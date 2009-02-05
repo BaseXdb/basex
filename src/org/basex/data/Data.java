@@ -423,8 +423,8 @@ public abstract class Data  {
   /**
    * Insert a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
-   * @param pre pre value
-   * @param par parent of node
+   * @param pre value at which to insert new data
+   * @param par parent pre value of node
    * @param d data instance to copy from
    */
   public abstract void insert(int pre, int par, Data d);

@@ -4,27 +4,27 @@ package org.basex.fuse;
  * Interface to filesystem in userspace framework.
  * 
  * @author Workgroup DBIS, University of Konstanz 2008, ISC License
- * @author Alexander Holupirek
+ * @author Alexander Holupirek, alex@holupirek.de
  */
 public abstract class DeepFuse {
 
   /** File element. */
-  public static final byte[] FILE = "file".getBytes();
+  protected static final byte[] FILE = "file".getBytes();
 
   /** Directory element. */
-  public static final byte[] DIR = "dir".getBytes();
+  protected static final byte[] DIR = "dir".getBytes();
 
   /** Name attribute. */
-  public static final byte[] NAME = "name".getBytes();
+  protected static final byte[] NAME = "name".getBytes();
 
   /** Type of file mask. (sys/stat.h) */
-  public static final int S_IFMT = 0170000;
+  protected static final int S_IFMT = 0170000;
 
   /** Type of directory. (sys/stat.h) */
-  public static final int S_IFDIR = 0040000;
+  protected static final int S_IFDIR = 0040000;
 
   /** Regular file type. */
-  public static final int S_IFREG = 0100000;
+  protected static final int S_IFREG = 0100000;
 
   /**
    * Check file mode for type directory.
@@ -45,8 +45,9 @@ public abstract class DeepFuse {
   }
 
   /**
-   * Get path to parent directory of a file, i.e., chop the file name (if any)
-   * and return the path prefix. A directory path is returned as is.
+   * TODO: delete me Get path to parent directory of a file, i.e., chop the file
+   * name (if any) and return the path prefix. A directory path is returned as
+   * is.
    * @param path to file
    * @param mode of file
    * @return parent directory of file
@@ -55,11 +56,11 @@ public abstract class DeepFuse {
     if(isDir(mode)) return path;
 
     int lastSlash = path.lastIndexOf('/');
-    return lastSlash == 0 ? "/" : path.substring(0, lastSlash - 1);
+    return lastSlash == 0 ? "/" : path.substring(0, lastSlash);
   }
 
   /**
-   * Get file name of a regular file.
+   * TODO: delete me Get file name of a regular file.
    * @param path to file
    * @param mode of file
    * @return true for regular file, false otherwise
@@ -67,6 +68,37 @@ public abstract class DeepFuse {
   protected String getName(final String path, final int mode) {
     if(!isFile(mode)) return "";
     return path.substring(path.lastIndexOf('/') + 1, path.length());
+  }
+
+  /**
+   * Deletes any prefix ending with the last slash `/' character present in
+   * string. FUSE always passes 'absolute, normalized' pathnames, i.e., starting
+   * with a slash, redundant and trailing slashes removed.
+   * @param path to extract filename
+   * @return filename of path
+   */
+  protected String basename(final String path) {
+    if(path.compareTo("/") == 0) return path;
+    int s = path.lastIndexOf('/');
+    return path.substring(s + 1, path.length());
+  }
+
+  /**
+   * Deletes the filename portion, beginning with the last slash `/' character
+   * to the end of string. FUSE always passes 'absolute, normalized' pathnames,
+   * i.e., starting with a slash, redundant and trailing slashes removed.
+   * 
+   * Example:
+   * <ul>
+   * <li>dirname("/usr/bin/trail") returns "/usr/bin"</li>
+   * <li>dirname("/") returns "/"</li>
+   * </ul>
+   * @param path to extract dirname
+   * @return dirname of path
+   */
+  protected String dirname(final String path) {
+    int s = path.lastIndexOf('/');
+    return s > 0 ? path.substring(0, s) : "/";
   }
 
   /**
@@ -318,7 +350,7 @@ public abstract class DeepFuse {
    * 
    * @return zero on success, or -1 if an error occurred
    */
-  public abstract int init();
+  protected abstract int init();
 
   /**
    * Clean up filesystem.

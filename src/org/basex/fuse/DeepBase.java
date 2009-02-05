@@ -1,85 +1,61 @@
 package org.basex.fuse;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.basex.build.Builder;
+import org.basex.build.Parser;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
-import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 
-/**
- * BaseX as filesystem in userspace implementation.
- * 
- * @author Workgroup DBIS, University of Konstanz 2008, ISC License
- * @author Alexander Holupirek
- * @author Christian Gruen
- */
-public class DeepBase extends DeepFuse {
+/** Stores a file hierarchy as XML. */
+public final class DeepBase extends DeepFuse {
 
-  /** Debug flag. */
-  private static boolean debug = true;
-
-  /** Filesystem database name. */
-  private static final String DBNAME = "deepbase";
-
-  /** Filesystem data reference. */
+  /** Default database name, if none is provided. */
+  private static final String DEFAULT_DBNAME = "deepfuse";
+  
+  /** Database reference. */
   private Data data;
 
-  /** Default constructor. */
-  public DeepBase() {
-    startup();
-  }
+  /** Database instance name. */
+  private String dbname;
 
   /**
-   * Debug message.
-   * 
-   * @param m method name
-   * @param s debug msg
+   * Creates an empty database.
+   * @param name of database instance
    */
-  private void debug(final String m, final String... s) {
-    if(!debug) return;
-    System.err.printf("%25s", m);
-    for(final String x : s)
-      System.err.printf(" %s", x);
-    System.err.printf("\n");
-  }
-
-  /**
-   * Initialization.
-   */
-  private void startup() {
+  private void createEmptyDB(final String name) {
     try {
-      debug("[DeepBase.startup]");
       Prop.read();
-      data = Open.open(DBNAME);
-    } catch(FileNotFoundException e) {
-      try {
-        data = CreateDB.xml(IO.get("deepfs.xml"), DBNAME);
-        startup();
-      } catch(IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
-      }
+      Context ctx = new Context();
+      final Parser p = new Parser(IO.get(name)) {
+        @Override
+        public void parse(final Builder build) { /* empty */}
+      };
+      ctx.data(CreateDB.xml(p, name));
+      data = ctx.data();
     } catch(IOException e) {
       e.printStackTrace();
-      System.exit(1);
+    } catch(Exception e) {
+      e.printStackTrace();
     }
   }
 
   /**
-   * Converts a pathname to an DeepFS XPath expression. 
-   * 
+   * Converts a pathname to an DeepFS XPath expression. FUSE always passes
+   * 'absolute, normalized' pathnames, i.e., starting with a slash, redundant
+   * and trailing slashes removed.
    * @param path name
+   * @param dir toogle flag
    * @return xpath query
    */
-  private String pn2xp(final String path) {
+  private String pn2xp(final String path, final boolean dir) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
     qb.append("/deepfuse");
@@ -92,69 +68,161 @@ public class DeepBase extends DeepFuse {
           eb.setLength(0);
         }
         qb.append(c);
-
       } else {
         eb.append(c);
       }
     }
-    if(eb.length() != 0) qb.append("*[@name = \"" + eb + "\"]");
+    if(eb.length() != 0) if(dir) qb.append("dir[@name = \"" + eb + "\"]");
+    else qb.append("*[@name = \"" + eb + "\"]");
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    debug("[DeepBase.pn2xp]", "'" + qu + "'");
+
     return qu;
   }
 
   /**
-   * Performs an XQuery query and returns the resulting node set.
-   * 
-   * @param xq query
-   * @return result nodes
+   * Process the query string and print result.
+   * @param query to process
+   * @return result reference
    * @throws QueryException on failure
    */
-  private Nodes query(final String xq) throws QueryException {
-    return new QueryProcessor(xq).queryNodes(new Nodes(0, data));
+  private Nodes xquery(final String query) throws QueryException {
+    return new QueryProcessor(query).queryNodes(new Nodes(0, data));
   }
 
   /**
-   * Performs an XQuery query and returns the resulting node set.
-   * 
-   * @param xq query
-   * @return result nodes
+   * Evaluates given path and returns the pre value of the parent directory (if
+   * any).
+   * @param path to be analyzed
+   * @return pre value of parent directory or -1 if none is found
    * @throws QueryException on failure
    */
-  private Nodes queryOne(final String xq) throws QueryException {
-    Nodes n = new QueryProcessor(xq).queryNodes(new Nodes(0, data));
-    if(n.size != 1) throw new QueryException("Expected exactly one match for "
-        + xq + " but got " + n.size);
-    return n;
+  private int parentPre(final String path) throws QueryException {
+    Nodes n = xquery(pn2xp(dirname(path), true));
+    return n.size == 0 ? -1 : n.nodes[0];
   }
 
   /**
-   * Get attributes for file.
-   * 
-   * Instead of returning the stat information for path, the id of the node is
-   * returned. The DeepBase counterpart C implementation holds the native stat
-   * information for the returned id.
-   * 
-   * @param path filesystem pathname the id is requested for
-   * @return int node id or -1 on failure
+   * Construct a MemData object containing <file name="filename"/> <dir
+   * name="dirname"/> ready to be inserted into main Data instance.
+   * @param path to file to build MemData for
+   * @param mode to determine file type
+   * @return MemData reference
+   */
+  private MemData buildData(final String path, final int mode) {
+    final String dname = basename(path);
+    byte[] elem;
+    if(isDir(mode)) elem = DIR;
+    else if(isFile(mode)) elem = FILE;
+    else elem = "unknown".getBytes();
+    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
+    int tagID = data.tags.index(elem, null, false);
+    int attID = data.atts.index(NAME, null, false);
+    m.addElem(tagID, 0, 1, 2, 2, false);
+    m.addAtt(attID, 0, dname.getBytes(), 1);
+    return m;
+  }
+
+  /**
+   * Insert a file node.
+   * @param path of file to insert
+   * @param mode of file
+   * @throws QueryException on failure
+   * @return pre value of newly inserted node
+   */
+  private int insert(final String path, final int mode) throws QueryException {
+    int ppre = parentPre(path);
+    if(ppre == -1) return -1;
+    int npre = ppre + data.size(ppre, data.kind(ppre));
+    data.insert(npre, ppre, buildData(path, mode));
+    data.flush();
+    data.meta.update();
+    return npre;
+  }
+
+  /**
+   * Deletes a file node.
+   * @param path of file to delete
+   * @throws QueryException on failure
+   * @return zero on success, -1 on failure
+   */
+  private int delete(final String path) throws QueryException {
+    Nodes n = xquery(pn2xp(path, false));
+    if(n.size == 0) return -1;
+    else data.delete(n.nodes[0]);
+    return 0;
+  }
+
+  /** Constructor. */
+  public DeepBase() {
+    this(DEFAULT_DBNAME);
+  }
+  
+  /**
+   * Constructor.
+   * @param name of the database to open/create
+   */
+  public DeepBase(final String name) {
+    dbname = name;
+    init();
+  }
+
+
+  /**
+   * Return data reference.
+   * @return data
+   */
+  public Data getData() {
+    return data;
+  }
+
+  /**
+   * Set data reference.
+   * @param d data reference
+   */
+  public void setData(final Data d) {
+    data = d;
+  }
+
+  /**
+   * Insert DeepFS root element. <deepfuse mountpoint="unknown"/>.
+   * @return zero on success
    */
   @Override
-  public int getattr(final String path) {
-    debug("[DeepBase.getattr]", path);
+  public int init() {
+    createEmptyDB(dbname);
+    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
+    int tagID = data.tags.index("deepfuse".getBytes(), null, false);
+    int attID = data.atts.index("mountpoint".getBytes(), null, false);
+    m.addElem(tagID, 0, 1, 2, 2, false);
+    m.addAtt(attID, 0, "unknown".getBytes(), 1);
+    data.insert(1, 0, m);
+    data.flush();
+    data.meta.update();
+    return 0;
+  }
+
+  @Override
+  public int destroy() {
     try {
-      final Nodes n = query(pn2xp(path));
-      debug("[DeepBase.getattr]", "found " + n.size);
-      if(n.size > 0) {
-        int pre = n.nodes[0];
-        debug("[DeepBase.getattr]", "pre " + pre + " id " + data.id(pre));
-        return data.id(pre);
-      }
+      data.close();
+      return 0;
+    } catch(IOException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+
+  @Override
+  public int mkdir(final String path, final int mode) {
+    try {
+      if(!isDir(mode)) return -1;
+      return insert(path, mode) == -1 ? -1 : 0;
     } catch(QueryException e) {
       e.printStackTrace();
+      return -1;
     }
-    return -1;
   }
 
   /**
@@ -167,62 +235,64 @@ public class DeepBase extends DeepFuse {
   @Override
   public int create(final String path, final int mode) {
     try {
-      debug("[DeepBase.create]", "path " + path, "mode "
-          + Integer.toOctalString(mode));
-
-      if(isDir(mode)) return -1;
-      // construct regular file entry.
-      MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
-      int tagID = data.tags.index(FILE, null, false);
-      int tagID2 = data.atts.index(NAME, null, false);
-      m.addElem(tagID, 0, 1, 2, 2, false);
-      m.addAtt(tagID2, 0, getName(path, mode).getBytes(), 1);
-      // Get pre value of directory to insert.
-      Nodes pnode = queryOne(pn2xp(chopFilename(path, mode)));
-      int ppre = pnode.nodes[0];
-      int pid = data.id(ppre);
-      int ipre = ppre + 2;
-      debug("[DeepBase.create]", "ppre " + ppre + " id " + pid);
-      data.insert(ipre, 1, m);
-      data.flush();
-      data.meta.update();
-      int iid = data.id(ipre);
-      debug("[DeepBase.create]", "ipre " + ipre + " id " + iid);
-      return iid;
+      if(!isFile(mode)) return -1;
+      int pre = insert(path, mode);
+      return (pre == -1) ? -1 : data.id(pre);
     } catch(QueryException e) {
       e.printStackTrace();
       return -1;
     }
   }
 
+  /**
+   * Resolves path and returns id. id serves as index into stat array in native
+   * fuse implementation.
+   * @param path to be resolved
+   * @return id of node or -1 if not found
+   */
   @Override
-  public int init() {
+  public int getattr(final String path) {
+    try {
+      Nodes n = xquery(pn2xp(path, false));
+      return n.size == 0 ? -1 : n.nodes[0];
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+
+
+  @Override
+  public int unlink(final String path) {
+    try {
+      return delete(path);
+    } catch (QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }    
+  }
+
+  @Override
+  public int rmdir(final String path) {
+    /* TODO: rmdir deletes only empty dir.  What happens with --ignore? */
+    return unlink(path);
+  }
+  
+  @Override
+  public int opendir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public int destroy() {
-    try {
-      debug("[DeepBase.destroy]");
-      data.close();
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
-    return 0;
+  public String readdir(final String path, final int offset) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
-  public int unlink(final String path) {
-    try {
-      debug("[DeepBase.unlink] " + path);
-      Nodes n = queryOne(pn2xp(path));
-      data.delete(n.nodes[0]);
-      data.flush();
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+  public int rename(final String from, final String to) {
+    // TODO Auto-generated method stub
     return 0;
   }
 
@@ -245,7 +315,7 @@ public class DeepBase extends DeepFuse {
   }
 
   @Override
-  public int chown(final String path, final int owner, final int group) {
+  public int chown(final String path, final int uid, final int gid) {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -305,12 +375,6 @@ public class DeepBase extends DeepFuse {
   }
 
   @Override
-  public int mkdir(final String path, final int mode) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
   public int mknod(final String path, final int mode, final int dev) {
     // TODO Auto-generated method stub
     return 0;
@@ -323,50 +387,8 @@ public class DeepBase extends DeepFuse {
   }
 
   @Override
-  public int opendir(final String path) {
-    debug("[DeepBase.opendir]", "path: " + path);
-    try {
-      QueryProcessor x = new QueryProcessor("count(" + pn2xp(path)
-          + "/child::*)");
-      debug("[DeepBase.opendir]", "query: " + x.query);
-      Result r = x.query(new Nodes(0, data));
-      debug("[DeepBase.opendir]", "#dirs: " + r.toString());
-      String s = r.toString();
-      String t = s.substring(1, s.length() - 1);
-      debug("[DeepBase.opendir]", t);
-      return new Integer(t).intValue();
-    } catch(QueryException e) {
-      e.printStackTrace();
-    }
-    return 0;
-  }
-
-  @Override
   public byte[] read(final String path, final int length, final int offset) {
     // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String readdir(final String path, final int offset) {
-    debug("[DeepBase.readdir]", "path: " + path + " offset: " + offset);
-    StringBuilder sb = new StringBuilder();
-    sb.append("data(");
-    sb.append(pn2xp(path));
-    sb.append("/child::*[");
-    sb.append(offset);
-    sb.append("]/@name)");
-    try {
-      QueryProcessor x = new QueryProcessor(sb.toString());
-      Result r = x.query(new Nodes(0, data));
-      debug("[DeepBase.readdir]", sb.toString());
-      String s = r.toString();
-      String t = s.substring(2, s.length() - 2);
-      debug("[DeepBase.readdir]", t);
-      return t;
-    } catch(QueryException e) {
-      e.printStackTrace();
-    }
     return null;
   }
 
@@ -390,18 +412,6 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int removexattr(final String path) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int rename(final String from, final String to) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int rmdir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -438,7 +448,7 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int write(final String path, final int length, final int offset,
-      final byte[] data1) {
+      final byte[] mydata) {
     // TODO Auto-generated method stub
     return 0;
   }

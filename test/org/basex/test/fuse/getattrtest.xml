@@ -1,0 +1,1 @@
+<deepfuse mountpoint="unknown"><file name="afile"/><file name="bfile"/><dir name="a"><dir name="b"><file name="cfile"/></dir><file name="dfile"/></dir><file name="efile"/><dir name="c"><file name="ffile"/><dir name="d"><file name="gfile"/><file name="hfile"/></dir><file name="ifile"/></dir><file name="jfile"/><file name="kfile"/></deepfuse>
