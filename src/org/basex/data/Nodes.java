@@ -178,7 +178,6 @@ public final class Nodes implements Result {
   }
 
   public void serialize(final Serializer ser) throws IOException {
-    //if(ftpos != null) ftpos.serialize();
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
