@@ -29,7 +29,9 @@ public final class QueryTest {
   /** Test all flag. */
   private static final boolean ALL = true;
   /** Wrong results counter. */
-  private static int wrong;
+  private int wrong;
+  /** Query counter. */
+  private int counter;
 
   /**
    * Main method of the test class.
@@ -76,7 +78,7 @@ public final class QueryTest {
     }
 
     System.out.println(ok ? "All tests correct." : wrong + " Wrong results...");
-    System.out.println("Time: " + p);
+    System.out.println(counter + " queries, " + p);
   }
 
   /**
@@ -118,6 +120,8 @@ public final class QueryTest {
       if(VERBOSE) err(cmd, ext);
 
       proc = new XQuery(query);
+      counter++;
+      
       if(proc.execute(CONTEXT)) {
         Result val = proc.result();
         final Result cmp = correct ? (Result) qu[1] : null;

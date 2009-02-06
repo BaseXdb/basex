@@ -40,10 +40,12 @@ public final class IndexAccess extends Simple {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       final IndexIterator it = data.ids(ind);
+      final int s = it.size();
+      int p = -1;
       
       @Override
       public Item next() {
-        ctx.item = it.more() ? new DBNode(data, it.next()) : null;
+        ctx.item = ++p < s ? new DBNode(data, it.next()) : null;
         return ctx.item;
       }
       @Override

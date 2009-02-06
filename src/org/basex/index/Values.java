@@ -75,16 +75,19 @@ public final class Values extends Index {
     return new IndexIterator() {
       /** Number of results. */
       int s = idxl.readNum(pos);
+      /** Last index position. */
+      long p = idxl.pos();
       /** Last pre value. */
-      int p = 0;
-      /** Number of values. */
-      int d = -1;
-      @Override
-      public boolean more() { return ++d < s; }
-      @Override
-      public int next() { return p += idxl.readNum(); }
-      @Override
-      public int size() { return s; }
+      int v = 0;
+
+      public int next() {
+        v += idxl.readNum(p);
+        p = idxl.pos();
+        return v;
+      }
+      public int size() {
+        return s;
+      }
     };
   }
 
@@ -131,7 +134,12 @@ public final class Values extends Index {
       for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
     }
     ids.sort();
-    return new IndexArrayIterator(ids.list, ids.size);
+
+    return new IndexIterator() {
+      int p = -1;
+      public int next() { return ++p < ids.size ? ids.list[p] : null; }
+      public int size() { return ids.size; }
+    };
   }
   
   /**

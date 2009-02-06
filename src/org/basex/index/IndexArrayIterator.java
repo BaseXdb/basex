@@ -8,17 +8,15 @@ import org.basex.util.IntArrayList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class IndexArrayIterator extends IndexIterator {
-  /** Result array. */
-  private int[] pres = null;
+public class IndexArrayIterator implements IndexIterator {
   /** Number of results. */
   private int size;
   /** Counter. */
   private int d = -1;
   /** Pre and Pos values. */
-  private int[][] ftdata = null;
+  private int[][] ftdata;
   /** Each token in the query has a number. */
-  protected int toknum = 0;
+  protected int toknum;
   /** Token from query. */
   protected FTTokenizer[] tok;
 
@@ -45,29 +43,10 @@ public class IndexArrayIterator extends IndexIterator {
   /**
    * Constructor.
    * @param res pre array
-   * @param s number of results
-   */
-  public IndexArrayIterator(final int[] res, final int s) {
-    pres = res;
-    size = s;
-  }
-
-  /**
-   * Constructor.
-   * @param res pre array
    * @param c Flag for data converting
    */
   public IndexArrayIterator(final int[][] res, final boolean c) {
-    this(res, res[0].length, c);
-  }
-
-  /**
-   * Constructor.
-   * @param res pre array
-   * @param s size
-   * @param c Flag for data converting
-   */
-  public IndexArrayIterator(final int[][] res, final int s, final boolean c) {
+    final int s = res[0].length;
     if (c) convertData(res[0], res[1], s);
     else {
       ftdata = res;
@@ -75,36 +54,36 @@ public class IndexArrayIterator extends IndexIterator {
     }
   }
 
-  @Override
+  /**
+   * Checks if more results are available.
+   * @return result
+   */
   public boolean more() {
     return ++d < size;
   }
 
-  @Override
-  public int next() {
-    return pres != null ? pres[d] : ftdata[d][0];
-  }
-
   /**
-   * Get next FTNode.
+   * Returns the next FTNode.
    * @return FTNode next FTNode
    */
   public FTNode nextFTNode() {
-    final FTNode n = pres != null ? new FTNode(pres[d]) :
-      ftdata == null ? new FTNode() : new FTNode(ftdata[d], toknum);
+    final FTNode n = ftdata == null ? new FTNode() :
+      new FTNode(ftdata[d], toknum);
     if(tok != null) n.setToken(tok);
     return n;
   }
 
-  @Override
+  public int next() {
+    return ftdata[d][0];
+  }
+
   public int size() {
     return size;
   }
 
   /**
-   * Each token in the query has a number.
+   * Sets the unique token number.
    * Used for visualization.
-   *
    * @param tn number of tokens
    */
   public void setTokenNum(final int tn) {
@@ -112,7 +91,7 @@ public class IndexArrayIterator extends IndexIterator {
   }
 
   /**
-   * Set FTTokinzer.
+   * Sets the tokenizer.
    * @param token FTTokenizer
    */
   public void setToken(final FTTokenizer[] token) {

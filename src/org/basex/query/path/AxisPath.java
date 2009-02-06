@@ -93,8 +93,8 @@ public class AxisPath extends Path {
     // check if all steps are child steps
     boolean children = true;
     for(final Step s : step)
-      children &= s.axis == Axis.CHILD;
-      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+      //children &= s.axis == Axis.CHILD;
+      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
 
     // return null if no iterator could be created

@@ -7,12 +7,15 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.util.Array;
 
 /**
- * Iterative path expression for only child steps.
+ * Iterative path expression for location paths which return sorted and
+ * duplicate-free results.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Dennis Stratmann
+ * @author Christian Gruen
  */
 public final class SimpleIterPath extends AxisPath {
   /**
@@ -27,44 +30,39 @@ public final class SimpleIterPath extends AxisPath {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      Iter[] iter = null;
-      boolean init = true;
-      int p = 0;
-      Iter ri = null;
-
       final Item c = ctx.item;
-      final long cp = ctx.pos;
+      Expr[] expr;
+      Iter[] iter;
+      int p;
 
       @Override
       public Item next() throws QueryException {
-        if (init) {
-          init = false;
-          if(root != null) {
-            if(ri == null) ri = ctx.iter(root);
-            ctx.item = ri.next();
-          }
-          iter = new Iter[step.length];
-          ctx.pos = 1;
+        if(iter == null) {
+          final int o = root != null ? 1 : 0;
+          // copy expressions to be iterated
+          expr = new Expr[step.length + o];
+          expr[0] = root;
+          Array.copy(step, expr, o);
+          // create iterator array
+          iter = new Iter[expr.length];
+          iter[0] = ctx.iter(expr[0]);
         }
-        
-        while(p > -1) {
-          if(iter[p] == null) iter[p] = ctx.iter(step[p]);
 
+        while(p != -1) {
           final Item i = iter[p].next();
           if(i == null) {
             p--;
           } else {
-            if (p == step.length - 1) {
+            if(p == iter.length - 1) {
               if(!i.node()) Err.or(NODESPATH, this, i.type);
               return i;
             }
             p++;
             ctx.item = i;
-            iter[p] = ctx.iter(step[p]);
+            iter[p] = ctx.iter(expr[p]);
           }
         }
         ctx.item = c;
-        ctx.pos = cp;
         return null;
       }
 
