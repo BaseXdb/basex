@@ -44,60 +44,55 @@ public final class IterStep extends Step {
     return new NodeIter() {
       final Item ci = ctx.item;
       final long cp = ctx.pos;
-      boolean more = true;
+      boolean finish;
       NodeIter ir;
       Iter iter;
       
       @Override
       public Nod next() throws QueryException {
-        if(more) {
-          if(iter == null) {
-            iter = checkCtx(ctx).iter();
-            ctx.pos = 1;
+        if(finish) return null;
+
+        if(iter == null) {
+          iter = checkCtx(ctx).iter();
+          ctx.pos = 0;
+        }
+        
+        Nod temp = null;
+        while(true) {
+          if(ir == null) {
+            final Item i = iter.next();
+            if(i == null) break;
+            if(!i.node()) Err.or(NODESPATH, IterStep.this, i.type);
+            ir = axis.init((Nod) i);
           }
           
-          Nod temp = null;
-          while(true) {
-            if(ir == null) {
-              final Item i = iter.next();
-              if(i == null) {
-                ctx.item = ci;
-                ctx.pos = cp;
-                if(temp != null) {
-                  more = false;
-                  return temp;
-                }
-                return null;
+          final Nod nod = ir.next();
+          if(nod != null) {
+            if(test.eval(nod)) {
+              // evaluates predicates
+              ctx.item = nod;
+              ctx.pos++;
+              final Item i = pred[0].test(ctx);
+              
+              if(i != null) {
+                // assign score value
+                nod.score(i.score());
+                // check if no more results are to be expected
+                if(pos != null && pos.last(ctx)) ir = null;
+                return nod.finish();
               }
-              if(!i.node()) Err.or(NODESPATH, IterStep.this, i.type);
-              ir = axis.init((Nod) i);
+              // remember last node
+              if(last) temp = nod.finish();
             }
-            
-            final Nod nod = ir.next();
-            if(nod != null) {
-              if(test.eval(nod)) {
-                // evaluates predicates
-                ctx.item = nod;
-                final Item i = pred[0].test(ctx);
-                ctx.pos++;
-                
-                if(i != null) {
-                  // assign score value
-                  nod.score(i.score());
-                  ctx.item = ci;
-                  return nod.finish();
-                }
-                // no more results are to be expected
-                if(pos != null && !pos.more(ctx)) ir = null;
-                // remember last node
-                if(last) temp = nod.finish();
-              }
-            } else {
-              ir = null;
-            }
+          } else {
+            ir = null;
           }
         }
-        return null;
+
+        ctx.item = ci;
+        ctx.pos = cp;
+        finish = last;
+        return temp;
       } 
     };
   }

@@ -33,13 +33,15 @@ public final class IterPred extends Pred {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      boolean more = true;
+      boolean finish;
       boolean fast;
       Iter iter;
       long p;
 
       @Override
       public Item next() throws QueryException {
+        if(finish) return null;
+
         // first call - initialize iterator
         if(iter == null) {
           iter = ctx.iter(root);
@@ -62,32 +64,29 @@ public final class IterPred extends Pred {
         final long cp = ctx.pos;
         Item it = null;
 
-        if(more) {
-          if(fast) {
-            // directly access relevant items
-            it = iter.get(p++ - 1);
-            ctx.pos = p;
-          } else {
-            // loop through all items
-            while((it = iter.next()) != null) {
-              // set context item and position
-              ctx.item = it;
-              ctx.pos = p++;
-              final Item i = pred[0].test(ctx);
-              if(i != null) {
-                // item accepted.. adopt scoring value
-                it.score(i.score());
-                break;
-              }
+        if(fast) {
+          // directly access relevant items
+          it = iter.get(p - 1);
+          ctx.pos = p++;
+        } else {
+          // loop through all items
+          while((it = iter.next()) != null) {
+            // set context item and position
+            ctx.item = it;
+            ctx.pos = p++;
+            final Item i = pred[0].test(ctx);
+            if(i != null) {
+              // item accepted.. adopt scoring value
+              it.score(i.score());
+              break;
             }
-
-            // returns the last item
-            if(last) it = ctx.item;
           }
+          // returns the last item
+          if(last) it = ctx.item;
         }
 
         // check if more items are to be expected
-        more &= !last && (pos == null || pos.more(ctx));
+        finish = last || pos != null && pos.last(ctx);
 
         // reset context
         ctx.item = ci;

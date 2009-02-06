@@ -46,8 +46,8 @@ public final class QueryTest {
    */
   private QueryTest() {
     Performance p = new Performance();
-    Prop.textindex = true;
-    Prop.attrindex = true;
+    Prop.textindex = false;
+    Prop.attrindex = false;
     Prop.chop = true;
     boolean ok = true;
 

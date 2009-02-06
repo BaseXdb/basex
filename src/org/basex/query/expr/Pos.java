@@ -86,8 +86,8 @@ public final class Pos extends Simple {
    * @param ctx query context
    * @return result of check
    */
-  public boolean more(final QueryContext ctx) {
-    return ctx.pos <= max;
+  public boolean last(final QueryContext ctx) {
+    return ctx.pos >= max;
   }
 
   /**
