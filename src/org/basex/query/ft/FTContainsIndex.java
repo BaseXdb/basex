@@ -9,6 +9,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Var;
 
 /**
  * FTContains expression with index access.
@@ -18,9 +19,9 @@ import org.basex.query.iter.Iter;
  */
 public final class FTContainsIndex extends Expr {
   /** Fulltext expression. */
-  FTExpr ftexpr;
+  final FTExpr ftexpr;
   /** Fulltext parser. */
-  FTTokenizer ft = new FTTokenizer();
+  final FTTokenizer ft;
 
   /**
    * Constructor.
@@ -59,6 +60,11 @@ public final class FTContainsIndex extends Expr {
     ser.openElement(this);
     ftexpr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public int countVar(final Var v) {
+    return 0;
   }
 
   @Override
