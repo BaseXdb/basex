@@ -19,6 +19,7 @@ import org.basex.build.xml.DOCWrapper;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Return;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 import org.basex.util.XMLToken;
@@ -840,6 +841,17 @@ public enum Type {
    */
   public boolean node() {
     return this == NOD || par == NOD;
+  }
+
+  /**
+   * Indicates the return type of an expression.
+   * Called by the compiler to check if expressions can be reformulated.
+   * null is returned by default.
+   * @return result of check
+   */
+  public Return returned() {
+    return num ? Return.NUM : node() ? Return.NOD :
+      this == Type.STR ? Return.STR : Return.NONUM;
   }
 
   /**

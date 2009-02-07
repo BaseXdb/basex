@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
@@ -109,15 +110,15 @@ public final class SeqType {
     Item n = iter.next();
     if(occ < 2 && n != null) Err.cast(type, item);
 
-    final SeqIter sb = new SeqIter();
-    sb.add(it);
+    final SeqIter si = new SeqIter();
+    si.add(it);
     while(n != null) {
       ins = n.type.instance(type);
       if(!n.u() && !ins) Err.cast(type, n);
-      sb.add(check(ins ? n : type.e(n, ctx)));
+      si.add(check(ins ? n : type.e(n, ctx)));
       n = iter.next();
     }
-    return sb.finish();
+    return si.finish();
   }
   
   /**
@@ -139,6 +140,18 @@ public final class SeqType {
       //Err.cast(type, item);
     }
     return it;
+  }
+
+  /**
+   * Indicates the return type of an expression.
+   * Called by the compiler to check if expressions can be reformulated.
+   * null is returned by default.
+   * @return result of check
+   */
+  public Return returned() {
+    final Return r = type.returned();
+    return occ == 0 ? r : r == Return.NUM ? Return.NUMSEQ :
+      r == Return.NOD ? Return.NODSEQ : Return.NONUMSEQ;
   }
 
   @Override

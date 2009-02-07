@@ -161,7 +161,8 @@ public final class Var extends Expr implements Cloneable {
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return expr != null ? expr.returned(ctx) : ret;
+    return type != null ? type.returned() :
+        expr != null ? expr.returned(ctx) : ret;
   }
 
   @Override

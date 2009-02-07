@@ -10,6 +10,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.Path;
 import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -42,7 +43,8 @@ public final class Let extends ForLet {
     
     // bind variable if no variables are used and if expression is no
     // constructor and no context
-    if(!score && expr.countVar(null) == 0 && !(expr instanceof CFrag)) {
+    if(!score && expr.countVar(null) == 0 && !(expr instanceof CFrag ||
+        expr instanceof Path)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {

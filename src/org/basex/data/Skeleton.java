@@ -149,7 +149,7 @@ public final class Skeleton {
   public void desc(final SkelNode in, final HashSet<SkelNode> out,
       final int t, final int k, final boolean desc) {
 
-    for(SkelNode n : in.ch) {
+    for(final SkelNode n : in.ch) {
       if(desc) desc(n, out, t, k, desc);
       if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
           (t == 0 || t == n.name)) out.add(n);

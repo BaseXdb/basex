@@ -109,7 +109,7 @@ public class FTContains extends Expr {
 
     // standard index evaluation; first expression will always be an axis path
     ctx.compInfo(OPTFTXINDEX);
-    final Expr root = new FTContainsIndex(ae, ft);
+    final Expr root = new FTIndexAccess(ae, ft, ic);
     return ((AxisPath) expr).invertPath(root, ic.step);
   }
   

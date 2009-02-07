@@ -20,23 +20,23 @@ public final class NodIter extends NodeIter {
   private int pos = -1;
   /** Sort flag. */
   private boolean sort;
-  /** Ordered node addition. */
-  private boolean ordered;
+  /** Flag for possible duplicates. */
+  private boolean dupl;
 
   /**
    * Constructor.
    */
   public NodIter() {
-    this(true);
+    this(false);
   }
 
   /**
    * Constructor.
-   * @param ord if set to true, all nodes are supposed to be added in order.
+   * @param d returns if the iterator might return duplicates
    */
-  public NodIter(final boolean ord) {
+  public NodIter(final boolean d) {
     list = new Nod[1];
-    ordered = ord;
+    dupl = d;
   }
 
   /**
@@ -45,14 +45,9 @@ public final class NodIter extends NodeIter {
    * @param s number of nodes
    */
   public NodIter(final Nod[] l, final int s) {
-    this(true);
+    this(false);
     list = l;
     size = s;
-  }
-  
-  @Override
-  public boolean ordered() {
-    return ordered;
   }
 
   /**
@@ -69,7 +64,7 @@ public final class NodIter extends NodeIter {
    */
   public void add(final Nod n) {
     if(size == list.length) resize();
-    if(!ordered && !sort) sort = size != 0 && list[size - 1].diff(n) > 0;
+    if(dupl && !sort) sort = size != 0 && list[size - 1].diff(n) > 0;
     list[size++] = n;
   }
 
@@ -90,7 +85,7 @@ public final class NodIter extends NodeIter {
 
   @Override
   public Nod next() {
-    if(!ordered) sort(sort);
+    if(dupl) sort(sort);
     return ++pos < size ? list[pos] : null;
   }
 
@@ -106,7 +101,7 @@ public final class NodIter extends NodeIter {
 
   @Override
   public Item finish() {
-    if(!ordered) sort(sort);
+    if(dupl) sort(sort);
     return Seq.get(list, size);
   }
 
@@ -115,7 +110,7 @@ public final class NodIter extends NodeIter {
    * @param force force sort
    */
   public void sort(final boolean force) {
-    ordered = true;
+    dupl = false;
     if(size > 1) {
       // sort arrays and remove duplicates
       if(force) sort(0, size);

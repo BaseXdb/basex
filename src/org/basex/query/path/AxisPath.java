@@ -16,11 +16,9 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.For;
 import org.basex.query.expr.Pred;
 import org.basex.query.expr.Return;
 import org.basex.query.expr.Root;
-import org.basex.query.expr.VarCall;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -74,15 +72,16 @@ public class AxisPath extends Path {
     // check if steps have predicates
     boolean pred = false;
     for(final Step s : st) pred |= s.pred.length != 0;
-    return new AxisPath(r, st).iterator(pred);
+    return new AxisPath(r, st).iterator(pred, null);
   }
 
   /**
    * If possible, converts this path expression to a path iterator.
    * @param pred predicate flag
+   * @param ctx context reference
    * @return resulting operator
    */
-  public final AxisPath iterator(final boolean pred) {
+  private AxisPath iterator(final boolean pred, final QueryContext ctx) {
     // variables in root expression or predicates not supported yet..
     if(pred || root != null && root.countVar(null) != 0) return this;
 
@@ -91,9 +90,8 @@ public class AxisPath extends Path {
       return new SingleIterPath(root, step);
 
     // check if all steps are child steps
-    boolean children = true;
+    boolean children = root == null || !root.duplicates(ctx);
     for(final Step s : step)
-      //children &= s.axis == Axis.CHILD;
       children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
 
@@ -139,14 +137,15 @@ public class AxisPath extends Path {
 
     // check if steps have predicates
     boolean preds = false;
+    boolean pos = false;
     for(final Step s : step) {
       // check if we have a predicate
       if(s.pred.length != 0) {
         preds = true;
-        if(s.countVar(null) != 0) {
-          // no caching possible - skip other steps
-          cache = false;
-          return this;
+        if(s.usesPos(ctx)) {
+          // variable and position test found - skip optimizations
+          if(s.countVar(null) != 0) return this;
+          pos = true;
         }
       }
     }
@@ -154,64 +153,92 @@ public class AxisPath extends Path {
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && root.countVar(null) == 0;
 
-    // check if the context item is set to a document node
+    // check if no position is used and if context is set to a document node
     final Data data = ctx.data();
-    if(data != null && ctx.item.type == Type.DOC) {
+    if(!pos && data != null && ctx.item.type == Type.DOC) {
       // check index access
       Expr e = index(ctx, data);
       if(e != this) return e;
   
       // check children path rewriting
-      if(!preds) {
-        e = children(ctx, data);
-        if(e != this) return e;
-      }
+      e = children(ctx, data);
+      if(e != this) return e;
     }
 
     // if applicable, return iterator
-    return iterator(preds);
+    return iterator(preds, ctx);
   }
 
   /**
-   * If possible, converts a descendant step to several child steps.
+   * Converts descendant steps to multiple child steps.
    * @param ctx query context
    * @param data data reference
    * @return path
    */
   private AxisPath children(final QueryContext ctx, final Data data) {
-    // convert single descendant step to child steps
-    if(!data.meta.uptodate || data.ns.size() != 0 || step.length != 1 ||
-        step[0].axis != Axis.DESC || step[0].test.kind != Kind.NAME)
-      return this;
+    for(int i = 0; i < step.length; i++) {
+      if(step[i].axis != Axis.DESC) continue;
+      
+      // check if child steps can be retrieved for current step
+      SkelNode node = node(data, i);
+      if(node == null) continue;
 
-    final ArrayList<SkelNode> n = new ArrayList<SkelNode>();
-    n.add(data.skel.root);
-    final int name = data.tagID(step[0].test.name.ln());
-    
-    int c = 0;
-    SkelNode node = null;
-    for(final SkelNode sn : data.skel.desc(n, 0, Data.DOC, true)) {
-      if(sn.kind == Data.ELEM && name == sn.name) {
-        node = sn;
-        c++;
-      }
-    }
-    
-    if(c == 1) {
+      ctx.compInfo(OPTCHILD, step[i]);
+
+      // cache child steps
       final TokenList tl = new TokenList();
       while(node.par != null) {
         tl.add(data.tags.key(node.name));
         node = node.par;
       }
-      final Step[] steps = new Step[tl.size];
-      for(int t = 0; t < tl.size; t++) steps[t] = Step.get(Axis.CHILD,
-          new NameTest(new QNm(tl.list[tl.size - t - 1]), Kind.NAME, false));
 
-      final AxisPath path = get(root, steps);
-      ctx.compInfo(OPTCHILD, this);
-      return path;
+      // build new steps
+      int ts = tl.size;
+      final Step[] steps = new Step[ts + step.length - i - 1];
+      for(int t = 0; t < ts - 1; t++) {
+        steps[t] = Step.get(Axis.CHILD, new NameTest(
+            new QNm(tl.list[ts - t - 1]), Kind.NAME, false));
+      }
+      steps[ts - 1] = Step.get(Axis.CHILD, new NameTest(
+          new QNm(tl.list[0]), Kind.NAME, false), step[i].pred);
+
+      while(++i < step.length) steps[ts++] = step[i];
+      return get(root, steps).children(ctx, data);
     }
     return this;
+  }
+  
+  /**
+   * Returns a skeleton node for the specified location step.
+   * @param data data reference
+   * @param l last step to be checked
+   * @return skeleton node
+   */
+  private SkelNode node(final Data data, final int l) {
+    // convert single descendant step to child steps
+    if(!data.meta.uptodate || data.ns.size() != 0) return null;
+
+    SkelNode node = data.skel.root;
+    for(int s = 0; s <= l; s++) {
+      final boolean desc = step[s].axis == Axis.DESC;
+      if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
+        return null;
+
+      final int name = data.tagID(step[s].test.name.ln());
+      final ArrayList<SkelNode> n = new ArrayList<SkelNode>();
+      n.add(node);
+
+      boolean found = false;
+      for(final SkelNode sn : data.skel.desc(n, 0, Data.DOC, desc)) {
+        if(sn.kind == Data.ELEM && name == sn.name) {
+          if(found) return null;
+          found = true;
+          node = sn;
+        }
+      }
+      if(!found) return null;
+    }
+    return node;
   }
 
   /**
@@ -225,7 +252,7 @@ public class AxisPath extends Path {
       throws QueryException {
     
     // skip position predicates and horizontal axes
-    for(final Step s : step) if(s.usesPos(ctx) || !s.axis.vert) return this;
+    for(final Step s : step) if(!s.axis.vert) return this;
 
     // check if path can be converted to an index access
     for(int i = 0; i < step.length; i++) {
@@ -234,8 +261,9 @@ public class AxisPath extends Path {
       IndexContext ictx = null;
       int minp = 0;
 
+      final boolean d = stp.pred.length == 0 || node(data, i) == null;
       for(int p = 0; p < stp.pred.length; p++) {
-        final IndexContext ic = new IndexContext(data, stp);
+        final IndexContext ic = new IndexContext(data, stp, d);
         stp.pred[p].indexAccessible(ctx, ic);
         if(ic.io && ic.iu) {
           if(ictx == null || ictx.is > ic.is) {
@@ -392,39 +420,20 @@ public class AxisPath extends Path {
     setRoot(ctx);
 
     final Data data = ctx.data();
-    if(data != null) {
-      if(data.meta.uptodate && data.ns.size() == 0) {
-        HashSet<SkelNode> nodes = new HashSet<SkelNode>();
-        nodes.add(data.skel.root);
+    if(data != null && data.meta.uptodate && data.ns.size() == 0) {
+      HashSet<SkelNode> nodes = new HashSet<SkelNode>(1);
+      nodes.add(data.skel.root);
 
-        for(final Step s : step) {
-          res = -1;
-          nodes = s.count(nodes, data);
-          if(nodes == null) break;
-          res = 0;
-          for(final SkelNode sn : nodes) res += sn.count;
-        }
+      for(final Step s : step) {
+        res = -1;
+        nodes = s.count(nodes, data);
+        if(nodes == null) break;
+        res = 0;
+        for(final SkelNode sn : nodes) res += sn.count;
       }
     }
     ctx.item = ci;
     return res;
-  }
-
-  /**
-   * Converts each step into a For-Loops.
-   *
-   * @param var variable
-   * @param pos position variable
-   * @param score score variable
-   * @return array with for expression
-   */
-  public For[] convSteps(final Var var, final Var pos, final Var score) {
-    final For[] f = new For[step.length];
-    final VarCall vc = new VarCall(var);
-    for (int i = 0; i < step.length; i++) {
-      f[i] = new For(new AxisPath(vc, new Step[]{step[i]}), var, pos, score);
-    }
-    return f;
   }
 
   /**
@@ -435,7 +444,7 @@ public class AxisPath extends Path {
   private void mergeDesc(final QueryContext ctx) {
     int ll = step.length;
     for(int l = 1; l < ll; l++) {
-      if(!step[l - 1].simple(DESCORSELF)) continue;
+      if(!step[l - 1].simple(DESCORSELF, false)) continue;
       final Step next = step[l];
       if(next.axis == CHILD && !next.usesPos(ctx)) {
         Array.move(step, l, -1, ll-- - l);
@@ -533,26 +542,6 @@ public class AxisPath extends Path {
       ctx.compInfo(OPTTEXT, this);
     }
     return this;
-  }
-
-  /**
-   * Adds a position predicate to the last step.
-   * @param ctx query context
-   * @return resulting path instance
-   */
-  public final AxisPath addPos(final QueryContext ctx) {
-    step[step.length - 1] = step[step.length - 1].addPos(ctx);
-    return get(root, step);
-  }
-
-  /**
-   * Adds a predicate to the last step.
-   * @param pred predicate to be added
-   * @return resulting path instance
-   */
-  public final AxisPath addPred(final Expr pred) {
-    step[step.length - 1] = step[step.length - 1].addPred(pred);
-    return get(root, step);
   }
 
   @Override

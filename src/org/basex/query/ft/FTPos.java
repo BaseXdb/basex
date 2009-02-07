@@ -134,7 +134,7 @@ public final class FTPos extends FTExpr {
    * @throws QueryException query exception
    */
   boolean filter(final QueryContext ctx) throws QueryException {
-    if(!ordered() || !content() || !same() || !different()) return false;
+    if(!order() || !content() || !same() || !different()) return false;
 
     // ...distance?
     if(dunit != null) {
@@ -201,7 +201,7 @@ public final class FTPos extends FTExpr {
    * Checks if the position values are ordered.
    * @return result of check
    */
-  private boolean ordered() {
+  private boolean order() {
     if(!ordered || size == 1) return true;
 
     final IntList[] il = sortPositions();

@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.BaseX;
 import org.basex.query.ExprInfo;
 import org.basex.query.IndexContext;
@@ -9,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -106,8 +104,8 @@ public abstract class Expr extends ExprInfo {
    * Returns if this is an empty sequence.
    * @return result of check
    */
-  public final boolean e() {
-    return this == Seq.EMPTY;
+  public boolean e() {
+    return false;
   }
 
   /**
@@ -167,6 +165,15 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Return returned(final QueryContext ctx) {
     return Return.SEQ;
+  }
+
+  /**
+   * Returns true if the expression might yield duplicates.
+   * @param ctx query context
+   * @return result of check
+   */
+  public boolean duplicates(final QueryContext ctx) {
+    return !returned(ctx).single;
   }
   
   /**

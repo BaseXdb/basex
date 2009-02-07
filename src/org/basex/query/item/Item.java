@@ -280,8 +280,12 @@ public abstract class Item extends Expr {
   
   @Override
   public Return returned(final QueryContext ctx) {
-    return type.num ? Return.NUM : type.node() ? Return.NOD :
-      type == Type.STR ? Return.STR : Return.NONUM;
+    return type.returned();
+  }
+  
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return false;
   }
 
   @Override

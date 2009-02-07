@@ -518,5 +518,5 @@ public interface QueryText {
   /** Optimization info. */
   String OPTBIND = "Bind static variable %";
   /** Optimization info. */
-  String OPTCHILD = "Parsing child steps for %";
+  String OPTCHILD = "Converting % to child steps";
 }

@@ -63,7 +63,7 @@ public final class CmpR extends Single {
    * @param ix include maximum value
    * @return expression
    */
-  public static Expr get(final CmpR e, final double mn, final boolean in,
+  private static Expr get(final CmpR e, final double mn, final boolean in,
       final double mx, final boolean ix) {
     return mn > mx ? Bln.FALSE : new CmpR(e.expr, mn, in, mx, ix);
   }
@@ -74,7 +74,7 @@ public final class CmpR extends Single {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr ex) throws QueryException {
+  static Expr get(final Expr ex) throws QueryException {
     if(ex instanceof CmpG || ex instanceof CmpV) {
       final Arr c = (Arr) ex;
       if(!c.standard(true)) return null;
@@ -113,7 +113,7 @@ public final class CmpR extends Single {
    * @param c range comparison
    * @return resulting expression or null
    */
-  public Expr intersect(final CmpR c) {
+  Expr intersect(final CmpR c) {
     if(c == null || !c.expr.sameAs(expr)) return null;
     return get(c, Math.max(min, c.min), mni && c.mni, Math.min(max, c.max),
         mxi && c.mxi);
@@ -129,7 +129,7 @@ public final class CmpR extends Single {
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
-      s.simpleName(Axis.ATTR);
+      s.simple(Axis.ATTR, true);
     
     // no text or attribute index applicable, min/max not included in range
     if(!text && !attr || !mni | !mxi || min == Double.NEGATIVE_INFINITY ||
@@ -149,7 +149,7 @@ public final class CmpR extends Single {
   @Override
   public AxisPath indexEquivalent(final QueryContext ctx,
       final IndexContext ic) {
-    final Expr root = new IndexAccess(ic.data, rt);
+    final Expr root = new IndexAccess(rt, ic);
     
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);
@@ -185,7 +185,7 @@ public final class CmpR extends Single {
     }
 
     final Step step = path.step[st - 1];
-    return !step.simpleName(Axis.ATTR) ? null : 
+    return !step.simple(Axis.ATTR, true) ? null : 
       ic.data.atts.stat(ic.data.attNameID(((NameTest) step.test).ln));
   }
   

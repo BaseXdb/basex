@@ -1707,7 +1707,10 @@ public class QueryParser extends InputParser {
   private byte[] cDataSection() throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
-      while(not(']')) tb.add(consume());
+      while(not(']')) {
+        final char c = consume();
+        if(c != '\r') tb.add(c);
+      }
       consume();
       if(curr() == ']' && next() == '>') {
         qp += 2;

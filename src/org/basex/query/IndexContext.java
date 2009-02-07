@@ -26,14 +26,18 @@ public final class IndexContext {
   public boolean ftnot;
   /** Flag for sequential processing. */
   public boolean seq;
+  /** Flag for potential duplicates. */
+  public boolean dupl;
 
   /**
    * Constructor.
    * @param d data reference
    * @param s index step
+   * @param l duplicate flag
    */
-  public IndexContext(final Data d, final Step s) {
+  public IndexContext(final Data d, final Step s, final boolean l) {
     data = d;
     step = s;
+    dupl = l;
   }
 }

@@ -66,14 +66,15 @@ public class List extends Arr {
   }
 
   @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return true;
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder("(");
     for(int v = 0; v != expr.length; v++) {
       sb.add((v != 0 ? ", " : "") + expr[v]);
-      /*if(sb.size > 15 && v + 1 != expr.length) {
-        sb.add(", ...");
-        break;
-      }*/
     }
     return sb.add(')').toString();
   }

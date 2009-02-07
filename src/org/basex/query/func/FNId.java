@@ -47,7 +47,7 @@ final class FNId extends Fun {
    * @throws QueryException xquery exception
    */
   private Iter id(final Iter it, final Nod node) throws QueryException {
-    final NodIter nb = new NodIter(false);
+    final NodIter nb = new NodIter(true);
     add(ids(it), nb, checkRoot(node));
     return nb;
   }
@@ -60,7 +60,7 @@ final class FNId extends Fun {
    * @throws QueryException xquery exception
    */
   private Iter idref(final Iter it, final Nod node) throws QueryException {
-    final NodIter nb = new NodIter(false);
+    final NodIter nb = new NodIter(true);
     addRef(ids(it), nb, checkRoot(node));
     return nb;
   }

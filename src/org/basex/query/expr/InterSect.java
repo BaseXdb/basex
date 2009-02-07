@@ -43,13 +43,8 @@ public final class InterSect extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
-    boolean order = true;
-    for(int e = 0; e != expr.length; e++) {
-      iter[e] = ctx.iter(expr[e]);
-      order &= iter[e].ordered();
-    }
-    final FTPosData ftd = ctx.ftdata;
-    return order ? eval(iter, ftd) : eval(iter, ftd);
+    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
+    return eval(iter, ctx.ftdata);
   }
   
   /**
@@ -62,7 +57,7 @@ public final class InterSect extends Arr {
   private NodIter eval(final Iter[] iter, final FTPosData ftd)
       throws QueryException {
 
-    NodIter seq = new NodIter(false);
+    NodIter seq = new NodIter(true);
 
     Item it;
     while((it = iter[0].next()) != null) {
@@ -71,7 +66,7 @@ public final class InterSect extends Arr {
     }
     
     for(int e = 1; e != expr.length; e++) {
-      final NodIter res = new NodIter(false);
+      final NodIter res = new NodIter(true);
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
         if(!it.node()) Err.nodes(this);

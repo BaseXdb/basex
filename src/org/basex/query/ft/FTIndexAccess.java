@@ -3,9 +3,10 @@ package org.basex.query.ft;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
+import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
+import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -17,25 +18,24 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTContainsIndex extends Expr {
+final class FTIndexAccess extends Simple {
   /** Fulltext expression. */
   final FTExpr ftexpr;
   /** Fulltext parser. */
   final FTTokenizer ft;
+  /** Index context. */
+  final IndexContext ictx;
 
   /**
    * Constructor.
-   * @param ftt FTTokenizer
    * @param ex contains, select and optional ignore expression
+   * @param ftt FTTokenizer
+   * @param ic index context
    */
-  FTContainsIndex(final FTExpr ex, final FTTokenizer ftt) {
+  FTIndexAccess(final FTExpr ex, final FTTokenizer ftt, final IndexContext ic) {
     ftexpr = ex;
     ft = ftt;
-  }
-  
-  @Override
-  public Expr comp(final QueryContext ctx) {
-    return this;
+    ictx = ic;
   }
 
   @Override
@@ -65,6 +65,11 @@ public final class FTContainsIndex extends Expr {
   @Override
   public int countVar(final Var v) {
     return 0;
+  }
+
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return ictx.dupl;
   }
 
   @Override

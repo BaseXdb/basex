@@ -40,12 +40,8 @@ public final class Union extends Arr {
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
-    boolean order = true;
-    for(int e = 0; e != expr.length; e++) {
-      iter[e] = ctx.iter(expr[e]);
-      order &= iter[e].ordered();
-    }
-    return order ? iter(iter) : eval(iter);
+    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
+    return duplicates(ctx) ? eval(iter) : iter(iter);
   }
 
   /**
@@ -86,11 +82,6 @@ public final class Union extends Arr {
         if(it != null && !it.node()) Err.nodes(Union.this);
         items[i] = (Nod) it;
       }
-
-      @Override
-      public boolean ordered() {
-        return true;
-      }
     };
   }
 
@@ -101,7 +92,7 @@ public final class Union extends Arr {
    * @throws QueryException query exception
    */
   private NodeIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter(false);
+    final NodIter ni = new NodIter(true);
     for(final Iter ir : iter) {
       Item it;
       while((it = ir.next()) != null) {

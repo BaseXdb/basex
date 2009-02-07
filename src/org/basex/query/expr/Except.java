@@ -25,7 +25,7 @@ public final class Except extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final NodIter ni = new NodIter(false);
+    final NodIter ni = new NodIter(true);
     Iter iter = ctx.iter(expr[0]);
     Item it;
     while((it = iter.next()) != null) {

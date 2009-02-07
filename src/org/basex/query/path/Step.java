@@ -16,7 +16,6 @@ import org.basex.query.expr.Return;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
@@ -148,21 +147,14 @@ public class Step extends Preds {
   }
 
   /**
-   * Checks if this is a simple axis (node test, no predicates).
+   * Checks if this is a simple axis without predicates.
    * @param ax axis to be checked
+   * @param name name/node test
    * @return result of check
    */
-  final boolean simple(final Axis ax) {
-    return axis == ax && test == Test.NODE && pred.length == 0;
-  }
-  
-  /**
-   * Checks if this is a simple name axis (no predicates).
-   * @param ax axis to be checked
-   * @return result of check
-   */
-  public final boolean simpleName(final Axis ax) {
-    return axis == ax && pred.length == 0 && test.kind == Test.Kind.NAME;
+  public final boolean simple(final Axis ax, final boolean name) {
+    return axis == ax && pred.length == 0 &&
+      (name ? test.kind == Test.Kind.NAME : test == Test.NODE);
   }
 
   /**
@@ -171,7 +163,7 @@ public class Step extends Preds {
    * @param data data reference
    * @return node array
    */
-  public HashSet<SkelNode> count(final HashSet<SkelNode> nodes,
+  HashSet<SkelNode> count(final HashSet<SkelNode> nodes,
       final Data data) {
 
     if(pred.length != 0) return null;
@@ -192,9 +184,7 @@ public class Step extends Preds {
     if(!desc && axis != Axis.CHILD) return null;
     
     final HashSet<SkelNode> out = new HashSet<SkelNode>();
-    for(final SkelNode sn : nodes) {
-      data.skel.desc(sn, out, name, kind, desc);
-    }
+    for(final SkelNode sn : nodes) data.skel.desc(sn, out, name, kind, desc);
     return out;
   }
   
@@ -203,22 +193,9 @@ public class Step extends Preds {
    * @param p predicate to be added
    * @return resulting step instance
    */
-  public final Step addPred(final Expr p) {
+  final Step addPred(final Expr p) {
     pred = Array.add(pred, p);
     return get(axis, test, pred);
-  }
-
-  /**
-   * Adds a position predicate to the step.
-   * @param ctx query context
-   * @return resulting step instance or null
-   */
-  final Step addPos(final QueryContext ctx) {
-    if(axis != Axis.PARENT && axis != Axis.SELF && pred.length == 0) {
-      ctx.compInfo(OPTPOS);
-      return addPred(Itr.get(1));
-    }
-    return this;
   }
 
   @Override

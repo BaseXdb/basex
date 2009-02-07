@@ -27,7 +27,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = true;
+  private static final boolean ALL = false;
   /** Wrong results counter. */
   private int wrong;
   /** Query counter. */
@@ -46,8 +46,8 @@ public final class QueryTest {
    */
   private QueryTest() {
     Performance p = new Performance();
-    Prop.textindex = false;
-    Prop.attrindex = false;
+    Prop.textindex = true;
+    Prop.attrindex = true;
     Prop.chop = true;
     boolean ok = true;
 

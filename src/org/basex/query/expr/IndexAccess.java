@@ -2,11 +2,11 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.RangeToken;
+import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -20,37 +20,33 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class IndexAccess extends Simple {
+final class IndexAccess extends Simple {
   /** Index type. */
   final IndexToken ind;
-  /** Data reference. */
-  final Data data;
+  /** Index context. */
+  final IndexContext ictx;
 
   /**
    * Constructor.
-   * @param d data reference
    * @param i index reference
+   * @param ic index context
    */
-  public IndexAccess(final Data d, final IndexToken i) {
-    data = d;
+  IndexAccess(final IndexToken i, final IndexContext ic) {
     ind = i;
+    ictx = ic;
   }
   
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final IndexIterator it = data.ids(ind);
+      final IndexIterator it = ictx.data.ids(ind);
       final int s = it.size();
       int p = -1;
       
       @Override
       public Item next() {
-        ctx.item = ++p < s ? new DBNode(data, it.next()) : null;
+        ctx.item = ++p < s ? new DBNode(ictx.data, it.next()) : null;
         return ctx.item;
-      }
-      @Override
-      public boolean ordered() {
-        return true;
       }
     };
   }
@@ -58,6 +54,11 @@ public final class IndexAccess extends Simple {
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.NODSEQ;
+  }
+
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return ictx.dupl;
   }
 
   @Override

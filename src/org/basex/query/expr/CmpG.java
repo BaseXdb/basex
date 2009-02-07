@@ -212,8 +212,8 @@ public final class CmpG extends Arr {
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
-      s.simpleName(Axis.ATTR);
-    
+      s.simple(Axis.ATTR, true);
+
     // no text or attribute index applicable
     if(!text && !attr) return;
 
@@ -236,7 +236,7 @@ public final class CmpG extends Arr {
     // create index access expressions
     final int il = index.length;
     final Expr[] ia = new IndexAccess[il];
-    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(ic.data, index[i]);
+    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(index[i], ic);
     
     // more than one string - merge index results
     final Expr root = il == 1 ? ia[0] : new Union(ia);

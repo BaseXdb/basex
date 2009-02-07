@@ -65,12 +65,11 @@ public final class SimpleIterPath extends AxisPath {
         ctx.item = c;
         return null;
       }
-
-      @Override
-      public boolean ordered() {
-        // results will always be ordered..
-        return true;
-      }
     };
+  }
+
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return false;
   }
 }

@@ -18,8 +18,6 @@ public abstract class Iter {
     @Override
     public Item finish() { return Seq.EMPTY; }
     @Override
-    public boolean ordered() { return true; }
-    @Override
     public int size() { return 0; }
     @Override
     public boolean reset() { return true; }
@@ -32,14 +30,6 @@ public abstract class Iter {
    */
   public abstract Item next() throws QueryException;
   
-  /**
-   * Returns true if the sequence is ordered. False is returned as default.
-   * @return result of check
-   */
-  public boolean ordered() {
-    return false;
-  }
-
   /**
    * Returns the specified item. Note: null is returned if the
    * item cannot be retrieved, so the returned value has to be checked.
@@ -78,7 +68,7 @@ public abstract class Iter {
   public boolean reverse() {
     return false;
   }
-
+  
   /**
    * Returns a sequence from all iterator values.
    * Should be called before {@link #next}.

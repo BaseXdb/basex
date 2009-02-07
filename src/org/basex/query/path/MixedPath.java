@@ -83,7 +83,7 @@ public final class MixedPath extends Path {
 
       // either nodes or atomic items are allowed in a result set, but not both
       if(si.size() != 0 && si.get(0).node()) {
-        final NodIter ni = new NodIter(false);
+        final NodIter ni = new NodIter(true);
         while((i = si.next()) != null) {
           if(!i.node()) Err.or(EVALNODESVALS);
           ni.add((Nod) i);

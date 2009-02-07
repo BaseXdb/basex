@@ -38,12 +38,11 @@ public final class SingleIterPath extends AxisPath {
         ctx.item = tmp;
         return it;
       }
-      
-      @Override
-      public boolean ordered() {
-        // results will always be ordered..
-        return true;
-      }
     };
+  }
+
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return false;
   }
 }

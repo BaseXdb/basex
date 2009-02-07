@@ -87,6 +87,12 @@ public abstract class Arr extends Expr {
   }
 
   @Override
+  public boolean duplicates(final QueryContext ctx) {
+    for(final Expr e : expr) if(e.duplicates(ctx)) return true;
+    return false;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(final Expr e : expr) e.plan(ser);

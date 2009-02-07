@@ -54,6 +54,9 @@ public class Pred extends Preds {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // quick evaluation of variable counters (array[$pos] ...)
+    //if(pred.length == 1 && pred[0].returned(ctx) == Return.NUM) {
+    //}
+
     if(pred.length == 1 && pred[0] instanceof VarCall) {
       final Item it = pred[0].ebv(ctx);
       if(it.n()) {

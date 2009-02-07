@@ -31,6 +31,8 @@ public class Seq extends Item {
     public Item ebv(final QueryContext ctx) { return Bln.FALSE; }
     @Override
     public Item test(final QueryContext ctx) { return null; }
+    @Override
+    public final boolean e() { return true; }
   };
 
   /** Item array. */
@@ -122,6 +124,11 @@ public class Seq extends Item {
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.SEQ;
+  }
+  
+  @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return size != 0;
   }
 
   @Override

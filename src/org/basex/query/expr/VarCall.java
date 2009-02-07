@@ -71,7 +71,8 @@ public final class VarCall extends Expr {
 
   @Override
   public boolean usesPos(final QueryContext ctx) {
-    return var.expr != null && var.expr.usesPos(ctx);
+    return var.returned(ctx) == Return.NUM || var.expr == null ||
+      var.expr.usesPos(ctx);
   }
 
   @Override
