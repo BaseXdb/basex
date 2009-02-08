@@ -46,21 +46,30 @@ public class QuerySuggest extends QueryParser {
   }
 
   @Override
-  void absPath(final int s) {
+  void absPath(final int s, final Axis axis, final Test test) {
+    System.out.println("absLocPath: " + s);
     if (s > 0) {
       final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
       list.add(skel.root);
       stack.push(list);
       if (s == 1) {
-        checkStep(Axis.CHILD, null);
+        checkStep(axis, test);
+        filter(false);
       } else if (s == 2) {
         checkStep(Axis.DESCORSELF, Test.NODE);
+        checkStep(axis, test);
+        filter(false);
       }
     }
   }
 
-  @Override
+  /**
+   * Performs optional step checks.
+   * @param axis axis
+   * @param test test
+   */
   void checkStep(final Axis axis, final Test test) {
+    System.out.println("checkStep: " + axis + " " + test);
     filter(true);
     if(axis == null) {
       if(!stack.empty())
@@ -89,6 +98,7 @@ public class QuerySuggest extends QueryParser {
    * @param finish finish flag
    */
   private void filter(final boolean finish) {
+    System.out.println("Filter: " + finish);
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
     final byte[] tn = entry(laxis, ltest);
@@ -117,6 +127,7 @@ public class QuerySuggest extends QueryParser {
    * @return completions
    */
   public StringList complete() {
+    System.out.println("complete");
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
     for(final SkelNode r : stack.peek()) {
@@ -134,6 +145,7 @@ public class QuerySuggest extends QueryParser {
    * @return completion
    */
   private byte[] entry(final Axis a, final Test t) {
+    System.out.println("entry: " + a + " " + t);
     if (t.type == Type.TXT) {
       return TEXT;
     }

@@ -1172,13 +1172,12 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    absPath(s);
-    final Expr ex = step();
+    final Expr ex = step(s);
     if(ex == null) {
+      absPath(s, null, null);
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
-
     final boolean slash = consume('/');
     final boolean step = ex instanceof Step;
     if(!slash && s == 0 && !step) return ex;
@@ -1192,7 +1191,7 @@ public class QueryParser extends InputParser {
     if(slash) {
       do {
         if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(), PATHMISS);
+        final Expr st = check(step(s), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1218,20 +1217,22 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step() throws QueryException {
+  protected Expr step(final int s) throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis();
+    return e != null ? e : axis(s);
   }
 
   /**
    * [ 71] Parses an AxisStep.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  Step axis() throws QueryException {
+  Step axis(final int s) throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1257,6 +1258,9 @@ public class QueryParser extends InputParser {
       ax = Axis.CHILD;
       test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
+      if (test != null) {
+        absPath(s, ax, test);
+      }
     }
     if(test == null) return null;
 
@@ -2589,22 +2593,17 @@ public class QueryParser extends InputParser {
     ctx.fun.funError((QNm) alter[0]);
     error(FUNCUNKNOWN, ((QNm) alter[0]).str());
   }
-
-  /**
-   * Performs optional step checks.
-   * @param axis axis
-   * @param test test
-   */
-  @SuppressWarnings("unused")
-  void checkStep(final Axis axis, final Test test) { }
   
   /**
-   * Adds Nodes to the Path.
+   * Performs optional step checks.
    * @param s Number of \
+   * @param axis axis
+   * @param test test
    * @throws QueryException parse Exception
    */
   @SuppressWarnings("unused")
-  void absPath(final int s) throws QueryException { }
+  void absPath(final int s, final Axis axis, final Test test)
+  throws QueryException { }
   
   /**
    * Throws the specified error.
