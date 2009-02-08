@@ -18,12 +18,12 @@ import org.basex.util.Token;
 /**
  * This class analyzes the current path and gives suggestions for code
  * completions.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public class QuerySuggest extends QueryParser {
-    /** Context. */
+  /** Context. */
   Context ctx;
   /** Current skeleton nodes. */
   Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
@@ -33,7 +33,9 @@ public class QuerySuggest extends QueryParser {
   Axis laxis;
   /** Last test. */
   Test ltest;
-  
+  /** Help for filter. */
+  static int filter = 0;
+
   /**
    * Constructor.
    * @param c QueryContext
@@ -47,31 +49,32 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   void absPath(final int s, final Axis axis, final Test test) {
+    //System.out.println("absLocPath: " + s);
     if (s > 0) {
       final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
       list.add(skel.root);
       stack.push(list);
-      if (s == 1) {
+      if(s == 1) {
         checkStep(axis, test);
-        filter(false);
-      } else if (s == 2) {
+        if (filter <= 1) filter(false);
+        filter++;
+      } else if(s == 2) {
         checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(axis, test);
-        if (axis != null && test != null) filter(false);
+        if(axis != null && test != null) filter(false);
       }
+    } else {
+      checkStep(axis, test);
     }
   }
 
-  /**
-   * Performs optional step checks.
-   * @param axis axis
-   * @param test test
-   */
+  @Override
   void checkStep(final Axis axis, final Test test) {
+    //System.out.println("checkStep: " + axis + " " + test);
     filter(true);
     if(axis == null) {
-      if(!stack.empty())
-        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
+      if(!stack.empty()) stack.push(skel.desc(stack.pop(), 0,
+          Data.ELEM, false));
       return;
     }
 
@@ -96,18 +99,19 @@ public class QuerySuggest extends QueryParser {
    * @param finish finish flag
    */
   private void filter(final boolean finish) {
+    //System.out.println("Filter: " + finish);
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
     final byte[] tn = entry(laxis, ltest);
     if(tn == null) return;
-    
+
     // [AW] temporarily added to skip Exception after input of "//*["
     if(stack.empty()) return;
-    
+
     final ArrayList<SkelNode> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
       final SkelNode n = list.get(c);
-      if(n.kind == Data.ELEM && tn == new byte[] { '*' }) continue;
+      if(n.kind == Data.ELEM && tn == new byte[] { '*'}) continue;
 
       final byte[] t = n.token(ctx.data());
       final boolean eq = Token.eq(t, tn);
@@ -124,6 +128,7 @@ public class QuerySuggest extends QueryParser {
    * @return completions
    */
   public StringList complete() {
+    //System.out.println("complete");
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
     for(final SkelNode r : stack.peek()) {
@@ -133,7 +138,7 @@ public class QuerySuggest extends QueryParser {
     sl.sort();
     return sl;
   }
-  
+
   /**
    * Returns a node entry.
    * @param a axis
@@ -141,13 +146,14 @@ public class QuerySuggest extends QueryParser {
    * @return completion
    */
   private byte[] entry(final Axis a, final Test t) {
-    if (t.type == Type.TXT) {
+    //System.out.println("entry: " + a + " " + t);
+    if(t.type == Type.TXT) {
       return TEXT;
     }
     if(t.type == Type.COM) {
       return COMM;
     }
-    if (t.type == Type.PI) {
+    if(t.type == Type.PI) {
       return PI;
     }
     if(t instanceof NameTest && t.name != null) {
@@ -156,7 +162,7 @@ public class QuerySuggest extends QueryParser {
     }
     return Token.EMPTY;
   }
-  
+
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
     final QueryException qe = new QueryException(err, arg);
