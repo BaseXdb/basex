@@ -1175,6 +1175,7 @@ public class QueryParser extends InputParser {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     final Expr ex = step(s);
     if(ex == null) {
+      // first 2 slashes
       absPath(s, null, null);
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
@@ -1191,6 +1192,7 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
+        // Slash 
         absPath(0, null, null);
         if(consume('/')) list = add(list, descOrSelf());
         final Expr st = check(step(s), PATHMISS);
@@ -1261,6 +1263,7 @@ public class QueryParser extends InputParser {
       test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
+        // Characters
         absPath(s, ax, test);
       }
     }
@@ -2606,16 +2609,6 @@ public class QueryParser extends InputParser {
   @SuppressWarnings("unused")
   void absPath(final int s, final Axis axis, final Test test)
   throws QueryException { }
-  
-  /**
-   * Performs optional step checks.
-   * @param axis axis
-   * @param test test
-   */
-  @SuppressWarnings("unused")
-  void checkStep(final Axis axis, final Test test) {
-    
-  }
   
   /**
    * Throws the specified error.
