@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Type;
@@ -10,7 +9,6 @@ import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.KindTest;
 import org.basex.query.path.Step;
-import org.basex.query.util.Var;
 
 /**
  * Context Item.
@@ -31,15 +29,15 @@ public final class Context extends Simple {
     ctx.compInfo(OPTTEXT);
     return AxisPath.get(null, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
   }
+  
+  @Override
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.CTX;
+  }
 
   @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Context;
-  }
-
-  @Override
-  public int countVar(final Var v) {
-    return v == null ? 1 : 0;
   }
   
   @Override

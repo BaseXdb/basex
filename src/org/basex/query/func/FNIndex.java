@@ -63,7 +63,7 @@ public final class FNIndex extends Set {
         if(!eq(fl.uri, uri)) return null;
         
         final Fun f = fl.func.newInstance();
-        f.args = args;
+        f.expr = args;
         f.func = fl;
         // check number of arguments
         if(args.length < fl.min || fl.max >= fl.min && args.length > fl.max)

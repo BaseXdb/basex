@@ -21,7 +21,7 @@ import org.basex.query.iter.Iter;
 final class FNAcc extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Expr e = args.length != 0 ? args[0] : checkCtx(ctx);
+    final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
 
     switch(func) {
       case POS:
@@ -51,14 +51,14 @@ final class FNAcc extends Fun {
   
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    if(args.length == 0) return this;
-    final Item it = args[0].i() ? (Item) args[0] : null;
+    if(expr.length == 0) return this;
+    final Item it = expr[0].i() ? (Item) expr[0] : null;
     
     switch(func) {
       case STRING:
         return it != null ? atomic(ctx) : this;
       case NUMBER:
-        return args[0].e() || it != null ? atomic(ctx) : this;
+        return expr[0].e() || it != null ? atomic(ctx) : this;
       default:
         return this;
     }
@@ -81,7 +81,8 @@ final class FNAcc extends Fun {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return func == FunDef.POS || func == FunDef.LAST || super.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return (use == Use.POS || use == Use.VAR) &&
+      (func == FunDef.POS || func == FunDef.LAST) || super.uses(use, ctx);
   }
 }

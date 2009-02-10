@@ -44,6 +44,11 @@ public final class Root extends Simple {
       n = p;
     }
   }
+  
+  @Override
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.CTX;
+  }
 
   @Override
   public Return returned(final QueryContext ctx) {

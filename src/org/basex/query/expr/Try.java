@@ -56,22 +56,22 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    for(final Catch c : ctch) if(c.usesPos(ctx)) return true;
-    return super.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    for(final Catch c : ctch) if(c.uses(use, ctx)) return true;
+    return super.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     int c = 0;
-    for(final Catch t : ctch) c += t.countVar(v);
-    return c + super.countVar(v);
+    for(final Catch t : ctch) c += t.count(v);
+    return c + super.count(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    for(final Catch c : ctch) c.removeVar(v);
-    return super.removeVar(v);
+  public Expr remove(final Var v) {
+    for(final Catch c : ctch) c.remove(v);
+    return super.remove(v);
   }
 
   @Override

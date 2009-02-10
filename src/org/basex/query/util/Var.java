@@ -50,20 +50,20 @@ public final class Var extends Expr implements Cloneable {
   /**
    * Constructor.
    * @param n variable name
-   * @param g global flag
    * @param t data type
+   * @param g global flag
    */
-  public Var(final QNm n, final boolean g, final SeqType t) {
+  public Var(final QNm n, final SeqType t, final boolean g) {
     this(n, g);
     type = t;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(expr != null) bind(expr.comp(ctx), ctx);
     return this;
   }
-  
+
   /**
    * Binds the specified expression to the variable.
    * @param e expression to be set
@@ -88,12 +88,12 @@ public final class Var extends Expr implements Cloneable {
     item = cast(e, ctx);
     return this;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return item(ctx).iter();
   }
-  
+
   /**
    * Evaluates the variable.
    * @param ctx query context
@@ -110,7 +110,7 @@ public final class Var extends Expr implements Cloneable {
     }
     return item;
   }
-  
+
   /**
    * Compares the variables for name equality.
    * @param v variable
@@ -119,7 +119,7 @@ public final class Var extends Expr implements Cloneable {
   public boolean eq(final Var v) {
     return v == this || v.name.eq(name);
   }
-  
+
   /**
    * Checks if the variable is not shadowed by the variable.
    * @param v variable
@@ -128,7 +128,7 @@ public final class Var extends Expr implements Cloneable {
   public boolean visible(final Var v) {
     return v == null || !v.name.eq(name);
   }
-  
+
   /**
    * Casts the specified item or checks its type.
    * @param it input item
@@ -141,12 +141,12 @@ public final class Var extends Expr implements Cloneable {
 
     if(it.type == Type.STR) ((Str) it).direct = false;
     if(type == null) return it;
-    
+
     if(!global) {
       if(type.occ < 2 && !it.type.instance(type.type))
         Err.or(XPINVCAST, it.type, type, it);
     }
-    
+
     return type.cast(it, ctx);
   }
 

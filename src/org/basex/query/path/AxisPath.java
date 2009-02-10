@@ -83,7 +83,7 @@ public class AxisPath extends Path {
    */
   private AxisPath iterator(final boolean pred, final QueryContext ctx) {
     // variables in root expression or predicates not supported yet..
-    if(pred || root != null && root.countVar(null) != 0) return this;
+    if(pred || root != null && root.uses(Use.VAR, ctx)) return this;
 
     // Simple iterator: one downward location step
     if(step.length == 1 && step[0].axis.down)
@@ -114,7 +114,7 @@ public class AxisPath extends Path {
     checkEmpty();
 
     final Item ci = ctx.item;
-    setRoot(ctx);
+    ctx.item = root(ctx);
     final Expr e = c(ctx);
     ctx.item = ci;
     return e;
@@ -142,16 +142,16 @@ public class AxisPath extends Path {
       // check if we have a predicate
       if(s.pred.length != 0) {
         preds = true;
-        if(s.usesPos(ctx)) {
+        if(s.uses(Use.POS, ctx)) {
           // variable and position test found - skip optimizations
-          if(s.countVar(null) != 0) return this;
+          if(s.uses(Use.VAR, ctx)) return this;
           pos = true;
         }
       }
     }
 
     // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && root.countVar(null) == 0;
+    cache = root != null && !root.uses(Use.VAR, ctx);
 
     // check if no position is used and if context is set to a document node
     final Data data = ctx.data();
@@ -159,7 +159,7 @@ public class AxisPath extends Path {
       // check index access
       Expr e = index(ctx, data);
       if(e != this) return e;
-  
+
       // check children path rewriting
       e = children(ctx, data);
       if(e != this) return e;
@@ -178,7 +178,7 @@ public class AxisPath extends Path {
   private AxisPath children(final QueryContext ctx, final Data data) {
     for(int i = 0; i < step.length; i++) {
       if(step[i].axis != Axis.DESC) continue;
-      
+
       // check if child steps can be retrieved for current step
       SkelNode node = node(data, i);
       if(node == null) continue;
@@ -207,7 +207,7 @@ public class AxisPath extends Path {
     }
     return this;
   }
-  
+
   /**
    * Returns a skeleton node for the specified location step.
    * @param data data reference
@@ -250,7 +250,7 @@ public class AxisPath extends Path {
    */
   private Expr index(final QueryContext ctx, final Data data)
       throws QueryException {
-    
+
     // skip position predicates and horizontal axes
     for(final Step s : step) if(!s.axis.vert) return this;
 
@@ -399,27 +399,25 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Sets the root node as context item.
+   * Returns the root of the current context or null.
    * @param ctx query context
+   * @return root
    */
-  public void setRoot(final QueryContext ctx) {
+  private Item root(final QueryContext ctx) {
     if(root != null) {
-      if(root instanceof Root) {
-        if(ctx.item != null) ctx.item = ((Root) root).root(ctx.item);
-      } else {
-        ctx.item = null;
-        if(root.i()) ctx.item = (Item) root;
-      }
+      if(root.i()) return (Item) root;
+      if(root instanceof Root && ctx.item != null)
+        return ((Root) root).root(ctx.item);
     }
+    return ctx.item;
   }
 
   @Override
   public long size(final QueryContext ctx) {
-    final Item ci = ctx.item;
     long res = -1;
-    setRoot(ctx);
 
-    final Data data = ctx.data();
+    final Item rt = root(ctx);
+    final Data data = rt instanceof DBNode ? ((DBNode) rt).data : null;
     if(data != null && data.meta.uptodate && data.ns.size() == 0) {
       HashSet<SkelNode> nodes = new HashSet<SkelNode>(1);
       nodes.add(data.skel.root);
@@ -432,7 +430,6 @@ public class AxisPath extends Path {
         for(final SkelNode sn : nodes) res += sn.count;
       }
     }
-    ctx.item = ci;
     return res;
   }
 
@@ -446,7 +443,7 @@ public class AxisPath extends Path {
     for(int l = 1; l < ll; l++) {
       if(!step[l - 1].simple(DESCORSELF, false)) continue;
       final Step next = step[l];
-      if(next.axis == CHILD && !next.usesPos(ctx)) {
+      if(next.axis == CHILD && !next.uses(Use.POS, ctx)) {
         Array.move(step, l, -1, ll-- - l);
         next.axis = DESC;
       }
@@ -527,6 +524,16 @@ public class AxisPath extends Path {
     return new AxisPath(rt, e);
   }
 
+  /**
+   * Adds a predicate to the last step.
+   * @param pred predicate to be added
+   * @return resulting path instance
+   */
+  public final AxisPath addPred(final Expr pred) {
+    step[step.length - 1] = step[step.length - 1].addPred(pred);
+    return get(root, step);
+  }
+
   @Override
   public Expr addText(final QueryContext ctx) {
     final Step s = step[step.length - 1];
@@ -545,19 +552,19 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return usesPos(step, ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return uses(step, use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return usesVar(v, step);
+  public int count(final Var v) {
+    return count(step, v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    for(int s = 0; s != step.length; s++) step[s].removeVar(v);
-    return super.removeVar(v);
+  public Expr remove(final Var v) {
+    for(int s = 0; s != step.length; s++) step[s].remove(v);
+    return super.remove(v);
   }
 
   @Override

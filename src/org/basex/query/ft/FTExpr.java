@@ -27,7 +27,7 @@ public abstract class FTExpr extends Expr {
    * Constructor.
    * @param e expression
    */
-  public FTExpr(final FTExpr... e) {
+  protected FTExpr(final FTExpr... e) {
     expr = e;
   }
 
@@ -41,21 +41,21 @@ public abstract class FTExpr extends Expr {
   public abstract FTNodeIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public final boolean usesPos(final QueryContext ctx) {
-    for(final FTExpr e : expr) if(e.usesPos(ctx)) return true;
+  public boolean uses(final Use use, final QueryContext ctx) {
+    for(final FTExpr e : expr) if(e.uses(use, ctx)) return true;
     return false;
   }
 
   @Override
-  public final int countVar(final Var v) {
+  public final int count(final Var v) {
     int c = 0;
-    for(final FTExpr e : expr) c += e.countVar(v);
+    for(final FTExpr e : expr) c += e.count(v);
     return c;
   }
 
   @Override
-  public final FTExpr removeVar(final Var v) {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].removeVar(v);
+  public final FTExpr remove(final Var v) {
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
     return this;
   }
 
@@ -70,31 +70,6 @@ public abstract class FTExpr extends Expr {
       throws QueryException {
     BaseX.notexpected();
     return null;
-  }
-
-  @Override
-  public final String color() {
-    return "66FF66";
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final FTExpr e : expr) e.plan(ser);
-    ser.closeElement();
-  }
-  
-  /**
-   * Prints the array with the specified separator.
-   * @param sep separator
-   * @return string representation
-   */
-  protected final String toString(final Object sep) {
-    final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; e++) {
-      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
-    }
-    return sb.toString();
   }
   
   /**
@@ -125,8 +100,33 @@ public abstract class FTExpr extends Expr {
    * do not violate the grammar.
    * @return result of check
    */
-  public boolean usesExclude() {
+  protected boolean usesExclude() {
     for(final FTExpr e : expr) if(e.usesExclude()) return true;
     return false;
+  }
+
+  @Override
+  public final String color() {
+    return "66FF66";
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    for(final FTExpr e : expr) e.plan(ser);
+    ser.closeElement();
+  }
+  
+  /**
+   * Prints the array with the specified separator.
+   * @param sep separator
+   * @return string representation
+   */
+  protected final String toString(final Object sep) {
+    final StringBuilder sb = new StringBuilder();
+    for(int e = 0; e != expr.length; e++) {
+      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
+    }
+    return sb.toString();
   }
 }

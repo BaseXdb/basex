@@ -17,13 +17,13 @@ public abstract class ForLet extends Expr {
   protected Var var;
 
   @Override
-  public final int countVar(final Var v) {
-    return v == null ? 1 : expr.countVar(v);
+  public final int count(final Var v) {
+    return expr.count(v);
   }
 
   @Override
-  public final Expr removeVar(final Var v) {
-    expr = expr.removeVar(v);
+  public final Expr remove(final Var v) {
+    expr = expr.remove(v);
     return this;
   }
 

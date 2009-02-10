@@ -74,15 +74,20 @@ public final class Catch extends Single {
   }
 
   @Override
-  public int countVar(final Var v) {
-    return v == null ? 1 : v.visible(var1) && v.visible(var2) &&
-      v.visible(var3) ? super.countVar(v) : 0;
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.VAR || super.uses(use, ctx);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
+  public int count(final Var v) {
     return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
-      super.removeVar(v) : this;
+        super.count(v) : 0;
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
+      super.remove(v) : this;
   }
 
   @Override

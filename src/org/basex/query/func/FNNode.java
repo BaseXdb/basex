@@ -20,7 +20,7 @@ final class FNNode extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (args.length == 1 ? args[0] : checkCtx(ctx)).atomic(ctx);
+    final Item it = (expr.length == 1 ? expr[0] : checkCtx(ctx)).atomic(ctx);
     final boolean empty = it == null;
 
     switch(func) {

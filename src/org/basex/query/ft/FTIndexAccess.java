@@ -10,7 +10,6 @@ import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Var;
 
 /**
  * FTContains expression with index access.
@@ -60,11 +59,6 @@ final class FTIndexAccess extends Simple {
     ser.openElement(this);
     ftexpr.plan(ser);
     ser.closeElement();
-  }
-
-  @Override
-  public int countVar(final Var v) {
-    return 0;
   }
 
   @Override

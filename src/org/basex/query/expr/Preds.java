@@ -61,23 +61,23 @@ public abstract class Preds extends Expr {
   }
   
   @Override
-  public boolean usesPos(final QueryContext ctx) {
+  public boolean uses(final Use use, final QueryContext ctx) {
     for(final Expr p : pred) {
-      if(p.returned(ctx).num || p.usesPos(ctx)) return true;
+      if(use == Use.POS && p.returned(ctx).num || p.uses(use, ctx)) return true;
     }
     return false;
   }
 
   @Override
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     int c = 0;
-    for(final Expr p : pred) c += p.countVar(v);
+    for(final Expr p : pred) c += p.count(v);
     return c;
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
+  public Expr remove(final Var v) {
+    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].remove(v);
     return this;
   }
 

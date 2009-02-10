@@ -99,7 +99,8 @@ public class Step extends Preds {
     // Last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null && usesPos(ctx)) return this;
+    if(pred.length > 1 || !last && pos == null &&
+        uses(Use.POS, ctx)) return this;
     // Use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }

@@ -62,6 +62,6 @@ public final class CText extends CFrag {
   
   @Override
   public String toString() {
-    return "text" + super.toString();
+    return toString("text");
   }
 }

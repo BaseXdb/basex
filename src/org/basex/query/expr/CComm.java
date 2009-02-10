@@ -55,6 +55,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return "comment" + super.toString();
+    return toString("comment");
   }
 }

@@ -195,14 +195,14 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public int countVar(final Var v) {
-    return tag.countVar(v) + super.countVar(v);
+  public int count(final Var v) {
+    return tag.count(v) + super.count(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    tag = tag.removeVar(v);
-    return super.removeVar(v);
+  public Expr remove(final Var v) {
+    tag = tag.remove(v);
+    return super.remove(v);
   }
 
   @Override
@@ -220,6 +220,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return "elem " + tag + super.toString();
+    return toString("elem " + tag);
   }
 }

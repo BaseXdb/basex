@@ -26,15 +26,15 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = args.length == 2 ? args[1].atomic(ctx) :
+    final Item it = expr.length == 2 ? expr[1].atomic(ctx) :
       checkCtx(ctx).atomic(ctx);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
 
     final Nod node = checkNode(it);
     switch(func) {
-      case ID:    return id(ctx.iter(args[0]), node);
-      case IDREF: return idref(ctx.iter(args[0]), node);
-      case LANG:  return lang(lc(checkStr(args[0], ctx)), node);
+      case ID:    return id(ctx.iter(expr[0]), node);
+      case IDREF: return idref(ctx.iter(expr[0]), node);
+      case LANG:  return lang(lc(checkStr(expr[0], ctx)), node);
       default:    return super.iter(ctx);
     }
   }

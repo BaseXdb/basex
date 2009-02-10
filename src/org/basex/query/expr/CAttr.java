@@ -90,14 +90,14 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public int countVar(final Var v) {
-    return atn.countVar(v) + super.countVar(v);
+  public int count(final Var v) {
+    return atn.count(v) + super.count(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    atn = atn.removeVar(v);
-    return super.removeVar(v);
+  public Expr remove(final Var v) {
+    atn = atn.remove(v);
+    return super.remove(v);
   }
 
   @Override
@@ -119,6 +119,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return "attribute" + atn + super.toString();
+    return toString("attribute" + atn);
   }
 }

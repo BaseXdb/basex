@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import org.basex.BaseX;
@@ -13,7 +12,6 @@ import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Scoring;
-import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -269,15 +267,10 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public final boolean usesPos(final QueryContext ctx) {
+  public boolean uses(final Use use, final QueryContext ctx) {
     return false;
   }
 
-  @Override
-  public final int countVar(final Var v) {
-    return 0;
-  }
-  
   @Override
   public Return returned(final QueryContext ctx) {
     return type.returned();

@@ -22,7 +22,7 @@ import org.basex.query.util.Err;
 final class FNNum extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Item it = args[0].atomic(ctx);
+    final Item it = expr[0].atomic(ctx);
     if(it == null) return null;
 
     if(!it.u() && !it.n()) Err.num(info(), it);
@@ -39,8 +39,8 @@ final class FNNum extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    if(args[0].e()) return args[0];
-    for(final Expr a : args) if(!a.i()) return this;
+    if(expr[0].e()) return expr[0];
+    for(final Expr a : expr) if(!a.i()) return this;
     final Item it = atomic(ctx);
     return it == null ? Seq.EMPTY : it;
   }
@@ -92,7 +92,7 @@ final class FNNum extends Fun {
   private Item rnd(final Item it, final double n, final QueryContext ctx)
       throws QueryException {
 
-    final int pp = args.length == 1 ? 0 : (int) checkItr(args[1], ctx);
+    final int pp = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
     if(it.type == Type.DEC && pp >= 0) {
       return Dec.get(it.dec().setScale(pp, BigDecimal.ROUND_HALF_EVEN));
     }

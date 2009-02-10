@@ -562,24 +562,24 @@ public class QueryParser extends InputParser {
     if(module != null && !name.uri.eq(module.uri)) error(MODNS, name);
 
     final SeqType typ = consumeWS(AS) ? sequenceType() : null;
-    final Var var = new Var(name, true, typ);
-    final Var ext = ctx.vars.get(var);
+    final Var var = new Var(name, typ, true);
+    final Var old = ctx.vars.get(var);
 
     if(consumeWS2(EXTERNAL)) {
-      if(ext == null) {
+      if(old == null) {
         ctx.vars.addGlobal(var);
       } else {
-        if(ext.expr == null || typ != null && ext.item == null) {
+        if(old.expr == null || typ != null && old.item == null) {
           error(VARDEFINE, var);
         }
         // a variable has been bound before the query has been parsed...
         if(typ != null) {
-          ext.type = typ;
-          ext.item(ctx);
+          old.type = typ;
+          old.item(ctx);
         }
       }
     } else {
-      if(ext != null) error(VARDEFINE, var);
+      if(old != null) error(VARDEFINE, var);
       check(ASSIGN);
       ctx.vars.addGlobal(var.bind(check(single(), VARMISSING), ctx));
     }
@@ -616,7 +616,7 @@ public class QueryParser extends InputParser {
     while(curr() == '$') {
       final QNm arg = varName();
       final SeqType argType = consumeWS(AS) ? sequenceType() : null;
-      final Var var = new Var(arg, true, argType);
+      final Var var = new Var(arg, argType, true);
       ctx.vars.add(var);
 
       for(final Var v : args) if(v.name.eq(arg)) error(FUNCDUPL, arg);
@@ -628,7 +628,7 @@ public class QueryParser extends InputParser {
     check(PAR2);
 
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
-    final Func func = new Func(new Var(name, true, type), args, true);
+    final Func func = new Func(new Var(name, type, true), args, true);
 
     ctx.fun.add(func);
     if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
@@ -750,7 +750,7 @@ public class QueryParser extends InputParser {
 
         final QNm name = varName();
         final SeqType type = !score && consumeWS(AS) ? sequenceType() : null;
-        final Var var = new Var(name, false, type);
+        final Var var = new Var(name, type, false);
 
         final Var at = fr && consumeWS(AT) ?
             new Var(varName(), false) : null;
@@ -818,8 +818,8 @@ public class QueryParser extends InputParser {
     final int s = ctx.vars.size();
     For[] fl = {};
     do {
-      final Var var = new Var(varName(), false,
-          consumeWS(AS) ? sequenceType() : null);
+      final Var var = new Var(varName(), consumeWS(AS) ?
+          sequenceType() : null, false);
       check(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
@@ -853,7 +853,7 @@ public class QueryParser extends InputParser {
         name = varName();
         check(AS);
       }
-      final Var var = new Var(name, false, sequenceType());
+      final Var var = new Var(name, sequenceType(), false);
       if(name != null) ctx.vars.add(var);
       check(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
@@ -866,7 +866,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final int s = ctx.vars.size();
     final QNm name = curr() == '$' ? varName() : null;
-    final Var var = name != null ? new Var(name, false, null) : null;
+    final Var var = name != null ? new Var(name, null, false) : null;
     if(var != null) ctx.vars.add(var);
     check(RETURN);
 
@@ -2608,8 +2608,8 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   void absPath(final int s, final Axis axis, final Test test)
-  throws QueryException { }
-  
+    throws QueryException { }
+
   /**
    * Throws the specified error.
    * @param err error to be thrown

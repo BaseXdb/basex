@@ -88,18 +88,18 @@ public final class Ord extends Expr {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return expr != null && expr.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return expr != null && expr.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return expr == null ? 1 : expr.countVar(v);
+  public int count(final Var v) {
+    return expr.count(v);
   }
 
   @Override
-  public Ord removeVar(final Var v) {
-    if(expr != null) expr = expr.removeVar(v);
+  public Ord remove(final Var v) {
+    if(expr != null) expr = expr.remove(v);
     return this;
   }
 

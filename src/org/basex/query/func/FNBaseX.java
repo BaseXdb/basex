@@ -19,8 +19,8 @@ import org.basex.query.iter.Iter;
 final class FNBaseX extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] arg = new Iter[args.length];
-    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+    final Iter[] arg = new Iter[expr.length];
+    for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
 
     switch(func) {
       case EVAL: return eval(ctx);
@@ -41,11 +41,11 @@ final class FNBaseX extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(func == FunDef.CONTAINSLC) {
-      final byte[] i = args[1].i() ? checkStr((Item) args[1]) : null;
+      final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
       // query string is empty; return true
-      if(args[1].e() || i != null && i.length == 0) return Bln.TRUE;
+      if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
       // input string is empty; return false
-      if(args[0].e() && i != null && i.length != 0) return Bln.FALSE;
+      if(expr[0].e() && i != null && i.length != 0) return Bln.FALSE;
     }
     return this;
   }
@@ -58,7 +58,7 @@ final class FNBaseX extends Fun {
    */
   private Iter eval(final QueryContext ctx) throws QueryException {
     final QueryContext qt = new QueryContext();
-    qt.parse(string(checkStr(args[0], ctx)));
+    qt.parse(string(checkStr(expr[0], ctx)));
     qt.compile(null);
     return qt.iter();
   }
@@ -78,8 +78,8 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item contains(final QueryContext ctx) throws QueryException {
-    final byte[] qu = checkStr(args[1], ctx);
-    final Iter iter = ctx.iter(args[0]);
+    final byte[] qu = checkStr(expr[1], ctx);
+    final Iter iter = ctx.iter(expr[0]);
     Item it;
     while((it = iter.next()) != null) {
       if(containslc(checkStr(it), qu)) return Bln.TRUE;

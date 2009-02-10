@@ -23,8 +23,8 @@ import org.basex.util.Token;
 final class FNContext extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Iter[] arg = new Iter[args.length];
-    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+    final Iter[] arg = new Iter[expr.length];
+    for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
 
     switch(func) {
       case CURRDATE:  return currDate(ctx);

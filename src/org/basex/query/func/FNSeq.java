@@ -24,8 +24,8 @@ import org.basex.util.Token;
 final class FNSeq extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] arg = new Iter[args.length];
-    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+    final Iter[] arg = new Iter[expr.length];
+    for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
 
     switch(func) {
       case INDEXOF:  return indexOf(ctx);
@@ -53,12 +53,12 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
-    final Item it = args[1].atomic(ctx);
+    final Item it = expr[1].atomic(ctx);
     if(it == null) Err.empty(this);
-    if(args.length == 3) checkColl(args[2], ctx);
+    if(expr.length == 3) checkColl(expr[2], ctx);
     
     return new Iter() {
-      final Iter iter = args[0].iter(ctx);
+      final Iter iter = expr[0].iter(ctx);
       int c = 0;
 
       @Override
@@ -80,10 +80,10 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter distinct(final QueryContext ctx) throws QueryException {
-    if(args.length == 2) checkColl(args[1], ctx);
+    if(expr.length == 2) checkColl(expr[1], ctx);
     
     return new Iter() {
-      final Iter iter = args[0].iter(ctx);
+      final Iter iter = expr[0].iter(ctx);
       final ItemSet map = new ItemSet();
 
       @Override
@@ -106,9 +106,9 @@ final class FNSeq extends Fun {
    */
   private Iter insbef(final QueryContext ctx) throws QueryException {
     return new Iter() {
-      final long pos = Math.max(1, checkItr(args[1], ctx));
-      final Iter iter = args[0].iter(ctx);
-      final Iter ins = args[2].iter(ctx);
+      final long pos = Math.max(1, checkItr(expr[1], ctx));
+      final Iter iter = expr[0].iter(ctx);
+      final Iter ins = expr[2].iter(ctx);
       long p = pos;
       boolean last;
 
@@ -133,8 +133,8 @@ final class FNSeq extends Fun {
    */
   private Iter remove(final QueryContext ctx) throws QueryException {
     return new Iter() {
-      final long pos = checkItr(args[1], ctx);
-      final Iter iter = args[0].iter(ctx);
+      final long pos = checkItr(expr[1], ctx);
+      final Iter iter = expr[0].iter(ctx);
       long c = 0;
 
       @Override
@@ -154,11 +154,11 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter subseq(final QueryContext ctx) throws QueryException {
-    final long s = Math.round(checkDbl(args[1], ctx));
-    final long e = args.length > 2 ? s + Math.round(checkDbl(args[2], ctx)) :
+    final long s = Math.round(checkDbl(expr[1], ctx));
+    final long e = expr.length > 2 ? s + Math.round(checkDbl(expr[2], ctx)) :
       Long.MAX_VALUE;
     
-    final Iter iter = ctx.iter(args[0]);
+    final Iter iter = ctx.iter(expr[0]);
     return iter.size() != -1 ? new Iter() {
       // directly access specified items
       long c = Math.max(1, s);
@@ -189,7 +189,7 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(args[0]);
+    final Iter iter = ctx.iter(expr[0]);
     
     // process reversable iterator...
     if(iter.reverse()) return iter;
@@ -215,10 +215,10 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    if(args.length == 3) checkColl(args[2], ctx);
+    if(expr.length == 3) checkColl(expr[2], ctx);
 
-    final Iter iter1 = ctx.iter(args[0]);
-    final Iter iter2 = ctx.iter(args[1]);
+    final Iter iter1 = ctx.iter(expr[0]);
+    final Iter iter2 = ctx.iter(expr[1]);
 
     Item it1 = null;
     Item it2 = null;

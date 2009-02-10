@@ -30,7 +30,7 @@ final class FNPat extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case TOKEN:   return token(checkStr(args[0], ctx), ctx);
+      case TOKEN:   return token(checkStr(expr[0], ctx), ctx);
       default:      return super.iter(ctx);
     }
   }
@@ -38,8 +38,8 @@ final class FNPat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case MATCH:   return match(checkStr(args[0], ctx), ctx);
-      case REPLACE: return replace(checkStr(args[0], ctx), ctx);
+      case MATCH:   return match(checkStr(expr[0], ctx), ctx);
+      case REPLACE: return replace(checkStr(expr[0], ctx), ctx);
       default:      return super.atomic(ctx);
     }
   }
@@ -54,7 +54,7 @@ final class FNPat extends Fun {
   private Item match(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final Pattern p = pattern(args[1], args.length == 3 ? args[2] : null, ctx);
+    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     return Bln.get(p.matcher(Token.string(val)).find());
   }
 
@@ -68,7 +68,7 @@ final class FNPat extends Fun {
   private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final Item repl = args[2].atomic(ctx);
+    final Item repl = expr[2].atomic(ctx);
     if(repl == null) Err.empty(this);
 
     final byte[] rep = checkStr(repl);
@@ -79,7 +79,7 @@ final class FNPat extends Fun {
         i++;
       }
     }
-    final Pattern p = pattern(args[1], args.length == 4 ? args[3] : null, ctx);
+    final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
     try {
       return Str.get(Token.token(p.matcher(
           Token.string(val)).replaceAll(Token.string(rep))));
@@ -101,7 +101,7 @@ final class FNPat extends Fun {
   private Iter token(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final Pattern p = pattern(args[1], args.length == 3 ? args[2] : null, ctx);
+    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     final SeqIter sb = new SeqIter();
     final String str = Token.string(val);
     if(str.length() != 0) {

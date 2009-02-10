@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
@@ -114,19 +113,19 @@ public class FTContains extends Expr {
   }
   
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return expr.usesPos(ctx) || ftexpr.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return expr.uses(use, ctx) || ftexpr.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return expr.countVar(v) + ftexpr.countVar(v);
+  public int count(final Var v) {
+    return expr.count(v) + ftexpr.count(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    expr = expr.removeVar(v);
-    ftexpr = ftexpr.removeVar(v);
+  public Expr remove(final Var v) {
+    expr = expr.remove(v);
+    ftexpr = ftexpr.remove(v);
     return this;
   }
 
@@ -141,15 +140,15 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public String toString() {
-    return expr + " ftcontains " + ftexpr;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr.plan(ser);
     ftexpr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    return expr + " ftcontains " + ftexpr;
   }
 }

@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
-import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -21,15 +21,13 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class Fun extends Expr {
+public abstract class Fun extends Arr {
   /** Function description. */
   public FunDef func;
-  /** Function results. */
-  protected Expr[] args;
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
-    for(int a = 0; a < args.length; a++) args[a] = args[a].comp(ctx);
+    super.comp(ctx);
     final Expr e = c(ctx);
     if(e != this) ctx.compInfo(OPTPRE, this, e);
     return e;
@@ -43,25 +41,6 @@ public abstract class Fun extends Expr {
    */
   @SuppressWarnings("unused")
   public Expr c(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
-  @Override
-  public boolean usesPos(final QueryContext ctx) {
-    for(final Expr a : args) if(a.usesPos(ctx)) return true;
-    return false;
-  }
-
-  @Override
-  public int countVar(final Var v) {
-    int c = 0;
-    for(final Expr a : args) c += a.countVar(v);
-    return c;
-  }
-
-  @Override
-  public Expr removeVar(final Var v) {
-    for(int e = 0; e != args.length; e++) args[e] = args[e].removeVar(v);
     return this;
   }
   
@@ -139,8 +118,8 @@ public abstract class Fun extends Expr {
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(func.toString().replaceAll("\\(.*\\)", "") + "(");
-    for(int a = 0; a < args.length; a++) {
-      sb.append((a != 0 ? ", " : "") + args[a]);
+    for(int a = 0; a < expr.length; a++) {
+      sb.append((a != 0 ? ", " : "") + expr[a]);
     }
     sb.append(')');
     return sb.toString();
@@ -153,11 +132,11 @@ public abstract class Fun extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(args.length == 0) {
+    if(expr.length == 0) {
       ser.emptyElement(this, NAM, Token.token(func.desc));
     } else {
       ser.openElement(this, NAM, Token.token(func.desc));
-      for(Expr arg : args) arg.plan(ser);
+      for(Expr arg : expr) arg.plan(ser);
       ser.closeElement();
     }
   }

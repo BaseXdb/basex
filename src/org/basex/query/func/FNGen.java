@@ -22,9 +22,9 @@ final class FNGen extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case DATA:
-        return data(ctx.iter(args[0]));
+        return data(ctx.iter(expr[0]));
       case COLLECT:
-        final Iter iter = args.length != 0 ? ctx.iter(args[0]) : null;
+        final Iter iter = expr.length != 0 ? ctx.iter(expr[0]) : null;
         final Item it = iter != null ? iter.next() : null;
         if(iter != null && it == null) Err.empty(this);
         return ctx.coll(iter == null ? null : checkStr(it));
@@ -35,7 +35,7 @@ final class FNGen extends Fun {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(args[0]);
+    final Iter iter = ctx.iter(expr[0]);
 
     switch(func) {
       case DOC:
@@ -62,8 +62,8 @@ final class FNGen extends Fun {
     // ..slows it down if the document will not be used, 
     // but allows more optimizations
     if(func == FunDef.DOC) {
-      if(!args[0].i()) return this;
-      final Item it = (Item) args[0];
+      if(!expr[0].i()) return this;
+      final Item it = (Item) expr[0];
       return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false);
     }
     return this;

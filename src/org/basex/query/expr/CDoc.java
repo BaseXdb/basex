@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CDoc extends Single {
+public final class CDoc extends CFrag {
   /**
    * Constructor.
    * @param e expression
@@ -34,7 +34,7 @@ public final class CDoc extends Single {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final NodIter nodes = new NodIter();
-    final Iter iter = ctx.iter(expr);
+    final Iter iter = ctx.iter(expr[0]);
     final byte[] base = Token.EMPTY;
 
     final TokenBuilder text = new TokenBuilder();
@@ -81,11 +81,6 @@ public final class CDoc extends Single {
     Nod it;
     while((it = ni.next()) != null) nodes.add(it.copy());
   }
-  
-  @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
-  }
 
   @Override
   public String info() {
@@ -94,6 +89,6 @@ public final class CDoc extends Single {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + expr + ")";
+    return toString(name());
   }
 }

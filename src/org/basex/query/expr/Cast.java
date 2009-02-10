@@ -52,6 +52,11 @@ public final class Cast extends Single {
     expr.plan(ser);
     ser.closeElement();
   }
+  
+  @Override
+  public Return returned(final QueryContext ctx) {
+    return seq.returned();
+  }
 
   @Override
   public String info() {

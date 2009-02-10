@@ -54,8 +54,6 @@ public final class FTNodeItem extends DBNode {
 
   @Override 
   public double score() {
-    // [SG] old scoring routine was returning irritating results..
-    //   using default 0 and 1, until better solution is available
     if(score == -1) score = ftn.size > 0 && ftn.getToken() != null ? 1 : 0;
     return score;
   }

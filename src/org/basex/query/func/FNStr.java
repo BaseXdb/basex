@@ -25,7 +25,7 @@ import org.basex.util.XMLToken;
 final class FNStr extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Expr e = args[0];
+    final Expr e = expr[0];
 
     switch(func) {
       case STCODE:
@@ -37,21 +37,21 @@ final class FNStr extends Fun {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Expr e = args[0];
+    final Expr e = expr[0];
 
     switch(func) {
       case CODESTR:
         return cp2str(e.iter(ctx));
       case COMPARE:
-        if(args.length == 3) checkColl(args[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
         Item it1 = e.atomic(ctx);
-        Item it2 = args[1].atomic(ctx);
+        Item it2 = expr[1].atomic(ctx);
         if(it1 == null || it2 == null) return null;
         final int d = diff(checkStr(it1), checkStr(it2));
         return Itr.get(Math.max(-1, Math.min(1, d)));
       case CODEPNT:
         it1 = e.atomic(ctx);
-        it2 = args[1].atomic(ctx);
+        it2 = expr[1].atomic(ctx);
         if(it1 == null || it2 == null) return null;
         return Bln.get(eq(checkStr(it1), checkStr(it2)));
       case STRJOIN:
@@ -74,37 +74,37 @@ final class FNStr extends Fun {
         return Str.get(esc(checkStr(e, ctx)));
       case CONCAT:
         final TokenBuilder tb = new TokenBuilder();
-        for(final Expr a : args) {
+        for(final Expr a : expr) {
           final Item it = a.atomic(ctx);
           if(it != null) tb.add(it.str());
         }
         return Str.get(tb.finish());
       case CONTAINS:
-        if(args.length == 3) checkColl(args[2], ctx);
-        Item it = args[1].atomic(ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
+        Item it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
         return Bln.get(contains(checkStr(e, ctx), checkStr(it)));
       case STARTS:
-        if(args.length == 3) checkColl(args[2], ctx);
-        it = args[1].atomic(ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
+        it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
         return Bln.get(startsWith(checkStr(e, ctx), checkStr(it)));
       case ENDS:
-        if(args.length == 3) checkColl(args[2], ctx);
-        it = args[1].atomic(ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
+        it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
         return Bln.get(endsWith(checkStr(e, ctx), checkStr(it)));
       case SUBAFTER:
-        if(args.length == 3) checkColl(args[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] str = checkStr(e, ctx);
-        final byte[] sa = checkStr(args[1], ctx);
+        final byte[] sa = checkStr(expr[1], ctx);
         int pa = indexOf(str, sa);
         return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
           Str.ZERO;
       case SUBBEFORE:
-        if(args.length == 3) checkColl(args[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] sb = checkStr(e, ctx);
-        final int pb = indexOf(sb, checkStr(args[1], ctx));
+        final int pb = indexOf(sb, checkStr(expr[1], ctx));
         return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
       default:
         return super.atomic(ctx);
@@ -115,11 +115,11 @@ final class FNStr extends Fun {
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
       case CONTAINS:
-        final byte[] i = args[1].i() ? checkStr((Item) args[1]) : null;
+        final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
         // query string is empty; return true
-        if(args[1].e() || i != null && i.length == 0) return Bln.TRUE;
+        if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
         // input string is empty; return false
-        if(args[0].e() && i != null && i.length != 0) return Bln.FALSE;
+        if(expr[0].e() && i != null && i.length != 0) return Bln.FALSE;
         return this;
       default:
         return this;
@@ -173,13 +173,13 @@ final class FNStr extends Fun {
    */
   private Item substr(final QueryContext ctx) throws QueryException {
     // normalize positions
-    final double ds = checkDbl(args[1], ctx);
-    final byte[] str = checkStr(args[0], ctx);
-    final boolean end = args.length == 3;
+    final double ds = checkDbl(expr[1], ctx);
+    final byte[] str = checkStr(expr[0], ctx);
+    final boolean end = expr.length == 3;
     int l = len(str);
     if(ds != ds) return Str.ZERO;
     int s = (int) Math.floor(ds - .5);
-    int e = end ? (int) Math.floor(checkDbl(args[2], ctx) + .5) : l;
+    int e = end ? (int) Math.floor(checkDbl(expr[2], ctx) + .5) : l;
     if(s < 0) {
       e += s;
       s = 0;
@@ -207,11 +207,11 @@ final class FNStr extends Fun {
    * @throws QueryException xquery exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(args[0], ctx);
-    final Item is = args[1].atomic(ctx);
+    final byte[] str = checkStr(expr[0], ctx);
+    final Item is = expr[1].atomic(ctx);
     if(is == null) Err.empty(this);    
     final byte[] sea = checkStr(is);
-    final Item ir = args[2].atomic(ctx);
+    final Item ir = expr[2].atomic(ctx);
     if(ir == null) Err.empty(this);    
     final byte[] rep = checkStr(ir);
     return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
@@ -226,12 +226,12 @@ final class FNStr extends Fun {
    * @throws QueryException xquery exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
-    final Item is = args[1].atomic(ctx);
+    final Item is = expr[1].atomic(ctx);
     if(is == null) Err.empty(this);    
     final byte[] sep = checkStr(is);
 
     final TokenBuilder tb = new TokenBuilder();
-    final Iter iter = args[0].iter(ctx);
+    final Iter iter = expr[0].iter(ctx);
     int c = 0;
     Item i;
     while((i = iter.next()) != null) {
@@ -268,10 +268,10 @@ final class FNStr extends Fun {
    * @throws QueryException xquery exception
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(args[0], ctx);
+    final byte[] str = checkStr(expr[0], ctx);
     Norm norm = null;
-    if(args.length == 2) {
-      final byte[] n = uc(trim(checkStr(args[1], ctx)));
+    if(expr.length == 2) {
+      final byte[] n = uc(trim(checkStr(expr[1], ctx)));
       for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);
     } else {

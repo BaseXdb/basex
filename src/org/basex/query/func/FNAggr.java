@@ -25,7 +25,7 @@ import org.basex.query.util.Err;
 public final class FNAggr extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(args[0]);
+    final Iter iter = ctx.iter(expr[0]);
 
     switch(func) {
       case COUNT:
@@ -39,7 +39,7 @@ public final class FNAggr extends Fun {
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
-          args.length == 2 ? args[1].atomic(ctx) : Itr.ZERO;
+          expr.length == 2 ? expr[1].atomic(ctx) : Itr.ZERO;
       case AVG:
         it = iter.next();
         return it == null ? null : sum(iter, it, true);
@@ -52,9 +52,9 @@ public final class FNAggr extends Fun {
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
       case AVG:
-        return args[0].e() ? Seq.EMPTY : this;
+        return expr[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        final long c = args[0].size(ctx);
+        final long c = expr[0].size(ctx);
         return c >= 0 ? Itr.get(c) : this;
       default:
         return this;
@@ -71,6 +71,7 @@ public final class FNAggr extends Fun {
    */
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
+
     Item res = it.u() ? Dbl.get(it.str()) : it;
     if(!res.n() && !res.d()) Err.or(FUNNUMDUR, this, res.type);
     final boolean n = res.n();
@@ -98,7 +99,7 @@ public final class FNAggr extends Fun {
   private Item minmax(final Iter iter1, final CmpV.Comp cmp,
       final QueryContext ctx) throws QueryException {
 
-    if(args.length == 2) checkColl(args[1], ctx);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     Item res = iter1.next();
     if(res == null) return null;

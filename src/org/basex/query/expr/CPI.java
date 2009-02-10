@@ -69,6 +69,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return "processing-instruction" + super.toString();
+    return toString("processing-instruction");
   }
 }

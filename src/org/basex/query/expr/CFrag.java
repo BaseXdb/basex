@@ -18,12 +18,21 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
+  public final boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.FRG || super.uses(use, ctx);
+  }
+
+  @Override
   public final Return returned(final QueryContext ctx) {
     return Return.NOD;
   }
 
-  @Override
-  public String toString() {
-    return " { " + toString(", ") + " }";
+  /**
+   * Returns a string representation of the expression.
+   * @param pre expression prefix
+   * @return string
+   */
+  protected final String toString(final String pre) {
+    return pre + " { " + super.toString(", ") + " }";
   }
 }

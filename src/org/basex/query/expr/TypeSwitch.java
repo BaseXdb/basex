@@ -15,8 +15,10 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class TypeSwitch extends Single {
-  /** Return expression. */
+public final class TypeSwitch extends Expr {
+  /** Default return expression. */
+  private Expr ret;
+  /** Typeswitch expression. */
   private Expr ts;
   /** Expression list. */
   public Case[] cs;
@@ -31,7 +33,7 @@ public final class TypeSwitch extends Single {
    * @param r default return expression
    */
   public TypeSwitch(final Expr t, final Case[] c, final Var v, final Expr r) {
-    super(r);
+    ret = r;
     ts = t;
     cs = c;
     var = v;
@@ -54,31 +56,31 @@ public final class TypeSwitch extends Single {
       if(iter != null) return iter;
     }
     if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx));
-    final Iter si = SeqIter.get(ctx.iter(expr));
+    final Iter si = SeqIter.get(ctx.iter(ret));
     ctx.vars.reset(s);
     return si;
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    for(final Case c : cs) if(c.usesPos(ctx)) return true;
-    return ts.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    if(use == Use.VAR) return true;
+    for(final Case c : cs) if(c.uses(use, ctx)) return true;
+    return ts.uses(use, ctx) || ret.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    if(v == null) return 1;
+  public int count(final Var v) {
     if(!v.visible(var)) return 0;
-    int c = 0;
-    for(final Case s : cs) c += s.countVar(v);
-    return c + ts.countVar(v);
+    int c = ts.count(v);
+    for(final Case s : cs) c = Math.max(c, s.count(v));
+    return Math.max(c, ret.count(v));
   }
 
   @Override
-  public Expr removeVar(final Var v) {
+  public Expr remove(final Var v) {
     if(!v.visible(var)) return this;
-    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].removeVar(v);
-    ts = ts.removeVar(v);
+    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].remove(v);
+    ts = ts.remove(v);
     return this;
   }
   
@@ -88,7 +90,7 @@ public final class TypeSwitch extends Single {
     for(int l = 1; l < cs.length; l++) {
       if(t != cs[l].returned(ctx)) return Return.SEQ;
     }
-    return t == ts.returned(ctx) ? t : Return.SEQ;
+    return t == ret.returned(ctx) ? t : Return.SEQ;
   }
 
   @Override
@@ -98,7 +100,7 @@ public final class TypeSwitch extends Single {
       if(l != 0) sb.append(", ");
       sb.append(cs[l]);
     }
-    return sb + " " + DEFAULT + " " + expr;
+    return sb + " " + DEFAULT + " " + ret;
   }
 
   @Override
@@ -107,7 +109,7 @@ public final class TypeSwitch extends Single {
     if(var != null) ser.attribute(VAR, var.name.str());
     for(final Case c : cs) c.plan(ser);
     ts.plan(ser);
-    expr.plan(ser);
+    ret.plan(ser);
     ser.closeElement();
   }
 }

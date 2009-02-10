@@ -82,21 +82,21 @@ public final class Order extends Expr {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    for(final Ord o : ord) if(o.usesPos(ctx)) return true;
+  public boolean uses(final Use use, final QueryContext ctx) {
+    for(final Ord o : ord) if(o.uses(use, ctx)) return true;
     return false;
   }
 
   @Override
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     int c = 0;
-    for(final Ord o : ord) c += o.countVar(v);
+    for(final Ord o : ord) c += o.count(v);
     return c;
   }
 
   @Override
-  public Order removeVar(final Var v) {
-    for(int o = 0; o < ord.length; o++) ord[o] = ord[o].removeVar(v);
+  public Order remove(final Var v) {
+    for(int o = 0; o < ord.length; o++) ord[o] = ord[o].remove(v);
     return this;
   }
 

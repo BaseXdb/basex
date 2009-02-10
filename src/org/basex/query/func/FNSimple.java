@@ -21,11 +21,11 @@ public final class FNSimple extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case ONEMORE:
-        final Iter ir = SeqIter.get(ctx.iter(args[0]));
+        final Iter ir = SeqIter.get(ctx.iter(expr[0]));
         if(ir.size() < 1) Err.or(ONEMORE);
         return ir;
       case UNORDER:
-        return ctx.iter(args[0]);
+        return ctx.iter(expr[0]);
       default:
         return super.iter(ctx);
     }
@@ -33,7 +33,7 @@ public final class FNSimple extends Fun {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Expr e = args.length == 1 ? args[0] : null;
+    final Expr e = expr.length == 1 ? expr[0] : null;
     switch(func) {
       case FALSE:   return Bln.FALSE;
       case TRUE:    return Bln.TRUE;
@@ -59,8 +59,8 @@ public final class FNSimple extends Fun {
   
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    final boolean i = args.length == 1 && args[0].i();
-    final boolean e = args.length == 1 && args[0].e();
+    final boolean i = expr.length == 1 && expr[0].i();
+    final boolean e = expr.length == 1 && expr[0].e();
     
     switch(func) {
       case FALSE:
@@ -72,24 +72,24 @@ public final class FNSimple extends Fun {
         return i ? atomic(ctx) : this;
       case NOT:
         if(i) return atomic(ctx);
-        if(args[0] instanceof Fun) {
-          final Fun fs = (Fun) args[0];
+        if(expr[0] instanceof Fun) {
+          final Fun fs = (Fun) expr[0];
           if(fs.func == FunDef.EMPTY) {
-            args = fs.args;
+            expr = fs.expr;
             func = FunDef.EXISTS;
           } else if(fs.func == FunDef.EXISTS) {
-            args = fs.args;
+            expr = fs.expr;
             func = FunDef.EMPTY;
           }
         }
         return this;
       case ZEROONE:
-        return e || i || args[0].returned(ctx).single ? args[0] : this;
+        return e || i || expr[0].returned(ctx).single ? expr[0] : this;
       case EXONE:
       case ONEMORE:
-        return i || args[0].returned(ctx).single ? args[0] : this;
+        return i || expr[0].returned(ctx).single ? expr[0] : this;
       case UNORDER:
-        return args[0];
+        return expr[0];
       default:
         return this;
     }

@@ -1,6 +1,10 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
@@ -12,7 +16,9 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Case extends Single {
+public final class Case extends Expr {
+  /** Expression list. */
+  protected Expr expr;
   /** Variable. */
   private final Var var;
 
@@ -22,7 +28,7 @@ public final class Case extends Single {
    * @param r return expression
    */
   public Case(final Var v, final Expr r) {
-    super(r);
+    expr = r;
     var = v;
   }
 
@@ -32,13 +38,18 @@ public final class Case extends Single {
   }
 
   @Override
-  public int countVar(final Var v) {
-    return v == null ? 1 : v.visible(var) ? super.countVar(v) : 0;
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.VAR || super.uses(use, ctx);
   }
 
   @Override
-  public Case removeVar(final Var v) {
-    if(!v.eq(var)) expr = expr.removeVar(v);
+  public int count(final Var v) {
+    return v == null ? 1 : v.visible(var) ? super.count(v) : 0;
+  }
+
+  @Override
+  public Case remove(final Var v) {
+    if(!v.eq(var)) expr = expr.remove(v);
     return this;
   }
   
@@ -63,6 +74,13 @@ public final class Case extends Single {
   @Override
   public Return returned(final QueryContext ctx) {
     return expr.returned(ctx);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, VAR, var.name.str());
+    expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override

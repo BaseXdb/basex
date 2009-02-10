@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 
@@ -43,30 +44,28 @@ public final class FLWR extends FLWOR {
     if(fl.length == 0) {
       // replace FLWR with IF clause or pass on return clause
       ctx.compInfo(OPTFLWOR);
-      return where != null ? new If(where, expr, Seq.EMPTY) : expr;
+      return where != null ? new If(where, ret, Seq.EMPTY) : ret;
     }
 
     /* [CG] add where clause as predicate to last for clause
      * and remove variable calls.
      * Problem: where ....[$i = ...] -> ....[. = ...]
-    if(fl[fl.length - 1] instanceof For || fl.length == 1) {
+     */
+    if(where != null && fl[fl.length - 1] instanceof For) {
       final For f = (For) fl[fl.length - 1];
-      if(where != null && f.pos == null && f.score == null &&
-          f.expr instanceof AxisPath) {
-        final Return t = where.returned(ctx);
-        if(!t.num) {
+      if(f.pos == null && f.score == null && f.expr instanceof AxisPath) {
+        if(!where.returned(ctx).num) {
           ctx.compInfo(OPTWHERE);
-          f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
+          f.expr = ((AxisPath) f.expr).addPred(where.remove(f.var));
           where = null;
           return comp(ctx);
         }
       }
     }
-     */
     
     // simplify simple return expression
-    if(where == null && fl.length == 1 && expr instanceof VarCall) {
-      final Var v = ((VarCall) expr).var;
+    if(where == null && fl.length == 1 && ret instanceof VarCall) {
+      final Var v = ((VarCall) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
         ctx.compInfo(OPTFLWOR);
         return fl[0].expr.comp(ctx);
@@ -99,7 +98,7 @@ public final class FLWR extends FLWOR {
               if(p + 1 != fl.length) {
                 p++;
               } else if(where == null || where.ebv(ctx).bool()) {
-                ir = ctx.iter(expr);
+                ir = ctx.iter(ret);
                 break;
               }
             }

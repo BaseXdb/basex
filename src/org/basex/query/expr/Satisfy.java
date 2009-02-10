@@ -16,7 +16,9 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Satisfy extends Single {
+public final class Satisfy extends Expr {
+  /** Expression list. */
+  public Expr sat;
   /** For/Let expressions. */
   private final For[] fl;
   /** Every flag. */
@@ -29,7 +31,7 @@ public final class Satisfy extends Single {
    * @param e every flag
    */
   public Satisfy(final For[] f, final Expr s, final boolean e) {
-    super(s);
+    sat = s;
     fl = f;
     every = e;
   }
@@ -44,7 +46,8 @@ public final class Satisfy extends Single {
       }
       fl[f] = (For) e;
     }
-    return super.comp(ctx);
+    sat = sat.comp(ctx);
+    return this;
   }
 
   @Override
@@ -68,7 +71,7 @@ public final class Satisfy extends Single {
 
     final boolean last = p + 1 == fl.length;
     while(it[p].next().bool()) {
-      if(every ^ (last ? expr.ebv(ctx).bool() : iter(ctx, it, p + 1))) {
+      if(every ^ (last ? sat.ebv(ctx).bool() : iter(ctx, it, p + 1))) {
         for(final Iter ri : it) ri.reset();
         return !every;
       }
@@ -77,23 +80,28 @@ public final class Satisfy extends Single {
   }
 
   @Override
-  public int countVar(final Var v) {
-    if(v == null) return 1;
-    int c = 0;
-    for(final ForLet f : fl) {
-      c += f.countVar(v);
-      if(f.shadows(v)) return c;
-    }
-    return c + super.countVar(v);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.VAR || sat.uses(use, ctx);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
+  public int count(final Var v) {
+    int c = 0;
     for(final ForLet f : fl) {
-      f.removeVar(v);
+      c += f.count(v);
+      if(f.shadows(v)) return c;
+    }
+    return c + sat.count(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    for(final ForLet f : fl) {
+      f.remove(v);
       if(f.shadows(v)) return this;
     }
-    return super.removeVar(v);
+    sat = sat.remove(v);
+    return this;
   }
 
   @Override
@@ -105,7 +113,7 @@ public final class Satisfy extends Single {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(final Expr f : fl) f.plan(ser);
-    expr.plan(ser);
+    sat.plan(ser);
     ser.closeElement();
   }
 
@@ -113,6 +121,6 @@ public final class Satisfy extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
     for(int i = 0; i < fl.length; i++) sb.append(" " + fl[i]);
-    return sb.append(" " + SATISFIES + " " + expr).toString();
+    return sb.append(" " + SATISFIES + " " + sat).toString();
   }
 }

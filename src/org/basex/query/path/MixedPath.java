@@ -100,19 +100,19 @@ public final class MixedPath extends Path {
   }
   
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return usesPos(step, ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return uses(step, use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return usesVar(v, step);
+  public int count(final Var v) {
+    return count(step, v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    for(int s = 0; s != step.length; s++) step[s] = step[s].removeVar(v);
-    return super.removeVar(v);
+  public Expr remove(final Var v) {
+    for(int s = 0; s != step.length; s++) step[s] = step[s].remove(v);
+    return super.remove(v);
   }
 
   @Override

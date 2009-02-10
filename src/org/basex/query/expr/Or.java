@@ -103,9 +103,7 @@ public final class Or extends Arr {
   public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
       throws QueryException {
 
-    for(int e = 0; e < expr.length; e++) {
-      expr[e] = expr[e].indexEquivalent(ctx, ic);
-    }
+    super.indexEquivalent(ctx, ic);
     return new Union(expr);
   }
   

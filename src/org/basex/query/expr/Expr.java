@@ -20,6 +20,13 @@ import org.basex.query.util.Var;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
+  /** Usage flags. */
+  protected enum Use {
+    /** Context.  */ CTX,
+    /** Fragment. */ FRG,
+    /** Position. */ POS,
+    /** Variable. */ VAR,
+  }
   /** Undefined value. */
   protected static final int UNDEF = Integer.MIN_VALUE;
 
@@ -120,20 +127,20 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if an expression accesses the position of a context item.
+   * Indicates if an expression uses the specified type.
    * Called by the compiler to perform certain optimizations.
    * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * @param use use type to be checked
    * @param ctx query context
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean usesPos(final QueryContext ctx) {
+  public boolean uses(final Use use, final QueryContext ctx) {
     return true;
   }
 
   /**
-   * Counts how often a variable is used by an expression and its children.
-   * If the argument is <code>null</code>, all variables are counted.
+   * Recursively counts the occurrences of the specified variable.
    * Called by the compiler to perform certain optimizations.
    * {@link Integer#MAX_VALUE} is returned by default and thus
    * assumed as "worst-case".
@@ -141,7 +148,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     return Integer.MAX_VALUE;
   }
 
@@ -151,7 +158,7 @@ public abstract class Expr extends ExprInfo {
    * @return expression with removed variable
    */
   @SuppressWarnings("unused")
-  public Expr removeVar(final Var v) {
+  public Expr remove(final Var v) {
     return this;
   }
 

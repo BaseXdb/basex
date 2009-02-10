@@ -18,7 +18,9 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FLWOR extends Single {
+public class FLWOR extends Expr {
+  /** Expression list. */
+  protected Expr ret;
   /** For/Let expressions. */
   protected ForLet[] fl;
   /** Where Expression. */
@@ -34,7 +36,7 @@ public class FLWOR extends Single {
    * @param r return expression
    */
   public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r) {
-    super(r);
+    ret = r;
     fl = f;
     where = w;
     order = o;
@@ -71,7 +73,7 @@ public class FLWOR extends Single {
     }
 
     if(order != null) order.comp(ctx);
-    expr = expr.comp(ctx);
+    ret = ret.comp(ctx);
     
     ctx.vars.reset(vs);
     return this;
@@ -105,34 +107,39 @@ public class FLWOR extends Single {
       } else {
         if(where == null || where.ebv(ctx).bool()) {
           order.add(ctx);
-          seq.add(ctx.iter(expr).finish());
+          seq.add(ctx.iter(ret).finish());
         }
       }
     }
   }
 
   @Override
-  public final int countVar(final Var v) {
-    if(v == null) return 1;
-    int c = 0;
-    for(final ForLet f : fl) {
-      c += f.countVar(v);
-      if(f.shadows(v)) return c;
-    }
-    if(where != null) c += where.countVar(v);
-    if(order != null) c += order.countVar(v);
-    return c + super.countVar(v);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.VAR || ret.uses(use, ctx);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
+  public final int count(final Var v) {
+    int c = 0;
     for(final ForLet f : fl) {
-      f.removeVar(v);
+      c += f.count(v);
+      if(f.shadows(v)) return c;
+    }
+    if(where != null) c += where.count(v);
+    if(order != null) c += order.count(v);
+    return c + ret.count(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    for(final ForLet f : fl) {
+      f.remove(v);
       if(f.shadows(v)) return this;
     }
-    if(where != null) where = where.removeVar(v);
-    if(order != null) order = order.removeVar(v);
-    return super.removeVar(v);
+    if(where != null) where = where.remove(v);
+    if(order != null) order = order.remove(v);
+    ret = ret.remove(v);
+    return this;
   }
 
   @Override
@@ -156,7 +163,7 @@ public class FLWOR extends Single {
     }
     if(order != null) order.plan(ser);
     ser.openElement(RET);
-    expr.plan(ser);
+    ret.plan(ser);
     ser.closeElement();
     ser.closeElement();
   }
@@ -167,6 +174,6 @@ public class FLWOR extends Single {
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
     if(where != null) sb.append(" where " + where);
     if(order != null) sb.append(order);
-    return sb.append(" return " + expr).toString();
+    return sb.append(" return " + ret).toString();
   }
 }

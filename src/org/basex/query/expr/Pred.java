@@ -46,7 +46,8 @@ public class Pred extends Preds {
     // Last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null && usesPos(ctx)) return this;
+    if(pred.length > 1 || !last && pos == null &&
+        uses(Use.POS, ctx)) return this;
     // Use iterative evaluation
     return new IterPred(root, pred, pos, last);
   }
@@ -95,19 +96,19 @@ public class Pred extends Preds {
   }
   
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return root.usesPos(ctx) || super.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return root.uses(use, ctx) || super.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return root.countVar(v) + super.countVar(v);
+  public int count(final Var v) {
+    return root.count(v) + super.count(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    root = root.removeVar(v);
-    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
+  public Expr remove(final Var v) {
+    root = root.remove(v);
+    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].remove(v);
     return this;
   }
 

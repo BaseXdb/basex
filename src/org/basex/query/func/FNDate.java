@@ -27,10 +27,10 @@ final class FNDate extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = args[0].atomic(ctx);
+    final Item it = expr[0].atomic(ctx);
     if(it == null) return null;
-    final boolean d = args.length == 2;
-    final Item zon = d ? args[1].atomic(ctx) : null;
+    final boolean d = expr.length == 2;
+    final Item zon = d ? expr[1].atomic(ctx) : null;
 
     switch(func) {
       case YEADUR:   return yea(checkDur(it));

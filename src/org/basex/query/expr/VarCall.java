@@ -47,7 +47,7 @@ public final class VarCall extends Expr {
      */
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
-        var.global || e instanceof CFrag || e instanceof FunCall) {
+        var.global || e.uses(Use.FRG, ctx) || e instanceof FunCall) {
       e = var.item(ctx);
     }
     ctx.ns = lc;
@@ -70,18 +70,18 @@ public final class VarCall extends Expr {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    return var.returned(ctx) == Return.NUM || var.expr == null ||
-      var.expr.usesPos(ctx);
+  public boolean uses(final Use use, final QueryContext ctx) {
+    return use == Use.POS && var.returned(ctx) == Return.NUM ||
+      use == Use.VAR || var.expr == null || var.expr.uses(use, ctx);
   }
 
   @Override
-  public int countVar(final Var v) {
-    return v == null || var.eq(v) ? 1 : 0;
+  public int count(final Var v) {
+    return var.eq(v) ? 1 : 0;
   }
 
   @Override
-  public Expr removeVar(final Var v) {
+  public Expr remove(final Var v) {
     return var.eq(v) ? new Context() : this;
   }
 

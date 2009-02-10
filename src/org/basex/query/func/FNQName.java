@@ -29,7 +29,7 @@ final class FNQName extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case INSCOPE:
-        return inscope(ctx, (Nod) check(args[0].atomic(ctx), Type.ELM));
+        return inscope(ctx, (Nod) check(expr[0].atomic(ctx), Type.ELM));
       default:
         return super.iter(ctx);
     }
@@ -38,8 +38,8 @@ final class FNQName extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = args[0].atomic(ctx);
-    final Item it2 = args.length == 2 ? args[1].atomic(ctx) : null;
+    final Item it = expr[0].atomic(ctx);
+    final Item it2 = expr.length == 2 ? expr[1].atomic(ctx) : null;
 
     switch(func) {
       case RESQNAME:

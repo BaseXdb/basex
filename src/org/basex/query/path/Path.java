@@ -39,29 +39,32 @@ public abstract class Path extends Expr {
   /**
    * Position test.
    * @param step step array
+   * @param use use type
    * @param ctx query context
    * @return result of check
    */
-  protected boolean usesPos(final Expr[] step, final QueryContext ctx) {
-    for(final Expr s : step) if(s.usesPos(ctx)) return true;
-    return root != null && root.usesPos(ctx);
+  protected boolean uses(final Expr[] step, final Use use,
+      final QueryContext ctx) {
+    if(use == Use.CTX && root == null) return true;
+    for(final Expr s : step) if(s.uses(use, ctx)) return true;
+    return root != null && root.uses(use, ctx);
   }
 
   /**
-   * Variables test.
-   * @param v variable to be checked
+   * Variable test.
    * @param step step array
+   * @param v variable to be checked
    * @return result of check
    */
-  protected int usesVar(final Var v, final Expr[] step) {
+  protected int count(final Expr[] step, final Var v) {
     int c = 0;
-    for(final Expr s : step) c += s.countVar(v);
-    return c + (root != null ? root.countVar(v) : 0);
+    for(final Expr s : step) c += s.count(v);
+    return c + (root != null ? root.count(v) : 0);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    if(root != null) root = root.removeVar(v);
+  public Expr remove(final Var v) {
+    if(root != null) root = root.remove(v);
     if(root instanceof Context) root = null;
     return this;
   }

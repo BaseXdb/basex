@@ -35,21 +35,21 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public boolean usesPos(final QueryContext ctx) {
-    for(final Expr e : expr) if(e.usesPos(ctx)) return true;
+  public boolean uses(final Use use, final QueryContext ctx) {
+    for(final Expr e : expr) if(e.uses(use, ctx)) return true;
     return false;
   }
 
   @Override
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     int c = 0;
-    for(final Expr e : expr) c += e.countVar(v);
+    for(final Expr e : expr) c += e.count(v);
     return c;
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].removeVar(v);
+  public Expr remove(final Var v) {
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
     return this;
   }
 
@@ -73,19 +73,6 @@ public abstract class Arr extends Expr {
       (num ? ((Item) expr[1]).n() : expr[1] instanceof Str);
   }
 
-  /**
-   * Prints the array with the specified separator.
-   * @param sep separator
-   * @return string representation
-   */
-  protected final String toString(final Object sep) {
-    final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; e++) {
-      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
-    }
-    return sb.toString();
-  }
-
   @Override
   public boolean duplicates(final QueryContext ctx) {
     for(final Expr e : expr) if(e.duplicates(ctx)) return true;
@@ -97,5 +84,18 @@ public abstract class Arr extends Expr {
     ser.openElement(this);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
+  }
+
+  /**
+   * Prints the array with the specified separator.
+   * @param sep separator
+   * @return string representation
+   */
+  protected final String toString(final Object sep) {
+    final StringBuilder sb = new StringBuilder();
+    for(int e = 0; e != expr.length; e++) {
+      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
+    }
+    return sb.toString();
   }
 }

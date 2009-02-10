@@ -22,13 +22,13 @@ final class FNOut extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case ERROR:
-        final int al = args.length;
+        final int al = expr.length;
         String code = FOER;
         Object num = 0;
         String msg = FUNERR1;
 
         if(al != 0) {
-          final Item it = args[0].atomic(ctx);
+          final Item it = expr[0].atomic(ctx);
           if(it == null) {
             if(al == 1) Err.empty(this);
           } else {
@@ -36,19 +36,19 @@ final class FNOut extends Fun {
             num = null;
           }
           if(al > 1) {
-            msg = Token.string(checkStr(args[1], ctx));
+            msg = Token.string(checkStr(expr[1], ctx));
           }
         }
         try {
           Err.or(new Object[] { code, num, msg });
           return null;
         } catch(final QueryException ex) {
-          if(al > 2) ex.iter = args[2].iter(ctx);
+          if(al > 2) ex.iter = expr[2].iter(ctx);
           throw ex;
         }
       case TRACE:
-        final Iter si = SeqIter.get(args[0].iter(ctx));
-        msg = Token.string(checkStr(args[1], ctx)) + " " + si;
+        final Iter si = SeqIter.get(expr[0].iter(ctx));
+        msg = Token.string(checkStr(expr[1], ctx)) + " " + si;
         ctx.evalInfo(msg);
         //BaseX.outln(msg);
         return si;

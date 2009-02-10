@@ -18,14 +18,14 @@ public abstract class Simple extends Expr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     return this;
   }
-  
+
   @Override
-  public boolean usesPos(final QueryContext ctx) {
+  public boolean uses(final Use use, final QueryContext ctx) {
     return false;
   }
 
   @Override
-  public int countVar(final Var v) {
+  public int count(final Var v) {
     return 0;
   }
   
