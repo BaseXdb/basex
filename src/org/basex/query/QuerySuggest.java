@@ -67,7 +67,7 @@ public class QuerySuggest extends QueryParser {
       } else if(s == 2) {
         if(axis != null && test != null) doFilt = true;
         checkStep(Axis.DESCORSELF, Test.NODE);
-        if (tempT != null) {
+        if (tempT != null && test != null) {
           if (tempT.sameAs(test)) {
             doFilt = false;
           } else {
