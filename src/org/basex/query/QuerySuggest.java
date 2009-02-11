@@ -62,8 +62,10 @@ public class QuerySuggest extends QueryParser {
       stack.push(list);
       if(s == 1) {
         checkStep(axis, test);
-        if (filter <= 1) filter(false);
-        filter++;
+        if (filter <= 1) {
+          filter++;
+          filter(false);
+        }
       } else if(s == 2) {
         if(axis != null && test != null) doFilt = true;
         checkStep(Axis.DESCORSELF, Test.NODE);
