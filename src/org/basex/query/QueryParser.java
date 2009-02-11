@@ -1245,6 +1245,7 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
+      absPath(2, ax, test);
       if(test == null) error(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {

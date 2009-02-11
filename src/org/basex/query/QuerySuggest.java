@@ -55,7 +55,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   void absPath(final int s, final Axis axis, final Test test) {
-    System.out.println("absLocPath: " + s);
+    //System.out.println("absLocPath: " + s);
     if (s > 0) {
       final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
       list.add(skel.root);
@@ -66,12 +66,16 @@ public class QuerySuggest extends QueryParser {
         filter++;
       } else if(s == 2) {
         if(axis != null && test != null) doFilt = true;
+        checkStep(Axis.DESCORSELF, Test.NODE);
         if (tempT != null) {
-          if (tempT.sameAs(test)) doFilt = false;
+          if (tempT.sameAs(test)) {
+            doFilt = false;
+          } else {
+            checkStep(tempA, tempT);
+          }
         }
         tempA = axis;
         tempT = test;
-        checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(axis, test);
         if (doFilt) filter(false);
       }
@@ -86,7 +90,7 @@ public class QuerySuggest extends QueryParser {
    * @param test test
    */
   void checkStep(final Axis axis, final Test test) {
-    System.out.println("checkStep: " + axis + " " + test);
+    //System.out.println("checkStep: " + axis + " " + test);
     filter(true);
     if(axis == null) {
       if(!stack.empty()) stack.push(skel.desc(stack.pop(), 0,
@@ -115,7 +119,7 @@ public class QuerySuggest extends QueryParser {
    * @param finish finish flag
    */
   private void filter(final boolean finish) {
-    System.out.println("Filter: " + finish);
+    //System.out.println("Filter: " + finish);
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
     final byte[] tn = entry(laxis, ltest);
@@ -144,7 +148,7 @@ public class QuerySuggest extends QueryParser {
    * @return completions
    */
   public StringList complete() {
-    System.out.println("complete");
+    //System.out.println("complete");
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
     for(final SkelNode r : stack.peek()) {
@@ -162,7 +166,7 @@ public class QuerySuggest extends QueryParser {
    * @return completion
    */
   private byte[] entry(final Axis a, final Test t) {
-    System.out.println("entry: " + a + " " + t);
+    //System.out.println("entry: " + a + " " + t);
     if(t.type == Type.TXT) {
       return TEXT;
     }
