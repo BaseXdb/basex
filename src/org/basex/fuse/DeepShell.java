@@ -128,7 +128,7 @@ public class DeepShell {
       return;
     }
     int err = fs.mkdir(args[1], DeepFuse.S_IFDIR);
-    if(err != 0) System.err.printf("mkdir failed. %d\n", err);
+    if(err == -1) System.err.printf("mkdir failed. %d\n", err);
   }
 
   /**
@@ -144,6 +144,21 @@ public class DeepShell {
     }
     int err = fs.rmdir(args[1]);
     if(err != 0) System.err.printf("rmdir failed. %d\n", err);
+  }
+  
+  /**
+   * Create a file if it doesn't exist yet. 
+   * @param args argument vector
+   */
+  @Command(shortcut = 'c',
+      args = "<file_name>", help = "create file (if it doesn't exist)")
+  public void touch(final String[] args) {
+    if(args.length != 2) {
+      help(new String[] { "help", "touch"});
+      return;
+    }
+    int err = fs.create(args[1], 0100755);
+    if(err < 0) System.err.printf("touch failed. %d\n", err);
   }
   
   /**

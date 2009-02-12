@@ -10,16 +10,20 @@ import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
+import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.item.Item;
+import org.basex.query.item.Str;
+import org.basex.query.iter.SeqIter;
 
 /** Stores a file hierarchy as XML. */
 public final class DeepBase extends DeepFuse {
 
   /** Default database name, if none is provided. */
   private static final String DEFAULT_DBNAME = "deepfuse";
-  
+
   /** Database reference. */
   private Data data;
 
@@ -104,6 +108,23 @@ public final class DeepBase extends DeepFuse {
   }
 
   /**
+   * Create a new regular file or directory.
+   * 
+   * @param path to the file to be created
+   * @param mode of file (directory, regular file ..., permission bits)
+   * @return id of the newly created file or -1 on failure
+   */
+  private int createFile(final String path, final int mode) {
+    try {
+      int pre = insert(path, mode);
+      return (pre == -1) ? -1 : data.id(pre);
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+
+  /**
    * Construct a MemData object containing <file name="filename"/> <dir
    * name="dirname"/> ready to be inserted into main Data instance.
    * @param path to file to build MemData for
@@ -158,7 +179,7 @@ public final class DeepBase extends DeepFuse {
   public DeepBase() {
     this(DEFAULT_DBNAME);
   }
-  
+
   /**
    * Constructor.
    * @param name of the database to open/create
@@ -167,7 +188,6 @@ public final class DeepBase extends DeepFuse {
     dbname = name;
     init();
   }
-
 
   /**
    * Return data reference.
@@ -214,34 +234,30 @@ public final class DeepBase extends DeepFuse {
     }
   }
 
+  /**
+   * Create a new directory.
+   * 
+   * @param path to directory to be created
+   * @param mode of directory
+   * @return id of the newly created directyory or -1 on failure
+   */
   @Override
   public int mkdir(final String path, final int mode) {
-    try {
-      if(!isDir(mode)) return -1;
-      return insert(path, mode) == -1 ? -1 : 0;
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+    if(!isDir(mode)) return -1;
+    return createFile(path, mode);
   }
 
   /**
    * Create a new regular file.
    * 
    * @param path to the file to be created
-   * @param mode of file (directory, regular file ..., permission bits)
+   * @param mode of regular file
    * @return id of the newly created file or -1 on failure
    */
   @Override
   public int create(final String path, final int mode) {
-    try {
-      if(!isFile(mode)) return -1;
-      int pre = insert(path, mode);
-      return (pre == -1) ? -1 : data.id(pre);
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+    if(!isFile(mode)) return -1;
+    return createFile(path, mode);
   }
 
   /**
@@ -261,33 +277,50 @@ public final class DeepBase extends DeepFuse {
     }
   }
 
-
   @Override
   public int unlink(final String path) {
     try {
       return delete(path);
-    } catch (QueryException e) {
+    } catch(QueryException e) {
       e.printStackTrace();
       return -1;
-    }    
+    }
+  }
+
+  @Override
+  public int opendir(final String path) {
+    try {
+      String query = "count(" + pn2xp(path, true) + "/child::*)";
+      QueryProcessor xquery = new QueryProcessor(query);
+      Result result = xquery.query(new Nodes(0, data));
+      SeqIter s = (SeqIter) result;
+      Item i = s.next();
+      return (i != null) ? (int) i.itr() : -1;
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
   @Override
   public int rmdir(final String path) {
-    /* TODO: rmdir deletes only empty dir.  What happens with --ignore? */
+    /* TODO: rmdir deletes only empty dir. What happens with --ignore? */
     return unlink(path);
-  }
-  
-  @Override
-  public int opendir(final String path) {
-    // TODO Auto-generated method stub
-    return 0;
   }
 
   @Override
   public String readdir(final String path, final int offset) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
+          + "]/@name)";
+      QueryProcessor xquery = new QueryProcessor(query);
+      SeqIter s = (SeqIter) xquery.query(new Nodes(0, data));
+      if(s.size() != 1) return null;
+      return (s.size() != 1) ? null : new String(((Str) s.next()).str());
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override

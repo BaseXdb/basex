@@ -63,15 +63,15 @@ public class DeepBaseTest {
    */
   @Test
   public void testMkdir() {
-    // mkdir should only accept directories (worng mode).
+    // mkdir should only accept directories (wrong mode test).
     assertEquals("mkdir -1", -1, dbfs.mkdir("/a/x", 0100644));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a", 0040755));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a/b", 0040755));
+    assertEquals("mkdir 0", 3, dbfs.mkdir("/a", 0040755));
+    assertEquals("mkdir 0", 5, dbfs.mkdir("/a/b", 0040755));
     // non-existing parent directories.
     assertEquals("mkdir -1", -1, dbfs.mkdir("/a/b/c/d/e", 0040755));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a/b/c", 0040755));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a/b/d", 0040755));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a/c", 0040755));
+    assertEquals("mkdir 0", 7, dbfs.mkdir("/a/b/c", 0040755));
+    assertEquals("mkdir 0", 9, dbfs.mkdir("/a/b/d", 0040755));
+    assertEquals("mkdir 0", 11, dbfs.mkdir("/a/c", 0040755));
     final String r3 = "<deepfuse mountpoint=\"unknown\">"
         + "<dir name=\"a\"><dir name=\"b\"><dir name=\"c\"/>"
         + "<dir name=\"d\"/></dir><dir name=\"c\"/></dir></deepfuse>";
@@ -84,14 +84,14 @@ public class DeepBaseTest {
    */
   @Test
   public void testCreate() {
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a", 0040755));
+    assertEquals("mkdir 0", 3, dbfs.mkdir("/a", 0040755));
     // create returns id
     assertEquals("create", 5, dbfs.create("/a/file.txt", 0100644));
     // wrong mode
     assertEquals("create", -1, dbfs.create("/a/dir", 0040755));
     // no parent directory to insert
     assertEquals("create", -1, dbfs.create("/a/b/c/file.txt", 0100644));
-    assertEquals("mkdir 0", 0, dbfs.mkdir("/a/b", 0040755));
+    assertEquals("mkdir 0", 7, dbfs.mkdir("/a/b", 0040755));
     query("/");
     assertEquals("create", 9, dbfs.create("/a/b/file.txt", 0100644));
   }
@@ -119,6 +119,19 @@ public class DeepBaseTest {
     query("/");
   }
 
+
+  /**
+   * Read directory entries (rmdir and unlink are handled the same way).
+   */
+  @Test
+  public void testReaddir() {
+    loadTestDB();
+    assertEquals("unlink", 0, dbfs.unlink("/afile"));
+    query("/");
+    assertEquals("unlink", 0, dbfs.unlink("/"));
+    query("/");
+  }
+  
   /**
    * Load a pre-filled DeepFS XML instance.
    */

@@ -317,7 +317,7 @@ public abstract class DeepFuse {
    * Open directory.
    * 
    * @param path name of the file
-   * @return zero on success, or -1 if an error occurred
+   * @return the number of directories or -1 if an error occurred
    */
   public abstract int opendir(final String path);
 
