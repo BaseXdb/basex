@@ -38,8 +38,6 @@ public class QuerySuggest extends QueryParser {
   /** Last test. */
   static Test tempT;
   /** Help for filter. */
-  static int filter = 0;
-  /** Help for filter. */
   static boolean doFilt;
 
   /**
@@ -61,11 +59,18 @@ public class QuerySuggest extends QueryParser {
       list.add(skel.root);
       stack.push(list);
       if(s == 1) {
+        if(axis == null && test == null) doFilt = true;
         checkStep(axis, test);
-        if (filter <= 1) {
-          filter++;
-          filter(false);
+        if (tempT != null && test != null) {
+          if (tempT.sameAs(test)) {
+            doFilt = false;
+          } else {
+            doFilt = true;
+          }
         }
+        tempA = axis;
+        tempT = test;
+        if (doFilt) filter(false);
       } else if(s == 2) {
         if(axis != null && test != null) doFilt = true;
         checkStep(Axis.DESCORSELF, Test.NODE);
