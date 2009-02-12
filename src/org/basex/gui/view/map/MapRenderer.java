@@ -288,7 +288,7 @@ final class MapRenderer {
             drawThumbnailsSentence(g, r, data, false, r.thumbf, true);
             return;
         }
-      } 
+      } else r.thumbal++;
     }
     int sum = data[2][0];
     for (int i = 1; i < data[2].length; i++) sum += data[2][i];
