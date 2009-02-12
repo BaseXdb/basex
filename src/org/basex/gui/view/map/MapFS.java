@@ -174,6 +174,8 @@ final class MapFS extends MapPainter {
           iw *= min;
           ih *= min;
         }
+//        iw = rect.w;
+//        ih = rect.h;
         rect.x += PICOFFSET;
         rect.y += PICOFFSET;
         g.drawImage(image, rect.x + ((ww - (int) iw) >> 1),
