@@ -1192,8 +1192,6 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
-        // Slash 
-        absPath(0, null, null);
         if(consume('/')) list = add(list, descOrSelf());
         final Expr st = check(step(s), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
@@ -1266,6 +1264,9 @@ public class QueryParser extends InputParser {
       if (test != null) {
         // Characters
         absPath(s, ax, test);
+      } else {
+        // Slashes
+        absPath(0, null, null);
       }
     }
     if(test == null) return null;
