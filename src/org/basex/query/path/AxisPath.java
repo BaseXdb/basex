@@ -92,8 +92,16 @@ public class AxisPath extends Path {
     // check if all steps are child steps
     boolean children = root == null || !root.duplicates(ctx);
     for(final Step s : step)
-      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+      children &= s.axis == Axis.CHILD;
+      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
+    
+    /*
+    boolean parents = true;
+    for(final Step s : step) parents &= s.axis == Axis.PARENT;
+    if(parents) 
+      return new ParentIterPath(root, step);
+*/
 
     // return null if no iterator could be created
     return this;
@@ -272,7 +280,7 @@ public class AxisPath extends Path {
           }
         }
       }
-
+ 
       // no index access possible; skip remaining tests
       if(ictx == null || !ictx.io || !ictx.iu) continue;
 
@@ -336,7 +344,8 @@ public class AxisPath extends Path {
           result.step[sl] = result.step[sl].addPred(np);
         }
         // add inverted path as predicate to last step
-        if(inv.length != 0) {
+        if(inv.length != 0) {          
+//          result.step[sl] = result.step[sl].addPred(a.iterator(false));
           result.step[sl] = result.step[sl].addPred(new AxisPath(null, inv));
         }
         // add remaining steps
@@ -351,6 +360,8 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    //return ctx.iter(root); }// [SG] remove me
+    
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
 
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
@@ -370,9 +381,9 @@ public class AxisPath extends Path {
     } else {
       citem.reset();
     }
-    return citem;
+    return citem; 
   }
-
+  
   /**
    * Recursive step iterator.
    * @param l current step

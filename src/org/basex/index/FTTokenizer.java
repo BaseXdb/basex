@@ -46,6 +46,8 @@ public final class FTTokenizer extends IndexToken {
   public int s;
   /** Number of tokens. */
   public int count = -1;
+  /** Backup last punctuation mark. */
+  public int lastpm;
 
   /**
    * Empty constructor.
@@ -115,6 +117,7 @@ public final class FTTokenizer extends IndexToken {
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
         sent++;
+        lastpm = c;
       } else if(!pa && c == '\n') {
         pa = true;
         para++;
@@ -168,12 +171,14 @@ public final class FTTokenizer extends IndexToken {
    * int[0]: token info, each length of each token
    * int[1]: sentence info, length of each sentence
    * int[2]: paragraph info, length of each paragraph
-   * int[3][] array with info
+   * int[3]: each token as int[]
+   * int[4]: punctuation marks of each sentence  
+   * int[5][] array with info
    * @return int arrays
    */
   public int[][] getInfo() {
     IntList[] il = new IntList[]{new IntList(), new IntList(), 
-        new IntList(), new IntList()};
+        new IntList(), new IntList(), new IntList()};
     int lass = 0;
     int lasp = 0;
     int sl = 0;
@@ -181,7 +186,10 @@ public final class FTTokenizer extends IndexToken {
     while (more()) {
       il[3].add(get());
       if (sent != lass) {
-        if (sl > 0) il[1].add(sl);
+        if (sl > 0) {
+          il[1].add(sl);
+          il[4].add(lastpm);
+        }
         lass = sent;
         sl = 0;
       }      
@@ -196,11 +204,14 @@ public final class FTTokenizer extends IndexToken {
       il[0].add(p - s);
     }
 
-    if (sent != lass && sl > 0) il[1].add(sl);
+    if (sent != lass && sl > 0) {
+      il[1].add(sl);
+      il[4].add(lastpm);
+    }
     if (pl > 0) il[2].add(pl);
         
     return new int[][]{il[0].finish(), il[1].finish(), 
-        il[2].finish(), il[3].finish()};
+        il[2].finish(), il[3].finish(), il[4].finish()};
   }
   
   /**

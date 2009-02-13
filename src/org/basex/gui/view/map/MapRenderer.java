@@ -155,7 +155,23 @@ final class MapRenderer {
     int ll = 0;
     int cp = 0;
     final int we = BaseXLayout.width(g, cw, ' ');
+    int ls = 0;
     while(ftt.more()) {
+      if (ls < ftt.sent) {
+        ls++;
+        final int w = BaseXLayout.width(g, cw, (byte) ftt.lastpm);
+        if (xx + ll +  w > ww) {
+          xx = r.x;
+          yy += fh;
+          ll = 0;
+        }
+        if (draw) {
+          g.drawString(new String(new byte[] {(byte) ftt.lastpm}), 
+              xx + ll - (xx > we ? we : 0), yy);
+        }
+//        ll += w;
+      }
+      
       if (cp < ftt.para) {
         cp = ftt.para;
         xx = r.x;
@@ -297,6 +313,8 @@ final class MapRenderer {
     r.thumbf = fnew;
     r.thumbfh = fhmi;
     r.thumblh = lhmi;
+    h = drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), false);
+    if (h < r.h)
     drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);    
   }
   /** Color for each tooltip token.  */
@@ -493,6 +511,8 @@ final class MapRenderer {
           yy += GUIProp.fontsize + 1;
           wl = 0;
         }
+        final boolean pm = 
+          !Character.isLetterOrDigit(tl.list[i][tl.list[i].length - 1]); 
         
         if (ttcol.list[i] > -1) {
           g.setColor(COLORFT[ttcol.list[i]]);
@@ -504,7 +524,7 @@ final class MapRenderer {
         } else {
           g.drawString(new String(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
-            g.drawLine(xx + wl, yy, xx + wl + l, yy);
+            g.drawLine(xx + wl, yy, xx + wl + (pm ? l - sw : l), yy);
           wl += l;
         }
         wl += sw;
@@ -522,10 +542,12 @@ final class MapRenderer {
    * @param y mouseY
    * @param w width of current maprect
    * @param g Graphics
+   * @param ds boolean flag for drawing space beetween tokens
    */
-  public static void drawThumbnailsSentenceToolTip(final ViewRect r,
+  public static void calcThumbnailsToolTip(final ViewRect r,
       final int[][] data, final boolean sen, final double sw, 
-      final int x, final int y, final int w, final Graphics g) {
+      final int x, final int y, final int w, final Graphics g,
+      final boolean ds) {
     final double ww = r.w;
     int yy = r.y + 3;
     
@@ -544,77 +566,17 @@ final class MapRenderer {
       sl += data[0][i];
       cc += data[0][i];
       
-      if (ll + wl >= ww) {
+      if (ll + wl + (ds ? +r.thumbf : 0) >= ww) {
         ir = inRect(r.x + ll, yy, wl - ll, r.thumbfh, x, y);
-        ll = wl - (int) (ww - ll);
+        ll = wl - (int) (ww - ll) + (ds ? +(int) r.thumbf : 0);
         yy += r.thumblh;
         ir |= inRect(r.x, yy, ll, r.thumbfh, x, y);
       } else {
         ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
-        ll += wl;        
+        ll += wl + (ds ? +r.thumbf : 0);        
       }
       
- /*     if (ir) {
-        final int ttl = getTooltipLength(w);
-        int c = 0, j = 0;
-        cc = cc - data[0][i];
-        while (c < ttl && i + j < data[0].length) {
-          final byte[] tok = new byte[data[0][i + j]];
-          int k = 0;
-          for (; k < tok.length && c++ < ttl; k++)
-            tok[k] = (byte) data[3][cc + k];
-          
-          cc += k;
-          if (k < tok.length) {
-            tok[k] = '.';
-            tok[k + 1 < tok.length ? k + 1 : k - 1] = '.';
-            tl.add(Array.finish(tok, k + 2));
-          } else tl.add(tok);
-          
-          if (r.pos != null) { 
-            while(pp < r.pos.length && i + j > r.pos[pp]) pp++;
-            if (pp < r.pos.length && i + j == r.pos[pp]) {
-              ttcol.add(r.poi[pp]);
-              pp++;
-            } else ttcol.add(-1);
-          } else ttcol.add(-1);
-          c++;
-          j++;
-        }
-        return;
-      }
-      
-*/      
-      /*
-      if (ir && inl < data[0].length) {
-        final int[] cw = fontWidths(g.getFont());
-        final int sp = BaseXLayout.width(g, cw, ' ');
-        ll = 0;
-        tl = new TokenList();
-        cnl -= cnl >= data[0][inl] ? data[0][inl] : 0;
-        while (ll < w / 2 && data[0].length > inl) {
-          if (inl == i) ul = tl.size - 1;
-          final byte[] tok = new byte[data[0][inl]];
-          for (int k = 0; k < tok.length; k++) { 
-            tok[k] = (byte) data[3][cnl + k];            
-          }
-          cnl += tok.length;
-          tl.add(tok);
-          if (r.pos != null) { 
-            while(pp < r.pos.length && inl > r.pos[pp]) pp++;
-            if (pp < r.pos.length && inl == r.pos[pp]) {
-              ttcol.add(r.poi[pp]);
-              pp++;
-            } else ttcol.add(-1);
-          } else ttcol.add(-1);
-
-          ll += (int) (data[0][inl] * r.thumbf);
-          inl++;
-        }
-        return;
-      }
-      */
-      if (ir) {
+       if (ir) {
         final int si = i;
         final int[] cw = fontWidths(g.getFont());
         final int sp = BaseXLayout.width(g, cw, ' ');
@@ -622,15 +584,32 @@ final class MapRenderer {
         // go some tokens backwards form current token
         while(r.pos != null && pp < r.pos.length && i > r.pos[pp]) pp++;
         final int pps = pp;
+        final int bpsl = psl;
+        final int bsl = sl;
         ll = sd * 2 + sp;
         int l = 0;
         byte[] tok;
         int p = cc >= data[0][i] ? cc - data[0][i] : 0;
         while (p > -1 && i > -1) {
-          tok = new byte[data[0][i]];
-          for (int k = 0; k < tok.length; k++) { 
+          // append punctuation mark
+          boolean apm = psl < data[1].length && data[1][psl] == sl;
+          tok = new byte[data[0][i] + (apm ? 1 : 0)];
+          for (int k = 0; k < tok.length - (apm ? 1 : 0); k++) { 
             tok[k] = (byte) data[3][p + k];            
           }
+
+          if (apm) {
+            tok[tok.length - 1] = (byte) data[4][psl];
+            sl += 1;            
+          } 
+          sl -= tok.length;
+          
+          if (sl == 0) {
+            psl--;
+            if (psl == -1) psl = data[1].length;
+            else sl = data[1][psl];
+          }
+          
           l = 0;
           for(int n = 0; n < tok.length; n += cl(tok[n])) 
             l += BaseXLayout.width(g, cw, cp(tok, n));
@@ -670,13 +649,29 @@ final class MapRenderer {
         ll = 0;
         
         pp = pps;
+        sl = bsl;
+        psl = bpsl;
         // process tokens after current token
         while (p < data[3].length && i < data[0].length) {
-          tok = new byte[data[0][i]];
+          boolean apm = false;
+          if (psl < data[1].length && data[1][psl] == sl) {
+            apm = true;
+            sl = 0;
+            psl++;
+          }
+          tok = new byte[data[0][i] + (apm ? 1 : 0)];
           l = 0;
-          for (int k = 0; k < tok.length; k++) { 
+
+          for (int k = 0; k < tok.length - (apm ? 1 : 0); k++) { 
             tok[k] = (byte) data[3][p + k];            
           }
+          
+          if (apm) {
+            tok[tok.length - 1] = (byte) data[4][psl];
+            sl += 1;            
+          } 
+          sl += tok.length;
+          
           for(int n = 0; n < tok.length; n += cl(tok[n])) 
             l += BaseXLayout.width(g, cw, cp(tok, n));
           if (ll + l + sp + 2 * sd >= w / 2) break;
@@ -692,7 +687,7 @@ final class MapRenderer {
               pp++;
             } else ttcol.add(-1);
           } else ttcol.add(-1);
-          p += tok.length;
+          p += tok.length - (apm ? 1 : 0);
           i++;
         }
         tl.add(new byte[]{'.', '.'});
@@ -843,7 +838,7 @@ final class MapRenderer {
       }
     }
     
-    return yy - r.y;
+    return yy - r.y + r.thumbfh;
   }
 
   /**

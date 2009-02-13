@@ -421,21 +421,24 @@ public final class MapView extends View implements Runnable {
         g.setColor(Color.black);
         switch(focusedRect.thumbal) {
           case 0 :
-            MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
-                false, mouseX, mouseY);
+//            MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
+//                false, mouseX, mouseY);
+            MapRenderer.calcThumbnailsToolTip(focusedRect, d, true, 
+                focusedRect.thumbf, mouseX, mouseY, getWidth(), g, true);
+            
             break;
           case 1 :
-            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, true, 
-                focusedRect.thumbf, mouseX, mouseY, getWidth(), g);
+            MapRenderer.calcThumbnailsToolTip(focusedRect, d, true, 
+                focusedRect.thumbf, mouseX, mouseY, getWidth(), g, false);
             break;
           case 2 :
-            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
-                focusedRect.thumbf, mouseX, mouseY, getWidth(), g);
+            MapRenderer.calcThumbnailsToolTip(focusedRect, d, false, 
+                focusedRect.thumbf, mouseX, mouseY, getWidth(), g, false);
             break;
           default :
-            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
+            MapRenderer.calcThumbnailsToolTip(focusedRect, d, false, 
                 Math.max(1.5, focusedRect.thumbf), mouseX, mouseY, 
-                getWidth(), g);
+                getWidth(), g, false);
         }
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), 
             getHeight(), getWidth());

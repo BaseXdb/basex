@@ -104,7 +104,7 @@ public class Step extends Preds {
     // Use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }
-  
+  /*
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter();
@@ -146,7 +146,52 @@ public class Step extends Preds {
     }
     return ni;
   }
+*/
+  /** Iterator for root expression. */
+  Iter iter =  null;
 
+  @Override
+  public NodeIter iter(final QueryContext ctx) throws QueryException {
+    if (iter == null) iter = checkCtx(ctx).iter();
+    final NodIter ni = new NodIter();
+    NodIter nb = new NodIter();
+    final Item it = iter.next();
+    if(it != null) {
+      if(!it.node()) Err.or(NODESPATH, Step.this, it.type);
+      final NodeIter ir = axis.init((Nod) it);
+      Nod nod;
+      while((nod = ir.next()) != null) {
+        if(test.eval(nod)) {
+          nod = nod.finish();
+          nod.score(Scoring.step(it.score()));
+          nb.add(nod);
+        }
+      }
+
+      // evaluates predicates
+      for(final Expr p : pred) {
+        ctx.size = nb.size;
+        ctx.pos = 1;
+        int c = 0;
+        for(int s = 0; s < nb.size; s++) {
+          ctx.item = nb.list[s];
+          final Item i = p.test(ctx);
+          if(i != null) {
+            // assign score value
+            nb.list[s].score(i.score());
+            nb.list[c++] = nb.list[s];
+          }
+          ctx.pos++;
+        }
+        nb.size = c;
+      }
+      for(int n = 0; n < nb.size; n++) ni.add(nb.list[n]);
+      nb = new NodIter();
+    }
+    return ni;
+  }
+
+  
   /**
    * Checks if this is a simple axis without predicates.
    * @param ax axis to be checked
