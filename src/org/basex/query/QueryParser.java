@@ -1173,11 +1173,10 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step(false, false, false);
+    final Expr ex = step(false, s == 2, false);
     if(ex == null) {
       // first 2 slashes
-      if (s == 1) absPath(true, false, true, null, null);
-      if (s == 2) absPath(true, true, true, null, null);
+      absPath(s != 0, s == 2, false, null, null);
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
@@ -1193,12 +1192,8 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
-        boolean desc = false;
-        if(consume('/')) {
-          list = add(list, descOrSelf());
-          desc = true;
-        }
-        final Expr st = check(step(false, desc, true), PATHMISS);
+        if(consume('/')) list = add(list, descOrSelf());
+        final Expr st = check(step(false, s == 2, true), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1254,7 +1249,6 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
-      //absPath(2, ax, test);
       if(test == null) error(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
