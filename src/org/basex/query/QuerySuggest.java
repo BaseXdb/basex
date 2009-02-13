@@ -30,6 +30,8 @@ public class QuerySuggest extends QueryParser {
   Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
   /** Skeleton reference. */
   Skeleton skel;
+  /** Storing of all steps. */
+  static ArrayList<Object[]> olds = new ArrayList<Object[]>(); 
   /** Last axis. */
   Axis laxis;
   /** Last test. */
@@ -50,22 +52,32 @@ public class QuerySuggest extends QueryParser {
   void absPath(final boolean root, final boolean desc, final boolean nslash,
       final Axis axis, final Test test) {
     //System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
-       // nslash + " AXIS: " + axis + " TEST: " + test);
+      //  nslash + " AXIS: " + axis + " TEST: " + test);
     final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
     list.add(skel.root);
     stack.push(list);
     // first 2 Slashes
     if (root) {
+      olds.clear();
       if (!desc) {
         checkStep(axis, test); 
         filter(false);
       } else {
         checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(axis, test);
+        Object[] step = new Object[2];
+        step[0] = Axis.DESCORSELF;
+        step[1] = Test.NODE;
+        olds.add(step);
       }
     } else if(nslash) {
-      System.out.println("SLASH");
+      //System.out.println("SLASH");
     } else {
+      if(olds.size() > 0) {
+        for (int i = 0; i < olds.size(); i++) {
+          checkStep((Axis) olds.get(i)[0], (Test) olds.get(i)[1]);
+        }
+      }
       checkStep(axis, test);
       filter(false);
     }
@@ -97,7 +109,6 @@ public class QuerySuggest extends QueryParser {
         stack.peek().clear();
       }
     }
-    System.out.println(stack.peek().size());
     laxis = axis;
     ltest = test;
   }
@@ -117,7 +128,6 @@ public class QuerySuggest extends QueryParser {
     if(stack.empty()) return;
 
     final ArrayList<SkelNode> list = stack.peek();
-    System.out.println(list.size());
     for(int c = list.size() - 1; c >= 0; c--) {
       final SkelNode n = list.get(c);
       if(n.kind == Data.ELEM && tn == new byte[] { '*'}) continue;
