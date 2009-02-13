@@ -65,9 +65,7 @@ public class QuerySuggest extends QueryParser {
       } else {
         checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(axis, test);
-        Object[] step = new Object[2];
-        step[0] = Axis.DESCORSELF;
-        step[1] = Test.NODE;
+        Object[] step = new Object[]{Axis.DESCORSELF, Test.NODE};
         olds.add(step);
       }
     } else if(nslash) {
