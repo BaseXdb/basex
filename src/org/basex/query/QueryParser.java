@@ -1173,10 +1173,11 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step(s);
+    final Expr ex = step(false, false, false);
     if(ex == null) {
       // first 2 slashes
-      absPath(s, null, null);
+      if (s == 1) absPath(true, false, true, null, null);
+      if (s == 2) absPath(true, true, true, null, null);
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
@@ -1192,8 +1193,12 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
-        if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(s), PATHMISS);
+        boolean desc = false;
+        if(consume('/')) {
+          list = add(list, descOrSelf());
+          desc = true;
+        }
+        final Expr st = check(step(false, desc, true), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1219,22 +1224,28 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
-   * @param s int
+   * @param root boolean
+   * @param desc boolean
+   * @param nslash boolean
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step(final int s) throws QueryException {
+  protected Expr step(final boolean root, final boolean desc,
+      final boolean nslash) throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis(s);
+    return e != null ? e : axis(root, desc, nslash);
   }
 
   /**
    * [ 71] Parses an AxisStep.
-   * @param s int
+   * @param root boolean
+   * @param desc boolean
+   * @param nslash boolean
    * @return query expression
    * @throws QueryException xquery exception
    */
-  Step axis(final int s) throws QueryException {
+  Step axis(final boolean root, final boolean desc,
+      final boolean nslash) throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1243,7 +1254,7 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
-      absPath(2, ax, test);
+      //absPath(2, ax, test);
       if(test == null) error(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
@@ -1263,10 +1274,10 @@ public class QueryParser extends InputParser {
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
         // Characters
-        absPath(s, ax, test);
-      } else {
+        absPath(root, desc, nslash, ax, test);
+      } else if (nslash) {
         // Slashes
-        absPath(0, null, null);
+        absPath(root, desc, nslash, null, null);
       }
     }
     if(test == null) return null;
@@ -2603,13 +2614,16 @@ public class QueryParser extends InputParser {
   
   /**
    * Performs optional step checks.
-   * @param s Number of \
+   * @param root boolean
+   * @param desc boolean
+   * @param nslash boolean
    * @param axis axis
    * @param test test
    * @throws QueryException parse Exception
    */
   @SuppressWarnings("unused")
-  void absPath(final int s, final Axis axis, final Test test)
+  void absPath(final boolean root, final boolean desc, final boolean nslash,
+      final Axis axis, final Test test)
     throws QueryException { }
 
   /**

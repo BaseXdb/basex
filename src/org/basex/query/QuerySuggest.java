@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 
 import java.util.ArrayList;
 import java.util.Stack;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.SkelNode;
@@ -33,14 +34,6 @@ public class QuerySuggest extends QueryParser {
   Axis laxis;
   /** Last test. */
   Test ltest;
-  /** Last axis. */
-  static Axis tempA;
-  /** Last test. */
-  static Test tempT;
-  /** Help for filter. */
-  static boolean doFilt;
-  /** Help if root is initialized. */
-  static boolean root = false;
 
   /**
    * Constructor.
@@ -54,44 +47,27 @@ public class QuerySuggest extends QueryParser {
   }
 
   @Override
-  void absPath(final int s, final Axis axis, final Test test) {
-    //System.out.println("absLocPath: " + s);
-    if (s > 0 && !root) {
-      root = true;
-      final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
-      list.add(skel.root);
-      stack.push(list);
-      if(s == 1) {
-        if(axis == null && test == null) doFilt = true;
-        checkStep(axis, test);
-        if (tempT != null && test != null) {
-          if (tempT.sameAs(test)) {
-            doFilt = false;
-          } else {
-            doFilt = true;
-          }
-        }
-        tempA = axis;
-        tempT = test;
-        if (doFilt) filter(false);
-      } else if(s == 2) {
-        if(axis != null && test != null) doFilt = true;
+  void absPath(final boolean root, final boolean desc, final boolean nslash,
+      final Axis axis, final Test test) {
+    //System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
+       // nslash + " AXIS: " + axis + " TEST: " + test);
+    final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
+    list.add(skel.root);
+    stack.push(list);
+    // first 2 Slashes
+    if (root) {
+      if (!desc) {
+        checkStep(axis, test); 
+        filter(false);
+      } else {
         checkStep(Axis.DESCORSELF, Test.NODE);
-        if (tempT != null && test != null) {
-          if (tempT.sameAs(test)) {
-            doFilt = false;
-          } else {
-            checkStep(tempA, tempT);
-          }
-        }
-        tempA = axis;
-        tempT = test;
         checkStep(axis, test);
-        if (doFilt) filter(false);
       }
+    } else if(nslash) {
+      System.out.println("SLASH");
     } else {
-      if (root) checkStep(axis, test);
-      if(axis != null && test != null) filter(false);
+      checkStep(axis, test);
+      filter(false);
     }
   }
 
@@ -121,6 +97,7 @@ public class QuerySuggest extends QueryParser {
         stack.peek().clear();
       }
     }
+    System.out.println(stack.peek().size());
     laxis = axis;
     ltest = test;
   }
@@ -140,10 +117,10 @@ public class QuerySuggest extends QueryParser {
     if(stack.empty()) return;
 
     final ArrayList<SkelNode> list = stack.peek();
+    System.out.println(list.size());
     for(int c = list.size() - 1; c >= 0; c--) {
       final SkelNode n = list.get(c);
       if(n.kind == Data.ELEM && tn == new byte[] { '*'}) continue;
-
       final byte[] t = n.token(ctx.data());
       final boolean eq = Token.eq(t, tn);
       if(finish) {
@@ -167,7 +144,6 @@ public class QuerySuggest extends QueryParser {
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }
     sl.sort();
-    root = false;
     return sl;
   }
 
