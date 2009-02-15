@@ -61,15 +61,17 @@ abstract class MapLayout {
    * Shneiderman (checks only leafnodes).
    * 
    * @param r arrraylist of rects
-   * @param data Gui data reference
    * @return aar 
    */
-  public static double aar(final ArrayList<MapRect> r, final Data data) {
+  public static double aar(final ArrayList<MapRect> r) {
     double aar = 0;
 
     for(int i = 0; i < r.size(); i++) {
       MapRect curr = r.get(i);
-      if (ViewData.isLeaf(data, curr.pre) && curr.w != 0 && curr.h != 0) {
+      // [JH] some problems occur after changing database.
+      // solve to include only leafnodes
+//      ViewData.isLeaf(data, curr.pre) && 
+      if (curr.w != 0 && curr.h != 0) {
         if (curr.w > curr.h) {
           aar += curr.w / curr.h;
         } else {
