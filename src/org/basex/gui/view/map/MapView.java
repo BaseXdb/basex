@@ -99,6 +99,8 @@ public final class MapView extends View implements Runnable {
   private static double aarn;
   /** distance change between layouts. */
   private static double distance;
+//  /** Hold old data instance. */
+//  private static Data dataold;
   
   /** TreeMap. */
   private BufferedImage mainMap;
@@ -219,13 +221,12 @@ public final class MapView extends View implements Runnable {
     calc(rect, mainRects, nodes, mainMap);
 
     if(GUIProp.mapinfo) {
-      final Data data  = gui.context.data();
       nnn = mainRects.size();
-      aaro = oldRects != null ? MapLayout.aar(oldRects, data) : 0;
-      aarn = MapLayout.aar(mainRects, data);
-      distance = 5d;
+      distance = 0;
       infoinit = true;
       if(mapInfo != null) {
+        aaro = (oldRects != null) ? MapLayout.aar(oldRects) : 0;
+        aarn = MapLayout.aar(mainRects);
         mapInfo.setValues(nno, nnn, recto, rect, aaro, aarn, distance);
         mapInfo.validate();
       }

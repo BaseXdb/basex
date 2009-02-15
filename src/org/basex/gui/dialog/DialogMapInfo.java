@@ -2,6 +2,8 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import java.text.DecimalFormat;
+
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -19,7 +21,10 @@ public final class DialogMapInfo extends Dialog {
   /** show information. */
   private BaseXCheckBox info;  
   /** Table Component. */
-  private BaseXBack p = new BaseXBack();;
+  private BaseXBack p = new BaseXBack();
+  /** Format for decimal numbers. */
+  DecimalFormat f = new DecimalFormat("#0.00"); 
+  
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -77,7 +82,7 @@ public final class DialogMapInfo extends Dialog {
     remove(p);
     // main table
     p.removeAll();
-    p.setLayout(new TableLayout(9, 3, 8, 0));
+    p.setLayout(new TableLayout(10, 3, 8, 0));
     p.add(new BaseXLabel(""));
     p.add(new BaseXLabel("neue Map", true, true));
     p.add(new BaseXLabel("alte Map", true, true));
@@ -90,10 +95,14 @@ public final class DialogMapInfo extends Dialog {
     p.add(new BaseXLabel(Integer.toString(nnn)));
     p.add(new BaseXLabel(Integer.toString(nno)));
     p.add(new BaseXLabel("Average aspect ratio: ", true, true));
-    p.add(new BaseXLabel(Double.toString(aarn)));
-    p.add(new BaseXLabel(Double.toString(aaro)));
+    p.add(new BaseXLabel(f.format(aarn)));
+    p.add(new BaseXLabel(f.format(aaro)));
+    p.add(new BaseXLabel(""));
+//    p.add(new BaseXLabel(Double.toString(aarn)));
+//    p.add(new BaseXLabel(Double.toString(aaro)));
     p.add(new BaseXLabel("distance change: ", true, true));
     p.add(new BaseXLabel(Double.toString(distance)));
+    p.add(new BaseXLabel(""));
     set(p, BorderLayout.CENTER);
     
     pack();
