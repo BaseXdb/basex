@@ -87,7 +87,7 @@ public final class MapView extends View implements Runnable {
   /** are these values initialized? true if values were assigned. */
   private static boolean infoinit = false;
   /**number of nodes before change. */
-  private static int nno; 
+  private static int nno = 0; 
   /**number of nodes now. */
   private static int nnn;
   /** Rectsize before. */
@@ -206,31 +206,35 @@ public final class MapView extends View implements Runnable {
     zoom(more, quick);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void refreshLayout() {
-    // store Rectangles of this MapLayout, to calculate additional information.
-    oldRects = mainRects;
-    recto = mainRect != null ? mainRect : new ViewRect(0, 0, 0, 0);
     // initial rectangle
     final int w = getWidth(), h = getHeight();
     final ViewRect rect = new ViewRect(0, 0, w, h, 0, 0);
+    rectn = rect;
     mainRects = new ArrayList<ViewRect>();
     final Nodes nodes = gui.context.current();
 
     calc(rect, mainRects, nodes, mainMap);
+
     if(GUIProp.mapinfo) {
-      nno = oldRects != null ? oldRects.size() : 0;
+      final Data data  = gui.context.data();
       nnn = mainRects.size();
-      rectn = rect;
-      aaro = 1.5;
-      aarn = 1.5;
+      aaro = oldRects != null ? MapLayout.aar(oldRects, data) : 0;
+      aarn = MapLayout.aar(mainRects, data);
       distance = 5d;
       infoinit = true;
-//      if(mapInfo != null) {
-//        mapInfo.newVals(nnn, rectn, aarn, distance);
-//        mapInfo.validate();
-//      }
+      if(mapInfo != null) {
+        mapInfo.setValues(nno, nnn, recto, rect, aaro, aarn, distance);
+        mapInfo.validate();
+      }
     }
+    // store Rectangle of this MapLayout
+    oldRects = new ArrayList<ViewRect>();
+    oldRects = (ArrayList<ViewRect>) mainRects.clone();
+    recto = new ViewRect(0, 0, w, h);
+    nno = oldRects != null ? oldRects.size() : 0;
     repaint();
   }
 
