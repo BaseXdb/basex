@@ -6,22 +6,25 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.view.ViewRect;
 
 /**
  * Dialog window for additional TreeMap information.
- * 
- * [JH] needs some more labels for average aspect ratio, distance change, 
- * number of drawn nodes, time needed, readability, ... if checkbox is enabled
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class DialogMapInfo extends Dialog {
   /** show information. */
   private BaseXCheckBox info;
-  /** average aspect ratios. */
-//  private BaseXLabel aar1, aar2;
+  /** number of nodes. */
+  private BaseXLabel nnold;
+  /** number of nodes. */
+  private BaseXLabel nnnew;
+  /** table container. */
+  final BaseXBack p = new BaseXBack();;
+  
   
   /**
    * Default constructor.
@@ -29,20 +32,72 @@ public final class DialogMapInfo extends Dialog {
    */
   public DialogMapInfo(final GUI main) {
     super(main, MAPINFOTITLE, false);
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(6, 2, 0, 5));
-    this.setResizable(true);
+    setResizable(true);
+    setSize(400, 200);
+    
     // create checkbox
     info = new BaseXCheckBox(MAPINFOTOGGLE, HELPMAPINFO,
         GUIProp.mapinfo, 0, this);
-    
     set(info, BorderLayout.NORTH);
+    
     finish(GUIProp.mapinfoloc);
     action(null);
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param main gui reference
+   * @param nno number of nodes old map
+   * @param nnn  number of nodes new map
+   * @param recto size old map
+   * @param rectn size new map
+   * @param aaro avarage aspect ratio old
+   * @param aarn average aspect ratio new
+   * @param distance change between old and new
+   */
+  public DialogMapInfo(final GUI main, final int nno, final int nnn,
+      final ViewRect recto, final ViewRect rectn, final double aaro, 
+      final double aarn, final double distance) {
+    this(main);
+    
+    // main table
+    p.removeAll();
+    p.setLayout(new TableLayout(3, 3, 0, 0));
+    p.add(new BaseXLabel(""));
+    p.add(new BaseXLabel("neue Map", true, true));
+    p.add(new BaseXLabel("alte Map", true, true));
+    p.add(new BaseXLabel("size: ", true, true));
+    p.add(new BaseXLabel(Integer.toString(rectn.w) + "x" + 
+        Integer.toString(rectn.h)));
+    p.add(new BaseXLabel(Integer.toString(recto.w) + "x" + 
+        Integer.toString(recto.h)));
+    p.add(new BaseXLabel("nodes painted: "));
+    p.add(new BaseXLabel(Integer.toString(nnn)));
+    p.add(new BaseXLabel(Integer.toString(nno)));
+    p.add(new BaseXLabel("Average aspect ratio: "));
+    p.add(new BaseXLabel(Double.toString(aarn)));
+    p.add(new BaseXLabel(Double.toString(aaro)));
+    p.add(new BaseXLabel("distance change: "));
+    p.add(new BaseXLabel(Double.toString(distance)));
+    
+    set(p, BorderLayout.CENTER);
+    action(null);
+  }
+  
+  /**
+   * Sets number of nodes Labels to specified values.
+   * @param nold old maps info
+   * @param nnew new maps info
+   */
+  public void writeNrNodes(final String nold, final String nnew) {
+    nnold.setText(nold);
+    nnnew.setText(nnew);
   }
 
   @Override
   public void action(final String cmd) {
+    GUIProp.mapinfo = info.isSelected();
     gui.notify.layout();
   }
 
