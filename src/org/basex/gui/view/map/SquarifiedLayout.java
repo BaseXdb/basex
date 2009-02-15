@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-import org.basex.gui.view.ViewRect;
 
 /**
  * Uses a Squarified Algorithm to divide Rectangles.
@@ -13,8 +12,8 @@ import org.basex.gui.view.ViewRect;
 public final class SquarifiedLayout extends MapLayout {
   
   @Override
-  void calcMap(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final MapList l,
+  void calcMap(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
     // one rectangle left...
     if(ne - ns <= 1) {
@@ -50,7 +49,7 @@ public final class SquarifiedLayout extends MapLayout {
         double hh = r.h;
   
         if(v) {
-          ArrayList<ViewRect> row = new ArrayList<ViewRect>();
+          ArrayList<MapRect> row = new ArrayList<MapRect>();
           double height = 0;
           while(ni < ne) {
             // height of current strip
@@ -65,13 +64,13 @@ public final class SquarifiedLayout extends MapLayout {
             double weight = calcWeight(size, childs, parsize, nn, data);
             height = weight * hh;
             
-            ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
+            ArrayList<MapRect> tmp = new ArrayList<MapRect>();
             // create temporary row including current rectangle
             double x = xx;
             for(int i = start; i <= ni; i++) {
               double w = i == ni ? xx + ww - x : 
                 calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * ww;
-              tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
+              tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
                   l.list[i], level));
               x += (int) w;
             }
@@ -97,7 +96,7 @@ public final class SquarifiedLayout extends MapLayout {
               parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
-                row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
+                row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
                     l.list[ni], level));
                 break;
               }
@@ -113,7 +112,7 @@ public final class SquarifiedLayout extends MapLayout {
             calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
           }
         } else {
-          ArrayList<ViewRect> row = new ArrayList<ViewRect>();
+          ArrayList<MapRect> row = new ArrayList<MapRect>();
           double width = 0;
           while(ni < ne) {
             // height of current strip
@@ -128,13 +127,13 @@ public final class SquarifiedLayout extends MapLayout {
             double weight = calcWeight(size, childs, parsize, nn, data);
             width = weight * ww;
             
-            ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
+            ArrayList<MapRect> tmp = new ArrayList<MapRect>();
             // create temporary row including current rectangle
             double y = yy;
             for(int i = start; i <= ni; i++) {
               double h = i == ni ? yy + hh - y : 
                 calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * hh;
-              tmp.add(new ViewRect((int) xx, (int) y, (int) width, (int) h,
+              tmp.add(new MapRect((int) xx, (int) y, (int) width, (int) h,
                   l.list[i], level));
               y += (int) h;
             }
@@ -160,7 +159,7 @@ public final class SquarifiedLayout extends MapLayout {
               parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
-                row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
+                row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
                     l.list[ni], level));
                 break;
               }

@@ -6,7 +6,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
-import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 
@@ -50,7 +49,6 @@ public final class FLWR extends FLWOR {
     /* [CG] add where clause as predicate to last for clause
      * and remove variable calls.
      * Problem: where ....[$i = ...] -> ....[. = ...]
-     */
     if(where != null && fl[fl.length - 1] instanceof For) {
       final For f = (For) fl[fl.length - 1];
       if(f.pos == null && f.score == null && f.expr instanceof AxisPath) {
@@ -62,6 +60,7 @@ public final class FLWR extends FLWOR {
         }
       }
     }
+    */
     
     // simplify simple return expression
     if(where == null && fl.length == 1 && ret instanceof VarCall) {

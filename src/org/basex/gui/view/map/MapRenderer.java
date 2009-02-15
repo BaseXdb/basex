@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.ViewRect;
 import org.basex.index.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -32,7 +31,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  static int calcHeight(final Graphics g, final ViewRect r,
+  static int calcHeight(final Graphics g, final MapRect r,
       final byte[] s) {
     return drawText(g, r, s, s.length, false);
   }
@@ -44,7 +43,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final ViewRect r,
+  static int drawText(final Graphics g, final MapRect r,
       final byte[] s) {
     return drawTextNew(g, r, s, s.length, true);
   }
@@ -58,7 +57,7 @@ final class MapRenderer {
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final ViewRect r,
+  static int drawText(final Graphics g, final MapRect r,
       final byte[] s, final int m, final boolean draw) {
 
     // limit string to given space
@@ -131,7 +130,7 @@ final class MapRenderer {
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
    */
-  private static int drawTextNew(final Graphics g, final ViewRect r,
+  private static int drawTextNew(final Graphics g, final MapRect r,
       final byte[] s, final int m, final boolean draw) {
 
     // limit string to given space
@@ -238,7 +237,7 @@ final class MapRenderer {
    * @param r rectangle
    * @param s text to be drawn
    */
-  static void drawThumbnails(final Graphics g, final ViewRect r,
+  static void drawThumbnails(final Graphics g, final MapRect r,
       final byte[] s) {
     // thumbnail width
     final double ffmax = 0.25;
@@ -333,7 +332,7 @@ final class MapRenderer {
    * @param draw boolean for drawing (used for calculating the higth)
    * @return heights
    */
-  public static int drawThumbnailsToken(final Graphics g, final ViewRect r,
+  public static int drawThumbnailsToken(final Graphics g, final MapRect r,
       final int[][] data, final boolean draw, final int x, final int y) {
     final double xx = r.x;
     final double ww = r.w;
@@ -544,7 +543,7 @@ final class MapRenderer {
    * @param g Graphics
    * @param ds boolean flag for drawing space beetween tokens
    */
-  public static void calcThumbnailsToolTip(final ViewRect r,
+  public static void calcThumbnailsToolTip(final MapRect r,
       final int[][] data, final boolean sen, final double sw, 
       final int x, final int y, final int w, final Graphics g,
       final boolean ds) {
@@ -732,7 +731,7 @@ final class MapRenderer {
    * @return higths
    */
   private static int drawThumbnailsSentence(final Graphics g,
-      final ViewRect r, final int[][] data, final boolean sen,
+      final MapRect r, final int[][] data, final boolean sen,
       final double sw, final boolean draw) {
     final double xx = r.x;
     final double ww = r.w;
@@ -846,7 +845,7 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
-  static void drawTextinContext(final Graphics g, final ViewRect r,
+  static void drawTextinContext(final Graphics g, final MapRect r,
       final byte[] s) {
 
     // limit string to given space

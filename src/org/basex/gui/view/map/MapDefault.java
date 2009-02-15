@@ -9,7 +9,6 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
 
 /**
@@ -28,9 +27,9 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<ViewRect> rects) {
+  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
     // some additions to set up borders
-    final ViewRect l = view.layouter.layout;
+    final MapRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();
@@ -38,7 +37,7 @@ final class MapDefault extends MapPainter {
     mpos = 0;
     for(int ri = 0; ri < rects.size(); ri++) {
       // get rectangle information
-      final ViewRect r = rects.get(ri);
+      final MapRect r = rects.get(ri);
       final int pre = r.pre;
       
       // level 1: next context node, set marker pointer to 0
@@ -83,7 +82,7 @@ final class MapDefault extends MapPainter {
 
       // skip drawing of string when left space is too small
       if(r.w < GUIProp.fontsize || r.h < GUIProp.fontsize) continue;
-      final ViewRect tvr = r.clone();
+      final MapRect tvr = r.clone();
       r.thumb = drawRectangle(g, tvr);
       r.thumbal = tvr.thumbal;
       r.thumbf = tvr.thumbf;
@@ -100,7 +99,7 @@ final class MapDefault extends MapPainter {
    * @param rect rectangle
    * @return if the current rectangle is shown as thumbnail
    */
-  boolean drawRectangle(final Graphics g, final ViewRect rect) {
+  boolean drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
     final int pre = rect.pre;
@@ -142,13 +141,13 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  boolean highlight(final ViewRect rect, final int mx, final int my,
+  boolean highlight(final MapRect rect, final int mx, final int my,
       final boolean click) {
     return false;
   }
 
   @Override
-  void init(final ArrayList<ViewRect> rects) {
+  void init(final ArrayList<MapRect> rects) {
   }
 
   @Override

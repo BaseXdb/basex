@@ -92,17 +92,10 @@ public class AxisPath extends Path {
     // check if all steps are child steps
     boolean children = root == null || !root.duplicates(ctx);
     for(final Step s : step)
-      children &= s.axis == Axis.CHILD;
-      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+      //children &= s.axis == Axis.CHILD;
+      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
     
-    /*
-    boolean parents = true;
-    for(final Step s : step) parents &= s.axis == Axis.PARENT;
-    if(parents) 
-      return new ParentIterPath(root, step);
-*/
-
     // return null if no iterator could be created
     return this;
   }

@@ -2,8 +2,6 @@ package org.basex.gui.view.map;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-import org.basex.gui.view.ViewRect;
-//import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -15,8 +13,8 @@ import org.basex.util.Token;
 public final class SplitLayout extends MapLayout {
 
   @Override
-  void calcMap(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final MapList l,
+  void calcMap(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
@@ -56,7 +54,7 @@ public final class SplitLayout extends MapLayout {
         int hh = v ? r.h : (int) (r.h * weight);
 
         // paint both rectangles if enough space is left
-        if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+        if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
             r.level), mainRects, l, ns, ni, level);
         if(v) {
           xx += ww;
@@ -65,7 +63,7 @@ public final class SplitLayout extends MapLayout {
           yy += hh;
           hh = r.h - hh;
         }
-        if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+        if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
             r.level), mainRects, l, ni, ne, level);
       }
     }

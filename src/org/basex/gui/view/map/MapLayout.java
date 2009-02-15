@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
-import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -16,7 +15,7 @@ import org.basex.util.Token;
  */
 abstract class MapLayout {
   /** Layout rectangle. */
-  ViewRect layout;
+  MapRect layout;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
 
@@ -25,12 +24,12 @@ abstract class MapLayout {
    */
   MapLayout() {
     switch(GUIProp.maplayout) {
-      case 0: layout = new ViewRect(0, 0, 0, 0); break;
-      case 1: layout = new ViewRect(1, 1, 2, 2); break;
-      case 2: layout = new ViewRect(0, o, 0, o); break;
-      case 3: layout = new ViewRect(2, o - 1, 4, o + 1); break;
-      case 4: layout = new ViewRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5: layout = new ViewRect(o >> 1, o, o, o + (o >> 1)); break;
+      case 0: layout = new MapRect(0, 0, 0, 0); break;
+      case 1: layout = new MapRect(1, 1, 2, 2); break;
+      case 2: layout = new MapRect(0, o, 0, o); break;
+      case 3: layout = new MapRect(2, o - 1, 4, o + 1); break;
+      case 4: layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
+      case 5: layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
       default:
     }
   }
@@ -41,7 +40,7 @@ abstract class MapLayout {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  public static double lineRatio(final ArrayList<ViewRect> r) {
+  public static double lineRatio(final ArrayList<MapRect> r) {
     if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
 
@@ -65,11 +64,11 @@ abstract class MapLayout {
    * @param data Gui data reference
    * @return aar 
    */
-  public static double aar(final ArrayList<ViewRect> r, final Data data) {
+  public static double aar(final ArrayList<MapRect> r, final Data data) {
     double aar = 0;
 
     for(int i = 0; i < r.size(); i++) {
-      ViewRect curr = r.get(i);
+      MapRect curr = r.get(i);
       if (ViewData.isLeaf(data, curr.pre) && curr.w != 0 && curr.h != 0) {
         if (curr.w > curr.h) {
           aar += curr.w / curr.h;
@@ -92,8 +91,8 @@ abstract class MapLayout {
    * @param second array of view rectangles
    * @return average distance
    */
-  public static double averageDistanceChange(final ArrayList<ViewRect> first, 
-      final ArrayList<ViewRect> second) {
+  public static double averageDistanceChange(final ArrayList<MapRect> first, 
+      final ArrayList<MapRect> second) {
     double aDist = 0.0;
     int length = Math.min(first.size(), second.size());
     int x1, x2, y1, y2;
@@ -116,7 +115,7 @@ abstract class MapLayout {
    * @param rectangles array of painted rects
    * @return nr of rects in the list
    */
-  public int getNumberRects(final ArrayList<ViewRect> rectangles) {
+  public int getNumberRects(final ArrayList<MapRect> rectangles) {
     return rectangles.size();
   }
 
@@ -219,11 +218,11 @@ abstract class MapLayout {
    * @param ns start array position
    * @param level indicates level which is calculated
    */
-  protected void putRect(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final IntList l, final int ns,
+  protected void putRect(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final IntList l, final int ns,
       final int level) {
     // calculate rectangle sizes
-    final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
+    final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
     mainRects.add(t);
 
     // position, with and height calculated using sizes of former level
@@ -236,7 +235,7 @@ abstract class MapLayout {
     if((w >= o || h >= o) && w > 0 && h > 0 &&
         !ViewData.isLeaf(data, t.pre)) {
       final MapList ch = children(data, t.pre);
-      if(ch.size != 0) calcMap(data, new ViewRect(x, y, w, h, l.list[ns],
+      if(ch.size != 0) calcMap(data, new MapRect(x, y, w, h, l.list[ns],
           r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
     }
   }
@@ -253,8 +252,8 @@ abstract class MapLayout {
    * @param v vertically???
    * 
    */
-  protected void splitUniformly(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final MapList l,
+  protected void splitUniformly(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level, final boolean v) {
     long nn, ln;
     int ni;
@@ -273,7 +272,7 @@ abstract class MapLayout {
     int hh = v ? r.h : (int) (r.h * ln / nn);
 
     // paint both rectangles if enough space is left
-    if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+    if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
         r.level), mainRects, l, ns, ni, level);
     if(v) {
       xx += ww;
@@ -282,7 +281,7 @@ abstract class MapLayout {
       yy += hh;
       hh = r.h - hh;
     }
-    if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+    if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
         r.level), mainRects, l, ni, ne, level);
   }
   
@@ -296,8 +295,8 @@ abstract class MapLayout {
    * @param ne end array position
    * @param level indicates level which is calculated
    */
-  abstract void calcMap(final Data data, final ViewRect r,
-      ArrayList<ViewRect> mainRects, final MapList l, final int ns,
+  abstract void calcMap(final Data data, final MapRect r,
+      ArrayList<MapRect> mainRects, final MapList l, final int ns,
       final int ne, final int level);
   
   /**

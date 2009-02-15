@@ -2,8 +2,6 @@ package org.basex.gui.view.map;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-import org.basex.gui.view.ViewRect;
-//import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -15,8 +13,8 @@ import org.basex.util.Token;
 public final class SliceDiceLayout extends MapLayout {
 
   @Override
-  void calcMap(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final MapList l,
+  void calcMap(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
@@ -63,7 +61,7 @@ public final class SliceDiceLayout extends MapLayout {
           int[] liste = new int[1];
           liste[0] = l.list[i];
           if(ww > 0 && hh > 0) calcMap(data,
-            new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level),
+            new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level),
             mainRects, new MapList(liste), 0, 1, level);
         }
       }

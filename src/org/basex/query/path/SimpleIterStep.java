@@ -34,7 +34,7 @@ public final class SimpleIterStep extends Step {
   
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter0 = checkCtx(ctx).iter();
+    final Iter iter = checkCtx(ctx).iter();
 
     return new NodeIter() {
       NodeIter ir;
@@ -44,7 +44,7 @@ public final class SimpleIterStep extends Step {
       public Nod next() throws QueryException {
         while(true) {
           if(ir == null) {
-            final Item it = iter0.next();
+            final Item it = iter.next();
             if(it == null) return null;
             if(!it.node()) Err.or(NODESPATH, SimpleIterStep.this, it.type);
             ir = axis.init((Nod) it);

@@ -18,7 +18,6 @@ import org.basex.fs.DataFS;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.util.Performance;
@@ -52,9 +51,9 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<ViewRect> rects) {
+  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
     final Data data = view.gui.context.data();
-    final ViewRect l = view.layouter.layout;
+    final MapRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);
@@ -63,7 +62,7 @@ final class MapFS extends MapPainter {
     final int rs = rects.size();
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
-      final ViewRect r = rects.get(ri);
+      final MapRect r = rects.get(ri);
       final int pre = r.pre;
 
       // level 1: next context node, set marker pointer to 0
@@ -105,7 +104,7 @@ final class MapFS extends MapPainter {
       // skip drawing of string when left space is too small
       if(r.w < min || r.h < min) continue;
 
-      final ViewRect cr = r.clone();
+      final MapRect cr = r.clone();
       if(drawRectangle(g, cr, mark)) {
         cr.x += 4;
         cr.w -= 8;
@@ -142,7 +141,7 @@ final class MapFS extends MapPainter {
    * @param mark selection flag
    * @return meta data flag
    */
-  boolean drawRectangle(final Graphics g, final ViewRect rect,
+  boolean drawRectangle(final Graphics g, final MapRect rect,
       final boolean mark) {
 
     final Context context = view.gui.context;
@@ -327,7 +326,7 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  boolean highlight(final ViewRect r, final int mx, final int my,
+  boolean highlight(final MapRect r, final int mx, final int my,
       final boolean click) {
 
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
@@ -339,9 +338,9 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void init(final ArrayList<ViewRect> rects) {
+  void init(final ArrayList<MapRect> rects) {
     final int off = Math.max(GUIProp.fontsize, 16);
-    for(final ViewRect r : rects) {
+    for(final MapRect r : rects) {
       if(r.w > off && r.h > off && fs.isFile(r.pre)) {
         final byte[] name = fs.name(r.pre);
         if(r.type == -1) r.type = GUIFS.type(name);

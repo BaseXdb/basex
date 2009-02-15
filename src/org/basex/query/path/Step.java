@@ -104,7 +104,7 @@ public class Step extends Preds {
     // Use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }
-  /*
+
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter();
@@ -146,8 +146,8 @@ public class Step extends Preds {
     }
     return ni;
   }
-*/
-  /** Iterator for root expression. */
+
+  /** Iterator for root expression.
   Iter iter =  null;
 
   @Override
@@ -190,6 +190,7 @@ public class Step extends Preds {
     }
     return ni;
   }
+  */
 
   
   /**

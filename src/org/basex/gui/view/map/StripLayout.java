@@ -2,9 +2,6 @@ package org.basex.gui.view.map;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-//import org.basex.gui.view.ViewData;
-import org.basex.gui.view.ViewRect;
-//import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -16,8 +13,8 @@ import org.basex.util.Token;
 public final class StripLayout extends MapLayout {
 
   @Override
-  void calcMap(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final MapList l,
+  void calcMap(final Data data, final MapRect r,
+      final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
@@ -41,7 +38,7 @@ public final class StripLayout extends MapLayout {
         double ww = r.w;
         double hh = r.h;
   
-        ArrayList<ViewRect> row = new ArrayList<ViewRect>();
+        ArrayList<MapRect> row = new ArrayList<MapRect>();
         double height = 0;
         while(ni < ne) {
           // height of current strip
@@ -50,7 +47,7 @@ public final class StripLayout extends MapLayout {
           double weight = calcWeight(size, childs, parsize, nn, data);
           height = weight * hh;
           
-          ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
+          ArrayList<MapRect> tmp = new ArrayList<MapRect>();
           // create temporary row including current rectangle
           double x = xx;
           for(int i = start; i <= ni; i++) {
@@ -59,7 +56,7 @@ public final class StripLayout extends MapLayout {
             double w = i == ni ? xx + ww - x : 
               calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, childs, data)
               * ww;
-            tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
+            tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
                 l.list[i], level));
             x += (int) w;
           }
@@ -82,7 +79,7 @@ public final class StripLayout extends MapLayout {
             parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
             // sometimes there has to be one rectangles to fill the left space
             if(ne == ni + 1) {
-              row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
+              row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
                   l.list[ni], level));
               break;
             }

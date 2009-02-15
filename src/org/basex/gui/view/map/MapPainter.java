@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.view.ViewRect;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.
@@ -35,7 +34,7 @@ abstract class MapPainter {
    * @param rs array size
    * @return next color mark
    */
-  Color nextMark(final ArrayList<ViewRect> rects, final int pre, final int ri,
+  Color nextMark(final ArrayList<MapRect> rects, final int pre, final int ri,
       final int rs) {
     final Nodes marked = view.gui.context.marked();
     // checks if the current node is a queried context node
@@ -58,7 +57,7 @@ abstract class MapPainter {
    * @param rects rectangle array
    */
   abstract void drawRectangles(final Graphics g,
-      final ArrayList<ViewRect> rects);
+      final ArrayList<MapRect> rects);
 
   /**
    * Checks mouse activity.
@@ -68,13 +67,13 @@ abstract class MapPainter {
    * @param my mouse y
    * @return true for mouse activity
    */
-  abstract boolean highlight(ViewRect rect, int mx, int my, boolean click);
+  abstract boolean highlight(MapRect rect, int mx, int my, boolean click);
 
   /**
    * Initializes the skipping of nodes.
    * @param rects rectangle array
    */
-  abstract void init(ArrayList<ViewRect> rects);
+  abstract void init(ArrayList<MapRect> rects);
 
   /**
    * Resets the painter.
