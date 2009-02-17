@@ -565,10 +565,18 @@ final class MapRenderer {
       sl += data[0][i];
       cc += data[0][i];
       
-      if (ll + wl + (ds ? +r.thumbf : 0) >= ww) {
-        ir = inRect(r.x + ll, yy, wl - ll, r.thumbfh, x, y);
-        ll = wl - (int) (ww - ll) + (ds ? +(int) r.thumbf : 0);
-        yy += r.thumblh;
+      if (ll + wl + (ds ? r.thumbf : 0) >= ww) {
+        if (ds) {
+          // draw token in new line
+          yy += r.thumblh;
+          ll = 0;
+          ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
+          ll = wl + (ds ? +(int) r.thumbf : 0);
+        } else {
+          ir = inRect(r.x + ll, yy, wl - ll, r.thumbfh, x, y);
+          ll = wl - (int) (ww - ll) + (ds ? +(int) r.thumbf : 0);
+          yy += r.thumblh;
+        }
         ir |= inRect(r.x, yy, ll, r.thumbfh, x, y);
       } else {
         ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
@@ -583,15 +591,16 @@ final class MapRenderer {
         // go some tokens backwards form current token
         while(r.pos != null && pp < r.pos.length && i > r.pos[pp]) pp++;
         final int pps = pp;
-        final int bpsl = psl;
-        final int bsl = sl;
+        final int bpsl = data[1][psl] == sl ? psl + 1 : psl;
+        final int bsl = data[1][psl] == sl ? 0 : sl;
         ll = sd * 2 + sp;
         int l = 0;
         byte[] tok;
         int p = cc >= data[0][i] ? cc - data[0][i] : 0;
+        boolean apm = false;
         while (p > -1 && i > -1) {
           // append punctuation mark
-          boolean apm = psl < data[1].length && data[1][psl] == sl;
+          apm = psl < data[1].length && data[1][psl] == sl;
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
           for (int k = 0; k < tok.length - (apm ? 1 : 0); k++) { 
             tok[k] = (byte) data[3][p + k];            
@@ -652,8 +661,8 @@ final class MapRenderer {
         psl = bpsl;
         // process tokens after current token
         while (p < data[3].length && i < data[0].length) {
-          boolean apm = false;
-          if (psl < data[1].length && data[1][psl] == sl) {
+          apm = false;
+          if (psl < data[1].length && data[1][psl] == sl + data[0][i]) {
             apm = true;
             sl = 0;
             psl++;
@@ -666,10 +675,10 @@ final class MapRenderer {
           }
           
           if (apm) {
-            tok[tok.length - 1] = (byte) data[4][psl];
-            sl += 1;            
+            tok[tok.length - 1] = (byte) data[4][psl - 1];
+//            sl += 1;            
           } 
-          sl += tok.length;
+          sl += apm ? sl : tok.length;
           
           for(int n = 0; n < tok.length; n += cl(tok[n])) 
             l += BaseXLayout.width(g, cw, cp(tok, n));
