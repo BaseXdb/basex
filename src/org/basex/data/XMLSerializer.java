@@ -3,9 +3,12 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.gui.GUIConstants;
 import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
+import org.basex.util.IntArrayList;
 
 /**
  * This is an interface for serializing XML results.
@@ -97,7 +100,8 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b, final int[][] ftd) throws IOException {
+  public void text(final byte[] b, final int[][] ftd, 
+      final IntArrayList ial) throws IOException {
     finishElement();
     int c = -1, pp = 0, wl = 0;
     FTTokenizer ftt = new FTTokenizer(b);
@@ -107,7 +111,13 @@ public final class XMLSerializer extends Serializer {
         if(Token.letterOrDigit(b[i]) && pp < ftd[0].length && c == ftd[0][pp]) {
           // write fulltext pointer in front of the token
           // used for coloring the token
-          out.write(0x10 + (ftd[1][pp++] & 0x0F));
+          final int[] diff = GUIConstants.getDiff(ftd[1][pp] , ial);
+          out.write(0x10 + (diff[0] & 0x0F));
+          if (diff[0] > 0)
+            out.write(0x10 + (diff[1] & 0x0F));
+          else 
+            out.write(0x10 + (ftd[1][pp] & 0x0F));
+          pp++;
         }
         ch(b[i]);
       }

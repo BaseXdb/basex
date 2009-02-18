@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.util.Token;
+import org.basex.util.IntArrayList;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -196,7 +197,8 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void text(final byte[] b, final int[][] ftd) throws IOException {
+  public void text(final byte[] b, final int[][] ftd, 
+      final IntArrayList ial) throws IOException {
     text(b);
   }
 

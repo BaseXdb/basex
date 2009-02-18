@@ -17,6 +17,8 @@ class MapRect extends ViewRect implements Cloneable {
   int[] pos;
   /** Fulltext pointer values. */
   int[] poi;
+  /** Color for ftands. */
+  int[][] acol;
   /** Abstraction level for thumbnail. */
   int thumbal;
   /** Height of a thumbnail uni.*/

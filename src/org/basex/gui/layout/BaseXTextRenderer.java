@@ -22,6 +22,8 @@ public final class BaseXTextRenderer extends BaseXBack {
   private int[] fwidth = GUIConstants.mfwidth;
   /** Color. */
   private Color col;
+  /** Difference of a color. */
+  private int diff = -1;
   /** Color highlighting flag. */
   private boolean high;
 
@@ -191,6 +193,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   private void write(final Graphics g) {
     final int ch = word.charAt(0);
     
+    
     if(high) {
       high = false;
     } else {
@@ -199,8 +202,13 @@ public final class BaseXTextRenderer extends BaseXBack {
     
     if(y > 0 && y < h) {
       if(ch >= 0x10 && ch < 0x20) {
-        col = GUIConstants.COLORFT[ch - 0x10];
-        high = true;
+        final int c = ch - 0x10;
+        if (diff == -1) diff = c;
+        else {
+          col = GUIConstants.getFTColor(c, diff);
+          diff = -1;
+          high = true;
+        }        
       }
 
       // mark error

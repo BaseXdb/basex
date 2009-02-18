@@ -496,7 +496,7 @@ public final class MapView extends View implements Runnable {
                 1.5, focusedRect.thumbf), mouseX, mouseY, getWidth(), g, false);
         }
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
-            getWidth());
+            getWidth(), focusedRect.acol);
         focusedRect.x -= 3;
         focusedRect.w += 3;
       }

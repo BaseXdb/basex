@@ -22,6 +22,8 @@ public final class FTNot extends FTExpr {
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+    // do not color fulltext if there is a ftnot
+    ctx.ftd = null;
     return score(expr[0].iter(ctx).next().score() == 0 ? 1 : 0);
   }
 

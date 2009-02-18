@@ -53,9 +53,11 @@ final class MapDefault extends MapPainter {
       if (ftd != null) {
         r.pos = ftd[0];
         r.poi = ftd[1];
+        r.acol = view.gui.context.marked().ftpos.col.finish();
       } else {
         r.pos = null;
         r.poi = null;
+        r.acol = null;
       }      
       
       g.setColor(mark ? col : COLORS[lvl]);

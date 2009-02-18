@@ -36,6 +36,8 @@ public class FTContains extends Expr {
   public FTTokenizer ft = new FTTokenizer();
   /** Flag for first evaluation.*/
   private int div = 0;
+  /** Visualize fulltext results. */
+  private boolean vis = true;
   
   /**
    * Constructor.
@@ -62,7 +64,7 @@ public class FTContains extends Expr {
   public Bln atomic(final QueryContext ctx) throws QueryException {    
     if (div == 0) 
       div = ++ctx.ftcount;
-
+    
     final Iter iter = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     final IntList[] ftd = ctx.ftd;
@@ -76,7 +78,7 @@ public class FTContains extends Expr {
       if(i instanceof DBNode) pre = ((DBNode) i).pre;
     }
     
-    if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null && ctx.ftdata != null) 
+    if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null && ctx.ftdata != null)
       ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);      
     
     ctx.ftitem = tmp;
@@ -94,6 +96,7 @@ public class FTContains extends Expr {
     if(s == null || s.test.type != Type.TXT || !ic.data.meta.ftxindex) return;
     
     ftexpr.indexAccessible(ctx, ic);
+    vis = !ic.ftnot;
   }
   
   @Override
@@ -104,7 +107,7 @@ public class FTContains extends Expr {
     
     final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsSIndex(expr, ae);
+    if(ic.seq) return new FTContainsSIndex(expr, ae, vis);
 
     // standard index evaluation; first expression will always be an axis path
     ctx.compInfo(OPTFTXINDEX);

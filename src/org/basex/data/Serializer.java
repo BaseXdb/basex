@@ -6,6 +6,7 @@ import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.util.Atts;
 import org.basex.util.TokenList;
+import org.basex.util.IntArrayList;
 
 /**
  * This is an interface for serializing XML results.
@@ -63,9 +64,11 @@ public abstract class Serializer {
    * Serializes a text.
    * @param b text bytes
    * @param ftd fulltext positions
+   * @param fta fulltext ftand colorinfo
    * @throws IOException exception
    */
-  public abstract void text(final byte[] b, final int[][] ftd)
+  public abstract void text(final byte[] b, final int[][] ftd, 
+      final IntArrayList fta)
     throws IOException;
 
   /**
@@ -260,7 +263,7 @@ public abstract class Serializer {
         p++;
       } else if(k == Data.TEXT) {
         final int[][] ftd = ft != null ? ft.get(p) : null;
-        if(ftd != null) text(data.text(p++), ftd);
+        if(ftd != null) text(data.text(p++), ftd, ft.col);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));

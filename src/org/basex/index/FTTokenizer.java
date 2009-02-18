@@ -209,7 +209,9 @@ public final class FTTokenizer extends IndexToken {
       il[4].add(lastpm);
     }
     if (pl > 0) il[2].add(pl);
-        
+    
+    // last sentence not finished with a punctation mark 
+    il[1].add(sl + 1);
     return new int[][]{il[0].finish(), il[1].finish(), 
         il[2].finish(), il[3].finish(), il[4].finish()};
   }

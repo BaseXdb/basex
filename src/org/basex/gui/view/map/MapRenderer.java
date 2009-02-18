@@ -216,7 +216,7 @@ final class MapRenderer {
       }
       if(draw) {
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(COLORFT[r.poi[pp]]);
+          g.setColor(getFTColor(r.poi[pp], r.acol));
           pp++;
         } else g.setColor(textc);
         g.drawString(new String(tok), xx + ll, yy);
@@ -368,7 +368,7 @@ final class MapRenderer {
       if (draw) {
         // draw word
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(COLORFT[r.poi[pp]]);
+          g.setColor(getFTColor(r.poi[pp], r.acol));
           pp++;
         } else
           g.setColor(textc);
@@ -470,9 +470,11 @@ final class MapRenderer {
    * @param ry viewrect y-value
    * @param rh viewrect h-value
    * @param rw viewrect width 
+   * @param acol ftand color array
    */
   public static void drawToolTip(final Graphics g, final int x, final int y, 
-      final int rx, final int ry, final int rh, final int rw) {
+      final int rx, final int ry, final int rh, final int rw, 
+      final int[][] acol) {
     if (tl != null && tl.size > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
@@ -500,7 +502,10 @@ final class MapRenderer {
           y + 28 : y  - GUIProp.fontsize * nl;
             
       g.setColor(Color.white);
-      g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wi + 1, 
+      if (nl == 1 && wl < wi)
+        g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wl + 1, 
+            GUIProp.fontsize * nl + 8);
+      else g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wi + 1, 
           GUIProp.fontsize * nl + 8);
       g.setColor(Color.black);
       wl = 0;
@@ -514,7 +519,7 @@ final class MapRenderer {
           !Character.isLetterOrDigit(tl.list[i][tl.list[i].length - 1]); 
         
         if (ttcol.list[i] > -1) {
-          g.setColor(COLORFT[ttcol.list[i]]);
+          g.setColor(getFTColor(ttcol.list[i], acol));
           g.drawString(new String(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
             g.drawLine(xx + wl, yy, xx + wl + l, yy);
@@ -804,7 +809,7 @@ final class MapRenderer {
           ll += wl - lastl;
           wl = lastl;
         }
-        if (draw) g.setColor(COLORFT[r.poi[pp]]);
+        if (draw) g.setColor(getFTColor(r.poi[pp], r.acol));
         pp++;
       }
 

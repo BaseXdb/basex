@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import org.basex.util.Array;
+import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
 
 /**
@@ -21,6 +22,8 @@ public final class FTPosData {
   private int[][] prepos = new int[1][];
   /** Pointer values for the pos values.*/
   private int[][] poi = new int[1][];
+  /** Array for ftand colors. */
+  public IntArrayList col = new IntArrayList();
   /** Number of pre values. */
   private int size;
 
@@ -31,8 +34,17 @@ public final class FTPosData {
     prepos = new int[1][];
     poi = new int[1][];
     size = 0;
+    col = new IntArrayList();
   }
 
+  /**
+   * Add a ftand color result.
+   * @param c int[] ftand color result
+   */
+  public void addFTAndCol(final int[] c) {
+    col.add(c);
+  }
+  
   /**
    * Add a node.
    * pp : [pre, pos0, ..., posn]
