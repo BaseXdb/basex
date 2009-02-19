@@ -85,7 +85,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean absolute(final int p) throws XQException {
     final SeqIter seq = sequence();
-    cursor(seq, p >= 0 ? p - 1 : seq.size + p);
+    cursor(seq, p >= 0 ? p - 1 : seq.size() + p);
     return pos > 0;
   }
 
@@ -98,7 +98,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public int count() throws XQException {
-    return sequence().size;
+    return sequence().size();
   }
 
   public boolean first() throws XQException {
@@ -166,7 +166,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public int getPosition() throws XQException {
     final SeqIter iter = sequence();
-    return pos != -1 ? pos : iter.size + 1;
+    return pos != -1 ? pos : iter.size() + 1;
   }
 
   public synchronized XMLStreamReader getSequenceAsStream() throws XQException {
@@ -209,7 +209,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean isBeforeFirst() throws XQException {
     sequence();
-    return pos == 0 && pos < sequence().size;
+    return pos == 0 && pos < sequence().size();
   }
 
   public boolean isFirst() throws XQException {
@@ -218,7 +218,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean isLast() throws XQException {
-    return pos == sequence().size;
+    return pos == sequence().size();
   }
 
   public boolean isOnItem() throws XQException {
@@ -233,7 +233,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean last() throws XQException {
     final SeqIter seq = sequence();
-    return cursor(seq, seq.size - 1);
+    return cursor(seq, seq.size() - 1);
   }
 
   public boolean next() throws XQException {
@@ -358,8 +358,8 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @throws XQException xquery exception
    */
   private boolean cursor(final SeqIter seq, final int p) throws XQException {
-    pos = p < 0 ? 0 : p >= seq.size ? -1 : p;
-    seq.pos = pos - 1;
+    pos = p < 0 ? 0 : p >= seq.size() ? -1 : p;
+    seq.pos(pos - 1);
     return p < 0 ? false : next();
   }
 }
