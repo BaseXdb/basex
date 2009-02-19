@@ -52,7 +52,7 @@ public final class Ls extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final FSParser g = new FSParser(args, "ahlrRSt");
+    final FSGetOpts g = new FSGetOpts(args, "ahlrRSt");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch(ch) {

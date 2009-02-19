@@ -3,7 +3,9 @@ package org.basex.fuse;
 import java.io.IOException;
 
 import org.basex.build.Builder;
+import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
+import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
@@ -17,8 +19,13 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
+import org.basex.util.Token;
 
-/** Stores a file hierarchy as XML. */
+/** Stores a file hierarchy as XML. 
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2008, ISC License
+ * @author Alexander Holupirek, alex@holupirek.de
+ */
 public final class DeepBase extends DeepFuse {
 
   /** Default database name, if none is provided. */
@@ -29,6 +36,12 @@ public final class DeepBase extends DeepFuse {
 
   /** Database instance name. */
   private String dbname;
+  
+  /** Path to backing store. */
+  private String backingstore;
+  
+  /** Path to mount point. */
+  private String mountpoint;
 
   /**
    * Creates an empty database.
@@ -135,13 +148,26 @@ public final class DeepBase extends DeepFuse {
     final String dname = basename(path);
     byte[] elem;
     if(isDir(mode)) elem = DIR;
-    else if(isFile(mode)) elem = FILE;
-    else elem = "unknown".getBytes();
+    else if(isFile(mode)) {
+      elem = FILE;
+      try {
+        MemBuilder mb = new MemBuilder();
+        mb.init(new MemData(64, data.tags, data.atts,
+            data.ns, data.skel));
+        Prop.fscont = true;
+        Prop.fsmeta = true;
+        FSParser p = new FSParser(path);
+        mb.build(p, "tmp_memdata4file");
+        return mb.finish();
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
+    } else elem = Token.token("unknown");
     MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
     int tagID = data.tags.index(elem, null, false);
     int attID = data.atts.index(NAME, null, false);
     m.addElem(tagID, 0, 1, 2, 2, false);
-    m.addAtt(attID, 0, dname.getBytes(), 1);
+    m.addAtt(attID, 0, Token.token(dname), 1);
     return m;
   }
 
@@ -156,22 +182,28 @@ public final class DeepBase extends DeepFuse {
     int ppre = parentPre(path);
     if(ppre == -1) return -1;
     int npre = ppre + data.size(ppre, data.kind(ppre));
+    data.meta.update();
     data.insert(npre, ppre, buildData(path, mode));
     data.flush();
-    data.meta.update();
     return npre;
   }
 
   /**
    * Deletes a file node.
    * @param path of file to delete
+   * @param dir is directory
    * @throws QueryException on failure
    * @return zero on success, -1 on failure
    */
-  private int delete(final String path) throws QueryException {
-    Nodes n = xquery(pn2xp(path, false));
+  private int delete(final String path, final boolean dir)
+      throws QueryException {
+    Nodes n = xquery(pn2xp(path, dir));
     if(n.size() == 0) return -1;
-    else data.delete(n.nodes[0]);
+    else {
+      data.meta.update();
+      data.delete(n.nodes[0]);
+      data.flush();
+    }
     return 0;
   }
 
@@ -182,10 +214,24 @@ public final class DeepBase extends DeepFuse {
 
   /**
    * Constructor.
-   * @param name of the database to open/create
+   * @param dbName of the database to open/create
    */
-  public DeepBase(final String name) {
-    dbname = name;
+  public DeepBase(final String dbName) {
+    dbname = dbName;
+    init();
+  }
+
+  /** Constructor.
+   * 
+   * @param mountPoint mount point of DeepFUSE
+   * @param backingStore backing storage root path
+   * @param dbName of the database to open/create
+   */
+  public DeepBase(final String mountPoint, final String backingStore,
+      final String dbName) {
+    mountpoint = mountPoint;
+    dbname = dbName;
+    backingstore = backingStore;
     init();
   }
 
@@ -206,17 +252,20 @@ public final class DeepBase extends DeepFuse {
   }
 
   /**
-   * Insert DeepFS root element. <deepfuse mountpoint="unknown"/>.
+   * Insert DeepFS root element.
    * @return zero on success
    */
   @Override
   public int init() {
     createEmptyDB(dbname);
-    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
-    int tagID = data.tags.index("deepfuse".getBytes(), null, false);
-    int attID = data.atts.index("mountpoint".getBytes(), null, false);
-    m.addElem(tagID, 0, 1, 2, 2, false);
-    m.addAtt(attID, 0, "unknown".getBytes(), 1);
+    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.skel);
+    int tagID = data.tags.index(Token.token("deepfuse"), null, false);
+    int attID1 = data.atts.index(Token.token("mountpoint"), null, false);
+    int attID2 = data.atts.index(Token.token("backingstore"), null, false);
+    // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
+    m.addElem(tagID, 0, 1, 3, 3, false);
+    m.addAtt(attID1, 0, Token.token(mountpoint), 1);
+    m.addAtt(attID2, 0, Token.token(backingstore), 2);
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
@@ -239,7 +288,7 @@ public final class DeepBase extends DeepFuse {
    * 
    * @param path to directory to be created
    * @param mode of directory
-   * @return id of the newly created directyory or -1 on failure
+   * @return id of the newly created directory or -1 on failure
    */
   @Override
   public int mkdir(final String path, final int mode) {
@@ -280,7 +329,7 @@ public final class DeepBase extends DeepFuse {
   @Override
   public int unlink(final String path) {
     try {
-      return delete(path);
+      return delete(path, false);
     } catch(QueryException e) {
       e.printStackTrace();
       return -1;
@@ -305,7 +354,12 @@ public final class DeepBase extends DeepFuse {
   @Override
   public int rmdir(final String path) {
     /* TODO: rmdir deletes only empty dir. What happens with --ignore? */
-    return unlink(path);
+    try {
+      return delete(path, true);
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
   @Override

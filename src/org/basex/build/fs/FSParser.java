@@ -39,8 +39,8 @@ import org.basex.util.Map;
  * for the import process in its {@link FSParser#parse(Builder)} method.
  * </ol>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Alexander Holupirek
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Alexander Holupirek, alex@holupirek.de
  */
 public final class FSParser extends Parser {
   /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
@@ -59,6 +59,8 @@ public final class FSParser extends Parser {
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre value stack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
+  /** Do not expect complete file hierarchy, but parse single files. */
+  private boolean singlemode;
 
   /**
    * Constructor.
@@ -82,6 +84,16 @@ public final class FSParser extends Parser {
     meta.add(TYPEMBX, new EMLExtractor());
   }
 
+  /** 
+   * Constructor to parse single file nodes.
+   * @param path String to file node to parse
+   * [AH] singlemode?
+   */
+  public FSParser(final String path) {
+    this(IO.get(path), false);
+    singlemode = true;
+  }
+  
   /**
    * Main entry point for the import of a file hierarchy.
    * Instantiates the engine and starts the traversal.
@@ -93,6 +105,11 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
+    if (singlemode) {
+      parseSingle();
+      return;
+    }
+    
     builder.startDoc(token(io.name()));
     builder.startElem(token(DEEPFS), atts.reset());
     
@@ -110,6 +127,15 @@ public final class FSParser extends Parser {
     builder.endDoc();
   }
 
+  /** Parse just a single file.
+   * @throws IOException I/O Exception
+   */
+  public void parseSingle() throws IOException {
+    builder.startDoc(token(io.name()));
+    file(new File(io.path()).getCanonicalFile());
+    builder.endDoc();
+  }
+  
   /**
    * Visits files in a directory or steps further down.
    * @param d the directory to be visited.

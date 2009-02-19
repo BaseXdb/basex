@@ -10,7 +10,7 @@ import org.basex.util.StringList;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  * @version 0.1
  */
-public final class FSParser {
+public final class FSGetOpts {
   /** Arguments found. */
   private final StringList foundArgs;
   /** Arguments passed to the program. */
@@ -37,7 +37,7 @@ public final class FSParser {
    * @param options A String containing a description of the
    *                  valid options
    */
-  public FSParser(final String arguments, final String options) {
+  public FSGetOpts(final String arguments, final String options) {
     args = arguments.split(" ");
     optString = options;
     multipleOptIndex = 1;

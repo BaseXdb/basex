@@ -2,7 +2,7 @@ package org.basex.test;
 
 import static org.junit.Assert.*;
 
-import org.basex.fs.FSParser;
+import org.basex.fs.FSGetOpts;
 import org.basex.util.StringList;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public final class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument arg1
      */
-    FSParser g = new FSParser("", "ahR");
+    FSGetOpts g = new FSGetOpts("", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt", null, g.getPath());
     /*
@@ -46,7 +46,7 @@ public final class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument /music/IckeUndEr
      */
-    g = new FSParser("/music/IckeUndEr", "ahR");
+    g = new FSGetOpts("/music/IckeUndEr", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt /music/IckeUndEr",
         "/music/IckeUndEr", g.getPath());
@@ -180,7 +180,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -a";
     final int[] enteredOptions =  {'d' , 'a'};
     final String args = "ahRbd:li";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -209,7 +209,7 @@ public final class GetOptTest {
     final String command = "-dickeUndEr -R";
     final int[] enteredOptions =  {'d', 'R'};
     final String args = "ahRbd:li";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -240,7 +240,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -X";
     final int[] enteredOptions =  {'d', 0};
     final String args = "ahRbd:li";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -270,7 +270,7 @@ public final class GetOptTest {
     final String command = "-d icke -u";
     final int[] enteredOptions =  {'d', 'u'};
     final String args = "ahRbd:lu";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -302,7 +302,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -iTest";
     final int[] enteredOptions =  {'d', 'i'};
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -336,7 +336,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -R -iTest -h";
     final int[] enteredOptions =  {'d', 'R', 'i', 'h'};
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -369,7 +369,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -R -iTest -h";
     final int[] enteredOptions =  {'d', 'R', 'i', 'h'};
     final String args = "ah:Rbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -406,7 +406,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -R -iTest -h";
     final int[] enteredOptions =  {'d', 'R', 'h'};
     final String args = "ahR:bd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -441,7 +441,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr -R -iTest /Itunes/music/";
     final int[] enteredOptions =  {'d', 'R', 'i'};
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -475,7 +475,7 @@ public final class GetOptTest {
     final String command = "/Itunes/music/ -d ickeUndEr -R -iTest ";
     final int[] enteredOptions =  {'d', 'R', 'i'};
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -510,7 +510,7 @@ public final class GetOptTest {
     final String command = "-d ickeUndEr /Itunes/music/ -R -iTest -X";
     final int[] enteredOptions =  {'d', 'R', 'i', 0};
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -543,7 +543,7 @@ public final class GetOptTest {
   public void testSourceAndTarget() {
     final String command = "ickeUndEr.txt icke.txt";
     final String args = "ahRbd:li:";
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
     g.getopt();
     final StringList argsOfGetopt = g.getFoundArgs();
     if(argsOfGetopt.size == 2) {
@@ -565,7 +565,7 @@ public final class GetOptTest {
 
     final int[] res = new int[length];
     int index;
-    final FSParser g = new FSParser(command, args);
+    final FSGetOpts g = new FSGetOpts(command, args);
     int ch = g.getopt();
     index = 0;
     while (ch != -1) {

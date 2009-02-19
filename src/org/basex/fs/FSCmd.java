@@ -76,8 +76,8 @@ public abstract class FSCmd {
    * @return option parser
    * @throws FSException file system exception
    */
-  final FSParser defaultOpts(final String args) throws FSException {
-    final FSParser g = new FSParser(args, "");
+  final FSGetOpts defaultOpts(final String args) throws FSException {
+    final FSGetOpts g = new FSGetOpts(args, "");
     while(g.more()) checkOpt(g);
     return g;
   }
@@ -89,7 +89,7 @@ public abstract class FSCmd {
    * @return specified argument
    * @throws FSException file system exception
    */
-  final int checkOpt(final FSParser g) throws FSException {
+  final int checkOpt(final FSGetOpts g) throws FSException {
     final int c = g.next();
     if(c == ':') error(g.getPath(), 99);
     if(c == 0) help();

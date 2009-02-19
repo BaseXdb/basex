@@ -1,7 +1,9 @@
 package org.basex.build;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
+
 import org.basex.data.MemData;
 import org.basex.data.MetaData;
 
@@ -25,6 +27,15 @@ public final class MemBuilder extends Builder {
     meta.file = parser.io;
     data = new MemData(64, tags, atts, ns, skel);
     data.meta = meta;
+    return this;
+  }
+  
+  /** Use existing instance (and their indexes) for build process.
+   * @param mdata existing instance
+   * @return builder
+   */
+  public MemBuilder init(final MemData mdata) {
+    data = mdata;
     return this;
   }
 
