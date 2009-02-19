@@ -57,21 +57,21 @@ abstract class MapLayout {
   }
 
   /**
-   * Computes average aspect ratio of a rectangle list as specified by 
-   * Shneiderman (checks only leafnodes).
+   * Computes average aspect ratio of a rectangle list. 
+   * [JH] as specified by Shneiderman only leafnodes should be checked
+   * [JH] why not more weighten the bigger nodes???
    * 
    * @param r arrraylist of rects
    * @return aar 
    */
   public static double aar(final ArrayList<MapRect> r) {
     double aar = 0;
-
+    int nrLeaves = 0;
     for(int i = 0; i < r.size(); i++) {
       MapRect curr = r.get(i);
-      // [JH] some problems occur after changing database.
-      // solve to include only leafnodes
-//      ViewData.isLeaf(data, curr.pre) && 
+      // Shneiderman would use this: children(data, curr.pre).size == 0 && 
       if (curr.w != 0 && curr.h != 0) {
+        nrLeaves++;
         if (curr.w > curr.h) {
           aar += curr.w / curr.h;
         } else {
@@ -79,7 +79,7 @@ abstract class MapLayout {
         }
       }
     }
-    return aar / r.size();
+    return nrLeaves > 0 ? aar / nrLeaves : -1;
   }
 
   /**

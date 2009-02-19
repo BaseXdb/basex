@@ -225,13 +225,13 @@ public final class MapView extends View implements Runnable {
       distance = 0;
       infoinit = true;
       if(mapInfo != null) {
-        aaro = (oldRects != null) ? MapLayout.aar(oldRects) : 0;
         aarn = MapLayout.aar(mainRects);
         mapInfo.setValues(nno, nnn, recto, rect, aaro, aarn, distance);
         mapInfo.validate();
       }
     }
     // store Rectangle of this MapLayout
+    aaro = aarn;
     oldRects = new ArrayList<MapRect>();
     oldRects = (ArrayList<MapRect>) mainRects.clone();
     recto = new MapRect(0, 0, w, h);
