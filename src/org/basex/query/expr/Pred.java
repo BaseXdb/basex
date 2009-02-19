@@ -78,15 +78,15 @@ public class Pred extends Preds {
 
     // evaluates predicates
     for(final Expr p : pred) {
-      ctx.size = si.size;
+      ctx.size = si.size();
       ctx.pos = 1;
       int c = 0;
-      for(int s = 0; s < si.size; s++) {
+      for(int s = 0, sl = si.size(); s < sl; s++) {
         ctx.item = si.item[s];
         if(p.test(ctx) != null) si.item[c++] = si.item[s];
         ctx.pos++;
       }
-      si.size = c;
+      si.size(c);
     }
 
     ctx.item = ci;

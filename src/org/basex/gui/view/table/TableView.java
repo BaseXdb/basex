@@ -102,7 +102,7 @@ public final class TableView extends View implements Runnable {
 
     final Context context = gui.context;
     final Nodes marked = context.marked();
-    if(marked.size != 0) {
+    if(marked.size() != 0) {
       final int p = tdata.getRoot(context.data(), marked.nodes[0]);
       if(p != -1) setPos(p);
     }

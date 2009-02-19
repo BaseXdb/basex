@@ -542,7 +542,7 @@ public final class GUI extends JFrame {
           if(nodes != null) {
             // use query result
             marked = nodes;
-          } else if(marked.size != 0) {
+          } else if(marked.size() != 0) {
             // remove old highlight
             marked = new Nodes(data);
           }
@@ -646,9 +646,9 @@ public final class GUI extends JFrame {
    */
   public void refreshControls() {
     final Nodes marked = context.marked();
-    if(marked != null) setHits(marked.size);
+    if(marked != null) setHits(marked.size());
 
-    BaseXLayout.enable(filter, marked != null && marked.size != 0);
+    BaseXLayout.enable(filter, marked != null && marked.size() != 0);
     refreshMode();
     toolbar.refresh();
     menu.refresh();

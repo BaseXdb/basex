@@ -89,7 +89,7 @@ public final class XQueryMV extends AQuery {
         // gather IDs for titles on top
         final Nodes res = (Nodes) result;
         final int[] pres = res.nodes;
-        final int size = res.size;
+        final int size = res.size();
         ids = new IDSet();
         
         for(int n = 0; n < size; n++) {
@@ -148,7 +148,7 @@ public final class XQueryMV extends AQuery {
     final int medid = data.tagID(MAB2.MEDIUM);
 
     final Nodes res = (Nodes) result;
-    final int size = res.size;
+    final int size = res.size();
 
     // write root tag
     ser.openElement(MAB2.ROOT);

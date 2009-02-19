@@ -143,7 +143,7 @@ public final class Locate extends FSCmd {
     
     try {
       final Nodes result = qu.queryNodes(context.current());
-      filesfound = result.size;
+      filesfound = result.size();
       if(!cFlag) {
         for(int i = 0; i < filesfound; i++) {
           out.println(fs.path(result.nodes[i]));

@@ -179,7 +179,7 @@ public final class QueryContext extends Progress {
   public void compile(final Nodes nodes) throws QueryException {
     try {
       // cache the initial context nodes
-      final int s = nodes != null ? nodes.size : 0;
+      final int s = nodes != null ? nodes.size() : 0;
       if(s != 0) {
         // create document nodes
         final Data data = nodes.data;

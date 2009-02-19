@@ -123,7 +123,7 @@ public final class RealView extends View {
       Graphics rg = realImage.getGraphics();
       rects = new ArrayList<RealRect[]>();
       Nodes curr = gui.context.current();
-      for(int i = 0; i < curr.size; i++) {
+      for(int i = 0; i < curr.size(); i++) {
         temperature(curr.nodes[i], rg, i);
 
       }
@@ -160,14 +160,14 @@ public final class RealView extends View {
     }
 
     // highlights marked nodes
-    if(!rects.isEmpty() && gui.context.marked().size > 0) {
+    if(!rects.isEmpty() && gui.context.marked().size() > 0) {
 
       g.setColor(Color.GREEN);
       Iterator<RealRect[]> it = rects.iterator();
 
       while(it.hasNext()) {
         final ViewRect[] r = it.next();
-        int size = gui.context.marked().size;
+        int size = gui.context.marked().size();
         final int[] markedNodes = new int[size];
         System.arraycopy(gui.context.marked().nodes, 0, markedNodes,
             0, size);

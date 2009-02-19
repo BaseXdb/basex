@@ -92,7 +92,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
     context.marked(mark);
     for(final View v : view) if(v != vw && v.isValid()) v.refreshMark();
-    BaseXLayout.enable(gui.filter, context.marked().size != 0);
+    BaseXLayout.enable(gui.filter, context.marked().size() != 0);
     gui.refreshControls();
   }
 
@@ -151,7 +151,7 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
-    if(nodes.size == 0) return;
+    if(nodes.size() == 0) return;
 
     final Context context = gui.context;
     final Nodes n = new Nodes(context.data(), context.marked().ftpos);
@@ -190,7 +190,7 @@ public final class ViewNotifier {
    * @param nodes new context nodes
    */
   public void jump(final Nodes nodes) {
-    if(nodes.size == 0) return;
+    if(nodes.size() == 0) return;
     final Context context = gui.context;
     init(context, nodes, new Nodes(context.data()));
     for(final View v : view) v.refreshContext(true, true);

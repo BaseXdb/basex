@@ -38,8 +38,8 @@ abstract class MapPainter {
       final int rs) {
     final Nodes marked = view.gui.context.marked();
     // checks if the current node is a queried context node
-    while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
-    if(mpos < marked.size) {
+    while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
+    if(mpos < marked.size()) {
       if(marked.nodes[mpos] == pre) {
         // mark node
         return GUIConstants.colormark1;

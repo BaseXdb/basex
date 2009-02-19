@@ -34,6 +34,8 @@ public final class Union extends Arr {
       if(expr[e].e()) expr = Array.delete(expr, e--);
     }
     if(el != expr.length) ctx.compInfo(OPTEMPTY);
+    // as union always returns sorted results,
+    // a single argument must be evaluated as well
     return this;
   }
 

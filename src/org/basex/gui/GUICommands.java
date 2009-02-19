@@ -218,7 +218,7 @@ public enum GUICommands implements GUICommand {
       // disallow copy of empty node set or root node
       final Nodes nodes = gui.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0));
+          nodes.size() != 0 && (nodes.size() != 1 || nodes.nodes[0] != 0));
     }
   },
 
@@ -237,7 +237,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
       final Nodes marked = gui.context.marked();
-      BaseXLayout.enable(button, marked != null && marked.size != 0);
+      BaseXLayout.enable(button, marked != null && marked.size() != 0);
     }
   },
 
@@ -254,7 +254,7 @@ public enum GUICommands implements GUICommand {
       // disallow copy of empty node set or root node
       final Nodes nodes = context.marked();
       boolean s = !Prop.mainmem && context.copied() != null && nodes != null &&
-        nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0) &&
+        nodes.size() != 0 && (nodes.size() != 1 || nodes.nodes[0] != 0) &&
         nodes.data.ns.size() == 0;
       if(s) {
         final Data d = nodes.data;
@@ -282,7 +282,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size != 0 &&
+      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size() != 0 &&
           n.data.ns.size() == 0);
     }
   },
@@ -303,7 +303,7 @@ public enum GUICommands implements GUICommand {
       final Nodes nodes = context.marked();
       final Data d = context.data();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-        nodes.size == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
+        nodes.size() == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
         d.kind(nodes.nodes[0]) == Data.DOC) && nodes.data.ns.size() == 0);
     }
   },
@@ -324,7 +324,7 @@ public enum GUICommands implements GUICommand {
       final Context context = gui.context;
       final Nodes nodes = context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-        nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
+        nodes.size() == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
         nodes.data.ns.size() == 0);
     }
   },
@@ -335,7 +335,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final Context context = gui.context;
       Nodes marked = context.marked();
-      if(marked.size == 0) {
+      if(marked.size() == 0) {
         final int pre = gui.focused;
         if(pre == -1) return;
         marked = new Nodes(pre, context.data());
@@ -346,7 +346,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final Nodes marked = gui.context.marked();
-      BaseXLayout.enable(button, marked != null && marked.size != 0);
+      BaseXLayout.enable(button, marked != null && marked.size() != 0);
     }
   },
 

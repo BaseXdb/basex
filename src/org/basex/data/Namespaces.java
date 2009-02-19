@@ -46,7 +46,7 @@ public final class Namespaces extends Set {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public synchronized void finish(final DataOutput out) throws IOException {
+  public synchronized void write(final DataOutput out) throws IOException {
     out.writeBytesArray(keys);
     out.writeNums(next);
     out.writeNums(bucket);

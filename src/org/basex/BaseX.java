@@ -28,7 +28,7 @@ public final class BaseX extends BaseXClient {
   }
 
   @Override
-  protected void init(final String[] args) {
+  public void init(final String[] args) {
     standalone = true;
     super.init(args);
   }

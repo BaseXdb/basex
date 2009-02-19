@@ -27,7 +27,7 @@ public final class XQFTTS extends W3CTS {
    * Constructor.
    */
   public XQFTTS() {
-    super("XQFTTS",  "/home/db/xml/xqftts/");
+    super("XQFTTS");
   }
   
   @Override

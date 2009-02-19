@@ -355,25 +355,24 @@ public class AxisPath extends Path {
   public Iter iter(final QueryContext ctx) throws QueryException {
     //return ctx.iter(root); }// [SG] remove me
     
+    final Item c = ctx.item;
+    final long cs = ctx.size;
+    final long cp = ctx.pos;
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
 
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
       litem = it;
-      final Item c = ctx.item;
-      final long cs = ctx.size;
-      final long cp = ctx.pos;
       ctx.item = it;
 
       citem = new NodIter();
       iter(0, citem, ctx);
       citem.sort(true);
-
-      ctx.item = c;
-      ctx.size = cs;
-      ctx.pos = cp;
     } else {
       citem.reset();
     }
+    ctx.item = c;
+    ctx.size = cs;
+    ctx.pos = cp;
     return citem; 
   }
   

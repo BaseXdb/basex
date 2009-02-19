@@ -41,12 +41,12 @@ public class BXNList implements NodeList {
     if(xquery != null) {
       if(i < xquery.size) n = xquery.list[i];
     } else {
-      if(i < nodes.size) n = new DBNode(nodes.data, nodes.nodes[i]);
+      if(i < nodes.size()) n = new DBNode(nodes.data, nodes.nodes[i]);
     }
     return n != null ? n.java() : null;
   }
 
   public final int getLength() {
-    return xquery != null ? xquery.size : nodes.size;
+    return xquery != null ? xquery.size : nodes.size();
   }
 }

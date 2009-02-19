@@ -43,14 +43,14 @@ public final class Copy extends AUpdate {
     }
     data.meta.update();
 
-    final int size = src.size;
-    final Data[] srcDocs = new Data[src.size];
+    final int size = src.size();
+    final Data[] srcDocs = new Data[src.size()];
     for(int c = 0; c < size; c++) srcDocs[c] = copy(src.data, src.nodes[c]);
 
     final IntList marked = Prop.gui ? new IntList() : null;
     int copied = 0;
 
-    for(int n = trg.size - 1; n >= 0; n--) {
+    for(int n = trg.size() - 1; n >= 0; n--) {
       final int par = trg.nodes[n];
       if(data.kind(par) != Data.ELEM) return error(COPYTAGS);
 
@@ -75,7 +75,7 @@ public final class Copy extends AUpdate {
     }
     
     if(Prop.gui) {
-      if(context.current().size > 1 || 
+      if(context.current().size() > 1 || 
           context.current().nodes[0] == src.nodes[0]) {
         context.current(new Nodes(0, data));
       }

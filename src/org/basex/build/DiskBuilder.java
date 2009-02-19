@@ -71,11 +71,11 @@ public final class DiskBuilder extends Builder {
     // close files
     final String db = meta.dbname;
     final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-    meta.finish(out);
-    tags.finish(out);
-    atts.finish(out);
-    skel.finish(out);
-    ns.finish(out);
+    meta.write(out);
+    tags.write(out);
+    atts.write(out);
+    skel.write(out);
+    ns.write(out);
     out.close();
 
     // write cached size and attribute values into main table

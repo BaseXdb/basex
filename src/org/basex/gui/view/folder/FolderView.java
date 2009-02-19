@@ -156,7 +156,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final Nodes marked = gui.context.marked();
-    if(marked.size != 0) jumpTo(marked.nodes[0], true);
+    if(marked.size() != 0) jumpTo(marked.nodes[0], true);
     refreshHeight();
     repaint();
   }
@@ -212,11 +212,11 @@ public final class FolderView extends View {
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
+    while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
 
     Color col = Color.black;
     Font fnt = font;
-    if(mpos < marked.size && marked.nodes[mpos] == pre) {
+    if(mpos < marked.size() && marked.nodes[mpos] == pre) {
       // mark node
       col = colormark3;
       fnt = bfont;

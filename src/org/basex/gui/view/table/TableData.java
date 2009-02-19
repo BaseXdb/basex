@@ -146,7 +146,7 @@ final class TableData {
     if(cols.length == 0) return;
     
     final Nodes n = context.current();
-    final boolean r = n.size == 1 && n.nodes[0] < 2;
+    final boolean r = n.size() == 1 && n.nodes[0] < 2;
     if(!create && r) {
       rows = rootRows;
       sortCol = -1;

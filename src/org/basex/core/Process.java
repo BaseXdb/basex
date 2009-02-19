@@ -185,7 +185,7 @@ public abstract class Process extends AbstractProcess {
       // check if all result nodes are tags
       if(err != null) {
         final Data data = context.data();
-        for(int i = nodes.size - 1; i >= 0; i--) {
+        for(int i = nodes.size() - 1; i >= 0; i--) {
           if(data.kind(nodes.nodes[i]) != Data.ELEM) {
             error(err);
             return null;

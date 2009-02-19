@@ -33,7 +33,7 @@ public final class Prompt extends Process {
       if(data.kind(pre) == Data.ELEM) {
         curr.add(Prop.fsmode ? data.fs.path(pre) : data.tag(pre));
       }
-      if(nodes.size != 1) curr.add("[...]");
+      if(nodes.size() != 1) curr.add("[...]");
     }
     out.print(BaseX.info(Prop.fsmode ? Prop.USER + ":%$ " : "%> ", curr));
   }

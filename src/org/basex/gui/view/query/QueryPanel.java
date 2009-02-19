@@ -41,7 +41,7 @@ abstract class QueryPanel {
     BaseXLayout.enable(go, !GUIProp.execrt);
     final Nodes marked = main.gui.context.marked();
     if(marked == null) return;
-    BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
+    BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size() != 0);
   }
 
   /**

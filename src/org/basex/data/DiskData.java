@@ -123,12 +123,13 @@ public final class DiskData extends Data {
       values.flush();
       // write meta data...
       final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-      meta.finish(out);
-      tags.finish(out);
-      atts.finish(out);
-      skel.finish(out);
-      ns.finish(out);
+      meta.write(out);
+      tags.write(out);
+      atts.write(out);
+      skel.write(out);
+      ns.write(out);
       out.close();
+      meta.dirty = false;
     } catch(final IOException e) {
       e.printStackTrace();
     }
@@ -136,7 +137,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    if(!meta.uptodate) flush();
+    if(meta.dirty) flush();
     cls();
   }
 

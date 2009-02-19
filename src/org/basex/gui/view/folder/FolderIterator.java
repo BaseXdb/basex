@@ -92,7 +92,7 @@ final class FolderIterator {
    */
   boolean moreCS() {
     final Nodes current = view.gui.context.current();
-    if(current == null || ++cp >= current.size) return false;
+    if(current == null || ++cp >= current.size()) return false;
     par = current.nodes[cp];
     pre = par;
     level = 0;

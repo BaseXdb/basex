@@ -113,7 +113,7 @@ final class MapDefault extends MapPainter {
     if(kind == Data.ELEM || kind == Data.DOC) {
       // show full path in top rectangle
       final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
-        current.size == 1 && pre != 0 && pre == current.nodes[0] ?
+        current.size() == 1 && pre != 0 && pre == current.nodes[0] ?
             ViewData.path(data, pre) : ViewData.tag(data, pre);
 
       g.setColor(Color.black);

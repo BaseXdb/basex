@@ -24,11 +24,11 @@ import org.basex.util.Token;
  */
 public abstract class Nod extends Item {
   /** Static node counter. */
-  private static int idcounter;
+  private static int sid;
+  /** Unique node id. */
+  protected final int id = sid++;
   /** Parent node. */
   protected Nod par;
-  /** Unique node id. */
-  protected int id;
 
   /**
    * Constructor.
@@ -36,7 +36,6 @@ public abstract class Nod extends Item {
    */
   protected Nod(final Type t) {
     super(t);
-    id = idcounter++;
   }
 
   @Override

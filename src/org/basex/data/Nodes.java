@@ -17,14 +17,14 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
-  /** Pre values container. */
-  public int[] nodes;
   /** Root Node. */
   public Data data;
-  /** Number of stored nodes. */
-  public int size;
   /** Fulltext position data. */
   public FTPosData ftpos;
+  /** Pre values container. */
+  public int[] nodes;
+  /** Number of stored nodes. */
+  private int size;
   
   /**
    * Node Set constructor.
@@ -74,7 +74,7 @@ public final class Nodes implements Result {
     data = d;
     ftpos = ft;
   }
-  
+
   /**
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.

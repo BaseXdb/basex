@@ -82,7 +82,7 @@ public final class Names extends Set {
    * @param out output stream
    * @throws IOException in case the file could not be written
    */
-  public synchronized void finish(final DataOutput out) throws IOException {
+  public synchronized void write(final DataOutput out) throws IOException {
     out.writeBytesArray(keys);
     out.writeNums(next);
     out.writeNums(bucket);

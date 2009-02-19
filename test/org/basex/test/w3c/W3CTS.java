@@ -63,7 +63,7 @@ public abstract class W3CTS {
   /** Test Suite Identifier. */
   private final String testid;
   /** Path to the XQuery Test Suite. */
-  private String path;
+  private String path = ".";
 
   /** Query Path. */
   private String queries;
@@ -133,14 +133,12 @@ public abstract class W3CTS {
   /**
    * Constructor.
    * @param nm name of test
-   * @param p path to the text files
    */
-  public W3CTS(final String nm, final String p) {
+  public W3CTS(final String nm) {
     input = nm + "Catalog.xml";
     testid = nm.substring(0, 4);
     pathhis = testid.toLowerCase() + ".hist";
     pathlog = testid.toLowerCase() + ".log";
-    path = p;
   }
 
   /**
@@ -214,7 +212,7 @@ public abstract class W3CTS {
 
       final TokenList dl = new TokenList();
       final Nodes doc = nodes("*:input-document", nodes);
-      for(int d = 0; d < doc.size; d++) {
+      for(int d = 0; d < doc.size(); d++) {
         dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
       colls.put(cname, dl.finish());
@@ -234,7 +232,7 @@ public abstract class W3CTS {
 
     BaseX.out("Parsing Queries");
     final Nodes nodes = nodes("//*:test-case", root);
-    for(int t = 0; t < nodes.size; t++) {
+    for(int t = 0; t < nodes.size(); t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(t % 1000 == 0) BaseX.out(".");
     }
@@ -329,8 +327,8 @@ public abstract class W3CTS {
       final QueryProcessor xq = new QueryProcessor(in, file);
       
       Nodes cont = nodes("*:contextItem", root);
-      if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
-          IO.XMLSUFFIX).execute(context, out);
+      if(cont.size() != 0) new Check(sources + string(
+          data.atom(cont.nodes[0])) + IO.XMLSUFFIX).execute(context, out);
 
       final QueryContext ctx = xq.ctx;
       ctx.stop = stop;
@@ -384,7 +382,7 @@ public abstract class W3CTS {
     final Nodes outFiles = nodes("*:output-file/text()", root);
     final Nodes cmpFiles = nodes("*:output-file/@compare", root);
     final StringBuilder tb = new StringBuilder();
-    for(int o = 0; o < outFiles.size; o++) {
+    for(int o = 0; o < outFiles.size(); o++) {
       if(o != 0) tb.append(DELIM);
       final String resFile = string(data.atom(outFiles.nodes[o]));
       final IO exp = IO.get(expected + pth + resFile);
@@ -415,7 +413,7 @@ public abstract class W3CTS {
     }
 
     boolean rightCode = false;
-    if(error != null && (outFiles.size == 0 || expError.length() != 0)) {
+    if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
       expError = error(pth + outname, expError);
       final String code = error.substring(0, Math.min(8, error.length()));
       for(final String er : SLASH.split(expError)) {
@@ -449,7 +447,7 @@ public abstract class W3CTS {
 
       if(s == split.length && !inspect) {
         if(print) {
-          if(outFiles.size == 0) result = error(pth + outname, expError);
+          if(outFiles.size() == 0) result = error(pth + outname, expError);
           logErr.append(logStr);
           logErr.append("[" + testid + " ] ");
           logErr.append(chop(result));
@@ -480,7 +478,7 @@ public abstract class W3CTS {
         ok++;
       }
     } else {
-      if(outFiles.size == 0 || expError.length() != 0) {
+      if(outFiles.size() == 0 || expError.length() != 0) {
         if(print) {
           logOK2.append(logStr);
           logOK2.append("[" + testid + " ] ");
@@ -560,7 +558,7 @@ public abstract class W3CTS {
       final QueryContext ctx) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < nod.size; c++) {
+    for(int c = 0; c < nod.size(); c++) {
       final byte[] nm = data.atom(nod.nodes[c]);
       final String src = srcs.get(string(nm));
       if(tb.size != 0) tb.add(", ");
@@ -599,7 +597,7 @@ public abstract class W3CTS {
   private void var(final Nodes nod, final Nodes var, final String pth,
       final QueryContext ctx) throws Exception {
 
-    for(int c = 0; c < nod.size; c++) {
+    for(int c = 0; c < nod.size(); c++) {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in);
@@ -652,7 +650,7 @@ public abstract class W3CTS {
   private String text(final String qu, final Nodes root) throws Exception {
     final Nodes n = nodes(qu, root);
     final TokenBuilder sb = new TokenBuilder();
-    for(int i = 0; i < n.size; i++) {
+    for(int i = 0; i < n.size(); i++) {
       if(i != 0) sb.add('/');
       sb.add(data.atom(n.nodes[i]));
     }

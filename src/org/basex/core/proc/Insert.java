@@ -51,7 +51,7 @@ public final class Insert extends AUpdate {
     if(!ok) return false;
     
     data.flush();
-    return Prop.info ? info(INSERTINFO, nodes.size, perf.getTimer()) : true;
+    return Prop.info ? info(INSERTINFO, nodes.size(), perf.getTimer()) : true;
   }
   
   /**
@@ -68,7 +68,7 @@ public final class Insert extends AUpdate {
     if(!check(n)) return error(ATTINVALID, n);
 
     // check if all nodes are elements
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       final int kind = data.kind(par);
       if(kind != Data.ELEM) return error(COPYTAGS);
@@ -82,7 +82,7 @@ public final class Insert extends AUpdate {
 
     // perform updates
     data.meta.update();
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
     }
@@ -118,7 +118,7 @@ public final class Insert extends AUpdate {
 
     // insert temporary instance of document
     data.meta.update();
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       data.insert(pre(par, pos, data), par, tmp);
     }
@@ -145,7 +145,7 @@ public final class Insert extends AUpdate {
 
     // check correctness of query
     final int pos = Prop.gui ? 0 : toInt(args[pi ? 2 : 1]);
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);
       if(k == Data.DOC && (kind == Data.TEXT || kind == Data.ELEM &&
@@ -154,7 +154,7 @@ public final class Insert extends AUpdate {
 
     // perform updates
     data.meta.update();
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       final int pre = pre(par, pos, data);
 

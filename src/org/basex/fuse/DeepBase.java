@@ -104,7 +104,7 @@ public final class DeepBase extends DeepFuse {
    */
   private int parentPre(final String path) throws QueryException {
     Nodes n = xquery(pn2xp(dirname(path), true));
-    return n.size == 0 ? -1 : n.nodes[0];
+    return n.size() == 0 ? -1 : n.nodes[0];
   }
 
   /**
@@ -170,7 +170,7 @@ public final class DeepBase extends DeepFuse {
    */
   private int delete(final String path) throws QueryException {
     Nodes n = xquery(pn2xp(path, false));
-    if(n.size == 0) return -1;
+    if(n.size() == 0) return -1;
     else data.delete(n.nodes[0]);
     return 0;
   }
@@ -270,7 +270,7 @@ public final class DeepBase extends DeepFuse {
   public int getattr(final String path) {
     try {
       Nodes n = xquery(pn2xp(path, false));
-      return n.size == 0 ? -1 : n.nodes[0];
+      return n.size() == 0 ? -1 : n.nodes[0];
     } catch(QueryException e) {
       e.printStackTrace();
       return -1;

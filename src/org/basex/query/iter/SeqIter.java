@@ -21,9 +21,9 @@ public final class SeqIter extends Iter implements Result {
   /** Items. */
   public Item[] item;
   /** Size. */
-  public int size;
+  private int size;
   /** Iterator. */
-  public int pos = -1;
+  private int pos = -1;
 
   /**
    * Constructor.
@@ -153,6 +153,22 @@ public final class SeqIter extends Iter implements Result {
   @Override
   public Item next() {
     return ++pos < size ? item[pos] : null;
+  }
+
+  /**
+   * Sets the iterator position.
+   * @param p position
+   */
+  public void pos(final int p) {
+    pos = p;
+  }
+
+  /**
+   * Sets the iterator size.
+   * @param s size
+   */
+  public void size(final int s) {
+    size = s;
   }
 
   @Override

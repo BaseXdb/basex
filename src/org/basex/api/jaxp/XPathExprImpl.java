@@ -87,7 +87,7 @@ public final class XPathExprImpl implements XPathExpression {
       if(nodes == null) throw new XPathExpressionException(
           "Result can't be cast to a nodeset");
 
-      if(nodes.size == 0) return null;
+      if(nodes.size() == 0) return null;
       final Data data = nodes.data;
       return res == XPathConstants.NODESET ? new BXNList(nodes) :
         new DBNode(data, nodes.nodes[0]).java();

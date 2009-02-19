@@ -200,7 +200,7 @@ public final class MapView extends View implements Runnable {
         && rectHist[hist + 1] != null
         && rectHist[hist + 1].pre == 0
         || more
-        && (context.size != 1 || focusedRect == null 
+        && (context.size() != 1 || focusedRect == null 
         || context.nodes[0] != focusedRect.pre);
     if(page) focusedRect = new MapRect(0, 0, getWidth(), 1);
 
@@ -381,7 +381,7 @@ public final class MapView extends View implements Runnable {
     }
 
     layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes), 0,
-        nodes.size, 0);
+        nodes.size(), 0);
     painter.init(rectangles);
     drawMap(map, rectangles);
     focus();

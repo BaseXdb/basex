@@ -56,6 +56,8 @@ public final class MetaData {
 
   /** Flag for removed index structures. */
   public boolean uptodate = true;
+  /** Dirty flag. */
+  public boolean dirty;
   /** Flag for out-of-dates indexes. */
   public boolean oldindex;
   /** Table size. */
@@ -113,6 +115,7 @@ public final class MetaData {
     atvindex = false;
     ftxindex = false;
     uptodate = false;
+    dirty = true;
   }
 
   /**
@@ -171,7 +174,7 @@ public final class MetaData {
    * @param out output stream
    * @throws IOException IO Exception
    */
-  public synchronized void finish(final DataOutput out) throws IOException {
+  public synchronized void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTORAGE,  STORAGE);
     writeInfo(out, IDBSTORAGE, ISTORAGE);
     writeInfo(out, DBFNAME,    file.path());

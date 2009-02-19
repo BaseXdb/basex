@@ -177,7 +177,8 @@ final class MapImages {
       }
       j = (j == 0 ? MAXNR : j) - 1;
     }
-    view.repaint();
+    // (might get slow for large maps)
+    view.refreshLayout();
   }
 
   /**

@@ -40,7 +40,7 @@ public final class Update extends AUpdate {
     if(!ok) return false;
 
     data.flush();
-    return Prop.info ? info(UPDATEINFO, nodes.size, perf.getTimer()) : true;
+    return Prop.info ? info(UPDATEINFO, nodes.size(), perf.getTimer()) : true;
   }
   
   /**
@@ -55,7 +55,7 @@ public final class Update extends AUpdate {
     if(!check(n)) return error(ATTINVALID, n);
     
     // check if errors can occur
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.nodes[i];
       if(data.kind(pre) != Data.ATTR)
         return error(UPDATENODE, CmdUpdate.values()[Data.ATTR]);
@@ -70,7 +70,9 @@ public final class Update extends AUpdate {
     
     // perform updates
     data.meta.update();
-    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], n, v);
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      data.update(nodes.nodes[i], n, v);
+    }
     return true;
   }
   
@@ -96,14 +98,14 @@ public final class Update extends AUpdate {
     }
     
     // check if nodes to be updated have the same type
-    for(int i = nodes.size - 1; i >= 0; i--) {
+    for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k != kind) return error(UPDATENODE, CmdUpdate.values()[kind]);
     }
     
     // perform updates
     data.meta.update();
-    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
+    for(int i = nodes.size() - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
     return true;
   }
 

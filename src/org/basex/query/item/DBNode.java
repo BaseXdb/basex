@@ -151,8 +151,9 @@ public class DBNode extends Nod {
 
   @Override
   public int diff(final Nod nod) {
-    if(!(nod instanceof DBNode) || data != ((DBNode) nod).data)
+    if(!(nod instanceof DBNode) || data != ((DBNode) nod).data) {
       return id - nod.id;
+    }
     return pre - ((DBNode) nod).pre;
   }
 

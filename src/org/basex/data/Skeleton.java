@@ -77,11 +77,11 @@ public final class Skeleton {
   }
   
   /**
-   * Finishes the structure.
+   * Writes the skeleton to the specified output.
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public synchronized void finish(final DataOutput out) throws IOException {
+  public synchronized void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
     if(root != null) root.finish(out);
   }

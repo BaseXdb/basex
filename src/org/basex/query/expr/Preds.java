@@ -1,13 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Type;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -33,30 +31,21 @@ public abstract class Preds extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    final Item ci = ctx.item;
-    final Type ct = ci != null ? ci.type : null;
-    if(ct == Type.DOC) ctx.item.type = Type.ELM;
-
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
       ex = Pos.get(ex, CmpV.Comp.EQ, ex);
       
       if(ex.i()) {
-        if(((Item) ex).bool()) {
-          ctx.compInfo(OPTTRUE, ex);
-          pred = Array.delete(pred, p--);
-        } else {
+        if(!((Item) ex).bool()) {
           ctx.compInfo(OPTFALSE, ex);
-          ctx.item = ci;
           return null;
         }
+        ctx.compInfo(OPTTRUE, ex);
+        pred = Array.delete(pred, p--);
       } else {
         pred[p] = ex;
       }
     }
-
-    ctx.item = ci;
-    if(ci != null) ctx.item.type = ct;
     return this;
   }
   
