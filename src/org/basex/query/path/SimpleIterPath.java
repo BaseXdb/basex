@@ -5,6 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
@@ -33,10 +34,11 @@ public final class SimpleIterPath extends AxisPath {
       final Item c = ctx.item;
       Expr[] expr;
       Iter[] iter;
+      Nod prev;
       int p;
 
       @Override
-      public Item next() throws QueryException {
+      public Nod next() throws QueryException {
         if(iter == null) {
           final int o = root != null ? 1 : 0;
           // copy expressions to be iterated
@@ -55,11 +57,16 @@ public final class SimpleIterPath extends AxisPath {
           } else {
             if(p == iter.length - 1) {
               if(!i.node()) Err.or(NODESPATH, this, i.type);
-              return i;
+              final Nod n = (Nod) i;
+              if(prev == null || !prev.is(n)) {
+                prev = n;
+                return n;
+              }
+            } else {
+              p++;
+              ctx.item = i;
+              iter[p] = ctx.iter(expr[p]);
             }
-            p++;
-            ctx.item = i;
-            iter[p] = ctx.iter(expr[p]);
           }
         }
         ctx.item = c;

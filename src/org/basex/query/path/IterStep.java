@@ -47,7 +47,6 @@ public final class IterStep extends Step {
       boolean finish;
       NodeIter ir;
       Iter iter;
-      Nod prev;
 
       @Override
       public Nod next() throws QueryException {
@@ -69,7 +68,7 @@ public final class IterStep extends Step {
           
           final Nod nod = ir.next();
           if(nod != null) {
-            if((prev == null || !nod.is(prev)) && test.eval(nod)) {
+            if(test.eval(nod)) {
               // evaluates predicates
               ctx.item = nod;
               ctx.pos++;
@@ -80,8 +79,7 @@ public final class IterStep extends Step {
                 nod.score(i.score());
                 // check if no more results are to be expected
                 if(pos != null && pos.last(ctx)) ir = null;
-                prev = nod.finish();
-                return prev;
+                return nod.finish();
               }
               // remember last node
               if(last) temp = nod.finish();

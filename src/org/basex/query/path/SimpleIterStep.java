@@ -38,9 +38,6 @@ public final class SimpleIterStep extends Step {
 
     return new NodeIter() {
       NodeIter ir;
-      // [CG] previous node is ignored if a new iterator is created
-      //  -> add reset method?
-      Nod prev;
 
       @Override
       public Nod next() throws QueryException {
@@ -54,9 +51,8 @@ public final class SimpleIterStep extends Step {
           final Nod n = ir.next();
           if(n == null) {
             ir = null;
-          } else if((prev == null || !n.is(prev)) && test.eval(n)) {
-            prev = n.finish();
-            return prev;
+          } else if(test.eval(n)) {
+            return n.finish();
           }
         }
       }

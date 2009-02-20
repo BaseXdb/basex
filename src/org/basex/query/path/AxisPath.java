@@ -72,20 +72,17 @@ public class AxisPath extends Path {
     // check if steps have predicates
     boolean pred = false;
     for(final Step s : st) pred |= s.pred.length != 0;
-    return new AxisPath(r, st).iterator(pred, null);
+    return new AxisPath(r, st).iterator(null);
   }
 
   /**
    * If possible, converts this path expression to a path iterator.
-   * @param pred predicate flag
    * @param ctx context reference
    * @return resulting operator
    */
-  private AxisPath iterator(final boolean pred, final QueryContext ctx) {
-    // variables in root expression or predicates not supported yet..
-
-    // [CG] check if predicates cause troubles at all...
-    if(pred || root != null && root.uses(Use.VAR, ctx)) return this;
+  private AxisPath iterator(final QueryContext ctx) {
+    // skip paths with variables...
+    if(root != null && root.uses(Use.VAR, ctx)) return this;
 
     // Simple iterator: one downward location step
     if(step.length == 1 && step[0].axis.down)
@@ -93,9 +90,8 @@ public class AxisPath extends Path {
 
     // check if all steps are child steps
     boolean children = root != null && !root.duplicates(ctx);
-    for(final Step s : step) children &= s.axis == Axis.CHILD;
-      // [CG] parent step might yield duplicates (see SimpleIterStep...)
-      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+    for(final Step s : step)
+      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
     
     // return null if no iterator could be created
@@ -139,12 +135,10 @@ public class AxisPath extends Path {
     mergeDesc(ctx);
 
     // check if steps have predicates
-    boolean preds = false;
     boolean pos = false;
     for(final Step s : step) {
       // check if we have a predicate
       if(s.pred.length != 0) {
-        preds = true;
         if(s.uses(Use.POS, ctx)) {
           // variable and position test found - skip optimizations
           if(s.uses(Use.VAR, ctx)) return this;
@@ -169,7 +163,7 @@ public class AxisPath extends Path {
     }
 
     // if applicable, return iterator
-    return iterator(preds, ctx);
+    return iterator(ctx);
   }
 
   /**
