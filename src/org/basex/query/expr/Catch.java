@@ -79,12 +79,6 @@ public final class Catch extends Single {
   }
 
   @Override
-  public int count(final Var v) {
-    return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
-        super.count(v) : 0;
-  }
-
-  @Override
   public Expr remove(final Var v) {
     return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
       super.remove(v) : this;

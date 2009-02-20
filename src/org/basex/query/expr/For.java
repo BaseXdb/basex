@@ -116,6 +116,11 @@ public final class For extends ForLet {
       }
     };
   }
+
+  @Override
+  boolean standard() {
+    return pos == null && score == null;
+  }
   
   @Override
   public boolean shadows(final Var v) {

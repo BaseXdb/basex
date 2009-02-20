@@ -40,10 +40,9 @@ public final class Let extends ForLet {
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx);
 
-    // bind variable if no variables are used and if expression is no
-    // constructor and no context
-    if(!score && !expr.uses(Use.VAR, ctx) && !expr.uses(Use.CTX, ctx) &&
-        !expr.uses(Use.FRG, ctx)) {
+    // bind variable if expression uses no var, pos, ctx or fragment
+    if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
+        expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
@@ -97,6 +96,11 @@ public final class Let extends ForLet {
         return true;
       }
     };
+  }
+
+  @Override
+  boolean standard() {
+    return !score;
   }
 
   @Override

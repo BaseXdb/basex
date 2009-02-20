@@ -253,7 +253,7 @@ public final class FTTest extends AbstractTest {
       { "FTAndOr 3", nodes(14),
         "//w [text() ftcontains 'HELLO' ftand 'hello']" },
       { "FTAndOr 4", nodes(7, 9, 11, 14),
-        "//w [text() ftcontains 'xml' ftand 'databases'  ftor 'hello' ]" },
+        "//w [text() ftcontains 'xml' ftand 'databases' ftor 'hello' ]" },
       { "FTAndOr 5", nodes(7, 9, 11),
         "//w [text() ftcontains 'databases' ftand ('xml' ftor 'hello')]" },
       { "FTAndOr 6", nodes(31, 33),

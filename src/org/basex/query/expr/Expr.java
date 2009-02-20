@@ -140,16 +140,14 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Recursively counts the occurrences of the specified variable.
-   * Called by the compiler to perform certain optimizations.
-   * {@link Integer#MAX_VALUE} is returned by default and thus
-   * assumed as "worst-case".
-   * @param v variable to be checked
+   * Checks if the specified variable is removable.
+   * @param v variable to be removed
+   * @param ctx query context
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public int count(final Var v) {
-    return Integer.MAX_VALUE;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return false;
   }
 
   /**

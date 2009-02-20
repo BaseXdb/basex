@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.util.Var;
 
 /**
  * Simple expression without arguments.
@@ -24,11 +23,6 @@ public abstract class Simple extends Expr {
     return false;
   }
 
-  @Override
-  public int count(final Var v) {
-    return 0;
-  }
-  
   @Override
   public String color() {
     return "FFFF66";

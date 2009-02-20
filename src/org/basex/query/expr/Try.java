@@ -62,13 +62,6 @@ public final class Try extends Single {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Catch t : ctch) c += t.count(v);
-    return c + super.count(v);
-  }
-
-  @Override
   public Expr remove(final Var v) {
     for(final Catch c : ctch) c.remove(v);
     return super.remove(v);

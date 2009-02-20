@@ -83,6 +83,8 @@ public class AxisPath extends Path {
    */
   private AxisPath iterator(final boolean pred, final QueryContext ctx) {
     // variables in root expression or predicates not supported yet..
+
+    // [CG] check if predicates cause troubles at all...
     if(pred || root != null && root.uses(Use.VAR, ctx)) return this;
 
     // Simple iterator: one downward location step
@@ -90,10 +92,10 @@ public class AxisPath extends Path {
       return new SingleIterPath(root, step);
 
     // check if all steps are child steps
-    boolean children = root == null || !root.duplicates(ctx);
-    for(final Step s : step)
-      //children &= s.axis == Axis.CHILD;
-      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+    boolean children = root != null && !root.duplicates(ctx);
+    for(final Step s : step) children &= s.axis == Axis.CHILD;
+      // [CG] parent step might yield duplicates (see SimpleIterStep...)
+      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
     if(children) return new SimpleIterPath(root, step);
     
     // return null if no iterator could be created
@@ -252,8 +254,9 @@ public class AxisPath extends Path {
   private Expr index(final QueryContext ctx, final Data data)
       throws QueryException {
 
+    
     // skip position predicates and horizontal axes
-    for(final Step s : step) if(!s.axis.vert) return this;
+    for(final Step s : step) if(!s.axis.down) return this;
 
     // check if path can be converted to an index access
     for(int i = 0; i < step.length; i++) {
@@ -262,6 +265,7 @@ public class AxisPath extends Path {
       IndexContext ictx = null;
       int minp = 0;
 
+      // check if resulting index path will be duplicate free
       final boolean d = stp.pred.length == 0 || node(data, i) == null;
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(data, stp, d);
@@ -338,8 +342,7 @@ public class AxisPath extends Path {
         }
         // add inverted path as predicate to last step
         if(inv.length != 0) {          
-//          result.step[sl] = result.step[sl].addPred(a.iterator(false));
-          result.step[sl] = result.step[sl].addPred(new AxisPath(null, inv));
+          result.step[sl] = result.step[sl].addPred(AxisPath.get(null, inv));
         }
         // add remaining steps
         for(int j = i + 1; j < step.length; j++) {
@@ -363,13 +366,13 @@ public class AxisPath extends Path {
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
       litem = it;
       ctx.item = it;
-
       citem = new NodIter();
       iter(0, citem, ctx);
       citem.sort(true);
     } else {
       citem.reset();
     }
+
     ctx.item = c;
     ctx.size = cs;
     ctx.pos = cp;
@@ -411,6 +414,7 @@ public class AxisPath extends Path {
       if(root.i()) return (Item) root;
       if(root instanceof Root && ctx.item != null)
         return ((Root) root).root(ctx.item);
+      return null;
     }
     return ctx.item;
   }
@@ -420,7 +424,8 @@ public class AxisPath extends Path {
     long res = -1;
 
     final Item rt = root(ctx);
-    final Data data = rt instanceof DBNode ? ((DBNode) rt).data : null;
+    final Data data = rt != null && rt.type == Type.DOC &&
+      rt instanceof DBNode ? ((DBNode) rt).data : null;
     if(data != null && data.meta.uptodate && data.ns.size() == 0) {
       HashSet<SkelNode> nodes = new HashSet<SkelNode>(1);
       nodes.add(data.skel.root);
@@ -560,8 +565,9 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public int count(final Var v) {
-    return count(step, v);
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final Step s : step) if(s.uses(Use.VAR, ctx)) return false;
+    return true;
   }
 
   @Override

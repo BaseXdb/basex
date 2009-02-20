@@ -119,15 +119,13 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public final int count(final Var v) {
-    int c = 0;
+  public boolean removable(final Var v, final QueryContext ctx) {
     for(final ForLet f : fl) {
-      c += f.count(v);
-      if(f.shadows(v)) return c;
+      if(!f.removable(v, ctx)) return false;
+      if(f.shadows(v)) return true;
     }
-    if(where != null) c += where.count(v);
-    if(order != null) c += order.count(v);
-    return c + ret.count(v);
+    return where == null || where.removable(v, ctx) &&
+      order == null && order.removable(v, ctx) && ret.removable(v, ctx);
   }
 
   @Override
@@ -143,13 +141,13 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public final String color() {
-    return "66FF66";
+  public Return returned(final QueryContext ctx) {
+    return Return.SEQ;
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.SEQ;
+  public final String color() {
+    return "66FF66";
   }
 
   @Override

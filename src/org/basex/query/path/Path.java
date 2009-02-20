@@ -50,18 +50,6 @@ public abstract class Path extends Expr {
     return root != null && root.uses(use, ctx);
   }
 
-  /**
-   * Variable test.
-   * @param step step array
-   * @param v variable to be checked
-   * @return result of check
-   */
-  protected int count(final Expr[] step, final Var v) {
-    int c = 0;
-    for(final Expr s : step) c += s.count(v);
-    return c + (root != null ? root.count(v) : 0);
-  }
-
   @Override
   public Expr remove(final Var v) {
     if(root != null) root = root.remove(v);

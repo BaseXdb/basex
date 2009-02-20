@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -31,6 +32,12 @@ public abstract class Preds extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    final Item ci = ctx.item;
+    final Type ct = ci != null ? ci.type : null;
+    // predicates will not necessarily start from the document node..
+    if(ct == Type.DOC) ctx.item.type = Type.ELM;
+
+    Expr e = this;
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
       ex = Pos.get(ex, CmpV.Comp.EQ, ex);
@@ -38,7 +45,8 @@ public abstract class Preds extends Expr {
       if(ex.i()) {
         if(!((Item) ex).bool()) {
           ctx.compInfo(OPTFALSE, ex);
-          return null;
+          e = null;
+          break;
         }
         ctx.compInfo(OPTTRUE, ex);
         pred = Array.delete(pred, p--);
@@ -46,7 +54,9 @@ public abstract class Preds extends Expr {
         pred[p] = ex;
       }
     }
-    return this;
+    ctx.item = ci;
+    if(ct != null) ctx.item.type = ct;
+    return e;
   }
   
   @Override
@@ -58,10 +68,9 @@ public abstract class Preds extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr p : pred) c += p.count(v);
-    return c;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final Expr p : pred) if(!p.removable(v, ctx)) return false;
+    return true;
   }
 
   @Override

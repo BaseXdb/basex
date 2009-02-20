@@ -90,11 +90,6 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public int count(final Var v) {
-    return atn.count(v) + super.count(v);
-  }
-
-  @Override
   public Expr remove(final Var v) {
     atn = atn.remove(v);
     return super.remove(v);

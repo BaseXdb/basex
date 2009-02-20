@@ -43,11 +43,6 @@ public final class Case extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    return v == null ? 1 : v.visible(var) ? super.count(v) : 0;
-  }
-
-  @Override
   public Case remove(final Var v) {
     if(!v.eq(var)) expr = expr.remove(v);
     return this;

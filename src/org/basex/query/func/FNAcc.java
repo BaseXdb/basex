@@ -72,17 +72,17 @@ final class FNAcc extends Fun {
   private Item number(final Item it) {
     if(it.type == Type.DBL) return it;
 
+    double d = Double.NaN;
     try {
-      if(it.type != Type.URI && (it.s() || it.n() || it.u()))
-        return Dbl.get(it.dbl());
+      if(it.type != Type.URI && (it.s() || it.n() || it.u())) d = it.dbl();
     } catch(final QueryException e) { }
 
-    return Dbl.get(Double.NaN);
+    return Dbl.get(d);
   }
 
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
-    return (use == Use.POS || use == Use.VAR) &&
-      (func == FunDef.POS || func == FunDef.LAST) || super.uses(use, ctx);
+    return use == Use.POS && (func == FunDef.POS || func == FunDef.LAST) ||
+      super.uses(use, ctx);
   }
 }

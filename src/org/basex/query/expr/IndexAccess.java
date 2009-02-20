@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-final class IndexAccess extends Simple {
+public final class IndexAccess extends Simple {
   /** Index type. */
   final IndexToken ind;
   /** Index context. */
@@ -31,7 +31,7 @@ final class IndexAccess extends Simple {
    * @param i index reference
    * @param ic index context
    */
-  IndexAccess(final IndexToken i, final IndexContext ic) {
+  public IndexAccess(final IndexToken i, final IndexContext ic) {
     ind = i;
     ictx = ic;
   }
@@ -45,8 +45,7 @@ final class IndexAccess extends Simple {
       
       @Override
       public Item next() {
-        ctx.item = ++p < s ? new DBNode(ictx.data, it.next()) : null;
-        return ctx.item;
+        return ++p < s ? new DBNode(ictx.data, it.next()) : null;
       }
     };
   }

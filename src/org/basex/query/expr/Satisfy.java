@@ -85,13 +85,12 @@ public final class Satisfy extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
+  public boolean removable(final Var v, final QueryContext ctx) {
     for(final ForLet f : fl) {
-      c += f.count(v);
-      if(f.shadows(v)) return c;
+      if(!f.removable(v, ctx)) return false;
+      if(f.shadows(v)) return true;
     }
-    return c + sat.count(v);
+    return sat.removable(v, ctx);
   }
 
   @Override

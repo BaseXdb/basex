@@ -168,8 +168,8 @@ public final class MP3Extractor extends AbstractExtractor {
       // no readable version found..
       if(tt == null) {
         BaseX.debug(ID3UNKNOWN, tag, file.getName());
-      } else if(enc == 0) {
-        // unicode characters aren't supported yet (enc != 0)
+      } else if(enc == 0 || enc == 3) {
+        // UTF16 not supported (0: ISO8859, 1: LE, 2: BW, 3: UTF8)
         final byte[] cont = chop(fsize - 1, tt.length == 3);
 
         if(cont == null) {
@@ -181,7 +181,7 @@ public final class MP3Extractor extends AbstractExtractor {
       }
       s -= FRAME_HEADER_LENGTH + fsize;
 
-      // handle encoding (enc != 0) ?
+      // to be done: handle unicode encodings
     }
     skip(in, s - 1);
     return frames;
@@ -189,27 +189,26 @@ public final class MP3Extractor extends AbstractExtractor {
 
   /**
    * Chops remaining zero bytes from the current content.
-   * @param fs content size
+   * @param s content size
    * @param conv convert null bytes to spaces
    * @return resulting content or null if content is invalid
    */
-  private byte[] chop(final int fs, final boolean conv) {
+  private byte[] chop(final int s, final boolean conv) {
     // find last valid character
-    int i = fs;
+    int i = s;
     while(--i >= 0 && content[i] == 0);
     if(i == -1) return EMPTY;
 
-    int j = i;
     // check if there are still zero bytes
+    int j = i;
     while(--j >= 0 && content[j] != 0);
-
-    if(conv && j != -1) {
-      for(int k = i; k > j; k--) if(content[k] == 0) content[k] = ' ';
-      return Array.create(content, j + 1, i - j);
-    }
+    if(j == -1) return Array.finish(content, i + 1);
 
     // return null if zero bytes have been found
-    return j == -1 ? Array.finish(content, i + 1) : null;
+    if(!conv) return null;
+    
+    for(int k = i; k > j; k--) if(content[k] == 0) content[k] = ' ';
+    return Array.create(content, j + 1, i - j);
   }
 
   @Override

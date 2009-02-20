@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 
@@ -28,9 +29,26 @@ public final class FLWR extends FLWOR {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    // add where clause to last for clause and remove variable calls.
+    if(where != null) {
+      final ForLet f = fl[fl.length - 1];
+      if(f instanceof For && f.standard() && where.removable(f.var, ctx)) {
+        if(!where.returned(ctx).num) {
+          ctx.compInfo(OPTWHERE);
+          final Expr w = where.remove(f.var);
+          if(f.expr instanceof AxisPath) {
+            f.expr = ((AxisPath) f.expr).addPred(w);
+          } else {
+            fl[fl.length - 1].expr = new Pred(f.expr, w);
+          }
+          where = null;
+        }
+      }
+    }
+
     final Expr ex = super.comp(ctx);
     if(ex != this) return ex;
-    
+
     // remove let clauses with static contents
     for(int f = 0; f != fl.length; f++) {
       if(fl[f].var.expr != null) {
@@ -46,22 +64,6 @@ public final class FLWR extends FLWOR {
       return where != null ? new If(where, ret, Seq.EMPTY) : ret;
     }
 
-    /* [CG] add where clause as predicate to last for clause
-     * and remove variable calls.
-     * Problem: where ....[$i = ...] -> ....[. = ...]
-    if(where != null && fl[fl.length - 1] instanceof For) {
-      final For f = (For) fl[fl.length - 1];
-      if(f.pos == null && f.score == null && f.expr instanceof AxisPath) {
-        if(!where.returned(ctx).num) {
-          ctx.compInfo(OPTWHERE);
-          f.expr = ((AxisPath) f.expr).addPred(where.remove(f.var));
-          where = null;
-          return comp(ctx);
-        }
-      }
-    }
-    */
-    
     // simplify simple return expression
     if(where == null && fl.length == 1 && ret instanceof VarCall) {
       final Var v = ((VarCall) ret).var;
@@ -86,7 +88,7 @@ public final class FLWR extends FLWOR {
           iter = new Iter[fl.length];
           for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
         }
-        
+
         while(true) {
           if(ir != null) {
             final Item i = ir.next();

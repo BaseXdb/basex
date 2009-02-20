@@ -195,11 +195,6 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public int count(final Var v) {
-    return tag.count(v) + super.count(v);
-  }
-
-  @Override
   public Expr remove(final Var v) {
     tag = tag.remove(v);
     return super.remove(v);

@@ -76,8 +76,8 @@ public final class VarCall extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    return var.eq(v) ? 1 : 0;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return true;
   }
 
   @Override

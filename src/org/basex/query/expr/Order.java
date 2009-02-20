@@ -88,13 +88,6 @@ public final class Order extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Ord o : ord) c += o.count(v);
-    return c;
-  }
-
-  @Override
   public Order remove(final Var v) {
     for(int o = 0; o < ord.length; o++) ord[o] = ord[o].remove(v);
     return this;
@@ -249,7 +242,7 @@ public final class Order extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(ORDER, EVAL, ITER);
+    ser.openElement(ORDER);
     for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
     ser.closeElement();
   }

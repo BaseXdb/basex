@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -27,7 +29,7 @@ public class Pred extends Preds {
    * @param r expression
    * @param p predicates
    */
-  public Pred(final Expr r, final Expr[] p) {
+  public Pred(final Expr r, final Expr... p) {
     super(p);
     root = r;
   }
@@ -36,6 +38,11 @@ public class Pred extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     if(super.comp(ctx) != this) return Seq.EMPTY;
     root = root.comp(ctx);
+    
+    if(root.e()) {
+      ctx.compInfo(OPTPRE, this);
+      return Seq.EMPTY;      
+    }
     
     // No predicates.. return root
     if(pred.length == 0) return root;
@@ -55,9 +62,6 @@ public class Pred extends Preds {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // quick evaluation of variable counters (array[$pos] ...)
-    //if(pred.length == 1 && pred[0].returned(ctx) == Return.NUM) {
-    //}
-
     if(pred.length == 1 && pred[0] instanceof VarCall) {
       final Item it = pred[0].ebv(ctx);
       if(it.n()) {
@@ -101,8 +105,8 @@ public class Pred extends Preds {
   }
 
   @Override
-  public int count(final Var v) {
-    return root.count(v) + super.count(v);
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return root.removable(v, ctx) && super.removable(v, ctx);
   }
 
   @Override

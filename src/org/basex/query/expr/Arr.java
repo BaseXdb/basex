@@ -41,10 +41,9 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr e : expr) c += e.count(v);
-    return c;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final Expr e : expr) if(!e.removable(v, ctx)) return false;
+    return true;
   }
 
   @Override

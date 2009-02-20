@@ -17,7 +17,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-final class FTIndexAccess extends Simple {
+public final class FTIndexAccess extends Simple {
   /** Fulltext expression. */
   final FTExpr ftexpr;
   /** Fulltext parser. */
@@ -31,7 +31,8 @@ final class FTIndexAccess extends Simple {
    * @param ftt FTTokenizer
    * @param ic index context
    */
-  FTIndexAccess(final FTExpr ex, final FTTokenizer ftt, final IndexContext ic) {
+  public FTIndexAccess(final FTExpr ex, final FTTokenizer ftt,
+      final IndexContext ic) {
     ftexpr = ex;
     ft = ftt;
     ictx = ic;

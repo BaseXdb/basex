@@ -69,14 +69,6 @@ public final class TypeSwitch extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    if(!v.visible(var)) return 0;
-    int c = ts.count(v);
-    for(final Case s : cs) c = Math.max(c, s.count(v));
-    return Math.max(c, ret.count(v));
-  }
-
-  @Override
   public Expr remove(final Var v) {
     if(!v.visible(var)) return this;
     for(int c = 0; c < cs.length; c++) cs[c] = cs[c].remove(v);

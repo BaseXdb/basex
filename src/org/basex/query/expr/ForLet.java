@@ -16,9 +16,15 @@ public abstract class ForLet extends Expr {
   /** Variable. */
   protected Var var;
 
+  /**
+   * Checks if clause has no scoring and position.
+   * @return result of check
+   */
+  abstract boolean standard();
+
   @Override
-  public final int count(final Var v) {
-    return expr.count(v);
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return expr.removable(v, ctx);
   }
 
   @Override

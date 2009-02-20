@@ -105,8 +105,9 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public int count(final Var v) {
-    return count(step, v);
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final Expr s : step) if(s.uses(Use.VAR, ctx)) return false;
+    return true;
   }
 
   @Override

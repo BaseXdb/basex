@@ -36,11 +36,6 @@ public abstract class Single extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
   public Expr remove(final Var v) {
     expr = expr.remove(v);
     return this;

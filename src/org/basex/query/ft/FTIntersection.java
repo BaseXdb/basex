@@ -24,9 +24,8 @@ final class FTIntersection extends FTExpr {
   /** Cache for negative expression. */
   private FTNodeItem[] cn;
   /** Collect each pointer once for a result.*/
-  private IntList col = new IntList();
+  private IntList col;
   
-
   /**
    * Constructor.
    * @param p pointer on positive expression
@@ -41,6 +40,12 @@ final class FTIntersection extends FTExpr {
     cn = new FTNodeItem[n.length];
   }
 
+  @Override
+  public FTExpr comp(final QueryContext ctx) throws QueryException {
+    if(ctx.ftdata != null) col = new IntList();
+    return super.comp(ctx);
+  }
+  
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
     return new FTNodeIter(){

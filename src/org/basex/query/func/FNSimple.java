@@ -69,7 +69,7 @@ public final class FNSimple extends Fun {
       case EMPTY:
       case EXISTS:
       case BOOL:
-        return i ? atomic(ctx) : this;
+        return e || i ? atomic(ctx) : this;
       case NOT:
         if(i) return atomic(ctx);
         if(expr[0] instanceof Fun) {
@@ -77,6 +77,7 @@ public final class FNSimple extends Fun {
           if(fs.func == FunDef.EMPTY) {
             expr = fs.expr;
             func = FunDef.EXISTS;
+            if(!expr[0].returned(ctx).num) return expr[0];
           } else if(fs.func == FunDef.EXISTS) {
             expr = fs.expr;
             func = FunDef.EMPTY;
@@ -84,7 +85,6 @@ public final class FNSimple extends Fun {
         }
         return this;
       case ZEROONE:
-        return e || i || expr[0].returned(ctx).single ? expr[0] : this;
       case EXONE:
       case ONEMORE:
         return i || expr[0].returned(ctx).single ? expr[0] : this;

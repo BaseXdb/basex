@@ -93,11 +93,6 @@ public final class Ord extends Expr {
   }
 
   @Override
-  public int count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
   public Ord remove(final Var v) {
     if(expr != null) expr = expr.remove(v);
     return this;
@@ -117,7 +112,7 @@ public final class Ord extends Expr {
   public String toString() {
     if(expr == null) return "";
     final StringBuilder sb = new StringBuilder(expr.toString());
-    if(desc) sb.append(" ascending");
+    if(desc) sb.append(" descending");
     if(!lst) sb.append(" empty greatest");
     return sb.toString();
   }

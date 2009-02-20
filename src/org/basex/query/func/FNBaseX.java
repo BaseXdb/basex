@@ -1,14 +1,25 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+import org.basex.data.Data;
+import org.basex.index.FTTokenizer;
+import org.basex.index.IndexToken;
+import org.basex.index.ValuesToken;
+import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.IndexAccess;
+import org.basex.query.ft.FTIndex;
+import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
 
 /**
  * Project specific functions.
@@ -23,7 +34,8 @@ final class FNBaseX extends Fun {
     for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
 
     switch(func) {
-      case EVAL: return eval(ctx);
+      case EVAL:  return eval(ctx);
+      case INDEX: return index(ctx);
       default:   return super.iter(ctx);
     }
   }
@@ -69,6 +81,39 @@ final class FNBaseX extends Fun {
    */
   private Item random() {
     return Dbl.get(Math.random());
+  }
+
+  /**
+   * Performs the contains lower case function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter index(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.data();
+    if(data == null) Err.or(XPNOCTX, this);
+
+    final IndexContext ic = new IndexContext(data, null, true);
+    final String type = string(checkStr(expr[1], ctx)).toLowerCase();
+    final byte[] word = checkStr(expr[0], ctx);
+
+    if(type.equals(FULLTEXT)) {
+      if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
+      return new FTIndexAccess(new FTIndex(data, word),
+          new FTTokenizer(word), ic).iter(ctx);
+    }
+    
+    IndexToken it = null;
+    if(type.equals(TEXT)) {
+      it = new ValuesToken(true, word);
+      if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
+    } else if(type.equals(ATTRIBUTE)) {
+      it = new ValuesToken(false, word);
+      if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
+    } else {
+      Err.or(WHICHIDX, type);
+    }
+    return new IndexAccess(it, ic).iter(ctx);
   }
 
   /**

@@ -7,6 +7,7 @@ package org.basex.query;
  * @author Christian Gruen
  */
 public interface QueryText {
+  /** BASX Error type. */ String BASX = "BASX";
   /** FOAR Error type. */ String FOAR = "FOAR";
   /** FOCA Error type. */ String FOCA = "FOCA";
   /** FOCH Error type. */ String FOCH = "FOCH";
@@ -27,6 +28,11 @@ public interface QueryText {
   /** XQUS Error type. */ String XUST = "XQUS";
   /** XQTY Error type. */ String XQTY = "XQTY";
 
+  /** BASX0001: Evaluation exception. */
+  Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
+  /** BASX0002: Evaluation exception. */
+  Object[] WHICHIDX = { BASX, 2, "Unknown index: '%'." };
+  
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
   /** FOAR0002: Evaluation exception. */
@@ -483,6 +489,8 @@ public interface QueryText {
   String OPTDESC = "Merging descendant-or-self step(s)";
   /** Optimization info. */
   String OPTPRE = "Pre-evaluating %";
+  /** Optimization info. */
+  String OPTWRITE = "Rewriting %";
   /** Optimization info. */
   String OPTFALSE = "Removing always false expression: %";
   /** Optimization info. */

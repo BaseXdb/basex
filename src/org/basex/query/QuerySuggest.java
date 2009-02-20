@@ -49,8 +49,8 @@ public class QuerySuggest extends QueryParser {
   @Override
   void absPath(final boolean root, final boolean desc, final boolean nslash,
       final Axis axis, final Test test) {
-    System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
-        nslash + " AXIS: " + axis + " TEST: " + test);
+    //System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
+    //    nslash + " AXIS: " + axis + " TEST: " + test);
     final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
     list.add(skel.root);
     stack.push(list);
@@ -78,7 +78,7 @@ public class QuerySuggest extends QueryParser {
    * @param test test
    */
   void checkStep(final Axis axis, final Test test) {
-    System.out.println("checkStep: " + axis + " " + test);
+    //System.out.println("checkStep: " + axis + " " + test);
     filter(true);
     if(axis == null) {
       if(!stack.empty()) stack.push(skel.desc(stack.pop(), 0,
@@ -107,7 +107,7 @@ public class QuerySuggest extends QueryParser {
    * @param finish finish flag
    */
   private void filter(final boolean finish) {
-    System.out.println("Filter: " + finish);
+    //System.out.println("Filter: " + finish);
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
     final byte[] tn = entry(laxis, ltest);
@@ -135,7 +135,7 @@ public class QuerySuggest extends QueryParser {
    * @return completions
    */
   public StringList complete() {
-    System.out.println("complete");
+    //System.out.println("complete");
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
     for(final SkelNode r : stack.peek()) {
@@ -153,7 +153,7 @@ public class QuerySuggest extends QueryParser {
    * @return completion
    */
   private byte[] entry(final Axis a, final Test t) {
-    System.out.println("entry: " + a + " " + t);
+    //System.out.println("entry: " + a + " " + t);
     if(t.type == Type.TXT) {
       return TEXT;
     }

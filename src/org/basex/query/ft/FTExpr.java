@@ -47,13 +47,6 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public final int count(final Var v) {
-    int c = 0;
-    for(final FTExpr e : expr) c += e.count(v);
-    return c;
-  }
-
-  @Override
   public final FTExpr remove(final Var v) {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
     return this;

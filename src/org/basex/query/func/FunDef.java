@@ -291,7 +291,9 @@ public enum FunDef {
   /** XQuery function - allows a case insensitive substring search. */
   CONTAINSLC(BXURI, FNBaseX.class, 2, 2, "containslc(item, item)", BLN),
   /** XQuery function - returns the name of the query file. */
-  FILENAME(BXURI, FNBaseX.class, 0, 0, "filename()", STR);
+  FILENAME(BXURI, FNBaseX.class, 0, 0, "filename()", STR),
+  /** XQuery function - accesses an index. */
+  INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN);
   
   /** Function classes. */
   Class<? extends Fun> func;

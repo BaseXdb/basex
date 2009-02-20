@@ -302,7 +302,7 @@ public final class QueryContext extends Progress {
    * @throws Exception exception
    */
   protected void plan(final Serializer ser) throws Exception {
-    vars.plan(ser);
+    //vars.plan(ser);
     fun.plan(ser);
     root.plan(ser);
   }

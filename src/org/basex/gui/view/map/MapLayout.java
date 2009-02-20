@@ -40,7 +40,7 @@ abstract class MapLayout {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  public static double lineRatio(final ArrayList<MapRect> r) {
+  static double lineRatio(final ArrayList<MapRect> r) {
     if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
 
@@ -61,10 +61,10 @@ abstract class MapLayout {
    * [JH] as specified by Shneiderman only leafnodes should be checked
    * [JH] why not more weighten the bigger nodes???
    * 
-   * @param r arrraylist of rects
+   * @param r arrray list of rects
    * @return aar 
    */
-  public static double aar(final ArrayList<MapRect> r) {
+  static double aar(final ArrayList<MapRect> r) {
     double aar = 0;
     int nrLeaves = 0;
     for(int i = 0; i < r.size(); i++) {
@@ -93,7 +93,7 @@ abstract class MapLayout {
    * @param second array of view rectangles
    * @return average distance
    */
-  public static double averageDistanceChange(final ArrayList<MapRect> first, 
+  static double averageDistanceChange(final ArrayList<MapRect> first, 
       final ArrayList<MapRect> second) {
     double aDist = 0.0;
     int length = Math.min(first.size(), second.size());
@@ -117,7 +117,7 @@ abstract class MapLayout {
    * @param rectangles array of painted rects
    * @return nr of rects in the list
    */
-  public int getNumberRects(final ArrayList<MapRect> rectangles) {
+  int getNumberRects(final ArrayList<MapRect> rectangles) {
     return rectangles.size();
   }
 
@@ -127,7 +127,7 @@ abstract class MapLayout {
    * @param par parent node
    * @return children
    */
-  protected static MapList children(final Data data, final int par) {
+  private static MapList children(final Data data, final int par) {
     final MapList list = new MapList();
 
     final int kind = data.kind(par);
@@ -158,7 +158,7 @@ abstract class MapLayout {
    * @param data Data reference
    * @return weight in context
    */
-  public static double calcWeight(final int rect, final int par, 
+  static double calcWeight(final int rect, final int par, 
       final Data data) {
     double weight;
     // get size of the node
@@ -183,7 +183,7 @@ abstract class MapLayout {
    * @param data context
    * @return weight
    */
-  public static double calcWeight(final long size, final int childs,
+  static double calcWeight(final long size, final int childs,
       final long sSize, final int sChilds, final Data data) {
     // if its not a filesystem, set sliderval for calc only to nr of childs
     double sizeP = data.fs != null ? (double) GUIProp.sizep : 0d;
@@ -202,7 +202,7 @@ abstract class MapLayout {
    * @param data take this data kontext
    * @return sum of the size attribute
    */
-  public static long addSizes(final IntList l, final int start, final int end, 
+  static long addSizes(final IntList l, final int start, final int end, 
       final Data data) {
     long sum = 0;
     for (int i = start; i < end; i++) {
@@ -252,7 +252,6 @@ abstract class MapLayout {
    * @param ne ending
    * @param level on which the nodes are
    * @param v vertically???
-   * 
    */
   protected void splitUniformly(final Data data, final MapRect r,
       final ArrayList<MapRect> mainRects, final MapList l,

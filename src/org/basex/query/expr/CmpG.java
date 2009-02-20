@@ -125,13 +125,17 @@ public final class CmpG extends Arr {
       e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
     } else if(e1.e() || e2.e()) {
       e = Bln.FALSE;
+    }
+    if(e != this) {
+      ctx.compInfo(OPTPRE, this);
     } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
       e = Pos.get(this, cmp.cmp, e2);
+      if(e != this) ctx.compInfo(OPTWRITE, this);
     } else if(standard(true)) {
       e = CmpR.get(this);
       if(e == null) e = this;
+      else ctx.compInfo(OPTWRITE, this);
     }
-    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 
@@ -207,8 +211,8 @@ public final class CmpG extends Arr {
 
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
-    if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str ||
-        expr[1] instanceof VarCall) && !(expr[1] instanceof Seq)) return;
+    if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
+        expr[1] instanceof Seq)) return;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
@@ -269,7 +273,6 @@ public final class CmpG extends Arr {
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr;
     if(path.root != null) return null;
-    //if(path.root != null || path.step.length != 1) return null;
 
     // step must not contain predicates
     return path.step[path.step.length - 1];

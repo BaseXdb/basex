@@ -93,7 +93,7 @@ public class FTContains extends Expr {
     // return if step is no text node, or if no index is available
     ic.iu = false;
     final Step s = CmpG.indexStep(expr);
-    if(s == null || s.test.type != Type.TXT || !ic.data.meta.ftxindex) return;
+    if(s == null || !ic.data.meta.ftxindex || s.test.type != Type.TXT) return;
     
     ftexpr.indexAccessible(ctx, ic);
     vis = !ic.ftnot;
@@ -118,11 +118,6 @@ public class FTContains extends Expr {
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
     return expr.uses(use, ctx) || ftexpr.uses(use, ctx);
-  }
-
-  @Override
-  public int count(final Var v) {
-    return expr.count(v) + ftexpr.count(v);
   }
 
   @Override

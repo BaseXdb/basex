@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -149,10 +150,13 @@ public final class CmpV extends Arr {
       e = atomic(ctx);
     } else if(e1.e() || e2.e()) {
       e = Seq.EMPTY;
+    }
+    if(e != this) {
+      ctx.compInfo(OPTPRE, this);
     } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
       e = Pos.get(this, cmp, e2);
+      if(e != this) ctx.compInfo(OPTWRITE, this);
     }
-    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 

@@ -12,6 +12,7 @@ import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Scoring;
+import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -269,6 +270,11 @@ public abstract class Item extends Expr {
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
     return false;
+  }
+
+  @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return true;
   }
 
   @Override
