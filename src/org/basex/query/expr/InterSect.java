@@ -8,8 +8,10 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeMore;
 import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
@@ -86,8 +88,17 @@ public final class InterSect extends Arr {
       final IntList il = new IntList();
       for(int i = 0; i < seq.size(); i++) {
         it = seq.list[i];
-        // [SG] pre + 1  will cause troubles for some documents..
-        if(it instanceof DBNode) il.add(((DBNode) it).pre + 1);
+        // [CG] not sure if we could get incorrect results this way
+        if(it instanceof DBNode) {
+          NodeMore ci = ((DBNode) it).child();
+          while(ci.more()) {
+            Item child = ci.next();
+            if (child instanceof DBNode) {
+              final DBNode dbn = (DBNode) child;
+              if (dbn.type == Type.TXT) il.add(dbn.pre); 
+            }
+          }
+        }
       }
       if(il.size == 0) ftd.init();
       else ftd.keep(il.finish());
