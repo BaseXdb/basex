@@ -21,29 +21,29 @@ public final class FTPosIndex extends FTExpr {
 
   /**
    * Constructor.
-   * @param e expression
    * @param p fulltext selections
    */
-  public FTPosIndex(final FTExpr e, final FTPos p) {
-    super(e);
+  public FTPosIndex(final FTPos p) {
+    super();
     pos = p;
   }
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
     final FTPos tmp = ctx.ftpos;
+    final FTExpr e = pos.expr[0];
 
     return new FTNodeIter() {
       @Override
       public FTNodeItem next() throws QueryException {
         ctx.ftpos = pos;
         pos.init(ctx.ftitem);
-        FTNodeItem it = expr[0].iter(ctx).next();
+        FTNodeItem it = e.iter(ctx).next();
         if (ctx.ftpos != null) {
           if (it.ftn.size > 0) {
             init(it);
             while(!pos.filter(ctx)) {
-              it = expr[0].iter(ctx).next();
+              it = e.iter(ctx).next();
               if(it.ftn.size == 0) {
                 ctx.ftpos = tmp;
                 return it;
@@ -81,12 +81,11 @@ public final class FTPosIndex extends FTExpr {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     pos.plan(ser);
-    expr[0].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return expr[0].toString();
+    return pos.toString();
   }
 }

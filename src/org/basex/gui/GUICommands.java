@@ -841,23 +841,21 @@ public enum GUICommands implements GUICommand {
     // start database creation thread
     new Action() {
       public void run() {
-        for(final Process proc : procs) {
-          final boolean ci = proc instanceof CreateIndex;
-          final boolean fs = proc instanceof CreateFS;
-          final boolean di = proc instanceof DropIndex;
-          final boolean op = proc instanceof Optimize;
+        for(final Process p : procs) {
+          final boolean ci = p instanceof CreateIndex;
+          final boolean fs = p instanceof CreateFS;
+          final boolean di = p instanceof DropIndex;
+          final boolean op = p instanceof Optimize;
 
           if(!ci && !di && !op) {
             new Close().execute(gui.context);
             gui.notify.init();
           }
-          Performance.sleep(100);
-          final DialogProgress wait = new DialogProgress(
-              gui, t, !fs, !op, proc);
 
           // execute process
+          final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, p);
           final Performance perf = new Performance();
-          final boolean ok = proc.execute(gui.context);
+          final boolean ok = p.execute(gui.context);
           wait.dispose();
 
           // return user information
@@ -866,7 +864,7 @@ public enum GUICommands implements GUICommand {
             if(op) JOptionPane.showMessageDialog(gui, INFOOPTIM,
                 DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
           } else {
-            JOptionPane.showMessageDialog(gui, proc.info(),
+            JOptionPane.showMessageDialog(gui, p.info(),
                 DIALOGINFO, JOptionPane.WARNING_MESSAGE);
           }
           // initialize views

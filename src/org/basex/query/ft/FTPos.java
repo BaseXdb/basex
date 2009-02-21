@@ -446,9 +446,10 @@ public final class FTPos extends FTExpr {
 
   @Override
   public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
+      throws QueryException {
 
-    return new FTPosIndex(expr[0].indexEquivalent(ctx, ic), this);
+    expr[0] = expr[0].indexEquivalent(ctx, ic);
+    return new FTPosIndex(this);
   }
 
   @Override

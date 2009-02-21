@@ -79,8 +79,6 @@ public final class BaseXServer {
       final ServerSocket server = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) serve(server);
-      BaseX.outln(SERVERSTOPPED);
-
       context.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);

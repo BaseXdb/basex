@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.basex.BaseX;
@@ -13,7 +14,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.util.Token;
 
 /**
  * Dialog window for editing XML nodes.
@@ -30,11 +30,11 @@ public final class DialogEdit extends Dialog {
   /** Text area. */
   private BaseXTextField input;
   /** Text area. */
-  private BaseXText input3;
+  private BaseXTextField input2;
   /** Text area. */
-  private BaseXText input2;
+  private BaseXText input3;
   /** Old content. */
-  private final String old1;
+  private String old1;
   /** Old content. */
   private String old2;
   /** Button panel. */
@@ -65,7 +65,7 @@ public final class DialogEdit extends Dialog {
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       final byte[] txt = kind == Data.ELEM ? data.tag(pre) : data.text(pre);
-      input = new BaseXTextField(Token.string(txt), null, this);
+      input = new BaseXTextField(string(txt), null, this);
       old1 = input.getText();
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {
@@ -73,27 +73,34 @@ public final class DialogEdit extends Dialog {
       input3 = new BaseXText(gui, null, true, this);
       input3.setText(data.text(pre));
       input3.setPreferredSize(new Dimension(400, 200));
-      old1 = Token.string(input3.getText());
+      old1 = string(input3.getText());
       pp.add(input3, BorderLayout.CENTER);
     } else {
-      byte[][] atts = new byte[2][];
       if(kind == Data.ATTR) {
-        atts[0] = data.attName(pre);
-        atts[1] = data.attValue(pre);
+        old1 = string(data.attName(pre));
+        old2 = string(data.attValue(pre));
       } else {
-        atts[0] = data.text(pre);
-        atts[1] = Token.EMPTY;
-        if(Token.contains(atts[0], ' ')) atts = Token.split(atts[0], ' ');
+        old1 = string(data.text(pre));
+        old2 = "";
+        final int i = old1.indexOf(' ');
+        if(i != -1) {
+          old2 = old1.substring(i + 1);
+          old1 = old1.substring(0, i);
+        }
       }
       final BaseXBack b = new BaseXBack();
       b.setLayout(new TableLayout(2, 1, 0, 8));
-      input = new BaseXTextField(Token.string(atts[0]), null, this);
-      old1 = input.getText();
+      input = new BaseXTextField(old1, null, this);
       b.add(input);
-      input2 = new BaseXText(gui, null);
-      input2.setText(atts[1]);
-      old2 = Token.string(atts[1]);
-      b.add(input2);
+      if(kind == Data.ATTR) {
+        input2 = new BaseXTextField(old2, null, this);
+        b.add(input2);
+      } else {
+        input3 = new BaseXText(gui, null, true, this);
+        input3.setText(token(old2));
+        input3.setPreferredSize(new Dimension(400, 200));
+        b.add(input3);
+      }
       pp.add(b, BorderLayout.CENTER);
     }
     if(input != null) input.selectAll();
@@ -111,7 +118,7 @@ public final class DialogEdit extends Dialog {
     super.close();
 
     final String in = input != null ? input.getText() :
-      Token.string(input3.getText());
+      string(input3.getText());
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       if(in.length() == 0 || in.equals(old1)) return;
@@ -119,8 +126,12 @@ public final class DialogEdit extends Dialog {
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       if(in.equals(old2)) return;
       result = new String[] { in };
+    } else if(kind == Data.ATTR) {
+      final String in2 = input2.getText();
+      if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
+      result = new String[] { in, in2 };
     } else {
-      final String in2 = Token.string(input2.getText());
+      final String in2 = string(input3.getText());
       if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
       result = new String[] { in, in2 };
     }
