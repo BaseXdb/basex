@@ -2084,7 +2084,7 @@ public class QueryParser extends InputParser {
       }
     }
     if(consumeWS(WEIGHT)) sel.weight = range();
-    //return ctx.ftdata == null && sel.standard() ? expr : sel;
+//    return ctx.ftdata == null && sel.standard() ? expr : sel;
     return sel;
   }
 

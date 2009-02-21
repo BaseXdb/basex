@@ -24,7 +24,7 @@ final class FTIntersection extends FTExpr {
   /** Cache for negative expression. */
   private FTNodeItem[] cn;
   /** Collect each pointer once for a result.*/
-  private IntList col;
+  private IntList col = new IntList();
   
   /**
    * Constructor.
@@ -42,7 +42,6 @@ final class FTIntersection extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    if(ctx.ftdata != null) col = new IntList();
     return super.comp(ctx);
   }
   
@@ -91,7 +90,8 @@ final class FTIntersection extends FTExpr {
             return next(ctx);
         }
       }
-      if (col != null) ctx.ftdata.addFTAndCol(col.finish());
+      if (col != null && ctx.ftdata != null) 
+        ctx.ftdata.addFTAndCol(col.finish());
       col = null;
       return n1;
     } else if (cp.length == 0) {
