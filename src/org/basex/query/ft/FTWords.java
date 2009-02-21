@@ -75,7 +75,8 @@ public final class FTWords extends FTExpr {
       // speed up default case...
       final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, word);
       len = word.length;
-      o += oc / ctx.ftopt.sb.count();
+      final int c = ctx.ftopt.sb.count();
+      o += c > 0 ? oc / ctx.ftopt.sb.count() : len == 0 ? 1 : 0;
     } else {
       final Iter iter = ctx.iter(query);
       Item i;
@@ -150,7 +151,7 @@ public final class FTWords extends FTExpr {
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ctx.ftopt;
-    ic.io &= occ == null && word != null &&
+    ic.io &= occ == null && word != null && word.length > 0 &&
       md.ftcs == fto.is(FTOpt.CS) && md.ftdc == fto.is(FTOpt.DC) &&
       md.ftst == fto.is(FTOpt.ST) && fto.sw == null &&
       (!fto.is(FTOpt.WC) || !md.ftfz);

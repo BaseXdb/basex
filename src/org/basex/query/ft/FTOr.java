@@ -32,10 +32,12 @@ public final class FTOr extends FTExpr {
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     double d = 0;
     for(final FTExpr e : expr) {
+      if (e instanceof FTPos) ((FTPos) e).ordered |= ctx.ftpos.ordered;
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
       if(s != 0) d = Scoring.or(d, s);
     }
+    ctx.ftpos.ordered = false;
     return score(d);
   }
 
