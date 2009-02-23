@@ -87,8 +87,6 @@ public class MapList extends IntList{
     for(int i = 0; i < size - 1; i++) {
       weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
           parchilds, data);
-//      System.out.println(list[i] + ":" + sizes[i] + ";" + nrchilds[i] + 
-//          ";" + weights[i]);
     }
   }
   

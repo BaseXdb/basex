@@ -99,8 +99,6 @@ public final class MapView extends View implements Runnable {
   private static double aarn;
   /** distance change between layouts. */
   private static double distance;
-//  /** Hold old data instance. */
-//  private static Data dataold;
   
   /** TreeMap. */
   private BufferedImage mainMap;
@@ -350,7 +348,7 @@ public final class MapView extends View implements Runnable {
    * Initializes the calculation of the main TreeMap.
    * 
    * @param rect initial space to layout rects in
-   * @param rectangles List of divided rects
+   * @param rectangles List to store divided rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */

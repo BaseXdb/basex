@@ -18,7 +18,6 @@ public final class SquarifiedLayout extends MapLayout {
     // one rectangle left...
     if(ne - ns <= 1) {
       putRect(data, r, mainRects, l, ns, level);
-    // subdivide list
     } else {
    // some more nodes have to be positioned on the first level
       if(level == 0) {

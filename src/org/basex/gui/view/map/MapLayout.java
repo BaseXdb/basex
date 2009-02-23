@@ -18,7 +18,7 @@ abstract class MapLayout {
   MapRect layout;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
-
+  
   /**
    * Constructor.
    */
