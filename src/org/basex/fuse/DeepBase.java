@@ -2,6 +2,7 @@ package org.basex.fuse;
 
 import java.io.IOException;
 
+import org.basex.BaseXWin;
 import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -13,15 +14,18 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.gui.GUI;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
-/** Stores a file hierarchy as XML. 
+/**
+ * Stores a file hierarchy as XML.
  * 
  * @author Workgroup DBIS, University of Konstanz 2008, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
@@ -30,18 +34,49 @@ public final class DeepBase extends DeepFuse {
 
   /** Default database name, if none is provided. */
   private static final String DEFAULT_DBNAME = "deepfuse";
+  
+  /** GUI reference. */
+  protected GUI gui;
 
   /** Database reference. */
   private Data data;
 
   /** Database instance name. */
   private String dbname;
-  
+
   /** Path to backing store. */
   private String backingstore;
-  
+
   /** Path to mount point. */
   private String mountpoint;
+
+  /** Constructor. */
+  public DeepBase() {
+    this("unknown", "unknown", DEFAULT_DBNAME);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param mountPoint mount point of DeepFUSE
+   * @param backingStore backing storage root path
+   * @param dbName of the database to open/create
+   */
+  public DeepBase(final String mountPoint, final String backingStore,
+      final String dbName) {
+    mountpoint = mountPoint;
+    dbname = dbName;
+    backingstore = backingStore;
+  
+    final BaseXWin win = new BaseXWin(new String[] {});
+    init();
+  
+    while(win.gui == null)
+      Performance.sleep(100);
+    gui = win.gui;
+    gui.context.data(data);
+    gui.notify.init();
+  }
 
   /**
    * Creates an empty database.
@@ -121,15 +156,15 @@ public final class DeepBase extends DeepFuse {
   }
 
   /**
-   * Create a new regular file or directory.
+   * Create a new regular file or directory node.
    * 
    * @param path to the file to be created
    * @param mode of file (directory, regular file ..., permission bits)
    * @return id of the newly created file or -1 on failure
    */
-  private int createFile(final String path, final int mode) {
+  private int createNode(final String path, final int mode) {
     try {
-      int pre = insert(path, mode);
+      int pre = insertFileNode(path, mode);
       return (pre == -1) ? -1 : data.id(pre);
     } catch(QueryException e) {
       e.printStackTrace();
@@ -148,21 +183,8 @@ public final class DeepBase extends DeepFuse {
     final String dname = basename(path);
     byte[] elem;
     if(isDir(mode)) elem = DIR;
-    else if(isFile(mode)) {
-      elem = FILE;
-      try {
-        MemBuilder mb = new MemBuilder();
-        mb.init(new MemData(64, data.tags, data.atts,
-            data.ns, data.skel));
-        Prop.fscont = true;
-        Prop.fsmeta = true;
-        FSParser p = new FSParser(path);
-        mb.build(p, "tmp_memdata4file");
-        return mb.finish();
-      } catch(IOException e) {
-        e.printStackTrace();
-      }
-    } else elem = Token.token("unknown");
+    else if(isFile(mode)) elem = FILE;
+    else elem = Token.token("unknown");
     MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
     int tagID = data.tags.index(elem, null, false);
     int attID = data.atts.index(NAME, null, false);
@@ -172,19 +194,62 @@ public final class DeepBase extends DeepFuse {
   }
 
   /**
-   * Insert a file node.
+   * Extract content of file and build a MemData object.
+   * @param path from which to include content (it's in backing store).
+   * @return MemData reference
+   */
+  private MemData buildContentData(final String path) {
+    MemData md = new MemData(64, data.tags, data.atts, data.ns, data.skel);
+    try {
+      MemBuilder mb = new MemBuilder();
+      mb.init(md);
+      Prop.fscont = true;
+      Prop.fsmeta = true;
+      FSParser p = new FSParser(backingstore + path);
+      mb.build(p, "tmp_memdata4file");
+      return mb.finish();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    return md;
+  }
+
+  /**
+   * Insert a file node (regular file, directory ...).
    * @param path of file to insert
    * @param mode of file
    * @throws QueryException on failure
    * @return pre value of newly inserted node
    */
-  private int insert(final String path, final int mode) throws QueryException {
+  private int insertFileNode(final String path, final int mode)
+      throws QueryException {
+    return insert(path, buildData(path, mode));
+  }
+
+  /**
+   * Insert extracted file content.
+   * @param path to file at which to insert the extracted content
+   * @throws QueryException on failure
+   * @return pre value of newly inserted content, -1 on failure
+   */
+  private int insertContent(final String path) throws QueryException {
+    return insert(path, buildContentData(path));
+  }
+
+  /**
+   * Insert MemData at given path position.
+   * @param path at which to insert (content or file)
+   * @param md memory data insert to insert
+   * @return pre value of newly inserted node
+   * @throws QueryException in case of failure
+   */
+  private int insert(final String path, final MemData md) 
+    throws QueryException {
     int ppre = parentPre(path);
     if(ppre == -1) return -1;
     int npre = ppre + data.size(ppre, data.kind(ppre));
-    data.meta.update();
-    data.insert(npre, ppre, buildData(path, mode));
-    data.flush();
+    data.insert(npre, ppre, md);
+    refresh();
     return npre;
   }
 
@@ -200,39 +265,19 @@ public final class DeepBase extends DeepFuse {
     Nodes n = xquery(pn2xp(path, dir));
     if(n.size() == 0) return -1;
     else {
-      data.meta.update();
       data.delete(n.nodes[0]);
-      data.flush();
+      refresh();
     }
     return 0;
   }
 
-  /** Constructor. */
-  public DeepBase() {
-    this(DEFAULT_DBNAME);
-  }
-
   /**
-   * Constructor.
-   * @param dbName of the database to open/create
+   * Refreshes the data reference and GUI.
    */
-  public DeepBase(final String dbName) {
-    dbname = dbName;
-    init();
-  }
-
-  /** Constructor.
-   * 
-   * @param mountPoint mount point of DeepFUSE
-   * @param backingStore backing storage root path
-   * @param dbName of the database to open/create
-   */
-  public DeepBase(final String mountPoint, final String backingStore,
-      final String dbName) {
-    mountpoint = mountPoint;
-    dbname = dbName;
-    backingstore = backingStore;
-    init();
+  private void refresh() {
+    data.meta.update();
+    data.flush();
+    gui.notify.update();
   }
 
   /**
@@ -269,6 +314,7 @@ public final class DeepBase extends DeepFuse {
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
+  
     return 0;
   }
 
@@ -293,7 +339,7 @@ public final class DeepBase extends DeepFuse {
   @Override
   public int mkdir(final String path, final int mode) {
     if(!isDir(mode)) return -1;
-    return createFile(path, mode);
+    return createNode(path, mode);
   }
 
   /**
@@ -306,7 +352,7 @@ public final class DeepBase extends DeepFuse {
   @Override
   public int create(final String path, final int mode) {
     if(!isFile(mode)) return -1;
-    return createFile(path, mode);
+    return createNode(path, mode);
   }
 
   /**
@@ -487,8 +533,12 @@ public final class DeepBase extends DeepFuse {
 
   @Override
   public int release(final String path) {
-    // TODO Auto-generated method stub
-    return 0;
+    try {
+      return insertContent(path);
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
   @Override

@@ -33,11 +33,14 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class BaseXWin {
+  /** GUI reference. */
+  public GUI gui;
+  
   /**
    * Constructor.
    * @param args command-line arguments
    */
-  protected BaseXWin(final String[] args) {
+  public BaseXWin(final String[] args) {
     // some mac issues
     System.setProperty("apple.laf.useScreenMenuBar", "true");
     System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);
@@ -57,7 +60,7 @@ public final class BaseXWin {
         // initialize look and feel
         init();
         // open main window
-        final GUI gui = new GUI();
+        gui = new GUI();
 
         // open specified document or database
         if(args.length != 0) {

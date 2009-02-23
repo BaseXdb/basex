@@ -44,7 +44,7 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepBase(DBNAME);
+    dbfs = new DeepBase(DBNAME, "not_mounted", "java_only_test");
     dbfs.init();
   }
 
