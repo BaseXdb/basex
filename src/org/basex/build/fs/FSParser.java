@@ -87,7 +87,6 @@ public final class FSParser extends Parser {
   /** 
    * Constructor to parse single file nodes.
    * @param path String to file node to parse
-   * [AH] singlemode?
    */
   public FSParser(final String path) {
     this(IO.get(path), false);
@@ -198,7 +197,8 @@ public final class FSParser extends Parser {
    */
   private void file(final File f) throws IOException {
     curr = f;
-    builder.startElem(FILE, atts(f, false));
+    if (!singlemode)
+      builder.startElem(FILE, atts(f, false));
     if (f.canRead()) {
       if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
@@ -235,7 +235,8 @@ public final class FSParser extends Parser {
       }
     }
 
-    builder.endElem(FILE);
+    if (!singlemode)
+      builder.endElem(FILE);
     // add file size to parent folder
     sizeStack[lvl] += f.length();
   }

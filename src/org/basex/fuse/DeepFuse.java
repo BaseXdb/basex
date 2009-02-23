@@ -45,32 +45,6 @@ public abstract class DeepFuse {
   }
 
   /**
-   * TODO: delete me Get path to parent directory of a file, i.e., chop the file
-   * name (if any) and return the path prefix. A directory path is returned as
-   * is.
-   * @param path to file
-   * @param mode of file
-   * @return parent directory of file
-   */
-  protected String chopFilename(final String path, final int mode) {
-    if(isDir(mode)) return path;
-
-    int lastSlash = path.lastIndexOf('/');
-    return lastSlash == 0 ? "/" : path.substring(0, lastSlash);
-  }
-
-  /**
-   * TODO: delete me Get file name of a regular file.
-   * @param path to file
-   * @param mode of file
-   * @return true for regular file, false otherwise
-   */
-  protected String getName(final String path, final int mode) {
-    if(!isFile(mode)) return "";
-    return path.substring(path.lastIndexOf('/') + 1, path.length());
-  }
-
-  /**
    * Deletes any prefix ending with the last slash `/' character present in
    * string. FUSE always passes 'absolute, normalized' pathnames, i.e., starting
    * with a slash, redundant and trailing slashes removed.

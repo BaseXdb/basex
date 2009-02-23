@@ -34,9 +34,12 @@ public final class DeepBase extends DeepFuse {
 
   /** Default database name, if none is provided. */
   private static final String DEFAULT_DBNAME = "deepfuse";
-  
+
   /** GUI reference. */
   protected GUI gui;
+
+  /** GUI flag. */
+  private boolean wgui;
 
   /** Database reference. */
   private Data data;
@@ -52,7 +55,7 @@ public final class DeepBase extends DeepFuse {
 
   /** Constructor. */
   public DeepBase() {
-    this("unknown", "unknown", DEFAULT_DBNAME);
+    this("unknown", "unknown", DEFAULT_DBNAME, true);
   }
 
   /**
@@ -61,21 +64,25 @@ public final class DeepBase extends DeepFuse {
    * @param mountPoint mount point of DeepFUSE
    * @param backingStore backing storage root path
    * @param dbName of the database to open/create
+   * @param guitoggle whether BaseXWin is wanted or not
    */
   public DeepBase(final String mountPoint, final String backingStore,
-      final String dbName) {
+      final String dbName, final boolean guitoggle) {
     mountpoint = mountPoint;
     dbname = dbName;
     backingstore = backingStore;
-  
-    final BaseXWin win = new BaseXWin(new String[] {});
+    wgui = guitoggle;
+
     init();
-  
-    while(win.gui == null)
-      Performance.sleep(100);
-    gui = win.gui;
-    gui.context.data(data);
-    gui.notify.init();
+
+    if(wgui) {
+      final BaseXWin win = new BaseXWin(new String[] {});
+      while(win.gui == null)
+        Performance.sleep(100);
+      gui = win.gui;
+      gui.context.data(data);
+      gui.notify.init();
+    }
   }
 
   /**
@@ -148,11 +155,31 @@ public final class DeepBase extends DeepFuse {
    * any).
    * @param path to be analyzed
    * @return pre value of parent directory or -1 if none is found
-   * @throws QueryException on failure
    */
-  private int parentPre(final String path) throws QueryException {
-    Nodes n = xquery(pn2xp(dirname(path), true));
-    return n.size() == 0 ? -1 : n.nodes[0];
+  private int parentPre(final String path) {
+    try {
+      Nodes n = xquery(pn2xp(dirname(path), true));
+      return n.size() == 0 ? -1 : n.nodes[0];
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+
+  /**
+   * Evaluates given path and returns the pre value.
+   * 
+   * @param path to be traversed
+   * @return pre value of file node or -1 if none is found
+   */
+  private int pathPre(final String path) {
+    try {
+      Nodes n = xquery(pn2xp(path, false));
+      return n.size() == 0 ? -1 : n.nodes[0];
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
   /**
@@ -163,13 +190,8 @@ public final class DeepBase extends DeepFuse {
    * @return id of the newly created file or -1 on failure
    */
   private int createNode(final String path, final int mode) {
-    try {
-      int pre = insertFileNode(path, mode);
-      return (pre == -1) ? -1 : data.id(pre);
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+    int pre = insertFileNode(path, mode);
+    return (pre == -1) ? -1 : data.id(pre);
   }
 
   /**
@@ -218,37 +240,34 @@ public final class DeepBase extends DeepFuse {
    * Insert a file node (regular file, directory ...).
    * @param path of file to insert
    * @param mode of file
-   * @throws QueryException on failure
    * @return pre value of newly inserted node
    */
-  private int insertFileNode(final String path, final int mode)
-      throws QueryException {
-    return insert(path, buildData(path, mode));
+  private int insertFileNode(final String path, final int mode) {
+    int ppre = parentPre(path);
+    if(ppre == -1) return -1;
+    return insert(ppre, buildData(path, mode));
   }
 
   /**
    * Insert extracted file content.
    * @param path to file at which to insert the extracted content
-   * @throws QueryException on failure
    * @return pre value of newly inserted content, -1 on failure
    */
-  private int insertContent(final String path) throws QueryException {
-    return insert(path, buildContentData(path));
+  private int insertContent(final String path) {
+    int fpre = pathPre(path);
+    if(fpre == -1) return -1;
+    return insert(fpre, buildContentData(path));
   }
 
   /**
-   * Insert MemData at given path position.
-   * @param path at which to insert (content or file)
+   * Insert MemData at given pre position and refresh GUI.
+   * @param pre value at which to insert (content or file)
    * @param md memory data insert to insert
    * @return pre value of newly inserted node
-   * @throws QueryException in case of failure
    */
-  private int insert(final String path, final MemData md) 
-    throws QueryException {
-    int ppre = parentPre(path);
-    if(ppre == -1) return -1;
-    int npre = ppre + data.size(ppre, data.kind(ppre));
-    data.insert(npre, ppre, md);
+  private int insert(final int pre, final MemData md) {
+    int npre = pre + data.size(pre, data.kind(pre));
+    data.insert(npre, pre, md);
     refresh();
     return npre;
   }
@@ -257,16 +276,23 @@ public final class DeepBase extends DeepFuse {
    * Deletes a file node.
    * @param path of file to delete
    * @param dir is directory
-   * @throws QueryException on failure
+   * @param cont delete only content of file
    * @return zero on success, -1 on failure
    */
-  private int delete(final String path, final boolean dir)
-      throws QueryException {
-    Nodes n = xquery(pn2xp(path, dir));
-    if(n.size() == 0) return -1;
-    else {
-      data.delete(n.nodes[0]);
-      refresh();
+  private int delete(final String path, final boolean dir, final boolean cont) {
+    try {
+      final StringBuilder qb = new StringBuilder();
+      qb.append(pn2xp(path, dir));
+      if(!dir && cont) qb.append("/content");
+      Nodes n = xquery(qb.toString());
+      if(n.size() == 0) return -1;
+      else {
+        data.delete(n.nodes[0]);
+        refresh();
+      }
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
     }
     return 0;
   }
@@ -277,7 +303,7 @@ public final class DeepBase extends DeepFuse {
   private void refresh() {
     data.meta.update();
     data.flush();
-    gui.notify.update();
+    if (wgui) gui.notify.update();
   }
 
   /**
@@ -314,13 +340,14 @@ public final class DeepBase extends DeepFuse {
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
-  
+
     return 0;
   }
 
   @Override
   public int destroy() {
     try {
+      if (wgui) gui.dispose();
       data.close();
       return 0;
     } catch(IOException e) {
@@ -374,12 +401,8 @@ public final class DeepBase extends DeepFuse {
 
   @Override
   public int unlink(final String path) {
-    try {
-      return delete(path, false);
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+
+    return delete(path, false, false);
   }
 
   @Override
@@ -399,13 +422,8 @@ public final class DeepBase extends DeepFuse {
 
   @Override
   public int rmdir(final String path) {
-    /* TODO: rmdir deletes only empty dir. What happens with --ignore? */
-    try {
-      return delete(path, true);
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
-    }
+    /* [AH] rmdir(2) deletes only empty dir. What happens with --ignore? */
+    return delete(path, true, false);
   }
 
   @Override
@@ -425,168 +443,169 @@ public final class DeepBase extends DeepFuse {
 
   @Override
   public int rename(final String from, final String to) {
-    // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
   public int access(final String path, final int mode) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int bmap(final String path, final long blocksize, final long idx) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int chmod(final String path, final int mode) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int chown(final String path, final int uid, final int gid) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int fgetattr(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int flush(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int fsync(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int fsyncdir(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int ftruncate(final String path, final long off) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int getxattr(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int link(final String name1, final String name2) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int listxattr(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int lock(final String path, final int cmd) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int mknod(final String path, final int mode, final int dev) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int open(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public byte[] read(final String path, final int length, final int offset) {
-    // TODO Auto-generated method stub
+    
     return null;
   }
 
   @Override
   public String readlink(final String path) {
-    // TODO Auto-generated method stub
+    
     return null;
   }
 
   @Override
   public int release(final String path) {
-    try {
-      return insertContent(path);
-    } catch(QueryException e) {
-      e.printStackTrace();
-      return -1;
+    boolean dirty = true;
+
+    if(dirty) {
+      delete(path, false, true);
+      insertContent(path);
     }
+
+    return 0;
   }
 
   @Override
   public int releasedir(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int removexattr(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int setxattr(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int statfs(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int symlink(final String from, final String to) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int truncate(final String path, final long off) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int utimens(final String path) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 
   @Override
   public int write(final String path, final int length, final int offset,
       final byte[] mydata) {
-    // TODO Auto-generated method stub
+    
     return 0;
   }
 }
