@@ -91,7 +91,7 @@ public class MapList extends IntList{
   }
   
   /**
-   * Inits the sizes and number of childs of each nodes in this list.
+   * Inits the sizes and number of child of each nodes in this list.
    * @param data reference
    */
   public void initChilds(final Data data) {

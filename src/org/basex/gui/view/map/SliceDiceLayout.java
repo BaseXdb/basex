@@ -20,7 +20,7 @@ public final class SliceDiceLayout extends MapLayout {
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
       putRect(data, r, mainRects, l, ns, level);
-    } else {        
+    } else {
       // determine direction
       final boolean v = (level % 2) == 0 ? true : false;
 //      final boolean v = r.w < r.h;
