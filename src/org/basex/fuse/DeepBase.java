@@ -365,8 +365,9 @@ public final class DeepBase extends DeepFuse {
    */
   @Override
   public int mkdir(final String path, final int mode) {
-    if(!isDir(mode)) return -1;
-    return createNode(path, mode);
+    //if(!isDir(mode)) return -1;
+    System.err.println("mkdir path: " + path + " mode: " + mode);
+    return createNode(path, S_IFDIR | mode);
   }
 
   /**
@@ -378,8 +379,8 @@ public final class DeepBase extends DeepFuse {
    */
   @Override
   public int create(final String path, final int mode) {
-    if(!isFile(mode)) return -1;
-    return createNode(path, mode);
+    //if(!isFile(mode)) return -1;
+    return createNode(path, S_IFREG | mode);
   }
 
   /**
