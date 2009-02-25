@@ -50,10 +50,12 @@ public class QuerySuggest extends QueryParser {
   void absPath(final boolean root, final boolean desc, final boolean nslash,
       final Axis axis, final Test test) {
     //System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
-    //    nslash + " AXIS: " + axis + " TEST: " + test);
+      //  nslash + " AXIS: " + axis + " TEST: " + test);
+    if(!nslash) {
     final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
     list.add(skel.root);
     stack.push(list);
+    }
     // first 2 Slashes
     if (root) {
       if (!desc) {
@@ -65,6 +67,7 @@ public class QuerySuggest extends QueryParser {
       }
     } else if(nslash) {
       checkStep(axis, test);
+      filter(false);
     } else {
       if (desc) checkStep(Axis.DESCORSELF, Test.NODE);  
       checkStep(axis, test);
@@ -172,7 +175,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
-    final QueryException qe = new QueryException(err, arg);
+    final QueryException qe = new QueryException(err, arg);   
     qe.complete(this, complete());
     throw qe;
   }

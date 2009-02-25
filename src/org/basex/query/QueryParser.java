@@ -1173,7 +1173,7 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step(false, s == 2, false);
+    final Expr ex = step();
     if(ex == null) {
       // first 2 slashes
       absPath(s != 0, s == 2, false, null, null);
@@ -1192,8 +1192,13 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
-        if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(false, s == 2, true), PATHMISS);
+        if(consume('/')) {
+          absPath(false, true, true, null, null);
+          list = add(list, descOrSelf());
+        } else {
+          absPath(false, false, true, null, null);
+        }
+        final Expr st = check(step(), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1219,28 +1224,20 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
-   * @param root boolean
-   * @param desc boolean
-   * @param nslash boolean
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step(final boolean root, final boolean desc,
-      final boolean nslash) throws QueryException {
+  protected Expr step() throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis(root, desc, nslash);
+    return e != null ? e : axis();
   }
 
   /**
    * [ 71] Parses an AxisStep.
-   * @param root boolean
-   * @param desc boolean
-   * @param nslash boolean
    * @return query expression
    * @throws QueryException xquery exception
    */
-  Step axis(final boolean root, final boolean desc,
-      final boolean nslash) throws QueryException {
+  Step axis() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1268,10 +1265,7 @@ public class QueryParser extends InputParser {
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
         // Characters
-        absPath(root, desc, nslash, ax, test);
-      } else if (nslash) {
-        // Slashes
-        absPath(root, desc, nslash, null, null);
+        absPath(false, false, false, ax, test);
       }
     }
     if(test == null) return null;
