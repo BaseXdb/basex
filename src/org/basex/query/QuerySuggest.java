@@ -60,18 +60,15 @@ public class QuerySuggest extends QueryParser {
     if (root) {
       if (!desc) {
         checkStep(axis, test); 
-        filter(false);
       } else {
         checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(axis, test);
       }
     } else if(nslash) {
       checkStep(axis, test);
-      filter(false);
     } else {
       if (desc) checkStep(Axis.DESCORSELF, Test.NODE);  
       checkStep(axis, test);
-      filter(false);
     }
   }
 
@@ -109,7 +106,7 @@ public class QuerySuggest extends QueryParser {
    * Filters the current steps.
    * @param finish finish flag
    */
-  private void filter(final boolean finish) {
+  public void filter(final boolean finish) {
     //System.out.println("Filter: " + finish);
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
