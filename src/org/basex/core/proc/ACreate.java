@@ -57,7 +57,7 @@ abstract class ACreate extends Process {
 
         context.close();
         final Performance pp = new Performance();
-        if(db.endsWith(DataText.BDBSUF)) {
+        if(Prop.usebdb) {
           final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
           builder = (Builder) cls.newInstance();
           //builder = new BDBBuilder();

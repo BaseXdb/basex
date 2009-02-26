@@ -58,9 +58,9 @@ public final class Open extends Process {
    * @throws IOException exception
    */
   public static Data open(final String db) throws IOException {
-    if(db.endsWith(DataText.BDBSUF)) {
+    if(Prop.usebdb) {
       try {
-        return (Data) Class.forName("org.basex.build.BDBData").getConstructor(
+        return (Data) Class.forName("org.basex.data.BDBData").getConstructor(
             new Class[] { String.class }).newInstance(db);
       } catch(final Exception e) {
         e.printStackTrace();

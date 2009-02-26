@@ -173,8 +173,4 @@ public interface DataText {
   // DEEPFS STRINGS ===========================================================
   /** Name of the current deepfs shared library. */
   String DEEPLIB = "deepstorage";
-
-  // BERKELEY DB STRINGS ======================================================
-  /** Suffix for berkeley db databases. */
-  String BDBSUF = "_bdb";
 }

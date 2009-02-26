@@ -7,11 +7,13 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.basex.BaseX;
 import org.basex.build.BuildException;
+import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
@@ -86,7 +88,17 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Parser p, final String db) throws IOException {
     if(db == null) return new MemBuilder().build(p, "");
     
-    final DiskBuilder builder = new DiskBuilder();
+    final Builder builder;
+    if (Prop.usebdb) {
+      try {
+        final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
+        builder = (Builder) cls.newInstance();
+      } catch(final Exception e) {
+        throw new IOException(e);
+      }
+    } else {
+      builder = new DiskBuilder();
+    }
     try {
       final Data data = builder.build(p, db);
       if(data.meta.txtindex) data.setIndex(IndexToken.Type.TXT,
