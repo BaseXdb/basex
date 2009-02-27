@@ -1175,8 +1175,6 @@ public class QueryParser extends InputParser {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     final Expr ex = step(s);
     if(ex == null) {
-      // first 2 slashes
-      absPath(s != 0, s == 2, false, null, null);
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
@@ -1249,6 +1247,7 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
+      checkStep(ax, test);
       if(test == null) error(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
@@ -1267,11 +1266,13 @@ public class QueryParser extends InputParser {
       test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
-        // Characters
-        absPath(false, s == 2, s == 10 || s == 20, ax, test);
-        // Slashes
-      } else if (s == 10 || s == 20) {
-        absPath(false, s == 20, true, null, test);
+        if (s != 10 && s != 20) absPath();
+        if (s == 2)  checkStep(Axis.DESCORSELF, Test.NODE);
+        checkStep(ax, test);
+      } else if (s == 10 || s == 20 || s == 1 || s == 2) {
+        if (s != 10 && s != 20) absPath();
+        if (s == 2)  checkStep(Axis.DESCORSELF, Test.NODE);
+        checkStep(null, null);
       }
     }
     if(test == null) return null;
@@ -2608,18 +2609,20 @@ public class QueryParser extends InputParser {
   }
   
   /**
+   * Parses an AbsoluteLocationPath.
+   * @throws QueryException parse Exception
+   */
+  @SuppressWarnings("unused")
+  void absPath() throws QueryException { }
+  
+  /**
    * Performs optional step checks.
-   * @param root boolean
-   * @param desc boolean
-   * @param nslash boolean
    * @param axis axis
    * @param test test
    * @throws QueryException parse Exception
    */
   @SuppressWarnings("unused")
-  void absPath(final boolean root, final boolean desc, final boolean nslash,
-      final Axis axis, final Test test)
-    throws QueryException { }
+  void checkStep(final Axis axis, final Test test) throws QueryException { }
 
   /**
    * Throws the specified error.
