@@ -173,7 +173,8 @@ public class QuerySuggest extends QueryParser {
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
     //System.out.println("error");
-    final QueryException qe = new QueryException(err, arg);   
+    final QueryException qe = new QueryException(err, arg);
+    this.mark();
     qe.complete(this, complete());
     throw qe;
   }
