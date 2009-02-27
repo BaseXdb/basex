@@ -50,7 +50,7 @@ public class QuerySuggest extends QueryParser {
   void absPath(final boolean root, final boolean desc, final boolean nslash,
       final Axis axis, final Test test) {
     //System.out.println("ROOT: " + root + " DESC: " + desc +  " NSLASH: " +
-      //  nslash + " AXIS: " + axis + " TEST: " + test);
+       // nslash + " AXIS: " + axis + " TEST: " + test);
     if(!nslash) {
     final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
     list.add(skel.root);
@@ -172,6 +172,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
+    //System.out.println("error");
     final QueryException qe = new QueryException(err, arg);   
     qe.complete(this, complete());
     throw qe;

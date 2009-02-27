@@ -1173,7 +1173,7 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step();
+    final Expr ex = step(s);
     if(ex == null) {
       // first 2 slashes
       absPath(s != 0, s == 2, false, null, null);
@@ -1192,13 +1192,14 @@ public class QueryParser extends InputParser {
 
     if(slash) {
       do {
+        int tmp;
         if(consume('/')) {
-          absPath(false, true, true, null, null);
+          tmp = 20;
           list = add(list, descOrSelf());
         } else {
-          absPath(false, false, true, null, null);
+          tmp = 10;
         }
-        final Expr st = check(step(), PATHMISS);
+        final Expr st = check(step(tmp), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1224,20 +1225,22 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step() throws QueryException {
+  protected Expr step(final int s) throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis();
+    return e != null ? e : axis(s);
   }
 
   /**
    * [ 71] Parses an AxisStep.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  Step axis() throws QueryException {
+  Step axis(final int s) throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1265,7 +1268,10 @@ public class QueryParser extends InputParser {
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
         // Characters
-        absPath(false, false, false, ax, test);
+        absPath(false, s == 2, s == 10 || s == 20, ax, test);
+        // Slashes
+      } else if (s == 10 || s == 20) {
+        absPath(false, s == 20, true, null, test);
       }
     }
     if(test == null) return null;
