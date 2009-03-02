@@ -6,6 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
 
 /**
@@ -13,29 +14,89 @@ import org.basex.query.util.Err;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
+ * @author Dennis Stratmann
  */
 public final class Except extends Arr {
   /**
    * Constructor.
-   * @param l expression list
+   * @param e expression list
    */
-  public Except(final Expr[] l) {
-    super(l);
+  public Except(final Expr[] e) {
+    super(e);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final NodIter ni = new NodIter(true);
-    Iter iter = ctx.iter(expr[0]);
+  public NodeIter iter(final QueryContext ctx) throws QueryException {
+    final Iter[] iter = new Iter[expr.length];
+    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
+    //return duplicates(ctx) ? eval(iter) : iter(iter);
+    return eval(iter);
+  }
+  
+  /**
+   * Creates an except iterator.
+   * @param iter iterators
+   * @return resulting iterator
+  private NodeIter iter(final Iter[] iter) {
+    return new NodeIter() {
+      Nod[] items;
+
+      @Override
+      public Nod next() throws QueryException {
+        if(items == null) { 
+          items = new Nod[iter.length];
+          for(int i = 0; i != iter.length; i++) next(i);
+        }
+
+        for(int i = 1; i != items.length; i++) {
+          if (items[0] == null) return null;
+          if (items[i] == null) continue;
+          final int d = items[0].diff(items[i]);
+          if(d > 0) {
+            if(i+1 == items.length) {
+              next(0);
+              return items[0];
+            }
+          }
+          if (d == 0) {
+            next(0);
+            next(i);
+            i = 0;
+          }
+          if(d < 0) {
+            next(i--);
+          }
+        }
+        return null;
+      }
+      
+      private void next(final int i) throws QueryException {
+        final Item it = iter[i].next();
+        if(it != null && !it.node()) Err.nodes(Except.this);
+        items[i] = (Nod) it;
+      }
+    };
+  }
+   */
+
+  /**
+   * Evaluates the iterators.
+   * @param iter iterators
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private NodeIter eval(final Iter[] iter) throws QueryException {
+    NodIter ni = new NodIter(true);
+
     Item it;
-    while((it = iter.next()) != null) {
-      if(!(it.node())) Err.nodes(this);
+    while((it = iter[0].next()) != null) {
+      if(!it.node()) Err.nodes(this);
       ni.add((Nod) it);
     }
-
+    
     for(int e = 1; e != expr.length; e++) {
-      iter = ctx.iter(expr[e]);
-      while((it = iter.next()) != null) {
+      final Iter ir = iter[e];
+      while((it = ir.next()) != null) {
         if(!(it.node())) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < ni.size; s++) {
@@ -45,7 +106,7 @@ public final class Except extends Arr {
     }
     return ni;
   }
-
+  
   @Override
   public String toString() {
     return "(" + toString(" except ") + ")";

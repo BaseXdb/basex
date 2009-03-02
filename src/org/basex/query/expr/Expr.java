@@ -173,7 +173,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns true if the expression might yield duplicates.
+   * Returns true if the expression might yield duplicates and unsorted
+   * results.
    * @param ctx query context
    * @return result of check
    */

@@ -8,6 +8,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
 
 /**
@@ -15,6 +16,7 @@ import org.basex.query.util.Err;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
+ * @author Dennis Stratmann
  */
 public final class InterSect extends Arr {
   /**
@@ -41,7 +43,42 @@ public final class InterSect extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
     for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
-    return eval(iter);
+    return duplicates(ctx) ? eval(iter) : iter(iter);
+  }
+  
+  /**
+   * Creates a intersect iterator.
+   * @param iter iterators
+   * @return resulting iterator
+   */
+  private NodeIter iter(final Iter[] iter) {
+    return new NodeIter() {
+      final Nod[] items = new Nod[iter.length];
+
+      @Override
+      public Nod next() throws QueryException {
+        for(int i = 0; i != iter.length; i++) if(!next(i)) return null;
+
+        for(int i = 1; i != items.length; i++) {
+          final int d = items[0].diff(items[i]);
+          if(d < 0) {
+            if(!next(0)) return null;
+            i = 0;
+          } else if(d > 0) {
+            if(!next(i--)) return null;
+          }
+        }
+        return items[0];
+      }
+      
+      private boolean next(final int i) throws QueryException {
+        final Item it = iter[i].next();
+        if(it == null) return false;
+        if(!it.node()) Err.nodes(InterSect.this);
+        items[i] = (Nod) it;
+        return true;
+      }
+    };
   }
   
   /**
