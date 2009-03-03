@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -23,6 +24,8 @@ public final class Nodes implements Result {
   public FTPosData ftpos;
   /** Pre values container. */
   public int[] nodes;
+  /** Sorted pre values. */
+  public int[] sorted;
   /** Number of stored nodes. */
   private int size;
   
@@ -75,6 +78,18 @@ public final class Nodes implements Result {
     ftpos = ft;
   }
 
+  public int size() {
+    return size;
+  }
+  
+  public boolean same(final Result v) {
+    if(!(v instanceof Nodes) || v.size() != size) return false;
+    final Nodes n = (Nodes) v;
+    if(data != n.data) return false;
+    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
+    return ftpos == null || ftpos.same(n.ftpos);
+  }
+
   /**
    * Checks if the specified node is contained in the array.
    * @param p pre value
@@ -91,11 +106,29 @@ public final class Nodes implements Result {
    * @return true if the node was found
    */
   public int find(final int p) {
-    return Arrays.binarySearch(nodes, p);
+    if(sorted == null) sort();
+    return Arrays.binarySearch(sorted, p);
   }
 
   /**
-   * The specified pre value is added to or removed from the context set.
+   * Creates a sorted node array. If the original array is already sorted,
+   * the same reference is used.
+   */
+  private void sort() {
+    int i = Integer.MIN_VALUE;
+    for(final int n : nodes) {
+      if(i > n) {
+        sorted = Array.finish(nodes, size);
+        Arrays.sort(sorted);
+        return;
+      }
+      i = n;
+    }
+    sorted = nodes;
+  }
+  
+  /**
+   * The specified pre value is added to or removed from the node array.
    * @param p pre value
    */
   public void toggle(final int p) {
@@ -120,7 +153,7 @@ public final class Nodes implements Result {
    * @param bi second set
    * @return resulting set
    */
-  public static int[] union(final int[] ai, final int[] bi) {
+  private static int[] union(final int[] ai, final int[] bi) {
     final int al = ai.length, bl = bi.length;
     final IntList c = new IntList();
     int a = 0, b = 0;
@@ -133,25 +166,6 @@ public final class Nodes implements Result {
     while(b != bl) c.add(bi[b++]);
     return c.finish();
   }
-
-  /**
-   * Intersects two integer arrays via union.
-   * Note that the input arrays must be sorted.
-   * @param ai first set
-   * @param bi second set
-   * @return resulting set
-   */
-  public static int[] intersect(final int[] ai, final int[] bi) {
-    final int al = ai.length, bl = bi.length;
-    final IntList c = new IntList();
-    for(int a = 0, b = 0; a != al && b != bl;) {
-      final int d = ai[a] - bi[b];
-      if(d == 0) c.add(ai[a]);
-      if(d > 0) b++;
-      else a++;
-    }
-    return c.finish();
-  }
   
   /**
    * Subtracts the second from the first array.
@@ -160,7 +174,7 @@ public final class Nodes implements Result {
    * @param bi second set
    * @return resulting set
    */
-  public static int[] except(final int[] ai, final int[] bi) {
+  private static int[] except(final int[] ai, final int[] bi) {
     final int al = ai.length, bl = bi.length;
     final IntList c = new IntList();
     int a = 0, b = 0;
@@ -172,18 +186,6 @@ public final class Nodes implements Result {
     }
     while(a != al) c.add(ai[a++]);
     return c.finish();
-  }
-
-  public int size() {
-    return size;
-  }
-  
-  public boolean same(final Result v) {
-    if(!(v instanceof Nodes) || v.size() != size) return false;
-    final Nodes n = (Nodes) v;
-    if(data != n.data) return false;
-    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
-    return ftpos == null || ftpos.same(n.ftpos);
   }
 
   public void serialize(final Serializer ser) throws IOException {

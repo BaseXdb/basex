@@ -58,12 +58,6 @@ public final class Pos extends Simple {
   public static Expr get(final Expr expr, final Comp cmp, final Expr arg)
       throws QueryException {
 
-    if(arg instanceof Range) {
-      // 'null' as argument seems strange, but is ok here..
-      final long[] rng = ((Range) arg).range(null);
-      if(rng != null) return get(rng[0], rng[1]);
-    }
-    
     if(!arg.i()) return expr;
 
     Item it = (Item) arg;

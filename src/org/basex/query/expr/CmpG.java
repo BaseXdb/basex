@@ -129,7 +129,13 @@ public final class CmpG extends Arr {
     if(e != this) {
       ctx.compInfo(OPTPRE, this);
     } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
-      e = Pos.get(this, cmp.cmp, e2);
+      if(e2 instanceof Range) {
+        // 'null' as argument seems strange, but is ok here..
+        final long[] rng = ((Range) e2).range(null);
+        if(rng != null) e = Pos.get(rng[0], rng[1]);
+      } else {
+        e = Pos.get(this, cmp.cmp, e2);
+      }
       if(e != this) ctx.compInfo(OPTWRITE, this);
     } else if(standard(true)) {
       e = CmpR.get(this);
