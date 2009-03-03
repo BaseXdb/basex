@@ -69,6 +69,6 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return "FTContainsIndex(" + ftexpr + ")";
+    return getClass().getSimpleName() + "(" + ftexpr + ")";
   }
 }

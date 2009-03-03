@@ -29,14 +29,14 @@ public final class Except extends Arr {
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
     for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
-    //return duplicates(ctx) ? eval(iter) : iter(iter);
-    return eval(iter);
+    return duplicates(ctx) ? eval(iter) : iter(iter);
   }
   
   /**
    * Creates an except iterator.
    * @param iter iterators
    * @return resulting iterator
+   */
   private NodeIter iter(final Iter[] iter) {
     return new NodeIter() {
       Nod[] items;
@@ -52,22 +52,23 @@ public final class Except extends Arr {
           if (items[0] == null) return null;
           if (items[i] == null) continue;
           final int d = items[0].diff(items[i]);
-          if(d > 0) {
+          
+          if(d < 0) {
             if(i+1 == items.length) {
-              next(0);
-              return items[0];
+              break;
             }
           }
           if (d == 0) {
             next(0);
-            next(i);
             i = 0;
           }
-          if(d < 0) {
+          if(d > 0) {
             next(i--);
           }
         }
-        return null;
+        final Nod temp = items[0]; 
+        next(0);
+        return temp;
       }
       
       private void next(final int i) throws QueryException {
@@ -77,7 +78,6 @@ public final class Except extends Arr {
       }
     };
   }
-   */
 
   /**
    * Evaluates the iterators.
