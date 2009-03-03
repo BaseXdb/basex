@@ -34,21 +34,21 @@ final class MapDefault extends MapPainter {
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();
 
-    mpos = 0;
-    for(int ri = 0; ri < rects.size(); ri++) {
+    final int rs = rects.size();
+    for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.pre;
-      
+
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
-      if(lvl == 0) mpos = 0;
 
       final boolean full = r.w == ww && r.h == hh;
-      
+
       // draw rectangle
-      Color col = nextMark(rects, pre, ri, rects.size());
+      Color col = nextMark(rects, ri);
       final boolean mark = col != null;
+
       final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
       if (ftd != null) {
         r.pos = ftd[0];
@@ -58,8 +58,8 @@ final class MapDefault extends MapPainter {
         r.pos = null;
         r.poi = null;
         r.acol = null;
-      }      
-      
+      }
+
       g.setColor(mark ? col : COLORS[lvl]);
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
           ViewData.isLeaf(data, pre)) {
@@ -123,9 +123,8 @@ final class MapDefault extends MapPainter {
       g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
       g.setFont(mfont);
       final byte[] text = ViewData.content(data, pre, false);
-      
+
       final int p = BaseXLayout.centerPos(g, text, rect.w);
-      
       if(p != -1) {
         rect.x += p;
         rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;
@@ -140,23 +139,5 @@ final class MapDefault extends MapPainter {
       }
     }
     return false;
-  }
-
-  @Override
-  boolean highlight(final MapRect rect, final int mx, final int my,
-      final boolean click) {
-    return false;
-  }
-
-  @Override
-  void init(final ArrayList<MapRect> rects) {
-  }
-
-  @Override
-  void reset() {
-  }
-
-  @Override
-  void close() {
   }
 }

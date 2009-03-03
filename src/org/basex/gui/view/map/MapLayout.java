@@ -68,7 +68,7 @@ abstract class MapLayout {
     double aar = 0;
     int nrLeaves = 0;
     for(int i = 0; i < r.size(); i++) {
-      MapRect curr = r.get(i);
+      final MapRect curr = r.get(i);
       // Shneiderman would use this: children(data, curr.pre).size == 0 && 
       if (curr.w != 0 && curr.h != 0) {
         nrLeaves++;
@@ -96,7 +96,7 @@ abstract class MapLayout {
   static double averageDistanceChange(final ArrayList<MapRect> first, 
       final ArrayList<MapRect> second) {
     double aDist = 0.0;
-    int length = Math.min(first.size(), second.size());
+    final int length = Math.min(first.size(), second.size());
     int x1, x2, y1, y2;
 
     for (int i = 0; i < length; i++) {
@@ -105,7 +105,7 @@ abstract class MapLayout {
         x2 = second.get(i).x + second.get(i).w >> 1;
         y1 = first.get(i).y + first.get(i).h >> 1;
         y2 = second.get(i).y + second.get(i).h >> 1;
-        aDist += ((x1 - x2) ^ 2 + (y1 - y2) ^ 2) ^ (1 / 2);
+        aDist += x1 - x2 ^ 2 + y1 - y2 ^ 2 ^ 1 / 2;
       }
     }
     return aDist / length;
@@ -162,9 +162,9 @@ abstract class MapLayout {
       final Data data) {
     double weight;
     // get size of the node
-    long size = Token.toLong(data.attValue(data.sizeID, rect));
+    final long size = Token.toLong(data.attValue(data.sizeID, rect));
     // parents size
-    long sSize = Token.toLong(data.attValue(data.sizeID, par));
+    final long sSize = Token.toLong(data.attValue(data.sizeID, par));
     // call weightening function
     weight = calcWeight(size, children(data, rect).size, 
         sSize, children(data, par).size, data);
@@ -186,12 +186,11 @@ abstract class MapLayout {
   static double calcWeight(final long size, final int childs,
       final long sSize, final int sChilds, final Data data) {
     // if its not a filesystem, set sliderval for calc only to nr of childs
-    double sizeP = data.fs != null ? (double) GUIProp.sizep : 0d;
+    double sizeP = data.fs != null ? GUIProp.sizep : 0d;
     if (sSize == 0) sizeP = 0d;
-    long dadSize = (size == 0 && sSize == 0) ? 1 : sSize;
+    final long dadSize = size == 0 && sSize == 0 ? 1 : sSize;
     
-    return ((sizeP / 100) * ((double) size / dadSize)) + 
-    ((1 - sizeP / 100) * ((double) childs / sChilds));
+    return sizeP / 100 * size / dadSize + (1 - sizeP / 100) * childs / sChilds;
   }
   
   /**
@@ -234,8 +233,7 @@ abstract class MapLayout {
     final int h = t.h - layout.h;
 
     // skip too small rectangles and leaf nodes (= meta data in deepfs)
-    if((w >= o || h >= o) && w > 0 && h > 0 &&
-        !ViewData.isLeaf(data, t.pre)) {
+    if((w >= o || h >= o) && w > 0 && h > 0 && !ViewData.isLeaf(data, t.pre)) {
       final MapList ch = children(data, t.pre);
       if(ch.size != 0) calcMap(data, new MapRect(x, y, w, h, l.list[ns],
           r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);

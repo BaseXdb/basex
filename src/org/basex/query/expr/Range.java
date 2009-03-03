@@ -28,20 +28,21 @@ public final class Range extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+
+    Expr e = this;
     if(expr[0].e() || expr[1].e()) {
-      ctx.compInfo(OPTPRE, this);
-      return Seq.EMPTY;
-    }
-    if(expr[0].i() && expr[1].i()) {
+      e = Seq.EMPTY;
+    } else {
       final long[] v = range(ctx);
-      if(v[0] == v[1]) return Itr.get(v[0]);
+      if(v != null && v[0] == v[1]) e = Itr.get(v[0]);
     }
-    return this;
+    if(e != this) ctx.compInfo(OPTPRE, this);
+    return e;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final long[] v = range(ctx);
+    final long[] v = rng(ctx);
     if(v == null) return Iter.EMPTY;
     return v[0] > v[1] ? Iter.EMPTY : v[0] == v[1] ? Itr.get(v[0]).iter() :
       new RangeIter(v[0], v[1]);
@@ -50,19 +51,31 @@ public final class Range extends Arr {
   @Override
   public long size(final QueryContext ctx) throws QueryException {
     if(expr[0].i() && expr[1].i()) {
-      final long[] v = range(ctx);
+      final long[] v = rng(ctx);
       if(v[1] >= v[0]) return v[1] - v[0] + 1;
     }
     return -1;
   }
 
   /**
-   * Returns the start and end value of the range operator.
+   * Returns the start and end value of the range operator, or null if
+   * the range could not be evaluated.
    * @param ctx query context
    * @return value array
    * @throws QueryException Exception
    */
-  private long[] range(final QueryContext ctx) throws QueryException {
+  public long[] range(final QueryContext ctx) throws QueryException {
+    return expr[0].i() && expr[1].i() ? rng(ctx) : null;
+  }
+
+  /**
+   * Returns the start and end value of the range operator, or null if
+   * the range could not be evaluated.
+   * @param ctx query context
+   * @return value array
+   * @throws QueryException Exception
+   */
+  private long[] rng(final QueryContext ctx) throws QueryException {
     final Item a = expr[0].atomic(ctx);
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx);

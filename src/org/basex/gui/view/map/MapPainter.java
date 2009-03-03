@@ -15,9 +15,7 @@ import org.basex.gui.GUIConstants;
 abstract class MapPainter {
   /** Graphics reference. */
   MapView view;
-  /** Marked position. */
-  int mpos;
-  
+
   /**
    * Constructor.
    * @param m map reference.
@@ -25,63 +23,61 @@ abstract class MapPainter {
   MapPainter(final MapView m) {
     view = m;
   }
-  
+
   /**
    * Returns next color mark.
    * @param rects rectangle array
-   * @param pre pre array
    * @param ri current position
-   * @param rs array size
    * @return next color mark
    */
-  Color nextMark(final ArrayList<MapRect> rects, final int pre, final int ri,
-      final int rs) {
-    final Nodes marked = view.gui.context.marked();
-    // checks if the current node is a queried context node
-    while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
-    if(mpos < marked.size()) {
-      if(marked.nodes[mpos] == pre) {
-        // mark node
-        return GUIConstants.colormark1;
-      } else if(ri + 1 < rs && marked.nodes[mpos] < rects.get(ri + 1).pre) {
-        // mark ancestor of invisible node
-        return GUIConstants.colormark2;
-      } 
-    }
-    return null;
-  }
+  final Color nextMark(final ArrayList<MapRect> rects, final int ri) {
 
+    final Nodes marked = view.gui.context.marked();
+
+    // find marked node
+    final int p = -marked.find(rects.get(ri).pre) - 1;
+    if(p < 0) return GUIConstants.colormark1;
+
+    // mark ancestor of invisible node
+    return p < marked.size() && ri + 1 < rects.size() && 
+      marked.nodes[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : null;
+  }
+  
   /**
    * Paints node contents.
    * @param g graphics reference
-   * @param rects rectangle array
+   * @param r rectangle array
    */
-  abstract void drawRectangles(final Graphics g,
-      final ArrayList<MapRect> rects);
+  abstract void drawRectangles(final Graphics g, final ArrayList<MapRect> r);
 
   /**
-   * Checks mouse activity.
-   * @param click mouse click
+   * Reacts on a mouse over/mouse click on the focused area.
+   * @param click mouse click (false: mouse move)
    * @param rect current rectangle
    * @param mx mouse x
    * @param my mouse y
-   * @return true for mouse activity
+   * @return true if area is mouse sensitive
    */
-  abstract boolean highlight(MapRect rect, int mx, int my, boolean click);
+  @SuppressWarnings("unused")
+  boolean mouse(final MapRect rect, final int mx, final int my,
+      final boolean click) {
+    return false;
+  }
 
   /**
-   * Initializes the skipping of nodes.
+   * Initializes the painter.
    * @param rects rectangle array
    */
-  abstract void init(ArrayList<MapRect> rects);
+  @SuppressWarnings("unused")
+  void init(final ArrayList<MapRect> rects) { }
 
   /**
    * Resets the painter.
    */
-  abstract void reset();
+  void reset() { }
 
   /**
    * Closes the painter.
    */
-  abstract void close();
+  void close() { }
 }

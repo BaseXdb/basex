@@ -69,7 +69,7 @@ public final class QueryView extends View {
       input[i].addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
           mode = m;
-          update();
+          update(true);
         }
       });
       box.add(input[i]);
@@ -93,7 +93,7 @@ public final class QueryView extends View {
     if(!gui.context.db()) {
       for(int i = 0; i < NPANELS; i++) panels[i].finish();
     } else {
-      update();
+      update(false);
     }
   }
 
@@ -118,8 +118,9 @@ public final class QueryView extends View {
 
   /**
    * Updates the query panels.
+   * @param force force query execution 
    */
-  public void update() {
+  void update(final boolean force) {
     for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);
     removeAll();
     add(back, BorderLayout.NORTH);
@@ -128,7 +129,7 @@ public final class QueryView extends View {
     search.refresh();
     open.setEnabled(mode == 0);
     save.setEnabled(mode == 0);
-    if(GUIProp.execrt) search.query(GUIProp.showquery);
+    if(GUIProp.execrt) search.query(force);
     revalidate();
     repaint();
     refresh();
@@ -168,17 +169,17 @@ public final class QueryView extends View {
    * Sets a new XQuery request.
    * @param xq XQuery
    */
-  public void setXQuery(final byte[] xq) {
+  public void setQuery(final byte[] xq) {
     panels[0].last = Token.string(xq);
     mode = 0;
-    update();
+    update(true);
   }
 
   /**
    * Returns the last XQuery input..
    * @return XQuery
    */
-  public byte[] getXQuery() {
+  public byte[] getQuery() {
     return Token.token(panels[0].last);
   }
   

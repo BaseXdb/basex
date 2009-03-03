@@ -123,7 +123,7 @@ public enum GUICommands implements GUICommand {
       if(fc.select(BaseXFileChooser.Mode.OPEN)) {
         try {
           final IO file = fc.getFile();
-          gui.query.setXQuery(file.content());
+          gui.query.setQuery(file.content());
           Prop.xquery = file;
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(gui, XQOPERROR,
@@ -148,7 +148,7 @@ public enum GUICommands implements GUICommand {
         try {
           final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
-          file.write(gui.query.getXQuery());
+          file.write(gui.query.getQuery());
           Prop.xquery = file;
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(gui, XQSAVERROR,

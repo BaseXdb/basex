@@ -66,7 +66,7 @@ final class FolderIterator {
   }
 
   /**
-   * Checks if there are further nodes to iterate.
+   * Checks if there are more nodes to iterate.
    * @return true for more data
    */
   boolean more() {
@@ -87,7 +87,7 @@ final class FolderIterator {
   }
 
   /**
-   * Checks if there are further context nodes to check.
+   * Checks if there are more context nodes to check.
    * @return true for more data
    */
   boolean moreCS() {
@@ -102,7 +102,7 @@ final class FolderIterator {
   }
 
   /**
-   * Checks if there are further data nodes to check.
+   * Checks if there are more data nodes to check.
    * @param data data reference
    * @return true for more data
    */

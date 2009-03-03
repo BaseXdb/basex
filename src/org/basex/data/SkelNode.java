@@ -16,7 +16,7 @@ import org.basex.util.Array;
 public final class SkelNode {
   /** Tag/attribute name reference. */
   public final short name;
-  /** Node kind. */
+  /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
   /** Tag counter. */
   public int count;

@@ -50,8 +50,6 @@ public final class FolderView extends View {
   /** Empty Box. */
   private BufferedImage emptyBox;
 
-  /** Currently marked position. */
-  private int mpos;
   /** Scroll Bar. */
   private final BaseXBar scroll;
 
@@ -186,7 +184,6 @@ public final class FolderView extends View {
     startY = -scroll.pos();
     totalW = getWidth() - (treeH > getHeight() ? scroll.getWidth() : 0);
 
-    mpos = 0;
     final FolderIterator it = new FolderIterator(this, startY + 5, getHeight());
     final Data data = gui.context.data();
     while(it.more()) {
@@ -212,11 +209,9 @@ public final class FolderView extends View {
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
-
     Color col = Color.black;
     Font fnt = font;
-    if(mpos < marked.size() && marked.nodes[mpos] == pre) {
+    if(marked.find(pre) >= 0) {
       // mark node
       col = colormark3;
       fnt = bfont;

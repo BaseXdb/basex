@@ -76,13 +76,22 @@ public final class Nodes implements Result {
   }
 
   /**
+   * Checks if the specified node is contained in the array.
+   * @param p pre value
+   * @return true if the node was found
+   */
+  public boolean contains(final int p) {
+    return find(p) >= 0;
+  }
+
+  /**
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
    * @param p pre value
    * @return true if the node was found
    */
-  public boolean contains(final int p) {
-    return Arrays.binarySearch(nodes, p) >= 0;
+  public int find(final int p) {
+    return Arrays.binarySearch(nodes, p);
   }
 
   /**

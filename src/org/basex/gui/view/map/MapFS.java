@@ -58,7 +58,6 @@ final class MapFS extends MapPainter {
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);
 
-    mpos = 0;
     final int rs = rects.size();
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
@@ -67,13 +66,12 @@ final class MapFS extends MapPainter {
 
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
-      if(lvl == 0) mpos = 0;
 
       final boolean isImage = GUIFS.mime(fs.name(r.pre)) == GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
-      Color col = nextMark(rects, pre, ri, rs);
+      Color col = nextMark(rects, ri);
       final boolean mark = col != null;
 
       if(full && isImage) col = Color.black;
@@ -177,8 +175,8 @@ final class MapFS extends MapPainter {
 //        ih = rect.h;
         rect.x += PICOFFSET;
         rect.y += PICOFFSET;
-        g.drawImage(image, rect.x + ((ww - (int) iw) >> 1),
-            rect.y + ((hh - (int) ih) >> 1), (int) iw, (int) ih, view);
+        g.drawImage(image, rect.x + (ww - (int) iw >> 1),
+            rect.y + (hh - (int) ih >> 1), (int) iw, (int) ih, view);
         return false;
       }
     }
@@ -275,7 +273,7 @@ final class MapFS extends MapPainter {
         MapRenderer.drawText(g, rect, data.text(pre));
       }
     }
-    if(!file || rect.w < (o << 1) || rect.h < (o << 1)) return false;
+    if(!file || rect.w < o << 1 || rect.h < o << 1) return false;
 
     g.setColor(Color.black);
 
@@ -296,7 +294,7 @@ final class MapFS extends MapPainter {
         // minimize buffer size
         final File f = new File(string(path));
         s = Math.min(s, f.length());
-        
+
         // read file contents
         fileBuf = new byte[(int) s];
         BufferInput.read(f, fileBuf);
@@ -304,7 +302,7 @@ final class MapFS extends MapPainter {
         // check if file contains mainly ASCII characters
         int n = 0;
         for(final byte b : fileBuf) if(b >= ' ' || ws(b)) n++;
-        binary = (n << 3) + n < (s << 3);
+        binary = (n << 3) + n < s << 3;
       }
 
       // set binary string for images and binary files
@@ -326,7 +324,7 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  boolean highlight(final MapRect r, final int mx, final int my,
+  boolean mouse(final MapRect r, final int mx, final int my,
       final boolean click) {
 
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&

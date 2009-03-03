@@ -132,7 +132,8 @@ public abstract class Nod extends Item {
   /**
    * Compares two nodes for their unique order.
    * @param nod node to be compared
-   * @return result of check
+   * @return 0 if the nodes are equal or a positive/negative value
+   * if the node appears after/before the argument
    */
   public abstract int diff(final Nod nod);
 

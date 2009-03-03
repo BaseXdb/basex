@@ -34,7 +34,7 @@ import org.basex.util.Token;
 
 /**
  * This view is a TreeMap implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -86,11 +86,11 @@ public final class MapView extends View implements Runnable {
   /** are these values initialized? true if values were assigned. */
   private static boolean infoinit = false;
   /**number of nodes before change. */
-  private static int nno = 0; 
+  private static int nno = 0;
   /**number of nodes now. */
   private static int nnn;
   /** Rectsize before. */
-  private static MapRect recto; 
+  private static MapRect recto;
   /** Rectsize now. */
   private static MapRect rectn;
   /** aar old. */
@@ -99,7 +99,7 @@ public final class MapView extends View implements Runnable {
   private static double aarn;
   /** distance change between layouts. */
   private static double distance;
-  
+
   /** TreeMap. */
   private BufferedImage mainMap;
   /** Zoomed TreeMap. */
@@ -118,14 +118,14 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Start info dialog, may fill with information.
-   * 
+   *
    * @param gui reference to main window
    */
   public static void info(final GUI gui) {
     if(!GUIProp.mapinfo || !infoinit) {
       mapInfo = new DialogMapInfo(gui);
     } else if(infoinit) {
-      mapInfo = new DialogMapInfo(gui, nno, nnn, recto, rectn, aaro, aarn, 
+      mapInfo = new DialogMapInfo(gui, nno, nnn, recto, rectn, aaro, aarn,
           distance);
     }
     mapInfo.validate();
@@ -198,7 +198,7 @@ public final class MapView extends View implements Runnable {
         && rectHist[hist + 1] != null
         && rectHist[hist + 1].pre == 0
         || more
-        && (context.size() != 1 || focusedRect == null 
+        && (context.size() != 1 || focusedRect == null
         || context.nodes[0] != focusedRect.pre);
     if(page) focusedRect = new MapRect(0, 0, getWidth(), 1);
 
@@ -334,7 +334,7 @@ public final class MapView extends View implements Runnable {
     final boolean newFocus = focusedRect != fr || fr != null && fr.thumb;
     focusedRect = fr;
 
-    if(fr != null) gui.cursor(painter.highlight(focusedRect, mouseX, mouseY,
+    if(fr != null) gui.cursor(painter.mouse(focusedRect, mouseX, mouseY,
         false) ? CURSORHAND : CURSORARROW);
 
     if(newFocus) {
@@ -346,7 +346,7 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
-   * 
+   *
    * @param rect initial space to layout rects in
    * @param rectangles List to store divided rects in
    * @param nodes Nodes to draw in the map
@@ -514,7 +514,7 @@ public final class MapView extends View implements Runnable {
         else myy = mouseY - GUIProp.lensheight;
 
         // get area under cursor
-        MapRect rectToZoom = new MapRect(myx + GUIProp.lenswidth
+        final MapRect rectToZoom = new MapRect(myx + GUIProp.lenswidth
             - GUIProp.lensareawidth, myy + GUIProp.lensheight
             - GUIProp.lensareaheight, GUIProp.lensareawidth << 1,
             GUIProp.lensareaheight << 1);
@@ -540,10 +540,11 @@ public final class MapView extends View implements Runnable {
         h = GUIProp.lensheight << 1;
 
         final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-        ArrayList<MapRect> lensRects = new ArrayList<MapRect>();
+        final ArrayList<MapRect> lensRects = new ArrayList<MapRect>();
 
         final Nodes nodes = new Nodes(gui.focused, data);
-        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
+        final BufferedImage bi = new BufferedImage(w, h,
+            BufferedImage.TYPE_INT_BGR);
         calc(rect, lensRects, nodes, bi);
         final int ac = AlphaComposite.SRC_OVER;
         ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 1.0f));
@@ -573,7 +574,7 @@ public final class MapView extends View implements Runnable {
    * Zooms the coordinates of the specified rectangle.
    * @param r rectangle to be zoomed
    * @param zs zooming step
-   * 
+   *
    *          [JH] division by zero to resolve
    */
   private void zoom(final MapRect r, final int zs) {
@@ -610,7 +611,7 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Creates a buffered image for the treemap.
-   * 
+   *
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    */
@@ -634,11 +635,10 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseClicked(final MouseEvent e) {
     if(gui.updating) return;
-    final boolean left = SwingUtilities.isLeftMouseButton(e);
-    if(!left || focusedRect == null) return;
 
-    // single/double click?
-    if(painter.highlight(focusedRect, mouseX, mouseY, true)) return;
+    // process mouse clicks by the specific painter
+    if(SwingUtilities.isLeftMouseButton(e) && focusedRect != null)
+      painter.mouse(focusedRect, mouseX, mouseY, true);
   }
 
   @Override
