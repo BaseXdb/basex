@@ -54,7 +54,7 @@ public final class Except extends Arr {
           final int d = items[0].diff(items[i]);
           
           if(d < 0) {
-            if(i+1 == items.length) {
+            if(i + 1 == items.length) {
               break;
             }
           }
