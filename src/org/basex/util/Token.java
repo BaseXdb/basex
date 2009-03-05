@@ -848,32 +848,6 @@ public final class Token {
   }
 
   /**
-   * Performs a translation on the specified token.
-   * @param tok token
-   * @param srch characters to be found
-   * @param rep characters to be replaced
-   * @return translated token.
-   */
-  public static byte[] translate(final byte[] tok, final byte[] srch,
-      final byte[] rep) {
-    final int l = tok.length;
-    final byte[] tmp = new byte[l];
-    int c = 0;
-    for(int i = 0; i < l; i++) {
-      final byte b = tok[i];
-      int j = -1;
-      while(++j < srch.length && b != srch[j]);
-      if(j < srch.length) {
-        if(j >= rep.length) continue;
-        tmp[c++] = rep[j];
-      } else {
-        tmp[c++] = tok[i];
-      }
-    }
-    return c == l ? tmp : Array.finish(tmp, c);
-  }
-
-  /**
    * Checks if the specified character is a whitespace.
    * @param ch the letter to be checked
    * @return result of comparison

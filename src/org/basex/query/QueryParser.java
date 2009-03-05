@@ -2009,7 +2009,7 @@ public class QueryParser extends InputParser {
           codes = Array.add(codes, new QNm(qName(QNAMEINV)));
         } else {
           check("*");
-          codes = Array.add(codes, null);
+          codes = Array.add(codes, (QNm) null);
         }
       } while(consume(PIPE));
 

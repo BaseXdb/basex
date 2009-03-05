@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -214,11 +213,64 @@ final class FNStr extends Fun {
     final Item ir = expr[2].atomic(ctx);
     if(ir == null) Err.empty(this);    
     final byte[] rep = checkStr(ir);
-    return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
+    return Str.get(translate(string(str), string(sea), string(rep)));
+  }
+
+  /**
+   * Performs a translation on the specified token.
+   * @param tok token
+   * @param srch characters to be found
+   * @param rep characters to be replaced
+   * @return translated token.
+   */
+  private static byte[] translate(final String tok, final String srch,
+      final String rep) {
+    final int l = tok.length();
+    final StringBuilder tmp = new StringBuilder(l);
+    for(int i = 0; i < l; i++) {
+      final char b = tok.charAt(i);
+      int j = -1;
+      while(++j < srch.length() && b != srch.charAt(j));
+      if(j < srch.length()) {
+        if(j >= rep.length()) continue;
+        tmp.append(rep.charAt(j));
+      } else {
+        tmp.append(tok.charAt(i));
+      }
+    }
+    return token(tmp.toString());
+  }
+
+  /**
+  return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
       translate(str, sea, rep) : token(Pattern.compile(string(sea),
       Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep))));
   }
 
+   * Returns a string join.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException xquery exception
+  private Item strjoin(final QueryContext ctx) throws QueryException {
+    final Item is = expr[1].atomic(ctx);
+    if(is == null) Err.empty(this);    
+    final byte[] sep = checkStr(is);
+
+    final TokenBuilder tb = new TokenBuilder();
+    final Iter iter = expr[0].iter(ctx);
+    int c = 0;
+    Item i;
+    while((i = iter.next()) != null) {
+      tb.add(checkStr(i));
+      tb.add(sep);
+      c++;
+    }
+    final byte[] v = tb.finish();
+    return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
+  }
+   */
+
+  
   /**
    * Returns a string join.
    * @param ctx query context

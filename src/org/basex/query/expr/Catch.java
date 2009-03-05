@@ -51,7 +51,7 @@ public final class Catch extends Single {
   public Iter iter(final QueryContext ctx, final QueryException e)
       throws QueryException {
 
-    final byte[] code = Token.token(e.code());
+    final byte[] code = e.code() == null ? Token.EMPTY : Token.token(e.code());
     if(!find(code)) return null;
     
     final int s = ctx.vars.size();

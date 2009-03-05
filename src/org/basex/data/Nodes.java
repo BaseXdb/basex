@@ -28,7 +28,7 @@ public final class Nodes implements Result {
   public int[] sorted;
   /** Number of stored nodes. */
   private int size;
-  
+
   /**
    * Node Set constructor.
    * @param d data reference
@@ -36,7 +36,7 @@ public final class Nodes implements Result {
   public Nodes(final Data d) {
     this(new int[] { }, d);
   }
-  
+
   /**
    * Node Set constructor.
    * @param d data reference
@@ -81,7 +81,7 @@ public final class Nodes implements Result {
   public int size() {
     return size;
   }
-  
+
   public boolean same(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
@@ -126,7 +126,7 @@ public final class Nodes implements Result {
     }
     sorted = nodes;
   }
-  
+
   /**
    * The specified pre value is added to or removed from the node array.
    * @param p pre value
@@ -135,8 +135,9 @@ public final class Nodes implements Result {
     final int[] n = new int[] { p };
     nodes = contains(p) ? except(nodes, n) : union(nodes, n);
     size = nodes.length;
+    sorted = null;
   }
-  
+
   /**
    * The specified nodes are merged.
    * @param p pre value
@@ -144,6 +145,7 @@ public final class Nodes implements Result {
   public void union(final int[] p) {
     nodes = union(nodes, p);
     size = nodes.length;
+    sorted = null;
   }
 
   /**
@@ -166,7 +168,7 @@ public final class Nodes implements Result {
     while(b != bl) c.add(bi[b++]);
     return c.finish();
   }
-  
+
   /**
    * Subtracts the second from the first array.
    * Note that the input arrays must be sorted.
@@ -197,7 +199,7 @@ public final class Nodes implements Result {
     ser.node(data, nodes[n], ftpos);
     ser.closeResult();
   }
-  
+
   public void close() { }
 
   @Override
