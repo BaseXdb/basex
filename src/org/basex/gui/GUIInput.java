@@ -117,6 +117,7 @@ public final class GUIInput extends BaseXTextField {
 
         final boolean enter = c == KeyEvent.VK_ENTER;
         if(!enter) showPopup();
+        if(enter) pop.hide();
 
         // skip commands
         if(GUIProp.execrt && !cmdMode()) main.execute();
