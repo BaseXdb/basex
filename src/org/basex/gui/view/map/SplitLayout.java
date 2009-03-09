@@ -13,25 +13,25 @@ import org.basex.util.Token;
 public final class SplitLayout extends MapLayout {
 
   @Override
-  void calcMap(final Data data, final MapRect r,
+  void calcMap(final Data d, final MapRect r,
       final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
-      putRect(data, r, mainRects, l, ns, level);
+      putRect(d, r, mainRects, l, ns, level);
     } else {
       final boolean v = r.w > r.h;
       // some more nodes have to be positioned on the first level
       if(level == 0) {
-        splitUniformly(data, r, mainRects, l, ns, ne, level, v);
+        splitUniformly(d, r, mainRects, l, ns, ne, level, v);
       } else {
         double weight = 0;
         int ni = ns;
 
         // sometimes it is not the whole size of the parent node. simply sum
         // the sizes of the nodes in the list
-        long parsize = data.fs != null ? addSizes(l, ni, ne, data) : 0;
+        long parsize = d.fs != null ? addSizes(l, ni, ne, d) : 0;
         int parchilds = l.list[ne] - l.list[ni];
         if(parsize == 0) parsize = l.list[ne] - l.list[ns];
         weight = 0;
@@ -39,11 +39,11 @@ public final class SplitLayout extends MapLayout {
         // increment pivot until left rectangle contains more or equal
         // than half the weight or leave with just setting it to ne - 1
         for(; ni < ne - 1; ni++)  {
-          long size = data.fs != null ? 
-              Token.toLong(data.attValue(data.sizeID, l.list[ni])) : 0;
+          long size = d.fs != null ? 
+              Token.toLong(d.attValue(d.sizeID, l.list[ni])) : 0;
           int childs = l.list[ni + 1] - l.list[ni];
           if(weight >= 0.5) break;
-          weight += calcWeight(size, childs, parsize, parchilds, data);
+          weight += calcWeight(size, childs, parsize, parchilds, d);
         }
         
         int xx = r.x;
@@ -54,7 +54,7 @@ public final class SplitLayout extends MapLayout {
         int hh = v ? r.h : (int) (r.h * weight);
 
         // paint both rectangles if enough space is left
-        if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
+        if(ww > 0 && hh > 0) calcMap(d, new MapRect(xx, yy, ww, hh, 0,
             r.level), mainRects, l, ns, ni, level);
         if(v) {
           xx += ww;
@@ -63,7 +63,7 @@ public final class SplitLayout extends MapLayout {
           yy += hh;
           hh = r.h - hh;
         }
-        if(ww > 0 && hh > 0) calcMap(data, new MapRect(xx, yy, ww, hh, 0,
+        if(ww > 0 && hh > 0) calcMap(d, new MapRect(xx, yy, ww, hh, 0,
             r.level), mainRects, l, ni, ne, level);
       }
     }

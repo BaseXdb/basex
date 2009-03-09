@@ -1,6 +1,7 @@
 package org.basex.gui.view.map;
 
 import org.basex.data.Data;
+import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -85,8 +86,13 @@ public class MapList extends IntList{
     weights = new double[list.length];
 
     for(int i = 0; i < size - 1; i++) {
-      weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
-          parchilds, data);
+      // only fetch valuers from database if really needed
+      if(GUIProp.sizep != 100) {
+        weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
+            parchilds, data);
+      } else {
+        weights[i] = 0d;
+      }
     }
   }
   

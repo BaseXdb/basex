@@ -56,6 +56,8 @@ public final class MapView extends View implements Runnable {
   private MapPainter painter;
   /** Determines Layout Algorithm. */
   public MapLayout layouter;
+  /** keeps the hole maplayout. */
+  public NewMapLayout newmaplayout;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[ViewNotifier.MAXHIST];
@@ -377,9 +379,15 @@ public final class MapView extends View implements Runnable {
         layouter = new SplitLayout();
         break;
     }
-
-    layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes), 0,
-        nodes.size(), 0);
+    // should replace following lines
+//    newmaplayout = new NewMapLayout(nodes.data);
+//    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0,
+//        nodes.size(), 0);
+//    painter.init(newmaplayout.rectangles);
+//    drawMap(map, newmaplayout.rectangles);
+    // will be obsolete
+    layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes),
+    0, nodes.size(), 0);
     painter.init(rectangles);
     drawMap(map, rectangles);
     focus();

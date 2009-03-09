@@ -13,21 +13,21 @@ import org.basex.util.Token;
 public final class StripLayout extends MapLayout {
 
   @Override
-  void calcMap(final Data data, final MapRect r,
+  void calcMap(final Data d, final MapRect r,
       final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
     if(ne - ns <= 1) {
-      putRect(data, r, mainRects, l, ns, level);
+      putRect(d, r, mainRects, l, ns, level);
     } else {
       // some more nodes have to be positioned on the first level
       if(level == 0) {
-        splitUniformly(data, r, mainRects, l, ns, ne, level, r.w > r.h);
+        splitUniformly(d, r, mainRects, l, ns, ne, level, r.w > r.h);
       } else {
         // number of nodes used to calculate rect size
         int nn = l.list[ne] - l.list[ns];
-        long parsize = data.fs != null ? addSizes(l, ns, ne, data) : 0;
+        long parsize = d.fs != null ? addSizes(l, ns, ne, d) : 0;
         int ni = ns;
         // running start holding first element of current row
         int start = ns;
@@ -42,19 +42,19 @@ public final class StripLayout extends MapLayout {
         double height = 0;
         while(ni < ne) {
           // height of current strip
-          long size = data.fs != null ? addSizes(l, start, ni + 1, data) : 0;
+          long size = d.fs != null ? addSizes(l, start, ni + 1, d) : 0;
           int childs = l.list[ni + 1] - l.list[start];
-          double weight = calcWeight(size, childs, parsize, nn, data);
+          double weight = calcWeight(size, childs, parsize, nn, d);
           height = weight * hh;
           
           ArrayList<MapRect> tmp = new ArrayList<MapRect>();
           // create temporary row including current rectangle
           double x = xx;
           for(int i = start; i <= ni; i++) {
-            long tmpsize = data.fs != null ?
-                Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
+            long tmpsize = d.fs != null ?
+                Token.toLong(d.attValue(d.sizeID, l.list[i])) : 0;
             double w = i == ni ? xx + ww - x : 
-              calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, childs, data)
+              calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, childs, d)
               * ww;
             tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
                 l.list[i], level));
@@ -67,7 +67,7 @@ public final class StripLayout extends MapLayout {
             for(int i = 0; i < row.size(); i++) {
               MapList newl = new MapList(1);
               newl.add(row.get(i).pre);
-              calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+              calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
             }
             // preparing for new line to lay out
             hh -= row.get(0).h;
@@ -76,7 +76,7 @@ public final class StripLayout extends MapLayout {
             row.clear();
             start = ni;
             nn = l.list[ne] - l.list[start];
-            parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
+            parsize =  d.fs != null ? addSizes(l, start, ne, d) : 0;
             // sometimes there has to be one rectangles to fill the left space
             if(ne == ni + 1) {
               row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -92,7 +92,7 @@ public final class StripLayout extends MapLayout {
         for(int i = 0; i < row.size(); i++) {
           MapList newl = new MapList(1);
           newl.add(row.get(i).pre);
-          calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+          calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
         }
       }
     }

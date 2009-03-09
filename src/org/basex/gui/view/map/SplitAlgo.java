@@ -24,7 +24,7 @@ public class SplitAlgo extends MapAlgo {
    * @param ne end array position
    * @param level indicates level which is calculated
    * @param sumweight weight of this recursion level
-   * @return ArrayList holding layedout rectangles
+   * @return ArrayList containing rectangles
    */
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] w, final int ns, final int ne, final int level,
@@ -66,6 +66,6 @@ public class SplitAlgo extends MapAlgo {
   
   @Override
   public String getType() {
-    return "StripLayout";
+    return "SplitLayout";
   }
 }

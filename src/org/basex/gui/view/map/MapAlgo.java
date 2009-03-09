@@ -1,7 +1,6 @@
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
-import org.basex.gui.GUIProp;
 
 /**
  * Interface MapAlgorithms need to implement.
@@ -10,25 +9,29 @@ import org.basex.gui.GUIProp;
  *
  */
 public abstract class MapAlgo {
-  /** Layout rectangle. */
-  MapRect border;
-  /** Font size. */
-  final int o = GUIProp.fontsize + 4;
-  
+
   /**
-   * Constructor.
+   * Calculates the average aspect Ratios of rectangles given in the List.
+   *
+   * @param r Array of rectangles
+   * @return average aspect ratio
    */
-  public MapAlgo() {
-    switch(GUIProp.maplayout) {
-      case 0: border = new MapRect(0, 0, 0, 0); break;
-      case 1: border = new MapRect(1, 1, 2, 2); break;
-      case 2: border = new MapRect(0, o, 0, o); break;
-      case 3: border = new MapRect(2, o - 1, 4, o + 1); break;
-      case 4: border = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5: border = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
-      default:
+  static double lineRatio(final ArrayList<MapRect> r) {
+    if (r.isEmpty()) return Double.MAX_VALUE;
+    double ar = 0;
+
+    for(int i = 0; i < r.size(); i++) {
+      if (r.get(i).w != 0 && r.get(i).h != 0) {
+        if (r.get(i).w > r.get(i).h) {
+          ar += r.get(i).w / r.get(i).h;
+        } else {
+          ar += r.get(i).h / r.get(i).w;
+        }
+      }
     }
+    return ar / r.size();
   }
+  
   /**
    * Recursively splits rectangles.
    * @param r parent rectangle

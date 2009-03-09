@@ -12,28 +12,28 @@ import org.basex.data.Data;
 public final class SquarifiedLayout extends MapLayout {
   
   @Override
-  void calcMap(final Data data, final MapRect r,
+  void calcMap(final Data d, final MapRect r,
       final ArrayList<MapRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
     // one rectangle left...
     if(ne - ns <= 1) {
-      putRect(data, r, mainRects, l, ns, level);
+      putRect(d, r, mainRects, l, ns, level);
     } else {
    // some more nodes have to be positioned on the first level
       if(level == 0) {
-        splitUniformly(data, r, mainRects, l, ns, ne, level, r.w > r.h);
+        splitUniformly(d, r, mainRects, l, ns, ne, level, r.w > r.h);
       } else {
         // init number of childs ans sizes
-        l.initChilds(data);
+        l.initChilds(d);
         int nn = 0;
         // number of nodes on this level
         for(int i = 0; i <= ne; i++) {
           nn += l.nrchilds[i];
         }
-        long parsize = data.fs != null ? addSizes(l, ns, ne, data) : 0;
+        long parsize = d.fs != null ? addSizes(l, ns, ne, d) : 0;
         int ni = ns;
         // init weights of nodes and sort
-        l.initWeights(parsize, nn, data);
+        l.initWeights(parsize, nn, d);
         l.sort();
         // running start holding first element of current row
         int start = ns;
@@ -60,7 +60,7 @@ public final class SquarifiedLayout extends MapLayout {
             for(int i = start; i <= ni; i++) {
               childs += l.nrchilds[i];
             }
-            double weight = calcWeight(size, childs, parsize, nn, data);
+            double weight = calcWeight(size, childs, parsize, nn, d);
             height = weight * hh;
             
             ArrayList<MapRect> tmp = new ArrayList<MapRect>();
@@ -68,7 +68,7 @@ public final class SquarifiedLayout extends MapLayout {
             double x = xx;
             for(int i = start; i <= ni; i++) {
               double w = i == ni ? xx + ww - x : 
-                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * ww;
+                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, d) * ww;
               tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
                   l.list[i], level));
               x += (int) w;
@@ -80,7 +80,7 @@ public final class SquarifiedLayout extends MapLayout {
               for(int i = 0; i < row.size(); i++) {
                 MapList newl = new MapList(1);
                 newl.add(row.get(i).pre);
-                calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+                calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
               }
               // preparing for new line to lay out
               hh -= row.get(0).h;
@@ -92,7 +92,7 @@ public final class SquarifiedLayout extends MapLayout {
               for(int i = start; i <= ne; i++) {
                 nn += l.nrchilds[i];
               }
-              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
+              parsize =  d.fs != null ? addSizes(l, start, ne, d) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -108,7 +108,7 @@ public final class SquarifiedLayout extends MapLayout {
           for(int i = 0; i < row.size(); i++) {
             MapList newl = new MapList(1);
             newl.add(row.get(i).pre);
-            calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+            calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
           }
         } else {
           ArrayList<MapRect> row = new ArrayList<MapRect>();
@@ -123,7 +123,7 @@ public final class SquarifiedLayout extends MapLayout {
             for(int i = start; i <= ni; i++) {
               childs += l.nrchilds[i];
             }
-            double weight = calcWeight(size, childs, parsize, nn, data);
+            double weight = calcWeight(size, childs, parsize, nn, d);
             width = weight * ww;
             
             ArrayList<MapRect> tmp = new ArrayList<MapRect>();
@@ -131,7 +131,7 @@ public final class SquarifiedLayout extends MapLayout {
             double y = yy;
             for(int i = start; i <= ni; i++) {
               double h = i == ni ? yy + hh - y : 
-                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * hh;
+                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, d) * hh;
               tmp.add(new MapRect((int) xx, (int) y, (int) width, (int) h,
                   l.list[i], level));
               y += (int) h;
@@ -143,7 +143,7 @@ public final class SquarifiedLayout extends MapLayout {
               for(int i = 0; i < row.size(); i++) {
                 MapList newl = new MapList(1);
                 newl.add(row.get(i).pre);
-                calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+                calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
               }
               // preparing for new line to lay out
               ww -= row.get(0).w;
@@ -155,7 +155,7 @@ public final class SquarifiedLayout extends MapLayout {
               for(int i = start; i <= ne; i++) {
                 nn += l.nrchilds[i];
               }
-              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
+              parsize =  d.fs != null ? addSizes(l, start, ne, d) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -171,7 +171,7 @@ public final class SquarifiedLayout extends MapLayout {
           for(int i = 0; i < row.size(); i++) {
             MapList newl = new MapList(1);
             newl.add(row.get(i).pre);
-            calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
+            calcMap(d, row.get(i), mainRects, newl, 0, 1, level);
           }
         }
       }
