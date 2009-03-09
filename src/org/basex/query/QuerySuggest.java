@@ -47,11 +47,24 @@ public class QuerySuggest extends QueryParser {
   }
 
   @Override
-  void absPath() {
-    //System.out.println("absLocPath");
-    final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
-    list.add(skel.root);
-    stack.push(list);
+  void sugPath(final int type) {
+    if (type == 0) {
+      //System.out.println("absLocPath");
+      final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
+      list.add(skel.root);
+      stack.push(list);
+    } else if (type == 1) {
+      //System.out.println("relLocPath");
+      ArrayList<SkelNode> list = null;
+      if(stack.size() == 0) {
+        if(!ctx.root()) return;
+        list = new ArrayList<SkelNode>();
+        list.add(skel.root);
+      } else {
+        list = skel.desc(stack.peek(), 0, Data.ELEM, false);
+      }
+      stack.push(list);
+    }
   }
 
   @Override
@@ -150,6 +163,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
+    //System.out.println("error");
     final QueryException qe = new QueryException(err, arg);
     mark();
     qe.complete(this, complete());

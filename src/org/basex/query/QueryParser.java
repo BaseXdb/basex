@@ -1266,12 +1266,13 @@ public class QueryParser extends InputParser {
       test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
       if (test != null) {
-        if (s != 10 && s != 20) absPath();
+        if (s == 0) sugPath(1);
+        if (s != 10 && s != 20 && s != 0) sugPath(0);
         if (s == 2)  checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(ax, test);
       } else if (s == 10 || s == 20 || s == 1 || s == 2) {
-        if (s != 10 && s != 20) absPath();
-        if (s == 2)  checkStep(Axis.DESCORSELF, Test.NODE);
+        if (s != 10 && s != 20) sugPath(0);
+        if (s == 2 || s == 20)  checkStep(Axis.DESCORSELF, Test.NODE);
         checkStep(null, null);
       }
     }
@@ -2609,11 +2610,14 @@ public class QueryParser extends InputParser {
   }
   
   /**
-   * Parses an AbsoluteLocationPath.
+   * Parses a Suggestion Path.
+   * 0 for an absolute Path
+   * 1 for a relative Path
+   * @param type int
    * @throws QueryException parse Exception
    */
   @SuppressWarnings("unused")
-  void absPath() throws QueryException { }
+  void sugPath(final int type) throws QueryException { }
   
   /**
    * Performs optional step checks.
