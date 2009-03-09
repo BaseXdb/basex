@@ -63,7 +63,7 @@ public abstract class W3CTS {
   /** Test Suite Identifier. */
   private final String testid;
   /** Path to the XQuery Test Suite. */
-  private String path = ".";
+  private String path = "";
 
   /** Query Path. */
   private String queries;
@@ -106,6 +106,12 @@ public abstract class W3CTS {
     new HashMap<String, byte[][]>();
   /** Cached stop word files. */
   private final HashMap<String, String> stop = new HashMap<String, String>();
+  /** Cached stop word files. */
+  private final HashMap<String, String> stop2 = new HashMap<String, String>();
+  /** Cached stemming dictionaries. */
+  private final HashMap<String, String> stem = new HashMap<String, String>();
+  /** Cached thesaurus. */
+  private final HashMap<String, String> thes = new HashMap<String, String>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -218,11 +224,22 @@ public abstract class W3CTS {
       colls.put(cname, dl.finish());
     }
 
-    BaseX.outln("Caching Stopwords...");
+    BaseX.outln("Caching Fulltext Structures...");
     for(final int s : nodes("//*:stopwords", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       stop.put(text("@uri", srcRoot), val);
+      stop2.put(text("@ID", srcRoot), val);
+    }
+    for(final int s : nodes("//*:stemming-dictionary", root).nodes) {
+      final Nodes srcRoot = new Nodes(s, data);
+      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
+      stem.put(text("@ID", srcRoot), val);
+    }
+    for(final int s : nodes("//*:thesaurus", root).nodes) {
+      final Nodes srcRoot = new Nodes(s, data);
+      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
+      thes.put(text("@ID", srcRoot), val);
     }
 
     if(reporting) {
@@ -231,10 +248,11 @@ public abstract class W3CTS {
     }
 
     BaseX.out("Parsing Queries");
+    if(verbose) BaseX.outln();
     final Nodes nodes = nodes("//*:test-case", root);
     for(int t = 0; t < nodes.size(); t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
-      if(t % 1000 == 0) BaseX.out(".");
+      if(!verbose && t % 1000 == 0) BaseX.out(".");
     }
     BaseX.outln();
 
@@ -304,9 +322,9 @@ public abstract class W3CTS {
     final String outname = text("@name", root);
     String inname = text("*:query/@name", root);
     if(inname == null) inname = outname;
-    if(verbose) BaseX.outln(inname);
 
     if(single != null && !outname.startsWith(single)) return true;
+    if(verbose) BaseX.outln("- " + inname);
 
     final IO file = IO.get(queries + pth + inname + ".xq");
     if(!file.exists()) {
@@ -315,7 +333,6 @@ public abstract class W3CTS {
     }
 
     final String in = read(file);
-
     String output = "";
     String error = null;
     Item item = null;
@@ -342,6 +359,15 @@ public abstract class W3CTS {
       var(nodes("*:input-query/@name", root),
           nodes("*:input-query/@variable", root), pth, ctx);
 
+      String fn = stop2.get(text("*:aux-URI[@role = 'stopwords']", root));
+      if(fn != null) ctx.ftopt.stopwords(IO.get(fn), false, false);
+      
+      fn = stem.get(text("*:aux-URI[@role = 'stemming-dictionary']", root));
+      if(fn != null) ctx.ftopt.stemming(IO.get(fn));
+      
+      //fn = thes.get(text("*:aux-URI[@role = 'stemming-dictionary']", root));
+      //if(fn != null) ctx.ftopt.thesaurus(IO.get(fn));
+      
       for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
         final String f = mods.get(string(data.atom(p))) + ".xq";

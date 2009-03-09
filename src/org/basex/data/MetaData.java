@@ -96,7 +96,7 @@ public final class MetaData {
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = Token.toLong(v);
       }
-      return f != null && f.path().equals(path) && f.date() == t &&
+      return f != null && f.eq(IO.get(path)) && f.date() == t &&
         STORAGE.equals(str);
     } catch(final IOException ex) {
       BaseX.debug(ex);

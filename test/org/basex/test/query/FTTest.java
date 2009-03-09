@@ -288,10 +288,8 @@ public final class FTTest extends AbstractTest {
 
       { "FTStopWords 1", nodes(7, 9, 11), "//* [text() ftcontains " +
         "'and databases' with stop words ('xml', 'and')]" },
-      { "FTStopWords 2", nodes(),
-        "//* [text() ftcontains 'and databases' with stop words ('and')]" },
-      { "FTStopWords 3", nodes(7),
-        "//* [text() ftcontains 'have xml' with stop words ('we', 'have')]" },
+      { "FTStopWords 2", nodes(7),
+        "//* [text() ftcontains 'we use xml' with stop words ('use')]" },
 
       { "FTAtomization 1", nodes(21),
         "//at [. ftcontains 'bad one']" },
@@ -349,7 +347,8 @@ public final class FTTest extends AbstractTest {
       { "FTDistance 9", nodes(3),
         "//w [. ftcontains 'first' ftand 'second' " +
         " ftand 'third' distance exactly 1 words ordered]" },          
-
+      { "FTDistance 10", bool(true),
+        "'a b' ftcontains 'a' ftand ('b') distance exactly 0 words" },
       { "FTWindow 1", nodes(3, 37),
         "//w [. ftcontains 'second' ftand 'fifth' window 7 words]" },
       { "FTWindow 2", nodes(3, 37),

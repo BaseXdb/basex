@@ -281,6 +281,8 @@ public class QueryParser extends InputParser {
           copyNamespacesDecl();
         } else if(consumeWS(NSPACE)) {
           namespaceDecl();
+        } else if(consumeWS(FTOPTION)) {
+          while(ftMatchOption(ctx.ftopt));
         } else {
           qp = p;
           return;
@@ -318,8 +320,6 @@ public class QueryParser extends InputParser {
         functionDecl();
       } else if(consumeWS(OPTION)) {
         optionDecl();
-      } else if(consumeWS(FTOPTION)) {
-        ftMatchOption(ctx.ftopt);
       } else {
         qp = p;
         return;
@@ -949,9 +949,10 @@ public class QueryParser extends InputParser {
     if(!consumeWS(FTCONTAINS)) return e;
 
     // [CG] XQuery/FTIgnoreOption
-    final FTExpr select = ftSelection();
+    final FTExpr select = ftSelection(false);
     //Expr ignore = null;
-    if(consumeWS2(WITHOUT) && consumeWS2(CONTENT)) {
+    if(consumeWS2(WITHOUT)) {
+      check(CONTENT);
       //ignore = union();
       union();
       error(FTIGNORE);
@@ -2050,11 +2051,12 @@ public class QueryParser extends InputParser {
    * [FT160] Parses an FTDistance.
    * [FT162] Parses an FTScope.
    * [FT164] Parses an FTContent.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftSelection() throws QueryException {
-    final FTExpr expr = ftOr();
+  private FTExpr ftSelection(final boolean prg) throws QueryException {
+    final FTExpr expr = ftOr(prg);
     final FTPos sel = new FTPos(expr);
 
     while(true) {
@@ -2086,72 +2088,77 @@ public class QueryParser extends InputParser {
       }
     }
     if(consumeWS(WEIGHT)) sel.weight = range();
-//    return ctx.ftdata == null && sel.standard() ? expr : sel;
+    //return sel.standard() ? expr : sel;
     return sel;
   }
 
   /**
    * [FT145] Parses FTOr.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftOr() throws QueryException {
-    final FTExpr e = ftAnd();
+  private FTExpr ftOr(final boolean prg) throws QueryException {
+    final FTExpr e = ftAnd(prg);
     if(!consumeWS(FTOR)) return e;
 
     FTExpr[] list = { e };
-    do list = Array.add(list, ftAnd()); while(consumeWS(FTOR));
+    do list = Array.add(list, ftAnd(prg)); while(consumeWS(FTOR));
     return new FTOr(list);
   }
 
   /**
    * [FT146] Parses FTAnd.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftAnd() throws QueryException {
-    final FTExpr e = ftMildNot();
+  private FTExpr ftAnd(final boolean prg) throws QueryException {
+    final FTExpr e = ftMildNot(prg);
     if(!consumeWS(FTAND)) return e;
 
     FTExpr[] list = { e };
-    do list = Array.add(list, ftMildNot()); while(consumeWS(FTAND));
+    do list = Array.add(list, ftMildNot(prg)); while(consumeWS(FTAND));
     return new FTAnd(list);
   }
 
   /**
    * [FT147] Parses FTMildNot.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftMildNot() throws QueryException {
-    final FTExpr e = ftUnaryNot();
+  private FTExpr ftMildNot(final boolean prg) throws QueryException {
+    final FTExpr e = ftUnaryNot(prg);
     if(!consumeWS(NOT)) return e;
 
     FTExpr[] list = { e };
     do {
-      check(IN); list = Array.add(list, ftUnaryNot());
+      check(IN); list = Array.add(list, ftUnaryNot(prg));
     } while(consumeWS(NOT));
     return new FTMildNot(list);
   }
 
   /**
    * [FT148] Parses FTUnaryNot.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftUnaryNot() throws QueryException {
+  private FTExpr ftUnaryNot(final boolean prg) throws QueryException {
     final boolean not = consumeWS(FTNOT);
-    final FTExpr e = ftPrimaryWithOptions();
+    final FTExpr e = ftPrimaryWithOptions(prg);
     return not ? new FTNot(e) : e;
   }
 
   /**
    * [FT149] Parses FTPrimaryWithOptions.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftPrimaryWithOptions() throws QueryException {
-    final FTExpr expr = ftPrimary();
+  private FTExpr ftPrimaryWithOptions(final boolean prg) throws QueryException {
+    final FTExpr expr = ftPrimary(prg);
     final FTOpt fto = new FTOpt();
     // skip options if none were specified...
     boolean found = false;
@@ -2165,26 +2172,29 @@ public class QueryParser extends InputParser {
    * [FT152] Parses FTWordsValue.
    * [FT154] Parses FTAnyallOption.
    * [FT155] Parses FTTimes.
+   * @param prg pragma flag
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTExpr ftPrimary() throws QueryException {
+  private FTExpr ftPrimary(final boolean prg) throws QueryException {
     if(pragma()) {
+      while(pragma());
       check(BRACE1);
-      final FTExpr e = ftSelection();
+      final FTExpr e = ftSelection(true);
       check(BRACE2);
       return e;
     }
 
     if(consumeWS(PAR1)) {
-      final FTExpr e = ftSelection();
+      final FTExpr e = ftSelection(false);
       check(PAR2);
       return e;
     }
 
     skipWS();
-    final Expr e = quote(curr()) ? Str.get(stringLiteral()) :
-      enclosed(NOENCLEXPR);
+    final Expr e = curr('{') ? enclosed(NOENCLEXPR) : quote(curr()) ?
+        Str.get(stringLiteral()) : null;
+    if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
 
     // FTAnyAllOption
     FTMode mode = FTMode.ANY;
@@ -2319,19 +2329,9 @@ public class QueryParser extends InputParser {
             if(ctx.stop != null) fn = ctx.stop.get(fn);
 
             IO fl = IO.get(fn);
-            if(!fl.exists() && ctx.file != null) {
-              fl = file.merge(fl);
-              if(!fl.exists()) error(NOSTOPFILE, fl);
-            }
+            if(!fl.exists() && ctx.file != null) fl = file.merge(fl);
+            if(!ctx.ftopt.stopwords(fl, union, except)) error(NOSTOPFILE, fl);
 
-            try {
-              for(final byte[] sl : split(norm(fl.content()), ' ')) {
-                if(except) opt.sw.delete(sl);
-                else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
-              }
-            } catch(final IOException ex) {
-              error(NOSTOPFILE, fl);
-            }
           } else if(!union && !except) {
             error(FTSTOP);
           }

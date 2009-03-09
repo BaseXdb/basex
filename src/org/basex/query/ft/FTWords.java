@@ -12,8 +12,10 @@ import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTOpt.FTMode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
 import org.basex.query.util.Scoring;
 import org.basex.util.TokenBuilder;
 
@@ -75,25 +77,24 @@ public final class FTWords extends FTExpr {
       // speed up default case...
       final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, word);
       len = word.length;
-      final int c = ctx.ftopt.sb.count();
-      o += c > 0 ? oc / ctx.ftopt.sb.count() : len == 0 ? 1 : 0;
+      final int c = ctx.ftopt.qu.count();
+      o += c > 0 ? oc / ctx.ftopt.qu.count() : len == 0 ? 1 : 0;
     } else {
       final Iter iter = ctx.iter(query);
-      Item i;
+      byte[] it;
   
       switch(mode) {
         case ALL:
-          while((i = iter.next()) != null) {
-            final byte[] txt = i.str();
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
+          while((it = nextStr(iter)) != null) {
+            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, it);
             if(oc == 0) return 0;
-            len += txt.length;
-            o += oc / ctx.ftopt.sb.count();
+            len += it.length;
+            o += oc / ctx.ftopt.qu.count();
           }
           break;
         case ALLWORDS:
-          while((i = iter.next()) != null) {
-            for(final byte[] txt : split(i.str(), ' ')) {
+          while((it = nextStr(iter)) != null) {
+            for(final byte[] txt : split(it, ' ')) {
               final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
               if(oc == 0) return 0;
               len += txt.length;
@@ -102,16 +103,15 @@ public final class FTWords extends FTExpr {
           }
           break;
         case ANY:
-          while((i = iter.next()) != null) {
-            final byte[] txt = i.str();
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
-            len += txt.length;
-            o += oc / ctx.ftopt.sb.count();
+          while((it = nextStr(iter)) != null) {
+            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, it);
+            len += it.length;
+            o += oc / ctx.ftopt.qu.count();
           }
           break;
         case ANYWORD:
-          while((i = iter.next()) != null) {
-            for(final byte[] txt : split(i.str(), ' ')) {
+          while((it = nextStr(iter)) != null) {
+            for(final byte[] txt : split(it, ' ')) {
               final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
               len += txt.length;
               o += oc;
@@ -120,13 +120,13 @@ public final class FTWords extends FTExpr {
           break;
         case PHRASE:
           final TokenBuilder tb = new TokenBuilder();
-          while((i = iter.next()) != null) {
-            tb.add(i.str());
+          while((it = nextStr(iter)) != null) {
+            tb.add(it);
             tb.add(' ');
           }
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, tb.finish());
           len += tb.size;
-          o += oc / ctx.ftopt.sb.count();
+          o += oc / ctx.ftopt.qu.count();
           break;
       }
     }
@@ -140,6 +140,20 @@ public final class FTWords extends FTExpr {
     return o < mn || o > mx ? 0 : Math.max(1, len);
   }
 
+  /**
+   * Checks if the next item is a string.
+   * Returns a token representation or an exception.
+   * @param iter iterator to be checked
+   * @return item
+   * @throws QueryException evaluation exception
+   */
+  private byte[] nextStr(final Iter iter) throws QueryException {
+    final Item it = iter.next();
+    if(it == null) return null;
+    if(!it.s() && !it.u()) Err.type(info(), Type.STR, it);
+    return it.str();
+  }
+  
   @Override
   public void indexAccessible(final QueryContext ctx, final IndexContext ic) {
     /*

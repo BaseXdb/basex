@@ -104,34 +104,25 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    if (singlemode) {
-      parseSingle();
-      return;
-    }
-    
     builder.startDoc(token(io.name()));
-    builder.startElem(token(DEEPFS), atts.reset());
-    
-    for(final File f : root ? File.listRoots() :
-      new File[] { new File(io.path()).getCanonicalFile() }) {
-      
-      preStack[0] = builder.startElem(DIR, atts(f, true));
-      sizeStack[0] = 0;
-      parse(f);
-      builder.endElem(DIR);
-      builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
-    }
-    
-    builder.endElem(token(DEEPFS));
-    builder.endDoc();
-  }
 
-  /** Parse just a single file.
-   * @throws IOException I/O Exception
-   */
-  public void parseSingle() throws IOException {
-    builder.startDoc(token(io.name()));
-    file(new File(io.path()).getCanonicalFile());
+    if(singlemode) {
+      file(new File(io.path()).getCanonicalFile());
+    } else {
+      builder.startElem(token(DEEPFS), atts.reset());
+      
+      for(final File f : root ? File.listRoots() :
+        new File[] { new File(io.path()).getCanonicalFile() }) {
+        
+        preStack[0] = builder.startElem(DIR, atts(f, true));
+        sizeStack[0] = 0;
+        parse(f);
+        builder.endElem(DIR);
+        builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
+      }
+      
+      builder.endElem(token(DEEPFS));
+    }
     builder.endDoc();
   }
   

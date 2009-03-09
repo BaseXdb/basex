@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
+import org.basex.util.Map;
 import org.basex.util.Stemming;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -17,6 +18,8 @@ import org.basex.util.TokenList;
 public final class FTTokenizer extends IndexToken {
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
+  /** Stemming dictionary. */
+  public Map<byte[]> sd;
   /** Stemming flag. */
   public boolean st = Prop.ftst;
   /** Diacritics flag. */
@@ -77,6 +80,7 @@ public final class FTTokenizer extends IndexToken {
     cs = fto.is(FTOpt.CS);
     wc = fto.is(FTOpt.WC);
     fz = fto.is(FTOpt.FZ);
+    sd = fto.sd;
   }
 
   /**
@@ -149,7 +153,7 @@ public final class FTTokenizer extends IndexToken {
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
-    if(st) n = stem.word(n);
+    if(st) n = stem(n);
     return n;
   }
 
@@ -257,6 +261,19 @@ public final class FTTokenizer extends IndexToken {
     if(!a) return token(string(t).toLowerCase());
     for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
     return t;
+  }
+
+  /**
+   * Stems the specified token.
+   * @param t token to be converted
+   * @return the converted token
+   */
+  private byte[] stem(final byte[] t) {
+    /*if(sd != null) {
+      final byte[] sn = sd.get(t);
+      if(sn != null) return sn;
+    }*/
+    return stem.word(t);
   }
   
   /**

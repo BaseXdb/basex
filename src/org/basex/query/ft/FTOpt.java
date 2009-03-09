@@ -5,10 +5,12 @@ import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
+import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryTokens;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
+import org.basex.util.Map;
 import org.basex.util.Set;
 
 /**
@@ -52,13 +54,15 @@ public final class FTOpt extends ExprInfo {
   /** States which flags are assigned. */
   private final boolean[] set = new boolean[flag.length];
 
+  /** Stemming dictionary. */
+  public Map<byte[]> sd;
   /** Stopwords. */
   public Set sw;
   /** Language. */
   public byte[] ln;
 
   /** Fulltext tokenizer. */
-  public final FTTokenizer sb = new FTTokenizer();
+  public final FTTokenizer qu = new FTTokenizer();
 
   /**
    * Compiles the fulltext options, inheriting the parent options.
@@ -72,6 +76,7 @@ public final class FTOpt extends ExprInfo {
       }
     }
     if(sw == null) sw = opt.sw;
+    if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
   }
 
@@ -98,37 +103,38 @@ public final class FTOpt extends ExprInfo {
    * Checks if the first token contains the second fulltext term.
    * @param tk ft tokenizer
    * @param pos ft position filter
-   * @param sub query token
+   * @param q query token
    * @return number of occurrences
    */
-  public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {
-    if(sub.length == 0) return 0;
+  public int contains(final FTTokenizer tk, final FTPos pos, final byte[] q) {
+    if(q.length == 0) return 0;
 
     tk.st = is(ST);
     tk.dc = is(DC);
     tk.cs = is(CS);
+    tk.sd = sd;
     tk.init();
 
     if(is(FZ) && ls == null) ls = new Levenshtein();
-    sb.init(sub);
-    sb.st = tk.st;
-    sb.dc = tk.dc;
-    sb.cs = tk.cs;
-    sb.uc = is(UC);
-    sb.lc = is(LC);
-    sb.wc = is(WC);
-    sb.fz = is(FZ);
+    qu.init(q);
+    qu.st = tk.st;
+    qu.sd = tk.sd;
+    qu.dc = tk.dc;
+    qu.cs = tk.cs;
+    qu.uc = is(UC);
+    qu.lc = is(LC);
+    qu.wc = is(WC);
+    qu.fz = is(FZ);
 
     IntList il = null;
     while(tk.more()) {
       final int tp = tk.p;
+      final int tpos = tk.pos;
       byte[] t = tk.get();
       boolean f = true;
       boolean c = false;
-      sb.init();
-      final int tpos = tk.pos;
-      while(f && sb.more()) {
-        final byte[] s = sb.get();
+      qu.init();
+      while(f && qu.more()) {
         if(c) {
           tk.more();
           t = tk.get();
@@ -136,26 +142,23 @@ public final class FTOpt extends ExprInfo {
           c = true;
         }
 
-        if(sw != null) {
-          final boolean s1 = sw.id(s) != 0;
-          final boolean s2 = sw.id(t) != 0;
-          f = !(s1 ^ s2);
-          if(s1 || s2) continue;
-        }
-        f = sb.fz ? ls.similar(t, s) : sb.wc ?
+        final byte[] s = qu.get();
+        if(sw != null && sw.id(s) != 0) continue;
+
+        f = qu.fz ? ls.similar(t, s) : qu.wc ?
             string(t).matches(string(s)) : eq(t, s);
       }
 
       if(f) {
         if(il == null) il = new IntList();
         // each word position has to be saved for phrases
-        for(int i = 0; i < sb.pos; i++) il.add(tpos + i);
+        for(int i = 0; i < qu.pos; i++) il.add(tpos + i);
       }
       tk.p = tp;
     }
 
     if(il == null) return 0;
-    pos.add(sub, il);
+    pos.add(q, il);
     return il.size;
   }
 
@@ -186,6 +189,48 @@ public final class FTOpt extends ExprInfo {
      - if wildcards are specified, the fulltext index is a trie */
     return meta.ftcs == is(FTOpt.CS) && meta.ftdc == is(FTOpt.DC) &&
       meta.ftst == is(FTOpt.ST) && sw == null && (!is(FTOpt.WC) || !meta.ftfz);
+  }
+
+  /**
+   * Processes stopwords from the specified file.
+   * @param fl file
+   * @param u union flag
+   * @param e except flag
+   * @return success flag
+   */
+  public boolean stopwords(final IO fl, final boolean u, final boolean e) {
+    if(sw == null) sw = new Set();
+    try {
+      for(final byte[] sl : split(norm(fl.content()), ' ')) {
+        if(e) sw.delete(sl);
+        else if(!u || sw.id(sl) == 0) sw.add(sl);
+      }
+      return true;
+    } catch(final IOException ex) {
+      return false;
+    }
+  }
+
+  /**
+   * Processes a stemming dictionary.
+   * @param fl file
+   * @return success flag
+   */
+  public boolean stemming(final IO fl) {
+    if(sd == null) sd = new Map<byte[]>();
+    try {
+      for(final byte[] sl : split(fl.content(), '\n')) {
+        byte[] val = null;
+        for(final byte[] st : split(norm(sl), ' ')) {
+          if(val == null) val = st;
+          else sd.add(st, val);
+        }
+        sd.add(sl);
+      }
+      return true;
+    } catch(final IOException ex) {
+      return false;
+    }
   }
   
   @Override
