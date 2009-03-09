@@ -252,34 +252,6 @@ class NewMapLayout {
   }
   
   /**
-   * One rectangle left, add it and continue with its children.
-   * @param r parent rectangle
-   * @param l children array
-   * @param ns start array position
-   * @param level indicates level which is calculated
-   */
-  protected void putRect(final MapRect r, final IntList l, final int ns, 
-      final int level) {
-    
-    rectangles.add(r);
-
-    // position, with and height calculated using sizes of former level
-    final int x = r.x + layout.x;
-    final int y = r.y + layout.y;
-    final int w = r.w - layout.w;
-    final int h = r.h - layout.h;
-
-    // skip too small rectangles and leaf nodes (= meta data in deepfs)
-    if((w >= o || h >= o) && w > 0 && h > 0 &&
-        !ViewData.isLeaf(data, r.pre)) {
-      final MapList ch = children(r.pre);
-      if(ch.size != 0) rectangles.addAll(algo.calcMap(
-          new MapRect(x, y, w, h, l.list[ns], r.level + 1), 
-          ch, ch.weights, 0, ch.size - 1, level + 1));
-    }
-  }
-  
-  /**
    * Splits and adds rectangles uniformly distributed.
    * @param d reference
    * @param r rectangles to lay out in
@@ -335,18 +307,46 @@ class NewMapLayout {
   void makeMap(final MapRect r, final MapList l, final int ns, final int ne, 
       final int level) {
     if(ne - ns == 1) {
-      putRect(r, l, ns, level);
+      // one rectangle left, add it and go deeper
+      r.pre = l.list[ns];
+      putRect(r, level);
     } else {
       if(level == 0) {
         // some more roots have to be positioned
         rectangles.addAll(new SplitAlgo().
             calcMap(r, l, l.weights, ns, ne, level));
       } else {
-
-        // call recursive TreeMap algorithm
-        rectangles.addAll(algo.calcMap(r, l, l.weights, ns, ne, level));
-
+        ArrayList<MapRect> rects = algo.calcMap(r, l, l.weights, ns, ne, level);
+        // call recursion for each rectangle
+        for(MapRect rect : rects) {
+          putRect(rect, rect.level);
+        }
       }
+    }
+  }
+  
+  /**
+   * One rectangle left, add it and continue with its children.
+   * @param r parent rectangle
+   * @param level indicates level which is calculated
+   */
+  protected void putRect(final MapRect r, final int level) {
+    
+    rectangles.add(r);
+
+    // position, with and height calculated using sizes of former level
+    final int x = r.x + layout.x;
+    final int y = r.y + layout.y;
+    final int w = r.w - layout.w;
+    final int h = r.h - layout.h;
+
+    // skip too small rectangles and leaf nodes (= meta data in deepfs)
+    if((w >= o || h >= o) && w > 0 && h > 0 &&
+        !ViewData.isLeaf(data, r.pre)) {
+      final MapList ch = children(r.pre);
+
+      if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+          ch, 0, ch.size - 1, level + 1);
     }
   }
 }

@@ -61,6 +61,18 @@ class MapRect extends ViewRect implements Cloneable {
     pre = p;
     level = l;
   }
+  
+  /**
+   * Constructor taking MapRect for position initialization.
+   * @param r pos and dimension rectangle
+   * @param p rectangle pre value
+   * @param l level
+   */
+  MapRect(final ViewRect r, final int p, final int l) {
+    this(r.x, r.y, r.w, r.h);
+    pre = p;
+    level = l;
+  }
 
   /**
    * Verifies if the specified rectangle is contained inside the rectangle.

@@ -16,7 +16,8 @@ public class SplitAlgo extends MapAlgo {
   }
 
   /**
-   * Uses recursive SplitLayout algorithm.
+   * Uses recursive SplitLayout algorithm to divide rectangles on one level.
+   * 
    * @param r parent rectangle
    * @param l children array
    * @param w weights array
@@ -29,39 +30,47 @@ public class SplitAlgo extends MapAlgo {
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] w, final int ns, final int ne, final int level,
       final double sumweight) {
-    ArrayList<MapRect> rects = new ArrayList<MapRect>();
-    double weight = 0;
-    int ni = ns;
-
-    // increment pivot until left rectangle contains more or equal
-    // than half the weight or leave with just setting it to ne - 1
-    weight = 0;
-    for(; ni < ne - 1; ni++)  {
-      if(weight >= sumweight / 2) break;
-      weight += w[ni];
-    }
-    
-    int xx = r.x;
-    int yy = r.y;
-    int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sumweight * weight);
-    int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
-
-    // paint both rectangles if enough space is left
-    if(ww > 0 && hh > 0) rects.addAll(calcMap(
-        new MapRect(xx, yy, ww, hh, 0, r.level), 
-        l, w, ns, ni, level, weight));
-    if(r.w > r.h) {
-      xx += ww;
-      ww = r.w - ww;
+    if(ne - ns == 1) {
+      ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      rects.add(new MapRect(r, l.list[ns], level));
+      return rects;
     } else {
-      yy += hh;
-      hh = r.h - hh;
+      ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      double weight = 0.5;
+      int ni = ns;
+  
+      // increment pivot until left rectangle contains more or equal
+      // than half the weight or leave with just setting it to ne - 1
+      /*[JH] remove comment, use weights
+      weight = 0;
+      for(; ni < ne - 1; ni++)  {
+        if(weight >= sumweight / 2) break;
+        weight += w[ni];
+      }*/
+      ni = ne - 1;
+      
+      int xx = r.x;
+      int yy = r.y;
+      int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sumweight * weight);
+      int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
+  
+      // paint both rectangles if enough space is left
+      if(ww > 0 && hh > 0) rects.addAll(calcMap(
+          new MapRect(xx, yy, ww, hh, 0, r.level), 
+          l, w, ns, ni, level, weight));
+      if(r.w > r.h) {
+        xx += ww;
+        ww = r.w - ww;
+      } else {
+        yy += hh;
+        hh = r.h - hh;
+      }
+      if(ww > 0 && hh > 0) rects.addAll(calcMap(
+          new MapRect(xx, yy, ww, hh, 0, r.level), 
+          l, w, ni, ne, level, sumweight - weight));
+      
+      return rects;
     }
-    if(ww > 0 && hh > 0) rects.addAll(calcMap(
-        new MapRect(xx, yy, ww, hh, 0, r.level), 
-        l, w, ni, ne, level, sumweight - weight));
-    
-    return new ArrayList<MapRect>();
   }
   
   @Override

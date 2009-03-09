@@ -331,10 +331,11 @@ public final class MapView extends View implements Runnable {
         layouter = new SplitLayout();
         break;
     }
+    
     // should replace following lines
 //    newmaplayout = new NewMapLayout(nodes.data);
-//    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0,
-//        nodes.size(), 0);
+//    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
+//    mainRects = newmaplayout.rectangles;
 //    painter.init(newmaplayout.rectangles);
 //    drawMap(map, newmaplayout.rectangles);
     // will be obsolete
