@@ -24,14 +24,18 @@ public final class TableDiskAccessNIO extends TableAccess {
 
   /** File storing all blocks. */
   private final RandomAccessFile file;
+  /** File length. */
+  private long len;
   /** Filechannel for faster access. */
   private final FileChannel fc;
   /** Mapped Byte Buffer Window. */
-  private MappedByteBuffer[] mbytebuffer;
+  private MappedByteBuffer mbytebuffer;
+  /** Multiplicator. */
+  private static final int MULTI = 10000;
   /** Window size. Choose a multiple of blocksize. */
-  private static final int BUFFERSIZE =  10 * IO.BLOCKSIZE;
-  /** Window array size. */
-  private int numberofwindows;
+  private static final int BUFFERSIZE =  MULTI * IO.BLOCKSIZE;
+  /** Offset. */
+  private long currentMapping;
   
   /** Name of the database. */
   private final String db;
@@ -63,6 +67,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   private boolean indexdirty;
   /** Dirty flag. */
   private boolean dirty;
+  
 
   /**
    * Constructor.
@@ -87,26 +92,15 @@ public final class TableDiskAccessNIO extends TableAccess {
     // INITIALIZE FILE
     file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
     fc = file.getChannel();
-    final long len = file.length();
-    long tmplen = len;
-    int i = 0;
-    // (int) Math.ceil(len / BUFFERSIZE) + 1;
-    numberofwindows = (int) (len - 1 + BUFFERSIZE) / BUFFERSIZE;
-    mbytebuffer = new MappedByteBuffer[numberofwindows];
-    while(tmplen > BUFFERSIZE) {
-      mbytebuffer[i] = fc.map(FileChannel.MapMode.READ_WRITE, 
-          i * BUFFERSIZE, BUFFERSIZE);
-      // perform persisting changes
-      mbytebuffer[i].force();
-      tmplen = tmplen - BUFFERSIZE;
-      i++;
-    } 
-    if (tmplen != 0) {
-      mbytebuffer[i] = fc.map(FileChannel.MapMode.READ_WRITE, 
-          0, tmplen);
-      // perform persisting changes
-      mbytebuffer[i].force();
+    len = file.length();
+    if(len <= BUFFERSIZE) {
+      mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 0, len);
+    } else {
+      mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE,
+          0, BUFFERSIZE);
     }
+    // init current block
+    currentMapping = 0;
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
   }
 
@@ -140,6 +134,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     return (pre - firstPre) << IO.NODEPOWER;
   }
 
+  
   /**
    * Fetches the requested block into blockNumber and set firstPre and
    * blockSize.
@@ -150,13 +145,25 @@ public final class TableDiskAccessNIO extends TableAccess {
   private synchronized void readBlock(final int ind, final int first,
       final int next) {
       final int b = blocks[ind];
-      final int selector = numberofwindows / b;
-      final int offset = numberofwindows % b;
+//      System.out.println("block: " + b);
+      final int requestedMapping = b / MULTI;
+//      System.out.println(" reqMap: " + requestedMapping);
+
+      final int offset = b % MULTI;
+//      System.out.println(" offset: " + offset);
+
       writeBlock();
-      mbytebuffer[selector].position(offset * IO.BLOCKSIZE);
-      mbytebuffer[selector].get(buffer);
+      if (requestedMapping == currentMapping) {
+        mbytebuffer.position(offset * IO.BLOCKSIZE);
+        mbytebuffer.get(buffer);
+      } else {
+        moveWindow(requestedMapping);
+        mbytebuffer.position(offset * IO.BLOCKSIZE);
+        mbytebuffer.get(buffer);
+      }
 //      file.seek((long) b * IO.BLOCKSIZE);
 //      file.read(buffer);
+      // b - 1, because cause of previous calculations
       block = b;
       index = ind;
       firstPre = first;
@@ -167,14 +174,14 @@ public final class TableDiskAccessNIO extends TableAccess {
    * Checks whether the current block needs to be written and write it.
    */
   private synchronized void writeBlock() {
-    if(!dirty) return;
-    final int selector = numberofwindows / block;
-    final int offset = numberofwindows % block;
-    mbytebuffer[selector].position(offset * IO.BLOCKSIZE);
-    mbytebuffer[selector].put(buffer);
-//    file.seek((long) block * IO.BLOCKSIZE);
-//    file.write(buffer);
-    dirty = false;
+    try {
+      if(!dirty) return;
+      file.seek((long) block * IO.BLOCKSIZE);
+      file.write(buffer);
+      dirty = false;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
   }
 
   /**
@@ -189,7 +196,6 @@ public final class TableDiskAccessNIO extends TableAccess {
   public synchronized void flush() throws IOException {
     writeBlock();
     if(!indexdirty) return;
-
     final DataOutput out = new DataOutput(db, fn + 'i');
     out.writeNum(nrBlocks);
     out.writeNum(indexSize);
@@ -328,6 +334,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     updatePre(nr);
   }
   
+  
   /**
    * Updates the firstPre index entries.
    * @param nr number of entries to move
@@ -414,6 +421,29 @@ public final class TableDiskAccessNIO extends TableAccess {
     nextPre = index + 1 >= indexSize ? count : firstPres[index + 1];
   }
 
+  /**
+   * Moves reading window according the new mapping position.
+   * @param p new mapping position
+   */
+  private synchronized void moveWindow(final long p) {
+    try {
+      // check if mapped buffer exceeds remaining file length
+      if((len - (p * BUFFERSIZE)) < BUFFERSIZE) {
+        mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 
+            p * BUFFERSIZE, len - (p * BUFFERSIZE));
+//        System.out.println("case11111111111111111111");
+      } else {
+        mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 
+            p * BUFFERSIZE, BUFFERSIZE);
+//        System.out.println("case2222222222222222222222222222");
+
+      }
+      currentMapping = p;
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
   /**
    * Creates a new, empty block.
    */
