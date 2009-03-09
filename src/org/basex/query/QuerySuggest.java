@@ -166,6 +166,9 @@ public class QuerySuggest extends QueryParser {
     //System.out.println("error");
     final QueryException qe = new QueryException(err, arg);
     mark();
+    if (qe.simple().startsWith("Unexpected")) {
+      filter(false);
+    }
     qe.complete(this, complete());
     throw qe;
   }
