@@ -445,7 +445,7 @@ public final class CommandParser extends InputParser {
       if(e instanceof Cmd && !((Cmd) e).official) continue;
       if(e.name().startsWith(t)) list.add(e.name().toLowerCase());
     }
-    list.sort();
+    list.sort(true);
     return list;
   }
 

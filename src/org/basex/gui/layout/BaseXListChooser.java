@@ -93,8 +93,8 @@ public final class BaseXListChooser extends BaseXBack {
           list.setSelectedValue(values[newpos], true);
           text.setText(values[newpos]);
           text.selectAll();
-          parent.action(null);
           typed = false;
+          parent.action(null);
         }
       }
 
@@ -127,7 +127,6 @@ public final class BaseXListChooser extends BaseXBack {
             text.select(c, values[i].length());
           }
         }
-        parent.action(null);
       }
     });
     add(text);

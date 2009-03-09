@@ -43,8 +43,8 @@ public final class StripLayout extends MapLayout {
         while(ni < ne) {
           // height of current strip
           long size = d.fs != null ? addSizes(l, start, ni + 1, d) : 0;
-          int childs = l.list[ni + 1] - l.list[start];
-          double weight = calcWeight(size, childs, parsize, nn, d);
+          int children = l.list[ni + 1] - l.list[start];
+          double weight = calcWeight(size, children, parsize, nn, d);
           height = weight * hh;
           
           ArrayList<MapRect> tmp = new ArrayList<MapRect>();
@@ -54,7 +54,7 @@ public final class StripLayout extends MapLayout {
             long tmpsize = d.fs != null ?
                 Token.toLong(d.attValue(d.sizeID, l.list[i])) : 0;
             double w = i == ni ? xx + ww - x : 
-              calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, childs, d)
+              calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, children, d)
               * ww;
             tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
                 l.list[i], level));

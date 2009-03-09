@@ -1,9 +1,7 @@
 package org.basex.gui.layout;
 
-import java.awt.Component;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
 import org.basex.gui.dialog.Dialog;
 
@@ -14,96 +12,39 @@ import org.basex.gui.dialog.Dialog;
  * @author Christian Gruen
  */
 public final class BaseXCombo extends JComboBox {
-  /** Maximum number of strings to be stored. */
-  private static final int MAX = 30;
-  /** Last Input. */
-  String last = "";
-
   /**
    * Default Constructor.
    */
   public BaseXCombo() {
-    this(new String[] {}, null, false, null);
+    this(new String[] {}, null, null);
   }
 
   /**
    * Constructor.
    * @param choice combobox choice.
-   * @param e editable combobox
    * @param hlp help text
    */
-  public BaseXCombo(final String[] choice, final byte[] hlp,
-      final boolean e) {
-    this(choice, hlp, e, null);
+  public BaseXCombo(final String[] choice, final byte[] hlp) {
+    this(choice, hlp, null);
   }
 
   /**
    * Constructor.
-   * @param choice combobox choice.
+   * @param ch combobox choices.
    * @param hlp help text
-   * @param edit editable combobox
    * @param list action listener
    */
-  public BaseXCombo(final String[] choice, final byte[] hlp,
-      final boolean edit, final Dialog list) {
-    
-    super(choice);
-    setMaximumRowCount(edit ? 5 : 10);
+  public BaseXCombo(final String[] ch, final byte[] hlp, final Dialog list) {
+    super(ch);
     BaseXLayout.addDefaultKeys(this, list);
-
-    final Component comp = edit ? getEditor().getEditorComponent() : this; 
-    BaseXLayout.addHelp(comp, hlp);
-    if(!edit) return;
+    BaseXLayout.addHelp(this, hlp);
     
-    setEditable(true);
-    setText("");
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(e.getKeyChar() != 0xFFFF && isPopupVisible()) setPopupVisible(false);
-
-        final int key = e.getKeyCode();
-        final boolean ctrl = e.isControlDown();
-        if(ctrl && (key == KeyEvent.VK_Z || key == KeyEvent.VK_Y)) {
-          final String t = getText();
-          setText(last);
-          last = t;
+    if(list != null) {
+      addItemListener(new ItemListener() {
+        public void itemStateChanged(final ItemEvent ie) {
+          if(ie.getStateChange() == ItemEvent.SELECTED) list.action(null);
         }
-
-        if(key != KeyEvent.VK_ENTER) return;
-
-        // add current input to top of combo box
-        final String txt = getText();
-        removeItem(txt);
-        if(txt.length() == 0) return;
-        final int s = getItemCount();
-        if(s >= MAX) removeItemAt(s - 1);
-        insertItemAt(txt, 0);
-        setSelectedIndex(0);
-      }
-    });
+      });
+    }
   }
-
-  /**
-   * Returns the current text.
-   * @return text
-   */
-  public String getText() {
-    return getEditor().getItem().toString().trim();
-  }
-
-  /**
-   * Sets a text.
-   * @param txt text to be set
-   */
-  public void setText(final String txt) {
-    last = txt;
-    getEditor().setItem(txt);
-  }
-  
-  @Override
-  public void addKeyListener(final KeyListener l) {
-    if(isEditable()) getEditor().getEditorComponent().addKeyListener(l);
-    else super.addKeyListener(l);
-  } 
 }

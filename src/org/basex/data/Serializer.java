@@ -6,7 +6,6 @@ import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.util.Atts;
 import org.basex.util.TokenList;
-import org.basex.util.IntArrayList;
 
 /**
  * This is an interface for serializing XML results.
@@ -68,7 +67,7 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public abstract void text(final byte[] b, final int[][] ftd, 
-      final IntArrayList fta)
+      final TokenList fta)
     throws IOException;
 
   /**

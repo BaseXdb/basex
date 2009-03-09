@@ -4,8 +4,6 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.core.Prop;
@@ -109,15 +107,9 @@ public final class DialogPrefs extends Dialog {
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 12, 0));
 
-    lang = new BaseXCombo(Prop.LANGUAGES, HELPLANG, false, this);
+    lang = new BaseXCombo(Prop.LANGUAGES, HELPLANG, this);
     lang.setSelectedItem(Prop.language);
-    lang.addItemListener(new ItemListener() {
-      public void itemStateChanged(final ItemEvent ie) {
-        creds.setText(credits(lang.getSelectedItem().toString()));
-        action(null);
-      }
-      
-    });
+
     p.add(lang);
     creds = new BaseXLabel(credits(Prop.language));
     p.add(creds);
@@ -158,6 +150,7 @@ public final class DialogPrefs extends Dialog {
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
+    creds.setText(credits(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
   

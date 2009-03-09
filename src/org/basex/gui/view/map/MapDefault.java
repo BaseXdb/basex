@@ -44,9 +44,7 @@ final class MapDefault extends MapPainter {
       final int lvl = r.level;
 
       final boolean full = r.w == ww && r.h == hh;
-
-      // draw rectangle
-      Color col = nextMark(rects, ri);
+      Color col = color(rects, ri);
       final boolean mark = col != null;
 
       final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
@@ -61,7 +59,7 @@ final class MapDefault extends MapPainter {
       }
 
       g.setColor(mark ? col : COLORS[lvl]);
-      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
+      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||
           ViewData.isLeaf(data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {

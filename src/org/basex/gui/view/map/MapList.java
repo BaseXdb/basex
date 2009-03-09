@@ -12,13 +12,13 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Joerg Hauser
  */
-public class MapList extends IntList{
+public class MapList extends IntList {
   /** Weights array. */
   public double[] weights;
   /** Sizes array. */
   public long[] sizes;
   /** Number of children Array. */
-  public int[] nrchilds;
+  public int[] nrchildren;
 
   /**
    * Constructor, specifying an initial list size.
@@ -63,10 +63,10 @@ public class MapList extends IntList{
           long stmp = sizes[i];
           sizes[i] = sizes[i + 1];
           sizes[i + 1] = stmp;
-          // switch number of childs
-          int ctmp = nrchilds[i];
-          nrchilds[i] = nrchilds[i + 1];
-          nrchilds[i + 1] = ctmp;
+          // switch number of children
+          int ctmp = nrchildren[i];
+          nrchildren[i] = nrchildren[i + 1];
+          nrchildren[i + 1] = ctmp;
           
           switched = true;
         }
@@ -78,18 +78,18 @@ public class MapList extends IntList{
   /**
    * Calculates the weights of each list entry and stores it in an extra list.
    * @param parsize reference size
-   * @param parchilds reference number of nodes
+   * @param parchildren reference number of nodes
    * @param data reference
    */
-  public void initWeights(final long parsize, final int parchilds,
+  public void initWeights(final long parsize, final int parchildren,
       final Data data) {
     weights = new double[list.length];
 
     for(int i = 0; i < size - 1; i++) {
       // only fetch valuers from database if really needed
       if(GUIProp.sizep != 100) {
-        weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
-            parchilds, data);
+        weights[i] = MapLayout.calcWeight(sizes[i], nrchildren[i], parsize,
+            parchildren, data);
       } else {
         weights[i] = 0d;
       }
@@ -97,17 +97,17 @@ public class MapList extends IntList{
   }
   
   /**
-   * Inits the sizes and number of child of each nodes in this list.
+   * Initalizes the sizes and number of child of each nodes in this list.
    * @param data reference
    */
-  public void initChilds(final Data data) {
-    nrchilds = new int[list.length];
+  public void initChildren(final Data data) {
+    nrchildren = new int[list.length];
     sizes = new long[list.length];
 
     for(int i = 0; i < size - 1; i++) {
       sizes[i] = data.fs != null ? 
           Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-      nrchilds[i] = list[i + 1] - list[i];
+          nrchildren[i] = list[i + 1] - list[i];
     }
   }
 }

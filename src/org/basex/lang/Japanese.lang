@@ -164,15 +164,18 @@ ds_green=緑
 ds_blue=青
 
 dm_title=マップレイアウト
-dm_simple=簡易マップレイアウト
 dm_atts=属性の表示
-dm_prop=マップの整列
 dm_choice1=タイトル、枠線無し
 dm_choice2=タイトル無し、枠線最細
 dm_choice3=タイトル有り、枠線無し
 dm_choice4=タイトル有り、枠線最細
 dm_choice5=タイトル有り、枠線細
 dm_choice6=タイトル有り、枠線太
+dm_offset=Offsets
+dm_size=Size determined by
+dm_size_children=number of children
+dm_size_fssize=file size
+dm_size_both=children and file size
 
 dz_title=メモリ使用量
 dz_total=メモリ合計

@@ -147,14 +147,13 @@ public final class DialogImportFS  extends Dialog {
     });
     p.add(cont, BorderLayout.WEST);
 
-    maxsize = new BaseXCombo(IMPORTFSMAX, HELPFSMAX, false, this);
+    maxsize = new BaseXCombo(IMPORTFSMAX, HELPFSMAX, this);
     maxsize.setToolTipText(IMPORTFSMAXINFO);
     final int m = Prop.fstextmax;
     int i = -1;
     while(++i < IMPORTFSMAXSIZE.length - 1) {
       if(IMPORTFSMAXSIZE[i] == m) break;
     }
-    maxsize.setSelectedIndex(i);
 
     p.add(maxsize, BorderLayout.EAST);
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
@@ -168,8 +167,9 @@ public final class DialogImportFS  extends Dialog {
     
     // create buttons
     buttons = BaseXLayout.okCancel(this);
+
     set(buttons, BorderLayout.SOUTH);
-    action(null);
+    maxsize.setSelectedIndex(i);
     finish();
   }
 

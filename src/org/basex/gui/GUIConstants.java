@@ -9,7 +9,7 @@ import java.awt.Font;
 import javax.swing.UIManager;
 import org.basex.Text;
 import org.basex.io.IO;
-import org.basex.util.IntArrayList;
+import org.basex.util.TokenList;
 
 /**
  * GUI Constants used in different views.
@@ -100,7 +100,7 @@ public final class GUIConstants {
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT, null, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, null,
-    MENULAYOUT, COLOR, FONTS, MAPLAYOUT, MAPINFO, 
+    MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
     null, PREFS
   }, {
     SHOWHELP, INFO, null, ABOUT
@@ -316,7 +316,7 @@ public final class GUIConstants {
    * @param ftand int[][] data with ftand color results
    * @return resulting color
    */
-  public static Color getFTColor(final int i, final int[][] ftand) {
+  public static Color getFTColor(final int i, final byte[][] ftand) {
     if (ftand != null) {
       for (int j = 0; j < ftand.length; j++) {
         for (int k = 0; k < ftand[j].length; k++) {
@@ -373,7 +373,7 @@ public final class GUIConstants {
    * @param ftand ftand color info
    * @return int[2]{diff, color pointer}
    */
-  public static int[] getDiff(final int i, final IntArrayList ftand) {
+  public static int[] getDiff(final int i, final TokenList ftand) {
     if (ftand != null) {
       for (int j = 0; j < ftand.size; j++) {
         for (int k = 0; k < ftand.list[j].length && ftand.list[j][k] > 0; k++) {

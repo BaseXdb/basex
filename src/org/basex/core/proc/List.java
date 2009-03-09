@@ -72,7 +72,7 @@ public final class List extends Process {
     if(!dir.exists()) return db;
 
     for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());
-    db.sort();
+    db.sort(false);
     return db;
   }
 }

@@ -1,13 +1,9 @@
 package org.basex.gui.dialog;
 
-import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.text.DecimalFormat;
-
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.ViewRect;
@@ -18,110 +14,92 @@ import org.basex.gui.view.ViewRect;
  * @author Christian Gruen
  */
 public final class DialogMapInfo extends Dialog {
-  /** show information. */
-  private BaseXCheckBox info;  
-  /** Table Component. */
-  private BaseXBack p = new BaseXBack();
   /** Format for decimal numbers. */
   DecimalFormat f = new DecimalFormat("#0.00"); 
+  /** New Dimensions. */
+  private final BaseXLabel ndim = new BaseXLabel(" ");
+  /** Old Dimensions. */
+  private final BaseXLabel odim = new BaseXLabel(" ");
+  /** New Number of Nodes. */
+  private final BaseXLabel nsize = new BaseXLabel(" ");
+  /** Old Number of Nodes. */
+  private final BaseXLabel osize = new BaseXLabel(" ");
+  /** New Number of Nodes. */
+  private final BaseXLabel naar = new BaseXLabel(" ");
+  /** Old Aspect ratio. */
+  private final BaseXLabel oaar = new BaseXLabel(" ");
+  /** Execution time. */
+  private final BaseXLabel ntime = new BaseXLabel(" ");
+  /** Execution time. */
+  private final BaseXLabel otime = new BaseXLabel(" ");
+  /** Last time. */
+  private String timeo;
+  /** Last number of nodes. */
+  private int nno;
+  /** Last aspect ratio. */
+  private double aaro;
+  /** Last rectangle. */
+  private ViewRect recto;
   
   /**
    * Default constructor.
    * @param main reference to the main window
    */
   public DialogMapInfo(final GUI main) {
-    super(main, MAPINFOTITLE, false);
-    setResizable(true);
-    
-    // create checkbox
-    info = new BaseXCheckBox(MAPINFOTOGGLE, HELPMAPINFO,
-        GUIProp.mapinfo, 0, this);
-    set(info, BorderLayout.NORTH);
-    
-    finish(GUIProp.mapinfoloc);
-    action(null);
-  }
-  
-  /**
-   * Constructor.
-   * 
-   * @param main gui reference
-   * @param nno number of nodes old map
-   * @param nnn  number of nodes new map
-   * @param recto size old map
-   * @param rectn size new map
-   * @param aaro avarage aspect ratio old
-   * @param aarn average aspect ratio new
-   * @param distance change between old and new
-   */
-  public DialogMapInfo(final GUI main, final int nno, final int nnn,
-      final ViewRect recto, final ViewRect rectn, final double aaro, 
-      final double aarn, final double distance) {
-    this(main);
+    super(main, "Map Information", false);
 
-    // main table
-    setValues(nno, nnn, recto, rectn, aaro, aarn, distance);
-    
-    finish(GUIProp.mapinfoloc);
-    action(null);
+    final BaseXBack p = new BaseXBack();
+    p.setLayout(new TableLayout(5, 3, 5, 0));
+    p.add(new BaseXLabel(""));
+    p.add(new BaseXLabel("New Map      ", true, true));
+    p.add(new BaseXLabel("Old Map      ", true, true));
+    p.add(new BaseXLabel("Size: ", true, true));
+    p.add(ndim);
+    p.add(odim);
+    p.add(new BaseXLabel("Nodes painted: ", true, true));
+    p.add(nsize);
+    p.add(osize);
+    p.add(new BaseXLabel("Average aspect ratio: ", true, true));
+    p.add(naar);
+    p.add(oaar);
+    p.add(new BaseXLabel("Execution time: ", true, true));
+    p.add(ntime);
+    p.add(otime);
+
+    //p.add(new BaseXLabel("Distance change: ", true, true));
+    //p.add(dist);
+    //p.add(new BaseXLabel(""));
+
+    set(p, BorderLayout.NORTH);
+    setResizable(true);
+    finish(null);
   }
 
   /**
    * sets the table values.
-   * @param nno number of nodes old map
-   * @param nnn  number of nodes new map
-   * @param recto size old map
-   * @param rectn size new map
-   * @param aaro avarage aspect ratio old
-   * @param aarn average aspect ratio new
-   * @param distance change between old and new
+   * @param nn number of nodes
+   * @param rect main rectangle
+   * @param aar average aspect ratio
+   * @param time execution time
    */
-  public void setValues(final int nno, final int nnn,
-      final ViewRect recto, final ViewRect rectn, final double aaro, 
-      final double aarn, final double distance) {    
-    remove(p);
-    // main table
-    p.removeAll();
-    p.setLayout(new TableLayout(10, 3, 8, 0));
-    p.add(new BaseXLabel(""));
-    p.add(new BaseXLabel("neue Map", true, true));
-    p.add(new BaseXLabel("alte Map", true, true));
-    p.add(new BaseXLabel("size: ", true, true));
-    p.add(new BaseXLabel(Integer.toString(rectn.w) + "x" + 
-        Integer.toString(rectn.h)));
-    p.add(new BaseXLabel(Integer.toString(recto.w) + "x" + 
-        Integer.toString(recto.h)));
-    p.add(new BaseXLabel("nodes painted: ", true, true));
-    p.add(new BaseXLabel(Integer.toString(nnn)));
-    p.add(new BaseXLabel(Integer.toString(nno)));
-    p.add(new BaseXLabel("Average aspect ratio: ", true, true));
-    p.add(new BaseXLabel(f.format(aarn)));
-    p.add(new BaseXLabel(f.format(aaro)));
-    p.add(new BaseXLabel(""));
-//    p.add(new BaseXLabel(Double.toString(aarn)));
-//    p.add(new BaseXLabel(Double.toString(aaro)));
-    p.add(new BaseXLabel("distance change: ", true, true));
-    p.add(new BaseXLabel(Double.toString(distance)));
-    p.add(new BaseXLabel(""));
-    set(p, BorderLayout.CENTER);
-    
-    pack();
-    validate();
-  }
-  @Override
-  public void action(final String cmd) {
-    GUIProp.mapinfo = info.isSelected();
-    gui.notify.layout();
-  }
+  public void setValues(final int nn, final ViewRect rect, final double aar,
+      final String time) {
 
-  @Override
-  public void close() {
-    close(GUIProp.mapinfoloc);
-    GUIProp.write();
-  }
-
-  @Override
-  public void cancel() {
-    close();
+    final int nw = rect != null ? rect.w : 0;
+    final int nh = rect != null ? rect.h : 0;
+    final int ow = recto != null ? recto.w : 0;
+    final int oh = recto != null ? recto.h : 0;
+    ndim.setText(nw + " x " + nh);
+    odim.setText(ow + " x " + oh);
+    nsize.setText(Integer.toString(nn));
+    osize.setText(Integer.toString(nno));
+    naar.setText(f.format(aar));
+    oaar.setText(f.format(aaro));
+    ntime.setText(time);
+    otime.setText(timeo);
+    timeo = time;
+    recto = rect;
+    aaro = aar;
+    nno = nn;
   }
 }

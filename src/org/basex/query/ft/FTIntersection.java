@@ -4,7 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;
-import org.basex.util.IntList;
+import org.basex.util.TokenBuilder;
 
 /**
  * FTAnd expression with index access.
@@ -24,7 +24,7 @@ final class FTIntersection extends FTExpr {
   /** Cache for negative expression. */
   private FTNodeItem[] cn;
   /** Collect each pointer once for a result.*/
-  private IntList col = new IntList();
+  private TokenBuilder col = new TokenBuilder();
   
   /**
    * Constructor.
@@ -138,9 +138,10 @@ final class FTIntersection extends FTExpr {
       }
     }
 
-    if(col != null) col.add(n[0].ftn.getNumTokens());
-    for (int i = 1; i < n.length; i++) {
-      if (col != null) col.add(n[i].ftn.getNumTokens());
+    for(int i = 0; i < n.length; i++) {
+      // color highlighting - limit number of tokens to 128
+      if(col != null) col.add((byte) (n[i].ftn.getNumTokens() & 0x7F));
+      if(i == 0) continue;
       n2 = n[i];
       n1.ftn.reset();
       n1.merge(n2, 0);

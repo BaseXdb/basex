@@ -184,7 +184,7 @@ public final class GUI extends JFrame {
     nav.setBorder(2, 2, 0, 2);
 
     mode = new BaseXCombo(new String[] {
-        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE, false);
+        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {

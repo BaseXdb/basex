@@ -30,7 +30,7 @@ abstract class MapPainter {
    * @param ri current position
    * @return next color mark
    */
-  final Color nextMark(final ArrayList<MapRect> rects, final int ri) {
+  final Color color(final ArrayList<MapRect> rects, final int ri) {
     // find marked node
     final Nodes marked = view.gui.context.marked();
     final int p = -marked.find(rects.get(ri).pre) - 1;

@@ -179,7 +179,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(tmp.size == 0) return;
 
     final String[] keys = entries(tmp.finish());
-    final BaseXCombo cm = new BaseXCombo(keys, HELPSEARCHCAT, false);
+    final BaseXCombo cm = new BaseXCombo(keys, HELPSEARCHCAT);
     cm.addActionListener(this);
     cm.addKeyListener(main);
     panel.add(cm);
@@ -192,7 +192,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @param pos position
    */
   void addCombo(final String[] values, final int pos) {
-    final BaseXCombo cm = new BaseXCombo(values, HELPCAT, false);
+    final BaseXCombo cm = new BaseXCombo(values, HELPCAT);
     BaseXLayout.setWidth(cm, COMPW);
     cm.addActionListener(this);
     cm.addKeyListener(main);
@@ -374,7 +374,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final StringList sl = new StringList();
     sl.add("(" + key.length + " entries)");
     for(final byte[] k : key) sl.add(Token.string(k));
-    sl.sort();
+    sl.sort(true);
     return sl.finish();
   }
 }

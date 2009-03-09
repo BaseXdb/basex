@@ -133,7 +133,7 @@ public class QuerySuggest extends QueryParser {
       final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }
-    sl.sort();
+    sl.sort(true);
     return sl;
   }
 

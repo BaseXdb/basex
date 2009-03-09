@@ -87,7 +87,7 @@ final class MapImages {
    * Loads the currently cached images.
    */
   void load() {
-    if(!dl.running()) dl.execute();
+    if(!dl.running() && loaderC > 0) dl.execute();
   }
   
   /** Download thread. */

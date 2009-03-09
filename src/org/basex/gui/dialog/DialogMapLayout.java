@@ -2,8 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -23,15 +21,15 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  private final BaseXListChooser choice;
+  final BaseXListChooser algo;
   /** Layout slider. */
-  private final BaseXSlider sizeSlider;
+  final BaseXSlider sizeSlider;
   /** Show attributes. */
-  private final BaseXCheckBox atts;
+  final BaseXCheckBox atts;
   /** Select layout algorithm. */
-  BaseXCombo propalgo;
+  final BaseXCombo border;
   /** Size slider label. */
-  private final BaseXLabel sizeLabel;
+  final BaseXLabel sizeLabel;
   
   /**
    * Default constructor.
@@ -41,34 +39,23 @@ public final class DialogMapLayout extends Dialog {
     super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
-    // [JH] complete layout
-    p.setLayout(new TableLayout(4, 1, 0, 5));
+    p.setLayout(new TableLayout(4, 1, 0, 8));
 
     // create list
-    choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(210, 110);
-    choice.setIndex(GUIProp.maplayout);
-    p.add(choice);
-    
-    // create drop down
-    final BaseXBack tmpback = new BaseXBack();
-    tmpback.setLayout(new TableLayout(1, 2, 3, 5));
-    final BaseXLabel label = new BaseXLabel(MAPPROPALGO);
-    tmpback.add(label);
-    propalgo = new BaseXCombo(new String[] { "SplitLayout",
-        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, 
-        HELPMODE, false, this);
-    propalgo.setSelectedIndex(GUIProp.mapalgo);
+    algo = new BaseXListChooser(this, MAPALGO, HELPMAPLAYOUT);
+    p.add(algo);
 
-    propalgo.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        final int s = propalgo.getSelectedIndex();
-        if(s == GUIProp.mapalgo || !propalgo.isEnabled()) return;
-        action(null);
-      }
-    });
-    tmpback.add(propalgo);
-    p.add(tmpback);
+    // create drop down
+    border = new BaseXCombo(MAPOFFSETS, null, this);
+
+    // create drop down
+    final BaseXBack tmp = new BaseXBack();
+    tmp.setLayout(new TableLayout(1, 2, 3, 5));
+    tmp.add(new BaseXLabel(MAPOFF));
+    tmp.add(border);
+    p.add(tmp);
+
+    algo.setSize(tmp.getPreferredSize().width, 70);
 
     // create slider
     sizeLabel = new BaseXLabel(MAPSIZE);
@@ -87,20 +74,22 @@ public final class DialogMapLayout extends Dialog {
     if(!fs) p.add(atts);
 
     set(p, BorderLayout.CENTER);
-    
     finish(GUIProp.maplayoutloc);
-    action(null);
+
+    algo.setIndex(GUIProp.mapalgo);
+    border.setSelectedIndex(GUIProp.mapoffsets);
   }
 
   @Override
   public void action(final String cmd) {
-    GUIProp.maplayout = choice.getIndex();
-    GUIProp.mapalgo = propalgo.getSelectedIndex();
+    GUIProp.mapoffsets = border.getSelectedIndex();
+    GUIProp.mapalgo = algo.getIndex();
     GUIProp.mapatts = atts.isSelected();
     final int sizeprp = sizeSlider.value();
     GUIProp.sizep = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
       MAPBOTH : sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));
+
     gui.notify.layout();
   }
 

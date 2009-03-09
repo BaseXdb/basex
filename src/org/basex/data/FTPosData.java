@@ -1,8 +1,8 @@
 package org.basex.data;
 
 import org.basex.util.Array;
-import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
+import org.basex.util.TokenList;
 
 /**
  * This class provides a container for query fulltext positions
@@ -23,7 +23,7 @@ public final class FTPosData {
   /** Pointer values for the pos values.*/
   private int[][] poi = new int[1][];
   /** Array for ftand colors. */
-  public IntArrayList col = new IntArrayList();
+  public TokenList col = new TokenList();
   /** Number of pre values. */
   private int size;
 
@@ -34,14 +34,14 @@ public final class FTPosData {
     prepos = new int[1][];
     poi = new int[1][];
     size = 0;
-    col = new IntArrayList();
+    col = new TokenList();
   }
 
   /**
    * Add a ftand color result.
    * @param c int[] ftand color result
    */
-  public void addFTAndCol(final int[] c) {
+  public void addFTAndCol(final byte[] c) {
     col.add(c);
   }
   

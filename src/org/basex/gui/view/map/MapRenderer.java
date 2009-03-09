@@ -250,8 +250,9 @@ final class MapRenderer {
     //double sw;
     
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
-    int lhmi = (int) Math.max(3, ffh * GUIProp.fontsize);
-    int fhmi = (int) Math.max(6, (flh + ffh) * GUIProp.fontsize);
+    byte lhmi = (byte) Math.max(3, ffh * GUIProp.fontsize);
+    byte fhmi = (byte) Math.max(6, (flh + ffh) * GUIProp.fontsize);
+    
     int h = r.h;
     final double fac = Math.exp(Math.log(s.length) * 0.97) / s.length;
     r.thumbf = ff * GUIProp.fontsize;
@@ -265,9 +266,9 @@ final class MapRenderer {
       ff *= fac; //0.97;
       r.thumbf = ff * GUIProp.fontsize;
       ffh *= fac;
-      r.thumbfh = (int) Math.max(1, ffh * GUIProp.fontsize);
+      r.thumbfh = (byte) Math.max(1, ffh * GUIProp.fontsize);
       flh *= fac * fac;
-      r.thumblh = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+      r.thumblh = (byte) Math.max(1, (flh + ffh) * GUIProp.fontsize);
       //sw = f; //Math.max(f * 0.5, 1.5);
       switch(r.thumbal) {
         case 0:
@@ -305,6 +306,7 @@ final class MapRenderer {
         }
       } else r.thumbal++;
     }
+    
     int sum = data[2][0];
     for (int i = 1; i < data[2].length; i++) sum += data[2][i];
     int nl = (r.h - 6) / lhmi + 1;
@@ -474,7 +476,7 @@ final class MapRenderer {
    */
   public static void drawToolTip(final Graphics g, final int x, final int y, 
       final int rx, final int ry, final int rh, final int rw, 
-      final int[][] acol) {
+      final byte[][] acol) {
     if (tl != null && tl.size > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
@@ -540,7 +542,7 @@ final class MapRenderer {
    * Draws a text using thumbnail visualization.
    * @param r rectangle
    * @param data fulltext to be drawn
-   * @param sen flag for sentence or paragraphe
+   * @param sen flag for sentence or paragraph
    * @param sw length of a space
    * @param x mouseX
    * @param y mouseY

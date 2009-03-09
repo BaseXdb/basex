@@ -106,9 +106,10 @@ public final class FTOpt extends ExprInfo {
    * @param q query token
    * @return number of occurrences
    */
-  public int contains(final FTTokenizer tk, final FTPos pos, final byte[] q) {
+  int contains(final FTTokenizer tk, final FTPos pos, final byte[] q) {
     if(q.length == 0) return 0;
 
+    // assign options to text
     tk.st = is(ST);
     tk.dc = is(DC);
     tk.cs = is(CS);
@@ -116,11 +117,13 @@ public final class FTOpt extends ExprInfo {
     tk.init();
 
     if(is(FZ) && ls == null) ls = new Levenshtein();
+    // assign options to query
     qu.init(q);
     qu.st = tk.st;
-    qu.sd = tk.sd;
     qu.dc = tk.dc;
     qu.cs = tk.cs;
+    qu.sd = tk.sd;
+    // the following options only apply to the query terms..
     qu.uc = is(UC);
     qu.lc = is(LC);
     qu.wc = is(WC);

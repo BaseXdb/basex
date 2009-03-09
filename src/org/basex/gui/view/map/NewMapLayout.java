@@ -35,7 +35,7 @@ class NewMapLayout {
     data = d;
     rectangles = new ArrayList<MapRect>();
     
-    switch(GUIProp.maplayout) {
+    switch(GUIProp.mapoffsets) {
       case 0: layout = new MapRect(0, 0, 0, 0); break;
       case 1: layout = new MapRect(1, 1, 2, 2); break;
       case 2: layout = new MapRect(0, o, 0, o); break;
@@ -193,9 +193,9 @@ class NewMapLayout {
    * Calculates the percentual weight to use.
    * uses gui prop slider (size_p) to define size by any attributes (for now
    * use mixture of size and number of children) 
-   * weight = size_p * size + (1 - size_p) * |childs| whereas size_p in [0;1]
+   * weight = size_p * size + (1 - size_p) * |children| whereas size_p in [0;1]
    * 
-   * [JH] should be possible to replace size and childs by any other
+   * [JH] should be possible to replace size and children by any other
    * numerical attributes in future.
    * 
    * @param rect pre val of rect
@@ -216,24 +216,24 @@ class NewMapLayout {
   
   /**
    * Computes weight with given values for each value using GUIprop.sizep.
-   * weight = sizep/100 * size + (1 - sizep/100) * |childs|
+   * weight = sizep/100 * size + (1 - sizep/100) * |children|
    * whereas sizep in (0;100)
    * 
    * @param size one nodes size
-   * @param childs one nodes number of childs
+   * @param children one nodes number of children
    * @param sSize compare to more nodes size
-   * @param sChilds compare to more nodes number of childs
+   * @param sChildren compare to more nodes number of children
    * @return weight
    */
-  static double calcWeight(final long size, final int childs,
-      final long sSize, final int sChilds) {
-    // if its not a filesystem, set sliderval for calc only to nr of childs
+  static double calcWeight(final long size, final int children,
+      final long sSize, final int sChildren) {
+    // if its not a filesystem, set sliderval for calc only to nr of children
     double sizeP = data.fs != null ? (double) GUIProp.sizep : 0d;
     if (sSize == 0) sizeP = 0d;
     long dadSize = (size == 0 && sSize == 0) ? 1 : sSize;
     
     return ((sizeP / 100) * ((double) size / dadSize)) + 
-    ((1 - sizeP / 100) * ((double) childs / sChilds));
+      ((1 - sizeP / 100) * ((double) children / sChildren));
   }
   
   /**

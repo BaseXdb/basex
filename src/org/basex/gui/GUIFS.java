@@ -278,10 +278,10 @@ public final class GUIFS {
    * @param name file name
    * @return type
    */
-  public static int type(final byte[] name) {
+  public static short type(final byte[] name) {
     int i = name.length;
     while(--i > 0 && name[i] != '.');
-    return i == 0 ? 0 : get(name, ++i);
+    return (short) (i == 0 ? 0 : get(name, ++i));
   }
 
   /**

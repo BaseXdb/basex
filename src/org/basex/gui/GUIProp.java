@@ -90,14 +90,10 @@ public final class GUIProp {
   /** Flag for Java look and feel. */
   public static boolean javalook = false;
 
-  /** Flag for computing additional map infos. */
-  public static boolean mapinfo = false;
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
-  /** Treemap Layout. */
-  public static int maplayout = 3;
-  /** Treemap Proportion. */
-  public static int mapprop = 4;
+  /** Treemap Offsets. */
+  public static int mapoffsets = 3;
   /** Map algorithm. */
   public static int mapalgo = 0;
   /** number of child <-> size weightening in (0;100). */
@@ -112,8 +108,6 @@ public final class GUIProp {
   
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };
-  /** Dialog location. */
-  public static int[] mapinfoloc = { 100, 100 };
   /** Dialog location. */
   public static int[] fontsloc = { 100, 100 };
   /** Dialog location. */
@@ -158,6 +152,8 @@ public final class GUIProp {
   /** Fullscreen flag. */
   public static boolean fullscreen = false;
 
+  /** Flag for computing additional map infos. */
+  public static boolean mapinfo = false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size

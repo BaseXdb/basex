@@ -10,21 +10,21 @@ import org.basex.gui.view.ViewRect;
  */
 class MapRect extends ViewRect implements Cloneable {
   /** File Type. */
-  int type = -1;
+  short type = -1;
   /** Thumbnail view. */
   boolean thumb;
   /** Fulltext position values. */
   int[] pos;
   /** Fulltext pointer values. */
   int[] poi;
-  /** Color for ftands. */
-  int[][] acol;
+  /** Color for and combinations. */
+  byte[][] acol;
   /** Abstraction level for thumbnail. */
-  int thumbal;
-  /** Height of a thumbnail uni.*/
-  int thumbfh;
+  byte thumbal;
+  /** Height of a thumbnail unit.*/
+  byte thumbfh;
   /** Height of an empty line.*/ 
-  int thumblh;
+  byte thumblh;
   /** Width of a thumbnail unit. */
   double thumbf;
 

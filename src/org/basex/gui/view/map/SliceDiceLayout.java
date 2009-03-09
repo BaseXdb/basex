@@ -32,7 +32,7 @@ public final class SliceDiceLayout extends MapLayout {
         int par = d.parent(l.list[ns], d.kind(l.list[ns]));;
         long parsize = d.fs != null ? 
             Token.toLong(d.attValue(d.sizeID, par)) : 0;
-        int parchilds = l.list[ne] - l.list[ns];
+        int parchildren = l.list[ne] - l.list[ns];
   
         // setting initial proportions
         double xx = r.x;
@@ -40,13 +40,13 @@ public final class SliceDiceLayout extends MapLayout {
         double ww = 0;
         double hh = 0;
   
-        // calculate map for each rectangel on this level
+        // calculate map for each rectangle on this level
         for(int i = 0; i < l.size - 1; i++) {
           // draw map taking sizes into account
           long size = d.fs != null ? 
               Token.toLong(d.attValue(d.sizeID, l.list[i])) : 0;
-          int childs = l.list[i + 1] - l.list[i];
-          double weight = calcWeight(size, childs, parsize, parchilds, d);
+          int children = l.list[i + 1] - l.list[i];
+          double weight = calcWeight(size, children, parsize, parchildren, d);
           
           if(v) {
             yy += hh;

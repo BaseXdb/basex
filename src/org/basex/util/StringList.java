@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import org.basex.BaseX;
 
@@ -45,9 +46,15 @@ public final class StringList implements Iterable<String> {
 
   /**
    * Sorts the strings.
+   * @param cs respect case sensitivity
    */
-  public void sort() {
-    Arrays.sort(list, 0, size);
+  public void sort(final boolean cs) {
+    Arrays.sort(list, 0, size, new Comparator<String>() {
+      public int compare(final String s1, final String s2) {
+        return cs ? s1.compareTo(s2) :
+          s1.toLowerCase().compareTo(s2.toLowerCase());
+      }
+    });
   }
 
   public Iterator<String> iterator() {

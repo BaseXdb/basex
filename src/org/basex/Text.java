@@ -786,10 +786,6 @@ public interface Text {
   /** Command Info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
   /** Command Info. */
-  String GUIMAPINFO = lang("c_mapinfo");
-  /** Command Info. */
-  String GUIMAPINFOTT = lang("c_mapinfott");
-  /** Command Info. */
   String GUIOPEN = lang("c_open") + DOTS;
   /** Command Info. */
   String GUIOPENTT = lang("c_opentt");
@@ -1143,30 +1139,28 @@ public interface Text {
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
   /** Simple Map Layout. */
-  String MAPSIMPLE = lang("dm_simple");
-  /** Simple Map Layout. */
   String MAPATTS = lang("dm_atts");
-  /** Layout information. */
-  String MAPPROP = lang("dm_prop") + COL;
   /** Predefined number of layouts. */
-  String[] MAPLAYOUTCHOICE = {
-      lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
-      lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
+  String[] MAPOFFSETS = {
+    lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
+    lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
   };
+  /** Predefined number of layouts. */
+  String[] MAPALGO = {
+    "Split Layout", "SliceAndDice Layout", "Squarified Layout", "Strip Layout"
+  };
+
   /** Map layout-algorithm. */
-  String MAPPROPALGO = lang("dm_algo") + COL;
+  String MAPOFF = lang("dm_offset") + COL;
+
   /** Size depending on... */
   String MAPSIZE = lang("dm_size");
   /** Size depending on... */
   String MAPBOTH = lang("dm_size_both");
   /** Size depending on... */
-  String MAPCHILDREN = lang("dm_size_childs");
+  String MAPCHILDREN = lang("dm_size_children");
   /** Size depending on... */
   String MAPFSSIZE = lang("dm_size_fssize");
-  /** Dialog title for treemap info. */
-  String MAPINFOTITLE = lang("dmi_title");
-  /** Mapinfo checkbox. */
-  String MAPINFOTOGGLE = lang("dmi_info");
 
   /** Title of Memory Dialog. */
   String MEMTITLE = lang("dz_title");

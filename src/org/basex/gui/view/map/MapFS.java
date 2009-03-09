@@ -69,16 +69,14 @@ final class MapFS extends MapPainter {
 
       final boolean isImage = GUIFS.mime(fs.name(r.pre)) == GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
-
-      // draw rectangle
-      Color col = nextMark(rects, ri);
+      Color col = color(rects, ri);
       final boolean mark = col != null;
 
       if(full && isImage) col = Color.black;
       else if(full || col == null) col = COLORS[lvl];
       g.setColor(col);
 
-      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
+      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||
           ViewData.isLeaf(data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
