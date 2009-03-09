@@ -34,8 +34,6 @@ public final class DataAccessNIO {
   private final ByteBuffer dbbuffer;
   /** Offset. */
   private long off;
-  /** Position. */
-  private long position;
 
   /**
    * Constructor, initializing the file reader.
@@ -74,8 +72,6 @@ public final class DataAccessNIO {
     }
     // init offset
     off = 0;
-    // init position
-    position = 0;
   }
 
   /**
@@ -150,11 +146,6 @@ public final class DataAccessNIO {
    * @return text as byte array
    */
   public synchronized long pos() {
-    try {
-      position = rwChannel.position();
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
     return off + mbytebuffer.position();
   }
 
@@ -231,7 +222,6 @@ public final class DataAccessNIO {
             p, BUFFERSIZE);
       }
       off = p;
-      position = p;
       mbytebuffer.position(0);
     } catch(IOException e) {
       e.printStackTrace();
@@ -249,7 +239,6 @@ public final class DataAccessNIO {
     } else {
       // don't move window. Just set new position
       mbytebuffer.position((int) (p - off));
-      position = off + p;
     }
   }
   
