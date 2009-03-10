@@ -46,14 +46,6 @@ public final class BoolList {
     list[p] = v;
     size = Math.max(size, p + 1);
   }
-
-  /**
-   * Finishes the int array.
-   * @return int array
-   */
-  public boolean[] finish() {
-    return size == list.length ? list : Array.finish(list, size);
-  }
   
   /**
    * Checks if all values are b.
@@ -61,7 +53,15 @@ public final class BoolList {
    * @return boolean all b
    */
   public boolean all(final boolean b) {
-    for(final boolean bl : list) if(!bl && b) return false;
+    for(final boolean bl : list) if(bl != b) return false;
     return true;
+  }
+
+  /**
+   * Finishes the int array.
+   * @return int array
+   */
+  public boolean[] finish() {
+    return size == list.length ? list : Array.finish(list, size);
   }
 }

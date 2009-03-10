@@ -60,7 +60,7 @@ public final class Case extends Expr {
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
-    ctx.vars.add(var.bind(seq.finish(), ctx));
+    ctx.vars.add(var.bind(seq.finish(), ctx).clone());
     final Iter ir = ctx.iter(expr);
     ctx.vars.reset(s);
     return ir;

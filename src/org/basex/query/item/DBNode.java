@@ -192,12 +192,9 @@ public class DBNode extends Nod {
   @Override
   public NodeIter attr() {
     return new NodeIter() {
-      /** Temporary node. */
-      private final DBNode node = copy();
-      /** Current pre value. */
-      private int p = pre + 1;
-      /** Current size value. */
-      private final int s = pre + data.attSize(pre, data.kind(pre));
+      final DBNode node = copy();
+      final int s = pre + data.attSize(pre, data.kind(pre));
+      int p = pre + 1;
 
       @Override
       public Nod next() {
@@ -211,14 +208,10 @@ public class DBNode extends Nod {
   @Override
   public NodeMore child() {
     return new NodeMore() {
-      /** Temporary node. */
-      private final DBNode node = copy();
-      /** First call. */
-      private boolean more;
-      /** Current pre value. */
-      private int p;
-      /** Current size value. */
-      private int s;
+      final DBNode node = copy();
+      boolean more;
+      int p;
+      int s;
 
       @Override
       public boolean more() {
@@ -245,12 +238,9 @@ public class DBNode extends Nod {
   @Override
   public NodeIter desc() {
     return new NodeIter() {
-      /** Temporary node. */
-      private final DBNode node = copy();
-      /** Current pre value. */
-      private int p = pre + data.attSize(pre, data.kind(pre));
-      /** Current size value. */
-      private final int s = pre + data.size(pre, data.kind(pre));
+      final DBNode node = copy();
+      final int s = pre + data.size(pre, data.kind(pre));
+      int p = pre + data.attSize(pre, data.kind(pre));
 
       @Override
       public Nod next() {
@@ -266,12 +256,9 @@ public class DBNode extends Nod {
   @Override
   public NodeIter descOrSelf() {
     return new NodeIter() {
-      /** Temporary node. */
-      private final DBNode node = copy();
-      /** Current pre value. */
-      private int p = pre;
-      /** Current size value. */
-      private final int s = pre + data.size(pre, data.kind(pre));
+      final DBNode node = copy();
+      final int s = pre + data.size(pre, data.kind(pre));
+      int p = pre;
 
       @Override
       public Nod next() {

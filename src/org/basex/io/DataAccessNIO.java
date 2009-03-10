@@ -20,7 +20,7 @@ public final class DataAccessNIO {
   private final RandomAccessFile file;
   /** File length. */
   private long len;
-  /** Read Write Filechannel. */
+  /** Read Write file channel. */
   private FileChannel rwChannel;
   /** Mapped Byte Buffer Window. */
   private MappedByteBuffer mbytebuffer;
@@ -28,7 +28,7 @@ public final class DataAccessNIO {
   private static final int MULTI = 10000;
   /** Direct byte buffer size. */
   private static final int DBBUFFERSIZE = IO.BLOCKSIZE;
-  /** Window size. Choose a multiple of blocksize. */
+  /** Window size. Choose a multiple of block size. */
   private static final int BUFFERSIZE =  MULTI * IO.BLOCKSIZE;
   /** Direct byte buffer for updates. */
   private final ByteBuffer dbbuffer;
@@ -73,6 +73,11 @@ public final class DataAccessNIO {
     // init offset
     off = 0;
   }
+
+  /**
+   * Flushes the buffered data.
+   */
+  public synchronized void flush() { }
 
   /**
    * Closes the data access.
@@ -121,19 +126,19 @@ public final class DataAccessNIO {
     int l = readNum();
     final byte[] b = new byte[l];
     // checks if token length exceeds current window buffer size
-    if(l > mbytebuffer.remaining()) {
+    int tmp = mbytebuffer.remaining();
+    if(l > tmp) {
       int ll = 0;
-      int tmp = 0;
       while(ll < l) {
-        tmp = mbytebuffer.remaining();
         if(tmp >= l - ll) {
           mbytebuffer.get(b, ll, l - ll);
           ll = l;
         } else {
           mbytebuffer.get(b, ll, tmp);
-          ll = +tmp;
+          ll += tmp;
           moveWindow(off + BUFFERSIZE);
         }
+        tmp = mbytebuffer.remaining();
       }
     } else {
       mbytebuffer.get(b);
@@ -233,7 +238,7 @@ public final class DataAccessNIO {
    * @param p read position
    */
   public synchronized void cursor(final long p) {
-    // check if window have to be moved forward or backward
+    // check if window has to be moved forward or backward
     if(p > (off + BUFFERSIZE) || p < off) {
       moveWindow(p);
     } else {

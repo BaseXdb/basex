@@ -103,20 +103,8 @@ public final class FTPos extends FTExpr {
     final Item it = expr[0].iter(ctx).next();
     ctx.ftpos = tmp;
 
-    if(tmp != null) {
-    /*  final int os = tmp.term.size;
-      for(int i = 0; i < term.size; i++) tmp.term.add(term.list[i]);
-
-      final IntList[] il = new IntList[term.size + os];
-      System.arraycopy(pos, 0, il, 0, term.size);
-      System.arraycopy(tmp.pos, 0, il, term.size, os);
-      tmp.setPos(il, il.length);
-      ctx.ftd = il;*/
-      tmp.setPos(pos, pos.length);
-      ctx.ftd = pos;
-    } else {
-      ctx.ftd = pos;
-    }
+    if(tmp != null) tmp.setPos(pos, pos.length);
+    ctx.ftd = pos;
 
     final double s = it.score();
     if(s == 0 || !filter(ctx)) return score(0);
@@ -225,7 +213,6 @@ public final class FTPos extends FTExpr {
    * @return result of check
    */
   private boolean content() {
-    // ...to be revised...
     int l = 0;
     if(start || content) {
       for(int i = 0; i < size; i++) {
@@ -353,12 +340,14 @@ public final class FTPos extends FTExpr {
     if(bl.all(true)) return true;
     int i = x + 1;
 
-    final int p1 = pos(p.list[x], dst ? dunit : wunit);
+    final FTUnit unit = dst ? dunit : wunit;
+    final int p1 = pos(p.list[x], unit);
     while(i < p.size) {
-      final int p2 = pos(p.list[i], dst ? dunit : wunit);
+      final int p2 = pos(p.list[i], unit);
+
       if(dst) {
         // ftdistance
-        final int d = Math.abs(p1 - p2) - 1;
+        final int d = p2 - p1 - 1;
         if(d >= mn && d <= mx && !bl.list[pp.list[i]]) {
           bl.list[pp.list[x]] = true;
           bl.list[pp.list[i]] = true;
@@ -366,7 +355,7 @@ public final class FTPos extends FTExpr {
         }
       } else {
         // ftwindow
-        final int d = Math.abs(p1 - p2);
+        final int d = p2 - p1;
         if(mn + d <= mx && !bl.list[pp.list[i]]) {
           bl.list[pp.list[x]] = true;
           bl.list[pp.list[i]] = true;
@@ -389,7 +378,7 @@ public final class FTPos extends FTExpr {
    * @return IntList[] position values and pointer
    */
   private IntList[] sortPositions() {
-    final IntList[] il = { new IntList(), new IntList()};
+    final IntList[] il = { new IntList(), new IntList() };
     final int[] k = new int[size];
     int min = 0;
 
@@ -407,8 +396,7 @@ public final class FTPos extends FTExpr {
 
       il[0].add(pos[min].list[k[min]]);
       il[1].add(min);
-      k[min]++;
-      if(k[min] == pos[min].size) k[min] = -1;
+      if(++k[min] == pos[min].size) k[min] = -1;
     }
     return il;
   }

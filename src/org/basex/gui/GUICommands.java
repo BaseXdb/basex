@@ -203,7 +203,7 @@ public enum GUICommands implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copy the currently marked nodes. */
-  COPY(true, GUICOPY, "% C", GUICOPYTT) {
+  COPY(true, GUICOPY, "", GUICOPYTT) {
     @Override
     public void execute(final GUI gui) {
       final Context context = gui.context;
@@ -240,7 +240,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Paste the copied nodes. */
-  PASTE(true, GUIPASTE, "% V", GUIPASTETT) {
+  PASTE(true, GUIPASTE, "", GUIPASTETT) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Copy("0"));
@@ -268,7 +268,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Delete the currently marked nodes. */
-  DELETE(true, GUIDELETE, "DELETE", GUIDELETETT) {
+  DELETE(true, GUIDELETE, "", GUIDELETETT) {
     @Override
     public void execute(final GUI gui) {
       if(JOptionPane.showConfirmDialog(gui, DELETECONF, DELETETITLE,
@@ -286,7 +286,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Insert new nodes. */
-  INSERT(true, GUIINSERT, "F7", GUIINSERTTT) {
+  INSERT(true, GUIINSERT, "", GUIINSERTTT) {
     @Override
     public void execute(final GUI gui) {
       final DialogInsert insert = new DialogInsert(gui);
@@ -307,7 +307,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Copy the currently marked nodes. */
-  EDIT(true, GUIEDIT, "F2", GUIEDITTT) {
+  EDIT(true, GUIEDIT, "", GUIEDITTT) {
     @Override
     public void execute(final GUI gui) {
       final Nodes nodes = gui.context.marked();

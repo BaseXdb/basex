@@ -55,7 +55,7 @@ public final class TypeSwitch extends Expr {
       final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
     }
-    if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx));
+    if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx).clone());
     final Iter si = SeqIter.get(ctx.iter(ret));
     ctx.vars.reset(s);
     return si;

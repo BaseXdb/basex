@@ -55,9 +55,9 @@ public final class Catch extends Single {
     if(!find(code)) return null;
     
     final int s = ctx.vars.size();
-    if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx));
-    if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx));
-    if(var3 != null) ctx.vars.add(var3.bind(e.iter.finish(), ctx));
+    if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx).clone());
+    if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx).clone());
+    if(var3 != null) ctx.vars.add(var3.bind(e.iter.finish(), ctx).clone());
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);
     return iter;
