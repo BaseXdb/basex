@@ -36,14 +36,14 @@ public abstract class MapAlgo {
    * Recursively splits rectangles.
    * @param r parent rectangle
    * @param l children array
-   * @param w weights array
+   * @param weights weights array
    * @param ns start array position
    * @param ne end array position
    * @param level indicates level which is calculated
    * @return ArrayList holding layedout rectangles
    */
   abstract ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
-      final double[] w, final int ns, final int ne, final int level);
+      final double[] weights, final int ns, final int ne, final int level);
   
   /**
    * Find out which kind of Maplayout is used right now.

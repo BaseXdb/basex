@@ -53,13 +53,13 @@ class NewMapLayout {
         algo = new SplitAlgo();
         break;
       case 1:
-        algo = new SplitAlgo();
+        algo = new SliceDiceAlgo();
         break;
       case 2:
-        algo = new SplitAlgo();
+        algo = new SquarifiedAlgo();
         break;
       case 3:
-        algo = new SplitAlgo();
+        algo = new StripAlgo();
         break;
       default:
         algo = new SplitAlgo();
@@ -306,11 +306,20 @@ class NewMapLayout {
    */
   void makeMap(final MapRect r, final MapList l, final int ns, final int ne, 
       final int level) {
-    if(ne - ns == 1) {
+    if(ne - ns <= 1) {
       // one rectangle left, add it and go deeper
       r.pre = l.list[ns];
       putRect(r, level);
     } else {
+      l.initChildren(data);
+      int nn = 0;
+      // number of nodes on this level
+      for(int i = 0; i <= ne; i++) {
+        nn += l.nrchildren[i];
+      }
+      long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+      // init weights of nodes and sort
+      l.initWeights(parsize, nn, data);
       if(level == 0) {
         // some more roots have to be positioned
         rectangles.addAll(new SplitAlgo().

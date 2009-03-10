@@ -1,7 +1,6 @@
 package org.basex.gui.view.map;
 
 import org.basex.data.Data;
-import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -80,19 +79,16 @@ public class MapList extends IntList {
    * @param parsize reference size
    * @param parchildren reference number of nodes
    * @param data reference
+   * [JH] only take weights or number of childs into account if slider is 
+   * on position to do so
    */
   public void initWeights(final long parsize, final int parchildren,
       final Data data) {
     weights = new double[list.length];
 
     for(int i = 0; i < size - 1; i++) {
-      // only fetch valuers from database if really needed
-      if(GUIProp.sizep != 100) {
-        weights[i] = MapLayout.calcWeight(sizes[i], nrchildren[i], parsize,
-            parchildren, data);
-      } else {
-        weights[i] = 0d;
-      }
+      weights[i] = MapLayout.calcWeight(sizes[i], nrchildren[i], parsize,
+          parchildren, data);
     }
   }
   

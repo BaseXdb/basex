@@ -11,8 +11,8 @@ public class SplitAlgo extends MapAlgo {
 
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
-      final double[] w, final int ns, final int ne, final int level) {
-    return calcMap(r, l, w, ns, ne, level, 1);
+      final double[] weights, final int ns, final int ne, final int level) {
+    return calcMap(r, l, weights, ns, ne, level, 1);
   }
 
   /**
@@ -41,13 +41,13 @@ public class SplitAlgo extends MapAlgo {
   
       // increment pivot until left rectangle contains more or equal
       // than half the weight or leave with just setting it to ne - 1
-      /*[JH] remove comment, use weights
+      // [JH] remove comment, use weights
       weight = 0;
       for(; ni < ne - 1; ni++)  {
         if(weight >= sumweight / 2) break;
         weight += w[ni];
-      }*/
-      ni = ne - 1;
+      }
+//      ni = ne - 1;
       
       int xx = r.x;
       int yy = r.y;
