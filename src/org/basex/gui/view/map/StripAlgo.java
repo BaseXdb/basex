@@ -32,7 +32,7 @@ public class StripAlgo extends MapAlgo{
     
     while(ni < ne) {
       weight += l.weights[ni];
-      height = weight * r.h;
+      height = weight / sumweight * hh;
       
       ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
@@ -45,7 +45,7 @@ public class StripAlgo extends MapAlgo{
       }
 
       // if ar has increased discard tmp and add row
-      if(lineRatio(tmp) >= lineRatio(row)) {
+      if(lineRatio(tmp) > lineRatio(row)) {
         // add rects of row to solution
         rects.addAll(row);
         // preparing next line
@@ -54,7 +54,7 @@ public class StripAlgo extends MapAlgo{
         tmp.clear();
         row.clear();
         start = ni;
-        sumweight = sumweight - weight;
+        sumweight -= weight - l.weights[ni];
         weight = 0;
         // sometimes there has to be one rectangles to fill the left space
         if(ne == ni + 1) {
@@ -67,7 +67,7 @@ public class StripAlgo extends MapAlgo{
         ni++;
       }
     }
-
+    for(MapRect rect : row) rect.h = (int) hh;
     // adding last row
     rects.addAll(row);
     
