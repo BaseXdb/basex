@@ -336,13 +336,14 @@ public final class MapView extends View implements Runnable {
 //    newmaplayout = new NewMapLayout(nodes.data);
 //    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
 //    mainRects = newmaplayout.rectangles;
-//    painter.init(newmaplayout.rectangles);
-//    drawMap(map, newmaplayout.rectangles);
+//    painter.init(mainRects);
+//    drawMap(map, mainRects);
     // will be obsolete
     layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes),
     0, nodes.size(), 0);
     painter.init(rectangles);
     drawMap(map, rectangles);
+    
     focus();
 
     /*

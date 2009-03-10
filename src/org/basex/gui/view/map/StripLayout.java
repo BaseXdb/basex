@@ -88,7 +88,7 @@ public final class StripLayout extends MapLayout {
           ni++;
         }
   
-        // adding remaining rectangles
+        // adding last row
         for(int i = 0; i < row.size(); i++) {
           MapList newl = new MapList(1);
           newl.add(row.get(i).pre);

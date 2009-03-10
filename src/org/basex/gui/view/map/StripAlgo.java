@@ -11,10 +11,12 @@ public class StripAlgo extends MapAlgo{
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] weights, final int ns, final int ne, final int level) {
+    // stores all calculated rectangles
     ArrayList<MapRect> rects = new ArrayList<MapRect>();
     
+    // node iterator
     int ni = ns;
-    // running start holding first element of current row
+    // first node of current row
     int start = ns;
 
     // setting initial proportions
@@ -26,13 +28,14 @@ public class StripAlgo extends MapAlgo{
     ArrayList<MapRect> row = new ArrayList<MapRect>();
     double height = 0;
     double weight = 0;
+    double sumweight = 1;
     
     while(ni < ne) {
       weight += l.weights[ni];
-      height = weight * hh;
+      height = weight * r.h;
       
       ArrayList<MapRect> tmp = new ArrayList<MapRect>();
-      // create temporary row including current rectangle
+
       double x = xx;
       for(int i = start; i <= ni; i++) {
         double w = i == ni ? xx + ww - x : l.weights[i] / weight * ww;
@@ -40,30 +43,34 @@ public class StripAlgo extends MapAlgo{
             l.list[i], level));
         x += (int) w;
       }
-      double tmpratio = lineRatio(tmp);
+
       // if ar has increased discard tmp and add row
-      if(tmpratio > lineRatio(row)) {
-        // preparing for new line to lay out
+      if(lineRatio(tmp) >= lineRatio(row)) {
+        // add rects of row to solution
+        rects.addAll(row);
+        // preparing next line
         hh -= row.get(0).h;
         yy += row.get(0).h;
-        // add rects of row using recursion
-        rects.addAll(row);
         tmp.clear();
         row.clear();
-        ni--;
         start = ni;
+        sumweight = sumweight - weight;
         weight = 0;
+        // sometimes there has to be one rectangles to fill the left space
+        if(ne == ni + 1) {
+          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
+              l.list[ni], level));
+          break;
+        }
+      } else {
+        row = tmp;
+        ni++;
       }
-
-      // sometimes there has to be one rectangles to fill the left space
-      if(ne == ni + 1) {
-        rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-            l.list[ni], level));
-        break;
-      }
-      row = tmp;
-      ni++;
     }
+
+    // adding last row
+    rects.addAll(row);
+    
     return rects;
   }
 

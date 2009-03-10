@@ -36,7 +36,7 @@ public class SplitAlgo extends MapAlgo {
       return rects;
     } else {
       ArrayList<MapRect> rects = new ArrayList<MapRect>();
-      double weight = 0.5;
+      double weight;
       int ni = ns;
   
       // increment pivot until left rectangle contains more or equal
@@ -47,7 +47,6 @@ public class SplitAlgo extends MapAlgo {
         if(weight >= sumweight / 2) break;
         weight += w[ni];
       }
-//      ni = ne - 1;
       
       int xx = r.x;
       int yy = r.y;
