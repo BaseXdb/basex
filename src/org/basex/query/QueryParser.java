@@ -1248,8 +1248,16 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
-      checkStep(ax, test);
-      if(test == null) error(NOATTNAME);
+      if (s == 2) {
+        sugPath(0);
+        checkStep(Axis.DESCORSELF, Test.NODE);
+      }
+      if(test == null) {
+        checkStep(ax, new NameTest(new QNm(EMPTY), Test.Kind.STD, true));
+        error(NOATTNAME);
+      } else {
+        checkStep(ax, test);
+      }
     } else {
       for(final Axis a : Axis.values()) {
         if(consumeWS(a.name, COL2, NOLOCSTEP)) {
