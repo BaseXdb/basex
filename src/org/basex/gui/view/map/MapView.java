@@ -51,7 +51,7 @@ public final class MapView extends View implements Runnable {
   /** Determines Layout Algorithm. */
   public MapLayout layouter;
   /** Keeps the whole map layout. */
-  public NewMapLayout newmaplayout;
+  public MapLayout newmaplayout;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[ViewNotifier.MAXHIST];
@@ -311,7 +311,7 @@ public final class MapView extends View implements Runnable {
     painter.reset();
     
     // should replace following lines
-    newmaplayout = new NewMapLayout(nodes.data);
+    newmaplayout = new MapLayout(nodes.data);
     newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
     mainRects = (ArrayList<MapRect>) newmaplayout.rectangles.clone();
     painter.init(mainRects);
