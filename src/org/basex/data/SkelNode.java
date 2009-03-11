@@ -128,6 +128,20 @@ public final class SkelNode {
     }
   }
 
+  /***
+   * Counts parents of the SkelNode to compare level in hierarchy.
+   * @return count number of parents
+   */
+  public int countParents() {
+    SkelNode sn = this;
+    int counter = 0;
+    while (sn.par != null) {
+      sn = sn.par;
+      counter++;
+    }
+    return counter;
+  }
+  
   @Override
   public String toString() {
     return "Node[" + kind + ", " + name + ", " + ch.length

@@ -85,14 +85,18 @@ public class AxisPath extends Path {
     if(root != null && root.uses(Use.VAR, ctx)) return this;
 
     // Simple iterator: one downward location step
-    if(step.length == 1 && step[0].axis.down)
+    if(step.length == 1 && step[0].axis.down) {
       return new SingleIterPath(root, step);
+    }
 
     // check if all steps are child steps
     boolean children = root != null && !root.duplicates(ctx);
-    for(final Step s : step)
+    for(final Step s : step) {
       children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
-    if(children) return new SimpleIterPath(root, step);
+    }
+    if(children) {
+      return new SimpleIterPath(root, step);
+    }
     
     // return null if no iterator could be created
     return this;
@@ -177,21 +181,38 @@ public class AxisPath extends Path {
       if(step[i].axis != Axis.DESC) continue;
 
       // check if child steps can be retrieved for current step
-      SkelNode node = node(data, i);
-      if(node == null) continue;
+      ArrayList<SkelNode> nodes = node(data, i);
+      if(nodes == null) continue;
 
       ctx.compInfo(OPTCHILD, step[i]);
 
       // cache child steps
       final TokenList tl = new TokenList();
-      while(node.par != null) {
-        tl.add(data.tags.key(node.name));
-        node = node.par;
+      ArrayList<SkelNode> temp = new ArrayList<SkelNode>();
+      while(nodes.size() != 0) {
+        SkelNode rootNode = nodes.get(0);
+        temp.add(rootNode.par);
+        boolean same = true;
+        for (int j = 1; j < nodes.size(); j++) {
+          SkelNode node = nodes.get(j);
+          temp.add(node.par);
+          if (rootNode.name != node.name) same = false;
+          if (j == nodes.size() - 1) {
+            nodes = temp;
+            temp = null;
+            if (same) tl.add(data.tags.key(node.name));
+            else tl.add(null);
+          }
+        }
       }
 
       // build new steps
       int ts = tl.size;
       final Step[] steps = new Step[ts + step.length - i - 1];
+      
+      // Wildcard test
+      // Step.get(Axis.CHILD, new NameTest(false));
+      
       for(int t = 0; t < ts - 1; t++) {
         steps[t] = Step.get(Axis.CHILD, new NameTest(
             new QNm(tl.list[ts - t - 1]), Kind.NAME, false));
@@ -211,31 +232,33 @@ public class AxisPath extends Path {
    * @param l last step to be checked
    * @return skeleton node
    */
-  private SkelNode node(final Data data, final int l) {
+  private ArrayList<SkelNode> node(final Data data, final int l) {
     // convert single descendant step to child steps
     if(!data.meta.uptodate || data.ns.size() != 0) return null;
 
-    SkelNode node = data.skel.root;
+    ArrayList<SkelNode> in = new ArrayList<SkelNode>();
+    in.add(data.skel.root);
+
     for(int s = 0; s <= l; s++) {
       final boolean desc = step[s].axis == Axis.DESC;
       if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
         return null;
 
       final int name = data.tagID(step[s].test.name.ln());
-      final ArrayList<SkelNode> n = new ArrayList<SkelNode>();
-      n.add(node);
 
-      boolean found = false;
-      for(final SkelNode sn : data.skel.desc(n, 0, Data.DOC, desc)) {
+      final ArrayList<SkelNode> out = new ArrayList<SkelNode>();
+
+      for(final SkelNode sn : data.skel.desc(in, 0, Data.DOC, desc)) {
         if(sn.kind == Data.ELEM && name == sn.name) {
-          if(found) return null;
-          found = true;
-          node = sn;
+          if(out.size() != 0 && 
+              out.get(0).countParents() != sn.countParents()) return null;
+          out.add(sn);
         }
       }
-      if(!found) return null;
+      if(out.size() == 0) return null;
+      in = out;
     }
-    return node;
+    return in;
   }
 
   /**
