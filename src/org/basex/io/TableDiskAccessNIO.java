@@ -31,7 +31,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   /** Mapped Byte Buffer Window. */
   private MappedByteBuffer mbytebuffer;
   /** Multiplicator. */
-  private static final int MULTI = 10000;
+  private static final int MULTI = 1000;
   /** Window size. Choose a multiple of blocksize. */
   private static final int BUFFERSIZE =  MULTI * IO.BLOCKSIZE;
   /** Offset. */

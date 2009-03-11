@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -21,11 +22,11 @@ public final class DataAccessNIO {
   /** File length. */
   private long len;
   /** Read Write file channel. */
-  private FileChannel rwChannel;
+  private FileChannel fc;
   /** Mapped Byte Buffer Window. */
   private MappedByteBuffer mbytebuffer;
   /** Multiplicator. */
-  private static final int MULTI = 10000;
+  private static final int MULTI = 100;
   /** Direct byte buffer size. */
   private static final int DBBUFFERSIZE = IO.BLOCKSIZE;
   /** Window size. Choose a multiple of block size. */
@@ -34,6 +35,8 @@ public final class DataAccessNIO {
   private final ByteBuffer dbbuffer;
   /** Offset. */
   private long off;
+  /** Writing Position. */
+  private long writePosition;
 
   /**
    * Constructor, initializing the file reader.
@@ -61,23 +64,32 @@ public final class DataAccessNIO {
    */
   public DataAccessNIO(final File f) throws IOException {
     file = new RandomAccessFile(f, "rw");
-    rwChannel = file.getChannel();
+    fc = file.getChannel();
     len = file.length();
     dbbuffer = ByteBuffer.allocateDirect(DBBUFFERSIZE);
     if(len <= BUFFERSIZE) {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, len);
+      mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 0, len);
     } else {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
+      mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE,
           0, BUFFERSIZE);
     }
     // init offset
     off = 0;
+    // init write position
+    writePosition = 0;
   }
 
   /**
    * Flushes the buffered data.
    */
-  public synchronized void flush() { }
+  public synchronized void flush() {
+    try {
+      fc.position(writePosition);
+      fc.write(dbbuffer);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   /**
    * Closes the data access.
@@ -92,6 +104,11 @@ public final class DataAccessNIO {
    * @return file length
    */
   public synchronized long length() {
+    try {
+      len = file.length();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
     return len;
   }
 
@@ -126,19 +143,13 @@ public final class DataAccessNIO {
     int l = readNum();
     final byte[] b = new byte[l];
     // checks if token length exceeds current window buffer size
-    int tmp = mbytebuffer.remaining();
-    if(l > tmp) {
-      int ll = 0;
-      while(ll < l) {
-        if(tmp >= l - ll) {
-          mbytebuffer.get(b, ll, l - ll);
-          ll = l;
-        } else {
-          mbytebuffer.get(b, ll, tmp);
-          ll += tmp;
+    if(l > mbytebuffer.remaining()) {
+      for(int i = 0; i < l; i++) {
+        try {
+          b[i] = mbytebuffer.get();
+        } catch (BufferUnderflowException e) {
           moveWindow(off + BUFFERSIZE);
         }
-        tmp = mbytebuffer.remaining();
       }
     } else {
       mbytebuffer.get(b);
@@ -147,7 +158,7 @@ public final class DataAccessNIO {
   }
 
   /**
-   * Returns the current file position.
+   * Returns the current file position for reading purposes.
    * @return text as byte array
    */
   public synchronized long pos() {
@@ -203,7 +214,8 @@ public final class DataAccessNIO {
    */
   public synchronized void writeBytes(final long p, final byte[] v) {
     try {
-      rwChannel.position(p);
+      writePosition = p;
+      fc.position(p);
     } catch(IOException e) {
       e.printStackTrace();
     }
@@ -220,10 +232,10 @@ public final class DataAccessNIO {
     try {
       // check if mapped buffer exceeds remaining file length
       if((len - p) < BUFFERSIZE) {
-        mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+        mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 
             p , len - p);
       } else {
-        mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+        mbytebuffer = fc.map(FileChannel.MapMode.READ_WRITE, 
             p, BUFFERSIZE);
       }
       off = p;
@@ -315,10 +327,12 @@ public final class DataAccessNIO {
    * @param b byte to be written
    */
   private synchronized void write(final int b) {
+    // check if buffer is already full get new buffer
     if(off == DBBUFFERSIZE) {
       try {
-        rwChannel.write(dbbuffer);
+        fc.write(dbbuffer);
         dbbuffer.clear();
+        writePosition = writePosition + DBBUFFERSIZE;
       } catch(IOException e) {
         e.printStackTrace();
       }
