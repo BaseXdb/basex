@@ -135,6 +135,7 @@ public class QueryParser extends InputParser {
    */
   public QueryParser(final QueryContext c) {
     ctx = c;
+    file = c.file;
   }
 
   /**
@@ -2336,7 +2337,7 @@ public class QueryParser extends InputParser {
             if(ctx.stop != null) fn = ctx.stop.get(fn);
 
             IO fl = IO.get(fn);
-            if(!fl.exists() && ctx.file != null) fl = file.merge(fl);
+            if(!fl.exists() && file != null) fl = file.merge(fl);
             if(!ctx.ftopt.stopwords(fl, union, except)) error(NOSTOPFILE, fl);
 
           } else if(!union && !except) {

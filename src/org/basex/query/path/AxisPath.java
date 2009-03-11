@@ -33,7 +33,6 @@ import org.basex.query.path.Test.Kind;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
-import org.basex.util.TokenList;
 
 /**
  * Axis Path expression.
@@ -161,9 +160,10 @@ public class AxisPath extends Path {
       Expr e = index(ctx, data);
       if(e != this) return e;
 
-      // check children path rewriting
+      /* check children path rewriting
       e = children(ctx, data);
       if(e != this) return e;
+      */
     }
 
     // if applicable, return iterator
@@ -175,7 +175,6 @@ public class AxisPath extends Path {
    * @param ctx query context
    * @param data data reference
    * @return path
-   */
   private AxisPath children(final QueryContext ctx, final Data data) {
     for(int i = 0; i < step.length; i++) {
       if(step[i].axis != Axis.DESC) continue;
@@ -225,6 +224,7 @@ public class AxisPath extends Path {
     }
     return this;
   }
+   */
 
   /**
    * Returns a skeleton node for the specified location step.
