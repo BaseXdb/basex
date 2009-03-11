@@ -222,7 +222,7 @@ public final class MapView extends View implements Runnable {
     refreshLayout();
 
     // calculate zooming speed (slower for large zooming scales)
-    // [JH] division by zero if rect is to slight
+    // [JH] division by zero if rect is to slight, not appeared since long time
     if(mainRect.w > 0 && mainRect.h > 0) {
       zoomSpeed = (int) (Math.log(128 * getWidth() / mainRect.w) + Math.log(128
           * getHeight() / mainRect.h));
@@ -547,8 +547,6 @@ public final class MapView extends View implements Runnable {
    * Zooms the coordinates of the specified rectangle.
    * @param r rectangle to be zoomed
    * @param zs zooming step
-   *
-   *          [JH] division by zero to resolve
    */
   private void zoom(final MapRect r, final int zs) {
     int xs = r.x;

@@ -72,8 +72,7 @@ public class MapList extends IntList {
    * @param parsize reference size
    * @param parchildren reference number of nodes
    * @param data reference
-   * [JH] only take weights or number of childs into account if slider is 
-   * on position to do so
+   * [JH] modify to take textnode sizes into account
    */
   public void initWeights(final long parsize, final int parchildren,
       final Data data) {
