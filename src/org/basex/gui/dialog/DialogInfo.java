@@ -65,7 +65,7 @@ public final class DialogInfo extends Dialog {
     tab1.add(doc, BorderLayout.NORTH);
 
     final BaseXText text = text(InfoDB.db(meta, false, false));
-    BaseXLayout.setHeight(text, 220);
+    BaseXLayout.setHeight(text, 280);
     tab1.add(text, BorderLayout.CENTER);
 
     // second tab

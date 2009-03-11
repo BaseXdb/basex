@@ -115,6 +115,11 @@ public final class QueryArea extends QueryPanel {
   public void finish() { }
 
   @Override
+  public void refreshLayout() {
+    area.setFont(GUIConstants.mfont);
+  }
+
+  @Override
   void query(final boolean force) {
     String qu = Token.string(area.getText());
     if(force || !qu.equals(last)) {
@@ -171,7 +176,7 @@ public final class QueryArea extends QueryPanel {
   }
 
   /** Delays the display of error information. */
-  Action error = new Action() {
+  final Action error = new Action() {
     public void run() {
       area.error(err);
     }

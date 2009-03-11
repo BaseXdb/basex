@@ -85,7 +85,7 @@ public final class QueryView extends View {
     box.add(save);
 
     back.add(box, BorderLayout.CENTER);
-    refresh();
+    refreshLayout();
   }
 
   @Override
@@ -113,7 +113,9 @@ public final class QueryView extends View {
 
   @Override
   public void refreshLayout() {
-    refresh();
+    BaseXLayout.select(input[mode], true);
+    header.setFont(GUIConstants.lfont);
+    for(final QueryPanel p : panels) p.refreshLayout();
   }
 
   /**
@@ -132,7 +134,7 @@ public final class QueryView extends View {
     if(GUIProp.execrt) search.query(force);
     revalidate();
     repaint();
-    refresh();
+    refreshLayout();
   }
 
   /**
@@ -140,14 +142,6 @@ public final class QueryView extends View {
    */
   public void quit() {
     for(final QueryPanel p : panels) p.quit();
-  }
-
-  /**
-   * Refreshes the panel components.
-   */
-  void refresh() {
-    BaseXLayout.select(input[mode], true);
-    header.setFont(GUIConstants.lfont);
   }
 
   @Override

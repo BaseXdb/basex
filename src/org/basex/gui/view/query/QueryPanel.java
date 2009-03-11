@@ -35,6 +35,22 @@ abstract class QueryPanel {
   abstract void finish();
   /** Reacts on the GUI termination. */
   abstract void quit();
+  /** Refreshes the panel layout. */
+  abstract void refreshLayout();
+
+  /**
+   * Runs a query.
+   * @param force force the execution of a new query.
+   */
+  abstract void query(boolean force);
+  
+  /**
+   * Handles info messages resulting from a query execution.
+   * @param info info message
+   * @param ok true if query was successful
+   * @return true if info was evaluated
+   */
+  abstract boolean info(final String info, final boolean ok);
 
   /** Refreshes the panel. */
   void refresh() {
@@ -47,7 +63,7 @@ abstract class QueryPanel {
   /**
    * Initializes components which are equal in all panels.
    */
-  void initPanel() {
+  final void initPanel() {
     stop = new BaseXButton(GUI.icon("cmd-stop"), HELPSTOP);
     stop.trim();
     stop.addKeyListener(main);
@@ -71,18 +87,4 @@ abstract class QueryPanel {
     filter = GUIToolBar.newButton(GUICommands.FILTER, main.gui);
     filter.addKeyListener(main);
   }
-
-  /**
-   * Runs a query.
-   * @param force force the execution of a new query.
-   */
-  abstract void query(boolean force);
-  
-  /**
-   * Handles info messages resulting from a query execution.
-   * @param info info message
-   * @param ok true if query was successful
-   * @return true if info was evaluated
-   */
-  abstract boolean info(final String info, final boolean ok);
 }

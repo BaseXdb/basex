@@ -142,6 +142,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     panel.removeAll();
   }
 
+  @Override
+  public void refreshLayout() { }
+
   /**
    * Adds a text field.
    * @param pos position

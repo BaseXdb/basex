@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.index.FTTokenizer;
@@ -31,8 +30,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  static int calcHeight(final Graphics g, final MapRect r,
-      final byte[] s) {
+  static int calcHeight(final Graphics g, final MapRect r, final byte[] s) {
     return drawText(g, r, s, s.length, false);
   }
 
@@ -43,8 +41,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final MapRect r,
-      final byte[] s) {
+  static int drawText(final Graphics g, final MapRect r, final byte[] s) {
     return drawTextNew(g, r, s, s.length, true);
   }
 
@@ -239,6 +236,7 @@ final class MapRenderer {
    */
   static void drawThumbnails(final Graphics g, final MapRect r,
       final byte[] s) {
+
     // thumbnail width
     final double ffmax = 0.25;
     final double ffmin = 0.14;
@@ -318,12 +316,14 @@ final class MapRenderer {
     if (h < r.h)
     drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);    
   }
+
   /** Color for each tooltip token.  */
-  public static IntList ttcol;
+  static IntList ttcol;
   /** Tooltip tokens. */
-  public static TokenList tl;
+  static TokenList tl;
   /** Index of tooltip token to underline. */
   private static int ul;
+
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
@@ -334,7 +334,7 @@ final class MapRenderer {
    * @param draw boolean for drawing (used for calculating the higth)
    * @return heights
    */
-  public static int drawThumbnailsToken(final Graphics g, final MapRect r,
+  private static int drawThumbnailsToken(final Graphics g, final MapRect r,
       final int[][] data, final boolean draw, final int x, final int y) {
     final double xx = r.x;
     final double ww = r.w;
@@ -344,7 +344,7 @@ final class MapRenderer {
     int wl = 0; // word length
     int ll = 0; // line length
     
-    final Color textc = draw ? GUIConstants.COLORS[6] : null;
+    final Color textc = draw ? COLORS[r.level + 4] : null;
     int count = 0;
     int pp = 0;
     int sl = 0, pl = 0;
@@ -444,16 +444,15 @@ final class MapRenderer {
    * @return tooltip length
    */
   private static int getTooltipLength(final int ww) {
-    return (ww / (GUIProp.fontsize)) + 2;
+    return (ww / GUIProp.fontsize) + 2;
   }
   
   /**
    * Checks if cursor is inside the rect. 
-   * 
    * @param rx int x-value of the rect
    * @param ry int y-value of the rect
    * @param rw int width of the rect
-   * @param rh int hight of the rect
+   * @param rh int height of the rect
    * @param xx int x-value of the cursor
    * @param yy int y-value of the cursor
    * @return boolean
@@ -464,7 +463,7 @@ final class MapRenderer {
   }
   
   /**
-   * Draw tooltip.
+   * Draws a tooltip.
    * @param g graphics reference
    * @param x x-value 
    * @param y y-value
@@ -474,7 +473,7 @@ final class MapRenderer {
    * @param rw viewrect width 
    * @param acol ftand color array
    */
-  public static void drawToolTip(final Graphics g, final int x, final int y, 
+  static void drawToolTip(final Graphics g, final int x, final int y, 
       final int rx, final int ry, final int rh, final int rw, 
       final byte[][] acol) {
     if (tl != null && tl.size > 0) {
@@ -546,14 +545,14 @@ final class MapRenderer {
    * @param sw length of a space
    * @param x mouseX
    * @param y mouseY
-   * @param w width of current maprect
+   * @param w width of map view
    * @param g Graphics
-   * @param ds boolean flag for drawing space beetween tokens
+   * @param ds boolean flag for drawing space between tokens
    */
-  public static void calcThumbnailsToolTip(final MapRect r,
-      final int[][] data, final boolean sen, final double sw, 
-      final int x, final int y, final int w, final Graphics g,
-      final boolean ds) {
+  static void drawThumbnailsToolTip(final MapRect r, final int[][] data,
+      final boolean sen, final double sw, final int x, final int y,
+      final int w, final Graphics g, final boolean ds) {
+
     final double ww = r.w;
     int yy = r.y + 3;
     
@@ -735,16 +734,15 @@ final class MapRenderer {
     }
   }
   
-  
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
    * @param r rectangle
    * @param data fulltext to be drawn
-   * @param sen flag for sentence or paragraphe
+   * @param sen flag for sentence or paragraph
    * @param sw length of a space
-   * @param draw boolean for drawing (used for calculating the higth)
-   * @return higths
+   * @param draw boolean for drawing (used for calculating the height)
+   * @return height
    */
   private static int drawThumbnailsSentence(final Graphics g,
       final MapRect r, final int[][] data, final boolean sen,
@@ -757,7 +755,7 @@ final class MapRenderer {
     int wl = 0; // word length
     int ll = 0; // line length
 
-    final Color textc = GUIConstants.COLORS[6];
+    final Color textc = COLORS[r.level + 4];
     g.setColor(textc);
     int lastl = 0;
     int count = -1;
@@ -852,129 +850,6 @@ final class MapRenderer {
         }
       }
     }
-    
     return yy - r.y + r.thumbfh;
   }
-
-  /**
-   * Draws a text token within its context.
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-  static void drawTextinContext(final Graphics g, final MapRect r,
-      final byte[] s) {
-
-    // limit string to given space
-    final int[] cw = fontWidths(g.getFont());
-    final int fh = (int) (1.2 * GUIProp.fontsize);
-    int xx = r.x;
-    int yy = r.y + fh;
-    final Color textc = g.getColor();
-
-    int count = 0;
-    int pp = 0;
-    int sw = 0;
-    IntList poic = new IntList();
-    final int wd = width(g, cw, '.');
-    final int we = width(g, cw, ' ');
-    final String e = new String(" ");
-    final String d = new String(".");
-    FTTokenizer ftt = new FTTokenizer(s);
-    while(ftt.more()) {
-      if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-        sw += sw == 0 ? we + wd * 2 : we + wd;
-        if (sw > r.w) {
-          yy += fh;
-          xx = r.x;
-          sw = 2 * we;
-          if (yy >= r.y + r.h) return;
-        }
-        g.drawString(sw == we + wd * 2 ? d + d + e : d + e, xx, yy);
-        xx = r.x + sw;
-
-        byte[] tok = new byte[0];
-        byte[] t = null;
-        int c = 0;
-        while(pp + c + 1 < r.poi.length &&
-            r.poi[pp + 1] == r.poi[pp + c + 1] &&
-            r.pos[pp] == r.pos[pp + c] - c) {
-          if(t != null) {
-            ftt.more();
-            count++;
-          }
-          t = ftt.get();
-          for (byte b : t)
-            sw += width(g, cw, b);
-          sw += we;
-          if (sw > r.w) {
-            yy += fh;
-            xx = r.x;
-            sw = 2 * we;
-            if (yy >= r.y + r.h) return;
-          }
-          tok = Array.add(tok, Array.add(t, new byte[]{' '}));
-          c++;
-        }
-        sw -= we;
-        g.setColor(thumbnailcolor[r.poi[pp]]);
-        pp  = pp + c;
-        g.drawString(new String(tok), xx, yy);
-        g.setColor(textc);
-        if(!poic.contains(r.poi[pp])) poic.add(r.poi[pp]);
-        xx = r.x + sw;
-        int k = 0;
-        int ll;
-        while (k < 2 && ftt.more()) {
-          ll = sw;
-          count++;
-          if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-            g.setColor(thumbnailcolor[r.poi[pp]]);
-            pp++;
-            if(!poic.contains(r.poi[pp])) poic.add(r.poi[pp]);
-          } else g.setColor(textc);
-          sw += we;
-          if (sw > r.w) {
-            yy += fh;
-            xx = r.x;
-            sw = 2 * we;
-            if (yy >= r.y + r.h) return;
-          }
-          tok = ftt.get();
-          for (byte b : tok)
-            sw += width(g, cw, b);
-          if (sw > r.w) {
-            yy += fh;
-            xx = r.x;
-            sw = 2 * we;
-            if (yy >= r.y + r.h) return;
-          }
-          g.drawString(e + new String(tok), xx, yy);
-          g.setColor(textc);
-          xx += sw - ll;
-          k++;
-        }
-        sw += we + wd;
-        if (sw > r.w) {
-          yy += fh;
-          xx = r.x;
-          sw = 2 * we;
-          if (yy >= r.y + r.h) return;
-        }
-        g.drawString(e + d, xx, yy);
-        xx = r.x + sw;
-
-        if (r.poi != null && r.poi[0] == poic.size) {
-          g.drawString(d, xx, yy);
-          yy += fh;
-          xx = r.x;
-          sw = 0;
-          poic = new IntList();
-        }
-        if (yy >= r.y + r.h) return;
-
-      }
-      count++;
-    }
-  }
-   */
 }

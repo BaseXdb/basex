@@ -2,10 +2,7 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -328,14 +325,13 @@ public final class MapView extends View implements Runnable {
      */
   }
 
-  /**
+  /*
    * Initializes the calculation of the main TreeMap.
    * will be obsolete
    * @param rect initial space to layout rects in
    * @param rectangles List to store divided rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
-   */
   private void calc(final MapRect rect, final ArrayList<MapRect> rectangles,
       final Nodes nodes, final BufferedImage map) {
 
@@ -373,8 +369,8 @@ public final class MapView extends View implements Runnable {
      * Screenshots: try { File file = new File("screenshot.png");
      * ImageIO.write(mainMap, "png", file); } catch(IOException e) {
      * e.printStackTrace(); }
-     */
   }
+   */
 
   
   @Override
@@ -457,7 +453,6 @@ public final class MapView extends View implements Runnable {
         final int[][] d = ftt.getInfo();
         focused.x += 3;
         focused.w -= 3;
-        g.setColor(Color.black);
 
         boolean sen = false;
         boolean spc = false;
@@ -468,7 +463,7 @@ public final class MapView extends View implements Runnable {
           case 2:  break;
           default: sw = Math.max(1.5, focused.thumbf);
         }
-        MapRenderer.calcThumbnailsToolTip(focused, d, sen, sw,
+        MapRenderer.drawThumbnailsToolTip(focused, d, sen, sw,
             mouseX, mouseY, getWidth(), g, spc);
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
@@ -477,7 +472,7 @@ public final class MapView extends View implements Runnable {
         focused.w += 3;
       }
 
-      // draw area round cursor position
+      /* draw area round cursor position
       if(GUIProp.mapinteraction == 1) {
         // find out if position under cursor is out of view dimensions
         int myx, myy;
@@ -528,7 +523,7 @@ public final class MapView extends View implements Runnable {
         ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 1.0f));
         drawMap(bi, lensRects);
         g.drawImage(bi, myx, myy, this);
-      }
+      }*/
     }
 
     gui.painting = false;

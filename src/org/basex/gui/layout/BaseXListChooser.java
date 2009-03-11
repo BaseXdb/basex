@@ -23,16 +23,16 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BaseXListChooser extends BaseXBack {
+  /** Text field. */
+  final BaseXTextField text;
+  /** Scroll pane. */
+  final JScrollPane scroll;
   /** List. */
-  JList list;
+  final JList list;
   /** List Values. */
   String[] values;
-  /** Text field. */
-  BaseXTextField text;
   /** Numeric list. */
   boolean num = true;
-  /** Scroll pane. */
-  private JScrollPane scroll;
   
   /**
    * Default Constructor.
@@ -50,7 +50,7 @@ public final class BaseXListChooser extends BaseXBack {
     // checks if list is purely numeric
     for(final String v : values) {
       for(int c = 0; c < v.length(); c++) {
-        num = num && v.charAt(c) >= '0' && v.charAt(c) <= '9';
+        num &= v.charAt(c) >= '0' && v.charAt(c) <= '9';
       }
       if(!num) break;
     }
@@ -94,7 +94,6 @@ public final class BaseXListChooser extends BaseXBack {
           text.setText(values[newpos]);
           text.selectAll();
           typed = false;
-          parent.action(null);
         }
       }
 
@@ -127,6 +126,7 @@ public final class BaseXListChooser extends BaseXBack {
             text.select(c, values[i].length());
           }
         }
+        parent.action(null);
       }
     });
     add(text);
