@@ -165,7 +165,6 @@ public class QuerySuggest extends QueryParser {
   void error(final Object[] err, final Object... arg) throws QueryException {
     //System.out.println("error");
     final QueryException qe = new QueryException(err, arg);
-    System.out.println(qe.simple());
     mark();
     if (qe.simple().startsWith("Unexpected") ||
         qe.simple().equals("Expecting attribute name.")) filter(false);
