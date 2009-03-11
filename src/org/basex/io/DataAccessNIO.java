@@ -142,17 +142,12 @@ public final class DataAccessNIO {
     cursor(p);
     int l = readNum();
     final byte[] b = new byte[l];
-    // checks if token length exceeds current window buffer size
-    if(l > mbytebuffer.remaining()) {
-      for(int i = 0; i < l; i++) {
-        try {
-          b[i] = mbytebuffer.get();
-        } catch (BufferUnderflowException e) {
-          moveWindow(off + BUFFERSIZE);
-        }
+    for(int i = 0; i < l; i++) {
+      try {
+        b[i] = mbytebuffer.get();
+      } catch (BufferUnderflowException e) {
+        moveWindow(off + BUFFERSIZE);
       }
-    } else {
-      mbytebuffer.get(b);
     }
     return b;
   }
