@@ -175,7 +175,6 @@ public final class MapView extends View implements Runnable {
     final int w = getWidth(), h = getHeight();
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
     mainRects = new ArrayList<MapRect>();
-    mainRects = new ArrayList<MapRect>();
     final Nodes nodes = gui.context.current();
 
     final Performance p = new Performance();
@@ -303,6 +302,7 @@ public final class MapView extends View implements Runnable {
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */
+  @SuppressWarnings("unchecked")
   private void calc(final MapRect rect, final Nodes nodes, 
       final BufferedImage map) {
 
@@ -313,9 +313,9 @@ public final class MapView extends View implements Runnable {
     // should replace following lines
     newmaplayout = new NewMapLayout(nodes.data);
     newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
-    mainRects = newmaplayout.rectangles;
+    mainRects = (ArrayList<MapRect>) newmaplayout.rectangles.clone();
     painter.init(mainRects);
-    drawMap(map, mainRects);
+    drawMap(map, newmaplayout.rectangles);
     focus();
 
     /*
