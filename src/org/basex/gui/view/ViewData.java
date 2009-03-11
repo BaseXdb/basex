@@ -1,7 +1,6 @@
 package org.basex.gui.view;
 
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
@@ -76,12 +75,13 @@ public final class ViewData {
    * @return name
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
-    final int kind = data.kind(p);
-    if(kind == Data.ELEM) return data.tag(p);
-    if(kind == Data.DOC)  return data.text(p);
-    if(kind == Data.TEXT) return s ? TEXT : data.text(p);
-    if(kind == Data.COMM) return s ? COMM : concat(COM1, data.text(p), COM2);
-    if(kind == Data.PI)   return s ? PI : concat(PI1, data.text(p), PI2);
+    switch(data.kind(p)) {
+      case Data.ELEM: return data.tag(p);
+      case Data.DOC:  return data.text(p);
+      case Data.TEXT: return s ? TEXT : data.text(p);
+      case Data.COMM: return s ? COMM : data.text(p);
+      case Data.PI:   return s ? PI : data.text(p);
+    }
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(ATT);

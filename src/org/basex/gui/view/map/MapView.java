@@ -440,8 +440,8 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
+      g.setFont(font);
       if(data.kind(focused.pre) == Data.ELEM) {
-        g.setFont(font);
         String tt = Token.string(ViewData.tag(data, focused.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
