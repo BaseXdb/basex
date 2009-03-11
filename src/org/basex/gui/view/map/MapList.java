@@ -1,6 +1,7 @@
 package org.basex.gui.view.map;
 
 import org.basex.data.Data;
+import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -58,24 +59,16 @@ public class MapList extends IntList {
           double wtmp = weights[i];
           weights[i] = weights[i + 1];
           weights[i + 1] = wtmp;
-          // switch sizes
-          long stmp = sizes[i];
-          sizes[i] = sizes[i + 1];
-          sizes[i + 1] = stmp;
-          // switch number of children
-          int ctmp = nrchildren[i];
-          nrchildren[i] = nrchildren[i + 1];
-          nrchildren[i + 1] = ctmp;
           
           switched = true;
         }
       }
       n--;
     } while (n >= 0 && switched);
-  }
+  }  
   
   /**
-   * Calculates the weights of each list entry and stores it in an extra list.
+   * Initializes the weights of each list entry and stores it in an extra list.
    * @param parsize reference size
    * @param parchildren reference number of nodes
    * @param data reference
@@ -85,25 +78,32 @@ public class MapList extends IntList {
   public void initWeights(final long parsize, final int parchildren,
       final Data data) {
     weights = new double[list.length];
-
-    for(int i = 0; i < size - 1; i++) {
-      weights[i] = MapLayout.calcWeight(sizes[i], nrchildren[i], parsize,
-          parchildren, data);
-    }
-  }
-  
-  /**
-   * Initalizes the sizes and number of child of each nodes in this list.
-   * @param data reference
-   */
-  public void initChildren(final Data data) {
     nrchildren = new int[list.length];
     sizes = new long[list.length];
-
-    for(int i = 0; i < size - 1; i++) {
-      sizes[i] = data.fs != null ? 
-          Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-          nrchildren[i] = list[i + 1] - list[i];
-    }
+    int sizeP = GUIProp.sizep;
+    
+    // use #children and size for weight
+    if (0 < GUIProp.sizep && GUIProp.sizep < 100 && data.fs != null) {
+      for(int i = 0; i < size - 1; i++) {
+        sizes[i] = data.fs != null ? 
+            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
+        nrchildren[i] = list[i + 1] - list[i];
+        weights[i] = sizeP / 100d * sizes[i] / parsize + 
+            (1 - sizeP / 100d) * nrchildren[i] / parchildren;
+      }
+    // only sizes
+    } else if (GUIProp.sizep == 100 && data.fs != null) {
+      for(int i = 0; i < size - 1; i++) {
+        sizes[i] = data.fs != null ? 
+            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
+        weights[i] = sizes[i] * 1d / parsize;
+      }    
+    //only #children
+    } else if (GUIProp.sizep == 0 || data.fs == null) {
+      for(int i = 0; i < size - 1; i++) {
+        nrchildren[i] = list[i + 1] - list[i];
+        weights[i] = nrchildren[i] * 1d / parchildren;
+      }
+    } 
   }
 }

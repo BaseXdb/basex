@@ -64,20 +64,7 @@ class NewMapLayout {
       default:
         algo = new SplitAlgo();
         break;
-//      case 1:
-//        algo = new SliceDiceLayout();
-//        break;
-//      case 2:
-//        algo = new SquarifiedLayout();
-//        break;
-//      case 3:
-//        algo = new StripLayout();
-//        break;
-//      default:
-//        algo = new SplitLayout();
-//        break;
     }
-    
   }
 
   /**
@@ -197,6 +184,8 @@ class NewMapLayout {
    * 
    * [JH] should be possible to replace size and children by any other
    * numerical attributes in future.
+   * [JH] add some more to do this leaving sizes or number of childs if slider
+   * is in possition to do so
    * 
    * @param rect pre val of rect
    * @param par comparison rectangles
@@ -253,47 +242,52 @@ class NewMapLayout {
   
   /**
    * Splits and adds rectangles uniformly distributed.
-   * @param d reference
    * @param r rectangles to lay out in
-   * @param mainRects rect array reference
    * @param l list of rectangles to lay out
    * @param ns starting point
    * @param ne ending
-   * @param level on which the nodes are
-   * @param v vertically???
+   * @return rectangles uniformly devided
    */
-  /*protected void splitUniformly(final Data d, final MapRect r,
-      final ArrayList<MapRect> mainRects, final MapList l,
-      final int ns, final int ne, final int level, final boolean v) {
-    long nn, ln;
-    int ni;
-    // number of nodes used to calculate space
-    nn = ne - ns;
-    // nn / 2, pretends to be the middle of the handled list
-    // except if starting point in the list is not at position 0
-    ln = nn >> 1;
-    // pivot with integrated list start
-    ni = (int) (ns + ln);
-    
-    int xx = r.x;
-    int yy = r.y;
-
-    int ww = !v ? r.w : (int) (r.w * ln / nn);
-    int hh = v ? r.h : (int) (r.h * ln / nn);
-
-    // paint both rectangles if enough space is left
-    if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0,
-        r.level), mainRects, l, ns, ni, level);
-    if(v) {
-      xx += ww;
-      ww = r.w - ww;
+  protected ArrayList<MapRect> splitUniformly(final MapRect r, final MapList l,
+      final int ns, final int ne) {
+    if (ne - ns == 1) {
+      ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      rects.add(new MapRect(r, l.list[ns], 0));
+      return rects;
     } else {
-      yy += hh;
-      hh = r.h - hh;
+      ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      long nn, ln;
+      int ni;
+      // number of nodes used to calculate space
+      nn = ne - ns;
+      // nn / 2, pretends to be the middle of the handled list
+      // except if starting point in the list is not at position 0
+      ln = nn >> 1;
+      // pivot with integrated list start
+      ni = (int) (ns + ln);
+      
+      boolean v = r.w > r.h;
+      
+      int xx = r.x;
+      int yy = r.y;
+      int ww = !v ? r.w : (int) (r.w * ln / nn);
+      int hh = v ? r.h : (int) (r.h * ln / nn);
+  
+      // paint both rectangles if enough space is left
+      if(ww > 0 && hh > 0) rects.addAll(
+          splitUniformly(new MapRect(xx, yy, ww, hh, 0, r.level), l, ns, ni));
+      if(v) {
+        xx += ww;
+        ww = r.w - ww;
+      } else {
+        yy += hh;
+        hh = r.h - hh;
+      }
+      if(ww > 0 && hh > 0) rects.addAll(
+          splitUniformly(new MapRect(xx, yy, ww, hh, 0, r.level), l, ni, ne));
+      return rects;
     }
-    if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0,
-        r.level), mainRects, l, ni, ne, level);
-  }*/
+  }
 
 
   /**
@@ -311,26 +305,18 @@ class NewMapLayout {
       r.pre = l.list[ns];
       putRect(r, level);
     } else {
-      l.initChildren(data);
-      int nn = 0;
-      // number of nodes on this level
-      for(int i = 0; i <= ne; i++) {
-        nn += l.nrchildren[i];
-      }
-      long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
-      // init weights of nodes and sort
-      l.initWeights(parsize, nn, data);
+      ArrayList<MapRect> rects;
       if(level == 0) {
-        // some more roots have to be positioned
-        rectangles.addAll(new SplitAlgo().
-            calcMap(r, l, l.weights, ns, ne, level));
+        rects = splitUniformly(r, l, ns, ne);
       } else {
-        ArrayList<MapRect> rects = algo.calcMap(r, l, l.weights, ns, ne, level);
-        // call recursion for each rectangle
-        for(MapRect rect : rects) {
-          putRect(rect, rect.level);
-        }
+        int nn = l.list[ne] - l.list[ns];
+        long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+        // init weights of nodes and sort
+        l.initWeights(parsize, nn, data);
+        rects = algo.calcMap(r, l, l.weights, ns, ne, level);
       }
+      // call recursion for next deeper levels
+      for(MapRect rect : rects) putRect(rect, rect.level);
     }
   }
   

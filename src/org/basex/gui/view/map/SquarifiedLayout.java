@@ -24,7 +24,7 @@ public final class SquarifiedLayout extends MapLayout {
         splitUniformly(d, r, mainRects, l, ns, ne, level, r.w > r.h);
       } else {
         // init number of children and sizes
-        l.initChildren(d);
+//        l.initChildren(d);
         int nn = 0;
         // number of nodes on this level
         for(int i = 0; i <= ne; i++) {

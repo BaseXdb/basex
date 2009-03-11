@@ -3,9 +3,10 @@ package org.basex.gui.view.map;
 import java.util.ArrayList;
 
 /**
- * SplitLayout Algorithm.
- * @author joggele
- *
+ * Slice-and-Dice Layout Algorithm.
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public class SliceDiceAlgo extends MapAlgo{
   @Override

@@ -157,7 +157,7 @@ abstract class MapLayout {
    * weight = size_p * size + (1 - size_p) * |children| whereas size_p in [0;1]
    * 
    * [JH] should be possible to replace size and children by any other
-   * numerical attributes in future.
+   * numerical attributes.
    * 
    * @param rect pre val of rect
    * @param par comparison rectangles

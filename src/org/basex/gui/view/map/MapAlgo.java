@@ -5,8 +5,8 @@ import java.util.ArrayList;
 /**
  * Interface MapAlgorithms need to implement.
  * 
- * @author joggele
- *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public abstract class MapAlgo {
 

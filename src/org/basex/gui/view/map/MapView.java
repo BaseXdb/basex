@@ -182,8 +182,9 @@ public final class MapView extends View implements Runnable {
     final Nodes nodes = gui.context.current();
 
     final Performance p = new Performance();
-    calc(rect, mainRects, nodes, mainMap);
-
+//    calc(rect, mainRects, nodes, mainMap);
+    calc(rect, nodes, mainMap);
+    
     if(GUIProp.mapinfo) {
       final double aar = MapLayout.aar(mainRects);
       mapInfo.setValues(mainRects.size(), rect, aar, p.getTimer());
@@ -302,6 +303,35 @@ public final class MapView extends View implements Runnable {
    * Initializes the calculation of the main TreeMap.
    *
    * @param rect initial space to layout rects in
+   * @param nodes Nodes to draw in the map
+   * @param map image to draw rectangles on
+   */
+  private void calc(final MapRect rect, final Nodes nodes, 
+      final BufferedImage map) {
+
+    // calculate new main rectangles
+    if(painter == null) return;
+    painter.reset();
+    
+    // should replace following lines
+    newmaplayout = new NewMapLayout(nodes.data);
+    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
+    mainRects = newmaplayout.rectangles;
+    painter.init(mainRects);
+    drawMap(map, mainRects);
+    focus();
+
+    /*
+     * Screenshots: try { File file = new File("screenshot.png");
+     * ImageIO.write(mainMap, "png", file); } catch(IOException e) {
+     * e.printStackTrace(); }
+     */
+  }
+
+  /**
+   * Initializes the calculation of the main TreeMap.
+   * will be obsolete
+   * @param rect initial space to layout rects in
    * @param rectangles List to store divided rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
@@ -332,13 +362,6 @@ public final class MapView extends View implements Runnable {
         break;
     }
     
-    // should replace following lines
-//    newmaplayout = new NewMapLayout(nodes.data);
-//    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
-//    mainRects = newmaplayout.rectangles;
-//    painter.init(mainRects);
-//    drawMap(map, mainRects);
-    // will be obsolete
     layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes),
     0, nodes.size(), 0);
     painter.init(rectangles);
@@ -353,6 +376,7 @@ public final class MapView extends View implements Runnable {
      */
   }
 
+  
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();

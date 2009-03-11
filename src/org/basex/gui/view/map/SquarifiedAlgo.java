@@ -3,15 +3,17 @@ package org.basex.gui.view.map;
 import java.util.ArrayList;
 
 /**
- * SplitLayout Algorithm.
- * @author joggele
+ * Squarified Layout Algorithm.
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public class SquarifiedAlgo extends MapAlgo {
 
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] weights, final int ns, final int ne, final int level) {
+    if(level <= 4) l.sort();
     ArrayList<MapRect> rects = new ArrayList<MapRect>();
     int ni = ns;
     // running start holding first element of current row
@@ -23,93 +25,97 @@ public class SquarifiedAlgo extends MapAlgo {
     double ww = r.w;
     double hh = r.h;
     
+    ArrayList<MapRect> row = new ArrayList<MapRect>();
+    double height = 0;
+    double width = 0;
+    double weight = 0;
+    double sumweight = 1;
+    
     while(ni < ne) {
-      double weight = 0;
-      double ratio = Double.MAX_VALUE;
       if(ww < hh) {
-        ArrayList<MapRect> row = new ArrayList<MapRect>();
-        double height = 0;
-  
         weight += l.weights[ni];
-        height = weight * hh;
+        height = weight / sumweight * hh;
         
         ArrayList<MapRect> tmp = new ArrayList<MapRect>();
-        // create temporary row including current rectangle
+
         double x = xx;
         for(int i = start; i <= ni; i++) {
-          // sometimes left space has to be used
-          double w = i == ni ? xx + ww - x : l.weights[i] * ww;
+          double w = i == ni ? xx + ww - x : l.weights[i] / weight * ww;
           tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
               l.list[i], level));
           x += (int) w;
         }
-        double tmpratio = lineRatio(tmp);
+
         // if ar has increased discard tmp and add row
-        if(tmpratio > ratio) {
-          // add row to rects
+        if(lineRatio(tmp) > lineRatio(row)) {
+          // add rects of row to solution
           rects.addAll(row);
-          // preparing for new line to lay out
+          // preparing next line
           hh -= row.get(0).h;
           yy += row.get(0).h;
           tmp.clear();
           row.clear();
           start = ni;
-          
+          sumweight -= weight - l.weights[ni];
+          weight = 0;
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni + 1) {
-            rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
                 l.list[ni], level));
             break;
           }
+        } else {
+          row = tmp;
+          ni++;
         }
-        ratio = tmpratio;
-        row = tmp;
-        ni++;
       } else {
-        ArrayList<MapRect> row = new ArrayList<MapRect>();
-        double width = 0;
         weight += l.weights[ni];
-        width = weight * ww;
+        width = weight / sumweight * ww;
         
         ArrayList<MapRect> tmp = new ArrayList<MapRect>();
-        // create temporary row including current rectangle
+
         double y = yy;
         for(int i = start; i <= ni; i++) {
-          // sometimes left space has to be used
-          double h = i == ni ? yy + hh - y : l.weights[i] * hh;
-          tmp.add(new MapRect((int) xx, (int) y, (int) width, (int) hh,
+          double h = i == ni ? yy + hh - y : l.weights[i] / weight * hh;
+          tmp.add(new MapRect((int) xx, (int) y, (int) width, (int) h,
               l.list[i], level));
           y += (int) h;
         }
-        double tmpratio = lineRatio(tmp);
+
         // if ar has increased discard tmp and add row
-        if(tmpratio > ratio) {
-          // add row to rects
+        if(lineRatio(tmp) > lineRatio(row)) {
+          // add rects of row to solution
           rects.addAll(row);
-          // preparing for new line to lay out
-          yy -= row.get(0).w;
+          // preparing next line
+          ww -= row.get(0).w;
           xx += row.get(0).w;
           tmp.clear();
           row.clear();
           start = ni;
-          
+          sumweight -= weight - l.weights[ni];
+          weight = 0;
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni + 1) {
-            rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
                 l.list[ni], level));
             break;
           }
+        } else {
+          row = tmp;
+          ni++;
         }
-        ratio = tmpratio;
-        row = tmp;
-        ni++;
       }
     }
+    
+    for(MapRect rect : row) rect.h = (int) hh;
+    // adding last row
+    rects.addAll(row);
+    
     return rects;
   }
   
   @Override
   public String getType() {
-    return "SplitLayout";
+    return "SquarifiedLayout";
   }
 }

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 /**
  * SplitLayout Algorithm.
- * @author joggele
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public class SplitAlgo extends MapAlgo {
 
