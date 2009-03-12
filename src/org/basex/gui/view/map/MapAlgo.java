@@ -33,7 +33,8 @@ public abstract class MapAlgo {
   }
   
   /**
-   * Recursively splits rectangles.
+   * Splits List nodes into Rectangles matching in given space.
+   * 
    * @param r parent rectangle
    * @param l children array
    * @param weights weights array

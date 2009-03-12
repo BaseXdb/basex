@@ -257,12 +257,22 @@ class MapLayout {
       r.pre = l.list[ns];
       putRect(r, level);
     } else {
+      long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+      int nn;
       ArrayList<MapRect> rects;
       if(level == 0) {
-        rects = splitUniformly(r, l, ns, ne);
+        // [JH] use this for all instances
+        if(data.fs != null) {
+          rects = splitUniformly(r, l, ns, ne);
+        } else {
+          nn = l.list[ne - 1] - l.list[ns];
+          l.initWeights(parsize, nn, data);
+          
+          MapAlgo tmp = new SplitAlgo();
+          rects = tmp.calcMap(r, l, l.weights, ns, ne - 1, level);
+        }
       } else {
-        int nn = l.list[ne] - l.list[ns];
-        long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+        nn = l.list[ne] - l.list[ns];
         // init weights of nodes and sort
         l.initWeights(parsize, nn, data);
         rects = algo.calcMap(r, l, l.weights, ns, ne, level);
@@ -279,7 +289,6 @@ class MapLayout {
    */
   protected void putRect(final MapRect r, final int level) {
     rectangles.add(r);
-//    System.out.println(algo.getType() + " nr nodes: " + rectangles.size());
 
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;

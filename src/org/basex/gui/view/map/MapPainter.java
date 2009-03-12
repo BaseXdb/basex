@@ -3,6 +3,7 @@ package org.basex.gui.view.map;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 
@@ -39,6 +40,8 @@ abstract class MapPainter {
     // mark ancestor of invisible node
     // [JH] does not mark ancestors if MapNodes have been sorted
     // better find parent to mark
+//    final Data data = view.gui.context.data();
+//    if(ViewData.parent(data, p)) return GUIConstants.colormark2;
 //    return p < marked.size() && ri + 1 < rects.size() && 
 //      marked.sorted[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : 
 //    null;
