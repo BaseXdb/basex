@@ -1,9 +1,12 @@
 package org.basex.gui.view.map;
 
+import java.util.Arrays;
+
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * stores an integer array of pre values and their corresponding weights, sizes 
@@ -15,10 +18,6 @@ import org.basex.util.Token;
 public class MapList extends IntList {
   /** Weights array. */
   public double[] weights;
-  /** Sizes array. */
-  public long[] sizes;
-  /** Number of children Array. */
-  public int[] nrchildren;
 
   /**
    * Constructor, specifying an initial list size.
@@ -44,28 +43,41 @@ public class MapList extends IntList {
   
   @Override
   public void sort() {
-    if(weights == null) return;
-    boolean switched = true;
-    int n = size;
-    do {
-      switched = false;
-      for(int i = 0; i < size - 1; i++) {
-        if(weights[i] < weights[i + 1]) {
-          // switch entries
-          int tmp = list[i];
-          list[i] = list[i + 1];
-          list[i + 1] = tmp;
-          // switch weights
-          double wtmp = weights[i];
-          weights[i] = weights[i + 1];
-          weights[i + 1] = wtmp;
-          
-          switched = true;
-        }
-      }
-      n--;
-    } while (n >= 0 && switched);
-  }  
+//    if(weights == null) return;
+    
+    final TokenList tl = new TokenList();
+    for(int c = 0; c < size; c++) tl.add(Token.token(weights[c]));
+    sort(tl.finish(), true, false);
+     
+    Arrays.sort(weights);
+    
+    for (int l = 0, r = weights.length - 1; l < r; l++, r--) {
+      // exchange the first and last
+      double temp = weights[l]; weights[l]  = weights[r]; weights[r] = temp;
+    }
+
+    // simple bubble sort, obsolete
+//    boolean switched = true;
+//    int n = size;
+//    do {
+//      switched = false;
+//      for(int i = 0; i < size - 1; i++) {
+//        if(weights[i] < weights[i + 1]) {
+//          // switch entries
+//          int tmpint = list[i];
+//          list[i] = list[i + 1];
+//          list[i + 1] = tmpint;
+//          // switch weights
+//          double wtmp = weights[i];
+//          weights[i] = weights[i + 1];
+//          weights[i + 1] = wtmp;
+//          
+//          switched = true;
+//        }
+//      }
+//      n--;
+//    } while (n >= 0 && switched);
+  }
   
   /**
    * Initializes the weights of each list entry and stores it in an extra list.
@@ -77,8 +89,8 @@ public class MapList extends IntList {
   public void initWeights(final long parsize, final int parchildren,
       final Data data) {
     weights = new double[list.length];
-    nrchildren = new int[list.length];
-    sizes = new long[list.length];
+    int[] nrchildren = new int[list.length];
+    long[] sizes = new long[list.length];
     int sizeP = GUIProp.sizep;
     
     // use #children and size for weight
@@ -103,6 +115,7 @@ public class MapList extends IntList {
         nrchildren[i] = list[i + 1] - list[i];
         weights[i] = nrchildren[i] * 1d / parchildren;
       }
-    } 
+    }
+    for (int i = 0; i < size; i++) if(Double.isNaN(weights[i])) weights[i] = 0;
   }
 }

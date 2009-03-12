@@ -13,7 +13,11 @@ public class SquarifiedAlgo extends MapAlgo {
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] weights, final int ns, final int ne, final int level) {
-    if(level <= 4) l.sort();
+    if(level <= 4) {
+      l.sort();
+    }
+    
+    
     ArrayList<MapRect> rects = new ArrayList<MapRect>();
     int ni = ns;
     // running start holding first element of current row
