@@ -568,6 +568,8 @@ public final class MapView extends View implements Runnable {
         ye += (int) ((zr.y + ye * zr.h / th - ye) * s / MAXZS);
       } else {
         final long s = 10000 - (zoomIn ? ZS[-zs] : ZS[ZOOMSIZE + zs]);
+        if(zr.w == 0) zr.w = 1;
+        if(zr.h == 0) zr.h = 1;
         xs = (int) (-xe * zr.x / zr.w * s / MAXZS);
         xe = (int) (xs + xe + xe * (xe - zr.w) / zr.w * s / MAXZS);
         ys = (int) (-ye * zr.y / zr.h * s / MAXZS);

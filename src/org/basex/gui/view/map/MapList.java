@@ -114,6 +114,7 @@ public class MapList extends IntList {
         weights[i] = nrchildren[i] * 1d / parchildren;
       }
     }
-    for (int i = 0; i < size; i++) if(Double.isNaN(weights[i])) weights[i] = 0;
+//    for (int i = 0; i < size; i++) 
+//    if(Double.isNaN(weights[i])) weights[i] = 0;
   }
 }

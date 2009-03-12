@@ -35,10 +35,13 @@ abstract class MapPainter {
     final Nodes marked = view.gui.context.marked();
     final int p = -marked.find(rects.get(ri).pre) - 1;
     if(p < 0) return GUIConstants.colormark1;
-
+    else return null;
     // mark ancestor of invisible node
-    return p < marked.size() && ri + 1 < rects.size() && 
-      marked.sorted[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : null;
+    // [JH] does not mark ancestors if MapNodes have been sorted
+    // better find parent to mark
+//    return p < marked.size() && ri + 1 < rects.size() && 
+//      marked.sorted[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : 
+//    null;
   }
   
   /**

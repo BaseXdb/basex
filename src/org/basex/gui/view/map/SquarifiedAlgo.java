@@ -75,7 +75,6 @@ public class SquarifiedAlgo extends MapAlgo {
       } else {
         weight += l.weights[ni];
         width = weight / sumweight * ww;
-        
         ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
         double y = yy;

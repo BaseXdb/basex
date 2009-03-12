@@ -278,8 +278,8 @@ class MapLayout {
    * @param level indicates level which is calculated
    */
   protected void putRect(final MapRect r, final int level) {
-    
     rectangles.add(r);
+//    System.out.println(algo.getType() + " nr nodes: " + rectangles.size());
 
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
@@ -288,8 +288,7 @@ class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and leaf nodes (= meta data in deepfs)
-    if((w >= o || h >= o) && w > 0 && h > 0 &&
-        !ViewData.isLeaf(data, r.pre)) {
+    if((w >= o || h >= o) && w > 0 && h > 0 && !ViewData.isLeaf(data, r.pre)) {
       final MapList ch = children(r.pre);
 
       if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
