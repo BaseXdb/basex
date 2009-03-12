@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 
