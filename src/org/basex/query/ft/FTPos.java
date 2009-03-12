@@ -103,12 +103,16 @@ public final class FTPos extends FTExpr {
     final Item it = expr[0].iter(ctx).next();
     ctx.ftpos = tmp;
 
-    if(tmp != null) tmp.setPos(pos, pos.length);
+    final double s = it.score();
+    if(s == 0 || !filter(ctx)) {
+      return score(0);
+    }
+
+    if(tmp != null) //tmp.setPos(pos, pos.length);
+      tmp.addPos(pos, pos.length);
     ctx.ftd = pos;
 
-    final double s = it.score();
-    if(s == 0 || !filter(ctx)) return score(0);
-
+    
     // calculate weight
     final double d = weight != null ? checkDbl(weight, ctx) : 1;
     if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
@@ -169,6 +173,19 @@ public final class FTPos extends FTExpr {
   void setPos(final IntList[] il, final int ilsize) {
     pos = il;
     size = ilsize;
+  }
+  
+  /**
+   * Add position values to existing values.
+   * @param il IntList[] with position values
+   * @param ilsize int number of tokens in query
+   */
+  void addPos(final IntList[] il, final int ilsize) {
+    final IntList[] iln = new IntList[size + ilsize];
+    System.arraycopy(pos, 0, iln, 0, size);
+    System.arraycopy(il, 0, iln, size, ilsize);
+    pos = iln;
+    size += ilsize;    
   }
 
   /**
