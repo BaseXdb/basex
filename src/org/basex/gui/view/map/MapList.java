@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 
@@ -43,19 +44,17 @@ public class MapList extends IntList {
   
   @Override
   public void sort() {
-//    if(weights == null) return;
+    if(weights == null) return;
     
     final TokenList tl = new TokenList();
     for(int c = 0; c < size; c++) tl.add(Token.token(weights[c]));
     sort(tl.finish(), true, false);
-     
     Arrays.sort(weights);
-    
     for (int l = 0, r = weights.length - 1; l < r; l++, r--) {
       // exchange the first and last
       double temp = weights[l]; weights[l]  = weights[r]; weights[r] = temp;
     }
-
+    
     // simple bubble sort, obsolete
 //    boolean switched = true;
 //    int n = size;
