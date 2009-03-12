@@ -92,7 +92,7 @@ public final class DiskData extends Data {
       // read indexes
       tags = new Names(in);
       atts = new Names(in);
-      skel = new Skeleton(this, in);
+      path = new PathSummary(this, in);
       ns = new Namespaces(in);
   
       // main memory mode.. keep table in memory
@@ -126,7 +126,7 @@ public final class DiskData extends Data {
       meta.write(out);
       tags.write(out);
       atts.write(out);
-      skel.write(out);
+      path.write(out);
       ns.write(out);
       out.close();
       meta.dirty = false;

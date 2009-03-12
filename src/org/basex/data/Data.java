@@ -44,8 +44,8 @@ public abstract class Data  {
   public Names atts;
   /** Namespace index. */
   public Namespaces ns;
-  /** Tree structure. */
-  public Skeleton skel;
+  /** Path Summary. */
+  public PathSummary path;
 
   /** Text index. */
   protected Index txtindex;

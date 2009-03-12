@@ -89,9 +89,9 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
-    for(final byte[] k : data.skel.desc(Token.EMPTY, true, true)) {
+    for(final byte[] k : data.path.desc(Token.EMPTY, true, true)) {
       int c = 0;
-      for(final byte[] kk : data.skel.desc(k, true, false)) {
+      for(final byte[] kk : data.path.desc(k, true, false)) {
         final Names index = !startsWith(kk, '@') ? data.tags : data.atts;
         if(index.stat(index.id(delete(kk, '@'))).leaf) c++;
       }
@@ -128,7 +128,7 @@ final class TableData {
     } else {
       if(r == -1 && roots.size == 0) return;
       if(root == -1) root = data.tags.id(roots.list[0]);
-      for(final byte[] k : data.skel.desc(data.tags.key(root), true, true)) {
+      for(final byte[] k : data.path.desc(data.tags.key(root), true, true)) {
         final boolean elem = !startsWith(k, '@');
         final byte[] key = delete(k, '@');
         final Names index = elem ? data.tags : data.atts;

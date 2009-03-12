@@ -37,6 +37,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor(final String q) {
     query = q;
+    Prop.read();
     progress(ctx);
   }
   

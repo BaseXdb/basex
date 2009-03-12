@@ -308,17 +308,17 @@ public final class FTTest extends AbstractTest {
         "'A B' ftcontains ('A' ftand 'B') ftor ('C' ftand 'D') ordered" },
       { "FTOrdered 6", bool(true),
         "'C D' ftcontains ('A' ftand 'B') ftor ('C' ftand 'D') ordered" },
-      /* not quite sure about the following ones..
       { "FTOrdered 7", bool(true),
         "'A B C D' ftcontains ('B' ftand 'A' ordered) ftor " +
         "('C' ftand 'D' ordered) ordered" },
+      /* not quite sure about the following ones..
       { "FTOrdered 8", bool(true),
         "'A B' ftcontains ('B' ftor 'A') ordered" },
       { "FTOrdered 9", bool(true),
         "'A B C' ftcontains ('A' ftor 'C') ftand 'B' ordered" },
+        */
       { "FTOrdered 10", bool(false),
         "'B A' ftcontains ('A' ftand ftnot 'B') ordered" },
-      */
         
       { "FTDistance 1", nodes(3),
         "//w [text() ftcontains 'the' ftand 'fourth' " +

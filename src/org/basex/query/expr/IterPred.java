@@ -79,7 +79,7 @@ public final class IterPred extends Pred {
               // item accepted.. adopt scoring value
               it.score(i.score());
               break;
-            }// else return it; //[SG] remove me
+            }
           }
           // returns the last item
           if(last) it = ctx.item;

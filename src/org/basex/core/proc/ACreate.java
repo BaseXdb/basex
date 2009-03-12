@@ -60,7 +60,6 @@ abstract class ACreate extends Process {
         if(Prop.usebdb) {
           final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
           builder = (Builder) cls.newInstance();
-          //builder = new BDBBuilder();
         } else {
           builder = new DiskBuilder();
         }

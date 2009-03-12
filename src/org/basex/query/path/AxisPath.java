@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.data.SkelNode;
+import org.basex.data.PathNode;
 import org.basex.data.StatsKey;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -33,6 +33,7 @@ import org.basex.query.path.Test.Kind;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
+import org.basex.util.TokenList;
 
 /**
  * Axis Path expression.
@@ -160,10 +161,9 @@ public class AxisPath extends Path {
       Expr e = index(ctx, data);
       if(e != this) return e;
 
-      /* check children path rewriting
-      e = children(ctx, data);
+      // check children path rewriting
+     e = children(ctx, data);
       if(e != this) return e;
-      */
     }
 
     // if applicable, return iterator
@@ -171,73 +171,65 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Converts descendant steps to multiple child steps.
+   * Converts descendant to child steps.
    * @param ctx query context
    * @param data data reference
    * @return path
+   */
   private AxisPath children(final QueryContext ctx, final Data data) {
     for(int i = 0; i < step.length; i++) {
       if(step[i].axis != Axis.DESC) continue;
 
       // check if child steps can be retrieved for current step
-      ArrayList<SkelNode> nodes = node(data, i);
+      ArrayList<PathNode> nodes = pathNodes(data, i);
       if(nodes == null) continue;
 
       ctx.compInfo(OPTCHILD, step[i]);
 
       // cache child steps
       final TokenList tl = new TokenList();
-      ArrayList<SkelNode> temp = new ArrayList<SkelNode>();
-      while(nodes.size() != 0) {
-        SkelNode rootNode = nodes.get(0);
-        temp.add(rootNode.par);
-        boolean same = true;
-        for (int j = 1; j < nodes.size(); j++) {
-          SkelNode node = nodes.get(j);
-          temp.add(node.par);
-          if (rootNode.name != node.name) same = false;
-          if (j == nodes.size() - 1) {
-            nodes = temp;
-            temp = null;
-            if (same) tl.add(data.tags.key(node.name));
-            else tl.add(null);
-          }
+      while(nodes.get(0).par != null) {
+        final ArrayList<PathNode> temp = new ArrayList<PathNode>();
+        byte[] tag = data.tags.key(nodes.get(0).name);
+        for(int j = 0; j < nodes.size(); j++) {
+          final PathNode sn = nodes.get(j);
+          if(nodes.get(0).name != sn.name) tag = null;
+          temp.add(sn.par);
         }
+        tl.add(tag);
+        nodes = temp;
       }
 
       // build new steps
       int ts = tl.size;
       final Step[] steps = new Step[ts + step.length - i - 1];
-      
-      // Wildcard test
-      // Step.get(Axis.CHILD, new NameTest(false));
-      
-      for(int t = 0; t < ts - 1; t++) {
-        steps[t] = Step.get(Axis.CHILD, new NameTest(
-            new QNm(tl.list[ts - t - 1]), Kind.NAME, false));
+      for(int t = 0; t <= ts - 1; t++) {
+        final Expr[] preds = t == ts - 1 ? step[i].pred : new Expr[] {};
+        final byte[] n = tl.list[ts - t - 1];
+        final NameTest nt = n == null ? new NameTest(false) :
+          new NameTest(new QNm(n), Kind.NAME, false);
+        steps[t] = Step.get(Axis.CHILD, nt, preds);
       }
-      steps[ts - 1] = Step.get(Axis.CHILD, new NameTest(
-          new QNm(tl.list[0]), Kind.NAME, false), step[i].pred);
-
       while(++i < step.length) steps[ts++] = step[i];
+
       return get(root, steps).children(ctx, data);
     }
     return this;
   }
-   */
-
+  
   /**
-   * Returns a skeleton node for the specified location step.
+   * Returns all summary path nodes for the specified location step or null
+   * if nodes cannot be retrieved or are found on different levels.
    * @param data data reference
    * @param l last step to be checked
-   * @return skeleton node
+   * @return path nodes
    */
-  private ArrayList<SkelNode> node(final Data data, final int l) {
+  private ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // convert single descendant step to child steps
     if(!data.meta.uptodate || data.ns.size() != 0) return null;
 
-    ArrayList<SkelNode> in = new ArrayList<SkelNode>();
-    in.add(data.skel.root);
+    ArrayList<PathNode> in = new ArrayList<PathNode>();
+    in.add(data.path.root);
 
     for(int s = 0; s <= l; s++) {
       final boolean desc = step[s].axis == Axis.DESC;
@@ -246,12 +238,11 @@ public class AxisPath extends Path {
 
       final int name = data.tagID(step[s].test.name.ln());
 
-      final ArrayList<SkelNode> out = new ArrayList<SkelNode>();
+      final ArrayList<PathNode> out = new ArrayList<PathNode>();
 
-      for(final SkelNode sn : data.skel.desc(in, 0, Data.DOC, desc)) {
+      for(final PathNode sn : data.path.desc(in, 0, Data.DOC, desc)) {
         if(sn.kind == Data.ELEM && name == sn.name) {
-          if(out.size() != 0 && 
-              out.get(0).countParents() != sn.countParents()) return null;
+          if(out.size() != 0 && out.get(0).level() != sn.level()) return null;
           out.add(sn);
         }
       }
@@ -283,7 +274,7 @@ public class AxisPath extends Path {
       int minp = 0;
 
       // check if resulting index path will be duplicate free
-      final boolean d = stp.pred.length == 0 || node(data, i) == null;
+      final boolean d = stp.pred.length == 0 || pathNodes(data, i) == null;
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(data, stp, d);
         stp.pred[p].indexAccessible(ctx, ic);
@@ -373,8 +364,6 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    //return ctx.iter(root); }// [SG] remove me
-    
     final Item c = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
@@ -427,13 +416,10 @@ public class AxisPath extends Path {
    * @return root
    */
   private Item root(final QueryContext ctx) {
-    if(root != null) {
-      if(root.i()) return (Item) root;
-      if(root instanceof Root && ctx.item != null)
-        return ((Root) root).root(ctx.item);
-      return null;
-    }
-    return ctx.item;
+    return root == null ? ctx.item :
+      root.i() ? (Item) root :
+      root instanceof Root && ctx.item != null ? ((Root) root).root(ctx.item) :
+      null;
   }
 
   @Override
@@ -444,15 +430,15 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
     if(data != null && data.meta.uptodate && data.ns.size() == 0) {
-      HashSet<SkelNode> nodes = new HashSet<SkelNode>(1);
-      nodes.add(data.skel.root);
+      HashSet<PathNode> nodes = new HashSet<PathNode>(1);
+      nodes.add(data.path.root);
 
       for(final Step s : step) {
         res = -1;
         nodes = s.count(nodes, data);
         if(nodes == null) break;
         res = 0;
-        for(final SkelNode sn : nodes) res += sn.count;
+        for(final PathNode sn : nodes) res += sn.count;
       }
     }
     return res;

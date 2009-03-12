@@ -178,7 +178,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       if(!elem.startsWith("@")) sl.add(Token.token(elem));
     }
     
-    final TokenList tmp = data.skel.desc(sl, true, false);
+    final TokenList tmp = data.path.desc(sl, true, false);
     if(tmp.size == 0) return;
 
     final String[] keys = entries(tmp.finish());

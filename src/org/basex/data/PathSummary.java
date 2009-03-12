@@ -15,18 +15,18 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Skeleton {
+public final class PathSummary {
   /** Data reference. */
   private Data data;
   /** Parent stack. */
-  private SkelNode[] stack;
+  private PathNode[] stack;
   /** Root node. */
-  public SkelNode root;
+  public PathNode root;
 
   /**
    * Default Constructor.
    */
-  public Skeleton() {
+  public PathSummary() {
     init();
   }
 
@@ -34,7 +34,7 @@ public final class Skeleton {
    * Initializes the data structures.
    */
   public void init() {
-    stack = new SkelNode[IO.MAXHEIGHT];
+    stack = new PathNode[IO.MAXHEIGHT];
     root = null;
   }
 
@@ -44,8 +44,8 @@ public final class Skeleton {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public Skeleton(final Data d, final DataInput in) throws IOException {
-    if(in.readBool()) root = new SkelNode(in, null);
+  public PathSummary(final Data d, final DataInput in) throws IOException {
+    if(in.readBool()) root = new PathNode(in, null);
     data = d;
   }
 
@@ -68,7 +68,7 @@ public final class Skeleton {
    */
   public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
-      root = new SkelNode(n, k, null);
+      root = new PathNode(n, k, null);
       stack[0] = root;
     } else {
       stack[l] = stack[l - 1].get(n, k, tl);
@@ -77,7 +77,7 @@ public final class Skeleton {
   }
   
   /**
-   * Writes the skeleton to the specified output.
+   * Writes the path summary to the specified output.
    * @param out output stream
    * @throws IOException I/O exception
    */
@@ -109,7 +109,7 @@ public final class Skeleton {
   public TokenList desc(final TokenList in, final boolean d, final boolean o) {
     if(root == null) return new TokenList();
     // follow the specified descendant/child steps
-    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
+    ArrayList<PathNode> n = new ArrayList<PathNode>();
     n.add(root);
     n = desc(n, 0, Data.DOC, true);
 
@@ -122,13 +122,13 @@ public final class Skeleton {
 
     // sort by number of occurrences
     final TokenList tmp = new TokenList();
-    for(final SkelNode r : n) tmp.add(token(r.count));
+    for(final PathNode r : n) tmp.add(token(r.count));
     final IntList occ = IntList.createOrder(tmp.finish(), true, false);
 
     // remove non-text/attribute nodes
     final TokenList out = new TokenList();
     for(int i = 0; i < n.size(); i++) {
-      final SkelNode r = n.get(o ? occ.list[i] : i);
+      final PathNode r = n.get(o ? occ.list[i] : i);
       final byte[] name = r.token(data);
       if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
         out.add(name);
@@ -146,10 +146,10 @@ public final class Skeleton {
    * @param k node kind
    * @param desc if false, return only children
    */
-  public void desc(final SkelNode in, final HashSet<SkelNode> out,
+  public void desc(final PathNode in, final HashSet<PathNode> out,
       final int t, final int k, final boolean desc) {
 
-    for(final SkelNode n : in.ch) {
+    for(final PathNode n : in.ch) {
       if(desc) desc(n, out, t, k, desc);
       if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
           (t == 0 || t == n.name)) out.add(n);
@@ -164,13 +164,13 @@ public final class Skeleton {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public ArrayList<SkelNode> desc(final ArrayList<SkelNode> in, final int t,
+  public ArrayList<PathNode> desc(final ArrayList<PathNode> in, final int t,
       final int k, final boolean desc) {
 
-    final ArrayList<SkelNode> out = new ArrayList<SkelNode>();
-    for(final SkelNode n : in) {
+    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    for(final PathNode n : in) {
       if(t != 0 && (n.name != t || n.kind != k)) continue;
-      for(final SkelNode c : n.ch) {
+      for(final PathNode c : n.ch) {
         if(desc) c.desc(out);
         else out.add(c);
       }

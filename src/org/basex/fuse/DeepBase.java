@@ -207,7 +207,7 @@ public final class DeepBase extends DeepFuse {
     if(isDir(mode)) elem = DIR;
     else if(isFile(mode)) elem = FILE;
     else elem = Token.token("unknown");
-    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
+    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(elem, null, false);
     int attID = data.atts.index(NAME, null, false);
     m.addElem(tagID, 0, 1, 2, 2, false);
@@ -221,7 +221,7 @@ public final class DeepBase extends DeepFuse {
    * @return MemData reference
    */
   private MemData buildContentData(final String path) {
-    MemData md = new MemData(64, data.tags, data.atts, data.ns, data.skel);
+    MemData md = new MemData(64, data.tags, data.atts, data.ns, data.path);
     try {
       MemBuilder mb = new MemBuilder();
       mb.init(md);
@@ -329,7 +329,7 @@ public final class DeepBase extends DeepFuse {
   @Override
   public int init() {
     createEmptyDB(dbname);
-    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.skel);
+    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(Token.token("deepfuse"), null, false);
     int attID1 = data.atts.index(Token.token("mountpoint"), null, false);
     int attID2 = data.atts.index(Token.token("backingstore"), null, false);

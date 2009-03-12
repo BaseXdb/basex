@@ -4,7 +4,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
-import org.basex.data.Skeleton;
+import org.basex.data.PathSummary;
 import org.basex.index.Names;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dec;
@@ -22,7 +22,7 @@ import org.basex.util.Token;
 abstract class AbstractTest {
   /** Dummy data reference. */
   static final Data DATA = new MemData(1, new Names(), new Names(),
-      new Namespaces(), new Skeleton());
+      new Namespaces(), new PathSummary());
   /** Document. */
   String doc;
   /** Queries. */

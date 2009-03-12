@@ -27,10 +27,10 @@ public final class MemData extends Data {
    * @param tag tag index
    * @param att attribute name index
    * @param n namespaces
-   * @param s skeleton
+   * @param s path summary
    */
   public MemData(final int cap, final Names tag, final Names att,
-      final Namespaces n, final Skeleton s) {
+      final Namespaces n, final PathSummary s) {
     val1 = new long[cap];
     val2 = new long[cap];
     txtindex = new MemValues();
@@ -39,7 +39,7 @@ public final class MemData extends Data {
     tags = tag;
     atts = att;
     ns = n;
-    skel = s;
+    path = s;
   }
 
   @Override

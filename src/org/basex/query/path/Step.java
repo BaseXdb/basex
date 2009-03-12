@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.data.SkelNode;
+import org.basex.data.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -41,24 +41,14 @@ public class Step extends Preds {
   public Test test;
 
   /**
-   * This method creates a step without predicates.
-   * @param a axis
-   * @param t node test
-   * @return step
-   */
-  public static Step get(final Axis a, final Test t) {
-    return new SimpleIterStep(a, t);
-  }
-
-  /**
    * This method creates a step instance.
    * @param a axis
    * @param t node test
    * @param p predicates
    * @return step
    */
-  public static Step get(final Axis a, final Test t, final Expr[] p) {
-    return p.length == 0 ? get(a, t) : new Step(a, t, p);
+  public static Step get(final Axis a, final Test t, final Expr... p) {
+    return p.length == 0 ? new SimpleIterStep(a, t) : new Step(a, t, p);
   }
 
   /**
@@ -164,7 +154,7 @@ public class Step extends Preds {
    * @param data data reference
    * @return node array
    */
-  HashSet<SkelNode> count(final HashSet<SkelNode> nodes,
+  HashSet<PathNode> count(final HashSet<PathNode> nodes,
       final Data data) {
 
     if(pred.length != 0) return null;
@@ -184,8 +174,8 @@ public class Step extends Preds {
     final boolean desc = axis == Axis.DESC;
     if(!desc && axis != Axis.CHILD) return null;
     
-    final HashSet<SkelNode> out = new HashSet<SkelNode>();
-    for(final SkelNode sn : nodes) data.skel.desc(sn, out, name, kind, desc);
+    final HashSet<PathNode> out = new HashSet<PathNode>();
+    for(final PathNode sn : nodes) data.path.desc(sn, out, name, kind, desc);
     return out;
   }
   

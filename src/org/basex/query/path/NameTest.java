@@ -18,7 +18,7 @@ import org.basex.query.item.Uri;
  */
 public final class NameTest extends Test {
   /** Local name. */
-  public byte[] ln;
+  public final byte[] ln;
 
   /**
    * Empty Constructor ('*').
@@ -36,7 +36,7 @@ public final class NameTest extends Test {
    */
   public NameTest(final QNm nm, final Kind t, final boolean att) {
     type = att ? Type.ATT : Type.ELM;
-    if(nm != null) ln = nm.ln();
+    ln = nm != null ? nm.ln() : null;
     name = nm;
     kind = t;
   }

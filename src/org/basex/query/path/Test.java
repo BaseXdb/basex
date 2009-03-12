@@ -32,11 +32,10 @@ public abstract class Test {
   public Kind kind;
   /** Node test. */
   public Type type;
-
   /** Name test. */
   public QNm name;
   /** Temporary QName instance. */
-  public QNm tmpq = new QNm();
+  final QNm tmpq = new QNm();
   
   /**
    * Optimizes and compiles the expression.

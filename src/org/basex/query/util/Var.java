@@ -78,14 +78,14 @@ public final class Var extends Expr implements Cloneable {
 
   /**
    * Binds the specified item to the variable.
-   * @param e item to be set
+   * @param it item to be set
    * @param ctx query context
    * @return self reference
    * @throws QueryException evaluation exception
    */
-  public Var bind(final Item e, final QueryContext ctx) throws QueryException {
-    expr = e;
-    item = cast(e, ctx);
+  public Var bind(final Item it, final QueryContext ctx) throws QueryException {
+    expr = it;
+    item = cast(it, ctx);
     return this;
   }
 

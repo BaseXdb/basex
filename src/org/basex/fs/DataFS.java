@@ -327,7 +327,7 @@ public final class DataFS {
       final byte[] mtime, final int parent, final int pre) {
 
     // create and insert temporary data instance
-    final MemData md = new MemData(5, data.tags, data.atts, data.ns, data.skel);
+    final MemData md = new MemData(5, data.tags, data.atts, data.ns, data.path);
     md.addElem(isDir ? dirID : fileID, 0, 1, 5, 5, false);
     md.addAtt(data.nameID, 0, name, 1);
     md.addAtt(suffID, 0, suffix, 2);

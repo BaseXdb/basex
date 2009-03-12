@@ -21,6 +21,7 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -190,7 +191,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     final Context context = new Context();
     
-    new Check(path + input).execute(context, null);
+    new CreateDB(path + input).execute(context, null);
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
@@ -328,7 +329,7 @@ public abstract class W3CTS {
 
     final IO file = IO.get(queries + pth + inname + ".xq");
     if(!file.exists()) {
-      BaseX.errln("Not found: " + file);
+      BaseX.errln("Not found? " + file);
       return true;
     }
 

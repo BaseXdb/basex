@@ -30,6 +30,8 @@ public final class Check extends Process {
     final Data data = context.data();
     final String name = args[0];
 
+    // [CG] check
+    
     // check open database...
     if(data != null && data.meta.dbname.equals(IO.get(name).dbname()))
         return Prop.info ? info(DBINMEM) : true;

@@ -9,7 +9,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Namespaces;
-import org.basex.data.Skeleton;
+import org.basex.data.PathSummary;
 import org.basex.index.Names;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
@@ -35,7 +35,7 @@ public abstract class Builder extends Progress {
   /** Namespace index. */
   protected Namespaces ns = new Namespaces();
   /** Tree structure. */
-  protected Skeleton skel = new Skeleton();
+  protected PathSummary skel = new PathSummary();
 
   /** Parser instance. */
   protected Parser parser;

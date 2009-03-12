@@ -7,8 +7,8 @@ import java.util.Stack;
 
 import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.data.SkelNode;
-import org.basex.data.Skeleton;
+import org.basex.data.PathNode;
+import org.basex.data.PathSummary;
 import org.basex.query.item.Type;
 import org.basex.query.path.Axis;
 import org.basex.query.path.NameTest;
@@ -26,14 +26,16 @@ import org.basex.util.Token;
 public class QuerySuggest extends QueryParser {
   /** Context. */
   Context ctx;
-  /** Current skeleton nodes. */
-  Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
-  /** Skeleton reference. */
-  Skeleton skel;
+  /** Current path summary nodes. */
+  Stack<ArrayList<PathNode>> stack = new Stack<ArrayList<PathNode>>();
+  /** Path summary. */
+  PathSummary skel;
   /** Last axis. */
   Axis laxis;
   /** Last test. */
   Test ltest;
+
+  // [CG] check
 
   /**
    * Constructor.
@@ -43,22 +45,22 @@ public class QuerySuggest extends QueryParser {
   public QuerySuggest(final QueryContext c, final Context context) {
     super(c);
     ctx = context;
-    skel = ctx.data().skel;
+    skel = ctx.data().path;
   }
 
   @Override
   void sugPath(final int type) {
     if (type == 0) {
       //System.out.println("absLocPath");
-      final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
+      final ArrayList<PathNode> list = new ArrayList<PathNode>();
       list.add(skel.root);
       stack.push(list);
     } else if (type == 1) {
       //System.out.println("relLocPath");
-      ArrayList<SkelNode> list = null;
+      ArrayList<PathNode> list = null;
       if(stack.size() == 0) {
         if(!ctx.root()) return;
-        list = new ArrayList<SkelNode>();
+        list = new ArrayList<PathNode>();
         list.add(skel.root);
       } else {
         list = skel.desc(stack.peek(), 0, Data.ELEM, false);
@@ -114,9 +116,9 @@ public class QuerySuggest extends QueryParser {
     // [AW] temporarily added to skip Exception after input of "//*["
     if(stack.empty()) return;
 
-    final ArrayList<SkelNode> list = stack.peek();
+    final ArrayList<PathNode> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
-      final SkelNode n = list.get(c);
+      final PathNode n = list.get(c);
       if(n.kind == Data.ELEM && tn == new byte[] { '*'}) continue;
       final byte[] t = n.token(ctx.data());
       final boolean eq = Token.eq(t, tn);
@@ -136,7 +138,7 @@ public class QuerySuggest extends QueryParser {
     //System.out.println("complete");
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
-    for(final SkelNode r : stack.peek()) {
+    for(final PathNode r : stack.peek()) {
       final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }
