@@ -1289,6 +1289,8 @@ public class QueryParser extends InputParser {
 
     Expr[] pred = {};
     while(consumeWS2(BR1)) {
+      checkStep(ax, test);
+      pred();
       pred = add(pred, expr());
       check(BR2);
     }
@@ -2635,6 +2637,13 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   void checkStep(final Axis axis, final Test test) throws QueryException { }
+  
+  /**
+   * Parses a Pred.
+   * @throws QueryException parse Exception
+   */
+  @SuppressWarnings("unused")
+  void pred() throws QueryException { }
 
   /**
    * Throws the specified error.

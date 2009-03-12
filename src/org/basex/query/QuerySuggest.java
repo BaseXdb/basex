@@ -66,6 +66,13 @@ public class QuerySuggest extends QueryParser {
       stack.push(list);
     }
   }
+  
+  @Override
+  void pred() {
+    final int s = stack.size();
+    //System.out.println("pred: " + s);
+    while(stack.size() != s) stack.pop();
+  }
 
   @Override
   void checkStep(final Axis axis, final Test test) {
