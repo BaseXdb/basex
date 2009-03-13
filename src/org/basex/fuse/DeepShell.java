@@ -44,7 +44,8 @@ public class DeepShell {
 
   /** Constructor. */
   DeepShell() {
-    fs = new DeepBase("DeepShell (no native connection)", "none", "deepshell", false);
+    fs = new DeepBase("DeepShell (no native connection)", "none", "deepshell", 
+        false);
     // initialize/mount filesystem
     fs.init();
     loop();

@@ -309,7 +309,6 @@ public final class MapView extends View implements Runnable {
     // calculate new main rectangles
     if(painter == null) return;
     painter.reset();
-    
     // should replace following lines
     newmaplayout = new MapLayout(nodes.data);
     newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);

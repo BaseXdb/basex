@@ -42,6 +42,15 @@ public class MapList extends IntList {
   }
   
   @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("IntList[");
+    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + list[i]);
+    sb.append("]\nweights[");
+    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + weights[i]);
+    return sb.append("]").toString();
+  }
+  
+  @Override
   public void sort() {
     if(weights == null) return;
     
@@ -83,6 +92,8 @@ public class MapList extends IntList {
    * @param parchildren reference number of nodes
    * @param data reference
    * [JH] modify to take textnode sizes into account
+   * [JH] some weight problems occur displaying folders without any files and 
+   * children
    */
   public void initWeights(final long parsize, final int parchildren,
       final Data data) {
@@ -114,7 +125,5 @@ public class MapList extends IntList {
         weights[i] = nrchildren[i] * 1d / parchildren;
       }
     }
-//    for (int i = 0; i < size; i++) 
-//    if(Double.isNaN(weights[i])) weights[i] = 0;
   }
 }

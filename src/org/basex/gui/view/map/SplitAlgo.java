@@ -54,7 +54,7 @@ public class SplitAlgo extends MapAlgo {
       int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
   
       // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0) rects.addAll(calcMap(
+      if(ww > 0 && hh > 0 && weight > 0) rects.addAll(calcMap(
           new MapRect(xx, yy, ww, hh, 0, r.level), 
           l, w, ns, ni, level, weight));
       if(r.w > r.h) {
@@ -64,7 +64,9 @@ public class SplitAlgo extends MapAlgo {
         yy += hh;
         hh = r.h - hh;
       }
-      if(ww > 0 && hh > 0) rects.addAll(calcMap(
+//      System.out.println("ww: " + ww + " hh: " + hh + " sumweight: " 
+//      + sumweight + " weight: " + weight + " ni: " + ni + " ne: " + ne);
+      if(ww > 0 && hh > 0 && sumweight - weight > 0) rects.addAll(calcMap(
           new MapRect(xx, yy, ww, hh, 0, r.level), 
           l, w, ni, ne, level, sumweight - weight));
       
