@@ -32,7 +32,7 @@ public abstract class DeepFuse {
    * @param mode of file
    * @return true for regular file, false otherwise
    */
-  protected boolean isFile(final int mode) {
+  protected boolean isRegFile(final int mode) {
     return (mode & S_IFMT) == S_IFREG;
   }
 

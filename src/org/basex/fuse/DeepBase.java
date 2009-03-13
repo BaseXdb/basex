@@ -35,7 +35,7 @@ import org.basex.util.Performance;
 public final class DeepBase extends DeepFuse implements DataText {
 
   /** Default database name, if none is provided. */
-  private static final String DEFAULT_DBNAME = "deepfuse";
+  private static final String DEFAULT_DBNAME = DEEPFS;
 
   /** GUI reference. */
   protected GUI gui;
@@ -274,7 +274,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   private int insertFileNode(final String path, final int mode) {
     int ppre = parentPre(path);
     if(ppre == -1) return -1;
-    if (isFile(mode))
+    if (isRegFile(mode))
       return insert(ppre, buildFileData(path, mode));
     else
       return insert(ppre, buildData(path, mode));
