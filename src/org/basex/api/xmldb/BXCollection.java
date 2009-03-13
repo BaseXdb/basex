@@ -180,7 +180,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       data.meta.update();
       data.insert(data.meta.size, -1, new MemBuilder().build(p, id));
       data.flush();
-      ctx.flush();
+      ctx.update();
     } catch(final IOException ex) {
       BaseX.debug(ex);
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
