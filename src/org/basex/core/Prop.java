@@ -133,8 +133,6 @@ public final class Prop {
   public static boolean fsmeta = false;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
-  /** Filesystem mode. */
-  public static boolean fsmode = false;
 
   /** Levenshtein default error. */
   public static int lserr = 0;

@@ -109,7 +109,7 @@ public final class FSParser extends Parser {
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
-      builder.startElem(token(DEEPFS), atts.reset());
+      builder.startElem(DEEPFS, atts.reset());
       
       for(final File f : root ? File.listRoots() :
         new File[] { new File(io.path()).getCanonicalFile() }) {
@@ -121,7 +121,7 @@ public final class FSParser extends Parser {
         builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
       }
       
-      builder.endElem(token(DEEPFS));
+      builder.endElem(DEEPFS);
     }
     builder.endDoc();
   }

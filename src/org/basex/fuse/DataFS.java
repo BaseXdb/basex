@@ -1,4 +1,4 @@
-package org.basex.fs;
+package org.basex.fuse;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
@@ -24,8 +24,9 @@ public final class DataFS {
   /** Force flush after each update. */
   public static final boolean FLUSH = false;
   /** Root dir. */
-  public static final int ROOTDIR = 2;
+  public static final int ROOTDIR = 1;
   /** # of attributes. */
+  // [AH] constant for number of attributes
   static final int NUMATT = 5;
   /** Data reference. */
   final Data data;
@@ -37,6 +38,10 @@ public final class DataFS {
   public int suffID;
   /** Index References. */
   public int timeID;
+  /** Index References. */
+  public int modeID;
+  /** Index References. */
+  public int unknownID;
 
   /**
    * Constructor.
@@ -44,10 +49,13 @@ public final class DataFS {
    */
   public DataFS(final Data d) {
     data = d;
+    dirID  = d.tags.id(DataText.DIR);
+    fileID = d.tags.id(DataText.FILE);
+    unknownID  = d.tags.id(DataText.UNKNOWN);
+
     suffID = d.atts.id(DataText.SUFFIX);
     timeID = d.atts.id(DataText.MTIME);
-    fileID = d.tags.id(DataText.FILE);
-    dirID  = d.tags.id(DataText.DIR);
+    modeID = d.atts.id(DataText.MODE);
   }
 
   /**

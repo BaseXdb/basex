@@ -29,7 +29,7 @@ public final class Open extends Process {
   protected boolean exec() {
     final String db = args[0].replaceAll("(.*)\\..*", "$1");
     if(!IO.dbpath(db).exists())
-      if(!db.equals(DataText.DEEPFS)) return error(DBNOTFOUND, db);
+      if(!db.equals(DataText.S_DEEPFS)) return error(DBNOTFOUND, db);
 
     // close old database
     context.close();

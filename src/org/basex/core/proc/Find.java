@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
@@ -124,26 +125,26 @@ public final class Find extends AQuery {
       char operator = qu.charAt(0);
       boolean exact = true;
       if(operator == '>') {
-        pred = "@size";
+        pred = "@" + DataText.S_SIZE;
         size = true;
       } else if(operator == '<') {
-        pred = "@size";
+        pred =  "@" + DataText.S_SIZE;
         size = true;
       } else if(operator == '}') {
         operator = '>';
-        pred = "@mtime";
+        pred = "@" + DataText.S_MTIME;
         date = true;
       } else if(operator == '{') {
         operator = '<';
-        pred = "@mtime";
+        pred = "@" + DataText.S_MTIME;
         date = true;
       } else if(operator == '.') {
-        pred = "@suffix";
+        pred = "@" + DataText.S_SUFFIX;
         operator = '=';
       } else if(operator == '~') {
-        pred = "@name";
+        pred = "@" + DataText.S_NAME;
       } else if(operator == '=') {
-        pred = "@name";
+        pred = "@" + DataText.S_NAME;
       } else {
         int i = qu.indexOf("=", 1);
         final int s = qu.indexOf(" ", 1);
@@ -155,7 +156,7 @@ public final class Find extends AQuery {
           operator = qu.charAt(0);
           size = operator != '=';
         } else {
-          pred = "@name";
+          pred = "@" + DataText.S_NAME;
           exact = false;
         }
       }
@@ -178,7 +179,8 @@ public final class Find extends AQuery {
       } else {
         final int d = t.lastIndexOf(".");
         // dot found... add suffix check
-        if(d != -1) xpath.add("[@suffix = \"" + t.substring(d + 1) + "\"]");
+        if(d != -1) xpath.add("[@" + DataText.S_SUFFIX + " = \"" +
+            t.substring(d + 1) + "\"]");
         t = "\"" + t + "\"";
       }
       // add predicate
@@ -232,7 +234,7 @@ public final class Find extends AQuery {
         if(term.length == 0) continue;
         tb.add("[");
         if(fs && i == 1) {
-          tb.add("@name ftcontains \"" + term + "\"");
+          tb.add("@" + DataText.S_NAME + " ftcontains \"" + term + "\"");
         } else {
           final boolean elm = elem.list[i];
           tb.add(elm ? ".//" : "@");

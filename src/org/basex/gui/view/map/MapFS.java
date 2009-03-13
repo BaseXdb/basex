@@ -14,7 +14,7 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fs.DataFS;
+import org.basex.fuse.DataFS;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;

@@ -34,9 +34,6 @@ import org.basex.util.Performance;
  */
 public final class DeepBase extends DeepFuse implements DataText {
 
-  /** Default database name, if none is provided. */
-  private static final String DEFAULT_DBNAME = DEEPFS;
-
   /** GUI reference. */
   protected GUI gui;
 
@@ -45,6 +42,9 @@ public final class DeepBase extends DeepFuse implements DataText {
 
   /** Database reference. */
   private Data data;
+
+  /** Database name attribute. */
+  private String name;
 
   /** Database instance name. */
   private String dbname;
@@ -55,21 +55,18 @@ public final class DeepBase extends DeepFuse implements DataText {
   /** Path to mount point. */
   private String mountpoint;
 
-  /** Constructor. */
-  public DeepBase() {
-    this("unknown", "unknown", DEFAULT_DBNAME, false);
-  }
-
   /**
    * Constructor.
    * 
+   * @param path absolute path
    * @param mountPoint mount point of DeepFUSE
    * @param backingStore backing storage root path
    * @param dbName of the database to open/create
    * @param guitoggle whether BaseXWin is wanted or not
    */
-  public DeepBase(final String mountPoint, final String backingStore,
-      final String dbName, final boolean guitoggle) {
+  public DeepBase(final String path, final String mountPoint,
+      final String backingStore, final String dbName, final boolean guitoggle) {
+    name = path;
     mountpoint = mountPoint;
     dbname = dbName;
     backingstore = backingStore;
@@ -89,18 +86,32 @@ public final class DeepBase extends DeepFuse implements DataText {
 
   /**
    * Creates an empty database.
-   * @param name of database instance
+   * @param n name of database instance
    */
-  private void createEmptyDB(final String name) {
+  private void createEmptyDB(final String n) {
     try {
       Prop.read();
       Context ctx = new Context();
-      final Parser p = new Parser(IO.get(name)) {
+      final Parser p = new Parser(IO.get(n)) {
         @Override
         public void parse(final Builder build) { /* empty */}
       };
-      ctx.data(CreateDB.xml(p, name));
+      ctx.data(CreateDB.xml(p, n));
       data = ctx.data();
+
+      // initialize tags and attribute names
+      data.tags.index(DEEPFS, null, false);
+      data.tags.index(DIR, null, false);
+      data.tags.index(FILE, null, false);
+      data.tags.index(UNKNOWN, null, false);
+
+      data.atts.index(NAME, null, false);
+      data.atts.index(SIZE, null, false);
+      data.atts.index(MTIME, null, false);
+      data.atts.index(MODE, null, false);
+      data.atts.index(SUFFIX, null, false);
+      data.initNames();
+      
     } catch(IOException e) {
       e.printStackTrace();
     } catch(Exception e) {
@@ -205,16 +216,12 @@ public final class DeepBase extends DeepFuse implements DataText {
    */
   private MemData buildData(final String path, final int mode) {
     final String dname = basename(path);
-    byte[] elem;
-    if(isDir(mode)) elem = DIR;
-    else elem = token("unknown");
-    MemData m = new MemData(2, data.tags, data.atts, data.ns, data.path);
-    int tagID = data.tags.index(elem, null, false);
-    int attID = data.atts.index(NAME, null, false);
-    int modeID = data.atts.index(MODE, null, false);
-    m.addElem(tagID, 0, 1, 3, 3, false);
-    m.addAtt(attID, 0, token(dname), 1);
-    m.addAtt(modeID, 0, token(Integer.toOctalString(mode)), 2);
+    int elemID = isDir(mode) ? data.fs.dirID : data.fs.unknownID;
+    MemData m = new MemData(4, data.tags, data.atts, data.ns, data.path);
+    m.addElem(elemID, 0, 1, 4, 4, false);
+    m.addAtt(data.nameID, 0, token(dname), 1);
+    m.addAtt(data.sizeID, 0, ZERO, 2);
+    m.addAtt(data.fs.modeID, 0, token(Integer.toOctalString(mode)), 3);
     return m;
   }
 
@@ -227,20 +234,14 @@ public final class DeepBase extends DeepFuse implements DataText {
    */
   private MemData buildFileData(final String path, final int mode) {
     final String fname = basename(path);
-    MemData m = new MemData(5, data.tags, data.atts, data.ns, data.path);
-    int tagID    = data.tags.index(FILE, null, false);
-    int nameID   = data.atts.index(NAME, null, false);
-    int suffixID = data.atts.index(SUFFIX, null, false);
-    int sizeID   = data.atts.index(SIZE, null, false);
-    int mtimeID  = data.atts.index(MTIME, null, false);
-    int modeID   = data.atts.index(MODE, null, false);
-    m.addElem(tagID, 0, 1, 6, 6, false);
-    m.addAtt(nameID,   0, token(fname), 1);
+    MemData m = new MemData(6, data.tags, data.atts, data.ns, data.path);
+    m.addElem(data.fs.fileID, 0, 1, 6, 6, false);
+    m.addAtt(data.nameID,   0, token(fname), 1);
     final int dot = fname.lastIndexOf('.');
-    m.addAtt(suffixID, 0, lc(token(fname.substring(dot + 1))), 2);
-    m.addAtt(sizeID,   0, token("tba"), 3);
-    m.addAtt(mtimeID,  0, token("tba"), 4);
-    m.addAtt(modeID,  0, token(Integer.toOctalString(mode)), 5);
+    m.addAtt(data.fs.suffID, 0, lc(token(fname.substring(dot + 1))), 2);
+    m.addAtt(data.sizeID,   0, ZERO, 3);
+    m.addAtt(data.fs.timeID,  0, ZERO, 4);
+    m.addAtt(data.fs.modeID,  0, token(Integer.toOctalString(mode)), 5);
     return m;
   }
   
@@ -362,13 +363,14 @@ public final class DeepBase extends DeepFuse implements DataText {
   public int init() {
     createEmptyDB(dbname);
     MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
-    int tagID = data.tags.index(DEEPFS_TOK, null, false);
-    int attID1 = data.atts.index(MOUNTPOINT, null, false);
-    int attID2 = data.atts.index(BACKINGSTORE, null, false);
+    int tagID = data.tags.index(DEEPFS, null, false);
+    int attID2 = data.atts.index(MOUNTPOINT, null, false);
+    int attID3 = data.atts.index(BACKINGSTORE, null, false);
     // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
-    m.addElem(tagID, 0, 1, 3, 3, false);
-    m.addAtt(attID1, 0, token(mountpoint), 1);
-    m.addAtt(attID2, 0, token(backingstore), 2);
+    m.addElem(tagID, 0, 1, 4, 4, false);
+    m.addAtt(data.nameID, 0, token(name), 1);
+    m.addAtt(attID2, 0, token(mountpoint), 2);
+    m.addAtt(attID3, 0, token(backingstore), 3);
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();

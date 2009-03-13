@@ -167,7 +167,7 @@ class MapLayout {
     final int last = par + data.size(par, kind);
     final boolean atts = GUIProp.mapatts && data.fs == null;
     int p = par + (atts ? 1 : data.attSize(par, kind));
-    while(p != last) {
+    while(p < last) {
       list.add(p);
       p += data.size(p, data.kind(p));
     }
@@ -187,7 +187,8 @@ class MapLayout {
   static long addSizes(final IntList l, final int start, final int end) {
     long sum = 0;
     for (int i = start; i < end; i++) {
-      sum += Token.toLong(data.attValue(data.sizeID, l.list[i]));
+      final byte[] val = data.attValue(data.sizeID, l.list[i]);
+      if(val != null) sum += Token.toLong(val);
     }
     return sum;
   }

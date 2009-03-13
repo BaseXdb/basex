@@ -17,7 +17,7 @@ public interface Commands {
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
     DUMMYQUERY(false), XQUERY(true), XQUERYMV(false),
-    XQUENV(false), FIND(true), CS(true), BASH(true),
+    XQUENV(false), FIND(true), CS(true),
     // UPDATE COMMANDS
     DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS

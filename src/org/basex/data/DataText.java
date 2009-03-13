@@ -66,23 +66,33 @@ public interface DataText {
   // DEEPFS STRINGS ===========================================================
 
   /** DeepFS tag. */
-  String DEEPFS = "deepfs";
+  String S_DEEPFS = "deepfs";
+  /** Time of last modification. */
+  String S_NAME = "name";
+  /** Time of last modification. */
+  String S_SIZE = "size";
+  /** Time of last modification. */
+  String S_MTIME = "mtime";
+  /** Time of last modification. */
+  String S_SUFFIX = "suffix";
+  
   /** DeepFS token. */
-  byte[] DEEPFS_TOK = token(DEEPFS);
+  byte[] DEEPFS = token(S_DEEPFS);
   /** Directory tag. */
   byte[] DIR = token("dir");
   /** File tag. */
   byte[] FILE = token("file");
+  /** Unknown tag (place holder). */
+  byte[] UNKNOWN = token("unknown");
+
   /** Name attribute. */
-  byte[] NAME = token("name");
+  byte[] NAME = token(S_NAME);
   /** Size attribute. */
-  byte[] SIZE = token("size");
-  /** Size attribute. */
-  byte[] STAT = token("stat");
+  byte[] SIZE = token(S_SIZE);
   /** Time of last modification. */
-  byte[] MTIME = token("mtime");
+  byte[] MTIME = token(S_MTIME);
   /** Suffix attribute. */
-  byte[] SUFFIX = token("suffix");
+  byte[] SUFFIX = token(S_SUFFIX);
   /** Suffix attribute. */
   byte[] CONTENT = token("content");
   /** File mode attribute. */

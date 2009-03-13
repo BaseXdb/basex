@@ -27,14 +27,15 @@ public final class Prompt extends Process {
   protected void out(final PrintOutput out) throws IOException {
     final TokenBuilder curr = new TokenBuilder();
     final Data data = context.data();
+    final boolean fs = data != null && data.fs != null;
     if(data != null) {
       final Nodes nodes = context.current();
       final int pre = nodes.nodes[0];
       if(data.kind(pre) == Data.ELEM) {
-        curr.add(Prop.fsmode ? data.fs.path(pre) : data.tag(pre));
+        curr.add(fs ? data.fs.path(pre) : data.tag(pre));
       }
       if(nodes.size() != 1) curr.add("[...]");
     }
-    out.print(BaseX.info(Prop.fsmode ? Prop.USER + ":%$ " : "%> ", curr));
+    out.print(BaseX.info(fs ? Prop.USER + ":%$ " : "%> ", curr));
   }
 }

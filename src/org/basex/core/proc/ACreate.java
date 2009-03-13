@@ -53,7 +53,7 @@ abstract class ACreate extends Process {
         progress(builder);
         context.data(builder.build(p, db));
       } else {
-        if(db.equals(DataText.DEEPFS)) return error(CREATENODEEPDB);
+        if(db.equals(DataText.S_DEEPFS)) return error(CREATENODEEPDB);
 
         context.close();
         final Performance pp = new Performance();

@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fs.DataFS;
 import org.basex.util.Performance;
 
 /**
@@ -46,9 +45,6 @@ public final class Context {
    */
   public boolean root() {
     if(current == null) return true;
-    if(Prop.fsmode) {
-      return current.size() == 1 && current.nodes[0] == DataFS.ROOTDIR;
-    }
     for(final int n : current.nodes) if(data.kind(n) != Data.DOC) return false;
     return true;
   }
@@ -70,19 +66,17 @@ public final class Context {
       BaseX.debug("Warning: Database still open.");
       close();
     }
-    Prop.fsmode = d.fs != null;
     data = d;
     copied = null;
     marked = new Nodes(d);
-    flush();
+    update();
   }
   
   /**
    * Flushes the context (i.e., updates references).
    */
-  public void flush() {
-    current = Prop.fsmode ? new Nodes(DataFS.ROOTDIR, data) :
-      new Nodes(data.doc(), data);
+  public void update() {
+    current = new Nodes(data.doc(), data);
   }
     
   /**
@@ -100,7 +94,6 @@ public final class Context {
         d.close();
         if(Prop.mainmem) Performance.gc(1);
       }
-      Prop.fsmode = false;
       return true;
     } catch(final IOException ex) {
       BaseX.debug(ex);

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Commands.CmdFS;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdSet;
@@ -24,7 +23,6 @@ import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.Fs;
 import org.basex.core.proc.GetInfo;
 import org.basex.core.proc.GetResult;
 import org.basex.core.proc.Help;
@@ -89,28 +87,9 @@ public final class CommandParser extends InputParser {
     Process[] list = new Process[0];
     if(!more()) return list;
 
-    boolean fsmode = Prop.fsmode;
     while(true) {
-      Cmd cmd = null;
-      Process proc;
-      if(fsmode) {
-        cmd = Cmd.BASH;
-        CmdFS fs = CmdFS.EXT;
-        String args = name(null);
-        try {
-          fs = Enum.valueOf(CmdFS.class, args.toUpperCase());
-          if(fs == Commands.CmdFS.EXIT) fsmode = false;
-          args = "";
-        } catch(final Exception ex) {
-          args += " ";
-        }
-        final String a = string(null);
-        proc = new Fs(fs.name(), a == null ? args : args + a);
-      } else {
-        cmd = consume(Cmd.class, null);
-        proc = parse(cmd);
-        if(proc instanceof Fs) fsmode = true;
-      }
+      Cmd cmd = consume(Cmd.class, null);
+      Process proc = parse(cmd);
       list = Array.add(list, proc);
       consumeWS();
       if(!more()) return list;
@@ -259,8 +238,6 @@ public final class CommandParser extends InputParser {
         return new GetResult(number(null));
       case GETINFO:
         return new GetInfo(number(null));
-      case BASH:
-        return new Fs();
       case EXIT:
       case QUIT:
         return new Exit();
@@ -422,11 +399,7 @@ public final class CommandParser extends InputParser {
    * @param cmd input completions
    * @throws QueryException query exception
    */
-  private void help(final StringList alt, final Cmd cmd)
-      throws QueryException {
-    
-    if(cmd == Cmd.BASH) throw new QueryException(
-        org.basex.fs.Help.help(""));
+  private void help(final StringList alt, final Cmd cmd) throws QueryException {
     error(alt, PROCSYNTAX, cmd.help(true, true));
   }
 

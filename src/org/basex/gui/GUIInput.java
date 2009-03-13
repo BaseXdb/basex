@@ -10,6 +10,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
+import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryContext;
@@ -192,6 +193,9 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void queryPopup(final String query) {
+    final Data data = gui.context.data();
+    if(data != null && !data.meta.uptodate) return;
+    
     StringList sl = null;
     try {
       final QuerySuggest parser = new QuerySuggest(new QueryContext(),

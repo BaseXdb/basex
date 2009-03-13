@@ -2,6 +2,7 @@ package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.util.IntList;
@@ -212,7 +213,7 @@ public final class PlotAxis {
     // newer files. the newest file gets the lowest value (max - d + min) but is
     // still displayed on the right end of the plot.
     final Data data = plotData.context.data();
-    if(data.fs != null && eq(data.atts.key(attrID), token("mtime"))) {
+    if(data.fs != null && eq(data.atts.key(attrID), DataText.MTIME)) {
       range = ln(max - min);
       return 1 - (1 / range * (ln(max - d)));
     }

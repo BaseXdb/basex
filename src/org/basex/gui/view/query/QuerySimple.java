@@ -13,6 +13,7 @@ import javax.swing.BoxLayout;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -250,8 +251,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         final StatsKey stat = names.stat(names.id(key));
         switch(stat.kind) {
           case INT:
-            addSlider(stat.min, stat.max, cp + 1, item.equals("@size"),
-                item.equals("@mtime"), true);
+            addSlider(stat.min, stat.max, cp + 1,
+                item.equals("@" + DataText.S_SIZE),
+                item.equals("@" + DataText.S_MTIME), true);
             break;
           case DBL:
             addSlider(stat.min, stat.max, cp + 1, false, false, false);

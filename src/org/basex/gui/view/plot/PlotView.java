@@ -21,6 +21,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUIProp;
@@ -182,7 +183,7 @@ public final class PlotView extends View implements Runnable {
             // choose size category as default for vertical axis
             int y = 0;
             for(int k = 0; k < keys.length; k++) {
-              if(keys[k].equals("@size") || keys[k].equals("size")) {
+              if(keys[k].endsWith(DataText.S_SIZE)) {
                 y = k;
                 break;
               }
@@ -190,7 +191,7 @@ public final class PlotView extends View implements Runnable {
             // choose name category as default for horizontal axis
             int x = y == 0 ? Math.min(1, keys.length) : 0;
             for(int k = 0; k < keys.length; k++) {
-              if(keys[k].equals("@name") || keys[k].equals("name")) {
+              if(keys[k].endsWith(DataText.S_NAME)) {
                 x = k;
                 break;
               }
@@ -925,8 +926,8 @@ public final class PlotView extends View implements Runnable {
    */
   private String formatString(final double value, final boolean drawX) {
     final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
-    return BaseXLayout.value(value, attr.equals("@size"),
-        attr.equals("@mtime"));
+    return BaseXLayout.value(value, attr.equals("@" + DataText.S_SIZE),
+        attr.equals("@" + DataText.S_MTIME));
   }
 
   @Override

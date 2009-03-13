@@ -36,7 +36,6 @@ public final class Export extends Process {
       final boolean root = context.root();
       if(root) {
         out.println(BaseX.info(DOCDECL, Token.UTF8));
-        if(Prop.fsmode) current = new Nodes(0, current.data);
       }
       current.serialize(new XMLSerializer(out, !root, current.data.meta.chop));
       out.close();
