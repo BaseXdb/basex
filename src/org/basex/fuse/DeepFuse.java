@@ -1,5 +1,6 @@
 package org.basex.fuse;
 
+
 /**
  * Interface to filesystem in userspace framework.
  * 
@@ -8,16 +9,7 @@ package org.basex.fuse;
  */
 public abstract class DeepFuse {
 
-  /** File element. */
-  protected static final byte[] FILE = "file".getBytes();
-
-  /** Directory element. */
-  protected static final byte[] DIR = "dir".getBytes();
-
-  /** Name attribute. */
-  protected static final byte[] NAME = "name".getBytes();
-
-  /** Type of file mask. (sys/stat.h) */
+    /** Type of file mask. (sys/stat.h) */
   protected static final int S_IFMT = 0170000;
 
   /** Type of directory. (sys/stat.h) */

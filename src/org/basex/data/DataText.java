@@ -7,7 +7,7 @@ import org.basex.core.Prop;
 /**
  * This class assembles texts which are used in the data classes.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public interface DataText {
@@ -63,10 +63,12 @@ public interface DataText {
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
 
-  // TAGS/ATTRIBUTE NAMES ====================================================
+  // DEEPFS STRINGS ===========================================================
 
   /** DeepFS tag. */
   String DEEPFS = "deepfs";
+  /** DeepFS token. */
+  byte[] DEEPFS_TOK = token(DEEPFS);
   /** Directory tag. */
   byte[] DIR = token("dir");
   /** File tag. */
@@ -83,7 +85,13 @@ public interface DataText {
   byte[] SUFFIX = token("suffix");
   /** Suffix attribute. */
   byte[] CONTENT = token("content");
-
+  /** File mode attribute. */
+  byte[] MODE = token("mode");
+  /** Mountpoint attribute. */
+  byte[] MOUNTPOINT = token("mountpoint");
+  /** Backingstore attribute. */
+  byte[] BACKINGSTORE = token("backingstore");
+  
   // XML SERIALIZATION ========================================================
 
   /** Ampersand Entity. */
@@ -169,8 +177,4 @@ public interface DataText {
   String DATAATV = "atv";
   /** Database - Fulltext index. */
   String DATAFTX = "ftx";
-
-  // DEEPFS STRINGS ===========================================================
-  /** Name of the current deepfs shared library. */
-  String DEEPLIB = "deepstorage";
 }

@@ -94,7 +94,7 @@ public final class CreateDB extends ACreate {
         final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
         builder = (Builder) cls.newInstance();
       } catch(final Exception e) {
-        throw new IOException(e);
+        throw new IOException(e.toString());
       }
     } else {
       builder = new DiskBuilder();

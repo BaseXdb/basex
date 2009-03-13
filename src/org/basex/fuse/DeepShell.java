@@ -17,7 +17,7 @@ import org.basex.query.QueryProcessor;
 /**
  * Rudimentary shell to interact with a file hierarchy stored in XML.
  * 
- * @author Workgroup DBIS, University of Konstanz 2008, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public class DeepShell {
@@ -44,7 +44,7 @@ public class DeepShell {
 
   /** Constructor. */
   DeepShell() {
-    fs = new DeepBase();
+    fs = new DeepBase("DeepShell (no native connection)", "none", "deepshell", false);
     // initialize/mount filesystem
     fs.init();
     loop();
@@ -127,7 +127,7 @@ public class DeepShell {
       help(new String[] { "help", "mkdir"});
       return;
     }
-    int err = fs.mkdir(args[1], DeepFuse.S_IFDIR);
+    int err = fs.mkdir(args[1], DeepFuse.S_IFDIR | 0775);
     if(err == -1) System.err.printf("mkdir failed. %d\n", err);
   }
 
@@ -157,7 +157,7 @@ public class DeepShell {
       help(new String[] { "help", "touch"});
       return;
     }
-    int err = fs.create(args[1], 0100755);
+    int err = fs.create(args[1], 0100644);
     if(err < 0) System.err.printf("touch failed. %d\n", err);
   }
   

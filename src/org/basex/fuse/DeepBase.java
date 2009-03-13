@@ -1,5 +1,7 @@
 package org.basex.fuse;
 
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 
 import org.basex.BaseXWin;
@@ -11,6 +13,7 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -22,7 +25,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * Stores a file hierarchy as XML.
@@ -30,7 +32,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2008, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
-public final class DeepBase extends DeepFuse {
+public final class DeepBase extends DeepFuse implements DataText {
 
   /** Default database name, if none is provided. */
   private static final String DEFAULT_DBNAME = "deepfuse";
@@ -55,7 +57,7 @@ public final class DeepBase extends DeepFuse {
 
   /** Constructor. */
   public DeepBase() {
-    this("unknown", "unknown", DEFAULT_DBNAME, true);
+    this("unknown", "unknown", DEFAULT_DBNAME, false);
   }
 
   /**
@@ -117,7 +119,7 @@ public final class DeepBase extends DeepFuse {
   private String pn2xp(final String path, final boolean dir) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
-    qb.append("/deepfuse");
+    qb.append("/deepfs");
     if(path.equals("/")) return qb.toString();
     for(int i = 0; i < path.length(); i++) {
       final char c = path.charAt(i);
@@ -195,8 +197,8 @@ public final class DeepBase extends DeepFuse {
   }
 
   /**
-   * Construct a MemData object containing <file name="filename"/> <dir
-   * name="dirname"/> ready to be inserted into main Data instance.
+   * Construct a MemData object containing <dir name="dirname"/> ... 
+   * ready to be inserted into main Data instance.
    * @param path to file to build MemData for
    * @param mode to determine file type
    * @return MemData reference
@@ -205,16 +207,43 @@ public final class DeepBase extends DeepFuse {
     final String dname = basename(path);
     byte[] elem;
     if(isDir(mode)) elem = DIR;
-    else if(isFile(mode)) elem = FILE;
-    else elem = Token.token("unknown");
+    else elem = token("unknown");
     MemData m = new MemData(2, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(elem, null, false);
     int attID = data.atts.index(NAME, null, false);
-    m.addElem(tagID, 0, 1, 2, 2, false);
-    m.addAtt(attID, 0, Token.token(dname), 1);
+    int modeID = data.atts.index(MODE, null, false);
+    m.addElem(tagID, 0, 1, 3, 3, false);
+    m.addAtt(attID, 0, token(dname), 1);
+    m.addAtt(modeID, 0, token(Integer.toOctalString(mode)), 2);
     return m;
   }
 
+  /**
+   * Construct a MemData object containing <file name="filename" .../> 
+   * element ready to be inserted into main data instance.
+   * @param path to file to build MemData for
+   * @param mode to determine file type
+   * @return MemData reference
+   */
+  private MemData buildFileData(final String path, final int mode) {
+    final String fname = basename(path);
+    MemData m = new MemData(5, data.tags, data.atts, data.ns, data.path);
+    int tagID    = data.tags.index(FILE, null, false);
+    int nameID   = data.atts.index(NAME, null, false);
+    int suffixID = data.atts.index(SUFFIX, null, false);
+    int sizeID   = data.atts.index(SIZE, null, false);
+    int mtimeID  = data.atts.index(MTIME, null, false);
+    int modeID   = data.atts.index(MODE, null, false);
+    m.addElem(tagID, 0, 1, 6, 6, false);
+    m.addAtt(nameID,   0, token(fname), 1);
+    final int dot = fname.lastIndexOf('.');
+    m.addAtt(suffixID, 0, lc(token(fname.substring(dot + 1))), 2);
+    m.addAtt(sizeID,   0, token("tba"), 3);
+    m.addAtt(mtimeID,  0, token("tba"), 4);
+    m.addAtt(modeID,  0, token(Integer.toOctalString(mode)), 5);
+    return m;
+  }
+  
   /**
    * Extract content of file and build a MemData object.
    * @param path from which to include content (it's in backing store).
@@ -245,7 +274,10 @@ public final class DeepBase extends DeepFuse {
   private int insertFileNode(final String path, final int mode) {
     int ppre = parentPre(path);
     if(ppre == -1) return -1;
-    return insert(ppre, buildData(path, mode));
+    if (isFile(mode))
+      return insert(ppre, buildFileData(path, mode));
+    else
+      return insert(ppre, buildData(path, mode));
   }
 
   /**
@@ -330,13 +362,13 @@ public final class DeepBase extends DeepFuse {
   public int init() {
     createEmptyDB(dbname);
     MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
-    int tagID = data.tags.index(Token.token("deepfuse"), null, false);
-    int attID1 = data.atts.index(Token.token("mountpoint"), null, false);
-    int attID2 = data.atts.index(Token.token("backingstore"), null, false);
+    int tagID = data.tags.index(DEEPFS_TOK, null, false);
+    int attID1 = data.atts.index(MOUNTPOINT, null, false);
+    int attID2 = data.atts.index(BACKINGSTORE, null, false);
     // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
     m.addElem(tagID, 0, 1, 3, 3, false);
-    m.addAtt(attID1, 0, Token.token(mountpoint), 1);
-    m.addAtt(attID2, 0, Token.token(backingstore), 2);
+    m.addAtt(attID1, 0, token(mountpoint), 1);
+    m.addAtt(attID2, 0, token(backingstore), 2);
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
@@ -365,8 +397,7 @@ public final class DeepBase extends DeepFuse {
    */
   @Override
   public int mkdir(final String path, final int mode) {
-    //if(!isDir(mode)) return -1;
-    System.err.println("mkdir path: " + path + " mode: " + mode);
+    //if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR. 
     return createNode(path, S_IFDIR | mode);
   }
 
@@ -379,7 +410,7 @@ public final class DeepBase extends DeepFuse {
    */
   @Override
   public int create(final String path, final int mode) {
-    //if(!isFile(mode)) return -1;
+    //if(!isFile(mode)) return -1; // Linux does not submit S_IFREG.
     return createNode(path, S_IFREG | mode);
   }
 
