@@ -76,11 +76,18 @@ class MapList extends IntList {
   
   @Override
   public String toString() {
-    
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
-    for(int i = 0; i < size; i++) {
-      sb.append((i == 0 ? "" : ", ") + list[i] + "/" + weight[i]);
+    if(weight == null) {
+      StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
+      for(int i = 0; i < size; i++) {
+        sb.append((i == 0 ? "" : ", ") + list[i]);
+      }
+      return sb.append("]").toString();
+    } else {
+      StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
+      for(int i = 0; i < size; i++) {
+        sb.append((i == 0 ? "" : ", ") + list[i] + "/" + weight[i]);
+      }
+      return sb.append("]").toString();
     }
-    return sb.append("]").toString();
   }
 }
