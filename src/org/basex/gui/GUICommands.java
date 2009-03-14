@@ -793,7 +793,7 @@ public enum GUICommands implements GUICommand {
   /**
    * Constructor.
    * @param d data reference flag
-   * @param e string entry
+   * @param e text of the menu item
    * @param k key shortcut
    * @param h help string
    */

@@ -272,11 +272,9 @@ public final class FTTokenizer extends IndexToken {
    * @return the converted token
    */
   private byte[] stem(final byte[] t) {
-    /*if(sd != null) {
-      final byte[] sn = sd.get(t);
-      if(sn != null) return sn;
-    }*/
-    return stem.word(t);
+    if(sd == null) return stem.word(t);
+    final byte[] sn = sd.get(t);
+    return sn != null ? sn : t;
   }
   
   /**

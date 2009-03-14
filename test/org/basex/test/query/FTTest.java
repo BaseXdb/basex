@@ -349,6 +349,9 @@ public final class FTTest extends AbstractTest {
         " ftand 'third' distance exactly 1 words ordered]" },          
       { "FTDistance 10", bool(true),
         "'a b' ftcontains 'a' ftand ('b') distance exactly 0 words" },
+      { "FTDistance 11", bool(true),
+        "'a b' ftcontains ('a') ftand ('b') entire content" },
+
       { "FTWindow 1", nodes(3, 37),
         "//w [. ftcontains 'second' ftand 'fifth' window 7 words]" },
       { "FTWindow 2", nodes(3, 37),

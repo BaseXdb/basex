@@ -26,14 +26,6 @@ public class MapList extends IntList {
   }
   
   /**
-   * Constructor, specifying an initial list size.
-   * @param is initial size of the list
-   */
-  public MapList(final int is) {
-    super(is);
-  }
-
-  /**
    * Constructor, specifying an initial array.
    * @param v initial list values
    */
@@ -53,6 +45,8 @@ public class MapList extends IntList {
   @Override
   public void sort() {
     if(weights == null) return;
+
+    // [CG] check...
     
     final TokenList tl = new TokenList();
     for(int c = 0; c < size; c++) tl.add(Token.token(weights[c]));
