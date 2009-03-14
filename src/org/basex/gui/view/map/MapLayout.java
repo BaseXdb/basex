@@ -179,55 +179,6 @@ class MapLayout {
     }
     return sum;
   }
-  
-  /*
-   * Splits and adds rectangles uniformly distributed.
-   * @param r rectangles to lay out in
-   * @param l list of rectangles to lay out
-   * @param ns starting point
-   * @param ne ending
-   * @return rectangles uniformly devided
-  protected ArrayList<MapRect> splitUniformly(final MapRect r, final MapList l,
-      final int ns, final int ne) {
-    if (ne - ns == 1) {
-      ArrayList<MapRect> rects = new ArrayList<MapRect>();
-      rects.add(new MapRect(r, l.list[ns], 0));
-      return rects;
-    } else {
-      ArrayList<MapRect> rects = new ArrayList<MapRect>();
-      long nn, ln;
-      int ni;
-      // number of nodes used to calculate space
-      nn = ne - ns;
-      // nn / 2, pretends to be the middle of the handled list
-      // except if starting point in the list is not at position 0
-      ln = nn >> 1;
-      // pivot with integrated list start
-      ni = (int) (ns + ln);
-      
-      boolean v = r.w > r.h;
-      
-      int xx = r.x;
-      int yy = r.y;
-      int ww = !v ? r.w : (int) (r.w * ln / nn);
-      int hh = v ? r.h : (int) (r.h * ln / nn);
-  
-      // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0) rects.addAll(
-          splitUniformly(new MapRect(xx, yy, ww, hh, 0, r.level), l, ns, ni));
-      if(v) {
-        xx += ww;
-        ww = r.w - ww;
-      } else {
-        yy += hh;
-        hh = r.h - hh;
-      }
-      if(ww > 0 && hh > 0) rects.addAll(
-          splitUniformly(new MapRect(xx, yy, ww, hh, 0, r.level), l, ni, ne));
-      return rects;
-    }
-  }
-   */
 
   /**
    * Recursively splits rectangles.

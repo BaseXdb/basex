@@ -67,8 +67,15 @@ class MapList extends IntList {
       }    
     //only #children
     } else if (GUIProp.sizep == 0 || data.fs == null) {
+//      long len = 0;
+//      for(int i = 0; i < size; i++) {
+//        len += data.textLen(list[i]);
+//      }
       for(int i = 0; i < size - 1; i++) {
         nrchildren[i] = list[i + 1] - list[i];
+//        weight[i] = 1d * data.textLen(list[i]) / len + 
+//            0d * nrchildren[i] / parchildren;
+        // old
         weight[i] = nrchildren[i] * 1d / parchildren;
       }
     }

@@ -178,7 +178,7 @@ final class MapFS extends MapPainter {
         return false;
       }
     }
-
+    
     final boolean full = !isImage && rect.w >= GUIProp.fontsize * 12 &&
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
@@ -204,7 +204,12 @@ final class MapFS extends MapPainter {
           rect.x += off;
           rect.w -= off;
         }
-
+        
+        // [JH] should be placed somewhere higher
+        final MapRect l = view.layout.layout;
+        rect.h = rect.h - l.h * 2;
+        rect.w = rect.w - l.w * 2;
+        
         final int h = MapRenderer.calcHeight(g, rect, text);
         if(img != null) {
           if(!mark) {
