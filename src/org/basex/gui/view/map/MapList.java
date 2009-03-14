@@ -76,6 +76,7 @@ class MapList extends IntList {
   
   @Override
   public String toString() {
+    
     StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
     for(int i = 0; i < size; i++) {
       sb.append((i == 0 ? "" : ", ") + list[i] + "/" + weight[i]);

@@ -249,11 +249,12 @@ class MapLayout {
       ArrayList<MapRect> rects;
       if(level == 0) {
         // [JH] may first level layout should not be defined to splitalgo
-        nn = l.list[ne - 1] - l.list[ns];
+        nn = l.list[ne - 1] - l.list[ns] + 
+            data.size(l.list[ne - 1], data.kind(l.list[ne - 1]));
         l.initWeights(parsize, nn, data);
         
         final MapAlgo tmp = new SplitAlgo();
-        rects = tmp.calcMap(r, l, l.weight, ns, ne - 1, level);
+        rects = tmp.calcMap(r, l, l.weight, ns, ne, level);
       } else {
         nn = l.list[ne] - l.list[ns];
         // init weights of nodes and sort
