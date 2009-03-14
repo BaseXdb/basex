@@ -27,7 +27,7 @@ import org.xmldb.api.modules.XMLResource;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class BXXMLResource implements XMLResource, BXXMLDBText {

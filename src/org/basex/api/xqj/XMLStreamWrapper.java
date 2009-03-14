@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  * Would be the easiest solution, but some large file cannot be parsed
  * with the default parser.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class XMLStreamWrapper extends Parser {

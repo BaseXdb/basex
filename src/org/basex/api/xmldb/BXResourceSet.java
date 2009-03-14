@@ -13,7 +13,7 @@ import org.xmldb.api.base.XMLDBException;
 
 /**
  * Implementation of the ResourceSet Interface for the XMLDB:API.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class BXResourceSet implements ResourceSet, BXXMLDBText {

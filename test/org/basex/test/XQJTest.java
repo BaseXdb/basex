@@ -40,7 +40,7 @@ import org.xml.sax.XMLReader;
 /**
  * This class tests some XQJ features (arbitrary samples).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class XQJTest extends TestCase {

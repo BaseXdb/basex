@@ -6,7 +6,7 @@ import org.xmldb.api.*;
 
 /**
  * This class serves an example for executing XPath requests with the XML:DB API.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX-Group
  */
 public final class XMLDBExample1 {

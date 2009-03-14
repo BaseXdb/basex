@@ -6,7 +6,7 @@ import org.basex.core.Prop;
 /**
  * This class organizes textual information for the XMLDB API.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public interface BXXMLDBText {

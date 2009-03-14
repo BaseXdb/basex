@@ -26,7 +26,7 @@ import org.basex.util.Token;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class BXCollection implements Collection, BXXMLDBText {

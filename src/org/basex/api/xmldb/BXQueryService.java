@@ -14,7 +14,7 @@ import org.xmldb.api.modules.XPathQueryService;
 
 /**
  * Abstract QueryService definition for the XMLDB:API.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class BXQueryService implements XPathQueryService, BXXMLDBText {
@@ -88,14 +88,14 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     
     try {
       // creates a query instance
-      final QueryProcessor proc = new QueryProcessor(query);
+      final QueryProcessor proc = new QueryProcessor(query, nodes);
 
       // add default namespaces
       for(final String n : ns.keySet()) {
         proc.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
       }
       // perform query and return result
-      return new BXResourceSet(proc.query(nodes), coll);
+      return new BXResourceSet(proc.query(), coll);
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

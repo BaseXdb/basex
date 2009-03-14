@@ -13,7 +13,7 @@ import org.basex.util.Token;
 /**
  * Java XQuery API - Connection.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class BXQConnection extends BXQDataFactory

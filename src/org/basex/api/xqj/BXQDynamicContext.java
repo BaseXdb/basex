@@ -41,7 +41,7 @@ import org.xml.sax.XMLReader;
 /**
  * Java XQuery API - Dynamic Context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 abstract class BXQDynamicContext extends BXQAbstract
@@ -227,7 +227,7 @@ abstract class BXQDynamicContext extends BXQAbstract
         }.delay(sc.timeout * 1000);
       }
       query.parse();
-      ctx.compile(null);
+      ctx.compile();
       Iter iter = ctx.iter();
       if(sc.scrollable) iter = SeqIter.get(iter);
       return new BXQSequence(iter, ctx, this, (BXQConnection) par);
