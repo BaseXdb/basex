@@ -13,29 +13,19 @@ import org.basex.util.TokenList;
  * For each pos values, theres a poi value stored. poiMax is the
  * max value of all pos0, ..., poin
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
 public final class FTPosData {
+  /** Array for ftand colors. */
+  public TokenList col = new TokenList();
   /** Pre values and its pos values. */
   private int[][] prepos = new int[1][];
   /** Pointer values for the pos values.*/
   private int[][] poi = new int[1][];
-  /** Array for ftand colors. */
-  public TokenList col = new TokenList();
   /** Number of pre values. */
   private int size;
-
-  /**
-   * Initializes position arrays.
-   */
-  public void init() {
-    prepos = new int[1][];
-    poi = new int[1][];
-    size = 0;
-    col = new TokenList();
-  }
 
   /**
    * Add a ftand color result.
@@ -149,31 +139,6 @@ public final class FTPosData {
     System.arraycopy(prepos[i], 1, r[0], 0, r[0].length);
     System.arraycopy(poi[i], 1, r[1], 0, r[1].length);
     return r;
-  }
-
-  /**
-   * Keeps all ftdata specified in pres.
-   * All other ftdata is deleted.
-   *
-   * @param pres int[] pre values to keep
-   */
-  public void keep(final int[] pres) {
-    if(size == 0 || pres == null) return;
-    final int[][] tpp = new int[pres.length][];
-    final int[][] tp = new int[pres.length][];
-    int p = 0, t = 0, i = 0;
-    while (i < size && p < pres.length) {
-      final int d = prepos[i][0] - pres[p];
-      if (d == 0) {
-        tpp[t] = prepos[i];
-        tp[t++] = poi[i];
-        p++;
-      } else if (d < 0) i++;
-        else p++;  
-    }
-    prepos = tpp;
-    poi = tp;
-    size = t;
   }
 
   /**

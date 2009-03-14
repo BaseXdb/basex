@@ -18,7 +18,7 @@ import org.basex.util.Token;
 /**
  * Abstract item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Item extends Expr {
@@ -123,14 +123,6 @@ public abstract class Item extends Expr {
    */
   public final boolean node() {
     return type.node();
-  }
-
-  /**
-   * Returns the sequence size or 1.
-   * @return result of check
-   */
-  public int size() {
-    return 1;
   }
 
   /**

@@ -8,7 +8,7 @@ import org.basex.query.iter.Iter;
 /**
  * Predicate expression. Mustn't be called with more than one predicate.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Dennis Stratmann
  */
 public final class IterPred extends Pred {

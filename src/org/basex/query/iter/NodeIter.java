@@ -7,7 +7,7 @@ import org.basex.query.item.Nod;
 /**
  * Node iterator interface.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class NodeIter extends Iter {

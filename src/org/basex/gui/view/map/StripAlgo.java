@@ -5,15 +5,15 @@ import java.util.ArrayList;
 /**
  * StripLayout Algorithm.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
 public class StripAlgo extends MapAlgo{
   @Override
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
-      final double[] weights, final int ns, final int ne, final int level) {
+  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+      final double[] weights, final int ns, final int ne, final int l) {
     // stores all calculated rectangles
-    ArrayList<MapRect> rects = new ArrayList<MapRect>();
+    final ArrayList<MapRect> rects = new ArrayList<MapRect>();
     
     // node iterator
     int ni = ns;
@@ -21,9 +21,9 @@ public class StripAlgo extends MapAlgo{
     int start = ns;
 
     // setting initial proportions
-    double xx = r.x;
+    final double xx = r.x;
     double yy = r.y;
-    double ww = r.w;
+    final double ww = r.w;
     double hh = r.h;
 
     ArrayList<MapRect> row = new ArrayList<MapRect>();
@@ -32,16 +32,16 @@ public class StripAlgo extends MapAlgo{
     double sumweight = 1;
     
     while(ni < ne) {
-      weight += l.weights[ni];
+      weight += ml.weight[ni];
       height = weight / sumweight * hh;
       
-      ArrayList<MapRect> tmp = new ArrayList<MapRect>();
+      final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
       double x = xx;
       for(int i = start; i <= ni; i++) {
-        double w = i == ni ? xx + ww - x : l.weights[i] / weight * ww;
+        final double w = i == ni ? xx + ww - x : ml.weight[i] / weight * ww;
         tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
-            l.list[i], level));
+            ml.list[i], l));
         x += (int) w;
       }
 
@@ -55,12 +55,12 @@ public class StripAlgo extends MapAlgo{
         tmp.clear();
         row.clear();
         start = ni;
-        sumweight -= weight - l.weights[ni];
+        sumweight -= weight - ml.weight[ni];
         weight = 0;
         // sometimes there has to be one rectangles to fill the left space
         if(ne == ni + 1) {
           row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-              l.list[ni], level));
+              ml.list[ni], l));
           break;
         }
       } else {
@@ -68,15 +68,10 @@ public class StripAlgo extends MapAlgo{
         ni++;
       }
     }
-    for(MapRect rect : row) rect.h = (int) hh;
+    for(final MapRect rect : row) rect.h = (int) hh;
     // adding last row
     rects.addAll(row);
     
     return rects;
-  }
-
-  @Override
-  String getType() {
-    return "StripLayout Layout";
   }
 }

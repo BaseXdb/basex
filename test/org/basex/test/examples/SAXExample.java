@@ -13,8 +13,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * This class serves as an example for evaluating XQuery requests
  * and serializing the results via the SAX API.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author BaseX Team
  */
 public final class SAXExample extends DefaultHandler {
   /** Input XML file. */
@@ -44,9 +44,9 @@ public final class SAXExample extends DefaultHandler {
     new Check(XMLFILE).execute(ctx, null);
     
     // create query instance
-    final QueryProcessor query = new QueryProcessor(QUERY);
+    final QueryProcessor query = new QueryProcessor(QUERY, ctx.current());
     // execute query
-    final Result result = query.query(ctx.current());
+    final Result result = query.query();
 
     // create XML reader
     final XMLReader reader = new SAXSerializer(result);

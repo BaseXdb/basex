@@ -11,7 +11,7 @@ import org.basex.util.Performance;
  * Moreover, it provides references to the currently used, marked and
  * copied node sets.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Context {
@@ -63,7 +63,7 @@ public final class Context {
    */
   public void data(final Data d) {
     if(data != null) {
-      BaseX.debug("Warning: Database still open.");
+      BaseX.debug("Warning: database still open.");
       close();
     }
     data = d;
@@ -92,7 +92,7 @@ public final class Context {
         marked = null;
         copied = null;
         d.close();
-        if(Prop.mainmem) Performance.gc(1);
+        if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
       }
       return true;
     } catch(final IOException ex) {

@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This is the content area of the table view.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class TableContent extends BaseXBack {

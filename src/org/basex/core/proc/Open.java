@@ -13,7 +13,7 @@ import org.basex.io.IO;
 /**
  * Opens an existing database.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Open extends Process {
@@ -28,8 +28,8 @@ public final class Open extends Process {
   @Override
   protected boolean exec() {
     final String db = args[0].replaceAll("(.*)\\..*", "$1");
-    if(!IO.dbpath(db).exists())
-      if(!db.equals(DataText.S_DEEPFS)) return error(DBNOTFOUND, db);
+    if(!IO.dbpath(db).exists() && !db.equals(DataText.S_DEEPFS))
+      return error(DBNOTFOUND, db);
 
     // close old database
     context.close();
@@ -59,12 +59,6 @@ public final class Open extends Process {
    */
   public static Data open(final String db) throws IOException {
     if(Prop.usebdb) {
-      try {
-        return (Data) Class.forName("org.basex.data.BDBData").getConstructor(
-            new Class[] { String.class }).newInstance(db);
-      } catch(final Exception e) {
-        e.printStackTrace();
-      }
     }
     return new DiskData(db);
   }

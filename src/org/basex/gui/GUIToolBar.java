@@ -11,7 +11,7 @@ import org.basex.util.Token;
  * This is the toolbar of the main window.
  * The toolbar contents are defined in {@link GUIConstants#TOOLBAR}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIToolBar extends JToolBar {

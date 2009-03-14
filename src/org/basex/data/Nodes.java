@@ -14,7 +14,7 @@ import org.basex.util.TokenBuilder;
  * Instances of this class are used in the {@link Context} class to
  * reference the currently used nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Nodes implements Result {

@@ -13,7 +13,7 @@ import org.basex.io.IO;
  * memory; if negative, the database file is opened; if it doesn't exist, a
  * new database instance is created.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Check extends Process {
@@ -30,8 +30,6 @@ public final class Check extends Process {
     final Data data = context.data();
     final String name = args[0];
 
-    // [CG] check
-    
     // check open database...
     if(data != null && data.meta.dbname.equals(IO.get(name).dbname()))
         return Prop.info ? info(DBINMEM) : true;

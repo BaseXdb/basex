@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * operations. Next, it offers some utility methods which are used
  * throughout the project.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BaseX extends BaseXClient {

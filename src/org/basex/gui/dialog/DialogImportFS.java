@@ -28,7 +28,7 @@ import org.basex.util.StringList;
 /**
  * Dialog window for specifying the options for importing a file system.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DialogImportFS  extends Dialog {

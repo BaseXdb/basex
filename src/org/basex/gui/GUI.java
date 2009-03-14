@@ -56,7 +56,6 @@ import org.basex.gui.view.info.InfoView;
 import org.basex.gui.view.map.MapView;
 import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.query.QueryView;
-import org.basex.gui.view.real.RealView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.io.CachedOutput;
@@ -70,7 +69,7 @@ import org.basex.util.TokenBuilder;
  * This class is the main window of the GUI. It is the central instance
  * for user interactions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUI extends JFrame {
@@ -282,7 +281,6 @@ public final class GUI extends JFrame {
     final ViewPanel[][] panels = {
       { textpanel, helppanel },
       { new ViewPanel(new FolderView(notify, HELPFOLDER), FOLDERVIEW),
-        new ViewPanel(new RealView(notify, null), REALVIEW),
         new ViewPanel(new PlotView(notify, null), PLOTVIEW),
         new ViewPanel(new TableView(notify, HELPTABLE), TABLEVIEW),
         new ViewPanel(new MapView(notify, HELPMAP), MAPVIEW),

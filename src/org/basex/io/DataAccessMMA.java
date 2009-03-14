@@ -10,7 +10,7 @@ import org.basex.util.Num;
 /**
  * This class allows positional read and write access to a database file.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DataAccessMMA {
@@ -220,6 +220,8 @@ public final class DataAccessMMA {
     try {
       mbytebuffer[selector].position(off);
     }  catch (Exception e) {
+      e.printStackTrace();
+      /*
       System.out.println(numberofwindows);
       System.out.println(selector);
       System.out.println(p);
@@ -228,6 +230,7 @@ public final class DataAccessMMA {
       System.out.println(BUFFERSIZE);
       System.out.println(off);
       System.out.println("**********");
+      */
     }
   }
 

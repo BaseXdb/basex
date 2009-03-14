@@ -31,14 +31,14 @@ import org.basex.util.Token;
 /**
  * This view is a TreeMap implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class MapView extends View implements Runnable {
   /** Dynamic zooming steps. */
-  private static final int[] ZS = { 0, 31, 113, 205, 356, 553, 844, 1226, 1745,
+  private static final int[] ZS = { 0, 10, 40, 90, 210, 450, 800, 1226, 1745,
       2148, 2580, 3037, 3515, 4008, 4511, 5019, 5527, 6030, 6522, 6998, 7453,
-      7883, 8283, 8749, 9158, 9456, 9650, 9797, 9885, 9973, 10000};
+      7883, 8283, 8749, 9200, 9550, 9790, 9910, 9960, 9990, 10000};
   /** Number of zooming steps. */
   private static final int ZOOMSIZE = ZS.length - 1;
   /** Maximum zooming step. */
@@ -48,10 +48,8 @@ public final class MapView extends View implements Runnable {
   private ArrayList<MapRect> mainRects;
   /** Data specific map layout. */
   private MapPainter painter;
-  /** Determines Layout Algorithm. */
-  public MapLayout layouter;
   /** Keeps the whole map layout. */
-  public MapLayout newmaplayout;
+  public MapLayout layout;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[ViewNotifier.MAXHIST];
@@ -310,11 +308,11 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
     painter.reset();
     // should replace following lines
-    newmaplayout = new MapLayout(nodes.data);
-    newmaplayout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
-    mainRects = (ArrayList<MapRect>) newmaplayout.rectangles.clone();
+    layout = new MapLayout(nodes.data);
+    layout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
+    mainRects = (ArrayList<MapRect>) layout.rectangles.clone();
     painter.init(mainRects);
-    drawMap(map, newmaplayout.rectangles);
+    drawMap(map, layout.rectangles);
     focus();
 
     /*
@@ -323,53 +321,6 @@ public final class MapView extends View implements Runnable {
      * e.printStackTrace(); }
      */
   }
-
-  /*
-   * Initializes the calculation of the main TreeMap.
-   * will be obsolete
-   * @param rect initial space to layout rects in
-   * @param rectangles List to store divided rects in
-   * @param nodes Nodes to draw in the map
-   * @param map image to draw rectangles on
-  private void calc(final MapRect rect, final ArrayList<MapRect> rectangles,
-      final Nodes nodes, final BufferedImage map) {
-
-    // calculate new main rectangles
-    if(painter == null) return;
-    painter.reset();
-
-    // call recursive TreeMap algorithm
-    switch(GUIProp.mapalgo) {
-      case 0:
-        layouter = new SplitLayout();
-        break;
-      case 1:
-        layouter = new SliceDiceLayout();
-        break;
-      case 2:
-        layouter = new SquarifiedLayout();
-        break;
-      case 3:
-        layouter = new StripLayout();
-        break;
-      default:
-        layouter = new SplitLayout();
-        break;
-    }
-    
-    layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes),
-    0, nodes.size(), 0);
-    painter.init(rectangles);
-    drawMap(map, rectangles);
-    
-    focus();
-
-    /*
-     * Screenshots: try { File file = new File("screenshot.png");
-     * ImageIO.write(mainMap, "png", file); } catch(IOException e) {
-     * e.printStackTrace(); }
-  }
-   */
 
   
   @Override

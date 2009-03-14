@@ -13,7 +13,7 @@ import org.basex.query.item.Uri;
 /**
  * XQuery Name Test.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class NameTest extends Test {

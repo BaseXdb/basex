@@ -8,7 +8,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class assembles some index statistics.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class IndexStats {

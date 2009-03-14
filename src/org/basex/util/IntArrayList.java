@@ -6,7 +6,7 @@ import org.basex.BaseX;
 /**
  * This is a simple container for native int array values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class IntArrayList implements Iterable<int[]> {
@@ -38,14 +38,6 @@ public final class IntArrayList implements Iterable<int[]> {
   public void add(final int[] v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
-  }
-  
-  /**
-   * Finishes the int array.
-   * @return int array
-   */
-  public int[][] finish() {
-    return size == list.length ? list : Array.finish(list, size);
   }
 
   public Iterator<int[]> iterator() {

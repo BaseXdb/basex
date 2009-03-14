@@ -3,7 +3,7 @@ package org.basex.query;
 /**
  * This class assembles textual information of the XQuery package.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public interface QueryText {

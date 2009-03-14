@@ -10,7 +10,7 @@ import org.w3c.dom.NodeList;
 /**
  * DOM - NodeList Implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class BXNList implements NodeList {

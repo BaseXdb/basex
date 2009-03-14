@@ -12,7 +12,7 @@ import org.basex.query.util.Err;
 /**
  * Except Expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Dennis Stratmann
  */

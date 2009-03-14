@@ -5,38 +5,38 @@ import java.util.ArrayList;
 /**
  * SplitLayout Algorithm.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
 public class SplitAlgo extends MapAlgo {
 
   @Override
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
-      final double[] weights, final int ns, final int ne, final int level) {
-    return calcMap(r, l, weights, ns, ne, level, 1);
+  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+      final double[] weights, final int ns, final int ne, final int l) {
+    return calcMap(r, ml, weights, ns, ne, l, 1);
   }
 
   /**
    * Uses recursive SplitLayout algorithm to divide rectangles on one level.
    * 
    * @param r parent rectangle
-   * @param l children array
+   * @param ml children array
    * @param w weights array
    * @param ns start array position
    * @param ne end array position
-   * @param level indicates level which is calculated
+   * @param l indicates level which is calculated
    * @param sumweight weight of this recursion level
    * @return ArrayList containing rectangles
    */
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
-      final double[] w, final int ns, final int ne, final int level,
+  private ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+      final double[] w, final int ns, final int ne, final int l,
       final double sumweight) {
     if(ne - ns == 1) {
-      ArrayList<MapRect> rects = new ArrayList<MapRect>();
-      rects.add(new MapRect(r, l.list[ns], level));
+      final ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      rects.add(new MapRect(r, ml.list[ns], l));
       return rects;
     } else {
-      ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      final ArrayList<MapRect> rects = new ArrayList<MapRect>();
       double weight;
       int ni = ns;
   
@@ -56,7 +56,7 @@ public class SplitAlgo extends MapAlgo {
       // paint both rectangles if enough space is left
       if(ww > 0 && hh > 0 && weight > 0) rects.addAll(calcMap(
           new MapRect(xx, yy, ww, hh, 0, r.level), 
-          l, w, ns, ni, level, weight));
+          ml, w, ns, ni, l, weight));
       if(r.w > r.h) {
         xx += ww;
         ww = r.w - ww;
@@ -64,18 +64,12 @@ public class SplitAlgo extends MapAlgo {
         yy += hh;
         hh = r.h - hh;
       }
-//      System.out.println("ww: " + ww + " hh: " + hh + " sumweight: " 
-//      + sumweight + " weight: " + weight + " ni: " + ni + " ne: " + ne);
+
       if(ww > 0 && hh > 0 && sumweight - weight > 0) rects.addAll(calcMap(
           new MapRect(xx, yy, ww, hh, 0, r.level), 
-          l, w, ni, ne, level, sumweight - weight));
+          ml, w, ni, ne, l, sumweight - weight));
       
       return rects;
     }
-  }
-  
-  @Override
-  public String getType() {
-    return "SplitLayout";
   }
 }

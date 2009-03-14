@@ -35,7 +35,7 @@ import org.basex.util.Token;
  * This is a simple web server.
  * Files with an <code>.xq</code> suffix are evaluated as XQuery.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BaseXWebServer {
@@ -283,7 +283,7 @@ public final class BaseXWebServer {
         final String val = arg.length == 2 ? arg[1] : "";
         xq.ctx.vars.addGlobal(v.bind(Str.get(val), null));
       }
-      xq.query(null).serialize(new XMLSerializer(out));
+      xq.query().serialize(new XMLSerializer(out));
     } catch(final Exception ex) {
       if(ex instanceof IOException) {
         out.println(SERVERERR);

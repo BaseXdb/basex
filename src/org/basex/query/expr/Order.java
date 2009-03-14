@@ -13,7 +13,7 @@ import org.basex.query.util.Var;
 /**
  * Order by expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Order extends Expr {
@@ -94,7 +94,8 @@ public final class Order extends Expr {
   }
 
   /**
-   * Recursively sorts the specified items via QuickSort.
+   * Recursively sorts the specified items.
+   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
    * @param o order array
    * @param s start position
    * @param e end position
@@ -103,9 +104,9 @@ public final class Order extends Expr {
   protected void sort(final int[] o, final int s, final int e) 
       throws QueryException {
 
-    if(e < 15) {
+    if(e < 7) {
       for(int i = s; i < e + s; i++)
-        for(int j = i; j > s && diff(o, j - 1, j) > 0; j--) s(o, j, j - 1);
+        for(int j = i; j > s && d(o, j - 1, j) > 0; j--) s(o, j, j - 1);
       return;
     }
 
@@ -122,20 +123,19 @@ public final class Order extends Expr {
       m = m(o, l, m, n);
     }
     
-    // well...
     final Item[] im = new Item[ord.length];
     for(int k = 0; k < ord.length; k++) im[k] = ord[k].item(o[m]);
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = diff(o, b, im);
+        final int h = d(o, b, im);
         if(h > 0) break;
         if(h == 0) s(o, a++, b);
         b++;
       }
       while(c >= b) {
-        final int h = diff(o, c, im);
+        final int h = d(o, c, im);
         if(h < 0) break;
         if(h == 0) s(o, c, d--);
         c--;
@@ -163,7 +163,7 @@ public final class Order extends Expr {
    * @return result
    * @throws QueryException evaluation exception
    */
-  private int diff(final int[] o, final int a, final Item[] it)
+  private int d(final int[] o, final int a, final Item[] it)
       throws QueryException {
 
     for(int k = 0; k < ord.length; k++) {
@@ -187,7 +187,7 @@ public final class Order extends Expr {
    * @return result
    * @throws QueryException evaluation exception
    */
-  private int diff(final int[] o, final int a, final int b)
+  private int d(final int[] o, final int a, final int b)
       throws QueryException {
 
     for(final Ord l : ord) {
@@ -212,9 +212,9 @@ public final class Order extends Expr {
    */
   private int m(final int[] o, final int a, final int b, final int c)
       throws QueryException {
-    return diff(o, a, b) < 0 ?
-        (diff(o, b, c) < 0 ? b : diff(o, a, c) < 0 ? c : a) :
-        (diff(o, b, c) > 0 ? b : diff(o, a, c) > 0 ? c : a);
+    return d(o, a, b) < 0 ?
+        (d(o, b, c) < 0 ? b : d(o, a, c) < 0 ? c : a) :
+        (d(o, b, c) > 0 ? b : d(o, a, c) > 0 ? c : a);
   }
 
   /**

@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class TokenBuilder {

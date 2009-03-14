@@ -12,7 +12,7 @@ import org.basex.util.XMLToken;
 /**
  * This abstract class defines syntax highlighting of text panels.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class QuerySyntax extends BaseXSyntax {

@@ -9,7 +9,7 @@ import org.basex.query.util.NSLocal;
 /**
  * This class provides access to namespace context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class NSContextImpl implements NamespaceContext {

@@ -20,7 +20,7 @@ import static org.basex.gui.GUIConstants.*;
  * The menu structure is defined in {@link GUIConstants#MENUBAR} and
  * {@link GUIConstants#MENUITEMS}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIMenu extends JMenuBar {

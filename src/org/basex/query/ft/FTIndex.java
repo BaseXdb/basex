@@ -14,7 +14,7 @@ import org.basex.query.iter.FTNodeIter;
 /**
  * This expression retrieves the ids of indexed fulltext terms.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
  */

@@ -14,7 +14,7 @@ import org.basex.util.TokenList;
 /**
  * This class allows to output XML results via SAX.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends Serializer {

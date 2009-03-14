@@ -7,7 +7,7 @@ import org.w3c.dom.Text;
 /**
  * DOM - Text Implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class BXText extends BXChar implements Text {

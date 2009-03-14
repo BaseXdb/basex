@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 /**
  * Time item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Tim extends Date {

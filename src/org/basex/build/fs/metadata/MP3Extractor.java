@@ -19,7 +19,7 @@ import org.basex.util.Array;
  * http://www.id3.org/id3v2.4.0-structure [2.4.0-s]
  * http://www.id3.org/id3v2.4.0-frames [2.4.0-f]
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
 public final class MP3Extractor extends AbstractExtractor {

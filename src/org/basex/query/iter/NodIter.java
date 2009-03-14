@@ -7,7 +7,7 @@ import org.basex.util.Array;
 
 /**
  * Simple node Iterator, ignoring duplicates.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class NodIter extends NodeIter {
@@ -37,17 +37,6 @@ public final class NodIter extends NodeIter {
   public NodIter(final boolean d) {
     list = new Nod[1];
     dupl = d;
-  }
-
-  /**
-   * Constructor.
-   * @param l node list
-   * @param s number of nodes
-   */
-  public NodIter(final Nod[] l, final int s) {
-    this(false);
-    list = l;
-    size = s;
   }
 
   /**

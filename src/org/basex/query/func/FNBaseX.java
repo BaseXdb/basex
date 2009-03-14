@@ -24,7 +24,7 @@ import org.basex.query.util.Err;
 /**
  * Project specific functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class FNBaseX extends Fun {
@@ -71,7 +71,7 @@ final class FNBaseX extends Fun {
   private Iter eval(final QueryContext ctx) throws QueryException {
     final QueryContext qt = new QueryContext();
     qt.parse(string(checkStr(expr[0], ctx)));
-    qt.compile(null);
+    qt.compile();
     return qt.iter();
   }
 

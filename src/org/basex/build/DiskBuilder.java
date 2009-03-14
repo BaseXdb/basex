@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * This class creates a disk based database instance. The disk layout is
  * described in the {@link DiskData} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder {

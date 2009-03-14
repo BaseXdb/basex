@@ -20,7 +20,7 @@ import org.basex.util.TokenList;
 /**
  * This is a container for the table data.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class TableData {
@@ -227,12 +227,12 @@ final class TableData {
     
     // sort columns by string lengths
     if(data.fs == null) {
-      final TokenList tl = new TokenList();
-      for(int c = 0; c < cs; c++) tl.add(Token.token(cols[c].width));
-      final IntList il = IntList.createOrder(tl.finish(), true, false);
+      final double[] widths = new double[cs];
+      for(int c = 0; c < cs; c++) widths[c] = cols[c].width;
+      final int[] il = Array.createOrder(widths, false);
       
       final TableCol[] cl = new TableCol[cs];
-      for(int c = 0; c < cs; c++) cl[c] = cols[il.list[c]];
+      for(int c = 0; c < cs; c++) cl[c] = cols[il[c]];
       cols = cl;
     }
     setWidths(false);

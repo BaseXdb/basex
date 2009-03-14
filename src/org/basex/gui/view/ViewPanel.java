@@ -8,7 +8,7 @@ import org.basex.gui.layout.BaseXBack;
  * This class contains a view reference and adds a {@link ViewMover}
  * on top of the view.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class ViewPanel extends BaseXBack implements ViewLayout {

@@ -7,7 +7,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Base64Binary item.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class B64 extends Item {

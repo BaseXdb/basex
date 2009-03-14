@@ -5,13 +5,13 @@ import java.util.ArrayList;
 /**
  * Slice-and-Dice Layout Algorithm.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-public class SliceDiceAlgo extends MapAlgo{
+public class SliceDiceAlgo extends MapAlgo {
   @Override
-  public ArrayList<MapRect>  calcMap(final MapRect r, final MapList l, 
-      final double[] weights, final int ns, final int ne, final int level) {
+  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+      final double[] weights, final int ns, final int ne, final int l) {
     
     // setting initial proportions
     double xx = r.x;
@@ -19,27 +19,22 @@ public class SliceDiceAlgo extends MapAlgo{
     double ww = 0;
     double hh = 0;
 
-    ArrayList<MapRect> rects = new ArrayList<MapRect>();
+    final ArrayList<MapRect> rects = new ArrayList<MapRect>();
     // calculate map for each rectangle on this level
-    for(int i = 0; i < l.size - 1; i++) {      
-      if((level % 2) == 0) {
+    for(int i = 0; i < ml.size - 1; i++) {      
+      if((l & 1) == 0) {
         yy += hh;
-        hh = l.weights[i] * r.h;
+        hh = ml.weight[i] * r.h;
         ww = r.w;
       } else {
         xx += ww;
-        ww = l.weights[i] * r.w;
+        ww = ml.weight[i] * r.w;
         hh = r.h;
       }
       
       if(ww > 0 && hh > 0) rects.add(new MapRect((int) xx, (int) yy, (int) ww, 
-          (int) hh, l.list[i], r.level));
+          (int) hh, ml.list[i], r.level));
     }
     return rects;
-  }
-
-  @Override
-  String getType() {
-    return "SliceAndDice Layout";
   }
 }

@@ -8,7 +8,7 @@ import org.basex.util.Token;
  * This class indexes tokens in a compressed tree structure.
  * The iterator returns all tokens in a sorted manner.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class ValueTree {

@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
 /**
  * XML Conformance Test Suite Wrapper.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class XMLTS {
@@ -137,6 +137,6 @@ public final class XMLTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new QueryProcessor(qu).queryNodes(root);
+    return new QueryProcessor(qu, root).queryNodes();
   }
 }

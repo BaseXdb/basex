@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * The same applies to the update operations; if you write an attribute
  * to an element node, your database will get messed up.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Data  {
@@ -341,26 +341,6 @@ public abstract class Data  {
         return substring(txt, indexOf(txt, ' ') + 1);
       default:
         return atm(pre);
-    }
-  }
-
-  /**
-   * Returns a atomized numeric content for any node kind.
-   * The atomized value can be an attribute value or XML content.
-   * @param pre pre value
-   * @return atomized value
-   */
-  public final double atomNum(final int pre) {
-    switch(kind(pre)) {
-      case TEXT: case COMM:
-        return textNum(pre);
-      case ATTR:
-        return attNum(pre);
-      case PI:
-        final byte[] txt = text(pre);
-        return toDouble(substring(txt, indexOf(txt, ' ') + 1));
-      default:
-        return toDouble(atm(pre));
     }
   }
 

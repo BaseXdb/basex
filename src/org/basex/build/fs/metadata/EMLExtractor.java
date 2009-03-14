@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
 /**
  * EML meta data extractor.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public final class EMLExtractor extends AbstractExtractor {

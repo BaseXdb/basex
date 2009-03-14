@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Evaluates the 'list' command. Shows all available databases.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class List extends Process {

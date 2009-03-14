@@ -12,7 +12,7 @@ import org.basex.util.Set;
 /**
  * This class organizes the namespaces of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {

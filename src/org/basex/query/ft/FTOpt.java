@@ -2,7 +2,6 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
@@ -17,7 +16,7 @@ import org.basex.util.Set;
  * This class contains all ftcontains options. It can be used
  * by different query implementations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
@@ -163,35 +162,6 @@ public final class FTOpt extends ExprInfo {
     if(il == null) return 0;
     pos.add(q, il);
     return il.size;
-  }
-
-  /**
-   * Merges two FTOpts.
-   * @param ftopt1 FTOpt to merge
-   */
-  public void merge(final FTOpt ftopt1) {
-    for (int i = 0; i < set.length; i++) {
-      if(!flag[i]) {
-        flag[i] = ftopt1.flag[i];
-        set[i] = ftopt1.set[i];
-      } else {
-        set[i] |= ftopt1.set[i];
-      }
-    }
-  }
-
-  /**
-   * Checks if an index can be used for query evaluation.
-   * @param meta meta data reference
-   * @return result of check
-   */
-  public boolean indexAccessible(final MetaData meta) {
-    /* if the following conditions are valid, the method returns true:
-     - case sensitivity, diacritics and stemming flags comply with index
-     - no stop words are specified
-     - if wildcards are specified, the fulltext index is a trie */
-    return meta.ftcs == is(FTOpt.CS) && meta.ftdc == is(FTOpt.DC) &&
-      meta.ftst == is(FTOpt.ST) && sw == null && (!is(FTOpt.WC) || !meta.ftfz);
   }
 
   /**

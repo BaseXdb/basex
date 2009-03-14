@@ -14,7 +14,7 @@ import org.basex.gui.view.ViewData;
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {
@@ -29,7 +29,7 @@ final class MapDefault extends MapPainter {
   @Override
   void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
     // some additions to set up borders
-    final MapRect l = view.newmaplayout.layout;
+    final MapRect l = view.layout.layout;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();

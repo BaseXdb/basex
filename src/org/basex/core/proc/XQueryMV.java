@@ -20,7 +20,7 @@ import org.basex.util.Token;
 /**
  * Evaluates the 'xquerymv' command.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class XQueryMV extends AQuery {
@@ -60,15 +60,14 @@ public final class XQueryMV extends AQuery {
     QueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = new QueryProcessor(query);
-        final Nodes nodes = context.current();
+        qu = new QueryProcessor(query, context.current());
         progress(qu);
 
         qu.parse();
         pars += per.getTime();
-        qu.compile(nodes);
+        qu.compile();
         comp += per.getTime();
-        result = qu.queryNodes(nodes);
+        result = qu.queryNodes();
         eval += per.getTime();
 
         final Nodes ns = (Nodes) result;

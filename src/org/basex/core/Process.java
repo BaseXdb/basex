@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * implementations. It evaluates queries that are sent by the GUI,
  * the client or the standalone version.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Process extends AbstractProcess {
@@ -178,9 +178,10 @@ public abstract class Process extends AbstractProcess {
    */
   protected final Nodes query(final String q, final String err) {
     try {
-      final QueryProcessor qu = new QueryProcessor(q == null ? "" : q);
+      final String query = q == null ? "" : q;
+      final QueryProcessor qu = new QueryProcessor(query, context.current());
       progress(qu);
-      final Nodes nodes = qu.queryNodes(context.current());
+      final Nodes nodes = qu.queryNodes();
       // check if all result nodes are tags
       if(err != null) {
         final Data data = context.data();

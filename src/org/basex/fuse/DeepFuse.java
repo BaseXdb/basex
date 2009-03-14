@@ -4,7 +4,7 @@ package org.basex.fuse;
 /**
  * Interface to filesystem in userspace framework.
  * 
- * @author Workgroup DBIS, University of Konstanz 2008, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public abstract class DeepFuse {

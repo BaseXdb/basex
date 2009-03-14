@@ -5,13 +5,13 @@ import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
-import org.basex.util.IntList;
+import org.basex.util.Array;
 import org.basex.util.Set;
 
 /**
  * Axis component of the scatter plot visualization.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public final class PlotAxis {
@@ -145,11 +145,11 @@ public final class PlotAxis {
    */
   private void textToNum(final byte[][] vals) {
     // get sorted indexes for values
-    final int[] tmpI = IntList.createOrder(vals, false, true).finish();
+    final int[] tmpI = Array.createOrder(vals, false, true);
     final int vl = vals.length;
     int i = 0;
 
-    // find first non empty value
+    // find first non-empty value
     // empty string is treated as non existing value -> coordinate = -1
     while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
 

@@ -16,7 +16,7 @@ import org.basex.util.Token;
 /**
  * This is the status bar of the main window. It displays progress information
  * and includes a memory status.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIStatus extends BaseXPanel implements Runnable {

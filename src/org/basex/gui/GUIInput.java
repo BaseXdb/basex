@@ -21,7 +21,7 @@ import org.basex.util.StringList;
 /**
  * This class offers a text field for keyword and XQuery input.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

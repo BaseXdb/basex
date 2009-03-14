@@ -1,5 +1,8 @@
 package org.basex.query.iter;
 
+import java.util.Iterator;
+
+import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -7,10 +10,10 @@ import org.basex.query.item.Seq;
 /**
  * Iterator interface.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Iter {
+public abstract class Iter implements Iterable<Item> {
   /** Empty iterator. */
   public static final Iter EMPTY = new Iter() {
     @Override
@@ -90,5 +93,21 @@ public abstract class Iter {
       item[s++] = i;
     }
     return Seq.get(item, s);
+  }
+
+
+  public Iterator<Item> iterator() {
+    return new Iterator<Item>() {
+      private Item next;
+      public boolean hasNext() {
+        try {
+          return (next = Iter.this.next()) != null;
+        } catch(final Exception ex) {
+          throw new RuntimeException(ex);
+        }
+      }
+      public Item next() { return next; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

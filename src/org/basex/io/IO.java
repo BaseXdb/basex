@@ -13,7 +13,7 @@ import org.xml.sax.InputSource;
 /**
  * BaseX file representation, pointing to a local or remote file or byte array
  * contents.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class IO {

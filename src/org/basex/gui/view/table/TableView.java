@@ -24,7 +24,7 @@ import org.basex.util.Token;
 /**
  * This view creates a flat table view on the database contents.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class TableView extends View implements Runnable {

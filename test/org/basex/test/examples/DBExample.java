@@ -8,8 +8,8 @@ import org.basex.io.*;
  * This class serves as an example for creating and processing database
  * instances.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author BaseX Team
  */
 public final class DBExample {
   /** Input XML file. */
@@ -35,11 +35,9 @@ public final class DBExample {
 
     // Uses console output
     ConsoleOutput out = new ConsoleOutput(System.out);
+
     // Uses file output
     //PrintOutput out = new PrintOutput(RESULT);
-
-    // Optionally sets a new database path
-    //new Set("dbpath", "/path/to/database").execute(context, out);
 
     // Creates a database for the specified path/file.
     new CreateDB(INPUT).execute(context, out);

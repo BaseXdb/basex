@@ -26,7 +26,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Paint filesystem specific TreeMap rectangles.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class MapFS extends MapPainter {
@@ -53,7 +53,7 @@ final class MapFS extends MapPainter {
   @Override
   void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
     final Data data = view.gui.context.data();
-    final MapRect l = view.newmaplayout.layout;
+    final MapRect l = view.layout.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);

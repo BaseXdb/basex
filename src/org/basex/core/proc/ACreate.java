@@ -25,7 +25,7 @@ import org.basex.util.Performance;
 /**
  * Abstract class for database creation.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 abstract class ACreate extends Process {
@@ -58,8 +58,6 @@ abstract class ACreate extends Process {
         context.close();
         final Performance pp = new Performance();
         if(Prop.usebdb) {
-          final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
-          builder = (Builder) cls.newInstance();
         } else {
           builder = new DiskBuilder();
         }

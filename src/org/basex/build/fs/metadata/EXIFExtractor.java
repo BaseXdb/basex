@@ -13,7 +13,7 @@ import static org.basex.build.fs.FSText.*;
 /**
  * This is an abstract class for defining EXIF extractors.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 abstract class EXIFExtractor extends AbstractExtractor {

@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class parses MAB2 data and creates a hierarchical representation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class MAB2Parser extends Parser {
@@ -584,7 +584,7 @@ public final class MAB2Parser extends Parser {
   /**
    * This is a simple data structure for storing MAB2 entries.
    *
-   * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Christian Gruen
    */
   static final class MAB2Entry {

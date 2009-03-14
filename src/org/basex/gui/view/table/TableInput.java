@@ -11,7 +11,7 @@ import org.basex.util.Performance;
 /**
  * This is a simple input box for BaseX views.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class TableInput implements Runnable {

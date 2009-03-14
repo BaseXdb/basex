@@ -5,7 +5,7 @@ import static org.basex.Text.*;
 /**
  * This class defines the available command-line commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -16,8 +16,7 @@ public interface Commands {
     DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true), CHECK(false),
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
-    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false),
-    XQUENV(false), FIND(true), CS(true),
+    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false), FIND(true), CS(true),
     // UPDATE COMMANDS
     DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS

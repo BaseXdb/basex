@@ -6,7 +6,7 @@ import org.basex.gui.layout.BaseXSplit;
 /**
  * Layout class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class ViewAlignment implements ViewLayout {

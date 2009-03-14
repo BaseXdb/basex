@@ -10,7 +10,7 @@ import org.basex.util.Token;
  * that the output was chopped in case there was more data than specified
  * by the limit.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CachedOutput extends PrintOutput {

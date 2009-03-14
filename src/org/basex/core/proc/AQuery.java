@@ -7,7 +7,6 @@ import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
-import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
@@ -19,7 +18,7 @@ import org.basex.util.Performance;
 
 /**
  * Abstract class for database queries.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 abstract class AQuery extends Process {
@@ -48,17 +47,16 @@ abstract class AQuery extends Process {
     QueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = new QueryProcessor(query == null ? "" : query);
-        final Nodes nodes = context.current();
+        qu = new QueryProcessor(query == null ? "" : query, context.current());
         progress(qu);
 
         qu.parse();
         pars += per.getTime();
         if(i == 0) plan(qu, false);
-        qu.compile(nodes);
+        qu.compile();
         if(i == 0) plan(qu, true);
         comp += per.getTime();
-        result = qu.query(nodes);
+        result = qu.query();
         eval += per.getTime();
       }
 

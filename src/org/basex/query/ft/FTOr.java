@@ -11,7 +11,7 @@ import org.basex.util.IntList;
 /**
  * FTOr expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class FTOr extends FTExpr {
@@ -49,6 +49,7 @@ public final class FTOr extends FTExpr {
   @Override
   public void indexAccessible(final QueryContext ctx, final IndexContext ic)
       throws QueryException {
+
     final IntList p = new IntList();
     final IntList n = new IntList();
     final int min = ic.is;

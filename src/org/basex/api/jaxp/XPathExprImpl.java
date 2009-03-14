@@ -21,7 +21,7 @@ import org.xml.sax.InputSource;
 /**
  * This class provides an API for standalone XPath processing.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class XPathExprImpl implements XPathExpression {
@@ -35,7 +35,7 @@ public final class XPathExprImpl implements XPathExpression {
    * @param expr query expression
    */
   public XPathExprImpl(final String expr) {
-    xproc = new QueryProcessor(expr);
+    xproc = new QueryProcessor(expr, context.current());
   }
 
   public String evaluate(final Object item) throws XPathExpressionException {
@@ -66,7 +66,7 @@ public final class XPathExprImpl implements XPathExpression {
    */
   private Result eval() throws XPathExpressionException {
     try {
-      return xproc.query(context.current());
+      return xproc.query();
     } catch(final QueryException ex) {
       throw new XPathExpressionException(ex);
     }

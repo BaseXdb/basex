@@ -49,7 +49,7 @@ import org.basex.util.TokenList;
 /**
  * XQuery Test Suite Wrapper.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class W3CTS {
@@ -342,12 +342,12 @@ public abstract class W3CTS {
     try {
       final Context context = new Context();
       final CachedOutput out = new CachedOutput();
-      final QueryProcessor xq = new QueryProcessor(in, file);
       
       Nodes cont = nodes("*:contextItem", root);
       if(cont.size() != 0) new Check(sources + string(
           data.atom(cont.nodes[0])) + IO.XMLSUFFIX).execute(context, out);
 
+      final QueryProcessor xq = new QueryProcessor(in, context.current());
       final QueryContext ctx = xq.ctx;
       ctx.stop = stop;
       
@@ -379,7 +379,7 @@ public abstract class W3CTS {
       //Prop.allInfo = true;
       
       // evaluate and serialize query
-      item = xq.eval(context.current());
+      item = xq.eval();
       item.serialize(new XMLSerializer(out));
       output = norm(out.finish());
       
@@ -628,7 +628,7 @@ public abstract class W3CTS {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in);
-      final Item item = xq.eval(null);
+      final Item item = xq.eval();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
       ctx.vars.addGlobal(v.bind(item, ctx));
     }
@@ -692,7 +692,7 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new QueryProcessor(qu).queryNodes(root);
+    return new QueryProcessor(qu, root).queryNodes();
   }
 
   /**

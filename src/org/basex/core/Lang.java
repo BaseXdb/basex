@@ -14,7 +14,7 @@ import org.basex.util.Token;
  * This class loads language specific data when the {@link #lang}
  * method is called for the first time.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

@@ -14,7 +14,7 @@ import org.basex.util.Token;
  * This main-memory based class builds an index for attribute values and
  * text contents in a tree structure and stores the result to disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class ValueBuilder extends Progress implements IndexBuilder {

@@ -13,7 +13,7 @@ import org.basex.util.TokenList;
 /**
  * This class assembles utility methods for painting rectangle contents.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class MapRenderer {
@@ -162,7 +162,7 @@ final class MapRenderer {
           ll = 0;
         }
         if (draw) {
-          g.drawString(new String(new byte[] {(byte) ftt.lastpm}),
+          g.drawString(Character.toString((char) ftt.lastpm),
               xx + ll - (xx > we ? we : 0), yy);
         }
 //        ll += w;
@@ -216,7 +216,7 @@ final class MapRenderer {
           g.setColor(getFTColor(r.poi[pp], r.acol));
           pp++;
         } else g.setColor(textc);
-        g.drawString(new String(tok), xx + ll, yy);
+        g.drawString(string(tok), xx + ll, yy);
         count++;
       }
       ll += wl + we;
@@ -521,13 +521,13 @@ final class MapRenderer {
 
         if (ttcol.list[i] > -1) {
           g.setColor(getFTColor(ttcol.list[i], acol));
-          g.drawString(new String(tl.list[i]), xx + wl, yy);
+          g.drawString(string(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
             g.drawLine(xx + wl, yy, xx + wl + l, yy);
           g.setColor(Color.black);
           wl += l;
         } else {
-          g.drawString(new String(tl.list[i]), xx + wl, yy);
+          g.drawString(string(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
             g.drawLine(xx + wl, yy, xx + wl + (pm ? l - sw : l), yy);
           wl += l;

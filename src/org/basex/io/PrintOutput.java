@@ -11,7 +11,7 @@ import org.basex.util.Token;
  * byte representation (usually UTF8) will be directly output without
  * further character conversion.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {

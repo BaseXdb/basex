@@ -18,7 +18,7 @@ import org.basex.query.util.Var;
 /**
  * Path expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

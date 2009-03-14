@@ -5,13 +5,13 @@ import java.util.Arrays;
 /**
  * This is a simple container for native int values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class IntList {
   /** Value array. */
   public int[] list;
-  /** Current array size. */
+  /** Number of entries. */
   public int size;
 
   /**
@@ -52,7 +52,7 @@ public class IntList {
    * @param v byte[]
    */
   public void add(final byte[] v) {
-    for (byte b : v) add(b);
+    for(final byte b : v) add(b);
   }
   
   /**
@@ -85,18 +85,6 @@ public class IntList {
   }
 
   /**
-   * Finishes the int array.
-   * @param p pointer of first value to copy
-   * @return int array
-   */
-  public int[] finish(final int p) {
-    final int[] tmp = new int[size - p - 1];
-    if (tmp.length > 0)
-      System.arraycopy(list, p + 1, tmp, 0, tmp.length);
-    return tmp;
-  }
-
-  /**
    * Resets the integer list.
    */
   public void reset() {
@@ -104,38 +92,33 @@ public class IntList {
   }
 
   /**
-   * Sorts the specified tokens and returns an {@link IntList} instance
-   * with the sort order of all tokens.
-   * @param tok token array to sort by
-   * @param num numeric sort
-   * @param asc ascending
-   * @return sorted integer list
-   */
-  public static IntList createOrder(final byte[][] tok, final boolean num,
-      final boolean asc) {
-    final IntList il = new IntList();
-    for(int i = 0; i < tok.length; i++) il.add(i);
-    il.sort(tok, num, asc);
-    return il;
-  }
-
-  /**
-   * Sorts the int values.
+   * Sorts the data.
    */
   public void sort() {
     Arrays.sort(list, 0, size);
   }
 
   /**
-   * Sorts the array in the order of the specified token array.
-   * This sort algorithm is derived from Java's highly optimized
-   * {Arrays#sort} array sort algorithms.
+   * Sorts the data in the order of the specified token array.
+   * Note that the input array will be resorted as well. -
+   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
    * @param tok token array to sort by
    * @param num numeric sort
    * @param asc ascending
    */
   public void sort(final byte[][] tok, final boolean num, final boolean asc) {
-    if(size > 1) sort(0, size, num, asc, tok);
+    sort(0, size, num, asc, tok);
+  }
+
+  /**
+   * Sorts the data in the order of the specified numeric array.
+   * Note that the input array will be resorted as well. -
+   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
+   * @param num token array to sort by
+   * @param asc ascending
+   */
+  public void sort(final double[] num, final boolean asc) {
+    sort(0, size, asc, num);
   }
 
   /**
@@ -204,6 +187,70 @@ public class IntList {
   }
 
   /**
+   * Sorts the array.
+   * @param s offset
+   * @param e length
+   * @param f ascending/descending sort
+   * @param t sort tokens
+   */
+  private void sort(final int s, final int e, final boolean f,
+      final double[] t) {
+
+    if(e < 7) {
+      for(int i = s; i < e + s; i++) {
+        for(int j = i; j > s; j--) {
+          final double h = t[j - 1] - t[j];
+          if(f ? h < 0 : h > 0) break;
+          s(j, j - 1, t);
+        }
+      }
+      return;
+    }
+
+    int m = s + (e >> 1);
+    if(e > 7) {
+      int l = s;
+      int n = s + e - 1;
+      if(e > 40) {
+        final int k = e >>> 3;
+        l = m(l, l + k, l + (k << 1));
+        m = m(m - k, m, m + k);
+        n = m(n - (k << 1), n - k, n);
+      }
+      m = m(l, m, n);
+    }
+    final double v = t[m];
+
+    int a = s, b = a, c = s + e - 1, d = c;
+    while(true) {
+      while(b <= c) {
+        final double h = t[b] - v;
+        if(f ? h > 0 : h < 0) break;
+        if(h == 0) s(a++, b, t);
+        b++;
+      }
+      while(c >= b) {
+        final double h = t[c] - v;
+        if(f ? h < 0 : h > 0) break;
+        if(h == 0) s(c, d--, t);
+        c--;
+      }
+      if(b > c) break;
+      s(b++, c--, t);
+    }
+
+    int k;
+    final int n = s + e;
+    k = Math.min(a - s, b - a);
+    s(s, b - k, k, t);
+    k = Math.min(d - c, n - d - 1);
+    s(b, n - k, k, t);
+
+    if((k = b - a) > 1) sort(s, k, f, t);
+    if((k = d - c) > 1) sort(n - k, k, f, t);
+  }
+
+  /**
    * Compares two numeric tokens and returns an integer.
    * @param a first token
    * @param b second token
@@ -240,6 +287,21 @@ public class IntList {
   }
 
   /**
+   * Swaps two array values.
+   * @param a first offset
+   * @param b second offset
+   * @param t sort tokens
+   */
+  private void s(final int a, final int b, final double[] t) {
+    final int l = list[a];
+    list[a] = list[b];
+    list[b] = l;
+    final double c = t[a];
+    t[a] = t[b];
+    t[b] = c;
+  }
+
+  /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
    * @param a first offset
    * @param b second offset
@@ -247,6 +309,17 @@ public class IntList {
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final byte[][] t) {
+    for(int i = 0; i < n; i++) s(a + i, b + i, t);
+  }
+
+  /**
+   * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param a first offset
+   * @param b second offset
+   * @param n number of values
+   * @param t sort tokens
+   */
+  private void s(final int a, final int b, final int n, final double[] t) {
     for(int i = 0; i < n; i++) s(a + i, b + i, t);
   }
 
@@ -259,13 +332,13 @@ public class IntList {
    */
   private int m(final int a, final int b, final int c) {
     return list[a] < list[b] ?
-        (list[b] < list[c] ? b : list[a] < list[c] ? c : a) :
-        (list[b] > list[c] ? b : list[a] > list[c] ? c : a);
+      (list[b] < list[c] ? b : list[a] < list[c] ? c : a) :
+      (list[b] > list[c] ? b : list[a] > list[c] ? c : a);
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("IntList[");
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
     for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + list[i]);
     return sb.append("]").toString();
   }

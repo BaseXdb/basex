@@ -10,7 +10,7 @@ import org.basex.data.MetaData;
 /**
  * This class creates a memory based database instance.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
@@ -30,8 +30,9 @@ public final class MemBuilder extends Builder {
     return this;
   }
   
-  /** Use existing instance (and their indexes) for build process.
-   * @param mdata existing instance
+  /**
+   * Uses the specified data instance (and its indexes) for the build process.
+   * @param mdata data instance
    * @return builder
    */
   public MemBuilder init(final MemData mdata) {

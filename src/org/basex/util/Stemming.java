@@ -4,7 +4,7 @@ package org.basex.util;
  * Simple stemming algorithm, derived from
  * Porter [1980], An algorithm for suffix stripping.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Stemming {

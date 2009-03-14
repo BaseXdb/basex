@@ -7,7 +7,7 @@ import org.basex.io.IO;
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class InputParser {
@@ -220,16 +220,5 @@ public class InputParser {
   public String rest() {
     final int e = Math.min(ql, qp + 15);
     return qu.substring(qp, e) + (e == ql ? "" : "...");
-  }
-  
-  /**
-   * Creates a string list.
-   * @param str input
-   * @return output
-   */
-  protected StringList list(final String... str) {
-    final StringList sl = new StringList();
-    for(final String s : str) sl.add(s);
-    return sl;
   }
 }

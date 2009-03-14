@@ -44,7 +44,7 @@ import org.basex.util.TokenBuilder;
  * This abstract query expression provides the architecture
  * for a compiled query.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {
@@ -99,7 +99,7 @@ public final class QueryContext extends Progress {
   public int ftcount = 0;
   /** Temporary place for ftdata. */
   public IntList[] ftd;
-  
+
   /** Current Date. */
   public Dat date;
   /** Current DateTime. */
@@ -150,6 +150,16 @@ public final class QueryContext extends Progress {
 
   /** Reference to the root expression. */
   private Expr root;
+  /** Initial context set (default: null). */
+  private Nodes nodes;
+
+  /**
+   * Sets initial context nodes.
+   * @param n initial nodeset
+   */
+  public void nodes(final Nodes n) {
+    nodes = n;
+  }
 
   /**
    * Parses the specified query.
@@ -173,10 +183,12 @@ public final class QueryContext extends Progress {
 
   /**
    * Optimizes the expression.
-   * @param nodes initial node set
    * @throws QueryException query exception
    */
-  public void compile(final Nodes nodes) throws QueryException {
+  public void compile() throws QueryException {
+    // add fulltext container reference
+    if(nodes != null && nodes.ftpos != null) ftdata = new FTPosData();
+
     try {
       // cache the initial context nodes
       final int s = nodes != null ? nodes.size() : 0;
@@ -224,14 +236,10 @@ public final class QueryContext extends Progress {
 
   /**
    * Evaluates the expression with the specified context set.
-   * @param nodes initial node set
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected Result eval(final Nodes nodes) throws QueryException {
-    // add fulltext container reference
-    if(nodes != null && nodes.ftpos != null) ftdata = new FTPosData();
-    
+  protected Result eval() throws QueryException {
     // evaluates the query
     final Iter it = iter();
     final SeqIter ir = new SeqIter(this);

@@ -3,7 +3,7 @@ package org.basex.io;
 /**
  * This class allows reading from a cached byte array.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CachedInput extends BufferInput {

@@ -6,7 +6,7 @@ import java.io.OutputStream;
 /**
  * This class serves as a buffered wrapper for output streams.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

@@ -7,7 +7,7 @@ import static org.basex.Text.*;
  * It gives feedback on the current process. Moreover, it allows to
  * interrupt the process by calling the {@link #stop} method.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Progress {

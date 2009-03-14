@@ -9,8 +9,8 @@ import org.basex.io.*;
  * This class serves as an example for inserting XML documents into
  * existing databases.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author BaseX Team
  */
 public final class InsertExample {
   /** Private constructor. */

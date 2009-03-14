@@ -5,7 +5,7 @@ package org.basex.util;
  * {@link Set hash set}.
  * @param <E> generic value type
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class Map<E> extends Set {

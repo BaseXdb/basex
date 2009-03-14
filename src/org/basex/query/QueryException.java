@@ -11,7 +11,7 @@ import org.basex.util.StringList;
 /**
  * This class indicates exceptions during query parsing or evaluation.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
@@ -58,6 +58,14 @@ public class QueryException extends Exception {
   }
 
   /**
+   * Returns the error column.
+   * @return error column
+   */
+  public final int col() {
+    return col;
+  }
+
+  /**
    * Returns the error line.
    * @return error line
    */
@@ -71,14 +79,6 @@ public class QueryException extends Exception {
    */
   public final StringList complete() {
     return complete == null ? new StringList() : complete;
-  }
-
-  /**
-   * Returns the error column.
-   * @return error column
-   */
-  public final int col() {
-    return col;
   }
 
   /**

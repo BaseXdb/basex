@@ -6,16 +6,14 @@ import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
-import org.basex.util.IntList;
 import org.basex.util.Set;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
  * This class indexes and organizes the tags or attribute names,
  * used in an XML document.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -107,23 +105,23 @@ public final class Names extends Set {
    * @return statistics string
    */
   public byte[] info() {
-    final byte[][] tl = new byte[size][];
+    final double[] tl = new double[size];
     int len = 0;
-    tl[0] = Token.EMPTY;
+    tl[0] = 0;
     for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;
-      tl[i] = Token.token(stat[i].counter);
+      tl[i] = stat[i].counter;
     }
     len += 2;
 
     // print all entries in descending number of occurrences
-    final IntList ids = IntList.createOrder(tl, true, false);
+    final int[] ids = Array.createOrder(tl, false);
     
     final TokenBuilder tb = new TokenBuilder();
     tb.add(NAMINDEX + NL);
     tb.add(IDXENTRIES + (size - 1) + NL);
     for(int i = 0; i < size - 1; i++) {
-      final int s = ids.list[i];
+      final int s = ids[i];
       if(stat[s] == null) continue;
       final byte[] key = keys[s];
       tb.add("  ");

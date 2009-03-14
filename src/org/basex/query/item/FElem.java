@@ -14,7 +14,7 @@ import org.basex.util.TokenList;
 /**
  * Element Node Fragment.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class FElem extends FNode {

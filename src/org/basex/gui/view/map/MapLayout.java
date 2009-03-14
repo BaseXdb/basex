@@ -10,22 +10,21 @@ import org.basex.util.Token;
 /**
  * Defines shared things of TreeMap Layout Algorithms.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
 class MapLayout {
-  /** Layout rectangle. */
-  MapRect layout;
   /** Font size. */
-  final int o = GUIProp.fontsize + 4;
-  /** List of rectangles. */
-  ArrayList<MapRect> rectangles;
+  private final int o = GUIProp.fontsize + 4;
   /** data reference. */
-  static Data data;
-  /** list of nodes. */
-  MapList list;
+  private final Data data;
   /** mapalgo to use in this layout. */
-  MapAlgo algo;
+  private final MapAlgo algo;
+
+  /** List of rectangles. */
+  final ArrayList<MapRect> rectangles;
+  /** Layout rectangle. */
+  final MapRect layout;
   
   /**
    * Constructor.
@@ -36,34 +35,22 @@ class MapLayout {
     rectangles = new ArrayList<MapRect>();
     
     switch(GUIProp.mapoffsets) {
-      case 0: layout = new MapRect(0, 0, 0, 0); break;
-      case 1: layout = new MapRect(1, 1, 2, 2); break;
-      case 2: layout = new MapRect(0, o, 0, o); break;
-      case 3: layout = new MapRect(2, o - 1, 4, o + 1); break;
-      case 4: layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5: layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
-      default:
+      case 1 : layout = new MapRect(1, 1, 2, 2); break;
+      case 2 : layout = new MapRect(0, o, 0, o); break;
+      case 3 : layout = new MapRect(2, o - 1, 4, o + 1); break;
+      case 4 : layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
+      case 5 : layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
+      default: layout = new MapRect(0, 0, 0, 0); break;
     }
     
     switch(GUIProp.mapalgo) {
       // select method to construct this treemap
       // may should be placed in makeMap to define different method for 
       // different levels
-      case 0:
-        algo = new SplitAlgo();
-        break;
-      case 1:
-        algo = new SliceDiceAlgo();
-        break;
-      case 2:
-        algo = new SquarifiedAlgo();
-        break;
-      case 3:
-        algo = new StripAlgo();
-        break;
-      default:
-        algo = new SplitAlgo();
-        break;
+      case 1 : algo = new StripAlgo(); break;
+      case 2 : algo = new SquarifiedAlgo(); break;
+      case 3 : algo = new SliceDiceAlgo(); break;
+      default: algo = new SplitAlgo(); break;
     }
   }
 
@@ -72,8 +59,7 @@ class MapLayout {
    *
    * @param r Array of rectangles
    * @return average aspect ratio
-   */
-  static double lineRatio(final ArrayList<MapRect> r) {
+  private static double lineRatio(final ArrayList<MapRect> r) {
     if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
 
@@ -88,6 +74,7 @@ class MapLayout {
     }
     return ar / r.size();
   }
+   */
 
   /**
    * Computes average aspect ratio of a rectangle list. 
@@ -102,7 +89,7 @@ class MapLayout {
     double aar = 0;
     int nrLeaves = 0;
     for(int i = 0; i < r.size(); i++) {
-      MapRect curr = r.get(i);
+      final MapRect curr = r.get(i);
       // Shneiderman would use this: children(data, curr.pre).size == 0 && 
       if (curr.w != 0 && curr.h != 0) {
         nrLeaves++;
@@ -126,8 +113,7 @@ class MapLayout {
    * @param first array of view rectangles
    * @param second array of view rectangles
    * @return average distance
-   */
-  static double averageDistanceChange(final ArrayList<MapRect> first, 
+  private static double averageDistanceChange(final ArrayList<MapRect> first, 
       final ArrayList<MapRect> second) {
     double aDist = 0.0;
     int length = Math.min(first.size(), second.size());
@@ -144,23 +130,24 @@ class MapLayout {
     }
     return aDist / length;
   }
+   */
 
-  /**
+  /*
    * Returns the number of rectangles painted.
    *
    * @param r array of painted rects
    * @return nr of rects in the list
-   */
-  int getNumberRects(final ArrayList<MapRect> r) {
+  private int getNumberRects(final ArrayList<MapRect> r) {
     return r.size();
   }
+   */
 
   /**
    * Returns all children of the specified node.
    * @param par parent node
    * @return children
    */
-  private static MapList children(final int par) {
+  private MapList children(final int par) {
     final MapList list = new MapList();
 
     final int kind = data.kind(par);
@@ -184,7 +171,7 @@ class MapLayout {
    * @param end here
    * @return sum of the size attribute
    */
-  static long addSizes(final IntList l, final int start, final int end) {
+  private long addSizes(final IntList l, final int start, final int end) {
     long sum = 0;
     for (int i = start; i < end; i++) {
       final byte[] val = data.attValue(data.sizeID, l.list[i]);
@@ -193,14 +180,13 @@ class MapLayout {
     return sum;
   }
   
-  /**
+  /*
    * Splits and adds rectangles uniformly distributed.
    * @param r rectangles to lay out in
    * @param l list of rectangles to lay out
    * @param ns starting point
    * @param ne ending
    * @return rectangles uniformly devided
-   */
   protected ArrayList<MapRect> splitUniformly(final MapRect r, final MapList l,
       final int ns, final int ne) {
     if (ne - ns == 1) {
@@ -241,7 +227,7 @@ class MapLayout {
       return rects;
     }
   }
-
+   */
 
   /**
    * Recursively splits rectangles.
@@ -258,7 +244,7 @@ class MapLayout {
       r.pre = l.list[ns];
       putRect(r, level);
     } else {
-      long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+      final long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
       int nn;
       ArrayList<MapRect> rects;
       if(level == 0) {
@@ -266,16 +252,16 @@ class MapLayout {
         nn = l.list[ne - 1] - l.list[ns];
         l.initWeights(parsize, nn, data);
         
-        MapAlgo tmp = new SplitAlgo();
-        rects = tmp.calcMap(r, l, l.weights, ns, ne - 1, level);
+        final MapAlgo tmp = new SplitAlgo();
+        rects = tmp.calcMap(r, l, l.weight, ns, ne - 1, level);
       } else {
         nn = l.list[ne] - l.list[ns];
         // init weights of nodes and sort
         l.initWeights(parsize, nn, data);
-        rects = algo.calcMap(r, l, l.weights, ns, ne, level);
+        rects = algo.calcMap(r, l, l.weight, ns, ne, level);
       }
       // call recursion for next deeper levels
-      for(MapRect rect : rects) putRect(rect, rect.level);
+      for(final MapRect rect : rects) putRect(rect, rect.level);
     }
   }
   
@@ -284,7 +270,7 @@ class MapLayout {
    * @param r parent rectangle
    * @param level indicates level which is calculated
    */
-  protected void putRect(final MapRect r, final int level) {
+  private void putRect(final MapRect r, final int level) {
     rectangles.add(r);
 
     // position, with and height calculated using sizes of former level

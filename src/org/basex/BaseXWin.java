@@ -29,7 +29,7 @@ import org.basex.util.Performance;
 /**
  * This is the starter class for the graphical frontend.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BaseXWin {

@@ -24,7 +24,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This view displays query information.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class InfoView extends View {

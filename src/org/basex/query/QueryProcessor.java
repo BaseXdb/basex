@@ -8,6 +8,7 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -16,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * the database. A variety of hierarchical parsers (XPath, XQuery, etc..)
  * can be implemented on top of this class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Progress {
@@ -50,6 +51,16 @@ public final class QueryProcessor extends Progress {
     this(qu);
     ctx.file = f;
   }
+  
+  /**
+   * XQuery Constructor.
+   * @param qu query
+   * @param n initial nodes
+   */
+  public QueryProcessor(final String qu, final Nodes n) {
+    this(qu);
+    ctx.nodes(n);
+  }
 
   /**
    * Parses the specified query.
@@ -62,45 +73,50 @@ public final class QueryProcessor extends Progress {
   
   /**
    * Compiles the query.
-   * @param nodes node context
    * @throws QueryException query exception
    */
-  public void compile(final Nodes nodes) throws QueryException {
+  public void compile() throws QueryException {
     parse();
-    if(!compiled) ctx.compile(nodes);
+    if(!compiled) ctx.compile();
     compiled = true;
   }
   
   /**
    * Returns a result iterator.
-   * @param nodes initial node set
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Item eval(final Nodes nodes) throws QueryException {
-    compile(nodes);
-    return ctx.iter().finish();
+  public Iter iter() throws QueryException {
+    compile();
+    return ctx.iter();
+  }
+  
+  /**
+   * Returns the result as an item.
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  public Item eval() throws QueryException {
+    return iter().finish();
   }
 
   /**
    * Parses the specified query and returns the result.
-   * @param nodes initial node set
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result query(final Nodes nodes) throws QueryException {
-    compile(nodes);
-    return ctx.eval(nodes);
+  public Result query() throws QueryException {
+    compile();
+    return ctx.eval();
   }
 
   /**
    * Parses the specified query and returns the result nodes.
-   * @param nodes node context
    * @return result of query
    * @throws QueryException query exception
    */
-  public Nodes queryNodes(final Nodes nodes) throws QueryException {
-    final Result res = query(nodes);
+  public Nodes queryNodes() throws QueryException {
+    final Result res = query();
     if(!(res instanceof Nodes)) throw new QueryException(QUERYNODESERR);
     return (Nodes) res;
   }

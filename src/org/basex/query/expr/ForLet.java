@@ -1,13 +1,12 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
 /**
  * Abstract For/Let Clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class ForLet extends Expr {
@@ -51,7 +50,4 @@ public abstract class ForLet extends Expr {
   public final String color() {
     return "66CC66";
   }
-
-  @Override
-  public abstract Iter iter(final QueryContext ctx);
 }

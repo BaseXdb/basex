@@ -39,7 +39,6 @@ import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
 import org.basex.core.proc.XQueryMV;
-import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -53,7 +52,7 @@ import org.basex.util.StringList;
  * This is a parser for command strings, creating {@link Process} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {
@@ -156,8 +155,6 @@ public final class CommandParser extends InputParser {
         return new XQuery(xquery(cmd));
       case XQUERYMV:
         return new XQueryMV(number(cmd), number(cmd), xquery(cmd));
-      case XQUENV:
-        return new XQEnv(xquery(null));
       case FIND:
         return new Find(string(cmd));
       case CS:

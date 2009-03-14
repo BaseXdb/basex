@@ -40,7 +40,7 @@ import org.basex.util.IntList;
 /**
  * A scatter plot visualization of the database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public final class PlotView extends View implements Runnable {

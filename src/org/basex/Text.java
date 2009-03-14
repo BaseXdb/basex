@@ -10,7 +10,7 @@ import org.basex.core.Lang;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link Lang} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
@@ -1147,7 +1147,7 @@ public interface Text {
   };
   /** Predefined number of layouts. */
   String[] MAPALGO = {
-    "Split Layout", "SliceAndDice Layout", "Squarified Layout", "Strip Layout"
+    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout"
   };
 
   /** Map layout-algorithm. */
@@ -1176,7 +1176,7 @@ public interface Text {
   /** About text. */
   String ABOUTTITLE = BaseX.info(lang("da_title"), NAME);
   /** Copyright Info. */
-  String COPYRIGHT = "© 2005-08 " + COMPANY;
+  String COPYRIGHT = "©2005-09 " + COMPANY;
   /** License Info. */
   String LICENSE = lang("da_license");
   /** Developer Info. */

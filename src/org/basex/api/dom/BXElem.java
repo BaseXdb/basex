@@ -14,7 +14,7 @@ import org.w3c.dom.TypeInfo;
 /**
  * DOM - Element Implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BXElem extends BXNode implements Element {

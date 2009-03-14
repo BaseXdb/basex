@@ -13,7 +13,7 @@ import org.basex.util.Num;
 /**
  * This class allows positional read and write access to a database file.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DataAccessNIO {

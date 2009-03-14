@@ -8,7 +8,7 @@ import org.basex.query.QueryException;
 /**
  * Simple expression without arguments.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Simple extends Expr {

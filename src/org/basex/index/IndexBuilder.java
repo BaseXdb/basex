@@ -7,7 +7,7 @@ import org.basex.data.Data;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public interface IndexBuilder {

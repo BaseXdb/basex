@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Interface MapAlgorithms need to implement.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
 public abstract class MapAlgo {
@@ -45,10 +45,4 @@ public abstract class MapAlgo {
    */
   abstract ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
       final double[] weights, final int ns, final int ne, final int level);
-  
-  /**
-   * Find out which kind of Maplayout is used right now.
-   * @return name Of Layoutalgorithm
-   */
-  abstract String getType();
 }

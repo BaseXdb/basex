@@ -24,7 +24,7 @@ import org.basex.io.IO;
 /**
  * Creates a new database.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
@@ -88,17 +88,12 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Parser p, final String db) throws IOException {
     if(db == null) return new MemBuilder().build(p, "");
     
-    final Builder builder;
-    if (Prop.usebdb) {
-      try {
-        final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
-        builder = (Builder) cls.newInstance();
-      } catch(final Exception e) {
-        throw new IOException(e.toString());
-      }
+    Builder builder = null;
+    if(Prop.usebdb) {
     } else {
       builder = new DiskBuilder();
     }
+
     try {
       final Data data = builder.build(p, db);
       if(data.meta.txtindex) data.setIndex(IndexToken.Type.TXT,

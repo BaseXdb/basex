@@ -29,7 +29,7 @@ import org.basex.util.Performance;
 /**
  * Stores a file hierarchy as XML.
  * 
- * @author Workgroup DBIS, University of Konstanz 2008, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public final class DeepBase extends DeepFuse implements DataText {
@@ -160,7 +160,7 @@ public final class DeepBase extends DeepFuse implements DataText {
    * @throws QueryException on failure
    */
   private Nodes xquery(final String query) throws QueryException {
-    return new QueryProcessor(query).queryNodes(new Nodes(0, data));
+    return new QueryProcessor(query, new Nodes(0, data)).queryNodes();
   }
 
   /**
@@ -443,8 +443,8 @@ public final class DeepBase extends DeepFuse implements DataText {
   public int opendir(final String path) {
     try {
       String query = "count(" + pn2xp(path, true) + "/child::*)";
-      QueryProcessor xquery = new QueryProcessor(query);
-      Result result = xquery.query(new Nodes(0, data));
+      QueryProcessor xquery = new QueryProcessor(query, new Nodes(0, data));
+      Result result = xquery.query();
       SeqIter s = (SeqIter) result;
       Item i = s.next();
       return (i != null) ? (int) i.itr() : -1;
@@ -465,8 +465,8 @@ public final class DeepBase extends DeepFuse implements DataText {
     try {
       String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
           + "]/@name)";
-      QueryProcessor xquery = new QueryProcessor(query);
-      SeqIter s = (SeqIter) xquery.query(new Nodes(0, data));
+      QueryProcessor xquery = new QueryProcessor(query, new Nodes(0, data));
+      SeqIter s = (SeqIter) xquery.query();
       if(s.size() != 1) return null;
       return (s.size() != 1) ? null : new String(((Str) s.next()).str());
     } catch(QueryException e) {

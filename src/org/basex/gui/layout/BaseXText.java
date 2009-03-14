@@ -37,7 +37,7 @@ import org.basex.util.Undo;
  * This class offers a fast text input, using the {@link BaseXTextRenderer}
  * class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BaseXText extends BaseXPanel {

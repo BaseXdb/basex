@@ -7,7 +7,7 @@ import org.basex.util.Token;
 /**
  * Expression Information.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class ExprInfo {

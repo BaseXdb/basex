@@ -7,12 +7,12 @@ import java.util.HashSet;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.IntList;
+import org.basex.util.Array;
 import org.basex.util.TokenList;
 
 /**
  * This class stores the tree structure of a document.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class PathSummary {
@@ -121,14 +121,14 @@ public final class PathSummary {
     }
 
     // sort by number of occurrences
-    final TokenList tmp = new TokenList();
-    for(final PathNode r : n) tmp.add(token(r.count));
-    final IntList occ = IntList.createOrder(tmp.finish(), true, false);
+    final double[] tmp = new double[n.size()];
+    for(int i = 0; i < n.size(); i++) tmp[i] = n.get(i).count;
+    final int[] occ = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
     final TokenList out = new TokenList();
     for(int i = 0; i < n.size(); i++) {
-      final PathNode r = n.get(o ? occ.list[i] : i);
+      final PathNode r = n.get(o ? occ[i] : i);
       final byte[] name = r.token(data);
       if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
         out.add(name);

@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * Test modeling a file hierarchy in XML.
  * 
- * @author Workgroup DBIS, University of Konstanz 2008, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public class DeepBaseTest {
@@ -158,7 +158,7 @@ public class DeepBaseTest {
   private String query(final String query) {
     try {
       Nodes n = new Nodes(0, dbfs.getData());
-      n = new QueryProcessor(query).queryNodes(n);
+      n = new QueryProcessor(query, n).queryNodes();
       PrintOutput out = new PrintOutput(TESTFILE);
       n.serialize(new XMLSerializer(out));
       out.flush();

@@ -5,12 +5,14 @@ import org.basex.core.proc.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
 
 /**
- * This class serves as an example for executing XQuery requests.
+ * This class presents three alternatives to process XQuery requests with BaseX.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author BaseX Team
  */
 public final class XQueryExample {
   /** Sample query. */
@@ -25,34 +27,45 @@ public final class XQueryExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    // FIRST EXAMPLE:
-    System.out.println("First example:");
-
-    // create standard output stream
+    // Creates a standard output stream
     ConsoleOutput out = new ConsoleOutput(System.out);
+
+    out.println("=== First example ===");
 
     // Creates a new database context
     Context context = new Context();
 
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);
-    
-    // Closes the output stream
-    out.println();
-    out.close();
 
-    
-    // SECOND EXAMPLE, directly accessing the query processor:
-    System.out.println("Second example:");
+    out.println();
+    out.println("=== Second example ====");
+
+    // Creates a result serializer
+    XMLSerializer xml = new XMLSerializer(out);
 
     // Creates a query instance
-    QueryProcessor xquery = new QueryProcessor(QUERY);
+    QueryProcessor proc1 = new QueryProcessor(QUERY);
 
-    // Executes the query; no initial context set is specified (null)
-    Result result = xquery.query(null);
+    // Executes the query.
+    Result result = proc1.query();
 
     // Serializes the result
-    result.serialize(new XMLSerializer(out));
+    result.serialize(xml);
+
+    out.println();
+    out.println("=== Third example ===");
+
+    // Creates a query instance
+    QueryProcessor proc2 = new QueryProcessor(QUERY);
+
+    // Returns a query iterator
+    Iter iter = proc2.iter();
+
+    // Iterates and serializes the result
+    for(final Item item : iter) {
+      item.serialize(xml);
+    }
 
     // Closes the output stream
     out.println();

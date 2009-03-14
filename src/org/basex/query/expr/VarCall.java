@@ -15,7 +15,7 @@ import org.basex.query.util.Var;
 /**
  * Variable expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class VarCall extends Expr {
@@ -52,15 +52,6 @@ public final class VarCall extends Expr {
     }
     ctx.ns = lc;
     return e;
-  }
-
-  /**
-   * Checks expression for equality.
-   * @param v variable
-   * @return result of check
-   */
-  public boolean eq(final Var v) {
-    return var.name.eq(v.name) && var.type == v.type;
   }
 
   @Override

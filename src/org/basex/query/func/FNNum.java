@@ -16,7 +16,7 @@ import org.basex.query.util.Err;
 /**
  * Numeric functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class FNNum extends Fun {

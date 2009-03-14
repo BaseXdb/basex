@@ -1,83 +1,37 @@
 package org.basex.gui.view.map;
 
-import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 
 /**
- * stores an integer array of pre values and their corresponding weights, sizes 
- * and number of children.
+ * Stores an integer array of pre values and their corresponding weights.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-public class MapList extends IntList {
+class MapList extends IntList {
   /** Weights array. */
-  public double[] weights;
+  double[] weight;
 
   /**
-   * Constructor, specifying an initial list size.
+   * Constructor.
    */
-  public MapList() {
+  MapList() {
   }
   
   /**
    * Constructor, specifying an initial array.
    * @param v initial list values
    */
-  public MapList(final int[] v) {
+  MapList(final int[] v) {
     super(v);
   }
   
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("IntList[");
-    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + list[i]);
-    sb.append("]\nweights[");
-    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + weights[i]);
-    return sb.append("]").toString();
-  }
-  
-  @Override
   public void sort() {
-    if(weights == null) return;
-
-    // [CG] check...
-    
-    final TokenList tl = new TokenList();
-    for(int c = 0; c < size; c++) tl.add(Token.token(weights[c]));
-    sort(tl.finish(), true, false);
-    Arrays.sort(weights);
-    for (int l = 0, r = weights.length - 1; l < r; l++, r--) {
-      // exchange the first and last
-      double temp = weights[l]; weights[l]  = weights[r]; weights[r] = temp;
-    }
-    
-    // simple bubble sort, obsolete
-//    boolean switched = true;
-//    int n = size;
-//    do {
-//      switched = false;
-//      for(int i = 0; i < size - 1; i++) {
-//        if(weights[i] < weights[i + 1]) {
-//          // switch entries
-//          int tmpint = list[i];
-//          list[i] = list[i + 1];
-//          list[i + 1] = tmpint;
-//          // switch weights
-//          double wtmp = weights[i];
-//          weights[i] = weights[i + 1];
-//          weights[i + 1] = wtmp;
-//          
-//          switched = true;
-//        }
-//      }
-//      n--;
-//    } while (n >= 0 && switched);
+    sort(weight, false);
   }
   
   /**
@@ -89,9 +43,8 @@ public class MapList extends IntList {
    * [JH] some weight problems occur displaying folders without any files and 
    * children
    */
-  public void initWeights(final long parsize, final int parchildren,
-      final Data data) {
-    weights = new double[list.length];
+  void initWeights(final long parsize, final int parchildren, final Data data) {
+    weight = new double[list.length];
     int[] nrchildren = new int[list.length];
     long[] sizes = new long[list.length];
     int sizeP = GUIProp.sizep;
@@ -102,7 +55,7 @@ public class MapList extends IntList {
         sizes[i] = data.fs != null ? 
             Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
         nrchildren[i] = list[i + 1] - list[i];
-        weights[i] = sizeP / 100d * sizes[i] / parsize + 
+        weight[i] = sizeP / 100d * sizes[i] / parsize + 
             (1 - sizeP / 100d) * nrchildren[i] / parchildren;
       }
     // only sizes
@@ -110,14 +63,23 @@ public class MapList extends IntList {
       for(int i = 0; i < size - 1; i++) {
         sizes[i] = data.fs != null ? 
             Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-        weights[i] = sizes[i] * 1d / parsize;
+        weight[i] = sizes[i] * 1d / parsize;
       }    
     //only #children
     } else if (GUIProp.sizep == 0 || data.fs == null) {
       for(int i = 0; i < size - 1; i++) {
         nrchildren[i] = list[i + 1] - list[i];
-        weights[i] = nrchildren[i] * 1d / parchildren;
+        weight[i] = nrchildren[i] * 1d / parchildren;
       }
     }
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
+    for(int i = 0; i < size; i++) {
+      sb.append((i == 0 ? "" : ", ") + list[i] + "/" + weight[i]);
+    }
+    return sb.append("]").toString();
   }
 }

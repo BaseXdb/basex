@@ -21,12 +21,12 @@
     <maxHeapSize>1024</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>5.0.0.0</fileVersion>
-    <txtFileVersion>BaseX 5.0</txtFileVersion>
+    <fileVersion>5.5.0.0</fileVersion>
+    <txtFileVersion>BaseX 5.5</txtFileVersion>
     <fileDescription>Native XML Database</fileDescription>
-    <copyright>(c) University of Konstanz, 2008</copyright>
-    <productVersion>5.0.0.0</productVersion>
-    <txtProductVersion>BaseX 5.0</txtProductVersion>
+    <copyright>(c) University of Konstanz, 2009</copyright>
+    <productVersion>5.5.0.0</productVersion>
+    <txtProductVersion>BaseX 5.5</txtProductVersion>
     <productName>BaseX</productName>
     <companyName>University of Konstanz</companyName>
     <internalName>BaseX</internalName>

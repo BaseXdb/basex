@@ -9,7 +9,7 @@ import org.basex.query.iter.Iter;
 /**
  * Iterative path expression.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Dennis Stratmann
  */
 public final class SingleIterPath extends AxisPath {

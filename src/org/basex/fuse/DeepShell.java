@@ -202,7 +202,7 @@ public class DeepShell {
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
       Nodes n = new Nodes(0, fs.getData());
-      n = new QueryProcessor("/").queryNodes(n);
+      n = new QueryProcessor("/", n).queryNodes();
       PrintOutput out = new PrintOutput(System.out);
       n.serialize(new XMLSerializer(out, false, true));
       out.println();

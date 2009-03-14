@@ -14,7 +14,7 @@ import org.basex.util.TokenList;
 /**
  * GUI Constants used in different views.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIConstants {
@@ -51,8 +51,6 @@ public final class GUIConstants {
   public static final String QUERYVIEW = "query";
   /** Internal name of the Help View. */
   public static final String HELPVIEW = "help";
-  /** Internal name of the Real Tree View. */
-  public static final String REALVIEW = "real";
   /** Internal name of the Plot View. */
   public static final String PLOTVIEW = "plot";
   
@@ -65,7 +63,7 @@ public final class GUIConstants {
    */
   public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " + FOLDERVIEW
       + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
-      + " " + INFOVIEW + " " + PLOTVIEW + " " + REALVIEW + " - -";
+      + " " + INFOVIEW + " " + PLOTVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
   public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " " + HELPVIEW

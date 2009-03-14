@@ -14,7 +14,7 @@ import org.basex.util.Token;
 /**
  * Stores a sequence type definition.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class SeqType {
@@ -33,16 +33,6 @@ public final class SeqType {
    */
   public SeqType(final QNm name, final int o, final boolean e) {
     type = Type.find(name, e);
-    occ = o;
-  }
-
-  /**
-   * Constructor.
-   * @param t sequence type
-   * @param o occurrences
-   */
-  public SeqType(final Type t, final int o) {
-    type = t;
     occ = o;
   }
 

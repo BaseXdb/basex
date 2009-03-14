@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * This class builds an index for text contents in a compressed trie.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
  */

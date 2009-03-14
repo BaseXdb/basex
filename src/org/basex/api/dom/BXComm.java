@@ -6,7 +6,7 @@ import org.w3c.dom.Comment;
 /**
  * DOM - Comment Implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class BXComm extends BXChar implements Comment {

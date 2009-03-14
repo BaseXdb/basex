@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * This class provides access to attribute values and text contents
  * stored on disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Values extends Index {

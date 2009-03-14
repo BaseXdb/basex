@@ -14,7 +14,7 @@ import org.basex.query.util.Err;
 /**
  * Generating functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 final class FNGen extends Fun {

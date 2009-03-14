@@ -7,7 +7,7 @@ import org.basex.util.IntList;
  * Offers an iterator for the children of a node. Could as well be
  * defined as generic child iterator.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class ChildIterator {

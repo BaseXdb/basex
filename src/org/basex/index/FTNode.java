@@ -6,7 +6,7 @@ import org.basex.util.IntList;
 /**
  * Full-text Node.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
 public final class FTNode {
@@ -57,17 +57,6 @@ public final class FTNode {
   }
 
   /**
-   * Constructor.
-   * @param prevalue pre value of the current node
-   */
-  FTNode(final int prevalue) {
-    pre = prevalue;
-    ip = new IntList();
-    ip.add(prevalue);
-    size = 1;
-  }
-
-  /**
    * Generates pointer with value v.
    * @param v value
    */
@@ -85,23 +74,6 @@ public final class FTNode {
   public int getPre() {
     return ip != null ? ip.list[0] : pre;
   }
-  
-  /**
-   * Get all position values.
-   * @return pre/pos values
-   */
-  public int[] getPos() {
-    return ip.finish(0);
-  }
-
-  /**
-   * Get all position pointer values.
-   * @return pre/pos values
-   */
-  public int[] getPoi() {
-    return p.finish();
-  }
-
   
   /**
    * Test is any pos value is remaining.
@@ -260,14 +232,7 @@ public final class FTNode {
     return p.list[c];
   }
 
-  /**
-   * Returns the complete ftnode.
-   * @return current ftnode
-   */
-  public int[] getFTNode() {
-    return ip.finish();
-  }
-
+  /*
   @Override
   public String toString() {
     if (getPre() == 0) return "FTNode[]";
@@ -277,32 +242,15 @@ public final class FTNode {
   }
   
   /**
-   * Converts an int-array to string.
+   * Returns a string representation of the object.
    * @param sp index of first int value
    * @param a array with values
    * @param ep index of last int value
    * @return a as string
-   */
   private static String toString(final int[] a, final int sp, final int ep) {
     final StringBuilder sb = new StringBuilder('[');
     for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
     return sb.toString();
-  }
-
-  /**
-   * Removes current position value.
-  public void removePos() {
-    ip.remove(c);
-    if (p != null) p.remove(c);
-    c--;
-  }
-   */
-  
-  /**
-   * Checks if node has position values.
-   * @return boolean has position values
-  public boolean hasPos() {
-    return ip != null && ip.size > 1; 
   }
    */
 }

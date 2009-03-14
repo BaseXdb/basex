@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * This class defines an action which is executed as a thread.
  * If it is called another time, the current thread is skipped.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Action implements Runnable {

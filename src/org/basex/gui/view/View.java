@@ -11,7 +11,7 @@ import org.basex.gui.layout.BaseXPanel;
  * View observer pattern. All inheriting classes are attached to the
  * views array
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class View extends BaseXPanel {
