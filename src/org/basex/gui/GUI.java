@@ -359,7 +359,7 @@ public final class GUI extends JFrame {
     GUIProp.write();
     Prop.write();
     super.dispose();
-    if (context.data().fs != null) System.exit(0);
+    System.exit(0);
   }
 
   /**
