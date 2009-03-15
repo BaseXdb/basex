@@ -43,9 +43,6 @@ public final class DeepBase extends DeepFuse implements DataText {
   /** Database reference. */
   private Data data;
 
-  /** Database name attribute. */
-  private String name;
-
   /** Database instance name. */
   private String dbname;
 
@@ -58,15 +55,13 @@ public final class DeepBase extends DeepFuse implements DataText {
   /**
    * Constructor.
    * 
-   * @param path absolute path
    * @param mountPoint mount point of DeepFUSE
    * @param backingStore backing storage root path
    * @param dbName of the database to open/create
    * @param guitoggle whether BaseXWin is wanted or not
    */
-  public DeepBase(final String path, final String mountPoint,
-      final String backingStore, final String dbName, final boolean guitoggle) {
-    name = path;
+  public DeepBase(final String mountPoint, final String backingStore,
+      final String dbName, final boolean guitoggle) {
     mountpoint = mountPoint;
     dbname = dbName;
     backingstore = backingStore;
@@ -82,6 +77,26 @@ public final class DeepBase extends DeepFuse implements DataText {
       gui.context.data(data);
       gui.notify.init();
     }
+  }
+  
+  /**
+   * Insert DeepFS root element.
+   * @return zero on success
+   */
+  @Override
+  public int init() {
+    createEmptyDB(dbname);
+    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
+    int tagID = data.tags.index(DEEPFS, null, false);
+    // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
+    m.addElem(tagID, 0, 1, 3, 3, false);
+    m.addAtt(data.fs.mountpointID, 0, token(mountpoint), 2);
+    m.addAtt(data.fs.backingstoreID, 0, token(backingstore), 3);
+    data.insert(1, 0, m);
+    data.flush();
+    data.meta.update();
+
+    return 0;
   }
 
   /**
@@ -105,6 +120,8 @@ public final class DeepBase extends DeepFuse implements DataText {
       data.tags.index(FILE, null, false);
       data.tags.index(UNKNOWN, null, false);
 
+      data.atts.index(BACKINGSTORE, null, false);
+      data.atts.index(MOUNTPOINT, null, false);
       data.atts.index(NAME, null, false);
       data.atts.index(SIZE, null, false);
       data.atts.index(MTIME, null, false);
@@ -355,33 +372,10 @@ public final class DeepBase extends DeepFuse implements DataText {
     data = d;
   }
 
-  /**
-   * Insert DeepFS root element.
-   * @return zero on success
-   */
-  @Override
-  public int init() {
-    createEmptyDB(dbname);
-    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
-    int tagID = data.tags.index(DEEPFS, null, false);
-    int attID2 = data.atts.index(MOUNTPOINT, null, false);
-    int attID3 = data.atts.index(BACKINGSTORE, null, false);
-    // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
-    m.addElem(tagID, 0, 1, 4, 4, false);
-    m.addAtt(data.nameID, 0, token(name), 1);
-    m.addAtt(attID2, 0, token(mountpoint), 2);
-    m.addAtt(attID3, 0, token(backingstore), 3);
-    data.insert(1, 0, m);
-    data.flush();
-    data.meta.update();
-
-    return 0;
-  }
-
   @Override
   public int destroy() {
     try {
-      if (wgui) gui.dispose();
+      if (wgui) gui.quit();
       data.close();
       return 0;
     } catch(IOException e) {

@@ -1,7 +1,9 @@
 package org.basex.fuse;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -30,6 +32,10 @@ public final class DataFS {
   public int modeID;
   /** Index References. */
   public int unknownID;
+  /** Index mountpoint. */
+  public int mountpointID;
+  /** Index backing store. */
+  public int backingstoreID;
 
   /**
    * Constructor.
@@ -44,6 +50,8 @@ public final class DataFS {
     suffID = d.atts.id(DataText.SUFFIX);
     timeID = d.atts.id(DataText.MTIME);
     modeID = d.atts.id(DataText.MODE);
+    backingstoreID = d.atts.id(DataText.BACKINGSTORE);
+    mountpointID = d.atts.id(DataText.MOUNTPOINT);
   }
 
   /**
@@ -80,10 +88,16 @@ public final class DataFS {
       p = data.parent(p, k);
       k = data.kind(p);
     }
-
+    
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size;
-
+    if (s != 0) {
+      byte[] b = mountpoint(il.list[s - 1]);
+      if (b.length != 0) {
+        tb.add(b);
+        if(!endsWith(b, '/')) tb.add('/');
+      }
+    }
     for(int i = s - 2; i >= 0; i--) {
       final byte[] node = replace(name(il.list[i]), '\\', '/');
       tb.add(node);
@@ -93,6 +107,15 @@ public final class DataFS {
     return endsWith(node, '/') ? substring(node, 0, node.length - 1) : node;
   }
 
+  /**
+   * Returns the mountpoint of a file hierarchy.
+   * @param pre pre value
+   * @return path mountpoint.
+   */
+  public byte[] mountpoint(final int pre) {
+    return attr(pre, data.fs.mountpointID);
+  }
+  
   /**
    * Returns the name of a file.
    * @param pre pre value
