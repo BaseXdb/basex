@@ -38,10 +38,10 @@ abstract class MapPainter {
     if(p < 0) return GUIConstants.colormark1;
     // mark ancestor of invisible node;
     if(!"Squarified Layout".equals(view.layout.algo.getName())) {
-      return p < marked.size() && ri + 1 < rects.size() && 
+      return p < marked.size() && ri + 1 < rects.size() &&
         marked.sorted[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : 
       null;
-      // [JH] does not mark ancestors if MapNodes have been sorted
+      // [JH] does not mark ancestors if Squarified Layout is selected
     } else return null;
   }
   

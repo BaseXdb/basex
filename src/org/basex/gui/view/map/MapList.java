@@ -2,6 +2,7 @@ package org.basex.gui.view.map;
 
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -70,16 +71,27 @@ class MapList extends IntList {
       }    
     //only #children
     } else if (GUIProp.mapweight == 0 || data.fs == null) {
-//      long len = 0;
-//      for(int i = 0; i < size; i++) {
-//        len += data.textLen(list[i]);
-//      }
+      boolean usetextlen = false;
+      long len = 0;
+      
+      if(usetextlen) {
+        for(int i = 0; i < size - 1; i++) {
+          int kind = data.kind(list[i]);
+          if(kind != Data.ELEM || kind != Data.ATTR) {
+            len += Token.string(ViewData.content(data, list[i], false)).
+                length();
+          }
+        }
+      }
+      
       for(int i = 0; i < size - 1; i++) {
         nrchildren[i] = list[i + 1] - list[i];
-//        weight[i] = 1d * data.textLen(list[i]) / len + 
-//            0d * nrchildren[i] / parchildren;
-        // old
-        weight[i] = nrchildren[i] * 1d / parchildren;
+        if(usetextlen) {
+          weight[i] = 0.5d * Token.string(ViewData.content(data, list[i], 
+              false)).length() / len + 0.5d * nrchildren[i] / parchildren;
+        } else {
+          weight[i] = nrchildren[i] * 1d / parchildren;
+        }
       }
     }
   }
