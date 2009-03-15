@@ -14,7 +14,9 @@ import org.basex.util.Token;
 class MapList extends IntList {
   /** Weights array. */
   double[] weight;
-
+  /** indicates if List has been sorted. */
+  boolean sorted = false;
+  
   /**
    * Constructor.
    */
@@ -32,6 +34,7 @@ class MapList extends IntList {
   @Override
   public void sort() {
     sort(weight, false);
+    sorted = true;
   }
   
   /**

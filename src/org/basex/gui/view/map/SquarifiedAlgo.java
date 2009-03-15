@@ -114,4 +114,9 @@ public class SquarifiedAlgo extends MapAlgo {
     
     return rects;
   }
+
+  @Override
+  String getName() {
+    return "Squarified Layout";
+  }
 }

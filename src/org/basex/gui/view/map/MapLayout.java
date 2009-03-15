@@ -19,7 +19,7 @@ class MapLayout {
   /** data reference. */
   private final Data data;
   /** mapalgo to use in this layout. */
-  private final MapAlgo algo;
+  protected final MapAlgo algo;
 
   /** List of rectangles. */
   final ArrayList<MapRect> rectangles;

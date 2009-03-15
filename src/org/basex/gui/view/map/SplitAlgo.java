@@ -72,4 +72,9 @@ public class SplitAlgo extends MapAlgo {
       return rects;
     }
   }
+
+  @Override
+  String getName() {
+    return "Split Layout";
+  }
 }

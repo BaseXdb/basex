@@ -74,4 +74,9 @@ public class StripAlgo extends MapAlgo{
     
     return rects;
   }
+
+  @Override
+  String getName() {
+    return "Strip Layout";
+  }
 }
