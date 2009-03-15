@@ -375,7 +375,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   @Override
   public int destroy() {
     try {
-      if (wgui) gui.quit();
+      if (wgui) gui.dispose();
       data.close();
       return 0;
     } catch(IOException e) {
