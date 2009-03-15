@@ -110,7 +110,7 @@ public final class DialogEdit extends Dialog {
     // create buttons
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
-    finish();
+    finish(null);
   }
 
   @Override

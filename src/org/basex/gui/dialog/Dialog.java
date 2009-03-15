@@ -3,10 +3,11 @@ package org.basex.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import javax.swing.JDialog;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 
 /**
@@ -22,6 +23,8 @@ public abstract class Dialog extends JDialog {
   protected boolean ok;
   /** Reference to the root panel. */
   private BaseXBack panel;
+  /** Dialog position. */
+  private int[] loc;
 
   /**
    * Default Constructor.
@@ -46,45 +49,46 @@ public abstract class Dialog extends JDialog {
     panel.setLayout(new BorderLayout());
     add(panel, BorderLayout.CENTER);
     setResizable(false);
-    
-    addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(final WindowEvent e) {
-        cancel();
-      }
-    });
   }
 
   /**
-   * Adds a component.
+   * Sets a component at the specified {@link BorderLayout} position.
    * @param comp component to be added
    * @param pos layout position
    */
-  public final void set(final Component comp, final String pos) {
+  protected final void set(final Component comp, final String pos) {
     panel.add(comp, pos);
   }
 
   /**
-   * Finishes dialog layout.
+   * Finalizes the dialog layout and sets it visible.
+   * @param l optional dialog location, relative to main window
    */
-  public final void finish() {
-    finish(null);
-  }
-
-  /**
-   * Finishes dialog layout and sets the dialog to the specified
-   * position relative to the main window.
-   * @param loc dialog location
-   */
-  public final void finish(final int[] loc) {
+  protected final void finish(final int[] l) {
     pack();
-    if(loc == null) setLocationRelativeTo(gui);
-    else setLocation(gui.getX() + loc[0], gui.getY() + loc[1]);
+    if(l == null) setLocationRelativeTo(gui);
+    else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
     setVisible(true);
+    loc = l;
+  }
+
+  @Override
+  public void setLocation(final int x, final int y) {
+    final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
+    final int xx = Math.max(0, Math.min(scr.width - getWidth(), x));
+    final int yy = Math.max(0, Math.min(scr.height - getHeight(), y));
+    super.setLocation(xx, yy);
   }
 
   /**
-   * Default action for canceling the dialog.
+   * Reacts on user input; can be overwritten.
+   * @param cmd the action command
+   */
+  @SuppressWarnings("unused")
+  public void action(final String cmd) { }
+
+  /**
+   * Cancels the dialog; can be overwritten.
    */
   public void cancel() {
     ok = false;
@@ -92,32 +96,25 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Default action for closing the dialog.
+   * Closes the dialog; can be overwritten and stores the dialog position
+   * if it has been specified before.
    */
   public void close() {
     ok = true;
     dispose();
   }
 
-  /**
-   * Reacts on user input.
-   * @param cmd the action command
-   */
-  @SuppressWarnings("unused")
-  public void action(final String cmd) { }
-  
-  /**
-   * Stores the dialog location in the specified array (relative to main window)
-   * and closes the window.
-   * @param loc location array
-   */
-  protected final void close(final int[] loc) {
-    final Container parent = getParent();
-    loc[0] = Math.max(0, getX() - parent.getX());
-    loc[1] = Math.max(0, getY() - parent.getY());
-    dispose();
+  @Override
+  public void dispose() {
+    if(loc != null) {
+      final Container parent = getParent();
+      loc[0] = getX() - parent.getX();
+      loc[1] = getY() - parent.getY();
+      GUIProp.write();
+    }
+    super.dispose();
   }
-
+  
   /**
    * States if the dialog window was confirmed or canceled.
    * @return true when dialog was confirmed

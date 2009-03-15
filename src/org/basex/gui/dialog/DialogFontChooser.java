@@ -88,15 +88,4 @@ public final class DialogFontChooser extends Dialog {
     GUIConstants.initFonts();
     gui.notify.layout();
   }
-
-  @Override
-  public void close() {
-    close(GUIProp.fontsloc);
-    GUIProp.write();
-  }
-
-  @Override
-  public void cancel() {
-    close();
-  }
 }

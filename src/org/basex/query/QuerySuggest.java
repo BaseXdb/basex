@@ -35,7 +35,7 @@ public class QuerySuggest extends QueryParser {
   /** Last test. */
   Test ltest;
 
-  // [CG] check
+  // [CG] Suggest/Check
 
   /**
    * Constructor.

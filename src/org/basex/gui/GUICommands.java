@@ -196,7 +196,7 @@ public enum GUICommands implements GUICommand {
   EXIT(false, GUIEXIT, null, GUIEXITTT) {
     @Override
     public void execute(final GUI gui) {
-      gui.quit();
+      gui.dispose();
     }
   },
 

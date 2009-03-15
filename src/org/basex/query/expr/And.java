@@ -77,8 +77,7 @@ public final class And extends Arr {
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
       if(!it.bool()) {
-        // [SG] pre + 1  will cause troubles for some documents..
-        // [CG] don't know if we get incorrect results this way ?!
+        // [SG] will only consider child nodes..
         /*if(it instanceof DBNode && ctx.ftdata != null && ctx.item != null) {
           NodeMore ci = ((DBNode) it).child();
           while(ci.more()) {

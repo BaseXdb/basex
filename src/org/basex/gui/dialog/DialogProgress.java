@@ -62,7 +62,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     if(cnc) p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this),
         BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
-    finish();
+    finish(null);
     
     prog = prg;
     timer.start();

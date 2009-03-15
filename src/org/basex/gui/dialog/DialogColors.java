@@ -72,15 +72,4 @@ public final class DialogColors extends Dialog {
     ((GUI) getParent()).updateLayout();
     repaint();
   }
-
-  @Override
-  public void close() {
-    close(GUIProp.colorsloc);
-    GUIProp.write();
-  }
-
-  @Override
-  public void cancel() {
-    close();
-  }
 }

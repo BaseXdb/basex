@@ -98,7 +98,7 @@ public final class DialogOpen extends Dialog {
 
     set(pp, BorderLayout.EAST);
     action(null);
-    finish();
+    finish(null);
   }
 
   /**

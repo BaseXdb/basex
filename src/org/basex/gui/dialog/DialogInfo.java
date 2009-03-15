@@ -148,7 +148,7 @@ public final class DialogInfo extends Dialog {
     action(null);
     setResizable(true);
     setMinimumSize(getPreferredSize());
-    finish();
+    finish(null);
   }
 
   /**

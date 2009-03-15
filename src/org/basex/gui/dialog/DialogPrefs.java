@@ -117,7 +117,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     set(pp, BorderLayout.CENTER);
-    finish();
+    finish(GUIProp.prefsloc);
   }
   
   /**
@@ -134,7 +134,7 @@ public final class DialogPrefs extends Dialog {
    * @param lng language
    * @return credits
    */
-  protected String credits(final String lng) {
+  private String credits(final String lng) {
     for(int i = 0; i < Prop.LANGUAGES.length; i++) {
       if(lng.equals(Prop.LANGUAGES[i]))
         return "Translated by " + Prop.LANGCREDS[i];
@@ -152,12 +152,18 @@ public final class DialogPrefs extends Dialog {
     GUIProp.javalook = javalook.isSelected();
     creds.setText(credits(lang.getSelectedItem().toString()));
     gui.notify.layout();
+    GUIProp.write();
+    Prop.write();
   }
   
   @Override
-  public void cancel() {
-    super.cancel();
-    GUIProp.write();
+  public void close() {
     Prop.write();
+    dispose();
+  }
+
+  @Override
+  public void cancel() {
+    close();
   }
 }

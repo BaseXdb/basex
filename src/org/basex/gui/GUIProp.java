@@ -37,10 +37,6 @@ public final class GUIProp {
   public static int[] guisize = { 1000, 744 };
   /** GUI position. */
   public static int[] guiloc = { 10, 10 };
-  /** Search GUI position. */
-  public static int[] searchloc = { 10, 10 };
-  /** Search GUI width. */
-  public static int searchwidth = 200;
   /** Flag for maximized GUI window. */
   public static boolean maxstate = false;
 
@@ -96,8 +92,8 @@ public final class GUIProp {
   public static int mapoffsets = 3;
   /** Map algorithm. */
   public static int mapalgo = 0;
-  /** number of child <-> size weightening in (0;100). */
-  public static int sizep = 50;
+  /** number of child <-> size weighting in (0;100). */
+  public static int mapweight = 0;
 
   /** Dot sizes in plot. */
   public static int plotdots = 0;
@@ -107,11 +103,13 @@ public final class GUIProp {
   public static boolean plotylog;
   
   /** Dialog location. */
-  public static int[] maplayoutloc = { 100, 100 };
+  public static int[] maplayoutloc = { 200, 200 };
   /** Dialog location. */
-  public static int[] fontsloc = { 100, 100 };
+  public static int[] fontsloc = { 200, 200 };
   /** Dialog location. */
-  public static int[] colorsloc = { 100, 100 };
+  public static int[] colorsloc = { 200, 200 };
+  /** Dialog location. */
+  public static int[] prefsloc = { 200, 200 };
 
   /** Path for creating new XML Documents. */
   public static String createpath = Prop.WORK;

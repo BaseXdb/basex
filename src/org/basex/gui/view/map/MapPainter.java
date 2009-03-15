@@ -45,6 +45,16 @@ abstract class MapPainter {
     } else return null;
   }
   
+  /*
+  if(p != marked.size()) {
+    final Data data = view.gui.context.data();
+    final int par = marked.nodes[p];
+    final int size = pre + data.size(pre, data.kind(pre));
+    if(par < size) return GUIConstants.colormark2;
+  }
+  return null;
+   */
+
   /**
    * Paints node contents.
    * @param g graphics reference

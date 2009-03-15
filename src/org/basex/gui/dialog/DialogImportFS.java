@@ -170,7 +170,7 @@ public final class DialogImportFS  extends Dialog {
 
     set(buttons, BorderLayout.SOUTH);
     maxsize.setSelectedIndex(i);
-    finish();
+    finish(null);
   }
 
   @Override

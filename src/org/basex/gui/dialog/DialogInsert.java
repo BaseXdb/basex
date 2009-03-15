@@ -102,7 +102,7 @@ public final class DialogInsert extends Dialog {
 
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
-    finish();
+    finish(null);
   }
 
   @Override

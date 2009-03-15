@@ -140,13 +140,14 @@ public final class GUI extends JFrame {
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
     final int w = GUIProp.guisize[0];
     final int h = GUIProp.guisize[1];
-    int x = Math.max(0, GUIProp.guiloc[0]);
-    int y = Math.max(0, GUIProp.guiloc[1]);
-    if(x > scr.width - w) x = Math.max(0, scr.width - w);
-    if(y > scr.height - h) y = Math.max(0, scr.height - h);
-
+    final int x = Math.max(0, Math.min(scr.width - w, GUIProp.guiloc[0]));
+    final int y = Math.max(0, Math.min(scr.height - h, GUIProp.guiloc[1]));
     setBounds(x, y, w, h);
-    if(GUIProp.maxstate) setExtendedState(MAXIMIZED_BOTH);
+    if(GUIProp.maxstate) {
+      setExtendedState(MAXIMIZED_HORIZ);
+      setExtendedState(MAXIMIZED_VERT);
+      setExtendedState(MAXIMIZED_BOTH);
+    }
 
     top = new BaseXBack();
     top.setLayout(new BorderLayout());
@@ -299,11 +300,11 @@ public final class GUI extends JFrame {
     status = new GUIStatus(this);
     if(GUIProp.showstatus) top.add(status, BorderLayout.SOUTH);
 
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
-        quit();
+        dispose();
       }
     });
     add(top);
@@ -344,10 +345,8 @@ public final class GUI extends JFrame {
     }
   }
 
-  /**
-   * Closes the database, writes the property files and quits.
-   */
-  void quit() {
+  @Override
+  public void dispose() {
     GUIProp.maxstate = getExtendedState() == MAXIMIZED_BOTH;
     if(!GUIProp.maxstate) {
       GUIProp.guiloc[0] = getX();
@@ -356,11 +355,10 @@ public final class GUI extends JFrame {
       GUIProp.guisize[1] = getHeight();
     }
     query.quit();
-
     context.close();
-    Prop.write();
     GUIProp.write();
-    dispose();
+    Prop.write();
+    super.dispose();
     System.exit(0);
   }
 

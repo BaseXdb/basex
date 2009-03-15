@@ -50,10 +50,10 @@ class MapList extends IntList {
     weight = new double[list.length];
     int[] nrchildren = new int[list.length];
     long[] sizes = new long[list.length];
-    int sizeP = GUIProp.sizep;
+    int sizeP = GUIProp.mapweight;
     
     // use #children and size for weight
-    if (0 < GUIProp.sizep && GUIProp.sizep < 100 && data.fs != null) {
+    if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && data.fs != null) {
       for(int i = 0; i < size - 1; i++) {
         sizes[i] = data.fs != null ? 
             Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
@@ -62,14 +62,14 @@ class MapList extends IntList {
             (1 - sizeP / 100d) * nrchildren[i] / parchildren;
       }
     // only sizes
-    } else if (GUIProp.sizep == 100 && data.fs != null) {
+    } else if (GUIProp.mapweight == 100 && data.fs != null) {
       for(int i = 0; i < size - 1; i++) {
         sizes[i] = data.fs != null ? 
             Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
         weight[i] = sizes[i] * 1d / parsize;
       }    
     //only #children
-    } else if (GUIProp.sizep == 0 || data.fs == null) {
+    } else if (GUIProp.mapweight == 0 || data.fs == null) {
 //      long len = 0;
 //      for(int i = 0; i < size; i++) {
 //        len += data.textLen(list[i]);

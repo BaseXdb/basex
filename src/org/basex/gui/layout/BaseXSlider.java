@@ -141,10 +141,15 @@ public final class BaseXSlider extends BaseXPanel {
   public void mouseDragged(final MouseEvent e) {
     final double prop = (max - min) * (mouseX - e.getX()) /
       (getWidth() - SLIDERW);
+
+    final int old = curr;
     curr = Math.max(min, Math.min(max, (int) (oldCurr - prop)));
-    if(dl != null) dl.action(null);
-    else al.actionPerformed(null);
-    repaint();
+
+    if(curr != old) {
+      if(dl != null) dl.action(null);
+      else al.actionPerformed(null);
+      repaint();
+    }
   }
   
   @Override

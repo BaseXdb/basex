@@ -187,7 +187,8 @@ public final class Prop {
    * @param filename file to be read
    * @param fields fields to be assigned
    */
-  public static void read(final String filename, final Field[] fields) {
+  public static synchronized void read(final String filename,
+      final Field[] fields) {
     final File file = new File(filename);
     if(!file.exists()) return;
 
@@ -281,7 +282,8 @@ public final class Prop {
    * @param filename file to be read
    * @param fields fields to be assigned
    */
-  public static void write(final String filename, final Field[] fields) {
+  public static synchronized void write(final String filename,
+      final Field[] fields) {
     final File file = new File(filename);
 
     try {

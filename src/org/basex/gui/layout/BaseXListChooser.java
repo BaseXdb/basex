@@ -44,6 +44,7 @@ public final class BaseXListChooser extends BaseXBack {
    */
   public BaseXListChooser(final Dialog parent, final String[] choice,
       final byte[] help) {
+
     // cache list values
     values = choice.clone();
     

@@ -62,7 +62,7 @@ public final class DialogRename extends Dialog {
     p.add(buttons, BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
 
-    finish();
+    finish(null);
   }
 
   @Override
