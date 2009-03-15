@@ -76,11 +76,8 @@ class MapList extends IntList {
       
       if(usetextlen) {
         for(int i = 0; i < size - 1; i++) {
-          int kind = data.kind(list[i]);
-          if(kind != Data.ELEM || kind != Data.ATTR) {
-            len += Token.string(ViewData.content(data, list[i], false)).
-                length();
-          }
+          len += Token.string(ViewData.content(data, list[i], false)).
+              length();
         }
       }
       
