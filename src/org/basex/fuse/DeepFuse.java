@@ -391,4 +391,10 @@ public abstract class DeepFuse {
    */
   public abstract int bmap(final String path, final long blocksize,
       final long idx);
+  
+  /**
+   * Start a gui to the filesystem.
+   * @return zero on success, or -1 if an error occurred
+   */
+  public abstract int fsgui();
 }

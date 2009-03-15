@@ -69,14 +69,21 @@ public final class DeepBase extends DeepFuse implements DataText {
 
     init();
 
-    if(wgui) {
-      final BaseXWin win = new BaseXWin(new String[] {});
-      while(win.gui == null)
-        Performance.sleep(100);
-      gui = win.gui;
-      gui.context.data(data);
-      gui.notify.init();
-    }
+    if(wgui) fsgui();
+  }
+  
+  /**
+   * Start BaseXWin with some data instance.
+   */
+  @Override
+  public int fsgui() {
+    final BaseXWin win = new BaseXWin(new String[] {});
+    while(win.gui == null)
+      Performance.sleep(100);
+    gui = win.gui;
+    gui.context.data(data);
+    gui.notify.init();
+    return (0);
   }
   
   /**
@@ -375,8 +382,8 @@ public final class DeepBase extends DeepFuse implements DataText {
   @Override
   public int destroy() {
     try {
-      if (wgui) gui.dispose();
-      data.close();
+      if (wgui && gui != null) gui.dispose();
+      if (data != null) data.close();
       return 0;
     } catch(IOException e) {
       e.printStackTrace();
