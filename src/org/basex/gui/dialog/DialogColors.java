@@ -69,7 +69,6 @@ public final class DialogColors extends Dialog {
     GUIProp.colorred = MAXCOLOR - sliderRed.value();
     GUIProp.colorgreen = MAXCOLOR - sliderGreen.value();
     GUIProp.colorblue = MAXCOLOR - sliderBlue.value();
-    ((GUI) getParent()).updateLayout();
-    repaint();
+    gui.updateLayout();
   }
 }

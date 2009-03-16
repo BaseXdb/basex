@@ -198,30 +198,16 @@ public final class GUIInput extends BaseXTextField {
     
     StringList sl = null;
     try {
-      final QuerySuggest parser = new QuerySuggest(new QueryContext(),
-          gui.context);
-      parser.parse(query, null, null);
-      parser.filter(false);
-      sl = parser.complete();
-      pre = query.substring(0, xPos(query) + 1);
+      final QuerySuggest qs = new QuerySuggest(new QueryContext(), gui.context);
+      qs.parse(query, null, null);
+      sl = qs.complete();
+      pre = query.substring(0, qs.qm);
     } catch(final QueryException ex) {
       sl = ex.complete();
-      pre = query.substring(0, Math.min(query.length(), ex.col()));
+      pre = query.substring(0, ex.col() - 1);
     }
+    if(getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);
-  }
-  
-  /**
-   * Returns an xpath completion position (temporary).
-   * @param query input query
-   * @return position
-   */
-  private int xPos(final String query) {
-    for(int q = query.length() - 1; q >= 0; q--) {
-      final int c = query.charAt(q);
-      if(c == '|' || c == '(' || c == '/' || c == '[') return q;
-    }
-    return -1;
   }
 
   /**

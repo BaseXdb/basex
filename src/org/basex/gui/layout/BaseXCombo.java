@@ -42,7 +42,9 @@ public final class BaseXCombo extends JComboBox {
     if(list != null) {
       addItemListener(new ItemListener() {
         public void itemStateChanged(final ItemEvent ie) {
-          if(ie.getStateChange() == ItemEvent.SELECTED) list.action(null);
+          if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
+            list.action(null);
+          }
         }
       });
     }

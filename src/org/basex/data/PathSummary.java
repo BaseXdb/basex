@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -11,7 +10,8 @@ import org.basex.util.Array;
 import org.basex.util.TokenList;
 
 /**
- * This class stores the tree structure of a document.
+ * This class stores the path summary of a document.
+ * It contains all unique location paths of the document.
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -21,7 +21,7 @@ public final class PathSummary {
   /** Parent stack. */
   private PathNode[] stack;
   /** Root node. */
-  public PathNode root;
+  private PathNode root;
 
   /**
    * Default Constructor.
@@ -31,7 +31,8 @@ public final class PathSummary {
   }
 
   /**
-   * Initializes the data structures.
+   * Initializes the data structures. This method is called if new statistics
+   * are created.
    */
   public void init() {
     stack = new PathNode[IO.MAXHEIGHT];
@@ -49,6 +50,8 @@ public final class PathSummary {
     data = d;
   }
 
+  // Summary Path creation ----------------------------------------------------
+  
   /**
    * Opens an element.
    * @param n name reference
@@ -86,6 +89,68 @@ public final class PathSummary {
     if(root != null) root.finish(out);
   }
 
+  // Summary Path traversal ---------------------------------------------------
+
+  /**
+   * Returns all children or descendants of the specified nodes.
+   * @param in input nodes
+   * @param desc if false, return only children
+   * @return descendant nodes
+   */
+  public ArrayList<PathNode> desc(final ArrayList<PathNode> in,
+      final boolean desc) {
+
+    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    for(final PathNode n : in) {
+      for(final PathNode c : n.ch) {
+        if(desc) c.addDesc(out);
+        else if(!out.contains(c)) out.add(c);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Returns all parents of the specified nodes.
+   * @param in input nodes
+   * @return parent nodes
+   */
+  public ArrayList<PathNode> parent(final ArrayList<PathNode> in) {
+    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
+    return out;
+  }
+
+  /**
+   * Returns the root node.
+   * @return root node
+   */
+  public ArrayList<PathNode> root() {
+    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    out.add(root);
+    return out;
+  }
+
+  /**
+   * Adds nodes to the hash set if they comply to the specified arguments.
+   * @param in input node
+   * @param out output nodes
+   * @param t name reference
+   * @param k node kind
+   * @param desc if false, return only children
+   */
+  public void desc(final PathNode in, final ArrayList<PathNode> out,
+      final int t, final int k, final boolean desc) {
+
+    for(final PathNode n : in.ch) {
+      if(desc) desc(n, out, t, k, desc);
+      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
+          (t == 0 || t == n.name)) {
+        out.add(n);
+      }
+    }
+  }
+
   /**
    * Returns descendant tags and attributes for the specified start key.
    * @param k input key
@@ -107,28 +172,33 @@ public final class PathSummary {
    * @return children
    */
   public TokenList desc(final TokenList in, final boolean d, final boolean o) {
-    if(root == null) return new TokenList();
     // follow the specified descendant/child steps
-    ArrayList<PathNode> n = new ArrayList<PathNode>();
-    n.add(root);
-    n = desc(n, 0, Data.DOC, true);
+    final ArrayList<PathNode> list = desc(root(), true);
 
     for(final byte[] i : in) {
       final boolean att = startsWith(i, '@');
       final byte kind = att ? Data.ATTR : Data.ELEM;
       final int id = att ? data.attNameID(substring(i, 1)) : data.tagID(i);
-      n = desc(n, id, kind, d);
+
+      final ArrayList<PathNode> out = new ArrayList<PathNode>();
+      for(final PathNode n : list) {
+        if(id != 0 && (n.name != id || n.kind != kind)) continue;
+        for(final PathNode c : n.ch) {
+          if(d) c.addDesc(out);
+          else out.add(c);
+        }
+      }
     }
 
     // sort by number of occurrences
-    final double[] tmp = new double[n.size()];
-    for(int i = 0; i < n.size(); i++) tmp[i] = n.get(i).count;
+    final double[] tmp = new double[list.size()];
+    for(int i = 0; i < list.size(); i++) tmp[i] = list.get(i).count;
     final int[] occ = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
     final TokenList out = new TokenList();
-    for(int i = 0; i < n.size(); i++) {
-      final PathNode r = n.get(o ? occ[i] : i);
+    for(int i = 0; i < list.size(); i++) {
+      final PathNode r = list.get(o ? occ[i] : i);
       final byte[] name = r.token(data);
       if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
         out.add(name);
@@ -137,44 +207,16 @@ public final class PathSummary {
     if(!o) out.sort(false);
     return out;
   }
-
+  
   /**
-   * Returns the specified nodes.
-   * @param in input node
-   * @param out output nodes
-   * @param t name reference
-   * @param k node kind
-   * @param desc if false, return only children
-   */
-  public void desc(final PathNode in, final HashSet<PathNode> out,
-      final int t, final int k, final boolean desc) {
-
-    for(final PathNode n : in.ch) {
-      if(desc) desc(n, out, t, k, desc);
-      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
-          (t == 0 || t == n.name)) out.add(n);
-    }
-  }
-
-  /**
-   * Returns the descendants of the specified nodes.
-   * @param in input nodes
-   * @param t name reference
-   * @param k node kind
-   * @param desc if false, return only children
-   * @return descendant nodes
-   */
-  public ArrayList<PathNode> desc(final ArrayList<PathNode> in, final int t,
-      final int k, final boolean desc) {
-
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
-    for(final PathNode n : in) {
-      if(t != 0 && (n.name != t || n.kind != k)) continue;
-      for(final PathNode c : n.ch) {
-        if(desc) c.desc(out);
-        else out.add(c);
+   * Sorts the specified list.
+   * @param list list to be sorted
+  private void sort(final ArrayList<PathNode> list) {
+    Collections.sort(list, new Comparator<PathNode>() {
+      public int compare(final PathNode o1, final PathNode o2) {
+        return diff(o1.token(data), o2.token(data));
       }
-    }
-    return out;
+    });
   }
+   */
 }

@@ -110,10 +110,7 @@ public final class BaseXLayout {
   public static void help(final Component cont, final byte[] help) {
     if(GUIProp.mousefocus) cont.requestFocusInWindow();
     if(GUIProp.fullscreen) return;
-    final GUI gui = gui(cont);
-    final boolean db = gui.context.db();
-    if(help != null && (!db && GUIProp.showstarthelp || db && GUIProp.showhelp))
-      gui.help.setText(help);
+    if(help != null && GUIProp.showhelp) gui(cont).help.setText(help);
   }
   
   /**
@@ -291,19 +288,13 @@ public final class BaseXLayout {
    * @param g graphics reference
    */
   public static void antiAlias(final Graphics g) {
-    Object hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
-
-    if(GUIProp.fontalias) {
-      // Check out Java 1.6 rendering; if not available, use default rendering
-      try {
-        final Class<?> rh = RenderingHints.class;
-        hint = rh.getField("VALUE_TEXT_ANTIALIAS_" + GUIProp.fontaa).get(null);
-      } catch(final Exception e) {
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-      }
+    try {
+      ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+          RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
+          GUIConstants.FONTALIAS[GUIProp.fontalias]).get(null));
+    } catch(final Exception e) {
+      BaseX.errln(e);
     }
-    final Graphics2D gg = (Graphics2D) g;
-    gg.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
 
   /**

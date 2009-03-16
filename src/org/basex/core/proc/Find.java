@@ -112,11 +112,11 @@ public final class Find extends AQuery {
     String qu = query;
 
     final Nodes current = context.current();
-    final TokenBuilder xpath = new TokenBuilder();
+    final TokenBuilder xquery = new TokenBuilder();
     final boolean r = root || current.size() == 1 && current.nodes[0] < 2;
 
-    if(r) xpath.add("/");
-    xpath.add("descendant-or-self::*");
+    if(r) xquery.add("/");
+    xquery.add("descendant-or-self::*");
 
     do {
       boolean size = false;
@@ -179,32 +179,32 @@ public final class Find extends AQuery {
       } else {
         final int d = t.lastIndexOf(".");
         // dot found... add suffix check
-        if(d != -1) xpath.add("[@" + DataText.S_SUFFIX + " = \"" +
+        if(d != -1) xquery.add("[@" + DataText.S_SUFFIX + " = \"" +
             t.substring(d + 1) + "\"]");
         t = "\"" + t + "\"";
       }
       // add predicate
-      xpath.add('[');
+      xquery.add('[');
       if(exact) {
-        xpath.add(pred + operator + t);
+        xquery.add(pred + operator + t);
       } else {
-        xpath.add(pred + " ftcontains " + t);
+        xquery.add(pred + " ftcontains " + t);
       }
-      xpath.add(']');
+      xquery.add(']');
 
       qu = qu.substring(i + 1);
     } while(qu.indexOf(' ') > -1);
 
     final Data data = context.data();
     if(data.meta.ftxindex) {
-      xpath.add(" | ");
-      if(!r) xpath.add(".");
-      xpath.add("//file");
+      xquery.add(" | ");
+      if(!r) xquery.add(".");
+      xquery.add("//file");
       for(final String t : split(query)) {
-        xpath.add("[.//text() ftcontains \"" + t + "\"]");
+        xquery.add("[.//text() ftcontains \"" + t + "\"]");
       }
     }
-    return xpath.toString();
+    return xquery.toString();
   }
 
   /**
@@ -260,11 +260,11 @@ public final class Find extends AQuery {
         tb.add("]");
       }
     }
-    String xpath = tb.toString();
-    if(xpath.length() != 0) xpath = (root ? "/" : "") +
-      "descendant-or-self::" + Token.string(tag) + xpath;
 
-    return xpath;
+    String xquery = tb.toString();
+    if(xquery.length() != 0) xquery = (root ? "/" : "") +
+      "descendant-or-self::" + Token.string(tag) + xquery;
+    return xquery;
   }
 
   /**

@@ -5,7 +5,6 @@ import static org.basex.query.path.Axis.*;
 import static org.basex.query.path.Test.NODE;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;
@@ -189,15 +188,12 @@ public class AxisPath extends Path {
       // cache child steps
       final TokenList tl = new TokenList();
       while(nodes.get(0).par != null) {
-        final ArrayList<PathNode> temp = new ArrayList<PathNode>();
         byte[] tag = data.tags.key(nodes.get(0).name);
         for(int j = 0; j < nodes.size(); j++) {
-          final PathNode sn = nodes.get(j);
-          if(nodes.get(0).name != sn.name) tag = null;
-          temp.add(sn.par);
+          if(nodes.get(0).name != nodes.get(j).name) tag = null;
         }
         tl.add(tag);
-        nodes = temp;
+        nodes = data.path.parent(nodes);
       }
 
       // build new steps
@@ -228,9 +224,7 @@ public class AxisPath extends Path {
     // convert single descendant step to child steps
     if(!data.meta.uptodate || data.ns.size() != 0) return null;
 
-    ArrayList<PathNode> in = new ArrayList<PathNode>();
-    in.add(data.path.root);
-
+    ArrayList<PathNode> in = data.path.root();
     for(int s = 0; s <= l; s++) {
       final boolean desc = step[s].axis == Axis.DESC;
       if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
@@ -239,8 +233,7 @@ public class AxisPath extends Path {
       final int name = data.tagID(step[s].test.name.ln());
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
-
-      for(final PathNode sn : data.path.desc(in, 0, Data.DOC, desc)) {
+      for(final PathNode sn : data.path.desc(in, desc)) {
         if(sn.kind == Data.ELEM && name == sn.name) {
           if(out.size() != 0 && out.get(0).level() != sn.level()) return null;
           out.add(sn);
@@ -429,10 +422,9 @@ public class AxisPath extends Path {
     final Item rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
-    if(data != null && data.meta.uptodate && data.ns.size() == 0) {
-      HashSet<PathNode> nodes = new HashSet<PathNode>(1);
-      nodes.add(data.path.root);
 
+    if(data != null && data.meta.uptodate && data.ns.size() == 0) {
+      ArrayList<PathNode> nodes = data.path.root();
       for(final Step s : step) {
         res = -1;
         nodes = s.count(nodes, data);

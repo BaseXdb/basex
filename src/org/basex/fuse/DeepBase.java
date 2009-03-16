@@ -54,7 +54,6 @@ public final class DeepBase extends DeepFuse implements DataText {
 
   /**
    * Constructor.
-   * 
    * @param mountPoint mount point of DeepFUSE
    * @param backingStore backing storage root path
    * @param dbName of the database to open/create
@@ -72,9 +71,6 @@ public final class DeepBase extends DeepFuse implements DataText {
     if(wgui) fsgui();
   }
   
-  /**
-   * Start BaseXWin with some data instance.
-   */
   @Override
   public int fsgui() {
     final BaseXWin win = new BaseXWin(new String[] {});
@@ -83,7 +79,7 @@ public final class DeepBase extends DeepFuse implements DataText {
     gui = win.gui;
     gui.context.data(data);
     gui.notify.init();
-    return (0);
+    return 0;
   }
   
   /**
@@ -144,12 +140,12 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Converts a pathname to an DeepFS XPath expression. FUSE always passes
+   * Converts a pathname to a DeepFS XPath expression. FUSE always passes on
    * 'absolute, normalized' pathnames, i.e., starting with a slash, redundant
    * and trailing slashes removed.
    * @param path name
-   * @param dir toogle flag
-   * @return xpath query
+   * @param dir toggle flag
+   * @return query
    */
   private String pn2xp(final String path, final boolean dir) {
     final StringBuilder qb = new StringBuilder();
@@ -178,7 +174,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Process the query string and print result.
+   * Processes the query string and print result.
    * @param query to process
    * @return result reference
    * @throws QueryException on failure
@@ -205,7 +201,6 @@ public final class DeepBase extends DeepFuse implements DataText {
 
   /**
    * Evaluates given path and returns the pre value.
-   * 
    * @param path to be traversed
    * @return pre value of file node or -1 if none is found
    */
@@ -220,8 +215,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Create a new regular file or directory node.
-   * 
+   * Creates a new regular file or directory node.
    * @param path to the file to be created
    * @param mode of file (directory, regular file ..., permission bits)
    * @return id of the newly created file or -1 on failure
@@ -232,7 +226,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Construct a MemData object containing <dir name="dirname"/> ... 
+   * Constructs a MemData object containing <dir name="dirname"/> ... 
    * ready to be inserted into main Data instance.
    * @param path to file to build MemData for
    * @param mode to determine file type
@@ -250,7 +244,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Construct a MemData object containing <file name="filename" .../> 
+   * Constructs a MemData object containing <file name="filename" .../> 
    * element ready to be inserted into main data instance.
    * @param path to file to build MemData for
    * @param mode to determine file type
@@ -270,7 +264,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
   
   /**
-   * Extract content of file and build a MemData object.
+   * Extracts content of file and build a MemData object.
    * @param path from which to include content (it's in backing store).
    * @return MemData reference
    */
@@ -291,7 +285,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Insert a file node (regular file, directory ...).
+   * Inserts a file node (regular file, directory ...).
    * @param path of file to insert
    * @param mode of file
    * @return pre value of newly inserted node
@@ -306,7 +300,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Insert extracted file content.
+   * Inserts extracted file content.
    * @param path to file at which to insert the extracted content
    * @return pre value of newly inserted content, -1 on failure
    */
@@ -317,7 +311,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Insert MemData at given pre position and refresh GUI.
+   * Inserts MemData at given pre position and refresh GUI.
    * @param pre value at which to insert (content or file)
    * @param md memory data insert to insert
    * @return pre value of newly inserted node
@@ -364,7 +358,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Return data reference.
+   * Returns the data reference.
    * @return data
    */
   public Data getData() {
@@ -372,7 +366,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Set data reference.
+   * Sets the data reference.
    * @param d data reference
    */
   public void setData(final Data d) {
@@ -392,8 +386,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Create a new directory.
-   * 
+   * Creates a new directory.
    * @param path to directory to be created
    * @param mode of directory
    * @return id of the newly created directory or -1 on failure
@@ -405,8 +398,7 @@ public final class DeepBase extends DeepFuse implements DataText {
   }
 
   /**
-   * Create a new regular file.
-   * 
+   * Creates a new regular file.
    * @param path to the file to be created
    * @param mode of regular file
    * @return id of the newly created file or -1 on failure

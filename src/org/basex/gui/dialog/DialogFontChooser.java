@@ -3,14 +3,13 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.border.EmptyBorder;
+import java.awt.RenderingHints;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXCombo;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.TableLayout;
 
@@ -30,7 +29,7 @@ public final class DialogFontChooser extends Dialog {
   /** Font size chooser. */
   private BaseXListChooser size;
   /** Anti-Aliasing mode. */
-  private BaseXCheckBox aalias;
+  private BaseXCombo aalias;
   
   /**
    * Default Constructor.
@@ -42,8 +41,8 @@ public final class DialogFontChooser extends Dialog {
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 4, 6, 2));
+    BaseXBack p = new BaseXBack();
+    p.setLayout(new TableLayout(2, 4, 6, 6));
     
     font = new BaseXListChooser(this, fonts, HELPFONT);
     font.setSize(150, 112);
@@ -63,20 +62,37 @@ public final class DialogFontChooser extends Dialog {
     type.setValue(FONTTYPES[GUIProp.fonttype]);
     size.setValue(Integer.toString(GUIProp.fontsize));
 
-    set(p, BorderLayout.CENTER);
+    final BaseXBack pp = new BaseXBack();
+    pp.setLayout(new TableLayout(1, 2, 5, 5));
+    pp.add(new BaseXLabel(FAALIAS));
     
-    aalias = new BaseXCheckBox(FAALIAS, HELPFALIAS, GUIProp.fontalias, this);
-    aalias.setBorder(new EmptyBorder(5, 4, 0, 0));
-    aalias.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        action(null);
-      }
-    });
-    set(aalias, BorderLayout.SOUTH);
+    final String[] combo = fullAlias() ? GUIConstants.FONTALIAS :
+      new String[] { GUIConstants.FONTALIAS[0], GUIConstants.FONTALIAS[1] };
+    aalias = new BaseXCombo(combo, HELPFALIAS, this);
+    aalias.setSelectedIndex(GUIProp.fontalias);
+
+    pp.add(aalias);
+    p.add(pp);
+    set(p, BorderLayout.CENTER);
 
     finish(GUIProp.fontsloc);
     font.focus();
   }
+
+  /**
+   * Checks if the Java version supports all anti-aliasing variants.
+   * @return result of check
+   */
+  public static boolean fullAlias() {
+    // Check out Java 1.6 rendering; if not available, use default rendering
+    try {
+      RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
+      return true;
+    } catch(final Exception e) {
+      return false;
+    }
+  }
+
 
   @Override
   public void action(final String cmd) {
@@ -84,7 +100,7 @@ public final class DialogFontChooser extends Dialog {
     GUIProp.monofont = font2.getValue();
     GUIProp.fonttype = type.getIndex();
     GUIProp.fontsize = size.getNum();
-    GUIProp.fontalias = aalias.isSelected();
+    GUIProp.fontalias = aalias.getSelectedIndex();
     GUIConstants.initFonts();
     gui.notify.layout();
   }

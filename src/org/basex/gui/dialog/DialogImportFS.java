@@ -149,11 +149,13 @@ public final class DialogImportFS  extends Dialog {
 
     maxsize = new BaseXCombo(IMPORTFSMAX, HELPFSMAX, this);
     maxsize.setToolTipText(IMPORTFSMAXINFO);
+
     final int m = Prop.fstextmax;
     int i = -1;
     while(++i < IMPORTFSMAXSIZE.length - 1) {
       if(IMPORTFSMAXSIZE[i] == m) break;
     }
+    maxsize.setSelectedIndex(i);
 
     p.add(maxsize, BorderLayout.EAST);
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
@@ -169,7 +171,8 @@ public final class DialogImportFS  extends Dialog {
     buttons = BaseXLayout.okCancel(this);
 
     set(buttons, BorderLayout.SOUTH);
-    maxsize.setSelectedIndex(i);
+
+    action(null);
     finish(null);
   }
 
@@ -215,12 +218,12 @@ public final class DialogImportFS  extends Dialog {
   public void close() {
     if(!ok) return;
 
-    super.close();
     Prop.fscont = cont.isSelected();
     Prop.fsmeta = meta.isSelected();
     Prop.fstextmax = IMPORTFSMAXSIZE[maxsize.getSelectedIndex()];
     GUIProp.fsall = all.isSelected();
     GUIProp.importfsname = dbname.getText();
     GUIProp.fspath = path.getText();
+    super.close();
   }
 }

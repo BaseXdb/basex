@@ -13,8 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.HashMap;
 import javax.swing.Box;
@@ -41,7 +39,7 @@ import org.basex.data.Data;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -86,9 +84,9 @@ public final class GUI extends JFrame {
   public final GUIInput input;
   /** Filter button. */
   public final BaseXButton filter;
+  /** Help dialog. */
+  public DialogHelp help;
 
-  /** Help view. */
-  public final TextView help;
   /** Text view. */
   final TextView text;
   /** Info view. */
@@ -272,22 +270,20 @@ public final class GUI extends JFrame {
     // create views
     notify = new ViewNotifier(this);
     query = new QueryView(notify, null);
-    text = new TextView(notify, Fill.DOWN, TEXTTIT, HELPTEXT);
-    help = new TextView(notify, Fill.DOWN, HELPTIT, null);
+    text = new TextView(notify);
     info = new InfoView(notify, HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
-    final ViewPanel helppanel = new ViewPanel(help, HELPVIEW);
 
     // create panels for closed and opened database mode
     final ViewPanel[][] panels = {
-      { textpanel, helppanel },
-      { new ViewPanel(new FolderView(notify, HELPFOLDER), FOLDERVIEW),
-        new ViewPanel(new PlotView(notify, null), PLOTVIEW),
-        new ViewPanel(new TableView(notify, HELPTABLE), TABLEVIEW),
-        new ViewPanel(new MapView(notify, HELPMAP), MAPVIEW),
+      { textpanel },
+      { new ViewPanel(new FolderView(notify), FOLDERVIEW),
+        new ViewPanel(new PlotView(notify), PLOTVIEW),
+        new ViewPanel(new TableView(notify), TABLEVIEW),
+        new ViewPanel(new MapView(notify), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),
         new ViewPanel(info, INFOVIEW),
-        helppanel, textpanel
+        textpanel
       }
     };
     views = new ViewContainer(this, panels);
@@ -301,28 +297,20 @@ public final class GUI extends JFrame {
     if(GUIProp.showstatus) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(final WindowEvent e) {
-        dispose();
-      }
-    });
     add(top);
 
     setVisible(true);
     views.updateViews();
     refreshControls();
-
-    Prop.xqerrcode = false;
-    Prop.chop = true;
-    input.requestFocusInWindow();
-
+    
     // start logo animation as thread
     new Action() {
       public void run() {
         views.run();
       }
     }.execute();
+
+    input.requestFocusInWindow();
   }
 
   /**
@@ -355,6 +343,7 @@ public final class GUI extends JFrame {
       GUIProp.guisize[1] = getHeight();
     }
     query.quit();
+    if(help != null) help.close();
     context.close();
     GUIProp.write();
     Prop.write();

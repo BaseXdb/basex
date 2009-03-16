@@ -34,6 +34,7 @@ import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogFontChooser;
+import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogImportFS;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
@@ -664,16 +665,19 @@ public enum GUICommands implements GUICommand {
   SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(!gui.context.db()) GUIProp.showstarthelp ^= true;
-      else GUIProp.showhelp ^= true;
-      gui.layoutViews();
+      GUIProp.showhelp ^= true;
+      if(GUIProp.showhelp) {
+        gui.help = new DialogHelp(gui);
+      } else {
+        gui.help.close();
+        gui.help = null;
+      }
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, gui.context.db() ? GUIProp.showhelp :
-        GUIProp.showstarthelp);
+      BaseXLayout.select(button, GUIProp.showhelp);
     }
 
     @Override

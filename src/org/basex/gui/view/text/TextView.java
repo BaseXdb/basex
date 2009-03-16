@@ -1,6 +1,7 @@
 package org.basex.gui.view.text;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -42,29 +43,24 @@ public final class TextView extends View {
   /**
    * Default constructor.
    * @param man view manager
-   * @param mode panel design
-   * @param head text header
-   * @param help help text
    */
-  public TextView(final ViewNotifier man, final Fill mode, final String head,
-      final byte[] help) {
-    super(man, help);
+  public TextView(final ViewNotifier man) {
+    super(man, HELPTEXT);
+
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
-    setMode(mode);
+    setMode(Fill.DOWN);
     
-    area = new BaseXText(gui, help, false);
+    area = new BaseXText(gui, HELPTEXT, false);
     add(area, BorderLayout.CENTER);
     
-    header = new BaseXLabel(head, true);
+    header = new BaseXLabel(TEXTTIT, true);
     export = GUIToolBar.newButton(GUICommands.EXPORT, gui);
 
     final Box box = new Box(BoxLayout.X_AXIS);
     box.add(header);
-    if(head.equals(TEXTTIT)) {
-      box.add(Box.createHorizontalGlue());
-      box.add(export);
-    }
+    box.add(Box.createHorizontalGlue());
+    box.add(export);
     add(box, BorderLayout.NORTH);
 
     refreshLayout();

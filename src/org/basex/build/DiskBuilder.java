@@ -74,7 +74,7 @@ public final class DiskBuilder extends Builder {
     meta.write(out);
     tags.write(out);
     atts.write(out);
-    skel.write(out);
+    path.write(out);
     ns.write(out);
     out.close();
 

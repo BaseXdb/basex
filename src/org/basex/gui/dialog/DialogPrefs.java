@@ -118,6 +118,7 @@ public final class DialogPrefs extends Dialog {
 
     set(pp, BorderLayout.CENTER);
     finish(GUIProp.prefsloc);
+
   }
   
   /**

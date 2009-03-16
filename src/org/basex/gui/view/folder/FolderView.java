@@ -1,5 +1,6 @@
 package org.basex.gui.view.folder;
 
+import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -67,10 +68,9 @@ public final class FolderView extends View {
   /**
    * Default Constructor.
    * @param man view manager
-   * @param help help text
    */
-  public FolderView(final ViewNotifier man, final byte[] help) {
-    super(man, help);
+  public FolderView(final ViewNotifier man) {
+    super(man, HELPFOLDER);
     createBoxes();
     setMode(Fill.UP);
     setLayout(new BorderLayout());

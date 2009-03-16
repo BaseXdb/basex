@@ -35,7 +35,7 @@ public abstract class Builder extends Progress {
   /** Namespace index. */
   protected Namespaces ns = new Namespaces();
   /** Tree structure. */
-  protected PathSummary skel = new PathSummary();
+  protected PathSummary path = new PathSummary();
 
   /** Parser instance. */
   protected Parser parser;
@@ -175,7 +175,7 @@ public abstract class Builder extends Progress {
    */
   public final void startDoc(final byte[] doc) throws IOException {
     parStack[level++] = meta.size;
-    skel.add(0, level, Data.DOC);
+    path.add(0, level, Data.DOC);
     addDoc(utf8(doc, Prop.ENCODING));
   }
 
@@ -338,7 +338,7 @@ public abstract class Builder extends Progress {
 
     // get tag reference
     final int tid = tags.index(tag, null, true);
-    skel.add(tid, level, Data.ELEM);
+    path.add(tid, level, Data.ELEM);
 
     // remember tag id and parent reference
     tagStack[level] = tid;
@@ -364,7 +364,7 @@ public abstract class Builder extends Progress {
       final byte[] av = att.val[a];
       final int an = atts.index(att.key[a], av, true);
       final int ans = ns.get(att.key[a]);
-      skel.add(an, level + 1, Data.ATTR);
+      path.add(an, level + 1, Data.ATTR);
       addAttr(an, ans, av, a + 1);
     }
 
@@ -415,7 +415,7 @@ public abstract class Builder extends Progress {
 
     // text node processing for statistics
     if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
-    skel.add(0, level, type, t.length);
+    path.add(0, level, type, t.length);
     addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], type);
   }
 }

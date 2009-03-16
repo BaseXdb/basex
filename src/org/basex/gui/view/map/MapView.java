@@ -84,10 +84,9 @@ public final class MapView extends View implements Runnable {
   /**
    * Default Constructor.
    * @param man view manager
-   * @param help help text
    */
-  public MapView(final ViewNotifier man, final byte[] help) {
-    super(man, help);
+  public MapView(final ViewNotifier man) {
+    super(man, HELPMAP);
     setMode(Fill.NONE);
     new BaseXPopup(this, POPUP);
     if(GUIProp.mapinfo) mapInfo = new DialogMapInfo(gui);

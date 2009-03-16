@@ -21,8 +21,8 @@ public final class GUIProp {
   public static int fonttype = 0;
   /** Font size. */
   public static int fontsize = 12;
-  /** Flag for anti-aliasing results in GUI mode. */
-  public static boolean fontalias = false;
+  /** Anti-aliasing mode. */
+  public static int fontalias = 0;
 
   /** Red GUI color factor. */
   public static int colorred = 20;
@@ -34,7 +34,7 @@ public final class GUIProp {
   // MAIN WINDOW OPTIONS ======================================================
 
   /** GUI height. */
-  public static int[] guisize = { 1000, 744 };
+  public static int[] guisize = { 1004, 748 };
   /** GUI position. */
   public static int[] guiloc = { 10, 10 };
   /** Flag for maximized GUI window. */
@@ -63,9 +63,7 @@ public final class GUIProp {
   /** Flag for activated tree view. */
   public static boolean showfolder = false;
   /** Flag for activated search view. */
-  public static boolean showquery = false;
-  /** Flag for activated help view. */
-  public static boolean showhelp = true;
+  public static boolean showquery = true;
   /** Flag for dissolving name attributes. */
   public static boolean shownames = true;
   /** Flag for showing the simple file dialog. */
@@ -103,13 +101,17 @@ public final class GUIProp {
   public static boolean plotylog;
   
   /** Dialog location. */
-  public static int[] maplayoutloc = { 200, 200 };
+  public static int[] maplayoutloc = { 790, 520 };
   /** Dialog location. */
-  public static int[] fontsloc = { 200, 200 };
+  public static int[] fontsloc = { 10, 530 };
   /** Dialog location. */
-  public static int[] colorsloc = { 200, 200 };
+  public static int[] colorsloc = { 530, 620 };
   /** Dialog location. */
-  public static int[] prefsloc = { 200, 200 };
+  public static int[] prefsloc = { 280, 230 };
+  /** Dialog location. */
+  public static int[] helploc = { 690, 484 };
+  /** Dialog size. */
+  public static int[] helpsize = { 300, 250 };
 
   /** Path for creating new XML Documents. */
   public static String createpath = Prop.WORK;
@@ -134,19 +136,13 @@ public final class GUIProp {
   /** Following options are not saved/read; don't remove this flag. */
   public static final boolean SKIP = true;
 
-  /** Anti-aliasing type. Supported variants:
-   *  LCD_HRGB / LCD_HBGR / LCD_VRGB / LCD_VBGR / GASP */
-  public static String fontaa = "GASP";
-
   /** Flag for displaying the menu in the GUI window. */
   public static boolean showmenu = true;
-  /** Flag for activated real tree view. */
-  public static boolean showreal = false;
+  /** Flag for activated help view. */
+  public static boolean showhelp = false;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;
-  /** Flag for activated help view after starting.  */
-  public static boolean showstarthelp = false;
   /** Fullscreen flag. */
   public static boolean fullscreen = false;
 

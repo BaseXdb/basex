@@ -277,7 +277,7 @@ proc_err=Could not execute '%'
 proc_nodb=No database opened.
 proc_nofs=Current database is no filesystem import.
 proc_mm=Command is not available in main memory mode.
-proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- you can increase Java's heap size with the flag -Xmx<size>\n- you can try BaseX's internal XML parser with 'set intparse on'\n- you can save memory by deactivating some indexes
+proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- increase Java's heap size with the flag -Xmx<size>\n- choose the internal XML parser in the GUI or via 'set intparse on'\n- deactivate the text and attribute indexes
 
 cmd_no=Expecting command.
 cmd_unknown=Unknown command '%'

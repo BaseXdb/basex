@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
@@ -36,6 +35,6 @@ public final class Prompt extends Process {
       }
       if(nodes.size() != 1) curr.add("[...]");
     }
-    out.print(BaseX.info(fs ? Prop.USER + ":%$ " : "%> ", curr));
+    out.print(BaseX.info(fs ? "%$ " : "%> ", curr));
   }
 }

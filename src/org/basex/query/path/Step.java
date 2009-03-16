@@ -3,7 +3,7 @@ package org.basex.query.path;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;
@@ -154,9 +154,7 @@ public class Step extends Preds {
    * @param data data reference
    * @return node array
    */
-  HashSet<PathNode> count(final HashSet<PathNode> nodes,
-      final Data data) {
-
+  ArrayList<PathNode> count(final ArrayList<PathNode> nodes, final Data data) {
     if(pred.length != 0) return null;
     int kind = -1;
     byte[] n = null;
@@ -174,7 +172,7 @@ public class Step extends Preds {
     final boolean desc = axis == Axis.DESC;
     if(!desc && axis != Axis.CHILD) return null;
     
-    final HashSet<PathNode> out = new HashSet<PathNode>();
+    final ArrayList<PathNode> out = new ArrayList<PathNode>();
     for(final PathNode sn : nodes) data.path.desc(sn, out, name, kind, desc);
     return out;
   }

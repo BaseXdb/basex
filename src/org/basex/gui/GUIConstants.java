@@ -61,13 +61,12 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " + FOLDERVIEW
-      + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
-      + " " + INFOVIEW + " " + PLOTVIEW + " - -";
+  public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " +
+    TEXTVIEW + " - V " + MAPVIEW + " " + TABLEVIEW + " " +
+    INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
-  public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " " + HELPVIEW
-      + " -";
+  public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " -";
 
   // TOOLBAR ==================================================================
 
@@ -130,6 +129,11 @@ public final class GUIConstants {
     /** Transparent mode.  */ NONE,
     /** Upward gradient.   */ UP,
     /** Downward gradient. */ DOWN
+  };
+
+  /** Anti-alias modes. */
+  public static final String[] FONTALIAS = {
+    "OFF", "ON", "GASP", "LCD_HRGB", "LCD_HBGR", "LCD_VRGB", "LCD_VBGR"
   };
 
   // COLORS ===================================================================

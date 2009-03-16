@@ -422,7 +422,7 @@ public final class DiskData extends Data {
     table.delete(pre, s);
     meta.size -= s;
 
-    // database cannot be empty; instead, an empty root node is kept
+    // [CG] Update/Delete: keep empty root node
     if(meta.size == 0) {
       meta.size = 1;
       size(0, DOC);

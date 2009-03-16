@@ -1173,12 +1173,17 @@ public class QueryParser extends InputParser {
    * @throws QueryException xquery exception
    */
   public Expr path() throws QueryException {
+    checkInit();
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step(s);
+    if(s > 0) checkAxis(s == 2 ? Axis.DESC : Axis.CHILD);
+    qm = qp;
+
+    final Expr ex = step();
     if(ex == null) {
-      if(s > 1) error(PATHMISS);
-      return s == 0 ? null : new Root();
+      if(s == 2) error(PATHMISS);
+      return s == 1 ? new Root() : null;
     }
+
     final boolean slash = consume('/');
     final boolean step = ex instanceof Step;
     if(!slash && s == 0 && !step) return ex;
@@ -1188,17 +1193,16 @@ public class QueryParser extends InputParser {
 
     final Expr root = s > 0 ? new Root() : !step ? ex : null;
     if(root != ex) list = add(list, ex);
-
+    
     if(slash) {
       do {
-        int tmp;
-        if(consume('/')) {
-          tmp = 20;
-          list = add(list, descOrSelf());
-        } else {
-          tmp = 10;
-        }
-        final Expr st = check(step(tmp), PATHMISS);
+        final boolean desc = consume('/');
+        qm = qp;
+        if(desc) list = add(list, descOrSelf());
+        checkAxis(desc ? Axis.DESC : Axis.CHILD);
+
+        final Expr st = step();
+        if(st == null) error(PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1211,6 +1215,7 @@ public class QueryParser extends InputParser {
       axes &= list[l] instanceof Step;
       if(axes) tmp[l] = (Step) list[l];
     }
+
     return axes ? AxisPath.get(root, tmp) : new MixedPath(root, list);
   }
 
@@ -1222,41 +1227,67 @@ public class QueryParser extends InputParser {
     return Step.get(Axis.DESCORSELF, Test.NODE);
   }
 
+  // Methods for query suggestions
+  
+  /**
+   * Performs an optional check init.
+   */
+  @SuppressWarnings("unused")
+  protected void checkInit() { }
+
+  /**
+   * Performs an optional axis check.
+   * @param axis axis
+   */
+  @SuppressWarnings("unused")
+  protected void checkAxis(final Axis axis) { }
+
+  /**
+   * Performs an optional test check.
+   * @param test node test
+   * @param attr attribute flag
+   */
+  @SuppressWarnings("unused")
+  protected void checkTest(final Test test, final boolean attr) { }
+
+  /**
+   * Checks a predicate.
+   * @param open open flag
+   */
+  @SuppressWarnings("unused")
+  protected void checkPred(final boolean open) { }
+
+  
+  
   /**
    * [ 70] Parses a StepExpr.
-   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step(final int s) throws QueryException {
+  protected Expr step() throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis(s);
+    return e != null ? e : axis();
   }
 
   /**
    * [ 71] Parses an AxisStep.
-   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  Step axis(final int s) throws QueryException {
+  Step axis() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
       ax = Axis.PARENT;
       test = Test.NODE;
+      checkTest(test, false);
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
-      if (s == 2) {
-        sugPath(0);
-        checkStep(Axis.DESCORSELF, Test.NODE);
-      }
+      checkTest(test, true);
       if(test == null) {
-        checkStep(ax, new NameTest(new QNm(EMPTY), Test.Kind.STD, true));
+        qp--;
         error(NOATTNAME);
-      } else {
-        checkStep(ax, test);
       }
     } else {
       for(final Axis a : Axis.values()) {
@@ -1274,25 +1305,16 @@ public class QueryParser extends InputParser {
       ax = Axis.CHILD;
       test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
-      if (test != null) {
-        if (s == 0) sugPath(1);
-        if (s != 10 && s != 20 && s != 0) sugPath(0);
-        if (s == 2)  checkStep(Axis.DESCORSELF, Test.NODE);
-        checkStep(ax, test);
-      } else if (s == 10 || s == 20 || s == 1 || s == 2) {
-        if (s != 10 && s != 20) sugPath(0);
-        if (s == 2 || s == 20)  checkStep(Axis.DESCORSELF, Test.NODE);
-        checkStep(null, null);
-      }
+      checkTest(test, ax == Axis.ATTR);
     }
     if(test == null) return null;
 
     Expr[] pred = {};
     while(consumeWS2(BR1)) {
-      checkStep(ax, test);
-      pred();
+      checkPred(true);
       pred = add(pred, expr());
       check(BR2);
+      checkPred(false);
     }
     return Step.get(ax, test, pred);
   }
@@ -2575,7 +2597,7 @@ public class QueryParser extends InputParser {
         qp++;
       }
     }
-    return true;
+    return p != qp;
   }
 
   /**
@@ -2618,32 +2640,6 @@ public class QueryParser extends InputParser {
     ctx.fun.funError((QNm) alter[0]);
     error(FUNCUNKNOWN, ((QNm) alter[0]).str());
   }
-  
-  /**
-   * Parses a Suggestion Path.
-   * 0 for an absolute Path
-   * 1 for a relative Path
-   * @param type int
-   * @throws QueryException parse Exception
-   */
-  @SuppressWarnings("unused")
-  void sugPath(final int type) throws QueryException { }
-  
-  /**
-   * Performs optional step checks.
-   * @param axis axis
-   * @param test test
-   * @throws QueryException parse Exception
-   */
-  @SuppressWarnings("unused")
-  void checkStep(final Axis axis, final Test test) throws QueryException { }
-  
-  /**
-   * Parses a Pred.
-   * @throws QueryException parse Exception
-   */
-  @SuppressWarnings("unused")
-  void pred() throws QueryException { }
 
   /**
    * Throws the specified error.
@@ -2651,7 +2647,6 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @throws QueryException parse exception
    */
-  @SuppressWarnings("unused")
   void error(final Object[] err, final Object... arg) throws QueryException {
     Err.or(err, arg);
   }

@@ -47,6 +47,7 @@ public final class DialogMapLayout extends Dialog {
 
     // create drop down
     border = new BaseXCombo(MAPOFFSETS, null, this);
+    border.setSelectedIndex(GUIProp.mapoffsets);
 
     // create drop down
     final BaseXBack tmp = new BaseXBack();
@@ -78,7 +79,6 @@ public final class DialogMapLayout extends Dialog {
     finish(GUIProp.maplayoutloc);
 
     algo.setIndex(GUIProp.mapalgo);
-    border.setSelectedIndex(GUIProp.mapoffsets);
   }
 
   @Override

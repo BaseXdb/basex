@@ -20,7 +20,7 @@ import org.basex.gui.layout.BaseXPanel;
  */
 public final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  public static final int SIZE = 7;
+  public static final int SIZE = 8;
   /** Move cursor. */
   public static final Cursor HAND = new Cursor(Cursor.MOVE_CURSOR);
   /** Flag if current mover is active. */

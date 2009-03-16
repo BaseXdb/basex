@@ -25,7 +25,7 @@ public final class MemBuilder extends Builder {
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.io;
-    data = new MemData(64, tags, atts, ns, skel);
+    data = new MemData(64, tags, atts, ns, path);
     data.meta = meta;
     return this;
   }

@@ -87,7 +87,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     initPanel();
 
-    copy = new BaseXButton(BUTTONTOXQUERY, HELPTOXPATH);
+    copy = new BaseXButton(BUTTONTOXQUERY, HELPTOXQUERY);
     copy.addKeyListener(main);
     copy.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {

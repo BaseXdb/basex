@@ -26,7 +26,7 @@ public final class InfoTable extends AInfo {
 
   @Override
   protected boolean exec() {
-    // evaluate input as number range or xpath
+    // evaluate input as number range or xquery
     if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
       result = query(args[0], null);
       if(result == null) return false;

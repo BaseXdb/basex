@@ -20,34 +20,35 @@ public final class Prop {
 
   // STATIC PROPERTIES ========================================================
 
-  /** Returns the system's default encoding. */
-  public static final String ENCODING = System.getProperty("file.encoding");
-  /** Returns the current working directory. */
-  public static final String WORK = System.getProperty("user.dir") + "/";
-  /** User's home directory. */
-  public static final String HOME = System.getProperty("user.home");
-  /** User name. */
-  public static final String USER = System.getProperty("user.name");
-  /** OS Flag (should be ignored whenever possible). */
-  public static final String OS = System.getProperty("os.name");
-  /** Flag denoting if OS belongs to UNIX or Windows family. */
-  public static final boolean UNIX = OS.charAt(0) != 'W';
-  /** Flag denoting if OS belongs to UNIX or Windows family. */
-  public static final boolean MAC = OS.charAt(0) == 'M';
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
+  /** New line string. */
+  public static final String SEP = System.getProperty("file.separator");
+  /** Returns the system's default encoding. */
+  public static final String ENCODING = System.getProperty("file.encoding");
+
+  /** Returns the current working directory. */
+  public static final String WORK = System.getProperty("user.dir") + SEP;
+  /** User's home directory. */
+  public static final String HOME = System.getProperty("user.home") + SEP;
+  /** OS Flag (should be ignored whenever possible). */
+  public static final String OS = System.getProperty("os.name");
+  /** Flag denoting if OS belongs not to Windows family. */
+  public static final boolean UNIX = OS.charAt(0) != 'W';
+  /** Flag denoting if OS belongs to Mac family. */
+  public static final boolean MAC = OS.charAt(0) == 'M';
 
   /** Available languages (should be retrieved dynamically, but leads to
    * problems with JAR file. Someone knows what to do?) */
   public static final String[] LANGUAGES = { "English", "German", "Japanese" };
   /** Translation credits. */
   public static final String[] LANGCREDS = { "Project Team",
-      "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
+      "Andreas Weiler, Project Team", "Kazuo Kashima" };
 
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
-  public static String dbpath = HOME + "/BaseXData";
+  public static String dbpath = HOME + "BaseXData";
   /** Web Server path. */
   public static String webpath = WORK + "web";
   /** Path to dotty. */
@@ -105,7 +106,7 @@ public final class Prop {
   /** Flag for creating databases on-the-fly (in memory). */
   public static boolean onthefly = false;
   /** Path for filtering XML Documents. */
-  public static String createfilter = "*.*";
+  public static String createfilter = "*.xml";
   /** Number of index occurrences to print in the index info. */
   public static int indexocc = 10;
 
@@ -165,7 +166,7 @@ public final class Prop {
   private static final String PROPUSER = "# User defined section";
 
   /** Default path to the BaseX configuration file. */
-  private static final String CONFIGFILE = HOME + "/" + IO.BASEXSUFFIX;
+  private static final String CONFIGFILE = HOME + IO.BASEXSUFFIX;
   /** Remembers if the config file has already been read. */
   private static boolean read;
 

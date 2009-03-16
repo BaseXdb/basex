@@ -103,7 +103,6 @@ public class QueryException extends Exception {
    */
   public final void complete(final InputParser qp, final StringList comp) {
     complete = comp;
-    qp.qm++;
     pos(qp);
   }
 

@@ -48,6 +48,8 @@ public final class BaseXWin {
     // read properties
     Prop.read();
     Prop.gui = true;
+    Prop.xqerrcode = false;
+    Prop.chop = true;
     GUIProp.read();
 
     // show waiting panel and wait some time to allow repainting

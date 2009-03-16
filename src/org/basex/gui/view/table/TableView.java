@@ -1,5 +1,6 @@
 package org.basex.gui.view.table;
 
+import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -47,10 +48,9 @@ public final class TableView extends View implements Runnable {
   /**
    * Default constructor.
    * @param man view manager
-   * @param help help text
    */
-  public TableView(final ViewNotifier man, final byte[] help) {
-    super(man, help);
+  public TableView(final ViewNotifier man) {
+    super(man, HELPTABLE);
     tdata = new TableData(gui.context);
     setLayout(new BorderLayout());
     header = new TableHeader(this);

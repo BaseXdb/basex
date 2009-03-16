@@ -105,10 +105,9 @@ public final class PlotView extends View implements Runnable {
   /**
    * Default Constructor.
    * @param man view manager
-   * @param hlp help text
    */
-  public PlotView(final ViewNotifier man, final byte[] hlp) {
-    super(man, hlp);
+  public PlotView(final ViewNotifier man) {
+    super(man, null);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
 

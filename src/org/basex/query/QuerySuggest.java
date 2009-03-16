@@ -1,20 +1,15 @@
 package org.basex.query;
 
-import static org.basex.data.DataText.*;
-
+import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Stack;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.PathNode;
-import org.basex.data.PathSummary;
-import org.basex.query.item.Type;
 import org.basex.query.path.Axis;
-import org.basex.query.path.NameTest;
 import org.basex.query.path.Test;
 import org.basex.util.StringList;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class analyzes the current path and gives suggestions for code
@@ -24,18 +19,18 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class QuerySuggest extends QueryParser {
-  /** Context. */
-  Context ctx;
-  /** Current path summary nodes. */
-  Stack<ArrayList<PathNode>> stack = new Stack<ArrayList<PathNode>>();
-  /** Path summary. */
-  PathSummary skel;
-  /** Last axis. */
-  Axis laxis;
-  /** Last test. */
-  Test ltest;
-
-  // [CG] Suggest/Check
+  /** Data reference. */
+  private Data data;
+  /** All current path nodes. */
+  private Stack<ArrayList<PathNode>> stack;
+  /** All current path nodes. */
+  private ArrayList<PathNode> all;
+  /** Current path nodes. */
+  private ArrayList<PathNode> curr;
+  /** Hide flag. */
+  private boolean show;
+  /** Last tag name. */
+  private byte[] tag;
 
   /**
    * Constructor.
@@ -44,139 +39,92 @@ public class QuerySuggest extends QueryParser {
    */
   public QuerySuggest(final QueryContext c, final Context context) {
     super(c);
-    ctx = context;
-    skel = ctx.data().path;
-  }
-
-  @Override
-  void sugPath(final int type) {
-    if (type == 0) {
-      //System.out.println("absLocPath");
-      final ArrayList<PathNode> list = new ArrayList<PathNode>();
-      list.add(skel.root);
-      stack.push(list);
-    } else if (type == 1) {
-      //System.out.println("relLocPath");
-      ArrayList<PathNode> list = null;
-      if(stack.size() == 0) {
-        if(!ctx.root()) return;
-        list = new ArrayList<PathNode>();
-        list.add(skel.root);
-      } else {
-        list = skel.desc(stack.peek(), 0, Data.ELEM, false);
-      }
-      stack.push(list);
-    }
+    data = context.data();
+    checkInit();
   }
   
-  @Override
-  void pred() {
-    final int s = stack.size();
-    //System.out.println("pred: " + s);
-    while(stack.size() != s) stack.pop();
-  }
-
-  @Override
-  void checkStep(final Axis axis, final Test test) {
-    //System.out.println("checkStep: " + axis + " " + test);
-    filter(true);
-    if(axis == null) {
-      if(!stack.empty()) stack.push(skel.desc(stack.pop(), 0,
-          Data.ELEM, false));
-      return;
-    }
-
-    // [CG] Suggest/check when stack is empty at this stage
-    if(!stack.empty()) {
-      if(axis == Axis.CHILD) {
-        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
-      } else if(axis == Axis.ATTR) {
-        stack.push(skel.desc(stack.pop(), 0, Data.ATTR, false));
-      } else if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
-        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, true));
-      } else {
-        stack.peek().clear();
-      }
-    }
-    laxis = axis;
-    ltest = test;
-  }
-
   /**
-   * Filters the current steps.
-   * @param finish finish flag
-   */
-  public void filter(final boolean finish) {
-    //System.out.println("Filter: " + finish);
-    if(laxis == null) return;
-    if(finish && ltest == Test.NODE) return;
-    final byte[] tn = entry(laxis, ltest);
-    if(tn == null) return;
-
-    // [AW] temporarily added to skip Exception after input of "//*["
-    if(stack.empty()) return;
-
-    final ArrayList<PathNode> list = stack.peek();
-    for(int c = list.size() - 1; c >= 0; c--) {
-      final PathNode n = list.get(c);
-      if(n.kind == Data.ELEM && tn == new byte[] { '*'}) continue;
-      final byte[] t = n.token(ctx.data());
-      final boolean eq = Token.eq(t, tn);
-      if(finish) {
-        if(!eq) list.remove(c);
-      } else {
-        if(eq || !Token.startsWith(t, tn)) list.remove(c);
-      }
-    }
-  }
-
-  /**
-   * Returns the code completions.
+   * Sorts and returns the query suggestions.
    * @return completions
    */
   public StringList complete() {
-    //System.out.println("complete");
     final StringList sl = new StringList();
-    if(stack.empty()) return sl;
-    for(final PathNode r : stack.peek()) {
-      final String name = Token.string(r.token(ctx.data()));
-      if(name.length() != 0 && !sl.contains(name)) sl.add(name);
+    if(show) {
+      for(final PathNode n : curr) {
+        final String nm = string(n.token(data));
+        if(nm.length() != 0 && !sl.contains(nm)) sl.add(nm);
+      }
+      sl.sort(true);
     }
-    sl.sort(true);
     return sl;
   }
 
+  @Override
+  protected void checkInit() {
+    if(stack != null && !stack.empty()) return;
+    all = data.path.root();
+    curr = all;
+    stack = new Stack<ArrayList<PathNode>>();
+  }
+
+  @Override
+  protected void checkAxis(final Axis axis) {
+    if(axis == Axis.CHILD || axis == Axis.DESC) {
+      all = data.path.desc(curr, axis == Axis.DESC);
+    } else {
+      all = new ArrayList<PathNode>();
+    }
+    curr = all;
+    show = true;
+  }
+
+  @Override
+  protected void checkTest(final Test test, final boolean attr) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(attr) tb.add('@');
+    if(test != null) tb.add(test.toString().replaceAll("\\*:?", ""));
+    tag = tb.finish();
+    checkTest(false);
+  }
+
   /**
-   * Returns a node entry.
-   * @param a axis
-   * @param t text
-   * @return completion
+   * Checks the tag name.
+   * @param eq equality test
    */
-  private byte[] entry(final Axis a, final Test t) {
-    //System.out.println("entry: " + a + " " + t);
-    if(t.type == Type.TXT) {
-      return TEXT;
+  private void checkTest(final boolean eq) {
+    if(tag == null) return;
+    
+    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    boolean s = false;
+    for(final PathNode p : all) {
+      final byte[] nm = p.token(data);
+      if(startsWith(nm, tag)) {
+        if(!eq || eq(nm, tag)) tmp.add(p);
+        s |= !eq(tag, nm);
+      }
     }
-    if(t.type == Type.COM) {
-      return COMM;
+    show = tag.length == 0 || s;
+    curr = tmp;
+  }
+  
+  @Override
+  protected void checkPred(final boolean open) {
+    if(open) {
+      checkTest(true);
+      final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+      for(final PathNode p : curr) tmp.add(p);
+      stack.add(tmp);
+      checkAxis(Axis.CHILD);
+    } else {
+      curr = stack.pop();
+      show = false;
+      all = curr;
     }
-    if(t.type == Type.PI) {
-      return PI;
-    }
-    if(t instanceof NameTest && t.name != null) {
-      final byte[] name = t.name.ln();
-      return a == Axis.ATTR ? Token.concat(ATT, name) : name;
-    }
-    return Token.EMPTY;
   }
 
   @Override
   void error(final Object[] err, final Object... arg) throws QueryException {
-    //System.out.println("error");
     final QueryException qe = new QueryException(err, arg);
-    mark();
-    if (qe.simple().startsWith("Unexpected") ||
-        qe.simple().equals("Expecting attribute name.")) filter(false);
     qe.complete(this, complete());
     throw qe;
   }

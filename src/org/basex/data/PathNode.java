@@ -24,7 +24,7 @@ public final class PathNode {
   public PathNode par;
   /** Children. */
   public PathNode[] ch;
-  /** Length of text. */
+  /** Average text length. */
   public double tl;
 
   /**
@@ -107,9 +107,9 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list.
    * @param nodes node list
    */
-  public void desc(final ArrayList<PathNode> nodes) {
+  public void addDesc(final ArrayList<PathNode> nodes) {
     nodes.add(this);
-    for(final PathNode n : ch) n.desc(nodes);
+    for(final PathNode n : ch) n.addDesc(nodes);
   }
 
   /**
@@ -144,7 +144,7 @@ public final class PathNode {
   
   @Override
   public String toString() {
-    return "Node[" + kind + ", " + name + ", " + ch.length
-      + " Children, " + tl + "]";
+    return "Node[Kind: " + kind + ", Name: " + name +
+           ", Children: " + ch.length + ", TextLength: " + tl + "]";
   }
 }

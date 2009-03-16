@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.JDialog;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -22,7 +25,7 @@ public abstract class Dialog extends JDialog {
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */
-  private BaseXBack panel;
+  protected BaseXBack panel;
   /** Dialog position. */
   private int[] loc;
 
@@ -49,6 +52,10 @@ public abstract class Dialog extends JDialog {
     panel.setLayout(new BorderLayout());
     add(panel, BorderLayout.CENTER);
     setResizable(false);
+    addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(final WindowEvent e) { ok = false; }
+    });
   }
 
   /**
@@ -68,8 +75,9 @@ public abstract class Dialog extends JDialog {
     pack();
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
-    setVisible(true);
     loc = l;
+    //ok = false;
+    setVisible(true);
   }
 
   @Override
@@ -107,9 +115,9 @@ public abstract class Dialog extends JDialog {
   @Override
   public void dispose() {
     if(loc != null) {
-      final Container parent = getParent();
-      loc[0] = getX() - parent.getX();
-      loc[1] = getY() - parent.getY();
+      final Container par = getParent();
+      loc[0] = getX() - par.getX();
+      loc[1] = getY() - par.getY();
       GUIProp.write();
     }
     super.dispose();

@@ -98,9 +98,7 @@ public final class DialogCreate extends Dialog {
     final BaseXButton button = new BaseXButton(BUTTONBROWSE,
         HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        choose();
-      }
+      public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(button);
     p1.add(p);
@@ -112,9 +110,7 @@ public final class DialogCreate extends Dialog {
     dbname.setText(IO.get(GUIProp.createpath).dbname());
     dbname.addKeyListener(new KeyAdapter() {
       @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
+      public void keyReleased(final KeyEvent e) { action(null); }
     });
     BaseXLayout.setWidth(dbname, 300);
     p1.add(dbname);
@@ -243,7 +239,6 @@ public final class DialogCreate extends Dialog {
     final boolean exists = pth.length() != 0 && file.exists();
     if(exists) {
       GUIProp.createpath = file.path();
-      filter.setEnabled(file.isDir());
     }
 
     final String nm = dbname();
@@ -264,6 +259,8 @@ public final class DialogCreate extends Dialog {
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
+    filter.setEnabled(exists && file.isDir());
+
     BaseXLayout.enableOK(buttons, BUTTONOK, ok);
   }
 

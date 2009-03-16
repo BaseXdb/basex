@@ -211,6 +211,7 @@ public final class ViewNotifier {
    * Notifies all views of layout changes.
    */
   public void layout() {
+    if(gui.help != null) gui.help.refreshLayout();
     if(gui.context.db()) for(final View v : view) v.refreshLayout();
   }
 

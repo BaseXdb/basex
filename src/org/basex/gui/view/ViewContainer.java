@@ -92,13 +92,11 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    */
   public void setViews(final boolean db) {
     views = panels[db ? 1 : 0];
-
+    
     // build layout or use default if something goes wrong
-    if(db) {
-      if(!buildLayout(GUIProp.layoutopened)) buildLayout(LAYOUTOPEN);
-    } else {
-      if(!buildLayout(GUIProp.layoutclosed)) buildLayout(LAYOUTCLOSE);
-    }
+    final String lo1 = db ? GUIProp.layoutopened : GUIProp.layoutclosed;
+    final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
+    if(!buildLayout(lo1)) buildLayout(lo2);
   }
 
   /**
