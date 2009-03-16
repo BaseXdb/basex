@@ -171,4 +171,7 @@ public interface FSText {
   /** Email attributes. */
   byte[][] ATTRIBUTETOKENS = { token("CC"), token("User-Agent"),
       token("Organization") };
+  
+  /** Error message 'Import FS...' if backing storage exists. */
+  String BACKINGEXISTS = "Backing storage exists, please delete first: ";
 }

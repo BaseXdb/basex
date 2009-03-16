@@ -3,8 +3,14 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.build.Builder;
@@ -62,6 +68,13 @@ public final class FSParser extends Parser {
   private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
+  /** DeepFS import flag (copy files to backing store). */
+  private boolean wbacking = true;
+  /** Root of backing store. */
+  private String backingroot = "/var/tmp/deepfs";
+  /** Length of absolute pathname of the root directory the import starts from,
+   * i.e. the prefix to be deleted and substituted by backingroot. */
+  private int importroot;
 
   /**
    * Constructor.
@@ -106,6 +119,10 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
+    backingroot = backingroot + "/" + io.name();
+    if (!new File(backingroot).mkdir())
+      throw new IOException(BACKINGEXISTS + backingroot);
+    
     builder.startDoc(token(io.name()));
 
     if(singlemode) {
@@ -115,6 +132,8 @@ public final class FSParser extends Parser {
       
       for(final File f : root ? File.listRoots() :
         new File[] { new File(io.path()).getCanonicalFile() }) {
+        
+        importroot = f.getAbsolutePath().length();
         
         preStack[0] = builder.startElem(DIR, atts(f, true));
         sizeStack[0] = 0;
@@ -141,13 +160,35 @@ public final class FSParser extends Parser {
       if(!valid(f)) continue;
 
       if(f.isDirectory()) {
+        if (wbacking)
+          new File(backingroot
+            + f.getAbsolutePath().substring(importroot)).mkdir();
         dir(f);
       } else {
+        if (wbacking)
+          copy(f.getAbsoluteFile(), new File(backingroot
+            + f.getAbsolutePath().substring(importroot)));
         file(f);
       }
     }
   }
 
+  /** Copy file to backing store.
+   * @param src file source
+   * @param dst file destination in backing store
+   * @throws IOException I/O exception
+   */
+  private void copy(final File src, final File dst) throws IOException {    
+    InputStream in = new FileInputStream(src);
+    OutputStream out = new FileOutputStream(dst);
+    byte[] buf = new byte[4096];
+    int len;
+
+    while((len = in.read(buf)) > 0) out.write(buf, 0, len);
+    in.close();
+    out.close();
+  }
+  
   /**
    * Determines if the specified file is valid and no symbolic link.
    * @param f file to be tested.

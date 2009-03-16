@@ -28,6 +28,8 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   boolean dtd;
   /** Element counter. */
   int nodes;
+  /** Document flag; if true, a document node is added. */
+  public boolean doc = true;
 
   // needed for XMLEntityManager: increase entity limit
   static { System.setProperty("entityExpansionLimit", "536870912"); }
@@ -35,11 +37,11 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   /**
    * Constructor.
    * @param build builder reference
-   * @param doc document name
+   * @param xml document name
    */
-  public SAX2Data(final Builder build, final String doc) {
+  public SAX2Data(final Builder build, final String xml) {
     builder = build;
-    name = doc;
+    name = xml;
   }
   
   @Override
@@ -146,7 +148,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   @Override
   public void startDocument() throws SAXException {
     try {
-      builder.startDoc(token(name));
+      if(doc) builder.startDoc(token(name));
     } catch(final IOException ex) {
       error(ex);
     }
@@ -155,7 +157,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   @Override
   public void endDocument() throws SAXException {
     try {
-      builder.endDoc();
+      if(doc) builder.endDoc();
     } catch(final IOException ex) {
       error(ex);
     }

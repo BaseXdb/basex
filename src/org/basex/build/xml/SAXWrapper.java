@@ -47,6 +47,7 @@ public final class SAXWrapper extends Parser {
         r = f.newSAXParser().getXMLReader();
       }
       sax = new SAX2Data(build, io.name());
+      sax.doc = doc;
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);

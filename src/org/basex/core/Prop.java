@@ -129,9 +129,9 @@ public final class Prop {
   public static IO xquery;
 
   /** Flag for importing file contents. */
-  public static boolean fscont = false;
+  public static boolean fscont = true;
   /** Flag for importing file metadata. */
-  public static boolean fsmeta = false;
+  public static boolean fsmeta = true;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
 
