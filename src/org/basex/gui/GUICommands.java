@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           GUIProp.xqpath, gui);
-      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
+      fc.addFilter(new String[] { IO.XQSUFFIX }, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.Mode.OPEN)) {
         try {
@@ -141,7 +141,7 @@ public enum GUICommands implements GUICommand {
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
           fn == null ? GUIProp.xqpath : fn, gui);
-      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
+      fc.addFilter(new String[] { IO.XQSUFFIX }, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         try {
@@ -176,7 +176,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
           GUIProp.createpath, gui);
-      fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
+      fc.addFilter(new String[] { IO.XMLSUFFIX }, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         final IO file = fc.getFile();

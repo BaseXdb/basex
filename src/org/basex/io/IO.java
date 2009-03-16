@@ -32,8 +32,6 @@ public abstract class IO {
   public static final String XMLSUFFIX = ".xml";
   /** ZIP Suffix. */
   public static final String ZIPSUFFIX = ".zip";
-  /** DOCX Suffix. */
-  public static final String DOCXSUFFIX = ".docx";
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
 

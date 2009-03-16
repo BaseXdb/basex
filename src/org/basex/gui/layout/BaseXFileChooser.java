@@ -58,12 +58,12 @@ public final class BaseXFileChooser {
   
   /**
    * Sets a file filter.
-   * @param suf suffix
+   * @param suf suffixes
    * @param dsc description
    */
-  public void addFilter(final String suf, final String dsc) {
+  public void addFilter(final String[] suf, final String dsc) {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
-    else fd.setFile("*" + suf);
+    else for(final String s : suf) fd.setFile("*" + s);
   }
   
   /**
@@ -136,7 +136,7 @@ public final class BaseXFileChooser {
    */
   static class Filter extends FileFilter {
     /** Suffix. */
-    private String suf;
+    private String[] suf;
     /** Description. */
     private String desc;
     
@@ -145,14 +145,17 @@ public final class BaseXFileChooser {
      * @param s suffix
      * @param d description
      */
-    Filter(final String s, final String d) {
+    Filter(final String[] s, final String d) {
       suf = s;
       desc = d;
     }
     
     @Override
     public boolean accept(final File file) {
-      return file.isDirectory() || file.getName().toLowerCase().endsWith(suf);
+      if(file.isDirectory()) return true;
+      final String name = file.getName().toLowerCase();
+      for(final String s : suf) if(name.endsWith(s)) return true;
+      return false;
     }
     @Override
     public String getDescription() {

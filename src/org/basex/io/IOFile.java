@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.basex.core.Prop;
 import org.xml.sax.InputSource;
 
 /**
@@ -69,8 +67,7 @@ public final class IOFile extends IO {
   @Override
   public boolean more() throws IOException {
     // process zip files
-    if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX) ||
-        path.endsWith(DOCXSUFFIX)) {
+    if(is instanceof ZipInputStream || zip()) {
       if(is == null) {
         // keep stream open until last file was parsed...
         is = new ZipInputStream(new FileInputStream(file)) {
@@ -85,10 +82,10 @@ public final class IOFile extends IO {
         if(zip == null) break;
         len = zip.getSize();
         path = zip.getName();
-
-        String filter = Prop.createfilter.replaceAll("\\*", ".*");
-        if(!filter.contains(".")) filter = ".*" + filter + ".*";
-        if(path.matches(filter) && !zip.isDirectory()) return true;
+        System.out.println(zip.getCompressedSize() + ": " + path);
+        System.out.println(zip.getSize() + ": " + path);
+        if(len > 0 && path.toLowerCase().endsWith(XMLSUFFIX) &&
+            !zip.isDirectory()) return true;
       }
       is.close();
       is = null;
@@ -110,6 +107,17 @@ public final class IOFile extends IO {
     return more ^= true;
   }
 
+  /**
+   * Matches the current file against various file suffixes.
+   * @return result of check
+   */
+  private boolean zip() {
+    final String suf = path.toLowerCase().replaceAll(".*\\.", ".");
+    return suf.equals(ZIPSUFFIX) || suf.equals(".docx") || 
+      suf.equals(".xslx") || suf.equals(".pptx") ||
+      suf.equals(".odt") || suf.equals(".ods") || suf.equals(".odp");
+  }
+  
   @Override
   public InputSource inputSource() {
     return is == null ? new InputSource(url(path)) : new InputSource(is);
