@@ -76,7 +76,6 @@ public abstract class Dialog extends JDialog {
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
     loc = l;
-    //ok = false;
     setVisible(true);
   }
 

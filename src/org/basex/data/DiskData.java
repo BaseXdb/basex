@@ -428,6 +428,9 @@ public final class DiskData extends Data {
       size(0, DOC);
     }
     updateDist(pre, -s);
+
+    // [AH] delete filesystem node
+    //if(fs != null) fs.delete(pre);
   }
 
   /**

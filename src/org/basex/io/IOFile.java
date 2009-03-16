@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.basex.core.Prop;
 import org.xml.sax.InputSource;
 
 /**
@@ -67,7 +69,8 @@ public final class IOFile extends IO {
   @Override
   public boolean more() throws IOException {
     // process zip files
-    if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX)) {
+    if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX) ||
+        path.endsWith(DOCXSUFFIX)) {
       if(is == null) {
         // keep stream open until last file was parsed...
         is = new ZipInputStream(new FileInputStream(file)) {
@@ -82,7 +85,10 @@ public final class IOFile extends IO {
         if(zip == null) break;
         len = zip.getSize();
         path = zip.getName();
-        if(!zip.isDirectory()) return true;
+
+        String filter = Prop.createfilter.replaceAll("\\*", ".*");
+        if(!filter.contains(".")) filter = ".*" + filter + ".*";
+        if(path.matches(filter) && !zip.isDirectory()) return true;
       }
       is.close();
       is = null;

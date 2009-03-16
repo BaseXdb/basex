@@ -50,7 +50,7 @@ public final class EMLExtractor extends AbstractExtractor {
   /** Email body character encoding. */
   private String mBodyCharset;
   /** Email body content type. */
-  private String mBodyType;
+  private String mBodyType = "";
 
   @Override
   public void extract(final Builder listener, final File f) throws IOException {
@@ -73,7 +73,7 @@ public final class EMLExtractor extends AbstractExtractor {
    * @throws IOException I/O exception
    */
   private boolean getSingleMailData(final Builder listener) throws IOException {
-    listener.startElem(EMAIL, null);
+    listener.startElem(EMAIL, atts.reset());
 
     // catch exceptions and insert them into tree to find the part of
     // the mail which caused problem

@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import java.io.IOException;
-import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -57,10 +56,13 @@ public final class DirParser extends Parser {
       while(path.more()) {
         if(!path.name().matches(filter)) continue;
         b.meta.filesize += io.length();
-        final SAXSource s = new SAXSource(io.inputSource());
-        if(s.getSystemId() == null) s.setSystemId(io.name());
-        parser = Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
+        parser = Parser.getXMLParser(io);
+        parser.doc = doc;
+        
+        //
         parser.parse(b);
+        
+        //
       }
     }
   }

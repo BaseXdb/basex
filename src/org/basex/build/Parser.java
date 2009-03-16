@@ -1,6 +1,12 @@
 package org.basex.build;
 
 import java.io.IOException;
+
+import javax.xml.transform.sax.SAXSource;
+
+import org.basex.build.xml.SAXWrapper;
+import org.basex.build.xml.XMLParser;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 
@@ -13,6 +19,8 @@ import org.basex.util.Atts;
 public abstract class Parser {
   /** Temporary attribute array. */
   protected final Atts atts = new Atts();
+  /** Document flag; if true, a document node is added. */
+  public boolean doc = true;
   /** Input file. */
   public IO io;
 
@@ -24,6 +32,18 @@ public abstract class Parser {
     io = f;
   }
 
+  /**
+   * Returns an XML parser instance.
+   * @param io io reference
+   * @return xml parser
+   * @throws IOException io exception
+   */
+  public static Parser getXMLParser(final IO io) throws IOException {
+    final SAXSource s = new SAXSource(io.inputSource());
+    if(s.getSystemId() == null) s.setSystemId(io.name());
+    return Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
+  }
+  
   /**
    * Parses all nodes and sends events to the specified builder.
    * @param build event listener.

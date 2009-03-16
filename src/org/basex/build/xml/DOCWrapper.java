@@ -31,7 +31,7 @@ public final class DOCWrapper extends Parser {
   /** Name of the document. */
   private final String filename;
   /** Root document. */
-  private final Node doc;
+  private final Node root;
   /** Element counter. */
   private int nodes;
 
@@ -42,7 +42,7 @@ public final class DOCWrapper extends Parser {
    */
   public DOCWrapper(final Document d, final String fn) {
     super(IO.get(fn));
-    doc = d;
+    root = d;
     filename = fn;
   }
 
@@ -51,7 +51,7 @@ public final class DOCWrapper extends Parser {
     builder.startDoc(token(filename));
 
     final Stack<NodeIterator> stack = new Stack<NodeIterator>();
-    stack.push(new NodeIterator(doc));
+    stack.push(new NodeIterator(root));
 
     while(!stack.empty()) {
       final NodeIterator ni = stack.peek();

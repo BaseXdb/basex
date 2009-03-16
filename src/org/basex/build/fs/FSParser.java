@@ -18,6 +18,7 @@ import org.basex.build.fs.metadata.MP3Extractor;
 import org.basex.build.fs.metadata.MetaDataException;
 import org.basex.build.fs.metadata.PNGExtractor;
 import org.basex.build.fs.metadata.TIFExtractor;
+import org.basex.build.fs.metadata.XMLExtractor;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
@@ -82,6 +83,7 @@ public final class FSParser extends Parser {
     meta.add(TYPEEML, new EMLExtractor());
     meta.add(TYPEMBS, new EMLExtractor());
     meta.add(TYPEMBX, new EMLExtractor());
+    meta.add(TYPEXML, new XMLExtractor());
   }
 
   /** 

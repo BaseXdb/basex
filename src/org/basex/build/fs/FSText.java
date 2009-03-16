@@ -13,9 +13,11 @@ public interface FSText {
   byte[] IMAGE = token("Image");
   /** Audio tag. */
   byte[] AUDIO = token("Audio");
+  /** XML tag. */
+  byte[] XML = token("XML");
+
   /** Image attributes. */
   byte[] TYPE = token("type");
-
   /** GIF suffix. */
   byte[] TYPEGIF = token("gif");
   /** JPG type. */
@@ -36,6 +38,8 @@ public interface FSText {
   byte[] TYPEMBX = token("mbx");
   /** MP3 suffix. */
   byte[] TYPEMP3 = token("mp3");
+  /** XML suffix. */
+  byte[] TYPEXML = token("xml");
 
   /** Width tag. */
   byte[] WIDTH = token("Width");
