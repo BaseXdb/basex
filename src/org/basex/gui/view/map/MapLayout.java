@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
+import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -22,7 +23,7 @@ class MapLayout {
   /** mapalgo to use in this layout. */
   protected final MapAlgo algo;
   /** text lentghs. */
-//  private double[] textLen;
+  private long[] textLen;
 
   /** List of rectangles. */
   final ArrayList<MapRect> rectangles;
@@ -249,14 +250,40 @@ class MapLayout {
   /**
    * initialize text lengths and store them into array.
    */
-//  protected void initLen() {
-//    int size = data.meta.size;
-//    textLen = new double[size];
-//    for(int pre = 0; pre < size; pre++) {
-//      final byte kind = (byte) data.kind(pre);
-//      if(kind == Data.TEXT) {
-//        textLen[pre] = data.textLen(pre);
-//      } else textLen[pre] = 0;
-//    }
-//  }
+  protected void initLen() {
+    int size = data.meta.size;
+    textLen = new long[size];
+    for(int i = 0; i < size; i++) textLen[i] = 0;
+    final int[] parStack = new int[IO.MAXHEIGHT];
+    int l = 0;
+    int par = 0;
+    int pre = 0;
+
+    for(pre = 0; pre < size; pre++) {
+      final byte kind = (byte) data.kind(pre);
+      par = data.parent(pre, kind);
+      
+      while(l > 1 && parStack[l - 2] >= par) {
+        textLen[parStack[l - 2]] += textLen[pre - 1];
+        l--;
+      }
+
+      if(kind == Data.TEXT) {
+        textLen[pre] = data.textLen(pre);
+        parStack[l] = pre;
+        l++;
+      } else {
+        parStack[l] = pre;
+        textLen[pre] = 0;
+        l++;
+      } 
+    }
+    while(l > 0 && parStack[l - 1] > par) {
+      textLen[parStack[l - 2]] += textLen[pre - 1];
+      l--;
+    }
+    
+//    for(int i = 0; i < size; i++) System.out.println(i + ";" + textLen[i]);
+    
+  }
 }
