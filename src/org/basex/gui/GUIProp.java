@@ -146,6 +146,8 @@ public final class GUIProp {
 
   /** Flag for computing additional map infos. */
   public static boolean mapinfo = false;
+  /** Show file contents in TreeMap. */
+  public static boolean filecont = false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size

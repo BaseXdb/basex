@@ -48,29 +48,14 @@ class MapList extends IntList {
    * children
    */
   void initWeights(final long parsize, final int parchildren, final Data data) {
+//    Arrays.toString(textLen);
     weight = new double[list.length];
     int[] nrchildren = new int[list.length];
     long[] sizes = new long[list.length];
     int sizeP = GUIProp.mapweight;
     
-    // use #children and size for weight
-    if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && data.fs != null) {
-      for(int i = 0; i < size - 1; i++) {
-        sizes[i] = data.fs != null ? 
-            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-        nrchildren[i] = list[i + 1] - list[i];
-        weight[i] = sizeP / 100d * sizes[i] / parsize + 
-            (1 - sizeP / 100d) * nrchildren[i] / parchildren;
-      }
-    // only sizes
-    } else if (GUIProp.mapweight == 100 && data.fs != null) {
-      for(int i = 0; i < size - 1; i++) {
-        sizes[i] = data.fs != null ? 
-            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-        weight[i] = sizes[i] * 1d / parsize;
-      }    
-    //only #children
-    } else if (GUIProp.mapweight == 0 || data.fs == null) {
+    // only children
+    if (GUIProp.mapweight == 0 || data.fs == null || GUIProp.filecont) {
       boolean usetextlen = false;
       long len = 0;
       
@@ -89,6 +74,23 @@ class MapList extends IntList {
         } else {
           weight[i] = nrchildren[i] * 1d / parchildren;
         }
+      }
+    // use #children and size for weight
+    } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 
+        data.fs != null) {
+      for(int i = 0; i < size - 1; i++) {
+        sizes[i] = data.fs != null ? 
+            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
+        nrchildren[i] = list[i + 1] - list[i];
+        weight[i] = sizeP / 100d * sizes[i] / parsize + 
+            (1 - sizeP / 100d) * nrchildren[i] / parchildren;
+      }
+    // only sizes
+    } else if (GUIProp.mapweight == 100 && data.fs != null) {
+      for(int i = 0; i < size - 1; i++) {
+        sizes[i] = data.fs != null ? 
+            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
+        weight[i] = sizes[i] * 1d / parsize;
       }
     }
   }
