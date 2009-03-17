@@ -100,10 +100,10 @@ class MapList extends IntList {
    * @param textLen array holding pre vals to textlengths
    * @param children number of children
    */
-  void initWeights(final long[] textLen, final int children) {
+  void initWeights(final int[] textLen, final int children) {
     weight = new double[list.length];
     int[] nrchildren = new int[list.length];
-    long textSum = 0;
+    int textSum = 0;
     for(int i = 0; i < size - 1; i++) textSum += textLen[list[i]];
     // only children
     for(int i = 0; i < size - 1; i++) {

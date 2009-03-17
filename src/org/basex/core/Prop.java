@@ -135,9 +135,9 @@ public final class Prop {
   public static IO xquery;
 
   /** Flag for importing file contents. */
-  public static boolean fscont = true;
+  public static boolean fscont = false;
   /** Flag for importing file metadata. */
-  public static boolean fsmeta = true;
+  public static boolean fsmeta = false;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
 
@@ -156,6 +156,8 @@ public final class Prop {
   
   /** Use BerkeleyDB instead of DiskData implementation. */
   public static boolean usebdb = false;
+  /** Fuse support. */
+  public static boolean fuse;
 
   // WEBSERVER OPTIONS ========================================================
 
@@ -176,6 +178,15 @@ public final class Prop {
   /** Remembers if the config file has already been read. */
   private static boolean read;
 
+  static {
+    try {
+      System.loadLibrary("xqfs");
+      fuse = true;
+    } catch(final UnsatisfiedLinkError ex) {
+      BaseX.debug(ex);
+    }    
+  }
+  
   /** Private constructor, preventing class instantiation. */
   private Prop() { }
 

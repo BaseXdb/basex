@@ -42,6 +42,7 @@ public final class DialogImportFS  extends Dialog {
   BaseXTextField backing;
   /** Mountpoint path. */
   BaseXTextField mountpoint;
+
   /** Database info. */
   private final BaseXLabel info;
   /** Parsing complete filesystem. */
@@ -66,13 +67,13 @@ public final class DialogImportFS  extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(7, 1));
+    p1.setLayout(new TableLayout(3, 1));
     p1.setBorder(8, 8, 8, 8);
 
     p1.add(new BaseXLabel(IMPORTFSTEXT, false, true));
 
     BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(5, 2, 6, 0));
+    p.setLayout(new TableLayout(7, 2, 6, 0));
     
     path = new BaseXTextField(GUIProp.fspath, HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
@@ -120,19 +121,24 @@ public final class DialogImportFS  extends Dialog {
     });
     p.add(all);
     
-    /* [CG] Hmm, need some GUI assistance here ;-) */
-    p.add(new BaseXLabel("Backing store:", true, true));    
     backing = new BaseXTextField(Prop.backingpath,
         "Directory for BLOBs.".getBytes(), this);
     BaseXLayout.setWidth(backing, 240);
-    p.add(backing);
     
-    p.add(new BaseXLabel("DeepFS mount point:", true, true));    
     mountpoint = new BaseXTextField(Prop.mountpoint,
         "Mount point of database as filesystem in userspace".getBytes(), this);
     BaseXLayout.setWidth(mountpoint, 240);
-    p.add(mountpoint);
-    
+
+    if(Prop.fuse) {
+      p.add(new BaseXLabel("Backing store:", false, true));
+      p.add(new BaseXLabel(""));
+      p.add(backing);
+      p.add(new BaseXLabel(""));
+      p.add(new BaseXLabel("DeepFS mount point:", false, true));    
+      p.add(new BaseXLabel(""));
+      p.add(mountpoint);
+      p.add(new BaseXLabel(""));
+    }
     
     p1.add(p);
 
@@ -142,7 +148,7 @@ public final class DialogImportFS  extends Dialog {
 
     // create checkboxes
     final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(9, 1));
+    p2.setLayout(new TableLayout(4, 1));
     p2.setBorder(8, 8, 8, 8);
     
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
@@ -220,7 +226,7 @@ public final class DialogImportFS  extends Dialog {
       if(!ok) {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
-        inf = RENAMEOVERBACKING;
+        inf = Prop.fuse ? RENAMEOVERBACKING : RENAMEOVER;
         img = GUI.icon("warn");
       }
     }

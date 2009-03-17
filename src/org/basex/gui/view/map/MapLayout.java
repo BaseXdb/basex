@@ -18,12 +18,12 @@ import org.basex.util.Token;
 class MapLayout {
   /** Font size. */
   private final int o = GUIProp.fontsize + 4;
-  /** data reference. */
+  /** Data reference. */
   private final Data data;
-  /** mapalgo to use in this layout. */
+  /** Map algorithm to use in this layout. */
   protected final MapAlgo algo;
-  /** text lentghs. */
-  private long[] textLen;
+  /** Text lengths. */
+  private int[] textLen;
 
   /** List of rectangles. */
   final ArrayList<MapRect> rectangles;
@@ -251,11 +251,9 @@ class MapLayout {
   
   /**
    * initialize text lengths and store them into array.
-   */
   protected void initLen() {
     int size = data.meta.size;
     textLen = new long[size];
-    for(int i = 0; i < size; i++) textLen[i] = 0;
     final int[] parStack = new int[IO.MAXHEIGHT];
     int l = 0;
     int par = 0;
@@ -288,4 +286,59 @@ class MapLayout {
 //    for(int i = 0; i < size; i++) System.out.println(i + ";" + textLen[i]);
     
   }
+  */
+
+  
+  /**
+   * Initializes the text lengths and stores them into an array.
+   */
+  protected void initLen() {
+    int size = data.meta.size;
+    textLen = new int[size];
+
+    final int[] parStack = new int[IO.MAXHEIGHT];
+    int l = 0;
+    int par = 0;
+
+    for(int pre = 0; pre < size; pre++) {
+      final int kind = data.kind(pre);
+      par = data.parent(pre, kind);
+      
+      while(l > 0 && parStack[l - 1] > par) {
+        textLen[parStack[l - 1]] += textLen[parStack[l]];
+        --l;
+      }
+      //if(l > 0) textLen[parStack[l - 1]] += textLen[parStack[l]];
+      parStack[l] = pre;
+
+      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
+        textLen[pre] = data.textLen(pre);
+      } else if(kind == Data.ELEM || kind == Data.DOC) {
+        textLen[pre] = 0;
+        l++;
+      } 
+
+      System.out.print("\n\n" + pre + ".PAR: ");
+      for(int i = 0; i < l; i++) {
+        System.out.print(parStack[i] + " ");
+      }
+      System.out.print("\n  LEN: ");
+      for(int i = 0; i < size; i++) {
+        System.out.print(textLen[i] + " ");
+      }
+    }
+
+    while(l > 0) {
+      textLen[parStack[l - 1]] += textLen[parStack[l]];
+      l--;
+    }
+    
+    System.out.println();
+    for(int i = 0; i < size; i++) {
+      System.out.println(i + ";" + textLen[i]);
+    }
+    
+  }
+
+  
 }

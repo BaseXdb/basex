@@ -2,12 +2,9 @@ package org.basex.fuse;
 
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
-import org.basex.build.fs.FSText;
 import org.basex.build.fs.FSUtils;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -40,8 +37,6 @@ public final class DataFS extends DeepFuse {
   public int mountpointID;
   /** Index backing store. */
   public int backingstoreID;
-  /** Flag for FUSE support (dynamic library is present). */
-  public static boolean fuse = false;
   
   /**
    * Mount database as FUSE.
@@ -74,10 +69,8 @@ public final class DataFS extends DeepFuse {
     backingstoreID = d.atts.id(DataText.BACKINGSTORE);
     mountpointID = d.atts.id(DataText.MOUNTPOINT);
 
-    loadFUSELibrary();
-    
-    if(fuse) {
-      File mp = new File(Prop.mountpoint);
+    if(Prop.fuse) {
+      final File mp = new File(Prop.mountpoint);
       if (!mp.mkdirs()) {
         if (mp.exists())
           if (!FSUtils.deleteDir(mp) || !mp.mkdirs()) {
@@ -87,21 +80,6 @@ public final class DataFS extends DeepFuse {
       }
       nativeMount("a", "b");
     }
-  }
-
-  /** 
-   * Tries to load DeepFS FUSE library.
-   * If not available fuse flag denotes its absence and BaseX operates
-   * just on backing storage without mounting DeepFS and native calls.
-   */
-  private void loadFUSELibrary() {
-    try {
-      System.loadLibrary("xqfs");
-      fuse = true;
-    } catch (UnsatisfiedLinkError e) {
-      System.err.println(FSText.NOFUSE + e.getMessage());
-      fuse = false;
-    }    
   }
   
   /**
@@ -142,7 +120,7 @@ public final class DataFS extends DeepFuse {
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size;
     if (s != 0) {
-      byte[] b = mountpoint(il.list[s - 1]);
+      final byte[] b = mountpoint(il.list[s - 1]);
       if (b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
