@@ -95,6 +95,24 @@ class MapList extends IntList {
     }
   }
   
+  /**
+   * Initializes the weights of each list using text lengths of nodes.
+   * @param textLen array holding pre vals to textlengths
+   * @param children number of children
+   */
+  void initWeights(final long[] textLen, final int children) {
+    weight = new double[list.length];
+    int[] nrchildren = new int[list.length];
+    long textSum = 0;
+    for(int i = 0; i < size - 1; i++) textSum += textLen[list[i]];
+    // only children
+    for(int i = 0; i < size - 1; i++) {
+      nrchildren[i] = list[i + 1] - list[i];
+      weight[i] = 1d * textLen[list[i]] / textSum + 
+          0d * nrchildren[i] / children;
+    }
+  }
+  
   @Override
   public String toString() {
     if(weight == null) {

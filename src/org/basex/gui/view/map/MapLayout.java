@@ -57,7 +57,7 @@ class MapLayout {
       default: algo = new SplitAlgo(); break;
     }
     
-//    if (GUIProp.mapweight == 0 || data.fs == null) initLen();
+    if (data.fs == null && GUIProp.usetextlength) initLen();
   }
 
   /**
@@ -214,8 +214,10 @@ class MapLayout {
         rects = tmp.calcMap(r, l, l.weight, ns, ne, level);
       } else {
         nn = l.list[ne] - l.list[ns];
-        // init weights of nodes and sort
-        l.initWeights(parsize, nn, data);
+        // init weights of nodes
+        if(GUIProp.usetextlength) {
+          l.initWeights(textLen, nn);
+        } else l.initWeights(parsize, nn, data);
         rects = algo.calcMap(r, l, l.weight, ns, ne, level);
       }
       // call recursion for next deeper levels
