@@ -109,7 +109,7 @@ public final class FTPos extends FTExpr {
     }
 
     if(tmp != null) //tmp.setPos(pos, pos.length);
-      tmp.addPos(pos, pos.length);
+      tmp.addPos(pos, pos.length, term);
     ctx.ftd = pos;
 
     
@@ -179,13 +179,16 @@ public final class FTPos extends FTExpr {
    * Add position values to existing values.
    * @param il IntList[] with position values
    * @param ilsize int number of tokens in query
+   * @param tl TokenList with tokens
    */
-  void addPos(final IntList[] il, final int ilsize) {
+  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
     final IntList[] iln = new IntList[size + ilsize];
     System.arraycopy(pos, 0, iln, 0, size);
     System.arraycopy(il, 0, iln, size, ilsize);
     pos = iln;
-    size += ilsize;    
+    size += ilsize;
+    for (int i = 0; i < tl.size; i++)
+      term.add(tl.list[i]);    
   }
 
   /**
@@ -243,7 +246,10 @@ public final class FTPos extends FTExpr {
           if(ordered && !content) break;
         }
         if(!o) return false;
-        if(o) break;
+        // [CG] this causes a bug for 
+        // 'a b' ftcontains 'a' ftand 'b' entire content
+        // not sure about its sense
+        //if(o) break; 
       }
     }
     if(content && l != ft.count()) return false;

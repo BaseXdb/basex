@@ -108,6 +108,7 @@ public final class FTTokenizer extends IndexToken {
    * @return result of check
    */
   public boolean more() {
+    if (text == null) return false;
     final int l = text.length;
     pos++;
 
