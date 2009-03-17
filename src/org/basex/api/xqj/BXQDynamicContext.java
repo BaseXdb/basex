@@ -33,7 +33,7 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
-import org.basex.util.Action;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
@@ -220,11 +220,13 @@ abstract class BXQDynamicContext extends BXQAbstract
     
     try {
       if(sc.timeout != 0) {
-        new Action() {
+        new Thread() {
+          @Override
           public void run() {
+            Performance.sleep(sc.timeout * 1000);
             ctx.stop();
           }
-        }.delay(sc.timeout * 1000);
+        }.start();
       }
       query.parse();
       ctx.compile();
