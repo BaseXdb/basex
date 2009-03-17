@@ -242,6 +242,157 @@ final class MapRenderer {
     final double ffmin = 0.14;
     // thumbnail height
     final double ffhmax = 0.5;
+    final double ffhmin = 0.28;
+    // empty line height
+    final double flhmax = 0.3; //0.8;
+    final double flhmin = 0.168;
+    // space width
+    //double sw;
+
+    double ff = ffmax, ffh = ffhmax, flh = flhmax;
+    double fftmin = ffmin, fftmax = ffmax, ffhtmin = ffhmin, 
+           ffhtmax = ffhmax, flhtmin = flhmin, flhtmax = flhmax;
+    double bff = ffmax, bffh = ffhmax, bflh = flhmax;
+    byte lhmi = (byte) Math.max(3, ffh * GUIProp.fontsize);
+    byte fhmi = (byte) Math.max(6, (flh + ffh) * GUIProp.fontsize);
+
+    int h = r.h;
+//    final double fac = Math.exp(Math.log(s.length) * 0.97) / s.length;
+    r.thumbf = ff * GUIProp.fontsize;
+    r.thumbal = 0;
+
+    FTTokenizer ftt = new FTTokenizer(s);
+    final int[][] data = ftt.getInfo();
+
+    boolean l = false;
+    while(r.thumbal < 3) {
+      ff = round((fftmax + fftmin)  / 2.0); //*= fac;
+      r.thumbf = ff * GUIProp.fontsize;
+      ffh = round((ffhtmax + ffhtmin) / 2.0); //*= fac;
+      r.thumbfh = (byte) Math.max(1, ffh * GUIProp.fontsize);
+      flh = round((flhtmax + flhtmin) / 2.0); // *= fac * fac;
+      r.thumblh = (byte) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+      //sw = f; //Math.max(f * 0.5, 1.5);
+      switch(r.thumbal) {
+        case 0:
+          h = drawThumbnailsToken(g, r, data, false, 0, 0);
+          break;
+        case 1:
+          h = drawThumbnailsSentence(g, r, data, true, r.thumbf, false);
+          break;
+        case 2:
+          h = drawThumbnailsSentence(g, r, data, false, r.thumbf, false);
+          break;
+      }
+
+      if (h >= r.h || ge(ff, ffmax) || ge(ffh, ffhmax) || ge(flh, flhmax)) {
+        if (l) {
+          // use last setup to draw
+          r.thumbf = bff * GUIProp.fontsize;
+          r.thumbfh = (byte) Math.max(1, bffh * GUIProp.fontsize);
+          r.thumblh = (byte) Math.max(1, (bflh + bffh) * GUIProp.fontsize);
+          switch(r.thumbal) {
+            case 0:
+              drawThumbnailsToken(g, r, data, true, 0, 0);
+              return;
+            case 1:
+              drawThumbnailsSentence(g, r, data, true, r.thumbf, true);
+              return;
+            case 2:
+              drawThumbnailsSentence(g, r, data, false, r.thumbf, true);
+              return;
+          }
+        } else {
+          if (le(ff, ffmin) || le(ffh, ffhmin) || le(flh, flhmin)) {
+            // change abstraction level      
+            r.thumbal++;
+            fhmi = r.thumbfh;
+            lhmi = r.thumblh;
+            fftmin = ffmin; 
+            fftmax = ffmax; 
+            ffhtmin = ffhmin;
+            ffhtmax = ffhmax; 
+            flhtmin = flhmin; 
+            flhtmax = flhmax;
+          } else {
+            // shrink size
+            fftmax = ff;
+            ffhtmax = ffh;
+            flhtmax = flh;
+          }          
+        }
+      } else {
+        l = true;
+        // backup and try to enlarge
+        bff = ff;
+        bffh = ffh;
+        bflh = flh;
+        fftmin = ff;
+        ffhtmin = ffh;
+        flhtmin = flh;
+      }
+    }
+
+    int sum = data[2][0];
+    for (int i = 1; i < data[2].length; i++) sum += data[2][i];
+    int nl = (r.h - 6) / lhmi + 1;
+    double fnew = (double) (nl * r.w) / (double) sum;
+    r.thumbf = fnew;
+    r.thumbfh = fhmi;
+    r.thumblh = lhmi;
+    h = drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), false);
+//    if (h < r.h)
+      drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);
+  }
+
+  /**
+   * Less.
+   * @param a double 1
+   * @param b double 2
+   * @return true if a < b
+   */
+  static boolean le(final double a, final double b) {
+    return a < b || a / b > 0.95 && a / b < 1.05;
+  }
+
+  /**
+   * Greater.
+   * @param a double 1
+   * @param b double 2
+   * @return true if a > b
+   */
+  static boolean ge(final double a, final double b) {
+    return a >= b || a / b > 0.95 && a / b < 1.05;
+  }
+
+  /**
+   * Round a value.
+   * @param a double to round
+   * @return rounded double
+   */
+  static double round(final double a) {
+    final int i = (int) (a * 100000);
+    final double d = a * 100000.0;
+    final double r = d - i >= 0.5 ? i + 1 : i;
+    return r / 100000.0;
+  }
+  /**
+   * Draws a text using thumbnail visualization.
+   * Calculates the needed space and chooses an abstraction level.
+   * Token/Sentence/Paragraphs
+   *
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   */
+  static void drawThumbnail(final Graphics g, final MapRect r,
+      final byte[] s) {
+
+    // thumbnail width
+    final double ffmax = 0.25;
+    final double ffmin = 0.14;
+    // thumbnail height
+    final double ffhmax = 0.5;
     // empty line height
     final double flhmax = 0.3; //0.8;
     // space width
@@ -317,6 +468,9 @@ final class MapRenderer {
     drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);
   }
 
+  
+
+  
   /** Color for each tooltip token.  */
   static IntList ttcol;
   /** Tooltip tokens. */
@@ -783,9 +937,10 @@ final class MapRenderer {
       }
       if (io == i) i++;
 
+      int fp = 0;
       // doesn't fit in line
       if (ll + wl >= ww) {
-        final int fp = (int) (ww - ll);
+        fp = (int) (ww - ll);
         if (fp <= r.thumbf) {
           yy += r.thumblh;
           ll = 0;
@@ -794,6 +949,14 @@ final class MapRenderer {
           // draw first part of the sentence
           if (draw) {
             g.setColor(textc);
+            if (r.pos != null && pp < r.pos.length 
+                && count == r.pos[pp] && sp < lastl) {
+              g.fillRect((int) (xx + ll), yy, wl - lastl, r.thumbfh);
+              ll += wl - lastl;
+              g.setColor(getFTColor(r.poi[pp], r.acol));
+              g.fillRect((int) (xx + ll), yy, (int) ww - ll, r.thumbfh);
+              lastl -= ww - ll;
+            } else 
             g.fillRect((int) (xx + ll), yy, fp, r.thumbfh);
           }
           yy += r.thumblh;
