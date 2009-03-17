@@ -152,7 +152,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Import filesystem. */
-  IMPORTFS(false, GUIIMPORTFS, null, GUIIMPORTFSTT) {
+  IMPORTFS(false, GUIIMPORTFS, "% D", GUIIMPORTFSTT) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogImportFS(gui).ok()) return;

@@ -114,8 +114,9 @@ dfs_meta=Importiere Meta-Daten
 dfs_ftindex=Indexiere Dateiinhalte
 
 dr_title=Datenbank umbenennen
-dr_exists=Databank existiert schon
-dr_over=Alte Databank wird überschrieben.
+dr_exists=Datenbank existiert schon
+dr_over=Alte Datenbank wird überschrieben.
+dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben.
 dr_invalid=Ungültiger Name
 
 dd_title=Datenbank löschen
@@ -320,12 +321,12 @@ db_no=Datenbank '%' wurde nicht gefunden.
 db_open=Datenbank ist offen.
 db_closed=Datenbank wurde geschlossen.
 db_closeerr=Datenbank konnte nicht geschlossen werden.
-db_optimized=Databank optimiert in %.
+db_optimized=Datenbank optimiert in %.
 db_dropped=Datenbank wurde gelöscht.
 db_notdropped=Datenbank konnte nicht gelöscht werden.
 db_notopened=Datenbank konnte nicht geöffnet werden.
 db_opened=Datenbank geöffnet in %.
-db_exported=Database exportiert in %.
+db_exported=Datenbank exportiert in %.
 
 # Index commands
 in_created=Index wurde erzeugt in %.

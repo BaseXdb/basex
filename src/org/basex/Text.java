@@ -1069,6 +1069,8 @@ public interface Text {
   String RENAMEEXISTS = lang("dr_exists");
   /** Info for overwrite a database. */
   String RENAMEOVER = lang("dr_over");
+  /** Info for overwrite a database and deletion of backing store. */
+  String RENAMEOVERBACKING = lang("dr_overbacking");
 
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");

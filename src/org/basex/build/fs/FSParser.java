@@ -71,7 +71,7 @@ public final class FSParser extends Parser {
   /** DeepFS import flag (copy files to backing store). */
   private boolean wbacking = true;
   /** Root of backing store. */
-  private String backingroot = "/var/tmp/deepfs";
+  private String backingroot = Prop.backingpath;
   /** Length of absolute pathname of the root directory the import starts from,
    * i.e. the prefix to be deleted and substituted by backingroot. */
   private int importroot;
@@ -120,25 +120,30 @@ public final class FSParser extends Parser {
     builder.encoding(Prop.ENCODING);
 
     backingroot = backingroot + "/" + io.name();
-    if (!new File(backingroot).mkdir())
-      throw new IOException(BACKINGEXISTS + backingroot);
+    File bs = new File(backingroot);
+    if (!bs.mkdirs())
+      if (bs.exists())
+        if (!FSUtils.deleteDir(bs) || !bs.mkdirs())
+          throw new IOException(BACKINGEXISTS + backingroot);
     
     builder.startDoc(token(io.name()));
 
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
-      builder.startElem(DEEPFS, atts.reset());
+      //atts.add(MOUNTPOINT, NOTMOUNTED);
+      atts.add(MOUNTPOINT, token(backingroot));
+      atts.add(BACKINGSTORE, token(backingroot));
+      builder.startElem(DEEPFS, atts);
       
       for(final File f : root ? File.listRoots() :
         new File[] { new File(io.path()).getCanonicalFile() }) {
         
         importroot = f.getAbsolutePath().length();
         
-        preStack[0] = builder.startElem(DIR, atts(f, true));
         sizeStack[0] = 0;
         parse(f);
-        builder.endElem(DIR);
+
         builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
       }
       

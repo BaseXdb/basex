@@ -38,6 +38,10 @@ public final class DialogImportFS  extends Dialog {
   BaseXTextField path;
   /** Database name. */
   BaseXTextField dbname;
+  /** Backing path. */
+  BaseXTextField backing;
+  /** Mountpoint path. */
+  BaseXTextField mountpoint;
   /** Database info. */
   private final BaseXLabel info;
   /** Parsing complete filesystem. */
@@ -68,7 +72,7 @@ public final class DialogImportFS  extends Dialog {
     p1.add(new BaseXLabel(IMPORTFSTEXT, false, true));
 
     BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(3, 2, 6, 0));
+    p.setLayout(new TableLayout(5, 2, 6, 0));
     
     path = new BaseXTextField(GUIProp.fspath, HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
@@ -114,8 +118,22 @@ public final class DialogImportFS  extends Dialog {
         action(null);
       }
     });
-    
     p.add(all);
+    
+    /* [CG] Hmm, need some GUI assistance here ;-) */
+    p.add(new BaseXLabel("Backing store:", true, true));    
+    backing = new BaseXTextField(Prop.backingpath,
+        "Directory for BLOBs.".getBytes(), this);
+    BaseXLayout.setWidth(backing, 240);
+    p.add(backing);
+    
+    p.add(new BaseXLabel("DeepFS mount point:", true, true));    
+    mountpoint = new BaseXTextField(Prop.mountpoint,
+        "Mount point of database as filesystem in userspace".getBytes(), this);
+    BaseXLayout.setWidth(mountpoint, 240);
+    p.add(mountpoint);
+    
+    
     p1.add(p);
 
     info = new BaseXLabel(" ");
@@ -202,7 +220,7 @@ public final class DialogImportFS  extends Dialog {
       if(!ok) {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
-        inf = RENAMEOVER;
+        inf = RENAMEOVERBACKING;
         img = GUI.icon("warn");
       }
     }

@@ -66,7 +66,7 @@ public final class DiskData extends Data {
   private final DataAccess texts;
   /** Values access file. */
   private final DataAccess values;
-
+  
   /**
    * Default Constructor.
    * @param db name of database
@@ -430,7 +430,8 @@ public final class DiskData extends Data {
     updateDist(pre, -s);
 
     // [AH] delete filesystem node
-    //if(fs != null) fs.delete(pre);
+    if(fs != null) 
+      System.err.println(fs.nativeUnlink(new String(fs.path(pre))));
   }
 
   /**

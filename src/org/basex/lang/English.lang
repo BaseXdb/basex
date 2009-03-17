@@ -114,6 +114,7 @@ dfs_ftindex=Index file contents
 dr_title=Rename Database
 dr_exists=Database exists already.
 dr_over=Old database will be overwritten.
+dr_overbacking=Old database and backing store will be overwritten.
 dr_invalid=Invalid name.
 
 dd_title=Drop Database

@@ -234,7 +234,7 @@ public final class DeepBase extends DeepFuse implements DataText {
    */
   private MemData buildData(final String path, final int mode) {
     final String dname = basename(path);
-    int elemID = isDir(mode) ? data.fs.dirID : data.fs.unknownID;
+    int elemID = isDirFile(mode) ? data.fs.dirID : data.fs.unknownID;
     MemData m = new MemData(4, data.tags, data.atts, data.ns, data.path);
     m.addElem(elemID, 0, 1, 4, 4, false);
     m.addAtt(data.nameID, 0, token(dname), 1);

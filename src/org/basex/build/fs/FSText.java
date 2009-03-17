@@ -173,5 +173,9 @@ public interface FSText {
       token("Organization") };
   
   /** Error message 'Import FS...' if backing storage exists. */
-  String BACKINGEXISTS = "Backing storage exists, please delete first: ";
+  String BACKINGEXISTS = "Backing storage exists & can not be deleted: ";
+  /** Error message 'Import FS...' if mountpoint exists. */
+  String MOUNTPOINTEXISTS = "Mountpoint exists & can not be deleted: ";
+  /** Error message missing DeepFS dynamic library. */
+  String NOFUSE = "DeepFS FUSE support disabled: ";
 }

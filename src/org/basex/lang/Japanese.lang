@@ -122,6 +122,7 @@ dfs_ftindex=ファイルの内容にインデックスを作成する
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。
 dr_over=古いデータベースは上書きされます。
+dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too).
 dr_invalid=不正な名前です。
 
 dd_title=データベースの削除

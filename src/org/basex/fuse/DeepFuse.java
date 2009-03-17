@@ -23,7 +23,7 @@ public abstract class DeepFuse {
    * @param mode of file
    * @return true if directory type, false otherwise
    */
-  protected boolean isDir(final int mode) {
+  protected boolean isDirFile(final int mode) {
     return (mode & S_IFMT) == S_IFDIR;
   }
 

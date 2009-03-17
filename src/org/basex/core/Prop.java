@@ -31,6 +31,8 @@ public final class Prop {
   public static final String WORK = System.getProperty("user.dir") + SEP;
   /** User's home directory. */
   public static final String HOME = System.getProperty("user.home") + SEP;
+  /** System's temporary directory. */
+  public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
   /** OS Flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs not to Windows family. */
@@ -51,6 +53,10 @@ public final class Prop {
   public static String dbpath = HOME + "BaseXData";
   /** Web Server path. */
   public static String webpath = WORK + "web";
+  /** DeepFS backing store path. */
+  public static String backingpath = TMP + "backingstore_deepfs";
+  /** DeepFS default mount point. */
+  public static String mountpoint = TMP + "deepfs";
   /** Path to dotty. */
   public static String dotty = "dotty";
   /** Language Name (currently: English or German). */

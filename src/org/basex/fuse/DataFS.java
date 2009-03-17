@@ -1,10 +1,14 @@
 package org.basex.fuse;
 
+import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.basex.BaseX;
+import org.basex.build.fs.FSText;
+import org.basex.build.fs.FSUtils;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -15,9 +19,9 @@ import org.basex.util.TokenBuilder;
  * Preliminary collection of file system methods.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Christian Gruen & Hannes Schwarz
+ * @author Christian Gruen, Alexander Holupirek, Hannes Schwarz
  */
-public final class DataFS {
+public final class DataFS extends DeepFuse {
   /** Data reference. */
   final Data data;
   /** Index References. */
@@ -32,11 +36,28 @@ public final class DataFS {
   public int modeID;
   /** Index References. */
   public int unknownID;
-  /** Index mountpoint. */
+  /** Index mount point. */
   public int mountpointID;
   /** Index backing store. */
   public int backingstoreID;
-
+  /** Flag for FUSE support (dynamic library is present). */
+  public static boolean fuse = false;
+  
+  /**
+   * Mount database as FUSE.
+   * @param mountpoint path where to mount BaseX.
+   * @param backing path to backing storage root.
+   * @return 0 on success, errno in case of failure.
+   */
+  public native int nativeMount(final String mountpoint, final String backing);
+  
+  /**
+   * Unlink file in backing store.
+   * @param pathname to file to delete
+   * @return 0 on success, errno in case of failure.
+   */
+  public native int nativeUnlink(final String pathname);
+  
   /**
    * Constructor.
    * @param d data reference
@@ -52,8 +73,37 @@ public final class DataFS {
     modeID = d.atts.id(DataText.MODE);
     backingstoreID = d.atts.id(DataText.BACKINGSTORE);
     mountpointID = d.atts.id(DataText.MOUNTPOINT);
+
+    loadFUSELibrary();
+    
+    if(fuse) {
+      File mp = new File(Prop.mountpoint);
+      if (!mp.mkdirs()) {
+        if (mp.exists())
+          if (!FSUtils.deleteDir(mp) || !mp.mkdirs()) {
+            System.err.println(MOUNTPOINTEXISTS + Prop.mountpoint);
+            return;
+          }
+      }
+      nativeMount("a", "b");
+    }
   }
 
+  /** 
+   * Tries to load DeepFS FUSE library.
+   * If not available fuse flag denotes its absence and BaseX operates
+   * just on backing storage without mounting DeepFS and native calls.
+   */
+  private void loadFUSELibrary() {
+    try {
+      System.loadLibrary("xqfs");
+      fuse = true;
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println(FSText.NOFUSE + e.getMessage());
+      fuse = false;
+    }    
+  }
+  
   /**
    * Checks if the specified node is a file.
    * @param pre pre value
@@ -157,6 +207,7 @@ public final class DataFS {
       final Runtime run = Runtime.getRuntime();
       if(Prop.MAC) {
         run.exec(new String[] { "open", path });
+        System.err.println("open " + path);
       } else if(Prop.UNIX) {
         run.exec(new String[] { "xdg-open", path });
       } else {
@@ -166,5 +217,229 @@ public final class DataFS {
       BaseX.debug(ex);
       ex.printStackTrace();
     }
+  }
+
+  @Override
+  public int access(final String path, final int mode) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int bmap(final String path, final long blocksize, final long idx) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int chmod(final String path, final int mode) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int chown(final String path, final int uid, final int gid) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int create(final String path, final int mode) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int destroy() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int fgetattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int flush(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int fsgui() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int fsync(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int fsyncdir(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int ftruncate(final String path, final long off) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getxattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  protected int init() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int link(final String name1, final String name2) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int listxattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int lock(final String path, final int cmd) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int mkdir(final String path, final int mode) {
+    System.err.println("Can't believe it.  Called back from DeepFS.");
+    System.err.printf("- %s %o\n", path, mode);
+    return 0;
+  }
+
+  @Override
+  public int mknod(final String path, final int mode, final int dev) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int open(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int opendir(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public byte[] read(final String path, final int length, final int offset) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String readdir(final String path, final int offset) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String readlink(final String path) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public int release(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int releasedir(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int removexattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int rename(final String from, final String to) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int rmdir(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int setxattr(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int statfs(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int symlink(final String from, final String to) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int truncate(final String path, final long off) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int unlink(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int utimens(final String path) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int write(final String path, final int length
+      , final int offset, final byte[] databuf) {
+    // TODO Auto-generated method stub
+    return 0;
   }
 }
