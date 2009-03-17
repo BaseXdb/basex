@@ -7,7 +7,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import javax.swing.AbstractButton;
-import javax.swing.JOptionPane;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -22,6 +21,7 @@ import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropIndex;
+import org.basex.core.proc.Export;
 import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
@@ -29,6 +29,7 @@ import org.basex.core.proc.Update;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
 import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
@@ -46,7 +47,6 @@ import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
-import org.basex.util.Action;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -84,9 +84,7 @@ public enum GUICommands implements GUICommand {
         if(new Close().execute(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
-        if(JOptionPane.showConfirmDialog(gui, NODBQUESTION, DIALOGINFO,
-            JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-          CREATE.execute(gui);
+        if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
       }
     }
   },
@@ -95,10 +93,7 @@ public enum GUICommands implements GUICommand {
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true).nodb()) {
-        JOptionPane.showMessageDialog(gui, INFONODB, DIALOGINFO,
-            JOptionPane.INFORMATION_MESSAGE);
-      }
+      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, INFODB);
     }
   },
 
@@ -117,19 +112,18 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           GUIProp.xqpath, gui);
-      fc.addFilter(new String[] { IO.XQSUFFIX }, CREATEXQDESC);
+      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
-      if(fc.select(BaseXFileChooser.Mode.OPEN)) {
+      final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
+      if(file != null) {
+        Prop.xquery = file;
         try {
-          final IO file = fc.getFile();
           gui.query.setQuery(file.content());
-          Prop.xquery = file;
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(gui, XQOPERROR,
-              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+          Dialog.error(gui, XQOPERROR);
         }
+        GUIProp.xqpath = file.getDir();
       }
-      GUIProp.xqpath = fc.getDir();
     }
   },
 
@@ -141,20 +135,19 @@ public enum GUICommands implements GUICommand {
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
           fn == null ? GUIProp.xqpath : fn, gui);
-      fc.addFilter(new String[] { IO.XQSUFFIX }, CREATEXQDESC);
+      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
-      if(fc.select(BaseXFileChooser.Mode.SAVE)) {
+      final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+      if(file != null) {
+        Prop.xquery = file;
         try {
-          final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
           file.write(gui.query.getQuery());
-          Prop.xquery = file;
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(gui, XQSAVERROR,
-              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+          Dialog.error(gui, XQSAVERROR);
         }
+        GUIProp.xqpath = file.getDir();
       }
-      GUIProp.xqpath = fc.getDir();
     }
   },
 
@@ -173,23 +166,23 @@ public enum GUICommands implements GUICommand {
   EXPORT(true, GUIEXPORT, "% E", GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
-      // open file chooser for XML creation
-      final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
-          GUIProp.createpath, gui);
-      fc.addFilter(new String[] { IO.XMLSUFFIX }, CREATEXMLDESC);
+      final IO file = save(gui);
+      if(file != null) gui.execute(new Export(file.path()));
+    }
+  },
 
-      if(fc.select(BaseXFileChooser.Mode.SAVE)) {
-        final IO file = fc.getFile();
-        file.suffix(IO.XMLSUFFIX);
+  /** Save document. */
+  SAVE(true, GUIEXPORT, "", GUIEXPORTTT) {
+    @Override
+    public void execute(final GUI gui) {
+      final IO file = save(gui);
+      if(file != null) {
         try {
           file.write(gui.text.getText());
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(gui, XQSAVERROR,
-              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+          Dialog.error(gui, XQSAVERROR);
         }
-        //main.execute(Commands.EXPORT, "\"" + file + "\"");
       }
-      GUIProp.createpath = fc.getFile().path();
     }
   },
 
@@ -272,9 +265,7 @@ public enum GUICommands implements GUICommand {
   DELETE(true, GUIDELETE, "", GUIDELETETT) {
     @Override
     public void execute(final GUI gui) {
-      if(JOptionPane.showConfirmDialog(gui, DELETECONF, DELETETITLE,
-          JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-        gui.execute(new Delete());
+      if(Dialog.confirm(gui, DELETECONF)) gui.execute(new Delete());
     }
 
     @Override
@@ -832,7 +823,8 @@ public enum GUICommands implements GUICommand {
    */
   static void progress(final GUI gui, final String t, final Process[] procs) {
     // start database creation thread
-    new Action() {
+    new Thread() {
+      @Override
       public void run() {
         for(final Process p : procs) {
           final boolean ci = p instanceof CreateIndex;
@@ -854,16 +846,34 @@ public enum GUICommands implements GUICommand {
           // return user information
           if(ok) {
             gui.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
-            if(op) JOptionPane.showMessageDialog(gui, INFOOPTIM,
-                DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
+            if(op) Dialog.info(gui, INFOOPTIM);
           } else {
-            JOptionPane.showMessageDialog(gui, p.info(),
-                DIALOGINFO, JOptionPane.WARNING_MESSAGE);
+            Dialog.error(gui, p.info());
           }
           // initialize views
           if(!ci && !di) gui.notify.init();
         }
       }
-    }.execute();
+    }.start();
+  }
+  
+  /**
+   * Displays a file save dialog and returns the file name or a null reference.
+   * @param gui gui reference
+   * @return io reference
+   */
+  static IO save(final GUI gui) {
+    // open file chooser for XML creation
+    final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
+        GUIProp.createpath, gui);
+    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
+
+    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    if(file == null) return null;
+
+    GUIProp.createpath = file.path();
+    file.suffix(IO.XMLSUFFIX);
+    GUIProp.createpath = file.getDir();
+    return file;
   }
 }

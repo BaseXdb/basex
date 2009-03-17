@@ -107,8 +107,6 @@ public final class GUIProp {
   /** Dialog location. */
   public static int[] colorsloc = { 530, 620 };
   /** Dialog location. */
-  public static int[] prefsloc = { 280, 230 };
-  /** Dialog location. */
   public static int[] helploc = { 690, 484 };
   /** Dialog size. */
   public static int[] helpsize = { 300, 250 };

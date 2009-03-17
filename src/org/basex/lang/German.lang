@@ -121,8 +121,7 @@ dr_invalid=Ungültiger Name
 dd_title=Datenbank löschen
 dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
 
-dx_title=Knoten löschen
-dx_question=Sind Sie sicher?
+dx_question=Möchten Sie wirklich löschen?
 
 dp_title=Einstellungen
 dp_dbpath=Datenbank-Pfad (Dateien müssen manuell verschoben werden)
@@ -171,7 +170,6 @@ dm_size_children=Anzahl Kinder
 dm_size_fssize=Dateigröße
 dm_size_both=Kinder und Dateigröße
 
-dz_title=Speicherverbrauch
 dz_total=Insgesamter Speicher
 dz_reserved=Reservierter Speicher
 dz_used=Genutzter Speicher

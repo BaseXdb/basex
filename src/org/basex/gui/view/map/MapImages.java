@@ -8,7 +8,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.basex.BaseX;
 import org.basex.data.Data;
-import org.basex.util.Action;
 import org.basex.util.Token;
 
 /**
@@ -40,6 +39,8 @@ final class MapImages {
   /** Cache counter. */
   int loaderC;
 
+  /** Thread reference. */
+  Thread thread;
 
   /**
    * Default Constructor.
@@ -53,7 +54,7 @@ final class MapImages {
    * Resets the image cache.
    */
   void reset() {
-    stop();
+    finish();
     for(int i = 0; i < MAXNR; i++) imgs[i] = null;
   }
 
@@ -87,72 +88,73 @@ final class MapImages {
    * Loads the currently cached images.
    */
   void load() {
-    if(!dl.running() && loaderC > 0) dl.execute();
-  }
-  
-  /** Download thread. */
-  final Action dl = new Action() {
-    public void run() {
-      while(loaderC > 0) {
-        final int id = idCache[--loaderC];
-        int ww = wCache[loaderC];
-        int hh = hCache[loaderC];
+    if(thread != null || loaderC == 0) return;
 
-        // find new image id in cached images
-        int ic = -1;
-        while(++ic < MAXNR && imgid[ic] != id);
-
-        // check if the image exists already, or if the existing version
-        // is bigger than the new one
-        if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
-            imgs[ic].getHeight() + 1 >= hh)) continue;
-
-        try {
-          // database closed - quit
-          final Data data = view.gui.context.data();
-          if(data == null) {
-            loaderC = 0;
-            return;
+    thread = new Thread() {
+      @Override
+      public void run() {
+        while(loaderC > 0) {
+          final int id = idCache[--loaderC];
+          int ww = wCache[loaderC];
+          int hh = hCache[loaderC];
+    
+          // find new image id in cached images
+          int ic = -1;
+          while(++ic < MAXNR && imgid[ic] != id);
+    
+          // check if the image exists already, or if the existing version
+          // is bigger than the new one
+          if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
+              imgs[ic].getHeight() + 1 >= hh)) continue;
+    
+          try {
+            // database closed - quit
+            final Data data = view.gui.context.data();
+            if(data == null) {
+              loaderC = 0;
+              break;
+            }
+            
+            // load image and wait until it's done
+            final File f = new File(Token.string(data.fs.path(id)));
+            BufferedImage image = ImageIO.read(f);
+            
+            // calculate optimal image size
+            final double iw = image.getWidth();
+            final double ih = image.getHeight();
+            final double min = Math.min(ww / iw, hh / ih);
+    
+            // create scaled image instance
+            if(min < 1) {
+              ww = (int) (iw * min);
+              hh = (int) (ih * min);
+    
+              final BufferedImage bi = new BufferedImage(ww, hh,
+                  BufferedImage.TYPE_INT_BGR);
+              bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
+              image = bi;
+            }
+    
+            // cache image
+            if(ic == MAXNR) {
+              ic = imgc;
+              imgid[ic] = id;
+              imgc = (ic + 1) % MAXNR;
+            }
+            imgs[ic] = image;
+            imgmax[ic] = min >= 1;
+    
+            if((loaderC & 5) == 0 && !view.gui.painting) paint();
+          } catch(final IOException ex) {
+            BaseX.debug(ex);
           }
-          
-          // load image and wait until it's done
-          final File f = new File(Token.string(data.fs.path(id)));
-          BufferedImage image = ImageIO.read(f);
-          
-          // calculate optimal image size
-          final double iw = image.getWidth();
-          final double ih = image.getHeight();
-          final double min = Math.min(ww / iw, hh / ih);
-
-          // create scaled image instance
-          if(min < 1) {
-            ww = (int) (iw * min);
-            hh = (int) (ih * min);
-
-            final BufferedImage bi = new BufferedImage(ww, hh,
-                BufferedImage.TYPE_INT_BGR);
-            bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
-            image = bi;
-          }
-
-          // cache image
-          if(ic == MAXNR) {
-            ic = imgc;
-            imgid[ic] = id;
-            imgc = (ic + 1) % MAXNR;
-          }
-          imgs[ic] = image;
-          imgmax[ic] = min >= 1;
-
-          if((loaderC & 5) == 0 && !view.gui.painting) paint();
-        } catch(final IOException ex) {
-          BaseX.debug(ex);
         }
+        paint();
+        thread = null;
       }
-      paint();
-    }
-  };
-  
+    };
+    thread.start();
+  }
   
   /**
    * Refreshes the map.
@@ -184,7 +186,7 @@ final class MapImages {
   /**
    * Stops the loading thread.
    */
-  void stop() {
+  void finish() {
     loaderC = 0;
   }
 }

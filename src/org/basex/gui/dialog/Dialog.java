@@ -1,5 +1,6 @@
 package org.basex.gui.dialog;
 
+import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -7,8 +8,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -128,5 +129,36 @@ public abstract class Dialog extends JDialog {
    */
   public final boolean ok() {
     return ok;
+  }
+
+  /**
+   * Static yes/no dialog.
+   * @param comp parent reference
+   * @param text text
+   * @return true if dialog was confirmed
+   */
+  public static boolean confirm(final Component comp, final String text) {
+    return JOptionPane.showConfirmDialog(comp, text, DIALOGINFO,
+        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+  }
+
+  /**
+   * Static error dialog.
+   * @param comp parent reference
+   * @param text text
+   */
+  public static void error(final Component comp, final String text) {
+    JOptionPane.showMessageDialog(comp, text, DIALOGINFO,
+        JOptionPane.ERROR_MESSAGE);
+  }
+
+  /**
+   * Static information dialog.
+   * @param comp parent reference
+   * @param text text
+   */
+  public static void info(final Component comp, final String text) {
+    JOptionPane.showMessageDialog(comp, text, DIALOGINFO,
+        JOptionPane.INFORMATION_MESSAGE);
   }
 }

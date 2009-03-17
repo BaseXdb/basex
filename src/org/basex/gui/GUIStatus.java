@@ -6,8 +6,8 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import javax.swing.JOptionPane;
 import org.basex.core.Prop;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 import org.basex.util.Performance;
@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class GUIStatus extends BaseXPanel implements Runnable {
+public final class GUIStatus extends BaseXPanel {
   /** Width of the memory status box. */
   private static final int MEMW = 70;
   /** Current status text. */
@@ -27,19 +27,17 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   /** Current path. */
   private String oldStatus = STATUSOK;
   /** Current focus on memory. */
-  boolean memfocus;
-  /** Error flag. */
-  boolean error;
+  private boolean memfocus;
   /** Maximum memory. */
-  long max = 1;
+  private long max = 1;
   /** Used memory. */
-  long used;
+  private long used;
 
   /**
    * Constructor.
    * @param main reference to the main window
    */
-  public GUIStatus(final GUI main) {
+  GUIStatus(final GUI main) {
     super(main, null);
     BaseXLayout.setHeight(this, getFont().getSize() + 6);
     addKeyListener(this);
@@ -51,17 +49,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    * Sets the status text.
    * @param stat the text to be set
    */
-  public void setText(final String stat) {
-    error = false;
-    refresh(stat);
-  }
-
-  /**
-   * Sets the error status text.
-   * @param stat the text to be set
-   */
-  public void setError(final String stat) {
-    error = true;
+  void setText(final String stat) {
     refresh(stat);
   }
 
@@ -76,7 +64,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     final Runtime rt = Runtime.getRuntime();
     max = rt.maxMemory();
     used = rt.totalMemory() - rt.freeMemory();
-    if(txt.equals(STATUSWAIT)) new Thread(this).start();
     repaint();
   }
 
@@ -86,15 +73,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    */
   public void setPath(final byte[] path) {
     status = path.length == 0 ? oldStatus : Token.string(path);
-    error = false;
-    repaint();
-  }
-
-  /**
-   * Thread.
-   */
-  public void run() {
-    Performance.sleep(500);
     repaint();
   }
 
@@ -129,12 +107,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     g.setColor(full ? colormark3 : color6);
     g.drawString(mem, fw, h);
 
-    /* print performance string
-    final int w = ww - fm.stringWidth(perf) - 10;
-    g.setColor(Color.black);
-    g.drawString(perf, w, h);
-    */
-
     // print status text
     g.setColor(Color.black);
     BaseXLayout.chopString(g, Token.token(status), 4, 0, fw - 24);
@@ -155,8 +127,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
           + MEMRESERVED + Performance.format(occ, true) + Prop.NL + MEMUSED
           + Performance.format(used, true) + Prop.NL + Prop.NL + MEMHELP;
 
-      JOptionPane.showMessageDialog(gui, inf, MEMTITLE,
-          JOptionPane.INFORMATION_MESSAGE);
+      Dialog.info(gui, inf);
     }
   }
 

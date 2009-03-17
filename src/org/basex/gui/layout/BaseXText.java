@@ -28,7 +28,6 @@ import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
-import org.basex.util.Action;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.Undo;
@@ -650,7 +649,8 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  final Action calc = new Action() {
+  final Thread calc = new Thread() {
+    @Override
     public void run() {
       rend.calc();
       rend.repaint();

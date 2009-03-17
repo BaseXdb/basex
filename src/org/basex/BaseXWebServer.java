@@ -27,7 +27,6 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.util.Var;
-import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -132,7 +131,8 @@ public final class BaseXWebServer {
       }
 
       // start session thread
-      new Action() {
+      new Thread() {
+        @Override
         public void run() {
           try {
             final IO file = req.file;
@@ -166,7 +166,7 @@ public final class BaseXWebServer {
             else ex.printStackTrace();
           }
         }
-      }.execute();
+      }.start();
     } catch(final Exception ex) {
       if(ex instanceof IOException) BaseX.errln(SERVERERR);
       else ex.printStackTrace();

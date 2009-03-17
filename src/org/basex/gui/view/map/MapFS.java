@@ -356,7 +356,7 @@ final class MapFS extends MapPainter {
 
   @Override
   void reset() {
-    images.stop();
+    images.finish();
   }
 
   @Override

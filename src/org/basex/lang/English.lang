@@ -119,8 +119,7 @@ dr_invalid=Invalid name.
 dd_title=Drop Database
 dd_question=Database '%' will be dropped.\nAre you sure?
 
-dx_title=Delete Nodes
-dx_question=Are you sure?
+dx_question=Do you really want to delete?
 
 dp_title=Preferences
 dp_dbpath=Database Path (databases must be manually moved)
@@ -169,7 +168,6 @@ dm_size_children=number of children
 dm_size_fssize=file size
 dm_size_both=no/children and file size
 
-dz_title=Memory Usage
 dz_total=Total Memory
 dz_reserved=Reserved Memory
 dz_used=Used Memory

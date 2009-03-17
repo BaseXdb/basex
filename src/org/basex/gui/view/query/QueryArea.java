@@ -20,7 +20,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.util.Action;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -171,14 +171,19 @@ public final class QueryArea extends QueryPanel {
 
     area.error(-1);
     info.setName(Integer.toString(err));
-    error.delay(500);
+
+    final int thread = ++threadID;
+    new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(500);
+        if(thread == threadID) area.error(err);
+      }
+    }.start();
+    
     return true;
   }
 
-  /** Delays the display of error information. */
-  final Action error = new Action() {
-    public void run() {
-      area.error(err);
-    }
-  };
+  /** Thread counter. */
+  int threadID;
 }

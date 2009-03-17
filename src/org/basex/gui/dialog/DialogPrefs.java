@@ -19,6 +19,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.io.IO;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -32,7 +33,7 @@ public final class DialogPrefs extends Dialog {
   /** Language Combo Box. */
   BaseXCombo lang;
   /** Directory path. */
-  private BaseXTextField path;
+  BaseXTextField path;
   /** Focus checkbox. */
   private BaseXCheckBox focus;
   /** Show names checkbox. */
@@ -47,7 +48,7 @@ public final class DialogPrefs extends Dialog {
    * @param main reference to the main window
    */
   public DialogPrefs(final GUI main) {
-    super(main, PREFSTITLE, false);
+    super(main, PREFSTITLE);
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
@@ -68,7 +69,9 @@ public final class DialogPrefs extends Dialog {
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        chooseDir();
+        final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
+            gui).select(BaseXFileChooser.Mode.DOPEN);
+        if(file != null) path.setText(file.getDir());
       }
     });
     
@@ -117,17 +120,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     set(pp, BorderLayout.CENTER);
-    finish(GUIProp.prefsloc);
-
-  }
-  
-  /**
-   * Opens the directory chooser and sets the new path.
-   */
-  void chooseDir() {
-    final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC,
-        path.getText(), gui);
-    if(fc.select(BaseXFileChooser.Mode.DIR)) path.setText(fc.getDir());
+    finish(null);
   }
   
   /**

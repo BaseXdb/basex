@@ -127,8 +127,7 @@ dr_invalid=不正な名前です。
 dd_title=データベースの削除
 dd_question=データベース '%' を削除します。\nよろしいですか。
 
-dx_title=ノードの削除
-dx_question=よろしいですか。
+dx_question=ノードの削除か。
 
 dp_title=設定
 dp_dbpath=データベースパス (データベースを手動で移動する必要があります。)
@@ -177,7 +176,6 @@ dm_size_children=number of children
 dm_size_fssize=file size
 dm_size_both=children and file size
 
-dz_title=メモリ使用量
 dz_total=メモリ合計
 dz_reserved=予約メモリ量
 dz_used=メモリ使用量

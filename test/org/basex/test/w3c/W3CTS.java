@@ -484,7 +484,7 @@ public abstract class W3CTS {
           logErr.append(Prop.NL);
           logErr.append(Prop.NL);
           final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
+          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
         }
         if(reporting) logFile.append("fail");
         err++;
@@ -496,7 +496,7 @@ public abstract class W3CTS {
           logOK.append(Prop.NL);
           logOK.append(Prop.NL);
           final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
+          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
         }
         if(reporting) {
           logFile.append("pass");

@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -128,8 +127,7 @@ public final class DialogOpen extends Dialog {
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
       if(db.length() == 0) return;
-      if(JOptionPane.showConfirmDialog(this, BaseX.info(DROPCONF, db),
-          DIALOGINFO, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+      if(Dialog.confirm(this, BaseX.info(DROPCONF, db))) {
         DropDB.drop(db);
         choice.setData(List.list().finish());
         choice.requestFocusInWindow();

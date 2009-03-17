@@ -899,8 +899,6 @@ public interface Text {
 
   // STATUS BAR ===============================================================
 
-  /** Wait text. */
-  String STATUSWAIT = lang("wait") + DOTS;
   /** Default message. */
   String STATUSOK = lang("s_ok") + ". ";
 
@@ -1095,8 +1093,6 @@ public interface Text {
   String PREFLANG = lang("dp_lang");
 
   /** Dialog title for deleting nodes. */
-  String DELETETITLE = lang("dx_title");
-  /** Dialog title for deleting nodes. */
   String DELETECONF = lang("dx_question");
 
   /** Dialog Title for inserting new data. */
@@ -1162,8 +1158,6 @@ public interface Text {
   /** Size depending on... */
   String MAPFSSIZE = lang("dm_size_fssize");
 
-  /** Title of Memory Dialog. */
-  String MEMTITLE = lang("dz_title");
   /** Memory information. */
   String MEMTOTAL = lang("dz_total") + COLS;
   /** Memory information. */

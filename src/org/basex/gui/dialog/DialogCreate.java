@@ -196,17 +196,15 @@ public final class DialogCreate extends Dialog {
   public void choose() {
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         GUIProp.createpath, gui);
-    fc.addFilter(new String[] { IO.GZSUFFIX  }, CREATEGZDESC);
-    fc.addFilter(new String[] { IO.ZIPSUFFIX }, CREATEZIPDESC);
-    fc.addFilter(new String[] { IO.XMLSUFFIX }, CREATEXMLDESC);
+    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
+    fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIX);
+    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
-    if(fc.select(BaseXFileChooser.Mode.OPENDIR)) {
-      final IO file = fc.getFile();
+    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname());
-      GUIProp.createpath = fc.getFile().path();
-    } else {
-      GUIProp.createpath = fc.getDir();
+      GUIProp.createpath = file.getDir();
     }
   }
 

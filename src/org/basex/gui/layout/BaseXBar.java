@@ -7,7 +7,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.Action;
 import org.basex.util.Performance;
 
 /**
@@ -193,7 +192,8 @@ public final class BaseXBar extends BaseXPanel {
     // start dragging
     if(sliding || animated) return;
 
-    new Action() {
+    new Thread() {
+      @Override
       public void run() {
         // scroll up/down/move slider
         animated = moving;
@@ -217,7 +217,7 @@ public final class BaseXBar extends BaseXPanel {
           }
         }
       }
-    }.execute();
+    }.start();
   }
 
   @Override

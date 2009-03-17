@@ -27,7 +27,6 @@ public final class IOFile extends IO {
   /** Zip entry. */
   ZipEntry zip;
 
-
   /**
    * Constructor.
    * @param f file path
@@ -82,8 +81,6 @@ public final class IOFile extends IO {
         if(zip == null) break;
         len = zip.getSize();
         path = zip.getName();
-        System.out.println(zip.getCompressedSize() + ": " + path);
-        System.out.println(zip.getSize() + ": " + path);
         if(len > 0 && path.toLowerCase().endsWith(XMLSUFFIX) &&
             !zip.isDirectory()) return true;
       }
@@ -137,8 +134,12 @@ public final class IOFile extends IO {
 
   @Override
   public IO merge(final IO f) {
-    final String fn = file.getParent() + "/" + f.name();
-    return f instanceof IOUrl ? f : new IOFile(fn);
+    return f instanceof IOUrl ? f : new IOFile(dir() + "/" + f.name());
+  }
+
+  @Override
+  public String dir() {
+    return file.isDirectory() ? file.getParent() : file.getPath();
   }
 
   @Override

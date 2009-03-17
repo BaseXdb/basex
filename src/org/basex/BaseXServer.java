@@ -59,7 +59,7 @@ public final class BaseXServer {
    * is established. This constructor blocks until a client connects.
    * @param args arguments
    */
-  private BaseXServer(final String[] args) {
+  public BaseXServer(final String... args) {
     Prop.server = true;
 
     if(!parseArguments(args)) return;

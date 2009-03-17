@@ -20,7 +20,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -39,6 +38,7 @@ import org.basex.data.Data;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -58,7 +58,6 @@ import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
-import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -304,11 +303,12 @@ public final class GUI extends JFrame {
     refreshControls();
     
     // start logo animation as thread
-    new Action() {
+    new Thread() {
+      @Override
       public void run() {
         views.run();
       }
-    }.execute();
+    }.start();
 
     input.requestFocusInWindow();
   }
@@ -342,14 +342,12 @@ public final class GUI extends JFrame {
       GUIProp.guisize[0] = getWidth();
       GUIProp.guisize[1] = getHeight();
     }
-    boolean fs = context.data() != null && context.data().fs != null;
     query.quit();
     if(help != null) help.close();
-    if(!fs) context.close();
+    if(context.data() == null || context.data().fs == null) context.close();
     GUIProp.write();
     Prop.write();
     super.dispose();
-    if(!fs) System.exit(0);
   }
 
   /**
@@ -424,9 +422,10 @@ public final class GUI extends JFrame {
    */
   void execute(final Process pr, final boolean main) {
     if(updating) return;
-    new Action() {
+    new Thread() {
+      @Override
       public void run() { exec(pr, main); }
-    }.execute();
+    }.start();
   }
 
   /** Thread counter. */
@@ -501,8 +500,7 @@ public final class GUI extends JFrame {
 
       if(!ok) {
         // show error info
-        if(feedback) status.setText(STATUSOK);
-        else status.setError(inf);
+        status.setText(feedback ? STATUSOK : inf); 
         cursor(CURSORARROW, true);
         proc = null;
         return false;
@@ -558,9 +556,7 @@ public final class GUI extends JFrame {
       ex.printStackTrace();
       String msg = ex.toString();
       if(msg.length() == 0) msg = ex.getMessage();
-
-      JOptionPane.showMessageDialog(GUI.this, BaseX.info(PROCERR, pr, msg),
-          DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+      Dialog.error(this, BaseX.info(PROCERR, pr, msg));
     }
 
     cursor(CURSORARROW, true);
@@ -746,7 +742,7 @@ public final class GUI extends JFrame {
       fullscr.setUndecorated(true);
       fullscr.setJMenuBar(menu);
       fullscr.add(top);
-      fullscr.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      fullscr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     } else {
       fullscr.removeAll();
       fullscr.dispose();
