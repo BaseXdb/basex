@@ -108,8 +108,8 @@ class MapList extends IntList {
     // only children
     for(int i = 0; i < size - 1; i++) {
       nrchildren[i] = list[i + 1] - list[i];
-      weight[i] = 1d * textLen[list[i]] / textSum + 
-          0d * nrchildren[i] / children;
+      weight[i] = GUIProp.mapweight / 100d * textLen[list[i]] / textSum + 
+          (1 - GUIProp.mapweight / 100d) * nrchildren[i] / children;
     }
   }
   

@@ -168,6 +168,7 @@ dm_offset=Offsets
 dm_size=Größe bestimmt durch
 dm_size_children=Anzahl Kinder
 dm_size_fssize=Dateigröße
+dm_size_textsize=Textlänge
 dm_size_both=Kinder und Dateigröße
 
 dz_total=Insgesamter Speicher

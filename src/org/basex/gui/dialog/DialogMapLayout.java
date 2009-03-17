@@ -64,9 +64,9 @@ public final class DialogMapLayout extends Dialog {
         GUIProp.mapweight, HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
     
-    // add slider only to dialog if we are using fs data
+    // add slider only to dialog if we are using fs data or textlengths
     final boolean fs = gui.context.data().fs != null;
-    if(fs) {
+    if(fs || GUIProp.usetextlength) {
       p.add(sizeLabel);
       p.add(sizeSlider);
     }
@@ -83,13 +83,14 @@ public final class DialogMapLayout extends Dialog {
 
   @Override
   public void action(final String cmd) {
+    final boolean fs = gui.context.data().fs != null;
     GUIProp.mapoffsets = border.getSelectedIndex();
     GUIProp.mapalgo = algo.getIndex();
     GUIProp.mapatts = atts.isSelected();
     final int sizeprp = sizeSlider.value();
     GUIProp.mapweight = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
-      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));
+      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN  : (fs ? MAPFSSIZE : MAPTEXTSIZE)));
 
     gui.notify.layout();
   }

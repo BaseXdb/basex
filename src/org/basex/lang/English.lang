@@ -166,6 +166,7 @@ dm_offset=Offsets
 dm_size=Size determined by
 dm_size_children=number of children
 dm_size_fssize=file size
+dm_size_textsize=text length
 dm_size_both=no/children and file size
 
 dz_total=Total Memory

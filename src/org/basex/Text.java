@@ -1157,6 +1157,8 @@ public interface Text {
   String MAPCHILDREN = lang("dm_size_children");
   /** Size depending on... */
   String MAPFSSIZE = lang("dm_size_fssize");
+  /** Size depending on... */
+  String MAPTEXTSIZE = lang("dm_size_textsize");
 
   /** Memory information. */
   String MEMTOTAL = lang("dz_total") + COLS;
