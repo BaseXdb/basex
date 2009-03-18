@@ -262,7 +262,8 @@ public abstract class Serializer {
         p++;
       } else if(k == Data.TEXT) {
         final int[][] ftd = ft != null ? ft.get(p) : null;
-        if(ftd != null) text(data.text(p++), ftd, ft.col);
+        if(ftd != null) 
+          text(data.text(p++), ftd, ft.col);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));

@@ -288,7 +288,6 @@ final class MapFS extends MapPainter {
     long s = 0;
     final byte[] path = ViewData.path(data, pre);
     byte[] fileBuf = null;
-    boolean fit = false;
     try {
       boolean binary = GUIFS.mime(name) == GUIFS.Type.IMAGE;
 
@@ -299,8 +298,7 @@ final class MapFS extends MapPainter {
         // minimize buffer size
         final File f = new File(string(path));
         s = Math.min(s, f.length());
-        fit = f.length() <= s;
-
+        
         // read file contents
         fileBuf = new byte[(int) s];
         BufferInput.read(f, fileBuf);
@@ -332,11 +330,22 @@ final class MapFS extends MapPainter {
       fileBuf = tmp;      
     }
     
+  /*  final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
+      if (ftd != null) {
+      r.pos = ftd[0];
+      r.poi = ftd[1];
+      r.acol = view.gui.context.marked().ftpos.col.finish();
+    } else {
+      r.pos = null;
+      r.poi = null;
+      r.acol = null;
+    }*/
+    
     // Check if text fits in rectangle
-    if (fit) {
+    final int h = MapRenderer.drawText(g, rect, fileBuf, false);
+    if (h < rect.h) {
       final int p = BaseXLayout.centerPos(g, fileBuf, rect.w);
       if(p != -1) rect.x += p;
-      final int h = MapRenderer.drawText(g, rect, fileBuf, false);
       rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
       final Color c = g.getColor();
       final Font f = g.getFont();
