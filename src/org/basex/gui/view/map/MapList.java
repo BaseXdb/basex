@@ -52,7 +52,7 @@ class MapList extends IntList {
     int sizeP = GUIProp.mapweight;
     
     // only children
-    // [JH, CG] gui.context.current() stores not existing node sometimes 
+    // [JH] gui.context.current() stores not existing node sometimes 
     // pre_val(last node) + 1?
     if (GUIProp.mapweight == 0 || data.fs == null || GUIProp.filecont) {
       for(int i = 0; i < size; i++) {
