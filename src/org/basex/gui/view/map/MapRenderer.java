@@ -341,7 +341,7 @@ final class MapRenderer {
     r.thumbfh = fhmi;
     r.thumblh = lhmi;
     h = drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), false);
-//    if (h < r.h)
+    if (h < r.h)
       drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);
   }
 

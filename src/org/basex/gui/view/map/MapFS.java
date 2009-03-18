@@ -287,6 +287,7 @@ final class MapFS extends MapPainter {
     long s = 0;
     final byte[] path = ViewData.path(data, pre);
     byte[] fileBuf = null;
+    boolean fit = false;
     try {
       boolean binary = GUIFS.mime(name) == GUIFS.Type.IMAGE;
 
@@ -297,6 +298,7 @@ final class MapFS extends MapPainter {
         // minimize buffer size
         final File f = new File(string(path));
         s = Math.min(s, f.length());
+        fit = f.length() <= s;
 
         // read file contents
         fileBuf = new byte[(int) s];
@@ -322,7 +324,11 @@ final class MapFS extends MapPainter {
 
     // draw file contents or binary information
     g.setFont(mfont);
-    MapRenderer.drawText(g, rect, fileBuf, (int) s, true);
+
+    // Check if text fits in rectangle
+    if (fit) MapRenderer.drawText(g, rect, fileBuf, (int) s, true);
+    else MapRenderer.drawThumbnails(g, rect, fileBuf);
+
     return false;
   }
 
@@ -333,7 +339,7 @@ final class MapFS extends MapPainter {
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
       mx - r.x < 16 && fs.isFile(r.pre) &&
       GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
-
+    
     if(active && click) fs.launch(view.gui.focused);
     return active;
   }
