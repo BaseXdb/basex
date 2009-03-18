@@ -50,6 +50,19 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
+   * @param draw flag for drawing the text
+   * @return last height that was occupied
+   */
+  static int drawText(final Graphics g, final MapRect r, final byte[] s, 
+      final boolean draw) {
+    return drawTextNew(g, r, s, s.length, draw);
+  }
+
+  /**
+   * Draws a text.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
    * @param m length of text
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
@@ -125,7 +138,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @param m length of text
    * @param draw draw text (otherwise: just calculate space)
-   * @return last height that was occupied
+   * @return height of the text
    */
   private static int drawTextNew(final Graphics g, final MapRect r,
       final byte[] s, final int m, final boolean draw) {
@@ -173,8 +186,8 @@ final class MapRenderer {
         xx = r.x;
         yy += fh;
         ll = 0;
-        if (yy >= r.y + r.h)
-          return yy - r.y;
+//        if (yy >= r.y + r.h)
+//          return yy - r.y;
       }
 
       byte[] tok = ftt.get();
@@ -186,8 +199,8 @@ final class MapRenderer {
         xx = r.x;
         yy += fh;
         ll = 0;
-        if (yy >= r.y + r.h)
-          return yy - r.y;
+//        if (yy >= r.y + r.h)
+//          return yy - r.y;
         if(draw && wl + we >= ww) {
           // single word is to long for the rectangle
           int twl = 0;

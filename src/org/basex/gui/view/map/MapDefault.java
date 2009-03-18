@@ -124,8 +124,9 @@ final class MapDefault extends MapPainter {
 
       final int p = BaseXLayout.centerPos(g, text, rect.w);
       if(p != -1) {
+        final int h = MapRenderer.drawText(g, rect, text, false);
         rect.x += p;
-        rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;
+        rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
         MapRenderer.drawText(g, rect, text);
       } else {
         if(MapRenderer.calcHeight(g, rect, text) < rect.h) {

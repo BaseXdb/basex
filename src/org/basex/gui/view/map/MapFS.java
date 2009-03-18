@@ -5,6 +5,7 @@ import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
@@ -325,9 +326,26 @@ final class MapFS extends MapPainter {
     // draw file contents or binary information
     g.setFont(mfont);
 
+    if (s < fileBuf.length) {
+      byte[] tmp = new byte[(int) s];
+      System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
+      fileBuf = tmp;      
+    }
+    
     // Check if text fits in rectangle
-    if (fit) MapRenderer.drawText(g, rect, fileBuf, (int) s, true);
-    else MapRenderer.drawThumbnails(g, rect, fileBuf);
+    if (fit) {
+      final int p = BaseXLayout.centerPos(g, fileBuf, rect.w);
+      if(p != -1) rect.x += p;
+      final int h = MapRenderer.drawText(g, rect, fileBuf, false);
+      rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
+      final Color c = g.getColor();
+      final Font f = g.getFont();
+      g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
+      g.setFont(mfont);
+      MapRenderer.drawText(g, rect, fileBuf);
+      g.setColor(c);
+      g.setFont(f);
+    } else MapRenderer.drawThumbnails(g, rect, fileBuf);
 
     return false;
   }
