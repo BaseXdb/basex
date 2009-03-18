@@ -250,49 +250,9 @@ class MapLayout {
   }
   
   /**
-   * initialize text lengths and store them into array.
-  protected void initLen() {
-    int size = data.meta.size;
-    textLen = new long[size];
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    int l = 0;
-    int par = 0;
-    int pre = 0;
-
-    for(pre = 0; pre < size; pre++) {
-      final byte kind = (byte) data.kind(pre);
-      par = data.parent(pre, kind);
-      
-      while(l > 1 && parStack[l - 2] >= par) {
-        textLen[parStack[l - 2]] += textLen[pre - 1];
-        l--;
-      }
-
-      if(kind == Data.TEXT) {
-        textLen[pre] = data.textLen(pre);
-        parStack[l] = pre;
-        l++;
-      } else {
-        parStack[l] = pre;
-        textLen[pre] = 0;
-        l++;
-      } 
-    }
-    while(l > 0 && parStack[l - 1] > par) {
-      textLen[parStack[l - 2]] += textLen[pre - 1];
-      l--;
-    }
-    
-//    for(int i = 0; i < size; i++) System.out.println(i + ";" + textLen[i]);
-    
-  }
-  */
-
-  
-  /**
    * Initializes the text lengths and stores them into an array.
    */
-  protected void initLen() {
+  private void initLen() {
     int size = data.meta.size;
     textLen = new int[size];
 
@@ -304,41 +264,23 @@ class MapLayout {
       final int kind = data.kind(pre);
       par = data.parent(pre, kind);
       
+      int ll = l;
       while(l > 0 && parStack[l - 1] > par) {
         textLen[parStack[l - 1]] += textLen[parStack[l]];
         --l;
       }
-      //if(l > 0) textLen[parStack[l - 1]] += textLen[parStack[l]];
+      if(ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
+
       parStack[l] = pre;
 
       if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
         textLen[pre] = data.textLen(pre);
+      } else if(kind == Data.ATTR) {
+        textLen[pre] = data.attLen(pre);
       } else if(kind == Data.ELEM || kind == Data.DOC) {
-        textLen[pre] = 0;
         l++;
       } 
-
-      System.out.print("\n\n" + pre + ".PAR: ");
-      for(int i = 0; i < l; i++) {
-        System.out.print(parStack[i] + " ");
-      }
-      System.out.print("\n  LEN: ");
-      for(int i = 0; i < size; i++) {
-        System.out.print(textLen[i] + " ");
-      }
     }
-
-    while(l > 0) {
-      textLen[parStack[l - 1]] += textLen[parStack[l]];
-      l--;
-    }
-    
-    System.out.println();
-    for(int i = 0; i < size; i++) {
-      System.out.println(i + ";" + textLen[i]);
-    }
-    
+    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
   }
-
-  
 }

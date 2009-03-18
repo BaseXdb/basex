@@ -388,6 +388,7 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
+      BaseXLayout.antiAlias(g);
       g.setFont(font);
       if(data.kind(focused.pre) == Data.ELEM) {
         String tt = Token.string(ViewData.tag(data, focused.pre));
