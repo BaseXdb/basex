@@ -149,7 +149,7 @@ public final class GUIProp {
   /** Show file contents in TreeMap. */
   public static boolean filecont = false;
   /** use textlengths to calculate treemap. */
-  public static boolean usetextlength = true;
+  public static boolean usetextlength = false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size
