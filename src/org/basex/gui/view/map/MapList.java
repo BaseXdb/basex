@@ -55,7 +55,7 @@ class MapList extends IntList {
     // [JH] gui.context.current() stores not existing node sometimes 
     // pre_val(last node) + 1?
     if (GUIProp.mapweight == 0 || data.fs == null || GUIProp.filecont) {
-      for(int i = 0; i < size; i++) {
+      for(int i = 0; i < size - 1; i++) {
         nrchildren[i] = data.size(list[i], data.kind(list[i]));
         weight[i] = nrchildren[i] * 1d / parchildren;
       }
