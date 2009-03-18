@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
-import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -43,37 +42,22 @@ class MapList extends IntList {
    * @param parsize reference size
    * @param parchildren reference number of nodes
    * @param data reference
-   * [JH] modify to take textnode sizes into account
    * [JH] some weight problems occur displaying folders without any files and 
    * children
    */
   void initWeights(final long parsize, final int parchildren, final Data data) {
-//    Arrays.toString(textLen);
     weight = new double[list.length];
     int[] nrchildren = new int[list.length];
     long[] sizes = new long[list.length];
     int sizeP = GUIProp.mapweight;
     
     // only children
+    // [JH, CG] gui.context.current() stores not existing node sometimes 
+    // pre_val(last node) + 1?
     if (GUIProp.mapweight == 0 || data.fs == null || GUIProp.filecont) {
-      boolean usetextlen = false;
-      long len = 0;
-      
-      if(usetextlen) {
-        for(int i = 0; i < size - 1; i++) {
-          len += Token.string(ViewData.content(data, list[i], false)).
-              length();
-        }
-      }
-      
-      for(int i = 0; i < size - 1; i++) {
-        nrchildren[i] = list[i + 1] - list[i];
-        if(usetextlen) {
-          weight[i] = 0.5d * Token.string(ViewData.content(data, list[i], 
-              false)).length() / len + 0.5d * nrchildren[i] / parchildren;
-        } else {
-          weight[i] = nrchildren[i] * 1d / parchildren;
-        }
+      for(int i = 0; i < size; i++) {
+        nrchildren[i] = data.size(list[i], data.kind(list[i]));
+        weight[i] = nrchildren[i] * 1d / parchildren;
       }
     // use #children and size for weight
     } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 
