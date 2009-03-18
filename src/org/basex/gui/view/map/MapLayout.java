@@ -205,12 +205,10 @@ class MapLayout {
       int nn;
       ArrayList<MapRect> rects;
       if(level == 0) {
-        System.out.println(l.toString());
         // [JH] may first level layout should not be defined to splitalgo
         nn = 0;
         for (int i = 0; i < l.size; i++) {
           nn += data.size(l.list[i], data.kind(l.list[i]));
-          System.out.print(data.size(l.list[i], data.kind(l.list[i])) + ";");
         }
         l.initWeights(parsize, nn, data);
         
