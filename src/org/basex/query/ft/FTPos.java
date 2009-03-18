@@ -1,4 +1,4 @@
-package org.basex.query.ft;
+ package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
@@ -233,6 +233,49 @@ public final class FTPos extends FTExpr {
    * @return result of check
    */
   private boolean content() {
+    int max = 0;
+    for (int i = 0; i < size; i++) 
+      for (int j = 0; j < pos[i].size; j++)
+        max = pos[i].list[j] > max ? pos[i].list[j] : max;
+    
+    final int[] c = new int[max + 1];
+    final int[] p = new int[max + 1];
+    c[0] = -1; // init first entry with -1
+    for (int i = 0; i < p.length; i++) p[i] = -1;
+    
+    for (int i = 0; i < size; i++)
+      for (int j = 0; j < pos[i].size; j++) {
+        c[pos[i].list[j]] = pos[i].list[j];
+        if (p[pos[i].list[j]] == -1) p[pos[i].list[j]] = i;
+      }
+    
+    if (start || content) {
+      int[] l = new int[Math.min(p.length, size)];
+      for (int i = 0; i < l.length; i++)  
+        if (p[i] > -1) l[p[i]] = -1;
+
+      for (int i = 0; i < l.length; i++) 
+        if (l[i] != -1) return false;
+      if (content) { 
+        if (l.length == ft.count()) return true;
+        else return l.length == size;
+      }
+    } else if (end) {
+      int count = ft.count() - 1;
+      int[] l = new int[count + 1];  
+      for (int i = c.length - 1; i > -1; i--) 
+        if (count == c[i]) {
+          l[count] = -1; 
+          count--;  
+        }
+      
+      for (int i = 1; i <= Math.min(max, size); i++) 
+        if (l[l.length - i] != -1) return false;
+      
+    }
+    return true;
+  } 
+  /*  private boolean contentN() {
     int l = 0;
     if(start || content) {
       for(int i = 0; i < size; i++) {
@@ -277,7 +320,7 @@ public final class FTPos extends FTExpr {
     }
     return true;
   }
-
+*/
   /**
    * Checks if all words are found in the same unit.
    * @return result of check

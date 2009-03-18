@@ -67,6 +67,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        { "FT 11", nodes(40),
+        "//wld[text() ftcontains '']" },
+        
       { "Simple 1", bool(true),
         "'abc' ftcontains 'abc'" },
       { "Simple 2", bool(true),
@@ -397,7 +400,46 @@ public final class FTTest extends AbstractTest {
         "//w [text() ftcontains 'hello' entire content]" },
       { "FTContent 10", nodes(9, 11),
         "//w [. ftcontains 'xml databases' entire content]" },
+      { "FTContent 11", bool(true),
+        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" + 
+        " ftand 'd' entire content" },
+      { "FTContent 12", bool(true),
+        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" + 
+        " ftand 'a' entire content" },
+      { "FTContent 13", bool(true),
+        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" + 
+        " ftand 'd' entire content ordered" },
+      { "FTContent 14", bool(false),
+        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" + 
+        " ftand 'a' entire content ordered" },
+      { "FTContent 15", bool(true),
+        "'a b c d' ftcontains 'a' ftand 'b' at start" },
+      { "FTContent 16", bool(true),
+        "'a b c d' ftcontains 'a' ftand 'b' at start ordered" },
+      { "FTContent 17", bool(true),
+        "'a b c d' ftcontains 'b' ftand 'a' at start" },
+      { "FTContent 18", bool(false),
+        "'a b c d' ftcontains 'b' ftand 'a' at start ordered" },
+      { "FTContent 19", bool(false),
+        "'a b c d' ftcontains 'c' ftand 'a' at start" },
+      { "FTContent 20", bool(true),
+        "'a b c d' ftcontains 'c' ftand 'd' at end" },
+      { "FTContent 21", bool(true),
+        "'a b c d' ftcontains 'c' ftand 'd' at end ordered" },
+      { "FTContent 22", bool(true),
+        "'a b c d' ftcontains 'd' ftand 'c' at end" },
+      { "FTContent 23", bool(false),
+        "'a b c d' ftcontains 'd' ftand 'c' at end ordered" },
+      { "FTContent 24", bool(false),
+        "'a b c d' ftcontains 'b' ftand 'd' at end" },
+      { "FTContent 25", bool(true),
+        "'a b c' ftcontains 'b c' ftand 'a' entire content" },
+      { "FTContent 26", bool(true),
+        "'a b c' ftcontains 'a' ftand 'b c' entire content" },
+      { "FTContent 27", bool(true),
+        "'a b c' ftcontains 'a b c' entire content" },
 
+        
       { "FTMildNot 1", nodes(3, 5),
         "//w [text() ftcontains 'xml' not in 'xml databases']" },
       { "FTMildNot 2", nodes(14),
