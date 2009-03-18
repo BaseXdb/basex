@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.data.Nodes;
+import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -32,12 +32,10 @@ public final class Export extends Process {
   protected boolean exec() {
     try {
       final PrintOutput out = new PrintOutput(args[0]);
-      Nodes current = context.current();
-      final boolean root = context.root();
-      if(root) {
-        out.println(BaseX.info(DOCDECL, Token.UTF8));
-      }
-      current.serialize(new XMLSerializer(out, !root, current.data.meta.chop));
+      out.println(BaseX.info(DOCDECL, Token.UTF8));
+
+      final Data data = context.data();
+      new XMLSerializer(out, false, data.meta.chop).node(data, 0);
       out.close();
 
       return Prop.info ? info(DBEXPORTED, perf.getTimer()) : true;

@@ -203,7 +203,7 @@ class MapLayout {
     } else {
       final long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
       int nn;
-      System.out.println(l.toString());
+      //System.out.println(l.toString());
       ArrayList<MapRect> rects;
       if(level == 0) {
         // [JH] may first level layout should not be defined to splitalgo

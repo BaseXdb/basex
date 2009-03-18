@@ -107,7 +107,7 @@ public final class BaseXFileChooser {
     if(state != JFileChooser.APPROVE_OPTION) return null;
     
     final IO io = IO.get(fc.getSelectedFile().getPath());
-    return io.exists() || mode != Mode.FSAVE ||
+    return mode != Mode.FSAVE || !io.exists() ||
       Dialog.confirm(gui, BaseX.info(FILEREPLACE, io.name())) ? io : null;
   }
   
