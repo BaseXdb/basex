@@ -184,12 +184,13 @@ final class MapFS extends MapPainter {
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
 
-    final int fullsize = full && file ? 1 : 0;
+    final int fullsize = !GUIProp.filecont && full && file ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);
     g.setFont(tag ? fullsize == 1 ? lfont : font : mfont);
 
+    // determine icon size
     final Image img = file ? GUIFS.images(name, fullsize) : null;
     final int fh = g.getFontMetrics().getHeight();
 
@@ -241,6 +242,7 @@ final class MapFS extends MapPainter {
       rect.x += 3;
       rect.w -= 3;
     } else {
+      // paint bigger header
       if(tag) {
         if(GUIFS.mime(name) == GUIFS.Type.IMAGE) return false;
 
@@ -263,7 +265,7 @@ final class MapFS extends MapPainter {
         if(w + sw + 40 < rect.w) {
           g.setColor(COLORS[rect.level + 10]);
           BaseXLayout.chopString(g, token(info),
-              rect.x + rect.w - sw, rect.y, rect.w);
+              rect.x, rect.y, rect.w);
         }
         rect.x += 10;
         rect.y += 30;
