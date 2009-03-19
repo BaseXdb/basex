@@ -1278,6 +1278,8 @@ public interface Text {
   /** Help String. */
   byte[] HELPMAP = token(lang("h_map"));
   /** Help String. */
+  byte[] HELPPLOT = token(lang("h_plot"));
+  /** Help String. */
   byte[] HELPFOLDER = token(lang("h_folder"));
   /** Help String. */
   byte[] HELPTABLE = token(lang("h_table"));
