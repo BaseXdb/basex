@@ -22,6 +22,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -126,8 +127,16 @@ final class MapFS extends MapPainter {
           p += data.attSize(p, k);
         }
         g.setFont(mfont);
-        MapRenderer.drawText(g, cr, tb.finish());
+        MapRenderer.drawText(g, cr, tb.finish());        
       }
+      r.thumb = cr.thumb;
+      r.thumbal = cr.thumbal;
+      r.thumbf = cr.thumbf;
+      r.thumbfh = cr.thumbfh;
+      r.thumblh = cr.thumblh;
+      r.poi = cr.poi;
+      r.pos = cr.pos;
+      r.fs = cr.fs;
     }
   }
 
@@ -332,16 +341,23 @@ final class MapFS extends MapPainter {
       fileBuf = tmp;      
     }
     
-  /*  final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
-      if (ftd != null) {
-      r.pos = ftd[0];
-      r.poi = ftd[1];
-      r.acol = view.gui.context.marked().ftpos.col.finish();
+    final int size = data.size(pre, Data.ELEM);
+    int[][] ftd = null;
+    for (int i = size - 1; i > -1; i--) if (data.kind(pre + i) == Data.ELEM 
+        && Token.eq(data.tag(pre + i), "content".getBytes())) {
+      ftd = view.gui.context.marked().ftpos.get(pre + i + 1);
+      break;
+    }
+     
+    if (ftd != null) {
+      rect.pos = ftd[0];
+      rect.poi = ftd[1];
+      rect.acol = view.gui.context.marked().ftpos.col.finish();
     } else {
-      r.pos = null;
-      r.poi = null;
-      r.acol = null;
-    }*/
+      rect.pos = null;
+      rect.poi = null;
+      rect.acol = null;      
+    }
     
     // Check if text fits in rectangle
     final int h = MapRenderer.drawText(g, rect, fileBuf, false);
@@ -356,7 +372,11 @@ final class MapFS extends MapPainter {
       MapRenderer.drawText(g, rect, fileBuf);
       g.setColor(c);
       g.setFont(f);
-    } else MapRenderer.drawThumbnails(g, rect, fileBuf);
+    } else {
+      rect.thumb = true;
+      rect.fs = true;
+      MapRenderer.drawThumbnails(g, rect, fileBuf);
+    }
 
     return false;
   }

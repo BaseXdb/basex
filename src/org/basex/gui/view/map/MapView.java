@@ -396,7 +396,18 @@ public final class MapView extends View implements Runnable {
       }
 
       if(focused.thumb) {
-        final byte[] text = ViewData.content(data, focused.pre, false);
+        int pre = focused.pre;
+        if (focused.fs) {
+          final int size = data.size(focused.pre, Data.ELEM);
+          for (int i = size - 1; i > -1; i--) 
+            if (data.kind(focused.pre + i) == Data.ELEM 
+              && Token.eq(data.tag(focused.pre + i), "content".getBytes())) {
+            pre = focused.pre + i + 1;
+            break;
+          }
+        }
+        
+        final byte[] text = ViewData.content(data, pre, false);
         final FTTokenizer ftt = new FTTokenizer(text);
         final int[][] d = ftt.getInfo();
         focused.x += 3;

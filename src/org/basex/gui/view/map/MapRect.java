@@ -27,6 +27,8 @@ class MapRect extends ViewRect implements Cloneable {
   byte thumblh;
   /** Width of a thumbnail unit. */
   double thumbf;
+  /** Flag for rects in MapFS. */
+  boolean fs = false;
 
   /**
    * Default constructor.
