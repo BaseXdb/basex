@@ -405,6 +405,9 @@ public final class MapView extends View implements Runnable {
             pre = focused.pre + i + 1;
             break;
           }
+          focused.x += 7;
+          focused.y += 55;
+          focused.w -= 11;
         }
         
         final byte[] text = ViewData.content(data, pre, false);
@@ -427,6 +430,11 @@ public final class MapView extends View implements Runnable {
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
             getWidth(), focused.acol);
+        if (focused.fs) {
+          focused.x -= 7;
+          focused.y -= 55;
+          focused.w += 11;
+        }
         focused.x -= 3;
         focused.w += 3;
       }

@@ -308,7 +308,7 @@ final class MapFS extends MapPainter {
 
         // minimize buffer size
         final File f = new File(string(path));
-        s = Math.min(s, f.length());
+        s = f.length(); // Math.min(s, f.length());
         
         // read file contents
         fileBuf = new byte[(int) s];
@@ -361,7 +361,7 @@ final class MapFS extends MapPainter {
     
     // Check if text fits in rectangle
     final int h = MapRenderer.drawText(g, rect, fileBuf, false);
-    if (h < rect.h) {
+    if (rect.h > h) {
       final int p = BaseXLayout.centerPos(g, fileBuf, rect.w);
       if(p != -1) rect.x += p;
       rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
@@ -375,6 +375,7 @@ final class MapFS extends MapPainter {
     } else {
       rect.thumb = true;
       rect.fs = true;
+     
       MapRenderer.drawThumbnails(g, rect, fileBuf);
     }
 
