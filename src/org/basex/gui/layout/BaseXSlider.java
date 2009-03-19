@@ -44,10 +44,11 @@ public final class BaseXSlider extends BaseXPanel {
    * @param mx max value
    * @param i initial value
    * @param list listener
+   * @param h help text
    */
   public BaseXSlider(final GUI main, final ActionListener list,
-      final int mn, final int mx, final int i) {
-    this(main, mn, mx, i, null);
+      final int mn, final int mx, final int i, final byte[] h) {
+    this(main, mn, mx, i, h);
     al = list;
   }
 

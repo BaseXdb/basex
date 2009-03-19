@@ -1280,6 +1280,18 @@ public interface Text {
   /** Help String. */
   byte[] HELPPLOT = token(lang("h_plot"));
   /** Help String. */
+  byte[] HELPPLOTAXISX = token(lang("h_plotaxisx"));
+  /** Help String. */
+  byte[] HELPPLOTAXISY = token(lang("h_plotaxisy"));
+  /** Help String. */
+  byte[] HELPPLOTXLOG = token(lang("h_plotxlog"));
+  /** Help String. */
+  byte[] HELPPLOTYLOG = token(lang("h_plotylog"));
+  /** Help String. */
+  byte[] HELPPLOTDOTS = token(lang("h_plotdots"));
+  /** Help String. */
+  byte[] HELPPLOTITEM = token(lang("h_plotitem"));
+  /** Help String. */
   byte[] HELPFOLDER = token(lang("h_folder"));
   /** Help String. */
   byte[] HELPTABLE = token(lang("h_table"));
