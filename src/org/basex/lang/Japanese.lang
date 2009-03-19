@@ -175,6 +175,7 @@ dm_offset=Offsets
 dm_size=Size determined by
 dm_size_children=number of children
 dm_size_fssize=file size
+dm_size_textsize=text length
 dm_size_both=children and file size
 
 dz_total=メモリ合計
@@ -577,7 +578,8 @@ h_cont=このチェックボックスを選択すると、ファイル内のテ�
 h_fsmax=インポートされるテキストファイルのサイズの上限を設定します。
 h_mapatts=このチェックボックスを選択すると、属性はツリーマップの中に表示されます。
 h_maplayout=ここではツリーマップビューのレイアウトアルゴリズムを変更します。データベースを開いている場合、変更は即座に反映されます。
-h_mapalign=ここではツリーマップビューの四角形の整列方法を変更します。データベースを開いている場合、変更は即座に反映されます。
+h_mapoff=ここではツリーマップビューの四角形の整列方法を変更します。データベースを開いている場合、変更は即座に反映されます。
+h_mapsize=Here you can influence how the rectangle size is calculated.
 h_drop=このボタンを押して現在選択されているデータベースを削除します。
 h_dropdb=削除したいデータベースを選択して下さい。
 h_lf=このオプションでアプリケーションの見た目を変更できます。

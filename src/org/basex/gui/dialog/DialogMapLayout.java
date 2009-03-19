@@ -46,7 +46,7 @@ public final class DialogMapLayout extends Dialog {
     p.add(algo);
 
     // create drop down
-    border = new BaseXCombo(MAPOFFSETS, null, this);
+    border = new BaseXCombo(MAPOFFSETS, HELPMAPOFF, this);
     border.setSelectedIndex(GUIProp.mapoffsets);
 
     // create drop down

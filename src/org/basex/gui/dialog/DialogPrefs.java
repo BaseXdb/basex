@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ public final class DialogPrefs extends Dialog {
   BaseXCombo lang;
   /** Directory path. */
   BaseXTextField path;
+
   /** Focus checkbox. */
   private BaseXCheckBox focus;
   /** Show names checkbox. */
@@ -42,6 +44,8 @@ public final class DialogPrefs extends Dialog {
   private BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private BaseXCheckBox javalook;
+  /** Buttons. */
+  private final BaseXBack buttons;
 
   /**
    * Default Constructor.
@@ -75,7 +79,7 @@ public final class DialogPrefs extends Dialog {
       }
     });
     
-    BaseXLayout.setWidth(path, 300);
+    BaseXLayout.setWidth(path, 280);
     BaseXLayout.setHeight(path, button.getPreferredSize().height);
     p.add(path);
     p.add(button);
@@ -119,6 +123,10 @@ public final class DialogPrefs extends Dialog {
     
     pp.add(p);
 
+    // create buttons
+    buttons = BaseXLayout.okCancel(this);
+    set(buttons, BorderLayout.SOUTH);
+
     set(pp, BorderLayout.CENTER);
     finish(null);
   }
@@ -138,26 +146,20 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final String cmd) {
+    creds.setText(credits(lang.getSelectedItem().toString()));
+    gui.notify.layout();
+  }
+  
+  @Override
+  public void close() {
     Prop.dbpath = path.getText();
     Prop.language = lang.getSelectedItem().toString();
     GUIProp.mousefocus = focus.isSelected();
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
-    creds.setText(credits(lang.getSelectedItem().toString()));
-    gui.notify.layout();
     GUIProp.write();
     Prop.write();
-  }
-  
-  @Override
-  public void close() {
-    Prop.write();
     dispose();
-  }
-
-  @Override
-  public void cancel() {
-    close();
   }
 }

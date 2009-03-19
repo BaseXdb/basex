@@ -186,6 +186,7 @@ public final class DialogCreate extends Dialog {
     // create buttons
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
+
     action(null);
     finish(null);
   }

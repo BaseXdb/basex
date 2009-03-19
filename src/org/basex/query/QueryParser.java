@@ -1180,7 +1180,10 @@ public class QueryParser extends InputParser {
 
     final Expr ex = step();
     if(ex == null) {
-      if(s == 2) error(PATHMISS);
+      if(s == 2) {
+        if(more()) checkInit();
+        error(PATHMISS);
+      }
       return s == 1 ? new Root() : null;
     }
 
@@ -1313,6 +1316,7 @@ public class QueryParser extends InputParser {
     while(consumeWS2(BR1)) {
       checkPred(true);
       pred = add(pred, expr());
+      if(more()) checkInit();
       check(BR2);
       checkPred(false);
     }

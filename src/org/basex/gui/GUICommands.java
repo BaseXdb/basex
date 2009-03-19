@@ -171,7 +171,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Save document. */
+  /** Save result text. */
   SAVE(true, GUIEXPORT, "", GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -868,7 +868,9 @@ public enum GUICommands implements GUICommand {
         GUIProp.createpath, gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
-    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    final boolean single = gui.context.data().doc().length == 1;
+    final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
+      BaseXFileChooser.Mode.DSAVE);
     if(file == null) return null;
 
     GUIProp.createpath = file.path();

@@ -82,7 +82,7 @@ public class QuerySuggest extends QueryParser {
   protected void checkTest(final Test test, final boolean attr) {
     final TokenBuilder tb = new TokenBuilder();
     if(attr) tb.add('@');
-    if(test != null) tb.add(test.toString().replaceAll("\\*:?", ""));
+    if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
     tag = tb.finish();
     checkTest(false);
   }

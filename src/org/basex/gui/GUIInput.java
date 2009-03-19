@@ -147,7 +147,6 @@ public final class GUIInput extends BaseXTextField {
    */
   protected void completeInput() {
     Object sel = box.getSelectedItem();
-    if(sel == null) sel = box.getItemAt(0);
     if(sel == null) return;
     final String suf = sel.toString();
     final int pl = pre.length();
@@ -167,6 +166,8 @@ public final class GUIInput extends BaseXTextField {
     } else if(GUIProp.searchmode == 1 ||
         GUIProp.searchmode == 0 && query.startsWith("/")) {
       queryPopup(query);
+    } else {
+      pop.setVisible(false);
     }
   }
 
@@ -216,14 +217,15 @@ public final class GUIInput extends BaseXTextField {
    */
   private void createCombo(final StringList sl) {
     if(sl == null || sl.size == 0) {
-      box.setSelectedItem(null);
+      //box.setSelectedItem(null);
       pop.setVisible(false);
       return;
     }
 
     if(comboChanged(sl)) {
-      box.setSelectedItem(null);
+      //box.setSelectedItem(null);
       box.setModel(new DefaultComboBoxModel(sl.finish()));
+      box.setSelectedIndex(-1);
       pop = new ComboPopup(box);
     }
     
