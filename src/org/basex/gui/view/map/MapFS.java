@@ -265,7 +265,7 @@ final class MapFS extends MapPainter {
         if(w + sw + 40 < rect.w) {
           g.setColor(COLORS[rect.level + 10]);
           BaseXLayout.chopString(g, token(info),
-              rect.x, rect.y, rect.w);
+              rect.x + rect.w - sw, rect.y, rect.w);
         }
         rect.x += 10;
         rect.y += 30;
