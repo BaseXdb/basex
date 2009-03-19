@@ -107,7 +107,7 @@ public final class PlotView extends View implements Runnable {
    * @param man view manager
    */
   public PlotView(final ViewNotifier man) {
-    super(man, null);
+    super(man, HELPPLOT);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
 
