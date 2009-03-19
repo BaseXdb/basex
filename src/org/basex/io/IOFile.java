@@ -139,7 +139,7 @@ public final class IOFile extends IO {
 
   @Override
   public String dir() {
-    return file.isDirectory() ? file.getParent() : file.getPath();
+    return file.isDirectory() ? file.getPath() : file.getParent();
   }
 
   @Override

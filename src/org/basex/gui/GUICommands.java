@@ -874,8 +874,7 @@ public enum GUICommands implements GUICommand {
     if(file == null) return null;
 
     GUIProp.createpath = file.path();
-    file.suffix(IO.XMLSUFFIX);
-    GUIProp.createpath = file.getDir();
+    if(single) file.suffix(IO.XMLSUFFIX);
     return file;
   }
 }

@@ -99,7 +99,6 @@ public final class GUIStatus extends BaseXPanel {
     g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
 
     // print current memory usage
-    g.setFont(getFont());
     FontMetrics fm = g.getFontMetrics();
     final String mem = Performance.format(used, true);
     int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
@@ -107,9 +106,18 @@ public final class GUIStatus extends BaseXPanel {
     g.setColor(full ? colormark3 : color6);
     g.drawString(mem, fw, h);
 
-    // print status text
+    // chop and print status text
     g.setColor(Color.black);
-    BaseXLayout.chopString(g, Token.token(status), 4, 0, fw - 24);
+    final StringBuilder sb = new StringBuilder(status);
+    if(fm.stringWidth(status) + 32 > fw) {
+      sb.setLength(0);
+      for(int s = 0; s < status.length() && fw > 48; s++) {
+        sb.append(status.charAt(s));
+        fw -= fm.charWidth(sb.charAt(s));
+      }
+      sb.append("...");
+    }
+    g.drawString(sb.toString(), 4, getFont().getSize());
   }
 
   @Override

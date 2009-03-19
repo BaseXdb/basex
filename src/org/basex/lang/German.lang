@@ -52,7 +52,7 @@ query_title=Query
 # Dialog Windows
 d_info=Information
 d_fctitle=Verzeichnis
-d_export=XML-Dokument speichern
+d_export=Datenbank exportieren
 
 dc_filter=Filter
 dc_title=XML-Dokument oder Verzeichnis

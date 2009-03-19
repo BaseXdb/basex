@@ -29,7 +29,7 @@ class MapLayout {
   final ArrayList<MapRect> rectangles;
   /** Layout rectangle. */
   final MapRect layout;
-  
+
   /**
    * Constructor.
    * @param d data reference to use in this maplayout
@@ -272,7 +272,7 @@ class MapLayout {
         textLen[parStack[l - 1]] += textLen[parStack[l]];
         --l;
       }
-      if(ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
+      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
 
       parStack[l] = pre;
 

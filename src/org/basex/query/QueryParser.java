@@ -1316,7 +1316,6 @@ public class QueryParser extends InputParser {
     while(consumeWS2(BR1)) {
       checkPred(true);
       pred = add(pred, expr());
-      if(more()) checkInit();
       check(BR2);
       checkPred(false);
     }
@@ -2662,8 +2661,7 @@ public class QueryParser extends InputParser {
    * @return new array
    * @throws QueryException xquery exception
    */
-  protected Expr[] add(final Expr[] ar, final Expr e)
-      throws QueryException {
+  protected Expr[] add(final Expr[] ar, final Expr e) throws QueryException {
     if(e == null) error(INCOMPLETE);
     final int size = ar.length;
     final Expr[] t = new Expr[size + 1];

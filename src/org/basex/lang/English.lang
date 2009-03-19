@@ -50,7 +50,7 @@ query_title=Query
 # Dialog Windows
 d_info=Information
 d_fctitle=Choose Directory
-d_export=Save XML Document
+d_export=Export Database
 
 dc_title=Input file or directory
 dc_filter=Filter

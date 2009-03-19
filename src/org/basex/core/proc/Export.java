@@ -7,6 +7,7 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -31,13 +32,21 @@ public final class Export extends Process {
   @Override
   protected boolean exec() {
     try {
-      final PrintOutput out = new PrintOutput(args[0]);
-      out.println(BaseX.info(DOCDECL, Token.UTF8));
-
       final Data data = context.data();
-      new XMLSerializer(out, false, data.meta.chop).node(data, 0);
-      out.close();
+      final int[] docs = data.doc();
+      for(final int pre : docs) {
+        IO file = IO.get(args[0]);
+        
+        // more documents - use original name and use argument as path
+        if(docs.length != 1) {
+          file = file.merge(IO.get(Token.string(data.text(pre))));
+        }
+        final PrintOutput out = new PrintOutput(file.path());
+        out.println(BaseX.info(DOCDECL, Token.UTF8));
+        new XMLSerializer(out, false, data.meta.chop).node(data, pre);
+        out.close();
 
+      }
       return Prop.info ? info(DBEXPORTED, perf.getTimer()) : true;
     } catch(final IOException ex) {
       BaseX.debug(ex);
