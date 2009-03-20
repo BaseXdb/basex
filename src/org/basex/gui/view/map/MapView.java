@@ -23,6 +23,7 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.index.FTTokenizer;
+import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -49,6 +50,8 @@ public final class MapView extends View implements Runnable {
   private MapPainter painter;
   /** Keeps the whole map layout. */
   public MapLayout layout;
+  /** Text lengths. */
+  private int[] textLen;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[ViewNotifier.MAXHIST];
@@ -172,8 +175,10 @@ public final class MapView extends View implements Runnable {
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
     mainRects = new ArrayList<MapRect>();
     final Nodes nodes = gui.context.current();
-
+    
     final Performance p = new Performance();
+    if (gui.context.current().data.fs == null && GUIProp.usetextlength) 
+      initLen();
 //    calc(rect, mainRects, nodes, mainMap);
     calc(rect, nodes, mainMap);
     
@@ -305,7 +310,7 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
     painter.reset();
     // should replace following lines
-    layout = new MapLayout(nodes.data);
+    layout = new MapLayout(nodes.data, textLen);
     layout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
     mainRects = (ArrayList<MapRect>) layout.rectangles.clone();
     painter.init(mainRects);
@@ -766,5 +771,42 @@ public final class MapView extends View implements Runnable {
     mainMap = createImage();
     zoomMap = createImage();
     refreshLayout();
+  }
+  
+  
+  /**
+   * Initializes the text lengths and stores them into an array.
+   */
+  private void initLen() {
+    Data data = gui.context.current().data;
+    int size = data.meta.size;
+    textLen = new int[size];
+
+    final int[] parStack = new int[IO.MAXHEIGHT];
+    int l = 0;
+    int par = 0;
+
+    for(int pre = 0; pre < size; pre++) {
+      final int kind = data.kind(pre);
+      par = data.parent(pre, kind);
+      
+      int ll = l;
+      while(l > 0 && parStack[l - 1] > par) {
+        textLen[parStack[l - 1]] += textLen[parStack[l]];
+        --l;
+      }
+      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
+
+      parStack[l] = pre;
+
+      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
+        textLen[pre] = data.textLen(pre);
+      } else if(kind == Data.ATTR) {
+        textLen[pre] = data.attLen(pre);
+      } else if(kind == Data.ELEM || kind == Data.DOC) {
+        l++;
+      } 
+    }
+    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
   }
 }

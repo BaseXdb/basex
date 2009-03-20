@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
-import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -33,9 +32,11 @@ class MapLayout {
   /**
    * Constructor.
    * @param d data reference to use in this maplayout
+   * @param tl text lengths array
    */
-  MapLayout(final Data d) {
+  MapLayout(final Data d, final int[] tl) {
     data = d;
+    textLen = tl;
     rectangles = new ArrayList<MapRect>();
     
     switch(GUIProp.mapoffsets) {
@@ -63,7 +64,7 @@ class MapLayout {
       default: algo = new SplitAlgo(); break;
     }
     
-    if (data.fs == null && GUIProp.usetextlength) initLen();
+//    if (data.fs == null && GUIProp.usetextlength) initLen();
   }
 
   /**
@@ -259,38 +260,38 @@ class MapLayout {
         ch, 0, ch.size - 1, level + 1);
   }
   
-  /**
-   * Initializes the text lengths and stores them into an array.
-   */
-  private void initLen() {
-    int size = data.meta.size;
-    textLen = new int[size];
-
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    int l = 0;
-    int par = 0;
-
-    for(int pre = 0; pre < size; pre++) {
-      final int kind = data.kind(pre);
-      par = data.parent(pre, kind);
-      
-      int ll = l;
-      while(l > 0 && parStack[l - 1] > par) {
-        textLen[parStack[l - 1]] += textLen[parStack[l]];
-        --l;
-      }
-      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
-
-      parStack[l] = pre;
-
-      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
-        textLen[pre] = data.textLen(pre);
-      } else if(kind == Data.ATTR) {
-        textLen[pre] = data.attLen(pre);
-      } else if(kind == Data.ELEM || kind == Data.DOC) {
-        l++;
-      } 
-    }
-    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
-  }
+//  /**
+//   * Initializes the text lengths and stores them into an array.
+//   */
+//  private void initLen() {
+//    int size = data.meta.size;
+//    textLen = new int[size];
+//
+//    final int[] parStack = new int[IO.MAXHEIGHT];
+//    int l = 0;
+//    int par = 0;
+//
+//    for(int pre = 0; pre < size; pre++) {
+//      final int kind = data.kind(pre);
+//      par = data.parent(pre, kind);
+//      
+//      int ll = l;
+//      while(l > 0 && parStack[l - 1] > par) {
+//        textLen[parStack[l - 1]] += textLen[parStack[l]];
+//        --l;
+//      }
+//      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
+//
+//      parStack[l] = pre;
+//
+//      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
+//        textLen[pre] = data.textLen(pre);
+//      } else if(kind == Data.ATTR) {
+//        textLen[pre] = data.attLen(pre);
+//      } else if(kind == Data.ELEM || kind == Data.DOC) {
+//        l++;
+//      } 
+//    }
+//    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
+//  }
 }
