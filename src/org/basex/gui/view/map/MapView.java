@@ -112,8 +112,10 @@ public final class MapView extends View implements Runnable {
     if(painter != null) painter.close();
 
     final Data data = gui.context.data();
+    
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
+      if (data.fs == null && GUIProp.usetextlength) initLen();
       painter = data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
       mainMap = createImage();
@@ -177,8 +179,6 @@ public final class MapView extends View implements Runnable {
     final Nodes nodes = gui.context.current();
     
     final Performance p = new Performance();
-    if (gui.context.current().data.fs == null && GUIProp.usetextlength) 
-      initLen();
 //    calc(rect, mainRects, nodes, mainMap);
     calc(rect, nodes, mainMap);
     
