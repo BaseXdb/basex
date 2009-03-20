@@ -33,7 +33,7 @@ public class SquarifiedAlgo extends MapAlgo {
     double weight = 0;
     double sumweight = 1;
     
-    while(ni < ne) {
+    while(ni <= ne) {
       if(ww < hh) {
         weight += ml.weight[ni];
         height = weight / sumweight * hh;

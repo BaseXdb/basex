@@ -31,7 +31,7 @@ public class StripAlgo extends MapAlgo{
     double weight = 0;
     double sumweight = 1;
     
-    while(ni < ne) {
+    while(ni <= ne) {
       weight += ml.weight[ni];
       height = weight / sumweight * hh;
       

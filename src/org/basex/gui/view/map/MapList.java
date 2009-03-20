@@ -38,6 +38,26 @@ class MapList extends IntList {
   }
   
   /**
+   * Initializes the weights giving each node of this level same weight.
+   */
+  void initWeights() {
+    for(int i = 0; i < size; i++) weight[i] = 1 / size;
+  }
+  
+  /**
+   * Initializes the weights only using number of descendants.
+   * @param parchildren reference number of nodes
+   * @param data reference
+   */
+  void initWeights(final int parchildren, final Data data) {
+    int[] nrchildren = new int[size];
+    for(int i = 0; i < size; i++) {
+      nrchildren[i] = data.size(list[i], data.kind(list[i]));
+      weight[i] = nrchildren[i] * 1d / parchildren;
+    }
+  }
+  
+  /**
    * Initializes the weights of each list entry and stores it in an extra list.
    * @param parsize reference size
    * @param parchildren reference number of nodes
@@ -46,34 +66,40 @@ class MapList extends IntList {
    * children
    */
   void initWeights(final long parsize, final int parchildren, final Data data) {
-    weight = new double[list.length];
-    int[] nrchildren = new int[list.length];
-    long[] sizes = new long[list.length];
+    weight = new double[size];
+    int[] nrchildren = new int[size];
+    long[] sizes = new long[size];
     int sizeP = GUIProp.mapweight;
     
+    if(size == 1) {
+      initWeights();
+      return;
+    }
+    
     // only children
-    // [JH] gui.context.current() stores not existing node sometimes 
-    // pre_val(last node) + 1?
     if (GUIProp.mapweight == 0 || data.fs == null || !GUIProp.mapfs) {
-      for(int i = 0; i < size - 1; i++) {
-        nrchildren[i] = data.size(list[i], data.kind(list[i]));
-        weight[i] = nrchildren[i] * 1d / parchildren;
-      }
+      initWeights(parchildren, data);
     // use #children and size for weight
     } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 
         data.fs != null) {
-      for(int i = 0; i < size - 1; i++) {
-        sizes[i] = data.fs != null ? 
-            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
-        nrchildren[i] = list[i + 1] - list[i];
+      for(int i = 0; i < size; i++) {
+        if(data.attValue(data.sizeID, list[i]) != null) 
+          sizes[i] = Token.toLong(data.attValue(data.sizeID, list[i]));
+        else {
+          sizes[i] = 0;
+        }
+        nrchildren[i] = data.size(list[i], data.kind(list[i]));
         weight[i] = sizeP / 100d * sizes[i] / parsize + 
             (1 - sizeP / 100d) * nrchildren[i] / parchildren;
       }
     // only sizes
     } else if (GUIProp.mapweight == 100 && data.fs != null) {
-      for(int i = 0; i < size - 1; i++) {
-        sizes[i] = data.fs != null ? 
-            Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
+      for(int i = 0; i < size; i++) {
+        if(data.attValue(data.sizeID, list[i]) != null) 
+          sizes[i] = Token.toLong(data.attValue(data.sizeID, list[i]));
+        else  {
+          sizes[i] = 0;
+        }
         weight[i] = sizes[i] * 1d / parsize;
       }
     }
@@ -83,15 +109,19 @@ class MapList extends IntList {
    * Initializes the weights of each list using text lengths of nodes.
    * @param textLen array holding pre vals to textlengths
    * @param children number of children
+   * @param data reference
    */
-  void initWeights(final int[] textLen, final int children) {
-    weight = new double[list.length];
-    int[] nrchildren = new int[list.length];
+  void initWeights(final int[] textLen, final int children, final Data data) {
+    weight = new double[size];
+    int[] nrchildren = new int[size];
     int textSum = 0;
-    for(int i = 0; i < size - 1; i++) textSum += textLen[list[i]];
+    for(int i = 0; i < size; i++) {
+      textSum += textLen[list[i]];
+    }
     // only children
-    for(int i = 0; i < size - 1; i++) {
-      nrchildren[i] = list[i + 1] - list[i];
+    for(int i = 0; i < size; i++) {
+      nrchildren[i] = data.size(list[i], data.kind(list[i]));
+      if(nrchildren[i] < 0) System.out.println(nrchildren[i]);
       weight[i] = GUIProp.mapweight / 100d * textLen[list[i]] / textSum + 
           (1 - GUIProp.mapweight / 100d) * nrchildren[i] / children;
     }

@@ -172,20 +172,18 @@ class MapLayout {
     }
 
     // paint all children
-    if(list.size != 0) list.add(p);
+//    if(list.size != 0) list.add(p);
     return list;
   }
   
   /**
    * Adds all the sizes attribute of the nodes in the given list.
    * @param l list of nodes
-   * @param start at element
-   * @param end here
    * @return sum of the size attribute
    */
-  private long addSizes(final IntList l, final int start, final int end) {
+  private long addSizes(final IntList l) {
     long sum = 0;
-    for (int i = start; i < end; i++) {
+    for (int i = 0; i < l.size; i++) {
       final byte[] val = data.attValue(data.sizeID, l.list[i]);
       if(val != null) sum += Token.toLong(val);
     }
@@ -202,17 +200,17 @@ class MapLayout {
    */
   void makeMap(final MapRect r, final MapList l, final int ns, final int ne, 
       final int level) {
-    if(ne - ns <= 1) {
+    if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
       r.pre = l.list[ns];
       putRect(r, level);  
     } else {
-      final long parsize = data.fs != null ? addSizes(l, ns, ne) : 0;
+      final long parsize = data.fs != null ? addSizes(l) : 0;
       int nn;
-      //System.out.println(l.toString());
       ArrayList<MapRect> rects;
       if(level == 0) {
         // [JH] may first level layout should not be defined to splitalgo
+        // [JH] use textLen
         nn = 0;
         for (int i = 0; i < l.size; i++) {
           nn += data.size(l.list[i], data.kind(l.list[i]));
@@ -222,10 +220,12 @@ class MapLayout {
         final MapAlgo tmp = new SplitAlgo();
         rects = tmp.calcMap(r, l, l.weight, ns, ne, level);
       } else {
-        nn = l.list[ne] - l.list[ns];
+        nn = l.list[ne] - l.list[ns] + 
+            data.size(l.list[ne], data.kind(l.list[ne]));
+        
         // init weights of nodes
-        if(GUIProp.usetextlength) {
-          l.initWeights(textLen, nn);
+        if(GUIProp.usetextlength && data.fs == null) {
+          l.initWeights(textLen, nn, data);
         } else l.initWeights(parsize, nn, data);
         rects = algo.calcMap(r, l, l.weight, ns, ne, level);
       }
@@ -249,12 +249,19 @@ class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if((w < off && h < off) || w == 0 || h == 0 || GUIProp.mapfs && 
-        ViewData.isLeaf(data, r.pre)) return;
+//    if((w < off && h < off) || w == 0 || h == 0 || GUIProp.mapfs && 
+//        ViewData.isLeaf(data, r.pre)) return;
+//    final MapList ch = children(r.pre);
+//    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+//        ch, 0, ch.size - 1, level + 1);
+    // skip too small rectangles and leaf nodes (= meta data in deepfs)
+    if((w >= off || h >= off) && w > 0 && h > 0 && 
+        (!GUIProp.mapfs || !ViewData.isLeaf(data, r.pre))) {
+      final MapList ch = children(r.pre);
 
-    final MapList ch = children(r.pre);
-    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
-        ch, 0, ch.size - 1, level + 1);
+      if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+          ch, 0, ch.size - 1, level + 1);
+    }
   }
   
   /**
