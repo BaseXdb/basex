@@ -42,7 +42,7 @@ public final class DialogMapLayout extends Dialog {
     super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(5, 1, 0, 8));
+    p.setLayout(new TableLayout(4, 1, 0, 8));
 
     // create list
     algo = new BaseXListChooser(this, MAPALGO, HELPMAPLAYOUT);
@@ -78,7 +78,7 @@ public final class DialogMapLayout extends Dialog {
     p.add(atts);
     
     s = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE, GUIProp.mapsimple, this);
-    p.add(s);
+//    p.add(s);
 
     set(p, BorderLayout.CENTER);
     finish(GUIProp.maplayoutloc);
