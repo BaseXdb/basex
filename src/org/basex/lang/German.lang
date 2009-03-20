@@ -158,6 +158,7 @@ ds_green=Grün
 ds_blue=Blau
 
 dm_title=Map-Layout
+dm_simple=Zerlege Rechtecke gleichverteilt
 dm_atts=Zeige Attribute
 dm_choice1=Kein Titel, kein Rand
 dm_choice2=Kein Titel, kleiner Rand
@@ -566,6 +567,7 @@ h_meta=Wenn diese Checkbox ausgewählt wurde, wird von vielen Dateitypen Meta-Da
 h_cont=Die textuellen Inhalte von Dateien können durch diese Checkbox in die Datenbank eingebunden werden. Wenn die Inhalte eingebunden wurden, können sie mit XPATH oder XQUERY durchsucht werden.
 h_fsmax=Hier kann ein Größenlimit für die eingebundenen Textdateien angegeben werden.
 h_mapatts=Wenn diese Checkbox ausgewählt wurde, werden auch Attribute in der TreeMap angezeigt.
+h_mapsimple=Wenn diese Checkbox ausgewählt wurde, werden die Rechtecke in der TreeMap gleichverteilt gesplittet.
 h_maplayout=Hier kann der Layout Algorithmus, welcher für die Map Visualisierung benutzt wird, verändert werden.
 h_mapoff=Hier können die Größe der Rechteckränder verändert werden.
 h_mapsize=Hier können Sie die Berechnung der Rechteckgrößen beeinflussen.

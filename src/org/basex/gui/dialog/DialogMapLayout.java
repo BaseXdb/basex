@@ -31,6 +31,8 @@ public final class DialogMapLayout extends Dialog {
   final BaseXCombo border;
   /** Size slider label. */
   final BaseXLabel sizeLabel;
+  /** devide rectangles uniformly. */
+  final BaseXCheckBox s;
   
   /**
    * Default constructor.
@@ -40,7 +42,7 @@ public final class DialogMapLayout extends Dialog {
     super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(4, 1, 0, 8));
+    p.setLayout(new TableLayout(5, 1, 0, 8));
 
     // create list
     algo = new BaseXListChooser(this, MAPALGO, HELPMAPLAYOUT);
@@ -74,6 +76,9 @@ public final class DialogMapLayout extends Dialog {
     // create checkbox
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
     p.add(atts);
+    
+    s = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE, GUIProp.mapsimple, this);
+    p.add(s);
 
     set(p, BorderLayout.CENTER);
     finish(GUIProp.maplayoutloc);
@@ -87,6 +92,7 @@ public final class DialogMapLayout extends Dialog {
     GUIProp.mapoffsets = border.getSelectedIndex();
     GUIProp.mapalgo = algo.getIndex();
     GUIProp.mapatts = atts.isSelected();
+    GUIProp.mapsimple = s.isSelected();
     final int sizeprp = sizeSlider.value();
     GUIProp.mapweight = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 

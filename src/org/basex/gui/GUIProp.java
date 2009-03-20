@@ -92,6 +92,8 @@ public final class GUIProp {
   public static int mapalgo = 0;
   /** number of child <-> size weighting in (0;100). */
   public static int mapweight = 0;
+  /** devide rectangles uniformly on each level. */
+  public static boolean mapsimple = false;
 
   /** Dot sizes in plot. */
   public static int plotdots = 0;

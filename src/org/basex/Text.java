@@ -1137,6 +1137,8 @@ public interface Text {
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
   /** Simple Map Layout. */
+  String MAPSIMPLE = lang("dm_simple");
+  /** Show Atts.  */
   String MAPATTS = lang("dm_atts");
   /** Predefined number of layouts. */
   String[] MAPOFFSETS = {
@@ -1241,6 +1243,8 @@ public interface Text {
   byte[] HELPFSMAX = token(lang("h_fsmax"));
   /** Help String. */
   byte[] HELPMAPATTS = token(lang("h_mapatts"));
+  /** Help String. */
+  byte[] HELPMAPSIMPLE = token(lang("h_mapsimple"));
   /** Help String. */
   byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
   /** Help String. */

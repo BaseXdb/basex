@@ -224,7 +224,7 @@ class MapLayout {
             data.size(l.list[ne], data.kind(l.list[ne]));
         
         // init weights of nodes
-        if(!GUIProp.mapfs && data.fs != null) {
+        if(GUIProp.mapsimple) {
           l.initWeights();
         } else if(GUIProp.usetextlength && data.fs == null) {
           l.initWeights(textLen, nn, data);
