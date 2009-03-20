@@ -13,13 +13,6 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXCombo extends JComboBox {
   /**
-   * Default Constructor.
-   */
-  public BaseXCombo() {
-    this(new String[] {}, null, null);
-  }
-
-  /**
    * Constructor.
    * @param choice combobox choice.
    * @param hlp help text

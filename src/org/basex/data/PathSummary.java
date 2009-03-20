@@ -166,39 +166,40 @@ public final class PathSummary {
   
   /**
    * Returns descendant tags and attributes for the specified descendant path.
-   * @param in input steps
+   * @param tl input steps
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final TokenList in, final boolean d, final boolean o) {
+  public TokenList desc(final TokenList tl, final boolean d, final boolean o) {
     // follow the specified descendant/child steps
-    final ArrayList<PathNode> list = desc(root(), true);
+    ArrayList<PathNode> in = desc(root(), true);
 
-    for(final byte[] i : in) {
+    for(final byte[] i : tl) {
       final boolean att = startsWith(i, '@');
       final byte kind = att ? Data.ATTR : Data.ELEM;
       final int id = att ? data.attNameID(substring(i, 1)) : data.tagID(i);
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
-      for(final PathNode n : list) {
-        if(id != 0 && (n.name != id || n.kind != kind)) continue;
+      for(final PathNode n : in) {
+        if(n.name != id || n.kind != kind) continue;
         for(final PathNode c : n.ch) {
           if(d) c.addDesc(out);
           else out.add(c);
         }
       }
+      in = out;
     }
 
     // sort by number of occurrences
-    final double[] tmp = new double[list.size()];
-    for(int i = 0; i < list.size(); i++) tmp[i] = list.get(i).count;
+    final double[] tmp = new double[in.size()];
+    for(int i = 0; i < in.size(); i++) tmp[i] = in.get(i).count;
     final int[] occ = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
     final TokenList out = new TokenList();
-    for(int i = 0; i < list.size(); i++) {
-      final PathNode r = list.get(o ? occ[i] : i);
+    for(int i = 0; i < in.size(); i++) {
+      final PathNode r = in.get(o ? occ[i] : i);
       final byte[] name = r.token(data);
       if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
         out.add(name);

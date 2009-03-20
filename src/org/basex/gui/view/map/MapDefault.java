@@ -57,8 +57,8 @@ final class MapDefault extends MapPainter {
         r.poi = null;
         r.acol = null;
       }
-
       g.setColor(mark ? col : COLORS[lvl]);
+
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||
           ViewData.isLeaf(data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);

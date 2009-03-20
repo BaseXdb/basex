@@ -46,7 +46,7 @@ public final class GUIInput extends BaseXTextField {
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
-    box = new BaseXCombo();
+    box = new BaseXCombo(new String[] {}, null);
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == 16) completeInput();

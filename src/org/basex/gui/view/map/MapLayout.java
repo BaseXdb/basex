@@ -249,19 +249,12 @@ class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-//    if((w < off && h < off) || w == 0 || h == 0 || GUIProp.mapfs && 
-//        ViewData.isLeaf(data, r.pre)) return;
-//    final MapList ch = children(r.pre);
-//    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
-//        ch, 0, ch.size - 1, level + 1);
-    // skip too small rectangles and leaf nodes (= meta data in deepfs)
-    if((w >= off || h >= off) && w > 0 && h > 0 && 
-        (!GUIProp.mapfs || !ViewData.isLeaf(data, r.pre))) {
-      final MapList ch = children(r.pre);
+    if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs && 
+        ViewData.isLeaf(data, r.pre)) return;
 
-      if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
-          ch, 0, ch.size - 1, level + 1);
-    }
+    final MapList ch = children(r.pre);
+    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+        ch, 0, ch.size - 1, level + 1);
   }
   
   /**
