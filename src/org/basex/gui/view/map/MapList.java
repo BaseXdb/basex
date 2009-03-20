@@ -41,7 +41,11 @@ class MapList extends IntList {
    * Initializes the weights giving each node of this level same weight.
    */
   void initWeights() {
-    for(int i = 0; i < size; i++) weight[i] = 1 / size;
+    weight = new double[size];
+    for(int i = 0; i < size; i++) {
+      System.out.println(size);
+      weight[i] = 1d / size; 
+    }
   }
   
   /**
@@ -66,18 +70,19 @@ class MapList extends IntList {
    * children
    */
   void initWeights(final long parsize, final int parchildren, final Data data) {
-    weight = new double[size];
-    int[] nrchildren = new int[size];
-    long[] sizes = new long[size];
-    int sizeP = GUIProp.mapweight;
-    
     if(size == 1) {
       initWeights();
       return;
     }
     
+    weight = new double[size];
+    int[] nrchildren = new int[size];
+    long[] sizes = new long[size];
+    int sizeP = GUIProp.mapweight;
+
+    
     // only children
-    if (GUIProp.mapweight == 0 || data.fs == null || !GUIProp.mapfs) {
+    if (GUIProp.mapweight == 0 || data.fs == null) {
       initWeights(parchildren, data);
     // use #children and size for weight
     } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 

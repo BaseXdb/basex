@@ -185,7 +185,7 @@ final class MapFS extends MapPainter {
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
 
-    final int fullsize = full && file ? 1 : 0;
+    final int fullsize = full && file && GUIProp.mapfs ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);

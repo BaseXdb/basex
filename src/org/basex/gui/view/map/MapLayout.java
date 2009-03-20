@@ -224,7 +224,9 @@ class MapLayout {
             data.size(l.list[ne], data.kind(l.list[ne]));
         
         // init weights of nodes
-        if(GUIProp.usetextlength && data.fs == null) {
+        if(!GUIProp.mapfs && data.fs != null) {
+          l.initWeights();
+        } else if(GUIProp.usetextlength && data.fs == null) {
           l.initWeights(textLen, nn, data);
         } else l.initWeights(parsize, nn, data);
         rects = algo.calcMap(r, l, l.weight, ns, ne, level);
@@ -247,7 +249,7 @@ class MapLayout {
     final int y = r.y + layout.y;
     final int w = r.w - layout.w;
     final int h = r.h - layout.h;
-
+    
     // skip too small rectangles and meta data in file systems
     if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs && 
         ViewData.isLeaf(data, r.pre)) return;
