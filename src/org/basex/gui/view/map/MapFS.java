@@ -129,14 +129,6 @@ final class MapFS extends MapPainter {
         g.setFont(mfont);
         MapRenderer.drawText(g, cr, tb.finish());        
       }
-      r.thumb = cr.thumb;
-      r.thumbal = cr.thumbal;
-      r.thumbf = cr.thumbf;
-      r.thumbfh = cr.thumbfh;
-      r.thumblh = cr.thumblh;
-      r.poi = cr.poi;
-      r.pos = cr.pos;
-      r.fs = cr.fs;
     }
   }
 
@@ -193,7 +185,7 @@ final class MapFS extends MapPainter {
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
 
-    final int fullsize = !GUIProp.filecont && full && file ? 1 : 0;
+    final int fullsize = full && file ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);
@@ -308,7 +300,7 @@ final class MapFS extends MapPainter {
 
         // minimize buffer size
         final File f = new File(string(path));
-        s = f.length(); // Math.min(s, f.length());
+        s = Math.min(s, f.length());
         
         // read file contents
         fileBuf = new byte[(int) s];

@@ -9,7 +9,6 @@ import java.awt.Font;
 import javax.swing.UIManager;
 import org.basex.Text;
 import org.basex.io.IO;
-import org.basex.util.TokenList;
 
 /**
  * GUI Constants used in different views.
@@ -366,26 +365,5 @@ public final class GUIConstants {
       }
       return c;
     }
-  }
-  
-  /**
-   * Get pointer and difference of color.
-   * 
-   * @param i pointer on token in query
-   * @param ftand ftand color info
-   * @return int[2]{diff, color pointer}
-   */
-  public static int[] getDiff(final int i, final TokenList ftand) {
-    if (ftand != null) {
-      for (int j = 0; j < ftand.size; j++) {
-        for (int k = 0; k < ftand.list[j].length && ftand.list[j][k] > 0; k++) {
-          if (i == ftand.list[j][k]) {
-            int d = i - ftand.list[j][0];
-            return new int[]{d, ftand.list[j][0]};
-          }
-        }
-      }
-    }
-    return new int[]{0, 0};    
   }
 }

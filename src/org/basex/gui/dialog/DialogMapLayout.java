@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import javax.swing.Box;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -49,10 +50,10 @@ public final class DialogMapLayout extends Dialog {
     border = new BaseXCombo(MAPOFFSETS, HELPMAPOFF, this);
     border.setSelectedIndex(GUIProp.mapoffsets);
 
-    // create drop down
-    final BaseXBack tmp = new BaseXBack();
-    tmp.setLayout(new TableLayout(1, 2, 3, 5));
+    BaseXBack tmp = new BaseXBack();
+    tmp.setLayout(new TableLayout(1, 3));
     tmp.add(new BaseXLabel(MAPOFF));
+    tmp.add(Box.createHorizontalStrut(25));
     tmp.add(border);
     p.add(tmp);
 
@@ -64,16 +65,15 @@ public final class DialogMapLayout extends Dialog {
         GUIProp.mapweight, HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
     
-    // add slider only to dialog if we are using fs data or textlengths
-    final boolean fs = gui.context.data().fs != null;
-    if(fs || GUIProp.usetextlength) {
-      p.add(sizeLabel);
-      p.add(sizeSlider);
-    }
+    tmp = new BaseXBack();
+    tmp.setLayout(new TableLayout(2, 1));
+    tmp.add(sizeLabel);
+    tmp.add(sizeSlider);
+    p.add(tmp);
 
     // create checkbox
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
-    if(!fs) p.add(atts);
+    p.add(atts);
 
     set(p, BorderLayout.CENTER);
     finish(GUIProp.maplayoutloc);

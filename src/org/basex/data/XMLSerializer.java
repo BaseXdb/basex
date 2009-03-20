@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.gui.GUIConstants;
 import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -110,7 +109,7 @@ public final class XMLSerializer extends Serializer {
         if(Token.letterOrDigit(b[i]) && pp < ftd[0].length && c == ftd[0][pp]) {
           // write fulltext pointer in front of the token
           // used for coloring the token
-          final int[] diff = GUIConstants.getDiff(ftd[1][pp] , ial);
+          final int[] diff = getDiff(ftd[1][pp] , ial);
           out.write(0x10 + (diff[0] & 0x0F));
           if (diff[0] > 0)
             out.write(0x10 + (diff[1] & 0x0F));
@@ -125,6 +124,23 @@ public final class XMLSerializer extends Serializer {
 
     while (wl < b.length) ch(b[wl++]);
     indent = false;
+  }
+
+  /**
+   * Returns the pointer and difference of color.
+   * @param i pointer on token in query
+   * @param ftand ftand color info
+   * @return int[2] { diff, color pointer }
+   */
+  private static int[] getDiff(final int i, final TokenList ftand) {
+    for(int j = 0; j < ftand.size; j++) {
+      for(int k = 0; k < ftand.list[j].length && ftand.list[j][k] > 0; k++) {
+        if(i == ftand.list[j][k]) {
+          return new int[] { i - ftand.list[j][0], ftand.list[j][0]};
+        }
+      }
+    }
+    return new int[] { 0, 0 };
   }
 
   /**

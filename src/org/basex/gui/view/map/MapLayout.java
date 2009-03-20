@@ -17,7 +17,7 @@ import org.basex.util.Token;
  */
 class MapLayout {
   /** Font size. */
-  private final int o = GUIProp.fontsize + 4;
+  private final int off = GUIProp.fontsize + 4;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
@@ -39,12 +39,18 @@ class MapLayout {
     rectangles = new ArrayList<MapRect>();
     
     switch(GUIProp.mapoffsets) {
-      case 1 : layout = new MapRect(1, 1, 2, 2); break;
-      case 2 : layout = new MapRect(0, o, 0, o); break;
-      case 3 : layout = new MapRect(2, o - 1, 4, o + 1); break;
-      case 4 : layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5 : layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
-      default: layout = new MapRect(0, 0, 0, 0); break;
+      case 1 :
+        layout = new MapRect(1, 1, 2, 2); break;
+      case 2 :
+        layout = new MapRect(0, off, 0, off); break;
+      case 3 :
+        layout = new MapRect(2, off - 1, 4, off + 1); break;
+      case 4 :
+        layout = new MapRect(off >> 2, off, off >> 1, off + (off >> 2)); break;
+      case 5 :
+        layout = new MapRect(off >> 1, off, off, off + (off >> 1)); break;
+      default:
+        layout = new MapRect(0, 0, 0, 0); break;
     }
     
     switch(GUIProp.mapalgo) {
@@ -242,14 +248,13 @@ class MapLayout {
     final int w = r.w - layout.w;
     final int h = r.h - layout.h;
 
-    // skip too small rectangles and leaf nodes (= meta data in deepfs)
-    if((w >= o || h >= o) && w > 0 && h > 0 && 
-        (GUIProp.filecont || !ViewData.isLeaf(data, r.pre))) {
-      final MapList ch = children(r.pre);
+    // skip too small rectangles and meta data in file systems
+    if((w < off && h < off) || w == 0 || h == 0 || GUIProp.mapfs && 
+        ViewData.isLeaf(data, r.pre)) return;
 
-      if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
-          ch, 0, ch.size - 1, level + 1);
-    }
+    final MapList ch = children(r.pre);
+    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+        ch, 0, ch.size - 1, level + 1);
   }
   
   /**
