@@ -65,8 +65,6 @@ class MapList extends IntList {
    * @param parsize reference size
    * @param parchildren reference number of nodes
    * @param data reference
-   * [JH] some weight problems occur displaying folders without any files and 
-   * children
    */
   void initWeights(final long parsize, final int parchildren, final Data data) {
     if(size == 1) {
@@ -78,10 +76,9 @@ class MapList extends IntList {
     int[] nrchildren = new int[size];
     long[] sizes = new long[size];
     int sizeP = GUIProp.mapweight;
-
     
     // only children
-    if (GUIProp.mapweight == 0 || data.fs == null) {
+    if (GUIProp.mapweight == 0 || data.fs == null || parsize == 0) {
       initWeights(parchildren, data);
     // use #children and size for weight
     } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 

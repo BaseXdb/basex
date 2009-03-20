@@ -211,7 +211,6 @@ class MapLayout {
       ArrayList<MapRect> rects;
       if(level == 0) {
         // [JH] may first level layout should not be defined to splitalgo
-        // [JH] use textLen
         nn = 0;
         for (int i = 0; i < l.size; i++) {
           nn += data.size(l.list[i], data.kind(l.list[i]));
