@@ -44,8 +44,8 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepBase(DBNAME, "/", "java_only_test", false);
-    dbfs.init();
+    dbfs = new DeepBase(DBNAME, "/", "java_only_test");
+    //dbfs.init();
   }
 
   /**
@@ -143,7 +143,7 @@ public class DeepBaseTest {
       Context ctx = new Context();
       ctx.data(CreateDB.xml(new XMLParser(
           IO.get("test/org/basex/test/fuse/getattrtest.xml")), "DBNAME"));
-      dbfs.setData(ctx.data());
+      dbfs.datafs.data = ctx.data();
     } catch(IOException e) {
       e.printStackTrace();
       fail("Problem loading test database.");
@@ -157,7 +157,7 @@ public class DeepBaseTest {
    */
   private String query(final String query) {
     try {
-      Nodes n = new Nodes(0, dbfs.getData());
+      Nodes n = new Nodes(0, dbfs.datafs.data);
       n = new QueryProcessor(query, n).queryNodes();
       PrintOutput out = new PrintOutput(TESTFILE);
       n.serialize(new XMLSerializer(out));

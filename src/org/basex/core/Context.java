@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -93,6 +94,11 @@ public final class Context {
         copied = null;
         d.close();
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
+        // [AH] close fuse instance
+        if(Prop.fuse) {
+          BaseX.err("[basex_diskdata_close]");
+          d.fs.nativeShutDown();
+        }
       }
       return true;
     } catch(final IOException ex) {

@@ -62,6 +62,10 @@ public interface DataText {
   String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
+  /** FS Mount point. */
+  String MOUNT = "MOUNT";
+  /** FS Backing store. */
+  String BACKING = "BACKING";
 
   // DEEPFS STRINGS ===========================================================
 

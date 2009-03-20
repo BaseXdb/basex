@@ -1,10 +1,13 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
+import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.util.Token;
 
 /**
  * Evaluates the 'delete' command.
@@ -44,7 +47,13 @@ public final class Delete extends Process {
 
     // delete all nodes backwards to preserve pre values of earlier nodes
     final int size = nodes.size();
-    for(int i = size - 1; i >= 0; i--) data.delete(nodes.nodes[i]);
+    for(int i = size - 1; i >= 0; i--) {
+      final int pre = nodes.nodes[i];
+      data.delete(pre);
+      // [AH] delete filesystem node
+      if(Prop.fuse) 
+        BaseX.errln(data.fs.nativeUnlink(Token.string(data.fs.path(pre))));
+    }
     
     // refresh current context
     final Nodes curr = context.current();
@@ -52,6 +61,7 @@ public final class Delete extends Process {
       context.current(new Nodes(0, data));
     }
     data.flush();
+
     return Prop.info ? info(DELETEINFO, nodes.size(), perf.getTimer()) : true;
   }
 }

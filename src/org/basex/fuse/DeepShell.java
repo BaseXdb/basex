@@ -8,7 +8,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
-
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -44,10 +43,9 @@ public class DeepShell {
 
   /** Constructor. */
   DeepShell() {
-    fs = new DeepBase("/", "DeepShell (no native connection)",
-        "deepshell", false);
+    fs = new DeepBase("/", "DeepShell (no native connection)", "deepshell");
     // initialize/mount filesystem
-    fs.init();
+    //fs.init();
     loop();
   }
 
@@ -201,7 +199,7 @@ public class DeepShell {
   @Command(shortcut = 's', help = "print file hierarchy as XML")
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
-      Nodes n = new Nodes(0, fs.getData());
+      Nodes n = new Nodes(0, fs.datafs.data);
       n = new QueryProcessor("/", n).queryNodes();
       PrintOutput out = new PrintOutput(System.out);
       n.serialize(new XMLSerializer(out, false, true));

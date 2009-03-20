@@ -2,8 +2,6 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.index.FTFuzzy;
 import org.basex.index.Index;
@@ -140,10 +138,6 @@ public final class DiskData extends Data {
   @Override
   public synchronized void close() throws IOException {
     if(meta.dirty) flush();
-    if(Prop.fuse) {
-      BaseX.err("[basex_diskdata_close]");
-      fs.nativeShutDown();
-    }
     cls();
   }
 
@@ -434,10 +428,6 @@ public final class DiskData extends Data {
       size(0, DOC);
     }
     updateDist(pre, -s);
-
-    // [AH] delete filesystem node
-    if(Prop.fuse) 
-      System.err.println(fs.nativeUnlink(new String(fs.path(pre))));
   }
 
   /**

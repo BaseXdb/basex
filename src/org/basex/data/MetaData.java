@@ -20,6 +20,11 @@ import org.basex.util.Token;
 public final class MetaData {
   /** Database name. */
   public String dbname;
+  /** FS mount point. */
+  public String mount;
+  /** FS backing path. */
+  public String backing;
+
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
   /** Original filename of XML document. */
@@ -151,6 +156,8 @@ public final class MetaData {
       else if(k.equals(DBTIME))     time     = Token.toLong(v);
       else if(k.equals(DBUPTODATE)) uptodate = toBool(v);
       else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
+      else if(k.equals(MOUNT))      mount    = v;
+      else if(k.equals(BACKING))    backing  = v;
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -195,6 +202,10 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
+    if(Prop.fuse) {
+      writeInfo(out, MOUNT,    mount);
+      writeInfo(out, BACKING,  backing);
+    }
     out.writeString("");
   }
 

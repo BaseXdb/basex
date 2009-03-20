@@ -150,8 +150,8 @@ public final class GUIProp {
   public static boolean mapinfo = false;
   /** Shows real file contents in the treemap. */
   public static boolean mapfs = true;
-  /** use textlengths to calculate treemap. */
-  public static boolean usetextlength = false;
+  /** use text lengths to calculate treemap. */
+  public static boolean usetextlength = true;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size
