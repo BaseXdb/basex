@@ -25,7 +25,6 @@ public final class ViewData {
    * @param data data reference
    * @param pre pre value
    * @return result of comparison
-   * [JH] has to be modified if file content should be drawn
    */
   public static boolean isLeaf(final Data data, final int pre) {
     final int kind = data.kind(pre);

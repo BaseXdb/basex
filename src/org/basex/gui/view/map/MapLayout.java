@@ -216,10 +216,14 @@ class MapLayout {
         for (int i = 0; i < l.size; i++) {
           nn += data.size(l.list[i], data.kind(l.list[i]));
         }
-        l.initWeights(parsize, nn, data);
+        if(GUIProp.mapsimple) {
+          l.initWeights();
+        } else if(GUIProp.usetextlength && data.fs == null) {
+          l.initWeights(textLen, nn, data);
+        } else l.initWeights(parsize, nn, data);
         
         final MapAlgo tmp = new SplitAlgo();
-        rects = tmp.calcMap(r, l, l.weight, ns, ne, level);
+        rects = tmp.calcMap(r, l, l.weight, 0, l.size - 1, level);
       } else {
         nn = l.list[ne] - l.list[ns] + 
             data.size(l.list[ne], data.kind(l.list[ne]));
@@ -230,6 +234,7 @@ class MapLayout {
         } else if(GUIProp.usetextlength && data.fs == null) {
           l.initWeights(textLen, nn, data);
         } else l.initWeights(parsize, nn, data);
+        
         rects = algo.calcMap(r, l, l.weight, ns, ne, level);
       }
       // call recursion for next deeper levels

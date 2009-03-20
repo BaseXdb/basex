@@ -63,8 +63,9 @@ public class SplitAlgo extends MapAlgo {
         yy += hh;
         hh = r.h - hh;
       }
-      if(ww > 0 && hh > 0 && sumweight - weight > 0) rects.addAll(calcMap(
-          new MapRect(xx, yy, ww, hh, 0, r.level), 
+//      System.out.println(ml.toString() + ";" + ni + ";" + ne);
+      if(ww > 0 && hh > 0 && sumweight - weight > 0 && ni + 1 <= ne)
+          rects.addAll(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), 
           ml, w, ni + 1, ne, l, sumweight - weight));
       
       return rects;
