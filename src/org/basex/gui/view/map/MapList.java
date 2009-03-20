@@ -43,7 +43,6 @@ class MapList extends IntList {
   void initWeights() {
     weight = new double[size];
     for(int i = 0; i < size; i++) {
-      System.out.println(size);
       weight[i] = 1d / size; 
     }
   }
