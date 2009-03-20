@@ -395,9 +395,9 @@ public final class MapView extends View implements Runnable {
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
       }
 
-      if(focused.thumb) {
+      if(!focused.fs && focused.thumb) {
         int pre = focused.pre;
-        if (focused.fs) {
+/*        if (focused.fs) {
           final int size = data.size(focused.pre, Data.ELEM);
           for (int i = size - 1; i > -1; i--) 
             if (data.kind(focused.pre + i) == Data.ELEM 
@@ -409,7 +409,7 @@ public final class MapView extends View implements Runnable {
           focused.y += 55;
           focused.w -= 11;
         }
-        
+*/        
         final byte[] text = ViewData.content(data, pre, false);
         final FTTokenizer ftt = new FTTokenizer(text);
         final int[][] d = ftt.getInfo();
@@ -430,11 +430,12 @@ public final class MapView extends View implements Runnable {
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
             getWidth(), focused.acol);
-        if (focused.fs) {
+ /*       if (focused.fs) {
           focused.x -= 7;
           focused.y -= 55;
           focused.w += 11;
         }
+ */
         focused.x -= 3;
         focused.w += 3;
       }
