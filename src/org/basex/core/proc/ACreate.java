@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
@@ -14,7 +15,6 @@ import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexBuilder;
@@ -53,8 +53,6 @@ abstract class ACreate extends Process {
         progress(builder);
         context.data(builder.build(p, db));
       } else {
-        if(db.equals(DataText.S_DEEPFS)) return error(CREATENODEEPDB);
-
         context.close();
         final Performance pp = new Performance();
         if(Prop.usebdb) {

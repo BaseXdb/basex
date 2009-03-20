@@ -104,7 +104,7 @@ public abstract class DeepFuse {
    * 
    * @param path to directory to be created
    * @param mode permissions for directory
-   * @return zero on success, or -1 if an error occurred (in which case, errno
+   * @return node id, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
   public abstract int mkdir(final String path, final int mode);

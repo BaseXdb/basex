@@ -2,6 +2,7 @@ package org.basex.fuse;
 
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -9,6 +10,11 @@ import org.basex.build.fs.FSUtils;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DataText;
+import org.basex.data.MemData;
+import org.basex.data.Nodes;
+import org.basex.gui.GUI;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -21,6 +27,8 @@ import org.basex.util.TokenBuilder;
 public final class DataFS extends DeepFuse {
   /** Data reference. */
   final Data data;
+  /** GUI reference. */
+  public GUI gui;
   /** Index References. */
   public int fileID;
   /** Index References. */
@@ -38,13 +46,18 @@ public final class DataFS extends DeepFuse {
   /** Index backing store. */
   public int backingstoreID;
   
+  /* ------------------------------------------------------------------------ 
+   *   Native deepfs method declarations (org_basex_fuse_DataFS.h)
+   * ------------------------------------------------------------------------ */
   /**
    * Mount database as FUSE.
    * @param mountpoint path where to mount BaseX.
    * @param backing path to backing storage root.
+   * @param dbname name of the BaseX database.
    * @return 0 on success, errno in case of failure.
    */
-  public native int nativeMount(final String mountpoint, final String backing);
+  public native int nativeMount(final String mountpoint,
+      final String backing, final String dbname);
   
   /**
    * Unlink file in backing store.
@@ -52,6 +65,12 @@ public final class DataFS extends DeepFuse {
    * @return 0 on success, errno in case of failure.
    */
   public native int nativeUnlink(final String pathname);
+  
+  /** 
+   * Tell DeepFS that BaseX will shutdown.
+   */
+  public native void nativeShutDown();
+  /* ------------------------------------------------------------------------ */
   
   /**
    * Constructor.
@@ -78,8 +97,13 @@ public final class DataFS extends DeepFuse {
             return;
           }
       }
-      nativeMount("a", "b");
+      nativeMount("/mnt/deepfs", "/var/tmp/deepfs", "demo");
     }
+    
+    if(Prop.gui)
+      BaseX.err("GUI MODE\n");
+    else
+      BaseX.err("CONSOLE MODE\n");
   }
   
   /**
@@ -197,6 +221,160 @@ public final class DataFS extends DeepFuse {
     }
   }
 
+  /* ------------------------------------------------------------------------ 
+   *  FUSE utility methods.
+   * ------------------------------------------------------------------------ */
+  /**
+   * Processes the query string and print result.
+   * @param query to process
+   * @return result reference
+   * @throws QueryException on failure
+   */
+  private Nodes xquery(final String query) throws QueryException {
+    BaseX.err("[basex_xquery] execute: " + query + "\n");
+    return new QueryProcessor(query, new Nodes(0, data)).queryNodes();
+  }
+  
+  /**
+   * Converts a pathname to a DeepFS XPath expression. FUSE always passes on
+   * 'absolute, normalized' pathnames, i.e., starting with a slash, redundant
+   * and trailing slashes removed.
+   * @param path name
+   * @param dir toggle flag
+   * @return query
+   */
+  private String pn2xp(final String path, final boolean dir) {
+    final StringBuilder qb = new StringBuilder();
+    final StringBuilder eb = new StringBuilder();
+    qb.append("/deepfs");
+    if(path.equals("/")) return qb.toString();
+    for(int i = 0; i < path.length(); i++) {
+      final char c = path.charAt(i);
+      if(c == '/') {
+        if(eb.length() != 0) {
+          qb.append("dir[@name = \"" + eb + "\"]");
+          eb.setLength(0);
+        }
+        qb.append(c);
+      } else {
+        eb.append(c);
+      }
+    }
+    if(eb.length() != 0) if(dir) qb.append("dir[@name = \"" + eb + "\"]");
+    else qb.append("*[@name = \"" + eb + "\"]");
+
+    String qu = qb.toString();
+    qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
+
+    return qu;
+  }
+  
+  /**
+   * Constructs a MemData object containing <dir name="dirname"/> ... 
+   * ready to be inserted into main Data instance.
+   * @param path to file to build MemData for
+   * @param mode to determine file type
+   * @return MemData reference
+   */
+  private MemData buildData(final String path, final int mode) {
+    final String dname = basename(path);
+    int elemID = isDirFile(mode) ? data.fs.dirID : data.fs.unknownID;
+    MemData m = new MemData(4, data.tags, data.atts, data.ns, data.path);
+    m.addElem(elemID, 0, 1, 4, 4, false);
+    m.addAtt(data.nameID, 0, token(dname), 1);
+    m.addAtt(data.sizeID, 0, ZERO, 2);
+    m.addAtt(data.fs.modeID, 0, token(Integer.toOctalString(mode)), 3);
+    return m;
+  }
+
+  /**
+   * Constructs a MemData object containing <file name="filename" .../> 
+   * element ready to be inserted into main data instance.
+   * @param path to file to build MemData for
+   * @param mode to determine file type
+   * @return MemData reference
+   */
+  private MemData buildFileData(final String path, final int mode) {
+    final String fname = basename(path);
+    MemData m = new MemData(6, data.tags, data.atts, data.ns, data.path);
+    m.addElem(data.fs.fileID, 0, 1, 6, 6, false);
+    m.addAtt(data.nameID,   0, token(fname), 1);
+    final int dot = fname.lastIndexOf('.');
+    m.addAtt(data.fs.suffID, 0, lc(token(fname.substring(dot + 1))), 2);
+    m.addAtt(data.sizeID,   0, ZERO, 3);
+    m.addAtt(data.fs.timeID,  0, ZERO, 4);
+    m.addAtt(data.fs.modeID,  0, token(Integer.toOctalString(mode)), 5);
+    return m;
+  }
+  
+  /**
+   * Evaluates given path and returns the pre value of the parent directory (if
+   * any).
+   * @param path to be analyzed
+   * @return pre value of parent directory or -1 if none is found
+   */
+  private int parentPre(final String path) {
+    try {
+      Nodes n = xquery(pn2xp(dirname(path), true));
+      return n.size() == 0 ? -1 : n.nodes[0];
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+  
+  /**
+   * Inserts a file node (regular file, directory ...).
+   * @param path of file to insert
+   * @param mode of file
+   * @return pre value of newly inserted node
+   */
+  private int insertFileNode(final String path, final int mode) {
+    int ppre = parentPre(path);
+    if(ppre == -1) return -1;
+    if (isRegFile(mode))
+      return insert(ppre, buildFileData(path, mode));
+    else
+      return insert(ppre, buildData(path, mode));
+  }
+  
+  /**
+   * Inserts MemData at given pre position and refresh GUI.
+   * @param pre value at which to insert (content or file)
+   * @param md memory data insert to insert
+   * @return pre value of newly inserted node
+   */
+  private int insert(final int pre, final MemData md) {
+    int npre = pre + data.size(pre, data.kind(pre));
+    data.insert(npre, pre, md);
+    refresh();
+    return npre;
+  }
+  
+  /**
+   * Refreshes the data reference and GUI.
+   */
+  private void refresh() {
+    data.meta.update();
+    data.flush();
+//    if (Prop.gui) gui.notify.update();
+  }
+  
+  /**
+   * Creates a new regular file or directory node.
+   * @param path to the file to be created
+   * @param mode of file (directory, regular file ..., permission bits)
+   * @return id of the newly created file or -1 on failure
+   */
+  private int createNode(final String path, final int mode) {
+    int pre = insertFileNode(path, mode);
+    return (pre == -1) ? -1 : data.id(pre);
+  }
+  /* ------------------------------------------------------------------------ */
+
+  /* ------------------------------------------------------------------------ 
+   *  FUSE callbacks.
+   * ------------------------------------------------------------------------ */
   @Override
   public int access(final String path, final int mode) {
     // TODO Auto-generated method stub
@@ -307,9 +485,10 @@ public final class DataFS extends DeepFuse {
 
   @Override
   public int mkdir(final String path, final int mode) {
-    System.err.println("Can't believe it.  Called back from DeepFS.");
-    System.err.printf("- %s %o\n", path, mode);
-    return 0;
+    BaseX.err("[basex_mkdir] path: " + path + " mode: " 
+        + Integer.toOctalString(mode) + "\n");
+    //if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR. 
+    return createNode(path, S_IFDIR | mode);
   }
 
   @Override

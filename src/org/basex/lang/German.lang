@@ -314,7 +314,6 @@ pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
 pc_err="%" konnte nicht eingelesen werden.
-pc_err_deepfs=Erzeugen der Spezialdatenbank deepfs nicht gestattet.
 pc_pos="%" (Zeile %, Spalte %)
 
 # Database commands

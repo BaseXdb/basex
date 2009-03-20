@@ -305,7 +305,6 @@ pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
 pc_dbnf=データベース名を入力してください。
 pc_err="%" をパースできませんでした。
-pc_err_deepfs=特殊データベース deepfs は手動で作ることを許可されていません。
 pc_pos=% (%行、%列)
 
 # Database commands

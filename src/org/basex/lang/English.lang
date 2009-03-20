@@ -311,7 +311,6 @@ pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
 pc_err="%" could not be parsed.
-pc_err_deepfs=Special database deepfs is not allowed to be created manually.
 pc_pos="%" (Line %, Col %)
 
 # Database commands

@@ -425,8 +425,6 @@ public interface Text {
   String CREATETABLE = lang("pc_tbl");
   /** Parse error. */
   String CREATEERR = lang("pc_err");
-  /** Not allowed to create 'deepfs' special database. */
-  String CREATENODEEPDB = lang("pc_err_deepfs");
 
   /** File not found. */
   String FILEWHICH = lang("pc_filenf");
