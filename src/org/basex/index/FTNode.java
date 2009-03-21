@@ -231,26 +231,4 @@ public final class FTNode {
   public int nextPoi() {
     return p.list[c];
   }
-
-  /*
-  @Override
-  public String toString() {
-    if (getPre() == 0) return "FTNode[]";
-    return "FTNode [Pre=" + getPre() + "; Pos="
-    + toString(ip.finish(), 0, ip.size)
-    + "; Poi=" + toString(p.finish(), 0, p.size) + "]";
-  }
-  
-  /**
-   * Returns a string representation of the object.
-   * @param sp index of first int value
-   * @param a array with values
-   * @param ep index of last int value
-   * @return a as string
-  private static String toString(final int[] a, final int sp, final int ep) {
-    final StringBuilder sb = new StringBuilder('[');
-    for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
-    return sb.toString();
-  }
-   */
 }

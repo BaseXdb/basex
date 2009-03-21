@@ -151,21 +151,10 @@ public final class GUIProp {
   /** Flag for computing additional map infos. */
   public static boolean mapinfo = false;
   /** Shows real file contents in the treemap. */
-  public static boolean mapfs = false;
+  public static boolean mapfs = true;
 
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
-
-  /* all values are only one half of the size
-  /** Width of focused Content.
-  public static int lensareawidth = 50;
-  /** Width of focused Content.
-  public static int lensareaheight = 50;
-  /** Width of Lens to be displayed.
-  public static int lensheight = 100;
-  /** Width of Lens to be displayed.
-  public static int lenswidth = 100;
-  */
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";

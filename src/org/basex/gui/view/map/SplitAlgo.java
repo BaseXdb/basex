@@ -28,8 +28,8 @@ public class SplitAlgo extends MapAlgo {
    * @return ArrayList containing rectangles
    */
   private ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
-      final int ns, final int ne, final int l,
-      final double sumweight) {
+      final int ns, final int ne, final int l, final double sumweight) {
+
     if(ne - ns == 0) {
       final ArrayList<MapRect> rects = new ArrayList<MapRect>();
       rects.add(new MapRect(r, ml.list[ns], l));

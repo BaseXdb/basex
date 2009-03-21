@@ -111,30 +111,6 @@ public final class InterSect extends Arr {
       }
       seq = res;
     }
-    
-    /* Intersection of fulltext data for visualization.
-     * Problem: ftcontains context not known anymore at this stage
-     * Example: //a[b/text() ftcontains 'c' and d/text() ftcontains 'e']
-     * 
-    if(ftd != null) {
-      final IntList il = new IntList();
-      for(int i = 0; i < seq.size(); i++) {
-        it = seq.list[i];
-        if(it instanceof DBNode) {
-          NodeMore ci = ((DBNode) it).child();
-          while(ci.more()) {
-            Item child = ci.next();
-            if (child instanceof DBNode) {
-              final DBNode dbn = (DBNode) child;
-              if (dbn.type == Type.TXT) il.add(dbn.pre); 
-            }
-          }
-        }
-      }
-      if(il.size == 0) ftd.init();
-      else ftd.keep(il.finish());
-    }*/
-
     return seq;
   }
 

@@ -1041,28 +1041,4 @@ public final class XMLScanner {
   public double percent() {
     return (double) input.pos() / input.length();
   }
-
-  /*
-   * Main method; used for testing purposes.
-   * @param args command line arguments
-  public static void main(final String[] args) {
-    // get filename(s) or use default
-    final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
-    final StringBuilder sb = new StringBuilder("Accepted:\n");
-
-    final long time = System.nanoTime();
-    for(final String f : fn) {
-      try {
-        final IO bxf = new IO(f);
-        final XMLScanner scan = new XMLScanner(bxf);
-        while(scan.more());
-        sb.append(f + "\n");
-      } catch(final IOException e) {
-        BaseX.errln("%: %", f, e.getMessage());
-      }
-    }
-    BaseX.outln("% ms.", (System.nanoTime() - time) / 1000000);
-    BaseX.outln(sb.toString());
-  }
-   */
 }

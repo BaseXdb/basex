@@ -149,21 +149,23 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color COLORDARK = new Color(64, 64, 64);
 
-  /** Colors of full-text hits. */
-  /*private static final Color[] COLORFT = new Color[] {
+  /** Fulltext color. */
+  public static final Color COLORFT = new Color(0, 224, 0);
+  
+  /* Colors of full-text hits.
+  private static final Color[] COLORFT = new Color[] {
     new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0), 
     new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224), 
     new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
     new Color(240, 240, 0)
-  };*/
+  };
 
-  /** Colors of full-text hits. */
+  /* Colors of full-text hits.
   private static final Color[] COLORFT = new Color[] {
     new Color(0, 0, 0), new Color(255, 0, 0), new Color(0, 255, 0), 
     new Color(0, 0, 255), new Color(255, 255, 0), new Color(255, 0, 255), 
     new Color(0, 255, 255), new Color(192, 192, 192)
-    };
-
+  };*/
   
   /** Transparent background color. */
   public static Color back;
@@ -308,62 +310,5 @@ public final class GUIConstants {
     if(f == lfont) return lwidth;
     if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
-  }
-  
-  /**
-   * Get color for a pointer.
-   * 
-   * @param i int pointer on fulltext token in query
-   * @param ftand int[][] data with ftand color results
-   * @return resulting color
-   */
-  public static Color getFTColor(final int i, final byte[][] ftand) {
-    if (ftand != null) {
-      for (int j = 0; j < ftand.length; j++) {
-        for (int k = 0; k < ftand[j].length; k++) {
-          if (i == ftand[j][k]) {
-            int d = i - ftand[j][0];
-            Color c = GUIConstants.COLORFT[ftand[j][0]];
-            while (d > 0) {
-              c = new Color((int) (c.getRed() * 0.7), 
-                  (int) (c.getGreen() * 0.7), 
-                  (int) (c.getBlue() * 0.7));          
-              d--;
-            }
-            return c;
-          }
-          if (ftand[j][0] + ftand[j].length == i && 
-              j + 1 < ftand.length && i != ftand[j + 1][0]) 
-            return GUIConstants.COLORFT[ftand[j][0] + 1];
-        }
-      }
-    }
-    if (i < GUIConstants.COLORFT.length)
-      return GUIConstants.COLORFT[i];
-    return Color.BLACK;
-  }
-  
-  /**
-   * Get color for fulltext token.
-   * @param i pointer on fulltext token in query
-   * @param diff difference to color
-   * @return resulting color
-   */
-  public static Color getFTColor(final int i, final int  diff) {
-    if (diff == 0) {
-      if (i < GUIConstants.COLORFT.length)
-        return GUIConstants.COLORFT[i];
-      return Color.BLACK;
-    } else {
-      Color c = GUIConstants.COLORFT[i];
-      int d = diff;
-      while (d > 0) {
-        c = new Color((int) (c.getRed() * 0.7), 
-            (int) (c.getGreen() * 0.7), 
-            (int) (c.getBlue() * 0.7));          
-        d--;
-      }
-      return c;
-    }
   }
 }

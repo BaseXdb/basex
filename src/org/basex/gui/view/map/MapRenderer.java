@@ -4,6 +4,7 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.index.FTTokenizer;
@@ -15,6 +16,7 @@ import org.basex.util.TokenList;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
+ * @author Sebastian Gath
  */
 final class MapRenderer {
   /** Count number of digit/char bytes. */
@@ -226,7 +228,8 @@ final class MapRenderer {
       }
       if(draw) {
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(getFTColor(r.poi[pp], r.acol));
+          g.setColor(COLORFT);
+          //g.setColor(getFTColor(r.poi[pp], r.acol));
           pp++;
         } else g.setColor(textc);
         g.drawString(string(tok), xx + ll, yy);
@@ -279,13 +282,13 @@ final class MapRenderer {
 
     boolean l = false;
     while(r.thumbal < 3) {
-      ff = round((fftmax + fftmin)  / 2.0); //*= fac;
+      ff = round((fftmax + fftmin)  / 2.0); // *= fac;
       r.thumbf = ff * GUIProp.fontsize;
-      ffh = round((ffhtmax + ffhtmin) / 2.0); //*= fac;
+      ffh = round((ffhtmax + ffhtmin) / 2.0); // *= fac;
       r.thumbfh = (byte) Math.max(1, ffh * GUIProp.fontsize);
       flh = round((flhtmax + flhtmin) / 2.0); // *= fac * fac;
       r.thumblh = (byte) Math.max(1, (flh + ffh) * GUIProp.fontsize);
-      //sw = f; //Math.max(f * 0.5, 1.5);
+      // sw = f; //Math.max(f * 0.5, 1.5);
       switch(r.thumbal) {
         case 0:
           h = drawThumbnailsToken(g, r, data, false, 0, 0);
@@ -423,7 +426,6 @@ final class MapRenderer {
     FTTokenizer ftt = new FTTokenizer(s);
     final int[][] data = ftt.getInfo();
 
-
     while(r.thumbal < 4) {
       ff *= fac; //0.97;
       r.thumbf = ff * GUIProp.fontsize;
@@ -480,9 +482,6 @@ final class MapRenderer {
     if (h < r.h)
     drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);
   }
-
-  
-
   
   /** Color for each tooltip token.  */
   static IntList ttcol;
@@ -537,7 +536,8 @@ final class MapRenderer {
       if (draw) {
         // draw word
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(getFTColor(r.poi[pp], r.acol));
+          g.setColor(COLORFT);
+          //g.setColor(getFTColor(r.poi[pp], r.acol));
           pp++;
         } else
           g.setColor(textc);
@@ -638,11 +638,9 @@ final class MapRenderer {
    * @param ry viewrect y-value
    * @param rh viewrect h-value
    * @param rw viewrect width
-   * @param acol ftand color array
    */
   static void drawToolTip(final Graphics g, final int x, final int y,
-      final int rx, final int ry, final int rh, final int rw,
-      final byte[][] acol) {
+      final int rx, final int ry, final int rh, final int rw) {
     if (tl != null && tl.size > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
@@ -669,13 +667,15 @@ final class MapRenderer {
       int yy = y + 28 + GUIProp.fontsize * nl + 4 < ry + rh ?
           y + 28 : y  - GUIProp.fontsize * nl;
 
-      g.setColor(Color.white);
-      if (nl == 1 && wl < wi)
-        g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wl + 1,
-            GUIProp.fontsize * nl + 8);
-      else g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wi + 1,
-          GUIProp.fontsize * nl + 8);
-      g.setColor(Color.black);
+      final int ww = nl == 1 && wl < wi ? wl : wi;
+      g.setColor(GUIConstants.COLORS[12]);
+      g.drawRect(xx - 3, yy - GUIProp.fontsize - 1, ww + 3,
+          GUIProp.fontsize * nl + 7);
+      g.setColor(GUIConstants.COLORS[0]);
+      g.fillRect(xx - 2, yy - GUIProp.fontsize, ww + 2,
+          GUIProp.fontsize * nl + 6);
+
+      g.setColor(GUIConstants.COLORS[24]);
       wl = 0;
       for (int i = 0; i < tl.size; i++) {
         l = len.list[i];
@@ -687,16 +687,17 @@ final class MapRenderer {
           !Character.isLetterOrDigit(tl.list[i][tl.list[i].length - 1]);
 
         if (ttcol.list[i] > -1) {
-          g.setColor(getFTColor(ttcol.list[i], acol));
+          g.setColor(COLORFT);
+          //g.setColor(getFTColor(ttcol.list[i], acol));
           g.drawString(string(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
-            g.drawLine(xx + wl, yy, xx + wl + l, yy);
+            g.drawLine(xx + wl, yy + 1, xx + wl + l, yy + 1);
           g.setColor(Color.black);
           wl += l;
         } else {
           g.drawString(string(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
-            g.drawLine(xx + wl, yy, xx + wl + (pm ? l - sw : l), yy);
+            g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
           wl += l;
         }
         wl += sw;
@@ -966,7 +967,8 @@ final class MapRenderer {
                 && count == r.pos[pp] && sp < lastl) {
               g.fillRect((int) (xx + ll), yy, wl - lastl, r.thumbfh);
               ll += wl - lastl;
-              g.setColor(getFTColor(r.poi[pp], r.acol));
+              g.setColor(COLORFT);
+              //g.setColor(getFTColor(r.poi[pp], r.acol));
               g.fillRect((int) (xx + ll), yy, (int) ww - ll, r.thumbfh);
               lastl -= ww - ll;
             } else 
@@ -985,7 +987,8 @@ final class MapRenderer {
           ll += wl - lastl;
           wl = lastl;
         }
-        if (draw) g.setColor(getFTColor(r.poi[pp], r.acol));
+        if(draw) g.setColor(COLORFT);
+        //if(draw) g.setColor(getFTColor(r.poi[pp], r.acol));
         pp++;
       }
 

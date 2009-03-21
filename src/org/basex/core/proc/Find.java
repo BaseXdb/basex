@@ -124,19 +124,17 @@ public final class Find extends AQuery {
       // check prefix
       char op = qu.charAt(0);
       if(op == '>') {
-        pred = "@" + DataText.S_SIZE;
+        pred = DataText.S_SIZE;
         size = true;
       } else if(op == '<') {
-        pred =  "@" + DataText.S_SIZE;
+        pred = DataText.S_SIZE;
         size = true;
       } else if(op == '.') {
-        pred = "@" + DataText.S_SUFFIX;
+        pred = DataText.S_SUFFIX;
         op = '=';
-      } else if(op == '=') {
-        pred = "@" + DataText.S_NAME;
       } else {
-        pred = "@" + DataText.S_NAME;
-        exact = false;
+        pred = DataText.S_NAME;
+        exact = op == '=';
       }
 
       int off = exact ? 1 : 0;
@@ -159,7 +157,7 @@ public final class Find extends AQuery {
         t = "\"" + t + "\"";
       }
       // add predicate
-      xquery.add('[' + pred + (exact ? op : " ftcontains ") + t + ']');
+      xquery.add("[@" + pred + (exact ? op : " ftcontains ") + t + "]");
 
       qu = qu.substring(i + 1);
     } while(qu.indexOf(' ') > -1);

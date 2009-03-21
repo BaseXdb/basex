@@ -77,18 +77,6 @@ public final class And extends Arr {
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
       if(!it.bool()) {
-        // [SG] will only consider child nodes..
-        /*if(it instanceof DBNode && ctx.ftdata != null && ctx.item != null) {
-          NodeMore ci = ((DBNode) it).child();
-          while(ci.more()) {
-            Item child = ci.next();
-            if (child instanceof DBNode) {
-              final DBNode dbn = (DBNode) child;
-              if (dbn.type == Type.TXT) ctx.ftdata.remove(dbn.pre);
-            }
-          }
-        }
-        */
         if(ctx.ftdata != null && ctx.item != null) 
           ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE;

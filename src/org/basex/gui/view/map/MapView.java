@@ -109,10 +109,12 @@ public final class MapView extends View implements Runnable {
     mainRects = null;
     zoomStep = 0;
     slide = false;
-    if(painter != null) painter.close();
+    if(painter != null) {
+      painter.close();
+      painter = null;
+    }
 
     final Data data = gui.context.data();
-    
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
       if (data.fs == null) initLen();
@@ -172,16 +174,15 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshLayout() {
+    if(painter == null) return;
+    painter.reset();
+
     // initial rectangle
     final int w = getWidth(), h = getHeight();
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-    mainRects = new ArrayList<MapRect>();
-    final Nodes nodes = gui.context.current();
-    
+
     final Performance p = new Performance();
-//    calc(rect, mainRects, nodes, mainMap);
-    calc(rect, nodes, mainMap);
-    
+    calc(rect, gui.context.current(), mainMap);
     if(GUIProp.mapinfo) {
       final double aar = MapLayout.aar(mainRects);
       mapInfo.setValues(mainRects.size(), rect, aar, p.getTimer());
@@ -307,8 +308,6 @@ public final class MapView extends View implements Runnable {
       final BufferedImage map) {
 
     // calculate new main rectangles
-    painter.reset();
-    // should replace following lines
     layout = new MapLayout(nodes.data, textLen);
     //layout.makeMap(rect, new MapList(nodes.sort().clone()), 0,
     layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
@@ -391,8 +390,8 @@ public final class MapView extends View implements Runnable {
       // paint focused rectangle
       final int x = focused.x;
       final int y = focused.y;
-      int w = focused.w;
-      int h = focused.h;
+      final int w = focused.w;
+      final int h = focused.h;
       g.setColor(color6);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
@@ -406,21 +405,8 @@ public final class MapView extends View implements Runnable {
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
       }
 
-      if(!focused.fs && focused.thumb) {
-        int pre = focused.pre;
-/*        if (focused.fs) {
-          final int size = data.size(focused.pre, Data.ELEM);
-          for (int i = size - 1; i > -1; i--) 
-            if (data.kind(focused.pre + i) == Data.ELEM 
-              && Token.eq(data.tag(focused.pre + i), "content".getBytes())) {
-            pre = focused.pre + i + 1;
-            break;
-          }
-          focused.x += 7;
-          focused.y += 55;
-          focused.w -= 11;
-        }
-*/        
+      if(focused.thumb) {
+        final int pre = focused.pre;
         final byte[] text = ViewData.content(data, pre, false);
         final FTTokenizer ftt = new FTTokenizer(text);
         final int[][] d = ftt.getInfo();
@@ -440,71 +426,11 @@ public final class MapView extends View implements Runnable {
             mouseX, mouseY, getWidth(), g, spc);
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
-            getWidth(), focused.acol);
- /*       if (focused.fs) {
-          focused.x -= 7;
-          focused.y -= 55;
-          focused.w += 11;
-        }
- */
+            getWidth());
         focused.x -= 3;
         focused.w += 3;
       }
-
-      /* draw area round cursor position
-      if(GUIProp.mapinteraction == 1) {
-        // find out if position under cursor is out of view dimensions
-        int myx, myy;
-        if(mouseX - GUIProp.lenswidth < 0) myx = 0;
-        else if(mouseX + GUIProp.lenswidth > getWidth()) myx = getWidth()
-            - (GUIProp.lenswidth << 1);
-        else myx = mouseX - GUIProp.lenswidth;
-
-        if(mouseY - GUIProp.lensheight < 0) myy = 0;
-        else if(mouseY + GUIProp.lensheight > getHeight()) myy = getHeight()
-            - (GUIProp.lensheight << 1);
-        else myy = mouseY - GUIProp.lensheight;
-
-        // get area under cursor
-        final MapRect rectToZoom = new MapRect(myx + GUIProp.lenswidth
-            - GUIProp.lensareawidth, myy + GUIProp.lensheight
-            - GUIProp.lensareaheight, GUIProp.lensareawidth << 1,
-            GUIProp.lensareaheight << 1);
-        g.setColor(Color.red);
-        g.drawRect(rectToZoom.x, rectToZoom.y, rectToZoom.w, rectToZoom.h);
-        // get rectangles to zoom in
-        int np = 0;
-        final IntList il = new IntList();
-        for(int r = 0, rl = mainRects.size(); r < rl; r++) {
-          final MapRect rect = mainRects.get(r);
-          if(mainRects.get(r).pre < np) continue;
-          if(rectToZoom.contains(rect)) {
-            il.add(rect.pre);
-            np = rect.pre + data.size(rect.pre, data.kind(rect.pre));
-          }
-        }
-        // draw lens border
-        g.setColor(Color.black);
-        g.drawRect(myx, myy, GUIProp.lenswidth << 1, GUIProp.lensheight << 1);
-
-        // calculate initial rectangle
-        w = GUIProp.lenswidth << 1;
-        h = GUIProp.lensheight << 1;
-
-        final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-        final ArrayList<MapRect> lensRects = new ArrayList<MapRect>();
-
-        final Nodes nodes = new Nodes(gui.focused, data);
-        final BufferedImage bi = new BufferedImage(w, h,
-            BufferedImage.TYPE_INT_BGR);
-        calc(rect, lensRects, nodes, bi);
-        final int ac = AlphaComposite.SRC_OVER;
-        ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 1.0f));
-        drawMap(bi, lensRects);
-        g.drawImage(bi, myx, myy, this);
-      }*/
     }
-
     gui.painting = false;
   }
 
@@ -784,8 +710,8 @@ public final class MapView extends View implements Runnable {
    * Initializes the text lengths and stores them into an array.
    */
   private void initLen() {
-    Data data = gui.context.current().data;
-    int size = data.meta.size;
+    final Data data = gui.context.current().data;
+    final int size = data.meta.size;
     textLen = new int[size];
 
     final int[] parStack = new int[IO.MAXHEIGHT];
@@ -796,7 +722,7 @@ public final class MapView extends View implements Runnable {
       final int kind = data.kind(pre);
       par = data.parent(pre, kind);
       
-      int ll = l;
+      final int ll = l;
       while(l > 0 && parStack[l - 1] > par) {
         textLen[parStack[l - 1]] += textLen[parStack[l]];
         --l;

@@ -275,52 +275,7 @@ public final class FTPos extends FTExpr {
     }
     return true;
   } 
-  /*  private boolean contentN() {
-    int l = 0;
-    if(start || content) {
-      for(int i = 0; i < size; i++) {
-        boolean o = false;
-        final int ts = pos[i].size;
-        for(int j = 0; j < (ordered ? Math.min(1, ts) : ts); j++) {
-          if(pos[i].list[j] == l) {
-            l += new FTTokenizer(term.list[i]).count();
-            o = true;
-          }
-          if(ordered && !content) break;
-        }
-        if(!o) return false;
-        // [CG] this causes a bug for 
-        // 'a b' ftcontains 'a' ftand 'b' entire content
-        // not sure about its sense
-        //if(o) break; 
-      }
-    }
-    if(content && l != ft.count()) return false;
 
-    if(end) {
-      final int c = ft.count();
-      for(int i = 0; i < size; i++) {
-        l += new FTTokenizer(term.list[i]).count();
-      }
-      l = pos.length == 1 ? 1 : l;
-      for(int i = 0; i < size; i++) {
-        boolean o = false;
-        final int ts = pos[i].size;
-        for(int j = ordered ? Math.max(0, ts - 1) : 0; j < ts; j++) {
-          if(l + pos[i].list[j] == c) {
-            o = true;
-            break;
-          }
-          if(ordered) break;
-        }
-        if(!o) return false;
-        if(o) break;
-      }
-       
-    }
-    return true;
-  }
-*/
   /**
    * Checks if all words are found in the same unit.
    * @return result of check

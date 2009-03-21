@@ -51,14 +51,6 @@ final class MapImages {
   }
 
   /**
-   * Resets the image cache.
-   */
-  void reset() {
-    finish();
-    for(int i = 0; i < MAXNR; i++) imgs[i] = null;
-  }
-
-  /**
    * Returns image with specified id or null if none was found.
    * @param id cache to be found
    * @return cached image
@@ -186,7 +178,15 @@ final class MapImages {
   /**
    * Stops the loading thread.
    */
-  void finish() {
+  void reset() {
     loaderC = 0;
+  }
+
+  /**
+   * Closes the image cache.
+   */
+  void close() {
+    reset();
+    for(int i = 0; i < MAXNR; i++) imgs[i] = null;
   }
 }

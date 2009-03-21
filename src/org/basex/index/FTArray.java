@@ -301,7 +301,6 @@ final class FTArray {
   
   /**
    * Inserts a node into the trie.
-   *
    * @param cn current node, which gets a new node
    * appended; start with root (0)
    * @param v value, which is to be inserted
@@ -462,7 +461,6 @@ final class FTArray {
 
   /**
    * Adds data to node.
-   *
    * @param s current size of ftdata
    * @param dataToAdd int[][]
    * @param p int pointer on ftdata
@@ -493,8 +491,8 @@ final class FTArray {
   }
 
   /**
-   * Save whether a corresponding node was found in method
-   * getInsertingPosition.
+   * Saves whether a corresponding node was found in method
+   * {@link #getInsertingPosition(int, byte)}.
    */
   private boolean found;
 
@@ -569,7 +567,7 @@ final class FTArray {
 
   /**
    * Uses binary search for finding inserting position.
-   * returns:
+   * Returns:
    * 0 if any successor exists, or 0 is inserting position
    * n here to insert
    * n and found = true, if nth item is occupied and here to insert
@@ -647,7 +645,7 @@ final class FTArray {
   }
 
   /**
-   * Extract all data from start - to end position out of data.
+   * Extracts all data from start - to end position out of data.
    * @param d byte[]
    * @param startPos int
    * @param endPos int

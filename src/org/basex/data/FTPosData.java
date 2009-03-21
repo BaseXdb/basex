@@ -72,7 +72,6 @@ public final class FTPosData {
   private void add(final int i, final int[] pp, final int[] p) {
     if(prepos[i][0] == pp[0]) {
       // check if equal or merge
-//      if (Array.eq(pp, prepos[i]) && Array.eq(p, poi[i])) return;
       if (Array.eq(pp, prepos[i])) return;
       final int[] tpp = new int[pp.length + prepos[i].length - 1];
       final int[] tp = new int[tpp.length];
@@ -229,7 +228,7 @@ public final class FTPosData {
    * @param ft reference to compare to
    * @return boolean same()
    */
-  public boolean same(final FTPosData ft) {
+  boolean same(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; i++) {
       if(!Array.eq(prepos[i], ft.prepos[i])

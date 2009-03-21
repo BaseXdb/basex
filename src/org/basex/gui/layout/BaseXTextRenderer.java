@@ -205,7 +205,8 @@ public final class BaseXTextRenderer extends BaseXBack {
         final int c = ch - 0x10;
         if (diff == -1) diff = c;
         else {
-          col = GUIConstants.getFTColor(c, diff);
+          col = GUIConstants.COLORFT;
+          //col = GUIConstants.getFTColor(c, diff);
           diff = -1;
           high = true;
         }        

@@ -344,11 +344,9 @@ final class MapFS extends MapPainter {
     if (ftd != null) {
       rect.pos = ftd[0];
       rect.poi = ftd[1];
-      rect.acol = view.gui.context.marked().ftpos.col.finish();
     } else {
       rect.pos = null;
       rect.poi = null;
-      rect.acol = null;      
     }
     
     // Check if text fits in rectangle
@@ -366,8 +364,6 @@ final class MapFS extends MapPainter {
       g.setFont(f);
     } else {
       rect.thumb = true;
-      rect.fs = true;
-     
       MapRenderer.drawThumbnails(g, rect, fileBuf);
     }
 
@@ -404,11 +400,11 @@ final class MapFS extends MapPainter {
 
   @Override
   void reset() {
-    images.finish();
+    images.reset();
   }
 
   @Override
   void close() {
-    images.reset();
+    images.close();
   }
 }

@@ -33,7 +33,8 @@ import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.Map;
 
-/** Imports/shreds/parses a file hierarchy into a BaseX database.
+/**
+ * Imports/shreds/parses a file hierarchy into a BaseX database.
  *
  * The overall process of importing a file hierarchy can be described
  * as follows:
@@ -179,7 +180,8 @@ public final class FSParser extends Parser {
     }
   }
 
-  /** Copy file to backing store.
+  /**
+   * Copies a file to the backing store.
    * @param src file source
    * @param dst file destination in backing store
    * @throws IOException I/O exception

@@ -240,36 +240,6 @@ final class FNStr extends Fun {
     }
     return token(tmp.toString());
   }
-
-  /**
-  return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
-      translate(str, sea, rep) : token(Pattern.compile(string(sea),
-      Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep))));
-  }
-
-   * Returns a string join.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException xquery exception
-  private Item strjoin(final QueryContext ctx) throws QueryException {
-    final Item is = expr[1].atomic(ctx);
-    if(is == null) Err.empty(this);    
-    final byte[] sep = checkStr(is);
-
-    final TokenBuilder tb = new TokenBuilder();
-    final Iter iter = expr[0].iter(ctx);
-    int c = 0;
-    Item i;
-    while((i = iter.next()) != null) {
-      tb.add(checkStr(i));
-      tb.add(sep);
-      c++;
-    }
-    final byte[] v = tb.finish();
-    return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
-  }
-   */
-
   
   /**
    * Returns a string join.
