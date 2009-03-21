@@ -28,24 +28,27 @@ public class SquarifiedAlgo extends MapAlgo {
     double hh = r.h;
     
     ArrayList<MapRect> row = new ArrayList<MapRect>();
-    double height = 0;
-    double width = 0;
+    int height = 0;
+    int width = 0;
     double weight = 0;
     double sumweight = 1;
     
     while(ni <= ne) {
       if(ww < hh) {
         weight += ml.weight[ni];
-        height = weight / sumweight * hh;
+        height = (int) (weight / sumweight * hh);
+        height = height > 0 ? height : 1;
         
         final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
         double x = xx;
         for(int i = start; i <= ni; i++) {
-          final double w = i == ni ? xx + ww - x : ml.weight[i] / weight * ww;
-          tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
+          int w = i == ni ? (int) (xx + ww - x) :
+            (int) (ml.weight[i] / weight * ww);
+          w = w > 0 ? w : 1;
+          tmp.add(new MapRect((int) x, (int) yy, w, height,
               ml.list[i], l));
-          x += (int) w;
+          x += w;
         }
 
         // if ar has increased discard tmp and add row
@@ -72,15 +75,18 @@ public class SquarifiedAlgo extends MapAlgo {
         }
       } else {
         weight += ml.weight[ni];
-        width = weight / sumweight * ww;
+        width = (int) (weight / sumweight * ww);
+        width = width > 0 ? width : 1;
         final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
         double y = yy;
         for(int i = start; i <= ni; i++) {
-          final double h = i == ni ? yy + hh - y : ml.weight[i] / weight * hh;
-          tmp.add(new MapRect((int) xx, (int) y, (int) width, (int) h,
+          int h = i == ni ? (int) (yy + hh - y) :
+            (int) (ml.weight[i] / weight * hh);
+          h = h > 0 ? h : 1;
+          tmp.add(new MapRect((int) xx, (int) y, width, h,
               ml.list[i], l));
-          y += (int) h;
+          y += h;
         }
 
         // if ar has increased discard tmp and add row

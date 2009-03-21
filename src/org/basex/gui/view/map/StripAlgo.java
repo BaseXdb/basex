@@ -27,22 +27,25 @@ public class StripAlgo extends MapAlgo{
     double hh = r.h;
 
     ArrayList<MapRect> row = new ArrayList<MapRect>();
-    double height = 0;
+    int height = 0;
     double weight = 0;
     double sumweight = 1;
     
     while(ni <= ne) {
       weight += ml.weight[ni];
-      height = weight / sumweight * hh;
+      height = (int) (weight / sumweight * hh);
+      height = height > 0 ? height : 1;
       
       final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
       double x = xx;
       for(int i = start; i <= ni; i++) {
-        final double w = i == ni ? xx + ww - x : ml.weight[i] / weight * ww;
-        tmp.add(new MapRect((int) x, (int) yy, (int) w, (int) height,
+        int w = i == ni ? (int) (xx + ww - x) :
+          (int) (ml.weight[i] / weight * ww);
+        w = w > 0 ? w : 1;
+        tmp.add(new MapRect((int) x, (int) yy, w, height,
             ml.list[i], l));
-        x += (int) w;
+        x += w;
       }
 
       // if ar has increased discard tmp and add row
