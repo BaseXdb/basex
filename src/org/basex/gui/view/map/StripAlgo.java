@@ -34,7 +34,7 @@ public class StripAlgo extends MapAlgo{
     while(ni <= ne) {
       weight += ml.weight[ni];
       height = (int) (weight / sumweight * hh);
-      height = height > 0 || yy + height > r.h ? height : 1;
+      height = height > 0 || yy + height > hh ? height : 1;
       
       final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
 
@@ -42,8 +42,8 @@ public class StripAlgo extends MapAlgo{
       for(int i = start; i <= ni; i++) {
         int w = i == ni ? (int) (xx + ww - x) :
           (int) (ml.weight[i] / weight * ww);
-        w = w > 0 || x + w > r.w ? w : 1;
-        tmp.add(new MapRect((int) x, (int) yy, w, height,
+        w = w > 0 || x + w > ww ? w : 1;
+        if(x + w <= xx + ww) tmp.add(new MapRect((int) x, (int) yy, w, height,
             ml.list[i], l));
         x += w;
       }
