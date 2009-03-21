@@ -1,7 +1,9 @@
 package org.basex.gui.view;
 
+import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXLayout;
@@ -58,6 +60,10 @@ public final class ViewNotifier {
     if(db) {
       cont[0] = ctx.current();
       marked[0] = new Nodes(ctx.data());
+      if(Prop.fuse) {
+        BaseX.errln("[ViewNotifier:64] Setting gui reference.");
+        ctx.data().fs.gui = gui;
+      }
     }
     
     gui.focused = -1;

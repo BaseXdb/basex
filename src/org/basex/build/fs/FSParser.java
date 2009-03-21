@@ -71,10 +71,10 @@ public final class FSParser extends Parser {
   /** DeepFS import flag (copy files to backing store). */
   private boolean wbacking = true;
   /** Root of backing store. */
-  private String backingroot = Prop.backingpath;
+  private String backingroot;
   /** Length of absolute pathname of the root directory the import starts from,
    * i.e. the prefix to be deleted and substituted by backingroot. */
-  private int importroot;
+  private int importRootLength;
 
   /**
    * Constructor.
@@ -119,7 +119,7 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    backingroot = backingroot + "/" + io.name();
+    backingroot = Prop.backingpath + "/" + io.name();
     File bs = new File(backingroot);
     if (!bs.mkdirs())
       if (bs.exists())
@@ -131,15 +131,16 @@ public final class FSParser extends Parser {
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
-      //atts.add(MOUNTPOINT, NOTMOUNTED);
-      atts.add(MOUNTPOINT, token(backingroot));
+      atts.reset();
+      atts.add(MOUNTPOINT, token(Prop.mountpoint));
+      atts.add(SIZE, token("0"));
       atts.add(BACKINGSTORE, token(backingroot));
       builder.startElem(DEEPFS, atts);
       
       for(final File f : root ? File.listRoots() :
         new File[] { new File(io.path()).getCanonicalFile() }) {
         
-        importroot = f.getAbsolutePath().length();
+        importRootLength = f.getAbsolutePath().length();
         
         sizeStack[0] = 0;
         parse(f);
@@ -167,12 +168,12 @@ public final class FSParser extends Parser {
       if(f.isDirectory()) {
         if (wbacking)
           new File(backingroot
-            + f.getAbsolutePath().substring(importroot)).mkdir();
+            + f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
         if (wbacking)
           copy(f.getAbsoluteFile(), new File(backingroot
-            + f.getAbsolutePath().substring(importroot)));
+            + f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
     }

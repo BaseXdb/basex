@@ -15,7 +15,7 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fuse.DataFS;
+import org.basex.fuse.DeepFS;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -37,7 +37,7 @@ final class MapFS extends MapPainter {
   /** Image cache. */
   private static MapImages images;
   /** Data FS reference. */
-  private static DataFS fs;
+  private static DeepFS fs;
   /** Flag for error message. */
   private boolean error;
 
@@ -46,7 +46,7 @@ final class MapFS extends MapPainter {
    * @param m map reference.
    * @param f fs reference
    */
-  MapFS(final MapView m, final DataFS f) {
+  MapFS(final MapView m, final DeepFS f) {
     super(m);
     fs = f;
     if(images == null) images = new MapImages(m);

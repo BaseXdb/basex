@@ -12,7 +12,7 @@ import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.fuse.DeepBase;
+import org.basex.fuse.DeepFS;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
@@ -35,7 +35,7 @@ public class DeepBaseTest {
   private static final String TESTFILE = "/tmp/deepbasetest.xml";
 
   /** DeepBase reference to test. */
-  DeepBase dbfs;
+  DeepFS dbfs;
 
   /**
    * Create the database.
@@ -44,7 +44,7 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepBase(DBNAME, "/", "java_only_test");
+    dbfs = new DeepFS(DBNAME);
     //dbfs.init();
   }
 
@@ -143,7 +143,7 @@ public class DeepBaseTest {
       Context ctx = new Context();
       ctx.data(CreateDB.xml(new XMLParser(
           IO.get("test/org/basex/test/fuse/getattrtest.xml")), "DBNAME"));
-      dbfs.datafs.data = ctx.data();
+      dbfs.data = ctx.data();
     } catch(IOException e) {
       e.printStackTrace();
       fail("Problem loading test database.");
@@ -157,7 +157,7 @@ public class DeepBaseTest {
    */
   private String query(final String query) {
     try {
-      Nodes n = new Nodes(0, dbfs.datafs.data);
+      Nodes n = new Nodes(0, dbfs.data);
       n = new QueryProcessor(query, n).queryNodes();
       PrintOutput out = new PrintOutput(TESTFILE);
       n.serialize(new XMLSerializer(out));

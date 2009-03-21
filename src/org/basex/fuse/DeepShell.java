@@ -8,6 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
+
+import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -36,14 +38,16 @@ public class DeepShell {
   }
 
   /** Filesystem reference. */
-  private DeepBase fs;
+  private DeepFS fs;
 
   /** Shell prompt. */
   private static final String PS1 = "$ ";
 
   /** Constructor. */
   DeepShell() {
-    fs = new DeepBase("/", "DeepShell (no native connection)", "deepshell");
+    BaseX.errln("DeepShell");
+    fs = new DeepFS("deepshell");
+    if (fs == null) System.exit(1);
     // initialize/mount filesystem
     //fs.init();
     loop();
@@ -74,7 +78,7 @@ public class DeepShell {
           }
         }
       }
-      System.out.printf(
+      BaseX.out(
           "%s: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
     } catch(Exception e) {
@@ -199,7 +203,7 @@ public class DeepShell {
   @Command(shortcut = 's', help = "print file hierarchy as XML")
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
-      Nodes n = new Nodes(0, fs.datafs.data);
+      Nodes n = new Nodes(0, fs.data);
       n = new QueryProcessor("/", n).queryNodes();
       PrintOutput out = new PrintOutput(System.out);
       n.serialize(new XMLSerializer(out, false, true));

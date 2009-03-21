@@ -21,9 +21,9 @@ public final class MetaData {
   /** Database name. */
   public String dbname;
   /** FS mount point. */
-  public String mount;
+  public String mount = Prop.mountpoint;
   /** FS backing path. */
-  public String backing;
+  public String backing = Prop.backingpath;
 
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
@@ -202,10 +202,10 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
-    if(Prop.fuse) {
-      writeInfo(out, MOUNT,    mount);
-      writeInfo(out, BACKING,  backing);
-    }
+//    if(Prop.fuse) {
+//      writeInfo(out, MOUNT,    mount);
+//      writeInfo(out, BACKING,  backing);
+//    }
     out.writeString("");
   }
 

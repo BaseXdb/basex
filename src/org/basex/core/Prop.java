@@ -158,6 +158,8 @@ public final class Prop {
   public static boolean usebdb = false;
   /** Fuse support. */
   public static boolean fuse;
+  /** EDBT temporary flag for extensive output. */
+  public static boolean edbt;
 
   // WEBSERVER OPTIONS ========================================================
 
@@ -180,11 +182,15 @@ public final class Prop {
 
   static {
     try {
-      System.loadLibrary("xqfs");
-      fuse = true;
+//      System.loadLibrary("deepfs");
+      System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
+      fuse = false;
+      edbt = false;
+      if(edbt) BaseX.errln("FUSE Support enabled ... OK");
     } catch(final UnsatisfiedLinkError ex) {
+      if(edbt) BaseX.err("Loading DeepFS library ... FAILURE.\n.");
       BaseX.debug(ex);
-    }    
+    }
   }
   
   /** Private constructor, preventing class instantiation. */

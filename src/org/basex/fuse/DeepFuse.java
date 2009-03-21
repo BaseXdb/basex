@@ -1,6 +1,5 @@
 package org.basex.fuse;
 
-
 /**
  * Interface to filesystem in userspace framework.
  * 

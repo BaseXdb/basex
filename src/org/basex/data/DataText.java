@@ -103,8 +103,6 @@ public interface DataText {
   byte[] MODE = token("mode");
   /** Mountpoint attribute. */
   byte[] MOUNTPOINT = token("mountpoint");
-  /** Not mounted attribute. */
-  byte[] NOTMOUNTEDD = token("(currently not mounted)");
   /** Backingstore attribute. */
   byte[] BACKINGSTORE = token("backingstore");
   
