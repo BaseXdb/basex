@@ -426,7 +426,7 @@ public final class MapView extends View implements Runnable {
           case 2:  break;
           default: sw = Math.max(1.5, focused.thumbf);
         }
-        MapRenderer.drawThumbnailsToolTip(focused, d, sen, sw,
+        MapRenderer.calculateThumbnailsToolTip(focused, d, sen, sw,
             mouseX, mouseY, getWidth(), g, spc);
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
