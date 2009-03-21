@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.index.FTTokenizer;
@@ -69,7 +68,7 @@ final class MapRenderer {
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final MapRect r,
+  private static int drawText(final Graphics g, final MapRect r,
       final byte[] s, final int m, final boolean draw) {
 
     // limit string to given space
@@ -668,14 +667,14 @@ final class MapRenderer {
           y + 28 : y  - GUIProp.fontsize * nl;
 
       final int ww = nl == 1 && wl < wi ? wl : wi;
-      g.setColor(GUIConstants.COLORS[12]);
+      g.setColor(COLORS[12]);
       g.drawRect(xx - 3, yy - GUIProp.fontsize - 1, ww + 3,
           GUIProp.fontsize * nl + 7);
-      g.setColor(GUIConstants.COLORS[0]);
+      g.setColor(COLORS[0]);
       g.fillRect(xx - 2, yy - GUIProp.fontsize, ww + 2,
           GUIProp.fontsize * nl + 6);
 
-      g.setColor(GUIConstants.COLORS[24]);
+      g.setColor(COLORS[24]);
       wl = 0;
       for (int i = 0; i < tl.size; i++) {
         l = len.list[i];

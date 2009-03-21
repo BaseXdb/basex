@@ -117,7 +117,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
-      if (data.fs == null) initLen();
+      initLen();
       painter = GUIProp.mapfs && data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
       mainMap = createImage();
@@ -192,6 +192,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshUpdate() {
+    initLen();
     refreshContext(false, true);
   }
 
@@ -337,7 +338,7 @@ public final class MapView extends View implements Runnable {
       super.paintComponent(g);
       return;
     }
-
+    
     if(mainRects == null) {
       refreshInit();
       return;
@@ -357,9 +358,12 @@ public final class MapView extends View implements Runnable {
       drawImage(g, mainMap, zoomStep);
     }
 
+    // check if focused rectangle is valid
+    if(focused != null && focused.pre >= data.meta.size) focused = null;
+    
     // skip node path view
-    if(focused == null || mainRects.size() == 1
-        && focused == mainRects.get(0)) {
+    if(focused == null || mainRects.size() == 1 &&
+        focused == mainRects.get(0)) {
       gui.painting = false;
       return;
     }
@@ -405,7 +409,7 @@ public final class MapView extends View implements Runnable {
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
       }
 
-      if(focused.thumb) {
+      if(focused != null && focused.thumb) {
         final int pre = focused.pre;
         final byte[] text = ViewData.content(data, pre, false);
         final FTTokenizer ftt = new FTTokenizer(text);
@@ -503,6 +507,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     if(gui.updating) return;
+
     super.mouseMoved(e);
     // refresh mouse focus
     mouseX = e.getX();
@@ -711,6 +716,10 @@ public final class MapView extends View implements Runnable {
    */
   private void initLen() {
     final Data data = gui.context.current().data;
+    if(data.fs != null) {
+      return;
+    }
+    
     final int size = data.meta.size;
     textLen = new int[size];
 
