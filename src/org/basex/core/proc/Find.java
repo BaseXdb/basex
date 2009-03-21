@@ -1,12 +1,10 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
-import java.util.GregorianCalendar;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DataText;
-import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
@@ -51,13 +49,14 @@ public final class Find extends AQuery {
    */
   public static String find(final String query, final Context ctx,
       final boolean root) {
-    
+
+    // treat input as XQuery
     if(query.startsWith("/")) return query;
 
     final boolean r = root || ctx.root();
     if(query.length() == 0) return r ? "/" : ".";
 
-    // deepfs instance
+    // file system instance
     final Data data = ctx.data();
     if(data.fs != null) return findFS(query, ctx, root);
 
@@ -111,98 +110,66 @@ public final class Find extends AQuery {
     final String query = term.replaceAll("\\*|\\?|\\&|\"", " ") + ' ';
     String qu = query;
 
-    final Nodes current = context.current();
     final TokenBuilder xquery = new TokenBuilder();
-    final boolean r = root || current.size() == 1 && current.nodes[0] < 2;
+    final boolean r = root || context.root();
 
     if(r) xquery.add("/");
     xquery.add("descendant-or-self::*");
 
     do {
       boolean size = false;
-      boolean date = false;
-      String pred = "";
-      char operator = qu.charAt(0);
       boolean exact = true;
-      if(operator == '>') {
+      String pred = "";
+
+      // check prefix
+      char op = qu.charAt(0);
+      if(op == '>') {
         pred = "@" + DataText.S_SIZE;
         size = true;
-      } else if(operator == '<') {
+      } else if(op == '<') {
         pred =  "@" + DataText.S_SIZE;
         size = true;
-      } else if(operator == '}') {
-        operator = '>';
-        pred = "@" + DataText.S_MTIME;
-        date = true;
-      } else if(operator == '{') {
-        operator = '<';
-        pred = "@" + DataText.S_MTIME;
-        date = true;
-      } else if(operator == '.') {
+      } else if(op == '.') {
         pred = "@" + DataText.S_SUFFIX;
-        operator = '=';
-      } else if(operator == '~') {
-        pred = "@" + DataText.S_NAME;
-      } else if(operator == '=') {
+        op = '=';
+      } else if(op == '=') {
         pred = "@" + DataText.S_NAME;
       } else {
-        int i = qu.indexOf("=", 1);
-        final int s = qu.indexOf(" ", 1);
-        if(i == -1) i = qu.indexOf("<", 1);
-        if(i == -1) i = qu.indexOf(">", 1);
-        if(i != -1 && (s == -1 || s > i)) {
-          pred = "self::file][descendant-or-self::node()/" + qu.substring(0, i);
-          qu = qu.substring(i);
-          operator = qu.charAt(0);
-          size = operator != '=';
-        } else {
-          pred = "@" + DataText.S_NAME;
-          exact = false;
-        }
+        pred = "@" + DataText.S_NAME;
+        exact = false;
       }
+
       int off = exact ? 1 : 0;
       while(off < qu.length() && qu.charAt(off) == ' ') off++;
       qu = qu.substring(off);
-      if(qu.length() == 0) return r ? "/" : ".";
+      if(qu.length() == 0) continue;
 
       final int i = qu.indexOf(' ');
       String t = qu.substring(0, i);
+
       if(size) {
         t = Long.toString(calcNum(Token.token(t)));
-      } else if(date) {
-        final String[] dat = t.split("\\.");
-        final int y = dat.length > 0 ? Integer.parseInt(dat[0]) : 1970;
-        final int m = dat.length > 1 ? Integer.parseInt(dat[1]) - 1 : 0;
-        final int d = dat.length > 2 ? Integer.parseInt(dat[2]) : 1;
-        final long time = new GregorianCalendar(y, m, d).getTime().getTime();
-        t = Long.toString(time / 60000);
       } else {
+        // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");
-        // dot found... add suffix check
-        if(d != -1) xquery.add("[@" + DataText.S_SUFFIX + " = \"" +
-            t.substring(d + 1) + "\"]");
+        if(d != -1) {
+          xquery.add("[@" + DataText.S_SUFFIX + " = \"" +
+              t.substring(d + 1) + "\"]");
+        }
         t = "\"" + t + "\"";
       }
       // add predicate
-      xquery.add('[');
-      if(exact) {
-        xquery.add(pred + operator + t);
-      } else {
-        xquery.add(pred + " ftcontains " + t);
-      }
-      xquery.add(']');
+      xquery.add('[' + pred + (exact ? op : " ftcontains ") + t + ']');
 
       qu = qu.substring(i + 1);
     } while(qu.indexOf(' ') > -1);
 
-    final Data data = context.data();
-    if(data.meta.ftxindex) {
-      xquery.add(" | ");
-      if(!r) xquery.add(".");
-      xquery.add("//file");
-      for(final String t : split(query)) {
-        xquery.add("[.//text() ftcontains \"" + t + "\"]");
-      }
+    xquery.add(" | ");
+    if(!r) xquery.add(".");
+    xquery.add("//file");
+    for(final String t : split(query)) {
+      if(Character.isLetterOrDigit(t.charAt(0)))
+        xquery.add("[descendant::text() ftcontains \"" + t + "\"]");
     }
     return xquery.toString();
   }

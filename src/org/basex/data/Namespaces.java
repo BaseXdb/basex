@@ -244,7 +244,7 @@ public final class Namespaces extends Set {
     Node find(final int p) {
       if(ch.length == 0) return this;
       int l = 0, m = 0, h = ch.length - 1;
-      while(l <= h) { //binary search
+      while(l <= h) { // binary search
         m = (l + h) >>> 1;
         final int v = ch[m].pre;
         if(v < p) l = m + 1;

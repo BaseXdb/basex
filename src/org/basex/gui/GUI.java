@@ -485,11 +485,13 @@ public final class GUI extends JFrame {
       final String inf = pr.info();
 
       // treat TextView different to other views
-      if(ok && pr.printing() && text.isValid()) {
+      if(ok && pr.printing()) {
+        // display text view if text output is
+        if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
+        
         // retrieve text result
         final CachedOutput out = new CachedOutput(TextView.MAX);
-        if(ok) pr.output(out);
-        else out.println(inf);
+        pr.output(out);
         out.addInfo();
         text.setText(out);
       }
