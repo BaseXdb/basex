@@ -123,4 +123,14 @@ public final class ViewData {
   public static int parent(final Data data, final int pre) {
     return data.parent(pre, data.kind(pre));
   }
+
+  /**
+   * Returns the size for the specified node.
+   * @param data data reference
+   * @param pre child node
+   * @return parent node
+   */
+  public static int size(final Data data, final int pre) {
+    return data.size(pre, data.kind(pre));
+  }
 }

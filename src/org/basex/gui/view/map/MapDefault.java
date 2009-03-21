@@ -81,15 +81,9 @@ final class MapDefault extends MapPainter {
       }
 
       // skip drawing of string when left space is too small
-      if(r.w < GUIProp.fontsize || r.h < GUIProp.fontsize) continue;
-      final MapRect tvr = r.clone();
-      r.thumb = drawRectangle(g, tvr);
-      r.thumbal = tvr.thumbal;
-      r.thumbf = tvr.thumbf;
-      r.thumbfh = tvr.thumbfh;
-      r.thumblh = tvr.thumblh;
-      r.poi = tvr.poi;
-      r.pos = tvr.pos;
+      if(r.w >= GUIProp.fontsize && r.h >= GUIProp.fontsize) {
+        drawRectangle(g, r);
+      }
     }
   }
 
@@ -97,9 +91,8 @@ final class MapDefault extends MapPainter {
    * Draws a single rectangle.
    * @param g graphics reference
    * @param rect rectangle
-   * @return if the current rectangle is shown as thumbnail
    */
-  boolean drawRectangle(final Graphics g, final MapRect rect) {
+  void drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
     final int pre = rect.pre;
@@ -107,7 +100,8 @@ final class MapDefault extends MapPainter {
     final Data data = context.data();
     final Nodes current = context.current();
     final int kind = data.kind(pre);
-
+    rect.thumb = false;
+    
     if(kind == Data.ELEM || kind == Data.DOC) {
       // show full path in top rectangle
       final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
@@ -126,17 +120,20 @@ final class MapDefault extends MapPainter {
       if(p != -1) {
         final int h = MapRenderer.drawText(g, rect, text, false);
         rect.x += p;
-        rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
+        rect.y += (rect.h - h) / 2 - 1;
         MapRenderer.drawText(g, rect, text);
+        rect.x -= p;
+        rect.y -= (rect.h - h) / 2 - 1;
       } else {
         if(MapRenderer.calcHeight(g, rect, text) < rect.h) {
           MapRenderer.drawText(g, rect, text);
         } else {
           MapRenderer.drawThumbnails(g, rect, text);
-          return true;
+          rect.thumb = true;
         }
       }
     }
-    return false;
+    rect.x -= 3;
+    rect.w += 3;
   }
 }

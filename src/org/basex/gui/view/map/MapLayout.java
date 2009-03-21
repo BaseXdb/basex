@@ -1,12 +1,9 @@
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
-
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
-import org.basex.util.IntList;
-import org.basex.util.Token;
 
 /**
  * Defines shared things of TreeMap Layout Algorithms.
@@ -22,7 +19,7 @@ class MapLayout {
   /** Map algorithm to use in this layout. */
   protected final MapAlgo algo;
   /** Text lengths. */
-  private int[] textLen;
+  private final int[] textLen;
 
   /** List of rectangles. */
   final ArrayList<MapRect> rectangles;
@@ -31,7 +28,7 @@ class MapLayout {
 
   /**
    * Constructor.
-   * @param d data reference to use in this maplayout
+   * @param d data reference to use in this layout
    * @param tl text lengths array
    */
   MapLayout(final Data d, final int[] tl) {
@@ -63,40 +60,16 @@ class MapLayout {
       case 3 : algo = new SliceDiceAlgo(); break;
       default: algo = new SplitAlgo(); break;
     }
-    
-//    if (data.fs == null && GUIProp.usetextlength) initLen();
   }
-
-  /**
-   * Calculates the average aspect Ratios of rectangles given in the List.
-   *
-   * @param r Array of rectangles
-   * @return average aspect ratio
-  private static double lineRatio(final ArrayList<MapRect> r) {
-    if (r.isEmpty()) return Double.MAX_VALUE;
-    double ar = 0;
-
-    for(int i = 0; i < r.size(); i++) {
-      if (r.get(i).w != 0 && r.get(i).h != 0) {
-        if (r.get(i).w > r.get(i).h) {
-          ar += r.get(i).w / r.get(i).h;
-        } else {
-          ar += r.get(i).h / r.get(i).w;
-        }
-      }
-    }
-    return ar / r.size();
-  }
-   */
 
   /**
    * Computes average aspect ratio of a rectangle list. 
-   * note: as specified by Shneiderman only leafnodes should be checked
+   * note: as specified by Shneiderman only leaf nodes should be checked
    * 
    * [JH] why not weight the bigger nodes more than smaller ones???
    * 
-   * @param r arrray list of rects
-   * @return aar 
+   * @param r array list of rectangles
+   * @return aspect ratio
    */
   static double aar(final ArrayList<MapRect> r) {
     double aar = 0;
@@ -117,45 +90,6 @@ class MapLayout {
   }
 
   /**
-   * Calculates the average distance of two maplayouts using the euclidean 
-   * distance of each rect in the first and the second rectlist.
-   * 
-   * [JH] how to handle rects available in one of the lists not included in 
-   * the other one?
-   *
-   * @param first array of view rectangles
-   * @param second array of view rectangles
-   * @return average distance
-  private static double averageDistanceChange(final ArrayList<MapRect> first, 
-      final ArrayList<MapRect> second) {
-    double aDist = 0.0;
-    int length = Math.min(first.size(), second.size());
-    int x1, x2, y1, y2;
-
-    for (int i = 0; i < length; i++) {
-      if(first.get(i).pre == second.get(i).pre) {
-        x1 = first.get(i).x + first.get(i).w >> 1;
-        x2 = second.get(i).x + second.get(i).w >> 1;
-        y1 = first.get(i).y + first.get(i).h >> 1;
-        y2 = second.get(i).y + second.get(i).h >> 1;
-        aDist += ((x1 - x2) ^ 2 + (y1 - y2) ^ 2) ^ (1 / 2);
-      }
-    }
-    return aDist / length;
-  }
-   */
-
-  /*
-   * Returns the number of rectangles painted.
-   *
-   * @param r array of painted rects
-   * @return nr of rects in the list
-  private int getNumberRects(final ArrayList<MapRect> r) {
-    return r.size();
-  }
-   */
-
-  /**
    * Returns all children of the specified node.
    * @param par parent node
    * @return children
@@ -163,34 +97,16 @@ class MapLayout {
   private MapList children(final int par) {
     final MapList list = new MapList();
 
-    final int kind = data.kind(par);
-    final int last = par + data.size(par, kind);
+    final int last = par + ViewData.size(data, par);
     final boolean atts = GUIProp.mapatts && data.fs == null;
-    int p = par + (atts ? 1 : data.attSize(par, kind));
+    int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);
-      p += data.size(p, data.kind(p));
+      p += ViewData.size(data, p);
     }
-
-    // paint all children
-//    if(list.size != 0) list.add(p);
     return list;
   }
   
-  /**
-   * Adds all the sizes attribute of the nodes in the given list.
-   * @param l list of nodes
-   * @return sum of the size attribute
-   */
-  private long addSizes(final IntList l) {
-    long sum = 0;
-    for (int i = 0; i < l.size; i++) {
-      final byte[] val = data.attValue(data.sizeID, l.list[i]);
-      if(val != null) sum += Token.toLong(val);
-    }
-    return sum;
-  }
-
   /**
    * Recursively splits rectangles.
    * @param r parent rectangle
@@ -201,42 +117,27 @@ class MapLayout {
    */
   void makeMap(final MapRect r, final MapList l, final int ns, final int ne, 
       final int level) {
+
     if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
       r.pre = l.list[ns];
       putRect(r, level);  
     } else {
-      final long parsize = data.fs != null ? addSizes(l) : 0;
-      int nn;
-      ArrayList<MapRect> rects;
+      int nn = 0;
       if(level == 0) {
-        // [JH] may first level layout should not be defined to splitalgo
-        nn = 0;
-        for (int i = 0; i < l.size; i++) {
-          nn += data.size(l.list[i], data.kind(l.list[i]));
-        }
-        if(GUIProp.mapsimple) {
-          l.initWeights();
-        } else if(GUIProp.usetextlength && data.fs == null) {
-          l.initWeights(textLen, nn, data);
-        } else l.initWeights(parsize, nn, data);
-        
-        final MapAlgo tmp = new SplitAlgo();
-        rects = tmp.calcMap(r, l, l.weight, 0, l.size - 1, level);
+        for(int i = 0; i < l.size; i++) nn += ViewData.size(data, l.list[i]);
       } else {
-        nn = l.list[ne] - l.list[ns] + 
-            data.size(l.list[ne], data.kind(l.list[ne]));
-        
-        // init weights of nodes
-        if(GUIProp.mapsimple) {
-          l.initWeights();
-        } else if(GUIProp.usetextlength && data.fs == null) {
-          l.initWeights(textLen, nn, data);
-        } else l.initWeights(parsize, nn, data);
-        
-        rects = algo.calcMap(r, l, l.weight, ns, ne, level);
+        nn = l.list[ne] - l.list[ns] + ViewData.size(data, l.list[ne]);
       }
+      
+      if(GUIProp.mapsimple) {
+        l.initWeights();
+      } else {
+        l.initWeights(textLen, nn, data);
+      }
+
       // call recursion for next deeper levels
+      final ArrayList<MapRect> rects = algo.calcMap(r, l, ns, ne, level);
       for(final MapRect rect : rects) putRect(rect, rect.level);
     }
   }
@@ -263,39 +164,4 @@ class MapLayout {
     if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
         ch, 0, ch.size - 1, level + 1);
   }
-  
-//  /**
-//   * Initializes the text lengths and stores them into an array.
-//   */
-//  private void initLen() {
-//    int size = data.meta.size;
-//    textLen = new int[size];
-//
-//    final int[] parStack = new int[IO.MAXHEIGHT];
-//    int l = 0;
-//    int par = 0;
-//
-//    for(int pre = 0; pre < size; pre++) {
-//      final int kind = data.kind(pre);
-//      par = data.parent(pre, kind);
-//      
-//      int ll = l;
-//      while(l > 0 && parStack[l - 1] > par) {
-//        textLen[parStack[l - 1]] += textLen[parStack[l]];
-//        --l;
-//      }
-//      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
-//
-//      parStack[l] = pre;
-//
-//      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
-//        textLen[pre] = data.textLen(pre);
-//      } else if(kind == Data.ATTR) {
-//        textLen[pre] = data.attLen(pre);
-//      } else if(kind == Data.ELEM || kind == Data.DOC) {
-//        l++;
-//      } 
-//    }
-//    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
-//  }
 }

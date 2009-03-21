@@ -64,25 +64,26 @@ public final class GUIProp {
   public static boolean showfolder = false;
   /** Flag for activated search view. */
   public static boolean showquery = true;
-  /** Flag for dissolving name attributes. */
-  public static boolean shownames = true;
-  /** Flag for showing the simple file dialog. */
-  public static boolean simplefd = false;
   /** Flag for activated plot view. */
   public static boolean showplot = false;
+
+  /** Flag for Java look and feel. */
+  public static boolean javalook = false;
+  /** Flag for dissolving name attributes. */
+  public static boolean shownames = true;
+  /** Focus follows mouse. */
+  public static boolean mousefocus = false;
+  /** Flag for showing the simple file dialog. */
+  public static boolean simplefd = false;
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static int searchmode = 0;
-  /** Focus follows mouse. */
-  public static boolean mousefocus = false;
   /** Flag for realtime context switch. */
   public static boolean filterrt = false;
   /** Flag for realtime context switch. */
   public static boolean execrt = true;
-  /** Flag for Java look and feel. */
-  public static boolean javalook = false;
 
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
@@ -92,7 +93,7 @@ public final class GUIProp {
   public static int mapalgo = 0;
   /** number of child <-> size weighting in (0;100). */
   public static int mapweight = 0;
-  /** devide rectangles uniformly on each level. */
+  /** divide rectangles uniformly on each level. */
   public static boolean mapsimple = false;
 
   /** Dot sizes in plot. */
@@ -119,6 +120,7 @@ public final class GUIProp {
   public static String xqpath = Prop.WORK;
   /** Path for importing the file system. */
   public static String fspath = Prop.WORK;
+
   /** Name of the filesystem database. */
   public static String importfsname = "Filesystem";
   /** Flag for importing complete file system hierarchy. */
@@ -149,20 +151,21 @@ public final class GUIProp {
   /** Flag for computing additional map infos. */
   public static boolean mapinfo = false;
   /** Shows real file contents in the treemap. */
-  public static boolean mapfs = true;
-  /** use text lengths to calculate treemap. */
-  public static boolean usetextlength = true;
+  public static boolean mapfs = false;
+
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
-  // all values are only one half of the size
-  /** Width of focused Content. */
+
+  /* all values are only one half of the size
+  /** Width of focused Content.
   public static int lensareawidth = 50;
-  /** Width of focused Content. */
+  /** Width of focused Content.
   public static int lensareaheight = 50;
-  /** Width of Lens to be displayed. */
+  /** Width of Lens to be displayed.
   public static int lensheight = 100;
-  /** Width of Lens to be displayed. */
+  /** Width of Lens to be displayed.
   public static int lenswidth = 100;
+  */
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";

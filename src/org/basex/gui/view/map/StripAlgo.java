@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class StripAlgo extends MapAlgo{
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
-      final double[] weights, final int ns, final int ne, final int l) {
+      final int ns, final int ne, final int l) {
     // stores all calculated rectangles
     final ArrayList<MapRect> rects = new ArrayList<MapRect>();
     

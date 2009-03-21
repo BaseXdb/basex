@@ -12,8 +12,8 @@ public class SplitAlgo extends MapAlgo {
 
   @Override
   public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
-      final double[] weights, final int ns, final int ne, final int l) {
-    return calcMap(r, ml, weights, ns, ne, l, 1);
+      final int ns, final int ne, final int l) {
+    return calcMap(r, ml, ns, ne, l, 1);
   }
 
   /**
@@ -21,7 +21,6 @@ public class SplitAlgo extends MapAlgo {
    * 
    * @param r parent rectangle
    * @param ml children array
-   * @param w weights array
    * @param ns start array position
    * @param ne end array position
    * @param l indicates level which is calculated
@@ -29,7 +28,7 @@ public class SplitAlgo extends MapAlgo {
    * @return ArrayList containing rectangles
    */
   private ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
-      final double[] w, final int ns, final int ne, final int l,
+      final int ns, final int ne, final int l,
       final double sumweight) {
     if(ne - ns == 0) {
       final ArrayList<MapRect> rects = new ArrayList<MapRect>();
@@ -44,7 +43,7 @@ public class SplitAlgo extends MapAlgo {
       // than half the weight or leave with just setting it to ne - 1
       weight = 0;
       for(; ni < ne;) {
-        weight += w[++ni];
+        weight += ml.weight[++ni];
         if(weight >= sumweight / 2 || ni == ne - 1) break;
       }
       
@@ -54,8 +53,7 @@ public class SplitAlgo extends MapAlgo {
       int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
       // paint both rectangles if enough space is left
       if(ww > 0 && hh > 0 && weight > 0) rects.addAll(calcMap(
-          new MapRect(xx, yy, ww, hh, 0, r.level), 
-          ml, w, ns, ni, l, weight));
+          new MapRect(xx, yy, ww, hh, 0, r.level), ml, ns, ni, l, weight));
       if(r.w > r.h) {
         xx += ww;
         ww = r.w - ww;
@@ -66,7 +64,7 @@ public class SplitAlgo extends MapAlgo {
 //      System.out.println(ml.toString() + ";" + ni + ";" + ne);
       if(ww > 0 && hh > 0 && sumweight - weight > 0 && ni + 1 <= ne)
           rects.addAll(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), 
-          ml, w, ni + 1, ne, l, sumweight - weight));
+          ml, ni + 1, ne, l, sumweight - weight));
       
       return rects;
     }

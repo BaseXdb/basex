@@ -97,11 +97,13 @@ public final class DataFS {
       nativeMount(d.meta.mount, d.meta.backing, d.meta.dbname);
       
     }
-    
+
+    /*
     if(Prop.gui)
       BaseX.err("GUI MODE\n");
     else
       BaseX.err("CONSOLE MODE\n");
+    */
   }
   
   /**

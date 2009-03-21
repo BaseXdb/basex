@@ -113,18 +113,20 @@ public final class Nodes implements Result {
   /**
    * Creates a sorted node array. If the original array is already sorted,
    * the same reference is used.
+   * @return sorted array
    */
-  private void sort() {
+  public int[] sort() {
     int i = Integer.MIN_VALUE;
+    sorted = nodes;
     for(final int n : nodes) {
       if(i > n) {
         sorted = Array.finish(nodes, size);
         Arrays.sort(sorted);
-        return;
+        break;
       }
       i = n;
     }
-    sorted = nodes;
+    return sorted;
   }
 
   /**

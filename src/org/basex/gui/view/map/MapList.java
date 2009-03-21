@@ -2,6 +2,7 @@ package org.basex.gui.view.map;
 
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -14,8 +15,6 @@ import org.basex.util.Token;
 class MapList extends IntList {
   /** Weights array. */
   double[] weight;
-  /** indicates if List has been sorted. */
-  boolean sorted = false;
   
   /**
    * Constructor.
@@ -34,114 +33,78 @@ class MapList extends IntList {
   @Override
   public void sort() {
     sort(weight, false);
-    sorted = true;
   }
-  
+
   /**
    * Initializes the weights giving each node of this level same weight.
    */
   void initWeights() {
     weight = new double[size];
-    for(int i = 0; i < size; i++) {
-      weight[i] = 1d / size; 
-    }
+    for(int i = 0; i < size; i++) weight[i] = 1d / size;
   }
   
   /**
-   * Initializes the weights only using number of descendants.
-   * @param parchildren reference number of nodes
+   * Initializes the weights of each list entry, using the text length of
+   * nodes or (if the array reference is null) the size attributes.
+   * @param textLen array holding pre values to text lengths
+   * @param nchildren reference number of nodes
    * @param data reference
    */
-  void initWeights(final int parchildren, final Data data) {
-    int[] nrchildren = new int[size];
-    for(int i = 0; i < size; i++) {
-      nrchildren[i] = data.size(list[i], data.kind(list[i]));
-      weight[i] = nrchildren[i] * 1d / parchildren;
-    }
-  }
-  
-  /**
-   * Initializes the weights of each list entry and stores it in an extra list.
-   * @param parsize reference size
-   * @param parchildren reference number of nodes
-   * @param data reference
-   */
-  void initWeights(final long parsize, final int parchildren, final Data data) {
-    if(size == 1) {
-      initWeights();
+  void initWeights(final int[] textLen, final int nchildren, final Data data) {
+    weight = new double[size];
+
+    // only children
+    if(GUIProp.mapweight == 0) {
+      for(int i = 0; i < size; i++) {
+        weight[i] = (double) ViewData.size(data, list[i]) / nchildren;
+      }
       return;
     }
-    
-    weight = new double[size];
-    int[] nrchildren = new int[size];
-    long[] sizes = new long[size];
-    int sizeP = GUIProp.mapweight;
-    
-    // only children
-    if (GUIProp.mapweight == 0 || data.fs == null || parsize == 0) {
-      initWeights(parchildren, data);
+
+    // summarize sizes
+    final double sizeP = GUIProp.mapweight / 100d;
+    long sum = 0;
+    for(int i = 0; i < size; i++) sum += weight(textLen, data, i);
+
     // use #children and size for weight
-    } else if (0 < GUIProp.mapweight && GUIProp.mapweight < 100 && 
-        data.fs != null) {
+    if(sizeP < 1) {
       for(int i = 0; i < size; i++) {
-        if(data.attValue(data.sizeID, list[i]) != null) 
-          sizes[i] = Token.toLong(data.attValue(data.sizeID, list[i]));
-        else {
-          sizes[i] = 0;
-        }
-        nrchildren[i] = data.size(list[i], data.kind(list[i]));
-        weight[i] = sizeP / 100d * sizes[i] / parsize + 
-            (1 - sizeP / 100d) * nrchildren[i] / parchildren;
+        weight[i] = sizeP * weight(textLen, data, i) / sum + 
+          (1 - sizeP) * ViewData.size(data, list[i]) / nchildren;
       }
     // only sizes
-    } else if (GUIProp.mapweight == 100 && data.fs != null) {
+    } else {
       for(int i = 0; i < size; i++) {
-        if(data.attValue(data.sizeID, list[i]) != null) 
-          sizes[i] = Token.toLong(data.attValue(data.sizeID, list[i]));
-        else  {
-          sizes[i] = 0;
-        }
-        weight[i] = sizes[i] * 1d / parsize;
+        weight[i] = weight(textLen, data, i) / sum;
       }
     }
   }
-  
-  /**
-   * Initializes the weights of each list using text lengths of nodes.
-   * @param textLen array holding pre vals to textlengths
-   * @param children number of children
-   * @param data reference
+
+  /***
+   * Returns the numeric weight for the specified input, or 1 as minimum.
+   * @param textLen array holding pre values to text lengths
+   * @param data data reference
+   * @param i array index
+   * @return calculated weight
    */
-  void initWeights(final int[] textLen, final int children, final Data data) {
-    weight = new double[size];
-    int[] nrchildren = new int[size];
-    int textSum = 0;
-    for(int i = 0; i < size; i++) {
-      textSum += textLen[list[i]];
+  private double weight(final int[] textLen, final Data data, final int i) {
+    double d = 0;
+    if(textLen != null) {
+      d = textLen[list[i]];
+    } else {
+      final byte[] val = data.attValue(data.sizeID, list[i]);
+      d = val != null ? Token.toLong(val) : 0;
     }
-    // only children
-    for(int i = 0; i < size; i++) {
-      nrchildren[i] = data.size(list[i], data.kind(list[i]));
-      if(nrchildren[i] < 0) System.out.println(nrchildren[i]);
-      weight[i] = GUIProp.mapweight / 100d * textLen[list[i]] / textSum + 
-          (1 - GUIProp.mapweight / 100d) * nrchildren[i] / children;
-    }
+    return d > 1 ? d : 1;
   }
   
   @Override
   public String toString() {
-    if(weight == null) {
-      StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
-      for(int i = 0; i < size; i++) {
-        sb.append((i == 0 ? "" : ", ") + list[i]);
-      }
-      return sb.append("]").toString();
-    } else {
-      StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
-      for(int i = 0; i < size; i++) {
-        sb.append((i == 0 ? "" : ", ") + list[i] + "/" + weight[i]);
-      }
-      return sb.append("]").toString();
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
+    for(int i = 0; i < size; i++) {
+      sb.append((i == 0 ? "" : ", ") + list[i]);
+      if(weight != null) sb.append("/" + weight[i]);
     }
+    return sb.append("]").toString();
   }
 }

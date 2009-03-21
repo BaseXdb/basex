@@ -115,8 +115,8 @@ public final class MapView extends View implements Runnable {
     
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
-      if (data.fs == null && GUIProp.usetextlength) initLen();
-      painter = data.fs != null ? new MapFS(this, data.fs) :
+      if (data.fs == null) initLen();
+      painter = GUIProp.mapfs && data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
       mainMap = createImage();
       zoomMap = createImage();
@@ -302,19 +302,25 @@ public final class MapView extends View implements Runnable {
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  @SuppressWarnings("unchecked")
+  //@SuppressWarnings("unchecked")
   private void calc(final MapRect rect, final Nodes nodes, 
       final BufferedImage map) {
 
     // calculate new main rectangles
-    if(painter == null) return;
     painter.reset();
     // should replace following lines
     layout = new MapLayout(nodes.data, textLen);
-    layout.makeMap(rect, new MapList(nodes.nodes), 0, nodes.size(), 0);
-    mainRects = (ArrayList<MapRect>) layout.rectangles.clone();
+    //layout.makeMap(rect, new MapList(nodes.sort().clone()), 0,
+    layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
+        nodes.size() - 1, 0);
+
+    //mainRects = (ArrayList<MapRect>) layout.rectangles.clone();
+    mainRects = layout.rectangles;
+    
+    // [CG] sort rectangles by their pre value
+    
     painter.init(mainRects);
-    drawMap(map, layout.rectangles);
+    drawMap(map, mainRects);
     focus();
 
     /*
@@ -637,7 +643,7 @@ public final class MapView extends View implements Runnable {
       if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {
         il.add(rect.pre);
-        np = rect.pre + data.size(rect.pre, data.kind(rect.pre));
+        np = rect.pre + ViewData.size(data, rect.pre);
       }
     }
     gui.notify.mark(new Nodes(il.finish(), data), null);
