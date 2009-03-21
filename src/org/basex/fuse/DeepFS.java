@@ -262,7 +262,9 @@ public final class DeepFS extends DeepFuse implements DataText {
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size;
     if(s != 0) {
-      final byte[] b = mountpoint(il.list[s - 1]);
+      final byte[] b;
+      if (Prop.fuse) b = mountpoint(il.list[s - 1]);
+      else b = backingstore(il.list[s - 1]);
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -278,14 +280,23 @@ public final class DeepFS extends DeepFuse implements DataText {
   }
 
   /**
-   * Returns the mountpoint of a file hierarchy.
+   * Returns the mountpoint attribute value of a deepfs file hierarchy.
    * @param pre pre value
    * @return path mountpoint.
    */
-  public byte[] mountpoint(final int pre) {
+  private byte[] mountpoint(final int pre) {
     return attr(pre, data.fs.mountpointID);
   }
-
+  
+  /**
+   * Returns the backingstore attribute value of a deepfs file hierarchy.
+   * @param pre pre value
+   * @return path mountpoint.
+   */
+  private byte[] backingstore(final int pre) {
+    return attr(pre, data.fs.backingstoreID);
+  }
+  
   /**
    * Returns the name of a file.
    * @param pre pre value
@@ -566,14 +577,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   }
 
   @Override
-  public int destroy() {
-    if(gui != null) {
-      if(Prop.edbt)
-        BaseX.errln("[basex_destroy]");
-      gui.context.close();
-      gui.notify.init();
-    }
-    
+  public int destroy() {    
     return 0;
   }
 
