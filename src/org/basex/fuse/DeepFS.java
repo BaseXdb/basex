@@ -108,12 +108,13 @@ public final class DeepFS extends DeepFuse implements DataText {
 
     if(Prop.fuse) {
       final File mp = new File(Prop.mountpoint);
-      final File bp = new File(Prop.backingpath);
+      final File bp = new File(Prop.backingpath + "/" + d.meta.dbname);
 
-      // check mountpoint
+      /* --- prepare (maybe mkdir, rm) mountpoint and backing store --- */
+      // mountpoint
       if(Prop.mountpoint.compareTo(d.meta.mount) != 0) {
         if(Prop.edbt) {
-          BaseX.errln("Prop.mountpoint and d.meta.mount differ",
+          BaseX.errln("[DataFS:118] Prop.mountpoint and d.meta.mount differ",
               Prop.mountpoint, " ", d.meta.mount);
         }
       }
@@ -127,20 +128,27 @@ public final class DeepFS extends DeepFuse implements DataText {
         if(!mp.mkdirs()) {
           if(mp.exists()) {
             if(!FSUtils.deleteDir(mp) || !mp.mkdirs()) {
-              System.err.println(FSText.MOUNTPOINTEXISTS + Prop.mountpoint);
+              BaseX.errln(FSText.MOUNTPOINTEXISTS + mp.toString());
               return;
             }
           }
         }
       }
-
-      // check backing store
+      // backing store
       if(!bp.exists()) {
         if(Prop.edbt) {
-          BaseX.errln("[DataFS:93] Backingpath does not exist. "
+          BaseX.errln("[DataFS:142] Backingpath does not exist. "
               + Prop.backingpath);
+          BaseX.errln("[DataFS:144] Creating backingpath");
         }
-        return;
+        if(!bp.mkdirs()) {
+          if(bp.exists()) {
+            if(!FSUtils.deleteDir(bp) || !bp.mkdirs()) {
+              BaseX.errln(FSText.BACKINGSTOREEXISTS + bp.toString());
+              return;
+            }
+          }
+        }
       }
 
       // try to mount deepfs
@@ -319,7 +327,7 @@ public final class DeepFS extends DeepFuse implements DataText {
       final Runtime run = Runtime.getRuntime();
       if(Prop.MAC) {
         run.exec(new String[] { "open", path});
-        System.err.println("open " + path);
+        if(Prop.edbt) BaseX.errln("open " + path);
       } else if(Prop.UNIX) {
         run.exec(new String[] { "xdg-open", path});
       } else {
@@ -560,9 +568,12 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public int destroy() {
     if(gui != null) {
+      if(Prop.edbt)
+        BaseX.errln("[basex_destroy]");
       gui.context.close();
       gui.notify.init();
     }
+    
     return 0;
   }
 

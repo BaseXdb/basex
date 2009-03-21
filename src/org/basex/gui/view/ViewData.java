@@ -1,9 +1,11 @@
 package org.basex.gui.view;
 
 import static org.basex.data.DataText.*;
+
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -44,6 +46,7 @@ public final class ViewData {
    * @return current path
    */
   public static byte[] path(final Data data, final int pre) {
+    if(data == null) return Token.EMPTY;
     if(data.fs != null) return data.fs.path(pre);
 
     int p = pre;

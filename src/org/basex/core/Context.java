@@ -95,9 +95,28 @@ public final class Context {
         d.close();
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
         // [AH] close fuse instance
-        if(Prop.fuse) {
-          BaseX.err("[basex_diskdata_close]");
-          d.fs.nativeShutDown();
+        if(Prop.fuse) { 
+          BaseX.err("[Context:99] Initiating DeepFS shutdown sequence in ");
+          // unmount running fuse.
+          for (int i = 5; i > -1; i--) {
+            Performance.sleep(1000);
+            BaseX.err(".. " + i);
+          }
+          BaseX.errln(".. NOW.");
+          String cmd = "umount -f " + Prop.mountpoint;
+          BaseX.errln("[Context:107] Trying to unmount deepfs: " + cmd);
+          Runtime r = Runtime.getRuntime();
+          java.lang.Process p = r.exec(cmd);
+          try {
+            p.waitFor();
+          } catch(InterruptedException e) {
+            e.printStackTrace();
+          }
+          int rc = p.exitValue();
+          String msg = "[Context:117] Unmount "  + Prop.mountpoint;
+          if (rc == 0) msg = msg + " ... OK."; 
+          else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
+          BaseX.errln(msg);
         }
       }
       return true;
