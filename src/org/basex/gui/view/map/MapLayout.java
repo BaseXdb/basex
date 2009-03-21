@@ -1,6 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
@@ -22,7 +21,7 @@ class MapLayout {
   private final int[] textLen;
 
   /** List of rectangles. */
-  final ArrayList<MapRect> rectangles;
+  final MapRects rectangles;
   /** Layout rectangle. */
   final MapRect layout;
 
@@ -34,7 +33,7 @@ class MapLayout {
   MapLayout(final Data d, final int[] tl) {
     data = d;
     textLen = tl;
-    rectangles = new ArrayList<MapRect>();
+    rectangles = new MapRects();
     
     switch(GUIProp.mapoffsets) {
       case 1 :
@@ -71,10 +70,10 @@ class MapLayout {
    * @param r array list of rectangles
    * @return aspect ratio
    */
-  static double aar(final ArrayList<MapRect> r) {
+  static double aar(final MapRects r) {
     double aar = 0;
     int nrLeaves = 0;
-    for(int i = 0; i < r.size(); i++) {
+    for(int i = 0; i < r.size; i++) {
       final MapRect curr = r.get(i);
       // Shneiderman would use this: children(data, curr.pre).size == 0 && 
       if (curr.w != 0 && curr.h != 0) {
@@ -137,7 +136,7 @@ class MapLayout {
       }
 
       // call recursion for next deeper levels
-      final ArrayList<MapRect> rects = algo.calcMap(r, l, ns, ne, level);
+      final MapRects rects = algo.calcMap(r, l, ns, ne, level);
       for(final MapRect rect : rects) putRect(rect, rect.level);
     }
   }

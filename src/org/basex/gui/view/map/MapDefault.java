@@ -3,7 +3,6 @@ package org.basex.gui.view.map;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.ArrayList;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -27,14 +26,14 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
+  void drawRectangles(final Graphics g, final MapRects rects) {
     // some additions to set up borders
     final MapRect l = view.layout.layout;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();
 
-    final int rs = rects.size();
+    final int rs = rects.size;
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
       final MapRect r = rects.get(ri);

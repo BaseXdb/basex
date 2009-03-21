@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
@@ -45,7 +44,7 @@ public final class MapView extends View implements Runnable {
   private static final int MAXZS = ZS[ZOOMSIZE];
 
   /** Array of current rectangles. */
-  private ArrayList<MapRect> mainRects;
+  private MapRects mainRects;
   /** Data specific map layout. */
   private MapPainter painter;
   /** Keeps the whole map layout. */
@@ -105,19 +104,16 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshInit() {
-    focused = null;
+    if(painter != null) painter.close();
+    painter = null;
     mainRects = null;
+    focused = null;
+    textLen = null;
     zoomStep = 0;
-    slide = false;
-    if(painter != null) {
-      painter.close();
-      painter = null;
-    }
 
     final Data data = gui.context.data();
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
-      initLen();
       painter = GUIProp.mapfs && data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
       mainMap = createImage();
@@ -133,7 +129,7 @@ public final class MapView extends View implements Runnable {
     if(gui.focused == -1 && focused != null) focused = null;
 
     final MapRect m = focused;
-    for(int mi = 0, ms = mainRects.size(); mi < ms; mi++) {
+    for(int mi = 0, ms = mainRects.size; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
       if(gui.focused == rect.pre || mi + 1 < ms
           && gui.focused < mainRects.get(mi + 1).pre) {
@@ -175,24 +171,18 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshLayout() {
     if(painter == null) return;
-    painter.reset();
 
     // initial rectangle
     final int w = getWidth(), h = getHeight();
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 
-    final Performance p = new Performance();
     calc(rect, gui.context.current(), mainMap);
-    if(GUIProp.mapinfo) {
-      final double aar = MapLayout.aar(mainRects);
-      mapInfo.setValues(mainRects.size(), rect, aar, p.getTimer());
-    }
     repaint();
   }
 
   @Override
   public void refreshUpdate() {
-    initLen();
+    textLen = null;
     refreshContext(false, true);
   }
 
@@ -275,7 +265,7 @@ public final class MapView extends View implements Runnable {
      * and small rectangles are descendants of bigger ones, the focused
      * rectangle can be found by simply parsing the array backward.
      */
-    int r = mainRects.size();
+    int r = mainRects.size;
     while(--r >= 0) {
       final MapRect rect = mainRects.get(r);
       if(rect.contains(mouseX, mouseY)) break;
@@ -308,20 +298,30 @@ public final class MapView extends View implements Runnable {
   private void calc(final MapRect rect, final Nodes nodes, 
       final BufferedImage map) {
 
+    final Performance p = new Performance();
+
     // calculate new main rectangles
+    initLen();
     layout = new MapLayout(nodes.data, textLen);
-    //layout.makeMap(rect, new MapList(nodes.sort().clone()), 0,
+
     layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
         nodes.size() - 1, 0);
 
-    //mainRects = (ArrayList<MapRect>) layout.rectangles.clone();
+    //mainRects = layout.rectangles.clone();
     mainRects = layout.rectangles;
-    
-    // [CG] sort rectangles by their pre value
+
+    // sort input nodes and rectangles to speedup highlighting
+    mainRects.sort();
+    nodes.sort();
     
     painter.init(mainRects);
     drawMap(map, mainRects);
     focus();
+
+    if(GUIProp.mapinfo) {
+      final double aar = MapLayout.aar(mainRects);
+      mapInfo.setValues(mainRects.size, rect, aar, p.getTimer());
+    }
 
     /*
      * Screenshots: try { File file = new File("screenshot.png");
@@ -362,7 +362,7 @@ public final class MapView extends View implements Runnable {
     if(focused != null && focused.pre >= data.meta.size) focused = null;
     
     // skip node path view
-    if(focused == null || mainRects.size() == 1 &&
+    if(focused == null || mainRects.size == 1 &&
         focused == mainRects.get(0)) {
       gui.painting = false;
       return;
@@ -370,7 +370,7 @@ public final class MapView extends View implements Runnable {
 
     if(GUIProp.mapoffsets == 0) {
       g.setColor(COLORS[32]);
-      int pre = mainRects.size();
+      int pre = mainRects.size;
       int par = ViewData.parent(data, focused.pre);
       while(--pre >= 0) {
         final MapRect rect = mainRects.get(pre);
@@ -497,7 +497,7 @@ public final class MapView extends View implements Runnable {
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    */
-  void drawMap(final BufferedImage map, final ArrayList<MapRect> rects) {
+  void drawMap(final BufferedImage map, final MapRects rects) {
     final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
     BaseXLayout.antiAlias(g);
@@ -543,7 +543,7 @@ public final class MapView extends View implements Runnable {
       // right mouse button
       if(!marked.contains(pre)) gui.notify.mark(0, null);
     } else if(e.getClickCount() == 2) {
-      if(mainRects.size() != 1) gui.notify.context(marked, false, null);
+      if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
     } else if(e.isControlDown()) {
@@ -555,7 +555,8 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || ++dragTol < 8) return;
+    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list)
+      return;
 
     // refresh mouse focus
     int mx = mouseX;
@@ -569,7 +570,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     final IntList il = new IntList();
     int np = 0;
-    for(int r = 0, rl = mainRects.size(); r < rl; r++) {
+    for(int r = 0, rl = mainRects.size; r < rl; r++) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {
@@ -611,48 +612,26 @@ public final class MapView extends View implements Runnable {
     final int size = data.meta.size;
     final Nodes current = context.current();
 
+    int pre = current.nodes[0];
     if(key == KeyEvent.VK_R) {
       final Random rnd = new Random();
-      int pre = 0;
       do {
         pre = rnd.nextInt(size);
       } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
-      gui.focused = pre;
-      gui.notify.jump(new Nodes(gui.focused, data));
-    } else if(key == KeyEvent.VK_N || key == KeyEvent.VK_B) {
+      gui.notify.jump(new Nodes(pre, data));
+    } else if(key == KeyEvent.VK_N) {
       // jump to next node
-      int pre = (current.nodes[0] + 1) % size;
-      while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre))
+      do {
         pre = (pre + 1) % size;
+      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
       gui.notify.jump(new Nodes(pre, data));
-    } else if(key == KeyEvent.VK_P || key == KeyEvent.VK_Z) {
+    } else if(key == KeyEvent.VK_P) {
       // jump to previous node
-      int pre = (current.nodes[0] == 0 ? size : current.nodes[0]) - 1;
-      while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre))
+      do {
         pre = (pre == 0 ? size : pre) - 1;
+      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
+
       gui.notify.jump(new Nodes(pre, data));
-    } else if(key == KeyEvent.VK_S && !slide) {
-      // slide show
-      slide = true;
-      new Thread() {
-        @Override
-        public void run() {
-          while(slide) {
-            int pre = context.current().nodes[0];
-            if(slideForward) {
-              pre = (pre + 1) % size;
-              while(!ViewData.isLeaf(data, pre))
-                pre = (pre + 1) % size;
-            } else {
-              pre = (pre == 0 ? size : pre) - 1;
-              while(!ViewData.isLeaf(data, pre))
-                pre = (pre == 0 ? size : pre) - 1;
-            }
-            gui.notify.jump(new Nodes(pre, data));
-            Performance.sleep(slideSpeed);
-          }
-        }
-      }.start();
     }
 
     final boolean cursor = key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN
@@ -663,15 +642,13 @@ public final class MapView extends View implements Runnable {
 
     int o = GUIProp.fontsize + 4;
     if(key == KeyEvent.VK_UP) {
-      mouseY = focused.y + (shift ? focused.h - GUIProp.fontsize : 0)
-          - 1;
+      mouseY = focused.y + (shift ? focused.h - GUIProp.fontsize : 0) - 1;
       if(shift) mouseX = focused.x + (focused.w >> 1);
     } else if(key == KeyEvent.VK_DOWN) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
     } else if(key == KeyEvent.VK_LEFT) {
-      mouseX = focused.x + (shift ? focused.w - GUIProp.fontsize : 0)
-          - 1;
+      mouseX = focused.x + (shift ? focused.w - GUIProp.fontsize : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
     } else if(key == KeyEvent.VK_RIGHT) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
@@ -680,15 +657,9 @@ public final class MapView extends View implements Runnable {
     o = mainRects.get(0).w == getWidth() ? (o >> 1) + 1 : 0;
     mouseX = Math.max(o, Math.min(getWidth() - o - 1, mouseX));
     mouseY = Math.max(o << 1, Math.min(getHeight() - o - 1, mouseY));
+
     if(focus()) repaint();
   }
-
-  /** Slide show flag. */
-  boolean slide;
-  /** Slide show flag. */
-  int slideSpeed = 2000;
-  /** Slide show flag. */
-  boolean slideForward = true;
 
   @Override
   public void keyTyped(final KeyEvent e) {
@@ -709,16 +680,15 @@ public final class MapView extends View implements Runnable {
     zoomMap = createImage();
     refreshLayout();
   }
-  
-  
+
   /**
    * Initializes the text lengths and stores them into an array.
    */
   private void initLen() {
+    painter.reset();
+
     final Data data = gui.context.current().data;
-    if(data.fs != null) {
-      return;
-    }
+    if(data.fs != null || textLen != null || GUIProp.mapweight == 0) return;
     
     final int size = data.meta.size;
     textLen = new int[size];

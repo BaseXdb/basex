@@ -1,7 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.util.ArrayList;
-
 /**
  * Slice-and-Dice Layout Algorithm.
  * 
@@ -10,7 +8,7 @@ import java.util.ArrayList;
  */
 public class SliceDiceAlgo extends MapAlgo {
   @Override
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+  public MapRects calcMap(final MapRect r, final MapList ml, 
       final int ns, final int ne, final int l) {
     
     // setting initial proportions
@@ -24,7 +22,7 @@ public class SliceDiceAlgo extends MapAlgo {
     int tmph = -1;
     int tmpw = -1;
     
-    final ArrayList<MapRect> rects = new ArrayList<MapRect>();
+    final MapRects rects = new MapRects();
     // calculate map for each rectangle on this level
     for(int i = 0; i < ml.size; i++) {      
       if((l & 1) == 0) {
@@ -48,10 +46,5 @@ public class SliceDiceAlgo extends MapAlgo {
       tmpw = (int) ww;
     }
     return rects;
-  }
-
-  @Override
-  String getName() {
-    return "Slice and Dice Layout";
   }
 }

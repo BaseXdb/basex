@@ -72,10 +72,19 @@ public final class Nodes implements Result {
    */
   public Nodes(final int[] n, final Data d, final FTPosData ft) {
     if(d == null) BaseX.notexpected("No data available");
-    nodes = n;
-    size = n.length;
     data = d;
     ftpos = ft;
+    set(n);
+  }
+
+  /**
+   * Sets the specified values.
+   * @param n values
+   */
+  public void set(final int[] n) {
+    nodes = n;
+    size = n.length;
+    sorted = null;
   }
 
   public int size() {
@@ -106,27 +115,26 @@ public final class Nodes implements Result {
    * @return true if the node was found
    */
   public int find(final int p) {
-    if(sorted == null) sort();
+    sort();
     return Arrays.binarySearch(sorted, p);
   }
 
   /**
    * Creates a sorted node array. If the original array is already sorted,
    * the same reference is used.
-   * @return sorted array
    */
-  public int[] sort() {
+  public void sort() {
+    if(sorted != null) return;
     int i = Integer.MIN_VALUE;
-    sorted = nodes;
     for(final int n : nodes) {
       if(i > n) {
         sorted = Array.finish(nodes, size);
         Arrays.sort(sorted);
-        break;
+        return;
       }
       i = n;
     }
-    return sorted;
+    sorted = nodes;
   }
 
   /**
@@ -135,9 +143,7 @@ public final class Nodes implements Result {
    */
   public void toggle(final int p) {
     final int[] n = new int[] { p };
-    nodes = contains(p) ? except(nodes, n) : union(nodes, n);
-    size = nodes.length;
-    sorted = null;
+    set(contains(p) ? except(nodes, n) : union(nodes, n));
   }
 
   /**
@@ -145,9 +151,7 @@ public final class Nodes implements Result {
    * @param p pre value
    */
   public void union(final int[] p) {
-    nodes = union(nodes, p);
-    size = nodes.length;
-    sorted = null;
+    set(union(nodes, p));
   }
 
   /**

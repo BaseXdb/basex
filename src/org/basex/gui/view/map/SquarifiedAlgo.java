@@ -1,7 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.util.ArrayList;
-
 /**
  * Squarified Layout Algorithm.
  *
@@ -11,12 +9,12 @@ import java.util.ArrayList;
 public class SquarifiedAlgo extends MapAlgo {
 
   @Override
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+  public MapRects calcMap(final MapRect r, final MapList ml, 
       final int ns, final int ne, final int l) {
 
     ml.sort();
     
-    final ArrayList<MapRect> rects = new ArrayList<MapRect>();
+    final MapRects rects = new MapRects();
     int ni = ns;
     // running start holding first element of current row
     int start = ns;
@@ -27,7 +25,7 @@ public class SquarifiedAlgo extends MapAlgo {
     double ww = r.w;
     double hh = r.h;
     
-    ArrayList<MapRect> row = new ArrayList<MapRect>();
+    MapRects row = new MapRects();
     int height = 0;
     int width = 0;
     double weight = 0;
@@ -39,8 +37,7 @@ public class SquarifiedAlgo extends MapAlgo {
         height = (int) (weight / sumweight * hh);
         height = height > 0 ? height : 1;
         
-        final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
-
+        final MapRects tmp = new MapRects();
         double x = xx;
         for(int i = start; i <= ni; i++) {
           int w = i == ni ? (int) (xx + ww - x) :
@@ -54,12 +51,12 @@ public class SquarifiedAlgo extends MapAlgo {
         // if ar has increased discard tmp and add row
         if(lineRatio(tmp) > lineRatio(row)) {
           // add rects of row to solution
-          rects.addAll(row);
+          rects.add(row);
           // preparing next line
           hh -= row.get(0).h;
           yy += row.get(0).h;
-          tmp.clear();
-          row.clear();
+          tmp.reset();
+          row.reset();
           start = ni;
           sumweight -= weight - ml.weight[ni];
           weight = 0;
@@ -77,7 +74,7 @@ public class SquarifiedAlgo extends MapAlgo {
         weight += ml.weight[ni];
         width = (int) (weight / sumweight * ww);
         width = width > 0 ? width : 1;
-        final ArrayList<MapRect> tmp = new ArrayList<MapRect>();
+        final MapRects tmp = new MapRects();
 
         double y = yy;
         for(int i = start; i <= ni; i++) {
@@ -92,12 +89,12 @@ public class SquarifiedAlgo extends MapAlgo {
         // if ar has increased discard tmp and add row
         if(lineRatio(tmp) > lineRatio(row)) {
           // add rects of row to solution
-          rects.addAll(row);
+          rects.add(row);
           // preparing next line
           ww -= row.get(0).w;
           xx += row.get(0).w;
-          tmp.clear();
-          row.clear();
+          tmp.reset();
+          row.reset();
           start = ni;
           sumweight -= weight - ml.weight[ni];
           weight = 0;
@@ -116,13 +113,8 @@ public class SquarifiedAlgo extends MapAlgo {
     
     for(final MapRect rect : row) rect.h = (int) hh;
     // adding last row
-    rects.addAll(row);
+    rects.add(row);
     
     return rects;
-  }
-
-  @Override
-  String getName() {
-    return "Squarified Layout";
   }
 }

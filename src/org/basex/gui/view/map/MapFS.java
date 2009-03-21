@@ -10,7 +10,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -53,14 +52,14 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
+  void drawRectangles(final Graphics g, final MapRects rects) {
     final Data data = view.gui.context.data();
     final MapRect l = view.layout.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);
 
-    final int rs = rects.size();
+    final int rs = rects.size;
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
       final MapRect r = rects.get(ri);
@@ -383,7 +382,7 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void init(final ArrayList<MapRect> rects) {
+  void init(final MapRects rects) {
     final int off = Math.max(GUIProp.fontsize, 16);
     for(final MapRect r : rects) {
       if(r.w > off && r.h > off && fs.isFile(r.pre)) {

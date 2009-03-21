@@ -1,7 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.util.ArrayList;
-
 /**
  * SplitLayout Algorithm.
  *
@@ -11,7 +9,7 @@ import java.util.ArrayList;
 public class SplitAlgo extends MapAlgo {
 
   @Override
-  public ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+  public MapRects calcMap(final MapRect r, final MapList ml, 
       final int ns, final int ne, final int l) {
     return calcMap(r, ml, ns, ne, l, 1);
   }
@@ -27,15 +25,15 @@ public class SplitAlgo extends MapAlgo {
    * @param sumweight weight of this recursion level
    * @return ArrayList containing rectangles
    */
-  private ArrayList<MapRect> calcMap(final MapRect r, final MapList ml, 
+  private MapRects calcMap(final MapRect r, final MapList ml, 
       final int ns, final int ne, final int l, final double sumweight) {
 
     if(ne - ns == 0) {
-      final ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      final MapRects rects = new MapRects();
       rects.add(new MapRect(r, ml.list[ns], l));
       return rects;
     } else {
-      final ArrayList<MapRect> rects = new ArrayList<MapRect>();
+      final MapRects rects = new MapRects();
       double weight;
       int ni = ns - 1;
   
@@ -52,7 +50,7 @@ public class SplitAlgo extends MapAlgo {
       int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sumweight * weight);
       int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
       // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0 && weight > 0) rects.addAll(calcMap(
+      if(ww > 0 && hh > 0 && weight > 0) rects.add(calcMap(
           new MapRect(xx, yy, ww, hh, 0, r.level), ml, ns, ni, l, weight));
       if(r.w > r.h) {
         xx += ww;
@@ -61,17 +59,12 @@ public class SplitAlgo extends MapAlgo {
         yy += hh;
         hh = r.h - hh;
       }
-//      System.out.println(ml.toString() + ";" + ni + ";" + ne);
+
       if(ww > 0 && hh > 0 && sumweight - weight > 0 && ni + 1 <= ne)
-          rects.addAll(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), 
+          rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), 
           ml, ni + 1, ne, l, sumweight - weight));
       
       return rects;
     }
-  }
-
-  @Override
-  String getName() {
-    return "Split Layout";
   }
 }

@@ -1,7 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.util.ArrayList;
-
 /**
  * Interface MapAlgorithms need to implement.
  * 
@@ -16,8 +14,8 @@ public abstract class MapAlgo {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  static double lineRatio(final ArrayList<MapRect> r) {
-    if (r.isEmpty()) return Double.MAX_VALUE;
+  static double lineRatio(final MapRects r) {
+    if (r.size() == 0) return Double.MAX_VALUE;
     double ar = 0;
 
     for(int i = 0; i < r.size(); i++) {
@@ -42,12 +40,6 @@ public abstract class MapAlgo {
    * @param level indicates level which is calculated
    * @return ArrayList holding laid out rectangles
    */
-  abstract ArrayList<MapRect> calcMap(final MapRect r, final MapList l, 
+  abstract MapRects calcMap(final MapRect r, final MapList l, 
       final int ns, final int ne, final int level);
-  
-  /**
-   * Get Algorithm name.
-   * @return String Layout name
-   */
-  abstract String getName();
 }

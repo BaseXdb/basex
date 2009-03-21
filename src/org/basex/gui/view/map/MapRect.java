@@ -8,7 +8,7 @@ import org.basex.gui.view.ViewRect;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-class MapRect extends ViewRect implements Cloneable {
+class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   /** File Type. */
   short type = -1;
   /** Thumbnail view. */
@@ -81,6 +81,10 @@ class MapRect extends ViewRect implements Cloneable {
    */
   boolean contains(final MapRect r) {
     return r.x >= x && r.y >= y && r.x + r.w <= x + w && r.y + r.h <= y + h;
+  }
+
+  public int compareTo(final MapRect r) {
+    return pre - r.pre;
   }
 
   @Override

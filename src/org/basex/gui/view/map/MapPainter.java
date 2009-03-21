@@ -2,8 +2,6 @@ package org.basex.gui.view.map;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.ArrayList;
-
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 
@@ -31,36 +29,24 @@ abstract class MapPainter {
    * @param ri current position
    * @return next color mark
    */
-  final Color color(final ArrayList<MapRect> rects, final int ri) {
+  final Color color(final MapRects rects, final int ri) {
     // find marked node
     final Nodes marked = view.gui.context.marked();
     final int p = -marked.find(rects.get(ri).pre) - 1;
     if(p < 0) return GUIConstants.colormark1;
+
     // mark ancestor of invisible node;
-    if(!"Squarified Layout".equals(view.layout.algo.getName())) {
-      return p < marked.size() && ri + 1 < rects.size() &&
-        marked.sorted[p] < rects.get(ri + 1).pre ? GUIConstants.colormark2 : 
-      null;
-      // [JH] does not mark ancestors if Squarified Layout is selected
-    } else return null;
+    final int i = rects.find(rects.get(ri));
+    return p < marked.size() && i + 1 < rects.size && marked.sorted[p] <
+      rects.sorted[i + 1].pre ? GUIConstants.colormark2 : null;
   }
-  
-  /*
-  if(p != marked.size()) {
-    final Data data = view.gui.context.data();
-    final int par = marked.nodes[p];
-    final int size = pre + data.size(pre, data.kind(pre));
-    if(par < size) return GUIConstants.colormark2;
-  }
-  return null;
-   */
 
   /**
    * Paints node contents.
    * @param g graphics reference
    * @param r rectangle array
    */
-  abstract void drawRectangles(final Graphics g, final ArrayList<MapRect> r);
+  abstract void drawRectangles(final Graphics g, final MapRects r);
 
   /**
    * Reacts on a mouse over/mouse click on the focused area.
@@ -81,7 +67,7 @@ abstract class MapPainter {
    * @param rects rectangle array
    */
   @SuppressWarnings("unused")
-  void init(final ArrayList<MapRect> rects) { }
+  void init(final MapRects rects) { }
 
   /**
    * Resets the painter.
