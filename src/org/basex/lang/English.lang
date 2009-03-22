@@ -598,3 +598,5 @@ h_catinput=Here you can further limit your query by entering substrings. To find
 h_mover=You can change the position of a view by dragging the bar on top of all view panels to any other place inside the main window.\n If you move a view outside the main window, it will be closed.
 h_tablehead=You can sort the table by clicking on the corresponding column in the table header. Moreover, you can directly query inside the table by entering something into the text fields.
 h_mem=This box displays the reserved memory of BaseX. By clicking on the box, you can enforce garbage collection.\n\n The display turns red if free memory is low. If this happens regularly, just launch BaseX with the Java flag -Xmx<size> ('java -X' gives you more information).
+h_guistatus=The status of the execution is shown.
+h_querycombo=Displays the opportunities for the query.
