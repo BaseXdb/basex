@@ -178,16 +178,13 @@ public final class Find extends AQuery {
    * @param cols filter columns
    * @param elem element flag
    * @param tag root tag
-   * @param data data reference
    * @param root root flag
    * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final Data data,
-      final boolean root) {
+      final BoolList elem, final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
-    final boolean fs = data.fs != null;
     for(int i = 0; i < filter.size; i++) {
       final String[] spl = split(filter.list[i]);
       for(final String s : spl) {
@@ -196,21 +193,18 @@ public final class Find extends AQuery {
         term = Token.trim(term);
         if(term.length == 0) continue;
         tb.add("[");
-        if(fs && i == 1) {
-          tb.add("@" + DataText.S_NAME + " ftcontains \"" + term + "\"");
-        } else {
-          final boolean elm = elem.list[i];
-          tb.add(elm ? ".//" : "@");
-          tb.add(cols.list[i]);
 
-          if(term[0] == '<' || term[0] == '>') {
-            tb.add(term[0]);
-            tb.add(calcNum(Token.substring(term, 1)));
-          } else {
-            tb.add(" ftcontains \"");
-            tb.add(term);
-            tb.add("\"");
-          }
+        final boolean elm = elem.list[i];
+        tb.add(elm ? ".//" : "@");
+        tb.add(cols.list[i]);
+
+        if(term[0] == '<' || term[0] == '>') {
+          tb.add(term[0]);
+          tb.add(calcNum(Token.substring(term, 1)));
+        } else {
+          tb.add(" ftcontains \"");
+          tb.add(term);
+          tb.add("\"");
         }
         tb.add("]");
       }

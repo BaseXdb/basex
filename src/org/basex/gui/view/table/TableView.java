@@ -85,6 +85,7 @@ public final class TableView extends View implements Runnable {
       findFocus();
       repaint();
     } else {
+      if(!more) tdata.resetFilter();
       gui.updating = true;
       new Thread(this).start();
     }

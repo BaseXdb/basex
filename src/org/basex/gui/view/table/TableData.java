@@ -346,7 +346,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tags.key(root), data, GUIProp.filterrt || r);
+        data.tags.key(root), GUIProp.filterrt || r);
     if(query.equals(last)) return null;
     last = query;
     return query;
