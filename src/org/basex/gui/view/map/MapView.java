@@ -310,7 +310,7 @@ public final class MapView extends View implements Runnable {
     layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
         nodes.size() - 1, 0);
 
-    //mainRects = layout.rectangles.clone();
+//    mainRects = (MapRects) layout.rectangles.clone();
     mainRects = layout.rectangles;
 
     painter.init(mainRects);
