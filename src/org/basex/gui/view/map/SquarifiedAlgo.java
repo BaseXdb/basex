@@ -33,7 +33,7 @@ public class SquarifiedAlgo extends MapAlgo {
     double tmpratio;
     double rowratio = Double.MAX_VALUE;
     
-    while(ni <= ne) {
+    while(ni <= ne && (xx + ww <= r.x + r.w || yy + hh <= r.y + r.h)) {
       if(ww < hh) {
         weight += ml.weight[ni];
         height = (int) (weight / sumweight * hh);
