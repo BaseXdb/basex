@@ -76,16 +76,25 @@ final class MapRects implements Iterable<MapRect> {
   }
 
   /**
-   * Returns the position of the specified node or the negative value - 1 of
-   * the position where it should have been found.
+   * Returns the position of the specified value or -1 if it has not been found.
    * @param r rectangle (pre value) to be found
    * @return true if the node was found
    */
   public int find(final MapRect r) {
     if(sorted == null) sort();
-    return Arrays.binarySearch(sorted, 0, size, r);
+    final int p = r.pre;
+    int l = 0;
+    int h = size - 1;
+    while(l <= h) {
+      final int m = (l + h) >>> 1;
+      final int c = list[m].pre - p;
+      if(c == 0) return m;
+      if(c < 0) l = m + 1;
+      else h = m - 1;
+    }
+    return -1;
   }
-
+  
   /**
    * Creates a sorted array. If the original array is already sorted,
    * the same reference is used.
