@@ -32,8 +32,7 @@ public class StripAlgo extends MapAlgo{
     double rowratio = Double.MAX_VALUE;
     
     
-    while(ni <= ne && (xx + ww <= r.x + r.w || yy + hh <= r.y + r.h)) {
-      
+    while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
       weight += ml.weight[ni];
       height = (int) (weight / sumweight * hh);
       height = height > 0 ? height : 1;
