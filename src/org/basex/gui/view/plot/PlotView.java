@@ -595,22 +595,24 @@ public final class PlotView extends View implements Runnable {
           l = 0;
           a = -1;
           while(a >= axis.min) {
-            if(a <= axis.max)
+            if(a <= axis.max) {
               drawCaptionAndGrid(g, drawX, formatString(a, drawX),
                   axis.calcPosition(a));
+            }
             final int lim = (int) (-1 * Math.pow(10, l + 1));
             double last = a;
             b = 2 * a;
             while(b > lim && b >= axis.min) {
               if(adequateDistance(drawX, last, b) && 
-                  adequateDistance(drawX, lim, b)) {
+                  adequateDistance(drawX, lim, b) &&
+                  b < axis.max) {
                 drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
                     formatString(b, drawX));
                 last = b;
               }
               b += a;
             }
-            
+              
             l++;
             a = -1 * (Math.pow(10, l));
           }
@@ -629,18 +631,19 @@ public final class PlotView extends View implements Runnable {
             if(a >= axis.min) {
               drawCaptionAndGrid(g, drawX, formatString(a, drawX),
                   axis.calcPosition(a));
-              final int lim = (int) Math.pow(10, l + 1);
-              double last = a;
-              b = 2 * a;
-              while(b < lim && b <= axis.max) {
-                if(adequateDistance(drawX, last, b) && 
-                    adequateDistance(drawX, lim, b)) {
-                  drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
-                      formatString(b, drawX));
-                  last = b;
-                }
-                b += a;
+            }
+            final int lim = (int) Math.pow(10, l + 1);
+            double last = a;
+            b = 2 * a;
+            while(b < lim && b <= axis.max) {
+              if(adequateDistance(drawX, last, b) && 
+                  adequateDistance(drawX, lim, b) &&
+                  b > axis.min) {
+                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
+                    formatString(b, drawX));
+                last = b;
               }
+              b += a;
             }
 
             l++;
