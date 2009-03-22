@@ -262,17 +262,16 @@ public final class PlotView extends View implements Runnable {
         RenderingHints.VALUE_ANTIALIAS_ON);
 
     // overdraw plot background
-    g.setColor(color1);
-    final int sz = sizeFactor();
+    /*g.setColor(color1);
     g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz,
-        plotHeight - sz);
+        plotHeight - sz);*/
 
     // draw axis and grid
       drawAxis(g, true);
       drawAxis(g, false);
 
     // draw dark plot bounder
-    g.setColor(color6);
+    /*g.setColor(color6);
     final int w = getWidth();
     final int h = getHeight();
     g.drawLine(MARGIN[1] + sz, MARGIN[0], w - MARGIN[3], MARGIN[0]);
@@ -280,7 +279,7 @@ public final class PlotView extends View implements Runnable {
         h - MARGIN[2] - sz);
     g.drawLine(MARGIN[1] + sz, MARGIN[0], MARGIN[1] + sz,
         h - MARGIN[2] - sz);
-    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - sz);
+    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - sz);*/
 
     // draw items
     g.setColor(color6);
@@ -481,8 +480,6 @@ public final class PlotView extends View implements Runnable {
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
 //    Performance perf = new Performance();
-    final int h = getHeight();
-    final int w = getWidth();
     g.setColor(back);
 
     final int sz = sizeFactor();
@@ -493,7 +490,7 @@ public final class PlotView extends View implements Runnable {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     // drawing horizontal axis line
     if(drawX) {
-      g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
+      //g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
       if(plotChanged) {
         axis.calcCaption(pWidth);
         final Kind kind = plotData.xAxis.type;
@@ -501,7 +498,7 @@ public final class PlotView extends View implements Runnable {
       }
     } else {
       // drawing vertical axis line
-      g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
+      //g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
       if(plotChanged) {
         axis.calcCaption(pHeight);
         final Kind kind = plotData.yAxis.type;
@@ -572,8 +569,8 @@ public final class PlotView extends View implements Runnable {
     } else {
       final boolean noRange = axis.max - axis.min == 0;
       // draw min and max grid line
-      drawCaptionAndGrid(g, drawX, "", 0);
-      drawCaptionAndGrid(g, drawX, "", 1);
+      drawIntermediateGridLine(g, drawX, 0, null);
+      drawIntermediateGridLine(g, drawX, 1, null);
 
       // return if insufficient plot space
       if(nrCaptions == 0) return;
@@ -587,57 +584,72 @@ public final class PlotView extends View implements Runnable {
 
       int c = 0;
 
-      // draw logarithmic scale
+      // draw LOGARITHMIC SCALE
       if(axis.log) {
-        int l = (int) (Math.log10(Math.abs(axis.min)));
-        l = l > 0 ? l : 1;
-        double a = axis.min;
+        int l = 0;
+        double a = 0;
         double b = 0;
-        final boolean neg = axis.min < 0;
-        // draw labels <= 0
-        if(neg) {
-          b = (int) (-1 * Math.pow(10, l));
-          while(adequateDistance(drawX, b, axis.max) && b > axis.min) {
-            if(adequateDistance(drawX, a, b) && b < axis.max)
-              // ------------------ insteps
-              drawCaptionAndGrid(g, drawX,
-                  formatString(b, drawX), axis.calcPosition(b));
-            a = b;
-            l--;
-            if(l == 0) {
-              b = 0;
-              // ------------------ insteps ?????
-              if(axis.max > 0 && adequateDistance(drawX, a, b))
-                drawCaptionAndGrid(g, drawX,
-                    formatString(b, drawX), axis.calcPosition(b));
-              break;
+
+        // draw labels for negative values
+        if(axis.min < 0) {
+          l = 0;
+          a = -1;
+          while(a >= axis.min) {
+            if(a <= axis.max)
+              drawCaptionAndGrid(g, drawX, formatString(a, drawX),
+                  axis.calcPosition(a));
+            final int lim = (int) (-1 * Math.pow(10, l + 1));
+            double last = a;
+            b = 2 * a;
+            while(b > lim && b >= axis.min) {
+              if(adequateDistance(drawX, last, b) && 
+                  adequateDistance(drawX, lim, b)) {
+                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
+                    formatString(b, drawX));
+                last = b;
+              }
+              b += a;
             }
-            b = (int) (-1 * Math.pow(10, l));
+            
+            l++;
+            a = -1 * (Math.pow(10, l));
           }
         }
+         
+        // draw 0 label if necessary; logarithmic crap
+        if(0 >= axis.min && 0 <= axis.max)
+          drawCaptionAndGrid(g, drawX, formatString(0, drawX), 
+              axis.calcPosition(0));
+        
+        // draw labels > 0
+        if(axis.max > 0) {
+          l = 0;
+          a = 1;
+          while(a <= axis.max) {
+            if(a >= axis.min) {
+              drawCaptionAndGrid(g, drawX, formatString(a, drawX),
+                  axis.calcPosition(a));
+              final int lim = (int) Math.pow(10, l + 1);
+              double last = a;
+              b = 2 * a;
+              while(b < lim && b <= axis.max) {
+                if(adequateDistance(drawX, last, b) && 
+                    adequateDistance(drawX, lim, b)) {
+                  drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
+                      formatString(b, drawX));
+                  last = b;
+                }
+                b += a;
+              }
+            }
 
-        // draw labels >= 0, logarithmic crap
-        if(neg) {
-          a = 0;
-          l++;
-        } else {
-          a = axis.min;
-          l = (int) (Math.log10(Math.abs(axis.min)));
-          l = l > 0 ? l : 0;
+            l++;
+            a = Math.pow(10, l);
+          }
         }
-        b = (int) (Math.pow(10, l));
-        b = b > 0 ? b : 0;
-        while(adequateDistance(drawX, b, axis.max) && b < axis.max) {
-          if(adequateDistance(drawX, a, b) && b > axis.min)
-            // ------------------ insteps
-            drawCaptionAndGrid(g, drawX, formatString(b, drawX),
-                axis.calcPosition(b));
-          a = b;
-          l++;
-          b = (int) (Math.pow(10, l));
-        }
+        
 
-      // draw linear scale
+      // draw LINEAR SCALE
       } else {
         // draw captions between min and max
         double d = axis.calcPosition(axis.startvalue);
@@ -667,9 +679,10 @@ public final class PlotView extends View implements Runnable {
    */
   private boolean adequateDistance(final boolean drawX, final double a,
       final double b) {
+    final double t = drawX ? 1.8d : 1.3d;
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -
-    calcCoordinate(drawX, axis.calcPosition(b))) > sizeFactor() * 1.5;
+    calcCoordinate(drawX, axis.calcPosition(b))) >= sizeFactor() / t;
   }
 
   /**
@@ -681,19 +694,48 @@ public final class PlotView extends View implements Runnable {
    */
   private void drawCaptionAndGrid(final Graphics g, final boolean drawX,
       final String caption, final double d) {
+    String cap = caption;
+ // if label is too long, it is is chopped to the first characters
+    if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
+    
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
     final int textH = g.getFontMetrics().getHeight();
     final int fs = GUIProp.fontsize;
-    String cap = caption;
+    final int imgW = BaseXLayout.width(g, cap) + fs;
+    final BufferedImage img = createCaptionImage(g, cap, false, imgW);
 
-    // if label is too long, it is is chopped to the first characters
-    if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
-
+    // ... after that
+    // the image and the grid line are drawn beside x / y axis
+    g.setColor(back);
+    if(drawX) {
+      final int y = h - MARGIN[2];
+      g.drawImage(img, pos - imgW + textH - fs + 3, y, this);
+      g.drawLine(pos, MARGIN[0], pos, y + fs / 2);
+      g.drawLine(pos - 1, MARGIN[0], pos - 1, y + fs / 2);
+    } else {
+      g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
+      g.drawLine(MARGIN[1] - fs / 2, pos, w - MARGIN[3], pos);
+      g.drawLine(MARGIN[1] - fs / 2, pos + 1, w - MARGIN[3], pos + 1);
+    }
+  }
+  
+  /**
+   * Creates a buffered image for a given string which serves as axis caption.
+   * @param g Graphics reference
+   * @param caption caption string
+   * @param im intermediate caption (lighter color)
+   * @param imgW image width
+   * @return buffered image
+   */
+  private BufferedImage createCaptionImage(final Graphics g,
+      final String caption, final boolean im, final int imgW) {
+    final int textH = g.getFontMetrics().getHeight();
+    final int fs = GUIProp.fontsize;
+    
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
-    final int imgW = BaseXLayout.width(g, cap) + fs;
     final int imgH = 160;
     final BufferedImage img = new BufferedImage(imgW, imgH,
         Transparency.BITMASK);
@@ -703,18 +745,49 @@ public final class PlotView extends View implements Runnable {
     g2d.rotate(ROTATE, imgW, 0 + textH);
     g2d.setFont(font);
     g2d.setColor(Color.black);
-    g2d.drawString(cap, fs, fs);
-
-    // ... after that
-    // the image and the grid line are drawn beside x / y axis
+    if(im) g2d.setColor(color4);
+    g2d.drawString(caption, fs, fs);
+    
+    return img;
+  }
+  
+  /**
+   * Draws intermediate grid lines without caption.
+   * @param g Graphics reference
+   * @param drawX draw line for x axis 
+   * @param d relative position of grid line 
+   * @param caption caption to draw. if cap = null, no caption is drawn
+   */
+  private void drawIntermediateGridLine(final Graphics g, final boolean drawX,
+      final double d, final String caption) {
+    String cap = caption;
+    final int pos = calcCoordinate(drawX, d);
+    final int h = getHeight();
+    final int w = getWidth();
+    final int fs = GUIProp.fontsize;
+    final int sf = sizeFactor();
     g.setColor(back);
-    if(drawX) {
+    
+    if(cap != null) {
+      if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
+      final int textH = g.getFontMetrics().getHeight();
+      final int imgW = BaseXLayout.width(g, cap) + fs;
+      final BufferedImage img = createCaptionImage(g, cap, true, imgW);
       final int y = h - MARGIN[2];
-      g.drawImage(img, pos - imgW + textH - fs, y, this);
-      g.drawLine(pos, MARGIN[0], pos, y + fs / 2);
+      if(drawX) {
+        g.drawImage(img, pos - imgW + textH - fs + 3, y - textH / 3, this);
+        g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2]);
+      } else {
+        g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
+        g.drawLine(MARGIN[1], pos, w - MARGIN[3], pos);
+      }
+      
     } else {
-      g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
-      g.drawLine(MARGIN[1] - fs / 2, pos, w - MARGIN[3], pos);
+      if(drawX) {
+        g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);
+      } else {
+        g.drawLine(MARGIN[1] + sf, pos, w - MARGIN[3], pos);
+      }
     }
   }
 
