@@ -155,6 +155,7 @@ ds_green=緑
 ds_blue=青
 
 dm_title=マップレイアウト
+dm_simple=Divide rectangles uniformly
 dm_atts=属性の表示
 dm_choice1=タイトル、枠線無し
 dm_choice2=タイトル無し、枠線最細
@@ -549,6 +550,7 @@ h_meta=このチェックボックスを選択すると、多くのファイル�
 h_cont=このチェックボックスを選択すると、ファイル内のテキスト情報をデータベースに含めることが出来ます。テキスト情報を含めた場合、それらはXPath や XQueryによって検索することが出来ます。
 h_fsmax=インポートされるテキストファイルのサイズの上限を設定します。
 h_mapatts=このチェックボックスを選択すると、属性はツリーマップの中に表示されます。
+h_mapsimple= If this checkbox is turned on, rectangles are divided uniformly in TreeMap.
 h_maplayout=ここではツリーマップビューのレイアウトアルゴリズムを変更します。データベースを開いている場合、変更は即座に反映されます。
 h_mapoff=ここではツリーマップビューの四角形の整列方法を変更します。データベースを開いている場合、変更は即座に反映されます。
 h_mapsize=Here you can influence how the rectangle size is calculated.

@@ -93,7 +93,7 @@ public final class PlotView extends View implements Runnable {
   boolean drawSubNodes;
   /** Indicates if the buffered image for marked nodes has to be redrawn. */
   boolean markingChanged;
-  /** Indicates if a filter operation is self implied or was trigger by
+  /** Indicates if a filter operation is self implied or was triggered by
    * another view. */
   boolean rightClick;
   /** Context which is displayed in the plot after a context change which was

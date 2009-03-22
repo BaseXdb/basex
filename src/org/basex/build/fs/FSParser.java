@@ -3,14 +3,12 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.build.Builder;
@@ -70,7 +68,7 @@ public final class FSParser extends Parser {
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
   /** DeepFS import flag (copy files to backing store). */
-  private boolean wbacking = true;
+  private boolean wbacking = false;
   /** Root of backing store. */
   private String backingroot;
   /** Length of absolute pathname of the root directory the import starts from,
@@ -121,11 +119,9 @@ public final class FSParser extends Parser {
     builder.encoding(Prop.ENCODING);
 
     backingroot = Prop.backingpath + "/" + io.name();
-    File bs = new File(backingroot);
-    if (!bs.mkdirs())
-      if (bs.exists())
-        if (!FSUtils.deleteDir(bs) || !bs.mkdirs())
-          throw new IOException(BACKINGEXISTS + backingroot);
+    final File bs = new File(backingroot);
+    if(wbacking && (!deleteDir(bs) || !bs.mkdirs()))
+      throw new IOException(BACKINGEXISTS + backingroot);
     
     builder.startDoc(token(io.name()));
 
@@ -133,8 +129,9 @@ public final class FSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      atts.add(MOUNTPOINT, token(Prop.mountpoint));
+      atts.add(NAME, token(io.path()));
       atts.add(SIZE, token("0"));
+      atts.add(MOUNTPOINT, token(Prop.mountpoint));
       atts.add(BACKINGSTORE, token(backingroot));
       builder.startElem(DEEPFS, atts);
       
@@ -142,13 +139,10 @@ public final class FSParser extends Parser {
         new File[] { new File(io.path()).getCanonicalFile() }) {
         
         importRootLength = f.getAbsolutePath().length();
-        
         sizeStack[0] = 0;
         parse(f);
-
         builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
       }
-      
       builder.endElem(DEEPFS);
     }
     builder.endDoc();
@@ -318,5 +312,19 @@ public final class FSParser extends Parser {
   @Override
   public double prog() {
     return 0;
+  }
+  
+  /**
+   * Deletes a non-empty directory. 
+   * @param dir to be deleted.
+   * @return boolean true for success, false for failure.
+   * */ 
+  public static boolean deleteDir(final File dir) {
+    if(dir.isDirectory()) {
+      for(final String child : dir.list()) {
+        if(!deleteDir(new File(dir, child))) return false;
+      }
+    }
+    return dir.delete();
   }
 }

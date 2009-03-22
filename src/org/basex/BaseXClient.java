@@ -240,7 +240,7 @@ public class BaseXClient {
   }
 
   /**
-   * Return command process.
+   * Returns a process instance.
    * @param p process
    * @return process
    */

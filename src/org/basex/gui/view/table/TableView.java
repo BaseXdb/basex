@@ -229,9 +229,8 @@ public final class TableView extends View implements Runnable {
         if(!e.isShiftDown()) tdata.resetFilter();
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         tdata.cols[c].filter = str;
-        final String query = tdata.find();
-        if(query != null) gui.execute(new XQuery(query));
-        repaint();
+        query();
+        //repaint();
       } else {
         Nodes nodes = context.marked();
         if(getCursor() == GUIConstants.CURSORARROW) {
@@ -252,6 +251,14 @@ public final class TableView extends View implements Runnable {
         }
       }
     }
+  }
+  
+  /**
+   * Performs a table query.
+   */
+  void query() {
+    final String query = tdata.find();
+    if(query != null) gui.execute(new XQuery(query));
   }
   
   @Override

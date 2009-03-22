@@ -1,17 +1,14 @@
 package org.basex.fuse;
 
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.FSText;
-import org.basex.build.fs.FSUtils;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
@@ -127,7 +124,7 @@ public final class DeepFS extends DeepFuse implements DataText {
         }
         if(!mp.mkdirs()) {
           if(mp.exists()) {
-            if(!FSUtils.deleteDir(mp) || !mp.mkdirs()) {
+            if(!FSParser.deleteDir(mp) || !mp.mkdirs()) {
               BaseX.errln(FSText.MOUNTPOINTEXISTS + mp.toString());
               return;
             }
@@ -143,8 +140,8 @@ public final class DeepFS extends DeepFuse implements DataText {
         }
         if(!bp.mkdirs()) {
           if(bp.exists()) {
-            if(!FSUtils.deleteDir(bp) || !bp.mkdirs()) {
-              BaseX.errln(FSText.BACKINGSTOREEXISTS + bp.toString());
+            if(!FSParser.deleteDir(bp) || !bp.mkdirs()) {
+              BaseX.errln(FSText.BACKINGEXISTS + bp.toString());
               return;
             }
           }
@@ -264,7 +261,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     if(s != 0) {
       final byte[] b;
       if (Prop.fuse) b = mountpoint(il.list[s - 1]);
-      else b = backingstore(il.list[s - 1]);
+      else b = name(il.list[s - 1]);
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -286,15 +283,6 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private byte[] mountpoint(final int pre) {
     return attr(pre, data.fs.mountpointID);
-  }
-  
-  /**
-   * Returns the backingstore attribute value of a deepfs file hierarchy.
-   * @param pre pre value
-   * @return path mountpoint.
-   */
-  private byte[] backingstore(final int pre) {
-    return attr(pre, data.fs.backingstoreID);
   }
   
   /**

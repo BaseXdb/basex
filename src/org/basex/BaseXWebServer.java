@@ -198,7 +198,7 @@ public final class BaseXWebServer {
   }
 
   /**
-   * Send requested file to output stream.
+   * Sends the file contents to the socket.
    * @param file reference
    * @param s socket reference
    * @throws IOException I/O exception
@@ -221,7 +221,7 @@ public final class BaseXWebServer {
   }
 
   /**
-   * Sends a file not found message to the client.
+   * Sends a "FileNotFound" message to the client.
    * @param code code
    * @param head optional headers
    * @param msg message
@@ -319,7 +319,7 @@ public final class BaseXWebServer {
   }
 
   /**
-   * Evaluate a process.
+   * Executes the specified command in the operating system.
    * @param s socket reference
    * @param exec process executable and arguments
    * @throws Exception exception

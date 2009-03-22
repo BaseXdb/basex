@@ -40,8 +40,7 @@ public final class Prop {
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
 
-  /** Available languages (should be retrieved dynamically, but leads to
-   * problems with JAR file. Someone knows what to do?) */
+  /** Supported languages. */
   public static final String[] LANGUAGES = { "English", "German", "Japanese" };
   /** Translation credits. */
   public static final String[] LANGCREDS = { "Project Team",
@@ -182,7 +181,6 @@ public final class Prop {
 
   static {
     try {
-//      System.loadLibrary("deepfs");
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
       fuse = false;
       edbt = false;

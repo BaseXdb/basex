@@ -68,7 +68,7 @@ public final class ClientProcess extends AbstractProcess {
   }
 
   /**
-   * Receive input stream over the network.
+   * Receives an input stream over the network.
    * @param o output stream
    * @throws IOException I/O Exception
    */

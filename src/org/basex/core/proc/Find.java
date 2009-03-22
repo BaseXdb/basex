@@ -189,8 +189,6 @@ public final class Find extends AQuery {
     final TokenBuilder tb = new TokenBuilder();
     final boolean fs = data.fs != null;
     for(int i = 0; i < filter.size; i++) {
-      if(filter.list[i].length() < 3) continue;
-
       final String[] spl = split(filter.list[i]);
       for(final String s : spl) {
         byte[] term = Token.token(s);
@@ -204,32 +202,21 @@ public final class Find extends AQuery {
           final boolean elm = elem.list[i];
           tb.add(elm ? ".//" : "@");
           tb.add(cols.list[i]);
-          String quote = "\"";
 
           if(term[0] == '<' || term[0] == '>') {
             tb.add(term[0]);
-            quote = "";
-            term = Token.token(calcNum(Token.substring(term, 1)));
-          } else if(data.meta.ftxindex && elm) {
-            tb.add(" ftcontains ");
-          } else if(spl.length == 1 && (elm && data.meta.txtindex ||
-              !elm && data.meta.atvindex)) {
-            tb.add(" = ");
+            tb.add(calcNum(Token.substring(term, 1)));
           } else {
-            tb.add(" ftcontains ");
+            tb.add(" ftcontains \"");
+            tb.add(term);
+            tb.add("\"");
           }
-          tb.add(quote);
-          tb.add(term);
-          tb.add(quote);
         }
         tb.add("]");
       }
     }
-
-    String xquery = tb.toString();
-    if(xquery.length() != 0) xquery = (root ? "/" : "") +
-      "descendant-or-self::" + Token.string(tag) + xquery;
-    return xquery;
+    return tb.size == 0 ? "." : (root ? "/" : "") +
+      "descendant-or-self::" + Token.string(tag) + tb;
   }
 
   /**

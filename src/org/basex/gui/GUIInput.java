@@ -116,12 +116,13 @@ public final class GUIInput extends BaseXTextField {
           return;
         }
 
-        final boolean enter = c == KeyEvent.VK_ENTER;
-        if(!enter) showPopup();
-        if(enter) pop.hide();
-
-        // skip commands
-        if(GUIProp.execrt && !cmdMode()) main.execute();
+        if(c == KeyEvent.VK_ENTER) {
+          pop.hide();
+        } else {
+          showPopup();
+          // skip commands
+          if(GUIProp.execrt && !cmdMode()) main.execute();
+        }
       }
     });
   }

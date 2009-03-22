@@ -181,9 +181,7 @@ final class TableData {
     final int[] n = context.current().nodes;
 
     rows = new IntList();
-    for(int c = 0; c < n.length; c++) {
-      int p = n[c];
-
+    for(int p : n) {
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {
@@ -342,7 +340,7 @@ final class TableData {
     final StringList filters = new StringList();
     final TokenList names = new TokenList();
     final BoolList elems = new BoolList();
-    for(TableCol col : cols) {
+    for(final TableCol col : cols) {
       filters.add(col.filter);
       names.add(col.name);
       elems.add(col.elem);
@@ -351,7 +349,7 @@ final class TableData {
         data.tags.key(root), data, GUIProp.filterrt || r);
     if(query.equals(last)) return null;
     last = query;
-    return query.length() != 0 ? query : "/";
+    return query;
   }
 
   /**

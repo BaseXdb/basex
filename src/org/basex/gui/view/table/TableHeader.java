@@ -279,7 +279,7 @@ final class TableHeader extends BaseXPanel {
         } else {
           // reset table filter
           tdata.resetFilter();
-          tdata.find();
+          view.query();
         }
       }
     }
@@ -377,7 +377,7 @@ final class TableHeader extends BaseXPanel {
     if(box == null || inputCol == -1 || e.isAltDown()) return;
     if(box.add(e.getKeyChar())) {
       tdata.cols[inputCol].filter = box.text;
-      tdata.find();
+      view.query();
     }
   }
 

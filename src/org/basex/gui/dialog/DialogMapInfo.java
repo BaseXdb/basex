@@ -76,7 +76,7 @@ public final class DialogMapInfo extends Dialog {
   }
 
   /**
-   * sets the table values.
+   * Sets the table values.
    * @param nn number of nodes
    * @param rect main rectangle
    * @param aar average aspect ratio

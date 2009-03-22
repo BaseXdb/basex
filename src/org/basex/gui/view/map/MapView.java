@@ -310,10 +310,6 @@ public final class MapView extends View implements Runnable {
     //mainRects = layout.rectangles.clone();
     mainRects = layout.rectangles;
 
-    // sort input nodes and rectangles to speedup highlighting
-    mainRects.sort();
-    nodes.sort();
-    
     painter.init(mainRects);
     drawMap(map, mainRects);
     focus();

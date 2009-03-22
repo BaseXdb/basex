@@ -176,6 +176,4 @@ public interface FSText {
   String BACKINGEXISTS = "Backing storage exists & can not be deleted: ";
   /** Error message 'Import FS...' if mountpoint exists & can't be cleaned. */
   String MOUNTPOINTEXISTS = "Mountpoint exists & can not be deleted: ";
-  /** Error message 'Import FS...' if backingpoint exists & can't be cleaned. */
-  String BACKINGSTOREEXISTS = "Backing store exists & can not be deleted: ";
 }
