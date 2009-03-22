@@ -28,6 +28,9 @@ public class StripAlgo extends MapAlgo{
     int height = 0;
     double weight = 0;
     double sumweight = 1;
+    double tmpratio = 0;
+    double rowratio = Double.MAX_VALUE;
+    
     
     while(ni <= ne) {
       weight += ml.weight[ni];
@@ -41,15 +44,18 @@ public class StripAlgo extends MapAlgo{
         int w = i == ni ? (int) (xx + ww - x) :
           (int) (ml.weight[i] / weight * ww);
         w = w > 0 ? w : 1;
+        
         if(x + w <= xx + ww) tmp.add(new MapRect((int) x, (int) yy, w, height,
             ml.list[i], l));
         x += w;
       }
+      tmpratio = lineRatio(tmp);
 
       // if ar has increased discard tmp and add row
-      if(lineRatio(tmp) > lineRatio(row)) {
+      if(tmpratio > rowratio) {
         // add rects of row to solution
         rects.add(row);
+        rowratio = Double.MAX_VALUE;
         // preparing next line
         hh -= row.get(0).h;
         yy += row.get(0).h;
@@ -66,11 +72,12 @@ public class StripAlgo extends MapAlgo{
         }
       } else {
         row = tmp;
+        rowratio = tmpratio;
         ni++;
       }
     }
-    for(final MapRect rect : row) rect.h = (int) hh;
     // adding last row
+    for(final MapRect rect : row) rect.h = (int) hh;
     rects.add(row);
     
     return rects;

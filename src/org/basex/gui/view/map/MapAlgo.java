@@ -9,27 +9,31 @@ package org.basex.gui.view.map;
 public abstract class MapAlgo {
 
   /**
-   * Calculates the average aspect Ratios of rectangles given in the List.
-   *
+   * Calculates the aspect Ratios of rectangles given in the List. Bigger 
+   * rectangles have more influence to the result.
+   * 
    * @param r Array of rectangles
    * @return average aspect ratio
    */
   static double lineRatio(final MapRects r) {
-    if (r.size() == 0) return Double.MAX_VALUE;
+    if(r.size() == 0) return Double.MAX_VALUE;
     double ar = 0;
+    double dev = 0;
 
-    for(int i = 0; i < r.size(); i++) {
-      if (r.get(i).w != 0 && r.get(i).h != 0) {
-        if (r.get(i).w > r.get(i).h) {
-          ar += r.get(i).w / r.get(i).h;
+    for(MapRect rect : r) {
+      if(rect.w != 0 && rect.h != 0) {
+        double d = rect.w * rect.h;
+        dev += d;
+        if(rect.w > rect.h) {
+          ar += d * rect.w / rect.h;
         } else {
-          ar += r.get(i).h / r.get(i).w;
+          ar += d * rect.h / rect.w;
         }
       }
     }
-    return ar / r.size();
+    return ar / dev;
   }
-  
+
   /**
    * Splits List nodes into Rectangles matching in given space.
    * 
@@ -40,6 +44,6 @@ public abstract class MapAlgo {
    * @param level indicates level which is calculated
    * @return ArrayList holding laid out rectangles
    */
-  abstract MapRects calcMap(final MapRect r, final MapList l, 
-      final int ns, final int ne, final int level);
+  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
+      final int ne, final int level);
 }

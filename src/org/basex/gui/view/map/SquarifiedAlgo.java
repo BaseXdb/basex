@@ -30,6 +30,8 @@ public class SquarifiedAlgo extends MapAlgo {
     int width = 0;
     double weight = 0;
     double sumweight = 1;
+    double tmpratio;
+    double rowratio = Double.MAX_VALUE;
     
     while(ni <= ne) {
       if(ww < hh) {
@@ -47,11 +49,13 @@ public class SquarifiedAlgo extends MapAlgo {
               ml.list[i], l));
           x += w;
         }
+        tmpratio = lineRatio(tmp);
 
         // if ar has increased discard tmp and add row
-        if(lineRatio(tmp) > lineRatio(row)) {
+        if(tmpratio > lineRatio(row)) {
           // add rects of row to solution
           rects.add(row);
+          rowratio = Double.MAX_VALUE;
           // preparing next line
           hh -= row.get(0).h;
           yy += row.get(0).h;
@@ -68,6 +72,7 @@ public class SquarifiedAlgo extends MapAlgo {
           }
         } else {
           row = tmp;
+          rowratio = tmpratio;
           ni++;
         }
       } else {
@@ -85,11 +90,13 @@ public class SquarifiedAlgo extends MapAlgo {
               ml.list[i], l));
           y += h;
         }
-
+        tmpratio = lineRatio(tmp);
+        
         // if ar has increased discard tmp and add row
-        if(lineRatio(tmp) > lineRatio(row)) {
+        if(tmpratio > rowratio) {
           // add rects of row to solution
           rects.add(row);
+          rowratio = Double.MAX_VALUE;
           // preparing next line
           ww -= row.get(0).w;
           xx += row.get(0).w;
@@ -106,6 +113,7 @@ public class SquarifiedAlgo extends MapAlgo {
           }
         } else {
           row = tmp;
+          rowratio = tmpratio;
           ni++;
         }
       }

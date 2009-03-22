@@ -147,7 +147,8 @@ class MapLayout {
    * @param level indicates level which is calculated
    */
   private void putRect(final MapRect r, final int level) {
-    rectangles.add(r);
+    if(!GUIProp.fsmeta) {
+      rectangles.add(r);
 
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
@@ -162,5 +163,31 @@ class MapLayout {
     final MapList ch = children(r.pre);
     if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
         ch, 0, ch.size - 1, level + 1);
+    } else {
+      // position, with and height calculated using sizes of former level
+      final int x = r.x + layout.x;
+      final int y = r.y + layout.y;
+      final int w = r.w - layout.w;
+      final int h = r.h - layout.h;
+      
+      // skip too small rectangles and meta data in file systems
+      if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs && 
+          ViewData.isLeaf(data, r.pre)) {
+        rectangles.add(r);
+        return;
+      }
+
+      final MapList ch = children(r.pre);
+      if(ViewData.isLeaf(data, r.pre) && ch.size > 0) {
+        r.w = r.w / 2;
+        rectangles.add(r);
+        makeMap(new MapRect(r.x + r.w, r.y, r.w, r.h, r.pre, r.level + 1),
+            ch, 0, ch.size - 1, level + 1);
+      } else {
+        rectangles.add(r);
+        if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+            ch, 0, ch.size - 1, level + 1);
+      }
+    }
   }
 }

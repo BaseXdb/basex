@@ -114,7 +114,10 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
-      painter = GUIProp.mapfs && data.fs != null ? new MapFS(this, data.fs) :
+      if(!GUIProp.fsmeta)
+        painter = GUIProp.mapfs && data.fs != null ? new MapFS(this, data.fs) :
+        new MapDefault(this);
+      else painter = data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
       mainMap = createImage();
       zoomMap = createImage();

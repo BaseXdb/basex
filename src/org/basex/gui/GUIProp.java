@@ -152,7 +152,8 @@ public final class GUIProp {
   public static boolean mapinfo = false;
   /** Shows real file contents in the treemap. */
   public static boolean mapfs = true;
-
+  /** show file cont plus meta data. */
+  public static boolean fsmeta = false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   
