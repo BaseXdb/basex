@@ -22,7 +22,7 @@ final class MapRects implements Iterable<MapRect> {
   /**
    * Default constructor.
    */
-  public MapRects() {
+  MapRects() {
     this(8);
   }
 
@@ -30,7 +30,7 @@ final class MapRects implements Iterable<MapRect> {
    * Constructor, specifying an initial list size.
    * @param is initial size of the list
    */
-  public MapRects(final int is) {
+  MapRects(final int is) {
     list = new MapRect[is];
   }
 
@@ -38,7 +38,7 @@ final class MapRects implements Iterable<MapRect> {
    * Adds a new value.
    * @param v value to be added
    */
-  public void add(final MapRect v) {
+  void add(final MapRect v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
@@ -47,7 +47,7 @@ final class MapRects implements Iterable<MapRect> {
    * Adds several new values.
    * @param v values to be added
    */
-  public void add(final MapRects v) {
+  void add(final MapRects v) {
     for(final MapRect m : v) add(m);
   }
 
@@ -56,7 +56,7 @@ final class MapRects implements Iterable<MapRect> {
    * @param i value index
    * @return value
    */
-  public MapRect get(final int i) {
+  MapRect get(final int i) {
     return list[i];
   }
 
@@ -64,14 +64,14 @@ final class MapRects implements Iterable<MapRect> {
    * Returns the number of entries.
    * @return number of entries
    */
-  public int size() {
+  int size() {
     return size;
   }
 
   /**
    * Resets the integer list.
    */
-  public void reset() {
+  void reset() {
     size = 0;
   }
 
@@ -80,7 +80,7 @@ final class MapRects implements Iterable<MapRect> {
    * @param r rectangle (pre value) to be found
    * @return true if the node was found
    */
-  public int find(final MapRect r) {
+  int find(final MapRect r) {
     if(sorted == null) sort();
     final int p = r.pre;
     int l = 0;
@@ -99,7 +99,7 @@ final class MapRects implements Iterable<MapRect> {
    * Creates a sorted array. If the original array is already sorted,
    * the same reference is used.
    */
-  public void sort() {
+  void sort() {
     int i = Integer.MIN_VALUE;
     for(final MapRect r : this) {
       if(i > r.pre) {
@@ -119,5 +119,15 @@ final class MapRects implements Iterable<MapRect> {
       public MapRect next() { return list[c]; }
       public void remove() { BaseX.notimplemented(); }
     };
+  }
+
+  /**
+   * Creates a copy of the rectangles.
+   * @return copy
+   */
+  MapRects copy() {
+    final MapRects rects = new MapRects(size);
+    rects.add(this);
+    return rects;
   }
 }
