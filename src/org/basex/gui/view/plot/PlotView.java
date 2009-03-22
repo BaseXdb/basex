@@ -494,7 +494,8 @@ public final class PlotView extends View implements Runnable {
       if(plotChanged) {
         axis.calcCaption(pWidth);
         final Kind kind = plotData.xAxis.type;
-        xLog.setEnabled(kind == Kind.DBL || kind == Kind.INT);
+        xLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) && 
+            Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
       // drawing vertical axis line
@@ -502,7 +503,8 @@ public final class PlotView extends View implements Runnable {
       if(plotChanged) {
         axis.calcCaption(pHeight);
         final Kind kind = plotData.yAxis.type;
-        yLog.setEnabled(kind == Kind.DBL || kind == Kind.INT);
+        yLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
+            Math.abs(axis.min - axis.max) >= 1);
       }
     }
     if(plotData.pres.length < 1) {
