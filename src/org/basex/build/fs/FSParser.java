@@ -118,7 +118,7 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    backingroot = Prop.backingpath + "/" + io.name();
+    backingroot = Prop.backingpath + Prop.SEP + io.name();
     final File bs = new File(backingroot);
     if(wbacking && (!deleteDir(bs) || !bs.mkdirs()))
       throw new IOException(BACKINGEXISTS + backingroot);

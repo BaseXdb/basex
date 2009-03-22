@@ -36,31 +36,26 @@ public final class FTPosData {
   }
   
   /**
-   * Add a node.
+   * Adds a node.
    * pp : [pre, pos0, ..., posn]
    * p : [poiMax, poi0, ..., poin]
    * @param pp int[] pre and positions
    * @param p int[] pointer
    */
   public void add(final int[] pp, final int[] p) {
-    if (pp == null || p == null) return;
-    if (size + 1 > prepos.length) {
+    if(size == prepos.length) {
       prepos = Array.extend(prepos);
       poi = Array.extend(poi);
     }
 
-    int i = 0;
-    while (i < size) {
-      if (prepos[i][0] < pp[0]) i++;
-      else {
-        add(i, pp, p);
-        return;
-      }
+    // find insertion position for new values or append them at the end
+    final int i = size > 0 && prepos[size - 1][0] > pp[0] ? find(pp[0]) : 0;
+    if(i >= 0) {
+      prepos[size] = pp;
+      poi[size++] = p;
+    } else {
+      add(-i - 1, pp, p);
     }
-
-    prepos[i] = pp;
-    poi[i] = p;
-    size++;
   }
 
   /**
@@ -112,17 +107,33 @@ public final class FTPosData {
    * @param pre int pre value
    * @return int[2][n] fulltext data or null
    */
-  public int[][] get(final int pre) {
+  private int find(final int pre) {
     // binary search
-    int l = 0, r = size;
-    while(l < r) {
-      final int m = l + (r - l) / 2;
+    int l = 0;
+    int h = size - 1;
+    while(l <= h) {
+      final int m = (l + h) >>> 1;
       final int c = prepos[m][0] - pre;
-      if(c == 0)  return getFTData(m);
-      else if(c < 0) l = m + 1;
-      else r = m - 1;
+      if(c == 0) return m;
+      if(c < 0) l = m + 1;
+      else h = m - 1;
     }
-    return r != size && l == r && prepos[l][0] == pre ? getFTData(l) : null;
+    return -l - 1;
+  }
+
+  /**
+   * Gets fulltext data from the container.
+   * If no data is stored for a pre value,
+   * null is returned.
+   * int[0] : [pos0, ..., posn]
+   * int[1] : [poi0, ..., poin]
+   *
+   * @param pre int pre value
+   * @return int[2][n] fulltext data or null
+   */
+  public int[][] get(final int pre) {
+    final int p = find(pre);
+    return p >= 0 ? getFTData(p) : null;
   }
 
   /**

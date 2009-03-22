@@ -105,7 +105,7 @@ public final class DeepFS extends DeepFuse implements DataText {
 
     if(Prop.fuse) {
       final File mp = new File(Prop.mountpoint);
-      final File bp = new File(Prop.backingpath + "/" + d.meta.dbname);
+      final File bp = new File(Prop.backingpath + Prop.SEP + d.meta.dbname);
 
       /* --- prepare (maybe mkdir, rm) mountpoint and backing store --- */
       // mountpoint
@@ -474,7 +474,8 @@ public final class DeepFS extends DeepFuse implements DataText {
       mb.init(md);
       Prop.fscont = true;
       Prop.fsmeta = true;
-      String bpath = Prop.backingpath + "/" + data.meta.dbname + "/" + path;
+      final String bpath = Prop.backingpath + Prop.SEP + data.meta.dbname +
+        Prop.SEP + path;
       // [AH]: Path to backing store file correct?
       BaseX.errln("[DataFS_parse_single_file] FIX ME? bpath : " + bpath);
       FSParser p = new FSParser(bpath);

@@ -156,7 +156,7 @@ public final class GUIProp {
   public static int mapinteraction = 0;
   
   /** Default path to the BaseX configuration file. */
-  private static String cfg = Prop.HOME + "/.basexwin";
+  private static String cfg = Prop.HOME + ".basexwin";
 
   /** Private constructor, preventing class instantiation. */
   private GUIProp() { }
