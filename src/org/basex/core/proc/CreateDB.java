@@ -54,26 +54,26 @@ public final class CreateDB extends ACreate {
 
   /**
    * Creates and returns a database for the specified XML document.
-   * @param db name of the database to be created
    * @param io file name
+   * @param name name of the database to be created
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final IO io, final String db) throws IOException {
+  public static Data xml(final IO io, final String name) throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(new DirParser(io), db);
+    return xml(new DirParser(io), name);
   }
 
   /**
    * Creates and returns a database from the specified SAX source.
    * @param s sax source
-   * @param db database name
+   * @param name database name
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final SAXSource s, final String db)
+  public static Data xml(final SAXSource s, final String name)
       throws IOException {
-    return xml(new SAXWrapper(s), db);
+    return xml(new SAXWrapper(s), name);
   }
 
   /**

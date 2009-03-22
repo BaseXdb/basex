@@ -422,7 +422,6 @@ public final class GUI extends JFrame {
    */
   void execute(final Process pr, final boolean main) {
     if(updating) return;
-    Performance.stack();
     new Thread() {
       @Override
       public void run() { exec(pr, main); }
