@@ -89,15 +89,15 @@ public final class FSParser extends Parser {
    * @param bs path to root of backing store for BLOBs 
    * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final IO path, final String mp, final String bs) {
-    super(path);
+  public FSParser(final String path, final String mp, final String bs) {
+    super(IO.get(path));
     Prop.intparse = true;
     Prop.entity = false;
     Prop.dtd = false;
     root = path.equals("/");
     
-    fsimportpath = path.path();
-    fsdbname = path.name();
+    fsimportpath = io.path();
+    fsdbname = io.name();
     backingroot = bs;
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
@@ -120,7 +120,7 @@ public final class FSParser extends Parser {
    * @param path String to file node to parse
    */
   public FSParser(final String path) {
-    this(IO.get(path), "single_file_mode", "single_file_mode");
+    this(path, "single_file_mode", "single_file_mode");
     singlemode = true;
   }
   

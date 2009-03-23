@@ -4,7 +4,6 @@ import org.basex.build.fs.FSParser;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.io.IO;
 
 /**
  * Creates a new filesystem mapping.
@@ -44,8 +43,7 @@ public final class CreateFS extends ACreate {
     Prop.chop = true;
     Prop.entity = true;
     Prop.mainmem = false;
-    return build(
-        new FSParser(IO.get(fsimportpath), mountpoint, backingstore), dbname);
+    return build(new FSParser(fsimportpath, mountpoint, backingstore), dbname);
   }
   
   @Override
