@@ -1,0 +1,618 @@
+# LANGUAGE FILE
+# The '%' character serves as dummy for internal replacements.
+
+# Start
+launch=Inizializzazione di 
+wait=Attendi
+version=Versione %
+
+# Menu Commands
+m_file=File
+m_edit=Modifica
+m_view=Visualizza
+m_options=Opzioni
+m_help=Aiuto
+m_db=Database
+m_xquery=XQuery
+m_main=Finestra principale
+m_views=Visualizzazioni
+m_inter=Interazione
+m_layout=Layout
+
+# Buttons
+b_ok=  OK  
+b_opt=Ottimizza...
+b_rename=Rinomina...
+b_open= Apri 
+b_cancel=Annulla
+b_drop=Cancella
+b_cmd=Comando
+b_xquery=XQuery
+b_browse=Sfoglia
+b_simple=Semplice
+b_search=Cerca
+
+# Status messages
+#s_path=Path
+s_ok=OK
+
+# Visualizations
+text_find=Trova
+no_table=Nessuna tabella disponibile per questi dati
+no_space=Spazio insufficiente
+map_binary=File binario
+info_title=Query Info
+info_no=Per favore lancia una Query...
+help_title=Aiuto
+text_title=Testo
+query_title=Query
+
+# Dialog Windows
+d_info=Informazione
+d_fctitle=Scegli una directory
+d_export=Salva Documento XML
+
+dc_title=Inserisci un file o una directory
+dc_filter=Filtra
+dc_name=Nome del Database
+dc_xmldesc=Documenti XML
+dc_zipdesc=Documenti XML in formato Zip
+dc_gzdesc=Documenti XML in formato GZip
+dc_xqdesc=file XQuery
+dc_doc=Documento
+dc_coll=Collezione
+dc_advtitle=Crea Database
+dc_chop=Rimuovi spazi vuoti
+dc_intparse=Usa il parses XML interno
+dc_entities=Parsing Entità
+dc_dtd=Parsing DTD
+dc_fzindex=Supporto Fuzzy Searching
+dc_ftstem=Stemming (Inglese)
+dc_ftdc=Diacritici
+dc_ftcs=Case Sensitive
+dc_mainmem=Modalità Main-Memory
+dc_chopinfo=Quest'opzione rimuove gli spazi vuoti tra i tag ed il contenuto
+dc_intparseinfo=Attiva quest'opzione per usare il parser XML integrato
+dc_entitiesinfo=Disattiva quest'opzione per saltare le entità indefinite (&...;)
+dc_dtdinfo=Disattiva quest'opzione per saltare i DTD
+dc_txtinfo=I testi possono essere indicizzati per velocizzare le query XPath
+dc_attinfo=Gli attributi possono essere indicizzati per velocizzare le query XPath
+dc_ftxinfo=Un indice fulltext velocizza le query XPath Full-Text
+dc_fzinfo=Quest'opzione velocizza le ricerche per similitudine
+dc_ftsteminfo=Si applica lo stemming a tutti i token prima di indicizzarli
+dc_ftcsinfo=Le maiuscole/minuscole sono considerate nell'indice
+dc_ftdcinfo=I diacritici sono considerati nell indice
+dc_mminfo=Questa modalità velocizza le interrogazioni, ma gli update sono disabilitati
+dc_general=Generale
+dc_parse=Parsing
+dc_names=Nomi
+dc_index=Indici
+dc_meta=Metadata
+dc_ft=Full-Text
+
+do_title=Apri Database
+do_nodbquestion=Vuoi crearne uno nuovo?
+
+dq_open=Apri un file XQuery
+dq_save=Salva un file XQuery
+dq_notopened=Impossibile aprire il file.
+dq_notsaved=Impossibile salvare il file.
+dq_replace=Il file "%" esiste già.\nVuoi sovrascriverlo?
+
+dfs_title=Importa Filesystem
+dfs_all=Importa tutto
+dfs_allinfo=Importa filesystem completo
+dfs_text=Directory da importare
+dfs_text1=informazione & metadata del file
+dfs_text2=Contenuti del file
+dfs_types=Tipi di file
+dfs_maxinfo=Limita l'inclusione di testo ad una dimensione data
+dfs_cont=Includi i contenuti testuali del file
+dfs_meta=Includi i metadata
+dfs_ftindex=Indicizza i contenuti del file
+
+dr_title=Rinomina Database
+dr_exists=Il Database esiste già.
+dr_over=Il vecchio Database verrà sovrascritto.
+# ADDED
+dr_overbacking=Old database and backing store will be overwritten.
+dr_invalid=Nome non valido.
+
+dd_title=Cancella Database
+dd_question=Il Database '%' verrà cancellato.\nSei sicuro?
+
+dx_question=Cancellare. Sei sicuro?
+
+dp_title=Preferenze
+
+dp_dbpath=Database Path (Il Database dev'essere rimosso manualmente)
+dp_inter=GUI & Interazioni
+dp_lf=Usa il Layout di Java (Richiede un riavvio)
+dp_focus=Focus del mouse realtime
+dp_simplefd=Usa un file chooser semplificato
+dp_names=Sostituisci tag con gli attributi @name
+dp_lang=Lingua (Richiede un riavvio)
+
+dn_title=Inserisci nuovi dati
+dn_name=Nome
+dn_value=Valore
+
+de_title=Modifica dati
+de_text=Modifica %
+de_kind1=Nodo Root
+de_kind2=Elemento
+de_kind3=Testo
+de_kind4=Attributo
+de_kind5=Commento
+de_kind6=PI
+
+df_title=Scegli carattere
+df_aalias=Anti-Aliasing
+df_type1=Normale
+df_type2=Grassetto
+df_type3=Corsivo
+
+ds_title=Combinazione di colori
+ds_red=Rosso
+ds_green=Verde
+ds_blue=Blu
+
+dm_title=Map Layout
+# ADDED
+dm_simple=Divide rectangles uniformly
+dm_atts=Mostra attributi
+dm_choice1=No Titolo, no Bordo
+dm_choice2=No Titolo, Bordo piccolo
+dm_choice3=Titolo, no Bordo
+dm_choice4=Titolo, Bordo piccolo
+dm_choice5=Titolo, Bordo grande
+#dm_choice5=Titolo, Bordo medio
+dm_offset=Offset
+dm_size=Dimensione determinata da
+dm_size_children=numero di figli
+dm_size_fssize=dimensione file
+dm_size_textsize=lunghezza testo
+dm_size_both=no/figli e dimensione file
+
+dz_total=Memoria totale
+dz_reserved=Memoria riservata
+dz_used=Memoria usata
+dz_help=Se la memoria è poca, lanciate\nBaseX con il Java flag -Xmx<size>
+
+da_title=Su %
+da_license=Licenza BSD (ISC)
+da_dev=Sviluppatore principale
+da_cont1=Team
+da_cont2=ed altri
+da_contact=Contatto
+
+c_about=Su %
+c_abouttt=Mostra le informazioni generali sul progetto.
+c_close=Chiudi
+c_closett=Chiude il Database attuale.
+c_color=Colori
+c_colortt=Consente di cambiare i colori dell'applicazione.
+c_cut=Taglia
+c_copy=Copia
+c_copytt=Copia i nodi XML selezionati.
+c_cppath=Copia Path
+c_cppathtt=Copia il Path nei nodi XML selezionati.
+c_create=Nuovo
+c_creatett=Crea un database a partire dal documento XML selezionato.
+c_delete=Cancella
+c_deletett=Cancella i nodi XML.
+c_drop=Cancella
+c_droptt=Cancella un database.
+c_edit=Modifica
+c_edittt=Modifica i nodi XML.
+c_exit=Esci
+c_exittt=Esce dall'applicazione.
+c_export=Exporta XML
+c_exporttt=Esporta il database attuale su un documento XML.
+c_filter=Filtra selezione
+c_filtertt=Filtra i nodi selezionati.
+c_fonts=Carattere...
+c_fontstt=Permettere di cambiare i caratteri dell'applicazione.
+c_full=Schermo intero
+c_fulltt=Passa a modalità schermo intero.
+c_goback=Indietro
+c_gobacktt=Ritorna alla query precedente.
+c_goforward=Avanti
+c_goforwardtt=Va avanti alla query successiva.
+c_goup=Livello superiore
+c_gouptt=Sale di un livello.
+c_importfs=Importa Filesystem
+c_importfstt=Crea un database a partire dalla struttura del Filesystem.
+c_info=Info Database
+c_infott=Mostra le informazioni sul Database attualmente in uso.
+c_insert=Nuovo
+c_inserttt=Crea un nuovo nodo XML.
+c_maplayout=Map Layout...
+c_maplayouttt=Cambia il map layout.
+c_open=Apri
+c_opentt=Apre un database.
+c_paste=Incolla
+c_pastett=Incolla i nodi copiati.
+c_prefs=Impostazioni
+c_prefstt=Mostra le impostazioni generali dell'applicazione.
+c_redo=Ripeti
+c_root=Home
+c_roottt=Salta al nodo root.
+c_rtexec=Esecuzione Realtime
+c_rtexectt=Se quest'opzione è attiva, le query vengono eseguite alla pressione di ogni pulsante.
+c_rtfilter=Filtro Realtime
+c_rtfiltertt=Se quest'opzione è attiva, i risultati della query vengono automaticamente filtrati.
+#c_select=Seleziona tutto
+#c_selecttt=Seleziona tutti i nodi root.
+c_showbuttons=Pulsanti
+c_showbuttonstt=Attiva/Disattiva la barra dei pulsanti.
+c_showhelp=Aiuto
+c_showhelptt=Mostra la schermata d'aiuto, che fornisce informazioni sui componenti selezionati.
+c_showinfo=Info Query
+c_showinfott=mostra il pannello query info.
+c_showinput=Campo di Input
+c_showinputtt=Attiva/Disattiva il campo di Input.
+c_showmap=Map
+c_showmaptt=Mostra la visualizzazione map.
+c_showmenu=Menu
+c_showmenutt=Attiva/Disattiva il menu.
+c_showsearch=Pannello Query
+c_showsearchtt=Mostra il pannello delle query.
+c_showstatus=Barra di stato
+c_showstatustt=Attiva/Disattiva la barra di stato.
+c_showtable=Tabella
+c_showtablett=Mostra la visualizazzione tabella.
+c_showplot=Plot
+c_showplottt=Mostra la visualizazzione scatter-plot.
+c_showtext=Testo
+c_showtexttt=Mostra la visualizazzione testo.
+c_showfolder=Folder
+c_showfoldertt=Mostra la visualizazzione folder.
+c_undo=Annulla
+c_xqopen=Apri
+c_xqopentt=Apre un file XQuery
+c_xqsave=Salva
+c_xqsavett=Salva la XQuery attuale
+
+# Commands & Processes
+proc_time=Tempo necessario
+proc_syntax=Sintassi
+proc_err=Impossibile eseguire '%'
+proc_nodb=Nessun database aperto.
+proc_nofs=Il database attuale non è un filesystem import.
+proc_mm=Questo comando non è disponibile in modalità Main-Memory.
+proc_outmem=Fuori dalla memoria principale.\nLe seguenti azioni potrebbero aiutarti:\n- aumenta la dimensione heap di Java con il flag -Xmx<size>\n- scegli il parser XML integrato nella GUI o attraverso 'set intparse on'\n- disattiva gli indici di testo ed attributi
+
+cmd_no=Attendo un comando.
+cmd_unknown=Comando sconosciuto: '%'
+cmd_similar=Intendevi '%'?
+cmd_ping=Connessione riuscita.
+
+# Help Commands
+help_short=Usa 'Aiuto'
+help_intro=Usa 'Aiuto' per avere maggiori informazioni.
+help_long=Usa 'Aiuto [...]' per avere maggiori informazioni su un comando specifico.
+
+# Create Command
+pc_create=Database creato
+pc_index=Creando Indici
+pc_update=Il formato del Database è cambiato; per favore crea un nuovo Database.
+pc_indupdate=Il formato degli indici è cambiato; per favore crea nuovi indici.
+pc_cancel=Creazione database annullata.
+pc_range=Spiacente, il documento è troppo grande per essere processato.
+pc_tags=Spiacente, il documento contiene troppi nomi di tag diversi.
+pc_atts=Spiacente, il documento contiene troppi nomi di attributi diversi.
+pc_indextxt=Indicizzando Testo
+pc_indexatt=Indicizzando Attributi
+pc_indexftx=Indicizzando Fulltext
+pc_parse="%" (% Nodi analizzati)
+pc_created=Database '%' creato in %.
+pc_tbl=Tabella creata in %.
+#pc_att=Attributi indicizzati in %.
+#pc_txt=Testo indicizzato in %.
+#pc_ftx=Fulltext indicizzato in %.
+pc_filenf=File o directory "%" non trovato.
+pc_pathnf=File o directory non trovato.
+pc_dbnf=Inserisci un nome per il Database.
+# ADDED
+pc_mountnf=Please enter an existent directory as mount point.
+pc_backingnf=Please enter an existent directory as backing store.
+pc_err="%" non può essere analizzato.
+#pc_err_deepfs=I database speciali deepfs non possono essere creati manualmente.
+pc_pos="%" (Linea %, Colonna %)
+
+# Database commands
+db_no=Database '%' non trovato.
+db_open=Database aperto.
+db_closed=Database chiuso.
+db_closeerr=Impossibile chiudere il Database.
+db_optimized=Database ottimizzato in %.
+db_dropped=Database cancellato.
+db_notdropped=Impossibile cancellare il Database.
+db_notopened=Impossibile aprire il Database.
+db_opened=Database aperto in %.
+db_exported=Database esportato in %.
+
+# Index commands
+in_created=Indici creati in %.
+in_err=Impossibile creare gli indici.
+in_dropped=Indici cancellati in %.
+in_notdropped=Impossibile cancellare gli indici.
+
+# Console Info
+cs_local=Standalone
+cs_client=Client
+
+# Server Info
+srv_connect=Impossibile comunicare col Server.
+srv_port=Numero porta non valido
+#srv_toomany=Troppe richieste in corso.
+srv_timeout=Server timeout (% sec.).
+srv_bind=Il server sta lavorando o il permesso è stato negato.
+srv_start=avviato.\nAttendo richieste...
+srv_stop=fermato.
+
+# Bye
+bye1=Buona giornata.
+bye2=Ci vediamo.
+bye3=Divertiti.
+bye4=Alla prossima.
+
+# Query Commands
+qu_pars=Parsing
+qu_comp=Compilando
+qu_eval=Eseguendo
+qu_time=Timing
+qu_result=Risultato
+qu_plan=Query plan
+qu_hits=Hit(s)
+qu_ms=ms
+
+# Query Commands.. the following strings must have the same length
+qu_tabquery=Query     
+qu_tabpars=Parsing   
+qu_tabcomp=Compilando
+qu_tabeval=Eseguendo
+qu_tabfinish=Completando
+qu_tabprint=Stampando  
+qu_tabtotal=Tempo totale
+qu_tabmem=Memoria   
+qu_tabprinted=Stampato  
+qu_tabhits=Results   
+
+# Update Commands
+uc_querynodeserr=La query deve contenere un nodeset.
+uc_deleteinfo=% nodo/i cancellato/i in %.
+uc_deleteroot=Impossibile cancellare il nodo document.
+uc_copyroot=Impossibile inserire dopo il nodo root.
+uc_copyinfo=% nodo/i copiato/i in %.
+uc_insertinfo=% nodo/i inserito/i in %.
+uc_updateinfo=% nodo/i aggiornato/i in %.
+uc_updatenode=Il nodo da aggiornare dev'essere %.
+uc_copytags=I nodi target devono essere elementi.
+uc_inserttext=Impossibile inserire un nodo testo dopo/prima di un altro nodo testo.
+uc_attinvalid="%" non è un nome di attributo valido.
+uc_attdupl=L'attributo "%" è già definito.
+uc_posinvalid=Valore di posizione non valido "%".
+uc_invalid=Il nome "%" non è valido.
+uc_txtinvalid=I nodi testo non possono essere vuoti.
+uc_namespaces=Impossibile aggiornare documenti con namespace.
+
+# Info Strings
+info_head=Informazioni sul Database
+info_index=Indici
+info_build=Creazione indici
+info_opt=Ottimizzando Database
+info_optim=Ottimizzazione terminata.
+info_stats=Crea statistiche
+info_dbname=Nome del Database
+info_ndocs=Documenti
+info_docsize=Fimensione Input
+info_dbsize=Dimensione Database
+info_doc=Path Sorgente
+info_time=Data
+info_mem=Memoria principale usata
+info_nodes=Nodi Tabella
+info_height=Altezza albero
+info_encoding=Codifica
+info_dbpath=Path Database
+info_nodb=Nessun database trovato.
+info_dblist= Databases trovato.
+info_dberror=non può essere aperto.
+info_info=Informazioni Processo
+info_all=verbose
+info_debug=Modalità Debug
+info_chop=Rimozione spazi vuoti
+info_entities=Parsing delle entità
+info_serialize=Serializza
+info_xmloutput=Output XML
+info_mainmem=Modalità Main Memory
+info_tagindex=Indice Tag
+info_atnindex=Indice nomi attributi
+info_txtindex=Indicizza testo
+info_atvindex=Indicizza attributi
+info_ftindex=Indice fulltext
+info_fzindex=fuzzy
+info_outofdated=non aggiornato
+info_db=Informazioni sul Database
+info_create=Creazione Database
+info_general=Informazioni generali
+info_resultchop=\n...output rimosso.
+info_on=ON
+info_off=OFF
+info_error=Errore
+
+# Command Help
+ch_nohelp=Spiacente, nessun aiuto disponibile.
+ch_dummydatabase0=Comandi del Database:
+ch_create1=Crea un Database o un Indice.
+ch_create2=Crea un Database da XML o Filesystem, oppure crea un Indice:
+ch_create3=  crea un Database [name] per il file o la directory XML [path]
+ch_file= [path] [name?]:
+ch_create4= [path] [name]:
+ch_create5=  Crea un Database Filesystem [name] per [path]
+ch_create6=  crea l'indice specificato
+ch_open0=[database]
+ch_open1=Apri [database].
+ch_open2=apre il [database] specificato.
+ch_info1=Mostra informazioni sul Database attuale.
+ch_info21=Mostra informazioni sul Database attualmente aperto:
+ch_info22=- nessun argomento: mostra informazioni globali
+ch_info23=: mostra informazioni sul Database
+ch_info24=: mostra informazioni sugli Indici
+ch_info25= [start end]|[query]: mostra tabella XML
+ch_check0=[database]
+ch_check1=Apri [database] se esiste, oppure creane uno nuovo.
+ch_check2=Controlla se il [database] specificato esiste.\n Se si, viene aperto. Altrimenti,\n l'argomento è interpretato come un nome di file, ed un nuovo\n database viene creato.
+ch_close1=Ciudi Database in uso.
+ch_close2=Chiude il Database in uso.
+ch_list1=Mostra Database disponibili.
+ch_list2=Mostra tutti i Database disponibili.
+ch_drop1=Cancella Database o Indice.
+ch_drop2=I seguenti argomenti possono essere specificati:
+ch_drop22=  calcella il Database [name]
+ch_drop21= [name]:
+ch_drop23=  cancella l'Idnice specificato
+ch_optimize1=Ottimizza il Database.
+ch_optimize2=Ottimizza le strutture del Database in uso.
+ch_export0=[file]
+ch_export1=Esporta Database come XML.
+ch_export2=Esporta il context set attuale in un [file] XML.
+ch_dummyquery0=Comandi Query:
+ch_xpath0=[query]
+ch_xpath1=Esegui query XPath.
+ch_xpath2=Esegue la [query] XPath specificata e stampa il risultato.
+ch_xquerymv0=[hits] [subhits] ["query"]
+ch_xquerymv1=Esegui query MedioVis.
+ch_xquerymv2=Esegue la [query] XPath specificata e limita il\n numero di risultati a [hits] ed il numero di\n elementi subordinati a [subhits].
+ch_xquery0=[query]
+ch_xquery1=Esegui [query] XQuery.
+ch_xquery2=Esegue una query XQuery e stampa il risultato.
+ch_find0=[query]
+ch_find1=Esegui keyword query.
+ch_find2=I seguenti modificatori possono essere usati:\n =  : cerca nodi di testo con corrispondenza esatta"\n @= : cerca attributi con corrispondenza esatta\n @  : cerca attributi
+
+# Help Texts
+ch_cs0=[query]
+ch_cs1=Esegui query XPath ed imposta i risultati come un nuovo context set.
+ch_cs2=Esegue la specifica [query] XPath ed imposta i risultati\ncome un nuovo context set.
+ch_bash1=Avvia bash.
+ch_bash2=Avvia la modalità bash
+ch_dummyupdate0=Aggiorna comandi:
+ch_copy0=[pos] [source],[target]
+ch_copy1=Copia nodi XML.
+ch_copy2=Esegue [source] e copia il risultato in [target]\n come figlio [pos] (0=ultimo figlio).
+ch_delete0=["target"]
+ch_delete1=Cancella nodi XML.
+ch_delete2=Cancella i nodi che soddisfano la query [target] specificata.
+ch_insert1=Inserisci nodi XML.
+ch_insert2=Inserisce un frammento o un nodo specifico\n come figlio [pos] (0=ultimo figlio) della query [target] data:
+ch_insert21=[name] [pos] [target]: Inserisci [name]
+ch_insert22=[text] [pos] [target]: Inserisci [text]
+ch_insert23=[name] [value] [target]: Inserisci [name] and [value]
+ch_insert24=[text] [pos] [target]: Inserisci [text]
+ch_insert25=[name] [value] [pos] [target]: Inserisci [name] e [value]
+ch_insert26=[frag] [pos] [target]: Inserisci [frag]
+ch_update1=Aggiorna nodi XML.
+ch_update2=Aggiorna i nodi che soddisfano la query [target] specificata:
+ch_update21=[name] [target]: Update with [name]
+ch_update22=[text] [target]: Update with [text]
+ch_update23=[name] [value] [target]: Update with [name] and [value]
+ch_update24=[text] [target]: Update with [text]
+ch_update25=[name] [value] [target]: Update with [name] and [value]
+ch_dummygeneral0=Comandi generali:
+ch_set0=[option] [value?]
+ch_set1=Imposta opzioni globali (valori attuali: usa 'Aiuto').
+ch_set2=[option]s disponibili con [value = on|off]:
+ch_set21= [all?]: Mostra (tutte) le process info
+ch_set22=: Visualizzazione delle informazioni di debug
+ch_set23=: Serializzazione dei risultati della query
+ch_set24=: Serializzazione dei risultati come XML
+ch_set25=: Modalità Main Memory
+ch_set26=: Rimozione degli spazi vuoti XML
+ch_set27=: Parsing delle entità XML
+ch_set28=: Indicizzando testo
+ch_set29=: Indicizzando valori attributi
+ch_set31=: Indicizzando Fulltext
+ch_help1=Ottieni aiuto su
+ch_help11= comandi.
+ch_help2=Se è specificato [command], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.\nSe è specificato 'all', anche i comandi nascosti sono inclusi.
+ch_exit1=Esci
+
+# Help Texts
+h_filter=Filtra i risultati delle query.
+h_queryrt=Se questa checkbox è attiva, le query sono eseguite automaticamente dopo la pressione di qualsiasi tasto.
+h_toxquery=La query XPath attuale viene copiata nel pannello di ricerca XQuery.
+h_toxpath=Modificando le impostazioni di ricerca, le query XPath sono compilate ed eseguite internamente. Puoi mostrare e cambiare la query attuale premendo questo bottone.
+h_hist=Mostra la cronologia degli input.
+h_go=Esegue la query.
+h_stop=Ferma il processo in corso.
+h_cancel=Schiaccia questo bottone per chiudere la finestra di dialogo e tronare alla schermata principale.
+h_mode=Clicca sulla combo box per scegliere tra la modalità di ricerca, XPath e comando.\nQuesta combo box è attiva solo se un database è aperto.
+h_ok=Schiaccia questo bottone per iniziare il processo.
+h_opt=Schiaccia questo bottone per ottimizzare il database.
+h_renamedb=Schiaccia questo bottone per rinominare il database selezionato.
+h_opendb=Schiaccia questo bottone per aprire il database selezionato.
+h_openinfo=Questo pannello mostra alcune informazioni sul database attualmente selezionato.
+h_falias=Si può applicare anti-aliasing a tutti i testi selezionando questa checkbox.
+h_browse=Usa questo bottone per trovare un file o una directory.
+h_fspath=Usa questo campo di testo per inserire o modificare la directori da passare al parser.
+h_dbpath=Qui è possibile modificare il path del database attuale.
+h_lang=Qui è possibile cambiare la lingua dell'applicazione. BaseX dev'essere riavviato per passare alla lingua selezionata.
+h_names=Quest'opzione controlla se un tag contiene un attributo 'name'. Se l'attributo esiste, il valore dell'attributo viene mostrato al posto del tag. Non è possibile cambiare quest'opzione se il database in uso no contiene attributi 'name'.
+h_fsname=Inserisci il nome del nuovo database in questo campo di testo.
+h_fsall=Se si seleziona questa checkbox, l'intero filesystem verrà passato al parser.
+# ADDED
+h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
+h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
+h_meta=Se si seleziona questa checkbox, i meta-data verranno estratti da numerosi tipi di file. i meta-data inclidono ad esempio la dimensione delle immagini, i tag ID3 dei file MP3 o i contenuti dei file mail.
+h_cont=Selezionando questa checkbox i contenuti testuali del file vengono inclusi. Se i contenuti vengono inclusi, possono essere cercati usando XPath o XQuery.
+h_fsmax=Qui è possibile definire una dimensione limite per i file di testo inclusi.
+h_mapatts= Se questa checkbox è attivata, gli attributi vengono mostrati dentro la TreeMap.
+# ADDED
+h_mapsimple= If this checkbox is turned on, rectangles are divided uniformly in TreeMap.
+h_maplayout=Qui puoi modificare l'algoritmo di layout usato nella visualizzazione Map. I cambi si vedono immediatamente se il database è aperto.
+#h_mapalign=Qui puoi modificare l'allineamento dei rettangoli della visualizzazione Map. I cambi si vedono immediatamente se il database è aperto.
+# ADDED
+h_mapoff=Here you can modify the offset sizes of the rectangles.
+h_mapsize=Qui puoi definire le fondamenta del calcolo della dimensione dei rettangoli.
+#h_mapinfo=Qui puoi attivare o disattivare il calcolo di informazione map addizionale.
+h_drop=Usa questo bottone per eliminare il database selezionato.
+h_dropdb=Scegli un database da cancellare.
+h_lf=L'aspetto dell'applicazione può essere cambiato con quest'opzione.
+h_focus=Se questa checkbox è attivata, i componenti di input vengono evidenziati non appena il cursore si move su di essi.
+h_simplefd=Se hai problemi con la selezione file standard, puoi passare ad una versione semplice, ma più veloce.
+h_open=Scegli il database da aprire.
+h_font=Qui puoi selezionare il carattere da usare nelle visualizzazioni.
+h_mmem=In modalità Main-Memory, le query verranno eseguite il 50-80% più velocemente. Per contro, il consumo di memoria aumenta, e gli aggiornamenti sul database sono disabilitati.
+h_colors=Muovi gli slider per cambiare i colori dell'interfaccia visuale.
+h_cmd=Qui puoi inserire i comandi BaseX. Usa 'aiuto' per avere una panoramica di tutti i comandi disponibili.\n\nPuoi recuperare input precedenti con i tasti SU e GIU'.
+h_searchxml=Digita qualcosa nel campo di testo per cercarlo nel tuo documento XML. La seguente sintassi è supportata:\n...     Trova tag e testi\n=...    Trova nodi testo esatti\n@ ...   Trova attributi e loro valori\n@=      Trova valori di attributi esatti\n/...    Esegui input come XPath
+h_searchfs=Digita qualcosa nel campo di testo per cercarlo nel tuo filesystem. La seguente sintassi è supportata:\n...      Trova file o directory\n= ...    Trova nomi esatti\n~ ...    Trova nomi simili\n. ..     Trova estensioni di file\n< ...    Trova file più piccoli della dimensione specificata\n> ...    Trova file più grandi della dimensione specificata\n...=...  Trova metadata (p.e. 'Album=Beatles')\n\nPuoi inserire comandi BaseX facendoli precedere dal segno di punto esclamativo.
+h_xpath=La modalità XPath permette l'inserimento di semplici richieste XPath. XPath è spesso processato più velocemente di XQuery. Il linguaggio XPath è basato su una rappresentazione ad albero del documento XML, e fornisce la possibilità di navigare lungo l'albero, selezionando i nodi secondo diversi criteri.
+h_modefilt=Se il filtraggio real-time è disattivato, schiaccia Ctrl+ENTER per filtrare i risultati delle query.
+h_map=Questa visualizzazione è chiamata TreeMap. Tutti i nodi del documento XML sono rappresentati come rettangoli, e riempiono l'intera area. I nodi possono essere evidenziati con click singolo e filtrati con doppio click. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
+# ADDED
+h_plot=This visualization is called Scatterplot View. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
+h_plotaxisx=With this combo box you can define the assignment to the x-axis.
+h_plotaxisy=With this combo box you can define the assignment to the y-axis.
+h_plotxlog=With this checkbox you can change the display of the x-axis to logarithmic.
+h_plotylog=With this checkbox you can change the display of the y-axis to logarithmic.
+h_plotdots=With this slider you can change the size of the dots in the Scatterplot.
+h_plotitem=With this combo box you can select the item to display.
+h_folder=Questa visualizzazione mostra tutti i nodi XML in visualizzazione folder. I nodi possono essere espansi o chiusi schiacciando le frecce. Altrimenti possono essere evidenziati con click singolo ed ingrandidi con click doppio. Consente di navigare in maniera efficiente il documento. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
+h_table=Questa visualizzazione mostra tutti i nodi XML in una tabella. Cliccando su un testo, tutti i nodi con lo stesso testo vengono evidenziati. Con doppio click su un testo, i risultati della query vengono filtrati. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
+h_text=Questo pannello mostra i risultati delle query ed altro output testuale.\n\nTasti rapidi: Usa '-' e '+' per cambiare la dimensione del carattere di tutti i pannelli. Digita qualunque testo dentro il pop-up di ricerca per lanciare una ricerca incrementale. E' un buon modo per trovare punti specifici di testo.
+h_info=Questo pannello mostra informazioni sulla compilazione ed esevuzione di una richiesta XPath o XQuery.
+h_search1=La modalità di inserimento XQuery offre l'intero range di funzionalità del linguaggio XQuery. XQuery utilizza espressioni XPath per selezionare parti di un documento XML. Permette questo tramite un'espressione FLWOR simile all'SQL per permettere i join. Un'espressione FLWOR è costituita dalle cinque parti da cui prende nome: FOR, LET, WHERE, ORDER BY, RETURN.
+h_search2=La modalità di ricerca semplice consente query semplici sul documento XML.
+h_querymode=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a IN //book\n where $a/topic = "BaseX"\n return $a/title"\n\nL'area di testo offre una funzione di cronologia: Puoi memorizzare l'input attuale con Ctrl+ENTER e recuperare input precedenti con Ctrl+UP/DOWN.
+h_searchcat=In questa combo box sono elencati tutti i tag e gli attributi del documento XML in uso. Se si seleziona un elemento, i risultati della query sono evidenziati nella visualizzazione. Se l'elemento contiene valori testuali, viene visualizzata una finestra pop-up addizionale, che consente una maggiore definizione della query.
+h_cat=In questa combo box sono elencati tutti i valori della categoria attuale. Se si seleziona uno dei valori, la query è ulteriormente raffinata.
+h_ds=Trascina le frecce destra e sinistra di questo slider per restringere i valori della categoria di query attuale. Se hai cambiato il range, puoi anche cliccare dentro lo slider e muoverlo a destra o a sinistra.
+h_catinput=Qui puoi limitare ulteriormente la tua query inserendo sottostringhe. Per trovare corrispondenze esatte e velocizzare la ricerca, puoi racchiudere l'input tra virgolette ("...").
+h_mover=Puoi cambiare la posizione di una view trascinando la barra sopra il pannello della viwe in qualsiasi altra posizione all'interno della finestra principale.\n Se sposti una view fuori dalla finestra principale, verrà chiusa.
+h_tablehead=Puoi ordinare la tabella cliccando la corrispondente colonna sull'intestazione. Inoltre, puoi eseguire una query dentro la tabella inserendo qualcosa dentro i campi di testo.
+h_mem=Questo campo mostra la memoria riservata di BaseX. Cliccandoci, è possibile forzare il garbage collection.\n\n Il display diventa rosso se la memoria libera è poca. Se succede spesso, lanciate BaseX con il Java flag -Xmx<size> ('java -X' fornisce maggiori informazioni).
+# ADDED
+h_guistatus=The status of the execution is shown.

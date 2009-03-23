@@ -32,7 +32,6 @@ b_simple=Simple
 b_search=Search
 
 # Status messages
-#s_path=Path
 s_ok=OK
 
 # Visualizations
@@ -237,8 +236,6 @@ c_rtexec=Realtime Execution
 c_rtexectt=If this option is turned on, queries are executed after each key click.
 c_rtfilter=Realtime Filtering
 c_rtfiltertt=If this option is turned on, the query results are automatically filtered.
-#c_select=Select All
-#c_selecttt=Selects all root nodes.
 c_showbuttons=Buttons
 c_showbuttonstt=Switches the button bar on/off.
 c_showhelp=Help
@@ -303,9 +300,6 @@ pc_indexftx=Indexing Fulltext
 pc_parse="%" (% Nodes parsed)
 pc_created=Database '%' created in %.
 pc_tbl=Table created in %.
-#pc_att=Attributes indexed in %.
-#pc_txt=Texts indexed in %.
-#pc_ftx=Fulltext indexed in %.
 pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
@@ -339,7 +333,6 @@ cs_client=Client
 # Server Info
 srv_connect=Can't communicate with the server.
 srv_port=Invalid port number
-#srv_toomany=Too many requests in progress.
 srv_timeout=Server timeout (% sec.).
 srv_bind=Server is running or permission was denied.
 srv_start=started.\nWaiting for requests...
