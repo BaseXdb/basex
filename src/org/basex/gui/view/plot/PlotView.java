@@ -51,9 +51,9 @@ public final class PlotView extends View implements Runnable {
   /** Whitespace between captions. */
   static final int CAPTIONWHITESPACE = 10;
   /** Maximum length of axis caption text. */
-  private static final int maxL = 11;
+  private final int maxL = 11;
   /** Position where overlength text is cut off. */
-  private static final int cutOff = 10;
+  private final int cutOff = 10;
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
