@@ -219,7 +219,9 @@ final class MapFS extends MapPainter {
         }
 
         g.setColor(Color.black);
-        MapRenderer.drawText(g, rect, text);
+        // [JH] review difference drawText - chopString
+//        MapRenderer.drawText(g, rect, text);
+        BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2);
         if(h == GUIProp.fontsize && img != null) {
           final long size = toLong(fs.size(pre));
           final byte[] info = token(Performance.format(size, false));

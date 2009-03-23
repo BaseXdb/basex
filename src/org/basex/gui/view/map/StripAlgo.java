@@ -45,7 +45,6 @@ public class StripAlgo extends MapAlgo{
           (int) (ml.weight[i] / weight * ww);
         w = w > 0 ? w : 1;
         
-//        if(x + w <= xx + ww)
         if(yy + height <= yy + hh)
           tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i], l));
         else break;
