@@ -37,15 +37,13 @@ class MapLayout {
     
     switch(GUIProp.mapoffsets) {
       case 1 :
-        layout = new MapRect(1, 1, 2, 2); break;
+        layout = new MapRect(0, 2, 0, 2); break;
       case 2 :
         layout = new MapRect(0, off, 0, off); break;
       case 3 :
         layout = new MapRect(2, off - 1, 4, off + 1); break;
       case 4 :
         layout = new MapRect(off >> 2, off, off >> 1, off + (off >> 2)); break;
-      case 5 :
-        layout = new MapRect(off >> 1, off, off, off + (off >> 1)); break;
       default:
         layout = new MapRect(0, 0, 0, 0); break;
     }

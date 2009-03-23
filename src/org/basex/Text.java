@@ -1141,7 +1141,7 @@ public interface Text {
   /** Predefined number of layouts. */
   String[] MAPOFFSETS = {
     lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
-    lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
+    lang("dm_choice4"), lang("dm_choice5")
   };
   /** Predefined number of layouts. */
   String[] MAPALGO = {

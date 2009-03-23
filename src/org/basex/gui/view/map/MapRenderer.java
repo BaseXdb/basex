@@ -19,7 +19,13 @@ import org.basex.util.TokenList;
  */
 final class MapRenderer {
   /** Count number of digit/char bytes. */
-  private static int cchars = 0;
+  private static int cchars;
+  /** Color for each tooltip token.  */
+  private static IntList ttcol;
+  /** Tooltip tokens. */
+  private static TokenList tl;
+  /** Index of tooltip token to underline. */
+  private static int ul;
 
   /** Private constructor. */
   private MapRenderer() { }
@@ -411,14 +417,6 @@ final class MapRenderer {
     if (h < r.h)
     drawThumbnailsSentence(g, r, data, false, Math.max(1.5, fnew), true);
   }
-
-  
-  /** Color for each tooltip token.  */
-  static IntList ttcol;
-  /** Tooltip tokens. */
-  static TokenList tl;
-  /** Index of tooltip token to underline. */
-  private static int ul;
 
   /**
    * Draws a text using thumbnail visualization.

@@ -162,7 +162,6 @@ dm_choice2=タイトル無し、枠線最細
 dm_choice3=タイトル有り、枠線無し
 dm_choice4=タイトル有り、枠線最細
 dm_choice5=タイトル有り、枠線細
-dm_choice6=タイトル有り、枠線太
 dm_offset=Offsets
 dm_size=Size determined by
 dm_size_children=number of children
