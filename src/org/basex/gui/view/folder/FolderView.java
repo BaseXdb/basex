@@ -234,30 +234,26 @@ public final class FolderView extends View {
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
     int xx = x;
-    final int yy = y;
 
     if(elem) {
-      if(fs) {
-        // print file icon
-        Image img = null;
-        if(file) {
-          img = GUIFS.images(name, 0);
-        } else if(dir) {
-          img = opened[pre] ? GUIFS.folder2[0] : GUIFS.folder1[0];
-        } else {
-          img = opened[pre] ? openedBox : closedBox;
-        }
-        g.drawImage(img, xx - lineH, yy - boxW - 1, this);
-        if(file || dir) xx += 5;
-      } else {
-        final Image box = opened[pre] ? openedBox : closedBox;
-        g.drawImage(box, xx - lineH, yy - boxW - 1, this);
+      final boolean large = GUIProp.fontsize > 20; 
+      final int off = large ? 1 : 0;
+      final int yy = y - boxW - (large ? 6 : 3);
+      Image box = opened[pre] ? openedBox : closedBox;
+      // print file icon
+      if(file) {
+        box = GUIFS.images(name, off);
+      } else if(dir) {
+        box = opened[pre] ? GUIFS.folder2[off] : GUIFS.folder1[off];
       }
+      g.drawImage(box, xx - lineH, yy, this);
+      if(fs && (file || dir)) xx += large ? 12 : 6;
     }
 
     g.setFont(fnt);
     g.setColor(col);
 
+    int yy = y;
     int tw = totalW + 6;
     if(file && tw - xx > 140) {
       final long size = Token.toLong(data.fs.size(pre));
