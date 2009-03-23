@@ -102,7 +102,7 @@ final class MapFS extends MapPainter {
       if(r.w < min || r.h < min) continue;
 
       final MapRect cr = r.clone();
-      if(drawRectangle(g, cr, mark)) {
+      if(drawRectangle(g, cr)) {
         cr.x += 4;
         cr.w -= 8;
 
@@ -135,11 +135,9 @@ final class MapFS extends MapPainter {
    * Paint single rectangle.
    * @param g graphics reference
    * @param rect rectangle
-   * @param mark selection flag
    * @return meta data flag
    */
-  boolean drawRectangle(final Graphics g, final MapRect rect,
-      final boolean mark) {
+  boolean drawRectangle(final Graphics g, final MapRect rect) {
 
     final Context context = view.gui.context;
     final Data data = context.data();
@@ -207,17 +205,16 @@ final class MapFS extends MapPainter {
           rect.w -= off;
         }
         
-        // [JH] should be placed somewhere higher
-        final MapRect l = view.layout.layout;
-        rect.h = rect.h - l.h * 2;
-        rect.w = rect.w - l.w * 2;
-        
         final int h = MapRenderer.calcHeight(g, rect, text);
         if(img != null) {
-          if(!mark) {
-            g.setColor(COLORS[rect.level + 1]);
-            g.fillRect(x + 1, rect.y + 1, w - 2, h - GUIProp.fontsize);
-          }
+          // [JH] review
+          // method call was
+          // boolean drawRectangle(final Graphics g, final MapRect rect,
+          //    final boolean mark) {
+//          if(!mark) {
+//            g.setColor(COLORS[rect.level + 1]);
+//            g.fillRect(x, rect.y, w, h);
+//          }
           g.drawImage(img, x, rect.y + 2, view);
         }
 
