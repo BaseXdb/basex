@@ -120,7 +120,7 @@ class MapLayout {
     if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
       r.pre = l.list[ns];
-      putRect(r, level);  
+      putRect(r, level);
     } else {
       int nn = 0;
       if(level == 0) {
@@ -137,7 +137,10 @@ class MapLayout {
 
       // call recursion for next deeper levels
       final MapRects rects = algo.calcMap(r, l, ns, ne, level);
-      for(final MapRect rect : rects) putRect(rect, rect.level);
+      for(final MapRect rect : rects) {
+        if(rect.x + rect.w <= r.x + r.w && rect.y + rect.h <= r.y + r.h)
+          putRect(rect, rect.level);
+      }
     }
   }
   
