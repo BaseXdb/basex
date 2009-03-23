@@ -44,7 +44,7 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepFS(DBNAME);
+    dbfs = new DeepFS(DBNAME, false);
     //dbfs.init();
   }
 

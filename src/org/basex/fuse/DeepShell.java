@@ -46,7 +46,7 @@ public class DeepShell {
   /** Constructor. */
   DeepShell() {
     BaseX.errln("DeepShell");
-    fs = new DeepFS("deepshell");
+    fs = new DeepFS("deepshell", false);
     if (fs == null) System.exit(1);
     // initialize/mount filesystem
     //fs.init();

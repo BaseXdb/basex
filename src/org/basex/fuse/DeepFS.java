@@ -153,9 +153,10 @@ public final class DeepFS extends DeepFuse implements DataText {
   /**
    * Constructor for DeepShell and java only test cases (no mount).
    * @param dbname name of initially empty database.
+   * @param fuse property value to be set for Prop.fuse
    */
-  public DeepFS(final String dbname) {
-    data = createEmptyDB(dbname);
+  public DeepFS(final String dbname, final boolean fuse) {
+    data = createEmptyDB(dbname, fuse);
     initNames();
     MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(DEEPFS, null, false);
@@ -166,16 +167,17 @@ public final class DeepFS extends DeepFuse implements DataText {
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
-
   }
 
   /**
    * Creates an empty database.
    * @param n name of database instance
+   * @param fuse property value to be set for Prop.fuse
    * @return data reference to empty database
    */
-  private Data createEmptyDB(final String n) {
+  private Data createEmptyDB(final String n, final boolean fuse) {
     Prop.read();
+    Prop.fuse = fuse;
     Context ctx = new Context();
 
     try {
@@ -546,7 +548,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private int insertFileNode(final String path, final int mode) {
     int ppre = parentPre(path);
-    if(ppre == -1) return -1;
+    if(ppre == -1) { BaseX.errln("no parent"); return -1; }
     if(isRegFile(mode)) return insert(ppre, buildFileData(path, mode));
     else return insert(ppre, buildData(path, mode));
   }
@@ -576,7 +578,10 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public int mkdir(final String path, final int mode) {
     // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR.
+    final String method = "[-basex_mkdir] ";
     final int n = createNode(path, S_IFDIR | mode);
+    BaseX.errln(method + "path: " + path 
+        + " mode: " + Integer.toOctalString(mode) + " id : (" + n + ")");
     refresh();
     return n;
   }

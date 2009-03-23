@@ -21,9 +21,9 @@ public final class MetaData {
   /** Database name. */
   public String dbname;
   /** DeepFS mount point. */
-  public String mountpoint = "(not set)";
+  public String mountpoint = "not_set_mountpoint";
   /** DeepFS backing path. */
-  public String backingpath = "(not set)";
+  public String backingpath = "not_set_backing_path";
 
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
