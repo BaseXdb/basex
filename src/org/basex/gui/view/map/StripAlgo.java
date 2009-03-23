@@ -47,6 +47,7 @@ public class StripAlgo extends MapAlgo{
         
         if(x + w <= xx + ww) tmp.add(new MapRect((int) x, (int) yy, w, height,
             ml.list[i], l));
+        else break;
         x += w;
       }
       tmpratio = lineRatio(tmp);

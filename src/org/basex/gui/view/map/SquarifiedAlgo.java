@@ -47,6 +47,7 @@ public class SquarifiedAlgo extends MapAlgo {
           w = w > 0 ? w : 1;
           if(x + w <= xx + ww) tmp.add(new MapRect((int) x, (int) yy, w, height,
               ml.list[i], l));
+          else break;
           x += w;
         }
         tmpratio = lineRatio(tmp);
@@ -88,6 +89,7 @@ public class SquarifiedAlgo extends MapAlgo {
           h = h > 0 ? h : 1;
           if(y + h <= yy + hh) tmp.add(new MapRect((int) xx, (int) y, width, h,
               ml.list[i], l));
+          else break;
           y += h;
         }
         tmpratio = lineRatio(tmp);
