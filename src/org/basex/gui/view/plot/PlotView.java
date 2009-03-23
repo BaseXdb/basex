@@ -50,6 +50,10 @@ public final class PlotView extends View implements Runnable {
   private static final int[] MARGIN = new int[4];
   /** Whitespace between captions. */
   static final int CAPTIONWHITESPACE = 10;
+  /** Maximum length of axis caption text. */
+  private static final int maxL = 11;
+  /** Position where overlength text is cut off. */
+  private static final int cutOff = 10;
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
@@ -701,7 +705,7 @@ public final class PlotView extends View implements Runnable {
       final String caption, final double d) {
     String cap = caption;
  // if label is too long, it is is chopped to the first characters
-    if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
+    if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
     
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
@@ -774,7 +778,7 @@ public final class PlotView extends View implements Runnable {
     g.setColor(back);
     
     if(cap != null) {
-      if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
+      if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
       final int textH = g.getFontMetrics().getHeight();
       final int imgW = BaseXLayout.width(g, cap) + fs;
       final BufferedImage img = createCaptionImage(g, cap, true, imgW);
