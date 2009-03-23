@@ -88,23 +88,25 @@ public final class Context {
     try {
       if(data != null) {
         final Data d = data;
+        final String mp = data.meta.mountpoint; // !! data = null
         data = null;
         current = null;
         marked = null;
         copied = null;
         d.close();
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
-        // [AH] close fuse instance
+        // -- close fuse instance
         if(Prop.fuse) { 
-          BaseX.err("[Context:99] Initiating DeepFS shutdown sequence in ");
-          // unmount running fuse.
-          for (int i = 5; i > -1; i--) {
+          final String method = "[BaseX.close] ";
+          BaseX.err(method + "Initiating DeepFS shutdown sequence ");
+          // -- unmount running fuse.
+          for (int i = 5; i > 0; i--) {
             Performance.sleep(1000);
-            BaseX.err(".. " + i);
+            BaseX.err(i + " .. ");
           }
-          BaseX.errln(".. NOW.");
-          String cmd = "umount -f " + Prop.mountpoint;
-          BaseX.errln("[Context:107] Trying to unmount deepfs: " + cmd);
+          BaseX.errln(" .. NOW.");
+          final String cmd = "umount -f " + mp;
+          BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
           Runtime r = Runtime.getRuntime();
           java.lang.Process p = r.exec(cmd);
           try {
@@ -113,7 +115,7 @@ public final class Context {
             e.printStackTrace();
           }
           int rc = p.exitValue();
-          String msg = "[Context:117] Unmount "  + Prop.mountpoint;
+          String msg = method + "Unmount "  + mp;
           if (rc == 0) msg = msg + " ... OK."; 
           else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
           BaseX.errln(msg);

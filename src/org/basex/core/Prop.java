@@ -52,10 +52,6 @@ public final class Prop {
   public static String dbpath = HOME + "BaseXData";
   /** Web Server path. */
   public static String webpath = WORK + "web";
-  /** DeepFS backing store path. */
-  public static String backingpath = TMP + "backingstore_deepfs";
-  /** DeepFS default mount point. */
-  public static String mountpoint = TMP + "deepfs";
   /** Path to dotty. */
   public static String dotty = "dotty";
   /** Language Name (currently: English or German). */
@@ -179,6 +175,7 @@ public final class Prop {
   /** Remembers if the config file has already been read. */
   private static boolean read;
 
+  /** Load DeepFS dynamic library and set FUSE support flag. */
   static {
     try {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");

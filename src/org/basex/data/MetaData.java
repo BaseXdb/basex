@@ -20,10 +20,10 @@ import org.basex.util.Token;
 public final class MetaData {
   /** Database name. */
   public String dbname;
-  /** FS mount point. */
-  public String mount = Prop.mountpoint;
-  /** FS backing path. */
-  public String backing = Prop.backingpath;
+  /** DeepFS mount point. */
+  public String mountpoint = "(not set)";
+  /** DeepFS backing path. */
+  public String backingpath = "(not set)";
 
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
@@ -135,29 +135,29 @@ public final class MetaData {
       if(k.length() == 0) break;
       final String v = in.readString();
 
-      if(k.equals(DBSTORAGE))       storage  = v;
-      else if(k.equals(IDBSTORAGE)) istorage = v;
-      else if(k.equals(DBSIZE))     size     = Token.toInt(v);
-      else if(k.equals(DBFNAME))    file     = IO.get(v);
-      else if(k.equals(DBFSIZE))    filesize = Token.toLong(v);
-      else if(k.equals(DBNDOCS))    ndocs    = Token.toInt(v);
-      else if(k.equals(DBFTDC))     ftdc     = toBool(v);
-      else if(k.equals(DBENCODING)) encoding = v;
-      else if(k.equals(DBHEIGHT))   height   = Token.toInt(v);
-      else if(k.equals(DBCHOPPED))  chop     = toBool(v);
-      else if(k.equals(DBENTITY))   entity   = toBool(v);
-      else if(k.equals(DBTXTINDEX)) txtindex = toBool(v);
-      else if(k.equals(DBATVINDEX)) atvindex = toBool(v);
-      else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
-      else if(k.equals(DBFZINDEX))  ftfz     = toBool(v);
-      else if(k.equals(DBFTSTEM))   ftst     = toBool(v);
-      else if(k.equals(DBFTCS))     ftcs     = toBool(v);
-      else if(k.equals(DBFTDC))     ftdc     = toBool(v);
-      else if(k.equals(DBTIME))     time     = Token.toLong(v);
-      else if(k.equals(DBUPTODATE)) uptodate = toBool(v);
-      else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
-      else if(k.equals(MOUNT))      mount    = v;
-      else if(k.equals(BACKING))    backing  = v;
+      if(k.equals(DBSTORAGE))       storage     = v;
+      else if(k.equals(IDBSTORAGE)) istorage    = v;
+      else if(k.equals(DBSIZE))     size        = Token.toInt(v);
+      else if(k.equals(DBFNAME))    file        = IO.get(v);
+      else if(k.equals(DBFSIZE))    filesize    = Token.toLong(v);
+      else if(k.equals(DBNDOCS))    ndocs       = Token.toInt(v);
+      else if(k.equals(DBFTDC))     ftdc        = toBool(v);
+      else if(k.equals(DBENCODING)) encoding    = v;
+      else if(k.equals(DBHEIGHT))   height      = Token.toInt(v);
+      else if(k.equals(DBCHOPPED))  chop        = toBool(v);
+      else if(k.equals(DBENTITY))   entity      = toBool(v);
+      else if(k.equals(DBTXTINDEX)) txtindex    = toBool(v);
+      else if(k.equals(DBATVINDEX)) atvindex    = toBool(v);
+      else if(k.equals(DBFTXINDEX)) ftxindex    = toBool(v);
+      else if(k.equals(DBFZINDEX))  ftfz        = toBool(v);
+      else if(k.equals(DBFTSTEM))   ftst        = toBool(v);
+      else if(k.equals(DBFTCS))     ftcs        = toBool(v);
+      else if(k.equals(DBFTDC))     ftdc        = toBool(v);
+      else if(k.equals(DBTIME))     time        = Token.toLong(v);
+      else if(k.equals(DBUPTODATE)) uptodate    = toBool(v);
+      else if(k.equals(DBLASTID))   lastid      = Token.toInt(v);
+      else if(k.equals(MOUNT))      mountpoint  = v;
+      else if(k.equals(BACKING))    backingpath = v;
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -202,10 +202,8 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
-//    if(Prop.fuse) {
-//      writeInfo(out, MOUNT,    mount);
-//      writeInfo(out, BACKING,  backing);
-//    }
+    writeInfo(out, MOUNT,      mountpoint);
+    writeInfo(out, BACKING,    backingpath);
     out.writeString("");
   }
 

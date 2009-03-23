@@ -13,13 +13,30 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class CreateFS extends ACreate {
+  
+  /** File hierarchy to be imported. */
+  private String fsimportpath;
+  /** Database name for imported file hierarchy. */
+  private String dbname;
+  /** DeepFS mount point. */
+  private String mountpoint;
+  /** DeepFS backing store. */
+  private String backingstore;
+  
   /**
    * Constructor.
    * @param path filesystem path
    * @param name name of database
+   * @param mp fuse mount point 
+   * @param bp path to BLOB backing store
    */
-  public CreateFS(final String path, final String name) {
-    super(STANDARD, path, name);
+  public CreateFS(final String path, final String name, final String mp,
+      final String bp) {
+    super(STANDARD, path, name, mp, bp);
+    fsimportpath = path;
+    dbname = name;
+    mountpoint = mp;
+    backingstore = bp;
   }
   
   @Override
@@ -27,9 +44,8 @@ public final class CreateFS extends ACreate {
     Prop.chop = true;
     Prop.entity = true;
     Prop.mainmem = false;
-    // if the first argument is a slash, all directories are
-    // parsed (which includes all partitions on Windows systems)
-    return build(new FSParser(IO.get(args[0]), args[0].equals("/")), args[1]);
+    return build(
+        new FSParser(IO.get(fsimportpath), mountpoint, backingstore), dbname);
   }
   
   @Override

@@ -1234,6 +1234,10 @@ public interface Text {
   /** Help String. */
   byte[] HELPFSALL = token(lang("h_fsall"));
   /** Help String. */
+  byte[] HELPFSBACKING = token(lang("h_fsbacking"));
+  /** Help String. */
+  byte[] HELPFSMOUNT = token(lang("h_fsmount"));
+  /** Help String. */
   byte[] HELPMETA = token(lang("h_meta"));
   /** Help String. */
   byte[] HELPCONT = token(lang("h_cont"));

@@ -1,14 +1,18 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
+
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -75,7 +79,7 @@ public final class DialogImportFS  extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(7, 2, 6, 0));
     
-    path = new BaseXTextField(GUIProp.fspath, HELPFSPATH, this);
+    path = new BaseXTextField(GUIProp.guifsimportpath, HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -101,7 +105,7 @@ public final class DialogImportFS  extends Dialog {
     p.add(new BaseXLabel(CREATENAME, false, true));
     p.add(new BaseXLabel(""));
 
-    dbname = new BaseXTextField(GUIProp.importfsname, HELPFSNAME, this);
+    dbname = new BaseXTextField(GUIProp.guifsdbname, HELPFSNAME, this);
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -121,12 +125,22 @@ public final class DialogImportFS  extends Dialog {
     });
     p.add(all);
     
-    backing = new BaseXTextField(Prop.backingpath,
-        "Directory for BLOBs.".getBytes(), this);
+    backing = new BaseXTextField(GUIProp.guibackingroot, HELPFSBACKING, this);
+    backing.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
+    });
     BaseXLayout.setWidth(backing, 240);
     
-    mountpoint = new BaseXTextField(Prop.mountpoint,
-        "Mount point of database as filesystem in userspace".getBytes(), this);
+    mountpoint = new BaseXTextField(GUIProp.guimountpoint, HELPFSMOUNT, this);
+    mountpoint.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
+    });
     BaseXLayout.setWidth(mountpoint, 240);
 
     if(Prop.fuse) {
@@ -208,16 +222,23 @@ public final class DialogImportFS  extends Dialog {
 
     final String nm = dbname.getText().trim();
     ok = nm.length() != 0;
-    if(ok) GUIProp.importfsname = nm;
+    if(ok) GUIProp.guifsdbname = nm;
     
     boolean exists = all.isSelected();
     if(!exists) {
       final String p = path.getText().trim();;
       final IO file = IO.get(p);
       exists = p.length() != 0 && file.exists();
-      if(exists) GUIProp.fspath = path.getText();
+      if(exists) GUIProp.guifsimportpath = path.getText();
     }
     ok &= exists;
+    
+    if (Prop.fuse) {
+      boolean backdir = new File(backing.getText().trim()).isDirectory();
+      ok &= backdir;
+      boolean mountdir = new File(mountpoint.getText().trim()).isDirectory();
+      ok &= mountdir;
+    }
     
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
     ImageIcon img = null;
@@ -245,8 +266,13 @@ public final class DialogImportFS  extends Dialog {
     Prop.fsmeta = meta.isSelected();
     Prop.fstextmax = IMPORTFSMAXSIZE[maxsize.getSelectedIndex()];
     GUIProp.fsall = all.isSelected();
-    GUIProp.importfsname = dbname.getText();
-    GUIProp.fspath = path.getText();
+    GUIProp.guifsimportpath = path.getText();
+    GUIProp.guifsdbname = dbname.getText();
+    if (Prop.fuse) {
+      GUIProp.guimountpoint = mountpoint.getText().trim();
+      GUIProp.guibackingroot = backing.getText().trim();
+    }
+
     super.close();
   }
 }

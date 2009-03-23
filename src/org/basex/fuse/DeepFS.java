@@ -1,8 +1,10 @@
 package org.basex.fuse;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
@@ -60,18 +62,16 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   /*
    * ------------------------------------------------------------------------
-   * Native deepfs method declarations (org_basex_fuse_DataFS.h)
+   * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
    * ------------------------------------------------------------------------
    */
   /**
    * Mount database as FUSE.
-   * @param mountpoint path where to mount BaseX.
-   * @param backing path to backing storage root.
-   * @param dbname name of the BaseX database.
+   * @param mp path where to mount BaseX.
+   * @param bs path to backing storage root of this instance.
    * @return 0 on success, errno in case of failure.
    */
-  public native int nativeMount(final String mountpoint, final String backing,
-      final String dbname);
+  public native int nativeMount(final String mp, final String bs);
 
   /**
    * Unlink file in backing store.
@@ -87,73 +87,66 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   /* ------------------------------------------------------------------------ */
 
+  /** 
+   * Initialize often used tags and attributes.
+   */
+  private void initNames() {
+    dirID = data.tags.id(DataText.DIR);
+    fileID = data.tags.id(DataText.FILE);
+    unknownID = data.tags.id(DataText.UNKNOWN);
+
+    suffID = data.atts.id(DataText.SUFFIX);
+    timeID = data.atts.id(DataText.MTIME);
+    modeID = data.atts.id(DataText.MODE);
+    backingstoreID = data.atts.id(DataText.BACKINGSTORE);
+    mountpointID = data.atts.id(DataText.MOUNTPOINT);
+  }
+ 
   /**
    * Constructor.
    * @param d data reference
    */
   public DeepFS(final Data d) {
     data = d;
-    dirID = d.tags.id(DataText.DIR);
-    fileID = d.tags.id(DataText.FILE);
-    unknownID = d.tags.id(DataText.UNKNOWN);
-
-    suffID = d.atts.id(DataText.SUFFIX);
-    timeID = d.atts.id(DataText.MTIME);
-    modeID = d.atts.id(DataText.MODE);
-    backingstoreID = d.atts.id(DataText.BACKINGSTORE);
-    mountpointID = d.atts.id(DataText.MOUNTPOINT);
-
+    
+    final String mountpoint = d.meta.mountpoint;
+    final String backingpath = d.meta.backingpath;
+    
+    initNames();
+    
     if(Prop.fuse) {
-      final File mp = new File(Prop.mountpoint);
-      final File bp = new File(Prop.backingpath + Prop.SEP + d.meta.dbname);
-
-      /* --- prepare (maybe mkdir, rm) mountpoint and backing store --- */
-      // mountpoint
-      if(Prop.mountpoint.compareTo(d.meta.mount) != 0) {
-        if(Prop.edbt) {
-          BaseX.errln("[DataFS:118] Prop.mountpoint and d.meta.mount differ",
-              Prop.mountpoint, " ", d.meta.mount);
-        }
-      }
+      final File mp = new File(mountpoint);
+      final File bp = new File(backingpath);
+      final String method = "[BaseX_mount] ";
+      /* --- prepare (maybe mkdir) mountpoint and backing store --- */
+      // - mountpoint
       if(!mp.exists()) {
-        if(Prop.edbt) {
-          BaseX.errln("[DataFS:95] Mountpoint does not exist  : "
-              + Prop.mountpoint);
-          BaseX.errln("[DataFS:97] Trying to create mountpoint: "
-              + Prop.mountpoint);
-        }
+        if(Prop.edbt)
+          BaseX.errln(method + "Mountpoint does not exist. " +
+              "Trying to create it: " + mountpoint);
         if(!mp.mkdirs()) {
-          if(mp.exists()) {
-            if(!FSParser.deleteDir(mp) || !mp.mkdirs()) {
-              BaseX.errln(FSText.MOUNTPOINTEXISTS + mp.toString());
-              return;
-            }
-          }
+          BaseX.errln(FSText.NOMOUNTPOINT + mp.toString());
+          return;
         }
       }
-      // backing store
+      // - backing store
       if(!bp.exists()) {
-        if(Prop.edbt) {
-          BaseX.errln("[DataFS:142] Backingpath does not exist. "
-              + Prop.backingpath);
-          BaseX.errln("[DataFS:144] Creating backingpath");
-        }
+        if(Prop.edbt)
+          BaseX.errln(method + "Backingpath does not exist. " +
+              "Trying to create it: " + backingpath);
         if(!bp.mkdirs()) {
-          if(bp.exists()) {
-            if(!FSParser.deleteDir(bp) || !bp.mkdirs()) {
-              BaseX.errln(FSText.BACKINGEXISTS + bp.toString());
-              return;
-            }
-          }
+          BaseX.errln(FSText.NOBACKINGPATH + bp.toString());
+          return;
         }
       }
 
-      // try to mount deepfs
       if (Prop.edbt) {
-        BaseX.errln("[DataFS] Trying to mount DeepFS on " + d.meta.mount);
+        BaseX.errln(method + "Trying to mount DeepFS\n"
+            + "\tmountpoint: " + mountpoint + "\n"
+            + "\tbacking   : " + backingpath);
       }
-      // nativeMount("/mnt/deepfs", "/var/tmp/deepfs", "demo");
-      nativeMount(d.meta.mount, d.meta.backing, d.meta.dbname);
+
+      nativeMount(mountpoint, backingpath);
     }
   }
 
@@ -163,17 +156,13 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   public DeepFS(final String dbname) {
     data = createEmptyDB(dbname);
-    if(data == null) {
-      BaseX.errln("[DataFS:162] Can not construct empty database.");
-      System.exit(-1);
-    }
-    // insert initial heading.
+    initNames();
     MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(DEEPFS, null, false);
     // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
     m.addElem(tagID, 0, 1, 3, 3, false);
-    m.addAtt(mountpointID, 0, MOUNTPOINT, 2);
-    m.addAtt(backingstoreID, 0, BACKINGSTORE, 3);
+    m.addAtt(mountpointID, 0, NOTMOUNTED, 2);
+    m.addAtt(backingstoreID, 0, NOBACKING, 3);
     data.insert(1, 0, m);
     data.flush();
     data.meta.update();
@@ -246,7 +235,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @param pre pre value
    * @return file path.
    */
-  public byte[] path(final int pre) {
+  public byte[] path(final int pre) { 
     int p = pre;
     int k = data.kind(p);
     final IntList il = new IntList();
@@ -261,7 +250,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     if(s != 0) {
       final byte[] b;
       if (Prop.fuse) b = mountpoint(il.list[s - 1]);
-      else b = name(il.list[s - 1]);
+      else b = backingstore(il.list[s - 1]);
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -277,12 +266,21 @@ public final class DeepFS extends DeepFuse implements DataText {
   }
 
   /**
-   * Returns the mountpoint attribute value of a deepfs file hierarchy.
+   * Returns mountpoint attribute value.
    * @param pre pre value
-   * @return path mountpoint.
+   * @return mountpoint value.
    */
   private byte[] mountpoint(final int pre) {
     return attr(pre, data.fs.mountpointID);
+  }
+
+  /**
+   * Returns backing store attribute value.
+   * @param pre pre value
+   * @return path mountpoint.
+   */
+  private byte[] backingstore(final int pre) {
+    return attr(pre, data.fs.backingstoreID);
   }
   
   /**
@@ -474,8 +472,7 @@ public final class DeepFS extends DeepFuse implements DataText {
       mb.init(md);
       Prop.fscont = true;
       Prop.fsmeta = true;
-      final String bpath = Prop.backingpath + Prop.SEP + data.meta.dbname +
-        Prop.SEP + path;
+      String bpath = data.meta.backingpath + Prop.SEP + path;
       // [AH]: Path to backing store file correct?
       BaseX.errln("[DataFS_parse_single_file] FIX ME? bpath : " + bpath);
       FSParser p = new FSParser(bpath);
@@ -640,6 +637,8 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public int rmdir(final String path) {
     /* [AH] rmdir(2) deletes only empty dir. What happens with --ignore? */
+    if (Prop.edbt)
+      BaseX.errln("[basex_rmdir] path: " + path);
     final int n = delete(path, true, false);
     refresh();
     return n;

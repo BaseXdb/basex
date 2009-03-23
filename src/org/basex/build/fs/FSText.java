@@ -172,8 +172,10 @@ public interface FSText {
   byte[][] ATTRIBUTETOKENS = { token("CC"), token("User-Agent"),
       token("Organization") };
   
-  /** Error message 'Import FS...' if backing storage exists. */
-  String BACKINGEXISTS = "Backing storage exists & can not be deleted: ";
-  /** Error message 'Import FS...' if mountpoint exists & can't be cleaned. */
-  String MOUNTPOINTEXISTS = "Mountpoint exists & can not be deleted: ";
+  /** Error message 'create fs ...' if mountpoint does not exist. */
+  String NOMOUNTPOINT = "Mountpoint does not exist. Please create first.";
+  /** Error message 'create fs ...' if backingpath does not exist. */
+  String NOBACKINGPATH = "Backing store does not exist. Please create first.";  
+  /** Error message 'create FS...' if backing storage exists. */
+  String BACKINGEXISTS = "Backing storage exists. Please delete first. ";
 }

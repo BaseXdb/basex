@@ -156,9 +156,12 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogImportFS(gui).ok()) return;
-      final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
-      final String name = GUIProp.importfsname;
-      progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
+      final String p = GUIProp.fsall ? "/" 
+          : GUIProp.guifsimportpath.replace('\\', '/');
+      final String n = GUIProp.guifsdbname;
+      final String m = GUIProp.guimountpoint;
+      final String b = GUIProp.guibackingroot;
+      progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
     }
   },
 

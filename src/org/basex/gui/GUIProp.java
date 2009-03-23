@@ -119,10 +119,14 @@ public final class GUIProp {
   /** Path for XQuery files. */
   public static String xqpath = Prop.WORK;
   /** Path for importing the file system. */
-  public static String fspath = Prop.WORK;
+  public static String guifsimportpath = Prop.WORK;
 
   /** Name of the filesystem database. */
-  public static String importfsname = "Filesystem";
+  public static String guifsdbname = "Filesystem";
+  /** Name of the mountpoint. */
+  public static String guimountpoint = Prop.TMP + "deepfs";
+  /** Name of the backingroot. */
+  public static String guibackingroot = Prop.TMP +  "backingstore_deepfs";
   /** Flag for importing complete file system hierarchy. */
   public static boolean fsall = false;
 

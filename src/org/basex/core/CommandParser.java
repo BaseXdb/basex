@@ -111,7 +111,10 @@ public final class CommandParser extends InputParser {
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:
-            return new CreateFS(path(cmd), name(cmd));
+            if (Prop.fuse)  
+              return new CreateFS(path(cmd), name(cmd), path(cmd), path(cmd));
+            else 
+              return new CreateFS(path(cmd), name(cmd), "no_fuse", "no_fuse");
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
         }

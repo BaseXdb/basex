@@ -30,6 +30,7 @@ import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.Map;
+import org.basex.util.Token;
 
 /**
  * Imports/shreds/parses a file hierarchy into a BaseX database.
@@ -57,7 +58,7 @@ public final class FSParser extends Parser {
   private Builder builder;
   /** The currently processed file. */
   private File curr;
-  /** Root flag. */
+  /** Root flag to parse root node or all partitions (C:, D: ...). */
   private boolean root;
   /** Level counter. */
   private int lvl;
@@ -67,23 +68,39 @@ public final class FSParser extends Parser {
   private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
-  /** DeepFS import flag (copy files to backing store). */
-  private boolean wbacking = false;
-  /** Root of backing store. */
+  /** Path to root of the backing store. */
+  private String fsimportpath;
+  /** Name of the database and backingroot sub directory. */
+  private String fsdbname;
+  /** Path to root of the backing store. */
   private String backingroot;
+  /** Path to root of the backing store for this import. */
+  public String mybackingpath;
+  /** Path to FUSE mountpoint. */
+  public String mountpoint;
   /** Length of absolute pathname of the root directory the import starts from,
-   * i.e. the prefix to be deleted and substituted by backingroot. */
+   * i.e. the prefix to be chopped from path and substituted by backingroot. */
   private int importRootLength;
 
   /**
    * Constructor.
    * @param path the traversal starts from
-   * @param r root flag to parse root node or all partitions (C:, D: ...).
+   * @param mp mount point for fuse
+   * @param bs path to root of backing store for BLOBs 
    * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final IO path, final boolean r) {
+  public FSParser(final IO path, final String mp, final String bs) {
     super(path);
-    root = r;
+    Prop.intparse = true;
+    Prop.entity = false;
+    Prop.dtd = false;
+    root = path.equals("/");
+    
+    fsimportpath = path.path();
+    fsdbname = path.name();
+    backingroot = bs;
+    mountpoint = mp;
+    mybackingpath = backingroot + Prop.SEP + fsdbname;
 
     meta.add(TYPEGIF, new GIFExtractor());
     meta.add(TYPEPNG, new PNGExtractor());
@@ -103,7 +120,7 @@ public final class FSParser extends Parser {
    * @param path String to file node to parse
    */
   public FSParser(final String path) {
-    this(IO.get(path), false);
+    this(IO.get(path), "single_file_mode", "single_file_mode");
     singlemode = true;
   }
   
@@ -118,10 +135,15 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    backingroot = Prop.backingpath + Prop.SEP + io.name();
-    final File bs = new File(backingroot);
-    if(wbacking && (!deleteDir(bs) || !bs.mkdirs()))
-      throw new IOException(BACKINGEXISTS + backingroot);
+    builder.meta.backingpath = mybackingpath;
+    builder.meta.mountpoint = mountpoint;
+    
+    // -- create backing store (DeepFS depends on it).
+    if(Prop.fuse) {
+      File bs = new File(mybackingpath);
+      if (!bs.mkdirs() && bs.exists())
+          throw new IOException(BACKINGEXISTS + mybackingpath);
+    }
     
     builder.startDoc(token(io.name()));
 
@@ -129,14 +151,20 @@ public final class FSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      atts.add(NAME, token(io.path()));
-      atts.add(SIZE, token("0"));
-      atts.add(MOUNTPOINT, token(Prop.mountpoint));
-      atts.add(BACKINGSTORE, token(backingroot));
+      if(Prop.fuse) {
+        atts.add(MOUNTPOINT  , token(mountpoint));
+        atts.add(SIZE        , Token.EMPTY);
+        atts.add(BACKINGSTORE, token(mybackingpath));
+      } else {
+        atts.add(MOUNTPOINT  , NOTMOUNTED);
+        atts.add(SIZE        , Token.EMPTY);
+        atts.add(BACKINGSTORE, token(fsimportpath));
+      }
+
       builder.startElem(DEEPFS, atts);
       
       for(final File f : root ? File.listRoots() :
-        new File[] { new File(io.path()).getCanonicalFile() }) {
+        new File[] { new File(fsimportpath).getCanonicalFile() }) {
         
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
@@ -161,13 +189,15 @@ public final class FSParser extends Parser {
       if(!valid(f)) continue;
 
       if(f.isDirectory()) {
-        if (wbacking)
-          new File(backingroot
+        // -- 'copy' directory to backing store
+        if (Prop.fuse)
+          new File(mybackingpath
             + f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
-        if (wbacking)
-          copy(f.getAbsoluteFile(), new File(backingroot
+        // -- copy file to backing store
+        if (Prop.fuse)
+          copy(f.getAbsoluteFile(), new File(mybackingpath
             + f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
@@ -178,17 +208,20 @@ public final class FSParser extends Parser {
    * Copies a file to the backing store.
    * @param src file source
    * @param dst file destination in backing store
-   * @throws IOException I/O exception
    */
-  private void copy(final File src, final File dst) throws IOException {    
-    InputStream in = new FileInputStream(src);
-    OutputStream out = new FileOutputStream(dst);
-    byte[] buf = new byte[4096];
-    int len;
-
-    while((len = in.read(buf)) > 0) out.write(buf, 0, len);
-    in.close();
-    out.close();
+  private void copy(final File src, final File dst) {
+    try {
+      InputStream in = new FileInputStream(src);
+      OutputStream out = new FileOutputStream(dst);
+      byte[] buf = new byte[4096];
+      int len;
+  
+      while((len = in.read(buf)) > 0) out.write(buf, 0, len);
+      in.close();
+      out.close();
+    } catch (IOException e) {
+      e.getMessage();
+    }
   }
   
   /**

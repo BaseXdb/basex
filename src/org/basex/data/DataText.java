@@ -100,10 +100,14 @@ public interface DataText {
   byte[] CONTENT = token("content");
   /** File mode attribute. */
   byte[] MODE = token("mode");
-  /** Mountpoint attribute. */
+  /** Mount point attribute. */
   byte[] MOUNTPOINT = token("mountpoint");
-  /** Backingstore attribute. */
+  /** Backing store attribute. */
   byte[] BACKINGSTORE = token("backingstore");
+  /** Negative mount point attribute. */
+  byte[] NOTMOUNTED = token("(not mounted)");
+  /** Negative backing store attribute. */
+  byte[] NOBACKING = token("(no backing store)");
   
   // XML SERIALIZATION ========================================================
 
