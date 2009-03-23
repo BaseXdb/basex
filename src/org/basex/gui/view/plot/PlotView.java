@@ -601,7 +601,7 @@ public final class PlotView extends View implements Runnable {
           l = 0;
           a = -1;
           while(a >= axis.min) {
-            if(a <= axis.max) {
+            if(a <= axis.max && adequateDistance(drawX, a, 0)) {
               drawCaptionAndGrid(g, drawX, formatString(a, drawX),
                   axis.calcPosition(a));
             }
@@ -634,7 +634,7 @@ public final class PlotView extends View implements Runnable {
           l = 0;
           a = 1;
           while(a <= axis.max) {
-            if(a >= axis.min) {
+            if(a >= axis.min && adequateDistance(drawX, a, 0)) {
               drawCaptionAndGrid(g, drawX, formatString(a, drawX),
                   axis.calcPosition(a));
             }
