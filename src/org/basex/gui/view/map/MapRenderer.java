@@ -290,9 +290,13 @@ final class MapRenderer {
     r.thumblh = lhmi;
     
     h = drawThumbnailsSentence(g, r, data, false, Math.max(1, fnew), false);
-    if (h <= r.h && fnew > 0) 
+    if (h <= r.h) 
       drawThumbnailsSentence(g, r, data, false, Math.max(1, fnew), true);
-    else r.thumbf = 0; // used to suppress tooltip
+    else {
+      //drawThumbnailsPara(g, r, data, true);
+      r.thumbf = 0; // used to suppress tooltip
+      
+    }
   }
 
   /**
@@ -546,14 +550,14 @@ final class MapRenderer {
    * Checks if cursor is inside the rect.
    * @param rx int x-value of the rect
    * @param ry int y-value of the rect
-   * @param rw int width of the rect
+   * @param rw double width of the rect
    * @param rh int height of the rect
    * @param xx int x-value of the cursor
    * @param yy int y-value of the cursor
    * @return boolean
    */
-  private static boolean inRect(final int rx, final int ry,
-      final int rw, final int rh, final int xx, final int yy) {
+  private static boolean inRect(final double rx, final int ry,
+      final double rw, final int rh, final int xx, final int yy) {
     return xx >= rx && xx <= rx + rw  && yy >= ry && yy <= ry + rh;
   }
 
@@ -591,11 +595,11 @@ final class MapRenderer {
         len.add(l);
       }
 
-      int xx = x + 10 + wi  >= rw ? rx + rw - wi : x + 10;
+      final int ww = nl == 1 && wl < wi ? wl : wi;
+      int xx = x + 10 + ww  >= rx + rw ? rx + rw - ww - 2 : x + 10;
       int yy = y + 28 + GUIProp.fontsize * nl + 4 < ry + rh ?
           y + 28 : y  - GUIProp.fontsize * nl;
-
-      final int ww = nl == 1 && wl < wi ? wl : wi;
+      //final int ww = nl == 1 && wl < wi ? wl : wi;
       g.setColor(COLORS[12]);
       g.drawRect(xx - 3, yy - GUIProp.fontsize - 1, ww + 3,
           GUIProp.fontsize * nl + 7);
@@ -652,7 +656,7 @@ final class MapRenderer {
     // rectangle is empty - don't need a tooltip 
     if (r.thumbf == 0) return;
     
-    final double ww = r.w;
+    final int ww = r.w;
     int yy = r.y + 3;
 
     int wl = 0; // word length
@@ -675,20 +679,29 @@ final class MapRenderer {
           // draw token in new line
           yy += r.thumblh;
           ll = 0;
-          ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
-          ll = wl + (ds ? +(int) r.thumbf : 0);
+//          g.drawRect(r.x, yy, (int) (ww - ll< wl ? ww - ll : wl), r.thumbfh);
+          ir = inRect(r.x, yy, ww - ll < wl ? ww - ll : wl, r.thumbfh, x, y);
+          ll += ww - ll < wl ? ww : wl + r.thumbf;
+          wl = ww - ll < wl ? ww - wl : 0; 
         } else {
-          ir = inRect(r.x + ll, yy, wl - ll, r.thumbfh, x, y);
-          ll = wl - (int) (ww - ll) + (ds ? +(int) r.thumbf : 0);
+//          g.drawRect((int) (r.x + ll), yy, 
+//          (int)(ww - ll < wl ? ww - ll : wl), r.thumbfh);
+          ir = inRect(r.x + ll, yy, 
+              ww - ll < wl ? ww - ll : wl, r.thumbfh, x, y);
+          wl = ww - ll < wl ? wl - (ww - ll) : 0;
+          ll = 0;
           yy += r.thumblh;
         }
-        ir |= inRect(r.x, yy, ll, r.thumbfh, x, y);
+//        g.drawRect((int) (r.x + ll), yy, (int)wl, (int) r.thumbfh);
+        ir |= inRect(r.x, yy, wl, r.thumbfh, x, y);
+        ll += wl;
       } else {
+//        g.drawRect((int) (r.x + ll), yy, (int) wl, (int) r.thumbfh);
         ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
-        ll += wl + (ds ? +r.thumbf : 0);
+        ll += wl + (ds ? r.thumbf : 0);
       }
 
-       if (ir) {
+      if (ir) {
         final int si = i;
         final int[] cw = fontWidths(g.getFont());
         final int sp = BaseXLayout.width(g, cw, ' ');
@@ -846,17 +859,17 @@ final class MapRenderer {
   private static int drawThumbnailsSentence(final Graphics g,
       final MapRect r, final int[][] data, final boolean sen,
       final double sw, final boolean draw) {
-    final double xx = r.x;
-    final double ww = r.w;
+    final int xx = r.x;
+    final int ww = r.w;
     final int ys = r.y + 3;
     int yy = ys;
 
-    double wl = 0; // word length
+    int wl = 0; // word length
     int ll = 0; // line length
 
     final Color textc = COLORS[r.level + 4];
     g.setColor(textc);
-    double lastl = 0;
+    int lastl = 0;
     int count = -1;
     int pp = 0;
     int sl = 0, pl = 0;
@@ -874,7 +887,7 @@ final class MapRenderer {
               || pp == r.pos.length)) {
         sl += data[0][i];
         pl += data[0][i];
-        lastl = data[0][i] * r.thumbf;
+        lastl = (int) (data[0][i] * r.thumbf);
         wl += lastl;
         count++;
         if (i < data[0].length) i++;
@@ -885,25 +898,25 @@ final class MapRenderer {
       int fp = 0;
       // doesn't fit in line
       if (ll + wl >= ww) {
-        fp = (int) (ww - ll);
+        fp = ww - ll;
         if (fp <= r.thumbf) {
           yy += r.thumblh;
           ll = 0;
         } else {
-          final int sp = (int) wl - fp;
+          final int sp = wl - fp;
           // draw first part of the sentence
           if (draw) {
             g.setColor(textc);
             if (r.pos != null && pp < r.pos.length 
                 && count == r.pos[pp] && sp < lastl) {
-              g.fillRect((int) (xx + ll), yy, (int) (wl - lastl), r.thumbfh);
+              g.fillRect(xx + ll, yy, wl - lastl, r.thumbfh);
               ll += wl - lastl;
               g.setColor(COLORFT);
               //g.setColor(getFTColor(r.poi[pp], r.acol));
-              g.fillRect((int) (xx + ll), yy, (int) ww - ll, r.thumbfh);
+              g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
               lastl -= ww - ll;
             } else 
-            g.fillRect((int) (xx + ll), yy, fp, r.thumbfh);
+            g.fillRect(xx + ll, yy, fp, r.thumbfh);
           }
           yy += r.thumblh;
           ll = 0;
@@ -915,7 +928,7 @@ final class MapRenderer {
       if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
         if (lastl > 0) {
           if (draw) 
-            g.fillRect((int) (xx + ll), yy, (int) (wl - lastl), r.thumbfh);
+            g.fillRect(xx + ll, yy, wl - lastl, r.thumbfh);
           ll += wl - lastl;
           wl = lastl;
         }
@@ -926,7 +939,7 @@ final class MapRenderer {
 
       if (wl + ll < ww) {
         if (draw) {
-          g.fillRect((int) (xx + ll), yy, (int) wl, r.thumbfh); //fh);
+          g.fillRect(xx + ll, yy, wl, r.thumbfh); //fh);
           g.setColor(textc);
         }
         ll += wl;
@@ -942,7 +955,7 @@ final class MapRenderer {
 
         if (draw) {
           g.setColor(Color.black);
-          g.fillRect((int) (xx + ll), yy, (int) sw, r.thumbfh); //sw, fh);
+          g.fillRect(xx + ll, yy, (int) sw, r.thumbfh); //sw, fh);
           g.setColor(textc);
         }
         ll += sw;
@@ -963,4 +976,47 @@ final class MapRenderer {
     }
     return yy - r.y + r.thumbfh;
   }
+  /**
+   * Draws a text using thumbnail visualization.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param data fulltext to be drawn
+   * @param draw boolean for drawing (used for calculating the height)
+   * @return height
+   */
+ /* private static int drawThumbnailsPara(final Graphics g,
+      final MapRect r, final int[][] data, final boolean draw) {
+    final double xx = r.x;
+    final double ww = r.w;
+    final int ys = r.y + 3;
+    int yy = ys;
+
+    double wl = 0; // word length
+
+    final Color textc = COLORS[r.level + 4];
+    g.setColor(textc);
+
+    int i = 0;
+    tl = new TokenList();
+    while (i < data[2].length) {
+      wl = data[2][i] * r.thumbf;
+      // doesn't fit in line
+      while (wl >= ww) {
+          g.setColor(textc);
+          g.fillRect((int) xx, yy, (int) ww, r.thumbfh);
+          wl -= ww;
+          yy += r.thumblh;
+      }
+      g.fillRect((int) xx, yy, (int) wl, r.thumbfh);
+      final Color c = g.getColor();
+      g.setColor(color6);
+      g.fillRect((int) xx, yy, (int) r.thumbf, r.thumbfh);
+      g.setColor(c);
+
+      i++;
+    }
+    return yy - r.y + r.thumbfh;
+  }
+*/
+  
 }
