@@ -96,6 +96,11 @@ public abstract class Dialog extends JDialog {
   public void action(final String cmd) { }
 
   /**
+   * Called when GUI design has changed.
+   */
+  public void refresh() { }
+
+  /**
    * Cancels the dialog; can be overwritten.
    */
   public void cancel() {

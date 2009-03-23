@@ -323,7 +323,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Filter currently marked nodes. */
-  FILTER(true, GUIFILTER, null, GUIFILTERTT) {
+  FILTER(true, GUIFILTER, "% ENTER", GUIFILTERTT) {
     @Override
     public void execute(final GUI gui) {
       final Context context = gui.context;
@@ -638,7 +638,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
+  MAPLAYOUT(true, GUIMAPLAYOUT, null, GUIMAPLAYOUTTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);

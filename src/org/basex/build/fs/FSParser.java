@@ -156,7 +156,7 @@ public final class FSParser extends Parser {
         atts.add(SIZE        , Token.EMPTY);
         atts.add(BACKINGSTORE, token(mybackingpath));
       } else {
-        atts.add(MOUNTPOINT  , NOTMOUNTED);
+        atts.add(NAME        , NOTMOUNTED);
         atts.add(SIZE        , Token.EMPTY);
         atts.add(BACKINGSTORE, token(fsimportpath));
       }

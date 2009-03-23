@@ -343,11 +343,10 @@ public final class GUI extends JFrame {
       GUIProp.guisize[1] = getHeight();
     }
     query.quit();
-    if(help != null) help.close();
     if(context.data() == null || context.data().fs == null) context.close();
+    super.dispose();
     GUIProp.write();
     Prop.write();
-    super.dispose();
   }
 
   /**

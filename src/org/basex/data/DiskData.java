@@ -395,10 +395,9 @@ public final class DiskData extends Data {
 
   @Override
   public void delete(final int pre) {
-    int k = kind(pre);
-
     // size of the subtree to delete
-    final int s = size(pre, k);
+    int k = kind(pre);
+    int s = size(pre, k);
 
     // reduce size of ancestors
     int par = pre;
@@ -418,16 +417,23 @@ public final class DiskData extends Data {
       size(par, k, size(par, k) - s);
     }
 
-    // delete node from table structure and reduce document size
-    table.delete(pre, s);
-    meta.size -= s;
-
-    // [CG] Update/Delete: keep empty root node
-    if(meta.size == 0) {
-      meta.size = 1;
-      size(0, DOC);
+    // preserve empty root node
+    int p = pre;
+    boolean empty = p == 0 && s == meta.size;
+    if(empty) {
+      p++;
+      s = size(p, kind(p));
     }
-    updateDist(pre, -s);
+    
+    // delete node from table structure and reduce document size
+    table.delete(p, s);
+    meta.size -= s;
+    updateDist(p, -s);
+
+    if(empty) {
+      size(0, DOC, 1);
+      update(0, Token.EMPTY, true);
+    }
   }
 
   /**

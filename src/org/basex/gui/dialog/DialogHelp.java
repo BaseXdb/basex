@@ -39,7 +39,7 @@ public final class DialogHelp extends Dialog {
     setPreferredSize(new Dimension(size[0], size[1]));
 
     finish(GUIProp.helploc);
-    refreshLayout();
+    refresh();
   }
 
   /**
@@ -50,10 +50,8 @@ public final class DialogHelp extends Dialog {
     area.setText(help);
   }
 
-  /**
-   * Called when GUI design has changed.
-   */
-  public void refreshLayout() {
+  @Override
+  public void refresh() {
     area.setFont(GUIConstants.font);
   }
 
