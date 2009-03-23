@@ -280,9 +280,10 @@ public abstract class Expr extends ExprInfo {
    * Adds a text to an expression.
    * @param ctx query context
    * @return expression
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr addText(final QueryContext ctx) {
+  public Expr addText(final QueryContext ctx) throws QueryException {
     return this;
   }
 }

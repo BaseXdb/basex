@@ -59,7 +59,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor(final String qu, final Nodes n) {
     this(qu);
-    ctx.nodes(n);
+    ctx.nodes = n;
   }
 
   /**

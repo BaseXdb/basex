@@ -55,22 +55,6 @@ public final class QueryContext extends Progress {
   /** Query string. */
   public String query;
   
-  /** Maximum number of evaluation dumps. */
-  protected static final int MAXDUMP = 16;
-  /** Query info counter. */
-  protected int cc;
-  /** Current evaluation time. */
-  protected long evalTime;
-  /** Info flag. */
-  protected boolean inf;
-
-  /** String container for query background information. */
-  protected final TokenBuilder info = new TokenBuilder();
-  /** Optimization flag. */
-  protected boolean firstOpt = true;
-  /** Evaluation flag. */
-  protected boolean firstEval = true;
-
   /** Namespaces. */
   public NSLocal ns = new NSLocal();
   /** Functions. */
@@ -121,15 +105,6 @@ public final class QueryContext extends Progress {
   /** Initial number of documents. */
   public int rootDocs;
 
-  /** List of modules. */
-  StringList modules = new StringList();
-  /** List of loaded modules. */
-  StringList modLoaded = new StringList();
-  /** Collections. */
-  NodIter[] collect = new NodIter[0];
-  /** Collection names. */
-  byte[][] collName = new byte[0][];
-
   /** Default boundary-space. */
   public boolean spaces = false;
   /** Empty Order mode. */
@@ -148,18 +123,26 @@ public final class QueryContext extends Progress {
   /** Revalidation Mode. */
   public int revalidate = 0;
 
-  /** Reference to the root expression. */
-  private Expr root;
-  /** Initial context set (default: null). */
-  private Nodes nodes;
+  /** String container for query background information. */
+  final TokenBuilder info = new TokenBuilder();
+  /** Optimization flag. */
+  boolean firstOpt = true;
+  /** Evaluation flag. */
+  boolean firstEval = true;
 
-  /**
-   * Sets initial context nodes.
-   * @param n initial nodeset
-   */
-  public void nodes(final Nodes n) {
-    nodes = n;
-  }
+  /** List of modules. */
+  StringList modules = new StringList();
+  /** List of loaded modules. */
+  StringList modLoaded = new StringList();
+  /** Collections. */
+  NodIter[] collect = new NodIter[0];
+  /** Collection names. */
+  byte[][] collName = new byte[0][];
+
+  /** Initial context set (default: null). */
+  Nodes nodes;
+  /** Reference to the root expression. */
+  Expr root;
 
   /**
    * Parses the specified query.
@@ -220,14 +203,11 @@ public final class QueryContext extends Progress {
       }
 
       // evaluates the query and returns the result
-      inf = Prop.allInfo;
-      if(inf) compInfo(QUERYCOMP);
+      if(Prop.allInfo) compInfo(QUERYCOMP);
       fun.comp(this);
       vars.comp(this);
       root = root.comp(this);
-      if(inf) compInfo(QUERYRESULT + "%", root);
-
-      evalTime = System.nanoTime();
+      if(Prop.allInfo) compInfo(QUERYRESULT + "%", root);
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);
@@ -310,7 +290,6 @@ public final class QueryContext extends Progress {
    * @throws Exception exception
    */
   protected void plan(final Serializer ser) throws Exception {
-    //vars.plan(ser);
     fun.plan(ser);
     root.plan(ser);
   }
@@ -332,7 +311,7 @@ public final class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public void compInfo(final String string, final Object... ext) {
-    if(!inf) return;
+    if(!Prop.allInfo) return;
     if(!firstOpt) info.add(QUERYSEP);
     firstOpt = false;
     info.add(string, ext);
@@ -345,7 +324,7 @@ public final class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public void evalInfo(final String string, final Object... ext) {
-    if(!inf) return;
+    if(!Prop.allInfo) return;
     if(firstEval) {
       info.add(NL);
       info.add(QUERYEVAL);
@@ -453,11 +432,22 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns the database root as expression or null.
-   * @return database root or null
+   * Returns the common database reference of all items or null.
+   * @return database reference or null
+   * @throws QueryException query exception
    */
-  public Data data() {
-    return item instanceof DBNode ? ((DBNode) item).data : null;
+  public Data data() throws QueryException {
+    if(item == null) return null;
+    Data data = null;
+    final Iter iter = item.iter();
+    Item it;
+    while((it = iter.next()) != null) {
+      if(!(it instanceof DBNode)) return null;
+      final Data d = ((DBNode) it).data;
+      if(data != null && d != data) return null;
+      data = d;
+    }
+    return data;
   }
 
   /**
