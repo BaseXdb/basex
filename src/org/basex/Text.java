@@ -432,6 +432,10 @@ public interface Text {
   String PATHWHICH = lang("pc_pathnf");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
+  /** Missing mount point. */
+  String MOUNTWHICH = lang("pc_mountnf");
+  /** Missing backing store. */
+  String BACKINGWHICH = lang("pc_backingnf");
 
   // DATABASE COMMANDS ========================================================
 

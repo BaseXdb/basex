@@ -309,6 +309,8 @@ pc_tbl=Table created in %.
 pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
+pc_mountnf=Please enter an existent directory as mount point.
+pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" could not be parsed.
 pc_pos="%" (Line %, Col %)
 

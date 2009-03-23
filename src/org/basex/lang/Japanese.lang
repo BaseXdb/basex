@@ -304,6 +304,8 @@ pc_tbl=% にテーブルが作成されました。
 pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
 pc_dbnf=データベース名を入力してください。
+pc_mountnf=Please enter an existent directory as mount point.
+pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、%列)
 

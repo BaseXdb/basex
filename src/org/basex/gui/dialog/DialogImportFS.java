@@ -220,27 +220,44 @@ public final class DialogImportFS  extends Dialog {
     BaseXLayout.enable(button, sel);
     BaseXLayout.enable(maxsize, cont.isSelected());
 
-    final String nm = dbname.getText().trim();
-    ok = nm.length() != 0;
-    if(ok) GUIProp.guifsdbname = nm;
+    boolean cAll; // import all is choosen?
+    boolean cNam; // dbname given?
+    boolean cBac = true; // backing store is existent directory?
+    boolean cMou = true; // mount point is existent directory?
     
-    boolean exists = all.isSelected();
-    if(!exists) {
+    final String nm = dbname.getText().trim();
+    cNam = nm.length() != 0;
+    if(cNam) GUIProp.guifsdbname = nm;
+    ok = cNam;
+    
+    cAll = all.isSelected();
+    if(cAll) {
+      GUIProp.guifsimportpath = path.getText();
+    }
+    if(!cAll && cNam) {
       final String p = path.getText().trim();;
       final IO file = IO.get(p);
-      exists = p.length() != 0 && file.exists();
-      if(exists) GUIProp.guifsimportpath = path.getText();
+      cAll = p.length() != 0 && file.exists();
     }
-    ok &= exists;
+    ok &= cAll;
     
     if (Prop.fuse) {
-      boolean backdir = new File(backing.getText().trim()).isDirectory();
-      ok &= backdir;
-      boolean mountdir = new File(mountpoint.getText().trim()).isDirectory();
-      ok &= mountdir;
+      cBac = new File(backing.getText().trim()).isDirectory();
+      ok &= cBac;
+      cMou = new File(mountpoint.getText().trim()).isDirectory();
+      ok &= cMou;
+    }
+
+    String inf = " ";
+    
+    if (!ok) {
+      if(!cMou) inf = MOUNTWHICH;
+      if(!cBac) inf = BACKINGWHICH;
+      if(!cAll) inf = PATHWHICH;
+      if(!cNam) inf = DBWHICH;
     }
     
-    String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
+    
     ImageIcon img = null;
     if(ok) {
       ok = IO.valid(nm);
