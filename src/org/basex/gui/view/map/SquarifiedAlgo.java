@@ -45,8 +45,8 @@ public class SquarifiedAlgo extends MapAlgo {
           int w = i == ni ? (int) (xx + ww - x) :
             (int) (ml.weight[i] / weight * ww);
           w = w > 0 ? w : 1;
-          if(x + w <= xx + ww) tmp.add(new MapRect((int) x, (int) yy, w, height,
-              ml.list[i], l));
+          if(x + w <= xx + ww && yy + height <= yy + hh) 
+            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i], l));
           else break;
           x += w;
         }
@@ -87,8 +87,8 @@ public class SquarifiedAlgo extends MapAlgo {
           int h = i == ni ? (int) (yy + hh - y) :
             (int) (ml.weight[i] / weight * hh);
           h = h > 0 ? h : 1;
-          if(y + h <= yy + hh) tmp.add(new MapRect((int) xx, (int) y, width, h,
-              ml.list[i], l));
+          if(y + h <= yy + hh && yy + height <= yy + hh) 
+            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.list[i], l));
           else break;
           y += h;
         }
