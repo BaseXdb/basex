@@ -1,11 +1,15 @@
 package org.basex.gui.view;
 
+import java.awt.Window;
+
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
+import org.basex.gui.dialog.Dialog;
+import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Array;
 
@@ -64,8 +68,14 @@ public final class ViewNotifier {
         BaseX.errln("[ViewNotifier:64] Setting gui reference.");
         ctx.data().fs.gui = gui;
       }
+    } else {
+      // close all dialogs (except help) together with database
+      for(final Window w : gui.getOwnedWindows()) {
+        if(w.isVisible() && w instanceof Dialog && !(w instanceof DialogHelp))
+          ((Dialog) w).cancel();
+      }
     }
-    
+
     gui.focused = -1;
     hist = 0;
     maxhist = 0;

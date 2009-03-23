@@ -55,7 +55,7 @@ public abstract class Dialog extends JDialog {
     setResizable(false);
     addWindowListener(new WindowAdapter() {
       @Override
-      public void windowClosing(final WindowEvent e) { ok = false; }
+      public void windowClosing(final WindowEvent e) { cancel(); }
     });
   }
 

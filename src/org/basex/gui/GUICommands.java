@@ -656,12 +656,12 @@ public enum GUICommands implements GUICommand {
   SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showhelp ^= true;
-      if(GUIProp.showhelp) {
+      if(!GUIProp.showhelp) {
+        GUIProp.showhelp = true;
         gui.help = new DialogHelp(gui);
+        gui.refreshControls();
       } else {
         gui.help.close();
-        gui.help = null;
       }
     }
 

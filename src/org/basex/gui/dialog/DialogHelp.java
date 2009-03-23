@@ -59,8 +59,11 @@ public final class DialogHelp extends Dialog {
 
   @Override
   public void close() {
+    GUIProp.showhelp = false;
     GUIProp.helpsize[0] = getWidth();
     GUIProp.helpsize[1] = getHeight();
+    gui.refreshControls();
+    gui.help = null;
     dispose();
   }
 

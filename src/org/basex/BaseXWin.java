@@ -134,8 +134,8 @@ public final class BaseXWin {
    * @return starter window
    */
   private JFrame waitPanel() {
-    final JFrame frame = new JFrame(Text.TITLE);
-    frame.setUndecorated(true);
+    final JFrame wait = new JFrame(Text.TITLE);
+    wait.setUndecorated(true);
 
     final JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(2, 1));
@@ -150,14 +150,14 @@ public final class BaseXWin {
     label.setFont(label.getFont().deriveFont(0));
     panel.add(label);
 
-    frame.add(panel);
-    frame.pack();
+    wait.add(panel);
+    wait.pack();
 
     final Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
-    final Dimension p = frame.getSize();
-    frame.setLocation((s.width - p.width) >> 1, (s.height - p.height) >> 1);
-    frame.setVisible(true);
-    return frame;
+    final Dimension p = wait.getSize();
+    wait.setLocation((s.width - p.width) >> 1, (s.height - p.height) >> 1);
+    wait.setVisible(true);
+    return wait;
   }
 
   /**
