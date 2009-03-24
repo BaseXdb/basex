@@ -152,12 +152,8 @@ public final class Prop {
   /** GUI mode (shouldn't be overwritten by property file). */
   public static boolean gui = false;
   
-  /** Use BerkeleyDB instead of DiskData implementation. */
-  public static boolean usebdb = false;
   /** Fuse support. */
   public static boolean fuse;
-  /** EDBT temporary flag for extensive output. */
-  public static boolean edbt;
 
   // WEBSERVER OPTIONS ========================================================
 
@@ -182,11 +178,8 @@ public final class Prop {
   static {
     try {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
-      fuse = false;
-      edbt = false;
-      if(edbt) BaseX.errln("FUSE Support enabled ... OK");
+      fuse = true;
     } catch(final UnsatisfiedLinkError ex) {
-      if(edbt) BaseX.err("Loading DeepFS library ... FAILURE.\n.");
       BaseX.debug(ex);
     }
   }

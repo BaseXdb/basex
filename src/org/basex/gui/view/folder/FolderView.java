@@ -459,10 +459,7 @@ public final class FolderView extends View {
     int key = e.getKeyCode();
 
     final boolean fs = data.fs != null;
-    if(e.isShiftDown() && key == KeyEvent.VK_ENTER && focusPre != -1) {
-      // launch file
-      if(fs) data.fs.launch(gui.focused);
-    } else if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
+    if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
       // open/close subtree
       final boolean open = key == KeyEvent.VK_RIGHT;
       if(e.isShiftDown()) {

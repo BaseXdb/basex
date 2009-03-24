@@ -90,8 +90,6 @@ public abstract class View extends BaseXPanel {
 
     if(key == KeyEvent.VK_ESCAPE) {
       gui.fullscreen(false);
-    } else if(key == KeyEvent.VK_ENTER) {
-      GUICommands.FILTER.execute(gui);
     } else if(key == KeyEvent.VK_SPACE) {
       gui.notify.mark(ctrl ? 2 : shift ? 1 : 0, null);
     } else if(key == KeyEvent.VK_BACK_SPACE) {

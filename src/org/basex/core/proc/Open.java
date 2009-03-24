@@ -58,8 +58,6 @@ public final class Open extends Process {
    * @throws IOException exception
    */
   public static Data open(final String db) throws IOException {
-    if(Prop.usebdb) {
-    }
     return new DiskData(db);
   }
 }

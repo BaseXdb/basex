@@ -59,7 +59,7 @@ public final class FSParser extends Parser {
   /** The currently processed file. */
   private File curr;
   /** Root flag to parse root node or all partitions (C:, D: ...). */
-  private boolean root;
+  private final boolean root;
   /** Level counter. */
   private int lvl;
   /** Directory size Stack. */
@@ -69,11 +69,11 @@ public final class FSParser extends Parser {
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
   /** Path to root of the backing store. */
-  private String fsimportpath;
+  private final String fsimportpath;
   /** Name of the database and backingroot sub directory. */
-  private String fsdbname;
+  private final String fsdbname;
   /** Path to root of the backing store. */
-  private String backingroot;
+  private final String backingroot;
   /** Path to root of the backing store for this import. */
   public String mybackingpath;
   /** Path to FUSE mountpoint. */
@@ -140,9 +140,9 @@ public final class FSParser extends Parser {
     
     // -- create backing store (DeepFS depends on it).
     if(Prop.fuse) {
-      File bs = new File(mybackingpath);
-      if (!bs.mkdirs() && bs.exists())
-          throw new IOException(BACKINGEXISTS + mybackingpath);
+      final File bs = new File(mybackingpath);
+      if(!bs.mkdirs() && bs.exists())
+        throw new IOException(BACKINGEXISTS + mybackingpath);
     }
     
     builder.startDoc(token(io.name()));
@@ -211,15 +211,15 @@ public final class FSParser extends Parser {
    */
   private void copy(final File src, final File dst) {
     try {
-      InputStream in = new FileInputStream(src);
-      OutputStream out = new FileOutputStream(dst);
-      byte[] buf = new byte[4096];
+      final InputStream in = new FileInputStream(src);
+      final OutputStream out = new FileOutputStream(dst);
+      final byte[] buf = new byte[4096];
       int len;
   
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
       in.close();
       out.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.getMessage();
     }
   }
@@ -345,19 +345,5 @@ public final class FSParser extends Parser {
   @Override
   public double prog() {
     return 0;
-  }
-  
-  /**
-   * Deletes a non-empty directory. 
-   * @param dir to be deleted.
-   * @return boolean true for success, false for failure.
-   * */ 
-  public static boolean deleteDir(final File dir) {
-    if(dir.isDirectory()) {
-      for(final String child : dir.list()) {
-        if(!deleteDir(new File(dir, child))) return false;
-      }
-    }
-    return dir.delete();
   }
 }

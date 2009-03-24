@@ -94,7 +94,6 @@ public final class DeepFS extends DeepFuse implements DataText {
     dirID = data.tags.id(DataText.DIR);
     fileID = data.tags.id(DataText.FILE);
     unknownID = data.tags.id(DataText.UNKNOWN);
-
     suffID = data.atts.id(DataText.SUFFIX);
     timeID = data.atts.id(DataText.MTIME);
     modeID = data.atts.id(DataText.MODE);
@@ -117,13 +116,9 @@ public final class DeepFS extends DeepFuse implements DataText {
     if(Prop.fuse) {
       final File mp = new File(mountpoint);
       final File bp = new File(backingpath);
-      final String method = "[BaseX_mount] ";
       /* --- prepare (maybe mkdir) mountpoint and backing store --- */
       // - mountpoint
       if(!mp.exists()) {
-        if(Prop.edbt)
-          BaseX.errln(method + "Mountpoint does not exist. " +
-              "Trying to create it: " + mountpoint);
         if(!mp.mkdirs()) {
           BaseX.errln(FSText.NOMOUNTPOINT + mp.toString());
           return;
@@ -131,21 +126,11 @@ public final class DeepFS extends DeepFuse implements DataText {
       }
       // - backing store
       if(!bp.exists()) {
-        if(Prop.edbt)
-          BaseX.errln(method + "Backingpath does not exist. " +
-              "Trying to create it: " + backingpath);
         if(!bp.mkdirs()) {
           BaseX.errln(FSText.NOBACKINGPATH + bp.toString());
           return;
         }
       }
-
-      if (Prop.edbt) {
-        BaseX.errln(method + "Trying to mount DeepFS\n"
-            + "\tmountpoint: " + mountpoint + "\n"
-            + "\tbacking   : " + backingpath);
-      }
-
       nativeMount(mountpoint, backingpath);
     }
   }
@@ -326,7 +311,6 @@ public final class DeepFS extends DeepFuse implements DataText {
       final Runtime run = Runtime.getRuntime();
       if(Prop.MAC) {
         run.exec(new String[] { "open", path});
-        if(Prop.edbt) BaseX.errln("open " + path);
       } else if(Prop.UNIX) {
         run.exec(new String[] { "xdg-open", path});
       } else {
@@ -350,8 +334,6 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @throws QueryException on failure
    */
   Nodes xquery(final String query) throws QueryException {
-    if (Prop.edbt)
-      BaseX.err("[basex_xquery] execute: " + query + "\n");
     return new QueryProcessor(query, new Nodes(0, data)).queryNodes();
   }
 
@@ -642,8 +624,6 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public int rmdir(final String path) {
     /* [AH] rmdir(2) deletes only empty dir. What happens with --ignore? */
-    if (Prop.edbt)
-      BaseX.errln("[basex_rmdir] path: " + path);
     final int n = delete(path, true, false);
     refresh();
     return n;

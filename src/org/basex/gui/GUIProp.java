@@ -25,7 +25,7 @@ public final class GUIProp {
   public static int fontalias = 0;
 
   /** Red GUI color factor. */
-  public static int colorred = 20;
+  public static int colorred = 18;
   /** Green GUI color factor. */
   public static int colorgreen = 16;
   /** Blue GUI color factor. */

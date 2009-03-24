@@ -80,9 +80,9 @@ public final class GUIInput extends BaseXTextField {
             if(i == 0) GUIProp.search = sl.finish();
             else if(i == 1) GUIProp.xquery = sl.finish();
             else GUIProp.commands = sl.finish();
-
+  
             // evaluate the input
-            main.execute();
+            if(e.getModifiers() == 0) main.execute();
           }
           return;
         }

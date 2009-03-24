@@ -622,7 +622,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Color schema. */
-  COLOR(false, GUICOLOR, null, GUICOLORTT) {
+  COLOR(false, GUICOLOR, "% 8", GUICOLORTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogColors(gui);
@@ -630,7 +630,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Change fonts. */
-  FONTS(false, GUIFONTS, null, GUIFONTSTT) {
+  FONTS(false, GUIFONTS, "% 9", GUIFONTSTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogFontChooser(gui);
@@ -638,7 +638,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(true, GUIMAPLAYOUT, null, GUIMAPLAYOUTTT) {
+  MAPLAYOUT(true, GUIMAPLAYOUT, "% 0", GUIMAPLAYOUTTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);
