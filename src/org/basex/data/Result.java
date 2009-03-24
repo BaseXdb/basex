@@ -36,10 +36,4 @@ public interface Result {
    * @throws IOException exception
    */
   void serialize(Serializer ser, int n) throws IOException;
-
-  /**
-   * Closes result references.
-   * @throws IOException exception
-   */
-  void close() throws IOException;
 }

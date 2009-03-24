@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.basex.BaseX;
 import org.basex.data.Data;
@@ -137,7 +136,8 @@ final class MapImages {
             imgmax[ic] = min >= 1;
     
             if((loaderC & 5) == 0 && !view.gui.painting) paint();
-          } catch(final IOException ex) {
+          } catch(final Exception ex) {
+            // catch and ignore any kind of exception
             BaseX.debug(ex);
           }
         }

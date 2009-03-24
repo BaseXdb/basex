@@ -172,26 +172,28 @@ public final class CommandParser extends InputParser {
         return new Delete(xquery(cmd));
       case INSERT:
         final CmdUpdate ins = consume(CmdUpdate.class, cmd);
+        final String in = ins.toString();
         switch(ins) {
           case FRAGMENT:
-            return new Insert(ins, string(cmd, true), number(cmd), xquery(cmd));
+            return new Insert(in, string(cmd, true), number(cmd), xquery(cmd));
           case ELEMENT: case TEXT: case COMMENT:
-            return new Insert(ins, name(cmd), number(cmd), xquery(cmd));
+            return new Insert(in, name(cmd), number(cmd), xquery(cmd));
           case PI:
-            return new Insert(ins, name(cmd), name(cmd), number(cmd),
+            return new Insert(in, name(cmd), name(cmd), number(cmd),
                 xquery(cmd));
           case ATTRIBUTE:
-            return new Insert(ins, name(cmd), name(cmd), xquery(cmd));
+            return new Insert(in, name(cmd), name(cmd), xquery(cmd));
         }
         break;
       case UPDATE:
         final CmdUpdate upd = consume(CmdUpdate.class, cmd);
+        final String up = upd.toString();
         switch(upd) {
           case ELEMENT: case TEXT: case COMMENT:
-            return new Update(upd, name(cmd), xquery(cmd));
+            return new Update(up, name(cmd), xquery(cmd));
           case PI:
           case ATTRIBUTE:
-            return new Update(upd, name(cmd), name(cmd), xquery(cmd));
+            return new Update(up, name(cmd), name(cmd), xquery(cmd));
           default:
         }
         break;

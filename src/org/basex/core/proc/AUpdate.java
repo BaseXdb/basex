@@ -13,14 +13,14 @@ import org.basex.util.Token;
  */
 abstract class AUpdate extends Process {
   /** Insert type. */
-  protected final CmdUpdate type;
+  private final String type;
 
   /**
    * Constructor.
    * @param t update type
    * @param a arguments
    */
-  AUpdate(final CmdUpdate t, final String... a) {
+  AUpdate(final String t, final String... a) {
     super(DATAREF | UPDATING, a);
     type = t;
   }
@@ -58,5 +58,13 @@ abstract class AUpdate extends Process {
       if(!Token.digit(c) && c != '-' && c != '.') break;
     }
     return i == name.length;
+  }
+
+  /**
+   * Returns the update type.
+   * @return update type.
+   */
+  protected CmdUpdate getType() {
+    return CmdUpdate.valueOf(type.toUpperCase());
   }
 }

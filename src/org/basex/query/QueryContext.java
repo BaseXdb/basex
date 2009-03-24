@@ -306,6 +306,14 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Closes the context.
+   * @throws IOException query exception
+   */
+  public void close() throws IOException {
+    for(int d = rootDocs; d < docs.length; d++) docs[d].data.close();
+  }
+
+  /**
    * Adds some optimization info.
    * @param string evaluation info
    * @param ext text text extensions

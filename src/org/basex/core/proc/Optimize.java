@@ -29,9 +29,7 @@ public final class Optimize extends ACreate {
   protected boolean exec() {
     // rebuild statistics
     final Data data = context.data();
-    if(!stats(data)) return error(DBOPTERR1);
-    info(DBOPT1, perf.getTimer());
-    return true;
+    return !stats(data) ? error(DBOPTERR1) : info(DBOPTIMIZED, perf.getTimer());
   }
 
   /**
@@ -48,29 +46,33 @@ public final class Optimize extends ACreate {
     final int[] parStack = new int[IO.MAXHEIGHT];
     final int[] tagStack = new int[IO.MAXHEIGHT];
     int h = 0;
-    int l = 0;
+    int level = 0;
 
     size = data.meta.size;
     for(pre = 0; pre < size; pre++) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
-      while(l > 0 && parStack[l - 1] > par) --l;
+      while(level > 0 && parStack[level - 1] > par) --level;
 
-      if(kind == Data.ELEM) {
+      if(kind == Data.DOC) {
+        parStack[level++] = pre;
+        data.path.add(0, level, kind);
+      } else if(kind == Data.ELEM) {
         final int id = data.tagID(pre);
         data.tags.index(data.tags.key(id), null, true);
-        tagStack[l] = id;
-        parStack[l] = pre;
-        if(h < ++l) h = l;
-        data.path.add(id, l, kind);
+        data.path.add(id, level, kind);
+        tagStack[level] = id;
+        parStack[level++] = pre;
       } else if(kind == Data.ATTR) {
         final int id = data.attNameID(pre);
         data.atts.index(data.atts.key(id), data.attValue(pre), true);
-        data.path.add(id, l + 1, kind);
-      } else if(kind == Data.TEXT || kind == Data.DOC) {
-        if(l > 0) data.tags.index(tagStack[l - 1], data.text(pre));
-        data.path.add(0, l, kind);
+        data.path.add(id, level, kind);
+      } else {
+        final byte[] txt = data.text(pre);
+        if(kind == Data.TEXT) data.tags.index(tagStack[level - 1], txt);
+        data.path.add(0, level, kind, txt.length);
       }
+      if(h < level) h = level;
     }
     data.meta.height = h;
     data.meta.uptodate = true;

@@ -29,13 +29,14 @@ public final class Insert extends AUpdate {
    * @param t insertion type
    * @param a arguments
    */
-  public Insert(final CmdUpdate t, final String... a) {
+  public Insert(final String t, final String... a) {
     super(t, a);
   }
 
   @Override
   protected boolean exec() {
     final Data data = context.data();
+    final CmdUpdate type = getType();
 
     // get sources from the marked node set or the specified query
     final Nodes nodes = Prop.gui ? context.marked() :
@@ -105,22 +106,20 @@ public final class Insert extends AUpdate {
       final Parser parser = Prop.intparse || io instanceof IOContent ?
           new XMLParser(io) : new SAXWrapper(new SAXSource(io.inputSource()));
 
-      tmp = new MemBuilder().build(parser, "tmp");
+      tmp = new MemBuilder().build(parser, io.dbname());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }
     
-    /* check if all nodes are elements
-    for(int i = nodes.size - 1; i >= 0; i--) {
-      if(data.kind(nodes.nodes[i]) != Data.ELEM) return error(COPYTAGS);
-    }*/
-
     // insert temporary instance of document
     data.meta.update();
+
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
-      data.insert(pre(par, pos, data), par, tmp);
+      // documents are always added at the end
+      final int p = par == 0 ? 0 : pos;
+      data.insert(pre(par, p, data), par, tmp);
     }
     return true;
   }
@@ -133,7 +132,7 @@ public final class Insert extends AUpdate {
    */
   private boolean node(final Data data, final Nodes nodes) {
     byte[] v = token(args[0]);
-    final int kind = type.ordinal();
+    final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
     if(kind == Data.ELEM || pi) {
       if(!check(v)) return error(NAMEINVALID, v);
@@ -190,6 +189,6 @@ public final class Insert extends AUpdate {
 
   @Override
   public String toString() {
-    return name() + " " + type + args();
+    return name() + " " + getType() + args();
   }
 }

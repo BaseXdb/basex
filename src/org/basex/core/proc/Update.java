@@ -19,7 +19,7 @@ public final class Update extends AUpdate {
    * @param t update type
    * @param a arguments
    */
-  public Update(final CmdUpdate t, final String... a) {
+  public Update(final String t, final String... a) {
     super(t, a);
   }
 
@@ -28,6 +28,7 @@ public final class Update extends AUpdate {
     final Data data = context.data();
 
     // get sources from the marked node set or the specified query
+    final CmdUpdate type = getType();
     final Nodes nodes = Prop.gui ? context.marked() : query(args[type ==
       CmdUpdate.PI || type == CmdUpdate.ATTRIBUTE ? 2 : 1], null);
     if(nodes == null) return false;
@@ -84,7 +85,7 @@ public final class Update extends AUpdate {
    */
   private boolean node(final Data data, final Nodes nodes) {
     byte[] v = token(args[0]);
-    final int kind = type.ordinal();
+    final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
     
     if(kind == Data.TEXT) {
@@ -112,6 +113,6 @@ public final class Update extends AUpdate {
   
   @Override
   public String toString() {
-    return name() + " " + type + args();
+    return name() + " " + getType() + args();
   }
 }

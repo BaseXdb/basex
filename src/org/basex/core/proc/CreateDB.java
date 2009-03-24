@@ -29,8 +29,8 @@ import org.basex.io.IO;
  */
 public final class CreateDB extends ACreate {
   /**
-   * Constructor.
-   * @param input input path
+   * Constructor. The file name, excluding the suffix, is used as database name.
+   * @param input file name or XML string
    */
   public CreateDB(final String input) {
     this(input, null);
@@ -38,7 +38,7 @@ public final class CreateDB extends ACreate {
 
   /**
    * Constructor.
-   * @param input input path
+   * @param input file name or XML string
    * @param name name of database
    */
   public CreateDB(final String input, final String name) {
@@ -54,7 +54,7 @@ public final class CreateDB extends ACreate {
 
   /**
    * Creates and returns a database for the specified XML document.
-   * @param io file name
+   * @param io file reference
    * @param name name of the database to be created
    * @return database instance
    * @throws IOException exception
@@ -67,7 +67,7 @@ public final class CreateDB extends ACreate {
   /**
    * Creates and returns a database from the specified SAX source.
    * @param s sax source
-   * @param name database name
+   * @param name name of database
    * @return database instance
    * @throws IOException exception
    */

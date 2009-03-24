@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.Text.*;
+import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -137,6 +138,14 @@ public final class QueryProcessor extends Progress {
    */
   public void setQuery(final String qu) {
     query = qu;;
+  }
+
+  /**
+   * Parses the specified query and returns the result.
+   * @throws IOException query exception
+   */
+  public void close() throws IOException {
+    ctx.close();
   }
   
   /**

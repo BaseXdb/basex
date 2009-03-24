@@ -24,6 +24,8 @@ import org.basex.util.Performance;
 abstract class AQuery extends Process {
   /** Performance measurements. */
   protected final Performance per = new Performance();
+  /** Performance measurements. */
+  protected QueryProcessor qp;
 
   /**
    * Constructor.
@@ -44,25 +46,24 @@ abstract class AQuery extends Process {
     long comp = 0;
     long eval = 0;
 
-    QueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = new QueryProcessor(query == null ? "" : query, context.current());
-        progress(qu);
+        qp = new QueryProcessor(query == null ? "" : query, context.current());
+        progress(qp);
 
-        qu.parse();
+        qp.parse();
         pars += per.getTime();
-        if(i == 0) plan(qu, false);
-        qu.compile();
-        if(i == 0) plan(qu, true);
+        if(i == 0) plan(qp, false);
+        qp.compile();
+        if(i == 0) plan(qp, true);
         comp += per.getTime();
-        result = qu.query();
+        result = qp.query();
         eval += per.getTime();
       }
 
       // dump some query info
       if(Prop.info) {
-        info(NL + qu.info());
+        info(NL + qp.info());
         info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
         info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
@@ -96,7 +97,7 @@ abstract class AQuery extends Process {
       ser.close();
     }
     if(Prop.info) outInfo(o, result.size());
-    result.close();
+    qp.close();
   }
 
   /**

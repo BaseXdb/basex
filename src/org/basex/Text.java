@@ -461,8 +461,6 @@ public interface Text {
   /** Database Optimized. */
   String DBOPTIMIZED = lang("db_optimized");
   /** Database Optimization. */
-  String DBOPT1 = "Statistics rebuilt in %." + NL;
-  /** Database Optimization. */
   String DBOPTERR1 = "Could not write statistics...";
 
   /** Index created. */

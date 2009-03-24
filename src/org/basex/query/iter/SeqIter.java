@@ -5,7 +5,6 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 
@@ -142,12 +141,6 @@ public final class SeqIter extends Iter implements Result {
     ser.openResult();
     ctx.serialize(ser, item[n]);
     ser.closeResult();
-  }
-  
-  public void close() throws IOException {
-    // close temporary database references
-    final DBNode[] docs = ctx.docs;
-    for(int d = ctx.rootDocs; d < docs.length; d++) docs[d].data.close();
   }
   
   @Override

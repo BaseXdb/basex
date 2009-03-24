@@ -405,17 +405,17 @@ public abstract class Builder extends Progress {
   /**
    * Adds a simple text, comment or processing instruction to the database.
    * @param txt the value to be added
-   * @param type the node type
+   * @param kind the node type
    * @throws IOException in case of parsing or writing problems
    */
-  private void addText(final TokenBuilder txt, final byte type)
+  private void addText(final TokenBuilder txt, final byte kind)
       throws IOException {
 
     final byte[] t = utf8(txt.finish(), meta.encoding);
 
     // text node processing for statistics
-    if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
-    path.add(0, level, type, t.length);
-    addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], type);
+    if(kind == Data.TEXT) tags.index(tagStack[level - 1], t);
+    path.add(0, level, kind, t.length);
+    addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], kind);
   }
 }

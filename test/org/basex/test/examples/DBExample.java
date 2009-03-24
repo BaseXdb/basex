@@ -5,21 +5,12 @@ import org.basex.core.proc.*;
 import org.basex.io.*;
 
 /**
- * This class serves as an example for creating and processing database
- * instances.
+ * This class shows how databases can be created.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
  */
 public final class DBExample {
-  /** Input XML file. */
-  static final String INPUT = "input.xml";
-  /** Name of the resulting database. */
-  static final String DBNAME = "input";
-  /** Sample query. */
-  static final String QUERY = "//li";
-  /** Result file. */
-  static final String RESULT = "result.txt";
 
   /** Private constructor. */
   private DBExample() { }
@@ -30,22 +21,47 @@ public final class DBExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    // Creates a new database context
-    Context context = new Context();
 
-    // Uses console output
+    // Creates a standard output stream
     ConsoleOutput out = new ConsoleOutput(System.out);
 
-    // Uses file output
-    //PrintOutput out = new PrintOutput(RESULT);
+    // Creates a new database context, referencing the database.
+    Context context = new Context();
 
-    // Creates a database for the specified path/file.
-    new CreateDB(INPUT).execute(context, out);
-    // Optionally opens an existing database
-    //new Open(DBNAME).execute(context, out);
+    out.println("=== First example: Creating a database from a file");
 
-    new XQuery(QUERY).execute(context, out);
+    // Sets an option: activates command info output
+    new Set("Info", "on").execute(context, out);
 
+    // Chops whitespaces between text nodes
+    new Set("Chop", "on").execute(context, out);
+
+    // Creates a database from the specified file.
+    new CreateDB("input.xml", "DB1").execute(context, out);
+
+
+    out.println("=== Second example: Creating a database from an input string");
+
+    // XML string.
+    String xml = "<xml>This is a test</xml>";
+    
+    // Creates a database for the specified input.
+    new CreateDB(xml, "DB2").execute(context, out);
+
+    
+    out.println("=== Third example: Opens an existing database");
+
+    // Opens an existing database
+    new Open("DB1").execute(context, out);
+
+    // Dumps information on the specified database context
+    new InfoDB().execute(context, out);
+
+    // Closes the database
+    context.close();
+
+    // Closes the output stream
     out.close();
   }
 }
+

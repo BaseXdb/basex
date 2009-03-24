@@ -496,7 +496,6 @@ public final class DiskData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final Data dt) {
-
     // first source node to be copied; if input is a document, skip first node
     final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
     // number of nodes to be inserted
@@ -532,7 +531,8 @@ public final class DiskData extends Data {
           break;
       }
     }
-    updateTable(pre, par, ss);
+    // update table if no document was inserted
+    if(par != 0) updateTable(pre, par, ss);
     
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);

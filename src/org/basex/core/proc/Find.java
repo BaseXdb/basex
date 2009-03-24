@@ -68,7 +68,6 @@ public final class Find extends AQuery {
     String preds = "";
     final String tag = "*";
     for(String term : terms) {
-      final byte[] token = Token.token(term);
       if(term.startsWith("@=")) {
         preds += "[@* = \"" + term.substring(2) + "\"]";
       } else if(term.startsWith("=")) {
@@ -79,17 +78,17 @@ public final class Find extends AQuery {
         if(term.length() == 1) continue;
         preds += "[@* ftcontains \"" + term.substring(1) + "\"]";
         term = term.substring(1);
-        if(XMLToken.isName(token)) {
-          // attribute exists.. add location path
+        // add valid name tests
+        if(XMLToken.isName(Token.token(term))) {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
         preds += "[text() ftcontains \"" + term + "\"]";
-        if(XMLToken.isName(token) && data.tagID(token) != 0) {
-          // add location path for tag
+        // add valid name tests
+        if(XMLToken.isName(Token.token(term))) {
           pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
         }
-        // name attribute exists...
+        // add name test...
         pre += "descendant-or-self::*[@name ftcontains \"" + term + "\"] | ";
       }
     }
@@ -162,12 +161,13 @@ public final class Find extends AQuery {
       qu = qu.substring(i + 1);
     } while(qu.indexOf(' ') > -1);
 
-    xquery.add(" | ");
-    if(!r) xquery.add(".");
-    xquery.add("//file");
+    boolean f = true;
     for(final String t : split(query)) {
-      if(Character.isLetterOrDigit(t.charAt(0)))
+      if(Character.isLetterOrDigit(t.charAt(0))) {
+        if(f) xquery.add(" | " + (r ? "/" : "") + "descendant-or-self::file");
         xquery.add("[descendant::text() ftcontains \"" + t + "\"]");
+        f = false;
+      }
     }
     return xquery.toString();
   }

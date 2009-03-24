@@ -35,7 +35,7 @@ import org.basex.util.Performance;
 public final class BaseXWin {
   /** GUI reference. */
   public GUI gui;
-  
+
   /**
    * Constructor.
    * @param args command-line arguments

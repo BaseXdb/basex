@@ -99,7 +99,7 @@ public class DeepShell {
       return new BufferedReader(isr).readLine().trim();
     } catch(final Exception ex) {
       // also catches interruptions such as ctrl+c, etc.
-      System.out.println();
+      BaseX.outln();
       return null;
     }
   }
@@ -192,7 +192,7 @@ public class DeepShell {
   public void quit(@SuppressWarnings("unused") final String[] args) {
     // unmount filesystem
     fs.destroy();
-    System.out.println("cu");
+    BaseX.outln("cu");
     System.exit(0);
   }
 

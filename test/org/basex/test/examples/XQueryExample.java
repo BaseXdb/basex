@@ -27,48 +27,56 @@ public final class XQueryExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
+
     // Creates a standard output stream
     ConsoleOutput out = new ConsoleOutput(System.out);
 
-    out.println("=== First example ===");
+    out.println("=== First example: Creating a result instance");
 
-    // Creates a new database context
+    // Creates a result serializer
+    XMLSerializer serializer = new XMLSerializer(out);
+
+    // Creates a query instance
+    QueryProcessor processor = new QueryProcessor(QUERY);
+
+    // Executes the query.
+    Result result = processor.query();
+
+    // Serializes the result
+    result.serialize(serializer);
+
+    // Closes the query processor
+    processor.close();
+
+    
+    out.println("\n=== Second example: Iterating through all results");
+
+    // Creates a query instance
+    processor = new QueryProcessor(QUERY);
+
+    // Returns a query iterator
+    Iter iterator = processor.iter();
+
+    // Uses an iterator to serialize the result
+    for(Item item : iterator) item.serialize(serializer);
+
+    // Closes the query processor and the output stream
+    processor.close();
+
+    
+    out.println("\n=== Third example: Using the BaseX command");
+
+    // Creates a database context
     Context context = new Context();
 
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);
-
-    out.println();
-    out.println("=== Second example ====");
-
-    // Creates a result serializer
-    XMLSerializer xml = new XMLSerializer(out);
-
-    // Creates a query instance
-    QueryProcessor proc1 = new QueryProcessor(QUERY);
-
-    // Executes the query.
-    Result result = proc1.query();
-
-    // Serializes the result
-    result.serialize(xml);
-
-    out.println();
-    out.println("=== Third example ===");
-
-    // Creates a query instance
-    QueryProcessor proc2 = new QueryProcessor(QUERY);
-
-    // Returns a query iterator
-    Iter iter = proc2.iter();
-
-    // Iterates and serializes the result
-    for(final Item item : iter) {
-      item.serialize(xml);
-    }
+    
+    // Closes the database
+    context.close();
 
     // Closes the output stream
-    out.println();
     out.close();
   }
 }
+

@@ -58,11 +58,7 @@ public final class DirParser extends Parser {
         b.meta.filesize += io.length();
         parser = Parser.getXMLParser(io);
         parser.doc = doc;
-        
-        //
         parser.parse(b);
-        
-        //
       }
     }
   }

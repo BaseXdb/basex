@@ -287,7 +287,7 @@ public enum GUICommands implements GUICommand {
       final DialogInsert insert = new DialogInsert(gui);
       if(insert.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[insert.kind];
-      gui.execute(new Insert(type, insert.result));
+      gui.execute(new Insert(type.toString(), insert.result));
     }
 
     @Override
@@ -309,7 +309,7 @@ public enum GUICommands implements GUICommand {
       final DialogEdit edit = new DialogEdit(gui, nodes.nodes[0]);
       if(edit.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[edit.kind];
-      gui.execute(new Update(type, edit.result));
+      gui.execute(new Update(type.toString(), edit.result));
     }
 
     @Override

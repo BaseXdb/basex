@@ -206,8 +206,6 @@ public final class Nodes implements Result {
     ser.closeResult();
   }
 
-  public void close() { }
-
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(getClass().getSimpleName());
