@@ -182,7 +182,7 @@ public final class Insert extends AUpdate {
     if(kind == Data.TEXT) {
       final int k = data.kind(pre - 1);
       if(k == Data.TEXT && data.parent(pre - 1, k) == par) return pre - 1;
-      if(data.kind(pre) == Data.TEXT) return pre;
+      if(pre < data.meta.size && data.kind(pre) == Data.TEXT) return pre;
     }
     return -1;
   }
