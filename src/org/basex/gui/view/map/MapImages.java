@@ -107,7 +107,7 @@ final class MapImages {
             }
             
             // load image and wait until it's done
-            final File f = new File(Token.string(data.fs.path(id)));
+            final File f = new File(Token.string(data.fs.path(id, false)));
             BufferedImage image = ImageIO.read(f);
             
             // calculate optimal image size

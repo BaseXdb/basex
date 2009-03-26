@@ -127,7 +127,7 @@ public final class TableContent extends BaseXBack {
             byte[] txt = data.attValue(ti.pre);
             if(data.fs != null) {
               final boolean size = tdata.cols[c].id == data.sizeID;
-              final boolean time = tdata.cols[c].id == data.fs.timeID;
+              final boolean time = tdata.cols[c].id == data.fs.mtimeID;
               if(size || time) {
                 txt = token(BaseXLayout.value(toDouble(txt), size, time));
               }
@@ -152,7 +152,7 @@ public final class TableContent extends BaseXBack {
         if(ce != 0) {
           final byte[] str = tb[c].size != 0 ? tb[c].finish() : null;
           if(str != null) {
-            if(data.fs != null && tdata.cols[c].id == data.fs.suffID) {
+            if(data.fs != null && tdata.cols[c].id == data.fs.suffixID) {
               g.drawImage(GUIFS.images(str, false), (int) x + 2,
                   posY - 8 + rowH / 2, this);
               x += 22;

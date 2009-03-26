@@ -371,7 +371,7 @@ public abstract class Builder extends Progress {
     // set leaf node information in index and add tag and atts to statistics
     if(level != 0) {
       if(level == 1) {
-        if(inDoc) error(MOREROOTS, parser.det(), tag);
+        if(inDoc && !Prop.fuse) error(MOREROOTS, parser.det(), tag);
       } else {
         tags.stat(tagStack[level - 1]).leaf = false;
       }

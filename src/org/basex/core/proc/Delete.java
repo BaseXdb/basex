@@ -2,11 +2,13 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 
-import org.basex.BaseX;
+import java.io.File;
+
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.fuse.FSUtils;
 import org.basex.util.Token;
 
 /**
@@ -49,10 +51,17 @@ public final class Delete extends Process {
     final int size = nodes.size();
     for(int i = size - 1; i >= 0; i--) {
       final int pre = nodes.nodes[i];
+      // delete filesystem node, but before! BaseX does (invalid pre)
+      if(Prop.fuse) {
+        final String bpath = Token.string(data.fs.path(pre, true));
+        File f = new File(bpath);
+        if (f.isDirectory())  
+          FSUtils.deleteDir(f);
+        else if (f.isFile())
+          f.delete();
+        data.fs.nativeUnlink(Token.string(data.fs.path(pre, false)));
+      }
       data.delete(pre);
-      // [AH] delete filesystem node
-      if(Prop.fuse) 
-        BaseX.errln(data.fs.nativeUnlink(Token.string(data.fs.path(pre))));
     }
     
     // refresh current context

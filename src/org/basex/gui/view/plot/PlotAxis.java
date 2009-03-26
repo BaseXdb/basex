@@ -212,7 +212,7 @@ public final class PlotAxis {
     // newer files. the newest file gets the lowest value (max - d + min) but is
     // still displayed on the right end of the plot.
     final Data data = plotData.context.data();
-    if(data.fs != null && !isTag && attrID == data.fs.timeID) {
+    if(data.fs != null && !isTag && attrID == data.fs.mtimeID) {
       range = ln(max - min);
       return 1 - (1 / range * (ln(max - d)));
     }

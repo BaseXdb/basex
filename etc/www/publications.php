@@ -1,11 +1,11 @@
 <?
 include("inc/header.inc");
 ?>
-  <p class="arrow"><b>Holupirek, Gr&uuml;n, Scholl; EDBT 2009, March 2009:</b><br/>
+  <p class="arrow"><b>Holupirek, Gr&uuml;n, Scholl; EDBT 2009 (demo track), March 2009:</b><br/>
     BaseX and DeepFS - Joint Storage for Filesystem and Database. (to appear)
   </p>
 
-  <p class="arrow"><b> Holupirek, Scholl; VLDB 2008, August 2008:</b><br/>
+  <p class="arrow"><b> Holupirek, Scholl; VLDB 2008 (PhD WS), August 2008:</b><br/>
     <a class="pdf" href="http://www.vldb.org/pvldb/1/1454237.pdf">Implementing Filesystems by Tree-aware DBMSs.</a>
   </p>
 
@@ -14,7 +14,7 @@ include("inc/header.inc");
     (<a class="pdf" href="http://www.inf.uni-konstanz.de/dbis/publications/download/HGS:BTW2007:slides.pdf">talk</a>)
   </p>
 
-  <p class="arrow"><b> Gr&uuml;n, Holupirek, Scholl; BTW 2007 Demo Panel, GI:</b><br/>
+  <p class="arrow"><b> Gr&uuml;n, Holupirek, Scholl; BTW 2007 (demo track), GI:</b><br/>
     <a class="pdf" href="http://www.inf.uni-konstanz.de/dbis/publications/download/GHS:BTW07.pdf">Visually Exploring and Querying XML with BaseX.</a>
     (<a class="pdf" href="http://www.inf.uni-konstanz.de/dbis/publications/download/GHS:BTW07:poster.pdf">poster</a>)    </p>
 

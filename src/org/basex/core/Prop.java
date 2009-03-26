@@ -179,8 +179,9 @@ public final class Prop {
     try {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
       fuse = true;
+      BaseX.debug("DeepFS FUSE support enabled ... OK");
     } catch(final UnsatisfiedLinkError ex) {
-      BaseX.debug(ex);
+      BaseX.debug("Loading DeepFS library ... failed.\n.");
     }
   }
   

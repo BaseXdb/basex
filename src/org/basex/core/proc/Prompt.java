@@ -31,10 +31,10 @@ public final class Prompt extends Process {
       final Nodes nodes = context.current();
       final int pre = nodes.nodes[0];
       if(data.kind(pre) == Data.ELEM) {
-        curr.add(fs ? data.fs.path(pre) : data.tag(pre));
+        curr.add(fs ? data.fs.path(pre, false) : data.tag(pre));
       }
       if(nodes.size() != 1) curr.add("[...]");
     }
-    out.print(BaseX.info(fs ? "%$ " : "%> ", curr));
+    out.print(BaseX.info(fs ? "%[basex] $ " : "%> ", curr));
   }
 }

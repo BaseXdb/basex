@@ -98,13 +98,13 @@ public final class Context {
         // -- close fuse instance
         if(Prop.fuse) { 
           final String method = "[BaseX.close] ";
-          BaseX.err(method + "Initiating DeepFS shutdown sequence ");
+          BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
           // -- unmount running fuse.
-          for (int i = 5; i > 0; i--) {
+          for (int i = 3; i > 0; i--) {
             Performance.sleep(1000);
             BaseX.err(i + " .. ");
           }
-          BaseX.errln(" .. NOW.");
+          BaseX.debug("GO.");
           final String cmd = "umount -f " + mp;
           BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
           Runtime r = Runtime.getRuntime();
@@ -118,7 +118,7 @@ public final class Context {
           String msg = method + "Unmount "  + mp;
           if (rc == 0) msg = msg + " ... OK."; 
           else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
-          BaseX.errln(msg);
+          BaseX.debug(msg);
         }
       }
       return true;

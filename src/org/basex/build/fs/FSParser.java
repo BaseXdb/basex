@@ -52,35 +52,35 @@ import org.basex.util.Token;
 public final class FSParser extends Parser {
   /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
   public static final int SIZEOFFSET = 3;
-  /** Meta data index. */
-  private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
-  /** Reference to the database builder. */
-  private Builder builder;
-  /** The currently processed file. */
-  private File curr;
-  /** Root flag to parse root node or all partitions (C:, D: ...). */
-  private final boolean root;
-  /** Level counter. */
-  private int lvl;
   /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre value stack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
-  /** Do not expect complete file hierarchy, but parse single files. */
-  private boolean singlemode;
   /** Path to root of the backing store. */
   private final String fsimportpath;
   /** Name of the database and backingroot sub directory. */
   private final String fsdbname;
   /** Path to root of the backing store. */
   private final String backingroot;
-  /** Path to root of the backing store for this import. */
-  public String mybackingpath;
   /** Path to FUSE mountpoint. */
-  public String mountpoint;
+  public final String mountpoint;
+  /** Meta data index. */
+  private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
+  /** Root flag to parse root node or all partitions (C:, D: ...). */
+  private final boolean root;
+  /** Path to root of the backing store for this import. */
+  public final String mybackingpath;
+  /** Reference to the database builder. */
+  private Builder builder;
+  /** The currently processed file. */
+  private File curr;
+  /** Level counter. */
+  private int lvl;
   /** Length of absolute pathname of the root directory the import starts from,
    * i.e. the prefix to be chopped from path and substituted by backingroot. */
   private int importRootLength;
+  /** Do not expect complete file hierarchy, but parse single files. */
+  private boolean singlemode;
 
   /**
    * Constructor.
@@ -120,7 +120,8 @@ public final class FSParser extends Parser {
    * @param path String to file node to parse
    */
   public FSParser(final String path) {
-    this(path, "single_file_mode", "single_file_mode");
+    // TODO: [AH] pass mountpoint and backing store args to single parser
+    this(path, "/mnt/deepfs", "/var/tmp/deepfs");
     singlemode = true;
   }
   
@@ -139,10 +140,10 @@ public final class FSParser extends Parser {
     builder.meta.mountpoint = mountpoint;
     
     // -- create backing store (DeepFS depends on it).
-    if(Prop.fuse) {
-      final File bs = new File(mybackingpath);
-      if(!bs.mkdirs() && bs.exists())
-        throw new IOException(BACKINGEXISTS + mybackingpath);
+    if(Prop.fuse && !singlemode) {
+      File bs = new File(mybackingpath);
+      if (!bs.mkdirs() && bs.exists())
+          throw new IOException(BACKINGEXISTS + mybackingpath);
     }
     
     builder.startDoc(token(io.name()));
@@ -213,10 +214,11 @@ public final class FSParser extends Parser {
     try {
       final InputStream in = new FileInputStream(src);
       final OutputStream out = new FileOutputStream(dst);
-      final byte[] buf = new byte[4096];
+      byte[] buf = new byte[4096];
       int len;
   
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
+      
       in.close();
       out.close();
     } catch (final IOException e) {
@@ -345,5 +347,19 @@ public final class FSParser extends Parser {
   @Override
   public double prog() {
     return 0;
+  }
+  
+  /**
+   * Deletes a non-empty directory. 
+   * @param dir to be deleted.
+   * @return boolean true for success, false for failure.
+   * */ 
+  public static boolean deleteDir(final File dir) {
+    if(dir.isDirectory()) {
+      for(final String child : dir.list()) {
+        if(!deleteDir(new File(dir, child))) return false;
+      }
+    }
+    return dir.delete();
   }
 }
