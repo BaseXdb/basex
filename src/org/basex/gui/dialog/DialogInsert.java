@@ -24,15 +24,22 @@ import org.basex.util.Token;
  * @author Lukas Kircher
  */
 public final class DialogInsert extends Dialog {
+  /** Remembers the last insertion type. */
+  public static int lkind = 1;
+
   /** Resulting query. */
   public String[] result;
   /** Node kind. */
   public int kind;
   
   /** Text area. */
-  BaseXTextField input;
+  BaseXTextField input1;
   /** Text area. */
   BaseXText input2;
+  /** First label. */
+  BaseXLabel label1;
+  /** Second label. */
+  BaseXLabel label2;
   /** Insert kind selection buttons. */
   BaseXRadio[] radio;
   /** Button panel. */
@@ -51,14 +58,14 @@ public final class DialogInsert extends Dialog {
     final BaseXBack b = new BaseXBack();
     b.setLayout(new TableLayout(5, 1, 0, 8));
 
-    final BaseXLabel label = new BaseXLabel(INSERTNAME, true, true);
-    label.setBorder(0, 0, 0, 0);
-    final BaseXLabel label2 = new BaseXLabel(" ", true, true);
+    label1 = new BaseXLabel(INSERTNAME, true, true);
+    label1.setBorder(0, 0, 0, 0);
+    label2 = new BaseXLabel(" ", true, true);
     label2.setBorder(0, 0, 0, 0);
     label2.setEnabled(false);
 
-    input = new BaseXTextField(null);
-    BaseXLayout.setWidth(input, 320);
+    input1 = new BaseXTextField(null);
+    BaseXLayout.setWidth(input1, 320);
 
     input2 = new BaseXText(gui, null);
     input2.setFont(GUIConstants.mfont);
@@ -72,13 +79,7 @@ public final class DialogInsert extends Dialog {
     
     final ActionListener al = new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        final Object src = e.getSource();
-        input.setEnabled(src != radio[2] && src != radio[4]);
-        label.setEnabled(src != radio[2] && src != radio[4]);
-        label.setText(src == radio[2] || src == radio[4] ? "" : INSERTNAME);
-        input2.setEnabled(src != radio[1]);
-        label2.setEnabled(src != radio[1]);
-        label2.setText(src == radio[1] ? "" : INSERTVALUE);
+        change(e.getSource());
       }
     };
 
@@ -86,14 +87,14 @@ public final class DialogInsert extends Dialog {
     for(int i = 1; i < EDITKIND.length; i++) {
       radio[i] = new BaseXRadio(EDITKIND[i], null, false, this);
       radio[i].addActionListener(al);
+      radio[i].setSelected(i == lkind);
       group.add(radio[i]);
       knd.add(radio[i]);
     }
-    radio[1].setSelected(true);
 
     b.add(knd);
-    b.add(label);
-    b.add(input);
+    b.add(label1);
+    b.add(input1);
     b.add(label2);
     pp.add(b, BorderLayout.CENTER);
 
@@ -102,14 +103,28 @@ public final class DialogInsert extends Dialog {
 
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
+    change(radio[lkind]);
     finish(null);
+  }
+  
+  /**
+   * Activates the specified radio button.
+   * @param src button reference
+   */
+  void change(final Object src) {
+    input1.setEnabled(src != radio[2] && src != radio[4]);
+    label1.setEnabled(src != radio[2] && src != radio[4]);
+    label1.setText(src == radio[2] || src == radio[4] ? "" : INSERTNAME);
+    input2.setEnabled(src != radio[1]);
+    label2.setEnabled(src != radio[1]);
+    label2.setText(src == radio[1] ? "" : INSERTVALUE);
   }
 
   @Override
   public void close() {
     super.close();
 
-    final String in1 = input.getText();
+    final String in1 = input1.getText();
     final String in2 = Token.string(input2.getText());
 
     for(int i = 1; i < KINDS.length; i++) {
@@ -123,5 +138,6 @@ public final class DialogInsert extends Dialog {
       case 2: case 4:
         result = new String[] { in2 }; break;
     }
+    lkind = kind;
   }
 }

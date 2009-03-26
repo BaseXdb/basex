@@ -124,7 +124,7 @@ final class MapRenderer {
 //          return yy - r.y;
       }
 
-      byte[] tok = ftt.get();
+      byte[] tok = ftt.orig();
       int wl = 0;
 
       for(int n = 0; n < tok.length; n += cl(tok[n]))
@@ -363,7 +363,7 @@ final class MapRenderer {
     int ml = 0;
     for (int i = 0; i < data[0].length; i++) {
       wl = data[0][i] * r.thumbf;
-      e = wl - (int) (data[0][i] * r.thumbf);
+      e += wl - (int) wl;
       if (e >= 1) {
         wl += (int) e;
         e -= (int) e;
@@ -515,14 +515,14 @@ final class MapRenderer {
       int yy = y + 28 + GUIProp.fontsize * nl + 4 < ry + rh ?
           y + 28 : y  - GUIProp.fontsize * nl;
       //final int ww = nl == 1 && wl < wi ? wl : wi;
-      g.setColor(COLORS[12]);
+      g.setColor(COLORS[10]);
       g.drawRect(xx - 3, yy - GUIProp.fontsize - 1, ww + 3,
           GUIProp.fontsize * nl + 7);
       g.setColor(COLORS[0]);
       g.fillRect(xx - 2, yy - GUIProp.fontsize, ww + 2,
           GUIProp.fontsize * nl + 6);
 
-      g.setColor(COLORS[24]);
+      g.setColor(COLORS[20]);
       wl = 0;
       for (int i = 0; i < tl.size; i++) {
         l = len.list[i];
@@ -539,7 +539,7 @@ final class MapRenderer {
           g.drawString(string(tl.list[i]), xx + wl, yy);
           if (ul > -1 && i == ul)
             g.drawLine(xx + wl, yy + 1, xx + wl + l, yy + 1);
-          g.setColor(Color.black);
+          g.setColor(COLORS[24]);
           wl += l;
         } else {
           g.drawString(string(tl.list[i]), xx + wl, yy);

@@ -159,6 +159,14 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
+   * Returns the original token.
+   * @return original token
+   */
+  public byte[] orig() {
+    return substring(text, s, p);
+  }
+  
+  /**
    * Counts the number of tokens.
    * @return number of tokens
    */
@@ -188,7 +196,7 @@ public final class FTTokenizer extends IndexToken {
     int sl = 0;
     int pl = 0;
     while(more()) {
-      final byte[] n = get();
+      final byte[] n = orig();
       final int l = n.length;
       il[0].add(l);
       il[3].add(n);
