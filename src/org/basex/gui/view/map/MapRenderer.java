@@ -348,8 +348,9 @@ final class MapRenderer {
     final int ys = r.y + 3;
     int yy = ys;
 
-    int wl = 0; // word length
-    int ll = 0; // line length
+    double wl = 0; // word length
+    double ll = 0; // line length
+    double e = 0;
 
     final Color textc = draw ? COLORS[r.level + 4] : null;
     int count = 0;
@@ -361,7 +362,12 @@ final class MapRenderer {
     tl = new TokenList();
     int ml = 0;
     for (int i = 0; i < data[0].length; i++) {
-      wl = (int) (data[0][i] * r.thumbf);
+      wl = data[0][i] * r.thumbf;
+      e = wl - (int) (data[0][i] * r.thumbf);
+      if (e >= 1) {
+        wl += (int) e;
+        e -= (int) e;
+      }
       sl += data[0][i];
       pl += data[0][i];
       cchars += data[0][i];
@@ -382,7 +388,7 @@ final class MapRenderer {
           pp++;
         } else
           g.setColor(textc);
-        g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
+        g.fillRect((int) (xx + ll), yy, (int) wl, r.thumbfh);
       }
 
       // check if cursor is inside the rect
@@ -568,8 +574,8 @@ final class MapRenderer {
     final int ww = r.w;
     int yy = r.y + 3;
 
-    int wl = 0; // word length
-    int ll = 0; // line length
+    double wl = 0; // word length
+    double ll = 0; // line length
     ul = -1;
     int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
     int pp = 0;
@@ -578,7 +584,7 @@ final class MapRenderer {
     boolean ir;
     for (int i = 0; i < data[0].length; i++) {
       ir = false;
-      wl = (int) (data[0][i] * r.thumbf);
+      wl = data[0][i] * r.thumbf;
       pl += data[0][i];
       sl += data[0][i];
       cc += data[0][i];
@@ -737,7 +743,7 @@ final class MapRenderer {
           ll = 0;
         }
 
-        ll += sw;
+        ll += (int) sw;
         sl = 0;
         psl++;
       }
@@ -783,7 +789,8 @@ final class MapRenderer {
     int pp = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
-
+    double error = 0;
+    
     int i = 0;
     tl = new TokenList();
     while (i < data[0].length) {
@@ -797,6 +804,11 @@ final class MapRenderer {
         sl += data[0][i];
         pl += data[0][i];
         lastl = (int) (data[0][i] * r.thumbf);
+        error += data[0][i] * r.thumbf - lastl;
+        if (error >= 1) {
+          wl += (int) error;
+          error -= (int) error;
+        }
         wl += lastl;
         count++;
         if (i < data[0].length) i++;
