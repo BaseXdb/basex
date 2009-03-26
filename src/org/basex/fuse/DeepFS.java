@@ -173,6 +173,9 @@ public final class DeepFS extends DeepFuse implements DataText {
   private Data createEmptyDB(final String n, final boolean fuse) {
     Context ctx = new Context();
 
+    // [AH] temporarily ignoring fuse attribute.. 
+    if(fuse);
+
     try {
       final Parser p = new Parser(IO.get(n)) {
         @Override

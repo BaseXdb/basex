@@ -190,7 +190,8 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    
+    Prop.onthefly = true;
+
     new CreateDB(path + input).execute(context, null);
     data = context.data();
 
@@ -382,6 +383,7 @@ public abstract class W3CTS {
       item = xq.eval();
       item.serialize(new XMLSerializer(out));
       output = norm(out.finish());
+      xq.close();
       
       //System.out.println(xq.ctx.info());
 
@@ -631,6 +633,7 @@ public abstract class W3CTS {
       final Item item = xq.eval();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
       ctx.vars.addGlobal(v.bind(item, ctx));
+      xq.close();
     }
   }
 

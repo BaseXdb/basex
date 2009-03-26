@@ -551,7 +551,7 @@ public final class DiskData extends Data {
       final int as, final int s) {
 
     final long id = ++meta.lastid;
-    final int t = tags.index(tag, null, true);
+    final int t = tags.index(tag, null, false);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, 
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
@@ -618,7 +618,7 @@ public final class DiskData extends Data {
     values.writeBytes(len, val);
 
     // build and insert new entry
-    final int att = atts.index(name, val, true);
+    final int att = atts.index(name, val, false);
     final long id = ++meta.lastid;
     table.insert(pre, new byte[] { ATTR, (byte) (att >> 8), (byte) att,
         (byte) (len >> 32), (byte) (len >> 24), (byte) (len >> 16),

@@ -48,7 +48,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMESPACE + ".org";
   /** Code version. */
-  String VERSION = "5.5";
+  String VERSION = "5.51";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version Information. */
