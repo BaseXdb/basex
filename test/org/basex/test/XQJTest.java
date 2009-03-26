@@ -45,7 +45,7 @@ import org.xml.sax.XMLReader;
  */
 public class XQJTest extends TestCase {
   /** Test file. */
-  private static final String INPUT = "doc('/home/db/xml/input.xml')";
+  private static final String INPUT = "doc('input.xml')";
   /** Driver reference. */
   protected String drv;
 
@@ -240,7 +240,7 @@ public class XQJTest extends TestCase {
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     final XQExpression ex = conn.createExpression();
-    final String query = "doc('/home/db/projects/basex/input.xml')//title";
+    final String query = "doc('input.xml')//title";
     //String query = "1,2";
     final XQResultSequence seq = ex.executeQuery(query);
     final XMLStreamReader xsr = seq.getSequenceAsStream();
@@ -492,9 +492,7 @@ public class XQJTest extends TestCase {
     //xqe.bindNode(new QName("v"), frag, null);
     xqe.bindNode(new QName("v"), document, null);
     xqs = xqe.executeQuery("declare variable $v external; $v");
-    while(xqs.next()) {
-      System.out.println("> " + xqs.getNode());
-    }
+    while(xqs.next()) xqs.getNode();
   }
 
   /**
@@ -511,5 +509,3 @@ public class XQJTest extends TestCase {
     expr.bindAtomicValue(new QName("v"), "A", type);
   }
 }
-
-

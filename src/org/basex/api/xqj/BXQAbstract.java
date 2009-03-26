@@ -55,8 +55,10 @@ abstract class BXQAbstract {
 
   /**
    * Closes the class.
+   * @throws XQException exception
    */
-  public final void close() {
+  @SuppressWarnings("unused")
+  public void close() throws XQException {
     closed = true;
   }
 
