@@ -29,7 +29,7 @@ public final class UpdateExample {
     Context context = new Context();
 
 
-    out.println("\n=== Create as new database");
+    out.println("\n=== Create a new database");
 
     // Sets an option: activates command info output
     new Set("Info", "on").execute(context, out);
@@ -38,7 +38,7 @@ public final class UpdateExample {
     new CreateDB("<doc a='b'>first</doc>", "Database").execute(context, out);
 
 
-    out.println("\n=== Inserts a document");
+    out.println("\n=== Insert a document");
 
     // Inserts a document into the database; argument can be a file name or XML
     // Position: 0 (ignored for documents)
@@ -46,13 +46,13 @@ public final class UpdateExample {
     new Insert("fragment", "<doc>second</doc>", "0", "/").execute(context, out);
 
 
-    out.println("\n=== Deletes nodes");
+    out.println("\n=== Delete nodes");
 
     // Deletes all attributes in the database.
     new Delete("//@*").execute(context, out);
 
 
-    out.println("\n=== Inserts a node");
+    out.println("\n=== Insert a node");
 
     // Inserts an element fragment into the database
     // Position: 1 = as first child
@@ -60,13 +60,13 @@ public final class UpdateExample {
     new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
 
 
-    out.println("\n=== Optimizes the database");
+    out.println("\n=== Optimize the database");
 
     // Updates all indexes and database statistics
     new Optimize().execute(context, out);
 
 
-    out.println("\n=== Outputs the result");
+    out.println("\n=== Output the result");
 
     // Serializes the database to show the result
     new XQuery("/").execute(context, out);

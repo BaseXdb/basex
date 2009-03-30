@@ -83,7 +83,6 @@ public class DBNode extends Nod {
   public void serialize(final Serializer ser) throws IOException {
     final int s = ser.ns.size;
     final byte[] dn = ser.dn;
-    
     ser.node(data, pre);
     ser.ns.size = s;
     ser.dn = dn;
@@ -97,7 +96,7 @@ public class DBNode extends Nod {
       case ATT:
         return data.attName(pre);
       case PI:
-        byte[] name = data.text(pre);
+        final byte[] name = data.text(pre);
         final int i = indexOf(name, ' ');
         return i != -1 ? substring(name, 0, i) : name;
       default:
@@ -114,10 +113,11 @@ public class DBNode extends Nod {
   public QNm qname(final QNm name) {
     final byte[] nm = nname();
     name.name(nm);
-    if(!name.ns() && data.ns.size() == 0) {
+    final boolean ns = name.ns();
+    if(!ns && data.ns.size() == 0) {
       name.uri = Uri.EMPTY;
     } else {
-      final int n = data.ns.get(nm, pre);
+      final int n = ns ? data.ns.get(nm, pre) : data.tagNS(pre);
       name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pre(nm)));
     }
     return name;

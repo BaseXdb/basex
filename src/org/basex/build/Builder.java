@@ -197,9 +197,9 @@ public abstract class Builder extends Progress {
    * @param val attribute value
    */
   public final void startNS(final byte[] name, final byte[] val) {
-    ns.add(name, val);
+    final int n = ns.add(name, val);
     // default namespace...
-    if(name.length == 0) nsStack[level] = ns.id(val);
+    if(name.length == 0) nsStack[level] = n;
   }
 
   /**
@@ -211,7 +211,10 @@ public abstract class Builder extends Progress {
    */
   public final int startElem(final byte[] tag, final Atts att)
       throws IOException {
-    return addElem(tag, att, true);
+    final int pre = addElem(tag, att);
+
+    if(meta.height < ++level) meta.height = level;
+    return pre;
   }
 
   /**
@@ -223,7 +226,7 @@ public abstract class Builder extends Progress {
   public final void emptyElem(final byte[] tag, final Atts att)
       throws IOException {
 
-    addElem(tag, att, false);
+    addElem(tag, att);
     ns.close(parStack[level]);
   }
 
@@ -241,6 +244,7 @@ public abstract class Builder extends Progress {
     final int pre = parStack[level];
     setSize(pre, meta.size - pre);
     ns.close(pre);
+    nsStack[level] = nsStack[level - 1];
   }
 
   /**
@@ -326,12 +330,10 @@ public abstract class Builder extends Progress {
    * Adds an element node to the storage.
    * @param name tag name
    * @param att attributes
-   * @param open opening tag
    * @return pre value of the created node
    * @throws IOException in case of parsing or writing problems
    */
-  private int addElem(final byte[] name, final Atts att,
-      final boolean open) throws IOException {
+  private int addElem(final byte[] name, final Atts att) throws IOException {
 
     // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
@@ -346,9 +348,6 @@ public abstract class Builder extends Progress {
     // cache pre value
     final int pre = meta.size;
 
-    // store namespaces
-    final boolean n = ns.open(meta.size);
-
     // add node
     final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
     final int al = att.size;
@@ -356,6 +355,10 @@ public abstract class Builder extends Progress {
     // get namespaces reference
     int tns = ns.get(tag);
     if(tns == 0) tns = nsStack[level];
+    nsStack[level + 1] = nsStack[level];
+
+    // store namespaces
+    final boolean n = ns.open(meta.size);
 
     addElem(tid, tns, dis, al + 1, n);
 
@@ -375,11 +378,6 @@ public abstract class Builder extends Progress {
       } else {
         tags.stat(tagStack[level - 1]).leaf = false;
       }
-    }
-
-    if(open) {
-      if(meta.height < ++level) meta.height = level;
-      nsStack[level] = nsStack[level - 1];
     }
     if(meta.size != 1) inDoc = true;
 

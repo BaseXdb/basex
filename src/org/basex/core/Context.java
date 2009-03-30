@@ -74,7 +74,7 @@ public final class Context {
   }
   
   /**
-   * Flushes the context (i.e., updates references).
+   * Updates references to the document nodes.
    */
   public void update() {
     current = new Nodes(data.doc(), data);

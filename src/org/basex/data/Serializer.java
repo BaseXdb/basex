@@ -241,12 +241,16 @@ public abstract class Serializer {
     final Atts nsp = new Atts();
     /** Parent Stack. */
     final int[] parent = new int[IO.MAXHEIGHT];
+    /** Namespace Stack. */
+    final byte[][] names = new byte[IO.MAXHEIGHT][];
     
     // current output level
     int l = 0;
     int p = pre;
     final int s = pre + data.size(pre, data.kind(p));
 
+    names[l] = dn;
+    
     // loop through all table entries
     while(p < s && !finished()) {
       int k = data.kind(p);
@@ -283,35 +287,44 @@ public abstract class Serializer {
         final byte[] name = data.tag(p);
         openElement(name);
 
-        nsp.reset();
-
         final int as = p + data.attSize(p, k);
-        int pp = p;
 
         // add namespace definitions
-        do {
-          addNS(data, pp, nsp);
-          pp = data.parent(pp, k);
-          k = data.kind(pp);
-        } while(tags.size == 1 && l == 0 && k == Data.ELEM);
-        
-        // serialize namespaces
-        for(int n = 0; n < nsp.size; n++) namespace(nsp.key[n], nsp.val[n]);
-        
-        // add namespace for tag
-        final byte[] key = pre(name);
-        byte[] uri = data.ns.key(data.tagNS(p));
-        if(uri == null) uri = EMPTY;
-        if(key.length != 0) {
-          if(ns.get(key) == -1) namespace(key, uri);
-        } else if(!eq(uri, dn)) {
-          dn = uri;
-          namespace(EMPTY, uri);
+        byte[] empty = null;
+        if(data.ns.size() != 0) {
+          nsp.reset();
+          int pp = p;
+          do {
+            addNS(data, pp, nsp);
+            pp = data.parent(pp, k);
+            k = data.kind(pp);
+          } while(tags.size == 1 && l == 0 && k == Data.ELEM);
+          
+          // serialize namespaces
+          for(int n = 0; n < nsp.size; n++) {
+            namespace(nsp.key[n], nsp.val[n]);
+            if(nsp.key[n].length == 0) empty = nsp.val[n];
+          }
+          
+          // add namespace for tag
+          final byte[] pref = pre(name);
+          byte[] uri = data.ns.key(data.tagNS(p));
+          if(uri == null) uri = EMPTY;
+          if(pref.length != 0) {
+            if(ns.get(pref) == -1) namespace(pref, uri);
+          } else if(!eq(uri, names[l])) {
+            dn = uri;
+            if(empty == null) {
+              namespace(EMPTY, uri);
+              empty = uri;
+            }
+          }
         }
 
         // serialize attributes
         while(++p != as) attribute(data.attName(p), data.attValue(p));
         parent[l++] = pa;
+        names[l] = empty == null ? EMPTY : empty;
       }
     }
     // process nodes that remain in the stack

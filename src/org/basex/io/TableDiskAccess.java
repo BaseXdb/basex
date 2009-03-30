@@ -77,6 +77,10 @@ public final class TableDiskAccess extends TableAccess {
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
   }
 
+  /* Static pre value check.
+  private static int lastPre = 0;
+  */
+  
   /**
    * Searches for the block containing the entry for that pre. then it
    * reads the block and returns it's offset inside the block.
@@ -84,6 +88,10 @@ public final class TableDiskAccess extends TableAccess {
    * @return offset of the entry in currentBlock
    */
   private synchronized int cursor(final int pre) {
+    
+    //if(pre - lastPre < 0) Performance.stack();
+    //lastPre = pre;
+    
     int fp = firstPre;
     int np = nextPre;
     if(pre >= fp && pre < np) return (pre - fp) << IO.NODEPOWER;

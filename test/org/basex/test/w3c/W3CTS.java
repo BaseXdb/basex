@@ -196,7 +196,7 @@ public abstract class W3CTS {
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
-    BaseX.outln("\nBaseX vs. XQuery Test Suite " +
+    BaseX.outln("\n" + TITLE + " vs. XQuery Test Suite " +
         text("/*:test-suite/@version", root));
 
     BaseX.outln("\nCaching Sources...");

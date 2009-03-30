@@ -175,7 +175,7 @@ public final class CommandParser extends InputParser {
         final String in = ins.toString();
         switch(ins) {
           case FRAGMENT:
-            return new Insert(in, string(cmd, true), number(cmd), xquery(cmd));
+            return new Insert(in, xquery(cmd), number(cmd), xquery(cmd));
           case ELEMENT: case TEXT: case COMMENT:
             return new Insert(in, name(cmd), number(cmd), xquery(cmd));
           case PI:
