@@ -1,4 +1,4 @@
-package org.basex.util;
+package org.basex.server;
 
 import java.net.Socket;
 

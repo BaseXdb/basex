@@ -1,4 +1,4 @@
-package org.basex;
+package org.basex.server;
 
 import static org.basex.Text.*;
 
@@ -7,11 +7,11 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.basex.BaseX;
 import org.basex.core.ClientProcess;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
-import org.basex.util.Session;
 import org.basex.util.Token;
 
 
@@ -41,7 +41,7 @@ public class BaseXServerNew {
    * @param args command line arguments
    */
   public static void main(final String[] args) {
-    new BaseXServer(args);
+    new BaseXServerNew(args);
   }
 
   /**
