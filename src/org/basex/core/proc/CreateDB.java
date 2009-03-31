@@ -12,6 +12,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
@@ -84,8 +85,8 @@ public final class CreateDB extends ACreate {
    * @throws IOException exception
    */
   public static Data xml(final Parser p, final String db) throws IOException {
-    if(db == null) return new MemBuilder().build(p, "");
-    
+    if(db == null || Prop.onthefly) return new MemBuilder().build(p, "");
+
     final Builder builder = new DiskBuilder();
     try {
       final Data data = builder.build(p, db);

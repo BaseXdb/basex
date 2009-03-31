@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,7 +34,9 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FNIndex;
+import org.basex.query.func.FNSeq;
 import org.basex.query.func.Fun;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
@@ -43,6 +46,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.Var;
 import org.basex.util.Performance;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
@@ -78,14 +82,14 @@ public abstract class W3CTS {
   private String sources;
   /** Inspect flag. */
   private static final byte[] INSPECT = token("Inspect");
+  /** XML flag. */
+  private static final byte[] XML = token("Fragment");
+  /** Fragment flag. */
+  private static final byte[] FRAGMENT = token("XML");
 
   /** Maximum length of result output. */
   private static int maxout = 500;
 
-  /** Delimiter. */
-  private static final String DELIM = "#~%~#";
-  /** Replacement pattern. */
-  private static final Pattern CHOP = Pattern.compile(DELIM, Pattern.LITERAL);
   /** Replacement pattern. */
   private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
 
@@ -191,6 +195,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     final Context context = new Context();
     Prop.onthefly = true;
+    //Prop.chop = true;
 
     new CreateDB(path + input).execute(context, null);
     data = context.data();
@@ -329,20 +334,16 @@ public abstract class W3CTS {
     if(verbose) BaseX.outln("- " + inname);
 
     final IO file = IO.get(queries + pth + inname + ".xq");
-    if(!file.exists()) {
-      BaseX.errln("Not found? " + file);
-      return true;
-    }
+    if(!file.exists()) throw new FileNotFoundException(file.toString());
 
     final String in = read(file);
-    String output = "";
     String error = null;
     Item item = null;
 
     final TokenBuilder files = new TokenBuilder();
+    final CachedOutput out = new CachedOutput();
     try {
       final Context context = new Context();
-      final CachedOutput out = new CachedOutput();
       
       Nodes cont = nodes("*:contextItem", root);
       if(cont.size() != 0) new Check(sources + string(
@@ -376,17 +377,11 @@ public abstract class W3CTS {
         xq.module(ns, f);
       }
 
-      //Prop.info = true;
-      //Prop.allInfo = true;
-      
       // evaluate and serialize query
       item = xq.eval();
       item.serialize(new XMLSerializer(out));
-      output = norm(out.finish());
       xq.close();
       
-      //System.out.println(xq.ctx.info());
-
     } catch(final QueryException ex) {
       error = ex.getMessage();
       if(error.startsWith("Stopped at")) {
@@ -410,14 +405,16 @@ public abstract class W3CTS {
 
     final Nodes outFiles = nodes("*:output-file/text()", root);
     final Nodes cmpFiles = nodes("*:output-file/@compare", root);
-    final StringBuilder tb = new StringBuilder();
+    boolean xml = false;
+    StringList result = new StringList();
     for(int o = 0; o < outFiles.size(); o++) {
-      if(o != 0) tb.append(DELIM);
       final String resFile = string(data.atom(outFiles.nodes[o]));
       final IO exp = IO.get(expected + pth + resFile);
-      tb.append(exp.exists() ? read(exp) : ("Not Found: " + exp));
+      if(!exp.exists()) throw new FileNotFoundException(exp.toString());
+      result.add(read(exp));
+      final byte[] type = data.atom(cmpFiles.nodes[o]);
+      xml |= eq(type, XML) || eq(type, FRAGMENT);
     }
-    String result = tb.toString();
     String expError = text("*:expected-error/text()", root);
 
     final StringBuilder log = new StringBuilder(pth + inname + ".xq");
@@ -429,7 +426,7 @@ public abstract class W3CTS {
     log.append(Prop.NL);
 
     /** Remove comments. */
-    log.append(compact(in));
+    log.append(norm(in));
     log.append(Prop.NL);
     final String logStr = log.toString();
     final boolean print = currTime || !logStr.contains("current-") &&
@@ -457,7 +454,7 @@ public abstract class W3CTS {
       if(print) {
         logOK.append(logStr);
         logOK.append("[Right] ");
-        logOK.append(error);
+        logOK.append(norm(error));
         logOK.append(Prop.NL);
         logOK.append(Prop.NL);
         addLog(pth, outname + ".log", error);
@@ -466,27 +463,42 @@ public abstract class W3CTS {
       ok++;
     } else if(error == null) {
       boolean inspect = false;
-      final String[] split = CHOP.split(result, 0);
       int s = -1;
-      while(++s < split.length) {
+      while(++s < result.size) {
         inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
             INSPECT);
-        if(split[s].equals(output)) break;
+        
+        xml &= item instanceof Nod;
+        if(xml) {
+          try {
+            final boolean doc = item.type == Type.DOC;
+            String rin = result.list[s].trim();
+            if(!doc) rin = "<root>" + rin + "</root>";
+            final Data rdata = CreateDB.xml(IO.get(rin), null);
+            final Item ritem = new DBNode(rdata, doc ? 0 : 2);
+            final boolean test = FNSeq.deep(item.iter(), ritem.iter());
+            rdata.close();
+            if(test) break;
+          } catch(final IOException ex) {
+            xml = false;
+          }
+        }
+        if(!xml && result.list[s].equals(out.toString())) break;
       }
 
-      if(s == split.length && !inspect) {
+      if(s == result.size && !inspect) {
         if(print) {
-          if(outFiles.size() == 0) result = error(pth + outname, expError);
+          if(outFiles.size() == 0) result.add(error(pth + outname, expError));
           logErr.append(logStr);
           logErr.append("[" + testid + " ] ");
-          logErr.append(chop(result));
+          logErr.append(norm(result.list[0]));
           logErr.append(Prop.NL);
           logErr.append("[Wrong] ");
-          logErr.append(chop(output));
+          logErr.append(norm(out.toString()));
           logErr.append(Prop.NL);
           logErr.append(Prop.NL);
           final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
+          addLog(pth, outname + (nodes ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) logFile.append("fail");
         err++;
@@ -494,11 +506,11 @@ public abstract class W3CTS {
         if(print) {
           logOK.append(logStr);
           logOK.append("[Right] ");
-          logOK.append(chop(output));
+          logOK.append(norm(out.toString()));
           logOK.append(Prop.NL);
           logOK.append(Prop.NL);
           final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
+          addLog(pth, outname + (nodes ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) {
           logFile.append("pass");
@@ -511,10 +523,10 @@ public abstract class W3CTS {
         if(print) {
           logOK2.append(logStr);
           logOK2.append("[" + testid + " ] ");
-          logOK2.append(expError);
+          logOK2.append(norm(expError));
           logOK2.append(Prop.NL);
           logOK2.append("[Rght?] ");
-          logOK2.append(error);
+          logOK2.append(norm(error));
           logOK2.append(Prop.NL);
           logOK2.append(Prop.NL);
           addLog(pth, outname + ".log", error);
@@ -525,10 +537,10 @@ public abstract class W3CTS {
         if(print) {
           logErr2.append(logStr);
           logErr2.append("[" + testid + " ] ");
-          logErr2.append(chop(result));
+          logErr2.append(norm(result.list[0]));
           logErr2.append(Prop.NL);
           logErr2.append("[Wrong] ");
-          logErr2.append(error);
+          logErr2.append(norm(error));
           logErr2.append(Prop.NL);
           logErr2.append(Prop.NL);
           addLog(pth, outname + ".log", error);
@@ -546,11 +558,11 @@ public abstract class W3CTS {
   }
 
   /**
-   * Removes comments and double string.
+   * Normalizes the specified string.
    * @param in input string
    * @return result
    */
-  private String compact(final String in) {
+  private String norm(final String in) {
     final StringBuilder sb = new StringBuilder();
     int m = 0;
     boolean s = false;
@@ -572,7 +584,8 @@ public abstract class W3CTS {
         s = ch <= ' ';
       }
     }
-    return sb.toString().trim();
+    final String res = sb.toString().replaceAll("(\r|\n)+", " ").trim();
+    return res.length() < maxout ? res : res.substring(0, maxout) + "...";
   }
 
   /**
@@ -727,63 +740,12 @@ public abstract class W3CTS {
   }
 
   /**
-   * Chops the specified string to a maximum of 100 characters.
-   * @param string string
-   * @return chopped string
-   */
-  private String chop(final String string) {
-    if(string == null) return "";
-    final String str = CHOP.matcher(string).replaceAll(" / ");
-    final int sl = str.length();
-    return sl < maxout ? str :
-      new StringBuilder(str.substring(0, maxout)).append("...").toString();
-  }
-
-  /**
    * Returns the contents of the specified file.
    * @param f file to be read
    * @return content
    * @throws IOException I/O exception
    */
   String read(final IO f) throws IOException {
-    final StringBuilder sb = new StringBuilder();
-    final BufferedReader br = new BufferedReader(new
-        InputStreamReader(new FileInputStream(f.path()), UTF8));
-    String l;
-    while((l = br.readLine()) != null) {
-      l = l.trim();
-      if(l.length() == 0) continue;
-      sb.append(l.indexOf(" />") != -1 ? l.replaceAll(" />", "/>") : l);
-      sb.append(' ');
-    }
-    br.close();
-    return sb.toString().trim();
-  }
-
-  /**
-   * Normalizes the specified string.
-   * @param string string
-   * @return normalized string
-   */
-  String norm(final byte[] string) {
-    final String str = string(string);
-    final StringBuilder sb = new StringBuilder();
-    boolean nl = true;
-    for(int l = 0; l < str.length(); l++) {
-      final char c = str.charAt(l);
-      if(nl) {
-        nl = c >= 0 && c <= ' ';
-      } else {
-        nl = c == '\r' || c == '\n';
-        if(nl) {
-          // delete trailing whitespaces
-          while(sb.charAt(sb.length() - 1) <= ' ')
-            sb.deleteCharAt(sb.length() - 1);
-          sb.append(' ');
-        }
-      }
-      if(!nl) sb.append(c);
-    }
-    return sb.toString().trim();
+    return string(f.content()).replaceAll("\r\n", "\n");
   }
 }

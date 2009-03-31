@@ -21,7 +21,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class FNSeq extends Fun {
+public final class FNSeq extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] arg = new Iter[expr.length];
@@ -216,9 +216,18 @@ final class FNSeq extends Fun {
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
     if(expr.length == 3) checkColl(expr[2], ctx);
-
-    final Iter iter1 = ctx.iter(expr[0]);
-    final Iter iter2 = ctx.iter(expr[1]);
+    return deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
+  }
+  
+  /**
+   * Checks items for deep equality.
+   * @param iter1 first iterator
+   * @param iter2 second iterator
+   * @return result of check
+   * @throws QueryException evaluation exception
+   */
+  public static boolean deep(final Iter iter1, final Iter iter2)
+      throws QueryException {
 
     Item it1 = null;
     Item it2 = null;
@@ -284,7 +293,7 @@ final class FNSeq extends Fun {
    * @return node
    * @throws QueryException query exception
    */
-  private Nod nextDeep(final NodeIter iter) throws QueryException {
+  private static Nod nextDeep(final NodeIter iter) throws QueryException {
     while(true) {
       final Nod n = iter.next();
       if(n == null || n.type != Type.COM && n.type != Type.PI) return n;

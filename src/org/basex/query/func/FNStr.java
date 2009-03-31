@@ -293,7 +293,9 @@ final class FNStr extends Fun {
     final byte[] str = checkStr(expr[0], ctx);
     Norm norm = null;
     if(expr.length == 2) {
-      final byte[] n = uc(trim(checkStr(expr[1], ctx)));
+      final Item is = expr[1].atomic(ctx);
+      if(is == null) Err.empty(this);    
+      final byte[] n = uc(trim(checkStr(is)));
       for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);
     } else {
