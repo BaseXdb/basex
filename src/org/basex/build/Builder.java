@@ -238,7 +238,7 @@ public abstract class Builder extends Progress {
   public final void endElem(final byte[] tag) throws IOException {
     checkStop();
     final byte[] t = utf8(tag, meta.encoding);
-    if(level-- == 0 || tags.id(t) != tagStack[level])
+    if(--level == 0 || tags.id(t) != tagStack[level])
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
     final int pre = parStack[level];

@@ -2,6 +2,7 @@ package org.basex.build.mediovis;
 
 import static org.basex.build.mediovis.MAB2.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -139,6 +140,7 @@ public final class MAB2Parser extends Parser {
     //b.encoding(Prop.ENCODING);
 
     builder = b;
+    builder.startDoc(token(io.name()));
     builder.startElem(LIBRARY, atts.reset());
 
     // find file offsets of all titles
@@ -193,6 +195,7 @@ public final class MAB2Parser extends Parser {
     }
 
     builder.endElem(LIBRARY);
+    builder.endDoc();
     input.close();
 
     // write the mediovis ids back to disk

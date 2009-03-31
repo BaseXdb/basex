@@ -563,6 +563,8 @@ public abstract class W3CTS {
    * @return result
    */
   private String norm(final String in) {
+    if(1 == 1) return in;
+    
     final StringBuilder sb = new StringBuilder();
     int m = 0;
     boolean s = false;
