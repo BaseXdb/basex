@@ -9,7 +9,6 @@ import java.net.Socket;
 
 import org.basex.BaseX;
 import org.basex.core.ClientProcess;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
 import org.basex.util.Token;
@@ -26,8 +25,6 @@ import org.basex.util.Token;
  */
 public class BaseXServerNew {
   
-  /** Database Context. */
-  final Context context = new Context();
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
@@ -71,6 +68,7 @@ public class BaseXServerNew {
       BaseX.outln(SERVERSTART);
       while(running) {
         Socket s = server.accept();
+        counter++;
         new Session(s, counter).start();
       }
       server.close();

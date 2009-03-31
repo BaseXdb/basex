@@ -19,27 +19,21 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ClientProcess2 extends AbstractProcess {
+public final class ClientProcessNew extends AbstractProcess {
   /** Process reference. */
   private Process proc;
-  /** Host name. */
-  private final String host;
-  /** Port number. */
-  private final int port;
-  /** Temporary socket instance. */
+  /** Socket instance. */
   private Socket socket;
   /** Last socket reference. */
   private int last;
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
-   * @param h name of the host
-   * @param p port
+   * @param s Socket
    * @param pr process
    */
-  public ClientProcess2(final String h, final int p, final Process pr) {
-    host = h;
-    port = p;
+  public ClientProcessNew(final Socket s, final Process pr) {
+    socket = s;
     proc = pr;
   }
   
@@ -68,7 +62,6 @@ public final class ClientProcess2 extends AbstractProcess {
    * @throws IOException I/O Exception
    */
   private void send(final String command) throws IOException {
-    socket = new Socket(host, port);
     new DataOutputStream(socket.getOutputStream()).writeUTF(command);
   }
 
