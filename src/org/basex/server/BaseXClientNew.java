@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Socket;
 import java.util.Random;
 
 import org.basex.BaseX;
 import org.basex.core.AbstractProcess;
-import org.basex.core.ClientProcess;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -56,6 +56,8 @@ public class BaseXClientNew {
   private int port = Prop.port;
   /** Console mode. */
   boolean console = true;
+  /** Socket. */
+  private Socket socket;
 
   /**
    * Main method of the <code>BaseXClient</code>, launching a local
@@ -75,6 +77,12 @@ public class BaseXClientNew {
    */
   protected void init(final String[] args) {
     if(!parseArguments(args)) return;
+    System.out.println(host + " " + port);
+    try {
+      socket = new Socket(host, port);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
     run();
   }
 
@@ -247,7 +255,7 @@ public class BaseXClientNew {
    * @return process
    */
   protected AbstractProcess getProcess(final Process p) {
-    return new ClientProcess(host, port, p);
+    return new ClientProcessNew(socket, p);
   }
 
   /**
