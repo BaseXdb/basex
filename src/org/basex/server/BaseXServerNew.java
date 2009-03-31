@@ -21,9 +21,9 @@ import org.basex.util.Token;
  * allow simultaneous database requests.
  * Add the '-h' option to get a list on all available command-line arguments.
  *
-* @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
-* @author Andreas Weiler
-*/
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Andreas Weiler
+ */
 public class BaseXServerNew {
   
   /** Database Context. */

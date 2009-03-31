@@ -5,9 +5,9 @@ import java.net.Socket;
 /**
  * Session for a Client Server Connection.
  *
-* @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
-* @author Andreas Weiler
-*/
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Andreas Weiler
+ */
 public class Session extends Thread {
   
   /** Socket. */
