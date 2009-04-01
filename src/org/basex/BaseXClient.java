@@ -20,7 +20,6 @@ import org.basex.io.CachedOutput;
 import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.server.ClientProcess2;
 import org.basex.util.Token;
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
@@ -43,8 +42,6 @@ public class BaseXClient {
   private boolean info;
   /** Flag for showing detailed info on command processing. */
   private boolean allInfo;
-  /** Flag which Process to use. */
-  private boolean old = true;
   /** XQuery file. */
   private String query;
   /** Output file for queries. */
@@ -248,8 +245,7 @@ public class BaseXClient {
    * @return process
    */
   protected AbstractProcess getProcess(final Process p) {
-    if (old) return new ClientProcess(host, port, p);
-    return new ClientProcess2(host, port, p);
+    return new ClientProcess(host, port, p);
   }
 
   /**
