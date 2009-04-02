@@ -5,6 +5,7 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -65,8 +66,11 @@ public class BaseXServerNew {
       BaseX.outln(SERVERSTART);
       while(running) {
         counter++;
-        new Session(serverSocket.accept(), counter).start();
+        Socket s = serverSocket.accept();
+        // start Session thread
+        new Session(s, counter).start();
       }
+      // close the serverSocket when Server is stopped.
       serverSocket.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);
