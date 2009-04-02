@@ -77,7 +77,6 @@ public class BaseXClientNew {
    */
   protected void init(final String[] args) {
     if(!parseArguments(args)) return;
-    System.out.println(host + " " + port);
     try {
       socket = new Socket(host, port);
     } catch(IOException e) {

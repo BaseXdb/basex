@@ -5,12 +5,9 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 import org.basex.BaseX;
-import org.basex.core.ClientProcess;
 import org.basex.core.Prop;
-import org.basex.core.proc.Exit;
 import org.basex.util.Token;
 
 
@@ -64,14 +61,13 @@ public class BaseXServerNew {
     }.start();*/
 
     try {
-      final ServerSocket server = new ServerSocket(Prop.port);
+      ServerSocket serverSocket = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) {
-        Socket s = server.accept();
         counter++;
-        new Session(s, counter).start();
+        new Session(serverSocket.accept(), counter).start();
       }
-      server.close();
+      serverSocket.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);
       if(ex instanceof BindException) {
@@ -123,7 +119,7 @@ public class BaseXServerNew {
             break;
           }
         }
-      } else if(args[a].equals("stop")) {
+      }/* else if(args[a].equals("stop")) {
         try {
           // run new process, sending the stop command
           new ClientProcess("localhost", Prop.port, new Exit()).execute(null);
@@ -134,7 +130,7 @@ public class BaseXServerNew {
           BaseX.debug(ex);
         }
         return false;
-      }
+      }*/
       if(!ok) break;
     }
     if(!ok) BaseX.errln(SERVERINFO);
