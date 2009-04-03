@@ -17,7 +17,7 @@ import org.basex.io.PrintOutput;
  * It extends the {@link AbstractProcess} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public final class ClientProcessNew extends AbstractProcess {
   /** Process reference. */
@@ -33,8 +33,8 @@ public final class ClientProcessNew extends AbstractProcess {
    * @param pr process
    */
   public ClientProcessNew(final Socket s, final Process pr) {
-    socket = s;
-    proc = pr;
+    this.socket = s;
+    this.proc = pr;
   }
   
   @Override

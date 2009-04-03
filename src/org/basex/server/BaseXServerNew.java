@@ -67,6 +67,7 @@ public class BaseXServerNew {
       while(running) {
         counter++;
         Socket s = serverSocket.accept();
+        System.out.println("Login from Client " + counter);
         // start Session thread
         new Session(s, counter).start();
       }
