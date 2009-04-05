@@ -7,7 +7,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -45,6 +44,7 @@ public class Session extends Thread {
   /** Flag for Session. */
   boolean running = true;
   
+  
   /**
    * Session.
    * @param s Socket
@@ -52,8 +52,8 @@ public class Session extends Thread {
    */
   public Session(final Socket s, final int c) {
     super("Session");
-    this.socket = s;
     this.clientId = c;
+    this.socket = s;
   }
   
   /**
@@ -61,23 +61,23 @@ public class Session extends Thread {
    * @throws IOException I/O Exception
    */
   private void handle() throws IOException {
-    PrintWriter os = new PrintWriter(socket.getOutputStream(), true);
+    PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
     BufferedReader is = new BufferedReader(new InputStreamReader(
         socket.getInputStream()));
 
     String in, out;
     out = "You are logged in to the BaseXServer";
-    os.println(out);
+    pw.println(out);
 
     while ((in = is.readLine()) != null) {
       if(in.equals("exit")) {
         System.out.println("Client " + clientId + " has logged out.");
         break;
       }
-      os.println("Echo from Server: " + in);
+      pw.println("Echo from Server: " + in);
     }
     is.close();
-    os.close();
+    pw.close();
     socket.close();
   }
   
@@ -88,30 +88,30 @@ public class Session extends Thread {
   private void handle2() throws IOException {
     //final Performance perf = new Performance();
     // get command and arguments
-    final OutputStream os = socket.getOutputStream();
-    final DataInputStream dis = new DataInputStream(socket.getInputStream());
-    final DataOutputStream dos = new DataOutputStream(os);
-    final PrintOutput out = new PrintOutput(new BufferedOutput(os));
+    DataInputStream dis = new DataInputStream(socket.getInputStream());
     final int sp = socket.getPort();
+    System.out.println(socket);
     String in;
-    while (running) { 
-      in = dis.readUTF().trim();
-      if(in.equals("exit")) {
+    while ((in = dis.readUTF()) != null) { 
+      String into = in.trim();
+      if(into.equals("exit")) {
         System.out.println("Client " + clientId + " has logged out.");
         break;
       }
       Process pr = null;
       try {
-        pr = new CommandParser(in).parse()[0];
+        pr = new CommandParser(into).parse()[0];
       } catch(final QueryException ex) {
         pr = new Process(0) { };
         pr.error(ex.extended());
         core = pr;
-        send(dos, -sp);
+        send(-sp);
       }
-      final Process proc = pr;
+      Process proc = pr;
       if(proc instanceof GetResult || proc instanceof GetInfo) {
-        final Process c = core;
+        Process c = core;
+        PrintOutput out = new PrintOutput(new BufferedOutput(
+            socket.getOutputStream()));
         if(c == null) {
           out.print(BaseX.info(SERVERTIME, Prop.timeout));
         } else if(proc instanceof GetResult) {
@@ -121,27 +121,25 @@ public class Session extends Thread {
           // the client requests information about the last process
           c.info(out);
         }
+        out.flush();
       } else {
         core = proc;
-        send(dos, proc.execute(context) ? sp : -sp);
+        send(proc.execute(context) ? sp : -sp);
       }
     }
-    os.close();
-    out.close();
-    dis.close();
-    dos.close();
+    System.out.println("CLOSED");
     socket.close();
   }
   
   /**
    * Returns an answer to the client.
-   * @param dos DataOutputStrem
    * @param id session id to be returned
    * @throws IOException I/O exception
    */
-  synchronized void send(final DataOutputStream dos, final int id)
-  throws IOException {
+  synchronized void send(final int id) throws IOException {
+    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
     dos.writeInt(id);
+    dos.flush();
   }
   
   @Override

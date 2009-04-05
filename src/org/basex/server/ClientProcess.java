@@ -17,54 +17,82 @@ import org.basex.io.PrintOutput;
  * It extends the {@link AbstractProcess} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
-public final class ClientProcessNew extends AbstractProcess {
+public final class ClientProcess extends AbstractProcess {
   /** Process reference. */
   private Process proc;
-  /** Socket instance. */
+  /** Host name. */
+  private final String host;
+  /** Port number. */
+  private final int port;
+  /** Temporary socket instance. */
   private Socket socket;
   /** Last socket reference. */
   private int last;
+  /** Boolean for first Process. */
+  private boolean first;
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
-   * @param s Socket
+   * @param h name of the host
+   * @param p port
    * @param pr process
    */
-  public ClientProcessNew(final Socket s, final Process pr) {
-    this.socket = s;
-    this.proc = pr;
+  /*public ClientProcess(final String h, final int p, final Process pr) {
+    host = h;
+    port = p;
+    proc = pr;
+  }*/
+  
+  /**
+   * Constructor, specifying the server host:port and the command to be sent.
+   * @param h name of the host
+   * @param p port
+   * @param pr process
+   * @param f boolean
+   */
+  public ClientProcess(final String h, final int p, final Process pr,
+      final boolean f) {
+    host = h;
+    port = p;
+    proc = pr;
+    first = f;
   }
   
   @Override
   public boolean execute(final Context ctx) throws IOException {
-    send(proc.toString());
+    send(proc.toString(), true);
     last = new DataInputStream(socket.getInputStream()).readInt();
     return last > 0;
   }
 
   @Override
   public void output(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETRESULT.name() + " " + last);
+    send(Commands.Cmd.GETRESULT.name() + " " + last, false);
     receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETINFO.name() + " " + last);
+    send(Commands.Cmd.GETINFO.name() + " " + last, false);
     receive(o);
   }
 
   /**
    * Sends the specified command and argument over the network.
    * @param command command to be sent
+   * @param get boolean
    * @throws IOException I/O Exception
    */
-  synchronized void send(final String command) throws IOException {
-    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-    out.writeUTF(command);
-    out.flush();
+  private void send(final String command, final boolean get)
+  throws IOException {
+    socket = new Socket(host, port);
+    if (first && get) {
+      new DataOutputStream(socket.getOutputStream()).writeUTF(command + "$");
+    } else {
+      new DataOutputStream(socket.getOutputStream()).writeUTF(command);
+    }
   }
 
   /**
@@ -72,7 +100,7 @@ public final class ClientProcessNew extends AbstractProcess {
    * @param o output stream
    * @throws IOException I/O Exception
    */
-  synchronized void receive(final PrintOutput o) throws IOException {
+  private void receive(final PrintOutput o) throws IOException {
     final InputStream in = socket.getInputStream();
     final byte[] bb = new byte[4096];
     int l = 0;
