@@ -76,6 +76,11 @@ public final class ClientProcessNew extends AbstractProcess {
     final InputStream in = socket.getInputStream();
     final byte[] bb = new byte[4096];
     int l = 0;
-    while((l = in.read(bb)) != -1) for(int i = 0; i < l; i++) o.write(bb[i]);
+    while((l = in.read(bb)) != -1) {
+      for(int i = 0; i < l; i++) {
+        o.write(bb[i]);
+      }
+      o.flush();
+    }
   }
 }

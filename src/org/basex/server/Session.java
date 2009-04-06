@@ -89,29 +89,31 @@ public class Session extends Thread {
     //final Performance perf = new Performance();
     // get command and arguments
     DataInputStream dis = new DataInputStream(socket.getInputStream());
+    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+    PrintOutput out = new PrintOutput(new BufferedOutput(
+        socket.getOutputStream()));
     final int sp = socket.getPort();
-    System.out.println(socket);
     String in;
-    while ((in = dis.readUTF()) != null) { 
-      String into = in.trim();
-      if(into.equals("exit")) {
-        System.out.println("Client " + clientId + " has logged out.");
+    //while ((in = dis.readUTF()) != null) { 
+    while ((in = getMessage(dis).trim()) != null) {
+      //in = getMessage(dis).trim();
+      if(in.equals("exit")) {
+        BaseX.outln("Client " + clientId + " has logged out.");
         break;
       }
       Process pr = null;
       try {
-        pr = new CommandParser(into).parse()[0];
+        pr = new CommandParser(in).parse()[0];
       } catch(final QueryException ex) {
         pr = new Process(0) { };
         pr.error(ex.extended());
         core = pr;
-        send(-sp);
+        send(-sp, dos);
+        return;
       }
       Process proc = pr;
       if(proc instanceof GetResult || proc instanceof GetInfo) {
         Process c = core;
-        PrintOutput out = new PrintOutput(new BufferedOutput(
-            socket.getOutputStream()));
         if(c == null) {
           out.print(BaseX.info(SERVERTIME, Prop.timeout));
         } else if(proc instanceof GetResult) {
@@ -124,23 +126,34 @@ public class Session extends Thread {
         out.flush();
       } else {
         core = proc;
-        send(proc.execute(context) ? sp : -sp);
+        send(proc.execute(context) ? sp : -sp, dos);
       }
     }
-    System.out.println("CLOSED");
+    dis.close();
     socket.close();
+  }
+  
+  /**
+   * Returns the Message from the Client.
+   * @param dis DataInputStream
+   * @return String
+   * @throws IOException I/O Exception
+   */
+  synchronized String getMessage(final DataInputStream dis) throws IOException {
+    return dis.readUTF();
   }
   
   /**
    * Returns an answer to the client.
    * @param id session id to be returned
+   * @param dos DataOutputStream
    * @throws IOException I/O exception
    */
-  synchronized void send(final int id) throws IOException {
-    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+  synchronized void send(final int id, final DataOutputStream dos)
+  throws IOException {
     dos.writeInt(id);
     dos.flush();
-  }
+    }
   
   @Override
   public void run() {

@@ -27,8 +27,8 @@ public class BaseXServerNew {
   boolean running = true;
   /** Verbose mode. */
   boolean verbose;
-  /** Counter for clientid. */
-  int counter = 0;
+  /** Last Id from a client. */
+  int lastid = 0;
 
   /**
    * Main method, launching the server process.
@@ -65,10 +65,10 @@ public class BaseXServerNew {
       ServerSocket serverSocket = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) {
-        counter++;
+        lastid++;
         Socket s = serverSocket.accept();
-        System.out.println("Login from Client " + counter);
-        new Session(s, counter).start();
+        BaseX.outln("Login from Client " + lastid);
+        new Session(s, lastid).start();
       }
       // close the serverSocket when Server is stopped.
       serverSocket.close();
