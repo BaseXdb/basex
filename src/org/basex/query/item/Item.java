@@ -85,6 +85,11 @@ public abstract class Item extends Expr {
     return true;
   }
 
+  @Override
+  public long size(final QueryContext ctx) {
+    return 1;
+  }
+
   /**
    * Checks if this is a numeric item.
    * @return result of check

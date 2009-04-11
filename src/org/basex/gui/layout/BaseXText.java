@@ -124,7 +124,7 @@ public final class BaseXText extends BaseXPanel {
 
     final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :
         new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
-        new CopyCmd(), new PasteCmd(), new DelCmd(), null };
+        new CopyCmd(), new PasteCmd(), new DelCmd() };
     popup = new BaseXPopup(this, pop);    
   }
 
@@ -144,7 +144,7 @@ public final class BaseXText extends BaseXPanel {
   public void setText(final byte[] t, final int s) {
     // remove 0x0Ds (carriage return) and compare old with new string
     int ns = 0;
-    final int ts = text.size;
+    final int ts = text.size();
     final byte[] tt = text.text;
     boolean eq = true;
     for(int r = 0; r < s; r++) {
@@ -177,18 +177,9 @@ public final class BaseXText extends BaseXPanel {
    * @param p cursor position
    */
   public void setCaret(final int p) {
-    setCaret(p, 1);
-  }
-
-  /**
-   * Sets a new cursor position.
-   * @param p cursor position
-   * @param a vertical alignment
-   */
-  public void setCaret(final int p, final int a) {
     text.pos(p);
     text.setCaret();
-    showCursor(a);
+    showCursor(1);
   }
 
   /**
@@ -230,7 +221,7 @@ public final class BaseXText extends BaseXPanel {
   public void selectAll() {
     text.pos(0);
     text.startMark();
-    text.pos(text.size);
+    text.pos(text.size());
     text.endMark();
     rend.repaint();
   }
@@ -278,7 +269,7 @@ public final class BaseXText extends BaseXPanel {
     }
     if(text.pos() != 0) text.next(true);
     text.startMark();
-    while(text.pos() < text.size) {
+    while(text.pos() < text.size()) {
       final int c = text.curr();
       if(c == '\n' || ch != Character.isLetterOrDigit(c)) break;
       text.next(true);
@@ -300,7 +291,6 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void mouseReleased(final MouseEvent e) {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
-    copy();
   }
 
   @Override
@@ -344,6 +334,7 @@ public final class BaseXText extends BaseXPanel {
     if(ctrl && !shf) {
       if(c == 'A') {
         selectAll();
+        text.setCaret();
         return;
       }
       if(c == 'C') {
@@ -372,7 +363,7 @@ public final class BaseXText extends BaseXPanel {
     if(c == KeyEvent.VK_RIGHT) {
       if(ctrl) {
         final boolean ch = Character.isLetterOrDigit(text.next(shf));
-        while(text.pos() < text.size && ch ==
+        while(text.pos() < text.size() && ch ==
           Character.isLetterOrDigit(text.curr())) text.next(shf);
       } else {
         text.next(shf);
@@ -408,7 +399,7 @@ public final class BaseXText extends BaseXPanel {
         else text.home(shf);
         down = false;
       } else if(c == KeyEvent.VK_END) {
-        if(ctrl) text.pos(text.size);
+        if(ctrl) text.pos(text.size());
         else text.end(Integer.MAX_VALUE, shf);
       } else if(c == KeyEvent.VK_PAGE_DOWN) {
         down(h / fh, shf);
@@ -455,7 +446,7 @@ public final class BaseXText extends BaseXPanel {
       text.next(shf);
     }
     text.end(col, shf);
-    if(text.pos() == text.size) col = -1;
+    if(text.pos() == text.size()) col = -1;
   }
 
   /**
@@ -483,17 +474,16 @@ public final class BaseXText extends BaseXPanel {
     super.keyTyped(e);
     if(!editable) return;
 
-    final char ch = e.getKeyChar();
-    final byte[] txt = text.text;
-    boolean down = true;
-
     final boolean ctrl = (Toolkit.getDefaultToolkit().
         getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
     // not nice here.. no alternative, though
+    final char ch = e.getKeyChar();
     if(!Prop.MAC && e.isAltDown() || e.isActionKey() ||
       ch == KeyEvent.VK_ESCAPE) return;
 
+    boolean down = true;
+    final byte[] txt = text.text;
     text.pos(text.cursor());
 
     if(ch == KeyEvent.VK_BACK_SPACE) {
@@ -510,14 +500,11 @@ public final class BaseXText extends BaseXPanel {
       }
       down = false;
     } else if(ch == KeyEvent.VK_DELETE) {
-      if(text.pos() != text.size) {
-        final boolean ld = Character.isLetterOrDigit(text.curr());
-        text.delete();
-        if(ctrl) {
-          while(text.pos() < text.size &&
-              ld == Character.isLetterOrDigit(text.curr())) text.delete();
-        }
-      }
+      if(text.start() == -1 && text.pos() == text.size()) return;
+      final boolean ld = Character.isLetterOrDigit(text.curr());
+      text.delete();
+      while(ctrl && text.pos() < text.size() &&
+          ld == Character.isLetterOrDigit(text.curr())) text.delete();
     } else {
       if(ctrl) return;
       if(text.start() != -1) text.delete();
@@ -562,10 +549,7 @@ public final class BaseXText extends BaseXPanel {
    */
   protected void cut() {
     text.pos(text.cursor());
-    if(copy()) {
-      text.delete();
-      if(undo != null) undo.store(text.finish(), text.cursor());
-    }
+    if(copy()) delete();
   }
 
   /**
@@ -596,6 +580,17 @@ public final class BaseXText extends BaseXPanel {
     if(text.start() != -1) text.delete();
     text.add(txt.toCharArray());
     if(undo != null) undo.store(text.finish(), text.cursor());
+    text.setCaret();
+  }
+
+  /**
+   * Deletes the selected text.
+   */
+  protected void delete() {
+    text.pos(text.cursor());
+    text.delete();
+    if(undo != null) undo.store(text.finish(), text.cursor());
+    text.setCaret();
   }
 
   /**
@@ -704,6 +699,8 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       cut();
+      rend.calc();
+      showCursor(2);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -736,6 +733,8 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       paste();
+      rend.calc();
+      showCursor(2);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -751,7 +750,9 @@ public final class BaseXText extends BaseXPanel {
   class DelCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      text.delete();
+      delete();
+      rend.calc();
+      showCursor(2);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {

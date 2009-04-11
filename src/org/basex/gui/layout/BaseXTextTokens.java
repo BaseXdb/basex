@@ -15,9 +15,9 @@ final class BaseXTextTokens {
   static final int TAB = 2;
   /** Text array to be written. */
   byte[] text = Token.EMPTY;
-  /** Text length. */
-  int size;
 
+  /** Text length. */
+  private int size;
   /** Current start position. */
   private int ps;
   /** Current end position. */
@@ -300,7 +300,7 @@ final class BaseXTextTokens {
     final TokenBuilder tb = new TokenBuilder();
     for(int s = ms < me ? ms : me, e = ms < me ? me : ms; s < e; s++) {
       final byte t = text[s];
-      if(t < 0 || t == 0x0A || t == 0x09 || t >= ' ') tb.add(t);
+      if(t < 0 || t >= ' ' || t == 0x0A || t == 0x09) tb.add(t);
     }
     return tb.toString();
   }
@@ -326,7 +326,7 @@ final class BaseXTextTokens {
   // CURSOR ===================================================================
 
   /**
-   * Returns if the cursor moves over the current token.
+   * Checks if the cursor moves over the current token.
    * @return result of check
    */
   boolean edited() {
@@ -334,7 +334,7 @@ final class BaseXTextTokens {
   }
 
   /**
-   * Sets the caret position.
+   * Sets the caret position to the current counter.
    */
   void setCaret() {
     pc = ps;
@@ -346,5 +346,13 @@ final class BaseXTextTokens {
    */
   int cursor() {
     return pc;
+  }
+
+  /**
+   * Returns the text size.
+   * @return text size
+   */
+  int size() {
+    return size;
   }
 }

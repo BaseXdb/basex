@@ -112,7 +112,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           GUIProp.xqpath, gui);
-      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
+      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
       if(file != null) {
@@ -123,6 +123,7 @@ public enum GUICommands implements GUICommand {
           Dialog.error(gui, XQOPERROR);
         }
         GUIProp.xqpath = file.getDir();
+        if(!GUIProp.showquery) SHOWSEARCH.execute(gui);
       }
     }
   },
@@ -131,6 +132,8 @@ public enum GUICommands implements GUICommand {
   XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
     public void execute(final GUI gui) {
+      if(!GUIProp.showquery) SHOWSEARCH.execute(gui);
+
       // open file chooser for XML creation
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,

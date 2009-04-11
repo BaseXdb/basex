@@ -4,7 +4,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 
 /**
- * XPathMark Simple Tests.
+ * Fulltext Test Queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

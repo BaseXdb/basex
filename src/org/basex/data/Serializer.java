@@ -141,6 +141,7 @@ public abstract class Serializer {
    */
   public final void openElement(final byte[] t, final byte[]... a)
       throws IOException {
+  
     finishElement();
     tags.add(t);
     inTag = true;
@@ -237,6 +238,7 @@ public abstract class Serializer {
    */
   public final int node(final Data data, final int pre,
       final FTPosData ft) throws IOException {
+
     /** Namespaces. */
     final Atts nsp = new Atts();
     /** Parent Stack. */

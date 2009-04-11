@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import static org.basex.Text.*;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -47,11 +46,6 @@ public final class CachedOutput extends PrintOutput {
    * @return byte array
    */
   public byte[] finish() {
-    if(max == 0) return Token.EMPTY;
-    if(finished()) {
-      final byte[] chop = Token.token(RESULTCHOP);
-      Array.copy(chop, buf, max - chop.length);
-    }
     return Array.finish(buf, size);
   }
 
@@ -71,15 +65,5 @@ public final class CachedOutput extends PrintOutput {
   @Override
   public String toString() {
     return Token.string(finish());
-  }
-  
-  /**
-   * Adds a textual chopping info to the cached output.
-   */
-  public void addInfo() {
-    if(finished() && max > 256) {
-      final byte[] chop = Token.token(RESULTCHOP);
-      Array.copy(chop, buf, max - chop.length);
-    }
   }
 }

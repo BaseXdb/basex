@@ -50,7 +50,8 @@ public final class XMLSerializer extends Serializer {
     pretty = p;
     if(xml) {
       // [CG] XML/Serialize: allow different encodings (incl. original one)
-      out.println("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
+      out.print("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
+      out.print('\n');
       openElement(RESULTS);
     }
   }
@@ -242,7 +243,7 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void indent(final boolean close) throws IOException {
-    out.println();
+    out.print('\n');
     final int s = tags.size + (close ? 1 : 0);
     for(int l = 1; l < s; l++) out.print(INDENT);
   }

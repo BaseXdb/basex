@@ -195,8 +195,12 @@ public class InputParser {
       }
       tb.ent = true;
     } else {
-      final char c = consume();
-      if(c != 0x0d) tb.add(c);
+      char c = consume();
+      if(c == 0x0d) {
+        c = 0x0a;
+        if(curr() == c) consume();
+      }
+      tb.add(c);
     }
     return null;
   }

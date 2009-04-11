@@ -483,7 +483,7 @@ public final class FTPos extends FTExpr {
     if(dunit != null) {
       sb.append(" distance(");
       sb.append(dist[0]);
-      sb.append(",");
+      sb.append("-");
       sb.append(dist[1]);
       sb.append(")");
     }

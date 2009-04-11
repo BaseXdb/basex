@@ -144,6 +144,8 @@ public interface QueryText {
   Object[] NOSTOPFILE = { FTST, 8, "Stop word file not found: \"%\"." };
   /** FTST0009: Parsing exception. */
   Object[] FTLAN = { FTST, 9, "Language '%' not supported." };
+  /** FTST0019: Parsing exception. */
+  Object[] FTDUP = { FTST, 19, "Match option '%' was defined twice." };
 
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };
@@ -274,10 +276,6 @@ public interface QueryText {
   /** XPQST0003: Evaluation exception. */
   Object[] QNAMEINV = { XPST, 3, "Invalid QName." };
 
-  /** XPST0003: Parsing exception. */
-  Object[] FTCASE = { XPST, 3, "Only one case option allowed." };
-  /** XPST0003: Parsing exception. */
-  Object[] FTDIA = { XPST, 3, "Only one diacritics option allowed." };
   /** XPST0003: Parsing exception. */
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
   /** XPST0003: Parsing exception. */

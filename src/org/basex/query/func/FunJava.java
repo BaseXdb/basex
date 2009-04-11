@@ -45,14 +45,14 @@ public final class FunJava extends Arr {
     String.class, boolean.class, Boolean.class, byte.class, Byte.class,
     short.class, Short.class, int.class, Integer.class, long.class, Long.class,
     float.class, Float.class, double.class, Double.class, BigDecimal.class,
-    BigInteger.class, QName.class
+    BigInteger.class, QName.class, CharSequence.class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
     Type.STR, Type.BLN, Type.BLN, Type.BYT, Type.BYT,
     Type.SHR, Type.SHR, Type.INT, Type.INT, Type.LNG, Type.LNG,
     Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC,
-    Type.ITR, Type.QNM
+    Type.ITR, Type.QNM, Type.STR
   };
   /** Java class. */
   private final Class<?> cls;

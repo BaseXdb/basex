@@ -135,7 +135,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     BaseXLayout.antiAlias(g);
     init(g, pos);
     while(more(g)) write(g);
-    if(cursor && text.cursor() == text.size) cursor(g, x);
+    if(cursor && text.cursor() == text.size()) cursor(g, x);
   }
 
   /**
@@ -192,7 +192,6 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void write(final Graphics g) {
     final int ch = word.charAt(0);
-    
     
     if(high) {
       high = false;

@@ -661,7 +661,7 @@ public interface Text {
   /** Database Info. */
   String INFOGENERAL = lang("info_general");
   /** Database Info. */
-  String RESULTCHOP = lang("info_resultchop");
+  String RESULTCHOP = " (" + lang("info_resultchop") + ")";
   /** Option flag. */
   String INFOON = lang("info_on");
   /** Option flag. */

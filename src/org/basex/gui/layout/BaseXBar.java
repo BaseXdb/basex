@@ -95,8 +95,10 @@ public final class BaseXBar extends BaseXPanel {
    */
   public void pos(final int p) {
     final int pp = Math.max(0, Math.min(height - getHeight(), p));
-    if(pos != pp) repaint();
-    pos = pp;
+    if(pos != pp) {
+      pos = pp;
+      repaint();
+    }
   }
 
   /**
@@ -112,8 +114,10 @@ public final class BaseXBar extends BaseXPanel {
    * @param h panel height
    */
   public void height(final int h) {
-    if(height != h) repaint();
-    height = h;
+    if(height != h) {
+      height = h;
+      repaint();
+    }
   }
 
   @Override
@@ -129,8 +133,8 @@ public final class BaseXBar extends BaseXPanel {
     // define minimum size for scrollbar mover
     barOffset = size < MINSIZE ? MINSIZE - size : 0;
     size += barOffset;
-    barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
     barSize = Math.min(size, barH - 1);
+    barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
 
     // paint scrollbar background
     g.setColor(GUIConstants.COLORCELL);

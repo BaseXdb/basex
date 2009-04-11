@@ -38,12 +38,12 @@ import org.basex.query.func.FNSeq;
 import org.basex.query.func.Fun;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
@@ -82,10 +82,10 @@ public abstract class W3CTS {
   private String sources;
   /** Inspect flag. */
   private static final byte[] INSPECT = token("Inspect");
-  /** XML flag. */
-  private static final byte[] XML = token("Fragment");
   /** Fragment flag. */
-  private static final byte[] FRAGMENT = token("XML");
+  private static final byte[] FRAGMENT = token("Fragment");
+  /** XML flag. */
+  private static final byte[] XML = token("XML");
 
   /** Maximum length of result output. */
   private static int maxout = 500;
@@ -195,7 +195,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     final Context context = new Context();
     Prop.onthefly = true;
-    //Prop.chop = true;
+    Prop.xqformat = false;
 
     new CreateDB(path + input).execute(context, null);
     data = context.data();
@@ -226,7 +226,7 @@ public abstract class W3CTS {
       final TokenList dl = new TokenList();
       final Nodes doc = nodes("*:input-document", nodes);
       for(int d = 0; d < doc.size(); d++) {
-        dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
+        dl.add(token(sources + string(data.atom(doc.nodes[d])) + ".xml"));
       }
       colls.put(cname, dl.finish());
     }
@@ -294,10 +294,10 @@ public abstract class W3CTS {
 
     if(reporting) {
       bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(report + NAME + IO.XMLSUFFIX), UTF8));
-      write(bw, report + NAME + "Pre" + IO.XMLSUFFIX);
+          new FileOutputStream(report + NAME + ".xml"), UTF8));
+      write(bw, report + NAME + "Pre.xml");
       bw.write(logFile.toString());
-      write(bw, report + NAME + "Pos" + IO.XMLSUFFIX);
+      write(bw, report + NAME + "Pos.xml");
       bw.close();
     }
 
@@ -338,7 +338,8 @@ public abstract class W3CTS {
 
     final String in = read(file);
     String error = null;
-    Item item = null;
+    SeqIter iter = null;
+    boolean doc = true;
 
     final TokenBuilder files = new TokenBuilder();
     final CachedOutput out = new CachedOutput();
@@ -347,7 +348,7 @@ public abstract class W3CTS {
       
       Nodes cont = nodes("*:contextItem", root);
       if(cont.size() != 0) new Check(sources + string(
-          data.atom(cont.nodes[0])) + IO.XMLSUFFIX).execute(context, out);
+          data.atom(cont.nodes[0])) + ".xml").execute(context, out);
 
       final QueryProcessor xq = new QueryProcessor(in, context.current());
       final QueryContext ctx = xq.ctx;
@@ -363,7 +364,7 @@ public abstract class W3CTS {
           nodes("*:input-query/@variable", root), pth, ctx);
 
       String fn = stop2.get(text("*:aux-URI[@role = 'stopwords']", root));
-      if(fn != null) ctx.ftopt.stopwords(IO.get(fn), false, false);
+      if(fn != null) ctx.ftopt.stopwords(IO.get(fn), false);
       
       fn = stem.get(text("*:aux-URI[@role = 'stemming-dictionary']", root));
       if(fn != null) ctx.ftopt.stemming(IO.get(fn));
@@ -378,8 +379,12 @@ public abstract class W3CTS {
       }
 
       // evaluate and serialize query
-      item = xq.eval();
-      item.serialize(new XMLSerializer(out));
+      final XMLSerializer xml = new XMLSerializer(out, false, Prop.xqformat);
+      iter = SeqIter.get(xq.iter());
+      for(final Item it : iter) {
+        doc &= it.type == Type.DOC;
+        it.serialize(xml);
+      }
       xq.close();
       
     } catch(final QueryException ex) {
@@ -406,6 +411,8 @@ public abstract class W3CTS {
     final Nodes outFiles = nodes("*:output-file/text()", root);
     final Nodes cmpFiles = nodes("*:output-file/@compare", root);
     boolean xml = false;
+    boolean frag = false;
+    
     StringList result = new StringList();
     for(int o = 0; o < outFiles.size(); o++) {
       final String resFile = string(data.atom(outFiles.nodes[o]));
@@ -413,7 +420,8 @@ public abstract class W3CTS {
       if(!exp.exists()) throw new FileNotFoundException(exp.toString());
       result.add(read(exp));
       final byte[] type = data.atom(cmpFiles.nodes[o]);
-      xml |= eq(type, XML) || eq(type, FRAGMENT);
+      xml |= eq(type, XML);
+      frag |= eq(type, FRAGMENT);
     }
     String expError = text("*:expected-error/text()", root);
 
@@ -468,22 +476,34 @@ public abstract class W3CTS {
         inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
             INSPECT);
         
-        xml &= item instanceof Nod;
-        if(xml) {
+        if(result.list[s].equals(out.toString())) break;
+
+        if(xml || frag) {
           try {
-            final boolean doc = item.type == Type.DOC;
-            String rin = result.list[s].trim();
-            if(!doc) rin = "<root>" + rin + "</root>";
+            iter.reset();
+
+            String rin = result.list[s];
+            if(!doc) rin = "<X>" + rin + "</X>";
             final Data rdata = CreateDB.xml(IO.get(rin), null);
-            final Item ritem = new DBNode(rdata, doc ? 0 : 2);
-            final boolean test = FNSeq.deep(item.iter(), ritem.iter());
+            
+            final SeqIter si = new SeqIter();
+            int pre = doc ? 0 : 2;
+            int size = rdata.meta.size;
+            while(pre < size) {
+              final int k = rdata.kind(pre);
+              if(k != Data.TEXT || !ws(rdata.atom(pre))) {
+                si.add(new DBNode(rdata, pre));
+              }
+              pre += rdata.size(pre, k);
+            }
+            final boolean test = FNSeq.deep(iter, si);
             rdata.close();
             if(test) break;
           } catch(final IOException ex) {
-            xml = false;
+            //ex.printStackTrace();
+            System.out.println("=> " + inname);
           }
         }
-        if(!xml && result.list[s].equals(out.toString())) break;
       }
 
       if(s == result.size && !inspect) {
@@ -497,8 +517,7 @@ public abstract class W3CTS {
           logErr.append(norm(out.toString()));
           logErr.append(Prop.NL);
           logErr.append(Prop.NL);
-          final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), out.toString());
+          addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) logFile.append("fail");
         err++;
@@ -509,8 +528,7 @@ public abstract class W3CTS {
           logOK.append(norm(out.toString()));
           logOK.append(Prop.NL);
           logOK.append(Prop.NL);
-          final boolean nodes = item instanceof Nod && item.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), out.toString());
+          addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) {
           logFile.append("pass");
@@ -553,7 +571,6 @@ public abstract class W3CTS {
       logFile.append("'/>");
       logFile.append(Prop.NL);
     }
-
     return single == null || !outname.equals(single);
   }
 
@@ -748,6 +765,6 @@ public abstract class W3CTS {
    * @throws IOException I/O exception
    */
   String read(final IO f) throws IOException {
-    return string(f.content()).replaceAll("\r\n", "\n");
+    return string(f.content()).replaceAll("\r\n?", "\n");
   }
 }

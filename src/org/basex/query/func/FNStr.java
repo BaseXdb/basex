@@ -72,12 +72,7 @@ final class FNStr extends Fun {
       case ESCURI:
         return Str.get(esc(checkStr(e, ctx)));
       case CONCAT:
-        final TokenBuilder tb = new TokenBuilder();
-        for(final Expr a : expr) {
-          final Item it = a.atomic(ctx);
-          if(it != null) tb.add(it.str());
-        }
-        return Str.get(tb.finish());
+        return concat(ctx);
       case CONTAINS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         Item it = expr[1].atomic(ctx);
@@ -120,6 +115,9 @@ final class FNStr extends Fun {
         // input string is empty; return false
         if(expr[0].e() && i != null && i.length != 0) return Bln.FALSE;
         return this;
+      case CONCAT:
+        for(final Expr a : expr) if(!a.i()) return this;
+        return concat(ctx);
       default:
         return this;
     }
@@ -303,6 +301,23 @@ final class FNStr extends Fun {
     }
     // [CG] XQuery/normalize-unicode
     return Str.get(str);
+  }
+
+  /**
+   * Concatenates strings.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Item concat(final QueryContext ctx)
+      throws QueryException {
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Expr a : expr) {
+      final Item it = a.atomic(ctx);
+      if(it != null) tb.add(it.str());
+    }
+    return Str.get(tb.finish());
   }
 
   /** Reserved characters. */

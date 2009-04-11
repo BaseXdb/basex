@@ -90,6 +90,15 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
+   * Returns if the specified flag has been set.
+   * @param f flag index
+   * @return true if flag has been set
+   */
+  public boolean isSet(final int f) {
+    return set[f];
+  }
+
+  /**
    * Returns the specified flag.
    * @param f flag index
    * @return flag
@@ -167,16 +176,15 @@ public final class FTOpt extends ExprInfo {
   /**
    * Processes stopwords from the specified file.
    * @param fl file
-   * @param u union flag
    * @param e except flag
    * @return success flag
    */
-  public boolean stopwords(final IO fl, final boolean u, final boolean e) {
+  public boolean stopwords(final IO fl, final boolean e) {
     if(sw == null) sw = new Set();
     try {
       for(final byte[] sl : split(norm(fl.content()), ' ')) {
         if(e) sw.delete(sl);
-        else if(!u || sw.id(sl) == 0) sw.add(sl);
+        else if(sw.id(sl) == 0) sw.add(sl);
       }
       return true;
     } catch(final IOException ex) {

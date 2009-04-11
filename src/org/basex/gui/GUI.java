@@ -489,10 +489,11 @@ public final class GUI extends JFrame {
         if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
         
         // retrieve text result
-        final CachedOutput out = new CachedOutput(TextView.MAX);
-        pr.output(out);
-        out.addInfo();
-        text.setText(out);
+        if(GUIProp.showtext) {
+          final CachedOutput out = new CachedOutput(TextView.MAX);
+          pr.output(out);
+          text.setText(out);
+        }
       }
 
       // check if query feedback was processed in the query view

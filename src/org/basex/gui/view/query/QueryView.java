@@ -83,9 +83,7 @@ public final class QueryView extends View {
     box.add(open);
     box.add(Box.createHorizontalStrut(1));
     box.add(save);
-
     back.add(box, BorderLayout.CENTER);
-    refreshLayout();
   }
 
   @Override
@@ -113,7 +111,6 @@ public final class QueryView extends View {
 
   @Override
   public void refreshLayout() {
-    BaseXLayout.select(input[mode], true);
     header.setFont(GUIConstants.lfont);
     for(final QueryPanel p : panels) p.refreshLayout();
   }
@@ -128,7 +125,6 @@ public final class QueryView extends View {
     add(back, BorderLayout.NORTH);
     search = panels[mode];
     search.init();
-    search.refresh();
     open.setEnabled(mode == 0);
     save.setEnabled(mode == 0);
     if(GUIProp.execrt) search.query(force);

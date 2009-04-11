@@ -1,7 +1,6 @@
 package org.basex.gui.view.text;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,6 +19,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -30,7 +30,7 @@ import org.basex.util.Token;
  */
 public final class TextView extends View {
   /** Maximum text size to be displayed. */
-  public static final int MAX = 1 << 20;
+  public static final int MAX = 1 << 21;
   /** Text Area. */
   private final BaseXText area;
   /** Header string. */
@@ -78,7 +78,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshMark() {
-    // skip refresh if text display has already been refreshed
+    // skip refresh if text has already been updated
     if(refreshed) refreshed = false;
     else refreshText(gui.context.marked());
   }
@@ -103,7 +103,6 @@ public final class TextView extends View {
     try {
       final CachedOutput out = new CachedOutput(MAX);
       nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
-      out.addInfo();
       setText(out);
       refreshed = false;
     } catch(final Exception ex) {
@@ -128,7 +127,16 @@ public final class TextView extends View {
    */
   public void setText(final CachedOutput out) {
     area.setSyntax(new XMLSyntax());
-    area.setText(out.buffer(), out.size());
+    
+    final byte[] buf = out.buffer();
+    String head = TEXTTIT;
+    if(out.finished()) {
+      final byte[] chop = Token.token(DOTS);
+      Array.copy(chop, buf, out.size() - chop.length);
+      head += RESULTCHOP;
+    }
+    area.setText(buf, out.size());
+    if(!header.getText().equals(head)) header.setText(head);
     refreshed = true;
   }
 

@@ -2302,22 +2302,22 @@ public class QueryParser extends InputParser {
     // [CG] XQuery/FTMatchOptions: thesaurus
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
-        error(FTCASE);
+      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+        error(FTDUP, CASE);
       opt.set(FTOpt.CS, true);
       opt.set(FTOpt.LC, true);
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
-        error(FTCASE);
+      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+        error(FTDUP, CASE);
       opt.set(FTOpt.CS, true);
       opt.set(FTOpt.UC, true);
     } else if(consumeWS(CASE)) {
-      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
-        error(FTCASE);
+      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+        error(FTDUP, CASE);
       opt.set(FTOpt.CS, consumeWS(SENSITIVE));
       if(!opt.is(FTOpt.CS)) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.is(FTOpt.DC)) error(FTDIA);
+      if(opt.isSet(FTOpt.DC)) error(FTDUP, DIACRITICS);
       opt.set(FTOpt.DC, consumeWS(SENSITIVE));
       if(!opt.is(FTOpt.DC)) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
@@ -2331,6 +2331,7 @@ public class QueryParser extends InputParser {
       if(!with && !consumeWS(WITHOUT)) return false;
 
       if(consumeWS2(STEMMING)) {
+        if(opt.isSet(FTOpt.ST)) error(FTDUP, STEMMING);
         opt.set(FTOpt.ST, with);
       } else if(consumeWS2(THESAURUS)) {
         opt.set(FTOpt.TS, with);
@@ -2365,8 +2366,7 @@ public class QueryParser extends InputParser {
 
             IO fl = IO.get(fn);
             if(!fl.exists() && file != null) fl = file.merge(fl);
-            if(!ctx.ftopt.stopwords(fl, union, except)) error(NOSTOPFILE, fl);
-
+            if(!opt.stopwords(fl, except)) error(NOSTOPFILE, fl);
           } else if(!union && !except) {
             error(FTSTOP);
           }
