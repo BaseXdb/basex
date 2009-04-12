@@ -177,7 +177,14 @@ public class BaseXClientNew {
   private boolean process(final String in) {
     try {
       for(final Process p : new CommandParser(in).parse()) {
-        if(p instanceof Exit) return false;
+        if(p instanceof Exit) {
+          AbstractProcess proc = getProcess(p);
+          try {
+            return proc.execute(context);
+          } catch(IOException e) {
+            e.printStackTrace();
+          }
+        }
         final boolean qu = p instanceof XQuery;
         if(!process(p, info || qu && Prop.xmlplan)) break;
       }

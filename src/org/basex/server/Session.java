@@ -2,12 +2,9 @@ package org.basex.server;
 
 import static org.basex.Text.*;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import org.basex.BaseX;
@@ -15,6 +12,7 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Exit;
 import org.basex.core.proc.GetInfo;
 import org.basex.core.proc.GetResult;
 import org.basex.io.BufferedOutput;
@@ -39,8 +37,6 @@ public class Session extends Thread {
   boolean verbose = false;
   /** Core. */
   Process core;
-  /** Flag which handle to use. */
-  boolean handle = true;
   /** Flag for Session. */
   boolean running = true;
   
@@ -61,31 +57,6 @@ public class Session extends Thread {
    * @throws IOException I/O Exception
    */
   private void handle() throws IOException {
-    PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-    BufferedReader is = new BufferedReader(new InputStreamReader(
-        socket.getInputStream()));
-
-    String in, out;
-    out = "You are logged in to the BaseXServer";
-    pw.println(out);
-
-    while ((in = is.readLine()) != null) {
-      if(in.equals("exit")) {
-        System.out.println("Client " + clientId + " has logged out.");
-        break;
-      }
-      pw.println("Echo from Server: " + in);
-    }
-    is.close();
-    pw.close();
-    socket.close();
-  }
-  
-  /**
-   * Handles Client Server Communication.
-   * @throws IOException I/O Exception
-   */
-  private void handle2() throws IOException {
     //final Performance perf = new Performance();
     // get command and arguments
     DataInputStream dis = new DataInputStream(socket.getInputStream());
@@ -94,13 +65,8 @@ public class Session extends Thread {
         socket.getOutputStream()));
     final int sp = socket.getPort();
     String in;
-    //while ((in = dis.readUTF()) != null) { 
-    while ((in = getMessage(dis).trim()) != null) {
-      //in = getMessage(dis).trim();
-      if(in.equals("exit")) {
-        BaseX.outln("Client " + clientId + " has logged out.");
-        break;
-      }
+    while (running) {
+      in = getMessage(dis).trim(); 
       Process pr = null;
       try {
         pr = new CommandParser(in).parse()[0];
@@ -110,6 +76,13 @@ public class Session extends Thread {
         core = pr;
         send(-sp, dos);
         return;
+      }
+      if(pr instanceof Exit) {
+        send(0, dos);
+        BaseX.outln("Client " + clientId + " has logged out.");
+        // interrupt running processes
+        running = false;
+        break;
       }
       Process proc = pr;
       if(proc instanceof GetResult || proc instanceof GetInfo) {
@@ -122,6 +95,7 @@ public class Session extends Thread {
         } else if(proc instanceof GetInfo) {
           // the client requests information about the last process
           c.info(out);
+          out.write(0);
         }
         out.flush();
       } else {
@@ -129,8 +103,11 @@ public class Session extends Thread {
         send(proc.execute(context) ? sp : -sp, dos);
       }
     }
-    dis.close();
-    socket.close();
+    //out.close();
+    //dos.close();
+    //dis.close();
+    //socket.close();
+    this.interrupt();
   }
   
   /**
@@ -158,10 +135,9 @@ public class Session extends Thread {
   @Override
   public void run() {
     try {
-      if(handle) handle2();
-      handle();
-    } catch(IOException e) {
-      e.printStackTrace();
+      handle(); 
+    } catch(IOException io) {
+      io.printStackTrace();
     }
   }
 }
