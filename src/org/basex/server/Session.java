@@ -5,6 +5,7 @@ import static org.basex.Text.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import org.basex.BaseX;
@@ -18,6 +19,7 @@ import org.basex.core.proc.GetResult;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
+import org.basex.util.Performance;
 
 /**
  * Session for a Client Server Connection.
@@ -34,22 +36,26 @@ public class Session extends Thread {
   /** ClientId. */
   private int clientId;
   /** Verbose mode. */
-  boolean verbose = false;
+  boolean verbose;
   /** Core. */
   Process core;
   /** Flag for Session. */
   boolean running = true;
+  /** Thread. */
+  Thread thread;
   
   
   /**
    * Session.
    * @param s Socket
    * @param c ClientId
+   * @param v Verbose Mode
    */
-  public Session(final Socket s, final int c) {
-    super("Session");
+  public Session(final Socket s, final int c, final boolean v) {
+    this.thread = new Thread("Session");
     this.clientId = c;
     this.socket = s;
+    this.verbose = v;
   }
   
   /**
@@ -57,16 +63,20 @@ public class Session extends Thread {
    * @throws IOException I/O Exception
    */
   private void handle() throws IOException {
-    //final Performance perf = new Performance();
+    final Performance perf = new Performance();
+    final InetAddress addr = socket.getInetAddress();
+    final String ha = addr.getHostAddress();
+    final int sp = socket.getPort();
     // get command and arguments
     DataInputStream dis = new DataInputStream(socket.getInputStream());
     DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
     PrintOutput out = new PrintOutput(new BufferedOutput(
         socket.getOutputStream()));
-    final int sp = socket.getPort();
+    final int port = socket.getPort();
     String in;
     while (running) {
       in = getMessage(dis).trim(); 
+      if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
         pr = new CommandParser(in).parse()[0];
@@ -79,7 +89,6 @@ public class Session extends Thread {
       }
       if(pr instanceof Exit) {
         send(0, dos);
-        BaseX.outln("Client " + clientId + " has logged out.");
         // interrupt running processes
         running = false;
         break;
@@ -102,12 +111,9 @@ public class Session extends Thread {
         core = proc;
         send(proc.execute(context) ? sp : -sp, dos);
       }
+      if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
-    //out.close();
-    //dos.close();
-    //dis.close();
-    //socket.close();
-    this.interrupt();
+    stopper();
   }
   
   /**
@@ -131,6 +137,19 @@ public class Session extends Thread {
     dos.writeInt(id);
     dos.flush();
     }
+  
+  /**
+   * Stops the thread. 
+   */
+  synchronized void stopper() {
+    BaseX.outln("Client " + clientId + " has logged out.");
+    try {
+      socket.close();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    thread = null;
+  }
   
   @Override
   public void run() {

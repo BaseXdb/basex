@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import org.basex.BaseX;
 import org.basex.core.Prop;
+import org.basex.core.proc.Exit;
 import org.basex.util.Token;
 
 
@@ -26,7 +27,7 @@ public class BaseXServerNew {
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
-  boolean verbose;
+  boolean verbose = false;
   /** Last Id from a client. */
   int lastid = 0;
 
@@ -50,28 +51,19 @@ public class BaseXServerNew {
 
     if(!parseArguments(args)) return;
 
-    // this thread cleans the process stack
-    /*new Thread() {
-      @Override
-      public void run() {
-        while(running) {
-          Performance.sleep(2500L);
-          clean();
-        }
-      }
-    }.start();*/
-
     try {
       ServerSocket serverSocket = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) {
-        lastid++;
         Socket s = serverSocket.accept();
+        lastid++;
         BaseX.outln("Login from Client " + lastid);
-        new Session(s, lastid).start();
+        new Session(s, lastid, verbose).start();
       }
       // close the serverSocket when Server is stopped.
       serverSocket.close();
+      // exits the BaseXServer
+      new Exit().execute(null);
     } catch(final Exception ex) {
       BaseX.debug(ex);
       if(ex instanceof BindException) {
@@ -123,22 +115,10 @@ public class BaseXServerNew {
             break;
           }
         }
-      }/* else if(args[a].equals("stop")) {
-        try {
-          // run new process, sending the stop command
-          new ClientProcess("localhost", Prop.port, new Exit()).execute(null);
-          BaseX.outln(SERVERSTOPPED);
-        } catch(final Exception ex) {
-          if(ex instanceof IOException) BaseX.errln(SERVERERR);
-          else BaseX.errln(ex.getMessage());
-          BaseX.debug(ex);
-        }
-        return false;
-      }*/
+      }
       if(!ok) break;
     }
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
   }
-
 }
