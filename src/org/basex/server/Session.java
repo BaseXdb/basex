@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.basex.BaseX;
 import org.basex.core.CommandParser;
@@ -155,8 +156,13 @@ public class Session extends Thread {
   public void run() {
     try {
       handle(); 
-    } catch(IOException io) {
+    } catch(Exception io) {
+      // for forced stops
+      if (io instanceof SocketException) {
+       stopper();
+      } else {
       io.printStackTrace();
+      }
     }
   }
 }
