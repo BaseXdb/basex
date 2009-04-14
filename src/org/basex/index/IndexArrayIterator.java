@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.ft.Tokenizer;
 import org.basex.util.IntArrayList;
 
 /**
@@ -18,7 +19,7 @@ public class IndexArrayIterator implements IndexIterator {
   /** Each token in the query has a number. */
   protected int toknum;
   /** Token from query. */
-  protected FTTokenizer[] tok;
+  protected Tokenizer[] tok;
 
   /** Empty iterator. */
   public static final IndexArrayIterator EMP = new IndexArrayIterator(0) {
@@ -94,7 +95,7 @@ public class IndexArrayIterator implements IndexIterator {
    * Sets the tokenizer.
    * @param token FTTokenizer
    */
-  public void setToken(final FTTokenizer[] token) {
+  public void setToken(final Tokenizer[] token) {
     tok = token;
   }
 
@@ -200,7 +201,7 @@ public class IndexArrayIterator implements IndexIterator {
       }
 
       @Override
-      public void setToken(final FTTokenizer[] token) {
+      public void setToken(final Tokenizer[] token) {
         iai1.setToken(token);
         iai2.setToken(token);
       }
@@ -270,7 +271,7 @@ public class IndexArrayIterator implements IndexIterator {
       }
 
       @Override
-      public void setToken(final FTTokenizer[] token) {
+      public void setToken(final Tokenizer[] token) {
         iai1.setToken(token);
         iai2.setToken(token);
       }

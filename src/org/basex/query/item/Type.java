@@ -691,7 +691,7 @@ public enum Type {
   JAVA("java", null, EMPTY, true, true, true, false);
 
   /** String representation. */
-  public final byte[] name;
+  public final String name;
   /** URI representation. */
   public final byte[] uri;
   /** Number flag. */
@@ -742,7 +742,7 @@ public enum Type {
    */
   private Type(final String nm, final Type pr, final byte[] ur, final boolean n,
       final boolean u, final boolean s, final boolean d) {
-    name = token(nm);
+    name = nm;
     uri = ur;
     par = pr;
     num = n;
@@ -861,11 +861,11 @@ public enum Type {
    * @return type or null
    */
   public static Type find(final QNm type, final boolean nodes) {
-    final byte[] ln = type.ln();
+    final String ln = string(type.ln());
     final byte[] uri = type.uri.str();
 
     for(final Type t : values()) {
-      if(eq(t.name, ln) && eq(uri, t.uri) &&
+      if(ln.equals(t.name) && eq(uri, t.uri) &&
           (nodes || t.par != null && t != AAT)) return t;
     }
     return null;
@@ -877,16 +877,16 @@ public enum Type {
    * @return type or null
    */
   public static Type node(final QNm type) {
-    final byte[] ln = type.ln();
+    final String ln = string(type.ln());
     final byte[] uri = type.uri.str();
     for(final Type t : Type.values()) {
-      if(t.node() && eq(ln, t.name) && eq(uri, t.uri)) return t;
+      if(t.node() && ln.equals(t.name) && eq(uri, t.uri)) return t;
     }
     return null;
   }
 
   @Override
   public String toString() {
-    return string(name);
+    return name;
   }
 };

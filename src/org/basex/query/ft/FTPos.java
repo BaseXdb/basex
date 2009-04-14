@@ -1,11 +1,9 @@
  package org.basex.query.ft;
 
-import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -13,7 +11,6 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTNodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
@@ -55,7 +52,7 @@ public final class FTPos extends FTExpr {
   /** Term list. */
   public TokenList term = new TokenList();
   /** Input token. */
-  public FTTokenizer ft;
+  public Tokenizer ft;
   /** Window. */
   public Expr window;
   /** Distance occurrences. */
@@ -84,14 +81,7 @@ public final class FTPos extends FTExpr {
       for(int d = 0; d < dist.length; d++) dist[d] = dist[d].comp(ctx);
     }
 
-    if(weight != null) {
-      weight = weight.comp(ctx);
-      if(weight.i()) {
-        final Item wg = (Item) weight;
-        if(!wg.n()) Err.or(XPTYPENUM, WEIGHT, weight);
-        if(wg.dbl() < 0 || wg.dbl() > 1000) Err.or(FTWEIGHT, wg);
-      }
-    }
+    if(weight != null) weight = weight.comp(ctx);
     return super.comp(ctx);
   }
 
@@ -112,11 +102,8 @@ public final class FTPos extends FTExpr {
       tmp.addPos(pos, pos.length, term);
     ctx.ftd = pos;
 
-    
     // calculate weight
-    final double d = weight != null ? checkDbl(weight, ctx) : 1;
-    if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-    return score(s * d);
+    return score(weight != null ? s * checkDbl(weight, ctx) : s);
   }
 
   /**
@@ -147,7 +134,7 @@ public final class FTPos extends FTExpr {
    * are performed.
    * @param tok tokenizer for source term
    */
-  void init(final FTTokenizer tok) {
+  void init(final Tokenizer tok) {
     size = 0;
     term.reset();
     ft = tok;

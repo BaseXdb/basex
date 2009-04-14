@@ -26,6 +26,9 @@ import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
+import org.basex.ft.StemDir;
+import org.basex.ft.StopWords;
+import org.basex.ft.Thesaurus;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
@@ -88,7 +91,7 @@ public abstract class W3CTS {
   private static final byte[] XML = token("XML");
 
   /** Maximum length of result output. */
-  private static int maxout = 500;
+  private static int maxout = 50;
 
   /** Replacement pattern. */
   private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
@@ -117,6 +120,8 @@ public abstract class W3CTS {
   private final HashMap<String, String> stem = new HashMap<String, String>();
   /** Cached thesaurus. */
   private final HashMap<String, String> thes = new HashMap<String, String>();
+  /** Cached thesaurus. */
+  private final HashMap<String, String> thes2 = new HashMap<String, String>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -194,7 +199,7 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    Prop.onthefly = true;
+    //Prop.onthefly = true;
     Prop.xqformat = false;
 
     new CreateDB(path + input).execute(context, null);
@@ -246,7 +251,8 @@ public abstract class W3CTS {
     for(final int s : nodes("//*:thesaurus", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      thes.put(text("@ID", srcRoot), val);
+      thes.put(text("@uri", srcRoot), val);
+      thes2.put(text("@ID", srcRoot), val);
     }
 
     if(reporting) {
@@ -343,16 +349,19 @@ public abstract class W3CTS {
 
     final TokenBuilder files = new TokenBuilder();
     final CachedOutput out = new CachedOutput();
-    try {
-      final Context context = new Context();
-      
-      Nodes cont = nodes("*:contextItem", root);
-      if(cont.size() != 0) new Check(sources + string(
-          data.atom(cont.nodes[0])) + ".xml").execute(context, out);
 
-      final QueryProcessor xq = new QueryProcessor(in, context.current());
-      final QueryContext ctx = xq.ctx;
-      ctx.stop = stop;
+    final Context context = new Context();
+    
+    Nodes cont = nodes("*:contextItem", root);
+    if(cont.size() != 0) new Check(sources + string(
+        data.atom(cont.nodes[0])) + ".xml").execute(context, out);
+
+    final QueryProcessor xq = new QueryProcessor(in, context.current());
+    final QueryContext ctx = xq.ctx;
+    ctx.stop = stop;
+    ctx.thes = thes;
+
+    try {
       
       files.add(file(nodes("*:input-file", root),
           nodes("*:input-file/@variable", root), ctx));
@@ -363,14 +372,29 @@ public abstract class W3CTS {
       var(nodes("*:input-query/@name", root),
           nodes("*:input-query/@variable", root), pth, ctx);
 
-      String fn = stop2.get(text("*:aux-URI[@role = 'stopwords']", root));
-      if(fn != null) ctx.ftopt.stopwords(IO.get(fn), false);
+      for(final String s : aux("stopwords", root)) {
+        String fn = stop2.get(s);
+        if(fn != null) {
+          if(ctx.ftopt.sw == null) ctx.ftopt.sw = new StopWords();
+          ctx.ftopt.sw.read(IO.get(fn), false);
+        }
+      }
       
-      fn = stem.get(text("*:aux-URI[@role = 'stemming-dictionary']", root));
-      if(fn != null) ctx.ftopt.stemming(IO.get(fn));
-      
-      //fn = thes.get(text("*:aux-URI[@role = 'stemming-dictionary']", root));
-      //if(fn != null) ctx.ftopt.thesaurus(IO.get(fn));
+      for(final String s : aux("stemming-dictionary", root)) {
+        String fn = stem.get(s);
+        if(fn != null) {
+          if(ctx.ftopt.sd == null) ctx.ftopt.sd = new StemDir();
+          ctx.ftopt.sd.read(IO.get(fn));
+        }
+      }
+
+      for(final String s : aux("thesaurus", root)) {
+        String fn = thes2.get(s);
+        if(fn != null) {
+          if(ctx.ftopt.th == null) ctx.ftopt.th = new Thesaurus();
+          ctx.ftopt.th.read(IO.get(fn));
+        }
+      }
       
       for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
@@ -385,8 +409,6 @@ public abstract class W3CTS {
         doc &= it.type == Type.DOC;
         it.serialize(xml);
       }
-      xq.close();
-      
     } catch(final QueryException ex) {
       error = ex.getMessage();
       if(error.startsWith("Stopped at")) {
@@ -483,7 +505,7 @@ public abstract class W3CTS {
             iter.reset();
 
             String rin = result.list[s];
-            if(!doc) rin = "<X>" + rin + "</X>";
+            if(!doc || frag) rin = "<X>" + rin + "</X>";
             final Data rdata = CreateDB.xml(IO.get(rin), null);
             
             final SeqIter si = new SeqIter();
@@ -500,8 +522,7 @@ public abstract class W3CTS {
             rdata.close();
             if(test) break;
           } catch(final IOException ex) {
-            //ex.printStackTrace();
-            System.out.println("=> " + inname);
+            ex.printStackTrace();
           }
         }
       }
@@ -571,6 +592,7 @@ public abstract class W3CTS {
       logFile.append("'/>");
       logFile.append(Prop.NL);
     }
+    xq.close();
     return single == null || !outname.equals(single);
   }
 
@@ -580,7 +602,7 @@ public abstract class W3CTS {
    * @return result
    */
   private String norm(final String in) {
-    if(1 == 1) return in;
+    //if(1 == 1) return in;
     
     final StringBuilder sb = new StringBuilder();
     int m = 0;
@@ -719,6 +741,18 @@ public abstract class W3CTS {
     return sb.toString();
   }
 
+
+  /**
+   * Returns the resulting auxiliary uri in multiple strings.
+   * @param role role
+   * @param root root node
+   * @return attribute value
+   * @throws Exception exception
+   */
+  private String[] aux(final String role, final Nodes root) throws Exception {
+    return text("*:aux-URI[@role = '" + role + "']", root).split("/");
+  }
+  
   /**
    * Returns the resulting query nodes.
    * @param qu query

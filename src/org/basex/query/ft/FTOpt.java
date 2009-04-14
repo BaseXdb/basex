@@ -3,14 +3,14 @@ package org.basex.query.ft;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
-import org.basex.io.IO;
+import org.basex.ft.StemDir;
+import org.basex.ft.StopWords;
+import org.basex.ft.Thesaurus;
+import org.basex.ft.Tokenizer;
+import org.basex.ft.Levenshtein;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryTokens;
 import org.basex.util.IntList;
-import org.basex.util.Levenshtein;
-import org.basex.util.Map;
-import org.basex.util.Set;
 
 /**
  * This class contains all ftcontains options. It can be used
@@ -45,26 +45,26 @@ public final class FTOpt extends ExprInfo {
   public static final int WC = 5;
   /** Fuzzy flag. */
   public static final int FZ = 6;
-  /** Thesaurus flag. */
-  public static final int TS = 7;
 
   /** Flag values. */
-  private final boolean[] flag = new boolean[TS + 1];
+  private final boolean[] flag = new boolean[FZ + 1];
   /** States which flags are assigned. */
   private final boolean[] set = new boolean[flag.length];
 
   /** Stemming dictionary. */
-  public Map<byte[]> sd;
+  public StemDir sd;
   /** Stopwords. */
-  public Set sw;
+  public StopWords sw;
+  /** Thesaurus. */
+  public Thesaurus th;
   /** Language. */
   public byte[] ln;
 
   /** Fulltext tokenizer. */
-  public final FTTokenizer qu = new FTTokenizer();
+  public final Tokenizer qu = new Tokenizer();
 
   /**
-   * Compiles the fulltext options, inheriting the parent options.
+   * Compiles the fulltext options, inheriting the options of the argument.
    * @param opt parent fulltext options
    */
   public void compile(final FTOpt opt) {
@@ -77,6 +77,8 @@ public final class FTOpt extends ExprInfo {
     if(sw == null) sw = opt.sw;
     if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
+    if(th == null) th = opt.th;
+    else if(opt.th != null) th.merge(opt.th);
   }
 
   /**
@@ -114,7 +116,7 @@ public final class FTOpt extends ExprInfo {
    * @param q query token
    * @return number of occurrences
    */
-  int contains(final FTTokenizer tk, final FTPos pos, final byte[] q) {
+  int contains(final Tokenizer tk, final FTPos pos, final byte[] q) {
     if(q.length == 0) return 0;
 
     // assign options to text
@@ -160,6 +162,18 @@ public final class FTOpt extends ExprInfo {
             string(t).matches(string(s)) : eq(t, s);
       }
 
+      if(!f && th != null) {
+        final byte[] tmp = qu.text;
+        for(final byte[] txt : th.find(qu.text)) {
+          qu.init(txt);
+          qu.more();
+          f |= eq(qu.get(), t);
+          qu.more();
+          if(f) break;
+        }
+        qu.text = tmp;
+      }
+      
       if(f) {
         if(il == null) il = new IntList();
         // each word position has to be saved for phrases
@@ -171,47 +185,6 @@ public final class FTOpt extends ExprInfo {
     if(il == null) return 0;
     pos.add(q, il);
     return il.size;
-  }
-
-  /**
-   * Processes stopwords from the specified file.
-   * @param fl file
-   * @param e except flag
-   * @return success flag
-   */
-  public boolean stopwords(final IO fl, final boolean e) {
-    if(sw == null) sw = new Set();
-    try {
-      for(final byte[] sl : split(norm(fl.content()), ' ')) {
-        if(e) sw.delete(sl);
-        else if(sw.id(sl) == 0) sw.add(sl);
-      }
-      return true;
-    } catch(final IOException ex) {
-      return false;
-    }
-  }
-
-  /**
-   * Processes a stemming dictionary.
-   * @param fl file
-   * @return success flag
-   */
-  public boolean stemming(final IO fl) {
-    if(sd == null) sd = new Map<byte[]>();
-    try {
-      for(final byte[] sl : split(fl.content(), '\n')) {
-        byte[] val = null;
-        for(final byte[] st : split(norm(sl), ' ')) {
-          if(val == null) val = st;
-          else sd.add(st, val);
-        }
-        sd.add(sl);
-      }
-      return true;
-    } catch(final IOException ex) {
-      return false;
-    }
   }
   
   @Override
@@ -227,7 +200,7 @@ public final class FTOpt extends ExprInfo {
   @Override
   public String toString() {
     final StringBuilder s = new StringBuilder();
-    if(is(ST))
+    if(is(ST) || sd != null)
       s.append(" " + QueryTokens.WITH + " " + QueryTokens.STEMMING);
     if(is(WC))
       s.append(" " + QueryTokens.WITH + " " + QueryTokens.WILDCARDS);
@@ -235,6 +208,8 @@ public final class FTOpt extends ExprInfo {
       s.append(" " + QueryTokens.WITH + " " + QueryTokens.FUZZY);
     if(is(DC))
       s.append(" " + QueryTokens.DIACRITICS + " " + QueryTokens.SENSITIVE);
+    if(th != null)
+      s.append(" " + QueryTokens.WITH + " " + QueryTokens.THESAURUS);
     if(is(UC))
       s.append(" " + QueryTokens.UPPERCASE);
     if(is(LC))

@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,7 +17,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
-import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.IntList;
 
@@ -33,7 +32,7 @@ public class FTContains extends Expr {
   /** Fulltext expression. */
   public FTExpr ftexpr;
   /** Fulltext parser. */
-  public FTTokenizer ft = new FTTokenizer();
+  public Tokenizer ft = new Tokenizer();
   /** Flag for first evaluation.*/
   private int div = 0;
   /** Visualize fulltext results. */
@@ -66,7 +65,7 @@ public class FTContains extends Expr {
       div = ++ctx.ftcount;
     
     final Iter iter = expr.iter(ctx);
-    final FTTokenizer tmp = ctx.ftitem;
+    final Tokenizer tmp = ctx.ftitem;
     final IntList[] ftd = ctx.ftd;
     int pre = -1;
     double d = 0;
@@ -75,7 +74,7 @@ public class FTContains extends Expr {
     while((i = iter.next()) != null) {
       ft.init(i.str());
       final double d2 = ftexpr.iter(ctx).next().score();
-      d = Scoring.and(d, d2);
+      d = ctx.score.and(d, d2);
       if(i instanceof DBNode && d2 > 0) pre = ((DBNode) i).pre;
       if (d2 > 0 && pre > -1 && ctx.ftd != null && ctx.ftdata != null)
         ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);

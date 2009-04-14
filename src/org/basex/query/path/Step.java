@@ -24,7 +24,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Kind;
 import org.basex.query.util.Err;
-import org.basex.query.util.Scoring;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -109,7 +108,7 @@ public class Step extends Preds {
       while((nod = ir.next()) != null) {
         if(test.eval(nod)) {
           nod = nod.finish();
-          nod.score(Scoring.step(it.score()));
+          nod.score(ctx.score.step(it.score()));
           nb.add(nod);
         }
       }

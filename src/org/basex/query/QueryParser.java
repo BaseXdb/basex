@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.ft.StopWords;
+import org.basex.ft.Thesaurus;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -81,7 +83,6 @@ import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputParser;
-import org.basex.util.Set;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
@@ -282,7 +283,9 @@ public class QueryParser extends InputParser {
         } else if(consumeWS(NSPACE)) {
           namespaceDecl();
         } else if(consumeWS(FTOPTION)) {
-          while(ftMatchOption(ctx.ftopt));
+          final FTOpt opt = new FTOpt();
+          while(ftMatchOption(opt));
+          ctx.ftopt.compile(opt);
         } else {
           qp = p;
           return;
@@ -1911,9 +1914,9 @@ public class QueryParser extends InputParser {
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
       if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pre());
-      final byte[] ln = type.ln();
-      error(eq(uri, Type.NOT.uri) && (eq(Type.NOT.name, ln) ||
-        eq(Type.AAT.name, ln))  ? CASTUNKNOWN : TYPEUNKNOWN, type);
+      final String ln = string(type.ln());
+      error(eq(uri, Type.NOT.uri) && ln.equals(Type.NOT.name) ||
+          ln.equals(Type.AAT.name) ? CASTUNKNOWN : TYPEUNKNOWN, type);
     }
     return seq;
   }
@@ -2299,8 +2302,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException xquery exception
    */
   private boolean ftMatchOption(final FTOpt opt) throws QueryException {
-    // [CG] XQuery/FTMatchOptions: thesaurus
-
     if(consumeWS(LOWERCASE)) {
       if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
         error(FTDUP, CASE);
@@ -2321,6 +2322,7 @@ public class QueryParser extends InputParser {
       opt.set(FTOpt.DC, consumeWS(SENSITIVE));
       if(!opt.is(FTOpt.DC)) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
+      if(opt.ln != null) error(FTDUP, LANGUAGE);
       opt.ln = lc(stringLiteral());
       if(!eq(opt.ln, EN)) error(FTLAN, opt.ln);
     } else if(consumeWS(OPTION)) {
@@ -2334,22 +2336,19 @@ public class QueryParser extends InputParser {
         if(opt.isSet(FTOpt.ST)) error(FTDUP, STEMMING);
         opt.set(FTOpt.ST, with);
       } else if(consumeWS2(THESAURUS)) {
-        opt.set(FTOpt.TS, with);
+        if(opt.th != null) error(FTDUP, THESAURUS);
+        opt.th = new Thesaurus();
         if(with) {
           final boolean par = consumeWS2(PAR1);
-          if(consumeWS2(AT)) {
-            ftThesaurusID();
-          } else {
-            check(DEFAULT);
-          }
-          while(par && consumeWS2(COMMA)) ftThesaurusID();
+          if(!consumeWS2(DEFAULT)) ftThesaurusID(opt.th);
+          while(par && consumeWS2(COMMA)) ftThesaurusID(opt.th);
           if(par) check(PAR2);
-          error(FTTHES);
         }
       } else if(consumeWS(STOP)) {
         // add union/except
         check(WORDS);
-        opt.sw = new Set();
+        if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);
+        opt.sw = new StopWords();
         boolean union = false;
         boolean except = false;
         while(with) {
@@ -2366,7 +2365,7 @@ public class QueryParser extends InputParser {
 
             IO fl = IO.get(fn);
             if(!fl.exists() && file != null) fl = file.merge(fl);
-            if(!opt.stopwords(fl, except)) error(NOSTOPFILE, fl);
+            if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
           } else if(!union && !except) {
             error(FTSTOP);
           }
@@ -2378,9 +2377,11 @@ public class QueryParser extends InputParser {
         check(STOP);
         check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {
+        if(opt.isSet(FTOpt.WC)) error(FTDUP, WILDCARDS);
         if(opt.is(FTOpt.FZ)) error(FTFZWC);
         opt.set(FTOpt.WC, with);
       } else if(consumeWS2(FUZZY)) {
+        if(opt.isSet(FTOpt.FZ)) error(FTDUP, FUZZY);
         if(opt.is(FTOpt.WC)) error(FTFZWC);
         opt.set(FTOpt.FZ, with);
       } else {
@@ -2393,12 +2394,30 @@ public class QueryParser extends InputParser {
 
   /**
    * [FT171] Parses an FTThesaurusID.
+   * @param thes link to thesaurus
    * @throws QueryException xquery exception
    */
-  private void ftThesaurusID() throws QueryException {
-    stringLiteral();
-    if(consumeWS2(RELATIONSHIP)) stringLiteral();
-    if(ftRange() != null) check(LEVELS);
+  private void ftThesaurusID(final Thesaurus thes) throws QueryException {
+    check(AT);
+
+    String fn = string(stringLiteral());
+    if(ctx.thes != null) fn = ctx.thes.get(fn);
+    final IO fl = IO.get(fn);
+
+    if(!thes.read(fl.exists() || file == null ? fl : file.merge(fl))) 
+      error(NOTHES, fl);
+
+    if(consumeWS2(RELATIONSHIP)) thes.rs(stringLiteral());
+
+    final Expr[] range = ftRange();
+    if(range != null) {
+      check(LEVELS);
+      if(range[0] instanceof Itr && range[1] instanceof Itr) {
+        thes.level(((Itr) range[0]).itr(), ((Itr) range[1]).itr());
+      } else {
+        error(THESRNG);
+      }
+    }
   }
 
   /**

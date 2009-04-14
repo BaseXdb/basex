@@ -1,11 +1,10 @@
-package org.basex.index;
+package org.basex.ft;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
+import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
-import org.basex.util.Map;
-import org.basex.util.Stemming;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
@@ -15,11 +14,11 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FTTokenizer extends IndexToken {
+public final class Tokenizer extends IndexToken {
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
   /** Stemming dictionary. */
-  public Map<byte[]> sd;
+  public StemDir sd;
   /** Stemming flag. */
   public boolean st = Prop.ftst;
   /** Diacritics flag. */
@@ -55,7 +54,7 @@ public final class FTTokenizer extends IndexToken {
   /**
    * Empty constructor.
    */
-  public FTTokenizer() {
+  public Tokenizer() {
     super(Type.FTX);
   }
 
@@ -63,7 +62,7 @@ public final class FTTokenizer extends IndexToken {
    * Constructor.
    * @param txt text
    */
-  public FTTokenizer(final byte[] txt) {
+  public Tokenizer(final byte[] txt) {
     this();
     text = txt;
   }
@@ -73,7 +72,7 @@ public final class FTTokenizer extends IndexToken {
    * @param txt text
    * @param fto fulltext options
    */
-  public FTTokenizer(final byte[] txt, final FTOpt fto) {
+  public Tokenizer(final byte[] txt, final FTOpt fto) {
     this(txt);
     lc = fto.is(FTOpt.LC);
     uc = fto.is(FTOpt.UC);
@@ -108,7 +107,7 @@ public final class FTTokenizer extends IndexToken {
    * @return result of check
    */
   public boolean more() {
-    if (text == null) return false;
+    if(text == null) return false;
     final int l = text.length;
     pos++;
 
@@ -154,7 +153,7 @@ public final class FTTokenizer extends IndexToken {
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
-    if(st) n = stem(n);
+    if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
 
@@ -273,17 +272,6 @@ public final class FTTokenizer extends IndexToken {
     if(!a) return token(string(t).toLowerCase());
     for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
     return t;
-  }
-
-  /**
-   * Stems the specified token.
-   * @param t token to be converted
-   * @return the converted token
-   */
-  private byte[] stem(final byte[] t) {
-    if(sd == null) return stem.word(t);
-    final byte[] sn = sd.get(t);
-    return sn != null ? sn : t;
   }
   
   /**

@@ -1,4 +1,4 @@
-package org.basex.util;
+package org.basex.ft;
 
 /**
  * Simple stemming algorithm, derived from
@@ -7,7 +7,7 @@ package org.basex.util;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Stemming {
+final class Stemming {
   /** Step 2. */
   private static final String[][] ST2 = { { "ational", "ate" },
     { "tional", "tion" }, { "enci", "ence" }, { "anci", "ance" },
@@ -41,7 +41,7 @@ public final class Stemming {
    * @param str word to be stemmed
    * @return result
    */
-  public byte[] word(final byte[] str) {
+  byte[] stem(final byte[] str) {
     tok = str;
     ts = 0;
     te = str.length;
@@ -55,7 +55,7 @@ public final class Stemming {
   /**
    * Stems the current word.
    */
-  public void word() {
+  private void word() {
     if(te - ts < 3) return;
 
     // step 1

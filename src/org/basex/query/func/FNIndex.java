@@ -3,11 +3,11 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.BaseX;
+import org.basex.ft.Levenshtein;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
-import org.basex.util.Levenshtein;
 import org.basex.util.Set;
 
 /**

@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.util.Scoring;
 import org.basex.util.Array;
 
 /**
@@ -81,7 +80,7 @@ public final class And extends Arr {
           ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE;
       }
-      s = Scoring.and(s, it.score());
+      s = ctx.score.and(s, it.score());
     }
     // no scoring - return default boolean
     return s == 0 ? Bln.TRUE : Bln.get(s);
@@ -97,6 +96,7 @@ public final class And extends Arr {
       throws QueryException {
     
     for(final Expr e : expr) {
+      ic.iu = false;
       e.indexAccessible(ctx, ic);
       if(!ic.iu || ic.is == 0) return;
     }

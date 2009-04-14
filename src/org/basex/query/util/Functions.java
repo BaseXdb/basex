@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Serializer;
+import org.basex.ft.Levenshtein;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -20,7 +21,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
-import org.basex.util.Levenshtein;
 import org.basex.util.Token;
 
 /**
@@ -119,7 +119,7 @@ public final class Functions extends ExprInfo {
     final byte[] ln = type.ln();
     final Levenshtein ls = new Levenshtein();
     for(final Type t : Type.values()) {
-      if(t.par != null &&  ls.similar(lc(ln), lc(t.name)))
+      if(t.par != null &&  ls.similar(lc(ln), lc(token(t.name))))
         Err.or(FUNSIMILAR, ln, t.name);
     }
     Err.or(FUNCUNKNOWN, type.str());
@@ -210,6 +210,6 @@ public final class Functions extends ExprInfo {
 
   @Override
   public String toString() {
-    return Token.string(name());
+    return name();
   }
 }

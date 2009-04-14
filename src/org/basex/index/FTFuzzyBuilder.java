@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.ft.Tokenizer;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
 import org.basex.util.Performance;
@@ -26,7 +27,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
   /** Current parsing value. */
   private int total;
   /** Word parser. */
-  private final FTTokenizer wp = new FTTokenizer();
+  private final Tokenizer wp = new Tokenizer();
   /** Word parser. */
   private FTHash[] tree = new FTHash[Token.MAXLEN + 1];
   /** Number of indexed words. */

@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.ft.Tokenizer;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 
@@ -23,7 +24,7 @@ public final class FTNode {
   /** Flag for negative node. */
   public boolean not;
   /** List for tokens from query. */
-  private FTTokenizer[] tok;
+  private Tokenizer[] tok;
   /** Number of stored values. */
   public int size;
 
@@ -94,7 +95,7 @@ public final class FTNode {
    * Setter for FTTokenizer.
    * @param token FTTokenizer
    */
-  public void setToken(final FTTokenizer[] token) {
+  public void setToken(final Tokenizer[] token) {
     tok = token;
   }
 
@@ -102,7 +103,7 @@ public final class FTNode {
    * Getter for the FTTokenizer.
    * @return FTTokenizer
    */
-  public FTTokenizer[] getToken() {
+  public Tokenizer[] getToken() {
     return tok;
   }
   
@@ -167,14 +168,14 @@ public final class FTNode {
 
     ip = new IntList(il.finish());
     if (tok != null) {
-      final FTTokenizer[] tmp = new FTTokenizer[tok.length + n.tok.length];
+      final Tokenizer[] tmp = new Tokenizer[tok.length + n.tok.length];
       System.arraycopy(tok, 0, tmp, 0, tok.length);
       System.arraycopy(n.tok, 0, tmp, tok.length, n.tok.length);
       tok = tmp;
     }
     
     if (tok != null && n.tok != null) {
-        final FTTokenizer[] ntok = new FTTokenizer[tok.length + n.tok.length];
+        final Tokenizer[] ntok = new Tokenizer[tok.length + n.tok.length];
         Array.copy(tok, ntok, 0);
         Array.copy(n.tok, ntok, tok.length);
     } else {

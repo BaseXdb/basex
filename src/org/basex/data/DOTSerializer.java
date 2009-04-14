@@ -168,6 +168,6 @@ public final class DOTSerializer extends Serializer {
   protected byte[] name(final ExprInfo expr) throws IOException {
     finishElement();
     color = expr.color();
-    return expr.name();
+    return token(expr.name());
   }
 }

@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
@@ -15,7 +14,8 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Scoring;
+import org.basex.ft.Tokenizer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Root;
@@ -50,6 +50,8 @@ import org.basex.util.TokenBuilder;
 public final class QueryContext extends Progress {
   /** Cached stop word files. */
   public HashMap<String, String> stop;
+  /** Cached thesaurus files. */
+  public HashMap<String, String> thes;
   /** Reference to the query file. */
   public IO file = Prop.xquery;
   /** Query string. */
@@ -71,10 +73,12 @@ public final class QueryContext extends Progress {
   /** Current leaf flag. */
   public boolean leaf;
 
+  /** Scoring instance. */
+  public Scoring score = new Scoring();
   /** Current fulltext item. */
   public FTPosData ftdata;
   /** Current fulltext item. */
-  public FTTokenizer ftitem;
+  public Tokenizer ftitem;
   /** Current fulltext options. */
   public FTOpt ftopt = new FTOpt();
   /** Current fulltext position filter. */
@@ -309,7 +313,7 @@ public final class QueryContext extends Progress {
    * Closes the context.
    * @throws IOException query exception
    */
-  public void close() throws IOException {
+  void close() throws IOException {
     for(int d = rootDocs; d < docs.length; d++) docs[d].data.close();
   }
 
@@ -483,6 +487,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return "Context[" + file + "]";
+    return getClass().getSimpleName() + "[" + file + "]";
   }
 }

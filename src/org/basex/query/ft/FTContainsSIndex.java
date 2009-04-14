@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -36,7 +36,7 @@ public final class FTContainsSIndex extends FTContains {
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {    
     final Iter ir = expr.iter(ctx);
-    final FTTokenizer tmp = ctx.ftitem;
+    final Tokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
         
     final FTNodeIter fti = ftexpr.iter(ctx);

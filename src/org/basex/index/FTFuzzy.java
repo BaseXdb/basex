@@ -7,9 +7,10 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.ft.Tokenizer;
+import org.basex.ft.Levenshtein;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
-import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -102,7 +103,7 @@ public final class FTFuzzy extends Index {
   @Override
   public int nrIDs(final IndexToken index) {
     // skip count of queries which stretch over multiple index entries
-    final FTTokenizer fto = (FTTokenizer) index;
+    final Tokenizer fto = (Tokenizer) index;
     if(fto.fz || fto.wc) return 1;
 
     final byte[] tok = index.get();
@@ -122,7 +123,7 @@ public final class FTFuzzy extends Index {
 
   @Override
   public IndexIterator ids(final IndexToken ind) {
-    final FTTokenizer ft = (FTTokenizer) ind;
+    final Tokenizer ft = (Tokenizer) ind;
     final byte[] tok = ft.get();
 
     // support fuzzy search
@@ -160,7 +161,7 @@ public final class FTFuzzy extends Index {
     int r;
     // find right limit
     do r = tp[tl + i++]; while(r == -1);
-    int x = r;
+    final int x = r;
 
     // binary search
     final int o = tl + 9;
@@ -248,7 +249,7 @@ public final class FTFuzzy extends Index {
       @Override
       public boolean more() {
         if (c == s) return false;
-        IntList il = new IntList();
+        final IntList il = new IntList();
         int pre;
         if (f) {
           f = false;
@@ -319,7 +320,7 @@ public final class FTFuzzy extends Index {
    * @return iterator
    */
   private IndexArrayIterator get(final byte[] tok) {
-    int p = token(tok);
+    final int p = token(tok);
     return p > -1 ? data(pointer(p, tok.length),
         size(p, tok.length), dat, data) : IndexArrayIterator.EMP;
   }

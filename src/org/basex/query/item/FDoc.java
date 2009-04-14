@@ -55,7 +55,7 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + Token.string(base) + ")";
+    return name() + "(" + Token.string(base) + ")";
   }
 
   @Override

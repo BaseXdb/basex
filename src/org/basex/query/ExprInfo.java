@@ -2,7 +2,6 @@ package org.basex.query;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.util.Token;
 
 /**
  * Expression Information.
@@ -28,15 +27,15 @@ public abstract class ExprInfo {
    * @return result of check
    */
   public String info() {
-    return Token.string(name()) + " expression";
+    return name() + " expression";
   }
 
   /**
    * Returns the simplified class name (for debugging).
    * @return class name
    */
-  public byte[] name() {
-    return Token.token(getClass().getSimpleName());
+  public String name() {
+    return getClass().getSimpleName();
   }
   
   /**

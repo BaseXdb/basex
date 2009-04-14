@@ -5,7 +5,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;
-import org.basex.query.util.Scoring;
 import org.basex.util.IntList;
 
 /**
@@ -35,7 +34,7 @@ public final class FTAnd extends FTExpr {
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
       if(s == 0) return score(0);
-      d = Scoring.and(d, s);
+      d = ctx.score.and(d, s);
     }
     return score(d);
   }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.ft.Tokenizer;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -73,7 +74,7 @@ public final class FTTrie extends Index {
   @Override
   public int nrIDs(final IndexToken ind) {
     // skip count of queries which stretch over multiple index entries
-    final FTTokenizer fto = (FTTokenizer) ind;
+    final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
     final byte[] tok = fto.get();
     final int id = cache.id(tok);
@@ -92,7 +93,7 @@ public final class FTTrie extends Index {
 
   @Override
   public IndexIterator ids(final IndexToken ind) {
-    final FTTokenizer ft = (FTTokenizer) ind;
+    final Tokenizer ft = (Tokenizer) ind;
     final byte[] tok = ft.get();
 
     // support fuzzy search

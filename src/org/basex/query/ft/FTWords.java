@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -16,7 +16,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.query.util.Scoring;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -60,7 +59,7 @@ public final class FTWords extends FTExpr {
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     final int len = contains(ctx);
-    return score(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size()));
+    return score(len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size()));
   }
 
   /**
@@ -172,7 +171,7 @@ public final class FTWords extends FTExpr {
     if(!ic.io) return;
     
     // index size is incorrect for phrases
-    final FTTokenizer ft = new FTTokenizer(word, fto);
+    final Tokenizer ft = new Tokenizer(word, fto);
     while(ic.is != 0 && ft.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(ft));
     ic.iu = true;
   }

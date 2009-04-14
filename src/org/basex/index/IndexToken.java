@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.ft.Tokenizer;
 import org.basex.util.Token;
 
 /**
@@ -32,7 +33,7 @@ public abstract class IndexToken {
   
   /**
    * Returns the current index token. Can be overwritten by an implementation
-   * to return other tokens, as is done in the {@link FTTokenizer}.
+   * to return other tokens, as is done in the {@link Tokenizer}.
    * @return token
    */
   public byte[] get() {

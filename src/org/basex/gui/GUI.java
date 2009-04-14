@@ -380,7 +380,7 @@ public final class GUI extends JFrame {
       if(in.length() > i) {
         try {
           for(final Process p : new CommandParser(in.substring(i)).parse()) {
-            if(!exec(p, true)) break;
+            if(!exec(p, p instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
           final boolean db = context.db();
@@ -459,8 +459,6 @@ public final class GUI extends JFrame {
 
     cursor(CURSORWAIT);
     try {
-      if(pr.updating()) updating = true;
-
       // cache some variables before executing the command
       final Performance perf = new Performance();
       final Nodes current = context.current();
@@ -468,24 +466,25 @@ public final class GUI extends JFrame {
       proc = pr;
 
       // execute command
+      updating = pr.updating();
       final boolean ok = pr.execute(context);
+      updating = false;
 
-      if(!ok && pr.info().length() == 0) {
+      // command info
+      final String inf = pr.info();
+
+      if(!ok && inf.length() == 0) {
         proc = null;
         return false;
       }
-      if(pr.updating()) updating = false;
 
       // try to convert xquery result to nodeset
       final Result result = pr.result();
       final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
-      // cached resulting text output
-      final String inf = pr.info();
-
       // treat TextView different to other views
       if(ok && pr.printing()) {
-        // display text view if text output is
+        // display text view if result will not highlight any nodes
         if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
         
         // retrieve text result
@@ -496,13 +495,17 @@ public final class GUI extends JFrame {
         }
       }
 
+      boolean feedback = main || data != null && GUIProp.showquery &&
+        query.info(pr instanceof XQuery ? inf : null, ok);
+      
       // check if query feedback was processed in the query view
-      final boolean feedback = main || data != null &&
-        GUIProp.showquery && query.info(pr instanceof XQuery ? inf : null, ok);
-
       if(!ok) {
         // show error info
-        status.setText(feedback ? STATUSOK : inf); 
+        if(!feedback) {
+          // display text view if text output is
+          if(!text.isValid()) GUICommands.SHOWTEXT.execute(this);
+          text.setText(Token.token(inf));
+        }
         cursor(CURSORARROW, true);
         proc = null;
         return false;
@@ -556,9 +559,9 @@ public final class GUI extends JFrame {
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();
-      String msg = ex.toString();
-      if(msg.length() == 0) msg = ex.getMessage();
-      Dialog.error(this, BaseX.info(PROCERR, pr, msg));
+      Dialog.error(this, BaseX.info(PROCERR, pr,
+          ex.toString().length() != 0 ? ex.toString() : ex.getMessage()));
+      updating = false;
     }
 
     cursor(CURSORARROW, true);

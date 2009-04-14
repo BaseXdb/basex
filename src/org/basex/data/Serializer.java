@@ -204,7 +204,7 @@ public abstract class Serializer {
    */
   @SuppressWarnings("unused")
   protected byte[] name(final ExprInfo expr) throws IOException {
-    return expr.name();
+    return token(expr.name());
   }
 
   /**

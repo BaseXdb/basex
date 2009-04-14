@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Scoring;
 import org.basex.util.Array;
 
 /**
@@ -82,7 +81,7 @@ public final class Or extends Arr {
       if(it.bool()) {
         final double s = it.score();
         if(s == 0) return Bln.TRUE;
-        d = Scoring.or(d, s);
+        d = ctx.score.or(d, s);
         found = true;
       }
     }
@@ -94,6 +93,7 @@ public final class Or extends Arr {
       throws QueryException {
     
     for(final Expr e : expr) {
+      ic.iu = false;
       e.indexAccessible(ctx, ic);
       if(!ic.iu) return;
     }

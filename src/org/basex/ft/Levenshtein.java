@@ -1,6 +1,7 @@
-package org.basex.util;
+package org.basex.ft;
 
 import org.basex.core.Prop;
+import org.basex.util.Token;
 
 /**
  * This class assembles methods for fuzzy token matching.

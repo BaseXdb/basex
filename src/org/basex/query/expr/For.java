@@ -12,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 
@@ -100,7 +99,7 @@ public final class For extends ForLet {
         if(it != null) {
           v.bind(it, ctx);
           if(p != null) p.bind(Itr.get(++c), ctx);
-          if(s != null) s.bind(Dbl.get(Scoring.finish(it.score())), ctx);
+          if(s != null) s.bind(Dbl.get(ctx.score.finish(it.score())), ctx);
         } else {
           reset();
         }

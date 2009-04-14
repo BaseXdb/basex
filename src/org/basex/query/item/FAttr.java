@@ -37,7 +37,7 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + Token.string(name.str()) + "=\"" +
+    return name() + "(" + Token.string(name.str()) + "=\"" +
       Token.string(val) + "\")";
   }
   

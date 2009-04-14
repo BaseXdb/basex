@@ -11,7 +11,6 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 
@@ -23,7 +22,7 @@ import org.basex.util.Token;
  */
 public abstract class Item extends Expr {
   /** Score value. */
-  protected double score = Scoring.DEFAULT;
+  protected double score;
   /** Data type. */
   public Type type;
   
@@ -285,7 +284,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public final byte[] name() {
+  public final String name() {
     return type.name;
   }
 

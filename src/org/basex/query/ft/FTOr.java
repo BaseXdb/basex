@@ -5,7 +5,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;
-import org.basex.query.util.Scoring;
 import org.basex.util.IntList;
 
 /**
@@ -35,7 +34,7 @@ public final class FTOr extends FTExpr {
       if (e instanceof FTPos) ((FTPos) e).ordered |= ctx.ftpos.ordered;
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
-      if(s != 0) d = Scoring.or(d, s);
+      if(s != 0) d = ctx.score.or(d, s);
     }
     ctx.ftpos.ordered = false;
     return score(d);

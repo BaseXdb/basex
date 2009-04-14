@@ -1,27 +1,21 @@
-package org.basex.query.util;
+package org.basex.ft;
 
 /**
- * Scoring class, assembling all scoring calculations.
- * Current scoring model is very simple.
+ * Simple default scoring model, assembling all scoring calculations.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Scoring {
-  /** Default scoring value. */
-  public static final double DEFAULT = 0;
   /** Logarithmic base for calculating the score value. */
-  public static final double LOG = Math.E - 1;
-
-  /** Private Constructor. */
-  private Scoring() { }
+  private static final double LOG = Math.E - 1;
 
   /**
    * Returns a scoring after a location step traversal.
    * @param s input value
    * @return result
    */
-  public static double step(final double s) {
+  public double step(final double s) {
     return s;
   }
 
@@ -32,7 +26,7 @@ public final class Scoring {
    * @param l complete length
    * @return result
    */
-  public static double word(final int tl, final double l) {
+  public double word(final int tl, final double l) {
     return Math.min(1, Math.log(1 + LOG * tl / l));
   }
 
@@ -42,7 +36,7 @@ public final class Scoring {
    * @param s2 second value
    * @return result
    */
-  public static double and(final double s1, final double s2) {
+  public double and(final double s1, final double s2) {
     return 1 - ((1 - s1) * (1 - s2));
   }
 
@@ -52,7 +46,7 @@ public final class Scoring {
    * @param s2 second value
    * @return result
    */
-  public static double or(final double s1, final double s2) {
+  public double or(final double s1, final double s2) {
     return and(s1, s2);
   }
 
@@ -61,7 +55,7 @@ public final class Scoring {
    * @param s input value
    * @return result
    */
-  public static double finish(final double s) {
+  public double finish(final double s) {
     return Math.min(1, (int) (s * 1000) / 1000d);
   }
 }

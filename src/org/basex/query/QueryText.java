@@ -18,7 +18,7 @@ public interface QueryText {
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
   /** FOTY Error type. */ String FOTY = "FOTY";
-  /** FTST Error type. */ String FTDY = "FTDY";
+  /** FTDY Error type. */ String FTDY = "FTDY";
   /** FTST Error type. */ String FTST = "FTST";
   /** XPDY Error type. */ String XPDY = "XPDY";
   /** XPST Error type. */ String XPST = "XPST";
@@ -135,15 +135,17 @@ public interface QueryText {
   Object[] FTMILD = { FTDY, 17, "Invalid mild not selection." };
 
   /** FTST0000: Parsing exception. */
-  Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
-  /** FTST0000: Parsing exception. */
   Object[] FTFZWC = { FTST, 0, "Only wildcards or Fuzzy search allowed." };
+  /** FTST0000: Parsing exception. */
+  Object[] THESRNG = { FTST, 0, "Only integers allowed for thesaurus level." };
   /** FTST0007: Parsing exception. */
   Object[] FTIGNORE = { FTST, 7, "Ignore option not supported yet." };
   /** FTST0008: Parsing exception. */
   Object[] NOSTOPFILE = { FTST, 8, "Stop word file not found: \"%\"." };
   /** FTST0009: Parsing exception. */
   Object[] FTLAN = { FTST, 9, "Language '%' not supported." };
+  /** FTST0018: Parsing exception. */
+  Object[] NOTHES = { FTST, 18, "Thesaurus not found: \"%\"." };
   /** FTST0019: Parsing exception. */
   Object[] FTDUP = { FTST, 19, "Match option '%' was defined twice." };
 

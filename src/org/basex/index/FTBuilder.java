@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.ft.Tokenizer;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
 import org.basex.util.Performance;
@@ -21,7 +22,7 @@ import org.basex.util.Token;
  */
 public final class FTBuilder extends Progress implements IndexBuilder {
   /** Word parser. */
-  private final FTTokenizer wp = new FTTokenizer();
+  private final Tokenizer wp = new Tokenizer();
   /** CTArray for tokens. */
   private FTArray index;
   /** Current parsing value. */

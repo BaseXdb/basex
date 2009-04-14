@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.DialogMapInfo;
 import org.basex.gui.layout.BaseXLayout;
@@ -21,7 +22,6 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
-import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -408,7 +408,7 @@ public final class MapView extends View implements Runnable {
       if(focused != null && focused.thumb) {
         final int pre = focused.pre;
         final byte[] text = ViewData.content(data, pre, false);
-        final FTTokenizer ftt = new FTTokenizer(text);
+        final Tokenizer ftt = new Tokenizer(text);
         final int[][] d = ftt.getInfo();
         focused.x += 3;
         focused.w -= 3;

@@ -2,7 +2,7 @@ package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.FTTokenizer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -21,7 +21,7 @@ public final class FTIndexAccess extends Simple {
   /** Fulltext expression. */
   final FTExpr ftexpr;
   /** Fulltext parser. */
-  final FTTokenizer ft;
+  final Tokenizer ft;
   /** Index context. */
   final IndexContext ictx;
 
@@ -31,7 +31,7 @@ public final class FTIndexAccess extends Simple {
    * @param ftt FTTokenizer
    * @param ic index context
    */
-  public FTIndexAccess(final FTExpr ex, final FTTokenizer ftt,
+  public FTIndexAccess(final FTExpr ex, final Tokenizer ftt,
       final IndexContext ic) {
     ftexpr = ex;
     ft = ftt;
@@ -43,7 +43,7 @@ public final class FTIndexAccess extends Simple {
     return new Iter(){
       @Override
       public Item next() throws QueryException {
-        final FTTokenizer tmp = ctx.ftitem;
+        final Tokenizer tmp = ctx.ftitem;
         ctx.ftitem = ft;
         final FTNodeItem it = ftexpr.iter(ctx).next();
         ctx.ftitem = tmp;
@@ -69,6 +69,6 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(" + ftexpr + ")";
+    return name() + "(" + ftexpr + ")";
   }
 }

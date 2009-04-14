@@ -40,12 +40,12 @@ import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
 import org.basex.core.proc.XQueryMV;
 import org.basex.core.proc.XQuery;
+import org.basex.ft.Levenshtein;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.util.Array;
 import org.basex.util.InputParser;
-import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
 
 /**

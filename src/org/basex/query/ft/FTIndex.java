@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.ft.Tokenizer;
 import org.basex.index.FTNode;
-import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
 import org.basex.query.QueryContext;
 import org.basex.query.item.FTNodeItem;
@@ -55,7 +55,7 @@ public final class FTIndex extends FTExpr {
        * @return true if result was found
        */
       private boolean evalIter() {
-        final FTTokenizer ft = new FTTokenizer(tok, fto);
+        final Tokenizer ft = new Tokenizer(tok, fto);
         ft.lp = true;
         while(ft.more()) {
           if(data.nrIDs(ft) == 0) return false;
@@ -70,7 +70,7 @@ public final class FTIndex extends FTExpr {
         }
         
         if(iat != null && iat.size() > 0) {
-          iat.setToken(new FTTokenizer[]{ft});
+          iat.setToken(new Tokenizer[]{ft});
           iat.setTokenNum(++ctx.ftcount);
           return true;
         }

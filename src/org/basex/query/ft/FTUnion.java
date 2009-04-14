@@ -89,7 +89,7 @@ final class FTUnion extends FTExpr {
     minp = -1;
     final FTNodeItem m = mp[pex[cp.list[0]]];
     for (int i = 1; i < cp.size; i++) {
-      m.merge(mp[pex[cp.list[i]]], 0);
+      m.merge(ctx, mp[pex[cp.list[i]]], 0);
       // in case of ftor !"a" ftor "b" "a b" is result
       m.ftn.not = false;
     }

@@ -10,7 +10,6 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 
@@ -77,7 +76,7 @@ public final class Let extends ForLet {
               s += it.score();
               c++;
             }
-            it = Dbl.get(Scoring.finish(s / c));
+            it = Dbl.get(ctx.score.finish(s / c));
           } else {
             it = ir.finish();
           }

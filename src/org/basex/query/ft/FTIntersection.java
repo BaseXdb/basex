@@ -144,7 +144,7 @@ final class FTIntersection extends FTExpr {
       if(i == 0) continue;
       n2 = n[i];
       n1.ftn.reset();
-      n1.merge(n2, 0);
+      n1.merge(ctx, n2, 0);
       n1.ftn.reset();
     }
     return n1;

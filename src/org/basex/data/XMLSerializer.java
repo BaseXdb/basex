@@ -3,7 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.index.FTTokenizer;
+
+import org.basex.ft.Tokenizer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -103,7 +104,7 @@ public final class XMLSerializer extends Serializer {
       final TokenList ial) throws IOException {
     finishElement();
     int c = -1, pp = 0, wl = 0;
-    FTTokenizer ftt = new FTTokenizer(b);
+    final Tokenizer ftt = new Tokenizer(b);
     while(ftt.more()) {
       c++;
       for(int i = wl; i < ftt.p; i++) {

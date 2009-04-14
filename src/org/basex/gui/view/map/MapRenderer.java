@@ -4,9 +4,10 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
+
+import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.index.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
@@ -89,7 +90,7 @@ final class MapRenderer {
       tmp = new byte[m];
       System.arraycopy(s, 0, tmp, 0, m);
     } else tmp = s;
-    final FTTokenizer ftt = new FTTokenizer(tmp);
+    final Tokenizer ftt = new Tokenizer(tmp);
 
     // get index on first pre value
     int count = 0;
@@ -209,7 +210,7 @@ final class MapRenderer {
     r.thumbf = ff * GUIProp.fontsize;
     r.thumbal = 0;
 
-    FTTokenizer ftt = new FTTokenizer(s);
+    Tokenizer ftt = new Tokenizer(s);
     final int[][] data = ftt.getInfo();
 
     boolean l = false;
