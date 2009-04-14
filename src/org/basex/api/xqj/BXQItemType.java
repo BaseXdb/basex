@@ -135,7 +135,7 @@ public final class BXQItemType implements XQItemType {
     if(type == Type.ITEM) throw new BXQException(TYPE);
 
     final Type t = base != -1 ? BASE[base] : type;
-    return new QName(Token.string(QueryTokens.XSURI), Token.string(t.name));
+    return new QName(Token.string(QueryTokens.XSURI), t.name);
   }
 
   public boolean isAnonymousType() {
@@ -163,6 +163,6 @@ public final class BXQItemType implements XQItemType {
   @Override
   public String toString() {
     //"xs:" +
-    return Token.string(type.name);
+    return type.name;
   }
 }
