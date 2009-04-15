@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.ft.StopWords;
+import org.basex.ft.ThesQuery;
 import org.basex.ft.Thesaurus;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
@@ -285,7 +286,7 @@ public class QueryParser extends InputParser {
         } else if(consumeWS(FTOPTION)) {
           final FTOpt opt = new FTOpt();
           while(ftMatchOption(opt));
-          ctx.ftopt.compile(opt);
+          ctx.ftopt.compile(ctx, opt);
         } else {
           qp = p;
           return;
@@ -2125,7 +2126,6 @@ public class QueryParser extends InputParser {
         else error(INCOMPLETE);
       }
     }
-    if(consumeWS(WEIGHT)) sel.weight = range();
     //return sel.standard() ? expr : sel;
     return sel;
   }
@@ -2201,6 +2201,10 @@ public class QueryParser extends InputParser {
     // skip options if none were specified...
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
+    if(consumeWS(WEIGHT)) {
+      found = true;
+      fto.weight = range();
+    }
     return found ? new FTOptions(expr, fto) : expr;
   }
 
@@ -2337,7 +2341,7 @@ public class QueryParser extends InputParser {
         opt.set(FTOpt.ST, with);
       } else if(consumeWS2(THESAURUS)) {
         if(opt.th != null) error(FTDUP, THESAURUS);
-        opt.th = new Thesaurus();
+        opt.th = new ThesQuery();
         if(with) {
           final boolean par = consumeWS2(PAR1);
           if(!consumeWS2(DEFAULT)) ftThesaurusID(opt.th);
@@ -2397,27 +2401,30 @@ public class QueryParser extends InputParser {
    * @param thes link to thesaurus
    * @throws QueryException xquery exception
    */
-  private void ftThesaurusID(final Thesaurus thes) throws QueryException {
+  private void ftThesaurusID(final ThesQuery thes) throws QueryException {
     check(AT);
 
     String fn = string(stringLiteral());
     if(ctx.thes != null) fn = ctx.thes.get(fn);
-    final IO fl = IO.get(fn);
+    IO fl = IO.get(fn);
 
-    if(!thes.read(fl.exists() || file == null ? fl : file.merge(fl))) 
-      error(NOTHES, fl);
-
-    if(consumeWS2(RELATIONSHIP)) thes.rs(stringLiteral());
-
+    if(!fl.exists() && file != null) fl = file.merge(file); 
+    final byte[] rel = consumeWS2(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange();
+    long min = 0;
+    long max = Long.MAX_VALUE;
     if(range != null) {
       check(LEVELS);
       if(range[0] instanceof Itr && range[1] instanceof Itr) {
-        thes.level(((Itr) range[0]).itr(), ((Itr) range[1]).itr());
+        min = ((Itr) range[0]).itr();
+        max = ((Itr) range[1]).itr();
       } else {
         error(THESRNG);
       }
     }
+    final Thesaurus th = new Thesaurus(fl, rel, min, max);
+    if(!th.init()) error(NOTHES, fl);
+    thes.add(th);
   }
 
   /**

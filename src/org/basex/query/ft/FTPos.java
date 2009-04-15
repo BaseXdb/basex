@@ -57,8 +57,6 @@ public final class FTPos extends FTExpr {
   public Expr window;
   /** Distance occurrences. */
   public Expr[] dist;
-  /** Weight. */
-  public Expr weight;
 
   /** Position list. */
   private IntList[] pos = new IntList[0];
@@ -80,8 +78,6 @@ public final class FTPos extends FTExpr {
     if(dist != null) {
       for(int d = 0; d < dist.length; d++) dist[d] = dist[d].comp(ctx);
     }
-
-    if(weight != null) weight = weight.comp(ctx);
     return super.comp(ctx);
   }
 
@@ -102,8 +98,7 @@ public final class FTPos extends FTExpr {
       tmp.addPos(pos, pos.length, term);
     ctx.ftd = pos;
 
-    // calculate weight
-    return score(weight != null ? s * checkDbl(weight, ctx) : s);
+    return score(s);
   }
 
   /**
@@ -428,7 +423,7 @@ public final class FTPos extends FTExpr {
    */
   public boolean standard() {
     return !ordered && !start && !end && !content && !same && !different &&
-      window == null && dist == null && weight == null;
+      window == null && dist == null;
   }
 
   @Override

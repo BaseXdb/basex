@@ -5,11 +5,14 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.ft.StemDir;
 import org.basex.ft.StopWords;
-import org.basex.ft.Thesaurus;
+import org.basex.ft.ThesQuery;
 import org.basex.ft.Tokenizer;
 import org.basex.ft.Levenshtein;
 import org.basex.query.ExprInfo;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
+import org.basex.query.expr.Expr;
 import org.basex.util.IntList;
 
 /**
@@ -51,12 +54,14 @@ public final class FTOpt extends ExprInfo {
   /** States which flags are assigned. */
   private final boolean[] set = new boolean[flag.length];
 
+  /** Weight. */
+  public Expr weight;
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stopwords. */
   public StopWords sw;
   /** Thesaurus. */
-  public Thesaurus th;
+  public ThesQuery th;
   /** Language. */
   public byte[] ln;
 
@@ -65,9 +70,13 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Compiles the fulltext options, inheriting the options of the argument.
+   * @param ctx query context
    * @param opt parent fulltext options
+   * @throws QueryException xquery exception
    */
-  public void compile(final FTOpt opt) {
+  public void compile(final QueryContext ctx, final FTOpt opt)
+      throws QueryException {
+
     for(int i = 0; i < flag.length; i++) {
       if(!set[i]) {
         set[i] = opt.set[i];
@@ -79,6 +88,8 @@ public final class FTOpt extends ExprInfo {
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
     else if(opt.th != null) th.merge(opt.th);
+
+    if(weight != null) weight = weight.comp(ctx);
   }
 
   /**

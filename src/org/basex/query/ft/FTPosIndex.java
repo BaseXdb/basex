@@ -1,13 +1,11 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;
-import org.basex.query.util.Err;
 
 /**
  * FTSelect expression.
@@ -52,13 +50,6 @@ public final class FTPosIndex extends FTExpr {
             } 
           }    
         }
-        // calculate weight
-        if(pos.weight != null) {
-          final double d = checkDbl(pos.weight, ctx);
-          if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-          if (d != -1) it.score(it.score() * d);
-        }
-
         ctx.ftpos = tmp;
         return it;
       }

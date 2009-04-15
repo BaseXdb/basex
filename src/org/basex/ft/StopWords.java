@@ -11,7 +11,7 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class StopWords extends Set {
+public final class StopWords extends Set {
   /**
    * Reads a stop words file.
    * @param fl file reference

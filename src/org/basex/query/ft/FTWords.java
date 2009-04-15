@@ -59,7 +59,10 @@ public final class FTWords extends FTExpr {
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     final int len = contains(ctx);
-    return score(len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size()));
+    final double s = len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size());
+    // calculate weight
+    final Expr w = ctx.ftopt.weight;
+    return score(w != null ? s * checkDbl(w, ctx) : s);
   }
 
   /**

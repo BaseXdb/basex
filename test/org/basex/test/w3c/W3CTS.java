@@ -28,6 +28,7 @@ import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.ft.StemDir;
 import org.basex.ft.StopWords;
+import org.basex.ft.ThesQuery;
 import org.basex.ft.Thesaurus;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
@@ -91,7 +92,7 @@ public abstract class W3CTS {
   private static final byte[] XML = token("XML");
 
   /** Maximum length of result output. */
-  private static int maxout = 50;
+  private static int maxout = 500;
 
   /** Replacement pattern. */
   private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
@@ -391,8 +392,9 @@ public abstract class W3CTS {
       for(final String s : aux("thesaurus", root)) {
         String fn = thes2.get(s);
         if(fn != null) {
-          if(ctx.ftopt.th == null) ctx.ftopt.th = new Thesaurus();
-          ctx.ftopt.th.read(IO.get(fn));
+          if(ctx.ftopt.th == null) ctx.ftopt.th = new ThesQuery();
+          final Thesaurus th = new Thesaurus(IO.get(fn));
+          if(th.init()) ctx.ftopt.th.add(th);
         }
       }
       

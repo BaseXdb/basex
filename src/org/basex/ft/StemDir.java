@@ -11,7 +11,7 @@ import org.basex.util.Map;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class StemDir extends Map<byte[]> {
+public final class StemDir extends Map<byte[]> {
   /**
    * Reads a stop words file.
    * @param fl file reference
