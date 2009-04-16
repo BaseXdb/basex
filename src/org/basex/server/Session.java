@@ -28,7 +28,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class Session extends Thread {
+public class Session implements Runnable {
   
   /** Database Context. */
   final Context context = new Context();
@@ -43,7 +43,7 @@ public class Session extends Thread {
   /** Flag for Session. */
   boolean running = true;
   /** Thread. */
-  Thread thread;
+  Thread thread = null;
   
   
   /**
@@ -53,10 +53,19 @@ public class Session extends Thread {
    * @param v Verbose Mode
    */
   public Session(final Socket s, final int c, final boolean v) {
-    this.thread = new Thread("Session");
     this.clientId = c;
     this.socket = s;
     this.verbose = v;
+  }
+  
+  /**
+   * Starts the Thread.
+   */
+  public synchronized void start() {
+    if (thread == null) {
+      thread = new Thread(this);
+      thread.start();
+    }
   }
   
   /**
@@ -114,7 +123,7 @@ public class Session extends Thread {
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
-    stopper();
+    stop();
   }
   
   /**
@@ -142,7 +151,7 @@ public class Session extends Thread {
   /**
    * Stops the thread. 
    */
-  synchronized void stopper() {
+  synchronized void stop() {
     BaseX.outln("Client " + clientId + " has logged out.");
     try {
       socket.close();
@@ -152,14 +161,13 @@ public class Session extends Thread {
     thread = null;
   }
   
-  @Override
   public void run() {
     try {
       handle(); 
     } catch(Exception io) {
       // for forced stops
       if (io instanceof SocketException) {
-       stopper();
+       stop();
       } else {
       io.printStackTrace();
       }
