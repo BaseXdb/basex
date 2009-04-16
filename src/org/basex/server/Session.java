@@ -35,7 +35,7 @@ public class Session implements Runnable {
   /** Socket. */
   private Socket socket;
   /** ClientId. */
-  private int clientId;
+  int clientId;
   /** Verbose mode. */
   boolean verbose;
   /** Core. */
@@ -44,6 +44,10 @@ public class Session implements Runnable {
   boolean running = true;
   /** Thread. */
   Thread thread = null;
+  /** DataOutputStream. */
+  DataOutputStream dos;
+  /** PrintOutput. */
+  PrintOutput out;
   
   
   /**
@@ -79,9 +83,8 @@ public class Session implements Runnable {
     final int sp = socket.getPort();
     // get command and arguments
     DataInputStream dis = new DataInputStream(socket.getInputStream());
-    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-    PrintOutput out = new PrintOutput(new BufferedOutput(
-        socket.getOutputStream()));
+    dos = new DataOutputStream(socket.getOutputStream());
+    out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
     String in;
     while (running) {
@@ -94,11 +97,11 @@ public class Session implements Runnable {
         pr = new Process(0) { };
         pr.error(ex.extended());
         core = pr;
-        send(-sp, dos);
+        send(-sp);
         return;
       }
       if(pr instanceof Exit) {
-        send(0, dos);
+        send(0);
         // interrupt running processes
         running = false;
         break;
@@ -119,7 +122,7 @@ public class Session implements Runnable {
         out.flush();
       } else {
         core = proc;
-        send(proc.execute(context) ? sp : -sp, dos);
+        send(proc.execute(context) ? sp : -sp);
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
@@ -139,11 +142,9 @@ public class Session implements Runnable {
   /**
    * Returns an answer to the client.
    * @param id session id to be returned
-   * @param dos DataOutputStream
    * @throws IOException I/O exception
    */
-  synchronized void send(final int id, final DataOutputStream dos)
-  throws IOException {
+  synchronized void send(final int id) throws IOException {
     dos.writeInt(id);
     dos.flush();
     }
