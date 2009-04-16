@@ -2,10 +2,13 @@ package org.basex.server;
 
 import static org.basex.Text.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -30,6 +33,8 @@ public class BaseXServerNew {
   boolean verbose = false;
   /** Last Id from a client. */
   int lastid = 0;
+  /** ServerSocket. */
+  ServerSocket serverSocket;
 
   /**
    * Main method, launching the server process.
@@ -52,8 +57,10 @@ public class BaseXServerNew {
     if(!parseArguments(args)) return;
 
     try {
-      ServerSocket serverSocket = new ServerSocket(Prop.port);
+      serverSocket = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
+      InputListener inputListener = new InputListener();
+      inputListener.start();
       while(running) {
         Socket s = serverSocket.accept();
         lastid++;
@@ -61,15 +68,21 @@ public class BaseXServerNew {
         new Session(s, lastid, verbose).start();
       }
       // close the serverSocket when Server is stopped.
-      serverSocket.close();
+      //serverSocket.close();
       // exits the BaseXServer
-      new Exit().execute(null);
+      //new Exit().execute(null);
     } catch(final Exception ex) {
       BaseX.debug(ex);
       if(ex instanceof BindException) {
         BaseX.errln(SERVERBIND);
       } else if(ex instanceof IOException) {
+        if(ex instanceof SocketException) {
+          BaseX.outln("Server stopped.");
+          // exits the BaseXServer
+          new Exit().execute(null);
+        } else {
         BaseX.errln(SERVERERR);
+        }
       } else {
         BaseX.errln(ex.getMessage());
       }
@@ -120,5 +133,44 @@ public class BaseXServerNew {
     }
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
+  }
+  
+  /**
+   * InputListener.
+   * @author Andy
+   *
+   */
+  class InputListener implements Runnable {
+    
+    /** Thread. */
+    Thread thread = null;
+    
+    /**
+     * Starts the thread.
+     */
+    public synchronized void start() {
+      if (thread == null) {
+        thread = new Thread(this);
+        thread.start();
+      }
+    }
+
+    public void run() {
+      while(true) {
+        // get user input
+        try {
+          final InputStreamReader isr = new InputStreamReader(System.in);
+          String temp = new BufferedReader(isr).readLine().trim();
+          if(temp.equals("stop")) {
+            thread = null;
+            // close the serverSocket when Server is stopped.
+            serverSocket.close();
+          }
+        } catch(final Exception ex) {
+          // also catches interruptions such as ctrl+c, etc.
+          BaseX.outln();
+        }
+      }
+    }
   }
 }
