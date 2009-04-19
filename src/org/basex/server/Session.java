@@ -33,7 +33,7 @@ public class Session implements Runnable {
   /** Database Context. */
   final Context context = new Context();
   /** Socket. */
-  private Socket socket;
+  Socket socket;
   /** ClientId. */
   int clientId;
   /** Verbose mode. */
@@ -48,6 +48,8 @@ public class Session implements Runnable {
   DataOutputStream dos;
   /** PrintOutput. */
   PrintOutput out;
+  /** BaseXServerNew. */
+  BaseXServerNew bx;
   
   
   /**
@@ -55,11 +57,14 @@ public class Session implements Runnable {
    * @param s Socket
    * @param c ClientId
    * @param v Verbose Mode
+   * @param b BaseXServerNew
    */
-  public Session(final Socket s, final int c, final boolean v) {
+  public Session(final Socket s, final int c, final boolean v,
+      final BaseXServerNew b) {
     this.clientId = c;
     this.socket = s;
     this.verbose = v;
+    this.bx = b;
   }
   
   /**
@@ -77,6 +82,7 @@ public class Session implements Runnable {
    * @throws IOException I/O Exception
    */
   private void handle() throws IOException {
+    BaseX.outln("Login from Client " + clientId);
     final Performance perf = new Performance();
     final InetAddress addr = socket.getInetAddress();
     final String ha = addr.getHostAddress();
@@ -87,7 +93,7 @@ public class Session implements Runnable {
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
     String in;
-    while (running) {
+    while (thread != null) {
       in = getMessage(dis).trim(); 
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
@@ -154,6 +160,7 @@ public class Session implements Runnable {
    */
   synchronized void stop() {
     BaseX.outln("Client " + clientId + " has logged out.");
+    bx.sessions.remove(this);
     try {
       socket.close();
     } catch(IOException e) {

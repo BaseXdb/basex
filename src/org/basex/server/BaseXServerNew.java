@@ -8,10 +8,12 @@ import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import org.basex.BaseX;
 import org.basex.core.Prop;
+import org.basex.core.proc.Exit;
 import org.basex.util.Token;
 
 /**
@@ -33,6 +35,12 @@ public class BaseXServerNew {
   int lastid = 0;
   /** Current client connections. */
   final ArrayList<Session> sessions = new ArrayList<Session>();
+  /** ServerSocket. */
+  ServerSocket serverSocket;
+  /** InputListener. */
+  InputListener inputListener;
+  /** SessionListenre. */
+  SessionListener sessionListener;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -55,60 +63,12 @@ public class BaseXServerNew {
     if(!parseArguments(args)) return;
 
     try {
-      final ServerSocket serverSocket = new ServerSocket(Prop.port);
+      serverSocket = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
-      // Thread for Sessions.
-      new Thread() {
-        @Override
-        public void run() {
-          while(true) {
-            Socket s;
-            try {
-              s = serverSocket.accept();
-              lastid++;
-              BaseX.outln("Login from Client " + lastid);
-              Session session = new Session(s, lastid, verbose);
-              session.start();
-              sessions.add(session);
-            } catch(IOException e) {
-              e.printStackTrace();
-            }
-          }
-        }
-      }.start();
-      // Thread for Console Input.
-      new Thread() {
-        @Override
-        public void run() {
-          while(true) {
-         // get user input
-            try {
-              final InputStreamReader isr = new InputStreamReader(System.in);
-              String temp = new BufferedReader(isr).readLine().trim();
-              if(temp.equals("stop")) {
-                BaseX.outln("Server stopped.");
-                //exits the BaseXServer
-                System.exit(0);
-              } else if(temp.equals("list")) {
-                BaseX.outln("Number of Clients: " + sessions.size());
-                BaseX.outln("List of Clients:");
-                for(int i = 0; i < sessions.size(); i++) {
-                  BaseX.outln("Client " + sessions.get(i).clientId);
-                }
-              } else {
-                BaseX.outln("No such command");
-              }
-            } catch(final Exception ex) {
-              // also catches interruptions such as ctrl+c, etc.
-              BaseX.outln();
-            }
-          }
-        }
-      }.start();
-      // close the serverSocket when Server is stopped.
-      // serverSocket.close();
-      // exits the BaseXServer
-      // new Exit().execute(null);
+      inputListener = new InputListener();
+      inputListener.start();
+      sessionListener = new SessionListener(this);
+      sessionListener.start();
     } catch(final Exception ex) {
       BaseX.debug(ex);
       if(ex instanceof BindException) {
@@ -117,6 +77,25 @@ public class BaseXServerNew {
         BaseX.errln(SERVERERR);
       } else {
         BaseX.errln(ex.getMessage());
+      }
+    }
+  }
+  
+  /**
+   * Stops.
+   */
+  public void stop() {
+    while(sessions.size() > 0) {
+      
+    }
+    if(sessions.size() == 0) {
+      try {
+        sessionListener.thread = null;
+        inputListener.thread = null;
+        serverSocket.close();
+        new Exit().execute(null);
+      } catch(IOException e) {
+        e.printStackTrace();
       }
     }
   }
@@ -165,5 +144,106 @@ public class BaseXServerNew {
     }
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
+  }
+  
+  /**
+   * InputListener listens to the Console Input.
+   * 
+   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+   * @author Andreas Weiler
+   *
+   */
+  class InputListener implements Runnable {
+    
+    /** Thread. */
+    Thread thread = null;
+    
+    /**
+     * Starts the Thread.
+     */
+    public synchronized void start() {
+      if (thread == null) {
+        thread = new Thread(this);
+        thread.start();
+      }
+    }
+
+    public void run() {
+      while(thread != null) {
+     // get user input
+        try {
+          final InputStreamReader isr = new InputStreamReader(System.in);
+          String com = new BufferedReader(isr).readLine().trim();
+          if(com.equals("stop")) {
+            if(sessions.size() > 0) {
+              BaseX.outln("There are still " + sessions.size() +
+                  " Clients connected, please wait.");
+            }
+            stop();
+          } else if(com.equals("list")) {
+            BaseX.outln("Number of Clients: " + sessions.size());
+            BaseX.outln("List of Clients:");
+            for(int i = 0; i < sessions.size(); i++) {
+              BaseX.outln("Client " + sessions.get(i).clientId);
+            }
+          } else {
+            BaseX.outln("No such command");
+          }
+        } catch(final Exception ex) {
+          // also catches interruptions such as ctrl+c, etc.
+          BaseX.outln();
+        }
+      }
+    } 
+  }
+  
+  /**
+   * SessionListener listens to new Client-Server Sessions.
+   * 
+   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+   * @author Andreas Weiler
+   *
+   */
+  class SessionListener implements Runnable {
+    
+    /** Thread. */
+    Thread thread = null;
+    /** BaseXServerNew. */
+    BaseXServerNew bx;
+   
+    /**
+     * Constructor.
+     * @param b BaseXServerNew
+     */
+    public SessionListener(final BaseXServerNew b) {
+      this.bx = b;
+    }
+    
+    /**
+     * Starts the Thread.
+     */
+    public synchronized void start() {
+      if (thread == null) {
+        thread = new Thread(this);
+        thread.start();
+      }
+    }
+
+    public void run() {
+      while(thread != null) {
+        Socket s;
+        try {
+          s = serverSocket.accept();
+          lastid++;
+          Session session = new Session(s, lastid, verbose, bx);
+          session.start();
+          sessions.add(session);
+        } catch(IOException e) {
+          if(e instanceof SocketException) {
+            return;
+          } else e.printStackTrace();
+        }
+      }
+    }
   }
 }
