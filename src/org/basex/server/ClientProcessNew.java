@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.basex.core.AbstractProcess;
 import org.basex.core.Commands;
@@ -38,9 +39,16 @@ public final class ClientProcessNew extends AbstractProcess {
   }
 
   @Override
-  public boolean execute(final Context ctx) throws IOException {
-    send(proc.toString());
-    last = new DataInputStream(socket.getInputStream()).readInt();
+  public boolean execute(final Context ctx) {
+    try {
+      send(proc.toString());
+      last = new DataInputStream(socket.getInputStream()).readInt();
+    } catch(IOException e) {
+      if(e instanceof SocketException) {
+        return false;
+      }
+      e.printStackTrace();
+    }
     return last > 0;
   }
 

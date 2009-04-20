@@ -85,8 +85,12 @@ public class BaseXServerNew {
    * Stops.
    */
   public void stop() {
-    while(sessions.size() > 0) {
-      
+    for(int i = 0; i < sessions.size(); i++) {
+      try {
+        sessions.get(i).dis.close();
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
     }
     if(sessions.size() == 0) {
       try {
@@ -175,16 +179,18 @@ public class BaseXServerNew {
           final InputStreamReader isr = new InputStreamReader(System.in);
           String com = new BufferedReader(isr).readLine().trim();
           if(com.equals("stop")) {
-            if(sessions.size() > 0) {
-              BaseX.outln("There are still " + sessions.size() +
-                  " Clients connected, please wait.");
-            }
             stop();
           } else if(com.equals("list")) {
-            BaseX.outln("Number of Clients: " + sessions.size());
+            int size = sessions.size();
+            BaseX.outln("Number of Clients: " + size);
             BaseX.outln("List of Clients:");
-            for(int i = 0; i < sessions.size(); i++) {
-              BaseX.outln("Client " + sessions.get(i).clientId);
+            for(int i = 0; i < size; i++) {
+              Session session = sessions.get(i);
+              String dbname = "No Database opened.";
+              if(session.context.db()) {
+              dbname = session.context.data().meta.dbname;
+              }
+              BaseX.outln("Client " + session.clientId + ": " + dbname);
             }
           } else {
             BaseX.outln("No such command");

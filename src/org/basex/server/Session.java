@@ -46,6 +46,8 @@ public class Session implements Runnable {
   Thread thread = null;
   /** DataOutputStream. */
   DataOutputStream dos;
+  /** DataInputStream. */
+  DataInputStream dis;
   /** PrintOutput. */
   PrintOutput out;
   /** BaseXServerNew. */
@@ -88,13 +90,13 @@ public class Session implements Runnable {
     final String ha = addr.getHostAddress();
     final int sp = socket.getPort();
     // get command and arguments
-    DataInputStream dis = new DataInputStream(socket.getInputStream());
+    dis = new DataInputStream(socket.getInputStream());
     dos = new DataOutputStream(socket.getOutputStream());
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
     String in;
-    while (thread != null) {
-      in = getMessage(dis).trim(); 
+    while (running) {
+      in = getMessage().trim(); 
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
@@ -137,11 +139,10 @@ public class Session implements Runnable {
   
   /**
    * Returns the Message from the Client.
-   * @param dis DataInputStream
    * @return String
    * @throws IOException I/O Exception
    */
-  synchronized String getMessage(final DataInputStream dis) throws IOException {
+  synchronized String getMessage() throws IOException {
     return dis.readUTF();
   }
   
