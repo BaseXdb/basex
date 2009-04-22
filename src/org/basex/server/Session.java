@@ -122,6 +122,7 @@ public class Session implements Runnable {
         } else if(proc instanceof GetResult) {
           // the client requests result of the last process
           c.output(out);
+          out.write(0);
         } else if(proc instanceof GetInfo) {
           // the client requests information about the last process
           c.info(out);

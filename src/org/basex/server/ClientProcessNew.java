@@ -55,13 +55,13 @@ public final class ClientProcessNew extends AbstractProcess {
   @Override
   public void output(final PrintOutput o) throws IOException {
     send(Commands.Cmd.GETRESULT.name() + " " + last);
-    receive(o, 0);
+    receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
     send(Commands.Cmd.GETINFO.name() + " " + last);
-    receive(o, 1);
+    receive(o);
   }
 
   /**
@@ -78,16 +78,15 @@ public final class ClientProcessNew extends AbstractProcess {
   /**
    * Receives an input stream over the network.
    * @param o output stream
-   * @param neg int
    * @throws IOException I/O Exception
    */
-  synchronized void receive(final PrintOutput o, final int neg)
+  synchronized void receive(final PrintOutput o)
   throws IOException {
     final InputStream in = socket.getInputStream();
     final byte[] bb = new byte[4096];
     int l = 0;
     while((l = in.read(bb)) != -1) {
-      for(int i = 0; i < l - neg; i++) {
+      for(int i = 0; i < l - 1; i++) {
         o.write(bb[i]);
       }
       if (l < 4096) break;
