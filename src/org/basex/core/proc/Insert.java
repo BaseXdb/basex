@@ -35,19 +35,20 @@ public final class Insert extends AUpdate {
 
   @Override
   protected boolean exec() {
-    final Data data = context.data();
-    final CmdUpdate type = getType();
+    final boolean gui = args[args.length - 1] == null;
 
     // get sources from the marked node set or the specified query
-    final Nodes nodes = Prop.gui ? context.marked() :
+    final CmdUpdate type = getType();
+    final Nodes nodes = gui ? context.marked() :
       query(args[type == CmdUpdate.PI ? 3 : 2], null);
     if(nodes == null) return false;
 
     boolean ok = false;
+    final Data data = context.data();
     switch(type) {
       case ATTRIBUTE: ok = attr(data, nodes); break;
-      case FRAGMENT:  ok = frag(data, nodes); break;
-      default:        ok = node(data, nodes); break;
+      case FRAGMENT:  ok = frag(data, nodes, gui); break;
+      default:        ok = node(data, nodes, gui); break;
     }
     if(!ok) return false;
     
@@ -94,10 +95,11 @@ public final class Insert extends AUpdate {
    * Inserts fragments.
    * @param data data reference
    * @param nodes node reference
+   * @param gui gui flag
    * @return success flag
    */
-  private boolean frag(final Data data, final Nodes nodes) {
-    final int pos = Prop.gui ? 0 : Token.toInt(args[1]);
+  private boolean frag(final Data data, final Nodes nodes, final boolean gui) {
+    final int pos = gui ? 0 : Token.toInt(args[1]);
     if(pos < 0) return error(POSINVALID, args[1]);
     
     Data tmp;
@@ -128,9 +130,10 @@ public final class Insert extends AUpdate {
    * Inserts nodes.
    * @param data data reference
    * @param nodes node reference
+   * @param gui gui flag
    * @return success flag
    */
-  private boolean node(final Data data, final Nodes nodes) {
+  private boolean node(final Data data, final Nodes nodes, final boolean gui) {
     byte[] v = token(args[0]);
     final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
@@ -143,7 +146,7 @@ public final class Insert extends AUpdate {
     }
 
     // check correctness of query
-    final int pos = Prop.gui ? 0 : toInt(args[pi ? 2 : 1]);
+    final int pos = gui ? 0 : toInt(args[pi ? 2 : 1]);
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);

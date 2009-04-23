@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.util.Atts;
+import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
 /**
@@ -15,13 +16,16 @@ import org.basex.util.TokenList;
  */
 public abstract class Serializer {
   /** Namespaces. */
-  public Atts ns = new Atts();
-  /** Opened tags. */
-  public TokenList tags = new TokenList();
+  public final Atts ns = new Atts();
   /** Current default namespace. */
   public byte[] dn = EMPTY;
+
+  /** Opened tags. */
+  private final TokenList tags = new TokenList();
+  /** Namespace levels. */
+  private final IntList nsl = new IntList();
   /** Flag for opened tag. */
-  protected boolean inTag;
+  private boolean inTag;
 
   // === abstract methods =====================================================
 
@@ -144,6 +148,7 @@ public abstract class Serializer {
   
     finishElement();
     tags.add(t);
+    nsl.add(ns.size);
     inTag = true;
     start(t);
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
@@ -179,12 +184,12 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final void closeElement() throws IOException {
+    ns.size = nsl.list[--tags.size];
     if(inTag) {
       inTag = false;
-      tags.size--;
       empty();
     } else {
-      close(tags.list[--tags.size]);
+      close(tags.list[tags.size]);
     }
   }
 
@@ -218,6 +223,14 @@ public abstract class Serializer {
   }
 
   /**
+   * Returns the current level.
+   * @return level
+   */
+  public final int level() {
+    return tags.size;
+  }
+
+  /**
    * Serializes a node of the specified data reference.
    * @param data data reference
    * @param pre pre value to start from
@@ -239,27 +252,22 @@ public abstract class Serializer {
   public final int node(final Data data, final int pre,
       final FTPosData ft) throws IOException {
 
-    /** Namespaces. */
-    final Atts nsp = new Atts();
-    /** Parent Stack. */
+    final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
     final int[] parent = new int[IO.MAXHEIGHT];
-    /** Namespace Stack. */
     final byte[][] names = new byte[IO.MAXHEIGHT][];
+    names[0] = dn;
     
-    // current output level
     int l = 0;
     int p = pre;
-    final int s = pre + data.size(pre, data.kind(p));
-
-    names[l] = dn;
     
     // loop through all table entries
+    final int s = pre + data.size(pre, data.kind(p));
     while(p < s && !finished()) {
       int k = data.kind(p);
-      final int pa = data.parent(p, k);
+      final int r = data.parent(p, k);
 
-      // close opened tags...
-      while(l > 0 && parent[l - 1] >= pa) {
+      // close opened elements...
+      while(l > 0 && parent[l - 1] >= r) {
         closeElement();
         l--;
       }
@@ -268,8 +276,7 @@ public abstract class Serializer {
         p++;
       } else if(k == Data.TEXT) {
         final int[][] ftd = ft != null ? ft.get(p) : null;
-        if(ftd != null) 
-          text(data.text(p++), ftd, ft.col);
+        if(ftd != null) text(data.text(p++), ftd, ft.col);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));
@@ -289,64 +296,51 @@ public abstract class Serializer {
         final byte[] name = data.tag(p);
         openElement(name);
 
-        final int as = p + data.attSize(p, k);
-
         // add namespace definitions
-        byte[] empty = null;
-        if(data.ns.size() != 0) {
+        byte[] empty = names[l];
+        if(nsp != null) {
           nsp.reset();
           int pp = p;
+          // collect namespaces from database
           do {
-            addNS(data, pp, nsp);
+            final int[] nm = data.ns(pp);
+            for(int n = 0; n < nm.length; n += 2) {
+              final byte[] key = data.ns.key(nm[n]);
+              if(!nsp.contains(key)) {
+                final byte[] val = data.ns.key(nm[n + 1]);
+                nsp.add(key);
+                namespace(key, val);
+                if(key.length == 0) empty = val;
+              }
+            }
             pp = data.parent(pp, k);
             k = data.kind(pp);
-          } while(tags.size == 1 && l == 0 && k == Data.ELEM);
-          
-          // serialize namespaces
-          for(int n = 0; n < nsp.size; n++) {
-            namespace(nsp.key[n], nsp.val[n]);
-            if(nsp.key[n].length == 0) empty = nsp.val[n];
+          } while(k == Data.ELEM && l == 0 && tags.size == 1);
+
+          // check namespace of current element
+          final byte[] key = pre(name);
+          byte[] val = data.ns.key(data.tagNS(p));
+          if(val == null) val = EMPTY;
+          if(key.length != 0) {
+            if(ns.get(key) == -1) namespace(key, val);
+          } else if(!eq(val, empty)) {
+            namespace(key, val);
+            empty = val;
           }
-          
-          // add namespace for tag
-          final byte[] pref = pre(name);
-          byte[] uri = data.ns.key(data.tagNS(p));
-          if(uri == null) uri = EMPTY;
-          if(pref.length != 0) {
-            if(ns.get(pref) == -1) namespace(pref, uri);
-          } else if(!eq(uri, names[l])) {
-            dn = uri;
-            if(empty == null) {
-              namespace(EMPTY, uri);
-              empty = uri;
-            }
-          }
+        } else if(l == 0 && dn != EMPTY) {
+          namespace(EMPTY, EMPTY);
         }
 
         // serialize attributes
+        final int as = p + data.attSize(p, k);
         while(++p != as) attribute(data.attName(p), data.attValue(p));
-        parent[l++] = pa;
-        names[l] = empty == null ? EMPTY : empty;
+        parent[l++] = r;
+        names[l] = empty;
       }
     }
-    // process nodes that remain in the stack
+
+    // process remaining elements...
     while(--l >= 0) closeElement();
     return s;
-  }
-
-  /**
-   * Adds namespaces for the specified arguments to the temporary
-   * attribute arrays.
-   * @param data data reference
-   * @param pre pre value
-   * @param nsp attribute reference
-   */
-  private void addNS(final Data data, final int pre, final Atts nsp) {
-    final int[] nm = data.ns(pre);
-    for(int n = 0; n < nm.length; n += 2) {
-      final byte[] key = data.ns.key(nm[n]);
-      nsp.addUnique(key, data.ns.key(nm[n + 1]));
-      if(key.length == 0) dn = data.ns.key(nm[n + 1]);
-    }
   }
 }

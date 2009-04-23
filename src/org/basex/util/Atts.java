@@ -52,15 +52,12 @@ public final class Atts {
   }
 
   /**
-   * Adds the specified values if the key is new.
+   * Checks if the specified key is found.
    * @param k key to be checked
-   * @param v value to be added
-   * @return true if values were added
+   * @return result of check
    */
-  public boolean addUnique(final byte[] k, final byte[] v) {
-    final boolean a = get(k) == -1;
-    if(a) add(k, v);
-    return a;
+  public boolean contains(final byte[] k) {
+    return get(k) != -1;
   }
 
   /**
@@ -69,7 +66,7 @@ public final class Atts {
    * @return reference or -1
    */
   public int get(final byte[] k) {
-    for(int i = size - 1; i >= 0; i--) if(Token.eq(key[i], k)) return i;
+    for(int i = 0; i < size; i++) if(Token.eq(key[i], k)) return i;
     return -1;
   }
 

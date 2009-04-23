@@ -69,7 +69,7 @@ public final class BaseXServer {
       @Override
       public void run() {
         while(running) {
-          Performance.sleep(2500L);
+          Performance.sleep(1000);
           clean();
         }
       }

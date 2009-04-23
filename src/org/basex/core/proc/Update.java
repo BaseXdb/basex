@@ -25,15 +25,16 @@ public final class Update extends AUpdate {
 
   @Override
   protected boolean exec() {
-    final Data data = context.data();
+    final boolean gui = args[args.length - 1] == null;
 
     // get sources from the marked node set or the specified query
     final CmdUpdate type = getType();
-    final Nodes nodes = Prop.gui ? context.marked() : query(args[type ==
+    final Nodes nodes = gui ? context.marked() : query(args[type ==
       CmdUpdate.PI || type == CmdUpdate.ATTRIBUTE ? 2 : 1], null);
     if(nodes == null) return false;
 
     boolean ok = false;
+    final Data data = context.data();
     switch(type) {
       case ATTRIBUTE: ok = attr(data, nodes); break;
       default:        ok = node(data, nodes); break;

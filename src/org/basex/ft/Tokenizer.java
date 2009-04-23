@@ -125,8 +125,7 @@ public final class Tokenizer extends IndexToken {
       } else if(!pa && c == '\n') {
         pa = true;
         para++;
-      } else if(c >= '0' && (letterOrDigit(c)  ||
-          Character.isLetterOrDigit(c))) {
+      } else if(ftChar(c)) {
         break;
       }
     }
@@ -137,17 +136,33 @@ public final class Tokenizer extends IndexToken {
     // parse token
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      if(c < '0' || !letterOrDigit(c) && !Character.isLetterOrDigit(c)) {
-        // [CG] FT/parse wildcard indicators
-        if(!wc || ws(c)) break;
-      }
+      // [CG] FT/parse wildcard indicators
+      if(!ftChar(c) && (!wc || ws(c))) break;
     }
     return true;
+  }
+
+  /**
+   * Returns true if the specified character is part of a token.
+   * @param ch character to be tested
+   * @return result of check
+   */
+  public boolean ftChar(final int ch) {
+    return ch >= '0' && (letterOrDigit(ch) || Character.isLetterOrDigit(ch));
   }
   
   @Override
   public byte[] get() {
-    byte[] n = substring(text, s, p);
+    return get(orig());
+  }
+
+  /**
+   * Returns a normalized version of the token.
+   * @param tok input token
+   * @return result
+   */
+  public byte[] get(final byte[] tok) {
+    byte[] n = tok;
     final boolean a = ascii(n);
     if(wc) n = wc(n);
     if(!dc) n = dia(n, a);
@@ -156,7 +171,7 @@ public final class Tokenizer extends IndexToken {
     if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
-
+  
   /**
    * Returns the original token.
    * @return original token
@@ -279,7 +294,7 @@ public final class Tokenizer extends IndexToken {
    * @param n input token
    * @return resulting token
    */
-  private static byte[] wc(final byte[] n) {
+  private byte[] wc(final byte[] n) {
     if(!contains(n, '\\')) return n;
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;
@@ -287,7 +302,7 @@ public final class Tokenizer extends IndexToken {
       if(c == '\\') {
         bs = true;
       } else if(bs) {
-        if(Character.isLetterOrDigit(c)) tb.add(c);
+        if(ftChar(c)) tb.add(c);
         bs = false;
       } else {
         tb.add(c);

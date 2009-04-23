@@ -126,8 +126,11 @@ public final class FTOpt extends ExprInfo {
    * @param pos ft position filter
    * @param q query token
    * @return number of occurrences
+   * @throws QueryException query exception
    */
-  int contains(final Tokenizer tk, final FTPos pos, final byte[] q) {
+  int contains(final Tokenizer tk, final FTPos pos, final byte[] q)
+      throws QueryException {
+
     if(q.length == 0) return 0;
 
     // assign options to text
@@ -175,7 +178,7 @@ public final class FTOpt extends ExprInfo {
 
       if(!f && th != null) {
         final byte[] tmp = qu.text;
-        for(final byte[] txt : th.find(qu.text)) {
+        for(final byte[] txt : th.find(qu)) {
           qu.init(txt);
           qu.more();
           f |= eq(qu.get(), t);

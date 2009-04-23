@@ -3,10 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.ft.Tokenizer;
 import org.basex.io.PrintOutput;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -79,14 +77,10 @@ public final class XMLSerializer extends Serializer {
     out.print(ATT1);
     for(final byte ch : v) {
       switch(ch) {
-        case '&': out.print(E_AMP); break;
-        case '>': out.print(E_GT);  break;
-        case '<': out.print(E_LT);  break;
         case '"': out.print(E_QU);  break;
         case 0x9: out.print(E_TAB); break;
         case 0xA: out.print(E_NL); break;
-        case 0xD: out.print(E_CR); break;
-        default:  out.write(ch);
+        default:  ch(ch);
       }
     }
     out.print(ATT2);
@@ -102,29 +96,28 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void text(final byte[] b, final int[][] ftd, 
       final TokenList ial) throws IOException {
+
     finishElement();
     int c = -1, pp = 0, wl = 0;
     final Tokenizer ftt = new Tokenizer(b);
     while(ftt.more()) {
       c++;
-      for(int i = wl; i < ftt.p; i++) {
-        if(Token.letterOrDigit(b[i]) && pp < ftd[0].length && c == ftd[0][pp]) {
+      for(int i = wl; i < ftt.p;) {
+        if(ftt.ftChar(cp(b, i)) && pp < ftd[0].length && c == ftd[0][pp]) {
           // write fulltext pointer in front of the token
           // used for coloring the token
           final int[] diff = getDiff(ftd[1][pp] , ial);
           out.write(0x10 + (diff[0] & 0x0F));
-          if (diff[0] > 0)
-            out.write(0x10 + (diff[1] & 0x0F));
-          else 
-            out.write(0x10 + (ftd[1][pp] & 0x0F));
+          out.write(0x10 + ((diff[0] > 0 ? diff[1] : ftd[1][pp]) & 0x0F));
           pp++;
         }
-        ch(b[i]);
+        int cl = cl(b[i]);
+        while(cl-- != 0) ch(b[i++]);
       }
       wl = ftt.p;
     }
 
-    while (wl < b.length) ch(b[wl++]);
+    while(wl < b.length) ch(b[wl++]);
     indent = false;
   }
 
@@ -143,21 +136,6 @@ public final class XMLSerializer extends Serializer {
       }
     }
     return new int[] { 0, 0 };
-  }
-
-  /**
-   * Prints a single character.
-   * @param b character to be printed
-   * @throws IOException exception
-   */
-  private void ch(final byte b) throws IOException {
-    switch(b) {
-      case '&': out.print(E_AMP); break;
-      case '>': out.print(E_GT); break;
-      case '<': out.print(E_LT); break;
-      case 0xD: out.print(E_CR); break;
-      default : out.write(b);
-    }
   }
 
   @Override
@@ -193,17 +171,26 @@ public final class XMLSerializer extends Serializer {
         out.print('#');
         out.print(token(v));
         out.print(';');
-        continue;
-      }
-      switch(ch) {
-        case '&': out.print(E_AMP); break;
-        case '>': out.print(E_GT); break;
-        case '<': out.print(E_LT); break;
-        case 0xD: out.print(E_CR); break;
-        default: out.write(ch);
+      } else {
+        ch(ch);
       }
     }
     indent = true;
+  }
+
+  /**
+   * Prints a single character.
+   * @param b character to be printed
+   * @throws IOException exception
+   */
+  private void ch(final byte b) throws IOException {
+    switch(b) {
+      case '&': out.print(E_AMP); break;
+      case '>': out.print(E_GT); break;
+      case '<': out.print(E_LT); break;
+      case 0xD: out.print(E_CR); break;
+      default : out.write(b);
+    }
   }
 
   @Override
@@ -245,7 +232,7 @@ public final class XMLSerializer extends Serializer {
    */
   private void indent(final boolean close) throws IOException {
     out.print('\n');
-    final int s = tags.size + (close ? 1 : 0);
+    final int s = level() + (close ? 1 : 0);
     for(int l = 1; l < s; l++) out.print(INDENT);
   }
 }

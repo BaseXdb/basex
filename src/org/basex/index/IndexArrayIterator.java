@@ -227,31 +227,28 @@ public class IndexArrayIterator implements IndexIterator {
 
       @Override
       public boolean more() {
-        r = null;
-        n[0] = c == 0 || c == -1 ? iai1.more()
-            ? iai1.nextFTNode() : null : n[0];
-        n[1] = c == 1 || c == -1 ? iai2.more()
-            ? iai2.nextFTNode() : null : n[1];
-        if (n[0] != null && n[1] != null) {
+        while(true) {
+          n[0] = c == 0 || c == -1 ? iai1.more()
+              ? iai1.nextFTNode() : null : n[0];
+          n[1] = c == 1 || c == -1 ? iai2.more()
+              ? iai2.nextFTNode() : null : n[1];
+          
+          if (n[0] == null || n[1] == null) return false;
+  
           final int dis = n[0].getPre() - n[1].getPre();
-          if (dis < 0) {
+          if(dis < 0) {
             c = 0;
-            return more();
-          } else if (dis > 0) {
+          } else if(dis > 0) {
             c = 1;
-            return more();
           } else {
             c = -1;
-            if (n[0].merge(n[1], w)) {
+            if(n[0].merge(n[1], w)) {
               n[0].reset();
               r = n[0];
               return true;
-            } else {
-              return more();
             }
           }
         }
-        return false;
       }
 
       @Override

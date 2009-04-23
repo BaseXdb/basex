@@ -104,11 +104,6 @@ public final class QueryContext extends Progress {
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
-  /** Used documents. */
-  public DBNode[] docs = {};
-  /** Initial number of documents. */
-  public int rootDocs;
-
   /** Default boundary-space. */
   public boolean spaces = false;
   /** Empty Order mode. */
@@ -138,15 +133,25 @@ public final class QueryContext extends Progress {
   StringList modules = new StringList();
   /** List of loaded modules. */
   StringList modLoaded = new StringList();
-  /** Collections. */
-  NodIter[] collect = new NodIter[0];
-  /** Collection names. */
-  byte[][] collName = new byte[0][];
-
   /** Initial context set (default: null). */
   Nodes nodes;
+
+  /** Collections. */
+  private NodIter[] collect = new NodIter[1];
+  /** Collection names. */
+  private byte[][] collName = new byte[1][];
+  /** Collection counter. */
+  private int colls = 0;
+
   /** Reference to the root expression. */
-  Expr root;
+  private Expr root;
+  /** Used documents. */
+  private DBNode[] doc = new DBNode[1];
+  /** Initial number of documents. */
+  private int rootDocs;
+  /** Number of documents. */
+  private int docs;
+
 
   /**
    * Parses the specified query.
@@ -178,31 +183,31 @@ public final class QueryContext extends Progress {
 
     try {
       // cache the initial context nodes
-      final int s = nodes != null ? nodes.size() : 0;
-      if(s != 0) {
+      docs = nodes != null ? nodes.size() : 0;
+      if(docs != 0) {
         // create document nodes
         final Data data = nodes.data;
-        docs = new DBNode[s];
-        for(int d = 0; d < s; d++) {
+        doc = new DBNode[docs];
+        for(int d = 0; d < docs; d++) {
           final int p = nodes.nodes[d];
-          if(data.kind(p) == Data.DOC) docs[rootDocs++] = new DBNode(data, p);
+          if(data.kind(p) == Data.DOC) doc[rootDocs++] = new DBNode(data, p);
         }
-        if(rootDocs == 0) docs[rootDocs++] = new DBNode(data, 0);
-        if(rootDocs != docs.length) docs = Array.finish(docs, rootDocs);
+        if(rootDocs == 0) doc[rootDocs++] = new DBNode(data, 0);
 
         final SeqIter si = new SeqIter();
         if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
           // query starts with root node - add document nodes
-          for(final DBNode d : docs) si.add(d);
+          for(int d = 0; d < docs; d++) si.add(doc[d]);
         } else {
           // otherwise, add all context items
-          for(int d = 0; d < s; d++) si.add(new DBNode(data, nodes.nodes[d]));
+          for(int d = 0; d < docs; d++)
+            si.add(new DBNode(data, nodes.nodes[d]));
         }
         item = si.finish();
         
         // add collection instances
         final NodIter ni = new NodIter();
-        for(final DBNode d : docs) ni.add(d);
+        for(int d = 0; d < docs; d++) ni.add(doc[d]);
         addColl(ni, token(data.meta.dbname));
       }
 
@@ -284,7 +289,6 @@ public final class QueryContext extends Progress {
    * @throws IOException query exception
    */
   public void serialize(final Serializer ser, final Item i) throws IOException {
-    ser.ns.reset();
     i.serialize(ser);
   }
   
@@ -314,7 +318,7 @@ public final class QueryContext extends Progress {
    * @throws IOException query exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs.length; d++) docs[d].data.close();
+    for(int d = rootDocs; d < docs; d++) doc[d].data.close();
   }
 
   /**
@@ -359,19 +363,22 @@ public final class QueryContext extends Progress {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the collections contain the document
-    for(final NodIter ni : collect) {
-      for(int n = 0; n < ni.size; n++) {
-        if(eq(db, ni.list[n].base())) return (DBNode) ni.list[n];
+    for(int c = 0; c < colls; c++) {
+      for(int n = 0; n < collect[c].size; n++) {
+        if(eq(db, collect[c].list[n].base()))
+          return (DBNode) collect[c].list[n];
       }
     }
 
     // check if the database has already been opened
     final String dbname = string(db);
-    for(final DBNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
+    for(int d = 0; d < docs; d++)
+      if(doc[d].data.meta.dbname.equals(dbname)) return doc[d];
 
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
-    for(final DBNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
+    for(int d = 0; d < docs; d++)
+      if(doc[d].data.meta.file.eq(bxw)) return doc[d];
 
     // get database instance
     Data data = null;
@@ -388,9 +395,9 @@ public final class QueryContext extends Progress {
     if(data == null) Err.or(coll ? NOCOLL : NODOC, msg);
 
     // add document to array
-    final int dl = docs.length;
-    docs = Array.add(docs, new DBNode(data, 0));
-    return docs[dl];
+    if(docs == doc.length) doc = Array.extend(doc);
+    doc[docs] = new DBNode(data, 0);
+    return doc[docs++];
   }
 
   /**
@@ -402,7 +409,7 @@ public final class QueryContext extends Progress {
   public Iter coll(final byte[] coll) throws QueryException {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
-      if(collName.length == 0) Err.or(COLLDEF);
+      if(colls == 0) Err.or(COLLDEF);
       return SeqIter.get(collect[0].list, collect[0].size);
     }
 
@@ -411,9 +418,8 @@ public final class QueryContext extends Progress {
       Err.or(COLLINV, Err.chop(coll));
 
     int c = -1;
-    final int cl = collName.length;
     while(true) {
-      if(++c == cl) addDocs(doc(coll, true));
+      if(++c == colls) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
       return SeqIter.get(collect[c].list, collect[c].size);
     }
@@ -439,8 +445,12 @@ public final class QueryContext extends Progress {
    * @param name name
    */
   public void addColl(final NodIter ni, final byte[] name) {
-    collect = Array.add(collect, ni);
-    collName = Array.add(collName, name);
+    if(colls == collect.length) {
+      collect = Array.extend(collect);
+      collName = Array.extend(collName);
+    }
+    collect[colls] = ni;
+    collName[colls++] = name;
   }
 
   /**

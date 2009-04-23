@@ -21,7 +21,7 @@ final class FolderIterator {
   int pre;
 
   /** Stack for parent nodes. */
-  private final int[] parents = new int[128];
+  private final int[] parents = new int[256];
   /** Panel height. */
   private final int height;
   /** Flag for a found context node. */

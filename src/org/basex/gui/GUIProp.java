@@ -66,6 +66,8 @@ public final class GUIProp {
   public static boolean showquery = true;
   /** Flag for activated plot view. */
   public static boolean showplot = false;
+  /** Flag for activated tree view. */
+  public static boolean showtree = false;
 
   /** Flag for Java look and feel. */
   public static boolean javalook = false;

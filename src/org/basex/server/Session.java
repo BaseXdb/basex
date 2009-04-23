@@ -40,6 +40,9 @@ public class Session implements Runnable {
   boolean verbose;
   /** Core. */
   Process core;
+  /** PrintOutput. */
+  Thread timeout;
+
   /** Flag for Session. */
   boolean running = true;
   /** Thread. */
@@ -131,11 +134,28 @@ public class Session implements Runnable {
         out.flush();
       } else {
         core = proc;
+        timeout(proc);
         send(proc.execute(context) ? sp : -sp);
+        timeout.interrupt();
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
     stop();
+  }
+  
+  /**
+   * Times out a process.
+   * @param proc process reference
+   */
+  private void timeout(final Process proc) {
+    timeout = new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(5000);  //Prop.timeout * 1000
+        proc.stop();
+      }
+    };
+    timeout.start();
   }
   
   /**
@@ -155,7 +175,7 @@ public class Session implements Runnable {
   synchronized void send(final int id) throws IOException {
     dos.writeInt(id);
     dos.flush();
-    }
+  }
   
   /**
    * Stops the thread. 

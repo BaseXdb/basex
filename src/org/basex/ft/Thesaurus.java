@@ -1,12 +1,18 @@
 package org.basex.ft;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.Token;
@@ -20,7 +26,7 @@ import org.basex.util.TokenList;
  */
 public final class Thesaurus {
   /** Thesaurus root references. */
-  private final Map<Node> nodes = new Map<Node>();
+  private final Map<ThesNode> nodes = new Map<ThesNode>();
   /** Relationships. */
   private static final Map<byte[]> RSHIPS = new Map<byte[]>();
 
@@ -37,22 +43,28 @@ public final class Thesaurus {
   }
   
   /** Thesaurus node. */
-  static class Node {
+  static class ThesNode {
     /** Related nodes. */
-    Node[] nodes = {};
+    ThesNode[] nodes = new ThesNode[1];
     /** Relationships. */
-    byte[][] rs = {};
+    byte[][] rs = new byte[1][];
     /** Term. */
     byte[] term;
+    /** Entries. */
+    int size;
 
     /**
      * Adds a relationship to the node.
      * @param n target node
      * @param r relationship
      */
-    void add(final Node n, final byte[] r) {
-      nodes = Array.add(nodes, n);
-      rs = Array.add(rs, r);
+    void add(final ThesNode n, final byte[] r) {
+      if(size == nodes.length) {
+        nodes = Array.extend(nodes);
+        rs = Array.extend(rs);
+      }
+      nodes[size] = n;
+      rs[size++] = r;
     }
   }
 
@@ -89,40 +101,43 @@ public final class Thesaurus {
   
   /**
    * Initializes the thesaurus.
+   * @param ft tokenizer
    * @return success flag
+   * @throws QueryException query exception
    */
-  public boolean init() {
+  private boolean init(final Tokenizer ft) throws QueryException {
     try {
       final Data data = new MemBuilder().build(new DirParser(file), "");
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
-        build(new Nodes(result.nodes[n], data));
+        build(new Nodes(result.nodes[n], data), ft);
       }
-      return true;
-    } catch(final Exception ex) {
-      return false;
+    } catch(final IOException ex) {
+      Err.or(NOTHES, file);
     }
+    return true;
   }
 
   /**
    * Builds the thesaurus.
    * @param in input nodes
-   * @throws Exception exception
+   * @param ft tokenizer
+   * @throws QueryException exception
    */
-  private void build(final Nodes in) throws Exception {
-    final byte[] term = text("*:term", in);
-    Node node = getNode(term);
-
+  private void build(final Nodes in, final Tokenizer ft) throws QueryException {
     final Nodes sub = nodes("*:synonym", in);
+    if(sub.size() == 0) return;
+
+    final ThesNode node = getNode(ft.get(text("*:term", in)));
     for(int n = 0; n < sub.size(); n++) {
       final Nodes tmp = new Nodes(sub.nodes[n], sub.data);
-      final Node snode = getNode(text("*:term", tmp));
+      final ThesNode snode = getNode(ft.get(text("*:term", tmp)));
       final byte[] rs = text("*:relationship", tmp);
       node.add(snode, rs);
 
       final byte[] srs = RSHIPS.get(rs);
       if(srs != null) snode.add(node, srs);
-      build(sub);
+      build(sub, ft);
     }
   }
 
@@ -131,10 +146,10 @@ public final class Thesaurus {
    * @param term term 
    * @return node
    */
-  private Node getNode(final byte[] term) {
-    Node node = nodes.get(term);
+  private ThesNode getNode(final byte[] term) {
+    ThesNode node = nodes.get(term);
     if(node == null) {
-      node = new Node();
+      node = new ThesNode();
       node.term = term;
       nodes.add(term, node);
     }
@@ -146,9 +161,10 @@ public final class Thesaurus {
    * @param query query string
    * @param in input nodes
    * @return resulting nodes
-   * @throws Exception exception
+   * @throws QueryException exception
    */
-  private Nodes nodes(final String query, final Nodes in) throws Exception {
+  private Nodes nodes(final String query, final Nodes in)
+      throws QueryException {
     return new QueryProcessor(query, in).queryNodes();
   }
 
@@ -157,19 +173,22 @@ public final class Thesaurus {
    * @param query query string
    * @param in input nodes
    * @return resulting text
-   * @throws Exception exception
+   * @throws QueryException exception
    */
-  private byte[] text(final String query, final Nodes in) throws Exception {
+  private byte[] text(final String query, final Nodes in)
+      throws QueryException {
     return new QueryProcessor(query, in).iter().next().str();
   }
   
   /**
    * Finds a thesaurus term.
    * @param list result list
-   * @param term query term
+   * @param ft tokenizer
+   * @throws QueryException query exception
    */
-  void find(final TokenList list, final byte[] term) {
-    find(list, nodes.get(term), 1);
+  void find(final TokenList list, final Tokenizer ft) throws QueryException {
+    if(nodes.size() == 0) init(ft);
+    find(list, nodes.get(ft.text), 1);
   }
 
   /**
@@ -178,13 +197,15 @@ public final class Thesaurus {
    * @param node input node
    * @param lev current level
    */
-  private void find(final TokenList list, final Node node, final long lev) {
+  private void find(final TokenList list, final ThesNode node, final long lev) {
     if(lev > max || node == null) return;
 
-    for(int n = 0; n < node.nodes.length; n++) {
-      if(rel.length == 0 || node.rs[n].equals(rel)) {
-        if(!list.contains(node.term)) {
-          if(lev >= min) list.add(node.term);
+    for(int n = 0; n < node.size; n++) {
+      if(rel.length == 0 || Token.eq(node.rs[n], rel)) {
+        final byte[] term = node.nodes[n].term;
+        if(!list.contains(term)) {
+          //if(lev >= min) list.add(node.term);
+          list.add(term);
           find(list, node.nodes[n], lev + 1);
         }
       }

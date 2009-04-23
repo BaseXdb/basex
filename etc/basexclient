@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Path to class directory (bin) or BaseX.jar
+BXPATH=`pwd`/../bin
+
+# Java options (virtual memory in MB)
+JMEM="-Xmx1024m"
+
+# Run BaseX
+java $JMEM -cp "$BXPATH" org.basex.BaseXClient "$@"

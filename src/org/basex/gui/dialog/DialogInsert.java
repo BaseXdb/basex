@@ -15,6 +15,7 @@ import org.basex.gui.layout.BaseXRadio;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -25,10 +26,10 @@ import org.basex.util.Token;
  */
 public final class DialogInsert extends Dialog {
   /** Remembers the last insertion type. */
-  public static int lkind = 1;
+  private static int lkind = 1;
 
-  /** Resulting query. */
-  public String[] result;
+  /** Resulting update arguments. */
+  public final StringList result = new StringList();
   /** Node kind. */
   public int kind;
   
@@ -127,17 +128,21 @@ public final class DialogInsert extends Dialog {
     final String in1 = input1.getText();
     final String in2 = Token.string(input2.getText());
 
-    for(int i = 1; i < KINDS.length; i++) {
-      if(radio[i].isSelected()) kind = i;
-    }
+    for(int i = 1; i < KINDS.length; i++) if(radio[i].isSelected()) kind = i;
+
     switch(kind) {
       case 0: case 3: case 5:
-        result = new String[] { in1, in2 }; break;
+        result.add(in1);
+        result.add(in2);
+        break;
       case 1:
-        result = new String[] { in1 }; break;
+        result.add(in1);
+        break;
       case 2: case 4:
-        result = new String[] { in2 }; break;
+        result.add(in2);
+        break;
     }
+    result.add(null);
     lkind = kind;
   }
 }

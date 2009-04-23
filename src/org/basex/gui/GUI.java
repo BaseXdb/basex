@@ -56,6 +56,7 @@ import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.query.QueryView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
+import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -280,6 +281,7 @@ public final class GUI extends JFrame {
         new ViewPanel(new PlotView(notify), PLOTVIEW),
         new ViewPanel(new TableView(notify), TABLEVIEW),
         new ViewPanel(new MapView(notify), MAPVIEW),
+        new ViewPanel(new TreeView(notify), TREEVIEW),
         new ViewPanel(query, QUERYVIEW),
         new ViewPanel(info, INFOVIEW),
         textpanel

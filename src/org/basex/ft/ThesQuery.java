@@ -1,6 +1,7 @@
 package org.basex.ft;
 
-import org.basex.util.Array;
+import java.util.ArrayList;
+import org.basex.query.QueryException;
 import org.basex.util.TokenList;
 
 /**
@@ -11,14 +12,14 @@ import org.basex.util.TokenList;
  */
 public final class ThesQuery {
   /** Thesaurus root references. */
-  private Thesaurus[] thes = {};
+  private ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
 
   /**
    * Merges two thesaurus definitions.
    * @param th second thesaurus
    */
   public void add(final Thesaurus th) {
-    thes = Array.add(thes, th);
+    thes.add(th);
   }
 
   /**
@@ -29,18 +30,19 @@ public final class ThesQuery {
     for(final Thesaurus t : th.thes) {
       boolean f = false;
       for(final Thesaurus tt : thes) f |= tt.eq(t);
-      if(!f) thes = Array.add(thes, t);
+      if(!f) thes.add(t);
     }
   }
 
   /**
    * Finds a thesaurus term.
-   * @param term term to be found
+   * @param ft tokenizer
    * @return result list
+   * @throws QueryException query exception
    */
-  public byte[][] find(final byte[] term) {
+  public byte[][] find(final Tokenizer ft) throws QueryException {
     final TokenList tl = new TokenList();
-    for(final Thesaurus th : thes) th.find(tl, term);
+    for(final Thesaurus th : thes) th.find(tl, ft);
     return tl.finish();
   }
 }

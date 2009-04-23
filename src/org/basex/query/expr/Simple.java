@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 
 /**
  * Simple expression without arguments.
@@ -13,8 +12,7 @@ import org.basex.query.QueryException;
  */
 public abstract class Simple extends Expr {
   @Override
-  @SuppressWarnings("unused")
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) {
     return this;
   }
 

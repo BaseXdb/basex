@@ -70,7 +70,7 @@ public final class Nodes implements Result {
    * @param d data reference
    * @param ft ft position data
    */
-  public Nodes(final int[] n, final Data d, final FTPosData ft) {
+  Nodes(final int[] n, final Data d, final FTPosData ft) {
     if(d == null) BaseX.notexpected("No data available");
     data = d;
     ftpos = ft;

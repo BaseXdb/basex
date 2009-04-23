@@ -81,11 +81,7 @@ public class DBNode extends Nod {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    final int s = ser.ns.size;
-    final byte[] dn = ser.dn;
     ser.node(data, pre);
-    ser.ns.size = s;
-    ser.dn = dn;
   }
 
   @Override

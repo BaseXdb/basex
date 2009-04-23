@@ -14,6 +14,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.StringList;
 
 /**
  * Dialog window for editing XML nodes.
@@ -23,7 +24,7 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogEdit extends Dialog {
   /** Resulting update arguments. */
-  public String[] result;
+  public final StringList result = new StringList();
   /** Node kind. */
   public final int kind;
   
@@ -120,20 +121,18 @@ public final class DialogEdit extends Dialog {
     final String in = input != null ? input.getText() :
       string(input3.getText());
 
+    result.add(in);
     if(kind == Data.ELEM || kind == Data.DOC) {
       if(in.length() == 0 || in.equals(old1)) return;
-      result = new String[] { in };
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       if(in.equals(old2)) return;
-      result = new String[] { in };
-    } else if(kind == Data.ATTR) {
-      final String in2 = input2.getText();
-      if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
-      result = new String[] { in, in2 };
     } else {
-      final String in2 = string(input3.getText());
+      final String in2 = kind == Data.ATTR ? input2.getText() :
+        string(input3.getText());
+
       if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
-      result = new String[] { in, in2 };
+      result.add(in2);
     }
+    result.add(null);
   }
 }

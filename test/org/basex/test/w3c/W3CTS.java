@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -200,7 +199,7 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    //Prop.onthefly = true;
+    Prop.onthefly = true;
     Prop.xqformat = false;
 
     new CreateDB(path + input).execute(context, null);
@@ -338,10 +337,9 @@ public abstract class W3CTS {
     if(inname == null) inname = outname;
 
     if(single != null && !outname.startsWith(single)) return true;
-    if(verbose) BaseX.outln("- " + inname);
+    if(verbose) BaseX.outln("- " + outname);
 
     final IO file = IO.get(queries + pth + inname + ".xq");
-    if(!file.exists()) throw new FileNotFoundException(file.toString());
 
     final String in = read(file);
     String error = null;
@@ -393,8 +391,7 @@ public abstract class W3CTS {
         String fn = thes2.get(s);
         if(fn != null) {
           if(ctx.ftopt.th == null) ctx.ftopt.th = new ThesQuery();
-          final Thesaurus th = new Thesaurus(IO.get(fn));
-          if(th.init()) ctx.ftopt.th.add(th);
+          ctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
         }
       }
       
@@ -441,7 +438,6 @@ public abstract class W3CTS {
     for(int o = 0; o < outFiles.size(); o++) {
       final String resFile = string(data.atom(outFiles.nodes[o]));
       final IO exp = IO.get(expected + pth + resFile);
-      if(!exp.exists()) throw new FileNotFoundException(exp.toString());
       result.add(read(exp));
       final byte[] type = data.atom(cmpFiles.nodes[o]);
       xml |= eq(type, XML);

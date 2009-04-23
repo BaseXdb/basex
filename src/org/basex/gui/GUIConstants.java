@@ -52,6 +52,8 @@ public final class GUIConstants {
   public static final String HELPVIEW = "help";
   /** Internal name of the Plot View. */
   public static final String PLOTVIEW = "plot";
+  /** Internal name of the Tree View. */
+  public static final String TREEVIEW = "tree";
   
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -62,7 +64,7 @@ public final class GUIConstants {
    */
   public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " +
     TEXTVIEW + " - V " + MAPVIEW + " " + TABLEVIEW + " " +
-    INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW + " - -";
+    INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
   public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " -";

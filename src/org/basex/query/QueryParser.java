@@ -1661,7 +1661,8 @@ public class QueryParser extends InputParser {
 
     final int i = indexOf(k, ':');
     final byte[] key = i == -1 ? EMPTY : substring(k, i + 1);
-    if(!ns.addUnique(key, v)) error(DUPLNSDEF, k);
+    if(ns.get(key) != -1) error(DUPLNSDEF, k);
+    ns.add(key, v);
   }
 
   /**
@@ -2423,7 +2424,7 @@ public class QueryParser extends InputParser {
       }
     }
     final Thesaurus th = new Thesaurus(fl, rel, min, max);
-    if(!th.init()) error(NOTHES, fl);
+    //if(!th.init()) error(NOTHES, fl);
     thes.add(th);
   }
 

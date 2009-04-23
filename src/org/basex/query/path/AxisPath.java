@@ -155,14 +155,20 @@ public class AxisPath extends Path {
 
     // check if no position is used and if context is set to a document node
     final Data data = ctx.data();
-    if(!pos && data != null && ctx.item.type == Type.DOC) {
-      // check index access
-      Expr e = index(ctx, data);
-      if(e != this) return e;
 
-      // check children path rewriting
-     e = children(ctx, data);
-      if(e != this) return e;
+    if(!pos && data != null) {
+      boolean doc = true;
+      for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
+      
+      if(doc) {
+        // check index access
+        Expr e = index(ctx, data);
+        if(e != this) return e;
+  
+        // check children path rewriting
+        e = children(ctx, data);
+        if(e != this) return e;
+      }
     }
 
     // if applicable, return iterator
@@ -235,6 +241,7 @@ public class AxisPath extends Path {
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
       for(final PathNode sn : data.path.desc(in, desc)) {
         if(sn.kind == Data.ELEM && name == sn.name) {
+          // skip test if a tag is found on different levels
           if(out.size() != 0 && out.get(0).level() != sn.level()) return null;
           out.add(sn);
         }
@@ -255,7 +262,6 @@ public class AxisPath extends Path {
   private Expr index(final QueryContext ctx, final Data data)
       throws QueryException {
 
-    
     // skip position predicates and horizontal axes
     for(final Step s : step) if(!s.axis.down) return this;
 
@@ -409,10 +415,11 @@ public class AxisPath extends Path {
    * @return root
    */
   private Item root(final QueryContext ctx) {
-    return root == null ? ctx.item :
-      root.i() ? (Item) root :
-      root instanceof Root && ctx.item != null ? ((Root) root).root(ctx.item) :
-      null;
+    final Item it = ctx.item;
+    if(root == null) return it;
+    if(root.i()) return (Item) root;
+    if(!(root instanceof Root) || it == null) return null;
+    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
   }
 
   @Override

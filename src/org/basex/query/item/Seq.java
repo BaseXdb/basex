@@ -36,7 +36,7 @@ public class Seq extends Item {
   };
 
   /** Item array. */
-  private Item[] val;
+  public Item[] val;
   /** Number of entries. */
   private int size;
 

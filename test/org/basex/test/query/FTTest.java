@@ -438,7 +438,10 @@ public final class FTTest extends AbstractTest {
         "'a b c' ftcontains 'a' ftand 'b c' entire content" },
       { "FTContent 27", bool(true),
         "'a b c' ftcontains 'a b c' entire content" },
-
+      { "FTContent 28", bool(false),
+        "'a b c' ftcontains 'a b' entire content" },
+      { "FTContent 29", bool(false),
+        "'a b c' ftcontains 'b c' entire content" },
         
       { "FTMildNot 1", nodes(3, 5),
         "//w [text() ftcontains 'xml' not in 'xml databases']" },

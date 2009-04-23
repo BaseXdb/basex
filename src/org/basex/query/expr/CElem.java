@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -99,6 +100,7 @@ public final class CElem extends CFrag {
 
       final QNm tname = CAttr.name(ctx, it);
       final byte[] uri = tname.uri.str();
+
       if(uri.length != 0) {
         final byte[] key = tname.pre();
         if(!eq(key, XML)) {
@@ -178,7 +180,7 @@ public final class CElem extends CFrag {
             while(node != null && node.type == Type.ELM) {
               final Atts ns = node.ns();
               for(int a = 0; a < ns.size; a++) {
-                atts.addUnique(ns.key[a], ns.val[a]);
+                if(!atts.contains(ns.key[a])) atts.add(ns.key[a], ns.val[a]);
               }
               node = node.parent();
             }

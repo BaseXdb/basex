@@ -19,7 +19,7 @@ import org.basex.util.TokenList;
  */
 public final class FElem extends FNode {
   /** Namespaces. */
-  private final Atts nsp;
+  private final Atts ns;
   /** Tag name. */
   private final QNm name;
   /** Base URI. */
@@ -41,17 +41,17 @@ public final class FElem extends FNode {
    * @param ch children
    * @param at attributes
    * @param b base uri
-   * @param ns namespaces
+   * @param nsp namespaces
    * @param p parent
    */
   public FElem(final QNm n, final NodIter ch, final NodIter at,
-      final byte[] b, final Atts ns, final Nod p) {
+      final byte[] b, final Atts nsp, final Nod p) {
     super(Type.ELM);
     name = n;
     children = ch;
     atts = at;
     base = b;
-    nsp = ns;
+    ns = nsp;
     par = p;
   }
 
@@ -72,7 +72,7 @@ public final class FElem extends FNode {
 
   @Override
   public Atts ns() {
-    return nsp;
+    return ns;
   }
 
   @Override
@@ -88,31 +88,31 @@ public final class FElem extends FNode {
   @Override
   public void serialize(final Serializer ser) throws IOException {
     final byte[] tag = name.str();
+    final byte[] uri = name.uri.str();
     ser.openElement(tag);
     
-    // serialize top level namespace definitions
-    final int s = ser.ns.size;
+    // remember top level namespace
     final byte[] dn = ser.dn;
-               
     boolean xmlns = false;
+
     // serialize all namespaces at top level...
-    if(ser.tags.size == 1) {
-      final TokenList nms = new TokenList();
+    if(ser.level() == 1) {
+      final TokenList nsp = new TokenList();
       Nod node = this;
       do {
-        final Atts ns = node.ns();
-        for(int a = ns.size - 1; a >= 0; a--) {
-          final byte[] key = ns.key[a];
+        final Atts nns = node.ns();
+        for(int a = nns.size - 1; a >= 0; a--) {
+          final byte[] key = nns.key[a];
           // namespace has already been serialized
-          if(nms.contains(key)) continue;
-          nms.add(key);
+          if(nsp.contains(key)) continue;
+          nsp.add(key);
           
-          final byte[] val = ns.val[a];
+          final byte[] val = nns.val[a];
           if(key.length == 0) {
             xmlns = true;
-            ser.dn = val;
+            if(Token.eq(ser.dn, val)) continue;
             // reset default namespace
-            if(val.length == 0) continue;
+            ser.dn = val;
           }
           ser.namespace(key, val);
         }
@@ -120,25 +120,22 @@ public final class FElem extends FNode {
       } while(node instanceof FElem);
 
       // serialize default namespace if not done yet
-      final Atts ns = ser.ns;
-      for(int p = ns.size - 1; p >= 0 && !xmlns; p--) {
-        if(ns.key[p].length != 0) continue;
+      for(int p = ser.ns.size - 1; p >= 0 && !xmlns; p--) {
+        if(ser.ns.key[p].length != 0) continue;
         xmlns = true;
-        ser.dn = ns.val[p];
-        ser.namespace(EMPTY, ns.val[p]);
+        ser.dn = ser.ns.val[p];
+        ser.namespace(EMPTY, ser.ns.val[p]);
       }
     } else {
-      for(int p = nsp.size - 1; p >= 0; p--) {
-        final byte[] key = nsp.key[p];
+      for(int p = ns.size - 1; p >= 0; p--) {
+        final byte[] key = ns.key[p];
         final int i = ser.ns.get(key);
-        if(i == -1 || !Token.eq(ser.ns.val[i], name.uri.str())) {
-          ser.namespace(key, nsp.val[p]);
+        if(i == -1 || !Token.eq(ser.ns.val[i], uri)) {
+          ser.namespace(key, ns.val[p]);
           xmlns |= key.length == 0;
         }
       }
     }
-    
-    byte[] uri = name.uri.str();
     
     if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) {
       ser.namespace(EMPTY, uri);
@@ -163,8 +160,7 @@ public final class FElem extends FNode {
     for(int n = 0; n < children.size; n++) children.list[n].serialize(ser);
     ser.closeElement();
 
-    // reset namespace pointer
-    ser.ns.size = s;
+    // reset top level namespace
     ser.dn = dn;
   }
 
@@ -172,7 +168,7 @@ public final class FElem extends FNode {
   public FElem copy() {
     final NodIter ch = new NodIter();
     final NodIter at = new NodIter();
-    final FElem node = new FElem(name, ch, at, base, nsp, par);
+    final FElem node = new FElem(name, ch, at, base, ns, par);
 
     for(int c = 0; c < children.size; c++) {
       ch.add(children.list[c].copy());
@@ -189,7 +185,7 @@ public final class FElem extends FNode {
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
-    if(atts.size != 0 || nsp.size != 0 || children.size != 0) sb.append("...");
+    if(atts.size != 0 || ns.size != 0 || children.size != 0) sb.append("...");
     return sb.append("/>").toString();
   }
 
