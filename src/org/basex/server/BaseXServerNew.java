@@ -92,8 +92,7 @@ public class BaseXServerNew {
         e.printStackTrace();
       }
     }
-    if(sessions.size() == 0) {
-      try {
+    try {
         sessionListener.thread = null;
         inputListener.thread = null;
         serverSocket.close();
@@ -101,7 +100,6 @@ public class BaseXServerNew {
       } catch(IOException e) {
         e.printStackTrace();
       }
-    }
   }
 
   /**
