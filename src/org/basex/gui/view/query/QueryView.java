@@ -50,10 +50,10 @@ public final class QueryView extends View {
   /**
    * Default constructor.
    * @param man view manager
-   * @param help help text
    */
-  public QueryView(final ViewNotifier man, final byte[] help) {
-    super(man, help);
+  public QueryView(final ViewNotifier man) {
+    super(man, null);
+
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
 
@@ -95,6 +95,24 @@ public final class QueryView extends View {
     }
   }
 
+  /**
+   * Updates the query panels.
+   * @param force force query execution 
+   */
+  void update(final boolean force) {
+    for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);
+    removeAll();
+    add(back, BorderLayout.NORTH);
+    search = panels[mode];
+    search.init();
+    open.setEnabled(mode == 0);
+    save.setEnabled(mode == 0);
+    if(GUIProp.execrt) search.query(force);
+    revalidate();
+    repaint();
+    refreshLayout();
+  }
+
   @Override
   public void refreshFocus() { }
 
@@ -113,24 +131,6 @@ public final class QueryView extends View {
   public void refreshLayout() {
     header.setFont(GUIConstants.lfont);
     for(final QueryPanel p : panels) p.refreshLayout();
-  }
-
-  /**
-   * Updates the query panels.
-   * @param force force query execution 
-   */
-  void update(final boolean force) {
-    for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);
-    removeAll();
-    add(back, BorderLayout.NORTH);
-    search = panels[mode];
-    search.init();
-    open.setEnabled(mode == 0);
-    save.setEnabled(mode == 0);
-    if(GUIProp.execrt) search.query(force);
-    revalidate();
-    repaint();
-    refreshLayout();
   }
 
   /**
@@ -171,10 +171,5 @@ public final class QueryView extends View {
    */
   public byte[] getQuery() {
     return Token.token(panels[0].last);
-  }
-  
-  @Override
-  public boolean isValid() {
-    return GUIProp.showquery;
   }
 }

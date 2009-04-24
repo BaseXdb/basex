@@ -96,8 +96,7 @@ public final class ViewNotifier {
   public void focus(final int pre, final View vw) {
     if(gui.focused == pre) return;
     gui.focused = pre;
-    for(final View v : view) 
-      if(v != vw && v.isValid()) v.refreshFocus();
+    for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
     if(pre != -1) gui.status.setPath(ViewData.path(gui.context.data(), pre));
   }
 

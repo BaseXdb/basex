@@ -269,7 +269,7 @@ public final class GUI extends JFrame {
 
     // create views
     notify = new ViewNotifier(this);
-    query = new QueryView(notify, null);
+    query = new QueryView(notify);
     text = new TextView(notify);
     info = new InfoView(notify, HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);

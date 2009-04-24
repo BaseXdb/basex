@@ -292,7 +292,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     return p;
   }
 
-
   @Override
   public void paint(final Graphics g) {
     super.paint(g);
