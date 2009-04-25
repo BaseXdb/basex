@@ -26,7 +26,7 @@ import org.basex.util.Token;
 /**
  * This class offers a real tree view.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Wolfgang Miller, Philipp Ziemer
+ * @author Wolfgang Miller
  */
 public final class TreeView extends View {
   /** Current font height. */
@@ -38,7 +38,7 @@ public final class TreeView extends View {
   /** array with position of the parent node. */
   private HashMap<Integer, Double> parentPos = null;
   /** array of current rectangles. */
-  private ArrayList<ViewRect[]> rects = null;
+  private ArrayList<TreeRect[]> rects = null;
   /** nodes in current line. */
   private int rectCount = 0;
   /** current mouse position x. */
@@ -50,7 +50,7 @@ public final class TreeView extends View {
   /** window height. */
   private int wheight = -1;
   /** current focused rect. */
-  private ViewRect focusedRect = null;
+  private TreeRect focusedRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
 
@@ -120,19 +120,19 @@ public final class TreeView extends View {
 
       realImage = createImage();
       Graphics rg = realImage.getGraphics();
-      rects = new ArrayList<ViewRect[]>();
+      rects = new ArrayList<TreeRect[]>();
       Nodes curr = gui.context.current();
       for(int i = 0; i < curr.size(); i++) {
         temperature(curr.nodes[i], rg, i);
 
       }
-      focus();
     }
     g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
-    // highlights focused node
-    if(focusedRect != null) {
+    // highlights the focused node
+    if(focus()) {
       ViewRect r = focusedRect;
+      g.setColor(Color.RED);
       g.drawRect(r.x, r.y, r.w, r.h);
 
       final int pre = r.pre;
@@ -162,7 +162,7 @@ public final class TreeView extends View {
     if(!rects.isEmpty() && gui.context.marked().size() > 0) {
 
       g.setColor(Color.GREEN);
-      Iterator<ViewRect[]> it = rects.iterator();
+      Iterator<TreeRect[]> it = rects.iterator();
 
       while(it.hasNext()) {
         final ViewRect[] r = it.next();
@@ -249,10 +249,10 @@ public final class TreeView extends View {
     if(rects == null) return false;
 
     // final Data data = gui.context.data();
-    final Iterator<ViewRect[]> it = rects.iterator();
+    final Iterator<TreeRect[]> it = rects.iterator();
 
     while(it.hasNext()) {
-      final ViewRect[] r = it.next();
+      final TreeRect[] r = it.next();
 
       for(int i = 0; i < r.length; i++) {
         if(r[i].contains(mousePosX, mousePosY)) {
@@ -337,7 +337,7 @@ public final class TreeView extends View {
       final int rootNum) {
 
     final int numberOfRoots = gui.context.current().nodes.length;
-    final ViewRect[] tRect = new ViewRect[rectCount];
+    final TreeRect[] tRect = new TreeRect[rectCount];
     final Data data = gui.context.data();
     final int size = parentList.size;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
@@ -363,15 +363,14 @@ public final class TreeView extends View {
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
-
       final int l = Math.max(2, (int) ratio); // rectangle length
       final int h = fontHeight; // rectangle height
 
       // g.drawRect((int) x, y, l, h);
-      ViewRect rect = new ViewRect();
+      TreeRect rect = new TreeRect();
       rect.x = (int) x;
       rect.y = y;
-      rect.level = l;
+      rect.w = l;
       rect.h = h;
       rect.pre = pre;
       tRect[r++] = rect;
