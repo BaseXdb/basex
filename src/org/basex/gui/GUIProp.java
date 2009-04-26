@@ -86,6 +86,8 @@ public final class GUIProp {
   public static boolean filterrt = false;
   /** Flag for realtime context switch. */
   public static boolean execrt = true;
+  /** Maximum text size to be displayed. */
+  public static int maxtext = 1 << 21;
 
   /** Show attributes in treemap. */
   public static boolean mapatts = false;

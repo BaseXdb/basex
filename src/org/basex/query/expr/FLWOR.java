@@ -124,8 +124,8 @@ public class FLWOR extends Expr {
       if(!f.removable(v, ctx)) return false;
       if(f.shadows(v)) return true;
     }
-    return where == null || where.removable(v, ctx) &&
-      order == null && order.removable(v, ctx) && ret.removable(v, ctx);
+    return (where == null || where.removable(v, ctx)) &&
+      (order == null || order.removable(v, ctx)) && ret.removable(v, ctx);
   }
 
   @Override

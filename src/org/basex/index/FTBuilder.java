@@ -266,9 +266,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     final byte[] tok = wp.get();
     if(tok.length > Token.MAXLEN) return;
 
-    final int pos = wp.pos;
-    if(index.bl) index(tok, id, pos);
-    else index.index(tok, id, pos);
+    if(index.bl) index(tok, id, wp.pos);
+    else index.index(tok, id, wp.pos);
   }
 
   /**

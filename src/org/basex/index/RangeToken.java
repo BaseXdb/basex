@@ -1,5 +1,7 @@
 package org.basex.index;
 
+import org.basex.data.Data.Type;
+
 /**
  * This class defines access to index text tokens.
  * 
@@ -27,5 +29,10 @@ public final class RangeToken extends IndexToken {
   @Override
   public boolean range() {
     return true;
+  }
+
+  @Override
+  public byte[] get() {
+    return null;
   }
 }

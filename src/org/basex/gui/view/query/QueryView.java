@@ -56,6 +56,7 @@ public final class QueryView extends View {
 
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
+    setFocusable(false);
 
     back = new BaseXBack(Fill.NONE);
     back.setLayout(new BorderLayout());

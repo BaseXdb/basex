@@ -1,5 +1,8 @@
 package org.basex.index;
 
+import org.basex.data.Data.Type;
+import org.basex.util.Token;
+
 /**
  * This class defines access to index text tokens.
  * 
@@ -7,6 +10,9 @@ package org.basex.index;
  * @author Christian Gruen
  */
 public final class ValuesToken extends IndexToken {
+  /** Text. */
+  private byte[] text = Token.EMPTY;
+
   /**
    * Constructor.
    * @param t index type
@@ -15,5 +21,10 @@ public final class ValuesToken extends IndexToken {
   public ValuesToken(final boolean t, final byte[] tok) {
     super(t ? Type.TXT : Type.ATV);
     text = tok;
+  }
+
+  @Override
+  public byte[] get() {
+    return text;
   }
 }

@@ -35,8 +35,8 @@ public final class MemValues extends Index {
   }
 
   @Override
-  public IndexIterator ids(final IndexToken ind) {
-    return index.ids(ind.text);
+  public IndexIterator ids(final IndexToken tok) {
+    return index.ids(tok.get());
   }
 
   @Override

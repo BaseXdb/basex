@@ -2,7 +2,6 @@ package org.basex.data;
 
 import org.basex.BaseX;
 import org.basex.index.Index;
-import org.basex.index.IndexToken;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
 import org.basex.util.Array;
@@ -49,10 +48,10 @@ public final class MemData extends Data {
   public void close() { }
 
   @Override
-  public void closeIndex(final IndexToken.Type index) { }
+  public void closeIndex(final Type index) { }
 
   @Override
-  public void setIndex(final IndexToken.Type type, final Index ind) {
+  public void setIndex(final Type type, final Index ind) {
     BaseX.notimplemented();
   }
 

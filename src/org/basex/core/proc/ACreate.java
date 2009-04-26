@@ -1,10 +1,8 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
@@ -15,10 +13,10 @@ import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.Data.Type;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexBuilder;
-import org.basex.index.IndexToken;
 import org.basex.index.ValueBuilder;
 import org.basex.util.Performance;
 
@@ -93,9 +91,9 @@ abstract class ACreate extends Process {
    * @throws IOException I/O exception
    */
   void index(final Data data) throws IOException {
-    if(data.meta.txtindex) buildIndex(IndexToken.Type.TXT, data);
-    if(data.meta.atvindex) buildIndex(IndexToken.Type.ATV, data);
-    if(data.meta.ftxindex) buildIndex(IndexToken.Type.FTX, data);
+    if(data.meta.txtindex) buildIndex(Type.TXT, data);
+    if(data.meta.atvindex) buildIndex(Type.ATV, data);
+    if(data.meta.ftxindex) buildIndex(Type.FTX, data);
   }
 
   /**
@@ -104,7 +102,7 @@ abstract class ACreate extends Process {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  void buildIndex(final IndexToken.Type i, final Data d)
+  void buildIndex(final Type i, final Data d)
       throws IOException {
 
     switch(i) {
@@ -123,7 +121,7 @@ abstract class ACreate extends Process {
    * @param data data reference
    * @throws IOException I/O exception
    */
-  private void buildIndex(final IndexToken.Type index, final IndexBuilder
+  private void buildIndex(final Type index, final IndexBuilder
       builder, final Data data) throws IOException {
 
     final Performance pp = new Performance();

@@ -92,13 +92,10 @@ public final class BaseXFileChooser {
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         state = fc.showOpenDialog(gui);
         break;
-      case DOPEN:
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(gui, null);
-        break;
       case FSAVE:
         state = fc.showSaveDialog(gui);
         break;
+      case DOPEN:
       case DSAVE:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         state = fc.showDialog(gui, null);

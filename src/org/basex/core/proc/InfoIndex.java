@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
-import org.basex.index.IndexToken;
+import org.basex.data.Data.Type;
 import org.basex.io.PrintOutput;
 
 /**
@@ -25,20 +25,20 @@ public final class InfoIndex extends AInfo {
   protected void out(final PrintOutput out) throws IOException {
     final Data data = context.data();
     out.println(INFOTAGINDEX);
-    out.println(data.info(IndexToken.Type.TAG));
+    out.println(data.info(Type.TAG));
     out.println(INFOATNINDEX);
-    out.println(data.info(IndexToken.Type.ATN));
+    out.println(data.info(Type.ATN));
     if(data.meta.txtindex) {
       out.println(INFOTEXTINDEX);
-      out.println(data.info(IndexToken.Type.TXT));
+      out.println(data.info(Type.TXT));
     }
     if(data.meta.atvindex) {
       out.println(INFOATTRINDEX);
-      out.println(data.info(IndexToken.Type.ATV));
+      out.println(data.info(Type.ATV));
     }
     if(data.meta.ftxindex) {
       out.println(INFOFTINDEX);
-      out.println(data.info(IndexToken.Type.FTX));
+      out.println(data.info(Type.FTX));
     }
   }
   

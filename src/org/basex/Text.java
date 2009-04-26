@@ -920,8 +920,9 @@ public interface Text {
   String QUERYTIT = lang("query_title");
   /** Help title. */
   String HELPTIT = lang("help_title");
-  /** Help title. */
+  /** Text title. */
   String TEXTTIT = lang("text_title");
+
   /** Plot visualization. */
   String PLOTLOG = "log";
 

@@ -7,7 +7,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
-import org.basex.index.IndexToken;
+import org.basex.data.Data.Type;
 
 /**
  * Creates a new index.
@@ -32,19 +32,19 @@ public final class CreateIndex extends ACreate {
   protected boolean exec() {
     try {
       final Data data = context.data();
-      IndexToken.Type index = null;
+      Type index = null;
       switch(type) {
         case TEXT:
           data.meta.txtindex = true;
-          index = IndexToken.Type.TXT;
+          index = Type.TXT;
           break;
         case ATTRIBUTE:
           data.meta.atvindex = true;
-          index = IndexToken.Type.ATV;
+          index = Type.ATV;
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
-          index = IndexToken.Type.FTX;
+          index = Type.FTX;
           break;
       }
       data.flush();

@@ -2,9 +2,11 @@ package org.basex.ft;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
+import org.basex.data.Data.Type;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
@@ -14,9 +16,9 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Tokenizer extends IndexToken {
+public class Tokenizer extends IndexToken {
   /** Stemming instance. */
-  private final Stemming stem = new Stemming();
+  private Stemming stem;
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stemming flag. */
@@ -42,14 +44,18 @@ public final class Tokenizer extends IndexToken {
   public int para;
   /** Current token. */
   public int pos = -1;
+  
+  /** Text. */
+  public byte[] text = Token.EMPTY;
   /** Current character position. */
   public int p;
-  /** Character start position. */
-  public int s;
-  /** Number of tokens. */
-  public int count = -1;
   /** Backup last punctuation mark. */
   public int lastpm;
+
+  /** Character start position. */
+  private int s;
+  /** Number of tokens. */
+  private int count = -1;
 
   /**
    * Empty constructor.
@@ -96,6 +102,7 @@ public final class Tokenizer extends IndexToken {
    * Initializes the iterator.
    */
   public void init() {
+    if(st && sd == null && stem == null) stem = new Stemming();
     sent = 0;
     para = 0;
     pos = -1;
@@ -107,7 +114,6 @@ public final class Tokenizer extends IndexToken {
    * @return result of check
    */
   public boolean more() {
-    if(text == null) return false;
     final int l = text.length;
     pos++;
 

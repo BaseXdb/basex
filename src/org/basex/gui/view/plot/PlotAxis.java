@@ -367,7 +367,7 @@ public final class PlotAxis {
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;
       while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 3 < space &&
-          dbl ? dbl : actlCaptionStep % 2 == 0) {
+          (dbl || actlCaptionStep % 2 == 0)) {
         actlCaptionStep /= 2;
         nrCaptions = (int) (range / actlCaptionStep);
       }

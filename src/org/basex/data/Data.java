@@ -37,6 +37,15 @@ public abstract class Data  {
   /** Node kind: Processing instruction. */
   public static final byte PI = 0x05;
 
+  /** Index types. */
+  public enum Type {
+    /** Attribute index. */ ATN,
+    /** Tag index.       */ TAG,
+    /** Text index.      */ TXT,
+    /** Attribute index. */ ATV,
+    /** Fulltext index.  */ FTX,
+  };
+
   /** Meta data. */
   public MetaData meta;
   /** Tag index. */
@@ -87,14 +96,14 @@ public abstract class Data  {
    * @param index index to be closed
    * @throws IOException in case the index could not be closed
    */
-  public abstract void closeIndex(IndexToken.Type index) throws IOException;
+  public abstract void closeIndex(Type index) throws IOException;
 
   /**
    * Assigns the specified index.
    * @param type index to be opened
    * @param ind index instance
    */
-  public abstract void setIndex(IndexToken.Type type, Index ind);
+  public abstract void setIndex(Type type, Index ind);
 
   /**
    * Returns a unique node id.
@@ -303,7 +312,7 @@ public abstract class Data  {
    * @param type index type
    * @return info
    */
-  public final byte[] info(final IndexToken.Type type) {
+  public final byte[] info(final Type type) {
     switch(type) {
       case TAG: return tags.info();
       case ATN: return atts.info();

@@ -28,11 +28,14 @@ public final class BaseXTextRenderer extends BaseXBack {
   private boolean high;
 
   /** Vertical start position. */
-  private BaseXBar bar;
+  private final BaseXBar bar;
   /** Width of current word. */
   private int wordW;
   /** Character widths. */
   private String word;
+  /** Search term. */
+  private String search;
+
   /** Border offset. */
   private int off;
   /** Current x coordinate. */
@@ -69,6 +72,64 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   void setText(final BaseXTextTokens t) {
     text = t;
+    search = null;
+  }
+
+  /**
+   * Finds the search term.
+   * @param s search term
+   * @param b backward browsing
+   * @return new position
+   */
+  int find(final String s, final boolean b) {
+    final int os = search == null ? 0 : search.length();
+    final int ns = s.length();
+    search = ns != 0 ? s.toLowerCase() : null;
+    return search == null || ns < os ? 0 : find(b, ns == os);
+  }
+
+  /**
+   * Finds the search term.
+   * @param b backward browsing
+   * @param s string is the same as last time
+   * (>0: new string is longer, 0: string is the same..)
+   * @return new position
+   */
+  int find(final boolean b, final boolean s) {
+    final int hh = h;
+    int lp = 0;
+    int ly = 0;
+    int sp = text.cursor();
+
+    h = Integer.MAX_VALUE;
+    final Graphics g = getGraphics();
+    init(g, 0);
+    while(more(g)) {
+      if(searched()) {
+        final int np = text.pos();
+        final int ny = y - fontH;
+        if(np >= sp && (np > sp || !s || b)) {
+          if(b && lp == 0 && np >= sp) {
+            sp = Integer.MAX_VALUE;
+          } else {
+            h = hh;
+            text.setCaret(sp = b ? lp : np);
+            return b ? ly : ny;
+          }
+        }
+        lp = np;
+        ly = ny;
+      }
+      next();
+    }
+
+    h = hh;
+    if(sp == 0 || sp == Integer.MAX_VALUE) {
+      text.setCaret(lp);
+      return ly;
+    }
+    text.setCaret(0);
+    return find(b, s);
   }
 
   @Override
@@ -205,7 +266,6 @@ public final class BaseXTextRenderer extends BaseXBack {
         if (diff == -1) diff = c;
         else {
           col = GUIConstants.COLORFT;
-          //col = GUIConstants.getFTColor(c, diff);
           diff = -1;
           high = true;
         }        
@@ -232,6 +292,14 @@ public final class BaseXTextRenderer extends BaseXBack {
         }
         text.pos(p);
       }
+      if(search != null && searched()) {
+        int cw = 0;
+        for(int c = 0; c < search.length(); c++) {
+          cw += charW(g, search.charAt(c));
+        }
+        g.setColor(GUIConstants.COLORS[text.cursor() == text.pos() ? 7 : 3]);
+        g.fillRect(x, y - fontH + 4, cw, fontH);
+      }
 
       // don't write whitespaces
       if(ch > ' ') {
@@ -254,6 +322,21 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
     }
     next();
+  }
+
+  /**
+   * Returns true if the searched term is found.
+   * @return result of check
+   */
+  private boolean searched() {
+    final int sl = search.length();
+    final int wl = word.length();
+    if(wl < sl) return false;
+    for(int s = 0; s < sl; s++) {
+      if(Character.toLowerCase(word.charAt(s)) !=
+        search.charAt(s)) return false;
+    }
+    return true;
   }
   
   /**

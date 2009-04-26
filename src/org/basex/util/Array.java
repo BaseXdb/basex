@@ -427,7 +427,7 @@ public final class Array {
    */
   public static int[] createOrder(final byte[][] tok, final boolean num,
       final boolean asc) {
-    final IntList il = new IntList(number(tok.length));
+    final IntList il = number(tok.length);
     il.sort(tok, num, asc);
     return il.finish();
   }
@@ -440,19 +440,19 @@ public final class Array {
    * @return sorted integer array
    */
   public static int[] createOrder(final double[] tok, final boolean asc) {
-    final IntList il = new IntList(number(tok.length));
+    final IntList il = number(tok.length);
     il.sort(tok, asc);
     return il.finish();
   }
 
   /**
-   * Returns an array with a number list.
+   * Returns an integer list with a number list.
    * @param l array size
    * @return number list
    */
-  private static int[] number(final int l) {
+  private static IntList number(final int l) {
     final int[] tmp = new int[l];
     for(int i = 0; i < l; i++) tmp[i] = i;
-    return tmp;
+    return new IntList(tmp);
   }
 }

@@ -76,9 +76,9 @@ public class FTContains extends Expr {
       final double d2 = ftexpr.iter(ctx).next().score();
       d = ctx.score.and(d, d2);
       if(i instanceof DBNode && d2 > 0) pre = ((DBNode) i).pre;
-      if (d2 > 0 && pre > -1 && ctx.ftd != null && ctx.ftdata != null)
+      if (d2 > 0 && pre > -1 && ctx.ftd != null && ctx.ftdata != null) {
         ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);
-      ctx.ftpos.setPos(new IntList[]{}, 0);
+      }
     }
     
     ctx.ftitem = tmp;

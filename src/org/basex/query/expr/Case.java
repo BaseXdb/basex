@@ -18,7 +18,7 @@ import org.basex.query.util.Var;
  */
 public final class Case extends Expr {
   /** Expression list. */
-  protected Expr expr;
+  private Expr expr;
   /** Variable. */
   private final Var var;
 

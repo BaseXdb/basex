@@ -110,6 +110,7 @@ public final class Names extends Set {
     tl[0] = 0;
     for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;
+      if(stat[i] == null) continue;
       tl[i] = stat[i].counter;
     }
     len += 2;

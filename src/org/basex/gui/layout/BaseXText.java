@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -28,6 +29,7 @@ import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
+import org.basex.gui.view.text.TextView;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.Undo;
@@ -49,8 +51,6 @@ public final class BaseXText extends BaseXPanel {
 
   /** Scrollbar reference. */
   final BaseXBar scroll;
-  /** Editable flag. */
-  final boolean editable;
   /** Popup Menu. */
   final BaseXPopup popup;
   
@@ -91,7 +91,6 @@ public final class BaseXText extends BaseXPanel {
     addComponentListener(this);
     addMouseListener(this);
     addKeyListener(this);
-    editable = edit;
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -137,6 +136,27 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Finds the specified term.
+   * @param t output text
+   * @param b backward browsing
+   */
+  public void find(final String t, final boolean b) {
+    find(rend.find(t, b));
+  }
+
+  /**
+   * Displays the search term.
+   * @param y vertical position
+   */
+  public void find(final int y) {
+    // updates the visible area
+    final int p = scroll.pos();
+    final int m = y + rend.fontH() * 3 - getHeight();
+    if(y != 0 && (p < m || p > y)) scroll.pos(y - getHeight() / 2);
+    repaint();
+  }
+
+  /**
    * Sets the output text.
    * @param t output text
    * @param s text size
@@ -177,8 +197,7 @@ public final class BaseXText extends BaseXPanel {
    * @param p cursor position
    */
   public void setCaret(final int p) {
-    text.pos(p);
-    text.setCaret();
+    text.setCaret(p);
     showCursor(1);
   }
 
@@ -313,10 +332,28 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
-
+    final boolean shf = e.isShiftDown();
     final boolean ctrl = (Toolkit.getDefaultToolkit().
         getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
+    if(c == KeyEvent.VK_F3) {
+      find(rend.find(shf, true));
+      return;
+    }
+    if(ctrl && c == KeyEvent.VK_F) {
+      // activate parent search field
+      Container cont = this;
+      do {
+        cont = cont.getParent();
+        if(cont instanceof TextView) {
+          ((TextView) cont).find();
+          e.consume();
+        }
+      } while(cont != null);
+      return;
+    }
+    
+    
     if(e.isAltDown() || c == KeyEvent.VK_SHIFT || c == KeyEvent.VK_META ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
 
@@ -324,8 +361,7 @@ public final class BaseXText extends BaseXPanel {
     cursor(true);
 
     final byte[] txt = text.text;
-    final boolean shf = e.isShiftDown();
-    
+
     boolean down = true;
     if(!ctrl && !e.isActionKey()) return;
 
@@ -342,7 +378,7 @@ public final class BaseXText extends BaseXPanel {
         return;
       }
 
-      if(editable) {
+      if(undo != null) {
         if(c == 'X') {
           cut();
         } else if(c == 'V') {
@@ -472,10 +508,7 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyTyped(final KeyEvent e) {
     super.keyTyped(e);
-    if(!editable) return;
-
-    final boolean ctrl = (Toolkit.getDefaultToolkit().
-        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
+    if(undo == null) return;
 
     // not nice here.. no alternative, though
     final char ch = e.getKeyChar();
@@ -485,6 +518,9 @@ public final class BaseXText extends BaseXPanel {
     boolean down = true;
     final byte[] txt = text.text;
     text.pos(text.cursor());
+
+    final boolean ctrl = (Toolkit.getDefaultToolkit().
+        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
@@ -519,11 +555,11 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyReleased(final KeyEvent e) {
     final int c = e.getKeyCode();
-    if(e.isControlDown() && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y))
-      return;
+    if(e.isControlDown() && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y) ||
+        undo == null) return;
 
-    if(undo != null) undo.store(text.finish(), text.cursor());
-    if(editable) e.consume();
+    undo.store(text.finish(), text.cursor());
+    e.consume();
   }
 
   /**

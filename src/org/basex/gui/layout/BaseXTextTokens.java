@@ -334,6 +334,14 @@ final class BaseXTextTokens {
   }
 
   /**
+   * Sets the caret position to the specified counter.
+   * @param c caret position
+   */
+  void setCaret(final int c) {
+    pc = c;
+  }
+
+  /**
    * Sets the caret position to the current counter.
    */
   void setCaret() {

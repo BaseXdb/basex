@@ -8,7 +8,7 @@ import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
-import org.basex.index.IndexToken;
+import org.basex.data.Data.Type;
 import org.basex.io.IO;
 
 /**
@@ -36,13 +36,13 @@ public final class DropIndex extends Process {
     switch(type) {
       case TEXT:
         data.meta.txtindex = false;
-        return drop(IndexToken.Type.TXT, DATATXT);
+        return drop(Type.TXT, DATATXT);
       case ATTRIBUTE:
         data.meta.atvindex = false;
-        return drop(IndexToken.Type.ATV, DATAATV);
+        return drop(Type.ATV, DATAATV);
       case FULLTEXT:
         data.meta.ftxindex = false;
-        return drop(IndexToken.Type.FTX, DATAFTX);
+        return drop(Type.FTX, DATAFTX);
       default:
         return false;
     }
@@ -54,7 +54,7 @@ public final class DropIndex extends Process {
    * @param pat pattern
    * @return success of operation
    */
-  private boolean drop(final IndexToken.Type index, final String pat) {
+  private boolean drop(final Type index, final String pat) {
     try {
       final Data data = context.data();
       data.flush();

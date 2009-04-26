@@ -491,7 +491,7 @@ public final class GUI extends JFrame {
         
         // retrieve text result
         if(GUIProp.showtext) {
-          final CachedOutput out = new CachedOutput(TextView.MAX);
+          final CachedOutput out = new CachedOutput(GUIProp.maxtext);
           pr.output(out);
           text.setText(out);
         }

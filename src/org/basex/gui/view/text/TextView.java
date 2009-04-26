@@ -2,8 +2,11 @@ package org.basex.gui.view.text;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -11,10 +14,15 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIToolBar;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXTextField;
+import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
@@ -28,16 +36,14 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class TextView extends View {
-  /** Maximum text size to be displayed. */
-  public static final int MAX = 1 << 21;
   /** Text Area. */
-  private final BaseXText area;
+  final BaseXText area;
   /** Header string. */
-  private final BaseXLabel header;
-  /** Open button. */
-  private BaseXButton export;
+  final BaseXLabel header;
+  /** Search field. */
+  BaseXTextField search;
   /** Painted flag. */
-  private boolean refreshed;
+  boolean refreshed;
   
   /**
    * Default constructor.
@@ -48,18 +54,58 @@ public final class TextView extends View {
 
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
+    setFocusable(false);
     
     area = new BaseXText(gui, HELPTEXT, false);
     add(area, BorderLayout.CENTER);
     
     header = new BaseXLabel(TEXTTIT, true);
-    export = GUIToolBar.newButton(GUICommands.SAVE, gui);
+    final BaseXButton export = GUIToolBar.newButton(GUICommands.SAVE, gui);
+    final BaseXButton root = GUIToolBar.newButton(GUICommands.HOME, gui);
+    search = new BaseXTextField(null);
 
-    final Box box = new Box(BoxLayout.X_AXIS);
-    box.add(header);
-    box.add(Box.createHorizontalGlue());
-    box.add(export);
-    add(box, BorderLayout.NORTH);
+    final Font f = getFont();
+    search.setFont(f.deriveFont((float) f.getSize() + 2));
+    search.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        final int co = e.getKeyCode();
+        if(co == KeyEvent.VK_ESCAPE) {
+          area.requestFocusInWindow();
+        } else if(co == KeyEvent.VK_ENTER || co == KeyEvent.VK_F3) {
+          area.find(search.getText(), e.isShiftDown());
+        }
+        // ignore Control/F shortcut
+        if((Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &
+            e.getModifiers()) != 0 && co == KeyEvent.VK_F) e.consume();
+      }
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        final char ch = e.getKeyChar();
+        if(ch != KeyEvent.VK_ENTER && Character.isDefined(ch))
+          area.find(search.getText(), false);
+      }
+    });
+    
+    BaseXLayout.setWidth(search, 120);
+    BaseXLayout.setHeight(search, (int) export.getPreferredSize().getHeight());
+
+    final BaseXBack back = new BaseXBack();
+    back.setMode(Fill.NONE);
+    back.setLayout(new BorderLayout());
+    back.add(header, BorderLayout.WEST);
+
+    final BaseXBack sp = new BaseXBack();
+    sp.setMode(Fill.NONE);
+    sp.setLayout(new TableLayout(1, 5));
+    sp.add(search);
+    sp.add(Box.createHorizontalStrut(5));
+    sp.add(root);
+    sp.add(Box.createHorizontalStrut(1));
+    sp.add(export);
+
+    back.add(sp, BorderLayout.EAST);
+    add(back, BorderLayout.NORTH);
 
     refreshLayout();
   }
@@ -99,7 +145,7 @@ public final class TextView extends View {
     }
     
     try {
-      final CachedOutput out = new CachedOutput(MAX);
+      final CachedOutput out = new CachedOutput(GUIProp.maxtext);
       nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
       setText(out);
       refreshed = false;
@@ -118,7 +164,7 @@ public final class TextView extends View {
   public void refreshUpdate() {
     refreshContext(false, true);
   }
-
+  
   /**
    * Sets the output text.
    * @param out output cache
@@ -145,6 +191,13 @@ public final class TextView extends View {
   public void setText(final byte[] txt) {
     area.setSyntax(BaseXSyntax.SIMPLE);
     area.setText(txt, txt.length);
+  }
+
+  /**
+   * Activates the search field.
+   */
+  public void find() {
+    search.requestFocusInWindow();
   }
 
   /**

@@ -26,6 +26,7 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Update;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
@@ -779,6 +780,14 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Cs("/"));
+    }
+  },
+
+  /** Go to root node. */
+  HOME(true, GUIROOT, null, GUIROOTTT) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.execute(new XQuery("/"));
     }
   };
 

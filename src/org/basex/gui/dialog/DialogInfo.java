@@ -11,6 +11,7 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
+import org.basex.data.Data.Type;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -19,8 +20,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
-import org.basex.index.IndexToken;
-import org.basex.index.IndexToken.Type;
 import org.basex.util.Token;
 
 /**
@@ -87,7 +86,7 @@ public final class DialogInfo extends Dialog {
         Token.token(TXTINDEXINFO), meta.txtindex, 0, this);
     p.add(indexes[0], BorderLayout.NORTH);
 
-    p.add(text(meta.txtindex ? data.info(IndexToken.Type.TXT) :
+    p.add(text(meta.txtindex ? data.info(Type.TXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
     tab3.add(p);
 
@@ -98,7 +97,7 @@ public final class DialogInfo extends Dialog {
         Token.token(ATTINDEXINFO), meta.atvindex, 0, this);
     p.add(indexes[1], BorderLayout.NORTH);
 
-    p.add(text(meta.atvindex ? data.info(IndexToken.Type.ATV) :
+    p.add(text(meta.atvindex ? data.info(Type.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
     tab3.add(p);
 
@@ -127,7 +126,7 @@ public final class DialogInfo extends Dialog {
         p.add(fl[f]);
       }
     } else {
-      p.add(text(data.info(IndexToken.Type.FTX)), BorderLayout.CENTER);
+      p.add(text(data.info(Type.FTX)), BorderLayout.CENTER);
     }
     tab4.add(p);
 
@@ -163,7 +162,7 @@ public final class DialogInfo extends Dialog {
     String lbl = tag ? INFOTAGINDEX : INFOATNINDEX;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
-    final Type index = tag ? IndexToken.Type.TAG : IndexToken.Type.ATN;
+    final Type index = tag ? Type.TAG : Type.ATN;
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }

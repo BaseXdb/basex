@@ -69,7 +69,7 @@ public final class Values extends Index {
   public IndexIterator ids(final IndexToken tok) {
     if(tok.range()) return idRange((RangeToken) tok);
     
-    final long pos = get(tok.text);
+    final long pos = get(tok.get());
     if(pos == 0) return IndexIterator.EMPTY;
     
     return new IndexIterator() {
@@ -137,7 +137,7 @@ public final class Values extends Index {
 
     return new IndexIterator() {
       int p = -1;
-      public int next() { return ++p < ids.size ? ids.list[p] : null; }
+      public int next() { return ++p < ids.size ? ids.list[p] : 0; }
       public int size() { return ids.size; }
     };
   }

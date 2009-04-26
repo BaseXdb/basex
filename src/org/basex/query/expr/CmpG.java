@@ -254,7 +254,7 @@ public final class CmpG extends Arr {
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(index[0].type == IndexToken.Type.TXT) {
+    if(index[0].type == org.basex.data.Data.Type.TXT) {
       ctx.compInfo(OPTTXTINDEX);
     } else {
       ctx.compInfo(OPTATVINDEX);

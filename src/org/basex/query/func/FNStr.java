@@ -297,7 +297,7 @@ final class FNStr extends Fun {
       for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);
     } else {
-      norm = Norm.C;
+      //norm = Norm.C;
     }
     // [CG] XQuery/normalize-unicode
     return Str.get(str);

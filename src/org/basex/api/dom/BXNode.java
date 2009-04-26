@@ -157,7 +157,7 @@ public abstract class BXNode implements Node {
 
   public Document getOwnerDocument() {
     Nod n = node;
-    Nod p = n;
+    Nod p;
     while((p = n.parent()) != null) n = p;
     return n.type == Type.DOC ? (Document) n.java() : null;
   }

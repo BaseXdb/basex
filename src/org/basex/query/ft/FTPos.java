@@ -59,7 +59,7 @@ public final class FTPos extends FTExpr {
   public Expr[] dist;
 
   /** Position list. */
-  private IntList[] pos = new IntList[0];
+  private IntList[] pos = {};
   /** Number of position lists. */
   private int size;
 
@@ -90,17 +90,30 @@ public final class FTPos extends FTExpr {
     ctx.ftpos = tmp;
 
     final double s = it.score();
-    if(s == 0 || !filter(ctx)) {
-      return score(0);
-    }
+    if(s == 0 || !filter(ctx)) return score(0);
 
-    if(tmp != null) //tmp.setPos(pos, pos.length);
-      tmp.addPos(pos, pos.length, term);
+    if(tmp != null) tmp.addPos(pos, pos.length, term);
     ctx.ftd = pos;
 
     return score(s);
   }
 
+  /**
+   * Add position values to existing values.
+   * @param il IntList[] with position values
+   * @param ilsize int number of tokens in query
+   * @param tl TokenList with tokens
+   */
+  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
+    final IntList[] iln = new IntList[size + ilsize];
+    System.arraycopy(pos, 0, iln, 0, size);
+    System.arraycopy(il, 0, iln, size, ilsize);
+    pos = iln;
+    size += ilsize;
+    for (int i = 0; i < tl.size; i++)
+      term.add(tl.list[i]);    
+  }
+  
   /**
    * Evaluates the position filters.
    * @param ctx query context
@@ -108,7 +121,8 @@ public final class FTPos extends FTExpr {
    * @throws QueryException query exception
    */
   boolean filter(final QueryContext ctx) throws QueryException {
-    if(!order() || !content() || !same() || !different()) return false;
+    if(!order() || !start() || !end() || !content() || !same() || !different())
+      return false;
 
     // ...distance?
     if(dunit != null) {
@@ -156,22 +170,6 @@ public final class FTPos extends FTExpr {
     pos = il;
     size = ilsize;
   }
-  
-  /**
-   * Add position values to existing values.
-   * @param il IntList[] with position values
-   * @param ilsize int number of tokens in query
-   * @param tl TokenList with tokens
-   */
-  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
-    final IntList[] iln = new IntList[size + ilsize];
-    System.arraycopy(pos, 0, iln, 0, size);
-    System.arraycopy(il, 0, iln, size, ilsize);
-    pos = iln;
-    size += ilsize;
-    for (int i = 0; i < tl.size; i++)
-      term.add(tl.list[i]);    
-  }
 
   /**
    * Evaluates the mild not expression.
@@ -199,62 +197,58 @@ public final class FTPos extends FTExpr {
     final IntList pp = il[1];
     int i = 0;
     int lp;
-    while (i < p.size && pp.list[i] != 0) i++;
+    while(i < p.size && pp.list[i] != 0) i++;
     lp = i;
     i++;
-    while (i < p.size) {
-      if (pp.list[i] < pp.list[lp] || pp.list[i] == pp.list[lp] + 1) lp = i;
-      if (pp.list[lp] == size - 1) return true;
+    while(i < p.size) {
+      if(pp.list[i] < pp.list[lp] || pp.list[i] == pp.list[lp] + 1) lp = i;
+      if(pp.list[lp] == size - 1) return true;
       i++;
     }
     return false;
   }
 
+
   /**
-   * Checks if the start and end conditions are fulfilled.
+   * Checks if the start condition is fulfilled.
+   * @return result of check
+   */
+  private boolean start() {
+    if(!start) return true;
+
+    for(int i = 0; i < size; i++) {
+      for(int j = 0; j < pos[i].size; j++) if(pos[i].list[j] == 0) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the end condition is fulfilled.
+   * @return result of check
+   */
+  private boolean end() {
+    if(!end) return true;
+
+    final int s = ft.count() - 1;
+    for(int i = 0; i < size; i++) {
+      for(int j = 0; j < pos[i].size; j++) if(pos[i].list[j] == s) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the entire content conditions are fulfilled.
    * @return result of check
    */
   private boolean content() {
-    int max = 0;
-    for (int i = 0; i < size; i++) 
-      for (int j = 0; j < pos[i].size; j++)
-        max = pos[i].list[j] > max ? pos[i].list[j] : max;
-    
-    final int[] c = new int[max + 1];
-    final int[] p = new int[max + 1];
-    c[0] = -1; // init first entry with -1
-    for (int i = 0; i < p.length; i++) p[i] = -1;
-    
-    for (int i = 0; i < size; i++)
-      for (int j = 0; j < pos[i].size; j++) {
-        c[pos[i].list[j]] = pos[i].list[j];
-        if (p[pos[i].list[j]] == -1) p[pos[i].list[j]] = i;
-      }
-    
-    if (start || content) {
-      int[] l = new int[Math.min(p.length, size)];
-      for (int i = 0; i < l.length; i++)  
-        if (p[i] > -1) l[p[i]] = -1;
+    if(!content) return true;
 
-      for (int i = 0; i < l.length; i++) 
-        if (l[i] != -1) return false;
-      if (content) { 
-        if (l.length == ft.count()) return true;
-        else return l.length == size;
-      }
-    } else if (end) {
-      int count = ft.count() - 1;
-      int[] l = new int[count + 1];  
-      for (int i = c.length - 1; i > -1; i--) 
-        if (count == c[i]) {
-          l[count] = -1; 
-          count--;  
-        }
-      
-      for (int i = 1; i <= Math.min(max, size); i++) 
-        if (l[l.length - i] != -1) return false;
-      
+    final int s = ft.count();
+    final boolean[] bl = new boolean[s];
+    for(int i = 0; i < size; i++) {
+      for(int j = 0; j < pos[i].size; j++) bl[pos[i].list[j]] = true;
     }
+    for(int j = 0; j < s; j++) if(!bl[j]) return false;
     return true;
   } 
 
