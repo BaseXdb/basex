@@ -40,13 +40,13 @@ public class Session implements Runnable {
   boolean verbose;
   /** Core. */
   Process core;
-  /** PrintOutput. */
+  /** Timeout Thread. */
   Thread timeout;
+  /** Session Thread. */
+  Thread session = null;
 
   /** Flag for Session. */
   boolean running = true;
-  /** Thread. */
-  Thread thread = null;
   /** DataOutputStream. */
   DataOutputStream dos;
   /** DataInputStream. */
@@ -76,9 +76,9 @@ public class Session implements Runnable {
    * Starts the Thread.
    */
   public synchronized void start() {
-    if (thread == null) {
-      thread = new Thread(this);
-      thread.start();
+    if (session == null) {
+      session = new Thread(this);
+      session.start();
     }
   }
   
@@ -188,7 +188,7 @@ public class Session implements Runnable {
     } catch(IOException e) {
       e.printStackTrace();
     }
-    thread = null;
+    session = null;
   }
   
   public void run() {

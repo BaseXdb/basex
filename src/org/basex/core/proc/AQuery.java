@@ -73,6 +73,7 @@ abstract class AQuery extends Process {
       BaseX.debug(ex);
       return error(ex.getMessage());
     } catch(final ProgressException ex) {
+      if(Prop.server) return error("Your query reached the timeout.");
       return error("");
     } catch(final Exception ex) {
       ex.printStackTrace();
