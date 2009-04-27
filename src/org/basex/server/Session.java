@@ -151,7 +151,7 @@ public class Session implements Runnable {
     timeout = new Thread() {
       @Override
       public void run() {
-        Performance.sleep(5000);  //Prop.timeout * 1000
+        Performance.sleep(Prop.timeout * 1000);
         proc.stop();
       }
     };

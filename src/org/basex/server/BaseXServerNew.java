@@ -190,6 +190,9 @@ public class BaseXServerNew {
               }
               BaseX.outln("Client " + session.clientId + ": " + dbname);
             }
+          } else if(com.equals("help")) {
+            BaseX.outln("-list     Lists all Clients connected to the Server"
+                + NL + "-stop     Stops the Server");
           } else {
             BaseX.outln("No such command");
           }
