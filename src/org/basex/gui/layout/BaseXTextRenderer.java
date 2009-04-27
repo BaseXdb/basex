@@ -85,7 +85,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     final int os = search == null ? 0 : search.length();
     final int ns = s.length();
     search = ns != 0 ? s.toLowerCase() : null;
-    return search == null || ns < os ? 0 : find(b, ns == os);
+    return ns < os ? 0 : find(b, ns == os);
   }
 
   /**
@@ -96,6 +96,8 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return new position
    */
   int find(final boolean b, final boolean s) {
+    if(search == null) return 0;
+
     final int hh = h;
     int lp = 0;
     int ly = 0;

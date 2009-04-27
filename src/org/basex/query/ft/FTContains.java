@@ -121,6 +121,11 @@ public class FTContains extends Expr {
   }
 
   @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return expr.removable(v, ctx) && ftexpr.removable(v, ctx);
+  }
+
+  @Override
   public Expr remove(final Var v) {
     expr = expr.remove(v);
     ftexpr = ftexpr.remove(v);

@@ -47,6 +47,12 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final Expr e : expr) if(!e.removable(v, ctx)) return false;
+    return true;
+  }
+
+  @Override
   public final FTExpr remove(final Var v) {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
     return this;
