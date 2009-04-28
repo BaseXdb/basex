@@ -83,20 +83,29 @@ public class AxisPath extends Path {
     // skip paths with variables...
     if(root != null && root.uses(Use.VAR, ctx)) return this;
 
-    // Simple iterator: one downward location step
-    if(step.length == 1 && step[0].axis.down) {
+    // Simple iterator: one downward location step or parent step or self
+    // step or an attribute
+    if(step.length == 1 && (step[0].axis.down
+        || step[0].axis == Axis.PARENT
+        || step[0].axis == Axis.SELF
+        || step[0].axis == Axis.ATTR)) {
       return new SingleIterPath(root, step);
     }
 
-    // check if all steps are child steps
+    // check if all steps are child steps, parent steps, self steps or
+    // attributes
     boolean children = root != null && !root.duplicates(ctx);
     for(final Step s : step) {
-      children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+      children &= s.axis == Axis.CHILD
+      || s.axis == Axis.PARENT
+      || s.axis == Axis.SELF
+      || s.axis == Axis.ATTR;
     }
+
     if(children) {
       return new SimpleIterPath(root, step);
     }
-    
+
     // return null if no iterator could be created
     return this;
   }
@@ -159,12 +168,12 @@ public class AxisPath extends Path {
     if(!pos && data != null) {
       boolean doc = true;
       for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
-      
+
       if(doc) {
         // check index access
         Expr e = index(ctx, data);
         if(e != this) return e;
-  
+
         // check children path rewriting
         e = children(ctx, data);
         if(e != this) return e;
@@ -218,7 +227,7 @@ public class AxisPath extends Path {
     }
     return this;
   }
-  
+
   /**
    * Returns all summary path nodes for the specified location step or null
    * if nodes cannot be retrieved or are found on different levels.
@@ -260,7 +269,7 @@ public class AxisPath extends Path {
    * @throws QueryException query exception
    */
   private Expr index(final QueryContext ctx, final Data data)
-      throws QueryException {
+  throws QueryException {
 
     // skip position predicates and horizontal axes
     for(final Step s : step) if(!s.axis.down) return this;
@@ -284,7 +293,7 @@ public class AxisPath extends Path {
           }
         }
       }
- 
+
       // no index access possible; skip remaining tests
       if(ictx == null || !ictx.io || !ictx.iu) continue;
 
@@ -383,7 +392,7 @@ public class AxisPath extends Path {
     ctx.pos = cp;
     return citem; 
   }
-  
+
   /**
    * Recursive step iterator.
    * @param l current step
@@ -392,7 +401,7 @@ public class AxisPath extends Path {
    * @throws QueryException query exception
    */
   private void iter(final int l, final NodIter ni, final QueryContext ctx)
-      throws QueryException {
+  throws QueryException {
 
     // cast is ok as all steps are axis steps here (see calling method)
     final NodeIter ir = (NodeIter) ctx.iter(step[l]);
@@ -428,7 +437,7 @@ public class AxisPath extends Path {
 
     final Item rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
-      rt instanceof DBNode ? ((DBNode) rt).data : null;
+    rt instanceof DBNode ? ((DBNode) rt).data : null;
 
     if(data != null && data.meta.uptodate && data.ns.size() == 0) {
       ArrayList<PathNode> nodes = data.path.root();
@@ -473,8 +482,8 @@ public class AxisPath extends Path {
     if(ll > 0) {
       final Step s = step[0];
       if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
-        (s.axis == ATTR || s.axis == PARENT || s.axis == SELF && s.test != NODE)
-        || root instanceof CAttr && s.axis == CHILD) warning(s);
+          (s.axis == ATTR || s.axis == PARENT || s.axis == SELF && s.test != NODE)
+          || root instanceof CAttr && s.axis == CHILD) warning(s);
     }
 
     for(int l = 1; l < ll; l++) {
