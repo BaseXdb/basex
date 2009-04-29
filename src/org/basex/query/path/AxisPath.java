@@ -162,23 +162,27 @@ public class AxisPath extends Path {
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Use.VAR, ctx);
 
-    // check if no position is used and if context is set to a document node
+ // check if context is set to a document node
     final Data data = ctx.data();
-
-    if(!pos && data != null) {
+    if(data != null) {
       boolean doc = true;
       for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
 
       if(doc) {
-        // check index access
-        Expr e = index(ctx, data);
-        if(e != this) return e;
+        
+        // check if no position is used 
+        if(!pos) {
+          // check index access
+          Expr e = index(ctx, data);
+          if(e != this) return e;          
+        }
 
         // check children path rewriting
-        e = children(ctx, data);
+        Expr e = children(ctx, data);
         if(e != this) return e;
       }
     }
+
 
     // if applicable, return iterator
     return iterator(ctx);
