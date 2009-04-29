@@ -59,6 +59,7 @@ abstract class AQuery extends Process {
         comp += per.getTime();
         result = qp.query();
         eval += per.getTime();
+        if(i + 1 < Prop.runs) qp.close();
       }
 
       // dump some query info
