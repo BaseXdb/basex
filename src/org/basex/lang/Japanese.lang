@@ -335,6 +335,7 @@ cs_client=クライアント
 srv_connect=サーバーと通信できません。
 srv_port=ポート番号が不正です。
 srv_timeout=Server timeout (% sec.).
+srv_timeerror=Your query reached the timeout.
 srv_bind=Server is running or permission was denied.
 srv_start=開始しました。\nリクエストを待っています。
 srv_stop=停止しました。

@@ -2,6 +2,7 @@ package org.basex.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -44,7 +45,7 @@ public final class ClientProcessNew extends AbstractProcess {
       send(proc.toString());
       last = new DataInputStream(socket.getInputStream()).readInt();
     } catch(IOException e) {
-      if(e instanceof SocketException) {
+      if(e instanceof SocketException || e instanceof EOFException) {
         return false;
       }
       e.printStackTrace();

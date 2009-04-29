@@ -111,6 +111,8 @@ public interface Text {
   String SERVERBIND = lang("srv_bind");
   /** Server timeout. */
   String SERVERTIME = lang("srv_timeout");
+  /** Error shown in the Client Console when timeout is reached. */
+  String TIMEOUTERR = lang("srv_timeerror");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */

@@ -482,7 +482,8 @@ public class AxisPath extends Path {
     if(ll > 0) {
       final Step s = step[0];
       if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
-          (s.axis == ATTR || s.axis == PARENT || s.axis == SELF && s.test != NODE)
+          (s.axis == ATTR || s.axis == PARENT || s.axis == SELF
+              && s.test != NODE)
           || root instanceof CAttr && s.axis == CHILD) warning(s);
     }
 
