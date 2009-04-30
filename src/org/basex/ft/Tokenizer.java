@@ -18,7 +18,7 @@ import org.basex.util.TokenList;
  */
 public class Tokenizer extends IndexToken {
   /** Stemming instance. */
-  private Stemming stem;
+  private Stemming stem = new Stemming();
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stemming flag. */
@@ -102,7 +102,6 @@ public class Tokenizer extends IndexToken {
    * Initializes the iterator.
    */
   public void init() {
-    if(st && sd == null && stem == null) stem = new Stemming();
     sent = 0;
     para = 0;
     pos = -1;

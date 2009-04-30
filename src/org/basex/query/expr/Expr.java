@@ -186,11 +186,13 @@ public abstract class Expr extends ExprInfo {
    * Checks if an index can be used for query evaluation.
    * @param ctx query context
    * @param ic index context
+   * @return true if an index can be used
    * @throws QueryException Exception
    */
   @SuppressWarnings("unused")
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx, final IndexContext ic)
+      throws QueryException {
+    return false;
   }
   
   /**

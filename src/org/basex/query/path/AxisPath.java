@@ -273,7 +273,7 @@ public class AxisPath extends Path {
    * @throws QueryException query exception
    */
   private Expr index(final QueryContext ctx, final Data data)
-  throws QueryException {
+      throws QueryException {
 
     // skip position predicates and horizontal axes
     for(final Step s : step) if(!s.axis.down) return this;
@@ -289,17 +289,16 @@ public class AxisPath extends Path {
       final boolean d = stp.pred.length == 0 || pathNodes(data, i) == null;
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(data, stp, d);
-        stp.pred[p].indexAccessible(ctx, ic);
-        if(ic.io && ic.iu) {
-          if(ictx == null || ictx.is > ic.is) {
-            ictx = ic;
-            minp = p;
-          }
+        if(!stp.pred[p].indexAccessible(ctx, ic)) {
+          ictx = null;
+        } else if(ictx == null || ictx.is > ic.is) {
+          ictx = ic;
+          minp = p;
         }
       }
 
       // no index access possible; skip remaining tests
-      if(ictx == null || !ictx.io || !ictx.iu) continue;
+      if(ictx == null) continue;
 
       // no results...
       if(ictx.is == 0) {

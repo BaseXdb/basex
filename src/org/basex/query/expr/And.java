@@ -92,14 +92,14 @@ public final class And extends Arr {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
     
     for(final Expr e : expr) {
-      ic.iu = false;
-      e.indexAccessible(ctx, ic);
-      if(!ic.iu || ic.is == 0) return;
+      if(!e.indexAccessible(ctx, ic)) return false;
+      if(ic.is == 0) break;
     }
+    return true;
   }
 
   @Override

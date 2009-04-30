@@ -118,12 +118,12 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic) {
-    ic.iu = false;
-    
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) {
+
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
-    if(s == null) return;
+    if(s == null) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
@@ -131,17 +131,17 @@ public final class CmpR extends Single {
     
     // no text or attribute index applicable, min/max not included in range
     if(!text && !attr || !mni | !mxi || min == Double.NEGATIVE_INFINITY ||
-        max == Double.POSITIVE_INFINITY) return;
+        max == Double.POSITIVE_INFINITY) return false;
 
     final StatsKey key = getKey(ic, text);
-    if(key == null) return;
+    if(key == null) return false;
 
     rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
-    ic.iu = true;
 
     // estimate costs for range access; all values out of range: no results
     ic.is = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
       ic.data.meta.size / 5;
+    return true;
   }
   
   @Override

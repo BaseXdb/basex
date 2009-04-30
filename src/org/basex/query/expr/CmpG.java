@@ -210,37 +210,36 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
-    ic.iu = false;
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
 
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
     if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
-        expr[1] instanceof Seq)) return;
+        expr[1] instanceof Seq)) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
       s.simple(Axis.ATTR, true);
 
     // no text or attribute index applicable
-    if(!text && !attr) return;
+    if(!text && !attr) return false;
 
     // loop through all strings
     final Iter ir = expr[1].iter(ctx);
     Item i;
     while((i = ir.next()) != null) {
-      if(!(i instanceof Str)) return;
+      if(!(i instanceof Str)) return false;
       final ValuesToken vt = new ValuesToken(text, i.str());
       ic.is = Math.min(ic.data.nrIDs(vt), ic.is);
       index = Array.add(index, vt);
     }
-    ic.iu = true;
+    return true;
   }
   
   @Override
   public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic) {
+    // [CG] necessary/possible?
     if(index.length == 0) return this;
     
     // create index access expressions

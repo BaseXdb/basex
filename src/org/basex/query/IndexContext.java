@@ -15,11 +15,6 @@ public final class IndexContext {
   public final Data data;
   /** Index Step. */
   public final Step step;
-  
-  /** Flag for index use. */
-  public boolean iu;
-  /** Flag for index options. */
-  public boolean io = true;
   /** Number of estimated results. */
   public int is = Integer.MAX_VALUE;
   /** Flag for ftnot expressions. */

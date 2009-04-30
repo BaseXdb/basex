@@ -421,12 +421,12 @@ public final class FTPos extends FTExpr {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
 
-    expr[0].indexAccessible(ctx, ic);
     // index can only be used if there is no ftselection specified before ftnot
-    ic.iu &= !ic.ftnot && standard();
+    //return expr[0].indexAccessible(ctx, ic) && !ic.ftnot && standard();
+    return expr[0].indexAccessible(ctx, ic) && standard();
   }
 
   @Override

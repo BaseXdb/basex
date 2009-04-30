@@ -157,7 +157,8 @@ public final class FTWords extends FTExpr {
   }
   
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic) {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) {
     /*
      * If the following conditions yield true, the index is accessed:
      * - no FTTimes option is specified and query is a simple String item
@@ -167,16 +168,15 @@ public final class FTWords extends FTExpr {
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ctx.ftopt;
-    ic.io &= occ == null && word != null && word.length > 0 &&
-      md.ftcs == fto.is(FTOpt.CS) && md.ftdc == fto.is(FTOpt.DC) &&
-      md.ftst == fto.is(FTOpt.ST) && fto.sw == null &&
-      (!fto.is(FTOpt.WC) || !md.ftfz);
-    if(!ic.io) return;
+    if(occ != null || word == null || word.length == 0 ||
+        md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
+        md.ftst != fto.is(FTOpt.ST) || fto.sw != null ||
+        (fto.is(FTOpt.WC) && md.ftfz)) return false;
     
     // index size is incorrect for phrases
     final Tokenizer ft = new Tokenizer(word, fto);
     while(ic.is != 0 && ft.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(ft));
-    ic.iu = true;
+    return true;
   }
 
   @Override

@@ -87,22 +87,24 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
 
     // return if step is no text node, or if no index is available
-    ic.iu = false;
     final Step s = CmpG.indexStep(expr);
-    if(s == null || !ic.data.meta.ftxindex || s.test.type != Type.TXT) return;
+    if(s == null || !ic.data.meta.ftxindex || s.test.type != Type.TXT)
+      return false;
     
-    ftexpr.indexAccessible(ctx, ic);
+    final boolean ia = ftexpr.indexAccessible(ctx, ic);
     vis = !ic.ftnot;
+    return ia;
   }
   
   @Override
   public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
       throws QueryException {
 
+    // [CG] necessary/possible?
     if(!ic.data.meta.ftxindex) return this;
     
     final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);

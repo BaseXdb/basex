@@ -89,14 +89,11 @@ public final class Or extends Arr {
   }
   
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
     
-    for(final Expr e : expr) {
-      ic.iu = false;
-      e.indexAccessible(ctx, ic);
-      if(!ic.iu) return;
-    }
+    for(final Expr e : expr) if(!e.indexAccessible(ctx, ic)) return false;
+    return true;
   }
 
   @Override

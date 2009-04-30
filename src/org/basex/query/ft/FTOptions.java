@@ -47,13 +47,14 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic) 
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
     
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    expr[0].indexAccessible(ctx, ic);
+    final boolean ia = expr[0].indexAccessible(ctx, ic);
     ctx.ftopt = tmp;
+    return ia;
   }
 
   @Override

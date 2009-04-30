@@ -31,7 +31,7 @@ public final class FTOr extends FTExpr {
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     double d = 0;
     for(final FTExpr e : expr) {
-      if (e instanceof FTPos) ((FTPos) e).ordered |= ctx.ftpos.ordered;
+      if(e instanceof FTPos) ((FTPos) e).ordered |= ctx.ftpos.ordered;
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
       if(s != 0) d = ctx.score.or(d, s);
@@ -46,56 +46,55 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final QueryContext ctx,
+      final IndexContext ic) throws QueryException {
 
     final IntList p = new IntList();
     final IntList n = new IntList();
     final int min = ic.is;
     int sum = 0;
 
-    for (int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; i++) {
       ic.ftnot = false;
-      expr[i].indexAccessible(ctx, ic);
-      if (!ic.io) return;
-      if (!ic.ftnot && ic.is > 0) {
-        p.add(i);
-        sum += ic.is;
-      } else if (ic.ftnot) {
-        if (ic.is > 0) n.add(i);
+      if(!expr[i].indexAccessible(ctx, ic)) return false;
+      if(ic.ftnot) {
+        if(ic.is > 0) n.add(i);
         else {
-          ic.iu = false;
           ic.seq = true;
           ic.is = Integer.MAX_VALUE;
-          return;
+          return false;
         }
+      } else if(ic.is > 0) {
+        p.add(i);
+        sum += ic.is;
       }
     }
     nex = n.finish();
     pex = p.finish();
 
-    if (pex.length == 0 && nex.length > 0) {
+    if(pex.length == 0 && nex.length > 0) {
       ic.seq = true;
       ic.is = Integer.MAX_VALUE;
-    } else if (nex.length > 0 && pex.length > 0) {
+    } else if(nex.length > 0 && pex.length > 0) {
       ic.seq = true;
       ic.is = Integer.MAX_VALUE;
     } else {
       ic.is = sum > min ? min : sum;
     } 
+    return true;
   }
   
   @Override
   public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
     throws QueryException {
 
-    for (int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; i++) {
       expr[i] = expr[i].indexEquivalent(ctx, ic);
     }
     
-    if (pex.length == 0) {
+    if(pex.length == 0) {
       // !A FTOR !B = !(a ftand b)
-      for (int i = 0; i < nex.length; i++) {
+      for(int i = 0; i < nex.length; i++) {
         expr[nex[i]] = expr[nex[i]].expr[0];
       }
       final FTIntersection fta = new FTIntersection(pex, nex, expr);
@@ -103,9 +102,9 @@ public final class FTOr extends FTExpr {
       return ftn; 
     }
 
-    if (pex.length == 0) return new FTUnion(nex, true, expr);
-    else if (nex.length == 0) return new FTUnion(pex, true, expr);
-    else if (pex.length == 1 && nex.length == 0) return expr[pex[0]]; 
+    if(pex.length == 0) return new FTUnion(nex, true, expr);
+    else if(nex.length == 0) return new FTUnion(pex, true, expr);
+    else if(pex.length == 1 && nex.length == 0) return expr[pex[0]]; 
     else return new FTUnion(gen(), true, expr);
 
   }
@@ -116,7 +115,7 @@ public final class FTOr extends FTExpr {
    */
   private int[] gen() {
     final int[] r = new int[expr.length];
-    for (int i = 0; i < expr.length; i++) r[i] = i;
+    for(int i = 0; i < expr.length; i++) r[i] = i;
     return r;
   }
 }
