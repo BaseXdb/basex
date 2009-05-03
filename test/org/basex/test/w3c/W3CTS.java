@@ -199,7 +199,7 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    Prop.onthefly = true;
+    //Prop.onthefly = true;
     Prop.xqformat = false;
 
     new CreateDB(path + input).execute(context, null);

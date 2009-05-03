@@ -21,15 +21,15 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTExpr comp(final QueryContext ctx) throws QueryException {
     // do not color fulltext if there is a ftnot
     ctx.ftd = null;
-    return score(expr[0].iter(ctx).next().score() == 0 ? 1 : 0);
+    return super.comp(ctx);
   }
 
   @Override
-  public String toString() {
-    return "ftnot " + expr[0];
+  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+    return score(expr[0].iter(ctx).next().score() == 0 ? 1 : 0);
   }
   
   @Override
@@ -53,5 +53,10 @@ public final class FTNot extends FTExpr {
   @Override
   public boolean usesExclude() {
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "ftnot " + expr[0];
   }
 }

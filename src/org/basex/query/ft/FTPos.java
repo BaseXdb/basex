@@ -62,6 +62,8 @@ public final class FTPos extends FTExpr {
   private IntList[] pos = {};
   /** Number of position lists. */
   private int size;
+  /** Standard flag. */
+  private boolean standard;
 
   /**
    * Constructor.
@@ -74,10 +76,10 @@ public final class FTPos extends FTExpr {
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     if(window != null) window = window.comp(ctx);
-
     if(dist != null) {
       for(int d = 0; d < dist.length; d++) dist[d] = dist[d].comp(ctx);
     }
+    standard = standard();
     return super.comp(ctx);
   }
 
@@ -92,26 +94,10 @@ public final class FTPos extends FTExpr {
     final double s = it.score();
     if(s == 0 || !filter(ctx)) return score(0);
 
-    if(tmp != null) tmp.addPos(pos, pos.length, term);
+    if(tmp.expr[0] != null) tmp.addPos(pos, pos.length, term);
     ctx.ftd = pos;
 
     return score(s);
-  }
-
-  /**
-   * Add position values to existing values.
-   * @param il IntList[] with position values
-   * @param ilsize int number of tokens in query
-   * @param tl TokenList with tokens
-   */
-  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
-    final IntList[] iln = new IntList[size + ilsize];
-    System.arraycopy(pos, 0, iln, 0, size);
-    System.arraycopy(il, 0, iln, size, ilsize);
-    pos = iln;
-    size += ilsize;
-    for (int i = 0; i < tl.size; i++)
-      term.add(tl.list[i]);    
   }
   
   /**
@@ -121,6 +107,8 @@ public final class FTPos extends FTExpr {
    * @throws QueryException query exception
    */
   boolean filter(final QueryContext ctx) throws QueryException {
+    if(standard) return true;
+    
     if(!order() || !start() || !end() || !content() || !same() || !different())
       return false;
 
@@ -169,6 +157,21 @@ public final class FTPos extends FTExpr {
   void setPos(final IntList[] il, final int ilsize) {
     pos = il;
     size = ilsize;
+  }
+
+  /**
+   * Add position values to existing values.
+   * @param il IntList[] with position values
+   * @param ilsize int number of tokens in query
+   * @param tl TokenList with tokens
+   */
+  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
+    final IntList[] iln = new IntList[size + ilsize];
+    System.arraycopy(pos, 0, iln, 0, size);
+    System.arraycopy(il, 0, iln, size, ilsize);
+    pos = iln;
+    size += ilsize;
+    for (int i = 0; i < tl.size; i++) term.add(tl.list[i]);
   }
 
   /**
@@ -444,14 +447,14 @@ public final class FTPos extends FTExpr {
     if(start) ser.attribute(token(QueryTokens.START), TRUE);
     if(end) ser.attribute(token(QueryTokens.END), TRUE);
     if(content) ser.attribute(token(QueryTokens.CONTENT), TRUE);
-    expr[0].plan(ser);
+    if(expr[0] != null) expr[0].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(expr[0]);
+    if(expr[0] != null) sb.append(expr[0]);
     if(ordered) sb.append(" " + QueryTokens.ORDERED);
     if(start) sb.append(" " + QueryTokens.AT + " " + QueryTokens.START);
     if(end) sb.append(" " + QueryTokens.AT + " " + QueryTokens.END);

@@ -34,7 +34,7 @@ public class FTContains extends Expr {
   /** Fulltext parser. */
   public Tokenizer ft = new Tokenizer();
   /** Flag for first evaluation.*/
-  private int div = 0;
+  private int div;
   /** Visualize fulltext results. */
   private boolean vis = true;
   
@@ -61,8 +61,7 @@ public class FTContains extends Expr {
 
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {    
-    if (div == 0) 
-      div = ++ctx.ftcount;
+    if(div == 0) div = ++ctx.ftcount;
     
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.ftitem;

@@ -162,7 +162,7 @@ public class AxisPath extends Path {
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Use.VAR, ctx);
 
- // check if context is set to a document node
+    // check if context is set to a document node
     final Data data = ctx.data();
     if(data != null) {
       boolean doc = true;
