@@ -1,11 +1,7 @@
 package org.basex.core;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.basex.data.Data;
+import org.basex.util.Array;
 
 /**
  * Class for all referenced Data.
@@ -14,50 +10,57 @@ import org.basex.data.Data;
  * @author Andreas Weiler
  */
 public class DataPool {
-  
-  /** Map for Datareferences. */
-  public static final HashMap<Data, Integer> DBPOOL = new
-  HashMap<Data, Integer>();
-  
-  
+
+  /** Datareferences. */
+  private Data[] data = new Data[8];
+  /** Number of opened DB for each reference. */
+  private int[] pins = new int[8];
+  /** Number of Datareferences. */
+  private int size = 0;
+
   /**
    * Returns the Data of the Database.
    * @param db Name of the Database.
    * @return Data
    */
   public Data pin(final String db) {
-    Iterator<Map.Entry<Data, Integer>> i = DBPOOL.entrySet().iterator();
-    while(i.hasNext()) {
-      Entry<Data, Integer> next = i.next();
-      if(next.getKey().meta.dbname.equals(db)) {
-        int j = next.getValue();
-        j++;
-        DBPOOL.put(next.getKey(), j);
-        return next.getKey();
+    for(int i = 0; i < size; i++) {
+      if(data[i].meta.dbname.equals(db)) {
+        pins[i]++;
+        return data[i];
       }
     }
     return null;
   }
-  
+
   /**
    * Removes a Datareference.
    * @param d Data
    */
   public void unpin(final Data d) {
-    if(DBPOOL.get(d) == 0) {
-      DBPOOL.remove(d);
-    } else {
-      int i = DBPOOL.get(d);
-      i--;
-      DBPOOL.put(d, i);
+    for(int i = 0; i < size; i++) {
+      if(data[i].equals(d)) {
+        if(pins[i] == 0) {
+          Array.move(data, i + 1, -1, --size - i);
+          Array.move(pins, i + 1, -1, --size - i);
+        } else {
+          pins[i]--;
+        }
+      }
     }
   }
-  
+
   /**
    * Adds a Datareference to the DBPOOL.
    * @param d Data
    */
   public void add(final Data d) {
-    DBPOOL.put(d, 1);
+    if(size == data.length) {
+      data = Array.extend(data);
+      pins = Array.extend(pins);
+    }
+    data[size] = d;
+    pins[size] = 1;
+    size++;
   }
 }
