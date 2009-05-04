@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.core;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class DBPool {
+public class DataPool {
   
   /** Map for Datareferences. */
   public static final HashMap<Data, Integer> DBPOOL = new

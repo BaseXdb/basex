@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.server.DBPool;
 import org.basex.util.Performance;
 
 /**
@@ -26,7 +25,7 @@ public final class Context {
   /** Currently copied nodes. */
   private Nodes copied;
   /** DBPool. */
-  public static final DBPool POOL = new DBPool();
+  public static final DataPool POOL = new DataPool();
   
   /**
    * Constructor.
