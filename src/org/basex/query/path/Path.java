@@ -6,6 +6,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Root;
+import org.basex.query.item.Item;
 import org.basex.query.util.Var;
 
 /**
@@ -44,6 +46,19 @@ public abstract class Path extends Expr {
     if(use == Use.CTX && root == null) return true;
     for(final Expr s : step) if(s.uses(use, ctx)) return true;
     return root != null && root.uses(use, ctx);
+  }
+
+  /**
+   * Returns the root of the current context or null.
+   * @param ctx query context
+   * @return root
+   */
+  protected Item root(final QueryContext ctx) {
+    final Item it = ctx.item;
+    if(root == null) return it;
+    if(root.i()) return (Item) root;
+    if(!(root instanceof Root) || it == null) return null;
+    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
   }
 
   @Override

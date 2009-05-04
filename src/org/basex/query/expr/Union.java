@@ -5,6 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -34,9 +35,11 @@ public final class Union extends Arr {
       if(expr[e].e()) expr = Array.delete(expr, e--);
     }
     if(el != expr.length) ctx.compInfo(OPTEMPTY);
+
     // as union always returns sorted results,
-    // a single argument must be evaluated as well
-    return this;
+    // a single, non-sorted argument must be evaluated as well
+    return expr.length == 0 ? Seq.EMPTY :
+      expr.length == 1 && !duplicates(ctx) ? expr[0] : this;
   }
 
   @Override

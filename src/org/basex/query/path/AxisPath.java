@@ -17,7 +17,6 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pred;
 import org.basex.query.expr.Return;
-import org.basex.query.expr.Root;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -421,19 +420,6 @@ public class AxisPath extends Path {
     }
   }
 
-  /**
-   * Returns the root of the current context or null.
-   * @param ctx query context
-   * @return root
-   */
-  private Item root(final QueryContext ctx) {
-    final Item it = ctx.item;
-    if(root == null) return it;
-    if(root.i()) return (Item) root;
-    if(!(root instanceof Root) || it == null) return null;
-    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
-  }
-
   @Override
   public long size(final QueryContext ctx) {
     long res = -1;
@@ -581,7 +567,9 @@ public class AxisPath extends Path {
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Step s : step) if(s.uses(Use.VAR, ctx)) return false;
+    for(final Step s : step) {
+      if(s.uses(Use.VAR, ctx) || s.pred.length != 0) return false;
+    }
     return true;
   }
 

@@ -86,6 +86,7 @@ public class Pred extends Preds {
       ctx.pos = 1;
       int c = 0;
       for(int s = 0, sl = si.size(); s < sl; s++) {
+        //System.out.println("? " + sl);
         ctx.item = si.item[s];
         if(p.test(ctx) != null) si.item[c++] = si.item[s];
         ctx.pos++;
@@ -106,7 +107,8 @@ public class Pred extends Preds {
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    return root.removable(v, ctx) && super.removable(v, ctx);
+    return false;
+    //return root.removable(v, ctx) && super.removable(v, ctx);
   }
 
   @Override

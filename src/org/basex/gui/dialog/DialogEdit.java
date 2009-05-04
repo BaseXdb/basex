@@ -24,7 +24,7 @@ import org.basex.util.StringList;
  */
 public final class DialogEdit extends Dialog {
   /** Resulting update arguments. */
-  public final StringList result = new StringList();
+  public StringList result;
   /** Node kind. */
   public final int kind;
   
@@ -121,6 +121,7 @@ public final class DialogEdit extends Dialog {
     final String in = input != null ? input.getText() :
       string(input3.getText());
 
+    result = new StringList();
     result.add(in);
     if(kind == Data.ELEM || kind == Data.DOC) {
       if(in.length() == 0 || in.equals(old1)) return;

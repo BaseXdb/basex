@@ -29,7 +29,7 @@ public final class DialogInsert extends Dialog {
   private static int lkind = 1;
 
   /** Resulting update arguments. */
-  public final StringList result = new StringList();
+  public StringList result;
   /** Node kind. */
   public int kind;
   
@@ -63,15 +63,13 @@ public final class DialogInsert extends Dialog {
     label1.setBorder(0, 0, 0, 0);
     label2 = new BaseXLabel(" ", true, true);
     label2.setBorder(0, 0, 0, 0);
-    label2.setEnabled(false);
 
-    input1 = new BaseXTextField(null);
+    input1 = new BaseXTextField(null, this);
     BaseXLayout.setWidth(input1, 320);
 
-    input2 = new BaseXText(gui, null);
+    input2 = new BaseXText(gui, null, true, this);
     input2.setFont(GUIConstants.mfont);
     input2.setPreferredSize(new Dimension(400, 200));
-    input2.setEnabled(false);
     setResizable(true);
 
     final BaseXBack knd = new BaseXBack();
@@ -130,6 +128,7 @@ public final class DialogInsert extends Dialog {
 
     for(int i = 1; i < KINDS.length; i++) if(radio[i].isSelected()) kind = i;
 
+    result = new StringList();
     switch(kind) {
       case 0: case 3: case 5:
         result.add(in1);

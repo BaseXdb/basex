@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
@@ -38,11 +39,21 @@ public final class MixedPath extends Path {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    if(root instanceof Context) root = null;
+
+    final Item ci = ctx.item;
+    ctx.item = root(ctx);
+    Expr e = this;
     for(int i = 0; i != step.length; i++) {
       step[i] = step[i].comp(ctx);
-      if(step[i].e()) return step[i];
+      if(step[i].e()) {
+        e = step[i];
+        break;
+      }
     }
-    return super.comp(ctx);
+    ctx.item = ci;
+    return e;
   }
 
   @Override
