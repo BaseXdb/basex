@@ -56,9 +56,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    for(final Catch c : ctch) if(c.uses(use, ctx)) return true;
-    return super.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    for(final Catch c : ctch) if(c.uses(u, ctx)) return true;
+    return super.uses(u, ctx);
   }
 
   @Override

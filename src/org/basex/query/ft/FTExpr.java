@@ -41,8 +41,8 @@ public abstract class FTExpr extends Expr {
   public abstract FTNodeIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    for(final FTExpr e : expr) if(e.uses(use, ctx)) return true;
+  public boolean uses(final Use u, final QueryContext ctx) {
+    for(final FTExpr e : expr) if(e.uses(u, ctx)) return true;
     return false;
   }
 

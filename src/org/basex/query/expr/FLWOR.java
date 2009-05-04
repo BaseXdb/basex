@@ -114,8 +114,8 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.VAR || ret.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.VAR || ret.uses(u, ctx);
   }
 
   @Override

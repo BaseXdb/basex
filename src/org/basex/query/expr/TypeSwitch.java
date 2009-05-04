@@ -62,10 +62,10 @@ public final class TypeSwitch extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    if(use == Use.VAR) return true;
-    for(final Case c : cs) if(c.uses(use, ctx)) return true;
-    return ts.uses(use, ctx) || ret.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    if(u == Use.VAR) return true;
+    for(final Case c : cs) if(c.uses(u, ctx)) return true;
+    return ts.uses(u, ctx) || ret.uses(u, ctx);
   }
 
   @Override

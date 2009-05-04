@@ -164,9 +164,11 @@ public final class BaseXLayout {
       @Override
       public void keyPressed(final KeyEvent e) {
         // process key events
-        if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-          if(!(e.getSource() instanceof BaseXButton)) l.close();
-        } else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        final int code = e.getKeyCode();
+        if(code == KeyEvent.VK_ENTER) {
+          final Object s = e.getSource();
+          if(!(s instanceof BaseXButton || s instanceof BaseXText)) l.close();
+        } else if(code == KeyEvent.VK_ESCAPE) {
           l.cancel();
         }
       }

@@ -80,8 +80,8 @@ public final class Satisfy extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.VAR || sat.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.VAR || sat.uses(u, ctx);
   }
 
   @Override

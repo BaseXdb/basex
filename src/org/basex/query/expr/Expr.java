@@ -130,12 +130,12 @@ public abstract class Expr extends ExprInfo {
    * Indicates if an expression uses the specified type.
    * Called by the compiler to perform certain optimizations.
    * <code>true</code> is returned by default and thus assumed as "worst-case".
-   * @param use use type to be checked
+   * @param u use type to be checked
    * @param ctx query context
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean uses(final Use use, final QueryContext ctx) {
+  public boolean uses(final Use u, final QueryContext ctx) {
     return true;
   }
 

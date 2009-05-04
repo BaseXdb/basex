@@ -264,7 +264,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
+  public boolean uses(final Use u, final QueryContext ctx) {
     return false;
   }
 

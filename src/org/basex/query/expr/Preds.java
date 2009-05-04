@@ -60,17 +60,16 @@ public abstract class Preds extends Expr {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
+  public boolean uses(final Use u, final QueryContext ctx) {
     for(final Expr p : pred) {
-      if(use == Use.POS && p.returned(ctx).num || p.uses(use, ctx)) return true;
+      if(u == Use.POS && p.returned(ctx).num || p.uses(u, ctx)) return true;
     }
     return false;
   }
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    // [CG] always return false?...
-    for(final Expr p : pred) if(!p.removable(v, ctx)) return false;
+    for(final Expr p : pred) if(p.uses(Use.VAR, ctx)) return false;
     return true;
   }
 

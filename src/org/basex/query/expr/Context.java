@@ -31,8 +31,8 @@ public final class Context extends Simple {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.CTX;
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.CTX;
   }
 
   @Override

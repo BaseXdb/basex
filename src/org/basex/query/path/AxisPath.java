@@ -168,7 +168,6 @@ public class AxisPath extends Path {
       for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
 
       if(doc) {
-        
         // check if no position is used 
         if(!pos) {
           // check index access
@@ -403,7 +402,7 @@ public class AxisPath extends Path {
    * @throws QueryException query exception
    */
   private void iter(final int l, final NodIter ni, final QueryContext ctx)
-  throws QueryException {
+      throws QueryException {
 
     // cast is ok as all steps are axis steps here (see calling method)
     final NodeIter ir = (NodeIter) ctx.iter(step[l]);
@@ -426,7 +425,7 @@ public class AxisPath extends Path {
 
     final Item rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
-    rt instanceof DBNode ? ((DBNode) rt).data : null;
+      rt instanceof DBNode ? ((DBNode) rt).data : null;
 
     if(data != null && data.meta.uptodate && data.ns.size() == 0) {
       ArrayList<PathNode> nodes = data.path.root();
@@ -561,15 +560,13 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return uses(step, use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return uses(step, u, ctx);
   }
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Step s : step) {
-      if(s.uses(Use.VAR, ctx) || s.pred.length != 0) return false;
-    }
+    for(final Step s : step) if(!s.removable(v, ctx)) return false;
     return true;
   }
 

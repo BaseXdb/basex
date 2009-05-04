@@ -117,8 +117,8 @@ public class FTContains extends Expr {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return expr.uses(use, ctx) || ftexpr.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return expr.uses(u, ctx) || ftexpr.uses(u, ctx);
   }
 
   @Override

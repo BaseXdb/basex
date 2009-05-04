@@ -10,6 +10,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
@@ -44,6 +45,10 @@ public final class MixedPath extends Path {
 
     final Item ci = ctx.item;
     ctx.item = root(ctx);
+    final Type ct = ctx.item != null ? ctx.item.type : null;
+    // expressions will not necessarily start from the document node..
+    if(ct == Type.DOC) ctx.item.type = Type.ELM;
+
     Expr e = this;
     for(int i = 0; i != step.length; i++) {
       step[i] = step[i].comp(ctx);
@@ -52,6 +57,7 @@ public final class MixedPath extends Path {
         break;
       }
     }
+    if(ct != null) ctx.item.type = ct;
     ctx.item = ci;
     return e;
   }
@@ -111,8 +117,8 @@ public final class MixedPath extends Path {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return uses(step, use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return uses(step, u, ctx);
   }
 
   @Override

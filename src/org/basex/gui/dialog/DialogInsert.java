@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
@@ -33,6 +32,8 @@ public final class DialogInsert extends Dialog {
   /** Node kind. */
   public int kind;
   
+  /** Background panel. */
+  BaseXBack back;
   /** Text area. */
   BaseXTextField input1;
   /** Text area. */
@@ -43,8 +44,6 @@ public final class DialogInsert extends Dialog {
   BaseXLabel label2;
   /** Insert kind selection buttons. */
   BaseXRadio[] radio;
-  /** Button panel. */
-  private final BaseXBack buttons;
 
   /**
    * Default Constructor.
@@ -53,15 +52,9 @@ public final class DialogInsert extends Dialog {
   public DialogInsert(final GUI main) {
     super(main, INSERTTITLE);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
-
-    final BaseXBack b = new BaseXBack();
-    b.setLayout(new TableLayout(5, 1, 0, 8));
-
     label1 = new BaseXLabel(INSERTNAME, true, true);
     label1.setBorder(0, 0, 0, 0);
-    label2 = new BaseXLabel(" ", true, true);
+    label2 = new BaseXLabel(INSERTVALUE, true, true);
     label2.setBorder(0, 0, 0, 0);
 
     input1 = new BaseXTextField(null, this);
@@ -69,8 +62,7 @@ public final class DialogInsert extends Dialog {
 
     input2 = new BaseXText(gui, null, true, this);
     input2.setFont(GUIConstants.mfont);
-    input2.setPreferredSize(new Dimension(400, 200));
-    setResizable(true);
+    BaseXLayout.setWidth(input2, 320);
 
     final BaseXBack knd = new BaseXBack();
     knd.setLayout(new TableLayout(1, 5));
@@ -90,18 +82,15 @@ public final class DialogInsert extends Dialog {
       group.add(radio[i]);
       knd.add(radio[i]);
     }
+    set(knd, BorderLayout.NORTH);
 
-    b.add(knd);
-    b.add(label1);
-    b.add(input1);
-    b.add(label2);
-    pp.add(b, BorderLayout.CENTER);
+    back = new BaseXBack();
+    back.setBorder(10, 0, 0, 0);
 
-    set(pp, BorderLayout.NORTH);
-    set(input2, BorderLayout.CENTER);
+    set(back, BorderLayout.CENTER);
+    set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
 
-    buttons = BaseXLayout.okCancel(this);
-    set(buttons, BorderLayout.SOUTH);
+    setResizable(true);
     change(radio[lkind]);
     finish(null);
   }
@@ -111,12 +100,21 @@ public final class DialogInsert extends Dialog {
    * @param src button reference
    */
   void change(final Object src) {
-    input1.setEnabled(src != radio[2] && src != radio[4]);
-    label1.setEnabled(src != radio[2] && src != radio[4]);
-    label1.setText(src == radio[2] || src == radio[4] ? "" : INSERTNAME);
-    input2.setEnabled(src != radio[1]);
-    label2.setEnabled(src != radio[1]);
-    label2.setText(src == radio[1] ? "" : INSERTVALUE);
+    int n = 0;
+    for(int r = 0; r < radio.length; r++) if(src == radio[r]) n = r;
+    BaseXLayout.setHeight(input2, n == 3 || n == 4 ? 30 : 200);
+
+    back.removeAll();
+    back.setLayout(new TableLayout(n == 3 || n == 5 ? 4 : 2, 1, 0, 8));
+    if(n != 2 && n != 4) {
+      back.add(label1);
+      back.add(input1);
+    }
+    if(n != 1) {
+      back.add(label2);
+      back.add(input2);
+    }
+    pack();
   }
 
   @Override

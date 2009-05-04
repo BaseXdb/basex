@@ -61,9 +61,9 @@ public final class VarCall extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.POS && var.returned(ctx) == Return.NUM ||
-      use == Use.VAR || var.expr == null || var.expr.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.POS && var.returned(ctx) == Return.NUM ||
+      u == Use.VAR || var.expr == null || var.expr.uses(u, ctx);
   }
 
   @Override

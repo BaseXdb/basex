@@ -152,7 +152,6 @@ public final class QueryContext extends Progress {
   /** Number of documents. */
   private int docs;
 
-
   /**
    * Parses the specified query.
    * @param q input query

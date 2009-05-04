@@ -82,8 +82,8 @@ public final class Order extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    for(final Ord o : ord) if(o.uses(use, ctx)) return true;
+  public boolean uses(final Use u, final QueryContext ctx) {
+    for(final Ord o : ord) if(o.uses(u, ctx)) return true;
     return false;
   }
 

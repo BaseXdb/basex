@@ -111,8 +111,8 @@ public final class Pos extends Simple {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.POS;
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.POS;
   }
   
   @Override

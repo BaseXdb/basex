@@ -18,8 +18,8 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public final boolean uses(final Use use, final QueryContext ctx) {
-    return use == Use.FRG || super.uses(use, ctx);
+  public final boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.FRG || super.uses(u, ctx);
   }
 
   @Override

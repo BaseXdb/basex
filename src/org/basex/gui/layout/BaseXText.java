@@ -95,7 +95,7 @@ public final class BaseXText extends BaseXPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        cursor(true);
+        if(isEnabled()) cursor(true);
       }
       @Override
       public void focusLost(final FocusEvent e) {
@@ -260,6 +260,8 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
+    if(!isEnabled()) return;
+    
     requestFocusInWindow();
     cursor(true);
 

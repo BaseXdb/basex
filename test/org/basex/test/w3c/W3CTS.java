@@ -361,7 +361,6 @@ public abstract class W3CTS {
     ctx.thes = thes;
 
     try {
-      
       files.add(file(nodes("*:input-file", root),
           nodes("*:input-file/@variable", root), ctx));
       files.add(file(nodes("*:input-URI", root),
@@ -404,10 +403,13 @@ public abstract class W3CTS {
       // evaluate and serialize query
       final XMLSerializer xml = new XMLSerializer(out, false, Prop.xqformat);
       iter = SeqIter.get(xq.iter());
-      for(final Item it : iter) {
+      Item it;
+      while((it = iter.next()) != null) {
         doc &= it.type == Type.DOC;
         it.serialize(xml);
       }
+      //System.err.println(xq.ctx.root);
+
     } catch(final QueryException ex) {
       error = ex.getMessage();
       if(error.startsWith("Stopped at")) {

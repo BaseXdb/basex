@@ -73,7 +73,7 @@ public final class DialogEdit extends Dialog {
       setResizable(true);
       input3 = new BaseXText(gui, null, true, this);
       input3.setText(data.text(pre));
-      input3.setPreferredSize(new Dimension(400, 200));
+      input3.setPreferredSize(new Dimension(320, 200));
       old1 = string(input3.getText());
       pp.add(input3, BorderLayout.CENTER);
     } else {

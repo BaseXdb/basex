@@ -101,21 +101,19 @@ public class Pred extends Preds {
   }
   
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return root.uses(use, ctx) || super.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return root.uses(u, ctx) || super.uses(u, ctx);
   }
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    return false;
-    //return root.removable(v, ctx) && super.removable(v, ctx);
+    return root.removable(v, ctx) && super.removable(v, ctx);
   }
 
   @Override
   public Expr remove(final Var v) {
     root = root.remove(v);
-    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].remove(v);
-    return this;
+    return super.remove(v);
   }
 
   @Override

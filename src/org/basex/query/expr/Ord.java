@@ -88,8 +88,8 @@ public final class Ord extends Expr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    return expr != null && expr.uses(use, ctx);
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return expr != null && expr.uses(u, ctx);
   }
 
   @Override
