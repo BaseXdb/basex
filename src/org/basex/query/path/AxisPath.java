@@ -82,24 +82,26 @@ public class AxisPath extends Path {
     // skip paths with variables...
     if(root != null && root.uses(Use.VAR, ctx)) return this;
 
-    // Simple iterator: one downward location step or parent step or self
-    // step or an attribute
-    if(step.length == 1 && (step[0].axis.down
-        || step[0].axis == Axis.PARENT
-        || step[0].axis == Axis.SELF
-        || step[0].axis == Axis.ATTR)) {
+    // Simple iterator: one downward location step or parent step
+    if(step.length == 1 && (step[0].axis.down 
+        || step[0].axis == Axis.PARENT)) {
       return new SingleIterPath(root, step);
     }
 
     // check if all steps are child steps, parent steps, self steps or
     // attributes
     boolean children = root != null && !root.duplicates(ctx);
-    for(final Step s : step) {
-      children &= s.axis == Axis.CHILD
-      || s.axis == Axis.PARENT
-      || s.axis == Axis.SELF
-      || s.axis == Axis.ATTR;
+    int i;
+    // check last step separated
+    for(i = 0; i < step.length - 1; i++) {
+      children &= step[i].axis == Axis.ATTR
+      || step[i].axis == Axis.CHILD
+      || step[i].axis == Axis.PARENT
+      || step[i].axis == Axis.SELF;
     }
+    // last step can also be a descendant or descendant-or-self step
+    children &= step[i].axis.down
+    || step[i].axis == Axis.PARENT;
 
     if(children) {
       return new SimpleIterPath(root, step);
@@ -172,7 +174,9 @@ public class AxisPath extends Path {
         if(!pos) {
           // check index access
           Expr e = index(ctx, data);
-          if(e != this) return e;          
+          if(e != this) {
+            return e;
+          }
         }
 
         // check children path rewriting
@@ -180,7 +184,6 @@ public class AxisPath extends Path {
         if(e != this) return e;
       }
     }
-
 
     // if applicable, return iterator
     return iterator(ctx);
