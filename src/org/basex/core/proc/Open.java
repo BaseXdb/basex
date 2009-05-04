@@ -3,13 +3,13 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
-import org.basex.server.DBPool;
 
 /**
  * Opens an existing database.
@@ -36,12 +36,11 @@ public final class Open extends Process {
     context.close();
 
     try {
-      DBPool pool = new DBPool();
       Data data = null;
-      if((data = pool.pin(db)) == null) {
+      if((data = Context.POOL.pin(db)) == null) {
       // open new database instance
       data = open(db);
-      pool.add(data);
+      Context.POOL.add(data);
       }
       context.data(data);
       if(Prop.info) {
