@@ -9,6 +9,7 @@ import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
+import org.basex.server.DBPool;
 
 /**
  * Opens an existing database.
@@ -35,8 +36,13 @@ public final class Open extends Process {
     context.close();
 
     try {
+      DBPool pool = new DBPool();
+      Data data = null;
+      if((data = pool.pin(db)) == null) {
       // open new database instance
-      final Data data = open(db);
+      data = open(db);
+      pool.add(data);
+      }
       context.data(data);
       if(Prop.info) {
         if(data.meta.oldindex) info(INDUPDATE + NL);
