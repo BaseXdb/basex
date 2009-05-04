@@ -197,7 +197,8 @@ public class Session implements Runnable {
     } catch(Exception io) {
       // for forced stops
       if (io instanceof SocketException) {
-       stop();
+        running = false;
+        stop();
       } else {
       io.printStackTrace();
       }

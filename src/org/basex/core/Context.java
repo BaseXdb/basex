@@ -90,6 +90,7 @@ public final class Context {
     try {
       if(data != null) {
         final Data d = data;
+        POOL.unpin(d);
         final String mp = data.meta.mountpoint; // !! data = null
         data = null;
         current = null;

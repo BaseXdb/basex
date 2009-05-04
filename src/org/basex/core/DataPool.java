@@ -40,11 +40,10 @@ public class DataPool {
   public void unpin(final Data d) {
     for(int i = 0; i < size; i++) {
       if(data[i].equals(d)) {
+        pins[i]--;
         if(pins[i] == 0) {
-          Array.move(data, i + 1, -1, --size - i);
-          Array.move(pins, i + 1, -1, --size - i);
-        } else {
-          pins[i]--;
+          Array.move(data, i + 1, -1, size - i);
+          Array.move(pins, i + 1, -1, size - i);
         }
       }
     }
