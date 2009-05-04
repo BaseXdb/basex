@@ -52,4 +52,12 @@ public class DBPool {
       DBPOOL.put(d, i);
     }
   }
+  
+  /**
+   * Adds a Datareference to the DBPOOL.
+   * @param d Data
+   */
+  public void add(final Data d) {
+    DBPOOL.put(d, 1);
+  }
 }
