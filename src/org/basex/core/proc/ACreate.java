@@ -8,7 +8,6 @@ import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
@@ -56,12 +55,7 @@ abstract class ACreate extends Process {
         final Performance pp = new Performance();
         builder = new DiskBuilder();
         progress(builder);
-        Data data = null;
-        if((data = Context.POOL.pin(db)) == null) {
-        // open new database instance
-        data = builder.build(p, db);
-        Context.POOL.add(data);
-        }
+        final Data data = builder.build(p, db);
         if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
         builder = null;
         index(data);
