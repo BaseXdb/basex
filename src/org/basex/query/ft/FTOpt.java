@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -13,6 +14,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -172,8 +174,7 @@ public final class FTOpt extends ExprInfo {
         final byte[] s = qu.get();
         if(sw != null && sw.id(s) != 0) continue;
 
-        f = qu.fz ? ls.similar(t, s) : qu.wc ?
-            string(t).matches(string(s)) : eq(t, s);
+        f = qu.fz ? ls.similar(t, s) : qu.wc ? regex(t, s) : eq(t, s);
       }
 
       if(!f && th != null) {
@@ -200,6 +201,23 @@ public final class FTOpt extends ExprInfo {
     pos.add(q, il);
     return il.size;
   }
+
+  /**
+   * Performs a regular expression.
+   * @param t input token
+   * @param s query token
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean regex(final byte[] t, final byte[] s) throws QueryException {
+    try {
+      return string(t).matches(string(s));
+    } catch(final Exception ex) {
+      Err.or(FTREG, s);
+      return false;
+    }
+  }
+  
   
   @Override
   public void plan(final Serializer ser) throws IOException {

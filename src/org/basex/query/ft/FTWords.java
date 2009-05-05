@@ -80,7 +80,7 @@ public final class FTWords extends FTExpr {
       final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, word);
       len = word.length;
       final int c = ctx.ftopt.qu.count();
-      o += c > 0 ? oc / ctx.ftopt.qu.count() : len == 0 ? 1 : 0;
+      o += c > 0 ? oc / c : 0;
     } else {
       final Iter iter = ctx.iter(query);
       byte[] it;
@@ -108,7 +108,8 @@ public final class FTWords extends FTExpr {
           while((it = nextStr(iter)) != null) {
             final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, it);
             len += it.length;
-            o += oc / ctx.ftopt.qu.count();
+            final int c = ctx.ftopt.qu.count();
+            o += c > 0 ? oc / c : 0;
           }
           break;
         case ANYWORD:
@@ -128,7 +129,8 @@ public final class FTWords extends FTExpr {
           }
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, tb.finish());
           len += tb.size;
-          o += oc / ctx.ftopt.qu.count();
+          final int c = ctx.ftopt.qu.count();
+          o += c > 0 ? oc / c : 0;
           break;
       }
     }

@@ -67,9 +67,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FT 11", nodes(40),
-        "//wld[text() ftcontains '']" },
-        
       { "Simple 1", bool(true),
         "'abc' ftcontains 'abc'" },
       { "Simple 2", bool(true),
@@ -90,7 +87,7 @@ public final class FTTest extends AbstractTest {
         "true() ftcontains 'true'" },
       { "Simple 10", bool(true),
         "false() ftcontains 'false'" },
-      { "Simple 11", bool(true),
+      { "Simple 11", bool(false),
         "'text' ftcontains ''" },
         
       { "FT 1", nodes(14),
@@ -113,7 +110,7 @@ public final class FTTest extends AbstractTest {
         "//w[text() = 'hello' and 'X' ftcontains 'X']" },
       { "FT 10", nodes(14),
         "//w[text() = 'hello' and text() ftcontains 'hello']" },
-      { "FT 11", nodes(40),
+      { "FT 11", nodes(),
         "//wld[text() ftcontains '']" },
 
       { "Preds 1", nodes(7, 9, 11),
@@ -231,6 +228,26 @@ public final class FTTest extends AbstractTest {
         "/fttest/co/w [text() ftcontains 'xml' all words]" },
       { "FTAnyAllOption 5", nodes(3, 5, 7, 9, 11),
         "/fttest/co/w [text() ftcontains 'xml' phrase]" },
+      { "FTAnyAllOption 6", bool(false),
+        "'text' ftcontains { '' } any" },
+      { "FTAnyAllOption 7", bool(false),
+        "'text' ftcontains { '' } all" },
+      { "FTAnyAllOption 8", bool(false),
+        "'text' ftcontains { '' } all words" },
+      { "FTAnyAllOption 9", bool(false),
+        "'text' ftcontains { '' } any word" },
+      { "FTAnyAllOption 10", bool(false),
+        "'text' ftcontains { '' } phrase" },
+      { "FTAnyAllOption 11", bool(true),
+        "'red balloon' ftcontains { 'red', '', 'balloon' } any" },
+      { "FTAnyAllOption 12", bool(false),
+        "'red balloon' ftcontains { 'red', '', 'balloon' } all" },
+      { "FTAnyAllOption 13", bool(true),
+        "'red balloon' ftcontains { 'red', '', 'balloon' } all words" },
+      { "FTAnyAllOption 14", bool(true),
+        "'red balloon' ftcontains { 'red', '', 'balloon' } any word" },
+      { "FTAnyAllOption 15", bool(true),
+        "'red balloon' ftcontains { 'red', '', 'balloon' } phrase" },
 
       { "FTTimes 1", nodes(7, 9, 11),
         "//w [text() ftcontains 'DaTaBaSeS' occurs exactly 1 times]" },
