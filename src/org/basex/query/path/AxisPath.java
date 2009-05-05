@@ -80,17 +80,19 @@ public class AxisPath extends Path {
    */
   private AxisPath iterator(final QueryContext ctx) {
     // skip paths with variables...
-    if(root != null && root.uses(Use.VAR, ctx)) return this;
+    if(root != null && root.uses(Use.VAR, ctx)) {
+      return this;
+    }
 
     // Simple iterator: one downward location step or parent step
-    if(step.length == 1 && (step[0].axis.down 
-        || step[0].axis == Axis.PARENT)) {
+    if(step.length == 1 && (step[0].axis.down)) {
       return new SingleIterPath(root, step);
     }
 
     // check if all steps are child steps, parent steps, self steps or
     // attributes
-    boolean children = root != null && !root.duplicates(ctx);
+    boolean children = true;
+    if (root != null) children &= !root.duplicates(ctx);
     int i;
     // check last step separated
     for(i = 0; i < step.length - 1; i++) {
@@ -100,8 +102,7 @@ public class AxisPath extends Path {
       || step[i].axis == Axis.SELF;
     }
     // last step can also be a descendant or descendant-or-self step
-    children &= step[i].axis.down
-    || step[i].axis == Axis.PARENT;
+    children &= step[i].axis.down;
 
     if(children) {
       return new SimpleIterPath(root, step);
