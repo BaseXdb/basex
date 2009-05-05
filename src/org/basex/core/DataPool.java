@@ -44,6 +44,7 @@ public class DataPool {
         if(pins[i] == 0) {
           Array.move(data, i + 1, -1, size - i - 1);
           Array.move(pins, i + 1, -1, size - i - 1);
+          size--;
         }
       }
     }
