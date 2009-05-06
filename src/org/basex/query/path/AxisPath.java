@@ -91,7 +91,8 @@ public class AxisPath extends Path {
 
     // check if all steps are child steps, parent steps, self steps or
     // attributes
-    boolean children = root != null && !root.duplicates(ctx);
+    boolean children = true;
+    if(root != null) children &= !root.duplicates(ctx);
 
     int i;
     // check last step separated

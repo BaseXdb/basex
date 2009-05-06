@@ -48,6 +48,8 @@ public final class SimpleIterPath extends AxisPath {
           // create iterator array
           iter = new Iter[expr.length];
           iter[0] = ctx.iter(expr[0]);
+          prev = null;
+          p = 0;
         }
 
         while(p != -1) {
@@ -71,6 +73,13 @@ public final class SimpleIterPath extends AxisPath {
         }
         ctx.item = c;
         return null;
+      }
+
+      @Override
+      public boolean reset() {
+        ctx.item = c;
+        iter = null;
+        return true;
       }
     };
   }

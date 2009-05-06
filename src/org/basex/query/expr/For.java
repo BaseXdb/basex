@@ -109,6 +109,7 @@ public final class For extends ForLet {
       @Override
       public boolean reset() {
         ctx.vars.reset(vs);
+        if(ir != null) ir.reset();
         ir = null;
         c = 0;
         return true;
