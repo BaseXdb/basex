@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.MetaData;
@@ -60,9 +61,13 @@ public final class FTWords extends FTExpr {
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     final int len = contains(ctx);
     final double s = len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size());
-    // calculate weight
     final Expr w = ctx.ftopt.weight;
-    return score(w != null ? s * checkDbl(w, ctx) : s);
+    if(w == null) return score(s);
+
+    // evaluate weight
+    final double d = checkDbl(w, ctx);
+    if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
+    return score(s * d);
   }
 
   /**

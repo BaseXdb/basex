@@ -330,7 +330,7 @@ public final class FTPos extends FTExpr {
    * @param pp pointer list
    * @param mn minimum number
    * @param mx maximum number
-   * @param bl BollList for each token
+   * @param bl boolean list for each token
    * @param dst flag for ftdistance
    * @return boolean result
    */

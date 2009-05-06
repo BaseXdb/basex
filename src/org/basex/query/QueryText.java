@@ -129,6 +129,8 @@ public interface QueryText {
   /** FORX0004: Evaluation exception. */
   Object[] REGERR = { FORX, 4, "Regular expression: '%'." };
 
+  /** FTDY0016: Evaluation exception. */
+  Object[] FTWEIGHT = { FTDY, 16, "Invalid weight value: %" };
   /** FTDY0017: Evaluation exception. */
   Object[] FTMILD = { FTDY, 17, "Invalid mild not selection." };
   /** FTDY0020: Evaluation exception. */
