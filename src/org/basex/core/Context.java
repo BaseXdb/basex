@@ -90,14 +90,13 @@ public final class Context {
     try {
       if(data != null) {
         final Data d = data;
-        POOL.unpin(d);
-        final String mp = data.meta.mountpoint; // !! data = null
         data = null;
         current = null;
         marked = null;
         copied = null;
-        d.close();
+        if(POOL.unpin(d)) d.close();
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
+
         // -- close fuse instance
         if(Prop.fuse) { 
           final String method = "[BaseX.close] ";
@@ -108,7 +107,7 @@ public final class Context {
             BaseX.err(i + " .. ");
           }
           BaseX.debug("GO.");
-          final String cmd = "umount -f " + mp;
+          final String cmd = "umount -f " + d.meta.mountpoint;
           BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
           Runtime r = Runtime.getRuntime();
           java.lang.Process p = r.exec(cmd);
@@ -118,7 +117,7 @@ public final class Context {
             e.printStackTrace();
           }
           int rc = p.exitValue();
-          String msg = method + "Unmount "  + mp;
+          String msg = method + "Unmount "  + d.meta.mountpoint;
           if (rc == 0) msg = msg + " ... OK."; 
           else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
           BaseX.debug(msg);

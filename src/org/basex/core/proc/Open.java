@@ -36,13 +36,14 @@ public final class Open extends Process {
     context.close();
 
     try {
-      Data data = null;
-      if((data = Context.POOL.pin(db)) == null) {
-      // open new database instance
-      data = open(db);
-      Context.POOL.add(data);
+      Data data = Context.POOL.pin(db);
+      if(data == null) {
+        // open new database instance
+        data = open(db);
+        Context.POOL.add(data);
       }
       context.data(data);
+
       if(Prop.info) {
         if(data.meta.oldindex) info(INDUPDATE + NL);
         info(DBOPENED, perf.getTimer());
