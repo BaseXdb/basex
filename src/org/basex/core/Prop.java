@@ -151,7 +151,9 @@ public final class Prop {
   public static boolean server = false;
   /** GUI mode (shouldn't be overwritten by property file). */
   public static boolean gui = false;
-  
+  /** Web Server mode (shouldn't be overwritten by property file). */
+  public static boolean web = false;
+
   /** Fuse support. */
   public static boolean fuse;
 

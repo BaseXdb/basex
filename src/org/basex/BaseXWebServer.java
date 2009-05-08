@@ -88,6 +88,8 @@ public final class BaseXWebServer {
    */
   private BaseXWebServer(final String[] args) {
     Prop.server = true;
+    Prop.web = true;
+
     try {
       if(!parseArguments(args)) return;
 

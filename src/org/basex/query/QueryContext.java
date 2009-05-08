@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
+import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
@@ -383,12 +384,16 @@ public final class QueryContext extends Progress {
     Data data = null;
     String msg = bxw.toString();
     try {
-      data = Check.check(dbname);
+      data = Prop.web ? Open.open(dbname) : Check.check(dbname);
     } catch(final IOException ex) {
-      msg = ex.getMessage();
-      if(file != null) {
-        try { data = Check.check(file.merge(bxw).path());
-        } catch(final IOException e) { msg = e.getMessage(); }
+      if(Prop.web) {
+        Err.or(INVDOC, dbname);
+      } else {
+        msg = ex.getMessage();
+        if(file != null) {
+          try { data = Check.check(file.merge(bxw).path());
+          } catch(final IOException e) { msg = e.getMessage(); }
+        }
       }
     }
     if(data == null) Err.or(coll ? NOCOLL : NODOC, msg);
