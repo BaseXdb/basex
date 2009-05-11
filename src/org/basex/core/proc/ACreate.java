@@ -50,7 +50,9 @@ abstract class ACreate extends Process {
       if(Prop.onthefly) {
         builder = new MemBuilder();
         progress(builder);
-        context.data(builder.build(p, db));
+        final Data data = builder.build(p, db);
+        context.data(data);
+        Context.POOL.add(data);
       } else {
         context.close();
         final Performance pp = new Performance();
