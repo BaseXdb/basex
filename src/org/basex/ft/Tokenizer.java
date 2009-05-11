@@ -337,6 +337,6 @@ public class Tokenizer extends IndexToken {
 
   @Override
   public String toString() {
-    return "FTTokenizer[" + string(text) + "]";
+    return getClass().getSimpleName() + "[" + string(text) + "]";
   }
 }
