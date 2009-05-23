@@ -7,7 +7,6 @@ import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
@@ -169,7 +168,7 @@ public class Tokenizer extends IndexToken {
   public byte[] get(final byte[] tok) {
     byte[] n = tok;
     final boolean a = ascii(n);
-    if(wc) n = wc(n);
+    //if(wc) n = wc(n);
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
@@ -298,7 +297,6 @@ public class Tokenizer extends IndexToken {
    * Returns a wildcard token.
    * @param n input token
    * @return resulting token
-   */
   private byte[] wc(final byte[] n) {
     if(!contains(n, '\\')) return n;
     final TokenBuilder tb = new TokenBuilder();
@@ -315,6 +313,7 @@ public class Tokenizer extends IndexToken {
     }
     return tb.finish();
   }
+   */
 
   /**
    * Returns the text size.

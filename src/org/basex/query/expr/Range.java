@@ -43,9 +43,8 @@ public final class Range extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final long[] v = rng(ctx);
-    if(v == null) return Iter.EMPTY;
-    return v[0] > v[1] ? Iter.EMPTY : v[0] == v[1] ? Itr.get(v[0]).iter() :
-      new RangeIter(v[0], v[1]);
+    return v == null || v[0] > v[1] ? Iter.EMPTY :
+      v[0] == v[1] ? Itr.get(v[0]).iter() : new RangeIter(v[0], v[1]);
   }
 
   @Override
@@ -64,7 +63,7 @@ public final class Range extends Arr {
    * @return value array
    * @throws QueryException Exception
    */
-  public long[] range(final QueryContext ctx) throws QueryException {
+  long[] range(final QueryContext ctx) throws QueryException {
     return expr[0].i() && expr[1].i() ? rng(ctx) : null;
   }
 
@@ -90,6 +89,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return "Range(" + toString(" to ") + ")";
+    return name() + "(" + toString(" to ") + ")";
   }
 }

@@ -174,7 +174,7 @@ public final class FTOpt extends ExprInfo {
         final byte[] s = qu.get();
         if(sw != null && sw.id(s) != 0) continue;
 
-        f = qu.fz ? ls.similar(t, s) : qu.wc ? regex(t, s) : eq(t, s);
+        f = qu.fz ? ls.similar(t, s) : qu.wc ? wc(t, s, 0, 0) : eq(t, s);
       }
 
       if(!f && th != null) {
@@ -203,30 +203,74 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Performs a regular expression.
-   * @param t input token
-   * @param s query token
-   * @return result of check
+   * Performs a wildcard search.
+   * @param t text token
+   * @param q query token
+   * @param tp input position
+   * @param qp query position
+   * @return result of check, or -1 for a negative match
    * @throws QueryException query exception
    */
-  private boolean regex(final byte[] t, final byte[] s) throws QueryException {
-    try {
-      return string(t).matches(string(s));
-    } catch(final Exception ex) {
-      Err.or(FTREG, s);
-      return false;
+  private boolean wc(final byte[] t, final byte[] q, final int tp, final int qp)
+      throws QueryException {
+
+    int ql = qp;
+    int tl = tp;
+    while(ql < q.length) {
+      // parse wildcards
+      if(q[ql] == '.') {
+        byte c = ++ql < q.length ? q[ql] : 0;
+        // minimum/maximum number of occurrence
+        int n = 0;
+        int m = Integer.MAX_VALUE;
+        if(c == '?') { // .?
+          ++ql;
+          m = 1;
+        } else if(c == '*') { // .*
+          ++ql;
+        } else if(c == '+') { // .+
+          ++ql;
+          n = 1;
+        } else if(c == '{') { // .{m,n}
+          m = 0;
+          while(true) {
+            c = ++ql < q.length ? q[ql] : 0;
+            if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
+            else if(c == ',') break;
+            else Err.or(FTREG, q);
+          }
+          while(true) {
+            c = ++ql < q.length ? q[ql] : 0;
+            if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
+            else if(c == '}') break;
+            else Err.or(FTREG, q);
+          }
+          ++ql;
+        } else { // .
+          m = 1;
+          n = 1;
+        }
+        // recursively evaluates wildcards (non-greedy)
+        while(!wc(t, q, tl + n, ql)) {
+          if(tl + n > t.length || ++n > m) return false;
+        }
+        tl += n;
+      } else {
+        if(q[ql] == '\\' && ++ql == q.length) Err.or(FTREG, q);
+        if(tl >= t.length || t[tl++] != q[ql++]) return false;
+      }
     }
+    return tl == t.length;
   }
-  
   
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(is(ST)) ser.attribute(token(QueryTokens.STEMMING), TRUE);
-    if(is(WC)) ser.attribute(token(QueryTokens.WILDCARDS), TRUE);
-    if(is(FZ)) ser.attribute(token(QueryTokens.FUZZY), TRUE);
+    if(is(ST)) ser.attribute(token(QueryTokens.STEMMING)  , TRUE);
+    if(is(WC)) ser.attribute(token(QueryTokens.WILDCARDS) , TRUE);
+    if(is(FZ)) ser.attribute(token(QueryTokens.FUZZY)     , TRUE);
     if(is(DC)) ser.attribute(token(QueryTokens.DIACRITICS), TRUE);
-    if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE), TRUE);
-    if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE), TRUE);
+    if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE) , TRUE);
+    if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE) , TRUE);
   }
 
   @Override

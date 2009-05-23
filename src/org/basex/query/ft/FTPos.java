@@ -58,8 +58,8 @@ public final class FTPos extends FTExpr {
   /** Distance occurrences. */
   public Expr[] dist;
 
-  /** Position list. */
-  private IntList[] pos = {};
+  /** Position lists. */
+  private IntList[] pos = new IntList[1];
   /** Number of position lists. */
   private int size;
   /** Standard flag. */
@@ -94,10 +94,25 @@ public final class FTPos extends FTExpr {
     final double s = it.score();
     if(s == 0 || !filter(ctx)) return score(0);
 
-    if(tmp.expr[0] != null) tmp.addPos(pos, pos.length, term);
+    if(tmp.expr[0] != null) tmp.addPos(pos, size, term);
     ctx.ftd = pos;
 
     return score(s);
+  }
+
+  /**
+   * Add position values to existing values.
+   * @param il IntList[] with position values
+   * @param ils int number of tokens in query
+   * @param tl TokenList with tokens
+   */
+  private void addPos(final IntList[] il, final int ils, final TokenList tl) {
+    final IntList[] iln = new IntList[size + ils];
+    System.arraycopy(pos, 0, iln, 0, size);
+    System.arraycopy(il, 0, iln, size, ils);
+    pos = iln;
+    size += ils;
+    for (int i = 0; i < tl.size; i++) term.add(tl.list[i]);
   }
   
   /**
@@ -107,23 +122,8 @@ public final class FTPos extends FTExpr {
    * @throws QueryException query exception
    */
   boolean filter(final QueryContext ctx) throws QueryException {
-    if(standard) return true;
-    
-    if(!order() || !start() || !end() || !content() || !same() || !different())
-      return false;
-
-    // ...distance?
-    if(dunit != null) {
-      final long mn = checkItr(dist[0], ctx);
-      final long mx = checkItr(dist[1], ctx);
-      if(!checkDist(mn, mx, true)) return false;
-    }
-    // ...window?
-    if(wunit != null) {
-      final long w = checkItr(window, ctx);
-      if(!checkDist(1, w, false)) return false;
-    }
-    return true;
+    return standard || order() && start() && end() && content() && same() &&
+      different() && dist(ctx) && window(ctx);
   }
 
   /**
@@ -144,7 +144,7 @@ public final class FTPos extends FTExpr {
    * @param il positions to be added
    */
   void add(final byte[] t, final IntList il) {
-    if(size == pos.length) pos = Array.resize(pos, size, size + 1);
+    if(size == pos.length) pos = Array.extend(pos);
     pos[size++] = il;
     term.add(t);
   }
@@ -152,26 +152,11 @@ public final class FTPos extends FTExpr {
   /**
    * Sets the position values and the number of tokens.
    * @param il IntList[] with position values
-   * @param ilsize int number of tokens in query
+   * @param ils int number of tokens in query
    */
-  void setPos(final IntList[] il, final int ilsize) {
+  void setPos(final IntList[] il, final int ils) {
     pos = il;
-    size = ilsize;
-  }
-
-  /**
-   * Add position values to existing values.
-   * @param il IntList[] with position values
-   * @param ilsize int number of tokens in query
-   * @param tl TokenList with tokens
-   */
-  void addPos(final IntList[] il, final int ilsize, final TokenList tl) {
-    final IntList[] iln = new IntList[size + ilsize];
-    System.arraycopy(pos, 0, iln, 0, size);
-    System.arraycopy(il, 0, iln, size, ilsize);
-    pos = iln;
-    size += ilsize;
-    for (int i = 0; i < tl.size; i++) term.add(tl.list[i]);
+    size = ils;
   }
 
   /**
@@ -179,7 +164,7 @@ public final class FTPos extends FTExpr {
    * @return boolean result
    */
   boolean mildNot() {
-    for(int i = 1; i < pos.length; i++) {
+    for(int i = 1; i < size; i++) {
       for(int j = 0; j < pos[i].size; j++) {
         if(pos[0].contains(pos[i].list[j])) 
           return pos[0].list[pos[0].size - 1] > pos[i].list[j]; //false
@@ -307,6 +292,27 @@ public final class FTPos extends FTExpr {
     return false;
   }
 
+  /**
+   * Performs the distance filter.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean dist(final QueryContext ctx) throws QueryException {
+    return dunit == null || checkDist(checkItr(dist[0], ctx),
+        checkItr(dist[1], ctx), true);
+  }
+
+  /**
+   * Performs the window filter.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean window(final QueryContext ctx) throws QueryException {
+    return wunit == null || checkDist(1, checkItr(window, ctx), false);
+  }
+  
   /**
    * Checks if each token is reached by the ftdistance query.
    * @param mn minimum distance

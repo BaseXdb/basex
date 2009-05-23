@@ -50,7 +50,7 @@ public final class CComm extends CFrag {
   
   @Override
   public String info() {
-    return "Comment constructor";
+    return "comment constructor";
   }
 
   @Override

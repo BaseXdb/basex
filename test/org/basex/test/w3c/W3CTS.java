@@ -505,7 +505,10 @@ public abstract class W3CTS {
             iter.reset();
 
             String rin = result.list[s];
-            if(!doc || frag) rin = "<X>" + rin + "</X>";
+            if(!doc || frag) {
+              if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
+              rin = "<X>" + rin + "</X>";
+            }
             final Data rdata = CreateDB.xml(IO.get(rin), null);
             
             final SeqIter si = new SeqIter();

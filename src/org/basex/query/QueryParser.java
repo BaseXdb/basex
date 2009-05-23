@@ -1414,8 +1414,10 @@ public class QueryParser extends InputParser {
     // decimal/double values or context item
     if(c == '.' && next() != '.') {
       consume('.');
-      return !digit(curr()) ? new Context() : decimalLiteral(
-          new TokenBuilder().add('.'));
+      if(!digit(curr())) return new Context();
+      tok.reset();
+      tok.add('.');
+      return decimalLiteral();
     }
     // strings
     if(quote(c)) return new Str(stringLiteral(), true);
@@ -1451,25 +1453,14 @@ public class QueryParser extends InputParser {
   private Expr numericLiteral() throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
-    if(letter(curr())) return checkDbl(tok);
+    if(letter(curr())) return checkDbl();
     if(!consume('.')) {
       final long l = toLong(tok.finish());
       if(l == Long.MIN_VALUE) error(BOUNDS, tok);
       return Itr.get(l);
     }
     tok.add('.');
-    return decimalLiteral(tok);
-  }
-
-  /**
-   * Checks if a number is followed by a whitespace.
-   * @param tb token builder
-   * @return expression
-   * @throws QueryException xquery exception
-   */
-  private Expr checkDbl(final TokenBuilder tb) throws QueryException {
-    if(!consume('e') && !consume('E')) error(NUMBERWS);
-    return decimalDouble(tb);
+    return decimalLiteral();
   }
 
   /**
@@ -1680,38 +1671,37 @@ public class QueryParser extends InputParser {
           tb.add(cDataSection());
           tb.ent = true;
         } else {
-          final byte[] txt = text(tb);
-          if(txt != null) return Str.get(txt);
-          return next() == '/' ? null : constructor();
+          final Str txt = text(tb);
+          return txt != null ? txt : next() == '/' ? null : constructor();
         }
       } else if(c == '{') {
         if(next() == '{') {
           tb.add(consume());
           consume();
         } else {
-          final byte[] txt = text(tb);
-          return txt != null ? Str.get(txt) : enclosed(NOENCLEXPR);
+          final Str txt = text(tb);
+          return txt != null ? txt : enclosed(NOENCLEXPR);
         }
       } else if(c == '}') {
         consume();
         check('}');
         tb.add('}');
-      } else if(c == 0) {
-        error(NOCLOSING, tag);
-      } else {
+      } else if(c != 0) {
         entity(tb);
+      } else {
+        error(NOCLOSING, tag);
       }
     } while(true);
   }
 
   /**
-   * Returns a text array.
+   * Returns a string item.
    * @param tb token builder
    * @return text or null reference
    */
-  private byte[] text(final TokenBuilder tb) {
+  private Str text(final TokenBuilder tb) {
     final byte[] t = tb.finish();
-    return t.length == 0 || !tb.ent && !ctx.spaces && ws(t) ? null : t;
+    return t.length == 0 || !tb.ent && !ctx.spaces && ws(t) ? null : Str.get(t);
   }
 
   /**
@@ -1980,33 +1970,33 @@ public class QueryParser extends InputParser {
 
   /**
    * [142] Parses a DecimalLiteral.
-   * @param tb start of number
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Expr decimalLiteral(final TokenBuilder tb) throws QueryException {
-    if(letter(curr())) return checkDbl(tb);
-    while(digit(curr())) tb.add(consume());
-    return letter(curr()) ? checkDbl(tb) : new Dec(tb.finish());
+  private Expr decimalLiteral() throws QueryException {
+    if(letter(curr())) return checkDbl();
+    while(digit(curr())) tok.add(consume());
+    return letter(curr()) ? checkDbl() : new Dec(tok.finish());
   }
 
   /**
-   * [142] Parses a DecimalDouble.
-   * @param tb start of number
-   * @return query expression
+   * [143] Parses a DoubleLiteral.
+   * Checks if a number is followed by a whitespace.
+   * @return expression
    * @throws QueryException xquery exception
    */
-  private Expr decimalDouble(final TokenBuilder tb) throws QueryException {
-    tb.add('e');
-    if(curr() == '+' || curr() == '-') tb.add(consume());
+  private Expr checkDbl() throws QueryException {
+    if(!consume('e') && !consume('E')) error(NUMBERWS);
+    tok.add('e');
+    if(curr() == '+' || curr() == '-') tok.add(consume());
     boolean dig = false;
     while(digit(curr())) {
-      tb.add(consume());
+      tok.add(consume());
       dig = true;
     }
     if(!dig) error(NUMBERINC);
     if(letter(curr())) error(NUMBERWS);
-    return Dbl.get(tb.finish());
+    return Dbl.get(tok.finish());
   }
 
   /**
