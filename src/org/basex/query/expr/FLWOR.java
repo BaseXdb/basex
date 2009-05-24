@@ -1,8 +1,10 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -28,6 +30,8 @@ public class FLWOR extends Expr {
   /** Order Expressions. */
   protected Order order;
 
+  /** Group by Expression. */
+  protected Group group;
   /**
    * Constructor.
    * @param f variable inputs
@@ -38,9 +42,28 @@ public class FLWOR extends Expr {
   public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r) {
     ret = r;
     fl = f;
+    group = null;
     where = w;
     order = o;
   }
+
+  /** FLWOR initialization.
+   * @param f variable inputs
+   * @param w where clause
+   * @param o order expression
+   * @param g group by expression
+   * @param r return expression
+   */
+  public FLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
+      final Expr r) {
+    ret = r;
+    fl = f;
+    where = w;
+    group = g;
+    order = o;
+
+  }
+
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
@@ -71,7 +94,9 @@ public class FLWOR extends Expr {
         where = null;
       }
     }
-
+    if(group != null) group.comp(ctx); 
+     
+    
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
     
@@ -85,7 +110,16 @@ public class FLWOR extends Expr {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
-    order.sq = seq;
+    if(group != null) {
+      System.out.println("Iterating group");
+      group.sq = seq;
+      return group.iter(ctx);
+
+    } else {
+      order.sq = seq;  
+    }
+    
+    
     return order.iter(ctx);
   }
 
@@ -106,6 +140,7 @@ public class FLWOR extends Expr {
         iter(ctx, seq, it, p + 1);
       } else {
         if(where == null || where.ebv(ctx).bool()) {
+          if(group != null) group.add(ctx);
           order.add(ctx);
           seq.add(ctx.iter(ret).finish());
         }
@@ -159,12 +194,13 @@ public class FLWOR extends Expr {
       where.plan(ser);
       ser.closeElement();
     }
+    if(group != null) group.plan(ser);
     if(order != null) order.plan(ser);
     ser.openElement(RET);
     ret.plan(ser);
     ser.closeElement();
     ser.closeElement();
-  }
+  } 
 
   @Override
   public final String toString() {
@@ -172,6 +208,7 @@ public class FLWOR extends Expr {
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
     if(where != null) sb.append(" where " + where);
     if(order != null) sb.append(order);
+    if(group != null) sb.append(group);
     return sb.append(" return " + ret).toString();
   }
 }

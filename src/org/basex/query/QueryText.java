@@ -245,6 +245,8 @@ public interface QueryText {
   Object[] ORDERBY = { XPST, 3,
       "Expecting valid expression after 'order by'." };
   /** XPST0003: Parsing exception. */
+  Object[] GRPBY = {XPST, 3, "Expecting valid expression after 'group by'."};
+  /** XPST0003: Parsing exception. */
   Object[] FLWORWHERE = { XPST, 3,
       "Expecting 'where', 'order' or 'return' expression." };
   /** XPST0003: Parsing exception. */

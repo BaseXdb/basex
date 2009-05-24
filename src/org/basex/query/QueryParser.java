@@ -32,6 +32,8 @@ import org.basex.query.expr.FLWR;
 import org.basex.query.expr.For;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Func;
+import org.basex.query.expr.Group;
+import org.basex.query.expr.Grp;
 import org.basex.query.expr.If;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
@@ -698,6 +700,7 @@ public class QueryParser extends InputParser {
    * [ 37] Parses a WhereClause.
    * [ 38] Parses an OrderByClause.
    * [ 39] Parses an OrderSpecList.
+   * [ 57]* Parses GroupByClause (*Xquery 1.1 draft)
    * @return query expression
    * @throws QueryException xquery exception
    */
@@ -712,6 +715,14 @@ public class QueryParser extends InputParser {
       ap = qp;
       where = check(single(), NOWHERE);
       alter = NOWHERE;
+    }
+
+    Grp[] group = null;
+    if(consumeWS(GROUP)) {
+      check(BY);
+      ap = qp;
+      do group = groupSpec(group); while(consumeWS2(COMMA));
+      if(group != null) group = Array.add(group, new Grp());
     }
 
     Ord[] order = null;
@@ -732,10 +743,12 @@ public class QueryParser extends InputParser {
     }
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
-
-    return order == null ? new FLWR(fl, where, ret) :
-      new FLWOR(fl, where, new Order(order), ret);
+    return order == null && group == null ? new FLWR(fl, where, ret) :
+      new FLWOR(fl, where, 
+                order == null ? null : new Order(order), 
+                group == null ? null : new Group(group), ret);
   }
+
 
   /**
    * [ 34] Parses a ForClause.
@@ -814,6 +827,25 @@ public class QueryParser extends InputParser {
     if(e.e()) return order;
     final Ord ord = new Ord(e, desc, least);
     return order == null ? new Ord[] { ord } : Array.add(order, ord);
+  }
+  
+  /**
+   * [59]* GroupingSpec  (*Xquery 1.1 Draft).
+   * 
+   * @param group grouping specification
+   * @return new Grp array
+   * @throws QueryException in case something went wrong
+   */
+  private Grp[] groupSpec(final Grp[] group) throws QueryException {
+    final Expr e = check(single(), GRPBY);
+        
+    if(consumeWS(COLLATION)) { // [ 59]* XQuery Draft 1.1
+      final byte[] coll = stringLiteral();
+      if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
+    }
+    if(e.e())  return group;
+    final Grp grp = new Grp(e);
+    return group == null ? new Grp[] { grp} : Array.add(group, grp);
   }
 
   /**

@@ -137,7 +137,7 @@ public final class QueryProcessor extends Progress {
    * @param qu query
    */
   public void setQuery(final String qu) {
-    query = qu;;
+    query = qu;
   }
 
   /**

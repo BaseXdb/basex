@@ -252,6 +252,8 @@ public interface QueryTokens {
   /** Parser token. */
   String WHERE = "where";
   /** Parser token. */
+  String GROUP = "group";
+  /** Parser token. */
   String WILDCARDS = "wildcards";
   /** Parser token. */
   String WINDOW = "window";
@@ -375,6 +377,8 @@ public interface QueryTokens {
   byte[] RET = token("Return");
   /** Query Plan. */
   byte[] ORDER = token("Order");
+  /** Query Plan Group. */
+  byte[] GROUPBY = token("Group");
   /** Query Plan. */
   byte[] NEGATE = token("Negate");
   /** Query Plan. */
