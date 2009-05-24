@@ -111,7 +111,6 @@ public class FLWOR extends Expr {
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
     if(group != null) {
-      System.out.println("Iterating group");
       group.sq = seq;
       return group.iter(ctx);
 
@@ -141,7 +140,7 @@ public class FLWOR extends Expr {
       } else {
         if(where == null || where.ebv(ctx).bool()) {
           if(group != null) group.add(ctx);
-          order.add(ctx);
+          if(order != null) order.add(ctx);
           seq.add(ctx.iter(ret).finish());
         }
       }
