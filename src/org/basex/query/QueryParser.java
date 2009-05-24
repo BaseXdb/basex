@@ -841,7 +841,7 @@ public class QueryParser extends InputParser {
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
 
-    final Grp grp = new Grp(v);
+    final Grp grp = new Grp(new VarCall(v));
     return group == null ? new Grp[] { grp } : Array.add(group, grp);
   }
 

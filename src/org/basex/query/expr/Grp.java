@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -23,20 +22,20 @@ public class Grp extends Expr {
   /** Sequence. */
   private SeqIter seq;
   /** Grouping expression. */
-  private Var var;
+  private Expr expr;
 
   /**
    * Constructor.
-   * @param v variable
+   * @param e expression
    */
-  public Grp(final Var v) {
+  public Grp(final Expr e) {
     seq = new SeqIter();
-    var = v;
+    expr = e;
   }
   
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    var = var.comp(ctx);
+    expr = expr.comp(ctx);
     return this;
   }
 
@@ -47,7 +46,7 @@ public class Grp extends Expr {
    */
   void add(final QueryContext ctx) throws QueryException {
     if(seq != null) {
-      final Iter iter = ctx.iter(var);
+      final Iter iter = ctx.iter(expr);
       Item it = iter.next();
       if(it != null) {
         if(iter.next() != null) Err.or(XPSORT);
@@ -62,7 +61,7 @@ public class Grp extends Expr {
    * Resets the built sequence.
    */
   void finish() {
-    if(seq != null) seq = new SeqIter();
+    seq = new SeqIter();
   }
 
   /**
@@ -71,31 +70,32 @@ public class Grp extends Expr {
    * @return item
    */
   Item item(final int i) {
-    return seq == null ? Itr.get(i) : seq.item[i];
+    return seq.item[i];
   }
 
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
-    return var.uses(use, ctx);
+    return expr.uses(use, ctx);
   }
 
   @Override
   public Grp remove(final Var v) {
+    if(expr != null) expr = expr.remove(v);
     return this;
   }
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return var.returned(ctx);
+    return expr.returned(ctx);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    var.plan(ser);
+    expr.plan(ser);
   }
   
   @Override
   public String toString() {
-    return var.toString();
+    return expr.toString();
   }
 }
