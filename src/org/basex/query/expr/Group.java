@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
@@ -16,9 +13,10 @@ import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 
 /**
- * Implementation of XQuery 1.1 Draft “GROUP BY”.
- * @author michael seiferle
+ * Implementation of the group by clause.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Michael Seiferle
  */
 public class Group extends Expr {
   /** Sequence to be grouped. */
@@ -27,12 +25,13 @@ public class Group extends Expr {
   Grp[] grp;
   
   /**
-   * Postgrouped Tuples.
+   * Post grouped Tuples.
    */
   HashMap<Integer, int[]> groups = null;
- /**
+
+  /**
    * Constructor.
-   * @param e expressions
+   * @param g groups
    */
   public Group(final Grp[] g) {
     grp = g;
@@ -44,9 +43,8 @@ public class Group extends Expr {
     return this;
   }
 
-
   /**
-   * Iterares over an array and merges its values.
+   * Iterates over an array and merges its values.
    * @param i first array
    * @param j second array
    * @return i UNION j
@@ -54,17 +52,21 @@ public class Group extends Expr {
   private static int[] merge(final int[]i, final int j) {
     int[] result = new int[i.length + 1];
     int counter = 0;
-    for (int k = 0; k < i.length; k++)  result[counter++] = i[k];
+    for(int k = 0; k < i.length; k++) result[counter++] = i[k];
     result[i.length] = j; 
     return result;
   }
+
   /**
    * Groups the Items.
    * @param g grouping specifications.
-   * @param lastitem se item 
-   * 
+   * @param lastitem last item
    */
   protected void group(final int[] g, final int lastitem) {
+
+    // [MS] temporarily suppressing Eclipse warning
+    if(g == g);
+    
     if(groups == null) groups = new HashMap<Integer, int[]>();
     Item next = null;
     for(Grp group : this.grp) {
@@ -115,7 +117,6 @@ public class Group extends Expr {
             ir = null;
           } else {
             if(++p == hashes.length) return null;
-            // return the first group member
             final int witness = groups.get(hashes[p])[0]; 
             ir = sq.item[witness].iter();
           }

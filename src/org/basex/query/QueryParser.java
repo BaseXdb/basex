@@ -722,6 +722,7 @@ public class QueryParser extends InputParser {
       check(BY);
       ap = qp;
       do group = groupSpec(group); while(consumeWS2(COMMA));
+      alter = GRPBY;
     }
 
     Ord[] order = null;
@@ -774,10 +775,8 @@ public class QueryParser extends InputParser {
         final SeqType type = !score && consumeWS(AS) ? sequenceType() : null;
         final Var var = new Var(name, type, false);
 
-        final Var at = fr && consumeWS(AT) ?
-            new Var(varName(), false) : null;
-        final Var sc = fr && consumeWS(SCORE) ?
-            new Var(varName(), false) : null;
+        final Var at = fr && consumeWS(AT) ? new Var(varName()) : null;
+        final Var sc = fr && consumeWS(SCORE) ? new Var(varName()) : null;
 
         check(fr ? IN : ASSIGN);
         final Expr e = check(single(), VARMISSING);
@@ -836,14 +835,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException in case something went wrong
    */
   private Grp[] groupSpec(final Grp[] group) throws QueryException {
-    final Var v = new Var(varName(), false);
-    if(consumeWS(COLLATION)) { // [ 59]* XQuery Draft 1.1
+    final Var v = new Var(varName());
+    if(consumeWS(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    if(v.e())  return group;
+
     final Grp grp = new Grp(v);
-    return group == null ? new Grp[] { grp} : Array.add(group, grp);
+    return group == null ? new Grp[] { grp } : Array.add(group, grp);
   }
 
   /**
@@ -1459,7 +1458,7 @@ public class QueryParser extends InputParser {
     if(quote(c)) return new Str(stringLiteral(), true);
     // variables
     if(c == '$') {
-      final Var var = new Var(varName(), false);
+      final Var var = new Var(varName());
       if(ctx.vars.get(var) == null) error(VARNOTDEFINED, var);
       return new VarCall(var);
     }
@@ -2086,14 +2085,14 @@ public class QueryParser extends InputParser {
       Var var3 = null;
       final int s = ctx.vars.size();
       if(consumeWS2(PAR1)) {
-        var1 = new Var(varName(), false);
+        var1 = new Var(varName());
         ctx.vars.add(var1);
         if(consumeWS2(COMMA)) {
-          var2 = new Var(varName(), false);
+          var2 = new Var(varName());
           if(var1.name.eq(var2.name)) error(VARDEFINED, var2);
           ctx.vars.add(var2);
           if(consumeWS2(COMMA)) {
-            var3 = new Var(varName(), false);
+            var3 = new Var(varName());
             if(var1.name.eq(var3.name) || var2.name.eq(var3.name))
               error(VARDEFINED, var3);
             ctx.vars.add(var3);

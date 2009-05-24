@@ -1,16 +1,10 @@
-/**
- * 
- */
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-//import org.basex.query.expr.Expr.Use;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
@@ -21,33 +15,28 @@ import org.basex.query.util.Var;
 
 /**
  * Single Group Expression.
- * @author michael
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Michael Seiferle
  */
 public class Grp extends Expr {
-  /** sequence. */
+  /** Sequence. */
   private SeqIter seq;
-  /** Groupingexpression. */
-  private Expr expr;
-  
-  
-  /**
-   * Empty constructor not used so far.
-   */
-  public Grp() { }
+  /** Grouping expression. */
+  private Var var;
 
   /**
    * Constructor.
-   * @param e expression
+   * @param v variable
    */
-  public Grp(final Expr e) {
+  public Grp(final Var v) {
     seq = new SeqIter();
-    expr = e;
+    var = v;
   }
   
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(expr != null) expr = expr.comp(ctx);
+    var = var.comp(ctx);
     return this;
   }
 
@@ -58,7 +47,7 @@ public class Grp extends Expr {
    */
   void add(final QueryContext ctx) throws QueryException {
     if(seq != null) {
-      final Iter iter = ctx.iter(expr);
+      final Iter iter = ctx.iter(var);
       Item it = iter.next();
       if(it != null) {
         if(iter.next() != null) Err.or(XPSORT);
@@ -87,29 +76,26 @@ public class Grp extends Expr {
 
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
-    return expr != null && expr.uses(use, ctx);
+    return var.uses(use, ctx);
   }
 
   @Override
   public Grp remove(final Var v) {
-    if(expr != null) expr = expr.remove(v);
     return this;
   }
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return expr == null ? Return.SEQ : expr.returned(ctx);
+    return var.returned(ctx);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    expr.plan(ser);
+    var.plan(ser);
   }
   
   @Override
   public String toString() {
-    if(expr == null) return "";
-    final StringBuilder sb = new StringBuilder(expr.toString());
-    return sb.toString();
+    return var.toString();
   }
 }

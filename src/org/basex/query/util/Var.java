@@ -39,11 +39,18 @@ public class Var extends Expr implements Cloneable {
   /**
    * Constructor.
    * @param n variable name
+   */
+  public Var(final QNm n) {
+    this(n, false);
+  }
+
+  /**
+   * Constructor.
+   * @param n variable name
    * @param g global flag
    */
   public Var(final QNm n, final boolean g) {
-    name = n;
-    global = g;
+    this(n, null, g);
   }
 
   /**
@@ -53,12 +60,13 @@ public class Var extends Expr implements Cloneable {
    * @param g global flag
    */
   public Var(final QNm n, final SeqType t, final boolean g) {
-    this(n, g);
+    name = n;
     type = t;
+    global = g;
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public Var comp(final QueryContext ctx) throws QueryException {
     if(expr != null) bind(expr.comp(ctx), ctx);
     return this;
   }

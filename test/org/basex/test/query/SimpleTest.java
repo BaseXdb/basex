@@ -94,6 +94,8 @@ public final class SimpleTest extends AbstractTest {
       { "PosPred 9", nodes(8, 15, 19, 22), "//*[position() > 1.1]" },
       { "PosPred A", nodes(), "//*[position() <= 0.9]" },
       { "PosPred B", string("XML"), "(('XML')[1])[1]" },
+      { "Prec 1", nodes(3, 5), "//body/preceding::*" },
+      { "Prec 2", nodes(3, 5), "//@id/preceding::*" },
       { "Union 1", nodes(0), ".|." },
       { "Union 2", nodes(0), ". | ." },
       { "Union 3", nodes(1), "*|*" },
