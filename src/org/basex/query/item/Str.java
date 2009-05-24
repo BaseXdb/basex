@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import java.math.BigDecimal;
-
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 

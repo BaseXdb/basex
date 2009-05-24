@@ -24,7 +24,7 @@ import org.basex.util.Token;
 public final class For extends ForLet {
   /** Positional variable. */
   Var pos;
-  /** Fulltext score. */
+  /** Full-text score. */
   Var score;
 
   /**

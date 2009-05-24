@@ -8,7 +8,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
-
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -46,7 +45,7 @@ public class DeepShell {
   /** Constructor. */
   DeepShell() {
     BaseX.errln("DeepShell");
-    fs = new DeepFS("deepshell", false);
+    fs = new DeepFS("deepshell");
     if (fs == null) System.exit(1);
     // initialize/mount filesystem
     //fs.init();

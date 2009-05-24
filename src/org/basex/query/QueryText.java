@@ -516,7 +516,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTATVINDEX = "Applying attribute index";
   /** Optimization info. */
-  String OPTFTXINDEX = "Applying fulltext index";
+  String OPTFTXINDEX = "Applying full-text index";
   /** Optimization info. */
   String OPTRNGINDEX = "Applying range index";
   /** Optimization info. */

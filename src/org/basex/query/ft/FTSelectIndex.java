@@ -13,49 +13,49 @@ import org.basex.query.iter.FTNodeIter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FTPosIndex extends FTExpr {
+public final class FTSelectIndex extends FTExpr {
   /** Position filter. */
-  public FTPos pos;
+  public FTSelect pos;
 
   /**
    * Constructor.
-   * @param p fulltext selections
+   * @param p full-text selections
    */
-  public FTPosIndex(final FTPos p) {
+  public FTSelectIndex(final FTSelect p) {
     super();
     pos = p;
   }
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
-    final FTPos tmp = ctx.ftpos;
+    final FTSelect tmp = ctx.ftselect;
     final FTExpr e = pos.expr[0];
 
     return new FTNodeIter() {
       @Override
       public FTNodeItem next() throws QueryException {
-        ctx.ftpos = pos;
+        ctx.ftselect = pos;
         pos.init(ctx.ftitem);
         FTNodeItem it = e.iter(ctx).next();
-        if (ctx.ftpos != null) {
-          if (it.ftn.size > 0) {
+        if (ctx.ftselect != null) {
+          if(it.ftn.size > 0) {
             init(it);
             while(!pos.filter(ctx)) {
               it = e.iter(ctx).next();
               if(it.ftn.size == 0) {
-                ctx.ftpos = tmp;
+                ctx.ftselect = tmp;
                 return it;
               }
               init(it);
             } 
           }    
         }
-        ctx.ftpos = tmp;
+        ctx.ftselect = tmp;
         return it;
       }
 
       /**
-       * Init FTPos for next seqEval with index use.
+       * Initializes item for next seqEval with index use.
        * @param it current FTNode 
        */
       void init(final FTNodeItem it) {

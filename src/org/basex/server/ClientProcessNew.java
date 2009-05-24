@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.net.SocketException;
-
 import org.basex.core.AbstractProcess;
 import org.basex.core.Commands;
 import org.basex.core.Context;

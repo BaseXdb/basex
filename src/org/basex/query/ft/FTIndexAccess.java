@@ -18,9 +18,9 @@ import org.basex.query.iter.Iter;
  * @author Christian Gruen
  */
 public final class FTIndexAccess extends Simple {
-  /** Fulltext expression. */
+  /** Full-text expression. */
   final FTExpr ftexpr;
-  /** Fulltext parser. */
+  /** Full-text parser. */
   final Tokenizer ft;
   /** Index context. */
   final IndexContext ictx;

@@ -29,19 +29,19 @@ import org.basex.util.IntList;
 public class FTContains extends Expr {
   /** Expression. */
   public Expr expr;
-  /** Fulltext expression. */
+  /** Full-text expression. */
   public FTExpr ftexpr;
-  /** Fulltext parser. */
+  /** Full-text parser. */
   public Tokenizer ft = new Tokenizer();
   /** Flag for first evaluation.*/
   private int div;
-  /** Visualize fulltext results. */
+  /** Visualize full-text results. */
   private boolean vis = true;
   
   /**
    * Constructor.
    * @param e expression
-   * @param fte fulltext expression
+   * @param fte full-text expression
    */
   public FTContains(final Expr e, final FTExpr fte) {
     expr = e;
@@ -66,18 +66,17 @@ public class FTContains extends Expr {
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.ftitem;
     final IntList[] ftd = ctx.ftd;
-    int pre = -1;
     double d = 0;
     Item i;
     ctx.ftitem = ft;
+
     while((i = iter.next()) != null) {
       ft.init(i.str());
       final double d2 = ftexpr.iter(ctx).next().score();
       d = ctx.score.and(d, d2);
-      if(i instanceof DBNode && d2 > 0) pre = ((DBNode) i).pre;
-      if (d2 > 0 && pre > -1 && ctx.ftd != null && ctx.ftdata != null) {
-        ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);
-      }
+
+      if(ctx.ftdata != null && ctx.ftd != null && d2 > 0 && i instanceof DBNode)
+        ctx.ftdata.addConvSeqData(ctx.ftd, ((DBNode) i).pre, div);
     }
     
     ctx.ftitem = tmp;
@@ -103,7 +102,7 @@ public class FTContains extends Expr {
   public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
       throws QueryException {
 
-    // [CG] necessary/possible?
+    // [CG] XQuery/Index: necessary/possible?
     if(!ic.data.meta.ftxindex) return this;
     
     final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);

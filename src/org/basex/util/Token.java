@@ -956,7 +956,7 @@ public final class Token {
   }
 
   /**
-   * Returns a lowercase ASCII character of the specified fulltext character.
+   * Returns a lowercase ASCII character of the specified full-text character.
    * Note that this method does not support unicode characters.
    * @param ch character to be converted
    * @return converted character

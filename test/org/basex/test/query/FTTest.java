@@ -4,7 +4,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 
 /**
- * Fulltext Test Queries.
+ * Full-text Test Queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -15,7 +15,6 @@ public final class FTTest extends AbstractTest {
     final StringBuilder sb = new StringBuilder();
     sb.append(set("ftindex", Prop.ftindex) + ";");
     sb.append(set("ftfuzzy", Prop.ftfuzzy) + ";");
-    sb.append(set("ftittr", Prop.ftittr) + ";");
     sb.append(set("ftst", Prop.ftst) + ";");
     sb.append(set("ftdc", Prop.ftdc) + ";");
     sb.append(set("ftcs", Prop.ftcs));
@@ -211,6 +210,33 @@ public final class FTTest extends AbstractTest {
       { "FTWildCard 12", nodes(40),
         "/fttest/wld [text() ftcontains '.+' with wildcards]" },
 
+      { "FTWildCard 13", bool(false),
+        "'a' ftcontains 'a.+' with wildcards" },
+      { "FTWildCard 14", bool(true),
+        "'aa' ftcontains 'a.+' with wildcards" },
+      { "FTWildCard 15", bool(true),
+        "'aaaa' ftcontains 'a.+' with wildcards" },
+      { "FTWildCard 16", bool(true),
+        "'a' ftcontains 'a.*' with wildcards" },
+      { "FTWildCard 17", bool(true),
+        "'aaaaaa' ftcontains 'a.*' with wildcards" },
+      { "FTWildCard 18", bool(false),
+        "'a' ftcontains 'a.' with wildcards" },
+      { "FTWildCard 19", bool(true),
+        "'aa' ftcontains 'a.' with wildcards" },
+      { "FTWildCard 20", bool(true),
+        "'a' ftcontains 'a.{0,1}' with wildcards" },
+      { "FTWildCard 21", bool(true),
+        "'aa' ftcontains 'a.{0,1}' with wildcards" },
+      { "FTWildCard 22", // error (space)
+        "'aa' ftcontains 'a.{0, 1}' with wildcards" },
+      { "FTWildCard 23", // error (negative number)
+        "'a' ftcontains 'a.{-1,1}' with wildcards" },
+      { "FTWildCard 24", // error (missing second value)
+        "'a' ftcontains 'a.{1}' with wildcards" },
+      { "FTWildCard 25", // error (wrong syntax)
+        "'a' ftcontains 'a.{1-5}' with wildcards" },
+        
       { "FTFuzzy 1", nodes(7, 9, 11),
         "//* [text() ftcontains 'Database' with fuzzy]" },
       { "FTFuzzy 2", nodes(7, 9, 11),
@@ -303,7 +329,7 @@ public final class FTTest extends AbstractTest {
                   
       { "FTLanguage 1", nodes(14),
         "//* [text() ftcontains 'hello' language 'en']" },
-      { "FTLanguage 2", // error...
+      { "FTLanguage 2", // error
         "//* [text() ftcontains 'hello' language 'jp']" },
 
       { "FTStopWords 1", nodes(7, 9, 11), "//* [text() ftcontains " +

@@ -59,7 +59,7 @@ public final class FNSeq extends Fun {
     
     return new Iter() {
       final Iter iter = expr[0].iter(ctx);
-      int c = 0;
+      int c;
 
       @Override
       public Item next() throws QueryException {
@@ -74,7 +74,7 @@ public final class FNSeq extends Fun {
   }
 
   /**
-   * Looks for distinct values in the sequence.
+   * Returns all distinct values of a sequence.
    * @param ctx query context
    * @return distinct iterator
    * @throws QueryException evaluation exception
@@ -88,12 +88,12 @@ public final class FNSeq extends Fun {
 
       @Override
       public Item next() throws QueryException {
-        Item i;
-        while((i = iter.next()) != null) {
+        while(true) {
+          Item i = iter.next();
+          if(i == null) return null;
           i = FNGen.atom(i);
           if(map.index(i)) return i;
         }
-        return null;
       }
     };
   }
@@ -135,13 +135,11 @@ public final class FNSeq extends Fun {
     return new Iter() {
       final long pos = checkItr(expr[1], ctx);
       final Iter iter = expr[0].iter(ctx);
-      long c = 0;
+      long c;
 
       @Override
       public Item next() throws QueryException {
-        Item i;
-        while((i = iter.next()) != null) if(++c != pos) return i;
-        return null;
+        return ++c != pos || iter.next() != null ? iter.next() : null;
       }
     };
   }

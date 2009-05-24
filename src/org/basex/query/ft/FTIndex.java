@@ -12,14 +12,14 @@ import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;
 
 /**
- * This expression retrieves the ids of indexed fulltext terms.
+ * This expression retrieves the ids of indexed full-text terms.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
  */
 public final class FTIndex extends FTExpr {
-  /** Fulltext token. */
+  /** Full-text token. */
   final byte[] tok;
   /** Data reference. */
   final Data data;

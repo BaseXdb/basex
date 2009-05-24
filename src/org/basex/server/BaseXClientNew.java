@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Random;
-
 import org.basex.BaseX;
 import org.basex.core.AbstractProcess;
 import org.basex.core.CommandParser;

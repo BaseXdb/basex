@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import java.text.SimpleDateFormat;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;

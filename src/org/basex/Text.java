@@ -649,7 +649,7 @@ public interface Text {
   String INFOTEXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
   String INFOATTRINDEX = lang("info_atvindex");
-  /** Info on Fulltext Indexing. */
+  /** Info on Full-text Indexing. */
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */
   String INFOFZINDEX = lang("info_fzindex");
@@ -990,15 +990,15 @@ public interface Text {
   String TXTINDEXINFO =  lang("dc_txtinfo");
   /** Value Index information. */
   String ATTINDEXINFO = lang("dc_attinfo");
-  /** Fulltext Index information. */
+  /** Full-text Index information. */
   String FTINDEXINFO = lang("dc_ftxinfo");
-  /** Fulltext Index information. */
+  /** Full-text Index information. */
   String FZINDEXINFO = lang("dc_fzinfo");
-  /** Fulltext Index information. */
+  /** Full-text Index information. */
   String FTSTEMINFO = lang("dc_ftsteminfo");
-  /** Fulltext Index information. */
+  /** Full-text Index information. */
   String FTCSINFO = lang("dc_ftcsinfo");
-  /** Fulltext Index information. */
+  /** Full-text Index information. */
   String FTDCINFO = lang("dc_ftdcinfo");
 
   /** General info. */

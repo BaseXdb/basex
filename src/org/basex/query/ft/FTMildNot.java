@@ -34,7 +34,7 @@ public final class FTMildNot extends FTExpr {
     boolean f = false;
     for(int i = 1; i < expr.length; i++)
       f |= expr[1].iter(ctx).next().score() != 0;
-    return score(!f || ctx.ftpos.mildNot() ? it.score() : 0);
+    return score(!f || ctx.ftselect.mildNot() ? it.score() : 0);
   }
 
   @Override

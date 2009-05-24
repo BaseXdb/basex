@@ -1,9 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.File;
-
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;

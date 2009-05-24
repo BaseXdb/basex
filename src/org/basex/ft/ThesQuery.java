@@ -5,7 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.util.TokenList;
 
 /**
- * Simple Thesaurus for fulltext requests.
+ * Simple Thesaurus entry for full-text requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

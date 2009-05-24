@@ -1,7 +1,6 @@
 package org.basex.query.iter;
 
 import java.util.Iterator;
-
 import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;

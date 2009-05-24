@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -124,7 +123,7 @@ public final class SeqType {
           if(!Token.eq(ext.str(), ((Nod) it).nname()))
               Err.or(XPCAST, it.type, ext);
           break;
-        // [CG] XQuery/check other types, similar to {@link Test} classes
+        // [CG] XQuery/check other types
         default:
       }
       //Err.cast(type, item);

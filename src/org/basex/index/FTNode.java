@@ -11,7 +11,7 @@ import org.basex.util.IntList;
  * @author Sebastian Gath
  */
 public final class FTNode {
-  /** Fulltext data for a node. */
+  /** Full-text data for a node. */
   public IntList ip;
   /** Pre value of the current node. */
   private int pre;

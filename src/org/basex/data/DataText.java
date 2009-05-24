@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Prop;
 
 /**
@@ -47,15 +46,15 @@ public interface DataText {
   String DBATVINDEX = "ATVINDEX";
   /** Word indexing. */
   String DBWRDINDEX = "WRDINDEX";
-  /** Fulltext indexing. */
+  /** Full-text indexing. */
   String DBFTXINDEX = "FTXINDEX";
-  /** Fuzzy indexing. */
+  /** Full-text fuzzy indexing. */
   String DBFZINDEX = "FZINDEX";
-  /** Fulltext stemming. */
+  /** Full-text stemming. */
   String DBFTSTEM = "FTSTEM";
-  /** Fulltext case sensitivity. */
+  /** Full-text case sensitivity. */
   String DBFTCS = "FTCS";
-  /** Fulltext diacritics removal. */
+  /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
   /** Up-to-date flag. */
   String DBUPTODATE = "UPTODATE";
@@ -192,6 +191,6 @@ public interface DataText {
   String DATATXT = "txt";
   /** Database - Attribute value index. */
   String DATAATV = "atv";
-  /** Database - Fulltext index. */
+  /** Database - Full-text index. */
   String DATAFTX = "ftx";
 }

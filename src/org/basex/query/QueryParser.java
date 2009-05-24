@@ -52,16 +52,22 @@ import org.basex.query.expr.Union;
 import org.basex.query.expr.VarCall;
 import org.basex.query.ft.FTAnd;
 import org.basex.query.ft.FTContains;
+import org.basex.query.ft.FTContent;
+import org.basex.query.ft.FTScope;
+import org.basex.query.ft.FTDistance;
 import org.basex.query.ft.FTExpr;
+import org.basex.query.ft.FTFilter;
 import org.basex.query.ft.FTMildNot;
 import org.basex.query.ft.FTNot;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.FTOptions;
 import org.basex.query.ft.FTOr;
-import org.basex.query.ft.FTPos;
+import org.basex.query.ft.FTOrder;
+import org.basex.query.ft.FTSelect;
+import org.basex.query.ft.FTWindow;
 import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTOpt.FTMode;
-import org.basex.query.ft.FTPos.FTUnit;
+import org.basex.query.ft.FTFilter.FTUnit;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Itr;
@@ -2087,38 +2093,41 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftSelection(final boolean prg) throws QueryException {
     final FTExpr expr = ftOr(prg);
-    final FTPos sel = new FTPos(expr);
+    FTFilter[] filters = {};
 
-    while(true) {
+    FTFilter f;
+    do {
+      f = null;
       if(consumeWS(ORDERED)) {
-        sel.ordered = true;
+        f = new FTOrder();
       } else if(consumeWS(WINDOW)) {
-        sel.window = additive();
-        sel.wunit = ftUnit();
+        f = new FTWindow(additive(), ftUnit());
       } else if(consumeWS(DISTANCE)) {
-        sel.dist = ftRange();
-        if(sel.dist == null) error(FTRANGE);
-        sel.dunit = ftUnit();
+        final Expr[] r = ftRange();
+        if(r == null) error(FTRANGE);
+        f = new FTDistance(r, ftUnit());
       } else if(consumeWS(AT)) {
-        sel.start = consumeWS(START);
-        if(!sel.start) sel.end = consumeWS(END);
-        if(!sel.start && !sel.end) error(INCOMPLETE);
+        boolean start = consumeWS(START);
+        boolean end = !start && consumeWS(END);
+        if(!start && !end) error(INCOMPLETE);
+        f = new FTContent(start, end);
       } else if(consumeWS(ENTIRE)) {
         check(CONTENT);
-        sel.content = true;
+        f = new FTContent(false, false);
       } else {
         final boolean same = consumeWS(SAME);
         final boolean diff = !same && consumeWS(DIFFERENT);
-        if(!same && !diff) break;
-        sel.same = same;
-        sel.different = diff;
-        if(consumeWS(SENTENCE)) sel.sdunit = FTUnit.SEN;
-        else if(consumeWS(PARAGRAPH)) sel.sdunit = FTUnit.PAR;
-        else error(INCOMPLETE);
+        if(same || diff) {
+          FTUnit unit = null;
+          if(consumeWS(SENTENCE)) unit = FTFilter.FTUnit.SENTENCE;
+          else if(consumeWS(PARAGRAPH)) unit = FTFilter.FTUnit.PARAGRAPH;
+          else error(INCOMPLETE);
+          f = new FTScope(unit, same);
+        }
       }
-    }
-    //return sel.standard() ? expr : sel;
-    return sel;
+      if(f != null) filters = Array.add(filters, f);
+    } while(f != null);
+    return new FTSelect(expr, filters);
   }
 
   /**
@@ -2283,9 +2292,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException xquery exception
    */
   private FTUnit ftUnit() throws QueryException {
-    if(consumeWS(WORDS)) return FTUnit.WRD;
-    if(consumeWS(SENTENCES)) return FTUnit.SEN;
-    if(consumeWS(PARAGRAPHS)) return FTUnit.PAR;
+    if(consumeWS(WORDS)) return FTUnit.WORD;
+    if(consumeWS(SENTENCES)) return FTUnit.SENTENCE;
+    if(consumeWS(PARAGRAPHS)) return FTUnit.PARAGRAPH;
     error(INCOMPLETE);
     return null;
   }

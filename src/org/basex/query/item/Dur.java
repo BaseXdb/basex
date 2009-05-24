@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.Duration;
-
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;

@@ -67,13 +67,13 @@ public final class FTOpt extends ExprInfo {
   /** Language. */
   public byte[] ln;
 
-  /** Fulltext tokenizer. */
+  /** Full-text tokenizer. */
   public final Tokenizer qu = new Tokenizer();
 
   /**
-   * Compiles the fulltext options, inheriting the options of the argument.
+   * Compiles the full-text options, inheriting the options of the argument.
    * @param ctx query context
-   * @param opt parent fulltext options
+   * @param opt parent full-text options
    * @throws QueryException xquery exception
    */
   public void compile(final QueryContext ctx, final FTOpt opt)
@@ -123,14 +123,14 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Checks if the first token contains the second fulltext term.
+   * Checks if the first token contains the second full-text term.
    * @param tk ft tokenizer
    * @param pos ft position filter
    * @param q query token
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final Tokenizer tk, final FTPos pos, final byte[] q)
+  int contains(final Tokenizer tk, final FTSelect pos, final byte[] q)
       throws QueryException {
 
     if(q.length == 0) return 0;
@@ -251,9 +251,8 @@ public final class FTOpt extends ExprInfo {
           n = 1;
         }
         // recursively evaluates wildcards (non-greedy)
-        while(!wc(t, q, tl + n, ql)) {
-          if(tl + n > t.length || ++n > m) return false;
-        }
+        while(!wc(t, q, tl + n, ql)) if(tl + ++n > t.length) return false;
+        if(n > m) return false;
         tl += n;
       } else {
         if(q[ql] == '\\' && ++ql == q.length) Err.or(FTREG, q);

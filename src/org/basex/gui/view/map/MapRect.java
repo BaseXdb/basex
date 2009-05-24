@@ -13,9 +13,9 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   short type = -1;
   /** Thumbnail view. */
   boolean thumb;
-  /** Fulltext position values. */
+  /** Full-text position values. */
   int[] pos;
-  /** Fulltext pointer values. */
+  /** Full-text pointer values. */
   int[] poi;
   /** Abstraction level for thumbnail. */
   byte thumbal;

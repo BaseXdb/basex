@@ -22,7 +22,7 @@ public final class FTNot extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    // do not color fulltext if there is a ftnot
+    // do not color full-text if there is a ftnot
     ctx.ftd = null;
     return super.comp(ctx);
   }

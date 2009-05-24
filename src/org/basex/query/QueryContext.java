@@ -21,7 +21,7 @@ import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Root;
 import org.basex.query.ft.FTOpt;
-import org.basex.query.ft.FTPos;
+import org.basex.query.ft.FTSelect;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -76,16 +76,16 @@ public final class QueryContext extends Progress {
 
   /** Scoring instance. */
   public Scoring score = new Scoring();
-  /** Current fulltext item. */
+  /** Current full-text item. */
   public FTPosData ftdata;
-  /** Current fulltext item. */
+  /** Current full-text item. */
   public Tokenizer ftitem;
-  /** Current fulltext options. */
+  /** Current full-text options. */
   public FTOpt ftopt = new FTOpt();
-  /** Current fulltext position filter. */
-  public FTPos ftpos = new FTPos(null);
+  /** Current full-text position filter. */
+  public FTSelect ftselect = new FTSelect(null);
   /** Count number of FTIndex. */
-  public int ftcount = 0;
+  public int ftcount;
   /** Temporary place for ftdata. */
   public IntList[] ftd;
 
@@ -121,7 +121,7 @@ public final class QueryContext extends Progress {
   /** Construction mode. */
   public boolean construct = false;
   /** Revalidation Mode. */
-  public int revalidate = 0;
+  public int revalidate;
 
   /** String container for query background information. */
   final TokenBuilder info = new TokenBuilder();
@@ -142,7 +142,7 @@ public final class QueryContext extends Progress {
   /** Collection names. */
   private byte[][] collName = new byte[1][];
   /** Collection counter. */
-  private int colls = 0;
+  private int colls;
 
   /** Reference to the root expression. */
   private Expr root;
@@ -178,7 +178,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    // add fulltext container reference
+    // add full-text container reference
     if(nodes != null && nodes.ftpos != null) ftdata = new FTPosData();
 
     try {
@@ -247,7 +247,7 @@ public final class QueryContext extends Progress {
         pre.add(((DBNode) i).pre);
       }
       
-      // completed... return standard nodeset with fulltext positions
+      // completed... return standard nodeset with full-text positions
       if(i == null) {
         final Nodes n = new Nodes(pre.finish(), data);
         n.ftpos = ftdata;

@@ -1,7 +1,7 @@
 package org.basex.test.w3c;
 
 /**
- * XQuery FullText Test Suite Wrapper.
+ * XQuery Full-text Test Suite Wrapper.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

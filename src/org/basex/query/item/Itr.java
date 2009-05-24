@@ -3,7 +3,6 @@ package org.basex.query.item;
 import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 

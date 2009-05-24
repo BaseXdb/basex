@@ -2,9 +2,7 @@ package org.basex.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.data.Data;
@@ -19,7 +17,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
- * Simple Thesaurus for fulltext requests.
+ * Simple Thesaurus for full-text requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

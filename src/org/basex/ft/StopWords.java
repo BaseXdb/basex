@@ -6,7 +6,7 @@ import org.basex.io.IO;
 import org.basex.util.Set;
 
 /**
- * Simple stop words set for fulltext requests.
+ * Simple stop words set for full-text requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

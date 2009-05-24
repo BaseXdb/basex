@@ -1,9 +1,7 @@
 package org.basex.build;
 
 import java.io.IOException;
-
 import javax.xml.transform.sax.SAXSource;
-
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;

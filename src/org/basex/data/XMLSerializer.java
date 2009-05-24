@@ -50,7 +50,7 @@ public final class XMLSerializer extends Serializer {
     if(xml) {
       // [CG] XML/Serialize: allow different encodings (incl. original one)
       out.print("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
-      out.print('\n');
+      out.println();
       openElement(RESULTS);
     }
   }
@@ -104,7 +104,7 @@ public final class XMLSerializer extends Serializer {
       c++;
       for(int i = wl; i < ftt.p;) {
         if(ftt.ftChar(cp(b, i)) && pp < ftd[0].length && c == ftd[0][pp]) {
-          // write fulltext pointer in front of the token
+          // write full-text pointer in front of the token
           // used for coloring the token
           final int[] diff = getDiff(ftd[1][pp] , ial);
           out.write(0x10 + (diff[0] & 0x0F));
@@ -231,7 +231,7 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void indent(final boolean close) throws IOException {
-    out.print('\n');
+    out.println();
     final int s = level() + (close ? 1 : 0);
     for(int l = 1; l < s; l++) out.print(INDENT);
   }

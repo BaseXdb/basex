@@ -29,14 +29,15 @@ public final class FTOr extends FTExpr {
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+    // [SG] why was the ordered flag (re)set here?
     double d = 0;
     for(final FTExpr e : expr) {
-      if(e instanceof FTPos) ((FTPos) e).ordered |= ctx.ftpos.ordered;
+      //if(e instanceof FTSelect) ((FTSelect) e).ordered |=ctx.ftselect.ordered;
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
       if(s != 0) d = ctx.score.or(d, s);
     }
-    ctx.ftpos.ordered = false;
+    //ctx.ftselect.ordered = false;
     return score(d);
   }
 

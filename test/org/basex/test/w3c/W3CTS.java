@@ -236,7 +236,7 @@ public abstract class W3CTS {
       colls.put(cname, dl.finish());
     }
 
-    BaseX.outln("Caching Fulltext Structures...");
+    BaseX.outln("Caching Full-text Structures...");
     for(final int s : nodes("//*:stopwords", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');

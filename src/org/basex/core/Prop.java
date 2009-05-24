@@ -99,7 +99,7 @@ public final class Prop {
   public static int runs = 1;
   /** Flag for whitespace chopping. */
   public static boolean chop = false;
-  /** Flag for creating a fulltext index. */
+  /** Flag for creating a full-text index. */
   public static boolean ftindex = false;
   /** Flag for creating a text index. */
   public static boolean textindex = true;
@@ -120,11 +120,11 @@ public final class Prop {
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
   
-  /** Flag for fulltext stemming. */
+  /** Flag for full-text stemming. */
   public static boolean ftst = false;
-  /** Flag for fulltext case sensitivity. */
+  /** Flag for full-text case sensitivity. */
   public static boolean ftcs = false;
-  /** Flag for fulltext diacritics. */
+  /** Flag for full-text diacritics. */
   public static boolean ftdc = false;
 
   /** Flow for showing the XQuery error code. */

@@ -1,14 +1,12 @@
 package org.basex.server;
 
 import static org.basex.Text.*;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-
 import org.basex.BaseX;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;

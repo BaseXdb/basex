@@ -25,7 +25,7 @@ public final class FTContainsSIndex extends FTContains {
   /**
    * Constructor.
    * @param e contains, select and optional ignore expression
-   * @param fte fulltext expression
+   * @param fte full-text expression
    * @param v visualize ft results
    */
   public FTContainsSIndex(final Expr e, final FTExpr fte, final boolean v) {
@@ -65,7 +65,7 @@ public final class FTContainsSIndex extends FTContains {
     }
     ctx.ftitem = tmp;
 
-    if (vis && Bln.get(d).bool() && ftn != null && ctx.ftpos != null &&
+    if (vis && Bln.get(d).bool() && ftn != null && ctx.ftselect != null &&
         ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftdata != null)
       ctx.ftdata.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
     

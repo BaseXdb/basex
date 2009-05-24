@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
-
 import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -329,7 +328,7 @@ final class MapRenderer {
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
    * @param r rectangle
-   * @param data fulltext to be drawn
+   * @param data full-text to be drawn
    * @param x x-value of the cursor
    * @param y y-value of the cursor
    * @param draw boolean for drawing (used for calculating the higth)
@@ -550,7 +549,7 @@ final class MapRenderer {
   /**
    * Calculate a text using thumbnail visualization.
    * @param r rectangle
-   * @param data fulltext to be drawn
+   * @param data full-text to be drawn
    * @param sen flag for sentence or paragraph
    * @param sw length of a space
    * @param x mouseX
@@ -754,7 +753,7 @@ final class MapRenderer {
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
    * @param r rectangle
-   * @param data fulltext to be drawn
+   * @param data full-text to be drawn
    * @param sen flag for sentence or paragraph
    * @param sw length of a space
    * @param draw boolean for drawing (used for calculating the height)
@@ -834,7 +833,7 @@ final class MapRenderer {
         }
       }
 
-      // color thumbnail because of fulltext hint
+      // color thumbnail because of full-text hint
       if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
         if (lastl > 0) {
           if (draw) 

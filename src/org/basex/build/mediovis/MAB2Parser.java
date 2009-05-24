@@ -2,7 +2,6 @@ package org.basex.build.mediovis;
 
 import static org.basex.build.mediovis.MAB2.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;

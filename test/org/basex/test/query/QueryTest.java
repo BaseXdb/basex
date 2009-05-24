@@ -54,13 +54,11 @@ public final class QueryTest {
     if(ALL) {
       // testing all kinds of combinations 
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
-        for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
-          for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
-            for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
-              for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
-                for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
-                  ok &= test();
-                }
+        for(int b = 0; b < 2; b++) { Prop.ftfuzzy = b == 0;
+          for(int c = 0; c < 2; c++) { Prop.ftst = c == 0;
+            for(int d = 0; d < 2; d++) { Prop.ftdc = d == 0;
+              for(int e = 0; e < 2; e++) { Prop.ftcs = e == 0;
+                ok &= test();
               }
             }
           }
@@ -68,9 +66,8 @@ public final class QueryTest {
       }
     } else {
       // single test
-      Prop.ftindex = true;
+      Prop.ftindex = false;
       Prop.ftfuzzy = true;
-      Prop.ftittr = true;
       Prop.ftst = false;
       Prop.ftdc = false;
       Prop.ftcs = false;
@@ -87,11 +84,7 @@ public final class QueryTest {
    */
   private boolean test() {
     boolean ok = true;
-    
-    for(final AbstractTest test : TESTS) {
-     //if (test == TESTS[2]) 
-       ok &= test(test, test.details());
-    }
+    for(final AbstractTest test : TESTS) ok &= test(test, test.details());
     return ok;
   }
 

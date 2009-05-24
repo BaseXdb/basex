@@ -6,7 +6,7 @@ import org.basex.io.IO;
 import org.basex.util.Map;
 
 /**
- * Simple stemming directory for fulltext requests.
+ * Simple stemming directory for full-text requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

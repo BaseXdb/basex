@@ -5,7 +5,7 @@ import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
 /**
- * This class provides a container for query fulltext positions
+ * This class provides a container for query full-text positions
  * for any visualization.
  * The data is stored as follows:
  * prepos[i][pre, pos0, ..., posn]
@@ -98,14 +98,14 @@ public final class FTPosData {
   }
 
   /**
-   * Gets fulltext data from the container.
+   * Gets full-text data from the container.
    * If no data is stored for a pre value,
    * null is returned.
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
    *
    * @param pre int pre value
-   * @return int[2][n] fulltext data or null
+   * @return int[2][n] full-text data or null
    */
   private int find(final int pre) {
     // binary search
@@ -122,14 +122,14 @@ public final class FTPosData {
   }
 
   /**
-   * Gets fulltext data from the container.
+   * Gets full-text data from the container.
    * If no data is stored for a pre value,
    * null is returned.
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
    *
    * @param pre int pre value
-   * @return int[2][n] fulltext data or null
+   * @return int[2][n] full-text data or null
    */
   public int[][] get(final int pre) {
     final int p = find(pre);
@@ -142,7 +142,7 @@ public final class FTPosData {
    * int[1] : [poi0, ..., poin]
    *
    * @param i pointer on the data
-   * @return int[2][n] fulltext data or null
+   * @return int[2][n] full-text data or null
    */
   private int[][] getFTData(final int i) {
     final int[][] r = new int[2][prepos[i].length - 1];
@@ -235,7 +235,7 @@ public final class FTPosData {
   }
 
   /**
-   * Compares fulltext data for equality.
+   * Compares full-text data for equality.
    * @param ft reference to compare to
    * @return boolean same()
    */

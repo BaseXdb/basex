@@ -66,8 +66,8 @@ public abstract class Serializer {
   /**
    * Serializes a text.
    * @param b text bytes
-   * @param ftd fulltext positions
-   * @param fta fulltext ftand colorinfo
+   * @param ftd full-text positions
+   * @param fta full-text ftand colorinfo
    * @throws IOException exception
    */
   public abstract void text(final byte[] b, final int[][] ftd, 
@@ -245,7 +245,7 @@ public abstract class Serializer {
    * Serializes a node of the specified data reference.
    * @param data data reference
    * @param pre pre value to start from
-   * @param ft fulltext data
+   * @param ft full-text data
    * @return last pre value
    * @throws IOException exception
    */

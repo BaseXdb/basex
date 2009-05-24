@@ -31,11 +31,11 @@ import org.basex.util.Token;
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
   private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
-  /** Fulltext indexing. */
+  /** Full-text indexing. */
   private BaseXCheckBox[] ft = new BaseXCheckBox[4];
-  /** Fulltext labels. */
+  /** Full-text labels. */
   private BaseXLabel[] fl = new BaseXLabel[4];
-  /** Editable fulltext options. */
+  /** Editable full-text options. */
   private boolean ftedit;
   /** Button panel. */
   private BaseXBack buttons;

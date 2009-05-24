@@ -151,7 +151,7 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color COLORDARK = new Color(64, 64, 64);
 
-  /** Fulltext color. */
+  /** Full-text color. */
   public static final Color COLORFT = new Color(0, 224, 0);
   
   /* Colors of full-text hits.

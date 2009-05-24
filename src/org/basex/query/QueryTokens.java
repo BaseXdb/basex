@@ -11,7 +11,7 @@ import static org.basex.util.Token.*;
  */
 public interface QueryTokens {
   
-  // FULLTEXT TOKENS ==========================================================
+  // FULL-TEXT TOKENS =========================================================
   
   /** Parser token. */
   String ALL = "all";

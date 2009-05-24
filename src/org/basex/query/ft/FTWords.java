@@ -71,7 +71,7 @@ public final class FTWords extends FTExpr {
   }
 
   /**
-   * Evaluates the fulltext match.
+   * Evaluates the full-text match.
    * @param ctx query context
    * @return length value, used for scoring
    * @throws QueryException xquery exception
@@ -82,7 +82,7 @@ public final class FTWords extends FTExpr {
 
     if(mode == FTMode.ANY && word != null) {
       // speed up default case...
-      final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, word);
+      final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, word);
       len = word.length;
       final int c = ctx.ftopt.qu.count();
       o += c > 0 ? oc / c : 0;
@@ -93,7 +93,7 @@ public final class FTWords extends FTExpr {
       switch(mode) {
         case ALL:
           while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, it);
+            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, it);
             if(oc == 0) return 0;
             len += it.length;
             o += oc / ctx.ftopt.qu.count();
@@ -102,7 +102,7 @@ public final class FTWords extends FTExpr {
         case ALLWORDS:
           while((it = nextStr(iter)) != null) {
             for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
+              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, txt);
               if(oc == 0) return 0;
               len += txt.length;
               o += oc;
@@ -111,7 +111,7 @@ public final class FTWords extends FTExpr {
           break;
         case ANY:
           while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, it);
+            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, it);
             len += it.length;
             final int c = ctx.ftopt.qu.count();
             o += c > 0 ? oc / c : 0;
@@ -120,7 +120,7 @@ public final class FTWords extends FTExpr {
         case ANYWORD:
           while((it = nextStr(iter)) != null) {
             for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
+              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, txt);
               len += txt.length;
               o += oc;
             }
@@ -132,7 +132,8 @@ public final class FTWords extends FTExpr {
             tb.add(it);
             tb.add(' ');
           }
-          final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, tb.finish());
+          final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect,
+              tb.finish());
           len += tb.size;
           final int c = ctx.ftopt.qu.count();
           o += c > 0 ? oc / c : 0;
@@ -171,7 +172,7 @@ public final class FTWords extends FTExpr {
      * - no FTTimes option is specified and query is a simple String item
      * - case sensitivity, diacritics and stemming flags comply with index
      * - no stop words are specified
-     * - if wildcards are specified, the fulltext index is a trie
+     * - if wildcards are specified, the full-text index is a trie
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ctx.ftopt;

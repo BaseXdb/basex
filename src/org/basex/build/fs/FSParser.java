@@ -120,7 +120,7 @@ public final class FSParser extends Parser {
    * @param path String to file node to parse
    */
   public FSParser(final String path) {
-    // TODO: [AH] pass mountpoint and backing store args to single parser
+    // [AH] pass mountpoint and backing store args to single parser
     this(path, "/mnt/deepfs", "/var/tmp/deepfs");
     singlemode = true;
   }

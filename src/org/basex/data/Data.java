@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.fuse.DeepFS;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -43,7 +42,7 @@ public abstract class Data  {
     /** Tag index.       */ TAG,
     /** Text index.      */ TXT,
     /** Attribute index. */ ATV,
-    /** Fulltext index.  */ FTX,
+    /** Full-text index. */ FTX,
   };
 
   /** Meta data. */
@@ -61,7 +60,7 @@ public abstract class Data  {
   protected Index txtindex;
   /** Attribute value index. */
   protected Index atvindex;
-  /** Fulltext index instance. */
+  /** Full-text index instance. */
   protected Index ftxindex;
 
   /** File system indicator. */

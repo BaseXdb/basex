@@ -54,7 +54,7 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox atvindex;
   /** Word Indexing mode. */
   private final BaseXCheckBox ftxindex;
-  /** Fulltext indexing. */
+  /** Full-text indexing. */
   private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
   /** Buttons. */
   private final BaseXBack buttons;

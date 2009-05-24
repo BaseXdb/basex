@@ -1,10 +1,8 @@
 package org.basex.fuse;
 
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
@@ -148,10 +146,9 @@ public final class DeepFS extends DeepFuse implements DataText {
   /**
    * Constructor for DeepShell and java only test cases (no mount).
    * @param dbname name of initially empty database.
-   * @param fuse property value to be set for Prop.fuse
    */
-  public DeepFS(final String dbname, final boolean fuse) {
-    data = createEmptyDB(dbname, fuse);
+  public DeepFS(final String dbname) {
+    data = createEmptyDB(dbname);
     initNames();
     MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     int tagID = data.tags.index(DEEPFS, null, false);
@@ -167,14 +164,10 @@ public final class DeepFS extends DeepFuse implements DataText {
   /**
    * Creates an empty database.
    * @param n name of database instance
-   * @param fuse property value to be set for Prop.fuse
    * @return data reference to empty database
    */
-  private Data createEmptyDB(final String n, final boolean fuse) {
+  private Data createEmptyDB(final String n) {
     Context ctx = new Context();
-
-    // [AH] temporarily ignoring fuse attribute.. 
-    if(fuse);
 
     try {
       final Parser p = new Parser(IO.get(n)) {

@@ -75,7 +75,7 @@ public class Tokenizer extends IndexToken {
   /**
    * Constructor.
    * @param txt text
-   * @param fto fulltext options
+   * @param fto full-text options
    */
   public Tokenizer(final byte[] txt, final FTOpt fto) {
     this(txt);
@@ -140,7 +140,6 @@ public class Tokenizer extends IndexToken {
     // parse token
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      // [CG] FT/parse wildcard indicators
       if(!ftChar(c) && (!wc || ws(c))) break;
     }
     return true;
@@ -198,7 +197,7 @@ public class Tokenizer extends IndexToken {
   }
 
   /**
-   * Gets fulltext info out of text.
+   * Gets full-text info out of text.
    * int[0]: length of each token
    * int[1]: sentence info, length of each sentence
    * int[2]: paragraph info, length of each paragraph

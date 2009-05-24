@@ -1,7 +1,6 @@
 package org.basex.gui.view;
 
 import java.awt.Window;
-
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.Context;

@@ -1,7 +1,6 @@
 package org.basex.gui.view;
 
 import static org.basex.data.DataText.*;
-
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;

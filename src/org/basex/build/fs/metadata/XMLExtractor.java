@@ -1,7 +1,6 @@
 package org.basex.build.fs.metadata;
 
 import static org.basex.build.fs.FSText.*;
-
 import java.io.File;
 import java.io.IOException;
 import org.basex.build.Builder;

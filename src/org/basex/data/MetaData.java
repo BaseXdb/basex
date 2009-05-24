@@ -45,18 +45,18 @@ public final class MetaData {
   public boolean txtindex = Prop.textindex;
   /** Flag for creating a attribute value index. */
   public boolean atvindex = Prop.attrindex;
-  /** Flag for creating a fulltext index. */
+  /** Flag for creating a full-text index. */
   public boolean ftxindex = Prop.ftindex;
   
   /** Flag for iterator optimized storage within ftindex. */
   public boolean ftittr = Prop.ftittr;
   /** Flag for fuzzy indexing. */
   public boolean ftfz = Prop.ftfuzzy;
-  /** Flag for fulltext stemming. */
+  /** Flag for full-text stemming. */
   public boolean ftst = Prop.ftst;
-  /** Flag for fulltext case sensitivity. */
+  /** Flag for full-text case sensitivity. */
   public boolean ftcs = Prop.ftcs;
-  /** Flag for fulltext diacritics removal. */
+  /** Flag for full-text diacritics removal. */
   public boolean ftdc = Prop.ftdc;
 
   /** Flag for removed index structures. */

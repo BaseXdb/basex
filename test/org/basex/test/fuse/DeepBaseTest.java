@@ -1,11 +1,9 @@
 package org.basex.test.fuse;
 
 import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
@@ -44,7 +42,7 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepFS(DBNAME, false);
+    dbfs = new DeepFS(DBNAME);
     //dbfs.init();
   }
 
