@@ -722,7 +722,6 @@ public class QueryParser extends InputParser {
       check(BY);
       ap = qp;
       do group = groupSpec(group); while(consumeWS2(COMMA));
-      if(group != null) group = Array.add(group, new Grp());
     }
 
     Ord[] order = null;
@@ -837,14 +836,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException in case something went wrong
    */
   private Grp[] groupSpec(final Grp[] group) throws QueryException {
-    final Expr e = check(single(), GRPBY);
-        
+    final Var v = new Var(varName(), false);
     if(consumeWS(COLLATION)) { // [ 59]* XQuery Draft 1.1
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    if(e.e())  return group;
-    final Grp grp = new Grp(e);
+    if(v.e())  return group;
+    final Grp grp = new Grp(v);
     return group == null ? new Grp[] { grp} : Array.add(group, grp);
   }
 

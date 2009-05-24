@@ -113,7 +113,8 @@ public class FLWOR extends Expr {
     if(group != null) {
       group.sq = seq;
       return group.iter(ctx);
-
+//      final Item m =  group.iter(ctx).finish();
+//      order.sq = (SeqIter) m.iter();
     } else {
       order.sq = seq;  
     }

@@ -34,8 +34,8 @@ public class Group extends Expr {
    * Constructor.
    * @param e expressions
    */
-  public Group(final Grp[] e) {
-    grp = e;
+  public Group(final Grp[] g) {
+    grp = g;
   }
   
   @Override
@@ -59,16 +59,16 @@ public class Group extends Expr {
     return result;
   }
   /**
+   * Groups the Items.
    * @param g grouping specifications.
    * @param lastitem se item 
-   * *TODO* mach es funktionierend
+   * 
    */
-  @SuppressWarnings("unused")
   protected void group(final int[] g, final int lastitem) {
     if(groups == null) groups = new HashMap<Integer, int[]>();
     Item next = null;
     for(Grp group : this.grp) {
-      if(group == null) { System.out.println("CONTIUINUES"); continue;}
+      if(group == null) { continue; }
       
       for(int i = 0; i < lastitem; i++) { // check all items matching
                                           //the specified Grouping option
@@ -85,7 +85,6 @@ public class Group extends Expr {
       }
       return;
     }
-
   }
     
   
@@ -106,9 +105,9 @@ public class Group extends Expr {
           for(int i = 0; i < e; i++) group[i] = i;
           group(group, e);
           for(final Grp g : grp) g.finish();
-          
         }
-        final Integer[] hashes =  groups.keySet().toArray(new Integer[groups.size()]);
+        final int s = groups.size();
+        final Integer[] hashes = groups.keySet().toArray(new Integer[s]);
         while(true) {
           if(ir != null) {
             final Item i = ir.next();
@@ -116,7 +115,8 @@ public class Group extends Expr {
             ir = null;
           } else {
             if(++p == hashes.length) return null;
-            final int witness = groups.get( hashes[p])[0];
+            // return the first group member
+            final int witness = groups.get(hashes[p])[0]; 
             ir = sq.item[witness].iter();
           }
         }
@@ -150,17 +150,6 @@ public class Group extends Expr {
     for(int o = 0; o < grp.length; o++) grp[o] = grp[o].remove(v);
     return this;
   }
-
-
-
-
-  /**
-   * Groups the elements specified by grp.
-   */
-  private void g() {
-    System.out.println(this.groups);
-  }
-
 
   @Override
   public void plan(final Serializer ser) throws IOException {

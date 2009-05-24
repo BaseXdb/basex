@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Var extends Expr implements Cloneable {
+public class Var extends Expr implements Cloneable {
   /** Return type. */
   public Return ret = Return.SEQ;
   /** Global flag. */
