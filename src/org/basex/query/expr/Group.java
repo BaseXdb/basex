@@ -59,19 +59,13 @@ public class Group extends Expr {
 
   /**
    * Groups the Items.
-   * @param g grouping specifications.
-   * @param lastitem last item
    */
-  protected void group(final int[] g, final int lastitem) {
-
-    // [MS] temporarily suppressing Eclipse warning
-    if(g == g);
-    
+  protected void group() {
     if(groups == null) groups = new HashMap<Integer, int[]>();
     Item next = null;
     for(Grp group : this.grp) {
       if(group == null) { continue; }
-      
+      final int lastitem = sq.size();
       for(int i = 0; i < lastitem; i++) { // check all items matching
                                           //the specified Grouping option
         next = group.item(i);
@@ -94,18 +88,15 @@ public class Group extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final int e = sq.size();
-      int[] group;
       Iter ir;
       int p = -1;
       
       @Override
       public Item next() throws QueryException {
-        if(group == null) {
+        if(groups == null) {
           // enumerate sort array and sort entries
-          group = new int[e];
-          for(int i = 0; i < e; i++) group[i] = i;
-          group(group, e);
+//          for(int i = 0; i < e; i++) group[i] = i;
+          group();
           for(final Grp g : grp) g.finish();
         }
         final int s = groups.size();

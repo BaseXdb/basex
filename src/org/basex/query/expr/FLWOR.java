@@ -110,16 +110,16 @@ public class FLWOR extends Expr {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
-    if(group != null) {
+    if(group != null) { // perform grouping
       group.sq = seq;
-      return group.iter(ctx);
-//      final Item m =  group.iter(ctx).finish();
-//      order.sq = (SeqIter) m.iter();
+      final Item m =  group.iter(ctx).finish();
+      if(order != null)
+        order.sq = (m.iter().size() > 1) ? (SeqIter) m.iter() : new SeqIter(m);
+      else
+        return m.iter();
     } else {
       order.sq = seq;  
     }
-    
-    
     return order.iter(ctx);
   }
 
