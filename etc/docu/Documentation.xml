@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.0//EN"  "http://www.oasis-open.org/docbook/xml/4.0/docbookx.dtd">
+
+<book>
+	<bookinfo>
+		<title>Documentation of BaseX</title>
+		<author>
+			<firstname>BaseX-Team</firstname>
+			<surname>BaseX-Team</surname>
+			<affiliation>
+				<address>
+					<email>info@basex.org</email>
+				</address>
+			</affiliation>
+		</author>
+		<copyright>
+			<year>2009</year>
+			<holder role="mailto:info@basex.org">BaseX-Team</holder>
+		</copyright>
+		<abstract>
+			<para>This book includes the full documentation of BaseX. BaseX is a native, open-source XML
+			 database and efficient XQuery/XQuery Full-Text processor. It supports very large XML instances
+			 and offers a visual, interactive frontend.</para>
+		</abstract>
+	</bookinfo>
+	<part>
+		<title>Part1</title>
+		<chapter>
+			<title>Part 1, Chapter 1</title>
+			<sect1>
+				<title>Part1, Chapter 1, Section1</title>
+				<para>	Your Text </para>
+			</sect1>
+		</chapter>
+		<chapter>
+			<title>Part 1, Chapter 2</title>
+			<sect1>
+				<title>Part1, Chapter 2, Section 1</title>
+				<para>	Your Text </para>
+			</sect1>
+		</chapter>
+	</part>
+</book>
