@@ -377,33 +377,49 @@ public final class QueryContext extends Progress {
 
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
-    for(int d = 0; d < docs; d++)
+    for(int d = 0; d < docs; d++) {
       if(doc[d].data.meta.file.eq(bxw)) return doc[d];
+    }
 
     // get database instance
     Data data = null;
-    String msg = bxw.toString();
-    try {
-      data = Prop.web ? Open.open(dbname) : Check.check(dbname);
-    } catch(final IOException ex) {
-      if(Prop.web) {
+ 
+    if(Prop.web) {
+      try {
+        data = Open.open(dbname);
+      } catch(final IOException ex) {
         Err.or(INVDOC, dbname);
-      } else {
-        msg = ex.getMessage();
-        if(file != null) {
-          try { data = Check.check(file.merge(bxw).path());
-          } catch(final IOException e) { msg = e.getMessage(); }
-        }
       }
+    } else {
+      data = check(dbname, file == null, coll);
+      if(data == null) data = check(file.merge(bxw).path(), true, coll);
     }
-    if(data == null) Err.or(coll ? NOCOLL : NODOC, msg);
-
+ 
     // add document to array
     if(docs == doc.length) doc = Array.extend(doc);
-    doc[docs] = new DBNode(data, 0);
-    return doc[docs++];
+    return doc[docs++] = new DBNode(data, 0);
   }
 
+  /**
+   * Opens the database or creates a new database instance
+   * for the specified document.
+   * @param path document path
+   * @param err error flag
+   * @param coll collection flag
+   * @return data instance
+   * @throws QueryException query exception
+   */
+  private Data check(final String path, final boolean err, final boolean coll)
+      throws QueryException {
+
+    try {
+      return Check.check(path);
+    } catch(final IOException ex) {
+      if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
+      return null;
+    }
+  }
+  
   /**
    * Adds a collection instance or returns an existing one.
    * @param coll name of the collection to be returned.

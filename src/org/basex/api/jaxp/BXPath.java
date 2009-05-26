@@ -51,30 +51,30 @@ public final class BXPath implements XPath {
   }
 
   public XPathExpression compile(final String expr) {
-    return new XPathExprImpl(expr);
+    return new BXPathExpression(expr);
   }
 
   public Object evaluate(final String expr, final Object item,
       final QName res) throws XPathExpressionException {
 
-    return new XPathExprImpl(expr).evaluate(item, res);
+    return new BXPathExpression(expr).evaluate(item, res);
   }
 
   public String evaluate(final String expr, final Object item)
       throws XPathExpressionException {
 
-    return new XPathExprImpl(expr).evaluate(item);
+    return new BXPathExpression(expr).evaluate(item);
   }
 
   public Object evaluate(final String expr, final InputSource source,
       final QName res) throws XPathExpressionException {
 
-    return new XPathExprImpl(expr).evaluate(source, res);
+    return new BXPathExpression(expr).evaluate(source, res);
   }
 
   public String evaluate(final String expr, final InputSource source)
       throws XPathExpressionException {
 
-    return new XPathExprImpl(expr).evaluate(source);
+    return new BXPathExpression(expr).evaluate(source);
   }
 }

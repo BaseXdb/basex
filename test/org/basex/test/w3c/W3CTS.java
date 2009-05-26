@@ -350,7 +350,7 @@ public abstract class W3CTS {
     final CachedOutput out = new CachedOutput();
 
     final Context context = new Context();
-    
+
     Nodes cont = nodes("*:contextItem", root);
     if(cont.size() != 0) new Check(sources + string(
         data.atom(cont.nodes[0])) + ".xml").execute(context, out);
@@ -377,7 +377,7 @@ public abstract class W3CTS {
           ctx.ftopt.sw.read(IO.get(fn), false);
         }
       }
-      
+
       for(final String s : aux("stemming-dictionary", root)) {
         String fn = stem.get(s);
         if(fn != null) {
@@ -393,7 +393,7 @@ public abstract class W3CTS {
           ctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
         }
       }
-      
+
       for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
         final String f = mods.get(string(data.atom(p))) + ".xq";
@@ -435,7 +435,7 @@ public abstract class W3CTS {
     final Nodes cmpFiles = nodes("*:output-file/@compare", root);
     boolean xml = false;
     boolean frag = false;
-    
+
     StringList result = new StringList();
     for(int o = 0; o < outFiles.size(); o++) {
       final String resFile = string(data.atom(outFiles.nodes[o]));
@@ -497,7 +497,7 @@ public abstract class W3CTS {
       while(++s < result.size) {
         inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
             INSPECT);
-        
+
         if(result.list[s].equals(out.toString())) break;
 
         if(xml || frag) {
@@ -510,7 +510,7 @@ public abstract class W3CTS {
               rin = "<X>" + rin + "</X>";
             }
             final Data rdata = CreateDB.xml(IO.get(rin), null);
-            
+
             final SeqIter si = new SeqIter();
             int pre = doc ? 0 : 2;
             int size = rdata.meta.size;
@@ -606,7 +606,7 @@ public abstract class W3CTS {
    */
   private String norm(final String in) {
     //if(1 == 1) return in;
-    
+
     final StringBuilder sb = new StringBuilder();
     int m = 0;
     boolean s = false;
@@ -755,7 +755,7 @@ public abstract class W3CTS {
   private String[] aux(final String role, final Nodes root) throws Exception {
     return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
-  
+
   /**
    * Returns the resulting query nodes.
    * @param qu query

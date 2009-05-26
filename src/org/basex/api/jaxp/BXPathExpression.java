@@ -24,7 +24,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class XPathExprImpl implements XPathExpression {
+public final class BXPathExpression implements XPathExpression {
   /** Query context. */
   private final Context context = new Context();
   /** Query context. */
@@ -34,7 +34,7 @@ public final class XPathExprImpl implements XPathExpression {
    * Constructor.
    * @param expr query expression
    */
-  public XPathExprImpl(final String expr) {
+  public BXPathExpression(final String expr) {
     xproc = new QueryProcessor(expr, context.current());
   }
 
