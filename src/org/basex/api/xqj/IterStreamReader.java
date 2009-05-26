@@ -9,7 +9,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.BaseX;
-import org.basex.api.jaxp.NSContextImpl;
+import org.basex.api.jaxp.BXNamespaceContext;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -178,7 +178,7 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   public NamespaceContext getNamespaceContext() {
-    return new NSContextImpl(ns);
+    return new BXNamespaceContext(ns);
   }
 
   public int getNamespaceCount() {
