@@ -233,6 +233,7 @@ public abstract class Nod extends Item {
 
       @Override
       public Nod next() throws QueryException {
+        // [CG] check results for incoming attribute nodes
         if(!more) {
           it = new NodIter();
           Nod n = Nod.this;
@@ -240,8 +241,7 @@ public abstract class Nod extends Item {
           while(p != null) {
             final NodeIter i = p.child();
             Nod c;
-            while((c = i.next()) != null && !c.is(n))
-              ;
+            while((c = i.next()) != null && !c.is(n));
             while((c = i.next()) != null) {
               it.add(c.finish());
               addDesc(c.child(), it);
@@ -277,8 +277,7 @@ public abstract class Nod extends Item {
           } else {
             it = r.child();
             Nod n;
-            while((n = it.next()) != null && !n.is(Nod.this))
-              ;
+            while((n = it.next()) != null && !n.is(Nod.this));
           }
           more = true;
         }
@@ -322,15 +321,17 @@ public abstract class Nod extends Item {
           Nod n = Nod.this;
           Nod p = n.parent();
           while(p != null) {
-            final NodIter tmp = new NodIter();
-            final NodeIter i = p.child();
-            Nod c;
-            while((c = i.next()) != null && !c.is(n)) {
-              tmp.add(c.finish());
-              addDesc(c.child(), tmp);
+            if(n.type != Type.ATT) {
+              final NodIter tmp = new NodIter();
+              final NodeIter i = p.child();
+              Nod c;
+              while((c = i.next()) != null && !c.is(n)) {
+                tmp.add(c.finish());
+                addDesc(c.child(), tmp);
+              }
+              for(int t = tmp.size - 1; t >= 0; t--)
+                it.add(tmp.list[t]);
             }
-            for(int t = tmp.size - 1; t >= 0; t--)
-              it.add(tmp.list[t]);
             n = p;
             p = p.parent();
           }

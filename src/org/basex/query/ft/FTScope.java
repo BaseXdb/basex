@@ -8,7 +8,7 @@ import org.basex.query.QueryTokens;
 import org.basex.util.BoolList;
 
 /**
- * FTDiff expression.
+ * FTScope expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

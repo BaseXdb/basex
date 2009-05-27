@@ -10,6 +10,7 @@ import org.basex.data.Data;
 import org.basex.ft.Tokenizer;
 import org.basex.ft.Levenshtein;
 import org.basex.io.DataAccess;
+import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -149,7 +150,7 @@ public final class FTFuzzy extends Index {
   /**
    * Determines the pointer on a token.
    * @param tok token looking for.
-   * @return int pointer
+   * @return int pointer or -1 if token was not found
    */
   private int token(final byte[] tok) {
     final int tl = tok.length;
@@ -232,11 +233,24 @@ public final class FTFuzzy extends Index {
     if(s == 0 || p < 0) return IndexArrayIterator.EMP;
 
     if(!d.meta.ftittr) {
-      final int[][] dt = new int[2][s];
+      final int[] r1 = new int[s];
+      final int[] r2 = new int[s];
       da.cursor(p);
-      for(int i = 0; i < s; i++) dt[0][i] = da.readNum();
-      for(int i = 0; i < s; i++) dt[1][i] = da.readNum();
-      return new IndexArrayIterator(dt, true);
+      for(int i = 0; i < s; i++) r1[i] = da.readNum();
+      for(int i = 0; i < s; i++) r2[i] = da.readNum();
+
+      final IntArrayList ia = new IntArrayList(s);
+      int i = 0, j;
+      int[] t;
+      while(i < s) {
+        j = i;
+        while(i < s && r1[j] == r1[i]) i++;
+        t = new int[i - j + 1];
+        t[0] = r1[j];
+        System.arraycopy(r2, j, t, 1, i - j);
+        ia.add(t);
+      }
+      return new IndexArrayIterator(ia.list, ia.size);
     }
 
     return new IndexArrayIterator(s) {
@@ -305,7 +319,7 @@ public final class FTFuzzy extends Index {
       do r = tp[i++]; while(r == -1);
       while(p < r) {
         if (ls.similar(ti.readBytes(p, p + s), tok)) {
-          it = IndexArrayIterator.merge(data(pointer(p, s),
+          it = IndexArrayIterator.union(data(pointer(p, s),
               size(p, s), dat, data), it);
         }
         p += s + 9;

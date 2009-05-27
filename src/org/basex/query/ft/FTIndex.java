@@ -42,39 +42,22 @@ public final class FTIndex extends FTExpr {
       public final FTOpt fto = ctx.ftopt;
 
       @Override
-      public FTNodeItem next() { 
-        if(iat == null && !evalIter()) {
-          return new FTNodeItem();
+      public FTNodeItem next() {
+        if(iat == null) {
+          final Tokenizer ft = new Tokenizer(tok, fto);
+          ft.lp = true;
+          ft.init();
+          int w = 0;
+          while(ft.more()) {
+            final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
+            iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
+            w++;
+          }
+          iat.setToken(new Tokenizer[] { ft });
+          iat.setTokenNum(++ctx.ftcount);
         }
         return new FTNodeItem(iat.more() ? iat.nextFTNode() :
           new FTNode(), data);
-      }
-
-      /**
-       * Evaluates the index access.
-       * @return true if result was found
-       */
-      private boolean evalIter() {
-        final Tokenizer ft = new Tokenizer(tok, fto);
-        ft.lp = true;
-        while(ft.more()) {
-          if(data.nrIDs(ft) == 0) return false;
-          ctx.checkStop();
-        }
-        ft.init();
-        int w = 0;
-        while(ft.more()) {
-          final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
-          iat = w == 0 ? it : IndexArrayIterator.and(iat, it, w);
-          w++;
-        }
-        
-        if(iat != null && iat.size() > 0) {
-          iat.setToken(new Tokenizer[]{ft});
-          iat.setTokenNum(++ctx.ftcount);
-          return true;
-        }
-        return false;
       }
     };
   }

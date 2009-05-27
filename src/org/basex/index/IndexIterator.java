@@ -11,19 +11,19 @@ public interface IndexIterator {
    * Empty iterator.
    */
   IndexIterator EMPTY = new IndexIterator() {
+    public boolean more() { return false; };
     public int next() { return 0; };
-    public int size() { return 0; }; 
   };
+  
+  /**
+   * Returns true if more results are found.
+   * @return size
+   */
+  boolean more();
 
   /**
    * Returns the next result.
    * @return result
    */
   int next();
-  
-  /**
-   * Returns the number of index results.
-   * @return size
-   */
-  int size();
 }

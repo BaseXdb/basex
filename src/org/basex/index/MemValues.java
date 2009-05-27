@@ -40,8 +40,11 @@ public final class MemValues extends Index {
   }
 
   @Override
-  public int nrIDs(final IndexToken ind) {
-    return ids(ind).size();
+  public int nrIDs(final IndexToken it) {
+    final IndexIterator ii = ids(it);
+    int c = 0;
+    while(ii.more()) c++;
+    return c;
   }
 
   @Override
@@ -87,8 +90,8 @@ public final class MemValues extends Index {
 
       return new IndexIterator() {
         int p = -1;
-        public int next() { return ++p < len[i] ? ids[i][p] : null; }
-        public int size() { return len[i]; }
+        public boolean more() { return ++p < len[i]; }
+        public int next() { return ids[i][p]; }
       };
     }
 

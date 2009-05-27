@@ -1,36 +1,41 @@
 package org.basex.index;
 
 import org.basex.ft.Tokenizer;
-import org.basex.util.IntArrayList;
 
 /**
  * This interface provides methods for returning index results.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class IndexArrayIterator implements IndexIterator {
-  /** Number of results. */
-  private int size;
   /** Counter. */
   private int d = -1;
   /** Pre and Pos values. */
   private int[][] ftdata;
   /** Each token in the query has a number. */
-  protected int toknum;
+  int toknum;
   /** Token from query. */
-  protected Tokenizer[] tok;
+  Tokenizer[] tok;
+  /** Number of results. */
+  int size;
 
   /** Empty iterator. */
   public static final IndexArrayIterator EMP = new IndexArrayIterator(0) {
     @Override
-    public boolean more() { return false; };
+    public boolean more() {
+      return false;
+    };
+
     @Override
-    public int next() { return 0; };
+    public int next() {
+      return 0;
+    };
+
     @Override
-    public int size() { return 0; };
-    @Override
-    public FTNode nextFTNode() { return new FTNode(); };
+    public FTNode nextFTNode() {
+      return new FTNode();
+    };
   };
 
   /**
@@ -43,16 +48,13 @@ public class IndexArrayIterator implements IndexIterator {
 
   /**
    * Constructor.
+   * [SG] only needed for non-iterative approach
    * @param res pre array
-   * @param c Flag for data converting
+   * @param rs result size
    */
-  public IndexArrayIterator(final int[][] res, final boolean c) {
-    final int s = res[0].length;
-    if (c) convertData(res[0], res[1], s);
-    else {
-      ftdata = res;
-      size = s;
-    }
+  public IndexArrayIterator(final int[][] res, final int rs) {
+    ftdata = res;
+    size = rs;
   }
 
   /**
@@ -78,13 +80,8 @@ public class IndexArrayIterator implements IndexIterator {
     return ftdata[d][0];
   }
 
-  public int size() {
-    return size;
-  }
-
   /**
-   * Sets the unique token number.
-   * Used for visualization.
+   * Sets the unique token number. Used for visualization.
    * @param tn number of tokens
    */
   public void setTokenNum(final int tn) {
@@ -100,71 +97,45 @@ public class IndexArrayIterator implements IndexIterator {
   }
 
   /**
-   * Converts the ftdata in the style:.
-   * pre1, pos0, ..., posn, pre2, ....
-   *
-   * @param r1 pre-values
-   * @param r2 pos-values
-   * @param siz number of pre/pos values
-   */
-  private void convertData(final int[] r1, final int[] r2, final int siz) {
-    final IntArrayList ia = new IntArrayList(siz);
-    int i = 0, s;
-    int[] t;
-    while (i < siz) {
-      s = i;
-      while (i < siz && r1[s] == r1[i]) i++;
-      t = new int[i - s + 1];
-      t[0] = r1[s];
-      System.arraycopy(r2, s, t, 1, i - s);
-      ia.add(t);
-    }
-    ftdata = ia.list;
-    size = ia.size;
-  }
-
-  /**
    * Merges two index array iterators.
    * @param iai1 first index array iterator to merge
    * @param iai2 second index array iterator to merge
    * @return IndexArrayIterator
    */
-  public static IndexArrayIterator merge(final IndexArrayIterator iai1,
+  public static IndexArrayIterator union(final IndexArrayIterator iai1,
       final IndexArrayIterator iai2) {
-    return IndexArrayIterator.merge(iai1, iai2, 0);
+    return IndexArrayIterator.union(iai1, iai2, 0);
   }
 
   /**
    * Merges two index array iterators.
-   * @param iai1 first index array iterator to merge
-   * @param iai2 second index array iterator to merge
+   * @param i1 first index array iterator to merge
+   * @param i2 second index array iterator to merge
    * @param w distance between two pos values
    * @return IndexArrayIterator
    */
-  private static IndexArrayIterator merge(final IndexArrayIterator iai1,
-      final IndexArrayIterator iai2, final int w) {
-    if (iai1 == EMP) return iai2;
-    if (iai2 == EMP) return iai1;
+  private static IndexArrayIterator union(final IndexArrayIterator i1,
+      final IndexArrayIterator i2, final int w) {
+    if(i1 == EMP) return i2;
+    if(i2 == EMP) return i1;
 
     return new IndexArrayIterator(1) {
-      FTNode[] n = new FTNode[2];
+      final FTNode[] n = new FTNode[2];
       FTNode r;
       int c = -1;
 
       @Override
       public boolean more() {
         r = null;
-        n[0] = c == 0 || c == -1 ? iai1.more()
-            ? iai1.nextFTNode() : null : n[0];
-        n[1] = c == 1 || c == -1 ? iai2.more()
-            ? iai2.nextFTNode() : null : n[1];
-        if (n[0] != null) {
-          if (n[1] != null) {
+        n[0] = c == 0 || c == -1 ? i1.more() ? i1.nextFTNode() : null : n[0];
+        n[1] = c == 1 || c == -1 ? i2.more() ? i2.nextFTNode() : null : n[1];
+        if(n[0] != null) {
+          if(n[1] != null) {
             final int dis = n[0].getPre() - n[1].getPre();
-            if (dis < 0) {
+            if(dis < 0) {
               r = n[0];
               c = 0;
-            } else if (dis > 0) {
+            } else if(dis > 0) {
               r = n[1];
               c = 1;
             } else {
@@ -177,7 +148,7 @@ public class IndexArrayIterator implements IndexIterator {
             c = 0;
             r = n[0];
           }
-        } else if (n[1] != null) {
+        } else if(n[1] != null) {
           c = 1;
           r = n[1];
         }
@@ -196,29 +167,30 @@ public class IndexArrayIterator implements IndexIterator {
 
       @Override
       public void setTokenNum(final int t) {
-        iai1.setTokenNum(t);
-        iai2.setTokenNum(t);
+        i1.setTokenNum(t);
+        i2.setTokenNum(t);
       }
 
       @Override
       public void setToken(final Tokenizer[] token) {
-        iai1.setToken(token);
-        iai2.setToken(token);
+        i1.setToken(token);
+        i2.setToken(token);
       }
     };
   }
 
   /**
    * Merges two index array iterators.
-   * @param iai1 first index array iterator to merge
-   * @param iai2 second index array iterator to merge
+   * @param i1 first index array iterator to merge
+   * @param i2 second index array iterator to merge
    * @param w distance between two pos values
    * @return IndexArrayIterator
    */
-  public static IndexArrayIterator and(final IndexArrayIterator iai1,
-      final IndexArrayIterator iai2, final int w) {
-    if (iai1 == EMP) return iai2;
-    if (iai2 == EMP) return iai1;
+  public static IndexArrayIterator intersect(final IndexArrayIterator i1,
+      final IndexArrayIterator i2, final int w) {
+
+    if(i1 == EMP) return i2;
+    if(i2 == EMP) return i1;
 
     return new IndexArrayIterator(1) {
       FTNode[] n = new FTNode[2];
@@ -228,13 +200,10 @@ public class IndexArrayIterator implements IndexIterator {
       @Override
       public boolean more() {
         while(true) {
-          n[0] = c == 0 || c == -1 ? iai1.more()
-              ? iai1.nextFTNode() : null : n[0];
-          n[1] = c == 1 || c == -1 ? iai2.more()
-              ? iai2.nextFTNode() : null : n[1];
-          
-          if (n[0] == null || n[1] == null) return false;
-  
+          n[0] = c == 0 || c == -1 ? i1.more() ? i1.nextFTNode() : null : n[0];
+          n[1] = c == 1 || c == -1 ? i2.more() ? i2.nextFTNode() : null : n[1];
+          if(n[0] == null || n[1] == null) return false;
+
           final int dis = n[0].getPre() - n[1].getPre();
           if(dis < 0) {
             c = 0;
@@ -263,14 +232,14 @@ public class IndexArrayIterator implements IndexIterator {
 
       @Override
       public void setTokenNum(final int t) {
-        iai1.setTokenNum(t);
-        iai2.setTokenNum(t);
+        i1.setTokenNum(t);
+        i2.setTokenNum(t);
       }
 
       @Override
       public void setToken(final Tokenizer[] token) {
-        iai1.setToken(token);
-        iai2.setToken(token);
+        i1.setToken(token);
+        i2.setToken(token);
       }
     };
   }

@@ -32,19 +32,19 @@ final class FTTokenMap extends Set {
   /**
    * Returns the value for the specified key.
    * @param id key to be found
-   * @return size or -1 if nothing was found
+   * @return sized
    */
   int getSize(final int id) {
-    return id != 0 ? sizes[id] : -1;
+    return sizes[id];
   }
 
   /**
    * Returns the pointer for the specified key.
    * @param id key to be found
-   * @return pointer or -1 if nothing was found
+   * @return pointer
    */
   long getPointer(final int id) {
-    return id != 0 ? pointers[id] : -1;
+    return pointers[id];
   }
   
   @Override

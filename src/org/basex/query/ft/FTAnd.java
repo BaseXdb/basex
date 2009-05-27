@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -67,27 +68,26 @@ public final class FTAnd extends FTExpr {
   public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
       throws QueryException {
 
-    if (pex.length == 1 && nex.length == 0)
-      expr[pex[0]].indexEquivalent(ctx, ic);
+    if(pex.length == 1 && nex.length == 0) {
+      expr[pex[0]] = expr[pex[0]].indexEquivalent(ctx, ic);
+    }
 
-    for (int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; i++) {
       expr[i] = expr[i].indexEquivalent(ctx, ic);
     }
-    
-    if (pex.length == 0) {
+
+    if(pex.length == 0) {
       // !A FTAnd !B = !(a ftor b)
-      for (int i = 0; i < nex.length; i++) {
+      for(int i = 0; i < nex.length; i++) {
         expr[nex[i]] = expr[nex[i]].expr[0];
       }
-      final FTUnion fta = new FTUnion(nex, false, expr);
-      final FTNotIndex ftn = new FTNotIndex(fta);
-      return ftn; 
+      return new FTNotIndex(new FTUnion(nex, false, expr));
     }
     return new FTIntersection(pex, nex, expr);
   }
 
   @Override
   public String toString() {
-    return toString(" ftand ");
+    return toString(" " + FTAND + " ");
   }
 }

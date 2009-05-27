@@ -484,22 +484,18 @@ public class AxisPath extends Path {
       final Step s1 = step[l];
       final Step s0 = step[l - 1];
 
-      if(s1.axis == SELF) {
+      if(s1.axis == SELF || s1.axis == DESCORSELF) {
         if(s1.test == NODE) continue;
-
         if(s0.axis == ATTR) warning(s1);
         if(s0.test.type == Type.TXT && s1.test.type != Type.TXT) warning(s1);
 
+        if(s1.axis == DESCORSELF) continue;
         final QNm n1 = s1.test.name;
         final QNm n0 = s0.test.name;
         if(n0 == null || n1 == null) continue;
         if(!n1.eq(n0)) warning(s1);
-
-      } else if(s1.axis == DESCORSELF) {
-        if(s1.test == NODE) continue;
+      } else if(s1.axis == FOLLSIBL || s1.axis == PRECSIBL) {
         if(s0.axis == ATTR) warning(s1);
-
-        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT) warning(s1);
       } else if(s1.axis == DESC || s1.axis == CHILD) {
         if(s0.axis == ATTR || s0.test.type == Type.TXT) warning(s1);
       }

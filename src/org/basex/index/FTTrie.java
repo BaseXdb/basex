@@ -73,7 +73,7 @@ public final class FTTrie extends Index {
 
   @Override
   public int nrIDs(final IndexToken ind) {
-    // skip count of queries which stretch over multiple index entries
+    // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
     final byte[] tok = fto.get();
@@ -280,7 +280,7 @@ public final class FTTrie extends Index {
     if(ending == null || ending.length == 0) {
       // save data current node
       if (ne[ne.length - 1] > 0) {
-        idata = IndexArrayIterator.merge(
+        idata = IndexArrayIterator.union(
             FTFuzzy.data(tdid, ne[ne.length - 1], inD, data), idata);
       }
       if (hasNextNodes(ne)) {
@@ -324,7 +324,7 @@ public final class FTTrie extends Index {
       return;
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
-      idata = IndexArrayIterator.merge(
+      idata = IndexArrayIterator.union(
           FTFuzzy.data(tdid, ne[ne.length - 1], inD, data), idata);
 
       countSkippedChars = 0;
@@ -464,7 +464,7 @@ public final class FTTrie extends Index {
         System.arraycopy(vsn, posw + 2, sc, 1, sc.length - 1);
       }
       // attach both result
-      d = IndexArrayIterator.merge(wc(0, sc, posw, false), d);
+      d = IndexArrayIterator.union(wc(0, sc, posw, false), d);
       return d;
     }
     
@@ -498,7 +498,7 @@ public final class FTTrie extends Index {
       // delete data
       idata = IndexArrayIterator.EMP;
       wc(resultNode, aw, false, counter[0], 0);
-      return IndexArrayIterator.merge(d, idata);
+      return IndexArrayIterator.union(d, idata);
     }
     
     if(wildcard == '+') {
@@ -531,7 +531,7 @@ public final class FTTrie extends Index {
 
         for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
           nvsn[l] = (byte) rne[t + 1];
-          tmpres = IndexArrayIterator.merge(wc(nvsn, l + 1), tmpres);
+          tmpres = IndexArrayIterator.union(wc(nvsn, l + 1), tmpres);
         }
       }
       return tmpres;
@@ -547,7 +547,7 @@ public final class FTTrie extends Index {
       // . wildcards left
       final IndexArrayIterator resultData = get(0, vsn);
       // save nodeValues for recursive method call
-      if(resultData.size() != 0 && recCall) {
+      if(resultData.size != 0 && recCall) {
         valuesFound = new byte[] {(byte) rne[counter[0] + 1]};
       }
       return resultData;
@@ -566,7 +566,7 @@ public final class FTTrie extends Index {
       if(!recCall) {
         for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
           aw[0] = (byte) rne[t + 1];
-          tmpNode = IndexArrayIterator.merge(get(rne[t], aw), tmpNode);
+          tmpNode = IndexArrayIterator.union(get(rne[t], aw), tmpNode);
         }
         return tmpNode;
       }
@@ -577,7 +577,7 @@ public final class FTTrie extends Index {
         // replace first letter
         aw[0] = (byte) rne[t + 1];
         valuesFound[t - rne[0] - 1] = (byte) rne[t + 1];
-        tmpNode = IndexArrayIterator.merge(get(rne[t], aw), tmpNode);
+        tmpNode = IndexArrayIterator.union(get(rne[t], aw), tmpNode);
       }
     }
     return IndexArrayIterator.EMP;
@@ -672,7 +672,7 @@ public final class FTTrie extends Index {
           ld = FTFuzzy.data(cdid, cne[cne.length - 1], inD, data);
           if (hasNextNodes(cne)) {
             for (int t = cne[0] + 1; t < cne.length - 1; t += 2) {
-              ld = IndexArrayIterator.merge(fuzzy(cne[t], null, -1,
+              ld = IndexArrayIterator.union(fuzzy(cne[t], null, -1,
                   new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c), ld);
             }
           }
@@ -685,7 +685,7 @@ public final class FTTrie extends Index {
           // delete char
           b = new byte[vsn.length - 1];
           System.arraycopy(vsn, 0, b, 0, i);
-          ld = IndexArrayIterator.merge(
+          ld = IndexArrayIterator.union(
               fuzzy(cn, cne, cdid, b, d + 1, p, r, c), ld);
         }
 
@@ -704,7 +704,7 @@ public final class FTTrie extends Index {
               tdid = did;
               b = new byte[vsn.length];
               System.arraycopy(vsn, 0, b, 0, vsn.length);
-              ld = IndexArrayIterator.merge(
+              ld = IndexArrayIterator.union(
                   fuzzy(cne[k], ne, tdid, b, d, p, r, c), ld);
             }
 
@@ -717,20 +717,20 @@ public final class FTTrie extends Index {
               b = new byte[vsn.length + 1];
               b[0] = (byte) cne[k + 1];
               System.arraycopy(vsn, 0, b, 1, vsn.length);
-              ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+              ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                   b, d, p + 1, r, c), ld);
 
               if (vsn.length > 0) {
                 // delete char
                 b = new byte[vsn.length - 1];
                 System.arraycopy(vsn, 1, b, 0, b.length);
-                ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+                ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                     b, d + 1, p, r, c), ld);
                 // replace char
                 b = new byte[vsn.length];
                 System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
                 b[0] = (byte) ne[1];
-                ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+                ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                     b, d, p, r + 1, c), ld);
               }
             }
@@ -756,14 +756,14 @@ public final class FTTrie extends Index {
           System.arraycopy(vsn, 0, b, 0, vsn.length);
 
           b[i] = (byte) cne[i + 1];
-          ld = IndexArrayIterator.merge(fuzzy(cn, cne, cdid,
+          ld = IndexArrayIterator.union(fuzzy(cn, cne, cdid,
               b, d, p, r + 1, c), ld);
           if (vsn.length > 1) {
             // delete char
             b = new byte[vsn.length - 1];
             System.arraycopy(vsn, 0, b, 0, i);
             System.arraycopy(vsn, i + 1, b, i, vsn.length - i - 1);
-            ld = IndexArrayIterator.merge(fuzzy(cn, cne, cdid,
+            ld = IndexArrayIterator.union(fuzzy(cn, cne, cdid,
                 b, d + 1, p, r, c), ld);
           }
         }
@@ -783,7 +783,7 @@ public final class FTTrie extends Index {
             tdid = did;
             b = new byte[vsn.length];
             System.arraycopy(vsn, 0, b, 0, vsn.length);
-            ld = IndexArrayIterator.merge(
+            ld = IndexArrayIterator.union(
                 fuzzy(cne[k], ne, tdid, b, d, p, r, c), ld);
           }
           if (c > d + p + r) {
@@ -795,20 +795,20 @@ public final class FTTrie extends Index {
             b = new byte[vsn.length + 1];
             b[0] = (byte) ne[1];
             System.arraycopy(vsn, 0, b, 1, vsn.length);
-            ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+            ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                 b, d, p + 1, r, c), ld);
 
             if (vsn.length > 0) {
               // delete char
               b = new byte[vsn.length - 1];
               System.arraycopy(vsn, 1, b, 0, b.length);
-              ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+              ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                   b, d + 1, p, r, c), ld);
                 // replace
               b = new byte[vsn.length];
               System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
                 b[0] = (byte) ne[1];
-                ld = IndexArrayIterator.merge(fuzzy(cne[k], ne, tdid,
+                ld = IndexArrayIterator.union(fuzzy(cne[k], ne, tdid,
                     b, d, p, r + 1, c), ld);
             }
           }

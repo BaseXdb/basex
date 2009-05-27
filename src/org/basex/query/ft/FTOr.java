@@ -1,5 +1,7 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -29,21 +31,13 @@ public final class FTOr extends FTExpr {
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
-    // [SG] why was the ordered flag (re)set here?
     double d = 0;
     for(final FTExpr e : expr) {
-      //if(e instanceof FTSelect) ((FTSelect) e).ordered |=ctx.ftselect.ordered;
       final FTNodeItem it = e.iter(ctx).next();
       final double s = it.score();
       if(s != 0) d = ctx.score.or(d, s);
     }
-    //ctx.ftselect.ordered = false;
     return score(d);
-  }
-
-  @Override
-  public String toString() {
-    return toString(" ftor ");
   }
   
   @Override
@@ -87,27 +81,24 @@ public final class FTOr extends FTExpr {
   
   @Override
   public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
+      throws QueryException {
 
     for(int i = 0; i < expr.length; i++) {
       expr[i] = expr[i].indexEquivalent(ctx, ic);
     }
-    
+
     if(pex.length == 0) {
       // !A FTOR !B = !(a ftand b)
       for(int i = 0; i < nex.length; i++) {
         expr[nex[i]] = expr[nex[i]].expr[0];
       }
-      final FTIntersection fta = new FTIntersection(pex, nex, expr);
-      final FTNotIndex ftn = new FTNotIndex(fta);
-      return ftn; 
+      return new FTNotIndex(new FTIntersection(pex, nex, expr));
     }
 
     if(pex.length == 0) return new FTUnion(nex, true, expr);
-    else if(nex.length == 0) return new FTUnion(pex, true, expr);
-    else if(pex.length == 1 && nex.length == 0) return expr[pex[0]]; 
-    else return new FTUnion(gen(), true, expr);
-
+    if(nex.length == 0) return new FTUnion(pex, true, expr);
+    if(pex.length == 1 && nex.length == 0) return expr[pex[0]];
+    return new FTUnion(gen(), true, expr);
   }
   
   /**
@@ -118,5 +109,10 @@ public final class FTOr extends FTExpr {
     final int[] r = new int[expr.length];
     for(int i = 0; i < expr.length; i++) r[i] = i;
     return r;
+  }
+
+  @Override
+  public String toString() {
+    return toString(" " + FTOR + " ");
   }
 }

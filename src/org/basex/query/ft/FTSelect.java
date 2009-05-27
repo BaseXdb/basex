@@ -27,7 +27,6 @@ public class FTSelect extends FTExpr {
   IntList[] pos = new IntList[1];
   /** Number of position lists. */
   int size;
-
   /** Filter array. */
   private final FTFilter[] filter;
 

@@ -77,23 +77,29 @@ public final class Values extends Index {
       int s = idxl.readNum(pos);
       /** Last index position. */
       long p = idxl.pos();
+      /** Current position. */
+      int c = -1;
       /** Last pre value. */
-      int v = 0;
+      int v;
 
+      public boolean more() {
+        return ++c < s;
+      }
+      
       public int next() {
         v += idxl.readNum(p);
         p = idxl.pos();
         return v;
       }
-      public int size() {
-        return s;
-      }
     };
   }
 
   @Override
-  public int nrIDs(final IndexToken tok) {
-    return ids(tok).size();
+  public int nrIDs(final IndexToken it) {
+    final IndexIterator ii = ids(it);
+    int c = 0;
+    while(ii.more()) c++;
+    return c;
   }
 
   /**
@@ -137,8 +143,8 @@ public final class Values extends Index {
 
     return new IndexIterator() {
       int p = -1;
-      public int next() { return ++p < ids.size ? ids.list[p] : 0; }
-      public int size() { return ids.size; }
+      public boolean more() { return ++p < ids.size; }
+      public int next() { return ids.list[p]; }
     };
   }
   
