@@ -6,7 +6,6 @@
 	<bookinfo>
 		<title>Documentation of BaseX</title>
 		<author>
-			<firstname>BaseX-Team</firstname>
 			<surname>BaseX-Team</surname>
 			<affiliation>
 				<address>
@@ -14,31 +13,91 @@
 				</address>
 			</affiliation>
 		</author>
+		<pubdate>June 2009</pubdate>
 		<copyright>
 			<year>2009</year>
-			<holder role="mailto:info@basex.org">BaseX-Team</holder>
+			<holder role="mailto:info@basex.org"></holder>
 		</copyright>
 		<abstract>
-			<para>This book includes the full documentation of BaseX. BaseX is a native, open-source XML
+			<para>This is  the full documentation of BaseX. BaseX is a native, open-source XML
 			 database and efficient XQuery/XQuery Full-Text processor. It supports very large XML instances
 			 and offers a visual, interactive frontend.</para>
 		</abstract>
 	</bookinfo>
-	<part>
-		<title>Part1</title>
-		<chapter>
-			<title>Part 1, Chapter 1</title>
-			<sect1>
-				<title>Part1, Chapter 1, Section1</title>
-				<para>	Your Text </para>
-			</sect1>
-		</chapter>
-		<chapter>
-			<title>Part 1, Chapter 2</title>
-			<sect1>
-				<title>Part1, Chapter 2, Section 1</title>
-				<para>	Your Text </para>
-			</sect1>
-		</chapter>
-	</part>
+	<chapter>
+		<title>Quick Start</title>
+		<sect1>
+			<title>Introduction</title>
+			<para>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text processor. 
+			 It supports very large XML instances and offers a visual, interactive frontend.  BaseX is written in Java and 
+			 freely available for download. It is developed by the Database and Information Systems Group at the University of Konstanz. </para>
+		</sect1>
+		<sect1>
+			<title>Getting Started</title>
+			<para>BaseX comes as an executable .jar (Java Archive), which automatically determines the correct system settings
+			 (i.e. paths and environment variables) for BaseX. </para>
+		</sect1>
+		<sect1>
+			<title>Starting with BaseX GUI</title>
+			<para></para>
+		</sect1>
+		<sect1>
+			<title>Starting with BaseX Console</title>
+			<para></para>
+		</sect1>
+		<sect1>
+			<title>Using BaseX as Server</title>
+			<para></para>
+		</sect1>
+		<sect1>
+			<title>Starting BaseX as a service</title>
+			<para></para>
+		</sect1>
+	</chapter>
+	<chapter>
+		<title>Working with the BaseX Console</title>
+		<sect1>
+			<title>Launching BaseX in console mode</title>
+			<para>	Your Text </para>
+		</sect1>
+		<sect1>
+			<title>Description of the Console Features</title>
+			<para>	Your Text </para>
+		</sect1>
+	</chapter>
+	<chapter>
+		<title>Working with the BaseX GUI</title>
+		<sect1>
+			<title>Launching BaseX in GUI mode</title>
+			<para>	Your Text </para>
+		</sect1>
+		<sect1>
+			<title>Description of all the Views in the GUI</title>
+			<para>	Your Text </para>
+		</sect1>
+	</chapter>
+	<chapter>
+		<title>Description of BaseX-Features</title>
+		<sect1>
+			<title>XQuery Implementation</title>
+			<para>	Your Text </para>
+		</sect1>
+	</chapter>
+	<chapter>
+		<title>Developer's Guide</title>
+		<sect1>
+			<title>Programming with BaseX API</title>
+			<para>	Your Text </para>
+		</sect1>
+		<sect1>
+			<title>Programming with XML:DB API</title>
+			<para>	Your Text </para>
+		</sect1>
+		<sect1>
+			<title>Programming with XQuery API</title>
+			<para>	Your Text </para>
+		</sect1>
+	</chapter>
+
+
 </book>
