@@ -10,7 +10,6 @@ import org.basex.data.Data;
 import org.basex.ft.Tokenizer;
 import org.basex.ft.Levenshtein;
 import org.basex.io.DataAccess;
-import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -137,7 +136,7 @@ public final class FTFuzzy extends Index {
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(tok) :
-      data(cache.getPointer(id), cache.getSize(id), dat, data);
+      data(cache.getPointer(id), cache.getSize(id), dat);
   }
 
   @Override
@@ -225,42 +224,19 @@ public final class FTFuzzy extends Index {
    * @param s number of pre/pos values
    * @param p pointer on data
    * @param da DataAccess for reading ftdata
-   * @param d data reference
    * @return int[][] data
    */
   static IndexArrayIterator data(final long p, final int s,
-      final DataAccess da, final Data d) {
+      final DataAccess da) {
     if(s == 0 || p < 0) return IndexArrayIterator.EMP;
 
-    if(!d.meta.ftittr) {
-      final int[] r1 = new int[s];
-      final int[] r2 = new int[s];
-      da.cursor(p);
-      for(int i = 0; i < s; i++) r1[i] = da.readNum();
-      for(int i = 0; i < s; i++) r2[i] = da.readNum();
-
-      final IntArrayList ia = new IntArrayList(s);
-      int i = 0, j;
-      int[] t;
-      while(i < s) {
-        j = i;
-        while(i < s && r1[j] == r1[i]) i++;
-        t = new int[i - j + 1];
-        t[0] = r1[j];
-        System.arraycopy(r2, j, t, 1, i - j);
-        ia.add(t);
-      }
-      return new IndexArrayIterator(ia.list, ia.size);
-    }
-
-    return new IndexArrayIterator(s) {
+    return new IndexArrayIterator() {
       boolean f = true;
       int lpre = -1;
       int c = 0;
       long pos = p;
       FTNode n = new FTNode();
 
-      @Override
       public boolean more() {
         if (c == s) return false;
         final IntList il = new IntList();
@@ -283,13 +259,12 @@ public final class FTFuzzy extends Index {
       }
 
       @Override
-      public FTNode nextFTNode() {
+      public FTNode node() {
         n.genPointer(toknum);
         if(tok != null) n.setToken(tok);
         return n;
       }
 
-      @Override
       public int next() {
         return n.getPre();
       }
@@ -305,8 +280,8 @@ public final class FTFuzzy extends Index {
    * @return int[][] data
    */
   private IndexIterator fuzzy(final byte[] tok, final int k) {
-    IndexArrayIterator it = new IndexArrayIterator(0);
-
+    IndexArrayIterator it = IndexArrayIterator.EMP;
+    
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;
@@ -320,7 +295,7 @@ public final class FTFuzzy extends Index {
       while(p < r) {
         if (ls.similar(ti.readBytes(p, p + s), tok)) {
           it = IndexArrayIterator.union(data(pointer(p, s),
-              size(p, s), dat, data), it);
+              size(p, s), dat), it);
         }
         p += s + 9;
       }
@@ -336,6 +311,6 @@ public final class FTFuzzy extends Index {
   private IndexArrayIterator get(final byte[] tok) {
     final int p = token(tok);
     return p > -1 ? data(pointer(p, tok.length),
-        size(p, tok.length), dat, data) : IndexArrayIterator.EMP;
+        size(p, tok.length), dat) : IndexArrayIterator.EMP;
   }
 }

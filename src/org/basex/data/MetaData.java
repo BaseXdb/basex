@@ -48,8 +48,7 @@ public final class MetaData {
   /** Flag for creating a full-text index. */
   public boolean ftxindex = Prop.ftindex;
   
-  /** Flag for iterator optimized storage within ftindex. */
-  public boolean ftittr = Prop.ftittr;
+
   /** Flag for fuzzy indexing. */
   public boolean ftfz = Prop.ftfuzzy;
   /** Flag for full-text stemming. */

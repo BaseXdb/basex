@@ -115,8 +115,6 @@ public final class Prop {
   public static int indexocc = 10;
 
   /** Flag for iterator optimized storage within ftindex. */
-  // [SG] to be removed.. ;)
-  public static boolean ftittr = true;
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
   

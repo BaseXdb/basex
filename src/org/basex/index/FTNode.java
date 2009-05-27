@@ -130,7 +130,7 @@ public final class FTNode {
    * @param w distance between the pos values
    * @return boolean
    */
-  public boolean merge(final FTNode n, final int w) {
+  public boolean union(final FTNode n, final int w) {
     if (not != n.not) return false;
 
     boolean mp = morePos();

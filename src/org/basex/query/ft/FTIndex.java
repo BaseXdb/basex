@@ -56,7 +56,7 @@ public final class FTIndex extends FTExpr {
           iat.setToken(new Tokenizer[] { ft });
           iat.setTokenNum(++ctx.ftcount);
         }
-        return new FTNodeItem(iat.more() ? iat.nextFTNode() :
+        return new FTNodeItem(iat.more() ? iat.node() :
           new FTNode(), data);
       }
     };

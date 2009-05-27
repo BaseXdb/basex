@@ -112,7 +112,7 @@ public final class FTTrie extends Index {
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(0, tok) :
-      FTFuzzy.data(cache.getPointer(id), cache.getSize(id), inD, data);
+      FTFuzzy.data(cache.getPointer(id), cache.getSize(id), inD);
   }
 
   @Override
@@ -135,7 +135,7 @@ public final class FTTrie extends Index {
 
     final int[] ne = nodeId(id, searchNode);
     return ne == null ? IndexArrayIterator.EMP :
-      FTFuzzy.data(did, ne[ne.length - 1], inD, data);
+      FTFuzzy.data(did, ne[ne.length - 1], inD);
   }
 
   /**
@@ -281,7 +281,7 @@ public final class FTTrie extends Index {
       // save data current node
       if (ne[ne.length - 1] > 0) {
         idata = IndexArrayIterator.union(
-            FTFuzzy.data(tdid, ne[ne.length - 1], inD, data), idata);
+            FTFuzzy.data(tdid, ne[ne.length - 1], inD), idata);
       }
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
@@ -325,7 +325,7 @@ public final class FTTrie extends Index {
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       idata = IndexArrayIterator.union(
-          FTFuzzy.data(tdid, ne[ne.length - 1], inD, data), idata);
+          FTFuzzy.data(tdid, ne[ne.length - 1], inD), idata);
 
       countSkippedChars = 0;
 
@@ -669,7 +669,7 @@ public final class FTTrie extends Index {
           if (c < d + p + r) return IndexArrayIterator.EMP;
           
           IndexArrayIterator ld = IndexArrayIterator.EMP;
-          ld = FTFuzzy.data(cdid, cne[cne.length - 1], inD, data);
+          ld = FTFuzzy.data(cdid, cne[cne.length - 1], inD);
           if (hasNextNodes(cne)) {
             for (int t = cne[0] + 1; t < cne.length - 1; t += 2) {
               ld = IndexArrayIterator.union(fuzzy(cne[t], null, -1,

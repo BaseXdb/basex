@@ -46,7 +46,7 @@ public final class FTNodeItem extends DBNode {
    * @param w number of words
    */
   public void merge(final QueryContext ctx, final FTNodeItem i1, final int w) {
-    ftn.merge(i1.ftn, w);
+    ftn.union(i1.ftn, w);
     score = ctx.score.and(score, i1.score);
   }
 

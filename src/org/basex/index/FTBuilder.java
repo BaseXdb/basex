@@ -63,7 +63,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     final String db = data.meta.dbname;
     final DataOutput outPre = new DataOutput(db, DATAFTX + 'b');
     if(index.bl) {
-      bulkLoad(outPre, data.meta.ftittr);
+      bulkLoad(outPre, true);
     }
 
     if(Prop.debug) {
@@ -155,23 +155,16 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     if (!index.bl) {
       // write data
       final int il = index.pre.size;
-      if (data.meta.ftittr) {
-        int lastpre = -1;
-        byte[] lp = new byte[]{};
-        for (int i = 0; i < il; i++) {
-          for (final int j = 0; j < pre[i].length; i++) {
-            if (lastpre != pre[i][j]) {
-              lastpre = pre[i][j];
-              lp = Num.simpleNum(pre[i][j]);
-            }
-            outPre.write(lp);
-            outPre.write(Num.simpleNum(pos[i][j]));
+      int lastpre = -1;
+      byte[] lp = new byte[]{};
+      for (int i = 0; i < il; i++) {
+        for (final int j = 0; j < pre[i].length; i++) {
+          if (lastpre != pre[i][j]) {
+            lastpre = pre[i][j];
+            lp = Num.simpleNum(pre[i][j]);
           }
-        }
-      } else {
-        for (int i = 0; i < il; i++) {
-          writeData(outPre, pre[i]);
-          writeData(outPre, pos[i]);
+          outPre.write(lp);
+          outPre.write(Num.simpleNum(pos[i][j]));
         }
       }
     }
@@ -236,18 +229,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       }
       index.insertSorted(tok, ds, cpre);
     }
-  }
-
-  /**
-   * Writes data to output stream.
-   *
-   * @param out DataOutput  stream for the data
-   * @param d data to write
-   * @throws IOException I/O exception
-   */
-  private void writeData(final DataOutput out, final int[] d)
-    throws IOException {
-    for(final byte b : Num.create(d)) out.write(b);
   }
 
   /**
