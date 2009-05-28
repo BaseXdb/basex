@@ -232,7 +232,7 @@ public final class DialogImportFS  extends Dialog {
       GUIProp.guifsimportpath = path.getText();
     }
     if(!cAll && cNam) {
-      final String p = path.getText().trim();;
+      final String p = path.getText().trim();
       final IO file = IO.get(p);
       cAll = p.length() != 0 && file.exists();
     }

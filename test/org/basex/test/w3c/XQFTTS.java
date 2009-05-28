@@ -1,5 +1,7 @@
 package org.basex.test.w3c;
 
+import org.basex.core.Prop;
+
 /**
  * XQuery Full-text Test Suite Wrapper.
  *
@@ -21,5 +23,6 @@ public final class XQFTTS extends W3CTS {
    */
   public XQFTTS() {
     super("XQFTTS");
+    Prop.ftindex = true;
   }
 }

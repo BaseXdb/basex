@@ -1,12 +1,10 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
-import org.basex.query.iter.FTNodeIter;
 import org.basex.util.IntList;
 
 /**
@@ -30,14 +28,15 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+    FTNodeItem it = null; 
     double d = 0;
     for(final FTExpr e : expr) {
-      final FTNodeItem it = e.iter(ctx).next();
-      final double s = it.score();
-      if(s != 0) d = ctx.score.or(d, s);
+      it = e.atomic(ctx);
+      d = ctx.score.or(it.score(), d);
     }
-    return score(d);
+    it.score(d);
+    return it;
   }
   
   @Override

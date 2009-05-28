@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class FTTrie extends Index {
+public final class FTTrie extends FTIndex {
   // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
   // l = length of the token t1, ..., tl
   // u = number of next nodes n1, ..., nu
@@ -28,10 +28,6 @@ public final class FTTrie extends Index {
   // s = size of pre values saved at pointer p
   // [byte, byte[l], byte, int, byte, ..., int, long]
 
-  /** Cache for number of hits and data reference per token. */
-  private final FTTokenMap cache = new FTTokenMap();
-  /** Values file. */
-  private final Data data;
   /** Trie structure on disk. */
   private final DataAccess inN;
   // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
@@ -46,10 +42,10 @@ public final class FTTrie extends Index {
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
-   * @param db name of the database
    * @throws IOException IO Exception
    */
-  public FTTrie(final Data d, final String db) throws IOException {
+  public FTTrie(final Data d) throws IOException {
+    final String db = d.meta.dbname;
     inN = new DataAccess(db, DATAFTX + 'a');
     inD = new DataAccess(db, DATAFTX + 'b');
     inS = new DataAccess(db, DATAFTX + 'c');
@@ -76,6 +72,7 @@ public final class FTTrie extends Index {
     // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
+
     final byte[] tok = fto.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
@@ -112,7 +109,7 @@ public final class FTTrie extends Index {
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(0, tok) :
-      FTFuzzy.data(cache.getPointer(id), cache.getSize(id), inD);
+      data(cache.getPointer(id), cache.getSize(id), inD);
   }
 
   @Override
@@ -135,7 +132,7 @@ public final class FTTrie extends Index {
 
     final int[] ne = nodeId(id, searchNode);
     return ne == null ? IndexArrayIterator.EMP :
-      FTFuzzy.data(did, ne[ne.length - 1], inD);
+      data(did, ne[ne.length - 1], inD);
   }
 
   /**
@@ -281,7 +278,7 @@ public final class FTTrie extends Index {
       // save data current node
       if (ne[ne.length - 1] > 0) {
         idata = IndexArrayIterator.union(
-            FTFuzzy.data(tdid, ne[ne.length - 1], inD), idata);
+            data(tdid, ne[ne.length - 1], inD), idata);
       }
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
@@ -325,7 +322,7 @@ public final class FTTrie extends Index {
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       idata = IndexArrayIterator.union(
-          FTFuzzy.data(tdid, ne[ne.length - 1], inD), idata);
+          data(tdid, ne[ne.length - 1], inD), idata);
 
       countSkippedChars = 0;
 
@@ -584,9 +581,8 @@ public final class FTTrie extends Index {
   }
 
   /**
-   * Traverse trie and return found node for searchValue; returns last
-   * touched node.
-   *
+   * Traverses the trie and returns a found node for searchValue;
+   * returns the last touched node.
    * @param cn int
    * @param sn int
    * @return id int last touched node
@@ -633,9 +629,8 @@ public final class FTTrie extends Index {
   }
 
   /**
-   * Traverse trie and return found node for searchValue; returns data
-   * from node or null.
-   *
+   * Traverses the trie and returns the found node for searchValue;
+   * returns data from node or null.
    * @param cn int current node id
    * @param crne byte[] current node entry (of cn)
    * @param crdid long current pointer on data
@@ -669,7 +664,7 @@ public final class FTTrie extends Index {
           if (c < d + p + r) return IndexArrayIterator.EMP;
           
           IndexArrayIterator ld = IndexArrayIterator.EMP;
-          ld = FTFuzzy.data(cdid, cne[cne.length - 1], inD);
+          ld = data(cdid, cne[cne.length - 1], inD);
           if (hasNextNodes(cne)) {
             for (int t = cne[0] + 1; t < cne.length - 1; t += 2) {
               ld = IndexArrayIterator.union(fuzzy(cne[t], null, -1,

@@ -6,7 +6,6 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fuse.FSUtils;
 import org.basex.util.Token;
 
 /**
@@ -52,9 +51,9 @@ public final class Delete extends Process {
         // delete filesystem node, but before! BaseX does (invalid pre)
         if(Prop.fuse) {
           final String bpath = Token.string(data.fs.path(pre, true));
-          File f = new File(bpath);
+          final File f = new File(bpath);
           if (f.isDirectory())  
-            FSUtils.deleteDir(f);
+            deleteDir(f);
           else if (f.isFile())
             f.delete();
           data.fs.nativeUnlink(Token.string(data.fs.path(pre, false)));
@@ -71,4 +70,18 @@ public final class Delete extends Process {
     }
     return Prop.info ? info(DELETEINFO, nodes.size(), perf.getTimer()) : true;
   }
+
+  /**
+   * Deletes a non-empty directory.
+   * @param dir to be deleted.
+   * @return boolean true for success, false for failure.
+   */
+  public static boolean deleteDir(final File dir) {
+    if(dir.isDirectory()) {
+      final String[] children = dir.list();
+      for(int i = 0; i < children.length; i++)
+        if(!deleteDir(new File(dir, children[i]))) return false;
+    }
+    return dir.delete();
+  } 
 }

@@ -15,7 +15,7 @@ import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
-import org.basex.index.FTBuilder;
+import org.basex.index.FTTrieBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
@@ -95,7 +95,7 @@ public final class CreateDB extends ACreate {
       if(data.meta.atvindex) data.setIndex(Type.ATV,
         new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
-        new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
+        new FTFuzzyBuilder().build(data) : new FTTrieBuilder().build(data));
       return data;
     } catch(final IOException ex) {
       try {

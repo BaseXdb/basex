@@ -4,14 +4,18 @@ import org.basex.core.Prop;
 import org.basex.util.Token;
 
 /**
- * This class assembles methods for fuzzy token matching.
+ * Levenshtein implementation, based on
+ * "Levenshtein [1965], Binary codes capable of correcting spurious insertions
+ * and deletions of ones".
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Levenshtein {
+  /** Maximum token size. */
+  private static final int MAX = 50;
   /** Static matrix for Levenshtein distance. */
-  private int[][] m = new int[52][52];
+  private int[][] m = new int[MAX + 2][MAX + 2];
 
   /**
    * Constructor.
@@ -35,7 +39,7 @@ public final class Levenshtein {
     final int sl = sub.length;
 
     // use exact search for too short and too long values
-    if(sl < 4 || tl > 50 || sl > 50) return eq(token, tl, sub);
+    if(sl < 4 || tl > MAX || sl > MAX) return eq(token, tl, sub);
 
     // skip different tokens with too different lengths
     int k = Prop.lserr;

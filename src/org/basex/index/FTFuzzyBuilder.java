@@ -74,7 +74,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
       Performance.gc(3);
       BaseX.debug("- Written: % (%)", p, Performance.getMem());
     }
-    return new FTFuzzy(data, data.meta.dbname);
+    return new FTFuzzy(data);
   }
 
   /**
@@ -140,21 +140,17 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
         outy.writeInt(ds);
 
         // write compressed pre and pos arrays
-        byte[] vpre = tre.pre[p];
-        byte[] vpos = tre.pos[p];
+        final byte[] vpre = tre.pre[p];
+        final byte[] vpos = tre.pos[p];
         int lpre = 4;
         int lpos = 4;
         // ftdata is stored here, with pre1, pos1, ..., preu, posu
         while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
           int z = 0;
-          while (z < Num.len(vpre, lpre)) {
-            outz.write(vpre[lpre + z++]);
-          }
+          while(z < Num.len(vpre, lpre)) outz.write(vpre[lpre + z++]);
           lpre += z;
           z = 0;
-          while (z < Num.len(vpos, lpos)) {
-            outz.write(vpos[lpos + z++]);
-          }
+          while(z < Num.len(vpos, lpos)) outz.write(vpos[lpos + z++]);
           lpos += z;
         }
 

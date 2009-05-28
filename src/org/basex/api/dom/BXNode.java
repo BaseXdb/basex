@@ -275,7 +275,7 @@ public abstract class BXNode implements Node {
   }
 
   /**
-   * Returns a node builder with the specified nodes. 
+   * Returns a node builder with the specified nodes.
    * @param it node iterator
    * @return node builder
    */

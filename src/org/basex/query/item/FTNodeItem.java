@@ -16,10 +16,11 @@ public final class FTNodeItem extends DBNode {
 
   /**
    * Constructor.
+   * @param s scoring
    */
-  public FTNodeItem() {
+  public FTNodeItem(final double s) {
     ftn = new FTNode();
-    score = -1;
+    score = s;
   }
 
   /**
@@ -28,30 +29,30 @@ public final class FTNodeItem extends DBNode {
    * @param dat Data reference
    */
   public FTNodeItem(final FTNode ftnode, final Data dat) {
-    super(dat, ftnode.getPre());
+    super(dat, ftnode.pre());
     ftn = ftnode;
     score = -1;
   }
 
-  @Override 
+  @Override
   public double score() {
-    if(score == -1) score = ftn.size > 0 && ftn.getToken() != null ? 1 : 0;
+    if(score == -1) score = !ftn.empty() && ftn.getToken() != null ? 1 : 0;
     return score;
   }
 
   /**
-   * Merge current item with an other FTNodeItem.
+   * Merges the current item with an other node.
    * @param ctx query context
-   * @param i1 other FTNodeItem
+   * @param i1 second node
    * @param w number of words
    */
-  public void merge(final QueryContext ctx, final FTNodeItem i1, final int w) {
+  public void union(final QueryContext ctx, final FTNodeItem i1, final int w) {
     ftn.union(i1.ftn, w);
-    score = ctx.score.and(score, i1.score);
+    score = ctx.score.or(score, i1.score);
   }
 
   @Override
   public String toString() {
-    return ftn.toString();
+    return super.toString() + " (" + ftn + ")";
   }
 }

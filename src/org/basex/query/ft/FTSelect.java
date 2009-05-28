@@ -6,8 +6,7 @@ import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTNodeItem;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -50,19 +49,22 @@ public class FTSelect extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
     final FTSelect tmp = ctx.ftselect;
     ctx.ftselect = this;
     init(ctx.ftitem);
-    final Item it = expr[0].iter(ctx).next();
+    final FTNodeItem it = expr[0].atomic(ctx);
     ctx.ftselect = tmp;
 
-    final double s = it.score();
-    if(s == 0 || !filter(ctx)) return score(0);
+    double s = it.score();
+    if(s != 0 && !filter(ctx)) s = 0;
 
-    if(tmp.expr[0] != null) tmp.addPos(pos, size, term);
-    ctx.ftd = pos;
-    return score(s);
+    if(s != 0) {
+      if(tmp.expr[0] != null) tmp.addPos(pos, size, term);
+      ctx.ftd = pos;
+    }
+    it.score(s);
+    return it;
   }
 
   /**
@@ -74,6 +76,14 @@ public class FTSelect extends FTExpr {
   boolean filter(final QueryContext ctx) throws QueryException {
     for(final FTFilter f : filter) if(!f.filter(ctx)) return false;
     return true;
+  }
+
+  /**
+   * Returns true if no position filters are specified.
+   * @return result of check
+   */
+  boolean standard() {
+    return filter.length == 0;
   }
 
   /**
@@ -89,16 +99,6 @@ public class FTSelect extends FTExpr {
     pos = iln;
     size += ils;
     for (int i = 0; i < tl.size; i++) term.add(tl.list[i]);
-  }
-
-  /**
-   * Sets the position values and the number of tokens.
-   * @param il IntList[] with position values
-   * @param ils int number of tokens in query
-   */
-  void setPos(final IntList[] il, final int ils) {
-    pos = il;
-    size = ils;
   }
 
   /**
@@ -143,7 +143,7 @@ public class FTSelect extends FTExpr {
       final IndexContext ic) throws QueryException {
 
     // [SG] are all position filters supported by the index?
-    return expr[0].indexAccessible(ctx, ic);
+    return expr[0].indexAccessible(ctx, ic) && filter.length == 0;
   }
 
   @Override

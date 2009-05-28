@@ -21,24 +21,23 @@ import org.basex.util.TokenBuilder;
 public final class Values extends Index {
   /** Number of hash entries. */
   int size;
-  /** Values file. */
-  final Data data;
   /** ID references. */
   final DataAccess idxr;
   /** ID lists. */
   final DataAccess idxl;
   /** Value type (texts/attributes). */
   final boolean text;
-
+  /** Values file. */
+  final Data data;
+  
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
-   * @param db name of the database
    * @param txt value type (texts/attributes)
    * @throws IOException IO Exception
    */
-  public Values(final Data d, final String db, final boolean txt)
-      throws IOException {
+  public Values(final Data d, final boolean txt) throws IOException {
+    final String db = d.meta.dbname;
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
@@ -82,10 +81,12 @@ public final class Values extends Index {
       /** Last pre value. */
       int v;
 
+      @Override
       public boolean more() {
         return ++c < s;
       }
       
+      @Override
       public int next() {
         v += idxl.readNum(p);
         p = idxl.pos();
@@ -96,10 +97,7 @@ public final class Values extends Index {
 
   @Override
   public int nrIDs(final IndexToken it) {
-    final IndexIterator ii = ids(it);
-    int c = 0;
-    while(ii.more()) c++;
-    return c;
+    return ids(it).size();
   }
 
   /**
@@ -143,7 +141,9 @@ public final class Values extends Index {
 
     return new IndexIterator() {
       int p = -1;
+      @Override
       public boolean more() { return ++p < ids.size; }
+      @Override
       public int next() { return ids.list[p]; }
     };
   }

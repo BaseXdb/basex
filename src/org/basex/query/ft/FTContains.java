@@ -72,7 +72,7 @@ public class FTContains extends Expr {
 
     while((i = iter.next()) != null) {
       ft.init(i.str());
-      final double d2 = ftexpr.iter(ctx).next().score();
+      final double d2 = ftexpr.atomic(ctx).score();
       d = ctx.score.and(d, d2);
 
       if(ctx.ftdata != null && ctx.ftd != null && d2 > 0 && i instanceof DBNode)

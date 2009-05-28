@@ -307,6 +307,10 @@ public final class FTTest extends AbstractTest {
         "ftand 'wel' ftand 'een' ftand 's']" },
       { "FTAndOr 7", nodes(),
         "//* [text() ftcontains 'databases' ftand 'db']" },
+      { "FTAndOr 8", nodes(14),
+        "//* [text() ftcontains 'hola' ftor 'hello']" },
+      { "FTAndOr 9", nodes(),
+        "//* [text() ftcontains 'hola' ftand 'hello']" },
 
       { "FTStemming 1", nodes(7, 9, 11),
         "//w [text() ftcontains 'xml database' with stemming]" },
@@ -494,6 +498,8 @@ public final class FTTest extends AbstractTest {
         "'a b' ftcontains 'a b' not in 'a'" },
       { "FTMildNot 6", bool(true),
         "'a b a' ftcontains 'a' not in 'a b'" },
+      { "FTMildNot 7", bool(false),
+        "'a b a b' ftcontains 'a' not in 'a b'" },
       
       { "FTUnaryNot 1", nodes(14, 37),
         "//w [text() ftcontains ftnot 'xml']" },

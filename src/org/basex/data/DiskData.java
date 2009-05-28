@@ -101,10 +101,10 @@ public final class DiskData extends Data {
       values = new DataAccess(db, DATAATV);
   
       if(index) {
-        if(meta.txtindex) txtindex = new Values(this, db, true);
-        if(meta.atvindex) atvindex = new Values(this, db, false);
-        if(meta.ftxindex) ftxindex =
-          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db);
+        if(meta.txtindex) txtindex = new Values(this, true);
+        if(meta.atvindex) atvindex = new Values(this, false);
+        if(meta.ftxindex) ftxindex = meta.ftfz ?
+            new FTFuzzy(this) : new FTTrie(this);
       }
       initNames();
     } catch(final IOException ex) {

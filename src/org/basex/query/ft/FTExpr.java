@@ -38,8 +38,24 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public abstract FTNodeIter iter(final QueryContext ctx) throws QueryException;
+  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+    final FTNodeItem it = atomic(ctx);
+    return new FTNodeIter() {
+      private boolean more;
+      @Override
+      public FTNodeItem next() { return (more ^= true) ? it : null; }
+      @Override
+      public int size() { return 1; }
+      @Override
+      public Item get(final long i) { return i == 0 ? it : null; }
+    };
+  }
 
+  @Override
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+    return iter(ctx).next();
+  }
+    
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     for(final FTExpr e : expr) if(e.uses(u, ctx)) return true;
@@ -69,29 +85,6 @@ public abstract class FTExpr extends Expr {
       throws QueryException {
     BaseX.notexpected();
     return null;
-  }
-  
-  /**
-   * Returns a scoring iterator.
-   * @param s scoring
-   * @return iterator
-   */
-  protected final FTNodeIter score(final double s) {
-    return new FTNodeIter() {
-      private boolean more;
-      @Override
-      public FTNodeItem next() { return (more ^= true) ? item() : null; }
-      @Override
-      public int size() { return 1; }
-      @Override
-      public Item get(final long i) { return i == 0 ? item() : null; }
-
-      private FTNodeItem item() {
-        final FTNodeItem ftn = new FTNodeItem();
-        ftn.score(s);
-        return ftn;
-      }
-    };
   }
 
   /**

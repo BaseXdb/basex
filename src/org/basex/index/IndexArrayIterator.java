@@ -8,7 +8,7 @@ import org.basex.ft.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class IndexArrayIterator implements IndexIterator {
+public abstract class IndexArrayIterator extends IndexIterator {
   /** Each token in the query has a number. */
   int toknum;
   /** Token from query. */
@@ -18,7 +18,9 @@ public abstract class IndexArrayIterator implements IndexIterator {
 
   /** Empty iterator. */
   static final IndexArrayIterator EMP = new IndexArrayIterator() {
+    @Override
     public boolean more() { return false; };
+    @Override
     public int next() { return 0; };
     @Override
     public FTNode node() { return null; };
@@ -40,7 +42,7 @@ public abstract class IndexArrayIterator implements IndexIterator {
 
   /**
    * Sets the tokenizer.
-   * @param token FTTokenizer
+   * @param token tokenizer
    */
   public void setToken(final Tokenizer[] token) {
     tok = token;
@@ -52,18 +54,19 @@ public abstract class IndexArrayIterator implements IndexIterator {
    * @param i2 second index array iterator to merge
    * @return IndexArrayIterator
    */
-  public static IndexArrayIterator union(final IndexArrayIterator i1,
+  static IndexArrayIterator union(final IndexArrayIterator i1,
       final IndexArrayIterator i2) {
 
     return new IndexArrayIterator() {
       FTNode r, s;
       int c;
 
+      @Override
       public boolean more() {
         if(c <= 0) r = i1.more() ? i1.node() : null;
         if(c >= 0) s = i2.more() ? i2.node() : null;
         if(r != null && s != null) {
-          c = r.getPre() - s.getPre();
+          c = r.pre() - s.pre();
           if(c == 0) {
             r.union(s, 0);
             r.reset();
@@ -79,8 +82,9 @@ public abstract class IndexArrayIterator implements IndexIterator {
         return c <= 0 ? r : s;
       }
 
+      @Override
       public int next() {
-        return r.getPre();
+        return r.pre();
       }
 
       @Override
@@ -110,6 +114,7 @@ public abstract class IndexArrayIterator implements IndexIterator {
     return new IndexArrayIterator() {
       FTNode r, s;
 
+      @Override
       public boolean more() {
         int c = 0;
         while(true) {
@@ -117,7 +122,7 @@ public abstract class IndexArrayIterator implements IndexIterator {
           if(c >= 0) s = i2.more() ? i2.node() : null;
           if(r == null || s == null) return false;
 
-          c = r.getPre() - s.getPre();
+          c = r.pre() - s.pre();
           if(c == 0 && r.union(s, w)) {
             r.reset();
             return true;
@@ -130,8 +135,9 @@ public abstract class IndexArrayIterator implements IndexIterator {
         return r;
       }
 
+      @Override
       public int next() {
-        return r.getPre();
+        return r.pre();
       }
 
       @Override

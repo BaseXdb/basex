@@ -17,7 +17,8 @@ import org.basex.util.TokenList;
  */
 public class Tokenizer extends IndexToken {
   /** Stemming instance. */
-  private Stemming stem = new Stemming();
+  private final Stemming stem = new Stemming();
+
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stemming flag. */
@@ -43,9 +44,9 @@ public class Tokenizer extends IndexToken {
   public int para;
   /** Current token. */
   public int pos = -1;
-  
+
   /** Text. */
-  public byte[] text = Token.EMPTY;
+  public byte[] text;
   /** Current character position. */
   public int p;
   /** Backup last punctuation mark. */
@@ -60,7 +61,7 @@ public class Tokenizer extends IndexToken {
    * Empty constructor.
    */
   public Tokenizer() {
-    super(Type.FTX);
+    this(Token.EMPTY);
   }
 
   /**
@@ -68,7 +69,7 @@ public class Tokenizer extends IndexToken {
    * @param txt text
    */
   public Tokenizer(final byte[] txt) {
-    this();
+    super(Type.FTX);
     text = txt;
   }
 
@@ -151,9 +152,25 @@ public class Tokenizer extends IndexToken {
    * @return result of check
    */
   public boolean ftChar(final int ch) {
-    return ch >= '0' && (letterOrDigit(ch) || Character.isLetterOrDigit(ch));
+    if(ch < '0') return false;
+    if(ch < 128) return LOD[ch - '0'];
+    return Character.isLetterOrDigit(ch);
   }
-  
+
+  /** Letter-or-digit table for ASCII codes larger than '0'. */
+  private static final boolean[] LOD = {
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  false, false, false, false, false, false,
+    false, true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  false, false, false, false, false,
+    false, true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  false, false, false, false, false
+  };
+
   @Override
   public byte[] get() {
     return get(orig());
@@ -167,14 +184,13 @@ public class Tokenizer extends IndexToken {
   public byte[] get(final byte[] tok) {
     byte[] n = tok;
     final boolean a = ascii(n);
-    //if(wc) n = wc(n);
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
     if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
-  
+
   /**
    * Returns the original token.
    * @return original token
@@ -182,7 +198,7 @@ public class Tokenizer extends IndexToken {
   public byte[] orig() {
     return substring(text, s, p);
   }
-  
+
   /**
    * Counts the number of tokens.
    * @return number of tokens
@@ -197,12 +213,74 @@ public class Tokenizer extends IndexToken {
   }
 
   /**
-   * Gets full-text info out of text.
+   * Removes diacritics from the specified token.
+   * Note that this method does only support the first 256 unicode characters.
+   * @param t token to be converted
+   * @param a ascii flag
+   * @return converted token
+   */
+  private static byte[] dia(final byte[] t, final boolean a) {
+    if(a) return t;
+    final String s = utf8(t, 0, t.length);
+    final StringBuilder sb = new StringBuilder();
+    final int jl = s.length();
+    for(int j = 0; j < jl; j++) {
+      final char c = s.charAt(j);
+      sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
+    }
+    return token(sb.toString());
+  }
+
+  /**
+   * Converts the specified token to upper case.
+   * @param t token to be converted
+   * @param a ascii flag
+   * @return the converted token
+   */
+  private static byte[] upper(final byte[] t, final boolean a) {
+    if(!a) return token(string(t).toUpperCase());
+    for(int i = 0; i < t.length; i++) t[i] = (byte) uc(t[i]);
+    return t;
+  }
+
+  /**
+   * Converts the specified token to lower case.
+   * @param t token to be converted
+   * @param a ascii flag
+   * @return the converted token
+   */
+  private static byte[] lower(final byte[] t, final boolean a) {
+    if(!a) return token(string(t).toLowerCase());
+    for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
+    return t;
+  }
+
+  /**
+   * Returns the text size.
+   * @return size
+   */
+  public int size() {
+    return text.length;
+  }
+
+  /**
+   * Converts the tokens to a TokenList.
+   * @return TokenList
+   */
+  public TokenList getTokenList() {
+    final TokenList tl = new TokenList();
+    init();
+    while(more()) tl.add(get());
+    return tl;
+  }
+
+  /**
+   * Gets full-text info out of text; needed for visualizations.
    * int[0]: length of each token
    * int[1]: sentence info, length of each sentence
    * int[2]: paragraph info, length of each paragraph
    * int[3]: each token as int[]
-   * int[4]: punctuation marks of each sentence  
+   * int[4]: punctuation marks of each sentence
    * @return int arrays
    */
   public int[][] getInfo() {
@@ -247,90 +325,6 @@ public class Tokenizer extends IndexToken {
 
     return new int[][] { il[0].finish(), il[1].finish(), il[2].finish(),
         il[3].finish(), il[4].finish()};
-  }
-  
-  /**
-   * Removes diacritics from the specified token.
-   * Note that this method does only support the first 256 unicode characters.
-   * @param t token to be converted
-   * @param ascii ascii flag
-   * @return converted token
-   */
-  private static byte[] dia(final byte[] t, final boolean ascii) {
-    if(ascii) return t;
-    final String s = utf8(t, 0, t.length);
-    final StringBuilder sb = new StringBuilder();
-    final int jl = s.length();
-    for(int j = 0; j < jl; j++) {
-      final char c = s.charAt(j);
-      sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
-    }
-    return token(sb.toString());
-  }
-
-  /**
-   * Converts the specified token to upper case.
-   * @param t token to be converted
-   * @param a ascii flag
-   * @return the converted token
-   */
-  private static byte[] upper(final byte[] t, final boolean a) {
-    if(!a) return token(string(t).toUpperCase());
-    for(int i = 0; i < t.length; i++) t[i] = (byte) uc(t[i]);
-    return t;
-  }
-
-  /**
-   * Converts the specified token to lower case.
-   * @param t token to be converted
-   * @param a ascii flag
-   * @return the converted token
-   */
-  private static byte[] lower(final byte[] t, final boolean a) {
-    if(!a) return token(string(t).toLowerCase());
-    for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
-    return t;
-  }
-  
-  /**
-   * Returns a wildcard token.
-   * @param n input token
-   * @return resulting token
-  private byte[] wc(final byte[] n) {
-    if(!contains(n, '\\')) return n;
-    final TokenBuilder tb = new TokenBuilder();
-    boolean bs = false;
-    for(final byte c : n) {
-      if(c == '\\') {
-        bs = true;
-      } else if(bs) {
-        if(ftChar(c)) tb.add(c);
-        bs = false;
-      } else {
-        tb.add(c);
-      }
-    }
-    return tb.finish();
-  }
-   */
-
-  /**
-   * Returns the text size.
-   * @return size
-   */
-  public int size() {
-    return text.length;
-  }
-
-  /**
-   * Converts the tokens to a TokenList.
-   * @return TokenList
-   */
-  public TokenList getTokenList() {
-    final TokenList tl = new TokenList();
-    init();
-    while(more()) tl.add(get());
-    return tl;
   }
 
   @Override

@@ -15,7 +15,7 @@ import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
-import org.basex.index.FTBuilder;
+import org.basex.index.FTTrieBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
@@ -113,7 +113,7 @@ abstract class ACreate extends Process {
       case TXT: buildIndex(i, new ValueBuilder(true), d);  break;
       case ATV: buildIndex(i, new ValueBuilder(false), d); break;
       case FTX: buildIndex(i, d.meta.ftfz ?
-          new FTFuzzyBuilder() : new FTBuilder(), d); break;
+          new FTFuzzyBuilder() : new FTTrieBuilder(), d); break;
       default: break;
     }
   }

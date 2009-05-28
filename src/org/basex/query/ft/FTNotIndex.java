@@ -21,11 +21,13 @@ public final class FTNotIndex extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) {
+  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     return new FTNodeIter() {
+      final FTNodeIter ir = expr[0].iter(ctx);
+
       @Override
       public FTNodeItem next() throws QueryException {
-        final FTNodeItem node = expr[0].iter(ctx).next();
+        final FTNodeItem node = ir.next();
         node.ftn.not ^= true;
         return node;
       }

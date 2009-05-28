@@ -84,7 +84,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     outl.close();
     outr.close();
     
-    return new Values(data, db, text);
+    return new Values(data, text);
   }
   
   @Override

@@ -26,7 +26,6 @@ public final class GUIToolBar extends JToolBar {
    * @param main reference to the main window
    */
   public GUIToolBar(final GUICommand[] tb, final GUI main) {
-    super();
     setFloatable(false);
     cmd = tb;
     gui = main;

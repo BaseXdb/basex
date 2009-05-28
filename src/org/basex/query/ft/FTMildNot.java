@@ -4,8 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTNodeItem;
 import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
@@ -21,20 +20,24 @@ public final class FTMildNot extends FTExpr {
    * @param l expression list
    * @throws QueryException query exception
    */
-  public FTMildNot(final FTExpr... l) throws QueryException {
+  public FTMildNot(final FTExpr[] l) throws QueryException {
     super(l);
     if(usesExclude()) Err.or(FTMILD);
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].iter(ctx).next();
-    if(it.score() == 0) return score(0);
-    
-    boolean f = false;
-    for(int i = 1; i < expr.length; i++)
-      f |= expr[1].iter(ctx).next().score() != 0;
-    return score(!f || ctx.ftselect.mildNot() ? it.score() : 0);
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+    final FTNodeItem it = expr[0].atomic(ctx);
+    double d = it.score();
+    if(d != 0) {
+      boolean f = false;
+      for(int i = 1; i < expr.length; i++) {
+        f |= expr[i].atomic(ctx).score() != 0;
+      }
+      if(f && !ctx.ftselect.mildNot()) d = 0;
+    }
+    it.score(d);
+    return it;
   }
 
   @Override

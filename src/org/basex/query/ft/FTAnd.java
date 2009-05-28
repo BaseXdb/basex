@@ -5,7 +5,6 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
-import org.basex.query.iter.FTNodeIter;
 import org.basex.util.IntList;
 
 /**
@@ -29,15 +28,18 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+    FTNodeItem it = null; 
     double d = 0;
     for(final FTExpr e : expr) {
-      final FTNodeItem it = e.iter(ctx).next();
-      final double s = it.score();
-      if(s == 0) return score(0);
+      it = e.atomic(ctx);
+      double s = d;
+      d = it.score();
+      if(d == 0) break;
       d = ctx.score.and(d, s);
     }
-    return score(d);
+    it.score(d);
+    return it;
   }
   
   @Override

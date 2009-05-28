@@ -29,7 +29,6 @@ import org.basex.util.TokenBuilder;
 
 /**
  * DeepFS: The XQuery Filesystem
- * 
  * Database-side implementation of DeepFS.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License

@@ -1330,7 +1330,7 @@ public interface Text {
   byte[] HELPMEM = token(lang("h_mem"));
   /** Help String. */
   byte[] HELPGUISTATUS = token(lang("h_guistatus"));
-  
+
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);
 }

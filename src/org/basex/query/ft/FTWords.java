@@ -11,10 +11,10 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTOpt.FTMode;
+import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
@@ -58,16 +58,18 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
     final int len = contains(ctx);
-    final double s = len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size());
-    final Expr w = ctx.ftopt.weight;
-    if(w == null) return score(s);
+    double s = len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size());
 
     // evaluate weight
-    final double d = checkDbl(w, ctx);
-    if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
-    return score(s * d);
+    final Expr w = ctx.ftopt.weight;
+    if(w != null) {
+      final double d = checkDbl(w, ctx);
+      if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
+      s *= d;
+    }
+    return new FTNodeItem(s);
   }
 
   /**
@@ -183,6 +185,7 @@ public final class FTWords extends FTExpr {
     
     // index size is incorrect for phrases
     final Tokenizer ft = new Tokenizer(word, fto);
+    ic.is = Integer.MAX_VALUE;
     while(ic.is != 0 && ft.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(ft));
     return true;
   }

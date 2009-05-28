@@ -85,7 +85,7 @@ public abstract class Iter implements Iterable<Item> {
     int s = 1;
     while((i = next()) != null) {
       if(s == item.length) {
-        final Item[] tmp = new Item[s << 2];
+        final Item[] tmp = new Item[s << 1];
         System.arraycopy(item, 0, tmp, 0, s);
         item = tmp;
       }

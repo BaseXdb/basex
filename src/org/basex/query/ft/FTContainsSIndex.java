@@ -46,13 +46,13 @@ public final class FTContainsSIndex extends FTContains {
     DBNode n;
     while((n = (DBNode) ir.next()) != null) {
       n.score(1);
-      while(ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
+      while(ftn != null && !ftn.ftn.empty() && n.pre > ftn.ftn.pre()) {
         ftn = fti.next();
       }
       
       if(ftn != null) {
         final boolean not = ftn.ftn.not;
-        if(ftn.ftn.getPre() == n.pre) {
+        if(ftn.ftn.pre() == n.pre) {
           ftn = null;
           d = not ? 0 : n.score();
           break;

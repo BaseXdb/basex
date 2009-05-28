@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
+import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
 
 /**
@@ -28,7 +29,7 @@ public final class FTIndexAccess extends Simple {
   /**
    * Constructor.
    * @param ex contains, select and optional ignore expression
-   * @param ftt FTTokenizer
+   * @param ftt tokenizer
    * @param ic index context
    */
   public FTIndexAccess(final FTExpr ex, final Tokenizer ftt,
@@ -39,13 +40,15 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    return new Iter(){
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final FTNodeIter ir = ftexpr.iter(ctx);
+
+    return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Tokenizer tmp = ctx.ftitem;
         ctx.ftitem = ft;
-        final FTNodeItem it = ftexpr.iter(ctx).next();
+        final FTNodeItem it = ir.next();
         ctx.ftitem = tmp;
         if(it.ftn.ip != null && it.ftn.p != null && ctx.ftdata != null) {
           ctx.ftdata.add(it.ftn.ip.finish(), it.ftn.p.finish());

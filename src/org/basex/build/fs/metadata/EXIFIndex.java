@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class indexes EXIF meta data.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -87,9 +87,9 @@ public final class EXIFIndex {
       "mode, no return light detected", "", "Flash fired, compulsory flash " +
       "mode, return light detected", "No Flash, compulsory flash mode", "",
       "", "", "", "", "", "", "No Flash, auto mode", "Flash fired, auto mode",
-      "", "", "", "Flash fired, auto mode, no return light detected", "", 
-      "Flash fired, auto mode, return light detected", "No flash function", 
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
+      "", "", "", "Flash fired, auto mode, no return light detected", "",
+      "Flash fired, auto mode, return light detected", "No flash function",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
       "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Flash " +
       "fired, red-eye reduction mode", "", "", "", "Flash fired, red-eye " +
       "reduction mode, no return light detected", "", "Flash fired, " +
@@ -97,8 +97,8 @@ public final class EXIFIndex {
       "compulsory flash mode, red-eye reduction mode", "", "", "", "Flash " +
       "fired, compulsory flash mode, red-eye reduction mode, no return " +
       "light detected", "", "Flash fired, compulsory flash mode, red-eye " +
-      "reduction mode, return light detected", "", "", "", "", "", "", "", 
-      "", "", "Flash fired, auto mode, red-eye reduction mode", "", "", "", 
+      "reduction mode, return light detected", "", "", "", "", "", "", "",
+      "", "", "Flash fired, auto mode, red-eye reduction mode", "", "", "",
       "Flash fired, auto mode, no return light detected, red-eye reduction " +
       "mode", "", "Flash fired, auto mode, return light detected, red-eye " +
       "reduction mode"))
@@ -128,15 +128,15 @@ public final class EXIFIndex {
       "Undefined", "One-Chip Color Area Sensor", "Two-Chip Color Area Sensor",
       "Three-Chip Color Area Sensor", "Color Sequential Area Sensor",
       "Trilinear Sensor", "Color Sequential Linear Sensor")));
-    info.put(0xA300, new EXIFUndefined("FileSource", 
+    info.put(0xA300, new EXIFUndefined("FileSource",
       bytes("", "", "", "Digital Still Camera (DSC)", "")));
-    info.put(0xA301, new EXIFUndefined("SceneType", 
+    info.put(0xA301, new EXIFUndefined("SceneType",
       bytes("", "Directly Photographed")));
-    info.put(0xA401, new EXIFShort("CustomRendered", 
+    info.put(0xA401, new EXIFShort("CustomRendered",
       bytes("Normal Process", "Custom Process")));
-    info.put(0xA402, new EXIFShort("ExposureMode", 
+    info.put(0xA402, new EXIFShort("ExposureMode",
       bytes("Auto", "Manual", "Auto Bracket")));
-    info.put(0xA403, new EXIFShort("WhiteBalance", 
+    info.put(0xA403, new EXIFShort("WhiteBalance",
       bytes("Auto", "Manual")));
     info.put(0xA404, new EXIFRational("DigitalZoomRatio", bytes(" x")));
     info.put(0xA405, new EXIFShort("FocalLengthIn35mmFilm"));
@@ -154,7 +154,7 @@ public final class EXIFIndex {
     info.put(0xA40C, new EXIFShort("SubjectDistanceRange",
       bytes("Unknown", "Macro", "Close", "Distant")));
   }
-  
+
   /**
    * Converts a string to a byte array.
    * @param str string array
@@ -163,7 +163,7 @@ public final class EXIFIndex {
   static byte[] bytes(final String str) {
     return token(str);
   }
-  
+
   /**
    * Converts strings to byte arrays.
    * @param str string array
@@ -174,7 +174,7 @@ public final class EXIFIndex {
     for(int v = 0; v < val.length; v++) val[v] = bytes(str[v]);
     return val;
   }
-  
+
   /**
    * Returns an EXIF information instance.
    * @param tagnr tag number
@@ -202,7 +202,7 @@ public final class EXIFIndex {
       tag = bytes(t);
       format = f;
     }
-    
+
     /**
      * Returns a byte array for the specified values.
      * @param obj values
@@ -222,7 +222,7 @@ public final class EXIFIndex {
     EXIFString(final String t) {
       super(t, STRING);
     }
-    
+
     @Override
     byte[] val(final Object... obj) {
       final byte[] buffer = (byte[]) obj[0];
@@ -235,7 +235,7 @@ public final class EXIFIndex {
       while(++s < e) if(buffer[s] > ' ') break;
       while(--e > s) if(buffer[e] > ' ') break;
       if(s >= e) return EMPTY;
-      
+
       /*if(type == 1) {
         GregorianCalendar gc = new GregorianCalendar(
             toInt(buffer, s, s + 4),
@@ -246,7 +246,7 @@ public final class EXIFIndex {
             toInt(buffer, s + 17, s + 19));
         return toBytes(gc.getTimeInMillis());
       }*/
-      
+
       return Array.create(buffer, s, e + 1 - s);
     }
   }
@@ -265,7 +265,7 @@ public final class EXIFIndex {
     EXIFShort(final String t) {
       super(t, SHORT);
     }
-    
+
     /**
      * Constructor.
      * @param t tag name
@@ -296,7 +296,7 @@ public final class EXIFIndex {
       format = LONG;
     }
   }
-  
+
   /**
    * EXIF Information structure.
    */
@@ -335,7 +335,7 @@ public final class EXIFIndex {
       this(t);
       info = i;
     }
-    
+
     @Override
     byte[] val(final Object... obj) {
       double v = (double) (Integer) obj[1] / (Integer) obj[0];
@@ -352,7 +352,7 @@ public final class EXIFIndex {
         }
         return concat(val, bytes(" seconds"));
       }
-      
+
       // ApertureValue
       if(type == 2) {
         v = Math.round(Math.pow(ROOT2, v) * 100) / 100d;
@@ -362,7 +362,7 @@ public final class EXIFIndex {
       BaseX.debug(EXIFRATIONAL);
       return EMPTY;
     }
-    
+
     /**
      * Returns double value as byte array.
      * @param v double value
@@ -370,7 +370,7 @@ public final class EXIFIndex {
      */
     private byte[] num(final double v) {
       final int vv = (int) v;
-      return v == vv ? token(vv) : token(v); 
+      return v == vv ? token(vv) : token(v);
     }
   }
 
@@ -397,7 +397,7 @@ public final class EXIFIndex {
       format = SIGNEDRATIONAL;
     }
   }
-  
+
   /**
    * EXIF Information structure.
    */
@@ -418,7 +418,7 @@ public final class EXIFIndex {
     /** Component array. */
     private static final byte[][] COMPCONF =
       bytes("Y", "Cb", "Cr", "R", "G", "B");
-    
+
     /**
      * Constructor.
      * @param t tag name
@@ -428,7 +428,7 @@ public final class EXIFIndex {
       super(t, UNDEFINED);
       type = p;
     }
-    
+
     /**
      * Constructor.
      * @param t tag name
@@ -444,7 +444,7 @@ public final class EXIFIndex {
       final byte[] val = (byte[]) obj[0];
 
       if(cat != null) return cat[val[0]];
-      
+
       // Default
       if(type == 0) return val;
 
@@ -460,7 +460,7 @@ public final class EXIFIndex {
         }
         return tb.finish();
       }
-      
+
       // ComponentsConfiguration
       if(type == 2) {
         if(eq(val, YCBCRCOMP)) return YCBCR;

@@ -183,16 +183,20 @@ public final class QueryContext extends Progress {
 
     try {
       // cache the initial context nodes
-      docs = nodes != null ? nodes.size() : 0;
-      if(docs != 0) {
+      if(nodes != null) {
         // create document nodes
         final Data data = nodes.data;
-        doc = new DBNode[docs];
         for(int d = 0; d < docs; d++) {
           final int p = nodes.nodes[d];
-          if(data.kind(p) == Data.DOC) doc[rootDocs++] = new DBNode(data, p);
+          if(data.kind(p) == Data.DOC) {
+            addDoc(new DBNode(data, p));
+            rootDocs++;
+          }
         }
-        if(rootDocs == 0) doc[rootDocs++] = new DBNode(data, 0);
+        if(rootDocs == 0) {
+          addDoc(new DBNode(data, 0));
+          rootDocs++;
+        }
 
         final SeqIter si = new SeqIter();
         if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
@@ -200,8 +204,8 @@ public final class QueryContext extends Progress {
           for(int d = 0; d < docs; d++) si.add(doc[d]);
         } else {
           // otherwise, add all context items
-          for(int d = 0; d < docs; d++)
-            si.add(new DBNode(data, nodes.nodes[d]));
+          for(int n = 0; n < nodes.size(); n++)
+            si.add(new DBNode(data, nodes.nodes[n]));
         }
         item = si.finish();
         
@@ -396,8 +400,19 @@ public final class QueryContext extends Progress {
     }
  
     // add document to array
+    final DBNode node = new DBNode(data, 0);
+    addDoc(node);
+    return node;
+  }
+  
+  /**
+   * Adds a document to the document array.
+   * @param node node to be added
+   */
+  private void addDoc(final DBNode node) {
     if(docs == doc.length) doc = Array.extend(doc);
-    return doc[docs++] = new DBNode(data, 0);
+    doc[docs++] = node;
+    
   }
 
   /**

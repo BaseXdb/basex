@@ -256,7 +256,7 @@ final class FNDate extends Fun {
       final Calendar c = Calendar.getInstance();
       tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;
     } else {
-      final DTd dtd = (DTd) check(zon, Type.DTD);;
+      final DTd dtd = (DTd) check(zon, Type.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) Err.or(INVALZONE, zon);
     }

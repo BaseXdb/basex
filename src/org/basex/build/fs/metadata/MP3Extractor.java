@@ -206,7 +206,7 @@ public final class MP3Extractor extends AbstractExtractor {
 
     // return null if zero bytes have been found
     if(!conv) return null;
-    
+
     for(int k = i; k > j; k--) if(content[k] == 0) content[k] = ' ';
     return Array.create(content, j + 1, i - j);
   }
@@ -223,9 +223,9 @@ public final class MP3Extractor extends AbstractExtractor {
     try {
       final long fileLen = f.length();
       file = f;
-  
+
       final int first = read();
-  
+
       // ID3 header
       if(first == 0x49 // ID3V2...
          && read() == 0x44
@@ -237,7 +237,7 @@ public final class MP3Extractor extends AbstractExtractor {
          && (sync2 = read()) < 0x80
          && (sync3 = read()) < 0x80
          && (sync4 = read()) < 0x80) {
-  
+
         // ID3 frames
         found = true;
         builder.startElem(AUDIO, atts.set(TYPE, TYPEMP3));
@@ -246,13 +246,13 @@ public final class MP3Extractor extends AbstractExtractor {
         experi = (hflag & 0x20) != 0;
         footer = (hflag & 0x10) != 0;
         size = sync1 << 21 | sync2 << 14 | sync3 << 7 | sync4;
-  
+
         final List<byte[]> frames = getID3V2(size);
-  
+
         // scans for the technical info and adds the audio header
         while(read() != 0xFF);
         getTechInfo(builder, size);
-  
+
         // insert ID3 info
         atts.reset();
         atts.add(ID3VERS, token("2." + major + '.' + minor));
@@ -260,12 +260,12 @@ public final class MP3Extractor extends AbstractExtractor {
         atts.add(ID3FLAG_EXPERI, token(experi));
         atts.add(ID3FLAG_FOOTER, token(footer));
         builder.startElem(ID3, atts);
-        
+
         for(int i = 0; i < frames.size() - 1; i += 2) {
           builder.nodeAndText(frames.get(i), atts.reset(), frames.get(i + 1));
         }
         builder.endElem(ID3);
-  
+
       } else if(fileLen > 0x80) { // ID3V1...
         found = true;
         builder.startElem(AUDIO, atts.set(TYPE, TYPEMP3));
@@ -275,13 +275,13 @@ public final class MP3Extractor extends AbstractExtractor {
         // scans for the technical info and adds the audio header
         getTechInfo(builder, 0x80);
         in.close();
-  
+
         // parse ID3V1 Tags..
         final RandomAccessFile raf = new RandomAccessFile(f, "r");
         raf.seek(fileLen - 0x80);
         raf.read(id3v1);
         raf.close();
-  
+
         // ...header tag always upper case?
         if(startsWith(id3v1, HEADERID3V1)) {
           final byte[] title = getTag(id3v1, 3, 30);
@@ -289,7 +289,7 @@ public final class MP3Extractor extends AbstractExtractor {
           final byte[] album = getTag(id3v1, 63, 30);
           final byte[] year = getTag(id3v1, 93, 4);
           final byte[] comment = getTag(id3v1, 97, 30);
-  
+
           builder.startElem(ID3, atts.set(ID3VERS, new byte[] { '1' }));
           add(builder, ID3TITLE, title);
           add(builder, ID3ARTIST, artist);

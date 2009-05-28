@@ -13,38 +13,35 @@ import org.basex.query.iter.FTNodeIter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FTSelectIndex extends FTExpr {
+final class FTSelectIndex extends FTExpr {
   /** Position filter. */
-  public FTSelect sel;
+  final FTSelect sel;
 
   /**
    * Constructor.
    * @param s full-text selections
    */
   public FTSelectIndex(final FTSelect s) {
-    super();
     sel = s;
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) {
+  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
     final FTSelect tmp = ctx.ftselect;
-    final FTExpr e = sel.expr[0];
+    final FTNodeIter ir = sel.expr[0].iter(ctx);
 
     return new FTNodeIter() {
       @Override
       public FTNodeItem next() throws QueryException {
         ctx.ftselect = sel;
         sel.init(ctx.ftitem);
-        FTNodeItem it = e.iter(ctx).next();
-        if(ctx.ftselect != null && it.ftn.size > 0) {
+        FTNodeItem it = ir.next();
+
+        if(!it.ftn.empty() && !ctx.ftselect.standard()) {
           init(it);
           while(!sel.filter(ctx)) {
-            it = e.iter(ctx).next();
-            if(it.ftn.size == 0) {
-              ctx.ftselect = tmp;
-              return it;
-            }
+            it = ir.next();
+            if(it.ftn.empty()) break;
             init(it);
           }
         }
@@ -54,12 +51,13 @@ public final class FTSelectIndex extends FTExpr {
 
       /**
        * Initializes item for next seqEval with index use.
-       * @param it current FTNode 
+       * @param it current node
        */
       void init(final FTNodeItem it) {
-        sel.setPos(it.ftn.convertPos(), it.ftn.p.list[0]);
+        sel.pos = it.ftn.convertPos();
+        sel.size = it.ftn.p.list[0];
         if(it.ftn.getToken() != null) {
-          sel.ft.init(it.data.text(it.ftn.getPre()));
+          sel.ft.init(it.data.text(it.ftn.pre()));
           sel.term = sel.ft.getTokenList();
         }
       }

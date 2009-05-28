@@ -20,7 +20,7 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTBuilder extends Progress implements IndexBuilder {
+public final class FTTrieBuilder extends Progress implements IndexBuilder {
   /** Word parser. */
   private final Tokenizer wp = new Tokenizer();
   /** CTArray for tokens. */
@@ -43,11 +43,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     wp.cs = data.meta.ftcs;
     int s = 0;
-    index = new FTArray(128, data.meta.ftcs);
-    index.bl |= data.meta.filesize > 1073741824;
-    if(index.bl) {
-        hash = new FTHash();
-    }
+    index = new FTArray(128);
+    hash = new FTHash();
 
     total = data.meta.size;
     for(id = 0; id < total; id++) {
@@ -62,9 +59,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     final String db = data.meta.dbname;
     final DataOutput outPre = new DataOutput(db, DATAFTX + 'b');
-    if(index.bl) {
-      bulkLoad(outPre, true);
-    }
+    bulkLoad(outPre, true);
 
     if(Prop.debug) {
       Performance.gc(3);
@@ -80,8 +75,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     final byte[][] tokens = index.tokens.list;
     final int[][] next = index.next.list;
-    final int[][] pre = index.pre.list;
-    final int[][] pos = index.pos.list;
 
     // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
     // l = length of the token t1, ..., tl
@@ -107,7 +100,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       outN.write((byte) -1);
       // write next pointer
       int j = 1;
-      for (; j < next[0].length - 2; j++) {
+      for(; j < next[0].length - 2; j++) {
         outN.writeInt(next[0][j]); // pointer
         // first char of next node
         outN.write(tokens[next[next[0][j]][0]][0]);
@@ -119,7 +112,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       s += 2L + (next[0].length - 3) * 5L + 9L;
       // all other nodes
       final int il = index.next.size;
-      for (int i = 1; i < il; i++) {
+      for(int i = 1; i < il; i++) {
         // check pointer on data needs 1 or 2 ints
         final int lp = next[i][next[i].length - 1] > -1 ? 0 : -1;
         // write token size as byte
@@ -128,44 +121,27 @@ public final class FTBuilder extends Progress implements IndexBuilder {
         outN.write(tokens[next[i][0]]);
         // write next pointer
         j = 1;
-        for (; j < next[i].length - 2 + lp; j++) {
+        for(; j < next[i].length - 2 + lp; j++) {
           outN.writeInt(next[i][j]); // pointer
           // first char of next node
           outN.write(tokens[next[next[i][j]][0]][0]);
         }
         outN.writeInt(next[i][j]); // data size
-        if (next[i][j] == 0 && next[i][j + 1] == 0) {
+        if(next[i][j] == 0 && next[i][j + 1] == 0) {
           // node has no data
           outN.write5(next[i][j + 1]);
         } else {
           // write pointer on data
-          //if (index.bl) {
-            if (lp == 0) {
-              outN.write5(next[i][j + 1]);
-            } else {
-              outN.write5(FTArray.toLong(next[i], next[i].length - 2));
-            }
+          // if (index.bl) {
+          if(lp == 0) {
+            outN.write5(next[i][j + 1]);
+          } else {
+            outN.write5(toLong(next[i], next[i].length - 2));
+          }
         }
         outS.writeInt(s);
-        s += 1L + tokens[next[i][0]].length * 1L
-        + (next[i].length - 3 + lp) * 5L + 9L;
-      }
-    }
-
-    if (!index.bl) {
-      // write data
-      final int il = index.pre.size;
-      int lastpre = -1;
-      byte[] lp = new byte[]{};
-      for (int i = 0; i < il; i++) {
-        for (final int j = 0; j < pre[i].length; i++) {
-          if (lastpre != pre[i][j]) {
-            lastpre = pre[i][j];
-            lp = Num.simpleNum(pre[i][j]);
-          }
-          outPre.write(lp);
-          outPre.write(Num.simpleNum(pos[i][j]));
-        }
+        s += 1L + tokens[next[i][0]].length * 1L + (next[i].length - 3 + lp)
+            * 5L + 9L;
       }
     }
 
@@ -178,17 +154,30 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       Performance.gc(3);
       BaseX.debug("- Written: % (%)", p, Performance.getMem());
     }
-    return new FTTrie(data, db);
+    return new FTTrie(data);
+  }
+
+  /**
+   * Converts long values split with toArray back. 
+   * @param ar int[] with values
+   * @param p pointer where the first value is found
+   * @return long l
+   */
+  private static long toLong(final int[] ar, final int p) {
+    long l = (long) ar[p] << 16;
+    l += -ar[p + 1] & 0xFFFF;
+    return l;
   }
 
   /**
    * Adds the data to each token.
    * @param outPre DataOutput
-   * @param ittr boolean itterator optimated storage
+   * @param ittr boolean iterator optimized storage
    * @throws IOException IOEXception
    */
-  private void bulkLoad(final DataOutput outPre,
-      final boolean ittr)  throws IOException {
+  private void bulkLoad(final DataOutput outPre, final boolean ittr)
+      throws IOException {
+
     hash.init();
     long cpre;
     int ds, p, lpre, lpos, spre, spos;
@@ -246,9 +235,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   private void index() {
     final byte[] tok = wp.get();
     if(tok.length > Token.MAXLEN) return;
-
-    if(index.bl) index(tok, id, wp.pos);
-    else index.index(tok, id, wp.pos);
+    index(tok, id, wp.pos);
   }
 
   /**
