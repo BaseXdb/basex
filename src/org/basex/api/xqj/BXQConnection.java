@@ -24,13 +24,6 @@ public final class BXQConnection extends BXQDataFactory
   /** Boolean Value if autoCommit is enabled. */
   private boolean autoCommit = true;
 
-  /**
-   * Constructor.
-   */
-  public BXQConnection() {
-    super();
-  }
-
   public void commit() throws XQException {
     opened();
   }
