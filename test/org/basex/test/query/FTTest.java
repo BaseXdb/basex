@@ -67,9 +67,9 @@ public final class FTTest extends AbstractTest {
 
     queries = new Object[][] {
       { "Simple 1", bool(true),
-        "'abc' ftcontains 'abc'" },
+        "'a' ftcontains 'a'" },
       { "Simple 2", bool(true),
-        "'a b c' ftcontains 'b'" },
+        "'a b' ftcontains 'b'" },
       { "Simple 3", bool(false),
         "'abc' ftcontains 'b'" },
       { "Simple 4", nodes(22),
@@ -361,14 +361,14 @@ public final class FTTest extends AbstractTest {
       { "FTOrdered 7", bool(true),
         "'A B C D' ftcontains ('B' ftand 'A' ordered) ftor " +
         "('C' ftand 'D' ordered) ordered" },
-      /* not quite sure about the following ones..
-      { "FTOrdered 8", bool(true),
-        "'A B' ftcontains ('B' ftor 'A') ordered" },
-      { "FTOrdered 9", bool(true),
-        "'A B C' ftcontains ('A' ftor 'C') ftand 'B' ordered" },
-        */
-      { "FTOrdered 10", bool(false),
+      { "FTOrdered 8", bool(false),
         "'B A' ftcontains ('A' ftand ftnot 'B') ordered" },
+      /* Next two still have to be fixed.. 
+      { "FTOrdered 9", bool(true),
+        "'A B' ftcontains ('B' ftor 'A') ordered" },
+      { "FTOrdered 10", bool(true),
+        "'A B C' ftcontains ('A' ftor 'C') ftand 'B' ordered" },
+      */
         
       { "FTDistance 1", nodes(3),
         "//w [text() ftcontains 'the' ftand 'fourth' " +

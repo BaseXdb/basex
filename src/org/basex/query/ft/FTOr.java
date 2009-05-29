@@ -49,9 +49,14 @@ public final class FTOr extends FTExpr {
     int sum = 0;
 
     for(int i = 0; i < expr.length; i++) {
+      final boolean ftnot = ic.ftnot;
       ic.ftnot = false;
-      if(!expr[i].indexAccessible(ctx, ic)) return false;
-      if(ic.ftnot) {
+      final boolean ia = expr[i].indexAccessible(ctx, ic);
+      final boolean ftn = ic.ftnot;
+      ic.ftnot = ftnot;
+      if(!ia) return false;
+
+      if(ftn) {
         if(ic.is > 0) n.add(i);
         else {
           ic.seq = true;

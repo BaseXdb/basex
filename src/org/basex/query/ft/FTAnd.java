@@ -46,23 +46,28 @@ public final class FTAnd extends FTExpr {
   public boolean indexAccessible(final QueryContext ctx,
       final IndexContext ic) throws QueryException {
 
-    final IntList i1 = new IntList();
-    final IntList i2 = new IntList();
+    final IntList ip = new IntList();
+    final IntList in = new IntList();
     int nmin = ic.is;
     for (int i = 0; i < expr.length; i++) {
-      if(!expr[i].indexAccessible(ctx, ic)) return false;
+      final boolean ftnot = ic.ftnot;
+      ic.ftnot = false;
+      final boolean ia = expr[i].indexAccessible(ctx, ic);
+      final boolean ftn = ic.ftnot;
+      ic.ftnot = ftnot;
+      if(!ia) return false;
       
-      if(!(expr[i] instanceof FTNot)) {
-        i1.add(i);
+      if(!ftn) {
+        ip.add(i);
         nmin = ic.is < nmin ? ic.is : nmin;
-      } else if (ic.is > 0) {
-        i2.add(i);
+      } else if(ic.is > 0) {
+        in.add(i);
       }
     }
-    pex = i1.finish();
-    nex = i2.finish();
-    ic.seq |= i1.size == 0;
-    ic.is = i1.size > 0 ? nmin : Integer.MAX_VALUE;
+    pex = ip.finish();
+    nex = in.finish();
+    ic.seq |= ip.size == 0;
+    ic.is = ip.size > 0 ? nmin : Integer.MAX_VALUE;
     return true;
   }
   
