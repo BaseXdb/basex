@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
 public final class Nodes implements Result {
   /** Root Node. */
   public Data data;
-  /** Full-text position data. */
+  /** Full-text position data (for visualization). */
   public FTPosData ftpos;
   /** Pre values container. */
   public int[] nodes;

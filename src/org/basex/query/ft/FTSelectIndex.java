@@ -34,7 +34,7 @@ final class FTSelectIndex extends FTExpr {
       @Override
       public FTNodeItem next() throws QueryException {
         ctx.ftselect = sel;
-        sel.init(ctx.ftitem);
+        sel.init(ctx.fttoken);
         FTNodeItem it = ir.next();
 
         if(!it.ftn.empty() && !ctx.ftselect.standard()) {

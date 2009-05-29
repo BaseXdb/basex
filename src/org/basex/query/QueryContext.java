@@ -76,16 +76,16 @@ public final class QueryContext extends Progress {
 
   /** Scoring instance. */
   public Scoring score = new Scoring();
-  /** Current full-text item. */
-  public FTPosData ftdata;
-  /** Current full-text item. */
-  public Tokenizer ftitem;
+  /** Full-text position data (for visualization). */
+  public FTPosData ftpos;
+  /** Count number of FTIndex (for visualization). */
+  public int ftcount;
+  /** Current full-text token. */
+  public Tokenizer fttoken;
   /** Current full-text options. */
   public FTOpt ftopt = new FTOpt();
-  /** Current full-text position filter. */
+  /** Current full-text position filters. */
   public FTSelect ftselect = new FTSelect(null);
-  /** Count number of FTIndex. */
-  public int ftcount;
   /** Temporary place for ftdata. */
   public IntList[] ftd;
 
@@ -179,7 +179,7 @@ public final class QueryContext extends Progress {
    */
   public void compile() throws QueryException {
     // add full-text container reference
-    if(nodes != null && nodes.ftpos != null) ftdata = new FTPosData();
+    if(nodes != null && nodes.ftpos != null) ftpos = new FTPosData();
 
     try {
       // cache the initial context nodes
@@ -254,7 +254,7 @@ public final class QueryContext extends Progress {
       // completed... return standard nodeset with full-text positions
       if(i == null) {
         final Nodes n = new Nodes(pre.finish(), data);
-        n.ftpos = ftdata;
+        n.ftpos = ftpos;
         return n;
       }
       

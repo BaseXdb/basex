@@ -60,7 +60,7 @@ public final class FTWords extends FTExpr {
   @Override
   public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
     final int len = contains(ctx);
-    double s = len == 0 ? 0 : ctx.score.word(len, ctx.ftitem.size());
+    double s = len == 0 ? 0 : ctx.score.word(len, ctx.fttoken.size());
 
     // evaluate weight
     final Expr w = ctx.ftopt.weight;
@@ -84,7 +84,7 @@ public final class FTWords extends FTExpr {
 
     if(mode == FTMode.ANY && word != null) {
       // speed up default case...
-      final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, word);
+      final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, word);
       len = word.length;
       final int c = ctx.ftopt.qu.count();
       o += c > 0 ? oc / c : 0;
@@ -95,7 +95,7 @@ public final class FTWords extends FTExpr {
       switch(mode) {
         case ALL:
           while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, it);
+            final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, it);
             if(oc == 0) return 0;
             len += it.length;
             o += oc / ctx.ftopt.qu.count();
@@ -104,7 +104,7 @@ public final class FTWords extends FTExpr {
         case ALLWORDS:
           while((it = nextStr(iter)) != null) {
             for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, txt);
+              final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, txt);
               if(oc == 0) return 0;
               len += txt.length;
               o += oc;
@@ -113,7 +113,7 @@ public final class FTWords extends FTExpr {
           break;
         case ANY:
           while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, it);
+            final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, it);
             len += it.length;
             final int c = ctx.ftopt.qu.count();
             o += c > 0 ? oc / c : 0;
@@ -122,7 +122,7 @@ public final class FTWords extends FTExpr {
         case ANYWORD:
           while((it = nextStr(iter)) != null) {
             for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect, txt);
+              final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, txt);
               len += txt.length;
               o += oc;
             }
@@ -134,7 +134,7 @@ public final class FTWords extends FTExpr {
             tb.add(it);
             tb.add(' ');
           }
-          final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftselect,
+          final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect,
               tb.finish());
           len += tb.size;
           final int c = ctx.ftopt.qu.count();

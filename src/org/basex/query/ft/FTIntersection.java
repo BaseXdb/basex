@@ -67,8 +67,8 @@ final class FTIntersection extends FTExpr {
             nod2 = null;
             return next();
           }
-          if(col != null && ctx.ftdata != null) {
-            ctx.ftdata.addFTAndCol(col.finish());
+          if(col != null && ctx.ftpos != null) {
+            ctx.ftpos.addFTAndCol(col.finish());
           }
           col = null;
           return n1;

@@ -52,7 +52,7 @@ public class FTSelect extends FTExpr {
   public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
     final FTSelect tmp = ctx.ftselect;
     ctx.ftselect = this;
-    init(ctx.ftitem);
+    init(ctx.fttoken);
     final FTNodeItem it = expr[0].atomic(ctx);
     ctx.ftselect = tmp;
 

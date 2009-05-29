@@ -46,12 +46,12 @@ public final class FTIndexAccess extends Simple {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Tokenizer tmp = ctx.ftitem;
-        ctx.ftitem = ft;
+        final Tokenizer tmp = ctx.fttoken;
+        ctx.fttoken = ft;
         final FTNodeItem it = ir.next();
-        ctx.ftitem = tmp;
-        if(it.ftn.ip != null && it.ftn.p != null && ctx.ftdata != null) {
-          ctx.ftdata.add(it.ftn.ip.finish(), it.ftn.p.finish());
+        ctx.fttoken = tmp;
+        if(it.ftn.ip != null && it.ftn.p != null && ctx.ftpos != null) {
+          ctx.ftpos.add(it.ftn.ip.finish(), it.ftn.p.finish());
         }
         return it.score() == 0 ? null : it;
       }

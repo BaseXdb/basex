@@ -64,22 +64,22 @@ public class FTContains extends Expr {
     if(div == 0) div = ++ctx.ftcount;
     
     final Iter iter = expr.iter(ctx);
-    final Tokenizer tmp = ctx.ftitem;
+    final Tokenizer tmp = ctx.fttoken;
     final IntList[] ftd = ctx.ftd;
     double d = 0;
     Item i;
-    ctx.ftitem = ft;
+    ctx.fttoken = ft;
 
     while((i = iter.next()) != null) {
       ft.init(i.str());
       final double d2 = ftexpr.atomic(ctx).score();
       d = ctx.score.and(d, d2);
 
-      if(ctx.ftdata != null && ctx.ftd != null && d2 > 0 && i instanceof DBNode)
-        ctx.ftdata.addConvSeqData(ctx.ftd, ((DBNode) i).pre, div);
+      if(ctx.ftpos != null && ctx.ftd != null && d2 > 0 && i instanceof DBNode)
+        ctx.ftpos.addConvSeqData(ctx.ftd, ((DBNode) i).pre, div);
     }
     
-    ctx.ftitem = tmp;
+    ctx.fttoken = tmp;
     ctx.ftd = ftd;
     return Bln.get(d);
   }

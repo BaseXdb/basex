@@ -36,8 +36,8 @@ public final class FTContainsSIndex extends FTContains {
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {    
     final Iter ir = expr.iter(ctx);
-    final Tokenizer tmp = ctx.ftitem;
-    ctx.ftitem = ft;
+    final Tokenizer tmp = ctx.fttoken;
+    ctx.fttoken = ft;
         
     final FTNodeIter fti = ftexpr.iter(ctx);
     if(ftn == null) ftn = fti.next();
@@ -63,11 +63,11 @@ public final class FTContainsSIndex extends FTContains {
         }
       }
     }
-    ctx.ftitem = tmp;
+    ctx.fttoken = tmp;
 
     if (vis && Bln.get(d).bool() && ftn != null && ctx.ftselect != null &&
-        ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftdata != null)
-      ctx.ftdata.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
+        ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftpos != null)
+      ctx.ftpos.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
     
     return Bln.get(d);
   }

@@ -152,8 +152,7 @@ public final class FTPosData {
   }
 
   /**
-   * Removes ftdata for this node.
-   *
+   * Removes position data for the specified node.
    * @param pre int pre value
    */
   public void remove(final int pre) {
@@ -184,10 +183,9 @@ public final class FTPosData {
 
   /**
    * Converts data from sequential ftcontains processing.
-   *
    * @param d IntList[] ftcontains data
-   * @param pre int pre value
-   * @param div int div to add for each pointer
+   * @param pre pre value
+   * @param div div to add for each pointer
    */
   public void addConvSeqData(final IntList[] d, final int pre, final int div) {
     if (d.length == 0) return;
