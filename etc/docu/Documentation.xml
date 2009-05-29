@@ -75,6 +75,17 @@
 			<title>Description of all the Views in the GUI</title>
 			<para>	Your Text </para>
 		</sect1>
+		<sect1>
+			<title>Description of the GUI Features</title>
+			<para>	Your Text </para>
+		</sect1>
+	</chapter>
+	<chapter>
+		<title>General Information</title>
+		<sect1>
+			<title>Location of BaseX Files</title>
+			<para>	Your Text </para>
+		</sect1>
 	</chapter>
 	<chapter>
 		<title>Description of BaseX-Features</title>
@@ -82,6 +93,16 @@
 			<title>XQuery Implementation</title>
 			<para>	Your Text </para>
 		</sect1>
+		<sect1>
+			<title>XQuery Full-Text Implementation</title>
+			<para>	Your Text </para>
+		</sect1>
+
+		<sect1>
+			<title>Description of the Indexes</title>
+			<para>	Your Text </para>
+		</sect1>
+
 	</chapter>
 	<chapter>
 		<title>Developer's Guide</title>
@@ -98,6 +119,4 @@
 			<para>	Your Text </para>
 		</sect1>
 	</chapter>
-
-
 </book>
