@@ -49,7 +49,7 @@ public final class FTAnd extends FTExpr {
     final IntList ip = new IntList();
     final IntList in = new IntList();
     int nmin = ic.is;
-    for (int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; i++) {
       final boolean ftnot = ic.ftnot;
       ic.ftnot = false;
       final boolean ia = expr[i].indexAccessible(ctx, ic);

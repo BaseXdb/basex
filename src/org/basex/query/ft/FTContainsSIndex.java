@@ -17,10 +17,10 @@ import org.basex.query.iter.Iter;
  * @author Christian Gruen
  */
 public final class FTContainsSIndex extends FTContains {
-  /** Current FTNodeItem. */
-  FTNodeItem ftn;
   /** Flag for visualizing ftdata. */ 
   private final boolean vis;
+  /** Current FTNodeItem. */
+  FTNodeItem ftn;
   
   /**
    * Constructor.
@@ -65,9 +65,10 @@ public final class FTContainsSIndex extends FTContains {
     }
     ctx.fttoken = tmp;
 
-    if (vis && Bln.get(d).bool() && ftn != null && ctx.ftselect != null &&
-        ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftpos != null)
+    if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
+        ctx.ftselect != null && ftn.ftn.ip != null && ftn.ftn.p !=  null) {
       ctx.ftpos.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
+    }
     
     return Bln.get(d);
   }

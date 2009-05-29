@@ -79,68 +79,63 @@ public final class FTWords extends FTExpr {
    * @throws QueryException xquery exception
    */
   private int contains(final QueryContext ctx) throws QueryException {
+    // speed up default case
+    if(mode == FTMode.ANY && word != null && occ == null)
+      return ctx.ftopt.contains(ctx, word) == 0 ? 0 : word.length;
+
+    // process special cases
+    final Iter iter = ctx.iter(query);
     int len = 0;
     int o = 0;
+    byte[] it;
 
-    if(mode == FTMode.ANY && word != null) {
-      // speed up default case...
-      final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, word);
-      len = word.length;
-      final int c = ctx.ftopt.qu.count();
-      o += c > 0 ? oc / c : 0;
-    } else {
-      final Iter iter = ctx.iter(query);
-      byte[] it;
-  
-      switch(mode) {
-        case ALL:
-          while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, it);
+    switch(mode) {
+      case ALL:
+        while((it = nextStr(iter)) != null) {
+          final int oc = ctx.ftopt.contains(ctx, it);
+          if(oc == 0) return 0;
+          len += it.length;
+          o += oc / ctx.ftopt.qu.count();
+        }
+        break;
+      case ALLWORDS:
+        while((it = nextStr(iter)) != null) {
+          for(final byte[] txt : split(it, ' ')) {
+            final int oc = ctx.ftopt.contains(ctx, txt);
             if(oc == 0) return 0;
-            len += it.length;
-            o += oc / ctx.ftopt.qu.count();
+            len += txt.length;
+            o += oc;
           }
-          break;
-        case ALLWORDS:
-          while((it = nextStr(iter)) != null) {
-            for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, txt);
-              if(oc == 0) return 0;
-              len += txt.length;
-              o += oc;
-            }
-          }
-          break;
-        case ANY:
-          while((it = nextStr(iter)) != null) {
-            final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, it);
-            len += it.length;
-            final int c = ctx.ftopt.qu.count();
-            o += c > 0 ? oc / c : 0;
-          }
-          break;
-        case ANYWORD:
-          while((it = nextStr(iter)) != null) {
-            for(final byte[] txt : split(it, ' ')) {
-              final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect, txt);
-              len += txt.length;
-              o += oc;
-            }
-          }
-          break;
-        case PHRASE:
-          final TokenBuilder tb = new TokenBuilder();
-          while((it = nextStr(iter)) != null) {
-            tb.add(it);
-            tb.add(' ');
-          }
-          final int oc = ctx.ftopt.contains(ctx.fttoken, ctx.ftselect,
-              tb.finish());
-          len += tb.size;
+        }
+        break;
+      case ANY:
+        while((it = nextStr(iter)) != null) {
+          final int oc = ctx.ftopt.contains(ctx, it);
+          len += it.length;
           final int c = ctx.ftopt.qu.count();
           o += c > 0 ? oc / c : 0;
-          break;
-      }
+        }
+        break;
+      case ANYWORD:
+        while((it = nextStr(iter)) != null) {
+          for(final byte[] txt : split(it, ' ')) {
+            final int oc = ctx.ftopt.contains(ctx, txt);
+            len += txt.length;
+            o += oc;
+          }
+        }
+        break;
+      case PHRASE:
+        final TokenBuilder tb = new TokenBuilder();
+        while((it = nextStr(iter)) != null) {
+          tb.add(it);
+          tb.add(' ');
+        }
+        final int oc = ctx.ftopt.contains(ctx, tb.finish());
+        len += tb.size;
+        final int c = ctx.ftopt.qu.count();
+        o += c > 0 ? oc / c : 0;
+        break;
     }
 
     long mn = 1;
@@ -171,22 +166,32 @@ public final class FTWords extends FTExpr {
       final IndexContext ic) {
     /*
      * If the following conditions yield true, the index is accessed:
-     * - no FTTimes option is specified and query is a simple String item
+     * - the query is a simple String item
+     * - no FTTimes option is specified
+     * - FTMode is different to ANY, ALL and PHRASE
      * - case sensitivity, diacritics and stemming flags comply with index
      * - no stop words are specified
-     * - if wildcards are specified, the full-text index is a trie
+     * - no wildcards are specified, or the index is a trie
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ctx.ftopt;
-    if(occ != null || word == null || word.length == 0 ||
+    if(word == null || word.length == 0 || occ != null ||
+        mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
         md.ftst != fto.is(FTOpt.ST) || fto.sw != null ||
-        (fto.is(FTOpt.WC) && md.ftfz)) return false;
+        fto.is(FTOpt.WC) && md.ftfz) return false;
     
-    // index size is incorrect for phrases
+    // summarize minimum number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(word, fto);
-    ic.is = Integer.MAX_VALUE;
-    while(ic.is != 0 && ft.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(ft));
+    ic.is = 0;
+    while(ft.more()) {
+      final double s = ic.data.nrIDs(ft);
+      if(s == 0) {
+        ic.is = 0;
+        break;
+      }
+      ic.is += s;
+    }
     return true;
   }
 

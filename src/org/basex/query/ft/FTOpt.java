@@ -124,18 +124,16 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Checks if the first token contains the second full-text term.
-   * @param tk ft tokenizer
-   * @param pos ft position filter
+   * @param ctx query context
    * @param q query token
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final Tokenizer tk, final FTSelect pos, final byte[] q)
-      throws QueryException {
-
+  int contains(final QueryContext ctx, final byte[] q) throws QueryException {
     if(q.length == 0) return 0;
 
     // assign options to text
+    final Tokenizer tk = ctx.fttoken;
     tk.st = is(ST);
     tk.dc = is(DC);
     tk.cs = is(CS);
@@ -198,7 +196,7 @@ public final class FTOpt extends ExprInfo {
     }
 
     if(il == null) return 0;
-    pos.add(q, il);
+    ctx.ftselect.add(q, il);
     return il.size;
   }
 

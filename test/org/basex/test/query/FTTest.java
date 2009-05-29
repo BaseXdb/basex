@@ -111,6 +111,8 @@ public final class FTTest extends AbstractTest {
         "//w[text() = 'hello' and text() ftcontains 'hello']" },
       { "FT 11", nodes(),
         "//wld[text() ftcontains '']" },
+      { "FT 12", nodes(),
+        "//wld[text() ftcontains ' ']" },
 
       { "Preds 1", nodes(7, 9, 11),
         "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },

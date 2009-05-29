@@ -32,22 +32,22 @@ public final class Scoring {
 
   /**
    * Combines two scoring values.
-   * @param s1 first value
-   * @param s2 second value
+   * @param o old value
+   * @param n new value
    * @return result
    */
-  public double and(final double s1, final double s2) {
-    return 1 - ((1 - s1) * (1 - s2));
+  public double and(final double o, final double n) {
+    return 1 - ((1 - o) * (1 - n));
   }
 
   /**
    * Combines two scoring values.
-   * @param s1 first value
-   * @param s2 second value
+   * @param o old value
+   * @param n new value
    * @return result
    */
-  public double or(final double s1, final double s2) {
-    return and(s1, s2);
+  public double or(final double o, final double n) {
+    return and(o, n);
   }
 
   /**

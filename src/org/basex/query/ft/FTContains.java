@@ -35,8 +35,6 @@ public class FTContains extends Expr {
   public Tokenizer ft = new Tokenizer();
   /** Flag for first evaluation.*/
   private int div;
-  /** Visualize full-text results. */
-  private boolean vis = true;
   
   /**
    * Constructor.
@@ -94,7 +92,6 @@ public class FTContains extends Expr {
       return false;
     
     final boolean ia = ftexpr.indexAccessible(ctx, ic);
-    vis = !ic.ftnot;
     return ia;
   }
   
@@ -107,7 +104,7 @@ public class FTContains extends Expr {
     
     final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsSIndex(expr, ae, vis);
+    if(ic.seq) return new FTContainsSIndex(expr, ae, !ic.ftnot);
 
     // standard index evaluation; first expression will always be an axis path
     ctx.compInfo(OPTFTXINDEX);
