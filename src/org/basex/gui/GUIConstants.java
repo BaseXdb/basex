@@ -151,8 +151,8 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color COLORDARK = new Color(64, 64, 64);
 
-  /** Full-text color. */
-  public static final Color COLORFT = new Color(0, 224, 0);
+//  /** Fulltext color. */
+//  public static final Color COLORFT = new Color(0, 224, 0);
   
   /* Colors of full-text hits.
   private static final Color[] COLORFT = new Color[] {
@@ -161,13 +161,13 @@ public final class GUIConstants {
     new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
     new Color(240, 240, 0)
   };
-
-  /* Colors of full-text hits.
+*/
+  /** Colors of full-text hits.*/
   private static final Color[] COLORFT = new Color[] {
-    new Color(0, 0, 0), new Color(255, 0, 0), new Color(0, 255, 0), 
-    new Color(0, 0, 255), new Color(255, 255, 0), new Color(255, 0, 255), 
-    new Color(0, 255, 255), new Color(192, 192, 192)
-  };*/
+    new Color(0, 255, 0), new Color(255, 0, 0),  
+    new Color(127, 0, 255), new Color(255, 200, 0), new Color(255, 0, 255), 
+    new Color(0, 255, 255), new Color(192, 192, 192), new Color(0, 0, 0)
+  };
   
   /** Transparent background color. */
   public static Color back;
@@ -312,5 +312,15 @@ public final class GUIConstants {
     if(f == lfont) return lwidth;
     if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
+  }
+  
+  /**
+   * Get fulltext color.
+   * @param p pointer on token in query.
+   * @return color
+   */
+  public static Color getFTColor(final int p) {
+    if (p == 0 || p > COLORFT.length) return COLORFT[0];
+    else return COLORFT[p - 1];
   }
 }

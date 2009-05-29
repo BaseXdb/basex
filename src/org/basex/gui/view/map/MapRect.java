@@ -25,7 +25,9 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   byte thumblh;
   /** Width of a thumbnail unit. */
   double thumbf;
-
+  /** Width of a space between two thumbnails. **/
+  double thumbsw;
+  
   /**
    * Default constructor.
    */

@@ -381,8 +381,9 @@ public class AxisPath extends Path {
     final Item c = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
+    
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
-
+ 
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
       litem = it;
       ctx.item = it;

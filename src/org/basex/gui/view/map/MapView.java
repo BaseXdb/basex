@@ -361,7 +361,8 @@ public final class MapView extends View implements Runnable {
     if(focused == null || mainRects.size == 1 &&
         focused == mainRects.get(0)) {
       gui.painting = false;
-      return;
+//      return;
+      if (focused == null || !focused.thumb) return;
     }
 
     if(GUIProp.mapoffsets == 0) {
@@ -415,14 +416,12 @@ public final class MapView extends View implements Runnable {
 
         boolean sen = false;
         boolean spc = false;
-        double sw = focused.thumbf;
         switch(focused.thumbal) {
           case 0:  sen = true; spc = true; break;
           case 1:  sen = true; break;
           case 2:  break;
-          default: sw = Math.max(1.5, focused.thumbf);
         }
-        MapRenderer.calculateThumbnailsToolTip(focused, d, sen, sw,
+        MapRenderer.calculateThumbnailsToolTip(focused, d, sen,
             mouseX, mouseY, getWidth(), g, spc);
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
