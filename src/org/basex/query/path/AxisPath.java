@@ -291,8 +291,8 @@ public class AxisPath extends Path {
       // check if resulting index path will be duplicate free
       final boolean d = stp.pred.length == 0 || pathNodes(data, i) == null;
       for(int p = 0; p < stp.pred.length; p++) {
-        final IndexContext ic = new IndexContext(data, stp, d);
-        if(!stp.pred[p].indexAccessible(ctx, ic)) {
+        final IndexContext ic = new IndexContext(ctx, data, stp, d);
+        if(!stp.pred[p].indexAccessible(ic)) {
           ictx = null;
         } else if(ictx == null || ictx.is > ic.is) {
           ictx = ic;
@@ -315,7 +315,7 @@ public class AxisPath extends Path {
       }
 
       // replace expressions for index access
-      final Expr ie = stp.pred[minp].indexEquivalent(ctx, ictx);
+      final Expr ie = stp.pred[minp].indexEquivalent(ictx);
 
       if(ictx.seq) {
         // do not invert path

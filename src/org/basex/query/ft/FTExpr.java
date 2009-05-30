@@ -81,8 +81,7 @@ public abstract class FTExpr extends Expr {
 
   @Override
   @SuppressWarnings("unused")
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
     BaseX.notexpected();
     return null;
   }

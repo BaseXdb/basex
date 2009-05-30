@@ -162,20 +162,20 @@ public final class FTWords extends FTExpr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) {
+  public boolean indexAccessible(final IndexContext ic) {
     /*
      * If the following conditions yield true, the index is accessed:
      * - the query is a simple String item
-     * - no FTTimes option is specified
+     * - no FTTimes option and no weight is specified
      * - FTMode is different to ANY, ALL and PHRASE
      * - case sensitivity, diacritics and stemming flags comply with index
      * - no stop words are specified
      * - no wildcards are specified, or the index is a trie
      */
     final MetaData md = ic.data.meta;
-    final FTOpt fto = ctx.ftopt;
-    if(word == null || word.length == 0 || occ != null ||
+    final FTOpt fto = ic.ctx.ftopt;
+    if(word == null || word.length == 0 ||
+        occ != null || ic.ctx.ftopt.weight != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
         md.ftst != fto.is(FTOpt.ST) || fto.sw != null ||
@@ -196,7 +196,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic) {
+  public FTExpr indexEquivalent(final IndexContext ic) {
     return new FTIndex(ic.data, word);
   }
   

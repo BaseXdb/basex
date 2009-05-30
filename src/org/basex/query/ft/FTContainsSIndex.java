@@ -46,10 +46,11 @@ public final class FTContainsSIndex extends FTContains {
     DBNode n;
     while((n = (DBNode) ir.next()) != null) {
       n.score(1);
+
       while(ftn != null && !ftn.ftn.empty() && n.pre > ftn.ftn.pre()) {
         ftn = fti.next();
       }
-      
+
       if(ftn != null) {
         final boolean not = ftn.ftn.not;
         if(ftn.ftn.pre() == n.pre) {
@@ -65,6 +66,7 @@ public final class FTContainsSIndex extends FTContains {
     }
     ctx.fttoken = tmp;
 
+    // add entry to visualization
     if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
         ctx.ftselect != null && ftn.ftn.ip != null && ftn.ftn.p !=  null) {
       ctx.ftpos.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());

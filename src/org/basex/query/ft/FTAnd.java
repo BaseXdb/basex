@@ -16,14 +16,14 @@ import org.basex.util.IntList;
 public final class FTAnd extends FTExpr {
   /** Saving index of positive expressions. */
   private int[] pex;
-  /** Saving index of negative expressions (FTNot). */
+  /** Saving index of negative (ftnot) expressions. */
   private int[] nex;
   
   /**
    * Constructor.
    * @param e expression list
    */
-  public FTAnd(final FTExpr... e) {
+  public FTAnd(final FTExpr[] e) {
     super(e);
   }
 
@@ -43,16 +43,14 @@ public final class FTAnd extends FTExpr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     final IntList ip = new IntList();
     final IntList in = new IntList();
     int nmin = ic.is;
     for(int i = 0; i < expr.length; i++) {
       final boolean ftnot = ic.ftnot;
       ic.ftnot = false;
-      final boolean ia = expr[i].indexAccessible(ctx, ic);
+      final boolean ia = expr[i].indexAccessible(ic);
       final boolean ftn = ic.ftnot;
       ic.ftnot = ftnot;
       if(!ia) return false;
@@ -72,15 +70,13 @@ public final class FTAnd extends FTExpr {
   }
   
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
+  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
     if(pex.length == 1 && nex.length == 0) {
-      expr[pex[0]] = expr[pex[0]].indexEquivalent(ctx, ic);
+      expr[pex[0]] = expr[pex[0]].indexEquivalent(ic);
     }
 
     for(int i = 0; i < expr.length; i++) {
-      expr[i] = expr[i].indexEquivalent(ctx, ic);
+      expr[i] = expr[i].indexEquivalent(ic);
     }
 
     if(pex.length == 0) {

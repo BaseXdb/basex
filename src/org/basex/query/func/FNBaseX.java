@@ -93,7 +93,7 @@ final class FNBaseX extends Fun {
     final Data data = ctx.data();
     if(data == null) Err.or(XPNOCTX, this);
 
-    final IndexContext ic = new IndexContext(data, null, true);
+    final IndexContext ic = new IndexContext(ctx, data, null, true);
     final String type = string(checkStr(expr[1], ctx)).toLowerCase();
     final byte[] word = checkStr(expr[0], ctx);
 

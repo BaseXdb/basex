@@ -89,18 +89,14 @@ public final class Or extends Arr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-    
-    for(final Expr e : expr) if(!e.indexAccessible(ctx, ic)) return false;
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    for(final Expr e : expr) if(!e.indexAccessible(ic)) return false;
     return true;
   }
 
   @Override
-  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
-    super.indexEquivalent(ctx, ic);
+  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+    super.indexEquivalent(ic);
     return new Union(expr);
   }
   

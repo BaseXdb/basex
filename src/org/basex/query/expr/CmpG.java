@@ -210,9 +210,7 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
     if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
@@ -226,7 +224,7 @@ public final class CmpG extends Arr {
     if(!text && !attr) return false;
 
     // loop through all strings
-    final Iter ir = expr[1].iter(ctx);
+    final Iter ir = expr[1].iter(ic.ctx);
     Item i;
     while((i = ir.next()) != null) {
       if(!(i instanceof Str)) return false;
@@ -238,10 +236,7 @@ public final class CmpG extends Arr {
   }
   
   @Override
-  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic) {
-    // [CG] XQuery/Index: necessary/possible?
-    if(index.length == 0) return this;
-    
+  public Expr indexEquivalent(final IndexContext ic) {
     // create index access expressions
     final int il = index.length;
     final Expr[] ia = new IndexAccess[il];
@@ -254,9 +249,9 @@ public final class CmpG extends Arr {
     final AxisPath path = orig.invertPath(root, ic.step);
 
     if(index[0].type == org.basex.data.Data.Type.TXT) {
-      ctx.compInfo(OPTTXTINDEX);
+      ic.ctx.compInfo(OPTTXTINDEX);
     } else {
-      ctx.compInfo(OPTATVINDEX);
+      ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
       final Step step = orig.step[0];
       Step[] steps = { Step.get(Axis.SELF, step.test) };

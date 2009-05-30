@@ -23,7 +23,7 @@ public final class FTOr extends FTExpr {
    * Constructor.
    * @param e expression list
    */
-  public FTOr(final FTExpr... e) {
+  public FTOr(final FTExpr[] e) {
     super(e);
   }
 
@@ -40,9 +40,7 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     final IntList p = new IntList();
     final IntList n = new IntList();
     final int min = ic.is;
@@ -51,7 +49,7 @@ public final class FTOr extends FTExpr {
     for(int i = 0; i < expr.length; i++) {
       final boolean ftnot = ic.ftnot;
       ic.ftnot = false;
-      final boolean ia = expr[i].indexAccessible(ctx, ic);
+      final boolean ia = expr[i].indexAccessible(ic);
       final boolean ftn = ic.ftnot;
       ic.ftnot = ftnot;
       if(!ia) return false;
@@ -84,12 +82,8 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
-    for(int i = 0; i < expr.length; i++) {
-      expr[i] = expr[i].indexEquivalent(ctx, ic);
-    }
+  public FTExpr indexEquivalent(final IndexContext ic)throws QueryException {
+    for(int i = 0; i < expr.length; i++) expr[i] = expr[i].indexEquivalent(ic);
 
     if(pex.length == 0) {
       // !A FTOR !B = !(a ftand b)

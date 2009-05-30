@@ -28,10 +28,10 @@ public final class FTPosData {
   private int size;
 
   /**
-   * Add a ftand color result.
+   * Adds an ftand color result.
    * @param c int[] ftand color result
    */
-  public void addFTAndCol(final byte[] c) {
+  public void addCol(final byte[] c) {
     col.add(c);
   }
   
@@ -187,8 +187,8 @@ public final class FTPosData {
    * @param pre pre value
    * @param div div to add for each pointer
    */
-  public void addConvSeqData(final IntList[] d, final int pre, final int div) {
-    if (d.length == 0) return;
+  public void add(final IntList[] d, final int pre, final int div) {
+    if(d.length == 0) return;
 
     int[] pp;
     int[] p;

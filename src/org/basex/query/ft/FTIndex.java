@@ -20,7 +20,7 @@ import org.basex.query.iter.FTNodeIter;
  */
 public final class FTIndex extends FTExpr {
   /** Full-text token. */
-  final byte[] tok;
+  private final byte[] tok;
   /** Data reference. */
   final Data data;
   /** Index iterator. */
@@ -38,24 +38,23 @@ public final class FTIndex extends FTExpr {
   
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter() {
-      public final FTOpt fto = ctx.ftopt;
+    if(iat == null) {
+      final Tokenizer ft = new Tokenizer(tok, ctx.ftopt);
+      ft.lp = true;
+      ft.init();
+      int w = 0;
+      while(ft.more()) {
+        final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
+        iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
+        w++;
+      }
+      iat.setToken(new Tokenizer[] { ft });
+      iat.setTokenNum(++ctx.ftcount);
+    }
 
+    return new FTNodeIter() {
       @Override
       public FTNodeItem next() {
-        if(iat == null) {
-          final Tokenizer ft = new Tokenizer(tok, fto);
-          ft.lp = true;
-          ft.init();
-          int w = 0;
-          while(ft.more()) {
-            final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
-            iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
-            w++;
-          }
-          iat.setToken(new Tokenizer[] { ft });
-          iat.setTokenNum(++ctx.ftcount);
-        }
         return new FTNodeItem(iat.more() ? iat.node() : new FTNode(), data);
       }
     };

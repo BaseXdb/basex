@@ -53,12 +53,8 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
-    for(int e = 0; e < expr.length; e++) {
-      expr[e] = expr[e].indexEquivalent(ctx, ic);
-    }
+  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 

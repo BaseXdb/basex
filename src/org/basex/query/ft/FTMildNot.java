@@ -46,13 +46,11 @@ public final class FTMildNot extends FTExpr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-    
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     final int mmin = ic.is;
     IntList il = new IntList(expr.length - 1);
     for (int i = 1; i < expr.length; i++) {
-      if(!expr[i].indexAccessible(ctx, ic)) return false;
+      if(!expr[i].indexAccessible(ic)) return false;
       if (ic.is > 0) il.add(i);
     }
     
@@ -63,32 +61,30 @@ public final class FTMildNot extends FTExpr {
       for (int i = 0; i < il.size; i++) e[c++] = expr[il.list[i]];
       expr = e;
     }
-    final boolean ia = expr[0].indexAccessible(ctx, ic);
+    final boolean ia = expr[0].indexAccessible(ic);
     ic.is = mmin < ic.is ? mmin : ic.is;
     return ia;
   }
   
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
-
-    if (expr.length == 1) return expr[0].indexEquivalent(ctx, ic);
+  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
+    if(expr.length == 1) return expr[0].indexEquivalent(ic);
     
     // assumption 1: ftcontains "a" not in "a b" not in "a c"
     // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
-    
+
     final FTExpr[] ie = new FTExpr[2];
     final FTMildNotIndex[] mne = new FTMildNotIndex[expr.length - 1];
     final int[] pex = new int[expr.length - 1];
-    ie[0] = expr[0].indexEquivalent(ctx, ic);
-    for (int i = 1; i < expr.length; i++) {
-      ie[1] = expr[i].indexEquivalent(ctx, ic);
+    ie[0] = expr[0].indexEquivalent(ic);
+    for(int i = 1; i < expr.length; i++) {
+      ie[1] = expr[i].indexEquivalent(ic);
       mne[i - 1] = new FTMildNotIndex(ie);
       pex[i - 1] = i - 1;
     }
-    if (mne.length == 1) {
+    if(mne.length == 1) {
       return mne[0];
     }
-    return new FTIntersection(pex, new int[]{}, mne);
+    return new FTIntersection(pex, new int[] {}, mne);
   }
 }

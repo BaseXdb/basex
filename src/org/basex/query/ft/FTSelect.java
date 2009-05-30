@@ -139,18 +139,14 @@ public class FTSelect extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // [SG] are all position filters supported by the index?
-    return expr[0].indexAccessible(ctx, ic) && filter.length == 0;
+    return expr[0].indexAccessible(ic) && filter.length == 0;
   }
 
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
-
-    expr[0] = expr[0].indexEquivalent(ctx, ic);
+  public FTExpr indexEquivalent(final IndexContext ic)throws QueryException {
+    expr[0] = expr[0].indexEquivalent(ic);
     return new FTSelectIndex(this);
   }
 

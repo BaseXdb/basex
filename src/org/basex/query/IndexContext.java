@@ -11,6 +11,8 @@ import org.basex.query.path.Step;
  * @author Sebastian Gath
  */
 public final class IndexContext {
+  /** Query context. */
+  public final QueryContext ctx;
   /** Data reference. */
   public final Data data;
   /** Index Step. */
@@ -26,11 +28,14 @@ public final class IndexContext {
 
   /**
    * Constructor.
+   * @param c query context
    * @param d data reference
    * @param s index step
    * @param l duplicate flag
    */
-  public IndexContext(final Data d, final Step s, final boolean l) {
+  public IndexContext(final QueryContext c, final Data d, final Step s,
+      final boolean l) {
+    ctx = c;
     data = d;
     step = s;
     dupl = l;

@@ -35,21 +35,18 @@ public final class FTNot extends FTExpr {
   }
   
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-    
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     ic.ftnot ^= true;
     // in case of ftand ftnot seq could be set false in FTAnd
     ic.seq = true;
-    final boolean ia = expr[0].indexAccessible(ctx, ic);
+    final boolean ia = expr[0].indexAccessible(ic);
     ic.is = Integer.MAX_VALUE;
     return ia;
   }
 
   @Override
-  public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
-    return new FTNotIndex(expr[0].indexEquivalent(ctx, ic));
+  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
+    return new FTNotIndex(expr[0].indexEquivalent(ic));
   }
 
   @Override

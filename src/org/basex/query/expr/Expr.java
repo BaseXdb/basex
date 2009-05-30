@@ -184,14 +184,12 @@ public abstract class Expr extends ExprInfo {
   
   /**
    * Checks if an index can be used for query evaluation.
-   * @param ctx query context
    * @param ic index context
    * @return true if an index can be used
    * @throws QueryException Exception
    */
   @SuppressWarnings("unused")
-  public boolean indexAccessible(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     return false;
   }
   
@@ -199,14 +197,12 @@ public abstract class Expr extends ExprInfo {
    * Returns an equivalent expression which accesses an index structure. 
    * Must be called if {@link #indexAccessible} is implemented for an
    * expression.
-   * @param ctx query context
    * @param ic index context
    * @return Equivalent index-expression or null
    * @throws QueryException Exception
    */
   @SuppressWarnings("unused")
-  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     BaseX.notexpected();
     return null;
   }

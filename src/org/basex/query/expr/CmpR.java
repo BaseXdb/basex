@@ -118,9 +118,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) {
-
+  public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
     if(s == null) return false;
@@ -145,14 +143,13 @@ public final class CmpR extends Single {
   }
   
   @Override
-  public AxisPath indexEquivalent(final QueryContext ctx,
-      final IndexContext ic) {
+  public AxisPath indexEquivalent(final IndexContext ic) {
     final Expr root = new IndexAccess(rt, ic);
     
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    ctx.compInfo(OPTRNGINDEX);
+    ic.ctx.compInfo(OPTRNGINDEX);
     if(rt.type == org.basex.data.Data.Type.ATV) {
       // add attribute step
       final Step step = orig.step[0];

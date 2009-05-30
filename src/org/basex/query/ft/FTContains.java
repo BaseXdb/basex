@@ -64,52 +64,44 @@ public class FTContains extends Expr {
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     final IntList[] ftd = ctx.ftd;
-    double d = 0;
-    Item i;
     ctx.fttoken = ft;
+    double s = 0;
+    Item i;
 
     while((i = iter.next()) != null) {
       ft.init(i.str());
-      final double d2 = ftexpr.atomic(ctx).score();
-      d = ctx.score.and(d, d2);
+      final double d = ftexpr.atomic(ctx).score();
+      s = ctx.score.and(s, d);
 
-      if(ctx.ftpos != null && ctx.ftd != null && d2 > 0 && i instanceof DBNode)
-        ctx.ftpos.addConvSeqData(ctx.ftd, ((DBNode) i).pre, div);
+      // add entry to visualization
+      if(ctx.ftpos != null && ctx.ftd != null && d > 0 && i instanceof DBNode)
+        ctx.ftpos.add(ctx.ftd, ((DBNode) i).pre, div);
     }
     
     ctx.fttoken = tmp;
     ctx.ftd = ftd;
-    return Bln.get(d);
+    return Bln.get(s);
   }
 
   @Override
-  public boolean indexAccessible(final QueryContext ctx,
-      final IndexContext ic) throws QueryException {
-
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // return if step is no text node, or if no index is available
     final Step s = CmpG.indexStep(expr);
-    if(s == null || !ic.data.meta.ftxindex || s.test.type != Type.TXT)
-      return false;
-    
-    final boolean ia = ftexpr.indexAccessible(ctx, ic);
-    return ia;
+    return s != null && ic.data.meta.ftxindex && s.test.type == Type.TXT &&
+      ftexpr.indexAccessible(ic);
   }
   
   @Override
-  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-      throws QueryException {
+  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+    ic.ctx.compInfo(OPTFTXINDEX);
 
-    // [CG] XQuery/Index: necessary/possible?
-    if(!ic.data.meta.ftxindex) return this;
-    
-    final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);
+    final FTExpr ie = ftexpr.indexEquivalent(ic);
+
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsSIndex(expr, ae, !ic.ftnot);
+    if(ic.seq) return new FTContainsSIndex(expr, ie, !ic.ftnot);
 
     // standard index evaluation; first expression will always be an axis path
-    ctx.compInfo(OPTFTXINDEX);
-    final Expr root = new FTIndexAccess(ae, ft, ic);
-    return ((AxisPath) expr).invertPath(root, ic.step);
+    return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ft, ic), ic.step);
   }
   
   @Override
