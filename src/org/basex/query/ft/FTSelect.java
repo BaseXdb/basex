@@ -108,6 +108,7 @@ public class FTSelect extends FTExpr {
    * @param il positions to be added
    */
   void add(final byte[] t, final IntList il) {
+    if (pos.length == 0) pos = new IntList[1];
     if(size == pos.length) pos = Array.extend(pos);
     pos[size++] = il;
     term.add(t);

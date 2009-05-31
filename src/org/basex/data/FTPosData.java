@@ -49,13 +49,26 @@ public final class FTPosData {
     }
 
     // find insertion position for new values or append them at the end
-    final int i = size > 0 && prepos[size - 1][0] > pp[0] ? find(pp[0]) : 0;
+    if (size == 0) {
+      prepos[size] = pp;
+      poi[size++] = p;      
+    } else if (prepos[size - 1][0] == pp[0]) {
+      add(size - 1, pp, p);
+    } else {
+      final int i = find(pp[0]);
+      if (i >= 0)
+        add(i, pp, p);
+      else 
+        add(-i - 1, pp, p);
+    }
+    /*
+    final int i = size > 0 && prepos[size - 1][0] < pp[0] ? find(pp[0]) : 0;
     if(i >= 0) {
       prepos[size] = pp;
       poi[size++] = p;
     } else {
       add(-i - 1, pp, p);
-    }
+    }*/
   }
 
   /**
@@ -65,7 +78,7 @@ public final class FTPosData {
    * @param p int[] pointer values
    */
   private void add(final int i, final int[] pp, final int[] p) {
-    if(prepos[i][0] == pp[0]) {
+    if(prepos[i] != null && prepos[i][0] == pp[0]) {
       // check if equal or merge
       if (Array.eq(pp, prepos[i])) return;
       final int[] tpp = new int[pp.length + prepos[i].length - 1];
