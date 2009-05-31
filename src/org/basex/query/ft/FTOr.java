@@ -75,6 +75,8 @@ public final class FTOr extends FTExpr {
     } else if(nex.length > 0 && pex.length > 0) {
       ic.seq = true;
       ic.is = Integer.MAX_VALUE;
+      // [SG] find solution here
+      return false;
     } else {
       ic.is = sum > min ? min : sum;
     } 
@@ -94,8 +96,9 @@ public final class FTOr extends FTExpr {
     }
 
     if(pex.length == 0) return new FTUnion(nex, true, expr);
-    if(nex.length == 0) return new FTUnion(pex, true, expr);
     if(pex.length == 1 && nex.length == 0) return expr[pex[0]];
+    if(nex.length == 0) return new FTUnion(pex, false, expr);
+    
     return new FTUnion(gen(), true, expr);
   }
   

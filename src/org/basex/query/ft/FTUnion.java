@@ -46,7 +46,6 @@ final class FTUnion extends FTExpr {
       public FTNodeItem next() throws QueryException { 
         boolean b = false;
         for(int i = 0; i < cp.size; i++) {
-          // [SG] seems to fail if first term was not found (see "FTAndOr 8") 
           final int p = pex[cp.list[i]];
           mp[p] = expr[p].iter(ctx).next();
           if(!b) b = !mp[i].ftn.empty();

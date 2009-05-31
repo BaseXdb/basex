@@ -129,13 +129,14 @@ public class FTSelect extends FTExpr {
    * @return boolean result
    */
   boolean mildNot() {
+    boolean f = true;
     for(int i = 1; i < size; i++) {
       for(int j = 0; j < pos[i].size; j++) {
         if(pos[0].contains(pos[i].list[j]))
-          return pos[0].list[pos[0].size - 1] > pos[i].list[j]; //false
+          f &= pos[0].list[pos[0].size - 1] > pos[i].list[j];
       }
     }
-    return true;
+    return f;
   }
 
   @Override

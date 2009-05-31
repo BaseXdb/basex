@@ -193,6 +193,7 @@ public final class FTOpt extends ExprInfo {
         for(int i = 0; i < qu.pos; i++) il.add(tpos + i);
       }
       tk.p = tp;
+      tk.pos = tpos;
     }
 
     if(il == null) return 0;
