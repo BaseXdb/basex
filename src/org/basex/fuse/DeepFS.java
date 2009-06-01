@@ -17,7 +17,6 @@ import org.basex.data.DataText;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.gui.GUI;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -36,8 +35,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen, Hannes Schwarz
  */
 public final class DeepFS extends DeepFuse implements DataText {
-  /** Data reference. */
-  public GUI gui;
+  /* Data reference - [AH] temporarily removed..
+  public GUI gui; */
   /** Data reference. */
   public Data data;
   /** Index References. */
@@ -366,7 +365,8 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private void refresh() {
     data.meta.update();
-    if(gui != null) gui.notify.update();
+    // [AH] temporarily removed..
+    //if(gui != null) gui.notify.update();
     // data.flush();
   }
 

@@ -1,7 +1,7 @@
 package org.basex.query.iter;
 
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 
 /**
  * Node iterator interface.
@@ -9,7 +9,7 @@ import org.basex.query.item.FTNode;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
-public abstract class FTNodeIter extends Iter {
+public abstract class FTIter extends Iter {
   @Override
-  public abstract FTNode next() throws QueryException;
+  public abstract FTItem next() throws QueryException;
 }

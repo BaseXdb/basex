@@ -6,8 +6,8 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 
 /**
@@ -20,9 +20,9 @@ public final class FTContainsSIndex extends FTContains {
   /** Flag for visualizing ftdata. */ 
   private final boolean vis;
   /** Current node item. */
-  FTNode ftn;
+  FTItem ftn;
   /** Node iterator. */
-  FTNodeIter fti;
+  FTIter fti;
   
   /**
    * Constructor.
@@ -72,7 +72,7 @@ public final class FTContainsSIndex extends FTContains {
 
     // add entry to visualization
     if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
-        ctx.ftselect != null && ftn.fte.pos != null && ftn.fte.poi !=  null) {
+        ftn.fte.pos != null && ftn.fte.poi !=  null) {
       ctx.ftpos.add(ftn.fte.pos.finish(), ftn.fte.poi.finish());
     }
     

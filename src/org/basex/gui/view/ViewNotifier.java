@@ -5,7 +5,6 @@ import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
@@ -66,8 +65,10 @@ public final class ViewNotifier {
       marked[0] = new Nodes(ctx.data());
       if(Prop.fuse) {
         BaseX.debug("[ViewNotifier] Setting gui reference in DeepFS.");
+        /* [AH] temporarily removed..
         Data data = ctx.data();
         data.fs.gui = gui;
+        */
       }
     } else {
       // close all dialogs (except help) together with database

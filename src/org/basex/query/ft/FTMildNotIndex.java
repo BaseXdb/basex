@@ -2,8 +2,8 @@ package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.util.IntList;
 
 /**
@@ -22,18 +22,18 @@ final class FTMildNotIndex extends FTExpr {
   }
   
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
-    return new FTNodeIter() {
-      final FTNodeIter i1 = expr[0].iter(ctx);
-      final FTNodeIter i2 = expr[1].iter(ctx);
-      FTNode n0, n1;
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    return new FTIter() {
+      final FTIter i1 = expr[0].iter(ctx);
+      final FTIter i2 = expr[1].iter(ctx);
+      FTItem n0, n1;
       
       @Override
-      public FTNode next() throws QueryException { 
+      public FTItem next() throws QueryException { 
         if(n0 == null) n0 = i1.next();
         if(n1 == null) n1 = i2.next();
         if(n0.empty() || n1.empty()) {
-          final FTNode tmp = n0;
+          final FTItem tmp = n0;
           n0 = null;
           return tmp;
         } 
@@ -45,7 +45,7 @@ final class FTMildNotIndex extends FTExpr {
         
         int d = n0.fte.pre() - n1.fte.pre();
         if(d < 0) {
-          final FTNode tmp = n0;
+          final FTItem tmp = n0;
           n0 = null;
           return tmp;
         }
@@ -71,7 +71,7 @@ final class FTMildNotIndex extends FTExpr {
         }
 
         if(pos.size > 1) {
-          final FTNode tmp = n0;
+          final FTItem tmp = n0;
           tmp.fte.pos = pos;
           tmp.fte.poi = poi;
           n0 = null;

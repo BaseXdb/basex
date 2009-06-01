@@ -3,11 +3,12 @@ package org.basex.query.ft;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 
 /**
  * FTWindow expression.
@@ -27,9 +28,9 @@ public class FTWindow extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTNode node)
+  boolean filter(final QueryContext ctx, final FTItem n, final Tokenizer ft)
       throws QueryException {
-    return checkDist(1, checkItr(expr[0], ctx), false, node.pos);
+    return checkDist(1, checkItr(expr[0], ctx), false, n.pos, ft);
   }
 
   @Override

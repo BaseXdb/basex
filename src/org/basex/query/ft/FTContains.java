@@ -12,7 +12,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -69,7 +69,7 @@ public class FTContains extends Expr {
 
     while((it = iter.next()) != null) {
       ft.init(it.str());
-      final FTNode node = ftexpr.atomic(ctx);
+      final FTItem node = ftexpr.atomic(ctx);
       final double d = node.score();
       s = ctx.score.and(s, d);
 

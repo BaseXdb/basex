@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
@@ -26,8 +26,8 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTNode atomic(final QueryContext ctx) throws QueryException {
-    FTNode it = expr[0].atomic(ctx);
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    FTItem it = expr[0].atomic(ctx);
     double d = it.score();
     if(d != 0) {
       boolean f = false;

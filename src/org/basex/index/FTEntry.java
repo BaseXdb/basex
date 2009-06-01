@@ -20,8 +20,6 @@ public final class FTEntry {
   /** Flag for negative node. */
   public boolean not;
 
-  /** Pre value of the current node. */
-  private int pre;
   /** Counter for pos values. */
   private int c;
   /** List for tokens from query. */
@@ -31,7 +29,7 @@ public final class FTEntry {
    * Constructor.
    */
   public FTEntry() {
-    pos = new IntList();
+    pos = new IntList(1);
   }
 
   /**
@@ -52,7 +50,14 @@ public final class FTEntry {
    * @return pre value
    */
   public int pre() {
-    return pos != null ? pos.list[0] : pre;
+    return pos.list[0];
+  }
+  
+  /**
+   * Reset position iterator.
+   */
+  public void reset() {
+    c = 0;
   }
   
   /**
@@ -64,26 +69,19 @@ public final class FTEntry {
   }
 
   /**
-   * Reset position iterator.
-   */
-  public void reset() {
-    c = 0;
-  }
-
-  /**
-   * Returns the current tokenizer.
-   * @return tokenizer
-   */
-  public Tokenizer[] getToken() {
-    return tok;
-  }
-  
-  /**
    * Get next pos value.
    * @return pos value
    */
   public int nextPos() {
     return pos.list[c];
+  }
+
+  /**
+   * Get next pointer.
+   * @return next pointer
+   */
+  public int nextPoi() {
+    return poi.list[c];
   }
   
   /**
@@ -168,14 +166,6 @@ public final class FTEntry {
   private void add(final IntList il, final IntList pn) {
     il.add(nextPos());
     if(pn != null) pn.add(nextPoi());
-  }
-
-  /**
-   * Get next pointer.
-   * @return next pointer
-   */
-  public int nextPoi() {
-    return poi.list[c];
   }
   
   @Override

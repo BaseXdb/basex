@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 import org.basex.util.IntList;
 
 /**
@@ -28,17 +28,17 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTNode atomic(final QueryContext ctx) throws QueryException {
-    FTNode it = null; 
-    double d = 0;
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    FTItem it = null; 
+    double s = 0;
     for(final FTExpr e : expr) {
       it = e.atomic(ctx).union(it);
-      double s = d;
-      d = it.score();
-      if(d == 0) break;
-      d = ctx.score.and(d, s);
+      final double d = s;
+      s = it.score();
+      if(s == 0) break;
+      s = ctx.score.and(s, d);
     }
-    it.score(d);
+    it.score(s);
     return it;
   }
   
@@ -75,7 +75,7 @@ public final class FTAnd extends FTExpr {
 
     if(pex.length == 0) {
       // !A FTAnd !B = !(a ftor b)
-      for(int i = 0; i < nex.length; i++) expr[nex[i]] = expr[nex[i]].expr[0];
+      for(int i = 0; i < expr.length; i++) expr[i] = expr[i].expr[0];
       return new FTNotIndex(new FTUnion(nex, false, expr));
     }
     return new FTIntersection(pex, nex, expr);

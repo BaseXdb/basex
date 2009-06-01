@@ -21,7 +21,6 @@ import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Root;
 import org.basex.query.ft.FTOpt;
-import org.basex.query.ft.FTSelect;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -85,8 +84,6 @@ public final class QueryContext extends Progress {
   public Tokenizer fttoken;
   /** Current full-text options. */
   public FTOpt ftopt = new FTOpt();
-  /** Current full-text position filters. */
-  public FTSelect ftselect = new FTSelect(null);
 
   /** Current Date. */
   public Dat date;

@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 
 /**
  * FTUnaryNot expression.
@@ -26,8 +26,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTNode atomic(final QueryContext ctx) throws QueryException {
-    final FTNode it = expr[0].atomic(ctx);
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    final FTItem it = expr[0].atomic(ctx);
     it.score(it.score() == 0 ? 1 : 0);
     return it;
   }

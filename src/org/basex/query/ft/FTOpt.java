@@ -14,7 +14,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.IntList;
@@ -132,7 +132,7 @@ public final class FTOpt extends ExprInfo {
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final byte[] q, final Tokenizer tk, final FTNode node)
+  int contains(final byte[] q, final Tokenizer tk, final FTItem node)
       throws QueryException {
     if(q.length == 0) return 0;
 

@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.item.FTItem;
 import org.basex.util.IntList;
 
 /**
@@ -28,14 +28,16 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTNode atomic(final QueryContext ctx) throws QueryException {
-    FTNode it = null; 
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    FTItem it = null; 
     double d = 0;
     for(final FTExpr e : expr) {
-      it = e.atomic(ctx).union(it);
-      d = ctx.score.or(it.score(), d);
+      final FTItem i = e.atomic(ctx);
+      it = i.score() != 0 ? i.union(it) : it;
+      d = ctx.score.or(i.score(), d);
     }
-    it.score(d);
+    if(it == null) it = new FTItem(0);
+    else it.score(d);
     return it;
   }
   
@@ -91,16 +93,18 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic)throws QueryException {
+  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
     for(int i = 0; i < expr.length; i++) expr[i] = expr[i].indexEquivalent(ic);
 
     if(pex.length == 0) {
       // !A FTOR !B = !(a ftand b)
-      for(int i = 0; i < nex.length; i++) expr[nex[i]] = expr[nex[i]].expr[0];
+      for(int i = 0; i < expr.length; i++) expr[i] = expr[i].expr[0];
       return new FTNotIndex(new FTIntersection(pex, nex, expr));
     }
 
-    if(pex.length == 0) return new FTUnion(nex, true, expr);
+    // [SG] is never the case..
+    //if(pex.length == 0) return new FTUnion(nex, true, expr);
+
     if(nex.length == 0) return pex.length == 1 ?
         expr[pex[0]] : new FTUnion(pex, false, expr);
     

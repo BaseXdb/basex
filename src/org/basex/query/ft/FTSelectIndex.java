@@ -5,11 +5,11 @@ import org.basex.data.Serializer;
 import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 
 /**
- * FTSelectIndex expression.
+ * Index-based full-text select expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -27,23 +27,19 @@ final class FTSelectIndex extends FTExpr {
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
-    final FTSelect tmp = ctx.ftselect;
-    final FTNodeIter ir = sel.expr[0].iter(ctx);
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    final FTIter ir = sel.expr[0].iter(ctx);
 
-    return new FTNodeIter() {
+    return new FTIter() {
       @Override
-      public FTNode next() throws QueryException {
-        ctx.ftselect = sel;
-        
-        FTNode it;
-        while(!(it = ir.next()).empty() && !ctx.ftselect.standard()) {
-          it.setPos();
-          sel.ft = new Tokenizer(it.data.text(it.fte.pre()));
-          if(sel.filter(ctx, it)) break;
+      public FTItem next() throws QueryException {
+        FTItem it;
+        while(!(it = ir.next()).empty() && !sel.standard()) {
+          // [SG] this here won't be executed as, currently, no filters
+          //   are allowed for the the index version (see FTSelect)
+          it.convertPos();
+          if(sel.filter(ctx, it, new Tokenizer(it.str()))) break;
         }
-
-        ctx.ftselect = tmp;
         return it;
       }
     };

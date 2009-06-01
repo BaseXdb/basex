@@ -2,8 +2,8 @@ package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTNodeIter;
+import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -15,12 +15,8 @@ import org.basex.util.TokenBuilder;
 final class FTIntersection extends FTExpr {
   /** Saving index of positive expressions. */
   final int[] pex;
-  /** Saving index of negative expressions (FTNot). */
+  /** Saving index of negative (ftnot) expressions. */
   final int[] nex;
-  /** Cache for positive expression. */
-  final FTNode[] cp;
-  /** Cache for negative expression. */
-  final FTNode[] cn;
   
   /**
    * Constructor.
@@ -32,27 +28,33 @@ final class FTIntersection extends FTExpr {
     super(e);
     pex = p;
     nex = n;
-    cp = new FTNode[p.length];
-    cn = new FTNode[n.length];
   }
 
   @Override
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    // initialize iterators
+    final FTIter[] ir = new FTIter[expr.length];
+    for(int i = 0; i < expr.length; i++) ir[i] = expr[i].iter(ctx);
+
+    return new FTIter() {
+      /** Cache for positive expression. */
+      final FTItem[] cp = new FTItem[pex.length];
+      /** Cache for negative expression. */
+      final FTItem[] cn = new FTItem[nex.length];
       /** Collect each pointer once for a result.*/
       TokenBuilder col = new TokenBuilder();
       /** Temporary node.  */
-      FTNode nod2;
+      FTItem nod2;
 
       @Override
-      public FTNode next() throws QueryException {
+      public FTItem next() throws QueryException {
         if(pex.length > 0) {
           moreP();
         } else {
           moreN();
         }
         
-        final FTNode n1 = calcFTAnd(cp, true);
+        final FTItem n1 = calcFTAnd(cp, true);
         if(!n1.empty()) {
           nod2 = nex.length > 0 && nod2 == null && moreN() ?
               calcFTAnd(cn, false) : nod2;
@@ -73,7 +75,7 @@ final class FTIntersection extends FTExpr {
           col = null;
           return n1;
         }
-        return cp.length == 0 ? calcFTAnd(cn, false) : new FTNode();
+        return cp.length == 0 ? calcFTAnd(cn, false) : new FTItem();
       }
 
       /**
@@ -83,14 +85,14 @@ final class FTIntersection extends FTExpr {
        * @return FTNode as result node
        * @throws QueryException Exception
        */
-      private FTNode calcFTAnd(final FTNode[] n, final boolean p)
+      private FTItem calcFTAnd(final FTItem[] n, final boolean p)
           throws QueryException {
 
-        if(n.length == 0) return new FTNode();
+        if(n.length == 0) return new FTItem();
         if(n.length == 1) return n[0];
 
-        FTNode n1 = n[0];
-        FTNode n2;
+        FTItem n1 = n[0];
+        FTItem n2;
         for(int i = 1; i < n.length; i++) {
           n2 = n[i];
           if(n1.empty()) return n1;
@@ -131,7 +133,7 @@ final class FTIntersection extends FTExpr {
        */
       private boolean moreN() throws QueryException {
         for(int i = 0; i < cn.length; i++) {
-          cn[i] = expr[nex[i]].iter(ctx).next();
+          cn[i] = ir[nex[i]].next();
           if(cn[i].empty()) return false;
         }
         return true;
@@ -144,7 +146,7 @@ final class FTIntersection extends FTExpr {
        */
       private boolean moreP() throws QueryException {
         for(int i = 0; i < cp.length; i++) {
-          cp[i] = expr[pex[i]].iter(ctx).next();
+          cp[i] = ir[pex[i]].next();
           if(cp[i].empty()) return false;
         }
         return true;
@@ -158,11 +160,10 @@ final class FTIntersection extends FTExpr {
        * @return FTNodeItem
        * @throws QueryException Exception
        */
-      private FTNode more(final FTNode[] n, final int i,
-           final boolean p) throws QueryException {
+      private FTItem more(final FTItem[] n, final int i, final boolean p)
+          throws QueryException {
 
-        if(p) n[i] = expr[pex[i]].iter(ctx).next();
-        else n[i] = expr[nex[i]].iter(ctx).next();
+        n[i] = ir[p ? pex[i] : nex[i]].next();
         return n[i];
       }
     };

@@ -12,7 +12,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
-public final class FTNode extends DBNode {
+public final class FTItem extends DBNode {
   /** Full-text entry. Only used by the index variant. */
   public FTEntry fte;
   /** Position lists. Needed for position filters. */
@@ -22,14 +22,14 @@ public final class FTNode extends DBNode {
    * Constructor, called by the sequential variant.
    * @param s scoring
    */
-  public FTNode(final double s) {
+  public FTItem(final double s) {
     score = s;
   }
 
   /**
    * Constructor, called by the index variant. 
    */
-  public FTNode() {
+  public FTItem() {
     fte = new FTEntry();
   }
 
@@ -38,8 +38,8 @@ public final class FTNode extends DBNode {
    * @param f full-text entry
    * @param d data reference
    */
-  public FTNode(final FTEntry f, final Data d) {
-    super(d, f.pre());
+  public FTItem(final FTEntry f, final Data d) {
+    super(d, f.pre(), null, Type.TXT);
     fte = f;
     score = -1;
   }
@@ -57,7 +57,7 @@ public final class FTNode extends DBNode {
    * @param n second node instance
    * @return self reference
    */
-  public FTNode union(final FTNode n) {
+  public FTItem union(final FTItem n) {
     if(n != null) {
       final IntList[] tmp = new IntList[pos.length + n.pos.length];
       Array.copy(n.pos, tmp, 0);
@@ -73,25 +73,25 @@ public final class FTNode extends DBNode {
    * @param i1 second node
    * @param w number of words
    */
-  public void union(final QueryContext ctx, final FTNode i1, final int w) {
+  public void union(final QueryContext ctx, final FTItem i1, final int w) {
     fte.union(i1.fte, w);
     score = ctx.score.or(score, i1.score);
   }
-
   
   /**
-   * Sets the position list. Called by the index variant.
+   * Converts the index positions. Called by the index variant.
    */
-  public void setPos() {
-    pos = new IntList[fte.poi.list[0]];
-    for(int k = 0; k < pos.length; k++) pos[k] = new IntList();
+  public void convertPos() {
+    pos = new IntList[fte.getNumTokens()];
+    for(int p = 0; p < pos.length; p++) pos[p] = new IntList();
     fte.reset();
     while(fte.morePos()) pos[fte.nextPoi() - 1].add(fte.nextPos());
   }
 
   @Override
   public double score() {
-    if(score == -1) score = !empty() && fte.getToken() != null ? 1 : 0;
+    // default score for index results
+    if(score == -1) score = empty() ? 0 : 1;
     return score;
   }
 
