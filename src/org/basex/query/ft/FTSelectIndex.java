@@ -2,6 +2,7 @@ package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;
@@ -21,7 +22,7 @@ final class FTSelectIndex extends FTExpr {
    * Constructor.
    * @param s full-text selections
    */
-  public FTSelectIndex(final FTSelect s) {
+  FTSelectIndex(final FTSelect s) {
     sel = s;
   }
 
@@ -34,32 +35,16 @@ final class FTSelectIndex extends FTExpr {
       @Override
       public FTNode next() throws QueryException {
         ctx.ftselect = sel;
-        sel.init(ctx.fttoken);
-        FTNode it = ir.next();
-
-        if(!it.empty() && !ctx.ftselect.standard()) {
-          init(it);
-          while(!sel.filter(ctx)) {
-            it = ir.next();
-            if(it.empty()) break;
-            init(it);
-          }
+        
+        FTNode it;
+        while(!(it = ir.next()).empty() && !ctx.ftselect.standard()) {
+          it.setPos();
+          sel.ft = new Tokenizer(it.data.text(it.fte.pre()));
+          if(sel.filter(ctx, it)) break;
         }
+
         ctx.ftselect = tmp;
         return it;
-      }
-
-      /**
-       * Initializes item for next seqEval with index use.
-       * @param it current node
-       */
-      void init(final FTNode it) {
-        sel.pos = it.fte.convertPos();
-        sel.size = it.fte.poi.list[0];
-        if(it.fte.getToken() != null) {
-          sel.ft.init(it.data.text(it.fte.pre()));
-          sel.term = sel.ft.getTokenList();
-        }
       }
     };
   }

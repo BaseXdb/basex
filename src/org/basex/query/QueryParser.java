@@ -2156,7 +2156,7 @@ public class QueryParser extends InputParser {
       }
       if(f != null) filters = Array.add(filters, f);
     } while(f != null);
-    return new FTSelect(expr, filters);
+    return filters.length == 0 ? expr : new FTSelect(expr, filters);
   }
 
   /**

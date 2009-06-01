@@ -5,7 +5,9 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.FTNode;
 import org.basex.util.BoolList;
+import org.basex.util.IntList;
 
 /**
  * FTScope expression.
@@ -28,11 +30,11 @@ public class FTScope extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx) {
-    if(!same) return diff(new BoolList(), 0);
+  boolean filter(final QueryContext ctx, final FTNode node) {
+    if(!same) return diff(new BoolList(), 0, node.pos);
 
-    for(int i = 0; i < sel.pos[0].size; i++) {
-      if(same(pos(sel.pos[0].list[i], unit), 1)) return true;
+    for(int i = 0; i < node.pos[0].size; i++) {
+      if(same(pos(node.pos[0].list[i], unit), 1, node.pos)) return true;
     }
     return false;
   }
@@ -41,12 +43,13 @@ public class FTScope extends FTFilter {
    * Recursively checks if all words are found in the same units.
    * @param v value to be compared
    * @param n current position
+   * @param pos position list
    * @return result of check
    */
-  private boolean same(final int v, final int n) {
-    if(n == sel.size) return true;
-    for(int i = 0; i < sel.pos[n].size; i++) {
-      if(pos(sel.pos[n].list[i], unit) == v && same(v, n + 1)) return true;
+  private boolean same(final int v, final int n, final IntList[] pos) {
+    if(n == pos.length) return true;
+    for(int i = 0; i < pos[n].size; i++) {
+      if(pos(pos[n].list[i], unit) == v && same(v, n + 1, pos)) return true;
     }
     return false;
   }
@@ -55,15 +58,16 @@ public class FTScope extends FTFilter {
    * Recursively checks if all words are found in different units.
    * @param bl boolean list
    * @param n current position
+   * @param pos position list
    * @return result of check
    */
-  private boolean diff(final BoolList bl, final int n) {
-    if(n == sel.size) return true;
-    for(int i = 0; i < sel.pos[n].size; i++) {
-      final int p = pos(sel.pos[n].list[i], unit);
+  private boolean diff(final BoolList bl, final int n, final IntList[] pos) {
+    if(n == pos.length) return true;
+    for(int i = 0; i < pos[n].size; i++) {
+      final int p = pos(pos[n].list[i], unit);
       if(p < bl.size && bl.list[p]) continue;
       bl.set(true, p);
-      if(diff(bl, n + 1)) return true;
+      if(diff(bl, n + 1, pos)) return true;
       bl.set(false, p);
     }
     return false;

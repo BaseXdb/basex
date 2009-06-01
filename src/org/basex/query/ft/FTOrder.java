@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.FTNode;
 import org.basex.util.IntList;
 
 /**
@@ -15,21 +16,18 @@ import org.basex.util.IntList;
  */
 public class FTOrder extends FTFilter {
   @Override
-  boolean filter(final QueryContext ctx) {
-    if(sel.size == 1) return true;
+  boolean filter(final QueryContext ctx, final FTNode node) {
+    if(node.pos.length == 1) return true;
 
-    final IntList[] il = sortPositions();
+    final IntList[] il = sortPositions(node.pos);
     final IntList p = il[0];
     final IntList pp = il[1];
     int i = 0;
-    int lp;
     while(i < p.size && pp.list[i] != 0) i++;
-    lp = i;
-    i++;
-    while(i < p.size) {
+    int lp = i;
+    while(++i < p.size) {
       if(pp.list[i] < pp.list[lp] || pp.list[i] == pp.list[lp] + 1) lp = i;
-      if(pp.list[lp] == sel.size - 1) return true;
-      i++;
+      if(pp.list[lp] == node.pos.length - 1) return true;
     }
     return false;
   }

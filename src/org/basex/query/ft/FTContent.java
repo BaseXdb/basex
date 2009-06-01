@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.FTNode;
 
 /**
  * FTContent expression.
@@ -29,12 +30,12 @@ public class FTContent extends FTFilter {
   }
   
   @Override
-  boolean filter(final QueryContext ctx) {
+  boolean filter(final QueryContext ctx, final FTNode node) {
     if(start || end) {
       final int p = start ? 0 : sel.ft.count() - 1;
-      for(int i = 0; i < sel.size; i++) {
-        for(int j = 0; j < sel.pos[i].size; j++) {
-          if(sel.pos[i].list[j] == p) return true;
+      for(int i = 0; i < node.pos.length; i++) {
+        for(int j = 0; j < node.pos[i].size; j++) {
+          if(node.pos[i].list[j] == p) return true;
         }
       }
       return false;
@@ -42,8 +43,8 @@ public class FTContent extends FTFilter {
 
     final int s = sel.ft.count();
     final boolean[] bl = new boolean[s];
-    for(int i = 0; i < sel.size; i++) {
-      for(int j = 0; j < sel.pos[i].size; j++) bl[sel.pos[i].list[j]] = true;
+    for(int i = 0; i < node.pos.length; i++) {
+      for(int j = 0; j < node.pos[i].size; j++) bl[node.pos[i].list[j]] = true;
     }
     for(final boolean b : bl) if(!b) return false;
     return true;

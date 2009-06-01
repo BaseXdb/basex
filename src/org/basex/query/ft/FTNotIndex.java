@@ -11,12 +11,12 @@ import org.basex.query.iter.FTNodeIter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
-public final class FTNotIndex extends FTExpr {
+final class FTNotIndex extends FTExpr {
   /**
    * Constructor.
    * @param e expression
    */
-  public FTNotIndex(final FTExpr e) {
+  FTNotIndex(final FTExpr e) {
     super(e);
   }
 

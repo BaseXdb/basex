@@ -12,13 +12,13 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
-import org.basex.util.IntList;
 
 /**
  * FTContains expression.
@@ -63,23 +63,22 @@ public class FTContains extends Expr {
 
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
-    final IntList[] ftd = ctx.ftd;
     ctx.fttoken = ft;
     double s = 0;
     Item it;
 
     while((it = iter.next()) != null) {
       ft.init(it.str());
-      final double d = ftexpr.atomic(ctx).score();
+      final FTNode node = ftexpr.atomic(ctx);
+      final double d = node.score();
       s = ctx.score.and(s, d);
 
       // add entry to visualization
-      if(d > 0 && ctx.ftpos != null && ctx.ftd != null && it instanceof DBNode)
-        ctx.ftpos.add(ctx.ftd, ((DBNode) it).pre, div);
+      if(d > 0 && ctx.ftpos != null && node.pos.length != 0 &&
+          it instanceof DBNode) ctx.ftpos.add(node.pos, ((DBNode) it).pre, div);
     }
 
     ctx.fttoken = tmp;
-    ctx.ftd = ftd;
     return Bln.get(s);
   }
 

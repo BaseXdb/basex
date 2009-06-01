@@ -171,21 +171,6 @@ public final class FTEntry {
   }
 
   /**
-   * Converts the pos values in the following style.
-   * [poi0]: pos0, ..., posk
-   * [poi1]: pos0, ..., posj
-   * @return IntList[]
-   */
-  public IntList[] convertPos() {
-    if(poi == null) return new IntList[0];
-    final IntList[] il = new IntList[poi.list[0]];
-    for(int k = 0; k < il.length; k++) il[k] = new IntList();
-    c = 0;
-    while(morePos()) il[nextPoi() - 1].add(nextPos());
-    return il;
-  }
-
-  /**
    * Get next pointer.
    * @return next pointer
    */

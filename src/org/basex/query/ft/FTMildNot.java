@@ -27,22 +27,34 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public FTNode atomic(final QueryContext ctx) throws QueryException {
-    final FTNode it = expr[0].atomic(ctx);
+    FTNode it = expr[0].atomic(ctx);
     double d = it.score();
     if(d != 0) {
       boolean f = false;
       for(int i = 1; i < expr.length; i++) {
-        f |= expr[i].atomic(ctx).score() != 0;
+        it = expr[i].atomic(ctx).union(it);
+        f |= it.score() != 0;
       }
-      if(f && !ctx.ftselect.mildNot()) d = 0;
+      if(f && !mildNot(it.pos)) d = 0;
     }
     it.score(d);
     return it;
   }
 
-  @Override
-  public String toString() {
-    return toString(" not in ");
+  /**
+   * Evaluates the mild not expression.
+   * @param pos position list
+   * @return boolean result
+   */
+  private boolean mildNot(final IntList[] pos) {
+    boolean f = true;
+    for(int i = 1; i < pos.length; i++) {
+      for(int j = 0; j < pos[i].size; j++) {
+        if(pos[0].contains(pos[i].list[j]))
+          f &= pos[0].list[pos[0].size - 1] > pos[i].list[j];
+      }
+    }
+    return f;
   }
   
   @Override
@@ -86,5 +98,10 @@ public final class FTMildNot extends FTExpr {
       return mne[0];
     }
     return new FTIntersection(pex, new int[] {}, mne);
+  }
+
+  @Override
+  public String toString() {
+    return toString(" not in ");
   }
 }

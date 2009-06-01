@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.FTNode;
 
 /**
  * FTWindow expression.
@@ -26,8 +27,9 @@ public class FTWindow extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx) throws QueryException {
-    return checkDist(1, checkItr(expr[0], ctx), false);
+  boolean filter(final QueryContext ctx, final FTNode node)
+      throws QueryException {
+    return checkDist(1, checkItr(expr[0], ctx), false, node.pos);
   }
 
   @Override

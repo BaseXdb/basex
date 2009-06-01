@@ -4,6 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.FTNode;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
 
@@ -19,6 +20,7 @@ public abstract class FTFilter extends Arr {
     /** Word unit. */      WORD,
     /** Sentence unit. */  SENTENCE,
     /** Paragraph unit. */ PARAGRAPH;
+
     /**
      * Returns a string representation.
      * @return string representation
@@ -26,6 +28,7 @@ public abstract class FTFilter extends Arr {
     @Override
     public String toString() { return name().toLowerCase(); }
   }
+
   /** Optional unit. */
   FTUnit unit;
   /** Select reference. */
@@ -40,36 +43,40 @@ public abstract class FTFilter extends Arr {
   /**
    * Evaluates the filter expression.
    * @param ctx query context
+   * @param node full-text node
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean filter(final QueryContext ctx) throws QueryException;
+  abstract boolean filter(final QueryContext ctx, final FTNode node)
+    throws QueryException;
   
   /**
-   * Checks if each token is reached by the ftdistance query.
+   * Checks if each token is reached by the distance query.
    * @param mn minimum distance
    * @param mx maximum distance
-   * @param dst flag for ftdistance
+   * @param dst flag for distance
+   * @param pos position list
    * @return result of check
    */
-  boolean checkDist(final long mn, final long mx, final boolean dst) {
-    final IntList[] il = sortPositions();
+  boolean checkDist(final long mn, final long mx, final boolean dst,
+      final IntList[] pos) {
+    final IntList[] il = sortPositions(pos);
     for(int z = 0; z < il[1].size; z++) {
-      if(checkDist(z, il[0], il[1], mn, mx, new BoolList(sel.size), dst))
+      if(checkDist(z, il[0], il[1], mn, mx, new BoolList(pos.length), dst))
         return true;
     }
     return false;
   }
 
   /**
-   * Checks if each token is reached by the ftdistance query.
+   * Checks if each token is reached by the distance query.
    * @param x current position value
    * @param p pos list
    * @param pp pointer list
    * @param mn minimum number
    * @param mx maximum number
    * @param bl boolean list for each token
-   * @param dst flag for ftdistance
+   * @param dst flag for distance
    * @return boolean result
    */
   private boolean checkDist(final int x, final IntList p,  final IntList pp,
@@ -83,7 +90,7 @@ public abstract class FTFilter extends Arr {
       final int p2 = pos(p.list[i], unit);
 
       if(dst) {
-        // ftdistance
+        // distance
         final int d = p2 - p1 - 1;
         if(d >= mn && d <= mx && !bl.list[pp.list[i]]) {
           bl.list[pp.list[x]] = true;
@@ -91,7 +98,7 @@ public abstract class FTFilter extends Arr {
           if(checkDist(i, p, pp, mn, mx, bl, dst)) return true;
         }
       } else {
-        // ftwindow
+        // window
         final int d = p2 - p1;
         if(mn + d <= mx && !bl.list[pp.list[i]]) {
           bl.list[pp.list[x]] = true;
@@ -122,29 +129,30 @@ public abstract class FTFilter extends Arr {
    * IntList[0] = position values sorted
    * IntList[1] = pointer to the position values.
    * Each pos value has a pointer, showing which token
-   * from the query cloud be found at that pos.
+   * from the query could be found at that pos.
+   * @param pos position list
    * @return IntList[] position values and pointer
    */
-  IntList[] sortPositions() {
+  IntList[] sortPositions(final IntList[] pos) {
     final IntList[] il = { new IntList(), new IntList() };
-    final int[] k = new int[sel.size];
+    final int[] k = new int[pos.length];
     int min = 0;
 
     while(true) {
       min = 0;
       boolean q = true;
-      for(int j = 0; j < sel.size; j++) {
+      for(int j = 0; j < pos.length; j++) {
         if(k[j] > -1) {
           if(k[min] == -1) min = j;
           q = false;
-          if(sel.pos[min].list[k[min]] > sel.pos[j].list[k[j]]) min = j;
+          if(pos[min].list[k[min]] > pos[j].list[k[j]]) min = j;
         }
       }
       if(q) break;
 
-      il[0].add(sel.pos[min].list[k[min]]);
+      il[0].add(pos[min].list[k[min]]);
       il[1].add(min);
-      if(++k[min] == sel.pos[min].size) k[min] = -1;
+      if(++k[min] == pos[min].size) k[min] = -1;
     }
     return il;
   }

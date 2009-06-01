@@ -12,12 +12,12 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FTMildNotIndex extends FTExpr {
+final class FTMildNotIndex extends FTExpr {
   /**
    * Constructor.
    * @param l expression list
    */
-  public FTMildNotIndex(final FTExpr... l) {
+  FTMildNotIndex(final FTExpr... l) {
     super(l);
   }
   

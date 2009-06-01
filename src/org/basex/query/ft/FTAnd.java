@@ -32,7 +32,7 @@ public final class FTAnd extends FTExpr {
     FTNode it = null; 
     double d = 0;
     for(final FTExpr e : expr) {
-      it = e.atomic(ctx);
+      it = e.atomic(ctx).union(it);
       double s = d;
       d = it.score();
       if(d == 0) break;

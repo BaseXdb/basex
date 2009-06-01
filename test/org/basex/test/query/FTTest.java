@@ -365,7 +365,7 @@ public final class FTTest extends AbstractTest {
         "('C' ftand 'D' ordered) ordered" },
       { "FTOrdered 8", bool(false),
         "'B A' ftcontains ('A' ftand ftnot 'B') ordered" },
-      /* Next two still have to be fixed.. 
+      /* Next two still have to be fixed..
       { "FTOrdered 9", bool(true),
         "'A B' ftcontains ('B' ftor 'A') ordered" },
       { "FTOrdered 10", bool(true),

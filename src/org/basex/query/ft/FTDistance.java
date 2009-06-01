@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.FTNode;
 
 /**
  * FTDistance expression.
@@ -26,8 +27,10 @@ public class FTDistance extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx) throws QueryException {
-    return checkDist(checkItr(expr[0], ctx), checkItr(expr[1], ctx), true);
+  boolean filter(final QueryContext ctx, final FTNode node)
+      throws QueryException {
+    return checkDist(checkItr(expr[0], ctx), checkItr(expr[1], ctx), true,
+        node.pos);
   }
 
   @Override

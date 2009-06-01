@@ -87,8 +87,6 @@ public final class QueryContext extends Progress {
   public FTOpt ftopt = new FTOpt();
   /** Current full-text position filters. */
   public FTSelect ftselect = new FTSelect(null);
-  /** Temporary place for ftdata. */
-  public IntList[] ftd;
 
   /** Current Date. */
   public Dat date;

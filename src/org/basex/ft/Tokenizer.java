@@ -7,7 +7,6 @@ import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 
 /**
  * Full-text tokenizer.
@@ -261,17 +260,6 @@ public class Tokenizer extends IndexToken {
    */
   public int size() {
     return text.length;
-  }
-
-  /**
-   * Converts the tokens to a TokenList.
-   * @return TokenList
-   */
-  public TokenList getTokenList() {
-    final TokenList tl = new TokenList();
-    init();
-    while(more()) tl.add(get());
-    return tl;
   }
 
   /**

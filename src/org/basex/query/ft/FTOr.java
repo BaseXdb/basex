@@ -32,7 +32,7 @@ public final class FTOr extends FTExpr {
     FTNode it = null; 
     double d = 0;
     for(final FTExpr e : expr) {
-      it = e.atomic(ctx);
+      it = e.atomic(ctx).union(it);
       d = ctx.score.or(it.score(), d);
     }
     it.score(d);

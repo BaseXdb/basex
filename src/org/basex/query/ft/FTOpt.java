@@ -14,7 +14,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.FTNode;
 import org.basex.query.util.Err;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
@@ -67,7 +69,7 @@ public final class FTOpt extends ExprInfo {
   public byte[] ln;
 
   /** Full-text tokenizer. */
-  public final Tokenizer qu = new Tokenizer();
+  final Tokenizer qu = new Tokenizer();
 
   /**
    * Compiles the full-text options, inheriting the options of the argument.
@@ -124,16 +126,17 @@ public final class FTOpt extends ExprInfo {
   /**
    * Checks if the first token contains the second full-text term.
    * Sequential variant.
-   * @param ctx query context
    * @param q query token
+   * @param tk input tokenizer
+   * @param node resulting node
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final QueryContext ctx, final byte[] q) throws QueryException {
+  int contains(final byte[] q, final Tokenizer tk, final FTNode node)
+      throws QueryException {
     if(q.length == 0) return 0;
 
     // assign options to text
-    final Tokenizer tk = ctx.fttoken;
     tk.st = is(ST);
     tk.dc = is(DC);
     tk.cs = is(CS);
@@ -197,7 +200,7 @@ public final class FTOpt extends ExprInfo {
     }
 
     if(il == null) return 0;
-    ctx.ftselect.add(q, il);
+    node.pos = Array.add(node.pos, il);
     return il.size;
   }
 

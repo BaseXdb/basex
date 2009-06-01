@@ -3,6 +3,8 @@ package org.basex.query.item;
 import org.basex.data.Data;
 import org.basex.index.FTEntry;
 import org.basex.query.QueryContext;
+import org.basex.util.Array;
+import org.basex.util.IntList;
 
 /**
  * XQuery item representing a full-text Node.
@@ -13,6 +15,8 @@ import org.basex.query.QueryContext;
 public final class FTNode extends DBNode {
   /** Full-text entry. Only used by the index variant. */
   public FTEntry fte;
+  /** Position lists. Needed for position filters. */
+  public IntList[] pos = {};
 
   /**
    * Constructor, called by the sequential variant.
@@ -49,6 +53,21 @@ public final class FTNode extends DBNode {
   }
 
   /**
+   * Merges the position lists of two nodes. Called by the sequential variant.
+   * @param n second node instance
+   * @return self reference
+   */
+  public FTNode union(final FTNode n) {
+    if(n != null) {
+      final IntList[] tmp = new IntList[pos.length + n.pos.length];
+      Array.copy(n.pos, tmp, 0);
+      Array.copy(pos, tmp, n.pos.length);
+      pos = tmp;
+    }
+    return this;
+  }
+
+  /**
    * Merges the current item with an other node. Called by the index variant.
    * @param ctx query context
    * @param i1 second node
@@ -57,6 +76,17 @@ public final class FTNode extends DBNode {
   public void union(final QueryContext ctx, final FTNode i1, final int w) {
     fte.union(i1.fte, w);
     score = ctx.score.or(score, i1.score);
+  }
+
+  
+  /**
+   * Sets the position list. Called by the index variant.
+   */
+  public void setPos() {
+    pos = new IntList[fte.poi.list[0]];
+    for(int k = 0; k < pos.length; k++) pos[k] = new IntList();
+    fte.reset();
+    while(fte.morePos()) pos[fte.nextPoi() - 1].add(fte.nextPos());
   }
 
   @Override
