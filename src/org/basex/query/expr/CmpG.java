@@ -9,6 +9,7 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -111,7 +112,7 @@ public final class CmpG extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].i() && expr[1] instanceof AxisPath) {
+    if(expr[0].i() && !expr[1].i()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
@@ -122,22 +123,44 @@ public final class CmpG extends Arr {
 
     Expr e = this;
     if(e1.i() && e2.i()) {
-      e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
+      e = Bln.get(eval((Item) e1, (Item) e2));
     } else if(e1.e() || e2.e()) {
       e = Bln.FALSE;
     }
     if(e != this) {
       ctx.compInfo(OPTPRE, this);
-    } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
-      if(e2 instanceof Range) {
-        // 'null' as argument seems strange, but is ok here..
-        final long[] rng = ((Range) e2).range(null);
-        if(rng != null) e = Pos.get(rng[0], rng[1]);
-      } else {
-        e = Pos.get(this, cmp.cmp, e2);
+    } else if(e1 instanceof Fun) {
+      final Fun fun = (Fun) expr[0];
+      if(fun.func == FunDef.POS) {
+        if(e2 instanceof Range) {
+          // position() CMP range
+          final long[] rng = ((Range) e2).range(ctx);
+          if(rng != null) e = Pos.get(rng[0], rng[1]);
+        } else {
+          // position() CMP number
+          e = Pos.get(this, cmp.cmp, e2);
+        }
+        if(e != this) ctx.compInfo(OPTWRITE, this);
+      } else if(fun.func == FunDef.COUNT) {
+        if(e2.i() && ((Item) e2).n() && ((Item) e2).dbl() == 0) {
+          // count(...) CMP 0
+          if(cmp == Comp.LT || cmp == Comp.GE) {
+            // < 0: always false, >= 0: always true
+            ctx.compInfo(OPTPRE, this);
+            e = Bln.get(cmp == Comp.GE);
+          } else {
+            // <=/= 0: empty(), >/!= 0: exist()
+            final Fun f = new FNSimple();
+            f.expr = fun.expr;
+            f.func = cmp == Comp.EQ || cmp == Comp.LE ?
+                FunDef.EMPTY : FunDef.EXISTS;
+            ctx.compInfo(OPTWRITE, this);
+            e = f;
+          }
+        }
       }
-      if(e != this) ctx.compInfo(OPTWRITE, this);
     } else if(standard(true)) {
+      // rewrite path CMP number
       e = CmpR.get(this);
       if(e == null) e = this;
       else ctx.compInfo(OPTWRITE, this);
@@ -153,22 +176,21 @@ public final class CmpG extends Arr {
     final boolean s1 = ir1.size() == 1;
     
     // evaluate single items
-    if(s1 && expr[1].i())
-      return Bln.get(eval(ir1.next(), (Item) expr[1], cmp.cmp));
+    if(s1 && expr[1].i()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
+
     Iter ir2 = ctx.iter(expr[1]);
     // skip empty result
     if(ir2.size() == 0) return Bln.FALSE;
     final boolean s2 = ir2.size() == 1;
     
     // evaluate single items
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), cmp.cmp));
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
     // evaluate iterator and single item
     Item it1, it2;
     if(s2) {
       it2 = ir2.next();
-      while((it1 = ir1.next()) != null)
-        if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
+      while((it1 = ir1.next()) != null) if(eval(it1, it2)) return Bln.TRUE;
       return Bln.FALSE;
     }
     
@@ -178,7 +200,7 @@ public final class CmpG extends Arr {
       final SeqIter seq = new SeqIter();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
-          if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
+          if(eval(it1, it2)) return Bln.TRUE;
           seq.add(it2);
         }
       }
@@ -187,26 +209,22 @@ public final class CmpG extends Arr {
 
     while((it1 = ir1.next()) != null) {
       ir2.reset();
-      while((it2 = ir2.next()) != null)
-        if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
+      while((it2 = ir2.next()) != null) if(eval(it1, it2)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }
 
   /**
    * Compares a single item.
-   * @param c comparator
    * @param a first item to be compared
    * @param b second item to be compared
    * @return result of check
    * @throws QueryException thrown if the items can't be compared
    */
-  static boolean eval(final Item a, final Item b, final CmpV.Comp c)
-      throws QueryException {
-
+  boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 
         !(a.n() && b.n())) Err.cmp(a, b);
-    return c.e(a, b);
+    return cmp.cmp.e(a, b);
   }
 
   @Override

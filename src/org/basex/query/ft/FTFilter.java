@@ -43,7 +43,7 @@ public abstract class FTFilter extends Arr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean filter(final QueryContext ctx) throws QueryException;
+  abstract boolean filter(final QueryContext ctx) throws QueryException;
   
   /**
    * Checks if each token is reached by the ftdistance query.

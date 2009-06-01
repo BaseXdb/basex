@@ -5,6 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 
 /**
@@ -15,7 +16,7 @@ import org.basex.query.iter.FTNodeIter;
  */
 public final class FTOptions extends FTExpr {
   /** FTOptions. */
-  private final FTOpt opt;
+  final FTOpt opt;
 
   /**
    * Constructor.
@@ -37,15 +38,35 @@ public final class FTOptions extends FTExpr {
     return this;
   }
 
+  // called by sequential variant
   @Override
-  public FTNodeIter iter(final QueryContext ctx) throws QueryException {
+  public FTNode atomic(final QueryContext ctx) throws QueryException {
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    final FTNodeIter ir = expr[0].iter(ctx);
+    final FTNode it = expr[0].atomic(ctx);
     ctx.ftopt = tmp;
-    return ir;
+    return it;
   }
 
+  // called by index variant
+  @Override
+  public FTNodeIter iter(final QueryContext ctx) {
+    return new FTNodeIter() {
+      FTOpt tmp = ctx.ftopt;
+      FTNodeIter ir;
+
+      @Override
+      public FTNode next() throws QueryException {
+        ctx.ftopt = opt;
+        if(ir == null) ir = expr[0].iter(ctx);
+        final FTNode it = ir.next();
+        ctx.ftopt = tmp;
+        return it;
+      }
+    };
+  }
+
+  
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     final FTOpt tmp = ic.ctx.ftopt;

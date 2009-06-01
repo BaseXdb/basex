@@ -227,32 +227,27 @@ public abstract class Nod extends Item {
   public final NodeIter foll() {
     return new NodeIter() {
       /** Iterator. */
-      private NodIter it;
-      /** First call. */
-      private boolean more;
+      private NodIter ir;
 
       @Override
       public Nod next() throws QueryException {
-        // [CG] check results for incoming attribute nodes
-        if(!more) {
-          it = new NodIter();
+        if(ir == null) {
+          ir = new NodIter();
           Nod n = Nod.this;
           Nod p = n.parent();
           while(p != null) {
             final NodeIter i = p.child();
             Nod c;
-            while((c = i.next()) != null && !c.is(n));
+            while(n.type != Type.ATT && (c = i.next()) != null && !c.is(n));
             while((c = i.next()) != null) {
-              it.add(c.finish());
-              addDesc(c.child(), it);
+              ir.add(c.finish());
+              addDesc(c.child(), ir);
             }
             n = p;
             p = p.parent();
           }
-          more = true;
         }
-
-        return it.next();
+        return ir.next();
       }
     };
   }
@@ -264,24 +259,21 @@ public abstract class Nod extends Item {
   public final NodeIter follSibl() {
     return new NodeIter() {
       /** Iterator. */
-      private NodeIter it;
-      /** First call. */
-      private boolean more;
+      private NodeIter ir;
 
       @Override
       public Nod next() throws QueryException {
-        if(!more) {
+        if(ir == null) {
           final Nod r = parent();
           if(r == null) {
-            it = NodeIter.NONE;
+            ir = NodeIter.NONE;
           } else {
-            it = r.child();
+            ir = r.child();
             Nod n;
-            while((n = it.next()) != null && !n.is(Nod.this));
+            while((n = ir.next()) != null && !n.is(Nod.this));
           }
-          more = true;
         }
-        return it.next();
+        return ir.next();
       }
     };
   }
@@ -297,8 +289,7 @@ public abstract class Nod extends Item {
 
       @Override
       public Nod next() {
-        more ^= true;
-        return more ? parent() : null;
+        return (more ^= true) ? parent() : null;
       }
     };
   }
@@ -310,14 +301,12 @@ public abstract class Nod extends Item {
   public final NodeIter prec() {
     return new NodeIter() {
       /** Iterator. */
-      private NodIter it;
-      /** First call. */
-      private boolean more;
+      private NodIter ir;
 
       @Override
       public Nod next() throws QueryException {
-        if(!more) {
-          it = new NodIter();
+        if(ir == null) {
+          ir = new NodIter();
           Nod n = Nod.this;
           Nod p = n.parent();
           while(p != null) {
@@ -329,15 +318,13 @@ public abstract class Nod extends Item {
                 tmp.add(c.finish());
                 addDesc(c.child(), tmp);
               }
-              for(int t = tmp.size - 1; t >= 0; t--)
-                it.add(tmp.list[t]);
+              for(int t = tmp.size - 1; t >= 0; t--) ir.add(tmp.list[t]);
             }
             n = p;
             p = p.parent();
           }
-          more = true;
         }
-        return it.next();
+        return ir.next();
       }
     };
   }
@@ -349,29 +336,26 @@ public abstract class Nod extends Item {
   public final NodeIter precSibl() {
     return new NodeIter() {
       /** Children nodes. */
-      private NodIter ch;
+      private NodIter ir;
       /** Counter. */
       private int c;
-      /** First call. */
-      private boolean more;
 
       @Override
       public Nod next() throws QueryException {
-        if(!more) {
+        if(ir == null) {
           final Nod r = parent();
           if(r == null) return null;
 
-          ch = new NodIter();
+          ir = new NodIter();
           final NodeIter iter = r.child();
           Nod n;
           while((n = iter.next()) != null) {
             if(n.is(Nod.this)) break;
-            ch.add(n.finish());
+            ir.add(n.finish());
           }
-          c = ch.size;
-          more = true;
+          c = ir.size;
         }
-        return c > 0 ? ch.list[--c] : null;
+        return c > 0 ? ir.list[--c] : null;
       }
     };
   }
@@ -383,17 +367,15 @@ public abstract class Nod extends Item {
   public final NodeMore self() {
     return new NodeMore() {
       /** First call. */
-      private boolean first = true;
+      private boolean more = true;
 
       @Override
       public boolean more() {
-        return first;
+        return more;
       }
       @Override
       public Nod next() {
-        final boolean f = first;
-        first = false; 
-        return f ? Nod.this : null;
+        return (more ^= true) ? null : Nod.this;
       }
     };
   }

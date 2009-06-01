@@ -5,18 +5,18 @@ import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
- * Full-text Node.
+ * This class contains position data for single full-text index entries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
-public final class FTNode {
+public final class FTEntry {
   /** Full-text data for a node (pre, pos1, pos2, ...). */
-  public IntList ip;
+  public IntList pos;
   /** Pointer for idpos - each idpos has a pointer at
    * its search string position in the query.
    * poi[0] = max. pointer value in poi */
-  public IntList p;
+  public IntList poi;
   /** Flag for negative node. */
   public boolean not;
 
@@ -30,45 +30,21 @@ public final class FTNode {
   /**
    * Constructor.
    */
-  public FTNode() {
-    ip = new IntList();
-  }
-
-  /**
-   * Constructor.
-   * @param idpos ftdata, pre, pos1, ..., posn
-   */
-  public FTNode(final IntList idpos) {
-    ip = idpos;
+  public FTEntry() {
+    pos = new IntList();
   }
 
   /**
    * Constructor.
    * @param idpos ftdata, pre, pos1, ..., posn
    * @param pointer pointer on query tokens
+   * @param token tokenizers
    */
-  public FTNode(final int[] idpos, final int[] pointer) {
-    ip = new IntList(idpos);
-    p = new IntList(pointer);
-  }
-
-  /**
-   * Returns true if no values are stored for this node.
-   * @return result of check
-   */
-  public boolean empty() {
-    return ip.size == 0;
-  }
-  
-  /**
-   * Generates pointer with value v.
-   * @param v value
-   */
-  void genPointer(final int v) {
-    if(p != null && p.size > 0 && p.list[0] == v) return;
-    final int[] t = new int[ip.size];
-    for (int i = 0; i < t.length; i++) t[i] = v;
-    p = new IntList(t);
+  public FTEntry(final IntList idpos, final IntList pointer,
+      final Tokenizer[] token) {
+    pos = idpos;
+    poi = pointer;
+    tok = token;
   }
 
   /**
@@ -76,7 +52,7 @@ public final class FTNode {
    * @return pre value
    */
   public int pre() {
-    return ip != null ? ip.list[0] : pre;
+    return pos != null ? pos.list[0] : pre;
   }
   
   /**
@@ -84,7 +60,7 @@ public final class FTNode {
    * @return boolean
    */
   public boolean morePos() {
-    return ++c < ip.size;
+    return ++c < pos.size;
   }
 
   /**
@@ -92,14 +68,6 @@ public final class FTNode {
    */
   public void reset() {
     c = 0;
-  }
-  
-  /**
-   * Sets the current tokenizer.
-   * @param token tokenizer
-   */
-  public void setToken(final Tokenizer[] token) {
-    tok = token;
   }
 
   /**
@@ -115,7 +83,7 @@ public final class FTNode {
    * @return pos value
    */
   public int nextPos() {
-    return ip.list[c];
+    return pos.list[c];
   }
   
   /**
@@ -123,7 +91,7 @@ public final class FTNode {
    * @return number of tokens
    */
   public int getNumTokens() {
-    return p.list[0];
+    return poi.list[0];
   }
 
   /**
@@ -133,7 +101,7 @@ public final class FTNode {
    * @param w distance between the pos values
    * @return boolean
    */
-  public boolean union(final FTNode n, final int w) {
+  public boolean union(final FTEntry n, final int w) {
     if(not != n.not) return false;
 
     boolean mp = morePos();
@@ -141,7 +109,7 @@ public final class FTNode {
     if(!(mp && nmp) || pre() != n.pre()) return false;
 
     final IntList il = new IntList();
-    final IntList pn = p != null ? initNewPointer(n.p) : null;
+    final IntList pn = poi != null ? initNewPointer(n.poi) : null;
     il.add(pre());
     while(mp && nmp) {
       final int d = nextPos() - n.nextPos() + w;
@@ -169,28 +137,16 @@ public final class FTNode {
       }
     }
 
-    ip = new IntList(il.finish());
+    pos = new IntList(il.finish());
 
-    // [SG] when is tok/n.tok null?
-    if(tok != null) {
-      final Tokenizer[] tmp = new Tokenizer[tok.length + n.tok.length];
-      Array.copy(tok, tmp, 0);
-      Array.copy(n.tok, tmp, tok.length);
-      tok = tmp;
-    }
-
-    if(tok != null && n.tok != null) {
-      // [SG] ntok is not stored here..
-      final Tokenizer[] ntok = new Tokenizer[tok.length + n.tok.length];
-      Array.copy(tok, ntok, 0);
-      Array.copy(n.tok, ntok, tok.length);
-    } else {
-      tok = null;
-    }
+    final Tokenizer[] tmp = new Tokenizer[tok.length + n.tok.length];
+    Array.copy(tok, tmp, 0);
+    Array.copy(n.tok, tmp, tok.length);
+    tok = tmp;
 
     c = 0;
-    if(p != null) p = new IntList(pn.finish());
-    return ip.size > 1;
+    if(poi != null) poi = new IntList(pn.finish());
+    return pos.size > 1;
   }
 
   /**
@@ -200,7 +156,7 @@ public final class FTNode {
    */
   private IntList initNewPointer(final IntList n) {
     final IntList il = new IntList();
-    il.add(p.list[0] > n.list[0] ? p.list[0] : n.list[0]);
+    il.add(poi.list[0] > n.list[0] ? poi.list[0] : n.list[0]);
     return il;
   }
 
@@ -221,8 +177,8 @@ public final class FTNode {
    * @return IntList[]
    */
   public IntList[] convertPos() {
-    if(p == null) return new IntList[0];
-    final IntList[] il = new IntList[p.list[0]];
+    if(poi == null) return new IntList[0];
+    final IntList[] il = new IntList[poi.list[0]];
     for(int k = 0; k < il.length; k++) il[k] = new IntList();
     c = 0;
     while(morePos()) il[nextPoi() - 1].add(nextPos());
@@ -234,7 +190,7 @@ public final class FTNode {
    * @return next pointer
    */
   public int nextPoi() {
-    return p.list[c];
+    return poi.list[c];
   }
   
   @Override

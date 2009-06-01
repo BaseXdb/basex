@@ -2,7 +2,7 @@ package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 
 /**
@@ -26,9 +26,9 @@ public final class FTNotIndex extends FTExpr {
       final FTNodeIter ir = expr[0].iter(ctx);
 
       @Override
-      public FTNodeItem next() throws QueryException {
-        final FTNodeItem node = ir.next();
-        node.ftn.not ^= true;
+      public FTNode next() throws QueryException {
+        final FTNode node = ir.next();
+        node.fte.not ^= true;
         return node;
       }
     };

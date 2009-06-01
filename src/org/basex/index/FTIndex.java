@@ -29,7 +29,7 @@ abstract class FTIndex extends Index {
       boolean f = true;
       long pos = p;
       int lpre, c;
-      FTNode n;
+      FTEntry n;
 
       @Override
       public boolean more() {
@@ -47,14 +47,15 @@ abstract class FTIndex extends Index {
         il.add(da.readNum(pos));
         while(++c < s && (lpre = da.readNum()) == pre) il.add(da.readNum());
         pos = da.pos();
-        n = new FTNode(il);
+
+        final int[] t = new int[il.size];
+        for(int i = 0; i < t.length; i++) t[i] = toknum;
+        n = new FTEntry(il, new IntList(t), tok);
         return true;
       }
 
       @Override
-      public FTNode node() {
-        n.genPointer(toknum);
-        n.setToken(tok);
+      public FTEntry node() {
         return n;
       }
 

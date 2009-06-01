@@ -18,15 +18,14 @@ import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
- * This class contains all ftcontains options. It can be used
- * by different query implementations.
+ * This class contains all ftcontains options.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
   /** Levenshtein reference. */
-  Levenshtein ls;
+  private Levenshtein ls;
 
   /** Words mode. */
   public enum FTMode {
@@ -124,6 +123,7 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Checks if the first token contains the second full-text term.
+   * Sequential variant.
    * @param ctx query context
    * @param q query token
    * @return number of occurrences

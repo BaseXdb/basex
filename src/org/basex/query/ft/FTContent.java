@@ -14,9 +14,9 @@ import org.basex.query.QueryTokens;
  */
 public class FTContent extends FTFilter {
   /** Start flag. */
-  private boolean start;
+  private final boolean start;
   /** End flag. */
-  private boolean end;
+  private final boolean end;
   
   /**
    * Constructor.
@@ -29,9 +29,9 @@ public class FTContent extends FTFilter {
   }
   
   @Override
-  public boolean filter(final QueryContext ctx) {
+  boolean filter(final QueryContext ctx) {
     if(start || end) {
-      int p = start ? 0 : sel.ft.count() - 1;
+      final int p = start ? 0 : sel.ft.count() - 1;
       for(int i = 0; i < sel.size; i++) {
         for(int j = 0; j < sel.pos[i].size; j++) {
           if(sel.pos[i].list[j] == p) return true;

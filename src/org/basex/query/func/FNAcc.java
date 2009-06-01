@@ -82,7 +82,8 @@ final class FNAcc extends Fun {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.POS && (func == FunDef.POS || func == FunDef.LAST) ||
-      super.uses(u, ctx);
+    final boolean pos = func == FunDef.POS || func == FunDef.LAST;
+    return u == Use.CTX && (pos || expr.length == 0) ||
+      u == Use.POS && pos || super.uses(u, ctx);
   }
 }

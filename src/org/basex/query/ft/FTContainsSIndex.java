@@ -6,7 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
 
@@ -19,8 +19,10 @@ import org.basex.query.iter.Iter;
 public final class FTContainsSIndex extends FTContains {
   /** Flag for visualizing ftdata. */ 
   private final boolean vis;
-  /** Current FTNodeItem. */
-  FTNodeItem ftn;
+  /** Current node item. */
+  FTNode ftn;
+  /** Node iterator. */
+  FTNodeIter fti;
   
   /**
    * Constructor.
@@ -39,7 +41,7 @@ public final class FTContainsSIndex extends FTContains {
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
         
-    final FTNodeIter fti = ftexpr.iter(ctx);
+    if(fti == null) fti = ftexpr.iter(ctx);
     if(ftn == null) ftn = fti.next();
 
     double d = 0;
@@ -47,13 +49,13 @@ public final class FTContainsSIndex extends FTContains {
     while((n = (DBNode) ir.next()) != null) {
       n.score(1);
 
-      while(ftn != null && !ftn.ftn.empty() && n.pre > ftn.ftn.pre()) {
+      while(ftn != null && !ftn.empty() && n.pre > ftn.fte.pre()) {
         ftn = fti.next();
       }
 
       if(ftn != null) {
-        final boolean not = ftn.ftn.not;
-        if(ftn.ftn.pre() == n.pre) {
+        final boolean not = ftn.fte.not;
+        if(ftn.fte.pre() == n.pre) {
           ftn = null;
           d = not ? 0 : n.score();
           break;
@@ -62,14 +64,16 @@ public final class FTContainsSIndex extends FTContains {
           d = n.score();
           break;
         }
+      } else {
+        fti = null;
       }
     }
     ctx.fttoken = tmp;
 
     // add entry to visualization
     if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
-        ctx.ftselect != null && ftn.ftn.ip != null && ftn.ftn.p !=  null) {
-      ctx.ftpos.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
+        ctx.ftselect != null && ftn.fte.pos != null && ftn.fte.poi !=  null) {
+      ctx.ftpos.add(ftn.fte.pos.finish(), ftn.fte.poi.finish());
     }
     
     return Bln.get(d);

@@ -6,7 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * Predicate expression. Mustn't be called with more than one predicate.
+ * Iterative predicate expression. Supports only one predicate.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Dennis Stratmann
@@ -20,7 +20,7 @@ public final class IterPred extends Pred {
   /**
    * Constructor.
    * @param r root expression
-   * @param p predicates
+   * @param p predicate
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
@@ -34,7 +34,7 @@ public final class IterPred extends Pred {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       boolean finish;
-      boolean fast;
+      boolean direct;
       Iter iter;
       long p;
 
@@ -51,10 +51,10 @@ public final class IterPred extends Pred {
           if(iter.size() != -1) {
             if(last) {
               p = iter.size();
-              fast = true;
+              direct = true;
             } else if(pos != null) {
               p = pos.min;
-              fast = true;
+              direct = true;
             }
           }
         }
@@ -64,7 +64,7 @@ public final class IterPred extends Pred {
         final long cp = ctx.pos;
         Item it = null;
 
-        if(fast) {
+        if(direct) {
           // directly access relevant items
           it = iter.get(p - 1);
           ctx.pos = p++;

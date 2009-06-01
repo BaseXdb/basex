@@ -78,7 +78,7 @@ final class MapRects implements Iterable<MapRect> {
   /**
    * Returns the position of the specified value or -1 if it has not been found.
    * @param r rectangle (pre value) to be found
-   * @return true if the node was found
+   * @return rectangle position of -1
    */
   int find(final MapRect r) {
     if(sorted == null) sort();

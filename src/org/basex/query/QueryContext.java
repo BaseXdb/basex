@@ -74,12 +74,13 @@ public final class QueryContext extends Progress {
   /** Current leaf flag. */
   public boolean leaf;
 
-  /** Scoring instance. */
-  public Scoring score = new Scoring();
   /** Full-text position data (for visualization). */
   public FTPosData ftpos;
   /** Count number of FTIndex (for visualization). */
   public int ftcount;
+
+  /** Scoring instance. */
+  public Scoring score = new Scoring();
   /** Current full-text token. */
   public Tokenizer fttoken;
   /** Current full-text options. */

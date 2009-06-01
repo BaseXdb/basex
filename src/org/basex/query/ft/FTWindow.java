@@ -26,7 +26,7 @@ public class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean filter(final QueryContext ctx) throws QueryException {
+  boolean filter(final QueryContext ctx) throws QueryException {
     return checkDist(1, checkItr(expr[0], ctx), false);
   }
 

@@ -204,26 +204,20 @@ public class DBNode extends Nod {
   @Override
   public NodeMore child() {
     return new NodeMore() {
+      int k = data.kind(pre);
+      int p = pre + data.attSize(pre, k);
+      final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      boolean more;
-      int p;
-      int s;
 
       @Override
       public boolean more() {
-        if(!more) {
-          final int k = data.kind(pre);
-          p = pre + data.attSize(pre, k);
-          s = pre + data.size(pre, k);
-          more = true;
-        }
         return p != s;
       }
 
       @Override
       public Nod next() {
         if(!more()) return null;
-        final int k = data.kind(p);
+        k = data.kind(p);
         node.set(p, k);
         p += data.size(p, k);
         return node;
@@ -234,14 +228,15 @@ public class DBNode extends Nod {
   @Override
   public NodeIter desc() {
     return new NodeIter() {
+      int k = data.kind(pre);
+      int p = pre + data.attSize(pre, k);
+      final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      final int s = pre + data.size(pre, data.kind(pre));
-      int p = pre + data.attSize(pre, data.kind(pre));
 
       @Override
       public Nod next() {
         if(p == s) return null;
-        final int k = data.kind(p);
+        k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
         return node;

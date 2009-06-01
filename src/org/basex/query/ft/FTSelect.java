@@ -6,7 +6,7 @@ import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -49,11 +49,11 @@ public class FTSelect extends FTExpr {
   }
 
   @Override
-  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+  public FTNode atomic(final QueryContext ctx) throws QueryException {
     final FTSelect tmp = ctx.ftselect;
     ctx.ftselect = this;
     init(ctx.fttoken);
-    final FTNodeItem it = expr[0].atomic(ctx);
+    final FTNode it = expr[0].atomic(ctx);
     ctx.ftselect = tmp;
 
     double s = it.score();
@@ -98,7 +98,7 @@ public class FTSelect extends FTExpr {
     System.arraycopy(il, 0, iln, size, ils);
     pos = iln;
     size += ils;
-    for (int i = 0; i < tl.size; i++) term.add(tl.list[i]);
+    for(int i = 0; i < tl.size; i++) term.add(tl.list[i]);
   }
 
   /**

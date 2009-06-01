@@ -15,7 +15,7 @@ import org.basex.util.IntList;
  */
 public class FTOrder extends FTFilter {
   @Override
-  public boolean filter(final QueryContext ctx) {
+  boolean filter(final QueryContext ctx) {
     if(sel.size == 1) return true;
 
     final IntList[] il = sortPositions();

@@ -15,7 +15,7 @@ import org.basex.util.BoolList;
  */
 public class FTScope extends FTFilter {
   /** Same/different flag. */
-  private boolean same;
+  private final boolean same;
 
   /**
    * Constructor.
@@ -28,7 +28,7 @@ public class FTScope extends FTFilter {
   }
 
   @Override
-  public boolean filter(final QueryContext ctx) {
+  boolean filter(final QueryContext ctx) {
     if(!same) return diff(new BoolList(), 0);
 
     for(int i = 0; i < sel.pos[0].size; i++) {

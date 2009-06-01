@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Return;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -39,8 +40,8 @@ public final class FNSimple extends Fun {
       case TRUE:    return Bln.TRUE;
       case EMPTY:   return Bln.get(!e.i() && e.iter(ctx).next() == null);
       case EXISTS:  return Bln.get(e.i() || e.iter(ctx).next() != null);
-      case BOOL:    return Bln.get((e.i() ? (Item) e : e.ebv(ctx)).bool());
-      case NOT:     return Bln.get(!(e.i() ? (Item) e : e.ebv(ctx)).bool());
+      case BOOL:    return Bln.get(e.ebv(ctx).bool());
+      case NOT:     return Bln.get(!e.ebv(ctx).bool());
       case ZEROONE:
         Iter iter = e.iter(ctx);
         Item it = iter.next();
@@ -92,6 +93,18 @@ public final class FNSimple extends Fun {
         return expr[0];
       default:
         return this;
+    }
+  }
+
+  @Override
+  public Return returned(final QueryContext ctx) {
+    switch(func) {
+      case ZEROONE:
+      case EXONE:
+      case ONEMORE:
+        return expr[0].returned(ctx);
+      default:
+        return super.returned(ctx);
     }
   }
 }

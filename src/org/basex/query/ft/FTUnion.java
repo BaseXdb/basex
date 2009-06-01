@@ -2,7 +2,7 @@ package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.util.IntList;
 
@@ -13,12 +13,6 @@ import org.basex.util.IntList;
  * @author Sebastian Gath
  */
 final class FTUnion extends FTExpr {
-  /** Cache for one of the nodes. */
-  final IntList cp;
-  /** Flag is set, if ith expression has any result. */
-  final FTNodeItem[] mp;
-  /** Pointer on the positive expression with the lowest pre-values.*/
-  int minp = -1;
   /** Saving index of positive expressions. */
   final int[] pex;
   /** Flag if one result was a ftnot. */
@@ -34,37 +28,44 @@ final class FTUnion extends FTExpr {
   FTUnion(final int[] posex, final boolean ftnot, final FTExpr... e) {
     super(e);
     pex = posex;
-    mp = new FTNodeItem[pex.length];
-    cp = new IntList(pex);
     not = ftnot;
   }
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
     return new FTNodeIter() {
+      /** Flag is set, if ith expression has any result. */
+      final FTNode[] mp = new FTNode[pex.length];
+      /** Cache for one of the nodes. */
+      final IntList cp = new IntList(pex);
+      /** Pointer on the positive expression with the lowest pre-values.*/
+      int minp = -1;
+
       @Override
-      public FTNodeItem next() throws QueryException { 
-        boolean b = false;
+      public FTNode next() throws QueryException { 
+        // [SG] is b needed?
+        //boolean b = false;
         for(int i = 0; i < cp.size; i++) {
           final int p = pex[cp.list[i]];
           mp[p] = expr[p].iter(ctx).next();
-          if(!b) b = !mp[i].ftn.empty();
+          //if(!b) b = !mp[i].ftn.empty();
         }
         cp.reset();
-        if(!b) for(final FTNodeItem c : mp) if(!c.ftn.empty()) break;
+        //if(!b) for(final FTNodeItem c : mp) if(!c.ftn.empty()) break;
 
         if(minp == -1) {
           minp = 0;
-          while(minp < mp.length && mp[minp].ftn.empty()) minp++;
+          while(minp < mp.length && mp[minp].empty()) minp++;
           if(minp < mp.length) cp.set(minp, 0);
           for(int ip = minp + 1; ip < pex.length; ip++) {
-            if(!mp[ip].ftn.empty()) {
-              final FTNodeItem n1 = mp[pex[ip]];
-              final FTNodeItem n2 = mp[pex[minp]];
-              if(n1.ftn.pre() < n2.ftn.pre()) {
+            if(!mp[ip].empty()) {
+              final FTNode n1 = mp[pex[ip]];
+              final FTNode n2 = mp[pex[minp]];
+              final int d = n1.fte.pre() - n2.fte.pre();
+              if(d < 0) {
                 minp = ip;
                 cp.set(ip, 0);
-              } else if(n1.ftn.pre() == n2.ftn.pre()) {
+              } else if(d == 0) {
                 cp.add(ip);
               }
             }
@@ -72,15 +73,15 @@ final class FTUnion extends FTExpr {
         }
 
         minp = -1;
-        final FTNodeItem m = mp[pex[cp.list[0]]];
+        final FTNode m = mp[pex[cp.list[0]]];
         for(int i = 1; i < cp.size; i++) {
           m.union(ctx, mp[pex[cp.list[i]]], 0);
           // in case of ftor !"a" ftor "b" "a b" is result
-          m.ftn.not = false;
+          m.fte.not = false;
         }
 
         // ftnot causes to set this flag (seq. index mode)
-        if(m.ftn.empty()) m.ftn.not = not;
+        if(m.empty()) m.fte.not = not;
         return m;
       }
     };

@@ -5,10 +5,10 @@ import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.ft.Tokenizer;
-import org.basex.index.FTNode;
+import org.basex.index.FTEntry;
 import org.basex.index.IndexArrayIterator;
 import org.basex.query.QueryContext;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 
 /**
@@ -20,9 +20,12 @@ import org.basex.query.iter.FTNodeIter;
  */
 public final class FTIndex extends FTExpr {
   /** Full-text token. */
-  private final byte[] tok;
+  final byte[] tok;
   /** Data reference. */
   final Data data;
+
+  // [SG] should be moved to iter() method as soon as all index operators
+  //  (mainly FTIntersections) call iter() only once
   /** Index iterator. */
   IndexArrayIterator iat;
 
@@ -38,24 +41,23 @@ public final class FTIndex extends FTExpr {
   
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
-    if(iat == null) {
-      final Tokenizer ft = new Tokenizer(tok, ctx.ftopt);
-      ft.lp = true;
-      ft.init();
-      int w = 0;
-      while(ft.more()) {
-        final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
-        iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
-        w++;
-      }
-      iat.setToken(new Tokenizer[] { ft });
-      iat.setTokenNum(++ctx.ftcount);
-    }
-
     return new FTNodeIter() {
       @Override
-      public FTNodeItem next() {
-        return new FTNodeItem(iat.more() ? iat.node() : new FTNode(), data);
+      public FTNode next() {
+        if(iat == null) {
+          final Tokenizer ft = new Tokenizer(tok, ctx.ftopt);
+          ft.lp = true;
+          ft.init();
+          int w = 0;
+          while(ft.more()) {
+            final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
+            iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
+            w++;
+          }
+          iat.setToken(new Tokenizer[] { ft });
+          iat.setTokenNum(++ctx.ftcount);
+        }
+        return new FTNode(iat.more() ? iat.node() : new FTEntry(), data);
       }
     };
   }

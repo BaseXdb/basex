@@ -36,8 +36,8 @@ public class List extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      Iter ir = null;
-      int e = 0;
+      Iter ir;
+      int e;
       
       @Override
       public Item next() throws QueryException {

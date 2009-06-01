@@ -2,7 +2,7 @@ package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.util.TokenBuilder;
 
@@ -17,14 +17,10 @@ final class FTIntersection extends FTExpr {
   final int[] pex;
   /** Saving index of negative expressions (FTNot). */
   final int[] nex;
-  /** Temporary node.  */
-  FTNodeItem nod2;
   /** Cache for positive expression. */
-  final FTNodeItem[] cp;
+  final FTNode[] cp;
   /** Cache for negative expression. */
-  final FTNodeItem[] cn;
-  /** Collect each pointer once for a result.*/
-  TokenBuilder col = new TokenBuilder();
+  final FTNode[] cn;
   
   /**
    * Constructor.
@@ -36,32 +32,37 @@ final class FTIntersection extends FTExpr {
     super(e);
     pex = p;
     nex = n;
-    cp = new FTNodeItem[p.length];
-    cn = new FTNodeItem[n.length];
+    cp = new FTNode[p.length];
+    cn = new FTNode[n.length];
   }
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) {
     return new FTNodeIter(){
+      /** Collect each pointer once for a result.*/
+      TokenBuilder col = new TokenBuilder();
+      /** Temporary node.  */
+      FTNode nod2;
+
       @Override
-      public FTNodeItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         if(pex.length > 0) {
           moreP();
         } else {
           moreN();
         }
         
-        final FTNodeItem n1 = calcFTAnd(cp, true);
-        if(!n1.ftn.empty()) {
+        final FTNode n1 = calcFTAnd(cp, true);
+        if(!n1.empty()) {
           nod2 = nex.length > 0 && nod2 == null && moreN() ?
               calcFTAnd(cn, false) : nod2;
           if(nod2 != null) {
-            int d = n1.ftn.pre() - nod2.ftn.pre();
+            int d = n1.fte.pre() - nod2.fte.pre();
             while(d > 0) {
               if(!moreN()) break;
               nod2 = calcFTAnd(cn, false);
-              if(nod2.ftn.empty()) break;
-              d = n1.ftn.pre() - nod2.ftn.pre();
+              if(nod2.empty()) break;
+              d = n1.fte.pre() - nod2.fte.pre();
             }
             if(d != 0) return n1;
             nod2 = null;
@@ -72,7 +73,7 @@ final class FTIntersection extends FTExpr {
           col = null;
           return n1;
         }
-        return cp.length == 0 ? calcFTAnd(cn, false) : new FTNodeItem(0);
+        return cp.length == 0 ? calcFTAnd(cn, false) : new FTNode();
       }
 
       /**
@@ -82,19 +83,19 @@ final class FTIntersection extends FTExpr {
        * @return FTNode as result node
        * @throws QueryException Exception
        */
-      private FTNodeItem calcFTAnd(final FTNodeItem[] n, final boolean p)
+      private FTNode calcFTAnd(final FTNode[] n, final boolean p)
           throws QueryException {
 
-        if(n.length == 0) return new FTNodeItem(0);
+        if(n.length == 0) return new FTNode();
         if(n.length == 1) return n[0];
 
-        FTNodeItem n1 = n[0];
-        FTNodeItem n2;
+        FTNode n1 = n[0];
+        FTNode n2;
         for(int i = 1; i < n.length; i++) {
           n2 = n[i];
-          if(n1.ftn.empty()) return n1;
-          if(n2.ftn.empty()) return n2;
-          int d = n1.ftn.pre() - n2.ftn.pre();
+          if(n1.empty()) return n1;
+          if(n2.empty()) return n2;
+          int d = n1.fte.pre() - n2.fte.pre();
           while(d != 0) {
             if(d < 0) {
               if(i != 1) {
@@ -102,23 +103,23 @@ final class FTIntersection extends FTExpr {
                 n2 = n[i];
               }
               n1 = more(n, 0, p);
-              if(n1.ftn.empty()) return n1;
+              if(n1.empty()) return n1;
             } else {
               n2 = more(n, i, p);
-              if(n2.ftn.empty()) return n2;
+              if(n2.empty()) return n2;
             }
-            d = n1.ftn.pre() - n2.ftn.pre();
+            d = n1.fte.pre() - n2.fte.pre();
           }
         }
 
         for(int i = 0; i < n.length; i++) {
           // color highlighting - limit number of tokens to 128
-          if(col != null) col.add((byte) (n[i].ftn.getNumTokens() & 0x7F));
+          if(col != null) col.add((byte) (n[i].fte.getNumTokens() & 0x7F));
           if(i == 0) continue;
           n2 = n[i];
-          n1.ftn.reset();
+          n1.fte.reset();
           n1.union(ctx, n2, 0);
-          n1.ftn.reset();
+          n1.fte.reset();
         }
         return n1;
       }
@@ -131,7 +132,7 @@ final class FTIntersection extends FTExpr {
       private boolean moreN() throws QueryException {
         for(int i = 0; i < cn.length; i++) {
           cn[i] = expr[nex[i]].iter(ctx).next();
-          if(cn[i].ftn.empty()) return false;
+          if(cn[i].empty()) return false;
         }
         return true;
       }
@@ -144,7 +145,7 @@ final class FTIntersection extends FTExpr {
       private boolean moreP() throws QueryException {
         for(int i = 0; i < cp.length; i++) {
           cp[i] = expr[pex[i]].iter(ctx).next();
-          if(cp[i].ftn.empty()) return false;
+          if(cp[i].empty()) return false;
         }
         return true;
       }
@@ -157,7 +158,7 @@ final class FTIntersection extends FTExpr {
        * @return FTNodeItem
        * @throws QueryException Exception
        */
-      private FTNodeItem more(final FTNodeItem[] n, final int i,
+      private FTNode more(final FTNode[] n, final int i,
            final boolean p) throws QueryException {
 
         if(p) n[i] = expr[pex[i]].iter(ctx).next();

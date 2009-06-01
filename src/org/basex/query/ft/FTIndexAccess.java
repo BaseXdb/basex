@@ -7,7 +7,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.iter.Iter;
@@ -48,10 +48,10 @@ public final class FTIndexAccess extends Simple {
       public Item next() throws QueryException {
         final Tokenizer tmp = ctx.fttoken;
         ctx.fttoken = ft;
-        final FTNodeItem it = ir.next();
+        final FTNode it = ir.next();
         ctx.fttoken = tmp;
-        if(it.ftn.ip != null && it.ftn.p != null && ctx.ftpos != null) {
-          ctx.ftpos.add(it.ftn.ip.finish(), it.ftn.p.finish());
+        if(it.fte.pos != null && it.fte.poi != null && ctx.ftpos != null) {
+          ctx.ftpos.add(it.fte.pos.finish(), it.fte.poi.finish());
         }
         return it.score() == 0 ? null : it;
       }

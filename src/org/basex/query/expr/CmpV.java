@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.path.AxisPath;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -135,7 +135,7 @@ public final class CmpV extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].i() && expr[1] instanceof AxisPath) {
+    if(expr[0].i() && !expr[1].i()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
@@ -152,9 +152,30 @@ public final class CmpV extends Arr {
     }
     if(e != this) {
       ctx.compInfo(OPTPRE, this);
-    } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
-      e = Pos.get(this, cmp, e2);
-      if(e != this) ctx.compInfo(OPTWRITE, this);
+    } else if(e1 instanceof Fun) {
+      final Fun fun = (Fun) expr[0];
+      if(fun.func == FunDef.POS) {
+        e = Pos.get(this, cmp, e2);
+        if(e != this) ctx.compInfo(OPTWRITE, this);
+      } else if(fun.func == FunDef.COUNT) {
+        // same as for general comparisons
+        if(e2.i() && ((Item) e2).n() && ((Item) e2).dbl() == 0) {
+          // count(...) CMP 0
+          if(cmp == Comp.LT || cmp == Comp.GE) {
+            // < 0: always false, >= 0: always true
+            ctx.compInfo(OPTPRE, this);
+            e = Bln.get(cmp == Comp.GE);
+          } else {
+            // <=/= 0: empty(), >/!= 0: exist()
+            final Fun f = new FNSimple();
+            f.expr = fun.expr;
+            f.func = cmp == Comp.EQ || cmp == Comp.LE ?
+                FunDef.EMPTY : FunDef.EXISTS;
+            ctx.compInfo(OPTWRITE, this);
+            e = f;
+          }
+        }
+      }
     }
     return e;
   }

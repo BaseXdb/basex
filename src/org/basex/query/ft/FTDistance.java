@@ -26,7 +26,7 @@ public class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean filter(final QueryContext ctx) throws QueryException {
+  boolean filter(final QueryContext ctx) throws QueryException {
     return checkDist(checkItr(expr[0], ctx), checkItr(expr[1], ctx), true);
   }
 

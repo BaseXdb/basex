@@ -11,7 +11,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTOpt.FTMode;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
@@ -58,9 +58,9 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
-    final int len = contains(ctx);
-    double s = len == 0 ? 0 : ctx.score.word(len, ctx.fttoken.size());
+  public FTNode atomic(final QueryContext ctx) throws QueryException {
+    final int c = contains(ctx);
+    double s = c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.size());
 
     // evaluate weight
     final Expr w = ctx.ftopt.weight;
@@ -69,7 +69,7 @@ public final class FTWords extends FTExpr {
       if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
       s *= d;
     }
-    return new FTNodeItem(s);
+    return new FTNode(s);
   }
 
   /**

@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 
 /**
@@ -32,16 +32,16 @@ final class FTSelectIndex extends FTExpr {
 
     return new FTNodeIter() {
       @Override
-      public FTNodeItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         ctx.ftselect = sel;
         sel.init(ctx.fttoken);
-        FTNodeItem it = ir.next();
+        FTNode it = ir.next();
 
-        if(!it.ftn.empty() && !ctx.ftselect.standard()) {
+        if(!it.empty() && !ctx.ftselect.standard()) {
           init(it);
           while(!sel.filter(ctx)) {
             it = ir.next();
-            if(it.ftn.empty()) break;
+            if(it.empty()) break;
             init(it);
           }
         }
@@ -53,11 +53,11 @@ final class FTSelectIndex extends FTExpr {
        * Initializes item for next seqEval with index use.
        * @param it current node
        */
-      void init(final FTNodeItem it) {
-        sel.pos = it.ftn.convertPos();
-        sel.size = it.ftn.p.list[0];
-        if(it.ftn.getToken() != null) {
-          sel.ft.init(it.data.text(it.ftn.pre()));
+      void init(final FTNode it) {
+        sel.pos = it.fte.convertPos();
+        sel.size = it.fte.poi.list[0];
+        if(it.fte.getToken() != null) {
+          sel.ft.init(it.data.text(it.fte.pre()));
           sel.term = sel.ft.getTokenList();
         }
       }

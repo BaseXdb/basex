@@ -1,9 +1,8 @@
 package org.basex.query.ft;
 
-import org.basex.index.FTNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.util.IntList;
 
@@ -27,51 +26,54 @@ public final class FTMildNotIndex extends FTExpr {
     return new FTNodeIter() {
       final FTNodeIter i1 = expr[0].iter(ctx);
       final FTNodeIter i2 = expr[1].iter(ctx);
-      FTNodeItem n0, n1;
+      FTNode n0, n1;
       
       @Override
-      public FTNodeItem next() throws QueryException { 
+      public FTNode next() throws QueryException { 
         if(n0 == null) n0 = i1.next();
         if(n1 == null) n1 = i2.next();
-        if(n1.ftn.empty() || n0.ftn.empty()) {
-          final FTNodeItem tmp = n0;
+        if(n0.empty() || n1.empty()) {
+          final FTNode tmp = n0;
           n0 = null;
           return tmp;
         } 
         
         final IntList pos = new IntList();
-        pos.add(n0.ftn.pre());
+        pos.add(n0.fte.pre());
         final IntList poi = new IntList();
-        poi.add(n0.ftn.getNumTokens());
+        poi.add(n0.fte.getNumTokens());
         
-        if(n0.ftn.pre() < n1.ftn.pre()) {
-          final FTNodeItem tmp = n0;
+        int d = n0.fte.pre() - n1.fte.pre();
+        if(d < 0) {
+          final FTNode tmp = n0;
           n0 = null;
           return tmp;
         }
-        if(n0.ftn.pre() > n1.ftn.pre()) {
+        if(d > 0) {
           n1 = null;
           return next();
         }
 
-        boolean mp0 = n0.ftn.morePos();
-        boolean mp1 = n1.ftn.morePos();
+        boolean mp0 = n0.fte.morePos();
+        boolean mp1 = n1.fte.morePos();
         while(mp0 && mp1) {
-          if(n0.ftn.nextPos() < n1.ftn.nextPos()) {
-            pos.add(n0.ftn.nextPos());
-            poi.add(n0.ftn.nextPoi());
-            mp0 = n0.ftn.morePos();
-          } else if(n0.ftn.nextPos() > n1.ftn.nextPos()) {
-            mp1 = n1.ftn.morePos();
-          } else {
-            mp0 = n0.ftn.morePos();
-            mp1 = n1.ftn.morePos();
+          d = n0.fte.nextPos() - n1.fte.nextPos();
+          if(d <= 0) {
+            if(d < 0) {
+              pos.add(n0.fte.nextPos());
+              poi.add(n0.fte.nextPoi());
+            }
+            mp0 = n0.fte.morePos();
+          }
+          if(d >= 0) {
+            mp1 = n1.fte.morePos();
           }
         }
+
         if(pos.size > 1) {
-          final FTNode n = new FTNode(pos.finish(), poi.finish());
-          n.setToken(n0.ftn.getToken());
-          final FTNodeItem tmp = new FTNodeItem(n, n0.data);
+          final FTNode tmp = n0;
+          tmp.fte.pos = pos;
+          tmp.fte.poi = poi;
           n0 = null;
           n1 = null;
           return tmp;

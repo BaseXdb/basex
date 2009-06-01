@@ -21,7 +21,9 @@ import org.basex.query.util.Var;
  */
 public class Pred extends Preds {
   /** Expression. */
-  public Expr root;
+  Expr root;
+  /** Counter flag. */
+  private boolean counter;
 
   /**
    * Constructor.
@@ -51,22 +53,23 @@ public class Pred extends Preds {
     final Pos pos = p instanceof Pos ? (Pos) p : null;
     // Last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
-    // Multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null &&
-        uses(Use.POS, ctx)) return this;
     // Use iterative evaluation
-    return new IterPred(root, pred, pos, last);
+    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx)))
+        return new IterPred(root, pred, pos, last);
+
+    // faster runtime evaluation of variable counters (array[$pos] ...)
+    counter = pred.length == 1 && p.returned(ctx) == Return.NUM &&
+      !p.uses(Use.CTX, ctx);
+    return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    // quick evaluation of variable counters (array[$pos] ...)
-    if(pred.length == 1 && pred[0] instanceof VarCall) {
+    if(counter) {
       final Item it = pred[0].ebv(ctx);
-      if(it.n()) {
-        final long l = it.itr();
-        return new IterPred(root, pred, (Pos) Pos.get(l, l), false).iter(ctx);
-      }
+      final long l = it.itr();
+      return l != it.dbl() ? Iter.EMPTY :
+        new IterPred(root, pred, (Pos) Pos.get(l, l), false).iter(ctx);
     }
     
     final Iter iter = ctx.iter(root);
@@ -85,7 +88,6 @@ public class Pred extends Preds {
       ctx.pos = 1;
       int c = 0;
       for(int s = 0, sl = si.size(); s < sl; s++) {
-        //System.out.println("? " + sl);
         ctx.item = si.item[s];
         if(p.test(ctx) != null) si.item[c++] = si.item[s];
         ctx.pos++;

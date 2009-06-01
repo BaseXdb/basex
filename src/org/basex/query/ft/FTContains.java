@@ -28,14 +28,14 @@ import org.basex.util.IntList;
  */
 public class FTContains extends Expr {
   /** Expression. */
-  public Expr expr;
+  Expr expr;
   /** Full-text expression. */
-  public FTExpr ftexpr;
+  FTExpr ftexpr;
   /** Full-text parser. */
-  public Tokenizer ft = new Tokenizer();
+  Tokenizer ft = new Tokenizer();
   /** Flag for first evaluation.*/
   private int div;
-  
+
   /**
    * Constructor.
    * @param e expression
@@ -45,12 +45,12 @@ public class FTContains extends Expr {
     expr = e;
     ftexpr = fte;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx).addText(ctx);
     ftexpr = ftexpr.comp(ctx);
-    
+
     Expr e = this;
     if(expr.e()) e = Bln.FALSE;
     if(e != this) ctx.compInfo(OPTPRE, this);
@@ -58,26 +58,26 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {    
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     if(div == 0) div = ++ctx.ftcount;
-    
+
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     final IntList[] ftd = ctx.ftd;
     ctx.fttoken = ft;
     double s = 0;
-    Item i;
+    Item it;
 
-    while((i = iter.next()) != null) {
-      ft.init(i.str());
+    while((it = iter.next()) != null) {
+      ft.init(it.str());
       final double d = ftexpr.atomic(ctx).score();
       s = ctx.score.and(s, d);
 
       // add entry to visualization
-      if(ctx.ftpos != null && ctx.ftd != null && d > 0 && i instanceof DBNode)
-        ctx.ftpos.add(ctx.ftd, ((DBNode) i).pre, div);
+      if(d > 0 && ctx.ftpos != null && ctx.ftd != null && it instanceof DBNode)
+        ctx.ftpos.add(ctx.ftd, ((DBNode) it).pre, div);
     }
-    
+
     ctx.fttoken = tmp;
     ctx.ftd = ftd;
     return Bln.get(s);
@@ -90,7 +90,7 @@ public class FTContains extends Expr {
     return s != null && ic.data.meta.ftxindex && s.test.type == Type.TXT &&
       ftexpr.indexAccessible(ic);
   }
-  
+
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     ic.ctx.compInfo(OPTFTXINDEX);
@@ -103,7 +103,7 @@ public class FTContains extends Expr {
     // standard index evaluation; first expression will always be an axis path
     return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ft, ic), ic.step);
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return expr.uses(u, ctx) || ftexpr.uses(u, ctx);

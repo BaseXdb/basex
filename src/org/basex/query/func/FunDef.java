@@ -13,7 +13,7 @@ import org.basex.query.expr.Return;
 public enum FunDef {
 
   /* FNAcc functions. */
-  
+
   /** XQuery function. */
   POS(FNURI, FNAcc.class, 0, 0, "position()", NUM),
   /** XQuery function. */
@@ -29,7 +29,7 @@ public enum FunDef {
   /** XQuery function. */
   URIQNAME(FNURI, FNAcc.class, 1, 1, "namespace-uri-from-QName(qname)",
       NONUMSEQ),
-  
+
   /* FNAggr functions. */
 
   /** XQuery function. */
@@ -44,7 +44,7 @@ public enum FunDef {
   SUM(FNURI, FNAggr.class, 1, 2, "sum(item, zero)", SEQ),
 
   /* FNContext functions. */
-  
+
   /** XQuery function. */
   CURRDATE(FNURI, FNContext.class, 0, 0, "current-date()", NONUM),
   /** XQuery function. */
@@ -126,7 +126,7 @@ public enum FunDef {
   DOC(FNURI, FNGen.class, 1, 1, "doc(item)", NODSEQ),
 
   /* FNId functions. */
-  
+
   /** XQuery function. */
   ID(FNURI, FNId.class, 1, 2, "id(string, item?)", NODSEQ),
   /** XQuery function. */
@@ -135,7 +135,7 @@ public enum FunDef {
   LANG(FNURI, FNId.class, 1, 2, "lang(string, item?)", BLN),
 
   /* FNNode functions. */
-  
+
   /** XQuery function. */
   DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", NONUMSEQ),
   /** XQuery function. */
@@ -154,7 +154,7 @@ public enum FunDef {
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", NONUMSEQ),
 
   /* FNNum functions. */
-  
+
   /** XQuery function. */
   ABS(FNURI, FNNum.class, 1, 1, "abs(num)", NUMSEQ),
   /** XQuery function. */
@@ -167,7 +167,7 @@ public enum FunDef {
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", NUMSEQ),
 
   /* FNOut functions. */
-  
+
   /** XQuery function. */
   ERROR(FNURI, FNOut.class, 0, 3, "error(code?, desc?, object?)", NONUMSEQ),
   /** XQuery function. */
@@ -184,7 +184,7 @@ public enum FunDef {
   TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", NONUMSEQ),
 
   /* FNQName functions. */
-  
+
   /** XQuery function. */
   INSCOPE(FNURI, FNQName.class, 1, 1, "in-scope-prefixes(elem)", NONUMSEQ),
   /** XQuery function. */
@@ -203,7 +203,7 @@ public enum FunDef {
   RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", NONUMSEQ),
 
   /* FNSeq functions. */
-  
+
   /** XQuery function. */
   DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(item, coll?)", SEQ),
   /** XQuery function. */
@@ -220,7 +220,7 @@ public enum FunDef {
   DEEPEQ(FNURI, FNSeq.class, 2, 3, "deep-equal(item, item, coll?)", BLN),
 
   /* FNSimple functions. */
-  
+
   /** XQuery function. */
   FALSE(FNURI, FNSimple.class, 0, 0, "false()", BLN),
   /** XQuery function. */
@@ -294,7 +294,7 @@ public enum FunDef {
   FILENAME(BXURI, FNBaseX.class, 0, 0, "filename()", STR),
   /** XQuery function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN);
-  
+
   /** Function classes. */
   Class<? extends Fun> func;
   /** Function uri. */
@@ -307,7 +307,7 @@ public enum FunDef {
   int max;
   /** Return type. */
   Return ret;
-  
+
   /**
    * Constructor.
    * @param ur uri
@@ -326,7 +326,7 @@ public enum FunDef {
     desc = dsc;
     ret = rt;
   }
-  
+
   @Override
   public final String toString() {
     return desc;

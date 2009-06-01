@@ -115,17 +115,6 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public final String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(func.toString().replaceAll("\\(.*\\)", "") + "(");
-    for(int a = 0; a < expr.length; a++) {
-      sb.append((a != 0 ? ", " : "") + expr[a]);
-    }
-    sb.append(')');
-    return sb.toString();
-  }
-
-  @Override
   public final String info() {
     return func.toString();
   }
@@ -139,5 +128,16 @@ public abstract class Fun extends Arr {
       for(Expr arg : expr) arg.plan(ser);
       ser.closeElement();
     }
+  }
+
+  @Override
+  public final String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(func.toString().replaceAll("\\(.*\\)", "") + "(");
+    for(int a = 0; a < expr.length; a++) {
+      sb.append((a != 0 ? ", " : "") + expr[a]);
+    }
+    sb.append(')');
+    return sb.toString();
   }
 }

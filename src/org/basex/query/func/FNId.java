@@ -167,4 +167,9 @@ final class FNId extends Fun {
     }
     return nod;
   }
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return (u == Use.CTX && expr.length == 1) || super.uses(u, ctx);
+  }
 }

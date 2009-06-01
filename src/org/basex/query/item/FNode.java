@@ -33,8 +33,6 @@ public abstract class FNode extends Nod {
 
   @Override
   public final int diff(final Nod nod) {
-    // [CG] XQuery/ID: check all cases
-    
     if(id != nod.id) {
       Nod n = this;
       while(n != null) {
@@ -110,15 +108,10 @@ public abstract class FNode extends Nod {
       private NodeMore[] it = new NodeMore[1];
       /** Iterator Level. */
       private int l;
-      /** First call. */
-      private boolean more;
 
       @Override
       public Nod next() throws QueryException {
-        if(!more) {
-          it[0] = self ? self() : child();
-          more = true;
-        }
+        if(it[0] == null) it[0] = self ? self() : child();
         if(l < 0) return null;
 
         final Nod node = it[l].next();

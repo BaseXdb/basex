@@ -76,6 +76,7 @@ public final class And extends Arr {
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
       if(!it.bool()) {
+        // [SG] delivers sometimes unexpected results
         if(ctx.ftpos != null && ctx.item != null && ctx.item instanceof DBNode)
           ctx.ftpos.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE;

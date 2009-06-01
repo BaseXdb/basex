@@ -23,14 +23,14 @@ public abstract class IndexArrayIterator extends IndexIterator {
     @Override
     public int next() { return 0; };
     @Override
-    public FTNode node() { return null; };
+    public FTEntry node() { return null; };
   };
 
   /**
    * Returns the next node.
    * @return FTNode next node
    */
-  public abstract FTNode node();
+  public abstract FTEntry node();
 
   /**
    * Sets the unique token number. Used for visualization.
@@ -58,7 +58,7 @@ public abstract class IndexArrayIterator extends IndexIterator {
       final IndexArrayIterator i2) {
 
     return new IndexArrayIterator() {
-      FTNode r, s;
+      FTEntry r, s;
       int c;
 
       @Override
@@ -78,7 +78,7 @@ public abstract class IndexArrayIterator extends IndexIterator {
       }
 
       @Override
-      public FTNode node() {
+      public FTEntry node() {
         return c <= 0 ? r : s;
       }
 
@@ -112,7 +112,7 @@ public abstract class IndexArrayIterator extends IndexIterator {
       final IndexArrayIterator i2, final int w) {
 
     return new IndexArrayIterator() {
-      FTNode r, s;
+      FTEntry r, s;
 
       @Override
       public boolean more() {
@@ -131,7 +131,7 @@ public abstract class IndexArrayIterator extends IndexIterator {
       }
 
       @Override
-      public FTNode node() {
+      public FTEntry node() {
         return r;
       }
 

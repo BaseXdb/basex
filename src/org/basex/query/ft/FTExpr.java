@@ -8,7 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
-import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.util.Var;
@@ -39,11 +39,11 @@ public abstract class FTExpr extends Expr {
 
   @Override
   public FTNodeIter iter(final QueryContext ctx) throws QueryException {
-    final FTNodeItem it = atomic(ctx);
+    final FTNode it = atomic(ctx);
     return new FTNodeIter() {
       private boolean more;
       @Override
-      public FTNodeItem next() { return (more ^= true) ? it : null; }
+      public FTNode next() { return (more ^= true) ? it : null; }
       @Override
       public int size() { return 1; }
       @Override
@@ -52,7 +52,7 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public FTNodeItem atomic(final QueryContext ctx) throws QueryException {
+  public FTNode atomic(final QueryContext ctx) throws QueryException {
     return iter(ctx).next();
   }
     
