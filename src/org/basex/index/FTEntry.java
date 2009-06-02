@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import org.basex.ft.Tokenizer;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
@@ -22,8 +20,6 @@ public final class FTEntry {
 
   /** Counter for pos values. */
   private int c;
-  /** List for tokens from query. */
-  private Tokenizer[] tok;
 
   /**
    * Constructor.
@@ -36,13 +32,10 @@ public final class FTEntry {
    * Constructor.
    * @param idpos ftdata, pre, pos1, ..., posn
    * @param pointer pointer on query tokens
-   * @param token tokenizers
    */
-  public FTEntry(final IntList idpos, final IntList pointer,
-      final Tokenizer[] token) {
+  public FTEntry(final IntList idpos, final IntList pointer) {
     pos = idpos;
     poi = pointer;
-    tok = token;
   }
 
   /**
@@ -85,29 +78,35 @@ public final class FTEntry {
   }
   
   /**
-   * Get number of tokens from query for this node.
-   * @return number of tokens
+   * Get token number.
+   * @return token number
    */
-  public int getNumTokens() {
+  public int getTokenNum() {
     return poi.list[0];
   }
 
   /**
-   * Merges n to the current FTNode.
+   * Merges n to the current node.
    * Pointer are node updated.
-   * @param n ftnode to be merged
+   * @param n node to be merged
    * @param w distance between the pos values
    * @return boolean
    */
   public boolean union(final FTEntry n, final int w) {
-    if(not != n.not) return false;
+    if(not != n.not || pre() != n.pre()) return false;
 
     boolean mp = morePos();
     boolean nmp = n.morePos();
-    if(!(mp && nmp) || pre() != n.pre()) return false;
+    if(!mp || !nmp) {
+      reset();
+      n.reset();
+      return false;
+    }
 
     final IntList il = new IntList();
-    final IntList pn = poi != null ? initNewPointer(n.poi) : null;
+    final IntList pn = new IntList();
+    pn.add(Math.max(poi.list[0], n.poi.list[0]));
+
     il.add(pre());
     while(mp && nmp) {
       final int d = nextPos() - n.nextPos() + w;
@@ -135,31 +134,15 @@ public final class FTEntry {
       }
     }
 
-    pos = new IntList(il.finish());
-
-    final Tokenizer[] tmp = new Tokenizer[tok.length + n.tok.length];
-    Array.copy(tok, tmp, 0);
-    Array.copy(n.tok, tmp, tok.length);
-    tok = tmp;
-
-    c = 0;
-    if(poi != null) poi = new IntList(pn.finish());
+    pos = il;
+    poi = pn;
+    reset();
+    n.reset();
     return pos.size > 1;
   }
 
   /**
-   * Initialize pointer list.
-   * @param n IntList
-   * @return IntList
-   */
-  private IntList initNewPointer(final IntList n) {
-    final IntList il = new IntList();
-    il.add(poi.list[0] > n.list[0] ? poi.list[0] : n.list[0]);
-    return il;
-  }
-
-  /**
-   * Adds node to il and ns pointer to il.
+   * Adds the current position lists.
    * @param il IntList takes the new node
    * @param pn IntList with pointers
    */
@@ -170,10 +153,6 @@ public final class FTEntry {
   
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName() + "[");
-    if(tok != null) for(final Tokenizer t : tok) sb.append(t + " ");
-    else sb.append("-");
-    return sb.append("]").toString();
+    return getClass().getSimpleName() + "[" + pos.list[0] + "]";
   }
 }

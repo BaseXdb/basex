@@ -17,15 +17,14 @@ abstract class FTIndex extends Index {
   Data data;
 
   /**
-   * Reads pre and position values from the specified data source and
-   * returns them via an iterator.
+   * Returns an iterator for an index entry.
    * @param p pointer on data
    * @param s number of pre/pos values
    * @param da data source
    * @return iterator
    */
-  IndexArrayIterator data(final long p, final int s, final DataAccess da) {
-    return new IndexArrayIterator() {
+  FTIndexIterator iter(final long p, final int s, final DataAccess da) {
+    return new FTIndexIterator() {
       boolean f = true;
       long pos = p;
       int lpre, c;
@@ -50,7 +49,7 @@ abstract class FTIndex extends Index {
 
         final int[] t = new int[il.size];
         for(int i = 0; i < t.length; i++) t[i] = toknum;
-        n = new FTEntry(il, new IntList(t), tok);
+        n = new FTEntry(il, new IntList(t));
         return true;
       }
 

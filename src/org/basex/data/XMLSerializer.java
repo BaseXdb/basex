@@ -94,8 +94,8 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b, final int[][] ftd, 
-      final TokenList ial) throws IOException {
+  public void text(final byte[] b, final int[][] ftd, final TokenList ial)
+      throws IOException {
 
     finishElement();
     int c = -1, pp = 0, wl = 0;

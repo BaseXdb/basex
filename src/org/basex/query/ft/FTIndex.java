@@ -6,7 +6,7 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.ft.Tokenizer;
 import org.basex.index.FTEntry;
-import org.basex.index.IndexArrayIterator;
+import org.basex.index.FTIndexIterator;
 import org.basex.query.QueryContext;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
@@ -38,7 +38,7 @@ public final class FTIndex extends FTExpr {
   public FTIter iter(final QueryContext ctx) {
     return new FTIter() {
       /** Index iterator. */
-      IndexArrayIterator iat;
+      FTIndexIterator iat;
 
       @Override
       public FTItem next() {
@@ -48,11 +48,10 @@ public final class FTIndex extends FTExpr {
           ft.init();
           int w = 0;
           while(ft.more()) {
-            final IndexArrayIterator it = (IndexArrayIterator) data.ids(ft);
-            iat = w == 0 ? it : IndexArrayIterator.intersect(iat, it, w);
+            final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
+            iat = w == 0 ? it : FTIndexIterator.intersect(iat, it, w);
             w++;
           }
-          iat.setToken(new Tokenizer[] { ft});
           iat.setTokenNum(++ctx.ftcount);
         }
         return new FTItem(iat.more() ? iat.node() : new FTEntry(), data);

@@ -14,9 +14,9 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  */
 public final class FTAnd extends FTExpr {
-  /** Saving index of positive expressions. */
+  /** Index of positive expressions. */
   private int[] pex;
-  /** Saving index of negative (ftnot) expressions. */
+  /** Index of negative (ftnot) expressions. */
   private int[] nex;
   
   /**

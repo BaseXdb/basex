@@ -41,7 +41,7 @@ final class FTMildNotIndex extends FTExpr {
         final IntList pos = new IntList();
         pos.add(n0.fte.pre());
         final IntList poi = new IntList();
-        poi.add(n0.fte.getNumTokens());
+        poi.add(n0.fte.getTokenNum());
         
         int d = n0.fte.pre() - n1.fte.pre();
         if(d < 0) {

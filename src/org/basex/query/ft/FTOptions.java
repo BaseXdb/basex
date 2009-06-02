@@ -52,7 +52,7 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTIter iter(final QueryContext ctx) {
     return new FTIter() {
-      FTOpt tmp = ctx.ftopt;
+      final FTOpt tmp = ctx.ftopt;
       FTIter ir;
 
       @Override

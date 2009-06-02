@@ -75,7 +75,7 @@ public class FTContains extends Expr {
 
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && node.pos.length != 0 &&
-          it instanceof DBNode) ctx.ftpos.add(node.pos, ((DBNode) it).pre, div);
+          it instanceof DBNode) ctx.ftpos.add(((DBNode) it).pre, node.pos, div);
     }
 
     ctx.fttoken = tmp;

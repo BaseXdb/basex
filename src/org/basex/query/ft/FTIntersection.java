@@ -13,9 +13,9 @@ import org.basex.util.TokenBuilder;
  * @author Sebastian Gath
  */
 final class FTIntersection extends FTExpr {
-  /** Saving index of positive expressions. */
+  /** Index of positive expressions. */
   final int[] pex;
-  /** Saving index of negative (ftnot) expressions. */
+  /** Index of negative (ftnot) expressions. */
   final int[] nex;
   
   /**
@@ -37,9 +37,9 @@ final class FTIntersection extends FTExpr {
     for(int i = 0; i < expr.length; i++) ir[i] = expr[i].iter(ctx);
 
     return new FTIter() {
-      /** Cache for positive expression. */
+      /** Cache for positive expressions. */
       final FTItem[] cp = new FTItem[pex.length];
-      /** Cache for negative expression. */
+      /** Cache for negative expressions. */
       final FTItem[] cn = new FTItem[nex.length];
       /** Collect each pointer once for a result.*/
       TokenBuilder col = new TokenBuilder();
@@ -116,12 +116,10 @@ final class FTIntersection extends FTExpr {
 
         for(int i = 0; i < n.length; i++) {
           // color highlighting - limit number of tokens to 128
-          if(col != null) col.add((byte) (n[i].fte.getNumTokens() & 0x7F));
+          if(col != null) col.add((byte) (n[i].fte.getTokenNum() & 0x7F));
           if(i == 0) continue;
           n2 = n[i];
-          n1.fte.reset();
           n1.union(ctx, n2, 0);
-          n1.fte.reset();
         }
         return n1;
       }
@@ -141,15 +139,13 @@ final class FTIntersection extends FTExpr {
 
       /**
        * Checks if more values are available.
-       * @return boolean
        * @throws QueryException XQException
        */
-      private boolean moreP() throws QueryException {
+      private void moreP() throws QueryException {
         for(int i = 0; i < cp.length; i++) {
           cp[i] = ir[pex[i]].next();
-          if(cp[i].empty()) return false;
+          if(cp[i].empty()) break;
         }
-        return true;
       }
 
       /**

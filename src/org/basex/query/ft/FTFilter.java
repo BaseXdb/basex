@@ -4,7 +4,6 @@ import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
-import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
@@ -32,12 +31,6 @@ public abstract class FTFilter extends Arr {
 
   /** Optional unit. */
   FTUnit unit;
-  
-  @Override
-  @SuppressWarnings("unused")
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    return super.comp(ctx);
-  }
 
   /**
    * Evaluates the filter expression.

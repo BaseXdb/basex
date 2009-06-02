@@ -75,15 +75,15 @@ public final class QueryContext extends Progress {
 
   /** Full-text position data (for visualization). */
   public FTPosData ftpos;
-  /** Count number of FTIndex (for visualization). */
+  /** Full-text token counter (for visualization). */
   public int ftcount;
 
   /** Scoring instance. */
   public Scoring score = new Scoring();
-  /** Current full-text token. */
-  public Tokenizer fttoken;
   /** Current full-text options. */
   public FTOpt ftopt = new FTOpt();
+  /** Current full-text token. */
+  public Tokenizer fttoken;
 
   /** Current Date. */
   public Dat date;

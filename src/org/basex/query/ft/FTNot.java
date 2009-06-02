@@ -21,11 +21,6 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    return super.comp(ctx);
-  }
-
-  @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     final FTItem it = expr[0].atomic(ctx);
     it.score(it.score() == 0 ? 1 : 0);

@@ -82,10 +82,10 @@ public final class FTItem extends DBNode {
    * Converts the index positions. Called by the index variant.
    */
   public void convertPos() {
-    pos = new IntList[fte.getNumTokens()];
+    pos = new IntList[fte.getTokenNum()];
     for(int p = 0; p < pos.length; p++) pos[p] = new IntList();
-    fte.reset();
     while(fte.morePos()) pos[fte.nextPoi() - 1].add(fte.nextPos());
+    fte.reset();
   }
 
   @Override

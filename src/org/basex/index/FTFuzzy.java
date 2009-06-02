@@ -133,7 +133,7 @@ public final class FTFuzzy extends FTIndex {
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(tok) :
-      data(cache.getPointer(id), cache.getSize(id), dat);
+      iter(cache.getPointer(id), cache.getSize(id), dat);
   }
 
   @Override
@@ -223,7 +223,7 @@ public final class FTFuzzy extends FTIndex {
    * @return int[][] data
    */
   private IndexIterator fuzzy(final byte[] tok, final int k) {
-    IndexArrayIterator it = IndexArrayIterator.EMP;
+    FTIndexIterator it = FTIndexIterator.EMP;
     
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
@@ -237,8 +237,7 @@ public final class FTFuzzy extends FTIndex {
       do r = tp[i++]; while(r == -1);
       while(p < r) {
         if(ls.similar(ti.readBytes(p, p + s), tok)) {
-          it = IndexArrayIterator.union(data(pointer(p, s),
-              size(p, s), dat), it);
+          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), dat), it);
         }
         p += s + ENTRY;
       }
@@ -251,9 +250,9 @@ public final class FTFuzzy extends FTIndex {
    * @param tok token looking for
    * @return iterator
    */
-  private IndexArrayIterator get(final byte[] tok) {
+  private FTIndexIterator get(final byte[] tok) {
     final int p = token(tok);
-    return p > -1 ? data(pointer(p, tok.length),
-        size(p, tok.length), dat) : IndexArrayIterator.EMP;
+    return p > -1 ? iter(pointer(p, tok.length),
+        size(p, tok.length), dat) : FTIndexIterator.EMP;
   }
 }
