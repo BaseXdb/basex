@@ -69,6 +69,9 @@ public abstract class Data  {
   public int nameID;
   /** Index References. */
   public int sizeID;
+  
+  /** Locking Flag. */
+  public boolean locked;
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -417,4 +420,20 @@ public abstract class Data  {
    * @param d data instance to copy from
    */
   public abstract void insert(int pre, int par, Data d);
+
+  /**
+   * Returns the locking sitation of the data.
+   * @return boolean locked
+   */
+  public boolean isLocked() {
+    return locked;
+  }
+
+  /**
+   * Locks and Unlocks the Datareference.
+   * @param l boolean if Data is locked
+   */
+  public void setLocked(final boolean l) {
+    this.locked = l;
+  }
 }

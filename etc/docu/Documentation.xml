@@ -2,9 +2,11 @@
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.0//EN"  "http://www.oasis-open.org/docbook/xml/4.0/docbookx.dtd">
 
+
+
 <book>
 	<bookinfo>
-		<title>Documentation of BaseX</title>
+		<title>Full-Documentation of BaseX</title>
 		<author>
 			<surname>BaseX-Team</surname>
 			<affiliation>
@@ -16,7 +18,7 @@
 		<pubdate>June 2009</pubdate>
 		<copyright>
 			<year>2009</year>
-			<holder role="mailto:info@basex.org"></holder>
+			<holder>DBIS, University of Konstanz</holder>
 		</copyright>
 		<abstract>
 			<para>This is  the full documentation of BaseX. BaseX is a native, open-source XML
@@ -25,33 +27,129 @@
 		</abstract>
 	</bookinfo>
 	<chapter>
-		<title>Quick Start</title>
+		<title>Introduction</title>
+		<para>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text processor. 
+		It supports very large XML instances and offers a visual, interactive frontend.  BaseX is written in Java and 
+		freely available for download. It is developed by the Database and Information Systems Group at the University of Konstanz.
+		 </para>
 		<sect1>
-			<title>Introduction</title>
-			<para>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text processor. 
-			 It supports very large XML instances and offers a visual, interactive frontend.  BaseX is written in Java and 
-			 freely available for download. It is developed by the Database and Information Systems Group at the University of Konstanz. </para>
+			<title>Prerequisites</title>
+			<sect2>
+				<title>Operating System</title>
+				<para>BaseX was tested on the following platforms:</para>
+				<itemizedlist>
+					<listitem>Windows 2000, XP, Vista, 7</listitem>
+					<listitem>Linux: Debian/Ubuntu, SuSE, Redhat</listitem>
+					<listitem>Max OS X (10.4+)</listitem>
+					<listitem>OpenBSD (4.3)</listitem>
+				</itemizedlist>
+				<para>Every other platform with a Java VM should be able to run BaseX.</para>
+			</sect2>
+			<sect2>
+				<title>Software</title>
+				<para>To run any version of BaseX, you need version 1.5 or later of
+				the Java runtime environment (JRE) or development kit (JDK).</para>
+				<para>The latest version of Java can be downloaded at 
+				<ulink url="http://www.java.com"/> or
+				<ulink url="http://java.sun.com"/> .</para>
+			</sect2>
+			<sect2>
+				<title>Hardware</title>
+				<para>BaseX works with very limited resources (400 MHz, 64 MB RAM).
+				To work with larger databases, however, you might benefit from more RAM.
+				If you encounter main memory limits, there are several things you can try:
+				<itemizedlist>
+						<listitem>Increase Java's virtual memory</listitem>
+						<listitem>Switch off database indexes</listitem>
+						<listitem>Use BaseX's internal XML parser</listitem>
+					</itemizedlist>
+				</para>
+			</sect2>
 		</sect1>
 		<sect1>
-			<title>Getting Started</title>
-			<para>BaseX comes as an executable .jar (Java Archive), which automatically determines the correct system settings
-			 (i.e. paths and environment variables) for BaseX. </para>
+			<title>Installation</title>
+			<para>BaseX works without any installation. The following files can be
+						<ulink url="http://www.inf.uni-konstanz.de/dbis/basex/download.php">downloaded</ulink>
+			from the homepage:</para>
+			<itemizedlist>
+				<listitem>
+					<emphasis>BaseX.jar</emphasis>:
+					simple JAR file</listitem>
+				<listitem>
+					<emphasis>BaseX.exe</emphasis>:
+					a JAR file, which is wrapped into a Windows executable</listitem>
+				<listitem>
+					<emphasis>BaseX-XQJ.jar</emphasis>:
+					<ulink url="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xqj.jar"> XQuery for Java</ulink> Database API</listitem>
+				<listitem>
+					<emphasis>BaseX-XMLDB.jar</emphasis>:
+					<ulink url="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xmldb.jar"> XML:DB</ulink> Database API</listitem>
+				<listitem>
+					<emphasis>BaseX-Complete.zip</emphasis>:
+					JAR files, sources, documentation and files to build the project</listitem>
+			</itemizedlist>
+			<para>The JAR file and the Windows executable can be launched with a
+			simple double-click. The "Complete" package contains the following
+			files and directories (selection):</para>
+			<blockquote>
+				<para>
+					<emphasis>Project Directory</emphasis>
+				</para>
+				<programlisting>
+	doc              Project documentation
+	etc              Various files for project handling
+	src              Project sources
+	.project         <ulink url="http://www.eclipse.org/">Eclipse</ulink> project file
+	makefile         Linux Makefile
+	BaseX.jar        Public JAR file
+	license.txt      Licensing Information
+	readme.txt       Project Information
+	build.xml        <ulink url="http://ant.apache.org/">Ant</ulink> Build file
+	input.xml        XML sample document</programlisting>
+			</blockquote>
+			<para>In the <code>etc</code> folder, you find Linux scripts and Windows 
+			batch files which can moved into your PATH environment to speedup
+			execution.
+			</para>
+		</sect1>
+		<sect1>
+			<title>Quick Start</title>
+			<para>By double-clicking the JAR file, the graphical interface is launched.
+	   		 If you start BaseX on the command line, or use the scripts mentioned above,
+	   		 you have some more options:
+
+			<blockquote>
+					<para>
+						<emphasis>Console version</emphasis>
+					</para>
+					<programlisting>java -cp BaseX.jar org.basex.BaseX</programlisting>
+					<para>
+						<emphasis>Running the server and a client instance</emphasis>
+					</para>
+					<programlisting>java -cp BaseX.jar org.basex.BaseXServer
+				java -cp BaseX.jar org.basex.BaseXClient</programlisting>
+					<para>
+						<emphasis>GUI version (granting more memory)</emphasis>
+					</para>
+					<programlisting>java -Xmx512m -jar BaseX.jar</programlisting>
+				</blockquote>
+			</para>
 		</sect1>
 		<sect1>
 			<title>Starting with BaseX GUI</title>
-			<para></para>
+			<para/>
 		</sect1>
 		<sect1>
 			<title>Starting with BaseX Console</title>
-			<para></para>
+			<para/>
 		</sect1>
 		<sect1>
 			<title>Using BaseX as Server</title>
-			<para></para>
+			<para/>
 		</sect1>
 		<sect1>
 			<title>Starting BaseX as a service</title>
-			<para></para>
+			<para/>
 		</sect1>
 	</chapter>
 	<chapter>
@@ -97,12 +195,10 @@
 			<title>XQuery Full-Text Implementation</title>
 			<para>	Your Text </para>
 		</sect1>
-
 		<sect1>
 			<title>Description of the Indexes</title>
 			<para>	Your Text </para>
 		</sect1>
-
 	</chapter>
 	<chapter>
 		<title>Developer's Guide</title>
