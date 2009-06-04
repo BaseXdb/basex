@@ -12,7 +12,7 @@ import org.basex.io.DataAccess;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
-import org.basex.io.TableDiskAccessNIO;
+import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
 import org.basex.util.Array;
 import org.basex.util.Token;
@@ -96,7 +96,7 @@ public final class DiskData extends Data {
   
       // main memory mode.. keep table in memory
       table = Prop.mainmem ? new TableMemAccess(db, DATATBL, meta.size) :
-        new TableDiskAccessNIO(db, DATATBL);
+        new TableDiskAccess(db, DATATBL);
       texts = new DataAccess(db, DATATXT);
       values = new DataAccess(db, DATAATV);
   
