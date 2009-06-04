@@ -3,12 +3,9 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-
 import org.basex.BaseX;
 import org.basex.util.Array;
-import org.basex.util.MappedByteBufferList;
 
 /**
  * This class stores the table on disk and reads it block-wise.
@@ -22,16 +19,16 @@ public final class TableDiskAccessNIO extends TableAccess {
   private static final int ENTRIES = IO.BLOCKSIZE >>> IO.NODEPOWER;
   /** Entries per new block. */
   private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
-  
-  /** Mapped bytebuffer window list. */
-  private MappedByteBufferList mbbuffer;
-  
+
+  /** Bytebuffer window list. */
+  private ByteBufferList mbbuffer;
+
   /** Temp buffer for creating a new block. */
   private final ByteBuffer tmpblock;
 
   /** Read Write file channel. */
   private FileChannel fc;
-  
+
   /** File storing all blocks. */
   private final RandomAccessFile file;
   /** Name of the database. */
@@ -69,7 +66,7 @@ public final class TableDiskAccessNIO extends TableAccess {
    * @param f prefix for all files (no ending)
    * @throws IOException in case files cannot be read
    */
-  public TableDiskAccessNIO(final String nm, final String f) 
+  public TableDiskAccessNIO(final String nm, final String f)
   throws IOException {
     db = nm;
     fn = f;
@@ -82,9 +79,9 @@ public final class TableDiskAccessNIO extends TableAccess {
     firstPres = in.readNums();
     blocks = in.readNums();
     in.close();
-    
+
     // create a mappedbytebuffer list
-    mbbuffer = new MappedByteBufferList(blocks.length);
+    mbbuffer = new ByteBufferList(blocks.length);
 
     // INITIALIZE FILE
     file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
@@ -118,7 +115,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     }
     if(low > high) BaseX.notexpected("Invalid Data Access [pre:" + pre +
         ",indexSize:" + indexSize + ",access:" + low + ">" + high + "]");
-    
+
     readBlock(mid, fp, np);
     return (pre - firstPre) << IO.NODEPOWER;
   }
@@ -137,7 +134,7 @@ public final class TableDiskAccessNIO extends TableAccess {
       final int b = blocks[ind];
       // check if block is already mapped
       if(mbbuffer.get(b) == null) {
-        mbbuffer.set(fc.map(FileChannel.MapMode.READ_WRITE, 
+        mbbuffer.set(fc.map(FileChannel.MapMode.READ_WRITE,
             b * IO.BLOCKSIZE, IO.BLOCKSIZE), b);
       }
       // else choose mapped block
@@ -186,7 +183,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   @Override
   public synchronized int read2(final int pos, final int off) {
     final int o = off + cursor(pos);
-    return ((mbbuffer.get(block).get(o) & 0xFF) << 8) 
+    return ((mbbuffer.get(block).get(o) & 0xFF) << 8)
     + (mbbuffer.get(block).get(o + 1) & 0xFF);
   }
 
@@ -195,7 +192,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     final int o = off + cursor(pos);
     return ((mbbuffer.get(block).get(o) & 0xFF) << 24)
         + ((mbbuffer.get(block).get(o + 1) & 0xFF) << 16)
-        + ((mbbuffer.get(block).get(o + 2) & 0xFF) << 8) 
+        + ((mbbuffer.get(block).get(o + 2) & 0xFF) << 8)
         + (mbbuffer.get(block).get(o + 3) & 0xFF);
   }
 
@@ -205,7 +202,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     return ((long) (mbbuffer.get(block).get(o) & 0xFF) << 32)
         + ((long) (mbbuffer.get(block).get(o + 1) & 0xFF) << 24)
         + ((mbbuffer.get(block).get(o + 2) & 0xFF) << 16)
-        + ((mbbuffer.get(block).get(o + 3) & 0xFF) << 8) 
+        + ((mbbuffer.get(block).get(o + 3) & 0xFF) << 8)
         + (mbbuffer.get(block).get(o + 4) & 0xFF);
   }
 
@@ -242,7 +239,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   }
 
   /* Note to delete method: Freed blocks are currently ignored. */
-  
+
   @Override
   public synchronized void delete(final int first, final int nr) {
     // mark index as dirty and get first block
@@ -255,7 +252,7 @@ public final class TableDiskAccessNIO extends TableAccess {
 
     // check if all entries are in current block => handle and return
     if(last < nextPre) {
-      copy(mbbuffer.get(block), from + nr, mbbuffer.get(block), 
+      copy(mbbuffer.get(block), from + nr, mbbuffer.get(block),
           from, nextPre - last - 1);
 
       updatePre(nr);
@@ -289,7 +286,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     }
 
     // delete entries at beginning of current (last) block
-    copy(mbbuffer.get(block), last - firstPre + 1, mbbuffer.get(block), 
+    copy(mbbuffer.get(block), last - firstPre + 1, mbbuffer.get(block),
         0, nextPre - last - 1);
 
     // update index entry for this block
@@ -297,7 +294,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     firstPre = first;
     updatePre(nr);
   }
-  
+
   /**
    * Updates the firstPre index entries.
    * @param nr number of entries to move
@@ -321,7 +318,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     // all entries fit in current block
     if(nr < ENTRIES - nextPre + firstPre) {
       // shift following entries forward and insert next entries
-      copy(mbbuffer.get(block), ins, mbbuffer.get(block), 
+      copy(mbbuffer.get(block), ins, mbbuffer.get(block),
           ins + nr, nextPre - pre);
       copy(entries, 0, mbbuffer.get(block), ins, nr);
 
@@ -344,11 +341,11 @@ public final class TableDiskAccessNIO extends TableAccess {
     int newBlocks = (int) ((double) (nr + NEWENTRIES - 1) / NEWENTRIES) + 1;
     // in case we insert at block boundary
     if(pre == nextPre - 1) newBlocks--;
-    
+
     // resize the index
     firstPres = Array.resize(firstPres, nrBlocks, nrBlocks + newBlocks);
     blocks = Array.resize(blocks, nrBlocks, nrBlocks + newBlocks);
-    
+
     Array.move(firstPres, index + 1, newBlocks, indexSize - index - 1);
     Array.move(blocks, index + 1, newBlocks, indexSize - index - 1);
 
@@ -398,7 +395,7 @@ public final class TableDiskAccessNIO extends TableAccess {
     }
     block = nrBlocks++;
     try {
-      mbbuffer.add(fc.map(FileChannel.MapMode.READ_WRITE, 
+      mbbuffer.add(fc.map(FileChannel.MapMode.READ_WRITE,
           block * IO.BLOCKSIZE, IO.BLOCKSIZE));
     } catch(IOException e) {
       e.printStackTrace();
@@ -413,8 +410,8 @@ public final class TableDiskAccessNIO extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private synchronized void copy(final MappedByteBuffer s, final int sp,
-      final MappedByteBuffer d, final int dp, final int l) {
+  private synchronized void copy(final ByteBuffer s, final int sp,
+      final ByteBuffer d, final int dp, final int l) {
     byte[] tmp = new byte[l << IO.NODEPOWER];
     s.position(sp << IO.NODEPOWER);
     s.get(tmp);
@@ -423,7 +420,7 @@ public final class TableDiskAccessNIO extends TableAccess {
 //    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
 //        l << IO.NODEPOWER);
   }
-  
+
   /**
    * Convenience method for copying blocks.
    * @param s source array
@@ -432,8 +429,8 @@ public final class TableDiskAccessNIO extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private synchronized void copy(final byte[] s, final int sp, 
-      final MappedByteBuffer d, final int dp, final int l) {
+  private synchronized void copy(final byte[] s, final int sp,
+      final ByteBuffer d, final int dp, final int l) {
     byte[] tmp = new byte[l << IO.NODEPOWER];
     System.arraycopy(s, sp << IO.NODEPOWER, tmp, 0,
         l << IO.NODEPOWER);
@@ -442,7 +439,7 @@ public final class TableDiskAccessNIO extends TableAccess {
 //    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
 //        l << IO.NODEPOWER);
   }
-  
+
   /**
    * Convenience method for copying blocks.
    * @param s source buffer
@@ -451,7 +448,7 @@ public final class TableDiskAccessNIO extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private synchronized void copy(final MappedByteBuffer s, final int sp, 
+  private synchronized void copy(final ByteBuffer s, final int sp,
       final byte[] d, final int dp, final int l) {
     byte[] tmp = new byte[l << IO.NODEPOWER];
     s.position(sp << IO.NODEPOWER);

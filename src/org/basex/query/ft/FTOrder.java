@@ -34,6 +34,11 @@ public class FTOrder extends FTFilter {
   }
 
   @Override
+  boolean content() {
+    return false;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.attribute(token(QueryTokens.ORDERED), TRUE);
   }

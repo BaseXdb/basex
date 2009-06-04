@@ -30,7 +30,7 @@ public abstract class FTFilter extends Arr {
   }
 
   /** Optional unit. */
-  FTUnit unit;
+  FTUnit unit = FTUnit.WORD;
 
   /**
    * Evaluates the filter expression.
@@ -42,6 +42,15 @@ public abstract class FTFilter extends Arr {
    */
   abstract boolean filter(final QueryContext ctx, final FTItem node,
       final Tokenizer ft) throws QueryException;
+
+  /**
+   * Checks if the filter needs the whole text node to be parsed.
+   * Is overwritten by some filters to perform other checks.
+   * @return result of check
+   */
+  boolean content() {
+    return unit != FTUnit.WORD;
+  }
   
   /**
    * Checks if each token is reached by the distance query.
@@ -53,7 +62,7 @@ public abstract class FTFilter extends Arr {
    * @return result of check
    */
   // [CG] reduce #arguments
-  boolean checkDist(final long mn, final long mx, final boolean dst,
+  final boolean checkDist(final long mn, final long mx, final boolean dst,
       final IntList[] pos, final Tokenizer ft) {
     final IntList[] il = sortPositions(pos);
     for(int z = 0; z < il[1].size; z++) {
@@ -116,7 +125,7 @@ public abstract class FTFilter extends Arr {
    * @param ft tokenizer
    * @return new position
    */
-  int pos(final int p, final FTUnit u, final Tokenizer ft) {
+  final int pos(final int p, final FTUnit u, final Tokenizer ft) {
     if(u == FTUnit.WORD) return p;
     ft.init();
     while(ft.more() && ft.pos != p);
@@ -132,7 +141,7 @@ public abstract class FTFilter extends Arr {
    * @param pos position list
    * @return IntList[] position values and pointer
    */
-  IntList[] sortPositions(final IntList[] pos) {
+  final IntList[] sortPositions(final IntList[] pos) {
     final IntList[] il = { new IntList(), new IntList() };
     final int[] k = new int[pos.length];
     int min = 0;

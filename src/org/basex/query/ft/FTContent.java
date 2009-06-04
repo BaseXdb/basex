@@ -52,6 +52,11 @@ public class FTContent extends FTFilter {
   }
 
   @Override
+  boolean content() {
+    return end || !start;
+  }
+  
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.attribute(token(start ? QueryTokens.START : end ? QueryTokens.END :
       QueryTokens.CONTENT), TRUE);

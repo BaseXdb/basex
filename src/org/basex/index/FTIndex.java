@@ -14,7 +14,15 @@ abstract class FTIndex extends Index {
   /** Cache for number of hits and data reference per token. */
   final FTTokenMap cache = new FTTokenMap();
   /** Values file. */
-  Data data;
+  final Data data;
+  
+  /**
+   * Constructor.
+   * @param d data reference
+   */
+  FTIndex(final Data d) {
+    data = d;
+  }
 
   /**
    * Returns an iterator for an index entry.

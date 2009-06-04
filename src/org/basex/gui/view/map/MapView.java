@@ -35,9 +35,9 @@ import org.basex.util.Token;
  */
 public final class MapView extends View implements Runnable {
   /** Dynamic zooming steps. */
-  private static final int[] ZS = { 0, 10, 40, 90, 210, 450, 800, 1226, 1745,
-      2148, 2580, 3037, 3515, 4008, 4511, 5019, 5527, 6030, 6522, 6998, 7453,
-      7883, 8283, 8749, 9200, 9550, 9790, 9910, 9960, 9990, 10000};
+  private static final int[] ZS = { 0, 0, 0, 0, 20, 80, 180, 320, 540, 840,
+    1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
+    9440, 9660, 9800, 9900, 9960, 9980, 9980, 9980, 10000 };
   /** Number of zooming steps. */
   private static final int ZOOMSIZE = ZS.length - 1;
   /** Maximum zooming step. */
@@ -216,8 +216,8 @@ public final class MapView extends View implements Runnable {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (Math.log(128 * getWidth() / mainRect.w) + Math.log(128
-          * getHeight() / mainRect.h));
+      zoomSpeed = (int) (Math.log(64 * getWidth() / mainRect.w) +
+          Math.log(64 * getHeight() / mainRect.h));
     }
 
     if(quick) {
@@ -243,8 +243,7 @@ public final class MapView extends View implements Runnable {
       repaint();
     }
     // wait until current painting is finished
-    while(gui.painting)
-      Performance.sleep(zoomSpeed);
+    while(gui.painting) Performance.sleep(zoomSpeed);
 
     // remove old rectangle and repaint map
     zoomStep = 0;

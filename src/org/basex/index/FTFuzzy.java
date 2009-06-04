@@ -65,13 +65,13 @@ public final class FTFuzzy extends FTIndex {
    * @throws IOException IO Exception
    */
   public FTFuzzy(final Data d) throws IOException {
+    super(d);
     final String db = d.meta.dbname;
-    ti = new DataAccess(db, DATAFTX + "y");
-    dat = new DataAccess(db, DATAFTX + "z");
-    data = d;
+    ti = new DataAccess(db, DATAFTX + 'y');
+    dat = new DataAccess(db, DATAFTX + 'z');
 
     // cache token length index
-    li = new DataAccess(db, DATAFTX + "x");
+    li = new DataAccess(db, DATAFTX + 'x');
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read();
     while(--is >= 0) {

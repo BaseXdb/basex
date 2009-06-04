@@ -16,7 +16,7 @@ import org.basex.query.item.FTItem;
  */
 public class FTSelect extends FTExpr {
   /** Filter array. */
-  private final FTFilter[] filter;
+  final FTFilter[] filter;
 
   /**
    * Constructor.

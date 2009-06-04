@@ -45,11 +45,11 @@ public final class FTTrie extends FTIndex {
    * @throws IOException IO Exception
    */
   public FTTrie(final Data d) throws IOException {
+    super(d);
     final String db = d.meta.dbname;
     inN = new DataAccess(db, DATAFTX + 'a');
     inD = new DataAccess(db, DATAFTX + 'b');
     inS = new DataAccess(db, DATAFTX + 'c');
-    data = d;
   }
 
   @Override
@@ -135,7 +135,7 @@ public final class FTTrie extends FTIndex {
   }
 
   /**
-   * Traverse trie and return found node for searchValue.
+   * Traverses the trie and returns a found node for the searched value.
    * Returns data from node or null.
    * @param id on node array (in main memory)
    * @param sn search nodes value

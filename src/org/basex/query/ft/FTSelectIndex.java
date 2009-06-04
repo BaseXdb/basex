@@ -17,6 +17,8 @@ import org.basex.query.iter.FTIter;
 final class FTSelectIndex extends FTExpr {
   /** Position filter. */
   final FTSelect sel;
+  /** Content flag. If true, the actual text nodes must be parsed. */
+  boolean content;
 
   /**
    * Constructor.
@@ -24,6 +26,7 @@ final class FTSelectIndex extends FTExpr {
    */
   FTSelectIndex(final FTSelect s) {
     sel = s;
+    for(final FTFilter f : sel.filter) content |= f.content();
   }
 
   @Override
@@ -38,7 +41,8 @@ final class FTSelectIndex extends FTExpr {
           // [SG] this here won't be executed as, currently, no filters
           //   are allowed for the the index version (see FTSelect)
           it.convertPos();
-          if(sel.filter(ctx, it, new Tokenizer(it.str()))) break;
+          final Tokenizer tok = content ? new Tokenizer(it.str()) : null;
+          if(sel.filter(ctx, it, tok)) break;
         }
         return it;
       }

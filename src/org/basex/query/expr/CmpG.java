@@ -171,17 +171,21 @@ public final class CmpG extends Arr {
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
     final Iter ir1 = ctx.iter(expr[0]);
+    final int is1 = ir1.size();
+
     // skip empty result
-    if(ir1.size() == 0) return Bln.FALSE;
-    final boolean s1 = ir1.size() == 1;
+    if(is1 == 0) return Bln.FALSE;
+    final boolean s1 = is1 == 1;
     
     // evaluate single items
     if(s1 && expr[1].i()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
 
     Iter ir2 = ctx.iter(expr[1]);
+    final int is2 = ir2.size();
+
     // skip empty result
-    if(ir2.size() == 0) return Bln.FALSE;
-    final boolean s2 = ir2.size() == 1;
+    if(is2 == 0) return Bln.FALSE;
+    final boolean s2 = is2 == 1;
     
     // evaluate single items
     if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
