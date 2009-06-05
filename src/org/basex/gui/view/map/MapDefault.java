@@ -46,14 +46,7 @@ final class MapDefault extends MapPainter {
       Color col = color(rects, ri);
       final boolean mark = col != null;
 
-      final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
-      if (ftd != null) {
-        r.pos = ftd[0];
-        r.poi = ftd[1];
-      } else {
-        r.pos = null;
-        r.poi = null;
-      }
+      r.pos = view.gui.context.marked().ftpos.get(pre);
       g.setColor(mark ? col : COLORS[lvl]);
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||

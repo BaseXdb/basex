@@ -9,7 +9,6 @@ import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 
 /**
  * This class allows to output XML results via SAX.
@@ -126,8 +125,7 @@ public final class DOTSerializer extends Serializer {
   }
   
   @Override
-  public void text(final byte[] b, final int[][] ftd, 
-      final TokenList ial) throws IOException {
+  public void text(final byte[] b, final FTPos ftp) throws IOException {
     text(b);
   }
 

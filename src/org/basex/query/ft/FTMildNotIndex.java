@@ -5,6 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.IntList;
+import org.basex.util.TokenBuilder;
 
 /**
  * FTMildnotIndex expression.
@@ -39,7 +40,7 @@ final class FTMildNotIndex extends FTExpr {
         } 
         
         final IntList pos = new IntList();
-        final IntList poi = new IntList();
+        final TokenBuilder poi = new TokenBuilder();
         
         int d = n0.fte.pre() - n1.fte.pre();
         if(d < 0) {

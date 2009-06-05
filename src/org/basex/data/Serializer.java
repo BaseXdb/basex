@@ -66,13 +66,10 @@ public abstract class Serializer {
   /**
    * Serializes a text.
    * @param b text bytes
-   * @param ftd full-text positions
-   * @param fta full-text ftand colorinfo
+   * @param ftp full-text positions
    * @throws IOException exception
    */
-  public abstract void text(final byte[] b, final int[][] ftd, 
-      final TokenList fta)
-    throws IOException;
+  public abstract void text(final byte[] b, final FTPos ftp) throws IOException;
 
   /**
    * Serializes a comment.
@@ -275,8 +272,8 @@ public abstract class Serializer {
       if(k == Data.DOC) {
         p++;
       } else if(k == Data.TEXT) {
-        final int[][] ftd = ft != null ? ft.get(p) : null;
-        if(ftd != null) text(data.text(p++), ftd, ft.col);
+        final FTPos ftd = ft != null ? ft.get(p) : null;
+        if(ftd != null) text(data.text(p++), ftd);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));

@@ -76,7 +76,7 @@ public final class QueryContext extends Progress {
   /** Full-text position data (for visualization). */
   public FTPosData ftpos;
   /** Full-text token counter (for visualization). */
-  public int ftcount;
+  public byte ftoknum;
 
   /** Scoring instance. */
   public Scoring score = new Scoring();

@@ -332,19 +332,11 @@ final class MapFS extends MapPainter {
     }
     
     final int size = data.size(pre, Data.ELEM);
-    int[][] ftd = null;
-    for (int i = size - 1; i > -1; i--) if (data.kind(pre + i) == Data.ELEM 
+    rect.pos = null;
+    for(int i = size - 1; i > -1; i--) if (data.kind(pre + i) == Data.ELEM 
         && Token.eq(data.tag(pre + i), "content".getBytes())) {
-      ftd = view.gui.context.marked().ftpos.get(pre + i + 1);
+      rect.pos = view.gui.context.marked().ftpos.get(pre + i + 1);
       break;
-    }
-     
-    if (ftd != null) {
-      rect.pos = ftd[0];
-      rect.poi = ftd[1];
-    } else {
-      rect.pos = null;
-      rect.poi = null;
     }
     
     // Check if text fits in rectangle

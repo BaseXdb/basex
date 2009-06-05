@@ -4,7 +4,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.util.TokenBuilder;
 
 /**
  * FTIntersection expression with index access.
@@ -41,8 +40,6 @@ final class FTIntersection extends FTExpr {
       final FTItem[] cp = new FTItem[pex.length];
       /** Cache for negative expressions. */
       final FTItem[] cn = new FTItem[nex.length];
-      /** Collect each pointer once for a result.*/
-      TokenBuilder col = new TokenBuilder();
       /** Temporary node.  */
       FTItem nod2;
 
@@ -70,9 +67,6 @@ final class FTIntersection extends FTExpr {
             nod2 = null;
             return next();
           }
-          // add color to visualization
-          if(ctx.ftpos != null && col != null) ctx.ftpos.addCol(col.finish());
-          col = null;
           return n1;
         }
         return cp.length == 0 ? calcFTAnd(cn, false) : new FTItem();
@@ -114,11 +108,7 @@ final class FTIntersection extends FTExpr {
           }
         }
 
-        for(int i = 0; i < n.length; i++) {
-          // color highlighting - limit number of tokens to 128
-          if(col != null) col.add((byte) (n[i].fte.getTokenNum() & 0x7F));
-          if(i != 0) n1.union(ctx, n[i], 0);
-        }
+        for(int i = 0; i < n.length; i++) if(i != 0) n1.union(ctx, n[i], 0);
         return n1;
       }
 

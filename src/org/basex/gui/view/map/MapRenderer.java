@@ -4,6 +4,8 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
+
+import org.basex.data.FTPos;
 import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -80,12 +82,14 @@ final class MapRenderer {
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());
     final int fh = (int) (1.2 * GUIProp.fontsize);
+
+    final FTPos ftp = r.pos;
     int xx = r.x;
     int yy = r.y + fh;
     final int ww = r.w;
     final Color textc = g.getColor();
     byte[] tmp;
-    if (s.length > m) {
+    if(s.length > m) {
       tmp = new byte[m];
       System.arraycopy(s, 0, tmp, 0, m);
     } else tmp = s;
@@ -100,21 +104,21 @@ final class MapRenderer {
     final int we = BaseXLayout.width(g, cw, ' ');
     int ls = 0;
     while(ftt.more()) {
-      if (ls < ftt.sent) {
+      if(ls < ftt.sent) {
         ls++;
         final int w = BaseXLayout.width(g, cw, (byte) ftt.lastpm);
-        if (xx + ll +  w > ww) {
+        if(xx + ll +  w > ww) {
           xx = r.x;
           yy += fh;
           ll = 0;
         }
-        if (draw) {
+        if(draw) {
           g.drawString(Character.toString((char) ftt.lastpm),
               xx + ll - (xx > we ? we : 0), yy);
         }
       }
 
-      if (cp < ftt.para) {
+      if(cp < ftt.para) {
         cp = ftt.para;
         xx = r.x;
         yy += fh;
@@ -126,7 +130,7 @@ final class MapRenderer {
 
       for(int n = 0; n < tok.length; n += cl(tok[n]))
         wl += BaseXLayout.width(g, cw, cp(tok, n));
-      if (ll + wl + we >= ww) {
+      if(ll + wl + we >= ww) {
         xx = r.x;
         yy += fh;
         ll = 0;
@@ -135,11 +139,11 @@ final class MapRenderer {
           // single word is to long for the rectangle
           int twl = 0;
           twl = 2 * BaseXLayout.width(g, cw, '.');
-          if (we + twl < ww) {
+          if(we + twl < ww) {
             int l, n = 0;
             for(; n < tok.length; n += cl(tok[n])) {
               l = BaseXLayout.width(g, cw, cp(tok, n));
-              if (twl + l + we >= ww) break;
+              if(twl + l + we >= ww) break;
               twl += l;
             }
             final byte[] ntok = new byte[n + 2];
@@ -155,9 +159,8 @@ final class MapRenderer {
         }
       }
       if(draw) {
-        if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(getFTColor(r.poi[pp]));
-          //g.setColor(getFTColor(r.poi[pp], r.acol));
+        if(ftp != null && pp < ftp.size() && count == ftp.pos[pp]) {
+          g.setColor(getFTColor(ftp.poi[pp]));
           pp++;
         } else g.setColor(textc);
         g.drawString(string(tok), xx + ll, yy);
@@ -230,8 +233,8 @@ final class MapRenderer {
           break;
       }
 
-      if (h >= r.h || ge(ff, ffmax) || ge(ffh, ffhmax) || ge(flh, flhmax)) {
-        if (l) {
+      if(h >= r.h || ge(ff, ffmax) || ge(ffh, ffhmax) || ge(flh, flhmax)) {
+        if(l) {
           // use last setup to draw
           r.thumbf = bff * GUIProp.fontsize;
           r.thumbfh = (byte) Math.max(1, bffh * GUIProp.fontsize);
@@ -249,7 +252,7 @@ final class MapRenderer {
               return;
           }
         } else {
-          if (le(ff, ffmin) || le(ffh, ffhmin) || le(flh, flhmin)) {
+          if(le(ff, ffmin) || le(ffh, ffhmin) || le(flh, flhmin)) {
             // change abstraction level      
             r.thumbal++;
             fhmi = r.thumbfh;
@@ -288,7 +291,7 @@ final class MapRenderer {
     r.thumbsw = Math.max(1, fnew);
     
     h = drawThumbnailsSentence(g, r, data, false, false);
-    if (h <= r.h) {
+    if(h <= r.h) {
       drawThumbnailsSentence(g, r, data, false, true);
     } else {
       //drawThumbnailsPara(g, r, data, true);
@@ -340,8 +343,11 @@ final class MapRenderer {
    */
   private static int drawThumbnailsToken(final Graphics g, final MapRect r,
       final int[][] data, final boolean draw, final int x, final int y) {
+
     final double xx = r.x;
     final double ww = r.w;
+    final FTPos ftp = r.pos;
+    
     final int ys = r.y + 3;
     int yy = ys;
     
@@ -362,7 +368,7 @@ final class MapRenderer {
       wl = (int) (data[0][i] * r.thumbf);
       e += data[0][i] * r.thumbf - wl;
 
-      if (e >= 1) {
+      if(e >= 1) {
         wl += (int) e;
         e -= (int) e;
       }
@@ -370,18 +376,18 @@ final class MapRenderer {
       pl += data[0][i];
       cchars += data[0][i];
       // check if rectangle fits in line - don't split token and dot
-      if (ll + wl + r.thumbsw * ((psl < data[1].length 
+      if(ll + wl + r.thumbsw * ((psl < data[1].length 
           && sl == data[1][psl]) ? 1 : 0) >= ww) { 
         yy += r.thumblh;
         ll = 0;
         ml = 0;
-        if (wl >= ww) return r.h + 3;
+        if(wl >= ww) return r.h + 3;
       }
       
-      if (draw) {
+      if(draw) {
         // draw word
-        if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(getFTColor(r.poi[pp]));
+        if(ftp != null && pp < ftp.size() && count == ftp.pos[pp]) {
+          g.setColor(getFTColor(ftp.poi[pp]));
           pp++;
         } else 
           g.setColor(textc);
@@ -390,7 +396,7 @@ final class MapRenderer {
       
 
       // check if cursor is inside the rect
-      if (x > 0 && y > 0
+      if(x > 0 && y > 0
           && (inRect((int) (xx + ll) + 1, yy, wl, r.thumbfh, x, y) || ml > 0)) {
         ul = -1;
         ml = ml == 0 ? getTooltipLength((int) ww) : ml;
@@ -399,17 +405,17 @@ final class MapRenderer {
         for (; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
           tok[k] = (byte) data[3][cchars - data[0][i] + k];
 
-        if (r.pos != null) {
-          while(pp < r.pos.length && count > r.pos[pp]) pp++;
-          if (pp < r.pos.length && count == r.pos[pp]) {
-            ttcol.add(r.poi[pp]);
+        if(ftp != null) {
+          while(pp < ftp.size() && count > ftp.pos[pp]) pp++;
+          if(pp < ftp.size() && count == ftp.pos[pp]) {
+            ttcol.add(ftp.poi[pp]);
             pp++;
           } else {
             ttcol.add(-1);
           }
         } else ttcol.add(-1);
 
-        if (k < tok.length) {
+        if(k < tok.length) {
           tok[k] = '.';
           tok[k + 1] = '.';
           tl.add(tok);
@@ -422,9 +428,9 @@ final class MapRenderer {
       ll += wl;
       count++;
 
-      if (psl < data[1].length && sl == data[1][psl]) {
+      if(psl < data[1].length && sl == data[1][psl]) {
         // new sentence, draw dot
-        if (draw) {
+        if(draw) {
           g.setColor(Color.black);
           g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
@@ -439,7 +445,7 @@ final class MapRenderer {
       wl = 0;
 
 
-      if (ppl < data[2].length && pl == data[2][ppl]) {
+      if(ppl < data[2].length && pl == data[2][ppl]) {
         // new paragraph
         yy += r.thumblh;
         ll = 0;
@@ -486,7 +492,7 @@ final class MapRenderer {
    */
   static void drawToolTip(final Graphics g, final int x, final int y,
       final int rx, final int ry, final int rh, final int rw) {
-    if (tl != null && tl.size > 0) {
+    if(tl != null && tl.size > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
       int wl = 0;
@@ -499,10 +505,10 @@ final class MapRenderer {
         for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n])) {
           l += BaseXLayout.width(g, cw, cp(tl.list[i], n));
         }
-        if (wl + l + sw < wi) wl += l + sw;
+        if(wl + l + sw < wi) wl += l + sw;
         else {
           nl++;
-          if (l > wi) wi = l;
+          if(l > wi) wi = l;
           wl = l + sw;
         }
         len.add(l);
@@ -526,24 +532,24 @@ final class MapRenderer {
       wl = 0;
       for (int i = 0; i < tl.size; i++) {
         l = len.list[i];
-        if (wl + l + sw >= wi) {
+        if(wl + l + sw >= wi) {
           yy += GUIProp.fontsize + 1;
           wl = 0;
         }
         final boolean pm =
           !Character.isLetterOrDigit(tl.list[i][tl.list[i].length - 1]);
 
-        if (ttcol.list[i] > -1) {
+        if(ttcol.list[i] > -1) {
           g.setColor(getFTColor(ttcol.list[i]));
           //g.setColor(getFTColor(ttcol.list[i], acol));
           g.drawString(string(tl.list[i]), xx + wl, yy);
-          if (ul > -1 && i == ul)
+          if(ul > -1 && i == ul)
             g.drawLine(xx + wl, yy + 1, xx + wl + l, yy + 1);
           g.setColor(COLORS[24]);
           wl += l;
         } else {
           g.drawString(string(tl.list[i]), xx + wl, yy);
-          if (ul > -1 && i == ul)
+          if(ul > -1 && i == ul)
             g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
           wl += l;
         }
@@ -568,8 +574,9 @@ final class MapRenderer {
       final int w, final Graphics g, final boolean ds) {
     
     // rectangle is empty - don't need a tooltip 
-    if (r.thumbf == 0) return;
+    if(r.thumbf == 0) return;
     
+    final FTPos ftp = r.pos;
     final int ww = r.w;
     int yy = r.y + 3;
 
@@ -586,7 +593,7 @@ final class MapRenderer {
       ir = false;
       wl = (int) (data[0][i] * r.thumbf);
       error += data[0][i] * r.thumbf - wl;
-      if (error >= 1) {
+      if(error >= 1) {
         wl += (int) error;
         error -= (int) error;
       }
@@ -595,9 +602,9 @@ final class MapRenderer {
       sl += data[0][i];
       cc += data[0][i];
 
-      if (ll + wl + (ds && 
+      if(ll + wl + (ds && 
           psl < data[1].length && data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
-        if (ds) {
+        if(ds) {
           // do not split token
           yy += r.thumblh;
 //          g.drawRect(r.x, yy, wl, r.thumbfh);
@@ -621,13 +628,13 @@ final class MapRenderer {
         ll += wl + (ds ? r.thumbf : 0);
       }
 
-      if (ir) {
+      if(ir) {
         final int si = i;
         final int[] cw = fontWidths(g.getFont());
         final int sp = BaseXLayout.width(g, cw, ' ');
         final int sd = BaseXLayout.width(g, cw, '.');
         // go some tokens backwards form current token
-        while(r.pos != null && pp < r.pos.length && i > r.pos[pp]) pp++;
+        while(ftp != null && pp < ftp.size() && i > ftp.pos[pp]) pp++;
         final int pps = pp;
         final int bpsl = data[1][psl] == sl ? psl + 1 : psl;
         final int bsl = data[1][psl] == sl ? 0 : sl;
@@ -636,7 +643,7 @@ final class MapRenderer {
         byte[] tok;
         int p = cc >= data[0][i] ? cc - data[0][i] : 0;
         boolean apm = false;
-        while (p > -1 && i > -1) {
+       while(p > -1 && i > -1) {
           // append punctuation mark
           apm = psl < data[1].length && data[1][psl] == sl;
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
@@ -644,39 +651,39 @@ final class MapRenderer {
             tok[k] = (byte) data[3][p + k];
           }
 
-          if (apm) {
+          if(apm) {
             tok[tok.length - 1] = (byte) data[4][psl];
             sl += 1;
           }
           sl -= tok.length;
 
-          if (sl == 0) {
+          if(sl == 0) {
             psl--;
-            if (psl == -1) psl = data[1].length;
+            if(psl == -1) psl = data[1].length;
             else sl = data[1][psl];
           }
 
           l = 0;
           for(int n = 0; n < tok.length; n += cl(tok[n]))
             l += BaseXLayout.width(g, cw, cp(tok, n));
-          if (si > i && ll + l + sp >= w / 2) break;
+          if(si > i && ll + l + sp >= w / 2) break;
           ll += l + sp;
 
           tl.add(tok);
           // find token color
-          if (r.pos != null) {
-            while(pp < r.pos.length && pp > -1 && i < r.pos[pp]) pp--;
-            if (pp < r.pos.length &&  pp > -1  && i == r.pos[pp]) {
-              ttcol.add(r.poi[pp]);
+          if(ftp != null) {
+            while(pp < ftp.size() && pp > -1 && i < ftp.pos[pp]) pp--;
+            if(pp < ftp.size() &&  pp > -1  && i == ftp.pos[pp]) {
+              ttcol.add(ftp.poi[pp]);
               pp++;
             } else ttcol.add(-1);
           } else ttcol.add(-1);
 
-          if (i == 0) break;
+          if(i == 0) break;
           p -= data[0][i - 1];
           i--;
         }
-        if (i > 0) {
+        if(i > 0) {
           tl.add(new byte[]{'.', '.'});
           ttcol.add(-1);
         }
@@ -699,9 +706,9 @@ final class MapRenderer {
         sl = bsl;
         psl = bpsl;
         // process tokens after current token
-        while (p < data[3].length && i < data[0].length) {
+       while(p < data[3].length && i < data[0].length) {
           apm = false;
-          if (psl < data[1].length && data[1][psl] == sl + data[0][i]) {
+          if(psl < data[1].length && data[1][psl] == sl + data[0][i]) {
             apm = true;
             sl = 0;
             psl++;
@@ -713,30 +720,30 @@ final class MapRenderer {
             tok[k] = (byte) data[3][p + k];
           }
 
-          if (apm) {
+          if(apm) {
             tok[tok.length - 1] = (byte) data[4][psl - 1];
           }
           sl += apm ? sl : tok.length;
 
           for(int n = 0; n < tok.length; n += cl(tok[n]))
             l += BaseXLayout.width(g, cw, cp(tok, n));
-          if (ll + l + sp + 2 * sd >= w / 2) break;
+          if(ll + l + sp + 2 * sd >= w / 2) break;
           ll += l + sp;
 
           tl.add(tok);
 
           pp = 0;
-          if (r.pos != null) {
-            while(pp < r.pos.length && i > r.pos[pp]) pp++;
-            if (pp < r.pos.length && i == r.pos[pp]) {
-              ttcol.add(r.poi[pp]);
+          if(ftp != null) {
+            while(pp < ftp.size() && i > ftp.pos[pp]) pp++;
+            if(pp < ftp.size() && i == ftp.pos[pp]) {
+              ttcol.add(ftp.poi[pp]);
               pp++;
             } else ttcol.add(-1);
           } else ttcol.add(-1);
           p += tok.length - (apm ? 1 : 0);
           i++;
         }
-        if (i < data[0].length) {
+        if(i < data[0].length) {
           tl.add(new byte[]{'.', '.'});
           ttcol.add(-1);
         }
@@ -744,8 +751,8 @@ final class MapRenderer {
       }
 
       // new sentence
-      if (ds && psl < data[1].length && data[1][psl] == sl) {
-        if (ll + r.thumbsw >= ww) {
+      if(ds && psl < data[1].length && data[1][psl] == sl) {
+        if(ll + r.thumbsw >= ww) {
           yy += r.thumblh;
           ll = ll - ww;          
         }  
@@ -756,10 +763,10 @@ final class MapRenderer {
       }
 
       // new paragraph
-      if (ppl < data[2].length && data[2][ppl] == pl) {
+      if(ppl < data[2].length && data[2][ppl] == pl) {
         pl = 0;
         ppl++;
-        if (sen) {
+        if(sen) {
           yy += r.thumblh;
           wl = 0;
           ll = 0;
@@ -780,6 +787,8 @@ final class MapRenderer {
   private static int drawThumbnailsSentence(final Graphics g,
       final MapRect r, final int[][] data, final boolean sen,
       final boolean draw) {
+
+    final FTPos ftp = r.pos;
     final int xx = r.x;
     final int ww = r.w;
     final int ys = r.y + 3;
@@ -800,12 +809,12 @@ final class MapRenderer {
     
     int i = 0;
     tl = new TokenList();
-    while (i < data[0].length) {
+   while(i < data[0].length) {
       wl = 0;
       ct = 0;
       g.setColor(textc);
       
-      while (i < data[0].length &&
+     while(i < data[0].length &&
           ppl < data[2].length && data[2][ppl] > pl &&
           (psl < data[1].length && data[1][psl] > sl ||
           psl >= data[1].length)) {
@@ -813,43 +822,43 @@ final class MapRenderer {
         pl += data[0][i];
         lastl = (int) (data[0][i] * r.thumbf);
         error += data[0][i] * r.thumbf - lastl;
-        if (error >= 1) {
+        if(error >= 1) {
           wl += (int) error;
           error -= (int) error;
         }
         wl += lastl;
         
-        if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+        if(ftp != null && pp < ftp.size() && count == ftp.pos[pp]) {
           ct++;
           pp++;
         }
         count++;
-        if (i < data[0].length) i++;
+        if(i < data[0].length) i++;
         else break;
       }
       
-     if (ct == 0) {
-        while (ll + wl >= ww) {
-          if (draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
+     if(ct == 0) {
+       while(ll + wl >= ww) {
+          if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
           wl -= ww - ll;
           ll = 0;
           yy += r.thumblh;         
         }
-        if (draw) g.fillRect(xx + ll, yy, wl, r.thumbfh);
+        if(draw) g.fillRect(xx + ll, yy, wl, r.thumbfh);
         ll += wl;
       } else {
         int cttmp = 0;
         int wltmp = wl / ct;
-        while (cttmp < ct) {
-          if (pp - ct + cttmp < r.poi.length) 
-            g.setColor(getFTColor(r.poi[pp - ct + cttmp]));;
-          while (ll + wltmp >= ww) {
-            if (draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
+        while(cttmp < ct) {
+          if(pp - ct + cttmp < ftp.size()) 
+            g.setColor(getFTColor(ftp.poi[pp - ct + cttmp]));;
+          while(ll + wltmp >= ww) {
+            if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
             wltmp -= ww - ll;
             ll = 0;
             yy += r.thumblh;         
           }
-          if (draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
+          if(draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
           ll += wltmp;
           wltmp = wl / ct + ((cttmp == ct - 2) ?  wl - (wl / ct) * ct : 0);
           cttmp++;
@@ -857,13 +866,13 @@ final class MapRenderer {
       }
  
       // new sentence
-      if (psl < data[1].length && data[1][psl] == sl) {
-        if (ll + r.thumbsw >= ww) {
+      if(psl < data[1].length && data[1][psl] == sl) {
+        if(ll + r.thumbsw >= ww) {
           yy += r.thumblh; //lh;
           ll = 0;
         }
 
-        if (draw) {
+        if(draw) {
           g.setColor(Color.black);
           g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh); //sw, fh);
           g.setColor(textc);
@@ -874,10 +883,10 @@ final class MapRenderer {
       }
 
       // new paragraph
-      if (ppl < data[2].length && data[2][ppl] == pl) {
+      if(ppl < data[2].length && data[2][ppl] == pl) {
         pl = 0;
         ppl++;
-        if (sen) {
+        if(sen) {
           yy += r.thumblh;
           wl = 0;
           ll = 0;

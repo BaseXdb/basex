@@ -369,11 +369,24 @@ public final class Array {
 
   /**
    * Checks two int arrays for equality.
-   * @param i1 int array
-   * @param i2 int array
-   * @return boolean
+   * @param i1 first array
+   * @param i2 second array
+   * @return result of check
    */
   public static boolean eq(final int[] i1, final int[] i2) {
+    final int il = i1.length;
+    if(il != i2.length) return false;
+    for(int i = 0; i < il; i++) if(i1[i] != i2[i]) return false;
+    return true;
+  }
+
+  /**
+   * Checks two byte arrays for equality.
+   * @param i1 first array
+   * @param i2 second array
+   * @return result of check
+   */
+  public static boolean eq(final byte[] i1, final byte[] i2) {
     final int il = i1.length;
     if(il != i2.length) return false;
     for(int i = 0; i < il; i++) if(i1[i] != i2[i]) return false;

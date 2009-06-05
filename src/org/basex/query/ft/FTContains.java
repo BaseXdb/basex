@@ -33,8 +33,8 @@ public class FTContains extends Expr {
   FTExpr ftexpr;
   /** Full-text parser. */
   Tokenizer ft = new Tokenizer();
-  /** Flag for first evaluation.*/
-  private int div;
+  /** Token number.*/
+  private byte tn;
 
   /**
    * Constructor.
@@ -59,7 +59,7 @@ public class FTContains extends Expr {
 
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
-    if(div == 0) div = ++ctx.ftcount;
+    if(tn == 0) tn = ++ctx.ftoknum;
 
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
@@ -75,7 +75,7 @@ public class FTContains extends Expr {
 
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && node.pos.length != 0 &&
-          it instanceof DBNode) ctx.ftpos.add(((DBNode) it).pre, node.pos, div);
+          it instanceof DBNode) ctx.ftpos.add(((DBNode) it).pre, node.pos, tn);
     }
 
     ctx.fttoken = tmp;

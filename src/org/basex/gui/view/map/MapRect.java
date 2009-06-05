@@ -1,5 +1,6 @@
 package org.basex.gui.view.map;
 
+import org.basex.data.FTPos;
 import org.basex.gui.view.ViewRect;
 
 /**
@@ -14,9 +15,7 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   /** Thumbnail view. */
   boolean thumb;
   /** Full-text position values. */
-  int[] pos;
-  /** Full-text pointer values. */
-  int[] poi;
+  FTPos pos;
   /** Abstraction level for thumbnail. */
   byte thumbal;
   /** Height of a thumbnail unit.*/

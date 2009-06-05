@@ -8,7 +8,7 @@ package org.basex.index;
  */
 public abstract class FTIndexIterator extends IndexIterator {
   /** Each token in the query has a number. */
-  int toknum;
+  byte toknum;
   /** Number of results. */
   int size;
 
@@ -32,7 +32,7 @@ public abstract class FTIndexIterator extends IndexIterator {
    * Sets the unique token number. Used for visualization.
    * @param tn number of tokens
    */
-  public void setTokenNum(final int tn) {
+  public void setTokenNum(final byte tn) {
     toknum = tn;
   }
 
@@ -73,7 +73,7 @@ public abstract class FTIndexIterator extends IndexIterator {
       }
 
       @Override
-      public void setTokenNum(final int tn) {
+      public void setTokenNum(final byte tn) {
         i1.toknum = tn;
         i2.toknum = tn;
       }
@@ -116,7 +116,7 @@ public abstract class FTIndexIterator extends IndexIterator {
       }
 
       @Override
-      public void setTokenNum(final int tn) {
+      public void setTokenNum(final byte tn) {
         i1.toknum = tn;
         i2.toknum = tn;
       }

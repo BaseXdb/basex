@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import org.basex.util.IntList;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class contains position data for single full-text index entries.
@@ -13,7 +14,7 @@ public final class FTEntry {
   public IntList pos;
   /** Pointer for idpos - each idpos has a pointer at
    * its search string position in the query. */
-  public IntList poi;
+  public TokenBuilder poi;
   /** Pre value. */
   public int pre;
   /** Flag for negative node. */
@@ -35,12 +36,12 @@ public final class FTEntry {
    * @param idpos ftdata, pos1, ..., posn
    * @param tn token number
    */
-  public FTEntry(final int p, final IntList idpos, final int tn) {
+  public FTEntry(final int p, final IntList idpos, final byte tn) {
     pre = p;
     pos = idpos;
-    final int[] t = new int[idpos.size];
+    final byte[] t = new byte[idpos.size];
     for(int i = 0; i < t.length; i++) t[i] = tn;
-    poi = new IntList(t);
+    poi = new TokenBuilder(t);
   }
 
   /**
@@ -78,8 +79,8 @@ public final class FTEntry {
    * Get next pointer.
    * @return next pointer
    */
-  public int nextPoi() {
-    return poi.list[c];
+  public byte nextPoi() {
+    return poi.chars[c];
   }
   
   /**
@@ -88,7 +89,7 @@ public final class FTEntry {
    */
   public int getTokenNum() {
     int m = 0;
-    for(int i = 0; i < poi.size; i++) m = Math.max(m, poi.list[i]);
+    for(int i = 0; i < poi.size; i++) m = Math.max(m, poi.chars[i]);
     return m;
   }
 
@@ -103,7 +104,7 @@ public final class FTEntry {
     if(not != n.not || pre() != n.pre()) return false;
 
     final IntList ps = new IntList();
-    final IntList pi = new IntList();
+    final TokenBuilder pi = new TokenBuilder();
     boolean mp = morePos();
     boolean np = n.morePos();
     while(mp || np) {
@@ -134,7 +135,7 @@ public final class FTEntry {
    * @param ps IntList takes the new node
    * @param pi IntList with pointers
    */
-  private void add(final IntList ps, final IntList pi) {
+  private void add(final IntList ps, final TokenBuilder pi) {
     ps.add(nextPos());
     pi.add(nextPoi());
   }

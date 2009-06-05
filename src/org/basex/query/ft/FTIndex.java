@@ -52,7 +52,7 @@ public final class FTIndex extends FTExpr {
             iat = w == 0 ? it : FTIndexIterator.intersect(iat, it, w);
             w++;
           }
-          iat.setTokenNum(++ctx.ftcount);
+          iat.setTokenNum(++ctx.ftoknum);
         }
         return new FTItem(iat.more() ? iat.node() : new FTEntry(), data);
       }
