@@ -13,7 +13,7 @@ import org.basex.util.Array;
  */
 class ByteBufferList {
   /** Value array. */
-  private ByteBuffer[] list;
+  private MappedByteBuffer[] list;
   /** Number of entries. */
   private int size;
 
@@ -22,16 +22,14 @@ class ByteBufferList {
    * @param is initial size of the list
    */
   ByteBufferList(final int is) {
-    list = new ByteBuffer[is];
-    System.out.println("list size: " + is);
-
+    list = new MappedByteBuffer[is];
   }
 
   /**
    * Adds next value.
    * @param v value to be added
    */
-  void add(final ByteBuffer v) {
+  void add(final MappedByteBuffer v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
@@ -41,7 +39,7 @@ class ByteBufferList {
    * @param p position
    * @return MappedByteBuffer
    */
-  ByteBuffer get(final int p) {
+  MappedByteBuffer get(final int p) {
     return list[p];
   }
 
