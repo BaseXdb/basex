@@ -13,9 +13,9 @@ import org.basex.util.Array;
  */
 class ByteBufferList {
   /** Value array. */
-  ByteBuffer[] list;
+  private ByteBuffer[] list;
   /** Number of entries. */
-  int size;
+  private int size;
 
   /**
    * Constructor, specifying an initial list size.
@@ -23,6 +23,8 @@ class ByteBufferList {
    */
   ByteBufferList(final int is) {
     list = new ByteBuffer[is];
+    System.out.println("list size: " + is);
+
   }
 
   /**
@@ -50,5 +52,6 @@ class ByteBufferList {
    */
   void set(final MappedByteBuffer v, final int p) {
     list[p] = v;
+    size = Math.max(size, p + 1);
   }
 }
