@@ -43,7 +43,7 @@ public final class PlotAxis {
   private double calculatedCaptionStep;
   /** Minimum value in case selected attribute is numerical. */
   double min;
-  /** Maximum  value in case selected attribute is numerical. */
+  /** Maximum value in case selected attribute is numerical. */
   double max;
   /** Axis uses logarithmic scale. */
   boolean log;

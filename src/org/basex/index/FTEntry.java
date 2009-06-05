@@ -39,9 +39,38 @@ public final class FTEntry {
   public FTEntry(final int p, final IntList idpos, final byte tn) {
     pre = p;
     pos = idpos;
-    final byte[] t = new byte[idpos.size];
-    for(int i = 0; i < t.length; i++) t[i] = tn;
-    poi = new TokenBuilder(t);
+    final byte[] pi = new byte[idpos.size];
+    for(int i = 0; i < pi.length; i++) pi[i] = tn;
+    poi = new TokenBuilder(pi);
+  }
+
+  /**
+   * Adds position data. Sequential variant.
+   * @param p pre value
+   * @param ps positions
+   * @param tn token number
+   */
+  public FTEntry(final int p, final IntList[] ps, final byte tn) {
+    int[] pp = ps[0].finish();
+    byte[] pi = new byte[pp.length];
+    for(int i = 0; i < pp.length; i++) pi[i] = tn;
+
+    for(int i = 1; i < ps.length; i++) {
+      final int prs = pp.length;
+      final int pss = ps[i].size;
+      final int[] tp = new int[prs + pss];
+      final byte[] ti = new byte[tp.length];
+      for(int j = 0, j0 = 0, j1 = 0; j < tp.length; j++) {
+        final boolean s = j0 == prs || j1 < pss && ps[i].list[j1] < pp[j0];
+        tp[j] = s ? ps[i].list[j1++] : pp[j0];
+        ti[j] = s ? (byte) (i + tn) : pi[j0++];
+      }
+      pp = tp;
+      pi = ti;
+    }
+    pre = p;
+    pos = new IntList(pp);
+    poi = new TokenBuilder(pi);
   }
 
   /**

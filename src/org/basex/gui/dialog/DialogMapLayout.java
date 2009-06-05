@@ -96,7 +96,7 @@ public final class DialogMapLayout extends Dialog {
     final int sizeprp = sizeSlider.value();
     GUIProp.mapweight = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
-      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN  : (fs ? MAPFSSIZE : MAPTEXTSIZE)));
+      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : (fs ? MAPFSSIZE : MAPTEXTSIZE)));
 
     gui.notify.layout();
   }

@@ -5,7 +5,6 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.util.Array;
 
@@ -75,12 +74,7 @@ public final class And extends Arr {
     double s = 0;
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
-      if(!it.bool()) {
-        // [SG] delivers sometimes unexpected results
-        if(ctx.ftpos != null && ctx.item != null && ctx.item instanceof DBNode)
-          ctx.ftpos.remove(((DBNode) ctx.item).pre + 1);
-        return Bln.FALSE;
-      }
+      if(!it.bool()) return Bln.FALSE;
       s = ctx.score.and(s, it.score());
     }
     // no scoring - return default boolean

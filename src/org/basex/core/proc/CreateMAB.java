@@ -29,8 +29,8 @@ public final class CreateMAB extends ACreate {
     final IO file = IO.get(args[0]);
     if(!file.exists()) return error(FILEWHICH, file);
 
-    Prop.chop  = true;
-    Prop.entity   = true;
+    Prop.chop = true;
+    Prop.entity = true;
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;

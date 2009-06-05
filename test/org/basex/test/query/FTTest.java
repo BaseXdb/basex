@@ -211,6 +211,12 @@ public final class FTTest extends AbstractTest {
         "/fttest/wld [text() ftcontains '.*' with wildcards]" },
       { "FTWildCard 12", nodes(40),
         "/fttest/wld [text() ftcontains '.+' with wildcards]" },
+      { "FTWildCard 13", nodes(14),
+        "//w [text() ftcontains 'he.{1,2}o' with wildcards]" },
+      { "FTWildCard 14", nodes(14),
+        "//w [text() ftcontains 'h.+ll.+' with wildcards]" },
+      { "FTWildCard 15", nodes(14),
+        "//w [text() ftcontains 'h.\\llo' with wildcards]" },
 
       { "FTWildCard 13", bool(false),
         "'a' ftcontains 'a.+' with wildcards" },

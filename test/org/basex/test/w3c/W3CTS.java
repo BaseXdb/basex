@@ -723,7 +723,7 @@ public abstract class W3CTS {
    */
   private String error(final String nm, final String error) throws Exception {
     final String error2 = expected + nm + ".log";
-    final IO file  = IO.get(error2);
+    final IO file = IO.get(error2);
     return file.exists() ? error + "/" + read(file) : error;
   }
 

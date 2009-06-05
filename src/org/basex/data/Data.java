@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Data  {
+public abstract class Data {
   /** Node kind: Document. */
   public static final byte DOC = 0x00;
   /** Node kind: Element. */

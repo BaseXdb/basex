@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
@@ -17,6 +16,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -106,7 +106,7 @@ public final class FTWords extends FTExpr {
         break;
       case ALLWORDS:
         while((it = nextStr(iter)) != null) {
-          for(final byte[] txt : split(it, ' ')) {
+          for(final byte[] txt : Token.split(it, ' ')) {
             final int oc = opt.contains(txt, ctx.fttoken, node);
             if(oc == 0) return 0;
             len += txt.length;
@@ -124,7 +124,7 @@ public final class FTWords extends FTExpr {
         break;
       case ANYWORD:
         while((it = nextStr(iter)) != null) {
-          for(final byte[] txt : split(it, ' ')) {
+          for(final byte[] txt : Token.split(it, ' ')) {
             final int oc = opt.contains(txt, ctx.fttoken, node);
             len += txt.length;
             o += oc;
@@ -166,7 +166,7 @@ public final class FTWords extends FTExpr {
     if(!it.s() && !it.u()) Err.type(info(), Type.STR, it);
     return it.str();
   }
-  
+
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     /*
@@ -176,18 +176,24 @@ public final class FTWords extends FTExpr {
      * - FTMode is different to ANY, ALL and PHRASE
      * - case sensitivity, diacritics and stemming flags comply with index
      * - no stop words are specified
-     * - no wildcards are specified, or the index is a trie
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ic.ctx.ftopt;
-    if(word == null || word.length == 0 ||
-        occ != null || ic.ctx.ftopt.weight != null ||
+    if(word == null || occ != null || ic.ctx.ftopt.weight != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
-        md.ftst != fto.is(FTOpt.ST) || fto.sw != null ||
-        fto.is(FTOpt.WC) && md.ftfz) return false;
-    
-    // summarize minimum number of hits; break loop if no hits are expected
+        md.ftst != fto.is(FTOpt.ST) || fto.sw != null) return false;
+
+    // limit index access to trie version and simple wildcard patterns
+    if(fto.is(FTOpt.WC)) {
+      if(md.ftfz || word[0] == '.') return false;
+      int d = 0;
+      for(final byte w : word) {
+        if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
+      }
+    }
+
+    // summarize number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(word, fto);
     ic.is = 0;
     while(ft.more()) {
@@ -205,7 +211,7 @@ public final class FTWords extends FTExpr {
   public FTExpr indexEquivalent(final IndexContext ic) {
     return new FTIndex(ic.data, word);
   }
-  
+
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

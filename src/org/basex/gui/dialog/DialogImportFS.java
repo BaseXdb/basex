@@ -32,7 +32,7 @@ import org.basex.util.StringList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class DialogImportFS  extends Dialog {
+public final class DialogImportFS extends Dialog {
   /** Available databases. */
   private final StringList db = List.list();
   /** Directory path. */

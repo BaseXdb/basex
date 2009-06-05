@@ -267,9 +267,9 @@ public final class DialogCreate extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    Prop.chop  = chop.isSelected();
+    Prop.chop = chop.isSelected();
     Prop.createfilter = filter.getText();
-    Prop.entity   = entities.isSelected();
+    Prop.entity = entities.isSelected();
     Prop.dtd = dtd.isSelected();
     Prop.textindex = txtindex.isSelected();
     Prop.attrindex = atvindex.isSelected();

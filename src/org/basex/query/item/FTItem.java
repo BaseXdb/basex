@@ -19,18 +19,18 @@ public final class FTItem extends DBNode {
   public IntList[] pos = {};
 
   /**
+   * Constructor, called by the index variant. 
+   */
+  public FTItem() {
+    fte = new FTEntry();
+  }
+
+  /**
    * Constructor, called by the sequential variant.
    * @param s scoring
    */
   public FTItem(final double s) {
     score = s;
-  }
-
-  /**
-   * Constructor, called by the index variant. 
-   */
-  public FTItem() {
-    fte = new FTEntry();
   }
 
   /**
@@ -97,6 +97,7 @@ public final class FTItem extends DBNode {
 
   @Override
   public String toString() {
-    return super.toString() + " (" + fte + ")";
+    return data != null ? super.toString() + " (" + fte + ")" :
+      name() + " (" + score + ")";
   }
 }

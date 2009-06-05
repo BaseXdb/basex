@@ -41,7 +41,7 @@ public final class Values extends Index {
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
-    idxl  = new DataAccess(db, file + 'l');
+    idxl = new DataAccess(db, file + 'l');
     idxr = new DataAccess(db, file + 'r');
     size = idxl.readNum();
   }

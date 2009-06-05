@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.ft.Tokenizer;
+import org.basex.index.FTEntry;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -75,7 +76,9 @@ public class FTContains extends Expr {
 
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && node.pos.length != 0 &&
-          it instanceof DBNode) ctx.ftpos.add(((DBNode) it).pre, node.pos, tn);
+          it instanceof DBNode) {
+        ctx.ftpos.add(new FTEntry(((DBNode) it).pre, node.pos, tn));
+      }
     }
 
     ctx.fttoken = tmp;

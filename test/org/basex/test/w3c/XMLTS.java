@@ -21,16 +21,16 @@ import org.basex.util.TokenBuilder;
  */
 public final class XMLTS {
   /** Root directory. */
-  private static  final String ROOT = "/home/dbis/xml/xmlts/";
+  private static final String ROOT = "/home/dbis/xml/xmlts/";
     //  "h:/xmlts/";
   /** Path to the XQuery Test Suite. */
-  private static  final String FILE = ROOT +
+  private static final String FILE = ROOT +
     "oasis/oasis.xml";
     //"sun/sun-not-wf.xml";
     //"ibm/ibm_oasis_not-wf.xml";
     //"xmltest/xmltest.xml";
   /** Path to the XQuery Test Suite. */
-  private static  final String PATH = FILE.replaceAll("[^/]+$", "");
+  private static final String PATH = FILE.replaceAll("[^/]+$", "");
   /** Verbose flag. */
   private boolean verbose;
   /** Data reference. */

@@ -42,7 +42,7 @@ public final class UpdateExample {
 
     // Inserts a document into the database; argument can be a file name or XML
     // Position: 0 (ignored for documents)
-    // Target  : insert on root level
+    // Target: insert on root level
     new Insert("fragment", "<doc>second</doc>", "0", "/").execute(context, out);
 
 
@@ -56,7 +56,7 @@ public final class UpdateExample {
 
     // Inserts an element fragment into the database
     // Position: 1 = as first child
-    // Target  : insert after all /doc elements...
+    // Target: insert after all /doc elements...
     new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
 
 

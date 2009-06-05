@@ -8,7 +8,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 
 /**
- * Updates an element in  database.
+ * Updates an element in the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

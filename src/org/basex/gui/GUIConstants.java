@@ -304,7 +304,7 @@ public final class GUIConstants {
     if(dfont == null) {
       dfont = new Font(GUIProp.monofont, 0,
           UIManager.getFont("TextArea.font").getSize() - 1);
-      dwidth  = new Container().getFontMetrics(dfont).getWidths();
+      dwidth = new Container().getFontMetrics(dfont).getWidths();
     }
     if(f == font) return fwidth;
     if(f == mfont) return mfwidth;

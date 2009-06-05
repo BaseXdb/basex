@@ -94,7 +94,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
     final int end = s + (entries * 0x0C);
 
     for(int e = s; e < end; e += 0x0C) {
-      final int tagnr  = getShort(e);     // Tag Number
+      final int tagnr = getShort(e);     // Tag Number
       int format = getShort(e + 2); // Data Format
 
       // Exit Offset - SubIFD

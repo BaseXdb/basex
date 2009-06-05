@@ -72,7 +72,7 @@ public final class FTContainsSIndex extends FTContains {
 
     // add entry to visualization
     if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
-        ftn.fte.pos != null && ftn.fte.poi !=  null) ctx.ftpos.add(ftn.fte);
+        ftn.fte.poi != null) ctx.ftpos.add(ftn.fte);
     
     return Bln.get(d);
   }

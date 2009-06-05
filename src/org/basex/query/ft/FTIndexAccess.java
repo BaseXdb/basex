@@ -52,9 +52,8 @@ public final class FTIndexAccess extends Simple {
         ctx.fttoken = tmp;
 
         // add entry to visualization
-        if(it.fte.pos != null && it.fte.poi != null && ctx.ftpos != null) {
-          ctx.ftpos.add(it.fte);
-        }
+        if(it.fte.poi != null && ctx.ftpos != null) ctx.ftpos.add(it.fte);
+
         return it.score() == 0 ? null : it;
       }
     };

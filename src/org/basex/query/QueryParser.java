@@ -828,7 +828,7 @@ public class QueryParser extends InputParser {
   }
   
   /**
-   * [59]* GroupingSpec  (*Xquery 1.1 Draft).
+   * [59]* GroupingSpec (*Xquery 1.1 Draft).
    * 
    * @param group grouping specification
    * @return new Grp array
