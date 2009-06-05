@@ -47,17 +47,13 @@ abstract class FTIndex extends Index {
           pos = da.pos();
           f = false;
         }
+        int pre = lpre;
 
         final IntList il = new IntList();
-        int pre = lpre;
-        il.add(pre);
         il.add(da.readNum(pos));
         while(++c < s && (lpre = da.readNum()) == pre) il.add(da.readNum());
         pos = da.pos();
-
-        final int[] t = new int[il.size];
-        for(int i = 0; i < t.length; i++) t[i] = toknum;
-        n = new FTEntry(il, new IntList(t));
+        n = new FTEntry(pre, il, toknum);
         return true;
       }
 

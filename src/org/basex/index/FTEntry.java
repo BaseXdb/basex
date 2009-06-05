@@ -9,17 +9,18 @@ import org.basex.util.IntList;
  * @author Sebastian Gath
  */
 public final class FTEntry {
-  /** Full-text data for a node (pre, pos1, pos2, ...). */
+  /** Full-text data for a node (pos1, pos2, ...). */
   public IntList pos;
   /** Pointer for idpos - each idpos has a pointer at
-   * its search string position in the query.
-   * poi[0] = max. pointer value in poi */
+   * its search string position in the query. */
   public IntList poi;
+  /** Pre value. */
+  public int pre;
   /** Flag for negative node. */
   public boolean not;
 
   /** Counter for pos values. */
-  private int c;
+  private int c = -1;
 
   /**
    * Constructor.
@@ -30,12 +31,16 @@ public final class FTEntry {
 
   /**
    * Constructor.
-   * @param idpos ftdata, pre, pos1, ..., posn
-   * @param pointer pointer on query tokens
+   * @param p pre value
+   * @param idpos ftdata, pos1, ..., posn
+   * @param tn token number
    */
-  public FTEntry(final IntList idpos, final IntList pointer) {
+  public FTEntry(final int p, final IntList idpos, final int tn) {
+    pre = p;
     pos = idpos;
-    poi = pointer;
+    final int[] t = new int[idpos.size];
+    for(int i = 0; i < t.length; i++) t[i] = tn;
+    poi = new IntList(t);
   }
 
   /**
@@ -43,14 +48,14 @@ public final class FTEntry {
    * @return pre value
    */
   public int pre() {
-    return pos.list[0];
+    return pre;
   }
   
   /**
    * Reset position iterator.
    */
   public void reset() {
-    c = 0;
+    c = -1;
   }
   
   /**
@@ -78,11 +83,13 @@ public final class FTEntry {
   }
   
   /**
-   * Get token number.
+   * Get token numbers.
    * @return token number
    */
   public int getTokenNum() {
-    return poi.list[0];
+    int m = 0;
+    for(int i = 0; i < poi.size; i++) m = Math.max(m, poi.list[i]);
+    return m;
   }
 
   /**
@@ -95,60 +102,41 @@ public final class FTEntry {
   public boolean union(final FTEntry n, final int w) {
     if(not != n.not || pre() != n.pre()) return false;
 
+    final IntList ps = new IntList();
+    final IntList pi = new IntList();
     boolean mp = morePos();
-    boolean nmp = n.morePos();
-    if(!mp || !nmp) {
-      reset();
-      n.reset();
-      return false;
-    }
+    boolean np = n.morePos();
+    while(mp || np) {
+      final int d = mp && np ? nextPos() - n.nextPos() + w : mp ? -1 : 1;
 
-    final IntList il = new IntList();
-    final IntList pn = new IntList();
-    pn.add(Math.max(poi.list[0], n.poi.list[0]));
-
-    il.add(pre());
-    while(mp && nmp) {
-      final int d = nextPos() - n.nextPos() + w;
-      if(d == 0) {
-        add(il, pn);
-        if(w > 0) n.add(il, pn);
+      if(d < 0) {
+        if(w == 0) add(ps, pi);
         mp = morePos();
-        nmp = n.morePos();
-      } else if(d < 0) {
-        if(w == 0) add(il, pn);
-        mp = morePos();
+      } else if(d > 0) {
+        if(w == 0) n.add(ps, pi);
+        np = n.morePos();
       } else {
-        if(w == 0) n.add(il, pn);
-        nmp = n.morePos();
-      }
-    }
-    if(w == 0) {
-      while(mp) {
-        add(il, pn);
+        add(ps, pi);
+        if(w > 0) n.add(ps, pi);
         mp = morePos();
-      }
-      while(nmp) {
-        n.add(il, pn);
-        nmp = n.morePos();
+        np = n.morePos();
       }
     }
-
-    pos = il;
-    poi = pn;
+    pos = ps;
+    poi = pi;
     reset();
     n.reset();
-    return pos.size > 1;
+    return pos.size > 0;
   }
 
   /**
    * Adds the current position lists.
-   * @param il IntList takes the new node
-   * @param pn IntList with pointers
+   * @param ps IntList takes the new node
+   * @param pi IntList with pointers
    */
-  private void add(final IntList il, final IntList pn) {
-    il.add(nextPos());
-    if(pn != null) pn.add(nextPoi());
+  private void add(final IntList ps, final IntList pi) {
+    ps.add(nextPos());
+    pi.add(nextPoi());
   }
   
   @Override

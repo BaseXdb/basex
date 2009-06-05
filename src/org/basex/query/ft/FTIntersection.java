@@ -117,9 +117,7 @@ final class FTIntersection extends FTExpr {
         for(int i = 0; i < n.length; i++) {
           // color highlighting - limit number of tokens to 128
           if(col != null) col.add((byte) (n[i].fte.getTokenNum() & 0x7F));
-          if(i == 0) continue;
-          n2 = n[i];
-          n1.union(ctx, n2, 0);
+          if(i != 0) n1.union(ctx, n[i], 0);
         }
         return n1;
       }
