@@ -89,25 +89,95 @@ public class AxisPath extends Path {
       return new SingleIterPath(root, step);
     }
 
-    // check if all steps are child steps, parent steps, self steps or
-    // attributes
-    boolean children = root != null && !root.duplicates(ctx);
+    // To check if the result of a path is in document order so that no special 
+    // ordering functions are needed and we can use the SimpleIterPath, 
+    // we are geared to an automaton that is provided in the paper 
+    // "Avoiding Unnecessary Ordering Operations in XPath" by
+    // Jan Hidders and Phillipe Michiels.
+    
+    // Link: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.4006
+    // Page 6 - Figure 5
+    
+    // Since BaseX has a slightly different implementation, it is possible
+    // to have alternating child and parent steps or more parent steps -
+    // different than described in the paper.
+    
+    // check if root exists and has no duplicates
+    boolean iter = root != null && !root.duplicates(ctx);
+    
+    if (iter) {
+      int i = 0;
+      while (true) {
+        
+        // First steps can be attribute, parent or self steps.
+        if (step[i].axis == Axis.ATTR 
+            || step[i].axis == Axis.PARENT 
+            || step[i].axis == Axis.SELF) {
+          i++;
+          // iter is still true.
+          if (i == step.length) break;
+          continue;
+        }
+        
+        // If after only-parent steps or without any parent steps the next 
+        // and only step is an descendant, descendant-or-self, preceding
+        // or following step, the result of the path is still in document order.
+        if (step[i].axis == Axis.DESC
+            || step[i].axis == Axis.DESCORSELF
+            || step[i].axis == Axis.FOLL
+            || step[i].axis == Axis.PREC) {
+          i++;
+          // iter is still true.
+          if (i == step.length) break;
+          else {
+            iter = false;
+            break;
+          }
+        }
+        
+        // If after only-parent steps or without any parent steps the next 
+        // step is an attribute, child, self, preceding-sibling or
+        // following-sibling step, the result of the path is still in 
+        // document order.
+        if (step[i].axis == Axis.ATTR
+            || step[i].axis == Axis.CHILD
+            || step[i].axis == Axis.FOLLSIBL
+            || step[i].axis == Axis.PRECSIBL 
+            || step[i].axis == Axis.SELF) {
+          i++;
+          // iter is still true.
+          if (i == step.length) break;
 
-    int i;
-    // check last step separated
-    for(i = 0; i < step.length - 1; i++) {
-      children &= step[i].axis == Axis.ATTR
-      || step[i].axis == Axis.CHILD
-      || step[i].axis == Axis.PARENT
-      || step[i].axis == Axis.SELF;
+          // In this state are finite attribute, child, parent or self steps 
+          // possible.
+          while (step[i].axis == Axis.ATTR
+              || step[i].axis == Axis.CHILD
+              || step[i].axis == Axis.PARENT 
+              || step[i].axis == Axis.SELF) {
+            i++;
+            // iter is still true.
+            if (i == step.length) break;
+          }
+          // iter is still true.
+          // This check is necessary because of the while loop before.
+          if (i == step.length) break;
+
+          // The last step can  be a attribute, child, parent or self step,
+          // and also a descendant or descendant-or-self step.
+          iter &= step[i].axis.down;
+          
+        } else {
+          iter = false;
+          break;
+        }
+        break;
+      }
     }
-    // last step can also be a descendant or descendant-or-self step
-    children &= step[i].axis.down;
-
-    if(children) {
+    
+    if(iter) {
       return new SimpleIterPath(root, step);
     }
-
+    
     // return null if no iterator could be created
     return this;
   }
