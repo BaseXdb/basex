@@ -159,18 +159,128 @@
 		</section>
 		<section><info><title>Description of the Console Features</title></info>
 			
-			<para> Your Text </para>
+			<para>You can type in help in the console to get a list of all BaseX commands.
+				Several commands can be separated by semicolons. To evaluate commands
+				without entering the console mode, you can use the -q option on the command line</para>
+			<section><info><title>Database Commands</title></info>
+				<para><itemizedlist>
+					<listitem>
+						<para>Create (create [DB|FS|INDEX] [...]):
+						Creates database from XML or filesystem, or creates index</para>
+					</listitem>
+					<listitem>
+						<para>Open (open [database]):
+						Opens the specified [database].</para>
+					</listitem>
+					<listitem>
+						<para>Info (info [DB|INDEX|TABLE]?):
+						Shows information on the currently opened database.</para>
+					</listitem>
+					<listitem>
+						<para>Close (close): 
+						Closes the current database.</para>
+					</listitem>
+					<listitem>
+						<para>List (list):
+						Lists all available databases. </para>
+					</listitem>
+					<listitem>
+						<para>Drop (drop [DB|INDEX] [...] ):
+						Drops a database or an index.</para>
+					</listitem>
+					<listitem>
+						<para>Export (export [file]): 
+						Exports the current context set to an XML [file].</para>
+					</listitem>
+					<listitem>
+						<para>Optimize (optimize):
+						Optimizes the current database structures.</para>
+					</listitem>
+				</itemizedlist></para></section>
+			<section><info><title>Query Commands</title></info>
+				<para><itemizedlist>
+					<listitem>
+						<para>XQuery (xquery [query]): 
+						Evaluates an XQuery and prints the result. </para>
+					</listitem>
+					<listitem>
+						<para>Find (find [query]): 
+							Evaluate a simple keyword [query] and print its results.
+							This command is used in the simple search mode in the GUI. </para>
+					</listitem>
+					<listitem>
+						<para>CS (cs [query]):
+						Evaluates the specified XPath [query] and set the
+						result as new context set. </para>
+					</listitem>
+				</itemizedlist></para></section>
+			<section><info><title>Update Commands</title></info>
+				<para><itemizedlist>
+					<listitem>
+						<para>Copy (copy [pos] [source] [target]): 
+							Copy database nodes. Evaluates the [source] query and copies
+							the resulting nodes as child nodes into the [target] query.
+							[pos] specifies the child position; if 0 is specified, the
+							nodes are inserted as last child. The queries should be enclosed
+							by brackets. </para>
+					</listitem>
+					<listitem>
+						<para>Delete (delete ["target"]): 
+							Delete database nodes resulting from the specified [target] query.
+							The query should be enclosed by brackets.</para>
+					</listitem>
+					<listitem>
+						<para>Insert (insert [fragment|element|attribute|text|comment|pi] [...]): 
+							Insert database nodes. Insert a fragment or a specific node at the
+							specified child [pos] of the specified [target] query.</para>
+					</listitem>
+					<listitem>
+						<para>Update (update [element|attribute|text|comment|pi] [...]): 
+							Update database nodes satisfying the specified [target] query. </para>
+					</listitem>
+				</itemizedlist></para></section>
+			<section><info><title>General Commands</title></info>
+				<para><itemizedlist>
+					<listitem>
+						<para>Help (help [command]): Get help on BaseX commands.
+							If [command] is specified, information on the specific
+							command is printed; otherwise, all commands are listed.
+							If 'all' is specified, hidden commands are included. </para>
+					</listitem>
+					<listitem>
+						<para>Set (set [option] [value?]): Sets global options.
+							The currently set values can be shown with the info command.</para>
+					</listitem>
+					<listitem>
+						<para>Exit (exit/quit): Leave the console mode of BaseX.</para>
+					</listitem>
+				</itemizedlist></para></section>
 		</section>
 	</chapter>
 	<chapter><info><title>Working with the BaseX GUI</title></info>
-		
-		<section><info><title>Launching BaseX in GUI mode</title></info>
-			
-			<para> Your Text </para>
-		</section>
 		<section><info><title>Description of all the Views in the GUI</title></info>
 			
-			<para> Your Text </para>
+			<para><itemizedlist>
+				<listitem>
+					<para>Text View: Displays query results and other textual output.</para>
+				</listitem>
+				<listitem>
+					<para>Map View: This visualization represents all data in a TreeMap.
+					All nodes of the XML document are represented as rectangles, filling
+					the complete area. You can choose in the Menu Options/Map Layout the
+					different Algorithms: Split, Strip, Squarified and Slice and Dice Layout.</para>
+				</listitem>
+				<listitem>
+					<para>Folder View: This visualization displays all XML nodes in a usual tree view.</para>
+				</listitem>
+				<listitem>
+					<para>Table View: This visualization displays all XML nodes in a
+						table with rows and columns.</para>
+				</listitem>
+				<listitem>
+					<para>Scatterplot View: This visualizations displays all XML nodes in a scatterplot.</para>
+				</listitem>
+			</itemizedlist></para>
 		</section>
 		<section><info><title>Description of the GUI Features</title></info>
 			
