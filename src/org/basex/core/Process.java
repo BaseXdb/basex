@@ -14,9 +14,9 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class provides the architecture for all internal command
- * implementations. It evaluates queries that are sent by the GUI,
- * the client or the standalone version.
- *
+ * implementations. It evaluates queries that are sent by the GUI, the client or
+ * the standalone version.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -55,15 +55,15 @@ public abstract class Process extends AbstractProcess {
   }
 
   /**
-   * Executes the process and serializes the results.
-   * If an error happens, an exception is thrown.
+   * Executes the process and serializes the results. If an error happens, an
+   * exception is thrown.
    * @param ctx query context
    * @param out output stream
    * @throws Exception execution exception
    */
   public void execute(final Context ctx, final PrintOutput out)
       throws Exception {
-    
+
     if(!execute(ctx)) throw new RuntimeException(info());
     output(out);
     if(Prop.info) out.println(info());
@@ -72,19 +72,19 @@ public abstract class Process extends AbstractProcess {
   @Override
   public final boolean execute(final Context ctx) {
     context = ctx;
-    /* [CG] Überprüfen ob data gelockt ist?
-    if (context.data().isLocked()) { 
-    new Thread() {
-      @Override
-      public void run() {
-        Performance.sleep(Prop.timeout * 1000);
-        this.stop();
-      }
-    }.start();
-    }*/
     // database does not exist...
     if(data() && context.data() == null) {
       return error(PROCNODB);
+    }
+    if(context.data() != null && context.data().isLocked()) {
+      new Thread() {
+        @Override
+        public void run() {
+          while(context.data().isLocked()) {
+            Performance.sleep(1000);
+          }
+        }
+      };
     }
     if(updating()) {
       if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
@@ -92,8 +92,14 @@ public abstract class Process extends AbstractProcess {
     }
 
     try {
+      if(context.data() != null) {
+        context.data().setLocked(true);
+      }
       final boolean ok = exec();
       if(updating()) context.update();
+      if(context.data() != null) {
+        context.data().setLocked(false);
+      }
       return ok;
     } catch(final Throwable ex) {
       // not expected...
@@ -132,7 +138,8 @@ public abstract class Process extends AbstractProcess {
    * @throws IOException exception
    */
   @SuppressWarnings("unused")
-  protected void out(final PrintOutput out) throws IOException { }
+  protected void out(final PrintOutput out) throws IOException {
+  }
 
   @Override
   public final void info(final PrintOutput out) throws IOException {
@@ -181,8 +188,8 @@ public abstract class Process extends AbstractProcess {
   /**
    * Performs the specified XQuery.
    * @param q query to be performed
-   * @param err if this string is specified, it is thrown if the results
-   * don't yield element nodes
+   * @param err if this string is specified, it is thrown if the results don't
+   *          yield element nodes
    * @return result set
    */
   protected final Nodes query(final String q, final String err) {
@@ -242,10 +249,9 @@ public abstract class Process extends AbstractProcess {
     return (props & prop) != 0;
   }
 
-
   /**
-   * Executes the specified process and adopts the process results to
-   * the current process.
+   * Executes the specified process and adopts the process results to the
+   * current process.
    * @param proc process to be executed
    * @return success of operation
    */
@@ -265,7 +271,8 @@ public abstract class Process extends AbstractProcess {
    */
   protected static int maxLength(final String[] str) {
     int max = 0;
-    for(final String s : str) if(max < s.length()) max = s.length();
+    for(final String s : str)
+      if(max < s.length()) max = s.length();
     return max;
   }
 
@@ -275,7 +282,8 @@ public abstract class Process extends AbstractProcess {
    */
   public final String args() {
     final StringBuilder sb = new StringBuilder();
-    for(final String a : args) if(a != null) sb.append(" " + a);
+    for(final String a : args)
+      if(a != null) sb.append(" " + a);
     return sb.toString();
   }
 
