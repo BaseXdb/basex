@@ -72,7 +72,16 @@ public abstract class Process extends AbstractProcess {
   @Override
   public final boolean execute(final Context ctx) {
     context = ctx;
-
+    /* [CG] Überprüfen ob data gelockt ist?
+    if (context.data().isLocked()) { 
+    new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(Prop.timeout * 1000);
+        this.stop();
+      }
+    }.start();
+    }*/
     // database does not exist...
     if(data() && context.data() == null) {
       return error(PROCNODB);
