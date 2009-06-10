@@ -106,14 +106,14 @@ final class MapRenderer {
     while(ftt.more()) {
       if(ls < ftt.sent) {
         ls++;
-        final int w = BaseXLayout.width(g, cw, (byte) ftt.lastpm);
+        final int w = BaseXLayout.width(g, cw, (byte) ftt.pm);
         if(xx + ll +  w > ww) {
           xx = r.x;
           yy += fh;
           ll = 0;
         }
         if(draw) {
-          g.drawString(Character.toString((char) ftt.lastpm),
+          g.drawString(Character.toString((char) ftt.pm),
               xx + ll - (xx > we ? we : 0), yy);
         }
       }

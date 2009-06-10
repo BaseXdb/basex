@@ -64,7 +64,7 @@ final class FTUnion extends FTExpr {
             if(!it[ip].empty()) {
               final FTItem n1 = it[pex[ip]];
               final FTItem n2 = it[pex[minp]];
-              final int d = n1.fte.pre() - n2.fte.pre();
+              final int d = n1.fte.pre - n2.fte.pre;
               if(d < 0) {
                 minp = ip;
                 cp.set(ip, 0);

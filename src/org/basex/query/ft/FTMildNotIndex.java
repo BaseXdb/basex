@@ -42,7 +42,7 @@ final class FTMildNotIndex extends FTExpr {
         final IntList pos = new IntList();
         final TokenBuilder poi = new TokenBuilder();
         
-        int d = n0.fte.pre() - n1.fte.pre();
+        int d = n0.fte.pre - n1.fte.pre;
         if(d < 0) {
           final FTItem tmp = n0;
           n0 = null;

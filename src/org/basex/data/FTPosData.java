@@ -24,6 +24,7 @@ public final class FTPosData {
   public void add(final FTEntry fte) {
     final int[] ps = fte.pos.finish();
     final byte[] pi = fte.poi.finish();
+
     int c = find(fte.pre);
     if(c < 0) { 
       c = -c - 1;

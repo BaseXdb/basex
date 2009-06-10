@@ -72,14 +72,6 @@ public final class FTEntry {
     pos = new IntList(pp);
     poi = new TokenBuilder(pi);
   }
-
-  /**
-   * Getter for the pre value.
-   * @return pre value
-   */
-  public int pre() {
-    return pre;
-  }
   
   /**
    * Reset position iterator.
@@ -130,7 +122,7 @@ public final class FTEntry {
    * @return boolean
    */
   public boolean union(final FTEntry n, final int w) {
-    if(not != n.not || pre() != n.pre()) return false;
+    if(not != n.not || pre != n.pre) return false;
 
     final IntList ps = new IntList();
     final TokenBuilder pi = new TokenBuilder();

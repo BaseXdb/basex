@@ -64,7 +64,7 @@ abstract class FTIndex extends Index {
 
       @Override
       public int next() {
-        return n.pre();
+        return n.pre;
       }
     };
   }

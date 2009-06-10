@@ -74,8 +74,7 @@ abstract class AQuery extends Process {
       BaseX.debug(ex);
       return error(ex.getMessage());
     } catch(final ProgressException ex) {
-      if(Prop.server) return error(TIMEOUTERR);
-      return error("");
+      return error(Prop.server ? TIMEOUTERR : "");
     } catch(final Exception ex) {
       ex.printStackTrace();
       return error(BaseX.bug(ex.getClass().getSimpleName()));

@@ -54,7 +54,7 @@ public abstract class FTIndexIterator extends IndexIterator {
         if(c <= 0) r = i1.more() ? i1.node() : null;
         if(c >= 0) s = i2.more() ? i2.node() : null;
         if(r != null && s != null) {
-          c = r.pre() - s.pre();
+          c = r.pre - s.pre;
           r.union(s, 0);
         } else {
           c = r != null ? -1 : 1;
@@ -69,7 +69,7 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public int next() {
-        return r.pre();
+        return r.pre;
       }
 
       @Override
@@ -100,7 +100,7 @@ public abstract class FTIndexIterator extends IndexIterator {
           if(c <= 0) r = i1.more() ? i1.node() : null;
           if(c >= 0) s = i2.more() ? i2.node() : null;
           if(r == null || s == null) return false;
-          c = r.pre() - s.pre();
+          c = r.pre - s.pre;
           if(r.union(s, w)) return true;
         }
       }
@@ -112,7 +112,7 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public int next() {
-        return r.pre();
+        return r.pre;
       }
 
       @Override

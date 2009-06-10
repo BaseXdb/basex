@@ -39,7 +39,7 @@ public final class FTItem extends DBNode {
    * @param d data reference
    */
   public FTItem(final FTEntry f, final Data d) {
-    super(d, f.pre(), null, Type.TXT);
+    super(d, f.pre, null, Type.TXT);
     fte = f;
     score = -1;
   }

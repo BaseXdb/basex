@@ -12,9 +12,9 @@ import static org.basex.Text.*;
  */
 public abstract class Progress {
   /** Stopped flag. */
-  private boolean stopped;
+  protected boolean stopped;
   /** Sub progress. */
-  private Progress sub;
+  protected Progress sub;
   
   /**
    * Returns short information on the current process or sub process.

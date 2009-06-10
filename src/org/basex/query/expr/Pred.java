@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
+import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
@@ -68,8 +69,9 @@ public class Pred extends Preds {
     if(counter) {
       final Item it = pred[0].ebv(ctx);
       final long l = it.itr();
-      return l != it.dbl() ? Iter.EMPTY :
-        new IterPred(root, pred, (Pos) Pos.get(l, l), false).iter(ctx);
+      final Expr e = Pos.get(l, l);
+      return l != it.dbl() || e == Bln.FALSE ? Iter.EMPTY :
+        new IterPred(root, pred, (Pos) e, false).iter(ctx);
     }
     
     final Iter iter = ctx.iter(root);

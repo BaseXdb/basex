@@ -56,12 +56,12 @@ final class FTIntersection extends FTExpr {
           nod2 = nex.length > 0 && nod2 == null && moreN() ?
               calcFTAnd(cn, false) : nod2;
           if(nod2 != null) {
-            int d = n1.fte.pre() - nod2.fte.pre();
+            int d = n1.fte.pre - nod2.fte.pre;
             while(d > 0) {
               if(!moreN()) break;
               nod2 = calcFTAnd(cn, false);
               if(nod2.empty()) break;
-              d = n1.fte.pre() - nod2.fte.pre();
+              d = n1.fte.pre - nod2.fte.pre;
             }
             if(d != 0) return n1;
             nod2 = null;
@@ -91,7 +91,7 @@ final class FTIntersection extends FTExpr {
           n2 = n[i];
           if(n1.empty()) return n1;
           if(n2.empty()) return n2;
-          int d = n1.fte.pre() - n2.fte.pre();
+          int d = n1.fte.pre - n2.fte.pre;
           while(d != 0) {
             if(d < 0) {
               if(i != 1) {
@@ -104,7 +104,7 @@ final class FTIntersection extends FTExpr {
               n2 = more(n, i, p);
               if(n2.empty()) return n2;
             }
-            d = n1.fte.pre() - n2.fte.pre();
+            d = n1.fte.pre - n2.fte.pre;
           }
         }
 

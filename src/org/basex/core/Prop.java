@@ -153,7 +153,10 @@ public final class Prop {
   public static boolean web = false;
 
   /** Fuse support. */
-  public static boolean fuse;
+  public static boolean fuse = false;
+
+  /** Flag to include key names in the language strings. */
+  public static boolean langkeys = false;
 
   // WEBSERVER OPTIONS ========================================================
 

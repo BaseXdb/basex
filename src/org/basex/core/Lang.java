@@ -19,9 +19,6 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public final class Lang {
-  /** Includes key names in the strings; helpful for adding new languages. */
-  private static final boolean SHOWKEYS = false;
-
   /** Throws an error if this class is loaded. This flag is used to check
    * if non-verbose processes access the language files. */
   private static final boolean DISALLOW = false;
@@ -61,7 +58,7 @@ public final class Lang {
           final String key = line.substring(0, i);
           String val = line.substring(i + 1);
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", "\n");
-          if(SHOWKEYS) val = val + " {" + key + "}";
+          if(Prop.langkeys) val = val + " {" + key + "}";
           if(texts.get(key) != null) {
             if(chk) BaseX.errln("%.lang: '%' assigned twice", lang, key);
           } else {

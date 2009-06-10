@@ -48,8 +48,8 @@ public class Tokenizer extends IndexToken {
   public byte[] text;
   /** Current character position. */
   public int p;
-  /** Backup last punctuation mark. */
-  public int lastpm;
+  /** Last punctuation mark. */
+  public int pm;
 
   /** Character start position. */
   private int s;
@@ -118,20 +118,26 @@ public class Tokenizer extends IndexToken {
     // parse whitespaces
     boolean sn = false;
     boolean pa = false;
+    boolean bs = false;
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      if(wc && c == '.') break;
-
+      if(wc && !bs) {
+        bs = c == '\\';
+        if(bs) continue;
+        if(c == '.') break;
+      }
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
         sent++;
-        lastpm = c;
+        pm = c;
       } else if(!pa && c == '\n') {
         pa = true;
         para++;
       } else if(ftChar(c)) {
+        if(bs) p--;
         break;
       }
+      bs = false;
     }
     // end of text...
     s = p;
@@ -139,8 +145,26 @@ public class Tokenizer extends IndexToken {
 
     // parse token
     for(; p < l; p += cl(text[p])) {
-      final int c = cp(text, p);
-      if(!ftChar(c) && (!wc || ws(c))) break;
+      int c = cp(text, p);
+      if(wc && !bs) {
+        bs = c == '\\';
+        if(bs) continue;
+        if(c == '.') {
+          c = p + 1 < l ? text[p + 1] : 0;
+          if(c == '?' || c == '*' || c == '+') {
+            ++p;
+          } else if(c == '{') {
+            while(++p < l && text[p] != '}');
+            if(p == l) break;
+          }
+          continue;
+        }
+      }
+      if(!ftChar(c)) {
+        if(bs) p--;
+        break;
+      }
+      bs = false;
     }
     return true;
   }
@@ -287,7 +311,7 @@ public class Tokenizer extends IndexToken {
       if(sent != lass) {
         if(sl > 0) {
           il[1].add(sl);
-          il[4].add(lastpm);
+          il[4].add(pm);
         }
         lass = sent;
         sl = 0;
@@ -304,7 +328,7 @@ public class Tokenizer extends IndexToken {
 
     if(sent != lass && sl > 0) {
       il[1].add(sl);
-      il[4].add(lastpm);
+      il[4].add(pm);
     }
     if(pl > 0) il[2].add(pl);
 
