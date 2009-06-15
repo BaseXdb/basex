@@ -137,7 +137,7 @@ public final class TreeView extends View {
       rects = new ArrayList<TreeRect>();
       Nodes curr = gui.context.current();
       for(int i = 0; i < curr.size(); i++) {
-        temperature(curr.nodes[i], rg, i);
+        treeView(curr.nodes[i], rg, i);
 
       }
     }
@@ -179,7 +179,6 @@ public final class TreeView extends View {
     // highlights marked nodes
     if(!rects.isEmpty() && gui.context.marked().size() > 0) {
 
-      g.setColor(Color.RED);
       Iterator<TreeRect> it = rects.iterator();
 
       while(it.hasNext()) {
@@ -191,6 +190,8 @@ public final class TreeView extends View {
         for(int j = 0; j < size; j++) {
           for(int z = 0; z < r.multiPres.length; z++) {
             if(r.multiPres[z] == markedNodes[j]) {
+
+              g.setColor(Color.RED);
 
               g.fillRect(r.x + 1, r.y + 1, r.w - 1, r.h - 1);
               drawTextIntoRectangle(g, data.kind(r.pre), r.pre, r.x
@@ -241,7 +242,7 @@ public final class TreeView extends View {
     if(!right && !left || focusedRect == null) return;
 
     if(left) {
-      gui.notify.mark(0, this);
+      gui.notify.mark(0, null);
       if(e.getClickCount() > 1 && focusedRect.multiPres.length > 0) {
         gui.notify.context(gui.context.marked(), false, this);
         refreshContext(false, false);
@@ -293,8 +294,7 @@ public final class TreeView extends View {
    * @param g the graphics reference
    * @param rootNum number of current root
    */
-  private void temperature(final int root, final Graphics g, 
-      final int rootNum) {
+  private void treeView(final int root, final Graphics g, final int rootNum) {
     final Data data = gui.context.data();
     int level = 0;
     sumNodeSizeInLine = data.meta.size;
@@ -457,7 +457,7 @@ public final class TreeView extends View {
 
       // draw nodes
       g.setColor(new Color(colorNode - (level * colorDiff)));
-      g.fillRect((int) x + 1, y + 1, (int) w - 2, h - 1);
+      g.fillRect((int) x, y, (int) w, h);
 
       drawTextIntoRectangle(g, nodeKind, pre, (int) boxMiddle, (int) w, y);
 
