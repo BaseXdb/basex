@@ -65,7 +65,9 @@ public final class TreeView extends View {
   /** color highlighted nodes. **/
   private final Color highlightColor = new Color(0x5D6FB7);
   /** minimum space in rects needed for tags. **/
-  final int minSpace = 35;
+  private final int minSpace = 35;
+  /** draw only element nodes. **/
+  private boolean onlyElementNodes = false;
 
   /**
    * Default Constructor.
@@ -334,10 +336,11 @@ public final class TreeView extends View {
 
       while(iterator.more()) {
         final int pre = iterator.next();
-        // if(data.kind(pre) == Data.ELEM) {
-        temp.add(pre);
-        ++nCount;
-        // }
+        
+        if(!onlyElementNodes || data.kind(pre) == Data.ELEM) {
+          temp.add(pre);
+          ++nCount;
+        }
         sumNodeSize += data.size(pre, data.kind(pre));
       }
     }
@@ -370,7 +373,6 @@ public final class TreeView extends View {
     while(currRatio < 2) {
       currRatio *= ++factor;
     }
-    // ratio = currRatio;
 
     for(int i = 0; i < size; i++) {
 
@@ -387,44 +389,35 @@ public final class TreeView extends View {
       int nodeKind = data.kind(pre);
       int nodeSize = data.size(pre, nodeKind);
 
-      int parent = data.parent(pre, nodeKind);
+//      int parent = data.parent(pre, nodeKind);
       if(nodeSize > 0) temp.put(pre, boxMiddle);
 
       preList.add(pre);
-
-      while(ratio < 2) {
-
-        int p = parentList.list[++i];
-
-        if(p == -1) {
-          continue;
-        }
-
-        int nK = data.kind(p);
-        int par = data.parent(p, nK);
-
-        if(par != parent) {
-          --i;
-          break;
-        }
-
-        int nS = data.size(p, nK);
-        if(nS > 0) temp.put(p, boxMiddle);
-        preList.add(p);
-        w += ratio;
-
-      }
+      //
+      // while(ratio < 2) {
+      //
+      // int p = parentList.list[++i];
+      //
+      // if(p == -1) {
+      // continue;
+      // }
+      //
+      // int nK = data.kind(p);
+      // int par = data.parent(p, nK);
+      //
+      // if(par != parent) {
+      // --i;
+      // break;
+      // }
+      //
+      // int nS = data.size(p, nK);
+      // if(nS > 0) temp.put(p, boxMiddle);
+      // preList.add(p);
+      // w += ratio;
+      //
+      // }
 
       w = Math.max(2, ratio);
-
-      // final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
-
-      // TemperatureColors
-      // int c = (int) Math.rint(255 * nodePercent * 40);
-      // c = c > 255 ? 255 : c;
-      // g.setColor(new Color(c, 0, 255 - c));
-
-      // rectangle height
 
       TreeRect rect = new TreeRect();
       rect.x = (int) x;
@@ -437,7 +430,7 @@ public final class TreeView extends View {
       rects.add(rect);
 
       g.setColor(new Color(colorRect - (level * colorDiff)));
-      g.drawRect((int) x + 1, y, (int) w - 1, h);
+      g.drawRect((int) x + 2, y, (int) w - 2, h);
 
       if(parentPos != null) {
 
@@ -457,7 +450,7 @@ public final class TreeView extends View {
 
       // draw nodes
       g.setColor(new Color(colorNode - (level * colorDiff)));
-      g.fillRect((int) x, y, (int) w, h);
+      g.fillRect((int) x + 1, y, (int) w - 1, h);
 
       drawTextIntoRectangle(g, nodeKind, pre, (int) boxMiddle, (int) w, y);
 
