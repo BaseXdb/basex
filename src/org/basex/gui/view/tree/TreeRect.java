@@ -12,6 +12,6 @@ public class TreeRect extends ViewRect {
   /**
    * array containing all pre values inside the rectangle.
    */
-  public int[] multiPres = null;
+  public int[]  multiPres = null;
 
 }
