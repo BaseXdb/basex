@@ -68,6 +68,8 @@ public final class TreeView extends View {
   private final int minSpace = 35;
   /** draw only element nodes. **/
   private boolean onlyElementNodes = false;
+//  /** depth of the document. **/
+//  private int documentDepth = -1; 
 
   /**
    * Default Constructor.
@@ -106,7 +108,6 @@ public final class TreeView extends View {
   protected void refreshMark() {
     wwidth = -1;
     wheight = -1;
-    System.out.println("ss");
     repaint();
   }
 
@@ -124,7 +125,8 @@ public final class TreeView extends View {
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
-
+//    documentDepth = data.meta.height;
+   
     /** Timer */
     final Performance perf = new Performance();
     perf.initTimer();
@@ -173,7 +175,7 @@ public final class TreeView extends View {
       }
       int w = BaseXLayout.width(g, s);
       g.setColor(highlightColor);
-      g.fillRect(r.x, r.y - fontHeight, w + 2, fontHeight);
+      g.fillRect(r.x - 1, r.y - fontHeight, w + 1, fontHeight);
       g.setColor(Color.WHITE);
       g.drawString(s, r.x + 1, (int) (r.y - fontHeight / 4f));
     }
@@ -336,7 +338,7 @@ public final class TreeView extends View {
 
       while(iterator.more()) {
         final int pre = iterator.next();
-        
+
         if(!onlyElementNodes || data.kind(pre) == Data.ELEM) {
           temp.add(pre);
           ++nCount;
@@ -389,7 +391,7 @@ public final class TreeView extends View {
       int nodeKind = data.kind(pre);
       int nodeSize = data.size(pre, nodeKind);
 
-//      int parent = data.parent(pre, nodeKind);
+      // int parent = data.parent(pre, nodeKind);
       if(nodeSize > 0) temp.put(pre, boxMiddle);
 
       preList.add(pre);
@@ -429,7 +431,8 @@ public final class TreeView extends View {
       preList.reset();
       rects.add(rect);
 
-      g.setColor(new Color(colorRect - (level * colorDiff)));
+      g.setColor(new Color(colorRect - 
+          ((level < 11 ? level : 11) * colorDiff)));
       g.drawRect((int) x + 2, y, (int) w - 2, h);
 
       if(parentPos != null) {
@@ -448,8 +451,10 @@ public final class TreeView extends View {
         // - fontHeight);
       }
 
-      // draw nodes
-      g.setColor(new Color(colorNode - (level * colorDiff)));
+     
+ 
+      g.setColor(new Color(colorNode - 
+          ((level < 12 ? level : 12) * colorDiff)));
       g.fillRect((int) x + 1, y, (int) w - 1, h);
 
       drawTextIntoRectangle(g, nodeKind, pre, (int) boxMiddle, (int) w, y);
