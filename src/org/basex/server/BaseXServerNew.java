@@ -86,6 +86,8 @@ public class BaseXServerNew {
     for(int i = 0; i < sessions.size(); i++) {
       try {
         sessions.get(i).dis.close();
+        int tmp = i;
+        BaseX.outln("Client " + (tmp + 1) + " has logged out.");
       } catch(IOException e) {
         e.printStackTrace();
       }

@@ -79,7 +79,7 @@ public class BaseXClientNew {
     try {
       socket = new Socket(host, port);
     } catch(IOException e) {
-      e.printStackTrace();
+      BaseX.errln(SERVERERR);
     }
     run();
   }

@@ -179,7 +179,6 @@ public class Session implements Runnable {
    * Stops the thread. 
    */
   synchronized void stop() {
-    BaseX.outln("Client " + clientId + " has logged out.");
     bx.sessions.remove(this);
     try {
       socket.close();
