@@ -69,7 +69,9 @@ public final class TreeView extends View {
   /** draw only element nodes. **/
   private boolean onlyElementNodes = false;
 //  /** depth of the document. **/
-//  private int documentDepth = -1; 
+//  private int documentDepth = -1;
+  /** notified focus flag. **/ 
+  boolean refreshedFocus = false;
 
   /**
    * Default Constructor.
@@ -89,6 +91,7 @@ public final class TreeView extends View {
 
   @Override
   protected void refreshFocus() {
+    refreshedFocus = true;
     repaint();
   }
 
@@ -126,11 +129,11 @@ public final class TreeView extends View {
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
 //    documentDepth = data.meta.height;
-   
+
     /** Timer */
     final Performance perf = new Performance();
     perf.initTimer();
-
+    
     /** Initialize sizes */
     fontHeight = g.getFontMetrics().getHeight();
 
@@ -273,16 +276,17 @@ public final class TreeView extends View {
 
     // final Data data = gui.context.data();
     final Iterator<TreeRect> it = rects.iterator();
-
     while(it.hasNext()) {
       final TreeRect r = it.next();
 
-      if(r.contains(mousePosX, mousePosY)) {
+      if(refreshedFocus ? r.pre == gui.focused : 
+        r.contains(mousePosX, mousePosY)) {
         focusedRect = r;
 
         for(int i = 0; i < r.multiPres.length; i++) {
           gui.notify.focus(r.multiPres[i], this);
         }
+        refreshedFocus = false;
         return true;
       }
     }
@@ -431,12 +435,10 @@ public final class TreeView extends View {
       preList.reset();
       rects.add(rect);
 
-      g.setColor(new Color(colorRect - 
-          ((level < 11 ? level : 11) * colorDiff)));
+      g.setColor(new Color(colorRect - ((level < 11 ? level : 11) * colorDiff)));
       g.drawRect((int) x + 2, y, (int) w - 2, h);
 
       if(parentPos != null) {
-
         final double parentMiddle = parentPos.get(data.parent(pre, nodeKind));
 
         g.setColor(new Color(colorRect));
@@ -451,10 +453,7 @@ public final class TreeView extends View {
         // - fontHeight);
       }
 
-     
- 
-      g.setColor(new Color(colorNode - 
-          ((level < 12 ? level : 12) * colorDiff)));
+      g.setColor(new Color(colorNode - ((level < 11 ? level : 11) * colorDiff)));
       g.fillRect((int) x + 1, y, (int) w - 1, h);
 
       drawTextIntoRectangle(g, nodeKind, pre, (int) boxMiddle, (int) w, y);
