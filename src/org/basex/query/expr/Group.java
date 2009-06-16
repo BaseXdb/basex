@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+//import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
@@ -21,6 +22,9 @@ import org.basex.query.util.Var;
 public class Group extends Expr {
   /** Sequence to be grouped. */
   SeqIter sq;
+  
+  /** Resulting Sequence (Sequence Grouped). **/
+  SeqIter sg;
   /** Group by specification. */
   Grp[] grp;
   
@@ -94,13 +98,12 @@ public class Group extends Expr {
       @Override
       public Item next() throws QueryException {
         if(groups == null) {
-          // enumerate sort array and sort entries
-//          for(int i = 0; i < e; i++) group[i] = i;
           group();
           for(final Grp g : grp) g.finish();
         }
         final int s = groups.size();
         final Integer[] hashes = groups.keySet().toArray(new Integer[s]);
+
         while(true) {
           if(ir != null) {
             final Item i = ir.next();
@@ -108,7 +111,10 @@ public class Group extends Expr {
             ir = null;
           } else {
             if(++p == hashes.length) return null;
-            final int witness = groups.get(hashes[p])[0]; 
+            final int witness = groups.get(hashes[p])[0];
+            
+            // *TODO* [ms] fill witness with all of its
+            // fellow group members children
             ir = sq.item[witness].iter();
           }
         }
