@@ -40,6 +40,13 @@ public class SplitAlgo extends MapAlgo {
       // increment pivot until left rectangle contains more or equal
       // than half the weight or leave with just setting it to ne - 1
       weight = 0;
+// [JH] only difference to BinaryLayout????
+//      ni = ns + ((ne - ns) / 2);
+//      System.out.println(ns + ";" + ne + ":" + ni);
+//      for(int i = ns; i <= ni; i++) {
+//        weight += ml.weight[i];
+//      }
+      
       for(; ni < ne;) {
         weight += ml.weight[++ni];
         if(weight >= sumweight / 2 || ni == ne - 1) break;

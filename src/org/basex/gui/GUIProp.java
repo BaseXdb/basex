@@ -162,6 +162,16 @@ public final class GUIProp {
   public static boolean mapfs = true;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
+  /** Scaling to use in the Map oneclickfocus. */
+  public static int lensscale = 2;
+  /** Alpha value of the zoombox. */
+  public static int zoomboxalpha = 100;
+  /** Width of the fisheyeview. */
+  public static int fishw = 300;
+  /** Height of the fisheyeview. */
+  public static int fishh = 200;
+  /** Show file contents in TreeMap. */
+  public static boolean filecont = true;
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + ".basexwin";

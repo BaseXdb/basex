@@ -2,7 +2,11 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -11,6 +15,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import javax.swing.SwingUtilities;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -29,15 +36,15 @@ import org.basex.util.Token;
 
 /**
  * This view is a TreeMap implementation.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class MapView extends View implements Runnable {
   /** Dynamic zooming steps. */
   private static final int[] ZS = { 0, 0, 0, 0, 20, 80, 180, 320, 540, 840,
-    1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
-    9440, 9660, 9800, 9900, 9960, 9980, 9980, 9980, 10000 };
+      1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
+      9440, 9660, 9800, 9900, 9960, 9980, 9980, 9980, 10000};
   /** Number of zooming steps. */
   private static final int ZOOMSIZE = ZS.length - 1;
   /** Maximum zooming step. */
@@ -49,6 +56,8 @@ public final class MapView extends View implements Runnable {
   private MapPainter painter;
   /** Keeps the whole map layout. */
   public MapLayout layout;
+  /** Keeps LKAyout for focused rectangle. */
+  public MapLayout tinyLayout;
   /** Text lengths. */
   private int[] textLen;
 
@@ -81,6 +90,20 @@ public final class MapView extends View implements Runnable {
   private BufferedImage mainMap;
   /** Zoomed TreeMap. */
   private BufferedImage zoomMap;
+  /** OnClick Zoom. */
+  private BufferedImage tinyMap;
+  /** Huge Map. */
+  private BufferedImage hugeMap;
+  /** scaling. */
+  private static int fkt = 2;
+  /** Y pos tiny Map. */
+  private int tinyy;
+  /** X pos tiny Map. */
+  private int tinyx;
+  /** W tiny Map. */
+  private int tinyw;
+  /** H tiny Map. */
+  private int tinyh;
 
   /**
    * Default Constructor.
@@ -114,10 +137,12 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
-      painter = data.fs != null ? new MapFS(this, data.fs) :
-        new MapDefault(this);
+      painter = data.fs != null ? new MapFS(this, data.fs) : new MapDefault(
+          this);
       mainMap = createImage();
       zoomMap = createImage();
+      if(GUIProp.mapinteraction == 2) hugeMap = new BufferedImage(fkt
+          * getWidth(), fkt * getHeight(), BufferedImage.TYPE_INT_BGR);
       refreshLayout();
       repaint();
     }
@@ -161,8 +186,8 @@ public final class MapView extends View implements Runnable {
         && rectHist[hist + 1] != null
         && rectHist[hist + 1].pre == 0
         || more
-        && (context.size() != 1 || focused == null
-        || context.nodes[0] != focused.pre);
+        && (context.size() != 1 
+        || focused == null || context.nodes[0] != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -174,9 +199,17 @@ public final class MapView extends View implements Runnable {
 
     // initial rectangle
     final int w = getWidth(), h = getHeight();
+
+    if(GUIProp.mapinteraction == 2) {
+      final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
+
+      calc(hrect, gui.context.current(), hugeMap);
+    }
+
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 
     calc(rect, gui.context.current(), mainMap);
+
     repaint();
   }
 
@@ -216,8 +249,8 @@ public final class MapView extends View implements Runnable {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (Math.log(64 * getWidth() / mainRect.w) +
-          Math.log(64 * getHeight() / mainRect.h));
+      zoomSpeed = (int) (Math.log(64 * getWidth() / mainRect.w) + Math.log(64
+          * getHeight() / mainRect.h));
     }
 
     if(quick) {
@@ -243,7 +276,8 @@ public final class MapView extends View implements Runnable {
       repaint();
     }
     // wait until current painting is finished
-    while(gui.painting) Performance.sleep(zoomSpeed);
+    while(gui.painting)
+      Performance.sleep(zoomSpeed);
 
     // remove old rectangle and repaint map
     zoomStep = 0;
@@ -276,8 +310,8 @@ public final class MapView extends View implements Runnable {
     final boolean newFocus = focused != fr || fr != null && fr.thumb;
     focused = fr;
 
-    if(fr != null) gui.cursor(painter.mouse(focused, mouseX, mouseY,
-        false) ? CURSORHAND : CURSORARROW);
+    if(fr != null) gui.cursor(painter.mouse(focused, mouseX, mouseY, false) ?
+        CURSORHAND : CURSORARROW);
 
     if(newFocus) {
       gui.notify.focus(focused != null ? focused.pre : -1, this);
@@ -288,13 +322,13 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
-   *
+   * 
    * @param rect initial space to layout rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  //@SuppressWarnings("unchecked")
-  private void calc(final MapRect rect, final Nodes nodes, 
+  // @SuppressWarnings("unchecked")
+  private void calc(final MapRect rect, final Nodes nodes,
       final BufferedImage map) {
 
     final Performance p = new Performance();
@@ -303,11 +337,11 @@ public final class MapView extends View implements Runnable {
     initLen();
     layout = new MapLayout(nodes.data, textLen);
 
-    layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
-        nodes.size() - 1, 0);
+    layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0, nodes.size() - 1,
+        0);
 
     mainRects = layout.rectangles.copy();
-    //mainRects = layout.rectangles;
+    // mainRects = layout.rectangles;
 
     painter.init(mainRects);
     drawMap(map, mainRects);
@@ -325,7 +359,6 @@ public final class MapView extends View implements Runnable {
      */
   }
 
-  
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();
@@ -333,7 +366,6 @@ public final class MapView extends View implements Runnable {
       super.paintComponent(g);
       return;
     }
-    
     if(mainRects == null) {
       refreshInit();
       return;
@@ -347,6 +379,8 @@ public final class MapView extends View implements Runnable {
     final Image img1 = in ? zoomMap : mainMap;
     final Image img2 = in ? mainMap : zoomMap;
     if(zoomStep > 0) {
+      tinyh = 0;
+      tinyw = 0;
       drawImage(g, img1, -zoomStep);
       drawImage(g, img2, zoomStep);
     } else {
@@ -355,13 +389,12 @@ public final class MapView extends View implements Runnable {
 
     // check if focused rectangle is valid
     if(focused != null && focused.pre >= data.meta.size) focused = null;
-    
+
     // skip node path view
-    if(focused == null || mainRects.size == 1 &&
-        focused == mainRects.get(0)) {
+    if(focused == null || mainRects.size == 1 && focused == mainRects.get(0)) {
       gui.painting = false;
-//      return;
-      if (focused == null || !focused.thumb) return;
+      // return;
+      if(focused == null || !focused.thumb) return;
     }
 
     if(GUIProp.mapoffsets == 0) {
@@ -416,18 +449,47 @@ public final class MapView extends View implements Runnable {
         boolean sen = false;
         boolean spc = false;
         switch(focused.thumbal) {
-          case 0:  sen = true; spc = true; break;
-          case 1:  sen = true; break;
-          case 2:  break;
+          case 0:
+            sen = true;
+            spc = true;
+            break;
+          case 1:
+            sen = true;
+            break;
+          case 2:
+            break;
         }
-        MapRenderer.calculateThumbnailsToolTip(focused, d, sen,
-            mouseX, mouseY, getWidth(), g, spc);
+        MapRenderer.calculateThumbnailsToolTip(focused, d, sen, mouseX, mouseY,
+            getWidth(), g, spc);
 
         MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
             getWidth());
         focused.x -= 3;
         focused.w += 3;
       }
+    }
+    if(GUIProp.mapinteraction == 1 && tinyMap != null) {
+      // set up some alpha display for the overlayed picture
+      final int ac = AlphaComposite.SRC_OVER;
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
+          GUIProp.zoomboxalpha / 100.0f));
+
+      g.drawImage(tinyMap, tinyx, tinyy, tinyw, tinyh, this);
+      // draw lens border
+      g.setColor(Color.black);
+      g.drawRect(tinyx, tinyy, tinyw, tinyh);
+    } else if(GUIProp.mapinteraction == 2) {
+      g.drawImage(hugeMap, mouseX - fkt * GUIProp.fishw / 2, mouseY - fkt
+          * GUIProp.fishh / 2, mouseX + fkt * GUIProp.fishw / 2, mouseY + fkt
+          * GUIProp.fishh / 2, fkt * (mouseX / 2 - GUIProp.fishw / 2), fkt
+          * (mouseY / 2 - GUIProp.fishh / 2), fkt
+          * (mouseX / 2 + GUIProp.fishw / 2), fkt
+          * (mouseY / 2 + GUIProp.fishh / 2), this);
+
+      // draw lens border
+      g.setColor(Color.black);
+      g.drawRect(mouseX - fkt * GUIProp.fishw / 2, mouseY - fkt * GUIProp.fishh
+          / 2, fkt * GUIProp.fishw, fkt * GUIProp.fishh);
     }
     gui.painting = false;
   }
@@ -487,7 +549,7 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Creates a buffered image for the treemap.
-   *
+   * 
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    */
@@ -506,7 +568,40 @@ public final class MapView extends View implements Runnable {
     // refresh mouse focus
     mouseX = e.getX();
     mouseY = e.getY();
-    if(focus()) repaint();
+    if(focus()) {
+      if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
+          mouseY < tinyy + tinyh)) {
+        tinyw = 0;
+        tinyh = 0;
+      }
+      repaint();
+    } else if(GUIProp.mapinteraction == 2) {
+
+      repaint();
+//      Graphics g = this.getGraphics();
+
+      // final MapRect rect = new MapRect(0, 0, mywidth, myheight, 0, 0);
+      //
+      // final Nodes nodes = new Nodes(focused.pre, data);
+      // final BufferedImage bi = new BufferedImage(mywidth, myheight,
+      // BufferedImage.TYPE_INT_BGR);
+      //
+      // tinyLayout = new MapLayout(nodes.data, textLen);
+      // tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
+      // nodes.size() - 1, 0);
+      //
+      // MapRects rects = new MapRects();
+      // rects.add(focused);
+      //
+      // painter.init(tinyLayout.rectangles.copy());
+      // drawMap(bi, tinyLayout.rectangles);
+      //        
+      // Rectangle srcrect = new Rectangle(fkt * (mouseX - (GUIProp.fishw / 2)),
+      // fkt * (mouseY - (GUIProp.fishh / 2)), fkt * GUIProp.fishw,
+      // fkt * GUIProp.fishh);
+      // Rectangle destrect = new Rectangle(mouseX - (GUIProp.fishw / 2),
+      // mouseY - (GUIProp.fishh / 2), GUIProp.fishw, GUIProp.fishh);
+    }
   }
 
   @Override
@@ -514,8 +609,52 @@ public final class MapView extends View implements Runnable {
     if(gui.updating) return;
 
     // process mouse clicks by the specific painter
-    if(SwingUtilities.isLeftMouseButton(e) && focused != null)
-      painter.mouse(focused, mouseX, mouseY, true);
+    if(SwingUtilities.isLeftMouseButton(e) && focused != null) painter.mouse(
+        focused, mouseX, mouseY, true);
+
+    if(GUIProp.mapinteraction == 1) {
+      final Data data = gui.context.data();
+      int screensize = getWidth() * getHeight();
+      // [JH] guiprop
+      screensize = screensize / 3;
+
+      tinyw = (int) Math.sqrt(focused.w * screensize / focused.h);
+      tinyh = screensize / tinyw;
+      // find out if position under cursor is out of view dimensions
+      // tinyw = GUIProp.lensscale * focused.w;
+      // tinyh = GUIProp.lensscale * focused.h;
+
+      // tinyy = focused.y + tinyy < getHeight() ? focused.y :
+      // focused.y + focused.h - tinyh;
+      if(focused.x + focused.w + tinyw < getWidth()) tinyx = focused.x
+          + focused.w;
+      else if(focused.x - tinyw > 0) tinyx = focused.x - tinyw;
+      else tinyx = (getWidth() - tinyw) / 2;
+
+      // tinyx = focused.x + tinyx < getWidth() ? focused.x :
+      // focused.x + focused.w - tinyw;
+      if(focused.y - tinyh > 0 && mouseY < focused.y + focused.h / 2) 
+        tinyy = focused.y - tinyh;
+      else if(focused.y + focused.h + tinyh < getHeight()) tinyy = focused.y
+          + focused.h;
+      else tinyy = (getHeight() - tinyh) / 2;
+
+      final MapRect rect = new MapRect(0, 0, tinyw, tinyh, 0, 0);
+
+      final Nodes nodes = new Nodes(focused.pre, data);
+      tinyMap = new BufferedImage(tinyw, tinyh, BufferedImage.TYPE_INT_BGR);
+
+      tinyLayout = new MapLayout(nodes.data, textLen);
+      tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
+          nodes.size() - 1, 0);
+
+      MapRects rects = new MapRects();
+      rects.add(focused);
+
+      painter.init(tinyLayout.rectangles.copy());
+      drawMap(tinyMap, tinyLayout.rectangles);
+      repaint();
+    }
   }
 
   @Override
@@ -626,6 +765,21 @@ public final class MapView extends View implements Runnable {
       } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
 
       gui.notify.jump(new Nodes(pre, data));
+    } else if(key == KeyEvent.VK_ESCAPE) {
+      tinyw = 0;
+      tinyh = 0;
+      repaint();
+      // [JH] needs an other key. print is not working because of global 
+      // keybinding
+    } else if(GUIProp.mapinteraction == 2 && key == KeyEvent.VK_1) {
+      try {
+        File file1 = new File("baseXTM.png");
+        ImageIO.write(mainMap, "png", file1);
+        File file2 = new File("baseXhugeTM.png");
+        ImageIO.write(hugeMap, "png", file2);
+      } catch(IOException exc) {
+        exc.printStackTrace();
+      }
     }
 
     final boolean cursor = key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN
@@ -648,6 +802,7 @@ public final class MapView extends View implements Runnable {
       mouseX = focused.x + (shift ? o : focused.w + 1);
       if(shift) mouseY = focused.y + (focused.h >> 1);
     }
+
     o = mainRects.get(0).w == getWidth() ? (o >> 1) + 1 : 0;
     mouseX = Math.max(o, Math.min(getWidth() - o - 1, mouseX));
     mouseY = Math.max(o << 1, Math.min(getHeight() - o - 1, mouseY));
@@ -683,7 +838,7 @@ public final class MapView extends View implements Runnable {
 
     final Data data = gui.context.current().data;
     if(data.fs != null || textLen != null || GUIProp.mapweight == 0) return;
-    
+
     final int size = data.meta.size;
     textLen = new int[size];
 
@@ -694,7 +849,7 @@ public final class MapView extends View implements Runnable {
     for(int pre = 0; pre < size; pre++) {
       final int kind = data.kind(pre);
       par = data.parent(pre, kind);
-      
+
       final int ll = l;
       while(l > 0 && parStack[l - 1] > par) {
         textLen[parStack[l - 1]] += textLen[parStack[l]];
@@ -710,8 +865,9 @@ public final class MapView extends View implements Runnable {
         textLen[pre] = data.attLen(pre);
       } else if(kind == Data.ELEM || kind == Data.DOC) {
         l++;
-      } 
+      }
     }
-    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
+    while(--l >= 0)
+      textLen[parStack[l]] += textLen[parStack[l + 1]];
   }
 }
