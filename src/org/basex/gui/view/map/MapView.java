@@ -94,6 +94,8 @@ public final class MapView extends View implements Runnable {
   private BufferedImage tinyMap;
   /** Huge Map. */
   private BufferedImage hugeMap;
+  /** Linear magnification. */
+  private boolean constMag = false;
   /** scaling. */
   private static int fkt = 2;
   /** Y pos tiny Map. */
@@ -481,7 +483,7 @@ public final class MapView extends View implements Runnable {
       // draw border
       g.setColor(Color.black);
       g.drawRect(tinyx, tinyy, tinyw, tinyh);
-    } else if(GUIProp.mapinteraction == 2) {
+    } else if(GUIProp.mapinteraction == 2 && constMag) {
       // [JH] stop rectangle at borders
       int dxstart = mouseX - GUIProp.fishw / 2;
       int dxend = mouseX + GUIProp.fishw / 2;
@@ -614,9 +616,12 @@ public final class MapView extends View implements Runnable {
         tinyh = 0;
       }
       repaint();
-    } else if(GUIProp.mapinteraction == 2) {
-
-      repaint();
+    } else if(GUIProp.mapinteraction == 2 && e.isControlDown()) {
+        constMag = true;
+        repaint();
+    } else if(GUIProp.mapinteraction == 2 && !e.isControlDown() && constMag) {
+        constMag = false;
+        repaint();
     }
   }
 
