@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
@@ -44,6 +45,10 @@ public final class CreateIndex extends ACreate {
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
+          data.meta.ftfz = Prop.ftfuzzy;
+          data.meta.ftst = Prop.ftst;
+          data.meta.ftcs = Prop.ftcs;
+          data.meta.ftdc = Prop.ftdc;
           index = Type.FTX;
           break;
       }

@@ -75,19 +75,18 @@ public final class FTMatches {
    * @return true if matches are left
    */
   public boolean phrase(final FTMatches all) {
-    int a = -1, b = -1;
-    while(++a < size && ++b < all.size) {
+    int a = 0, b = 0, c = 0;
+    while(a < size && b < all.size) {
       final int e = all.match[b].match[0].start;
       final int d = e - match[a].match[0].end - 1;
       if(d == 0) {
-        match[a].match[0].end = e;
-      } else if(d < 0) {
-        Array.move(match, a + 1, -1, --size - a--);
-      } else {
-        b--;
+        match[c] = match[a];
+        match[c++].match[0].end = e;
       }
+      if(d >= 0) a++;
+      if(d <= 0) b++;
     }
-    size = a;
+    size = c;
     return size != 0;
   }
 
@@ -128,11 +127,8 @@ public final class FTMatches {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName() + "[" + sTokenNum + "]\n");
-    for(int m = 0; m < size; m++) {
-      if(m != 0) sb.append("\n");
-      sb.append("  " + match[m]);
-    }
+    sb.append(getClass().getSimpleName() + "[" + sTokenNum + "]");
+    for(int m = 0; m < size; m++) sb.append("\n  " + match[m]);
     return sb.toString();
   }
 }

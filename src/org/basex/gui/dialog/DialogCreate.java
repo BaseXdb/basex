@@ -277,7 +277,7 @@ public final class DialogCreate extends Dialog {
     Prop.intparse = intparse.isSelected();
     Prop.ftfuzzy = ft[0].isSelected();
     Prop.ftst = ft[1].isSelected();
-    Prop.ftdc = ft[3].isSelected();
     Prop.ftcs = ft[2].isSelected();
+    Prop.ftdc = ft[3].isSelected();
   }
 }

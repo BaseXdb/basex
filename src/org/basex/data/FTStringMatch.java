@@ -41,8 +41,7 @@ public class FTStringMatch implements Comparable<FTStringMatch> {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append((not ? "-" : "+") + "[" + queryPos + ": ");
-    sb.append(start == end ? "" + (start + 1) :
-      (start + 1) + "-" + (end + 1));
+    sb.append(start == end ? "" + start : start + "-" + end);
     return sb.append("]").toString();
   }
 

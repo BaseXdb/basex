@@ -8,6 +8,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -204,19 +206,16 @@ public final class DialogInfo extends Dialog {
         fl[f].setEnabled(ftx);
       }
     }
-    final Data data = gui.context.data();
-    BaseXLayout.enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
+    BaseXLayout.enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
   }
 
   @Override
   public void close() {
     super.close();
-    final Data data = gui.context.data();
-    final MetaData meta = data.meta;
     if(!ftedit) return;
-    meta.ftfz = ft[0].isSelected();
-    meta.ftst = ft[1].isSelected();
-    meta.ftcs = ft[2].isSelected();
-    meta.ftdc = ft[3].isSelected();
+    Prop.ftfuzzy = ft[0].isSelected();
+    Prop.ftst = ft[1].isSelected();
+    Prop.ftcs = ft[2].isSelected();
+    Prop.ftdc = ft[3].isSelected();
   }
 }

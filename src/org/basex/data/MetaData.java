@@ -47,7 +47,6 @@ public final class MetaData {
   public boolean atvindex = Prop.attrindex;
   /** Flag for creating a full-text index. */
   public boolean ftxindex = Prop.ftindex;
-  
 
   /** Flag for fuzzy indexing. */
   public boolean ftfz = Prop.ftfuzzy;

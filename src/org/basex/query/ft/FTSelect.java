@@ -78,8 +78,7 @@ public class FTSelect extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    // [SG] check if/which filters can be evaluated by the index variant
-    return expr[0].indexAccessible(ic) && filter.length == 0;
+    return expr[0].indexAccessible(ic);
   }
 
   @Override
