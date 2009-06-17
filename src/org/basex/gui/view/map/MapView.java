@@ -468,28 +468,67 @@ public final class MapView extends View implements Runnable {
         focused.w += 3;
       }
     }
+    final int ac = AlphaComposite.SRC_OVER;
+    ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
+        GUIProp.zoomboxalpha / 100.0f));
     if(GUIProp.mapinteraction == 1 && tinyMap != null) {
-      // set up some alpha display for the overlayed picture
-      final int ac = AlphaComposite.SRC_OVER;
-      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
-          GUIProp.zoomboxalpha / 100.0f));
+//      // set up some alpha display for the overlayed picture
+//      final int ac = AlphaComposite.SRC_OVER;
+//      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
+//          GUIProp.zoomboxalpha / 100.0f));
 
       g.drawImage(tinyMap, tinyx, tinyy, tinyw, tinyh, this);
-      // draw lens border
+      // draw border
       g.setColor(Color.black);
       g.drawRect(tinyx, tinyy, tinyw, tinyh);
     } else if(GUIProp.mapinteraction == 2) {
-      g.drawImage(hugeMap, mouseX - fkt * GUIProp.fishw / 2, mouseY - fkt
-          * GUIProp.fishh / 2, mouseX + fkt * GUIProp.fishw / 2, mouseY + fkt
-          * GUIProp.fishh / 2, fkt * (mouseX / 2 - GUIProp.fishw / 2), fkt
-          * (mouseY / 2 - GUIProp.fishh / 2), fkt
-          * (mouseX / 2 + GUIProp.fishw / 2), fkt
-          * (mouseY / 2 + GUIProp.fishh / 2), this);
+      // [JH] stop rectangle at borders
+      int dxstart = mouseX - GUIProp.fishw / 2;
+      int dxend = mouseX + GUIProp.fishw / 2;
+      if(dxstart < 0) {
+        dxstart = 0;
+        dxend = GUIProp.fishw;
+      } else if(dxend > getWidth()) {
+        dxend = getWidth();
+        dxstart = getWidth() - GUIProp.fishw;
+      }
+      
+      int dystart = mouseY - GUIProp.fishh / 2;
+      int dyend = mouseY + GUIProp.fishh / 2;
+      if(dystart < 0) {
+        dystart = 0;
+        dyend = GUIProp.fishh;
+      } else if(dyend > getHeight()) {
+        dyend = getHeight();
+        dystart = getHeight() - GUIProp.fishh;
+      }
+      
+      int sxstart = fkt * mouseX - GUIProp.fishw / 2;
+      int sxend = fkt * mouseX + GUIProp.fishw / 2;
+      if(sxstart < 0) {
+        sxstart = 0;
+        sxend = GUIProp.fishw;
+      } else if(sxend > hugeMap.getWidth()) {
+        sxend = hugeMap.getWidth();
+        sxstart = hugeMap.getWidth() - GUIProp.fishw;
+      }
+      
+      int systart = fkt * mouseY - GUIProp.fishh / 2;
+      int syend = fkt * mouseY + GUIProp.fishh / 2;
+      if(systart < 0) {
+        systart = 0;
+        syend = GUIProp.fishh;
+      } else if(syend > hugeMap.getHeight()) {
+        syend = hugeMap.getHeight();
+        systart = hugeMap.getHeight() - GUIProp.fishh;
+      }     
+      
+      g.drawImage(hugeMap, dxstart, dystart, dxend, dyend, 
+          sxstart, systart, sxend, syend, this);
 
-      // draw lens border
+      // draw border
       g.setColor(Color.black);
-      g.drawRect(mouseX - fkt * GUIProp.fishw / 2, mouseY - fkt * GUIProp.fishh
-          / 2, fkt * GUIProp.fishw, fkt * GUIProp.fishh);
+      g.drawRect(dxstart, dystart, GUIProp.fishw, GUIProp.fishh);
     }
     gui.painting = false;
   }
@@ -578,29 +617,6 @@ public final class MapView extends View implements Runnable {
     } else if(GUIProp.mapinteraction == 2) {
 
       repaint();
-//      Graphics g = this.getGraphics();
-
-      // final MapRect rect = new MapRect(0, 0, mywidth, myheight, 0, 0);
-      //
-      // final Nodes nodes = new Nodes(focused.pre, data);
-      // final BufferedImage bi = new BufferedImage(mywidth, myheight,
-      // BufferedImage.TYPE_INT_BGR);
-      //
-      // tinyLayout = new MapLayout(nodes.data, textLen);
-      // tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
-      // nodes.size() - 1, 0);
-      //
-      // MapRects rects = new MapRects();
-      // rects.add(focused);
-      //
-      // painter.init(tinyLayout.rectangles.copy());
-      // drawMap(bi, tinyLayout.rectangles);
-      //        
-      // Rectangle srcrect = new Rectangle(fkt * (mouseX - (GUIProp.fishw / 2)),
-      // fkt * (mouseY - (GUIProp.fishh / 2)), fkt * GUIProp.fishw,
-      // fkt * GUIProp.fishh);
-      // Rectangle destrect = new Rectangle(mouseX - (GUIProp.fishw / 2),
-      // mouseY - (GUIProp.fishh / 2), GUIProp.fishw, GUIProp.fishh);
     }
   }
 
