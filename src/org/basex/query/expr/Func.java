@@ -70,7 +70,7 @@ public final class Func extends Single {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(var.name.str()).add("(...)");
-    if(var.type != null) tb.add(" as " + var.type);
+    if(var.type != null) tb.add(" " + AS + " " + var.type);
     if(expr != null) tb.add(" { " + expr + " }");
     return tb.toString();
   }

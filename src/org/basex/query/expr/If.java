@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -46,6 +47,7 @@ public final class If extends Arr {
 
   @Override
   public String toString() {
-    return "if " + expr[0] + " then " + expr[1] + " else " + expr[2];
+    return IF + " " + expr[0] + " " + THEN + " " + expr[1] + " " +
+      ELSE + " " + expr[2];
   }
 }

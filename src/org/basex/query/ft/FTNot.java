@@ -9,7 +9,7 @@ import org.basex.query.iter.FTIter;
 
 /**
  * FTUnaryNot expression.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
@@ -56,13 +56,12 @@ public final class FTNot extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    final boolean ia = expr[0].indexAccessible(ic);
     ic.ftnot ^= true;
     ic.seq = ic.ftnot;
-    final boolean ia = expr[0].indexAccessible(ic);
-    ic.is = Integer.MAX_VALUE;
     return ia;
   }
-  
+
   @Override
   public boolean usesExclude() {
     return true;

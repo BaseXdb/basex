@@ -65,6 +65,6 @@ public final class Castable extends Single {
 
   @Override
   public String toString() {
-    return expr + " castable as " + seq;
+    return expr + " " + CASTABLE + " " + AS + " " + seq;
   }
 }

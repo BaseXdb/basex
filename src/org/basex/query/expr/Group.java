@@ -3,12 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-//import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
@@ -152,14 +150,14 @@ public class Group extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(GROUPBY);
-    for(int o = 0; o != grp.length - 1; o++) grp[o].plan(ser);
+    for(int o = 0; o != grp.length; o++) grp[o].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" group by ");
-    for(int l = 0; l != grp.length - 1; l++) {
+    final StringBuilder sb = new StringBuilder(" " + GROUP + " " + BY + " ");
+    for(int l = 0; l != grp.length; l++) {
       sb.append((l != 0 ? ", " : "") + grp[l]);
     }
     return sb.toString();

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -103,6 +104,6 @@ public final class And extends Arr {
 
   @Override
   public String toString() {
-    return toString(" and ");
+    return toString(" " + AND + " ");
   }
 }

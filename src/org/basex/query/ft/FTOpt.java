@@ -265,6 +265,7 @@ public final class FTOpt extends ExprInfo {
     if(is(DC)) ser.attribute(token(QueryTokens.DIACRITICS), TRUE);
     if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE) , TRUE);
     if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE) , TRUE);
+    if(weight != null) weight.plan(ser);
   }
 
   @Override

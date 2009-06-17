@@ -57,12 +57,8 @@ public final class FTItem extends DBNode {
    * Merges the current item with an other node. Called by the index variant.
    * @param ctx query context
    * @param i1 second node
-   * @param w number of words
    */
-  public void union(final QueryContext ctx, final FTItem i1, final int w) {
-    // [CG] dummy
-    if(w != w) return;
-
+  public void union(final QueryContext ctx, final FTItem i1) {
     // [CG] FT: check pre != n.pre before call
     //matches[0].union(i1.matches[0], w);
     score = ctx.score.or(score, i1.score);

@@ -188,9 +188,7 @@ public class Var extends Expr implements Cloneable {
   public String toString() {
     final TokenBuilder sb = new TokenBuilder(DOLLAR);
     sb.add(name.str());
-    if(type != null) sb.add(" as " + type);
-    //if(item != null) sb.add(" = " + item);
-    //else if(expr != null) sb.add(" = " + expr);
+    if(type != null) sb.add(" " + AS + " " + type);
     return sb.toString();
   }
 }

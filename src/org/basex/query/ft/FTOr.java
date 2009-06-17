@@ -6,7 +6,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.util.IntList;
 
 /**
  * FTOr expression.
@@ -23,31 +22,65 @@ public final class FTOr extends FTExpr {
     super(e);
   }
 
-  /**
-   * Index constructor.
-   * @param posex pointer on expression
-   * @param ftnot flag for ftnot expression
-   * @param e expression list
-   */
-  FTOr(final FTExpr[] e, final int[] posex, final boolean ftnot) {
-    super(e);
-    pex = posex;
-    not = ftnot;
+  @Override
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    final FTItem it = expr[0].atomic(ctx);
+    for(int e = 1; e < expr.length; e++) {
+      final FTItem i = expr[e].atomic(ctx);
+      it.all.or(i.all);
+      it.score(ctx.score.or(it.score(), i.score()));
+    }
+    return it;
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    FTItem it = null; 
-    for(final FTExpr e : expr) {
-      final FTItem i = e.atomic(ctx);
-      if(it != null) {
-        it.all.or(i.all);
-        it.score(ctx.score.or(it.score(), i.score()));
-      } else {
-        it = i;
-      }
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    // initialize iterators
+    final FTIter[] ir = new FTIter[expr.length];
+    final FTItem[] it = new FTItem[expr.length];
+    for(int e = 0; e < expr.length; e++) {
+      ir[e] = expr[e].iter(ctx);
+      it[e] = ir[e].next();
     }
-    return it;
+    
+    return new FTIter() {
+      @Override
+      public FTItem next() throws QueryException { 
+        // find item with smallest pre value
+        int p = -1;
+        for(int i = 0; i < it.length; i++) {
+          if(it[i] != null && (p == -1 || it[p].pre > it[i].pre)) p = i;
+        }
+        // no items left - leave
+        if(p == -1) return null;
+
+        // merge all matches
+        final FTItem item = it[p];
+        for(int i = 0; i < it.length; i++) {
+          if(it[i] != null && p != i && item.pre == it[i].pre) {
+            item.all.or(it[i].all);
+            it[i] = ir[i].next();
+          }
+        }
+        it[p] = ir[p].next();
+        return item;
+      }
+    };
+  }
+  
+  @Override
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    // [CG] FT: negative variants currently ignored due to various syntax issues
+    //   e.g. (ftnot 'a') ftor (ftnot 'b' with stemming)
+    
+    int sum = 0;
+    for(int i = 0; i < expr.length; i++) {
+      if(!expr[i].indexAccessible(ic) || ic.ftnot) return false;
+      sum += ic.is;
+      ic.ftnot = false;
+    }
+    ic.is = sum;
+    return true;
   }
 
   @Override
@@ -59,11 +92,23 @@ public final class FTOr extends FTExpr {
   
   // [CG] FT: to be revised...
   
-  /** Index of positive expressions. */
+  /**
+   * Index constructor.
+   * @param posex pointer on expression
+   * @param ftnot flag for ftnot expression
+   * @param e expression list
+  FTOr(final FTExpr[] e, final int[] posex, final boolean ftnot) {
+    super(e);
+    pex = posex;
+    not = ftnot;
+  }
+   */
+
+  /** Index of positive expressions.
   int[] pex;
-  /** Index of negative (ftnot) expressions. */
+  /** Index of negative (ftnot) expressions.
   int[] nex;
-  /** Flag if one result was a ftnot. */
+  /** Flag if one result was a ftnot.
   boolean not;
   
   @Override
@@ -73,11 +118,11 @@ public final class FTOr extends FTExpr {
     for(int i = 0; i < expr.length; i++) ir[i] = expr[i].iter(ctx);
     
     return new FTIter() {
-      /** Item array. */
+      /** Item array.
       final FTItem[] it = new FTItem[pex.length];
-      /** Cache for one of the nodes. */
+      /** Cache for one of the nodes.
       final IntList cp = new IntList(pex);
-      /** Pointer on the positive expression with the lowest pre-values.*/
+      /** Pointer on the positive expression with the lowest pre-values.
       int minp = -1;
 
       @Override
@@ -130,30 +175,23 @@ public final class FTOr extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    // [CG] FT: skip index access
-    if(1 == 1) return false;
-
     final IntList ip = new IntList();
     final IntList in = new IntList();
     final int min = ic.is;
     int sum = 0;
 
     for(int i = 0; i < expr.length; i++) {
-      final boolean ftnot = ic.ftnot;
-      ic.ftnot = false;
-      final boolean ia = expr[i].indexAccessible(ic);
+      if(!expr[i].indexAccessible(ic)) return false;
       final boolean ftn = ic.ftnot;
-      ic.ftnot = ftnot;
-      if(!ia) return false;
+      ic.ftnot = false;
 
+      // [CG] FT: temporary
+      if(ftn) return false;
+      
       if(ftn) {
-        if(ic.is > 0) in.add(i);
-        else {
-          ic.seq = true;
-          ic.is = Integer.MAX_VALUE;
-          return false;
-        }
-      } else if(ic.is > 0) {
+        if(ic.is == 0) return false;
+        in.add(i);
+      } else {
         ip.add(i);
         sum += ic.is;
       }
@@ -161,37 +199,26 @@ public final class FTOr extends FTExpr {
     nex = in.finish();
     pex = ip.finish();
 
-    if(pex.length == 0 && nex.length > 0) {
+    // negative expressions found
+    if(nex.length > 0) {
       ic.seq = true;
       ic.is = Integer.MAX_VALUE;
-    } else if(nex.length > 0 && pex.length > 0) {
-      ic.seq = true;
-      ic.is = Integer.MAX_VALUE;
-      /* [SG] find solution here
-       *
-       * Will get complicated for arbitrarily mixed and nested pos./neg.
-       * expressions..  A | !(B & (!C & D)) etc.
-       *
-       * Approach from the relational world (but not really worth the trouble):
-       * Normalization to DNF/CNF.
-       */
-      return false;
-    } else {
-      ic.is = sum > min ? min : sum;
-    } 
+      return pex.length == 0;
+    }
+    
+    ic.is = sum > min ? min : sum;
     return true;
   }
   
   @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int i = 0; i < expr.length; i++) expr[i] = expr[i].indexEquivalent(ic);
-
-    if(pex.length == 0) {
+    if(nex.length > 0) {
       // !A FTOR !B = !(a ftand b)
-      FTExpr[] nexpr = new FTExpr[nex.length];
+      final FTExpr[] nexpr = new FTExpr[nex.length];
       for(int i = 0; i < nex.length; i++) nexpr[i] = expr[nex[i]].expr[0];
       return new FTNot(new FTAnd(nexpr, pex, nex));
     }
+    return pex.length == 1 ? expr[0] : this;
 
     if(nex.length == 0) return pex.length == 1 ? expr[pex[0]] : this;
     
@@ -199,5 +226,5 @@ public final class FTOr extends FTExpr {
     pex = new int[expr.length];
     for(int i = 0; i < expr.length; i++) pex[i] = i;
     return this;
-  }
+  }*/
 }

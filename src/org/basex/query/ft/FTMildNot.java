@@ -3,13 +3,11 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.FTMatches;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Err;
-import org.basex.util.IntList;
 
 /**
  * FTMildnot expression.
@@ -38,7 +36,12 @@ public final class FTMildNot extends FTExpr {
     if(all.size == 0) item.score(0);
     return item;
   }
-  
+
+  @Override
+  public FTIter iter(final QueryContext ctx) {
+    return null;
+  }
+
   @Override
   public String toString() {
     return toString(" " + NOT + " " + IN + " ");
@@ -46,7 +49,7 @@ public final class FTMildNot extends FTExpr {
 
 
   
-  // [CG] FT: to be revised...
+  /* [CG] FT: to be revised...
   
   @Override
   public FTIter iter(final QueryContext ctx) {
@@ -108,7 +111,6 @@ public final class FTMildNot extends FTExpr {
         n1 = null;
         n0 = null;
         return next();
-        */
       }
     };
   }
@@ -158,4 +160,5 @@ public final class FTMildNot extends FTExpr {
     }
     return new FTAnd(mne, pex, new int[] {});
   }
+        */
 }

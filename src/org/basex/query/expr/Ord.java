@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -112,8 +113,8 @@ public final class Ord extends Expr {
   public String toString() {
     if(expr == null) return "";
     final StringBuilder sb = new StringBuilder(expr.toString());
-    if(desc) sb.append(" descending");
-    if(!lst) sb.append(" empty greatest");
+    if(desc) sb.append(" " + DESCENDING);
+    if(!lst) sb.append(" " + EMPTYORD + " " + GREATEST);
     return sb.toString();
   }
 }

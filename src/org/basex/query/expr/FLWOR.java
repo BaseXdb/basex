@@ -203,9 +203,9 @@ public class FLWOR extends Expr {
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
-    if(where != null) sb.append(" where " + where);
+    if(where != null) sb.append(" " + WHERE + " " + where);
     if(order != null) sb.append(order);
     if(group != null) sb.append(group);
-    return sb.append(" return " + ret).toString();
+    return sb.append(" " + RETURN + " " + ret).toString();
   }
 }

@@ -70,6 +70,6 @@ public final class Treat extends Single {
 
   @Override
   public String toString() {
-    return expr + " castable?";
+    return expr + " " + TREAT + " " + AS + " " + seq;
   }
 }

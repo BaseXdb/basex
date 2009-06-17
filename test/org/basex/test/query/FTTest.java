@@ -319,6 +319,10 @@ public final class FTTest extends AbstractTest {
         "//* [text() ftcontains 'hola' ftor 'hello']" },
       { "FTAndOr 9", nodes(),
         "//* [text() ftcontains 'hola' ftand 'hello']" },
+      { "FTAndOr 10", nodes(14),
+        "//w [text() ftcontains 'HELLO' ftand ('hello' with stemming)]" },
+      { "FTAndOr 11", nodes(14),
+        "//w [text() ftcontains 'HELLO' ftand ('hello') with stemming]" },
 
       { "FTStemming 1", nodes(7, 9, 11),
         "//w [text() ftcontains 'xml database' with stemming]" },

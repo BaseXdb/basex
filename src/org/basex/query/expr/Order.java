@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -249,7 +250,7 @@ public final class Order extends Expr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" order by ");
+    final StringBuilder sb = new StringBuilder(" " + ORDER + " " + BY + " ");
     for(int l = 0; l != ord.length - 1; l++) {
       sb.append((l != 0 ? ", " : "") + ord[l]);
     }
