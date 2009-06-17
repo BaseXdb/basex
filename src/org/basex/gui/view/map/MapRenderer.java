@@ -364,7 +364,7 @@ final class MapRenderer {
     ttcol = new IntList();
     tl = new TokenList();
     int ml = 0;
-    for (int i = 0; i < data[0].length; i++) {
+    for(int i = 0; i < data[0].length; i++) {
       wl = (int) (data[0][i] * r.thumbf);
       e += data[0][i] * r.thumbf - wl;
 
@@ -402,7 +402,7 @@ final class MapRenderer {
         ml = ml == 0 ? getTooltipLength((int) ww) : ml;
         final byte[] tok = new byte[data[0][i] + 2 < ml ? data[0][i] : ml];
         int k = 0;
-        for (; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
+        for(; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
           tok[k] = (byte) data[3][cchars - data[0][i] + k];
 
         if(ftp != null) {
@@ -500,7 +500,7 @@ final class MapRenderer {
       int nl = 1;
       int wi = rw / 2;
       final IntList len = new IntList();
-      for (int i = 0; i < tl.size; i++) {
+      for(int i = 0; i < tl.size; i++) {
         l = 0;
         for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n])) {
           l += BaseXLayout.width(g, cw, cp(tl.list[i], n));
@@ -530,7 +530,7 @@ final class MapRenderer {
 
       g.setColor(COLORS[20]);
       wl = 0;
-      for (int i = 0; i < tl.size; i++) {
+      for(int i = 0; i < tl.size; i++) {
         l = len.list[i];
         if(wl + l + sw >= wi) {
           yy += GUIProp.fontsize + 1;
@@ -589,7 +589,7 @@ final class MapRenderer {
     tl = new TokenList();
     ttcol = new IntList();
     boolean ir;
-    for (int i = 0; i < data[0].length; i++) {
+    for(int i = 0; i < data[0].length; i++) {
       ir = false;
       wl = (int) (data[0][i] * r.thumbf);
       error += data[0][i] * r.thumbf - wl;
@@ -647,7 +647,7 @@ final class MapRenderer {
           // append punctuation mark
           apm = psl < data[1].length && data[1][psl] == sl;
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
-          for (int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
+          for(int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
             tok[k] = (byte) data[3][p + k];
           }
 
@@ -695,7 +695,7 @@ final class MapRenderer {
         final int[] tc = ttcol.finish();
         tl = new TokenList();
         ttcol = new IntList();
-        for (int j = toks.length - 1; j > -1; j--) {
+        for(int j = toks.length - 1; j > -1; j--) {
           tl.add(toks[j]);
           ttcol.add(tc[j]);
         }
@@ -716,7 +716,7 @@ final class MapRenderer {
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
           l = 0;
 
-          for (int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
+          for(int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
             tok[k] = (byte) data[3][p + k];
           }
 

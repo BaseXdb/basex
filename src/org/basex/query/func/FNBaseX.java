@@ -11,8 +11,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
-import org.basex.query.ft.FTIndex;
 import org.basex.query.ft.FTIndexAccess;
+import org.basex.query.ft.FTWords;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
@@ -99,7 +99,7 @@ final class FNBaseX extends Fun {
 
     if(type.equals(FULLTEXT)) {
       if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
-      return new FTIndexAccess(new FTIndex(data, word, ctx.ftpos == null),
+      return new FTIndexAccess(new FTWords(data, word, ctx.ftpos == null),
           new Tokenizer(word), ic).iter(ctx);
     }
     

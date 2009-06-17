@@ -101,7 +101,7 @@ public final class Context {
           final String method = "[BaseX.close] ";
           BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
           // -- unmount running fuse.
-          for (int i = 3; i > 0; i--) {
+          for(int i = 3; i > 0; i--) {
             Performance.sleep(1000);
             BaseX.err(i + " .. ");
           }

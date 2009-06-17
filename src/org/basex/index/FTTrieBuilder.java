@@ -1,17 +1,10 @@
 package org.basex.index;
 
-import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
-import org.basex.core.Progress;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Tokenizer;
 
 /**
  * This class builds an index for text contents in a compressed trie.
@@ -20,17 +13,11 @@ import org.basex.util.Tokenizer;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTTrieBuilder extends Progress implements IndexBuilder {
-  /** Word parser. */
-  private final Tokenizer wp = new Tokenizer();
+public final class FTTrieBuilder extends FTBuilder {
   /** CTArray for tokens. */
-  private FTArray index;
-  /** Current parsing value. */
-  private int id;
-  /** Current parsing value. */
-  private int total;
+  private final FTArray index = new FTArray(128);
   /** Hash structure for temporarily saving the tokens. */
-  private FTHash hash;
+  private FTHash hash = new FTHash();
 
   /**
    * Builds the index structure and returns an index instance.
@@ -38,40 +25,48 @@ public final class FTTrieBuilder extends Progress implements IndexBuilder {
    * @return index instance
    * @throws IOException IO Exception
    */
-  public FTTrie build(final Data data) throws IOException {
-    final Performance p = new Performance();
+  public FTIndex build(final Data data) throws IOException {
+    index(data);
+    return new FTTrie(data);
+  }
 
-    wp.cs = data.meta.ftcs;
-    int s = 0;
-    index = new FTArray(128);
-    hash = new FTHash();
+  @Override
+  void index(final byte[] tok) {
+    hash.index(tok, id, wp.pos);
+  }
 
-    total = data.meta.size;
-    for(id = 0; id < total; id++) {
-      checkStop();
-      if(data.kind(id) == Data.TEXT) index(data.text(id));
-    }
-
-    if(Prop.debug) {
-      Performance.gc(3);
-      BaseX.debug("- Indexed: % (%)", p, Performance.getMem());
-    }
-
+  @Override
+  void write(final Data data) throws IOException {
     final String db = data.meta.dbname;
-    final DataOutput outPre = new DataOutput(db, DATAFTX + 'b');
-    bulkLoad(outPre, true);
+    final DataOutput outb = new DataOutput(db, DATAFTX + 'b');
 
-    if(Prop.debug) {
-      Performance.gc(3);
-      BaseX.debug("- Hash&Trie: % (%)", p, Performance.getMem());
+    hash.init();
+
+    while(hash.more()) {
+      final int p = hash.next();
+      final byte[] tok = hash.key();
+      final int ds = hash.ns[p];
+      final long cpre = outb.size();
+
+      // write compressed pre and pos arrays
+      final byte[] vpre = hash.pre[p];
+      final byte[] vpos = hash.pos[p];
+      int lpre = 4;
+      int lpos = 4;
+
+      // ftdata is stored here, with pre1, pos1, ..., preu, posu
+      final int pres = Num.size(vpre);
+      final int poss = Num.size(vpos);
+      while(lpre < pres && lpos < poss) {
+        for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
+          outb.write(vpre[lpre++]);
+        for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
+          outb.write(vpos[lpos++]);
+      }
+      index.insertSorted(tok, ds, cpre);
     }
 
     hash = null;
-
-    if(Prop.debug) {
-      Performance.gc(3);
-      BaseX.debug("- Compressed: % (%)", p, Performance.getMem());
-    }
 
     final byte[][] tokens = index.tokens.list;
     final int[][] next = index.next.list;
@@ -89,6 +84,7 @@ public final class FTTrieBuilder extends Progress implements IndexBuilder {
 
     // document contains any text nodes -> empty index created;
     // only root node is kept
+    int s = 0;
     if(index.count != 1) {
       // index.next[i] : [p, n1, ..., s, d]
       // index.tokens[p], index.next[n1], ..., index.pre[d]
@@ -146,15 +142,9 @@ public final class FTTrieBuilder extends Progress implements IndexBuilder {
     }
 
     outS.writeInt(s);
-    outPre.close();
+    outb.close();
     outN.close();
     outS.close();
-
-    if(Prop.debug) {
-      Performance.gc(3);
-      BaseX.debug("- Written: % (%)", p, Performance.getMem());
-    }
-    return new FTTrie(data);
   }
 
   /**
@@ -167,99 +157,5 @@ public final class FTTrieBuilder extends Progress implements IndexBuilder {
     long l = (long) ar[p] << 16;
     l += -ar[p + 1] & 0xFFFF;
     return l;
-  }
-
-  /**
-   * Adds the data to each token.
-   * @param outPre DataOutput
-   * @param ittr boolean iterator optimized storage
-   * @throws IOException IOEXception
-   */
-  private void bulkLoad(final DataOutput outPre, final boolean ittr)
-      throws IOException {
-
-    hash.init();
-    long cpre;
-    int ds, p, lpre, lpos, spre, spos;
-    byte[] tok, vpre, vpos;
-
-    while(hash.more()) {
-      p = hash.next();
-      tok = hash.key();
-      ds = hash.ns[p];
-      cpre = outPre.size();
-
-      vpre = hash.pre[p];
-      vpos = hash.pos[p];
-      lpre = 4;
-      lpos = 4;
-      spre = Num.size(vpre);
-      spos = Num.size(vpos);
-
-      if (ittr) {
-        // ftdata is stored here, with pre1, pos1, ..., preu, posu
-        while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
-          int z = 0;
-          while (z < Num.len(vpre, lpre)) {
-            outPre.write(vpre[lpre + z++]);
-          }
-          lpre += z;
-          z = 0;
-          while (z < Num.len(vpos, lpos)) {
-            outPre.write(vpos[lpos + z++]);
-          }
-          lpos += z;
-        }
-      } else {
-        // ftdata is stored here, with pre1, ..., preu in outPre and
-        // pos1, ..., posu in outPos
-        for (int z = 4; z < spre; z++) outPre.write(vpre[z]);
-        for (int z = 4; z < spos; z++) outPre.write(vpos[z]);
-      }
-      index.insertSorted(tok, ds, cpre);
-    }
-  }
-
-  /**
-   * Extracts and indexes words from the specified byte array.
-   * @param tok token to be extracted and indexed
-   */
-  private void index(final byte[] tok) {
-    wp.init(tok);
-    while(wp.more()) index();
-  }
-
-  /**
-   * Indexes a single token and returns its unique id.
-   */
-  private void index() {
-    final byte[] tok = wp.get();
-    if(tok.length > Token.MAXLEN) return;
-    index(tok, id, wp.pos);
-  }
-
-  /**
-   * Indexes a single token.
-   * @param tok token to be indexed
-   * @param pre pre value of the token
-   * @param pos value position value of the token
-   */
-  private void index(final byte[] tok, final int pre, final int pos) {
-    hash.index(tok, pre, pos);
-  }
-
-  @Override
-  public String tit() {
-    return PROGINDEX;
-  }
-
-  @Override
-  public String det() {
-    return INDEXFTX;
-  }
-
-  @Override
-  public double prog() {
-    return (double) id / total;
   }
 }

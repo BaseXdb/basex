@@ -3,7 +3,6 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;

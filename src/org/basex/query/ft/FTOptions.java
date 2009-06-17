@@ -76,11 +76,6 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    return new FTOptions(expr[0].indexEquivalent(ic), opt);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     opt.plan(ser);

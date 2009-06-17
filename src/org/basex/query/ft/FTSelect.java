@@ -1,13 +1,13 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
-
 import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.util.Tokenizer;
 
 /**
@@ -19,6 +19,8 @@ import org.basex.util.Tokenizer;
 public class FTSelect extends FTExpr {
   /** Filter array. */
   final FTFilter[] filter;
+  /** Content flag. If true, the actual text nodes must be parsed. */
+  boolean content;
 
   /**
    * Constructor.
@@ -28,6 +30,7 @@ public class FTSelect extends FTExpr {
   public FTSelect(final FTExpr e, final FTFilter... f) {
     super(e);
     filter = f;
+    for(final FTFilter fl : f) content |= fl.content();
   }
 
   @Override
@@ -43,6 +46,26 @@ public class FTSelect extends FTExpr {
     final FTItem it = expr[0].atomic(ctx);
     filter(ctx, it, ctx.fttoken);
     return it;
+  }
+
+  @Override
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    final FTIter ir = expr[0].iter(ctx);
+
+    return new FTIter() {
+      @Override
+      public FTItem next() throws QueryException {
+        FTItem it;
+        while((it = ir.next()) != null && !standard()) {
+          // [SG] this here won't be executed as, currently, no filters
+          //   are allowed for the the index version (see FTSelect)
+          //it.convertPos();
+          final Tokenizer tok = content ? new Tokenizer(it.str()) : null;
+          if(filter(ctx, it, tok)) break;
+        }
+        return it;
+      }
+    };
   }
 
   /**
@@ -79,12 +102,6 @@ public class FTSelect extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     return expr[0].indexAccessible(ic);
-  }
-
-  @Override
-  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    expr[0] = expr[0].indexEquivalent(ic);
-    return new FTSelectIndex(this);
   }
 
   @Override

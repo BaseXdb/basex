@@ -16,13 +16,13 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FTContainsSIndex extends FTContains {
+public final class FTContainsIndex extends FTContains {
   /** Not flag. */ 
-  final boolean not;
+  private final boolean not;
   /** Current node item. */
-  FTItem ftn;
+  private FTItem ftn;
   /** Node iterator. */
-  FTIter fti;
+  private FTIter fti;
   
   /**
    * Constructor.
@@ -30,7 +30,7 @@ public final class FTContainsSIndex extends FTContains {
    * @param fte full-text expression
    * @param n not flag
    */
-  public FTContainsSIndex(final Expr e, final FTExpr fte, final boolean n) {
+  public FTContainsIndex(final Expr e, final FTExpr fte, final boolean n) {
     super(e, fte);
     not = n;
   }
@@ -63,40 +63,5 @@ public final class FTContainsSIndex extends FTContains {
     
     ctx.fttoken = tmp;
     return Bln.get(found ? 1 : 0);
-  }
-
-  /*
-  @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
-    final Iter ir = expr.iter(ctx);
-    final Tokenizer tmp = ctx.fttoken;
-    ctx.fttoken = ft;
-    
-    if(fti == null) fti = ftexpr.iter(ctx); 
-    if(ftn == null) ftn = fti.next();
-
-    boolean found = false;
-    DBNode n = null;
-    while(!found && (n = (DBNode) ir.next()) != null) {
-      while(ftn != null && n.pre > ftn.pre) ftn = fti.next();
-      found = (ftn != null && ftn.pre == n.pre) ^ not;
-      if(not && !found) ftn = null;
-    }
-    if(n == null) fti = null;
-
-    System.out.println(n);
-
-    // add entry to visualization
-    if(found && ctx.ftpos != null && !not) ctx.ftpos.add(ftn.pre, ftn.all);
-    
-    ctx.fttoken = tmp;
-    return Bln.get(found ? 1 : 0);
-  }
-  */
-
-  
-  @Override
-  public String toString() {
-    return expr + " ftcontainsSI " + ftexpr;
   }
 }

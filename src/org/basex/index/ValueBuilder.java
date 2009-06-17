@@ -51,8 +51,8 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     total = data.meta.size;
     final int type = text ? Data.TEXT : Data.ATTR;
     for(id = 0; id < total; id++) {
-      checkStop();
       if(data.kind(id) != type) continue;
+      checkStop();
       final byte[] tok = text ? data.text(id) : data.attValue(id);
       // skip too long and pure whitespace tokens
       if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, id);

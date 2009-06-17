@@ -53,20 +53,6 @@ public final class FTNot extends FTExpr {
     }
     return it;
   }
-  
-  @Override
-  public boolean usesExclude() {
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return FTNOT + " " + expr[0];
-  }
-
-
-
-  // [CG] FT: to be revised...
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
@@ -76,10 +62,14 @@ public final class FTNot extends FTExpr {
     ic.is = Integer.MAX_VALUE;
     return ia;
   }
+  
+  @Override
+  public boolean usesExclude() {
+    return true;
+  }
 
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    expr[0] = expr[0].indexEquivalent(ic);
-    return this;
+  public String toString() {
+    return FTNOT + " " + expr[0];
   }
 }

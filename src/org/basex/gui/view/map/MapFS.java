@@ -21,7 +21,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -333,10 +332,11 @@ final class MapFS extends MapPainter {
     
     final int size = data.size(pre, Data.ELEM);
     rect.pos = null;
-    for(int i = size - 1; i > -1; i--) if (data.kind(pre + i) == Data.ELEM 
-        && Token.eq(data.tag(pre + i), "content".getBytes())) {
-      rect.pos = view.gui.context.marked().ftpos.get(pre + i + 1);
-      break;
+    for(int i = pre; i < pre + size; i++) {
+      if(data.kind(i) == Data.ELEM && data.tagID(i) == fs.contentID) {
+        rect.pos = view.gui.context.marked().ftpos.get(i + 1);
+        break;
+      }
     }
     
     // Check if text fits in rectangle

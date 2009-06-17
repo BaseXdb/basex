@@ -2,7 +2,6 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -121,16 +120,16 @@ public final class FTMildNot extends FTExpr {
 
     final int mmin = ic.is;
     IntList il = new IntList(expr.length - 1);
-    for (int i = 1; i < expr.length; i++) {
+    for(int i = 1; i < expr.length; i++) {
       if(!expr[i].indexAccessible(ic)) return false;
-      if (ic.is > 0) il.add(i);
+      if(ic.is > 0) il.add(i);
     }
     
     if(il.size < expr.length - 1) {
       FTExpr[] e = new FTExpr[il.size + 1];
       e[0] = expr[0];
       int c = 1;
-      for (int i = 0; i < il.size; i++) e[c++] = expr[il.list[i]];
+      for(int i = 0; i < il.size; i++) e[c++] = expr[il.list[i]];
       expr = e;
     }
     final boolean ia = expr[0].indexAccessible(ic);
@@ -157,6 +156,6 @@ public final class FTMildNot extends FTExpr {
     if(mne.length == 1) {
       return mne[0];
     }
-    return new FTIntersection(pex, new int[] {}, mne);
+    return new FTAnd(mne, pex, new int[] {});
   }
 }

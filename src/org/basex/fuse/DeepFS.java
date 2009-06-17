@@ -61,6 +61,8 @@ public final class DeepFS extends DeepFuse implements DataText {
   public int sizeID;
   /** Index References. */
   public int nameID;
+  /** Index References. */
+  public int contentID;
   
   /*
    * ------------------------------------------------------------------------
@@ -98,6 +100,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     dirID          = data.tags.index(DIR,          null, false);
     fileID         = data.tags.index(FILE,         null, false);
     unknownID      = data.tags.index(UNKNOWN,      null, false);
+    contentID      = data.tags.index(CONTENT,      null, false);
     backingstoreID = data.atts.index(BACKINGSTORE, null, false);
     mountpointID   = data.atts.index(MOUNTPOINT,   null, false);
     nameID         = data.atts.index(NAME,         null, false);

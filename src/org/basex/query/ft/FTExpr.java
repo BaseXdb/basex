@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -9,7 +8,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.FTItem;
-import org.basex.query.item.Item;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Var;
 
@@ -38,24 +36,23 @@ public abstract class FTExpr extends Expr {
     return this;
   }
 
+  /**
+   * This method is called by the sequential full-text evaluation.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException evaluation exception
+   */
   @Override
-  public FTIter iter(final QueryContext ctx) throws QueryException {
-    final FTItem it = atomic(ctx);
-    return new FTIter() {
-      private boolean more;
-      @Override
-      public FTItem next() { return (more ^= true) ? it : null; }
-      @Override
-      public int size() { return 1; }
-      @Override
-      public Item get(final long i) { return i == 0 ? it : null; }
-    };
-  }
+  public abstract FTItem atomic(final QueryContext ctx) throws QueryException;
 
+  /**
+   * This method is called by the index-based full-text evaluation.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException evaluation exception
+   */
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    return iter(ctx).next();
-  }
+  public abstract FTIter iter(final QueryContext ctx) throws QueryException;
     
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
@@ -81,10 +78,9 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    BaseX.notexpected();
-    return null;
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].indexEquivalent(ic);
+    return this;
   }
 
   /**
