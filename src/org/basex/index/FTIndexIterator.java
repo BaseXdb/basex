@@ -1,5 +1,7 @@
 package org.basex.index;
 
+import org.basex.data.FTMatches;
+
 /**
  * This interface provides methods for returning index results.
  * 
@@ -19,14 +21,14 @@ public abstract class FTIndexIterator extends IndexIterator {
     @Override
     public int next() { return 0; };
     @Override
-    public FTEntry node() { return null; };
+    public FTMatches matches() { return null; };
   };
 
   /**
-   * Returns the next node.
-   * @return FTNode next node
+   * Returns the next match.
+   * @return next match
    */
-  public abstract FTEntry node();
+  public abstract FTMatches matches();
 
   /**
    * Sets the unique token number. Used for visualization.
@@ -46,30 +48,31 @@ public abstract class FTIndexIterator extends IndexIterator {
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
-      FTEntry r, s;
+      FTIndexIterator n, r, s;
       int c;
 
       @Override
       public boolean more() {
-        if(c <= 0) r = i1.more() ? i1.node() : null;
-        if(c >= 0) s = i2.more() ? i2.node() : null;
+        if(c <= 0) r = i1.more() ? i1 : null;
+        if(c >= 0) s = i2.more() ? i2 : null;
         if(r != null && s != null) {
-          c = r.pre - s.pre;
-          r.union(s, 0);
+          c = r.next() - s.next();
+          if(c == 0) r.matches().or(s.matches());
         } else {
           c = r != null ? -1 : 1;
         }
-        return node() != null;
+        n = c <= 0 ? r : s;
+        return n != null;
       }
 
       @Override
-      public FTEntry node() {
-        return c <= 0 ? r : s;
+      public FTMatches matches() {
+        return n.matches();
       }
 
       @Override
       public int next() {
-        return r.pre;
+        return n.next();
       }
 
       @Override
@@ -84,35 +87,34 @@ public abstract class FTIndexIterator extends IndexIterator {
    * Merges two index array iterators.
    * @param i1 first index array iterator to merge
    * @param i2 second index array iterator to merge
-   * @param w distance between two pos values
    * @return IndexArrayIterator
    */
   public static FTIndexIterator intersect(final FTIndexIterator i1,
-      final FTIndexIterator i2, final int w) {
+      final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
-      FTEntry r, s;
+      FTIndexIterator r, s;
 
       @Override
       public boolean more() {
         int c = 0;
         while(true) {
-          if(c <= 0) r = i1.more() ? i1.node() : null;
-          if(c >= 0) s = i2.more() ? i2.node() : null;
+          if(c <= 0) r = i1.more() ? i1 : null;
+          if(c >= 0) s = i2.more() ? i2 : null;
           if(r == null || s == null) return false;
-          c = r.pre - s.pre;
-          if(r.union(s, w)) return true;
+          c = r.next() - s.next();
+          if(c == 0 && r.matches().phrase(s.matches())) return true;
         }
       }
 
       @Override
-      public FTEntry node() {
-        return r;
+      public FTMatches matches() {
+        return r.matches();
       }
 
       @Override
       public int next() {
-        return r.pre;
+        return r.next();
       }
 
       @Override

@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,12 +24,31 @@ public final class FTNot extends FTExpr {
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     final FTItem it = expr[0].atomic(ctx);
+    it.all.not();
+    // needed to support negated queries without hits ('a' ftcontains ftnot 'b')
     it.score(it.score() == 0 ? 1 : 0);
     return it;
   }
-  
+
+  @Override
+  public boolean usesExclude() {
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return FTNOT + " " + expr[0];
+  }
+
+
+
+  // [CG] FT: to be revised...
+
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    // [CG] FT: skip index access
+    if(1 == 1) return false;
+
     ic.ftnot ^= true;
     // in case of ftand ftnot seq could be set false in FTAnd
     ic.seq = true;
@@ -40,15 +60,5 @@ public final class FTNot extends FTExpr {
   @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
     return new FTNotIndex(expr[0].indexEquivalent(ic));
-  }
-
-  @Override
-  public boolean usesExclude() {
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "ftnot " + expr[0];
   }
 }

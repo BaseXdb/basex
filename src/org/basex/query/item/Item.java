@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import org.basex.BaseX;
@@ -291,7 +292,7 @@ public abstract class Item extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.text(str());
+    ser.attribute(VAL, str());
     ser.closeElement();
   }
 

@@ -52,16 +52,16 @@ final class FTIntersection extends FTExpr {
         }
         
         final FTItem n1 = calcFTAnd(cp, true);
-        if(!n1.empty()) {
+        if(n1 != null) {
           nod2 = nex.length > 0 && nod2 == null && moreN() ?
               calcFTAnd(cn, false) : nod2;
           if(nod2 != null) {
-            int d = n1.fte.pre - nod2.fte.pre;
+            int d = n1.pre - nod2.pre;
             while(d > 0) {
               if(!moreN()) break;
               nod2 = calcFTAnd(cn, false);
-              if(nod2.empty()) break;
-              d = n1.fte.pre - nod2.fte.pre;
+              if(nod2 == null) break;
+              d = n1.pre - nod2.pre;
             }
             if(d != 0) return n1;
             nod2 = null;
@@ -69,7 +69,7 @@ final class FTIntersection extends FTExpr {
           }
           return n1;
         }
-        return cp.length == 0 ? calcFTAnd(cn, false) : new FTItem();
+        return cp.length == 0 ? calcFTAnd(cn, false) : null;
       }
 
       /**
@@ -82,16 +82,15 @@ final class FTIntersection extends FTExpr {
       private FTItem calcFTAnd(final FTItem[] n, final boolean p)
           throws QueryException {
 
-        if(n.length == 0) return new FTItem();
+        if(n.length == 0) return null;
         if(n.length == 1) return n[0];
 
         FTItem n1 = n[0];
         FTItem n2;
         for(int i = 1; i < n.length; i++) {
           n2 = n[i];
-          if(n1.empty()) return n1;
-          if(n2.empty()) return n2;
-          int d = n1.fte.pre - n2.fte.pre;
+          if(n1 == null || n2 == null) return null;
+          int d = n1.pre - n2.pre;
           while(d != 0) {
             if(d < 0) {
               if(i != 1) {
@@ -99,12 +98,12 @@ final class FTIntersection extends FTExpr {
                 n2 = n[i];
               }
               n1 = more(n, 0, p);
-              if(n1.empty()) return n1;
+              if(n1 == null) return null;
             } else {
               n2 = more(n, i, p);
-              if(n2.empty()) return n2;
+              if(n2 == null) return null;
             }
-            d = n1.fte.pre - n2.fte.pre;
+            d = n1.pre - n2.pre;
           }
         }
 
@@ -120,7 +119,7 @@ final class FTIntersection extends FTExpr {
       private boolean moreN() throws QueryException {
         for(int i = 0; i < cn.length; i++) {
           cn[i] = ir[nex[i]].next();
-          if(cn[i].empty()) return false;
+          if(cn[i] == null) return false;
         }
         return true;
       }
@@ -132,7 +131,7 @@ final class FTIntersection extends FTExpr {
       private void moreP() throws QueryException {
         for(int i = 0; i < cp.length; i++) {
           cp[i] = ir[pex[i]].next();
-          if(cp[i].empty()) break;
+          if(cp[i] == null) break;
         }
       }
 

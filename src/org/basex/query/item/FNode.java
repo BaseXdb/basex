@@ -82,7 +82,7 @@ public abstract class FNode extends Nod {
 
       @Override
       public Nod next() {
-        return more() ? iter.list[c++] : null;
+        return more() ? iter.item[c++] : null;
       }
     };
   }

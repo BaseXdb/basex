@@ -12,7 +12,7 @@ import org.basex.util.Array;
  */
 public final class NodIter extends NodeIter {
   /** Items. */
-  public Nod[] list;
+  public Nod[] item;
   /** Size. */
   public int size;
 
@@ -35,7 +35,7 @@ public final class NodIter extends NodeIter {
    * @param d returns if the iterator might return duplicates
    */
   public NodIter(final boolean d) {
-    list = new Nod[1];
+    item = new Nod[1];
     dupl = d;
   }
 
@@ -44,7 +44,7 @@ public final class NodIter extends NodeIter {
    * @param p deletion position
    */
   public void delete(final int p) {
-    Array.move(list, p + 1, -1, --size - p);
+    Array.move(item, p + 1, -1, --size - p);
   }
 
   /**
@@ -52,9 +52,9 @@ public final class NodIter extends NodeIter {
    * @param n node to be added
    */
   public void add(final Nod n) {
-    if(size == list.length) resize();
-    if(dupl && !sort) sort = size != 0 && list[size - 1].diff(n) > 0;
-    list[size++] = n;
+    if(size == item.length) resize();
+    if(dupl && !sort) sort = size != 0 && item[size - 1].diff(n) > 0;
+    item[size++] = n;
   }
 
   /**
@@ -62,8 +62,8 @@ public final class NodIter extends NodeIter {
    */
   private void resize() {
     final Nod[] tmp = new Nod[size << 1];
-    System.arraycopy(list, 0, tmp, 0, size);
-    list = tmp;
+    System.arraycopy(item, 0, tmp, 0, size);
+    item = tmp;
   }
 
   @Override
@@ -75,12 +75,12 @@ public final class NodIter extends NodeIter {
   @Override
   public Nod next() {
     if(dupl) sort(sort);
-    return ++pos < size ? list[pos] : null;
+    return ++pos < size ? item[pos] : null;
   }
 
   @Override
   public Item get(final long i) {
-    return i < size ? list[(int) i] : null;
+    return i < size ? item[(int) i] : null;
   }
 
   @Override
@@ -91,7 +91,7 @@ public final class NodIter extends NodeIter {
   @Override
   public Item finish() {
     if(dupl) sort(sort);
-    return Seq.get(list, size);
+    return Seq.get(item, size);
   }
 
   /**
@@ -105,7 +105,7 @@ public final class NodIter extends NodeIter {
       if(force) sort(0, size);
       int i = 1;
       for(int j = 1; j < size; j++) {
-        if(!list[i - 1].is(list[j])) list[i++] = list[j];
+        if(!item[i - 1].is(item[j])) item[i++] = item[j];
       }
       size = i;
     }
@@ -120,7 +120,7 @@ public final class NodIter extends NodeIter {
   private void sort(final int s, final int e) {
     if(e < 7) {
       for(int i = s; i < e + s; i++)
-        for(int j = i; j > s && list[j - 1].diff(list[j]) > 0; j--) s(j, j - 1);
+        for(int j = i; j > s && item[j - 1].diff(item[j]) > 0; j--) s(j, j - 1);
       return;
     }
     
@@ -136,18 +136,18 @@ public final class NodIter extends NodeIter {
       }
       m = m(l, m, n);
     }
-    final Nod v = list[m];
+    final Nod v = item[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = list[b].diff(v);
+        final int h = item[b].diff(v);
         if(h > 0) break;
         if(h == 0) s(a++, b);
         b++;
       }
       while(c >= b) {
-        final int h = list[c].diff(v);
+        final int h = item[c].diff(v);
         if(h < 0) break;
         if(h == 0) s(c, d--);
         c--;
@@ -185,9 +185,9 @@ public final class NodIter extends NodeIter {
    * @return median
    */
   private int m(final int a, final int b, final int c) {
-    return list[a].diff(list[b]) < 0 ?
-      (list[b].diff(list[c]) < 0 ? b : list[a].diff(list[c]) < 0 ? c : a) :
-       list[b].diff(list[c]) > 0 ? b : list[a].diff(list[c]) > 0 ? c : a;
+    return item[a].diff(item[b]) < 0 ?
+      (item[b].diff(item[c]) < 0 ? b : item[a].diff(item[c]) < 0 ? c : a) :
+       item[b].diff(item[c]) > 0 ? b : item[a].diff(item[c]) > 0 ? c : a;
   }
 
   /**
@@ -196,16 +196,16 @@ public final class NodIter extends NodeIter {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final Nod tmp = list[a];
-    list[a] = list[b];
-    list[b] = tmp;
+    final Nod tmp = item[a];
+    item[a] = item[b];
+    item[b] = tmp;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
     for(int v = 0; v != size; v++) {
-      sb.append((v != 0 ? ", " : "") + list[v]);
+      sb.append((v != 0 ? ", " : "") + item[v]);
       if(sb.length() > 15 && v + 1 != size) {
         sb.append(", ...");
         break;

@@ -1,12 +1,11 @@
-package org.basex.ft;
+package org.basex.util;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.data.Data.Type;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
-import org.basex.util.IntList;
-import org.basex.util.Token;
+import org.basex.query.ft.StemDir;
 
 /**
  * Full-text tokenizer.
@@ -34,8 +33,8 @@ public class Tokenizer extends IndexToken {
   public boolean wc;
   /** Fuzzy flag. */
   public boolean fz;
-  /** Flag for loading ftposition data. */
-  public boolean lp;
+  /** Fast evaluation flag. */
+  public boolean fast;
 
   /** Current sentence. */
   public int sent;
@@ -76,8 +75,9 @@ public class Tokenizer extends IndexToken {
    * Constructor.
    * @param txt text
    * @param fto full-text options
+   * @param f fast evaluation
    */
-  public Tokenizer(final byte[] txt, final FTOpt fto) {
+  public Tokenizer(final byte[] txt, final FTOpt fto, final boolean f) {
     this(txt);
     lc = fto.is(FTOpt.LC);
     uc = fto.is(FTOpt.UC);
@@ -85,6 +85,7 @@ public class Tokenizer extends IndexToken {
     wc = fto.is(FTOpt.WC);
     fz = fto.is(FTOpt.FZ);
     sd = fto.sd;
+    fast = f;
   }
 
   /**

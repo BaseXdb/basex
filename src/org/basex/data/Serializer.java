@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.ExprInfo;
+import org.basex.query.expr.Expr;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -169,7 +170,7 @@ public abstract class Serializer {
    * @param a attributes
    * @throws IOException exception
    */
-  public final void emptyElement(final ExprInfo expr, final byte[]... a)
+  public final void emptyElement(final Expr expr, final byte[]... a)
       throws IOException {
     openElement(name(expr));
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);

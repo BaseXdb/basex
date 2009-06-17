@@ -2,11 +2,11 @@ package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.util.Tokenizer;
 
 /**
  * Index-based full-text select expression.
@@ -37,10 +37,10 @@ final class FTSelectIndex extends FTExpr {
       @Override
       public FTItem next() throws QueryException {
         FTItem it;
-        while(!(it = ir.next()).empty() && !sel.standard()) {
+        while((it = ir.next()) != null && !sel.standard()) {
           // [SG] this here won't be executed as, currently, no filters
           //   are allowed for the the index version (see FTSelect)
-          it.convertPos();
+          //it.convertPos();
           final Tokenizer tok = content ? new Tokenizer(it.str()) : null;
           if(sel.filter(ctx, it, tok)) break;
         }

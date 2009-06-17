@@ -1,71 +1,57 @@
 package org.basex.query.item;
 
 import org.basex.data.Data;
-import org.basex.index.FTEntry;
+import org.basex.data.FTMatches;
 import org.basex.query.QueryContext;
-import org.basex.util.Array;
-import org.basex.util.IntList;
 
 /**
  * XQuery item representing a full-text Node.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
 public final class FTItem extends DBNode {
-  /** Full-text entry. Only used by the index variant. */
-  public FTEntry fte;
-  /** Position lists. Needed for position filters. */
-  public IntList[] pos = {};
-
-  /**
-   * Constructor, called by the index variant. 
-   */
-  public FTItem() {
-    fte = new FTEntry();
-  }
+  /** Full-text matches. */
+  public FTMatches all;
 
   /**
    * Constructor, called by the sequential variant.
+   * @param a matches
    * @param s scoring
    */
-  public FTItem(final double s) {
+  public FTItem(final FTMatches a, final double s) {
+    all = a;
     score = s;
   }
 
   /**
    * Constructor, called by the index variant.
-   * @param f full-text entry
+   * @param a full-text matches
    * @param d data reference
+   * @param p pre value
    */
-  public FTItem(final FTEntry f, final Data d) {
-    super(d, f.pre, null, Type.TXT);
-    fte = f;
+  public FTItem(final FTMatches a, final Data d, final int p) {
+    super(d, p, null, Type.TXT);
+    all = a;
     score = -1;
   }
 
-  /**
-   * Returns true if no values are stored for this node.
-   * @return result of check
-   */
-  public boolean empty() {
-    return fte.pos.size == 0;
+  @Override
+  public double score() {
+    // default score for index results
+    if(score == -1) score = all.match() ? 1 : 0;
+    return score;
   }
 
-  /**
-   * Merges the position lists of two nodes. Called by the sequential variant.
-   * @param n second node instance
-   * @return self reference
-   */
-  public FTItem union(final FTItem n) {
-    if(n != null) {
-      final IntList[] tmp = new IntList[pos.length + n.pos.length];
-      Array.copy(n.pos, tmp, 0);
-      Array.copy(pos, tmp, n.pos.length);
-      pos = tmp;
-    }
-    return this;
+  @Override
+  public String toString() {
+    return data != null ? super.toString() + " (" + all.size + ")" :
+      name() + " (" + score + ")";
   }
+
+
+
+  // [CG] FT: to be revised...
 
   /**
    * Merges the current item with an other node. Called by the index variant.
@@ -74,30 +60,11 @@ public final class FTItem extends DBNode {
    * @param w number of words
    */
   public void union(final QueryContext ctx, final FTItem i1, final int w) {
-    fte.union(i1.fte, w);
+    // [CG] dummy
+    if(w != w) return;
+
+    // [CG] FT: check pre != n.pre before call
+    //matches[0].union(i1.matches[0], w);
     score = ctx.score.or(score, i1.score);
-  }
-  
-  /**
-   * Converts the index positions. Called by the index variant.
-   */
-  public void convertPos() {
-    pos = new IntList[fte.getTokenNum()];
-    for(int p = 0; p < pos.length; p++) pos[p] = new IntList();
-    while(fte.morePos()) pos[fte.nextPoi() - 1].add(fte.nextPos());
-    fte.reset();
-  }
-
-  @Override
-  public double score() {
-    // default score for index results
-    if(score == -1) score = empty() ? 0 : 1;
-    return score;
-  }
-
-  @Override
-  public String toString() {
-    return data != null ? super.toString() + " (" + fte + ")" :
-      name() + " (" + score + ")";
   }
 }

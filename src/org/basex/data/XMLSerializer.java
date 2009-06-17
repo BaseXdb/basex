@@ -3,8 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.ft.Tokenizer;
 import org.basex.io.PrintOutput;
+import org.basex.util.Tokenizer;
 
 /**
  * This is an interface for serializing XML results.

@@ -1,4 +1,4 @@
-package org.basex.ft;
+package org.basex.util;
 
 import static org.basex.util.Token.*;
 

@@ -1,8 +1,9 @@
-package org.basex.ft;
+package org.basex.query.ft;
 
 import java.util.ArrayList;
 import org.basex.query.QueryException;
 import org.basex.util.TokenList;
+import org.basex.util.Tokenizer;
 
 /**
  * Simple Thesaurus entry for full-text requests.

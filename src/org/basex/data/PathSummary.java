@@ -208,16 +208,4 @@ public final class PathSummary {
     if(!o) out.sort(false);
     return out;
   }
-  
-  /**
-   * Sorts the specified list.
-   * @param list list to be sorted
-  private void sort(final ArrayList<PathNode> list) {
-    Collections.sort(list, new Comparator<PathNode>() {
-      public int compare(final PathNode o1, final PathNode o2) {
-        return diff(o1.token(data), o2.token(data));
-      }
-    });
-  }
-   */
 }

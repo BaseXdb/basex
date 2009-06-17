@@ -1,4 +1,4 @@
-package org.basex.ft;
+package org.basex.query.ft;
 
 /**
  * Simple default scoring model, assembling all scoring calculations.

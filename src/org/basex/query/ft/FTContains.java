@@ -3,8 +3,6 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
-import org.basex.index.FTEntry;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -20,6 +18,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
+import org.basex.util.Tokenizer;
 
 /**
  * FTContains expression.
@@ -34,8 +33,6 @@ public class FTContains extends Expr {
   FTExpr ftexpr;
   /** Full-text parser. */
   Tokenizer ft = new Tokenizer();
-  /** Token number.*/
-  private byte tn;
 
   /**
    * Constructor.
@@ -50,6 +47,7 @@ public class FTContains extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx).addText(ctx);
+    ctx.ftfast = ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
 
     Expr e = this;
@@ -60,8 +58,6 @@ public class FTContains extends Expr {
 
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
-    if(tn == 0) tn = ++ctx.ftoknum;
-
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
@@ -70,14 +66,16 @@ public class FTContains extends Expr {
 
     while((it = iter.next()) != null) {
       ft.init(it.str());
-      final FTItem node = ftexpr.atomic(ctx);
-      final double d = node.score();
+      final FTItem item = ftexpr.atomic(ctx);
+      //final double d = item.all.match() ? item.score() : 0;
+      final double d = item.score();
       s = ctx.score.and(s, d);
 
+      //System.out.println(item.all);
+      
       // add entry to visualization
-      if(d > 0 && ctx.ftpos != null && node.pos.length != 0 &&
-          it instanceof DBNode) {
-        ctx.ftpos.add(new FTEntry(((DBNode) it).pre, node.pos, tn));
+      if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
+        ctx.ftpos.add(((DBNode) it).pre, item.all);
       }
     }
 

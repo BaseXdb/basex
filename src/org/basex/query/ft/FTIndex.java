@@ -4,12 +4,11 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
-import org.basex.index.FTEntry;
 import org.basex.index.FTIndexIterator;
 import org.basex.query.QueryContext;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.util.Tokenizer;
 
 /**
  * This expression retrieves the ids of indexed full-text terms.
@@ -22,16 +21,20 @@ public final class FTIndex extends FTExpr {
   /** Data reference. */
   final Data data;
   /** Full-text token. */
-  final byte[] tok;
+  final byte[] txt;
+  /** Single evaluation. */
+  boolean fast;
 
   /**
    * Constructor.
    * @param d data reference
-   * @param t token
+   * @param t text
+   * @param f fast evaluation
    */
-  public FTIndex(final Data d, final byte[] t) {
+  public FTIndex(final Data d, final byte[] t, final boolean f) {
     data = d;
-    tok = t;
+    txt = t;
+    fast = f;
   }
 
   @Override
@@ -43,18 +46,17 @@ public final class FTIndex extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          final Tokenizer ft = new Tokenizer(tok, ctx.ftopt);
-          ft.lp = true;
+          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast);
+          // more than one token: deactivate fast processing
+          ft.fast &= ft.count() == 1;
           ft.init();
-          int w = 0;
           while(ft.more()) {
             final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
-            iat = w == 0 ? it : FTIndexIterator.intersect(iat, it, w);
-            w++;
+            iat = iat == null ? it : FTIndexIterator.intersect(iat, it);
           }
           iat.setTokenNum(++ctx.ftoknum);
         }
-        return new FTItem(iat.more() ? iat.node() : new FTEntry(), data);
+        return iat.more() ? new FTItem(iat.matches(), data, iat.next()) : null;
       }
     };
   }
@@ -62,12 +64,12 @@ public final class FTIndex extends FTExpr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.text(tok);
+    ser.text(txt);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return BaseX.info("%(\"%\")", name(), tok);
+    return BaseX.info("%(\"%\")", name(), txt);
   }
 }

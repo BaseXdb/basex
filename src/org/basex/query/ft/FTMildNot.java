@@ -1,6 +1,9 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
+
+import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -27,38 +30,37 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
-    FTItem it = expr[0].atomic(ctx);
-    double d = it.score();
-    if(d != 0) {
-      boolean f = false;
-      for(int i = 1; i < expr.length; i++) {
-        it = expr[i].atomic(ctx).union(it);
-        f |= it.score() != 0;
-      }
-      if(f && !mildNot(it.pos)) d = 0;
-    }
-    it.score(d);
-    return it;
-  }
-
-  /**
-   * Evaluates the mild not expression.
-   * @param pos position list
-   * @return boolean result
-   */
-  private boolean mildNot(final IntList[] pos) {
-    boolean f = true;
-    for(int i = 1; i < pos.length; i++) {
-      for(int j = 0; j < pos[i].size; j++) {
-        if(pos[0].contains(pos[i].list[j]))
-          f &= pos[0].list[pos[0].size - 1] > pos[i].list[j];
+    final FTItem item = expr[0].atomic(ctx);
+    final FTMatches all = item.all;
+    for(int e = 1; e < expr.length; e++) {
+      final FTMatches al = expr[e].atomic(ctx).all;
+      for(int a = 0; a < all.size; a++) {
+        for(int b = 0; b < al.size; b++) {
+          if(!all.match[a].notin(al.match[b])) {
+            all.delete(a--);
+            break;
+          }
+        }
       }
     }
-    return f;
+    if(all.size == 0) item.score(0);
+    return item;
   }
   
   @Override
+  public String toString() {
+    return toString(" " + NOT + " " + IN + " ");
+  }
+
+
+  
+  // [CG] FT: to be revised...
+  
+  @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    // [CG] FT: skip index access
+    if(1 == 1) return false;
+
     final int mmin = ic.is;
     IntList il = new IntList(expr.length - 1);
     for (int i = 1; i < expr.length; i++) {
@@ -98,10 +100,5 @@ public final class FTMildNot extends FTExpr {
       return mne[0];
     }
     return new FTIntersection(pex, new int[] {}, mne);
-  }
-
-  @Override
-  public String toString() {
-    return toString(" not in ");
   }
 }

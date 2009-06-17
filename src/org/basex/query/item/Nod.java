@@ -318,7 +318,7 @@ public abstract class Nod extends Item {
                 tmp.add(c.finish());
                 addDesc(c.child(), tmp);
               }
-              for(int t = tmp.size - 1; t >= 0; t--) ir.add(tmp.list[t]);
+              for(int t = tmp.size - 1; t >= 0; t--) ir.add(tmp.item[t]);
             }
             n = p;
             p = p.parent();
@@ -355,7 +355,7 @@ public abstract class Nod extends Item {
           }
           c = ir.size;
         }
-        return c > 0 ? ir.list[--c] : null;
+        return c > 0 ? ir.item[--c] : null;
       }
     };
   }

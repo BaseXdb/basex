@@ -2,13 +2,15 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.FTMatch;
+import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
+import org.basex.util.Tokenizer;
 
 /**
  * FTWindow expression.
@@ -28,9 +30,37 @@ public class FTWindow extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTItem n, final Tokenizer ft)
+  boolean filter(final QueryContext ctx, final FTMatch mtc, final Tokenizer ft)
       throws QueryException {
-    return checkDist(1, checkItr(expr[0], ctx), false, n.pos, ft);
+
+    final long win = checkItr(expr[0], ctx);
+    mtc.sort();
+
+    int end = 0;
+    FTStringMatch f = null;
+    for(final FTStringMatch m : mtc) {
+      if(!m.not) {
+        if(f == null) f = m;
+        end = m.end;
+      }
+    }
+    f.end = end;
+
+    final FTMatch match = new FTMatch();
+    for(final FTStringMatch m : mtc) {
+      if(m.not) {
+        match.add(m);
+      } else {
+        if(pos(end, ft) - pos(m.start, ft) + 1 > win) return false;
+        break;
+      }
+    }
+
+    mtc.reset();
+    mtc.add(f);
+    mtc.add(match);
+
+    return true;
   }
 
   @Override

@@ -2,7 +2,6 @@ package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,6 +10,7 @@ import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
+import org.basex.util.Tokenizer;
 
 /**
  * FTContains expression with index access.
@@ -51,10 +51,11 @@ public final class FTIndexAccess extends Simple {
         final FTItem it = ir.next();
         ctx.fttoken = tmp;
 
-        // add entry to visualization
-        if(it.fte.poi != null && ctx.ftpos != null) ctx.ftpos.add(it.fte);
+        //if(it != null) System.out.println(it.all);
 
-        return it.score() == 0 ? null : it;
+        // add entry to visualization
+        if(ctx.ftpos != null && it != null) ctx.ftpos.add(it.pre, it.all);
+        return it;
       }
     };
   }

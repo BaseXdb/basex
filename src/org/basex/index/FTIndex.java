@@ -1,8 +1,8 @@
 package org.basex.index;
 
 import org.basex.data.Data;
+import org.basex.data.FTMatches;
 import org.basex.io.DataAccess;
-import org.basex.util.IntList;
 
 /**
  * This abstract class defines methods for the available full-text indexes.
@@ -27,16 +27,20 @@ abstract class FTIndex extends Index {
   /**
    * Returns an iterator for an index entry.
    * @param p pointer on data
-   * @param s number of pre/pos values
+   * @param s number of pre/pos entries
    * @param da data source
+   * @param fast fast evaluation
    * @return iterator
    */
-  FTIndexIterator iter(final long p, final int s, final DataAccess da) {
+  FTIndexIterator iter(final long p, final int s, final DataAccess da,
+      final boolean fast) {
+
     return new FTIndexIterator() {
+      final FTMatches all = new FTMatches();
       boolean f = true;
       long pos = p;
       int lpre, c;
-      FTEntry n;
+      int pre = 0;
 
       @Override
       public boolean more() {
@@ -47,24 +51,26 @@ abstract class FTIndex extends Index {
           pos = da.pos();
           f = false;
         }
-        int pre = lpre;
+        pre = lpre;
 
-        final IntList il = new IntList();
-        il.add(da.readNum(pos));
-        while(++c < s && (lpre = da.readNum()) == pre) il.add(da.readNum());
+        all.reset(toknum);
+        all.add(da.readNum(pos));
+        while(++c < s && (lpre = da.readNum()) == pre) {
+          final int n = da.readNum();
+          if(!fast) all.add(n);
+        }
         pos = da.pos();
-        n = new FTEntry(pre, il, toknum);
         return true;
       }
 
       @Override
-      public FTEntry node() {
-        return n;
+      public FTMatches matches() {
+        return all;
       }
 
       @Override
       public int next() {
-        return n.pre;
+        return pre;
       }
     };
   }

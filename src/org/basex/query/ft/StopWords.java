@@ -1,4 +1,4 @@
-package org.basex.ft;
+package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;

@@ -4,22 +4,18 @@ import org.basex.util.Array;
 
 /**
  * This class contains full-text positions.
- *
- * The data is stored as follows:
- * pos[i][pos0, ..., posn]
- * poi[i][poi0, ..., poin]
- * For each pos values, a poi value is stored.
+ * For each position, a pointer is stored.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class FTPos {
-  /** Pre value. */
-  public int pre;
   /** Positions. */
   public int[] pos;
   /** Pointers. */
   public byte[] poi;
+  /** Pre value. */
+  int pre;
 
   /**
    * Constructor.
@@ -62,5 +58,15 @@ public class FTPos {
     }
     pos = ts;
     poi = ti;
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    sb.append("[" + pre + ": ");
+    for(int i = 0; i < pos.length; i++) {
+      sb.append((i != 0 ? "," : "") + pos[i] + "/" + poi[i]);
+    }
+    return sb.append("]").toString();
   }
 }

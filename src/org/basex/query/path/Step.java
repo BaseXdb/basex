@@ -119,18 +119,18 @@ public class Step extends Preds {
         ctx.pos = 1;
         int c = 0;
         for(int s = 0; s < nb.size; s++) {
-          ctx.item = nb.list[s];
+          ctx.item = nb.item[s];
           final Item i = p.test(ctx);
           if(i != null) {
             // assign score value
-            nb.list[s].score(i.score());
-            nb.list[c++] = nb.list[s];
+            nb.item[s].score(i.score());
+            nb.item[c++] = nb.item[s];
           }
           ctx.pos++;
         }
         nb.size = c;
       }
-      for(int n = 0; n < nb.size; n++) ni.add(nb.list[n]);
+      for(int n = 0; n < nb.size; n++) ni.add(nb.item[n]);
       nb = new NodIter();
     }
     return ni;

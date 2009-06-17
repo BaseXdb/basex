@@ -2,9 +2,10 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
+
+import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -18,6 +19,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Tokenizer;
 
 /**
  * FTWords expression.
@@ -26,6 +28,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
+  /** All matches. */
+  private final FTMatches all = new FTMatches();
   /** Minimum and maximum occurrences. */
   private final Expr[] occ;
   /** Search mode. */
@@ -34,6 +38,12 @@ public final class FTWords extends FTExpr {
   private Expr query;
   /** Single word. */
   private byte[] word;
+  /** Token number. */
+  private byte tokNum;
+  /** Standard evaluation. */
+  private boolean simple;
+  /** Single evaluation. */
+  private boolean fast;
 
   /**
    * Constructor.
@@ -54,13 +64,17 @@ public final class FTWords extends FTExpr {
     }
     query = query.comp(ctx);
     if(query instanceof Str) word = ((Str) query).str();
+    simple = mode == FTMode.ANY && word != null && occ == null;
+    fast = ctx.ftfast && occ == null;
     return this;
   }
 
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
-    final FTItem node = new FTItem(0);
-    final int c = contains(ctx, node);
+    if(tokNum == 0) tokNum = ++ctx.ftoknum;
+    all.reset(tokNum);
+
+    final int c = contains(ctx);
     double s = c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.size());
 
     // evaluate weight
@@ -70,24 +84,20 @@ public final class FTWords extends FTExpr {
       if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
       s *= d;
     }
-    node.score(s);
-    return node;
+    return new FTItem(all, s);
   }
 
   /**
    * Evaluates the full-text match.
    * @param ctx query context
-   * @param node resulting node
    * @return length value, used for scoring
    * @throws QueryException xquery exception
    */
-  private int contains(final QueryContext ctx, final FTItem node)
-      throws QueryException {
-
+  private int contains(final QueryContext ctx) throws QueryException {
     // speed up default case
     final FTOpt opt = ctx.ftopt;
-    if(mode == FTMode.ANY && word != null && occ == null)
-      return opt.contains(word, ctx.fttoken, node) == 0 ? 0 : word.length;
+    if(simple) return opt.contains(word, ctx.fttoken, all, fast) == 0 ?
+        0 : word.length;
 
     // process special cases
     final Iter iter = ctx.iter(query);
@@ -98,7 +108,7 @@ public final class FTWords extends FTExpr {
     switch(mode) {
       case ALL:
         while((it = nextStr(iter)) != null) {
-          final int oc = opt.contains(it, ctx.fttoken, node);
+          final int oc = opt.contains(it, ctx.fttoken, all, fast);
           if(oc == 0) return 0;
           len += it.length;
           o += oc / ctx.ftopt.qu.count();
@@ -107,7 +117,7 @@ public final class FTWords extends FTExpr {
       case ALLWORDS:
         while((it = nextStr(iter)) != null) {
           for(final byte[] txt : Token.split(it, ' ')) {
-            final int oc = opt.contains(txt, ctx.fttoken, node);
+            final int oc = opt.contains(txt, ctx.fttoken, all, fast);
             if(oc == 0) return 0;
             len += txt.length;
             o += oc;
@@ -116,16 +126,14 @@ public final class FTWords extends FTExpr {
         break;
       case ANY:
         while((it = nextStr(iter)) != null) {
-          final int oc = opt.contains(it, ctx.fttoken, node);
+          o += opt.contains(it, ctx.fttoken, all, fast);
           len += it.length;
-          final int c = opt.qu.count();
-          o += c > 0 ? oc / c : 0;
         }
         break;
       case ANYWORD:
         while((it = nextStr(iter)) != null) {
           for(final byte[] txt : Token.split(it, ' ')) {
-            final int oc = opt.contains(txt, ctx.fttoken, node);
+            final int oc = opt.contains(txt, ctx.fttoken, all, fast);
             len += txt.length;
             o += oc;
           }
@@ -137,10 +145,8 @@ public final class FTWords extends FTExpr {
           tb.add(it);
           tb.add(' ');
         }
-        final int oc = opt.contains(tb.finish(), ctx.fttoken, node);
+        o += opt.contains(tb.finish(), ctx.fttoken, all, fast);
         len += tb.size;
-        final int c = opt.qu.count();
-        o += c > 0 ? oc / c : 0;
         break;
     }
 
@@ -194,7 +200,7 @@ public final class FTWords extends FTExpr {
     }
 
     // summarize number of hits; break loop if no hits are expected
-    final Tokenizer ft = new Tokenizer(word, fto);
+    final Tokenizer ft = new Tokenizer(word, fto, fast);
     ic.is = 0;
     while(ft.more()) {
       final double s = ic.data.nrIDs(ft);
@@ -209,7 +215,7 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTExpr indexEquivalent(final IndexContext ic) {
-    return new FTIndex(ic.data, word);
+    return new FTIndex(ic.data, word, fast);
   }
 
   @Override

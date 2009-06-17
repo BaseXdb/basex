@@ -3,21 +3,17 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
-import org.basex.ft.StemDir;
-import org.basex.ft.StopWords;
-import org.basex.ft.ThesQuery;
-import org.basex.ft.Tokenizer;
-import org.basex.ft.Levenshtein;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
 import org.basex.query.util.Err;
-import org.basex.util.Array;
-import org.basex.util.IntList;
+import org.basex.util.Levenshtein;
+import org.basex.util.Tokenizer;
 
 /**
  * This class contains all ftcontains options.
@@ -128,13 +124,13 @@ public final class FTOpt extends ExprInfo {
    * Sequential variant.
    * @param q query token
    * @param tk input tokenizer
-   * @param node resulting node
+   * @param all matches
+   * @param fast stops evaluation after first hit
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final byte[] q, final Tokenizer tk, final FTItem node)
-      throws QueryException {
-    if(q.length == 0) return 0;
+  int contains(final byte[] q, final Tokenizer tk, final FTMatches all,
+      final boolean fast) throws QueryException {
 
     // assign options to text
     tk.st = is(ST);
@@ -156,15 +152,15 @@ public final class FTOpt extends ExprInfo {
     qu.wc = is(WC);
     qu.fz = is(FZ);
 
-    IntList il = null;
+    int count = 0;
     while(tk.more()) {
       final int tp = tk.p;
       final int tpos = tk.pos;
       byte[] t = tk.get();
-      boolean f = true;
+      boolean f = false;
       boolean c = false;
       qu.init();
-      while(f && qu.more()) {
+      while(qu.more()) {
         if(c) {
           tk.more();
           t = tk.get();
@@ -176,6 +172,7 @@ public final class FTOpt extends ExprInfo {
         if(sw != null && sw.id(s) != 0) continue;
 
         f = qu.fz ? ls.similar(t, s) : qu.wc ? wc(t, s, 0, 0) : eq(t, s);
+        if(!f) break;
       }
 
       if(!f && th != null) {
@@ -184,24 +181,21 @@ public final class FTOpt extends ExprInfo {
           qu.init(txt);
           qu.more();
           f |= eq(qu.get(), t);
-          qu.more();
           if(f) break;
         }
         qu.text = tmp;
       }
       
       if(f) {
-        if(il == null) il = new IntList();
         // each word position has to be saved for phrases
-        for(int i = 0; i < qu.pos; i++) il.add(tpos + i);
+        all.add(tpos, tpos + qu.pos - 1);
+        count++;
+        if(fast) break;
       }
       tk.p = tp;
       tk.pos = tpos;
     }
-
-    if(il == null) return 0;
-    node.pos = Array.add(node.pos, il);
-    return il.size;
+    return count;
   }
 
   /**

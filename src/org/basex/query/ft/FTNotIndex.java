@@ -28,7 +28,8 @@ final class FTNotIndex extends FTExpr {
       @Override
       public FTItem next() throws QueryException {
         final FTItem node = ir.next();
-        node.fte.not ^= true;
+        // [CG] FT: check
+        //node.fte.not ^= true;
         return node;
       }
     };

@@ -116,8 +116,8 @@ public final class CElem extends CFrag {
       if(text.size != 0) children.add(new FTxt(text.finish(), null));
 
       final FElem node = new FElem(tname, children, ats, base, nsp, null);
-      for(int n = 0; n < children.size; n++) children.list[n].parent(node);
-      for(int n = 0; n < ats.size; n++) ats.list[n].parent(node);
+      for(int n = 0; n < children.size; n++) children.item[n].parent(node);
+      for(int n = 0; n < ats.size; n++) ats.item[n].parent(node);
       ctx.ns.size(s);
       return node;
     }
@@ -151,10 +151,10 @@ public final class CElem extends CFrag {
           // check for duplicate attribute names
           final QNm qname = node.qname();
           for(int a = 0; a < ats.size; a++) {
-            if(qname.eq(ats.list[a].qname())) {
+            if(qname.eq(ats.item[a].qname())) {
               final byte[] nm = qname.str();
               if(!contains(nm, ':')) Err.or(ATTDUPL, nm);
-              else Err.or(ATTNSDUPL, qname, ats.list[a].qname());
+              else Err.or(ATTNSDUPL, qname, ats.item[a].qname());
             }
           }
           // add attribute

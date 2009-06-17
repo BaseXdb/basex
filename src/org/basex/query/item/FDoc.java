@@ -32,7 +32,7 @@ public final class FDoc extends FNode {
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < children.size; c++) {
-      final Nod n = children.list[c];
+      final Nod n = children.item[c];
       if(n.type != Type.COM && n.type != Type.PI) tb.add(n.str());
     }
     return tb.finish();
@@ -40,7 +40,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < children.size; c++) children.list[c].serialize(ser);
+    for(int c = 0; c < children.size; c++) children.item[c].serialize(ser);
   }
 
   @Override

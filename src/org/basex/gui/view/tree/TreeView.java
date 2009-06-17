@@ -17,7 +17,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.query.ChildIterator;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -31,7 +30,7 @@ public final class TreeView extends View {
   /** Current font height. */
   private int fontHeight;
   /** the sum of all size values of a node line. */
-  private int sumNodeSizeInLine = 0;
+  int sumNodeSizeInLine = 0;
   /** the list of all parent nodes of a node line. */
   private IntList parentList = null;
   /** array with position of the parent node. */
@@ -39,7 +38,7 @@ public final class TreeView extends View {
   /** array of current rectangles. */
   private ArrayList<TreeRect> rects = null;
   /** nodes in current line. */
-  private int nodeCount = 0;
+  int nodeCount = 0;
   /** current mouse position x. */
   private int mousePosX = -1;
   /** current mouse position y. */
@@ -435,7 +434,8 @@ public final class TreeView extends View {
       preList.reset();
       rects.add(rect);
 
-      g.setColor(new Color(colorRect - ((level < 11 ? level : 11) * colorDiff)));
+      g.setColor(new Color(colorRect - ((level < 11 ? level : 11) *
+          colorDiff)));
       g.drawRect((int) x + 2, y, (int) w - 2, h);
 
       if(parentPos != null) {
@@ -453,7 +453,8 @@ public final class TreeView extends View {
         // - fontHeight);
       }
 
-      g.setColor(new Color(colorNode - ((level < 11 ? level : 11) * colorDiff)));
+      g.setColor(new Color(colorNode - ((level < 11 ? level : 11) *
+          colorDiff)));
       g.fillRect((int) x + 1, y, (int) w - 1, h);
 
       drawTextIntoRectangle(g, nodeKind, pre, (int) boxMiddle, (int) w, y);

@@ -79,7 +79,7 @@ public final class FElem extends FNode {
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
     for(int n = 0; n < children.size; n++) {
-      final Nod c = children.list[n];
+      final Nod c = children.item[n];
       if(c.type == Type.ELM || c.type == Type.TXT) tb.add(c.str());
     }
     return tb.finish();
@@ -144,7 +144,7 @@ public final class FElem extends FNode {
     
     // serialize attributes
     for(int n = 0; n < atts.size; n++) {
-      final Nod nod = atts.list[n];
+      final Nod nod = atts.item[n];
       final QNm atn = nod.qname();
       if(atn.ns()) {
         if(!NSGlobal.standard(atn.uri.str())) {
@@ -157,7 +157,7 @@ public final class FElem extends FNode {
     }
 
     // serialize children
-    for(int n = 0; n < children.size; n++) children.list[n].serialize(ser);
+    for(int n = 0; n < children.size; n++) children.item[n].serialize(ser);
     ser.closeElement();
 
     // reset top level namespace
@@ -171,12 +171,12 @@ public final class FElem extends FNode {
     final FElem node = new FElem(name, ch, at, base, ns, par);
 
     for(int c = 0; c < children.size; c++) {
-      ch.add(children.list[c].copy());
-      ch.list[c].parent(node);
+      ch.add(children.item[c].copy());
+      ch.item[c].parent(node);
     }
     for(int c = 0; c < atts.size; c++) {
-      at.add(atts.list[c].copy());
-      at.list[c].parent(node);
+      at.add(atts.item[c].copy());
+      at.item[c].parent(node);
     }
     return node;
   }

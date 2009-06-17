@@ -14,11 +14,6 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  */
 public final class FTAnd extends FTExpr {
-  /** Index of positive expressions. */
-  private int[] pex;
-  /** Index of negative (ftnot) expressions. */
-  private int[] nex;
-  
   /**
    * Constructor.
    * @param e expression list
@@ -30,20 +25,38 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     FTItem it = null; 
-    double s = 0;
     for(final FTExpr e : expr) {
-      it = e.atomic(ctx).union(it);
-      final double d = s;
-      s = it.score();
-      if(s == 0) break;
-      s = ctx.score.and(s, d);
+      final FTItem i = e.atomic(ctx);
+      if(it != null) {
+        it.all = it.all.and(i.all);
+        it.score(i.score() == 0 ? 0 : ctx.score.and(i.score(), it.score()));
+      } else {
+        it = i;
+      }
+      if(it.score() == 0) break;
     }
-    it.score(s);
     return it;
   }
+
+  @Override
+  public String toString() {
+    return toString(" " + FTAND + " ");
+  }
+
+
+
+  // [CG] FT: to be revised...
+  
+  /** Index of positive expressions. */
+  private int[] pex;
+  /** Index of negative (ftnot) expressions. */
+  private int[] nex;
   
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    // [CG] FT: skip index access
+    if(1 == 1) return false;
+
     final IntList ip = new IntList();
     final IntList in = new IntList();
     int nmin = ic.is;
@@ -79,10 +92,5 @@ public final class FTAnd extends FTExpr {
       return new FTNotIndex(new FTUnion(nex, false, expr));
     }
     return new FTIntersection(pex, nex, expr);
-  }
-
-  @Override
-  public String toString() {
-    return toString(" " + FTAND + " ");
   }
 }

@@ -58,13 +58,13 @@ final class FTUnion extends FTExpr {
 
         if(minp == -1) {
           minp = 0;
-          while(minp < it.length && it[minp].empty()) minp++;
+          while(minp < it.length && it[minp] == null) minp++;
           if(minp < it.length) cp.set(minp, 0);
           for(int ip = minp + 1; ip < pex.length; ip++) {
-            if(!it[ip].empty()) {
+            if(it[ip] != null) {
               final FTItem n1 = it[pex[ip]];
               final FTItem n2 = it[pex[minp]];
-              final int d = n1.fte.pre - n2.fte.pre;
+              final int d = n1.pre - n2.pre;
               if(d < 0) {
                 minp = ip;
                 cp.set(ip, 0);
@@ -80,11 +80,13 @@ final class FTUnion extends FTExpr {
         for(int i = 1; i < cp.size; i++) {
           m.union(ctx, it[pex[cp.list[i]]], 0);
           // in case of ftor !"a" ftor "b" "a b" is result
-          m.fte.not = false;
+          // [CG] FT: check
+          //m.fte.not = false;
         }
 
         // ftnot causes to set this flag (seq. index mode)
-        if(m.empty()) m.fte.not = not;
+        // [CG] FT: check
+        //if(m.empty()) m.fte.not = not;
         return m;
       }
     };

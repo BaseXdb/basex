@@ -7,11 +7,11 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.ft.Tokenizer;
-import org.basex.ft.Levenshtein;
 import org.basex.io.DataAccess;
+import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Tokenizer;
 
 /**
  * This class provides access to attribute values and text contents
@@ -127,13 +127,13 @@ public final class FTFuzzy extends FTIndex {
     if(ft.fz) {
       int k = Prop.lserr;
       if(k == 0) k = tok.length >> 2;
-      return fuzzy(tok, k);
+      return fuzzy(tok, k, ft.fast);
     }
 
     // return cached or new result
     final int id = cache.id(tok);
-    return id == 0 ? get(tok) :
-      iter(cache.getPointer(id), cache.getSize(id), dat);
+    return id == 0 ? get(tok, ft.fast) :
+      iter(cache.getPointer(id), cache.getSize(id), dat, ft.fast);
   }
 
   @Override
@@ -220,9 +220,10 @@ public final class FTFuzzy extends FTIndex {
    *
    * @param tok token looking for
    * @param k number of errors allowed
+   * @param f fast evaluation
    * @return int[][] data
    */
-  private IndexIterator fuzzy(final byte[] tok, final int k) {
+  private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
     FTIndexIterator it = FTIndexIterator.EMP;
     
     final int tl = tok.length;
@@ -237,7 +238,8 @@ public final class FTFuzzy extends FTIndex {
       do r = tp[i++]; while(r == -1);
       while(p < r) {
         if(ls.similar(ti.readBytes(p, p + s), tok)) {
-          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), dat), it);
+          it = FTIndexIterator.union(
+              iter(pointer(p, s), size(p, s), dat, f), it);
         }
         p += s + ENTRY;
       }
@@ -248,11 +250,12 @@ public final class FTFuzzy extends FTIndex {
   /**
    * Get pre- and pos values, stored for token out of index.
    * @param tok token looking for
+   * @param f fast evaluation
    * @return iterator
    */
-  private FTIndexIterator get(final byte[] tok) {
+  private FTIndexIterator get(final byte[] tok, final boolean f) {
     final int p = token(tok);
     return p > -1 ? iter(pointer(p, tok.length),
-        size(p, tok.length), dat) : FTIndexIterator.EMP;
+        size(p, tok.length), dat, f) : FTIndexIterator.EMP;
   }
 }

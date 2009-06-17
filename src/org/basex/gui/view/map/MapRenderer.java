@@ -6,11 +6,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import org.basex.data.FTPos;
-import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
+import org.basex.util.Tokenizer;
 
 /**
  * This class assembles utility methods for painting rectangle contents.

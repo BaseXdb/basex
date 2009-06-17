@@ -100,7 +100,7 @@ public final class Except extends Arr {
         if(!(it.node())) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < ni.size; s++) {
-          if(ni.list[s].is(node)) ni.delete(s--);
+          if(ni.item[s].is(node)) ni.delete(s--);
         }
       }
     }

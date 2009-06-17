@@ -1,4 +1,4 @@
-package org.basex.ft;
+package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
@@ -15,6 +15,7 @@ import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
+import org.basex.util.Tokenizer;
 
 /**
  * Simple Thesaurus for full-text requests.

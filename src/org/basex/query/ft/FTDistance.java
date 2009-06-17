@@ -2,13 +2,15 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.FTMatch;
+import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
+import org.basex.util.Tokenizer;
 
 /**
  * FTDistance expression.
@@ -28,10 +30,34 @@ public class FTDistance extends FTFilter {
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTItem node, final Tokenizer ft)
+  boolean filter(final QueryContext ctx, final FTMatch mtc, final Tokenizer ft)
       throws QueryException {
-    return checkDist(checkItr(expr[0], ctx), checkItr(expr[1], ctx), true,
-        node.pos, ft);
+
+    final long min = checkItr(expr[0], ctx);
+    final long max = checkItr(expr[1], ctx);
+    mtc.sort();
+
+    final FTMatch match = new FTMatch();
+    FTStringMatch sm = null;
+    FTStringMatch f = null;
+    for(final FTStringMatch m : mtc) {
+      if(m.not) {
+        match.add(m);
+      } else {
+        if(sm != null) {
+          final int d = pos(m.start, ft) - pos(sm.end, ft) - 1;
+          if(d < min || d > max) return false;
+        } else {
+          f = m;
+        }
+        sm = m;
+      }
+    }
+    f.end = sm.end;
+    mtc.reset();
+    mtc.add(f);
+    mtc.add(match);
+    return true;
   }
 
   @Override

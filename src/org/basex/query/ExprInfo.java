@@ -10,11 +10,10 @@ import org.basex.data.Serializer;
  * @author Christian Gruen
  */
 public abstract class ExprInfo {
+
   /**
-   * Returns a string description of the expression. Contrary to the
-   * {@link #toString()} method, the current expressions aren't included
-   * in the output.
-   * @return result of check
+   * Returns a color string for the expression.
+   * @return color
    */
   public String color() {
     return null;
@@ -22,7 +21,7 @@ public abstract class ExprInfo {
 
   /**
    * Returns a string description of the expression. Contrary to the
-   * {@link #toString()} method, the current expressions aren't included
+   * {@link #toString()} method, arguments are not included
    * in the output.
    * @return result of check
    */
@@ -31,7 +30,7 @@ public abstract class ExprInfo {
   }
 
   /**
-   * Returns the simplified class name (for debugging).
+   * Returns the simplified class name.
    * @return class name
    */
   public String name() {

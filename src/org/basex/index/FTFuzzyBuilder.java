@@ -7,11 +7,11 @@ import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.ft.Tokenizer;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.Tokenizer;
 
 /**
  * This class builds an index for text contents, optimized for fuzzy search,

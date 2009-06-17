@@ -1,12 +1,14 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
+
+import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
+import org.basex.util.Tokenizer;
 
 /**
  * Full-text select expression.
@@ -30,29 +32,40 @@ public class FTSelect extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
+    ctx.ftfast &= filter.length == 0;
+    final FTExpr e = super.comp(ctx);
     for(final FTFilter f : filter) f.comp(ctx);
-    return super.comp(ctx);
+    return e;
   }
 
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     final FTItem it = expr[0].atomic(ctx);
-    if(it.score() != 0 && !filter(ctx, it, ctx.fttoken)) it.score(0);
+    filter(ctx, it, ctx.fttoken);
     return it;
   }
 
   /**
    * Evaluates the position filters.
    * @param ctx query context
-   * @param node input node
+   * @param item input node
    * @param ft tokenizer
    * @return result of check
    * @throws QueryException query exception
    */
-  boolean filter(final QueryContext ctx, final FTItem node, final Tokenizer ft)
+  boolean filter(final QueryContext ctx, final FTItem item, final Tokenizer ft)
       throws QueryException {
-    for(final FTFilter f : filter) if(!f.filter(ctx, node, ft)) return false;
-    return true;
+
+    final FTMatches all = item.all;
+    for(final FTFilter f : filter) {
+      for(int a = 0; a < all.size; a++) {
+        if(!f.filter(ctx, all.match[a], ft)) all.delete(a--);
+      }
+    }
+    // [CG] FT: temporary?
+    if(all.size == 0) item.score(0);
+
+    return all.size != 0;
   }
 
   /**

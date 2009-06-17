@@ -14,11 +14,6 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  */
 public final class FTOr extends FTExpr {
-  /** Saving index of positive expressions. */
-  private int[] pex;
-  /** Saving index of negative (ftnot) expressions. */
-  private int[] nex;
-  
   /**
    * Constructor.
    * @param e expression list
@@ -30,21 +25,39 @@ public final class FTOr extends FTExpr {
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     FTItem it = null; 
-    double d = 0;
     for(final FTExpr e : expr) {
       final FTItem i = e.atomic(ctx);
-      it = i.score() != 0 ? i.union(it) : it;
-      d = ctx.score.or(i.score(), d);
+      if(it != null) {
+        it.all.or(i.all);
+        it.score(ctx.score.or(it.score(), i.score()));
+      } else {
+        it = i;
+      }
     }
-    if(it == null) it = new FTItem(0);
-    else it.score(d);
     return it;
   }
+
+  @Override
+  public String toString() {
+    return toString(" " + FTOR + " ");
+  }
+
+  
+  
+  // [CG] FT: to be revised...
+  
+  /** Index of positive expressions. */
+  private int[] pex;
+  /** Index of negative (ftnot) expressions. */
+  private int[] nex;
   
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    final IntList p = new IntList();
-    final IntList n = new IntList();
+    // [CG] FT: skip index access
+    if(1 == 1) return false;
+
+    final IntList ip = new IntList();
+    final IntList in = new IntList();
     final int min = ic.is;
     int sum = 0;
 
@@ -57,19 +70,19 @@ public final class FTOr extends FTExpr {
       if(!ia) return false;
 
       if(ftn) {
-        if(ic.is > 0) n.add(i);
+        if(ic.is > 0) in.add(i);
         else {
           ic.seq = true;
           ic.is = Integer.MAX_VALUE;
           return false;
         }
       } else if(ic.is > 0) {
-        p.add(i);
+        ip.add(i);
         sum += ic.is;
       }
     }
-    nex = n.finish();
-    pex = p.finish();
+    nex = in.finish();
+    pex = ip.finish();
 
     if(pex.length == 0 && nex.length > 0) {
       ic.seq = true;
@@ -119,10 +132,5 @@ public final class FTOr extends FTExpr {
     final int[] r = new int[expr.length];
     for(int i = 0; i < expr.length; i++) r[i] = i;
     return r;
-  }
-
-  @Override
-  public String toString() {
-    return toString(" " + FTOR + " ");
   }
 }

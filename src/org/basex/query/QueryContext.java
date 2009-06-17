@@ -15,12 +15,11 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.ft.Scoring;
-import org.basex.ft.Tokenizer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Root;
 import org.basex.query.ft.FTOpt;
+import org.basex.query.ft.Scoring;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -39,6 +38,7 @@ import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Tokenizer;
 
 /**
  * This abstract query expression provides the architecture
@@ -77,6 +77,8 @@ public final class QueryContext extends Progress {
   public FTPosData ftpos;
   /** Full-text token counter (for visualization). */
   public byte ftoknum;
+  /** Fast full-text evaluation (stop after first hit). */
+  public boolean ftfast;
 
   /** Scoring instance. */
   public Scoring score = new Scoring();
@@ -365,8 +367,8 @@ public final class QueryContext extends Progress {
     // check if the collections contain the document
     for(int c = 0; c < colls; c++) {
       for(int n = 0; n < collect[c].size; n++) {
-        if(eq(db, collect[c].list[n].base()))
-          return (DBNode) collect[c].list[n];
+        if(eq(db, collect[c].item[n].base()))
+          return (DBNode) collect[c].item[n];
       }
     }
 
@@ -441,7 +443,7 @@ public final class QueryContext extends Progress {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(colls == 0) Err.or(COLLDEF);
-      return SeqIter.get(collect[0].list, collect[0].size);
+      return SeqIter.get(collect[0].item, collect[0].size);
     }
 
     // invalid collection reference
@@ -452,7 +454,7 @@ public final class QueryContext extends Progress {
     while(true) {
       if(++c == colls) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
-      return SeqIter.get(collect[c].list, collect[c].size);
+      return SeqIter.get(collect[c].item, collect[c].size);
     }
   }
 

@@ -21,7 +21,6 @@ import javax.imageio.ImageIO;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.ft.Tokenizer;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.DialogMapInfo;
 import org.basex.gui.layout.BaseXLayout;
@@ -33,6 +32,7 @@ import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.Tokenizer;
 
 /**
  * This view is a TreeMap implementation.

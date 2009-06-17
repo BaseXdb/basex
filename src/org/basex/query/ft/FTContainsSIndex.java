@@ -1,6 +1,5 @@
 package org.basex.query.ft;
 
-import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -9,6 +8,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
+import org.basex.util.Tokenizer;
 
 /**
  * Sequential FTContains expression with index access.
@@ -18,7 +18,7 @@ import org.basex.query.iter.Iter;
  */
 public final class FTContainsSIndex extends FTContains {
   /** Flag for visualizing ftdata. */ 
-  private final boolean vis;
+  final boolean vis;
   /** Current node item. */
   FTItem ftn;
   /** Node iterator. */
@@ -36,11 +36,11 @@ public final class FTContainsSIndex extends FTContains {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {    
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     final Iter ir = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
-        
+
     if(fti == null) fti = ftexpr.iter(ctx);
     if(ftn == null) ftn = fti.next();
 
@@ -49,13 +49,13 @@ public final class FTContainsSIndex extends FTContains {
     while((n = (DBNode) ir.next()) != null) {
       n.score(1);
 
-      while(ftn != null && !ftn.empty() && n.pre > ftn.fte.pre) {
-        ftn = fti.next();
-      }
+      while(ftn != null && ftn != null && n.pre > ftn.pre) ftn = fti.next();
 
       if(ftn != null) {
-        final boolean not = ftn.fte.not;
-        if(ftn.fte.pre == n.pre) {
+        // [CG] check
+        //final boolean not = ftn.matches.not;
+        boolean not = false;
+        if(ftn.pre == n.pre) {
           ftn = null;
           d = not ? 0 : n.score();
           break;
@@ -71,8 +71,7 @@ public final class FTContainsSIndex extends FTContains {
     ctx.fttoken = tmp;
 
     // add entry to visualization
-    if(ctx.ftpos != null && vis && d != 0 && ftn != null &&
-        ftn.fte.poi != null) ctx.ftpos.add(ftn.fte);
+    if(d > 0 && ctx.ftpos != null && vis) ctx.ftpos.add(ftn.pre, ftn.all);
     
     return Bln.get(d);
   }

@@ -1,7 +1,6 @@
-package org.basex.ft;
+package org.basex.util;
 
 import org.basex.core.Prop;
-import org.basex.util.Token;
 
 /**
  * Levenshtein implementation, based on

@@ -66,8 +66,6 @@ public final class GUIProp {
   public static boolean showquery = true;
   /** Flag for activated plot view. */
   public static boolean showplot = false;
-  /** Flag for activated tree view. */
-  public static boolean showtree = false;
 
   /** Flag for Java look and feel. */
   public static boolean javalook = false;
@@ -172,7 +170,10 @@ public final class GUIProp {
   public static int fishh = 200;
   /** Show file contents in TreeMap. */
   public static boolean filecont = true;
-  
+
+  /** Flag for activated tree view. */
+  public static boolean showtree = false;
+
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + ".basexwin";
 

@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
-import org.basex.ft.Tokenizer;
 import org.basex.index.IndexToken;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
@@ -20,6 +19,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.util.Tokenizer;
 
 /**
  * Project specific functions.
@@ -99,7 +99,7 @@ final class FNBaseX extends Fun {
 
     if(type.equals(FULLTEXT)) {
       if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
-      return new FTIndexAccess(new FTIndex(data, word),
+      return new FTIndexAccess(new FTIndex(data, word, ctx.ftpos == null),
           new Tokenizer(word), ic).iter(ctx);
     }
     

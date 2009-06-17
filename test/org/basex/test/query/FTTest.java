@@ -371,12 +371,12 @@ public final class FTTest extends AbstractTest {
         "('C' ftand 'D' ordered) ordered" },
       { "FTOrdered 8", bool(false),
         "'B A' ftcontains ('A' ftand ftnot 'B') ordered" },
-      /* Next two still have to be fixed..
       { "FTOrdered 9", bool(true),
-        "'A B' ftcontains ('B' ftor 'A') ordered" },
+        "'A B' ftcontains 'B' ftor 'A' ordered" },
       { "FTOrdered 10", bool(true),
+        "'A B' ftcontains ('B' ftor 'A') ordered" },
+      { "FTOrdered 11", bool(true),
         "'A B C' ftcontains ('A' ftor 'C') ftand 'B' ordered" },
-      */
         
       { "FTDistance 1", nodes(3),
         "//w [text() ftcontains 'the' ftand 'fourth' " +
@@ -396,13 +396,13 @@ public final class FTTest extends AbstractTest {
       { "FTDistance 6", nodes(3, 37),
         "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
         "ftand 'sentence' distance exactly 0 words]" },
-      { "FTDistance 7", nodes(3),
+      { "FTDistance 7", nodes(3, 37),
         "//w [text() ftcontains ('second' ftand 'third' window 3 words) " +
         "ftand 'sentence' distance exactly 0 words ordered]" },
-      { "FTDistance 8", nodes(37),
+      { "FTDistance 8", nodes(3, 37),
         "//w [. ftcontains 'third' ftand 'second' " +
         " ftand 'first' distance exactly 1 words ordered]" },
-      { "FTDistance 9", nodes(3),
+      { "FTDistance 9", nodes(3, 37),
         "//w [. ftcontains 'first' ftand 'second' " +
         " ftand 'third' distance exactly 1 words ordered]" },          
       { "FTDistance 10", bool(true),
@@ -414,11 +414,14 @@ public final class FTTest extends AbstractTest {
         "//w [. ftcontains 'second' ftand 'fifth' window 7 words]" },
       { "FTWindow 2", nodes(3, 37),
         "//w [. ftcontains 'second sentence' ftand 'fifth sentence' " +
-        "window 6 words]" },
+        "window 8 words]" },
       { "FTWindow 3", nodes(3, 37),
         "//w [. ftcontains 'third' ftand 'second' " +
         "ftand 'fifth' window 7 words]" },
       { "FTWindow 4", nodes(37),
+        "//w [. ftcontains 'fifth' ftand 'third' " +
+        "ftand 'second' ordered window 7 words]" },
+      { "FTWindow 4", nodes(3, 37),
         "//w [. ftcontains 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
         

@@ -33,7 +33,7 @@ public final class Vars extends ExprInfo {
    * @param v variable
    * @return variable
    */
-  public Var get(final Var v) {
+  Var get(final Var v) {
     for(int s = size - 1; s >= 0; s--) if(v.eq(vars[s])) return vars[s];
     return null;
   }
@@ -53,18 +53,18 @@ public final class Vars extends ExprInfo {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < size; i++)
-      sb.append((i == 0 ? "" : "\n") + i + ": " + vars[i]);
-    return sb.toString();
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     if(size == 0) return;
     ser.openElement(this);
     for(int i = 0; i < size; i++) vars[i].plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < size; i++)
+      sb.append((i == 0 ? "" : "\n") + i + ": " + vars[i]);
+    return sb.toString();
   }
 }

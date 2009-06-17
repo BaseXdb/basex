@@ -1,11 +1,8 @@
 package org.basex.query.ft;
 
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.util.IntList;
-import org.basex.util.TokenBuilder;
 
 /**
  * FTMildnotIndex expression.
@@ -23,14 +20,16 @@ final class FTMildNotIndex extends FTExpr {
   }
   
   @Override
-  public FTIter iter(final QueryContext ctx) throws QueryException {
+  public FTIter iter(final QueryContext ctx) {
     return new FTIter() {
-      final FTIter i1 = expr[0].iter(ctx);
-      final FTIter i2 = expr[1].iter(ctx);
-      FTItem n0, n1;
+      //final FTIter i1 = expr[0].iter(ctx);
+      //final FTIter i2 = expr[1].iter(ctx);
+      //FTItem n0, n1;
       
       @Override
-      public FTItem next() throws QueryException { 
+      public FTItem next() { 
+        return null;
+        /*
         if(n0 == null) n0 = i1.next();
         if(n1 == null) n1 = i2.next();
         if(n0.empty() || n1.empty()) {
@@ -48,7 +47,7 @@ final class FTMildNotIndex extends FTExpr {
           n0 = null;
           return tmp;
         }
-        if(d > 0) {
+//        if(d > 0) {
           n1 = null;
           return next();
         }
@@ -80,6 +79,7 @@ final class FTMildNotIndex extends FTExpr {
         n1 = null;
         n0 = null;
         return next();
+        */
       }
     };
   }

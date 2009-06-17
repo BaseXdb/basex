@@ -4,9 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.ft.StopWords;
-import org.basex.ft.ThesQuery;
-import org.basex.ft.Thesaurus;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -68,6 +65,9 @@ import org.basex.query.ft.FTOrder;
 import org.basex.query.ft.FTSelect;
 import org.basex.query.ft.FTWindow;
 import org.basex.query.ft.FTWords;
+import org.basex.query.ft.StopWords;
+import org.basex.query.ft.ThesQuery;
+import org.basex.query.ft.Thesaurus;
 import org.basex.query.ft.FTOpt.FTMode;
 import org.basex.query.ft.FTFilter.FTUnit;
 import org.basex.query.item.Dbl;
@@ -2610,6 +2610,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes the specified two strings or jumps back to the old query position.
+   * If the strings are found, the cursor is set after the first token.
    * @param s1 string to be consumed
    * @param s2 second string
    * @param expr alternative error message

@@ -2,11 +2,13 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.FTMatch;
+import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
-import org.basex.ft.Tokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
-import org.basex.query.item.FTItem;
+import org.basex.util.Tokenizer;
 
 /**
  * FTContent expression.
@@ -31,24 +33,23 @@ public class FTContent extends FTFilter {
   }
   
   @Override
-  boolean filter(final QueryContext ctx, final FTItem n, final Tokenizer ft) {
-    if(start || end) {
-      final int p = start ? 0 : ft.count() - 1;
-      for(int i = 0; i < n.pos.length; i++) {
-        for(int j = 0; j < n.pos[i].size; j++) {
-          if(n.pos[i].list[j] == p) return true;
-        }
+  boolean filter(final QueryContext ctx, final FTMatch mtc,
+      final Tokenizer ft) {
+    if(start) {
+      for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
+    } else if(end) {
+      final int p = ft.count() - 1;
+      for(final FTStringMatch sm : mtc) if(sm.end == p) return true;
+    } else {
+      final int s = ft.count();
+      final boolean[] bl = new boolean[s];
+      for(final FTStringMatch sm : mtc) {
+        for(int p = sm.start; p <= sm.end; p++) bl[p] = true;
       }
-      return false;
+      for(final boolean b : bl) if(!b) return false;
+      return true;
     }
-
-    final int s = ft.count();
-    final boolean[] bl = new boolean[s];
-    for(int i = 0; i < n.pos.length; i++) {
-      for(int j = 0; j < n.pos[i].size; j++) bl[n.pos[i].list[j]] = true;
-    }
-    for(final boolean b : bl) if(!b) return false;
-    return true;
+    return false;
   }
 
   @Override

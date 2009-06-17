@@ -103,7 +103,7 @@ public final class InterSect extends Arr {
         if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < seq.size(); s++) {
-          if(seq.list[s].is(node)) {
+          if(seq.item[s].is(node)) {
             res.add(node);
             break;
           } 
