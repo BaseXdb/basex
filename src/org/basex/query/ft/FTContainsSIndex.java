@@ -17,8 +17,8 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTContainsSIndex extends FTContains {
-  /** Flag for visualizing ftdata. */ 
-  final boolean vis;
+  /** Not flag. */ 
+  final boolean not;
   /** Current node item. */
   FTItem ftn;
   /** Node iterator. */
@@ -28,11 +28,11 @@ public final class FTContainsSIndex extends FTContains {
    * Constructor.
    * @param e contains, select and optional ignore expression
    * @param fte full-text expression
-   * @param v visualize ft results
+   * @param n not flag
    */
-  public FTContainsSIndex(final Expr e, final FTExpr fte, final boolean v) {
+  public FTContainsSIndex(final Expr e, final FTExpr fte, final boolean n) {
     super(e, fte);
-    vis = v;
+    not = n;
   }
 
   @Override
@@ -40,42 +40,61 @@ public final class FTContainsSIndex extends FTContains {
     final Iter ir = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
-
-    if(fti == null) fti = ftexpr.iter(ctx);
-    if(ftn == null) ftn = fti.next();
-
-    double d = 0;
-    DBNode n;
-    while((n = (DBNode) ir.next()) != null) {
-      n.score(1);
-
-      while(ftn != null && ftn != null && n.pre > ftn.pre) ftn = fti.next();
-
-      if(ftn != null) {
-        // [CG] check
-        //final boolean not = ftn.matches.not;
-        boolean not = false;
-        if(ftn.pre == n.pre) {
-          ftn = null;
-          d = not ? 0 : n.score();
-          break;
-        }
-        if(not) {
-          d = n.score();
-          break;
-        }
-      } else {
-        fti = null;
-      }
+    
+    // create index iterator
+    if(fti == null) {
+      fti = ftexpr.iter(ctx);
+      ftn = fti.next();
     }
-    ctx.fttoken = tmp;
+
+    // find next relevant index entry
+    boolean found = false;
+    DBNode n = null;
+    while(!found && (n = (DBNode) ir.next()) != null) {
+      // find entry with pre value equal to or larger than current node
+      while(ftn != null && n.pre > ftn.pre) ftn = fti.next();
+      found = (ftn != null && n.pre == ftn.pre) ^ not;
+    }
+    // reset index iterator after all nodes have been processed
+    if(n == null) fti = null;
 
     // add entry to visualization
-    if(d > 0 && ctx.ftpos != null && vis) ctx.ftpos.add(ftn.pre, ftn.all);
+    if(found && ctx.ftpos != null && !not) ctx.ftpos.add(ftn.pre, ftn.all);
     
-    return Bln.get(d);
+    ctx.fttoken = tmp;
+    return Bln.get(found ? 1 : 0);
   }
 
+  /*
+  @Override
+  public Bln atomic(final QueryContext ctx) throws QueryException {
+    final Iter ir = expr.iter(ctx);
+    final Tokenizer tmp = ctx.fttoken;
+    ctx.fttoken = ft;
+    
+    if(fti == null) fti = ftexpr.iter(ctx); 
+    if(ftn == null) ftn = fti.next();
+
+    boolean found = false;
+    DBNode n = null;
+    while(!found && (n = (DBNode) ir.next()) != null) {
+      while(ftn != null && n.pre > ftn.pre) ftn = fti.next();
+      found = (ftn != null && ftn.pre == n.pre) ^ not;
+      if(not && !found) ftn = null;
+    }
+    if(n == null) fti = null;
+
+    System.out.println(n);
+
+    // add entry to visualization
+    if(found && ctx.ftpos != null && !not) ctx.ftpos.add(ftn.pre, ftn.all);
+    
+    ctx.fttoken = tmp;
+    return Bln.get(found ? 1 : 0);
+  }
+  */
+
+  
   @Override
   public String toString() {
     return expr + " ftcontainsSI " + ftexpr;

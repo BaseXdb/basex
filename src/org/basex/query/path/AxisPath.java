@@ -84,16 +84,16 @@ public class AxisPath extends Path {
       return this;
     }
 
-    // Simple iterator: one downward location step or parent step
+    /* Simple iterator: one downward location step or parent step
     if(step.length == 1 && (step[0].axis.down)) {
       return new SingleIterPath(root, step);
-    }
+    }*/
 
     // To check if the result of a path is in document order so that no special 
     // ordering functions are needed and we can use the SimpleIterPath, 
     // we are geared to an automaton that is provided in the paper 
     // "Avoiding Unnecessary Ordering Operations in XPath" by
-    // Jan Hidders and Phillipe Michiels.
+    // Jan Hidders and Philippe Michiels.
     
     // Link: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.4006
     // Page 6 - Figure 5

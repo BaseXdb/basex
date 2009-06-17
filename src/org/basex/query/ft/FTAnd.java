@@ -89,7 +89,7 @@ public final class FTAnd extends FTExpr {
     if(pex.length == 0) {
       // !A FTAnd !B = !(a ftor b)
       for(int i = 0; i < expr.length; i++) expr[i] = expr[i].expr[0];
-      return new FTNotIndex(new FTUnion(nex, false, expr));
+      return new FTNot(new FTUnion(nex, false, expr));
     }
     return new FTIntersection(pex, nex, expr);
   }

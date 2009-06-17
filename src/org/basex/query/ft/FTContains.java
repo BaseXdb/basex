@@ -98,7 +98,7 @@ public class FTContains extends Expr {
     final FTExpr ie = ftexpr.indexEquivalent(ic);
 
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsSIndex(expr, ie, !ic.ftnot);
+    if(ic.seq) return new FTContainsSIndex(expr, ie, ic.ftnot);
 
     // standard index evaluation; first expression will always be an axis path
     return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ft, ic), ic.step);

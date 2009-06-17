@@ -113,7 +113,7 @@ public final class FTOr extends FTExpr {
       // !A FTOR !B = !(a ftand b)
       FTExpr[] nexpr = new FTExpr[nex.length];
       for(int i = 0; i < nex.length; i++) nexpr[i] = expr[nex[i]].expr[0];
-      return new FTNotIndex(new FTIntersection(pex, nex, nexpr));
+      return new FTNot(new FTIntersection(pex, nex, nexpr));
     }
 
     // [SG] is never the case..

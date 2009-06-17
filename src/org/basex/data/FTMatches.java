@@ -10,10 +10,10 @@ import org.basex.util.Array;
  * @author Christian Gruen
  */
 public final class FTMatches {
-  /** Number of entries. */
-  public int size;
   /** Full-text matches. */
   public FTMatch[] match = new FTMatch[1];
+  /** Number of entries. */
+  public int size;
   /** Current number of tokens. */
   private byte sTokenNum;
 
@@ -22,16 +22,25 @@ public final class FTMatches {
    * @param s sets the token number
    */
   public void reset(final byte s) {
-    size = 0;
     sTokenNum = s;
+    size = 0;
   }
 
   /**
-   * Checks if at least one of the matches yields true.
+   * Checks if at least one of the matches contains only includes.
    * @return result of check
    */
-  public boolean match() {
+  public boolean matches() {
     for(int a = 0; a < size; a++) if(match[a].match()) return true;
+    return false;
+  }
+
+  /**
+   * Checks if at least one of the matches is excluded.
+   * @return result of check
+   */
+  public boolean excludes() {
+    for(int a = 0; a < size; a++) if(!match[a].match()) return true;
     return false;
   }
 
@@ -70,7 +79,24 @@ public final class FTMatches {
   }
 
   /**
-   * Combines two matches as strings.
+   * Performs a mild not operation.
+   * @param all second match list
+   * @return true if matches are left
+   */
+  public boolean mildnot(final FTMatches all) {
+    for(int a = 0; a < size; a++) {
+      for(int b = 0; b < all.size; b++) {
+        if(!match[a].notin(all.match[b])) {
+          delete(a--);
+          break;
+        }
+      }
+    }
+    return size != 0;
+  }
+
+  /**
+   * Combines two matches as phrase.
    * @param all second match list
    * @return true if matches are left
    */

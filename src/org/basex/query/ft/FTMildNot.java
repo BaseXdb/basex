@@ -8,6 +8,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
@@ -33,15 +34,7 @@ public final class FTMildNot extends FTExpr {
     final FTItem item = expr[0].atomic(ctx);
     final FTMatches all = item.all;
     for(int e = 1; e < expr.length; e++) {
-      final FTMatches al = expr[e].atomic(ctx).all;
-      for(int a = 0; a < all.size; a++) {
-        for(int b = 0; b < al.size; b++) {
-          if(!all.match[a].notin(al.match[b])) {
-            all.delete(a--);
-            break;
-          }
-        }
-      }
+      if(!all.mildnot(expr[e].atomic(ctx).all)) break;
     }
     if(all.size == 0) item.score(0);
     return item;
@@ -55,6 +48,71 @@ public final class FTMildNot extends FTExpr {
 
   
   // [CG] FT: to be revised...
+  
+  @Override
+  public FTIter iter(final QueryContext ctx) {
+    return new FTIter() {
+      //final FTIter i1 = expr[0].iter(ctx);
+      //final FTIter i2 = expr[1].iter(ctx);
+      //FTItem n0, n1;
+      
+      @Override
+      public FTItem next() { 
+        return null;
+        /*
+        if(n0 == null) n0 = i1.next();
+        if(n1 == null) n1 = i2.next();
+        if(n0.empty() || n1.empty()) {
+          final FTItem tmp = n0;
+          n0 = null;
+          return tmp;
+        } 
+        
+        final IntList pos = new IntList();
+        final TokenBuilder poi = new TokenBuilder();
+        
+        int d = n0.fte.pre - n1.fte.pre;
+        if(d < 0) {
+          final FTItem tmp = n0;
+          n0 = null;
+          return tmp;
+        }
+//        if(d > 0) {
+          n1 = null;
+          return next();
+        }
+
+        boolean mp0 = n0.fte.morePos();
+        boolean mp1 = n1.fte.morePos();
+        while(mp0 && mp1) {
+          d = n0.fte.nextPos() - n1.fte.nextPos();
+          if(d <= 0) {
+            if(d < 0) {
+              pos.add(n0.fte.nextPos());
+              poi.add(n0.fte.nextPoi());
+            }
+            mp0 = n0.fte.morePos();
+          }
+          if(d >= 0) {
+            mp1 = n1.fte.morePos();
+          }
+        }
+
+        if(pos.size > 0) {
+          final FTItem tmp = n0;
+          tmp.fte.pos = pos;
+          tmp.fte.poi = poi;
+          n0 = null;
+          n1 = null;
+          return tmp;
+        }
+        n1 = null;
+        n0 = null;
+        return next();
+        */
+      }
+    };
+  }
   
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
@@ -88,12 +146,12 @@ public final class FTMildNot extends FTExpr {
     // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
 
     final FTExpr[] ie = new FTExpr[2];
-    final FTMildNotIndex[] mne = new FTMildNotIndex[expr.length - 1];
+    final FTMildNot[] mne = new FTMildNot[expr.length - 1];
     final int[] pex = new int[expr.length - 1];
     ie[0] = expr[0].indexEquivalent(ic);
     for(int i = 1; i < expr.length; i++) {
       ie[1] = expr[i].indexEquivalent(ic);
-      mne[i - 1] = new FTMildNotIndex(ie);
+      mne[i - 1] = new FTMildNot(ie);
       pex[i - 1] = i - 1;
     }
     if(mne.length == 1) {

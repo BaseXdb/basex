@@ -39,7 +39,7 @@ public final class FTItem extends DBNode {
   @Override
   public double score() {
     // default score for index results
-    if(score == -1) score = all.match() ? 1 : 0;
+    if(score == -1) score = all.matches() ? 1 : 0;
     return score;
   }
 

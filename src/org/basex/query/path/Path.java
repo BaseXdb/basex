@@ -55,7 +55,7 @@ public abstract class Path extends Expr {
    * @return root
    */
   protected Item root(final QueryContext ctx) {
-    final Item it = ctx.item;
+    final Item it = ctx != null ? ctx.item : null;
     if(root == null) return it;
     if(root.i()) return (Item) root;
     if(!(root instanceof Root) || it == null) return null;
