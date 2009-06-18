@@ -41,6 +41,14 @@ class ByteBufferList {
   MappedByteBuffer get(final int p) {
     return list[p];
   }
+  
+  /**
+   * Returns the last value.
+   * @return MappedByteBuffer
+   */
+  MappedByteBuffer last() {
+    return list[size - 1];
+  }
 
   /**
    * Sets a value at the specified position.
@@ -51,4 +59,13 @@ class ByteBufferList {
     list[p] = v;
     size = Math.max(size, p + 1);
   }
+  
+  /**
+   * Return list length.
+   * @return list length
+   */
+  public int length() {
+    return size;
+  }
+
 }
