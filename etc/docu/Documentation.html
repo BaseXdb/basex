@@ -1,27 +1,80 @@
-<html><head>
-      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-   <title>Full-Documentation of BaseX</title><meta name="generator" content="DocBook XSL-NS Stylesheets V1.74.3-pre"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e1"></a>Full-Documentation of BaseX</h1></div><div><div class="author"><h3 class="author"><span class="surname">BaseX-Team</span></h3><div class="affiliation"><div class="address"><p><br>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Full-Documentation of BaseX</title><link rev="made" href="0"><meta name="generator" content="DocBook XSL Stylesheets V1.74.3"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d59e1"></a>Full-Documentation of BaseX</h1></div><div><div class="author"><h3 class="author"><span class="surname">BaseX-Team</span></h3><div class="affiliation">
+				<div class="address"><p><br>
 					<code class="email">&lt;<a class="email" href="mailto:info@basex.org">info@basex.org</a>&gt;</code><br>
-				</p></div></div></div></div><div><p class="copyright">Copyright &copy; 2009 DBIS, University of Konstanz</p></div><div><p class="pubdate">June 2009</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#d0e22">1. Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e28">Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e32">Operating System</a></span></dt><dt><span class="section"><a href="#d0e53">Software</a></span></dt><dt><span class="section"><a href="#d0e67">Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e84">Installation</a></span></dt><dt><span class="section"><a href="#d0e151">Quick Start</a></span></dt><dt><span class="section"><a href="#d0e182">Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d0e187">Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d0e192">Using BaseX as Server</a></span></dt><dt><span class="section"><a href="#d0e197">Starting BaseX as a service</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d0e202">2. Working with the BaseX Console</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e206">Launching BaseX in console mode</a></span></dt><dt><span class="section"><a href="#d0e212">Description of the Console Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e218">Database Commands</a></span></dt><dt><span class="section"><a href="#d0e248">Query Commands</a></span></dt><dt><span class="section"><a href="#d0e263">Update Commands</a></span></dt><dt><span class="section"><a href="#d0e281">General Commands</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#d0e296">3. Working with the BaseX GUI</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e300">Description of all the Views in the GUI</a></span></dt><dt><span class="section"><a href="#d0e321">Description of the GUI Features</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d0e327">4. General Information</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e331">Location of BaseX Files</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d0e337">5. Description of BaseX-Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e341">XQuery Implementation</a></span></dt><dt><span class="section"><a href="#d0e347">XQuery Full-Text Implementation</a></span></dt><dt><span class="section"><a href="#d0e353">Description of the Indexes</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d0e359">6. Developer's Guide</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e363">Programming with BaseX API</a></span></dt><dt><span class="section"><a href="#d0e369">Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d0e375">Programming with XQuery API</a></span></dt></dl></dd></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e22"></a>Introduction</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e28">Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e32">Operating System</a></span></dt><dt><span class="section"><a href="#d0e53">Software</a></span></dt><dt><span class="section"><a href="#d0e67">Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e84">Installation</a></span></dt><dt><span class="section"><a href="#d0e151">Quick Start</a></span></dt><dt><span class="section"><a href="#d0e182">Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d0e187">Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d0e192">Using BaseX as Server</a></span></dt><dt><span class="section"><a href="#d0e197">Starting BaseX as a service</a></span></dt></dl></div><p>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text
+				</p></div>
+			</div></div></div><div><p class="copyright">Copyright © 2009 DBIS, University of Konstanz</p></div><div><p class="pubdate">June 2009</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#d59e33">1. Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e43">1. Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e50">1.1. Operating System</a></span></dt><dt><span class="section"><a href="#d59e91">1.2. Software</a></span></dt><dt><span class="section"><a href="#d59e111">1.3. Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e144">2. Installation</a></span></dt><dt><span class="section"><a href="#d59e238">3. Quick Start</a></span></dt><dt><span class="section"><a href="#d59e284">4. Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d59e294">5. Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d59e304">6. Using BaseX as Server</a></span></dt><dt><span class="section"><a href="#d59e314">7. Starting BaseX as a service</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e325">2. Working with the BaseX Console</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e332">1. Launching BaseX in console mode</a></span></dt><dt><span class="section"><a href="#d59e343">2. Description of the Console Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e353">2.1. Database Commands</a></span></dt><dt><span class="section"><a href="#d59e413">2.2. Query Commands</a></span></dt><dt><span class="section"><a href="#d59e442">2.3. Update Commands</a></span></dt><dt><span class="section"><a href="#d59e478">2.4. General Commands</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#d59e509">3. Working with the BaseX GUI</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e516">1. Description of all the Views in the GUI</a></span></dt><dt><span class="section"><a href="#d59e558">2. Description of the GUI Features</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e570">4. General Information</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e577">1. Location of BaseX Files</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e590">5. Description of BaseX-Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e597">1. XQuery Implementation</a></span></dt><dt><span class="section"><a href="#d59e608">2. XQuery Full-Text Implementation</a></span></dt><dt><span class="section"><a href="#d59e619">3. Description of the Indexes</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e631">6. Developer's Guide</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e638">1. Programming with BaseX API</a></span></dt><dt><span class="section"><a href="#d59e649">2. Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d59e660">3. Programming with XQuery API</a></span></dt></dl></dd></dl></div>
+	
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e33"></a>Chapter&nbsp;1.&nbsp;Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e43">1. Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e50">1.1. Operating System</a></span></dt><dt><span class="section"><a href="#d59e91">1.2. Software</a></span></dt><dt><span class="section"><a href="#d59e111">1.3. Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e144">2. Installation</a></span></dt><dt><span class="section"><a href="#d59e238">3. Quick Start</a></span></dt><dt><span class="section"><a href="#d59e284">4. Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d59e294">5. Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d59e304">6. Using BaseX as Server</a></span></dt><dt><span class="section"><a href="#d59e314">7. Starting BaseX as a service</a></span></dt></dl></div>
+		
+		<p>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text
 			processor. It supports very large XML instances and offers a visual, interactive
 			frontend. BaseX is written in Java and freely available for download. It is developed by
-			the Database and Information Systems Group at the University of Konstanz. </p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e28"></a>Prerequisites</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e32"></a>Operating System</h3></div></div></div><p>BaseX was tested on the following platforms:</p><div class="itemizedlist"><ul type="disc"><li><p>Windows 2000, XP, Vista, 7</p></li><li><p>Linux: Debian/Ubuntu, SuSE, Redhat</p></li><li><p>Max OS X (10.4+)</p></li><li><p>OpenBSD (4.3)</p></li></ul></div><p>Every other platform with a Java VM should be able to run BaseX.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e53"></a>Software</h3></div></div></div><p>To run any version of BaseX, you need version 1.5 or later of the Java runtime
-					environment (JRE) or development kit (JDK).</p><p>The latest version of Java can be downloaded at <code class="uri"><a class="uri" href="http://www.java.com" target="_top">http://www.java.com</a></code> or <code class="uri"><a class="uri" href="http://java.sun.com" target="_top">http://java.sun.com</a></code> .</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e67"></a>Hardware</h3></div></div></div><p>BaseX works with very limited resources (400 MHz, 64 MB RAM). To work with
+			the Database and Information Systems Group at the University of Konstanz. </p>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e43"></a>1.&nbsp;Prerequisites</h2></div></div></div>
+			
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e50"></a>1.1.&nbsp;Operating System</h3></div></div></div>
+				
+				<p>BaseX was tested on the following platforms:</p>
+				<div class="itemizedlist"><ul type="disc"><li>
+						<p>Windows 2000, XP, Vista, 7</p>
+					</li><li>
+						<p>Linux: Debian/Ubuntu, SuSE, Redhat</p>
+					</li><li>
+						<p>Max OS X (10.4+)</p>
+					</li><li>
+						<p>OpenBSD (4.3)</p>
+					</li></ul></div>
+				<p>Every other platform with a Java VM should be able to run BaseX.</p>
+			</div>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e91"></a>1.2.&nbsp;Software</h3></div></div></div>
+				
+				<p>To run any version of BaseX, you need version 1.5 or later of the Java runtime
+					environment (JRE) or development kit (JDK).</p>
+				<p>The latest version of Java can be downloaded at <code class="uri"><a class="uri" href="http://www.java.com" target="_top">http://www.java.com</a></code> or <code class="uri"><a class="uri" href="http://java.sun.com" target="_top">http://java.sun.com</a></code> .</p>
+			</div>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e111"></a>1.3.&nbsp;Hardware</h3></div></div></div>
+				
+				<p>BaseX works with very limited resources (400 MHz, 64 MB RAM). To work with
 					larger databases, however, you might benefit from more RAM. If you encounter
-					main memory limits, there are several things you can try: </p><div class="itemizedlist"><ul type="disc"><li><p>Increase Java's virtual memory</p></li><li><p>Switch off database indexes</p></li><li><p>Use BaseX's internal XML parser</p></li></ul></div><p>
-				</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e84"></a>Installation</h2></div></div></div><p>BaseX works without any installation. The following files can be <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php" target="_top">downloaded</a>
-				from the homepage: </p><div class="itemizedlist"><ul type="disc"><li><p>
-							<span class="emphasis"><em>BaseX.jar</em></span>: simple JAR file</p></li><li><p>
+					main memory limits, there are several things you can try: </p><div class="itemizedlist"><ul type="disc"><li>
+							<p>Increase Java's virtual memory</p>
+						</li><li>
+							<p>Switch off database indexes</p>
+						</li><li>
+							<p>Use BaseX's internal XML parser</p>
+						</li></ul></div><p>
+				</p>
+			</div>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e144"></a>2.&nbsp;Installation</h2></div></div></div>
+			
+			<p>BaseX works without any installation. The following files can be <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php" target="_top">downloaded</a>
+				from the homepage: </p><div class="itemizedlist"><ul type="disc"><li>
+						<p>
+							<span class="emphasis"><em>BaseX.jar</em></span>: simple JAR file</p>
+					</li><li>
+						<p>
 							<span class="emphasis"><em>BaseX.exe</em></span>: a JAR file, which is wrapped into a
-							Windows executable</p></li><li><p>
-							<span class="emphasis"><em>BaseX-XQJ.jar</em></span>: <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xqj.jar" target="_top"> XQuery for Java</a> Database API</p></li><li><p>
-							<span class="emphasis"><em>BaseX-XMLDB.jar</em></span>: <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xmldb.jar" target="_top"> XML:DB </a> Database API</p></li><li><p>
+							Windows executable</p>
+					</li><li>
+						<p>
+							<span class="emphasis"><em>BaseX-XQJ.jar</em></span>: <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xqj.jar" target="_top"> XQuery for Java</a> Database API</p>
+					</li><li>
+						<p>
+							<span class="emphasis"><em>BaseX-XMLDB.jar</em></span>: <a class="link" href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xmldb.jar" target="_top"> XML:DB </a> Database API</p>
+					</li><li>
+						<p>
 							<span class="emphasis"><em>BaseX-Complete.zip</em></span>: JAR files, sources,
-							documentation and files to build the project</p></li></ul></div><p>The JAR file and the Windows executable can be launched with a simple
+							documentation and files to build the project</p>
+					</li></ul></div>
+			<p>The JAR file and the Windows executable can be launched with a simple
 				double-click. The "Complete" package contains the following files and directories
-				(selection):</p><div class="blockquote"><blockquote class="blockquote"><p>
+				(selection):</p>
+			<div class="blockquote"><blockquote class="blockquote">
+				<p>
 					<span class="emphasis"><em>Project Directory</em></span>
-				</p><pre class="programlisting">
+				</p>
+				<pre class="programlisting">
 	doc              Project documentation
 	etc              Various files for project handling
 	src              Project sources
@@ -31,47 +84,192 @@
 	license.txt      Licensing Information
 	readme.txt       Project Information
 	build.xml        <a class="link" href="http://ant.apache.org/" target="_top">Ant</a> Build file
-	input.xml        XML sample document</pre></blockquote></div><p>In the <span class="emphasis"><em>etc</em></span> folder, you find Linux scripts and Windows batch
-				files which can moved into your PATH environment to speedup execution. </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e151"></a>Quick Start</h2></div></div></div><p>By double-clicking the JAR file, the graphical interface is launched. If you start
+	input.xml        XML sample document</pre>
+			</blockquote></div>
+			<p>In the <span class="emphasis"><em>etc</em></span> folder, you find Linux scripts and Windows batch
+				files which can moved into your PATH environment to speedup execution. </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e238"></a>3.&nbsp;Quick Start</h2></div></div></div>
+			
+			<p>By double-clicking the JAR file, the graphical interface is launched. If you start
 				BaseX on the command line, or use the scripts mentioned above, you have some more
-				options: </p><div class="blockquote"><blockquote class="blockquote"><p>
+				options: </p><div class="blockquote"><blockquote class="blockquote">
+					<p>
 						<span class="emphasis"><em>Console version</em></span>
-					</p><pre class="programlisting">java -cp BaseX.jar org.basex.BaseX</pre><p>
+					</p>
+					<pre class="programlisting">java -cp BaseX.jar org.basex.BaseX</pre>
+					<p>
 						<span class="emphasis"><em>Running the server and a client instance</em></span>
-					</p><pre class="programlisting">java -cp BaseX.jar org.basex.BaseXServer</pre><pre class="programlisting">java -cp BaseX.jar org.basex.BaseXClient</pre><p>
+					</p>
+					<pre class="programlisting">java -cp BaseX.jar org.basex.BaseXServer</pre>
+					<pre class="programlisting">java -cp BaseX.jar org.basex.BaseXClient</pre>
+					<p>
 						<span class="emphasis"><em>GUI version (granting more memory)</em></span>
-					</p><pre class="programlisting">java -Xmx512m -jar BaseX.jar</pre></blockquote></div><p>
-			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e182"></a>Starting with BaseX GUI</h2></div></div></div><p></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e187"></a>Starting with BaseX Console</h2></div></div></div><p></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e192"></a>Using BaseX as Server</h2></div></div></div><p></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e197"></a>Starting BaseX as a service</h2></div></div></div><p></p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e202"></a>Working with the BaseX Console</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e206">Launching BaseX in console mode</a></span></dt><dt><span class="section"><a href="#d0e212">Description of the Console Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e218">Database Commands</a></span></dt><dt><span class="section"><a href="#d0e248">Query Commands</a></span></dt><dt><span class="section"><a href="#d0e263">Update Commands</a></span></dt><dt><span class="section"><a href="#d0e281">General Commands</a></span></dt></dl></dd></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e206"></a>Launching BaseX in console mode</h2></div></div></div><p> Your Text </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e212"></a>Description of the Console Features</h2></div></div></div><p>You can type in help in the console to get a list of all BaseX commands.
+					</p>
+					<pre class="programlisting">java -Xmx512m -jar BaseX.jar</pre>
+				</blockquote></div><p>
+			</p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e284"></a>4.&nbsp;Starting with BaseX GUI</h2></div></div></div>
+			
+			<p></p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e294"></a>5.&nbsp;Starting with BaseX Console</h2></div></div></div>
+			
+			<p></p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e304"></a>6.&nbsp;Using BaseX as Server</h2></div></div></div>
+			
+			<p></p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e314"></a>7.&nbsp;Starting BaseX as a service</h2></div></div></div>
+			
+			<p></p>
+		</div>
+	</div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e325"></a>Chapter&nbsp;2.&nbsp;Working with the BaseX Console</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e332">1. Launching BaseX in console mode</a></span></dt><dt><span class="section"><a href="#d59e343">2. Description of the Console Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e353">2.1. Database Commands</a></span></dt><dt><span class="section"><a href="#d59e413">2.2. Query Commands</a></span></dt><dt><span class="section"><a href="#d59e442">2.3. Update Commands</a></span></dt><dt><span class="section"><a href="#d59e478">2.4. General Commands</a></span></dt></dl></dd></dl></div>
+		
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e332"></a>1.&nbsp;Launching BaseX in console mode</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e343"></a>2.&nbsp;Description of the Console Features</h2></div></div></div>
+			
+			<p>You can type in help in the console to get a list of all BaseX commands.
 				Several commands can be separated by semicolons. To evaluate commands
-				without entering the console mode, you can use the -q option on the command line</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e218"></a>Database Commands</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><p>Create (create [DB|FS|INDEX] [...]):
-						Creates database from XML or filesystem, or creates index</p></li><li><p>Open (open [database]):
-						Opens the specified [database].</p></li><li><p>Info (info [DB|INDEX|TABLE]?):
-						Shows information on the currently opened database.</p></li><li><p>Close (close): 
-						Closes the current database.</p></li><li><p>List (list):
-						Lists all available databases. </p></li><li><p>Drop (drop [DB|INDEX] [...] ):
-						Drops a database or an index.</p></li><li><p>Export (export [file]): 
-						Exports the current context set to an XML [file].</p></li><li><p>Optimize (optimize):
-						Optimizes the current database structures.</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e248"></a>Query Commands</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><p>XQuery (xquery [query]): 
-						Evaluates an XQuery and prints the result. </p></li><li><p>Find (find [query]): 
+				without entering the console mode, you can use the -q option on the command line</p>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e353"></a>2.1.&nbsp;Database Commands</h3></div></div></div>
+				<div class="itemizedlist"><ul type="disc"><li>
+						<p>Create (create [DB|FS|INDEX] [...]):
+						Creates database from XML or filesystem, or creates index</p>
+					</li><li>
+						<p>Open (open [database]):
+						Opens the specified [database].</p>
+					</li><li>
+						<p>Info (info [DB|INDEX|TABLE]?):
+						Shows information on the currently opened database.</p>
+					</li><li>
+						<p>Close (close): 
+						Closes the current database.</p>
+					</li><li>
+						<p>List (list):
+						Lists all available databases. </p>
+					</li><li>
+						<p>Drop (drop [DB|INDEX] [...] ):
+						Drops a database or an index.</p>
+					</li><li>
+						<p>Export (export [file]): 
+						Exports the current context set to an XML [file].</p>
+					</li><li>
+						<p>Optimize (optimize):
+						Optimizes the current database structures.</p>
+					</li></ul></div></div>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e413"></a>2.2.&nbsp;Query Commands</h3></div></div></div>
+				<div class="itemizedlist"><ul type="disc"><li>
+						<p>XQuery (xquery [query]): 
+						Evaluates an XQuery and prints the result. </p>
+					</li><li>
+						<p>Find (find [query]): 
 							Evaluate a simple keyword [query] and print its results.
-							This command is used in the simple search mode in the GUI. </p></li><li><p>CS (cs [query]):
+							This command is used in the simple search mode in the GUI. </p>
+					</li><li>
+						<p>CS (cs [query]):
 						Evaluates the specified XPath [query] and set the
-						result as new context set. </p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e263"></a>Update Commands</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><p>Copy (copy [pos] [source] [target]): 
+						result as new context set. </p>
+					</li></ul></div></div>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e442"></a>2.3.&nbsp;Update Commands</h3></div></div></div>
+				<div class="itemizedlist"><ul type="disc"><li>
+						<p>Copy (copy [pos] [source] [target]): 
 							Copy database nodes. Evaluates the [source] query and copies
 							the resulting nodes as child nodes into the [target] query.
 							[pos] specifies the child position; if 0 is specified, the
 							nodes are inserted as last child. The queries should be enclosed
-							by brackets. </p></li><li><p>Delete (delete ["target"]): 
+							by brackets. </p>
+					</li><li>
+						<p>Delete (delete ["target"]): 
 							Delete database nodes resulting from the specified [target] query.
-							The query should be enclosed by brackets.</p></li><li><p>Insert (insert [fragment|element|attribute|text|comment|pi] [...]): 
+							The query should be enclosed by brackets.</p>
+					</li><li>
+						<p>Insert (insert [fragment|element|attribute|text|comment|pi] [...]): 
 							Insert database nodes. Insert a fragment or a specific node at the
-							specified child [pos] of the specified [target] query.</p></li><li><p>Update (update [element|attribute|text|comment|pi] [...]): 
-							Update database nodes satisfying the specified [target] query. </p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e281"></a>General Commands</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><p>Help (help [command]): Get help on BaseX commands.
+							specified child [pos] of the specified [target] query.</p>
+					</li><li>
+						<p>Update (update [element|attribute|text|comment|pi] [...]): 
+							Update database nodes satisfying the specified [target] query. </p>
+					</li></ul></div></div>
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e478"></a>2.4.&nbsp;General Commands</h3></div></div></div>
+				<div class="itemizedlist"><ul type="disc"><li>
+						<p>Help (help [command]): Get help on BaseX commands.
 							If [command] is specified, information on the specific
 							command is printed; otherwise, all commands are listed.
-							If 'all' is specified, hidden commands are included. </p></li><li><p>Set (set [option] [value?]): Sets global options.
-							The currently set values can be shown with the info command.</p></li><li><p>Exit (exit/quit): Leave the console mode of BaseX.</p></li></ul></div></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e296"></a>Working with the BaseX GUI</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e300">Description of all the Views in the GUI</a></span></dt><dt><span class="section"><a href="#d0e321">Description of the GUI Features</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e300"></a>Description of all the Views in the GUI</h2></div></div></div><div class="itemizedlist"><ul type="disc"><li><p>Text View: Displays query results and other textual output.</p></li><li><p>Map View: This visualization represents all data in a TreeMap.
+							If 'all' is specified, hidden commands are included. </p>
+					</li><li>
+						<p>Set (set [option] [value?]): Sets global options.
+							The currently set values can be shown with the info command.</p>
+					</li><li>
+						<p>Exit (exit/quit): Leave the console mode of BaseX.</p>
+					</li></ul></div></div>
+		</div>
+	</div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e509"></a>Chapter&nbsp;3.&nbsp;Working with the BaseX GUI</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e516">1. Description of all the Views in the GUI</a></span></dt><dt><span class="section"><a href="#d59e558">2. Description of the GUI Features</a></span></dt></dl></div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e516"></a>1.&nbsp;Description of all the Views in the GUI</h2></div></div></div>
+			
+			<div class="itemizedlist"><ul type="disc"><li>
+					<p>Text View: Displays query results and other textual output.</p>
+				</li><li>
+					<p>Map View: This visualization represents all data in a TreeMap.
 					All nodes of the XML document are represented as rectangles, filling
 					the complete area. You can choose in the Menu Options/Map Layout the
-					different Algorithms: Split, Strip, Squarified and Slice and Dice Layout.</p></li><li><p>Folder View: This visualization displays all XML nodes in a usual tree view.</p></li><li><p>Table View: This visualization displays all XML nodes in a
-						table with rows and columns.</p></li><li><p>Scatterplot View: This visualizations displays all XML nodes in a scatterplot.</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e321"></a>Description of the GUI Features</h2></div></div></div><p> Your Text </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e327"></a>General Information</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e331">Location of BaseX Files</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e331"></a>Location of BaseX Files</h2></div></div></div><p> Your Text </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e337"></a>Description of BaseX-Features</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e341">XQuery Implementation</a></span></dt><dt><span class="section"><a href="#d0e347">XQuery Full-Text Implementation</a></span></dt><dt><span class="section"><a href="#d0e353">Description of the Indexes</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e341"></a>XQuery Implementation</h2></div></div></div><p> Your Text </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e347"></a>XQuery Full-Text Implementation</h2></div></div></div><p> Your Text </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e353"></a>Description of the Indexes</h2></div></div></div><p> Your Text </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e359"></a>Developer's Guide</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e363">Programming with BaseX API</a></span></dt><dt><span class="section"><a href="#d0e369">Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d0e375">Programming with XQuery API</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e363"></a>Programming with BaseX API</h2></div></div></div><p> Your Text </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e369"></a>Programming with XML:DB API</h2></div></div></div><p> Your Text </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e375"></a>Programming with XQuery API</h2></div></div></div><p> Your Text </p></div></div></div></body></html>
+					different Algorithms: Split, Strip, Squarified and Slice and Dice Layout.</p>
+				</li><li>
+					<p>Folder View: This visualization displays all XML nodes in a usual tree view.</p>
+				</li><li>
+					<p>Table View: This visualization displays all XML nodes in a
+						table with rows and columns.</p>
+				</li><li>
+					<p>Scatterplot View: This visualizations displays all XML nodes in a scatterplot.</p>
+				</li></ul></div>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e558"></a>2.&nbsp;Description of the GUI Features</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+	</div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e570"></a>Chapter&nbsp;4.&nbsp;General Information</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e577">1. Location of BaseX Files</a></span></dt></dl></div>
+		
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e577"></a>1.&nbsp;Location of BaseX Files</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+	</div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e590"></a>Chapter&nbsp;5.&nbsp;Description of BaseX-Features</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e597">1. XQuery Implementation</a></span></dt><dt><span class="section"><a href="#d59e608">2. XQuery Full-Text Implementation</a></span></dt><dt><span class="section"><a href="#d59e619">3. Description of the Indexes</a></span></dt></dl></div>
+		
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e597"></a>1.&nbsp;XQuery Implementation</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e608"></a>2.&nbsp;XQuery Full-Text Implementation</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e619"></a>3.&nbsp;Description of the Indexes</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+	</div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e631"></a>Chapter&nbsp;6.&nbsp;Developer's Guide</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e638">1. Programming with BaseX API</a></span></dt><dt><span class="section"><a href="#d59e649">2. Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d59e660">3. Programming with XQuery API</a></span></dt></dl></div>
+		
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e638"></a>1.&nbsp;Programming with BaseX API</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e649"></a>2.&nbsp;Programming with XML:DB API</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e660"></a>3.&nbsp;Programming with XQuery API</h2></div></div></div>
+			
+			<p> Your Text </p>
+		</div>
+	</div>
+</div></body></html>

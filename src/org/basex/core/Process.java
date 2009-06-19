@@ -84,7 +84,7 @@ public abstract class Process extends AbstractProcess {
             Performance.sleep(1000);
           }
         }
-      };
+      }.start();
     }
     if(updating()) {
       if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
