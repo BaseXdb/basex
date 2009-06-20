@@ -138,7 +138,7 @@ public class Session implements Runnable {
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
-    stop();
+    stop(true);
   }
   
   /**
@@ -177,9 +177,10 @@ public class Session implements Runnable {
   
   /**
    * Stops the thread. 
+   * @param quit check how the quit command is called
    */
-  synchronized void stop() {
-    bx.sessions.remove(this);
+  public void stop(final boolean quit) {
+    if (quit) bx.sessions.remove(this);
     try {
       BaseX.outln("Client " + clientId + " has logged out.");
       socket.close();
@@ -196,7 +197,7 @@ public class Session implements Runnable {
       // for forced stops
       if (io instanceof SocketException) {
         running = false;
-        stop();
+        stop(false);
       } else {
       io.printStackTrace();
       }

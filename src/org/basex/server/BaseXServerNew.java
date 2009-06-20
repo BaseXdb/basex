@@ -86,8 +86,7 @@ public class BaseXServerNew {
     for(int i = 0; i < sessions.size(); i++) {
       try {
         Session s = sessions.get(i);
-        s.dos.flush();
-        s.dis.close();
+        s.socket.close();
       } catch(IOException e) {
         e.printStackTrace();
       }
