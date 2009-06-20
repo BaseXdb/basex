@@ -107,7 +107,7 @@ public class Seq extends Item {
 
   @Override
   public int diff(final Item it) {
-    BaseX.notimplemented();
+    BaseX.notexpected();
     return 0;
   }
 

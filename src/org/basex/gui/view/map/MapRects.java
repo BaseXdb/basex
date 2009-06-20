@@ -117,7 +117,7 @@ final class MapRects implements Iterable<MapRect> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public MapRect next() { return list[c]; }
-      public void remove() { BaseX.notimplemented(); }
+      public void remove() { BaseX.notexpected(); }
     };
   }
 

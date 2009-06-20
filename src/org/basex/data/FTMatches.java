@@ -15,7 +15,7 @@ public final class FTMatches {
   /** Number of entries. */
   public int size;
   /** Current number of tokens. */
-  private byte sTokenNum;
+  public byte sTokenNum;
 
   /**
    * Resets the match counter.
@@ -36,15 +36,6 @@ public final class FTMatches {
   }
 
   /**
-   * Checks if at least one of the matches is excluded.
-   * @return result of check
-   */
-  public boolean excludes() {
-    for(int a = 0; a < size; a++) if(!match[a].match()) return true;
-    return false;
-  }
-
-  /**
    * Inverts string includes and excludes.
    */
   public void not() {
@@ -53,46 +44,53 @@ public final class FTMatches {
 
   /**
    * Merges two matches.
-   * @param all second match list
+   * @param m1 first match list
+   * @param m2 second match list
+   * @return self reference
    */
-  public void or(final FTMatches all) {
-    for(int a = 0; a < all.size; a++) add(all.match[a]);
-    sTokenNum = sTokenNum < all.sTokenNum ? all.sTokenNum : sTokenNum;
+  public static FTMatches or(final FTMatches m1, final FTMatches m2) {
+    final FTMatches tmp = new FTMatches();
+    for(int a = 0; a < m1.size; a++) tmp.add(m1.match[a]);
+    for(int a = 0; a < m2.size; a++) tmp.add(m2.match[a]);
+    tmp.sTokenNum = m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum;
+    return tmp;
   }
 
   /**
    * Merges two matches.
-   * @param all second match list
+   * @param m1 first match list
+   * @param m2 second match list
    * @return self reference
    */
-  public FTMatches and(final FTMatches all) {
+  public static FTMatches and(final FTMatches m1, final FTMatches m2) {
     final FTMatches tmp = new FTMatches();
-    for(int a = 0; a < size; a++) {
-      for(int b = 0; b < all.size; b++) {
-        final FTMatch m = new FTMatch(match[a]);
-        m.add(all.match[b]);
+    for(int a = 0; a < m1.size; a++) {
+      for(int b = 0; b < m2.size; b++) {
+        final FTMatch m = new FTMatch(m1.match[a]);
+        m.add(m2.match[b]);
         tmp.add(m);
       }
     }
-    tmp.sTokenNum = sTokenNum < all.sTokenNum ? all.sTokenNum : sTokenNum;
+    tmp.sTokenNum = m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum;
     return tmp;
   }
 
   /**
    * Performs a mild not operation.
-   * @param all second match list
-   * @return true if matches are left
+   * @param m1 first match list
+   * @param m2 second match list
+   * @return self reference
    */
-  public boolean mildnot(final FTMatches all) {
-    for(int a = 0; a < size; a++) {
-      for(int b = 0; b < all.size; b++) {
-        if(!match[a].notin(all.match[b])) {
-          delete(a--);
-          break;
-        }
+  public static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
+    final FTMatches tmp = new FTMatches();
+    for(int a = 0; a < m1.size; a++) {
+      boolean n = true;
+      for(int b = 0; b < m2.size; b++) {
+        n &= m1.match[a].notin(m2.match[b]);
       }
+      if(n) tmp.add(m1.match[a]);
     }
-    return size != 0;
+    return tmp;
   }
 
   /**

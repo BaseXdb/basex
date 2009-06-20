@@ -90,7 +90,7 @@ public final class And extends Arr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     for(final Expr e : expr) {
-      if(!e.indexAccessible(ic)) return false;
+      if(!e.indexAccessible(ic) || ic.seq) return false;
       if(ic.is == 0) break;
     }
     return true;

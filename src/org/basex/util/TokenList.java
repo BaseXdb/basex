@@ -104,7 +104,7 @@ public final class TokenList implements Iterable<byte[]> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public byte[] next() { return list[c]; }
-      public void remove() { BaseX.notimplemented(); }
+      public void remove() { BaseX.notexpected(); }
     };
   }
 }

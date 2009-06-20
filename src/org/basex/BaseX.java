@@ -141,7 +141,7 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented(final Object... ext) {
-    final TokenBuilder sb = new TokenBuilder(PROCIMPL);
+    final TokenBuilder sb = new TokenBuilder("Not Implemented.");
     if(ext.length != 0) sb.add(" (%)", ext);
     throw new UnsupportedOperationException(sb.add('.').toString());
   }
@@ -161,7 +161,7 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static String bug(final Object... ext) {
-    final TokenBuilder sb = new TokenBuilder(PROCBUG);
+    final TokenBuilder sb = new TokenBuilder("Implementation Bug?");
     if(ext.length != 0) sb.add(" (%)", ext);
     return sb.toString();
   }

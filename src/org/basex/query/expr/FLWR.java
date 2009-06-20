@@ -34,6 +34,7 @@ public final class FLWR extends FLWOR {
       final ForLet f = fl[fl.length - 1];
       if(f instanceof For && f.standard() && where.removable(f.var, ctx)) {
         if(!where.returned(ctx).num) {
+          // converting where clauses to predicates
           ctx.compInfo(OPTWHERE);
           final Expr w = where.remove(f.var);
           if(f.expr instanceof AxisPath) {

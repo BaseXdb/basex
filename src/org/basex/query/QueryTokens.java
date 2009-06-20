@@ -1,6 +1,5 @@
 package org.basex.query;
 
-import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 
 /**
@@ -323,7 +322,8 @@ public interface QueryTokens {
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
   /** BaseX URI. */
-  byte[] BXURI = token(org.basex.Text.URL);
+  //  Locally defined to avoid dependencies to other files
+  byte[] BXURI = token("http://www.basex.org");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -341,7 +341,8 @@ public interface QueryTokens {
   /** FN token. */
   byte[] FN = token("fn");
   /** BaseX token. */
-  byte[] BASEX = token(NAMESPACE);
+  //  Locally defined to avoid dependencies to other files
+  byte[] BASEX = token("basex");
   /** XS token. */
   byte[] XS = token("xs");
   /** XS token. */

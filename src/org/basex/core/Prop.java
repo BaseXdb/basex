@@ -232,6 +232,7 @@ public final class Prop {
       }
       br.close();
     } catch(final Exception ex) {
+      BaseX.debug(ex);
       BaseX.errln("% could not be read.", filename);
     }
   }

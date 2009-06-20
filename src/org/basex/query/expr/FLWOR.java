@@ -61,9 +61,7 @@ public class FLWOR extends Expr {
     where = w;
     group = g;
     order = o;
-
   }
-
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {

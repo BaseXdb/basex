@@ -24,6 +24,12 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
+  public FTExpr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    return expr[0] instanceof FTNot ? expr[0].expr[0] : this;
+  }
+
+  @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     return not(expr[0].atomic(ctx));
   }
@@ -57,8 +63,7 @@ public final class FTNot extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     final boolean ia = expr[0].indexAccessible(ic);
-    ic.ftnot ^= true;
-    ic.seq = ic.ftnot;
+    ic.not ^= true;
     return ia;
   }
 

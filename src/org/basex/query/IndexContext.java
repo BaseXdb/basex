@@ -20,7 +20,7 @@ public final class IndexContext {
   /** Number of estimated results. */
   public int is = Integer.MAX_VALUE;
   /** Flag for ftnot expressions. */
-  public boolean ftnot;
+  public boolean not;
   /** Flag for sequential processing. */
   public boolean seq;
   /** Flag for potential duplicates. */

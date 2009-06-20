@@ -88,8 +88,10 @@ public class FTContains extends Expr {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // return if step is no text node, or if no index is available
     final Step s = CmpG.indexStep(expr);
-    return s != null && ic.data.meta.ftxindex && s.test.type == Type.TXT &&
-      ftexpr.indexAccessible(ic);
+    final boolean ok = s != null && ic.data.meta.ftxindex &&
+      s.test.type == Type.TXT && ftexpr.indexAccessible(ic);
+    ic.seq |= ic.not;
+    return ok;
   }
 
   @Override
@@ -99,7 +101,7 @@ public class FTContains extends Expr {
     final FTExpr ie = ftexpr.indexEquivalent(ic);
 
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsIndex(expr, ie, ic.ftnot);
+    if(ic.seq) return new FTContainsIndex(expr, ie, ic.not);
 
     // standard index evaluation; first expression will always be an axis path
     return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ft, ic), ic.step);

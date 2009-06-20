@@ -369,12 +369,6 @@ public interface Text {
   String PROCMM = lang("proc_mm");
   /** Out of Memory Error. */
   String PROCOUTMEM = lang("proc_outmem");
-  /** Implementation Error. */
-  String PROCIMPL = "Not Implemented.";
-  /** Implementation Bug. */
-  String PROCBUG = "Implementation Bug?";
-  /** Implementation Bug. */
-  String PROCBUG2 = NL + "You are invited to send this to " + MAIL;
 
   /** Unknown Command error. */
   String CMDNO = lang("cmd_no");
@@ -637,13 +631,13 @@ public interface Text {
   String INFOENTITY = lang("info_entities");
   /** Info on result serialization. */
   String INFOSERIALIZE = lang("info_serialize");
-  /** Info on well formed XML serialization. */
+  /** Info on well-formed XML serialization. */
   String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
   String INFOMAINMEM = lang("info_mainmem");
   /** Info on Tag Index. */
   String INFOTAGINDEX = lang("info_tagindex");
-  /** Info on Attribut value Index. */
+  /** Info on Attribute value Index. */
   String INFOATNINDEX = lang("info_atnindex");
   /** Info on Text Indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
@@ -1141,7 +1135,7 @@ public interface Text {
   String MAPLAYOUTTITLE = lang("dm_title");
   /** Simple Map Layout. */
   String MAPSIMPLE = lang("dm_simple");
-  /** Show Atts.  */
+  /** Show Attributes.  */
   String MAPATTS = lang("dm_atts");
   /** Predefined number of layouts. */
   String[] MAPOFFSETS = {

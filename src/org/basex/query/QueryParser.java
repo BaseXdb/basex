@@ -2199,11 +2199,12 @@ public class QueryParser extends InputParser {
     final FTExpr e = ftUnaryNot(prg);
     if(!consumeWS(NOT)) return e;
 
-    FTExpr[] list = { e };
+    FTExpr[] list = { };
     do {
       check(IN); list = Array.add(list, ftUnaryNot(prg));
     } while(consumeWS(NOT));
-    return new FTMildNot(list);
+    // convert "A not in B not in ..." to "A not in(B or ...)"
+    return new FTMildNot(e, list.length == 1 ? list[0] : new FTOr(list));
   }
 
   /**

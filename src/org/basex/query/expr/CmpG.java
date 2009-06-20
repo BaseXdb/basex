@@ -225,7 +225,7 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws QueryException thrown if the items can't be compared
    */
-  boolean eval(final Item a, final Item b) throws QueryException {
+  private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 
         !(a.n() && b.n())) Err.cmp(a, b);
     return cmp.cmp.e(a, b);

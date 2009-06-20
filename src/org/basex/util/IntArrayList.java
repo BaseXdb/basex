@@ -45,7 +45,7 @@ public final class IntArrayList implements Iterable<int[]> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public int[] next() { return list[c]; }
-      public void remove() { BaseX.notimplemented(); }
+      public void remove() { BaseX.notexpected(); }
     };
   }
 }

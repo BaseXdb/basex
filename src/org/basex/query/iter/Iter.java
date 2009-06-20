@@ -106,7 +106,7 @@ public abstract class Iter implements Iterable<Item> {
         }
       }
       public Item next() { return next; }
-      public void remove() { BaseX.notimplemented(); }
+      public void remove() { BaseX.notexpected(); }
     };
   }
 }

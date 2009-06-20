@@ -62,6 +62,7 @@ public final class SimpleIterPath extends AxisPath {
               final Nod n = (Nod) i;
               if(prev == null || !prev.is(n)) {
                 prev = n;
+                ctx.item = c;
                 return n;
               }
             } else {

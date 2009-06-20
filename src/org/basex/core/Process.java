@@ -73,16 +73,15 @@ public abstract class Process extends AbstractProcess {
   public final boolean execute(final Context ctx) {
     context = ctx;
     // database does not exist...
-    if(data() && context.data() == null) {
+    final Data data = context.data();
+    if(data() && data == null) {
       return error(PROCNODB);
     }
-    if(context.data() != null && context.data().isLocked()) {
+    if(data != null && data.isLocked()) {
       new Thread() {
         @Override
         public void run() {
-          while(context.data().isLocked()) {
-            Performance.sleep(1000);
-          }
+          while(data.isLocked()) Performance.sleep(50);
         }
       }.start();
     }
@@ -92,14 +91,10 @@ public abstract class Process extends AbstractProcess {
     }
 
     try {
-      if(context.data() != null) {
-        context.data().setLocked(true);
-      }
+      if(data != null) data.setLocked(true);
       final boolean ok = exec();
       if(updating()) context.update();
-      if(context.data() != null) {
-        context.data().setLocked(false);
-      }
+      if(data != null) data.setLocked(false);
       return ok;
     } catch(final Throwable ex) {
       // not expected...

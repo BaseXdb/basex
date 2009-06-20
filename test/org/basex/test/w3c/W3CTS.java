@@ -71,7 +71,7 @@ public abstract class W3CTS {
   /** Test Suite Identifier. */
   private final String testid;
   /** Path to the XQuery Test Suite. */
-  private String path = "";
+  private String path = "f:/xqftts/";
 
   /** Query Path. */
   private String queries;

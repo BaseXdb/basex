@@ -48,31 +48,33 @@ public abstract class FTIndexIterator extends IndexIterator {
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
-      FTIndexIterator n, r, s;
-      int c;
+      FTIndexIterator r, s;
+      FTMatches m;
+      int c, p;
 
       @Override
       public boolean more() {
         if(c <= 0) r = i1.more() ? i1 : null;
         if(c >= 0) s = i2.more() ? i2 : null;
-        if(r != null && s != null) {
-          c = r.next() - s.next();
-          if(c == 0) r.matches().or(s.matches());
-        } else {
-          c = r != null ? -1 : 1;
-        }
-        n = c <= 0 ? r : s;
-        return n != null;
+        c = r != null && s != null ? r.next() - s.next() : r != null ? -1 : 1;
+
+        final FTIndexIterator n = c <= 0 ? r : s;
+        if(n == null) return false;
+        
+        m = n.matches();
+        p = n.next();
+        if(c == 0) m = FTMatches.or(m, s.matches());
+        return true;
       }
 
       @Override
       public FTMatches matches() {
-        return n.matches();
+        return m;
       }
 
       @Override
       public int next() {
-        return n.next();
+        return p;
       }
 
       @Override

@@ -356,17 +356,18 @@ public class AxisPath extends Path {
       // find cheapest index access
       final Step stp = step[i];
       IndexContext ictx = null;
-      int minp = 0;
+      int ip = 0;
 
       // check if resulting index path will be duplicate free
       final boolean d = stp.pred.length == 0 || pathNodes(data, i) == null;
+
+      // choose cheapest index access
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
-        if(!stp.pred[p].indexAccessible(ic)) {
-          ictx = null;
-        } else if(ictx == null || ictx.is > ic.is) {
+        if(stp.pred[p].indexAccessible(ic) &&
+            (ictx == null || ictx.is > ic.is)) {
           ictx = ic;
-          minp = p;
+          ip = p;
         }
       }
 
@@ -375,9 +376,9 @@ public class AxisPath extends Path {
 
       // no results...
       if(ictx.is == 0) {
-        if(ictx.ftnot) {
+        if(ictx.not) {
           // not operator... accept all results
-          stp.pred[minp] = Bln.TRUE;
+          stp.pred[ip] = Bln.TRUE;
           continue;
         }
         ctx.compInfo(OPTNOINDEX, this);
@@ -385,11 +386,11 @@ public class AxisPath extends Path {
       }
 
       // replace expressions for index access
-      final Expr ie = stp.pred[minp].indexEquivalent(ictx);
+      final Expr ie = stp.pred[ip].indexEquivalent(ictx);
 
       if(ictx.seq) {
         // do not invert path
-        stp.pred[minp] = ie;
+        stp.pred[ip] = ie;
       } else {
         Step[] inv = {};
 
@@ -397,7 +398,7 @@ public class AxisPath extends Path {
         final Expr[] newPreds = new Expr[stp.pred.length - 1];
         int c = 0;
         for(int p = 0; p != stp.pred.length; p++) {
-          if(p != minp) newPreds[c++] = stp.pred[p];
+          if(p != ip) newPreds[c++] = stp.pred[p];
         }
 
         // invert path before index step

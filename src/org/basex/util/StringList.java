@@ -62,7 +62,7 @@ public final class StringList implements Iterable<String> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public String next() { return list[c]; }
-      public void remove() { BaseX.notimplemented(); }
+      public void remove() { BaseX.notexpected(); }
     };
   }
 }

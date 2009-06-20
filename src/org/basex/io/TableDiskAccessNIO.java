@@ -138,13 +138,11 @@ public final class TableDiskAccessNIO extends TableAccess {
     try {
       final int b = blocks[ind];
       // check if block is already mapped
-      if(mbbuffer.get(b) == null) {
+      currentmbb = mbbuffer.get(b);
+      if(currentmbb == null) {
         currentmbb = fc.map(FileChannel.MapMode.READ_WRITE,
             b * IO.BLOCKSIZE, IO.BLOCKSIZE);
         mbbuffer.set(currentmbb, b);
-      } else {
-        // else choose mapped block
-        currentmbb = mbbuffer.get(b);
       }
       block = b;
       index = ind;
