@@ -70,6 +70,8 @@ public final class BaseXServer {
       public void run() {
         // interrupt running processes
         for(final BaseXSession ss : sess) ss.core.stop();
+        Prop.write();
+        context.close();
       }
     });
     
