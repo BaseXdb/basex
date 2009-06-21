@@ -8,30 +8,16 @@ import org.basex.data.Data.Type;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class IndexToken {
-  /** Index type. */
-  public Type type;
-
+public interface IndexToken {
   /**
-   * Constructor.
-   * @param t index type
+   * Returns the index type.
+   * @return type
    */
-  public IndexToken(final Type t) {
-    type = t;
-  }
+  Type type();
   
   /**
-   * Returns the current index token.
+   * Returns the current token.
    * @return token
    */
-  public abstract byte[] get();
-  
-  /**
-   * Returns the range flag. Can be overwritten by an implementation to
-   * support range searches.
-   * @return range flag
-   */
-  public boolean range() {
-    return false;
-  }
+  byte[] get();
 }

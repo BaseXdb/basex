@@ -270,7 +270,7 @@ public final class CmpG extends Arr {
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(index[0].type == org.basex.data.Data.Type.TXT) {
+    if(index[0].type() == org.basex.data.Data.Type.TXT) {
       ic.ctx.compInfo(OPTTXTINDEX);
     } else {
       ic.ctx.compInfo(OPTATVINDEX);

@@ -88,10 +88,6 @@ public final class TableDiskAccess extends TableAccess {
    * @return offset of the entry in currentBlock
    */
   private synchronized int cursor(final int pre) {
-    
-    //if(pre - lastPre < 0) Performance.stack();
-    //lastPre = pre;
-    
     int fp = firstPre;
     int np = nextPre;
     if(pre >= fp && pre < np) return (pre - fp) << IO.NODEPOWER;

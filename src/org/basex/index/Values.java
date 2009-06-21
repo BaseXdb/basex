@@ -66,7 +66,7 @@ public final class Values extends Index {
   
   @Override
   public IndexIterator ids(final IndexToken tok) {
-    if(tok.range()) return idRange((RangeToken) tok);
+    if(tok instanceof RangeToken) return idRange((RangeToken) tok);
     
     final long pos = get(tok.get());
     if(pos == 0) return IndexIterator.EMPTY;

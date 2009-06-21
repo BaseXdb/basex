@@ -65,7 +65,7 @@ public final class IndexAccess extends Simple {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(ind.type.toString()));
+    ser.openElement(this, TYPE, Token.token(ind.type().toString()));
     if(ind instanceof RangeToken) {
       final RangeToken rt = (RangeToken) ind;
       ser.attribute(MIN, Token.token(rt.min));
@@ -79,7 +79,7 @@ public final class IndexAccess extends Simple {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(name());
-    tb.add("(" + ind.type + ", ");
+    tb.add("(" + ind.type() + ", ");
     if(ind instanceof RangeToken) {
       final RangeToken rt = (RangeToken) ind;
       tb.add(rt.min + "-" + rt.max);

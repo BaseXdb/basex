@@ -234,7 +234,7 @@ public final class FTWords extends FTExpr {
 
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
-      if(md.ftfz || txt[0] == '.') return false;
+      //if(md.ftfz || txt[0] == '.') return false;
       int d = 0;
       for(final byte w : txt) {
         if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;

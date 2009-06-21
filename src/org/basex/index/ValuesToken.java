@@ -9,9 +9,11 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ValuesToken extends IndexToken {
+public final class ValuesToken implements IndexToken {
   /** Text. */
   private byte[] text = Token.EMPTY;
+  /** Index type. */
+  private final Type type;
 
   /**
    * Constructor.
@@ -19,11 +21,14 @@ public final class ValuesToken extends IndexToken {
    * @param tok token
    */
   public ValuesToken(final boolean t, final byte[] tok) {
-    super(t ? Type.TXT : Type.ATV);
+    type = t ? Type.TXT : Type.ATV;
     text = tok;
   }
+  
+  public Type type() {
+    return type;
+  }
 
-  @Override
   public byte[] get() {
     return text;
   }

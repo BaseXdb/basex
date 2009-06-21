@@ -13,7 +13,7 @@ import org.basex.query.ft.StemDir;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Tokenizer extends IndexToken {
+public class Tokenizer implements IndexToken {
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
 
@@ -67,8 +67,11 @@ public class Tokenizer extends IndexToken {
    * @param txt text
    */
   public Tokenizer(final byte[] txt) {
-    super(Type.FTX);
     text = txt;
+  }
+  
+  public Type type() {
+    return Type.FTX;
   }
 
   /**
@@ -195,7 +198,6 @@ public class Tokenizer extends IndexToken {
     true,  true,  true,  false, false, false, false, false
   };
 
-  @Override
   public byte[] get() {
     return get(orig());
   }

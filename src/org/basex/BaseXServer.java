@@ -42,7 +42,7 @@ public final class BaseXServer {
   boolean verbose;
 
   /** Current client connections. */
-  private final ArrayList<BaseXSession> sess = new ArrayList<BaseXSession>();
+  final ArrayList<BaseXSession> sess = new ArrayList<BaseXSession>();
 
   /**
    * Main method, launching the server process.
@@ -64,6 +64,15 @@ public final class BaseXServer {
 
     if(!parseArguments(args)) return;
 
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        // interrupt running processes
+        for(final BaseXSession ss : sess) ss.core.stop();
+      }
+    });
+    
     // this thread cleans the process stack
     new Thread() {
       @Override
@@ -123,8 +132,6 @@ public final class BaseXServer {
 
       if(pr instanceof Exit) {
         send(s, 1);
-        // interrupt running processes
-        for(final BaseXSession ss : sess) ss.core.stop();
         running = false;
         return;
       }

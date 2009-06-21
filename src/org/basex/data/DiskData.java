@@ -108,10 +108,9 @@ public final class DiskData extends Data {
       }
       initNames();
     } catch(final IOException ex) {
-      System.err.println("??");
       throw ex;
     } finally {
-      try { if(in != null) in.close(); } catch(final IOException e) { }
+      if(in != null) try { in.close(); } catch(final IOException e) { }
     }
   }
 

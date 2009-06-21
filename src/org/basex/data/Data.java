@@ -285,7 +285,7 @@ public abstract class Data {
    */
   public final IndexIterator ids(final IndexToken token) {
     if(token.get().length > MAXLEN) return null;
-    switch(token.type) {
+    switch(token.type()) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
       case FTX: return ftxindex.ids(token);
@@ -301,7 +301,7 @@ public abstract class Data {
   public final int nrIDs(final IndexToken token) {
     // token to long.. no results can be expected
     if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
-    switch(token.type) {
+    switch(token.type()) {
       case TXT: return txtindex.nrIDs(token);
       case ATV: return atvindex.nrIDs(token);
       case FTX: return ftxindex.nrIDs(token);

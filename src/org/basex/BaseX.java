@@ -136,7 +136,7 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Throws a runtime exception for unimplemented methods.
+   * Throws a runtime exception for an unimplemented method.
    * @param ext optional extension
    * @return dummy object
    */
@@ -147,7 +147,7 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Throws a runtime exception for unexpected exceptions.
+   * Throws a runtime exception for an unexpected exception.
    * @param ext optional extension
    * @return dummy object
    */
@@ -156,12 +156,13 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Throws a runtime exception for unexpected exceptions.
+   * Prints some information for an unexpected exception.
    * @param ext optional extension
    * @return dummy object
    */
   public static String bug(final Object... ext) {
-    final TokenBuilder sb = new TokenBuilder("Implementation Bug?");
+    final TokenBuilder sb = new TokenBuilder(
+        "Implementation Bug? Please send to " + MAIL);
     if(ext.length != 0) sb.add(" (%)", ext);
     return sb.toString();
   }
