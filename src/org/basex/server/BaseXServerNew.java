@@ -59,6 +59,16 @@ public class BaseXServerNew {
     Prop.server = true;
 
     if(!parseArguments(args)) return;
+    
+ // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        // interrupt running processes
+        for(final Session ss : sessions) ss.core.stop();
+        Prop.write();
+      }
+    });
 
     try {
       serverSocket = new ServerSocket(Prop.port);
