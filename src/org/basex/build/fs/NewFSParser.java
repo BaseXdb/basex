@@ -42,16 +42,6 @@ import org.basex.util.Token;
  */
 public final class NewFSParser extends Parser {
 
-  static { // for testing
-    boolean assertsEnabled = false;
-    //assert assertsEnabled = true; // Intentional side effect!!!
-    // [BL] ...ok as well?
-    assert assertsEnabled;
-    if(!assertsEnabled) {
-      throw new RuntimeException("Asserts must be enabled!!!");
-    }
-  }
-
   /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
   public static final int SIZEOFFSET = 3;
   /** Directory size Stack. */
