@@ -8,6 +8,7 @@ import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
+import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.FSText;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -27,16 +28,15 @@ import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
 /**
- * DeepFS: The XQuery Filesystem
- * Database-side implementation of DeepFS.
+ * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Christian Gruen, Hannes Schwarz
  */
 public final class DeepFS extends DeepFuse implements DataText {
-  /* Data reference - [AH] temporarily removed..
-  public GUI gui; */
+  /* Data reference - [AH] temporarily removed.. */
+  // public GUI gui;
   /** Data reference. */
   public Data data;
   /** Index References. */
@@ -63,7 +63,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   public int nameID;
   /** Index References. */
   public int contentID;
-  
+
   /*
    * ------------------------------------------------------------------------
    * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
@@ -91,7 +91,7 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   /* ------------------------------------------------------------------------ */
 
-  /** 
+  /**
    * Initialize often used tags and attributes.
    */
   private void initNames() {
@@ -109,19 +109,19 @@ public final class DeepFS extends DeepFuse implements DataText {
     modeID         = data.atts.index(MODE,         null, false);
     suffixID       = data.atts.index(SUFFIX,       null, false);
   }
- 
+
   /**
    * Constructor.
    * @param d data reference
    */
   public DeepFS(final Data d) {
     data = d;
-    
+
     final String mountpoint = d.meta.mountpoint;
     final String backingpath = d.meta.backingpath;
-    
+
     initNames();
-    
+
     if(Prop.fuse) {
       final File mp = new File(mountpoint);
       final File bp = new File(backingpath);
@@ -213,7 +213,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @param backing whether to return backing path or mountpath
    * @return file path.
    */
-  public byte[] path(final int pre, final boolean backing) { 
+  public byte[] path(final int pre, final boolean backing) {
     int p = pre;
     int k = data.kind(p);
     final IntList il = new IntList();
@@ -227,7 +227,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     final int s = il.size;
     if(s != 0) {
       final byte[] b;
-      if (Prop.fuse) b = backing ? backingstore(il.list[s - 1 ])
+      if(Prop.fuse) b = backing ? backingstore(il.list[s - 1])
           : mountpoint(il.list[s - 1]);
       else b = backingstore(il.list[s - 1]);
       if(b.length != 0) {
@@ -261,7 +261,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   private byte[] backingstore(final int pre) {
     return attr(pre, data.fs.backingstoreID);
   }
-  
+
   /**
    * Returns the name of a file.
    * @param pre pre value
@@ -359,7 +359,7 @@ public final class DeepFS extends DeepFuse implements DataText {
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    
+
     return qu;
   }
 
@@ -369,7 +369,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   private void refresh() {
     data.meta.update();
     // [AH] temporarily removed..
-    //if(gui != null) gui.notify.update();
+    // if(gui != null) gui.notify.update();
     // data.flush();
   }
 
@@ -405,7 +405,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   int insertContent(final String path) {
     int fpre = pathPre(path);
-    
+
     if(fpre == -1) return -1;
     return insert(fpre, buildContentData(path));
   }
@@ -452,7 +452,8 @@ public final class DeepFS extends DeepFuse implements DataText {
       Prop.fsmeta = true;
       String bpath = data.meta.backingpath + path;
       BaseX.debug("[DataFS_parse_file] path : " + path + " -> " + bpath);
-      FSParser p = new FSParser(bpath);
+      Parser p = Prop.newfsparser ? new NewFSParser(bpath)
+          : new FSParser(bpath);
       mb.build(p, "tmp_memdata4file");
       return mb.finish();
     } catch(IOException e) {
@@ -540,7 +541,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   }
 
   @Override
-  public int destroy() {    
+  public int destroy() {
     return 0;
   }
 
@@ -555,8 +556,8 @@ public final class DeepFS extends DeepFuse implements DataText {
     // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR.
     final String method = "[-basex_mkdir] ";
     final int n = createNode(path, S_IFDIR | mode);
-    BaseX.debug(method + "path: " + path 
-        + " mode: " + Integer.toOctalString(mode) + " id : (" + n + ")");
+    BaseX.debug(method + "path: " + path + " mode: "
+        + Integer.toOctalString(mode) + " id : (" + n + ")");
     refresh();
     return n;
   }
@@ -752,7 +753,7 @@ public final class DeepFS extends DeepFuse implements DataText {
 
     final String method = "[-basex_release] ";
     BaseX.debug(method + "path: " + path);
-    
+
     if(dirty) {
       delete(path, false, true);
       insertContent(path);

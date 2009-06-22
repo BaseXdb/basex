@@ -154,6 +154,8 @@ public final class Prop {
 
   /** Fuse support. */
   public static boolean fuse = false;
+  /** FSParser implementation. If true, the new implementation is used. */
+  public static boolean newfsparser = false;
 
   /** Flag to include key names in the language strings. */
   public static boolean langkeys = false;
@@ -182,18 +184,19 @@ public final class Prop {
     try {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
       fuse = true;
-      BaseX.debug("DeepFS FUSE support enabled ... OK");
+      // BaseX config is not parsed at this time ... skipping debug mode test
+      BaseX.errln("DeepFS FUSE support enabled ... OK");
     } catch(final UnsatisfiedLinkError ex) {
-      BaseX.debug("Loading DeepFS library ... failed.\n.");
+      BaseX.errln("Loading DeepFS library ... failed (%).", ex.getMessage());
     }
   }
-  
+
   /** Private constructor, preventing class instantiation. */
   private Prop() { }
 
   /**
-   * Reads the configuration file and initializes the project properties.
-   * The file is located in the user's home directory.
+   * Reads the configuration file and initializes the project properties. The
+   * file is located in the user's home directory.
    */
   public static void read() {
     if(read) return;
