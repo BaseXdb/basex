@@ -1,6 +1,8 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
+
+import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -45,7 +47,7 @@ public final class FTAnd extends FTExpr {
     final FTItem item = expr[0].atomic(ctx);
     for(int e = 1; e < expr.length; e++) {
       final FTItem it = expr[e].atomic(ctx);
-      item.all = FTMatches.and(item.all, it.all);
+      item.all = and(item.all, it.all);
       item.score(ctx.score.and(it.score(), item.score()));
     }
     return item;
@@ -90,8 +92,9 @@ public final class FTAnd extends FTExpr {
         // merge all matches
         final FTItem item = it[0];
         for(int i = 1; i < it.length; i++) {
-          if(neg[i]) continue; // item.all = FTMatches.not(it[i].all, 0);
-          item.all = FTMatches.and(item.all, it[i].all);
+          // [CG] FT: item.all = FTMatches.not(it[i].all, 0);
+          if(neg[i]) continue;
+          item.all = and(item.all, it[i].all);
           it[i] = ir[i].next();
         }
         it[0] = ir[0].next();
@@ -99,6 +102,25 @@ public final class FTAnd extends FTExpr {
       }
     };
   }
+
+  /**
+   * Merges two matches.
+   * @param m1 first match list
+   * @param m2 second match list
+   * @return resulting match
+   */
+  static FTMatches and(final FTMatches m1, final FTMatches m2) {
+    final FTMatches all = new FTMatches(
+        m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum);
+
+    for(final FTMatch s1 : m1) {
+      for(final FTMatch s2 : m2) {
+        all.add(new FTMatch().add(s1).add(s2));
+      }
+    }
+    return all;
+  }
+
   
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {

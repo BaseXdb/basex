@@ -115,7 +115,7 @@ public final class FTWords extends FTExpr {
           ft.init();
           while(ft.more()) {
             final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
-            iat = iat == null ? it : FTIndexIterator.intersect(iat, it);
+            iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
           }
           iat.setTokenNum(++ctx.ftoknum);
         }
@@ -189,7 +189,7 @@ public final class FTWords extends FTExpr {
 
     final long mn = occ != null ? checkItr(occ[0], ctx) : 1;
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
-    if(o == 0 && mn == 0) all = FTMatches.not(all, 0);
+    if(mn == 0 && o == 0) all = FTNot.not(all);
     return o < mn || o > mx ? 0 : Math.max(1, len);
   }
 
@@ -200,10 +200,11 @@ public final class FTWords extends FTExpr {
    * @return fast fast evaluation
    */
   boolean add(final int s, final int e) {
+    // [CG] FT: check if this is needed/correct
     if(!first && (mode == FTMode.ALL || mode == FTMode.ALLWORDS)) {
       all.and(s, e);
     } else {
-      all.add(s, e);
+      all.or(s, e);
     }
     return fast;
   }

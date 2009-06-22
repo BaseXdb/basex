@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
+import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -69,9 +70,30 @@ public final class FTMildNot extends FTExpr {
    * @return specified item
    */
   FTItem mildnot(final FTItem it1, final FTItem it2) {
-    it1.all = FTMatches.mildnot(it1.all, it2.all);
+    it1.all = mildnot(it1.all, it2.all);
+    // [CG] FT: check invalid milt not tests
     //if(it1.all == null) Err.or(FTMILD);
     return it1;
+  }
+
+  /**
+   * Performs a mild not operation.
+   * @param m1 first match list
+   * @param m2 second match list
+   * @return resulting match, or null if string exclude was found
+   */
+  private static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
+    final FTMatches all = new FTMatches(m1.sTokenNum);
+    for(final FTMatch s1 : m1) {
+      //if(!s1.match()) return null;
+      boolean n = true;
+      for(final FTMatch s2 : m2) {
+        //if(!s2.match()) return null;
+        n &= s1.notin(s2);
+      }
+      if(n) all.add(s1);
+    }
+    return all;
   }
 
   @Override

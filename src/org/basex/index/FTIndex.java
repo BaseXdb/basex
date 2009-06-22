@@ -54,10 +54,10 @@ abstract class FTIndex extends Index {
         pre = lpre;
         
         all.reset(toknum);
-        all.add(da.readNum(pos));
+        all.or(da.readNum(pos));
         while(++c < s && (lpre = da.readNum()) == pre) {
           final int n = da.readNum();
-          if(!fast) all.add(n);
+          if(!fast) all.or(n);
         }
         pos = da.pos();
         return true;

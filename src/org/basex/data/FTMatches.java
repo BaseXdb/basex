@@ -40,8 +40,8 @@ public final class FTMatches implements Iterable<FTMatch> {
    * Adds a match entry.
    * @param s position
    */
-  public void add(final int s) {
-    add(s, s);
+  public void or(final int s) {
+    or(s, s);
   }
 
   /**
@@ -49,8 +49,18 @@ public final class FTMatches implements Iterable<FTMatch> {
    * @param s start position
    * @param e end position
    */
-  public void add(final int s, final int e) {
+  public void or(final int s, final int e) {
     add(new FTMatch().add(new FTStringMatch(s, e, sTokenNum)));
+  }
+
+  /**
+   * Adds a match entry.
+   * @param s start position
+   * @param e end position
+   */
+  public void and(final int s, final int e) {
+    final FTStringMatch sm = new FTStringMatch(s, e, sTokenNum);
+    for(final FTMatch m : this) m.add(sm);
   }
 
   /**
@@ -62,16 +72,6 @@ public final class FTMatches implements Iterable<FTMatch> {
       match = size == 0 ? new FTMatch[1] : Array.extend(match);
     }
     match[size++] = m;
-  }
-
-  /**
-   * Adds a match entry.
-   * @param s start position
-   * @param e end position
-   */
-  public void and(final int s, final int e) {
-    final FTStringMatch sm = new FTStringMatch(s, e, sTokenNum);
-    for(final FTMatch m : this) m.add(sm);
   }
 
   /**
@@ -89,79 +89,6 @@ public final class FTMatches implements Iterable<FTMatch> {
   public boolean matches() {
     for(final FTMatch m : this) if(m.match()) return true;
     return false;
-  }
-
-  /**
-   * Merges two matches.
-   * @param m1 first match list
-   * @param m2 second match list
-   * @return resulting match
-   */
-  public static FTMatches or(final FTMatches m1, final FTMatches m2) {
-    final FTMatches all = new FTMatches(
-      m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum);
-    for(final FTMatch m : m1) all.add(m);
-    for(final FTMatch m : m2) all.add(m);
-    return all;
-  }
-
-  /**
-   * Merges two matches.
-   * @param m1 first match list
-   * @param m2 second match list
-   * @return resulting match
-   */
-  public static FTMatches and(final FTMatches m1, final FTMatches m2) {
-    final FTMatches all = new FTMatches(
-        m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum);
-
-    for(final FTMatch s1 : m1) {
-      for(final FTMatch s2 : m2) {
-        all.add(new FTMatch().add(s1).add(s2));
-      }
-    }
-    return all;
-  }
-
-  /**
-   * Merges two matches.
-   * @param m match
-   * @param i position to start from
-   * @return resulting match
-   */
-  public static FTMatches not(final FTMatches m, final int i) {
-    final FTMatches all = new FTMatches(m.sTokenNum);
-    if(i == m.size) {
-      all.add(new FTMatch());
-    } else {
-      for(final FTStringMatch s : m.match[i]) {
-        s.not ^= true;
-        for(final FTMatch tmp : not(m, i + 1)) {
-          all.add(new FTMatch().add(s).add(tmp));
-        }
-      }
-    }
-    return all;
-  }
-
-  /**
-   * Performs a mild not operation.
-   * @param m1 first match list
-   * @param m2 second match list
-   * @return resulting match, or null if string exclude was found
-   */
-  public static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
-    final FTMatches all = new FTMatches(m1.sTokenNum);
-    for(final FTMatch s1 : m1) {
-      //if(!s1.match()) return null;
-      boolean n = true;
-      for(final FTMatch s2 : m2) {
-        //if(!s2.match()) return null;
-        n &= s1.notin(s2);
-      }
-      if(n) all.add(s1);
-    }
-    return all;
   }
 
   /**

@@ -2,7 +2,9 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
 
+import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
+import org.basex.data.FTStringMatch;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -54,8 +56,38 @@ public final class FTNot extends FTExpr {
    * @return specified item
    */
   FTItem not(final FTItem item) {
-    if(item != null) item.all = FTMatches.not(item.all, 0);
+    if(item != null) item.all = not(item.all);
     return item;
+  }
+
+  /**
+   * Negates the specified matches.
+   * @param m match
+   * @return resulting matches
+   */
+  public static FTMatches not(final FTMatches m) {
+    return not(m, 0);
+  }
+
+  /**
+   * Negates the specified matches.
+   * @param m match
+   * @param i position to start from
+   * @return resulting match
+   */
+  private static FTMatches not(final FTMatches m, final int i) {
+    final FTMatches all = new FTMatches(m.sTokenNum);
+    if(i == m.size) {
+      all.add(new FTMatch());
+    } else {
+      for(final FTStringMatch s : m.match[i]) {
+        s.not ^= true;
+        for(final FTMatch tmp : not(m, i + 1)) {
+          all.add(new FTMatch().add(s).add(tmp));
+        }
+      }
+    }
+    return all;
   }
 
   @Override

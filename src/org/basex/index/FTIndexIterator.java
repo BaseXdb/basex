@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 
 /**
@@ -48,33 +49,28 @@ public abstract class FTIndexIterator extends IndexIterator {
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
-      FTIndexIterator r, s;
-      FTMatches m;
-      int c, p;
+      FTIndexIterator n, r, s;
+      int c;
 
       @Override
       public boolean more() {
         if(c <= 0) r = i1.more() ? i1 : null;
         if(c >= 0) s = i2.more() ? i2 : null;
         c = r != null && s != null ? r.next() - s.next() : r != null ? -1 : 1;
-
-        final FTIndexIterator n = c <= 0 ? r : s;
-        if(n == null) return false;
-        
-        m = n.matches();
-        p = n.next();
-        if(c == 0) m = FTMatches.or(m, s.matches());
-        return true;
+        n = c <= 0 ? r : s;
+        return n != null;
       }
 
       @Override
       public FTMatches matches() {
+        final FTMatches m = n.matches();
+        if(c == 0) for(final FTMatch sm : s.matches()) m.add(sm);
         return m;
       }
 
       @Override
       public int next() {
-        return p;
+        return n.next();
       }
 
       @Override
@@ -91,7 +87,7 @@ public abstract class FTIndexIterator extends IndexIterator {
    * @param i2 second index array iterator to merge
    * @return IndexArrayIterator
    */
-  public static FTIndexIterator intersect(final FTIndexIterator i1,
+  public static FTIndexIterator phrase(final FTIndexIterator i1,
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
