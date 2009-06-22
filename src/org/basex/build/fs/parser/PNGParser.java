@@ -3,10 +3,8 @@ package org.basex.build.fs.parser;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.build.fs.parser.Metadata.DataType;
 import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;

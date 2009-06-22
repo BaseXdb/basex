@@ -7,9 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.BaseX;
-import org.basex.build.fs.FSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
 import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
@@ -291,7 +289,7 @@ public class MP3Parser extends AbstractParser {
   /** The maximum number of bytes to read from the {@link FileChannel}. */
   private long fcLimit;
   /** Buffer for the file content. */
-  private ByteBuffer buf;
+  ByteBuffer buf;
 
   /** {@inheritDoc} */
   @Override

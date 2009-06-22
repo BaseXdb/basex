@@ -44,7 +44,9 @@ public final class NewFSParser extends Parser {
 
   static { // for testing
     boolean assertsEnabled = false;
-    assert assertsEnabled = true; // Intentional side effect!!!
+    //assert assertsEnabled = true; // Intentional side effect!!!
+    // [BL] ...ok as well?
+    assert assertsEnabled;
     if(!assertsEnabled) {
       throw new RuntimeException("Asserts must be enabled!!!");
     }

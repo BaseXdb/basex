@@ -1,7 +1,6 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.data.DataText.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -10,15 +9,12 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.Attribute;
 import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
-import org.basex.build.fs.parser.Metadata.Type;
-import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.DataType;
 import org.basex.data.DataText;
 import org.basex.util.Atts;
