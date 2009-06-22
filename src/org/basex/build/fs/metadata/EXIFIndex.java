@@ -124,7 +124,7 @@ public final class EXIFIndex {
     info.put(0xA210, new EXIFShort("FocalPlaneResolutionUnit",
       bytes("", "none", "inch", "cm")));
     info.put(0xA215, new EXIFRational("ExposureIndex"));
-    info.put(0xA217, new EXIFShort("SensingMethog", bytes(
+    info.put(0xA217, new EXIFShort("SensingMethod", bytes(
       "Undefined", "One-Chip Color Area Sensor", "Two-Chip Color Area Sensor",
       "Three-Chip Color Area Sensor", "Color Sequential Area Sensor",
       "Trilinear Sensor", "Color Sequential Linear Sensor")));

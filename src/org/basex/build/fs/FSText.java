@@ -162,7 +162,7 @@ public interface FSText {
   /** Email date info. */
   byte[] EMLDATE = token("Date");
   /** Email time info in minutes from 1.1.1970. */
-  byte[] EMLTIME = token("time");
+  byte[] EMLTIME = token("Time");
   /** Email content-type info. */
   byte[] EMLCONTENTTYPE = token("Content-Type");
 

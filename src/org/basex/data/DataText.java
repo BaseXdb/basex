@@ -77,7 +77,7 @@ public interface DataText {
   String S_MTIME = "mtime";
   /** Time of last modification. */
   String S_SUFFIX = "suffix";
-  
+
   /** DeepFS token. */
   byte[] DEEPFS = token(S_DEEPFS);
   /** Directory tag. */
@@ -95,8 +95,10 @@ public interface DataText {
   byte[] MTIME = token(S_MTIME);
   /** Suffix attribute. */
   byte[] SUFFIX = token(S_SUFFIX);
-  /** Suffix attribute. */
+  /** Content attribute. */
   byte[] CONTENT = token("content");
+  /** Offset attribute. */
+  byte[] OFFSET = token("offset");
   /** File mode attribute. */
   byte[] MODE = token("mode");
   /** Mount point attribute. */
@@ -107,7 +109,7 @@ public interface DataText {
   byte[] NOTMOUNTED = token("(not mounted)");
   /** Negative backing store attribute. */
   byte[] NOBACKING = token("(no backing store)");
-  
+
   // XML SERIALIZATION ========================================================
 
   /** Ampersand Entity. */
@@ -138,9 +140,9 @@ public interface DataText {
   /** PI output. */
   byte[] PI2 = token("?>");
   /** Element output. */
-  byte[] ELEM1 = { '<' };
+  byte[] ELEM1 = { '<'};
   /** Element output. */
-  byte[] ELEM2 = { '>' };
+  byte[] ELEM2 = { '>'};
   /** Element output. */
   byte[] ELEM3 = token("</");
   /** Element output. */
@@ -156,7 +158,7 @@ public interface DataText {
   /** Text step. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
-  byte[] ATT = { '@' };
+  byte[] ATT = { '@'};
 
   // TABLE SERIALIZATION ======================================================
 
@@ -177,7 +179,7 @@ public interface DataText {
   /** Fifth table Header. */
   String TABLEKIND = "  KIND  CONTENT" + Prop.NL;
   /** Table Kinds. */
-  String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  " };
+  String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
 
   // DATABASE FILES ===========================================================
 
