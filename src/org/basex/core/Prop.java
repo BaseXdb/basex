@@ -342,7 +342,7 @@ public final class Prop {
             bw.write(name + i + " = " + num[i] + NL);
           }
         } else {
-          bw.write(name + " = " + f.get(null).toString() + NL);
+          bw.write(name + " = " + f.get(null) + NL);
         }
       }
 

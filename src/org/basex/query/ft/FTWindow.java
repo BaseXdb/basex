@@ -17,22 +17,27 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTWindow extends FTFilter {
+public final class FTWindow extends FTFilter {
+  /** Window. */
+  private final Expr win;
+  
   /**
    * Constructor.
+   * @param e expression
    * @param w window
    * @param u unit
    */
-  public FTWindow(final Expr w, final FTUnit u) {
-    expr = new Expr[] { w };
+  public FTWindow(final FTExpr e, final Expr w, final FTUnit u) {
+    super(e);
+    win = w;
     unit = u;
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTMatch mtc, final Tokenizer ft)
-      throws QueryException {
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
+      final Tokenizer ft) throws QueryException {
 
-    final long win = checkItr(expr[0], ctx);
+    final long w = checkItr(win, ctx);
     mtc.sort();
 
     int end = 0;
@@ -50,7 +55,7 @@ public class FTWindow extends FTFilter {
       if(m.not) {
         match.add(m);
       } else {
-        if(pos(end, ft) - pos(m.start, ft) + 1 > win) return false;
+        if(pos(end, ft) - pos(m.start, ft) + 1 > w) return false;
         break;
       }
     }
@@ -64,11 +69,12 @@ public class FTWindow extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.attribute(token(QueryTokens.WINDOW), token(expr[0] + " " + unit));
+    ser.openElement(this, token(QueryTokens.WINDOW), token(win + " " + unit));
+    super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return QueryTokens.WINDOW + "(" + expr[0] + " " + unit + ")";
+    return super.toString() + QueryTokens.WINDOW + "(" + win + " " + unit + ")";
   }
 }

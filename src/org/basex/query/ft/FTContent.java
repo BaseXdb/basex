@@ -15,7 +15,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTContent extends FTFilter {
+public final class FTContent extends FTFilter {
   /** Start flag. */
   private final boolean start;
   /** End flag. */
@@ -23,16 +23,18 @@ public class FTContent extends FTFilter {
   
   /**
    * Constructor.
+   * @param ex expression
    * @param s start flag
    * @param e end flag
    */
-  public FTContent(final boolean s, final boolean e) {
+  public FTContent(final FTExpr ex, final boolean s, final boolean e) {
+    super(ex);
     start = s;
     end = e;
   }
   
   @Override
-  boolean filter(final QueryContext ctx, final FTMatch mtc,
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
     if(start) {
       for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
@@ -52,19 +54,21 @@ public class FTContent extends FTFilter {
   }
 
   @Override
-  boolean content() {
+  protected boolean content() {
     return end || !start;
   }
   
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.attribute(token(start ? QueryTokens.START : end ? QueryTokens.END :
-      QueryTokens.CONTENT), TRUE);
+    ser.openElement(this, token(start ? QueryTokens.START : end ?
+        QueryTokens.END : QueryTokens.CONTENT), TRUE);
+    super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return start || end ? QueryTokens.AT + " " + (start ? QueryTokens.START : 
-      QueryTokens.END) : QueryTokens.ENTIRE + " " + QueryTokens.CONTENT;
+    return super.toString() + (start || end ? QueryTokens.AT + " " +
+        (start ? QueryTokens.START : QueryTokens.END) :
+          QueryTokens.ENTIRE + " " + QueryTokens.CONTENT);
   }
 }

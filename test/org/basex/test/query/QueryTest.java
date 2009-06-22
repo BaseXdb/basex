@@ -66,7 +66,7 @@ public final class QueryTest {
       }
     } else {
       // single test
-      Prop.ftindex = true;
+      Prop.ftindex = false;
       Prop.ftfuzzy = false;
       Prop.ftst = false;
       Prop.ftdc = false;

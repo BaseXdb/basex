@@ -138,7 +138,7 @@ abstract class AQuery extends Process {
       final CachedOutput out = new CachedOutput();
       qu.plan(new XMLSerializer(out, false, true));
       info(NL + QUERYPLAN + NL);
-      info(out.toString() + NL);
+      info(out + NL);
     }
     // reset timer
     per.getTime();

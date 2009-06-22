@@ -31,9 +31,7 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
-    final FTItem item = mildnot(expr[0].atomic(ctx), expr[1].atomic(ctx));
-    if(item.all.size == 0) item.score(0);
-    return item;
+    return mildnot(expr[0].atomic(ctx), expr[1].atomic(ctx));
   }
 
   @Override
@@ -72,6 +70,7 @@ public final class FTMildNot extends FTExpr {
    */
   FTItem mildnot(final FTItem it1, final FTItem it2) {
     it1.all = FTMatches.mildnot(it1.all, it2.all);
+    //if(it1.all == null) Err.or(FTMILD);
     return it1;
   }
 

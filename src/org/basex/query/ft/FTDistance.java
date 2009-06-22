@@ -17,23 +17,28 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTDistance extends FTFilter {
+public final class FTDistance extends FTFilter {
+  /** Distance. */
+  private final Expr[] dist;
+
   /**
    * Constructor.
+   * @param e expression
    * @param d distances
    * @param u unit
    */
-  public FTDistance(final Expr[] d, final FTUnit u) {
-    expr = d;
+  public FTDistance(final FTExpr e, final Expr[] d, final FTUnit u) {
+    super(e);
+    dist = d;
     unit = u;
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTMatch mtc, final Tokenizer ft)
-      throws QueryException {
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
+      final Tokenizer ft) throws QueryException {
 
-    final long min = checkItr(expr[0], ctx);
-    final long max = checkItr(expr[1], ctx);
+    final long min = checkItr(dist[0], ctx);
+    final long max = checkItr(dist[1], ctx);
     mtc.sort();
 
     final FTMatch match = new FTMatch();
@@ -61,13 +66,14 @@ public class FTDistance extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.attribute(token(QueryTokens.DISTANCE),
-        token(expr[0] + "-" + expr[1] + " " + unit));
+    ser.openElement(this, token(QueryTokens.DISTANCE),
+        token(dist[0] + "-" + dist[1] + " " + unit));
+    super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return QueryTokens.DISTANCE + "(" +
-      expr[0] + "-" + expr[1] + " " + unit + ")";
+    return super.toString() + QueryTokens.DISTANCE + "(" +
+      dist[0] + "-" + dist[1] + " " + unit + ")";
   }
 }

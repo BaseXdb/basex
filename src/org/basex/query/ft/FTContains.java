@@ -68,12 +68,14 @@ public class FTContains extends Expr {
     while((it = iter.next()) != null) {
       ft.init(it.str());
       final FTItem item = ftexpr.atomic(ctx);
-      //final double d = item.all.match() ? item.score() : 0;
-      final double d = item.score();
+      double d = 0;
+      if(item.all.matches()) {
+        d = item.score();
+        // no scoring found - use default value
+        if(d == 0) d = 1;
+      }
       s = ctx.score.and(s, d);
 
-      //System.out.println(item.all);
-      
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
         ctx.ftpos.add(((DBNode) it).pre, item.all);

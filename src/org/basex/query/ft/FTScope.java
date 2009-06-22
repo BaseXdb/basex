@@ -16,22 +16,24 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTScope extends FTFilter {
+public final class FTScope extends FTFilter {
   /** Same/different flag. */
   private final boolean same;
 
   /**
    * Constructor.
+   * @param e expression
    * @param u unit
    * @param s same flag
    */
-  public FTScope(final FTUnit u, final boolean s) {
+  public FTScope(final FTExpr e, final FTUnit u, final boolean s) {
+    super(e);
     unit = u;
     same = s;
   }
 
   @Override
-  boolean filter(final QueryContext ctx, final FTMatch mtc,
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
     if(same) {
       int s = -1;
@@ -55,12 +57,14 @@ public class FTScope extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.attribute(token(same ? QueryTokens.SAME : QueryTokens.DIFFERENT),
-        token(unit.toString()));
+    ser.openElement(this, token(same ? QueryTokens.SAME :
+      QueryTokens.DIFFERENT), token(unit.toString()));
+    super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return (same ? QueryTokens.SAME : QueryTokens.DIFFERENT) + " " + unit;
+    return super.toString() + (same ? QueryTokens.SAME :
+      QueryTokens.DIFFERENT) + " " + unit;
   }
 }

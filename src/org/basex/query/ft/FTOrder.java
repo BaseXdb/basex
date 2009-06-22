@@ -15,10 +15,19 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTOrder extends FTFilter {
+public final class FTOrder extends FTFilter {
+  /**
+   * Constructor.
+   * @param e expression
+   */
+  public FTOrder(final FTExpr e) {
+    super(e);
+  }
+  
   @Override
-  boolean filter(final QueryContext ctx, final FTMatch mtc,
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
+
     int p = 0, s = 0;
     boolean f = true;
     for(final FTStringMatch sm : mtc) {
@@ -26,7 +35,6 @@ public class FTOrder extends FTFilter {
       if(f) {
         if(p == sm.queryPos) continue;
         p = sm.queryPos;
-        f = false;
       }
       f = s <= sm.start;
       if(f) s = sm.start;
@@ -35,17 +43,18 @@ public class FTOrder extends FTFilter {
   }
 
   @Override
-  boolean content() {
+  protected boolean content() {
     return false;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.attribute(token(QueryTokens.ORDERED), TRUE);
+    ser.openElement(this, token(QueryTokens.ORDERED), TRUE);
+    super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return QueryTokens.ORDERED;
+    return super.toString() + QueryTokens.ORDERED;
   }
 }

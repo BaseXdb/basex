@@ -17,7 +17,7 @@ public final class XQFTTS extends W3CTS {
   public static void main(final String[] args) throws Exception {
     new XQFTTS().init(args);
   }
-  
+
   /**
    * Constructor.
    */

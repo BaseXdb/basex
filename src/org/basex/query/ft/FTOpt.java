@@ -3,13 +3,10 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
-import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
 import org.basex.util.Levenshtein;
 import org.basex.util.Tokenizer;
@@ -52,8 +49,6 @@ public final class FTOpt extends ExprInfo {
   /** States which flags are assigned. */
   private final boolean[] set = new boolean[flag.length];
 
-  /** Weight. */
-  public Expr weight;
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stopwords. */
@@ -68,13 +63,9 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Compiles the full-text options, inheriting the options of the argument.
-   * @param ctx query context
    * @param opt parent full-text options
-   * @throws QueryException xquery exception
    */
-  public void compile(final QueryContext ctx, final FTOpt opt)
-      throws QueryException {
-
+  public void compile(final FTOpt opt) {
     for(int i = 0; i < flag.length; i++) {
       if(!set[i]) {
         set[i] = opt.set[i];
@@ -86,8 +77,6 @@ public final class FTOpt extends ExprInfo {
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
     else if(opt.th != null) th.merge(opt.th);
-
-    if(weight != null) weight = weight.comp(ctx);
   }
 
   /**
@@ -123,13 +112,12 @@ public final class FTOpt extends ExprInfo {
    * Sequential variant.
    * @param q query token
    * @param tk input tokenizer
-   * @param all matches
-   * @param fast stops evaluation after first hit
+   * @param words words reference
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final byte[] q, final Tokenizer tk, final FTMatches all,
-      final boolean fast) throws QueryException {
+  int contains(final byte[] q, final Tokenizer tk, final FTWords words)
+      throws QueryException {
 
     // assign options to text
     tk.st = is(ST);
@@ -166,7 +154,6 @@ public final class FTOpt extends ExprInfo {
         } else {
           c = true;
         }
-
         final byte[] s = qu.get();
         if(sw != null && sw.id(s) != 0) continue;
 
@@ -186,14 +173,15 @@ public final class FTOpt extends ExprInfo {
       }
       
       if(f) {
-        // each word position has to be saved for phrases
-        all.add(tpos, tpos + qu.pos - 1);
         count++;
-        if(fast) break;
+        if(words.add(tpos, tpos + qu.pos - 1)) break;
       }
       tk.p = tp;
       tk.pos = tpos;
     }
+
+    words.all.sTokenNum++;
+    words.first = false;
     return count;
   }
 
@@ -265,7 +253,6 @@ public final class FTOpt extends ExprInfo {
     if(is(DC)) ser.attribute(token(QueryTokens.DIACRITICS), TRUE);
     if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE) , TRUE);
     if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE) , TRUE);
-    if(weight != null) weight.plan(ser);
   }
 
   @Override

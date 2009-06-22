@@ -1,9 +1,15 @@
 package org.basex.query.ft;
 
+import java.io.IOException;
+
 import org.basex.data.FTMatch;
+import org.basex.data.FTMatches;
+import org.basex.data.Serializer;
+import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Arr;
+import org.basex.query.item.FTItem;
+import org.basex.query.iter.FTIter;
 import org.basex.util.Tokenizer;
 
 /**
@@ -12,7 +18,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class FTFilter extends Arr {
+public abstract class FTFilter extends FTExpr {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORD,
@@ -28,8 +34,57 @@ public abstract class FTFilter extends Arr {
   }
 
   /** Optional unit. */
-  FTUnit unit = FTUnit.WORD;
+  protected FTUnit unit = FTUnit.WORD;
 
+  /**
+   * Constructor.
+   * @param e expression
+   */
+  public FTFilter(final FTExpr e) {
+    super(e);
+  }
+
+  @Override
+  public FTItem atomic(final QueryContext ctx) throws QueryException {
+    final FTItem it = expr[0].atomic(ctx);
+    filter(ctx, it, ctx.fttoken);
+    return it;
+  }
+
+  @Override
+  public FTIter iter(final QueryContext ctx) throws QueryException {
+    final FTIter ir = expr[0].iter(ctx);
+
+    return new FTIter() {
+      @Override
+      public FTItem next() throws QueryException {
+        FTItem it;
+        while((it = ir.next()) != null) {
+          if(filter(ctx, it, content() ? new Tokenizer(it.str()) : null)) break;
+        }
+        return it;
+      }
+    };
+  }
+
+  /**
+   * Evaluates the position filters.
+   * @param ctx query context
+   * @param item input node
+   * @param ft tokenizer
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  boolean filter(final QueryContext ctx, final FTItem item, final Tokenizer ft)
+      throws QueryException {
+
+    final FTMatches all = item.all;
+    for(int a = 0; a < all.size; a++) {
+      if(!filter(ctx, all.match[a], ft)) all.delete(a--);
+    }
+    return all.size != 0;
+  }
+  
   /**
    * Evaluates the filter expression.
    * @param ctx query context
@@ -38,7 +93,7 @@ public abstract class FTFilter extends Arr {
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean filter(final QueryContext ctx, final FTMatch m,
+  protected abstract boolean filter(final QueryContext ctx, final FTMatch m,
       final Tokenizer ft) throws QueryException;
 
   /**
@@ -46,7 +101,7 @@ public abstract class FTFilter extends Arr {
    * Is overwritten by some filters to perform other checks.
    * @return result of check
    */
-  boolean content() {
+  protected boolean content() {
     return unit != FTUnit.WORD;
   }
 
@@ -56,10 +111,25 @@ public abstract class FTFilter extends Arr {
    * @param ft tokenizer
    * @return new position
    */
-  final int pos(final int p, final Tokenizer ft) {
+  protected final int pos(final int p, final Tokenizer ft) {
     if(unit == FTUnit.WORD) return p;
     ft.init();
     while(ft.more() && ft.pos != p);
     return unit == FTUnit.SENTENCE ? ft.sent : ft.para;
+  }
+
+  @Override
+  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+    return expr[0].indexAccessible(ic);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    return expr[0] + " ";
   }
 }

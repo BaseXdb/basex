@@ -1,6 +1,8 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
+
+import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -48,16 +50,12 @@ public final class FTNot extends FTExpr {
 
   /**
    * Negates a hit.
-   * @param it item
+   * @param item item
    * @return specified item
    */
-  FTItem not(final FTItem it) {
-    if(it != null) {
-      it.all.not();
-      // ..for negated queries without hits ('a' ftcontains ftnot 'b')
-      it.score(it.score() == 0 ? 1 : 0);
-    }
-    return it;
+  FTItem not(final FTItem item) {
+    if(item != null) item.all = FTMatches.not(item.all, 0);
+    return item;
   }
 
   @Override

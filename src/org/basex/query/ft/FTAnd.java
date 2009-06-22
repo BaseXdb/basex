@@ -43,10 +43,10 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     final FTItem item = expr[0].atomic(ctx);
-    for(int e = 1; e < expr.length && item.score() != 0; e++) {
+    for(int e = 1; e < expr.length; e++) {
       final FTItem it = expr[e].atomic(ctx);
       item.all = FTMatches.and(item.all, it.all);
-      item.score(it.score() == 0 ? 0 : ctx.score.and(it.score(), item.score()));
+      item.score(ctx.score.and(it.score(), item.score()));
     }
     return item;
   }
@@ -90,7 +90,7 @@ public final class FTAnd extends FTExpr {
         // merge all matches
         final FTItem item = it[0];
         for(int i = 1; i < it.length; i++) {
-          if(neg[i]) continue;
+          if(neg[i]) continue; // item.all = FTMatches.not(it[i].all, 0);
           item.all = FTMatches.and(item.all, it[i].all);
           it[i] = ir[i].next();
         }

@@ -24,11 +24,10 @@ public final class FTPosData {
    * @param all full-text matches
    */
   public void add(final int pre, final FTMatches all) {
-    // [CG] FT: add position data
     final IntList ps = new IntList();
     final TokenBuilder pi = new TokenBuilder();
-    for(int a = 0; a < all.size; a++) {
-      for(final FTStringMatch sm : all.match[a]) {
+    for(final FTMatch m : all) {
+      for(final FTStringMatch sm : m) {
         for(int s = sm.start; s <= sm.end; s++) {
           ps.add(s);
           pi.add(sm.queryPos);

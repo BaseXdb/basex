@@ -36,7 +36,7 @@ abstract class FTIndex extends Index {
       final boolean fast) {
 
     return new FTIndexIterator() {
-      final FTMatches all = new FTMatches();
+      final FTMatches all = new FTMatches(toknum);
       boolean f = true;
       long pos = p;
       int lpre, c;
@@ -52,7 +52,7 @@ abstract class FTIndex extends Index {
           f = false;
         }
         pre = lpre;
-
+        
         all.reset(toknum);
         all.add(da.readNum(pos));
         while(++c < s && (lpre = da.readNum()) == pre) {

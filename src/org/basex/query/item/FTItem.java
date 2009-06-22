@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
-import org.basex.query.QueryContext;
 
 /**
  * XQuery item representing a full-text Node.
@@ -46,21 +45,6 @@ public final class FTItem extends DBNode {
   @Override
   public String toString() {
     return data != null ? super.toString() + " (" + all.size + ")" :
-      name() + " (" + score + ")";
-  }
-
-
-
-  // [CG] FT: to be revised...
-
-  /**
-   * Merges the current item with an other node. Called by the index variant.
-   * @param ctx query context
-   * @param i1 second node
-   */
-  public void union(final QueryContext ctx, final FTItem i1) {
-    // [CG] FT: check pre != n.pre before call
-    //matches[0].union(i1.matches[0], w);
-    score = ctx.score.or(score, i1.score);
+      name() + " (" + all.size + ")";
   }
 }
