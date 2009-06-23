@@ -1,5 +1,7 @@
 package org.basex.gui.view.map;
 
+import org.basex.gui.GUIProp;
+
 /**
  * StripLayout Algorithm.
  *
@@ -26,61 +28,114 @@ public class StripAlgo extends MapAlgo{
 
     MapRects row = new MapRects();
     int height = 0;
+    int width = 0;
     double weight = 0;
     double sumweight = 1;
     double tmpratio;
     double rowratio = Double.MAX_VALUE;
     
-    
-    while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
-      weight += ml.weight[ni]; 
-      height = (int) ((weight / sumweight) * hh); 
-//      height = height > 0 ? height : 1;
-      
-      final MapRects tmp = new MapRects();
-
-      double x = xx;
-      for(int i = start; i <= ni; i++) {
-        int w = i == ni ? (int) (xx + ww - x) :
-          (int) (ml.weight[i] / weight * ww);
-//        w = w > 0 ? w : 1;
+    if(GUIProp.striphor) {
+      while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
+        weight += ml.weight[ni]; 
+        height = (int) ((weight / sumweight) * hh); 
+  //      height = height > 0 ? height : 1;
         
-        if(yy + height <= yy + hh)
-          tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i], l));
-        else break;
-        x += w;
-      }
-      tmpratio = lineRatio(tmp);
-
-      // if ar has increased discard tmp and add row
-      if(tmpratio > rowratio) {
-        // add rects of row to solution
-        rects.add(row);
-        rowratio = Double.MAX_VALUE;
-        // preparing next line
-        hh -= row.get(0).h;
-        yy += row.get(0).h;
-        tmp.reset();
-        row.reset();
-        start = ni;
-        sumweight -= weight - ml.weight[ni];
-        weight = 0;
-        // sometimes there has to be one rectangles to fill the left space
-        if(ne == ni) {
-          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-              ml.list[ni], l));
-          break;
+        final MapRects tmp = new MapRects();
+  
+        double x = xx;
+        for(int i = start; i <= ni; i++) {
+          int w = i == ni ? (int) (xx + ww - x) :
+            (int) (ml.weight[i] / weight * ww);
+  //        w = w > 0 ? w : 1;
+          
+          if(yy + height <= yy + hh)
+            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i], l));
+          else break;
+          x += w;
         }
-      } else {
-        row = tmp;
-        rowratio = tmpratio;
-        ni++;
+        tmpratio = lineRatio(tmp);
+  
+        // if ar has increased discard tmp and add row
+        if(tmpratio > rowratio) {
+          // add rects of row to solution
+          rects.add(row);
+          rowratio = Double.MAX_VALUE;
+          // preparing next line
+          hh -= row.get(0).h;
+          yy += row.get(0).h;
+          tmp.reset();
+          row.reset();
+          start = ni;
+          sumweight -= weight - ml.weight[ni];
+          weight = 0;
+          // sometimes there has to be one rectangles to fill the left space
+          if(ne == ni) {
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
+                ml.list[ni], l));
+            break;
+          }
+        } else {
+          row = tmp;
+          rowratio = tmpratio;
+          ni++;
+        }
       }
+      // adding last row
+      for(final MapRect rect : row) rect.h = (int) hh;
+      rects.add(row);
+      
+      return rects;
+    } else {
+      while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
+        weight += ml.weight[ni]; 
+        width = (int) ((weight / sumweight) * ww); 
+  //      height = height > 0 ? height : 1;
+        
+        final MapRects tmp = new MapRects();
+  
+        double y = yy;
+        for(int i = start; i <= ni; i++) {
+          int h = i == ni ? (int) (yy + hh - y) :
+            (int) (ml.weight[i] / weight * hh);
+  //        w = w > 0 ? w : 1;
+          
+          if(yy + height <= yy + hh)
+            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.list[i], l));
+          else break;
+          y += h;
+        }
+        tmpratio = lineRatio(tmp);
+  
+        // if ar has increased discard tmp and add row
+        if(tmpratio > rowratio) {
+          // add rects of row to solution
+          rects.add(row);
+          rowratio = Double.MAX_VALUE;
+          // preparing next line
+          ww -= row.get(0).w;
+          xx += row.get(0).w;
+          tmp.reset();
+          row.reset();
+          start = ni;
+          sumweight -= weight - ml.weight[ni];
+          weight = 0;
+          // sometimes there has to be one rectangles to fill the left space
+          if(ne == ni) {
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
+                ml.list[ni], l));
+            break;
+          }
+        } else {
+          row = tmp;
+          rowratio = tmpratio;
+          ni++;
+        }
+      }
+      // adding last row
+      for(final MapRect rect : row) rect.w = (int) ww;
+      rects.add(row);
+      
+      return rects;
     }
-    // adding last row
-    for(final MapRect rect : row) rect.h = (int) hh;
-    rects.add(row);
-    
-    return rects;
   }
 }

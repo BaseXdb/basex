@@ -93,6 +93,8 @@ public final class GUIProp {
   public static int mapoffsets = 3;
   /** Map algorithm. */
   public static int mapalgo = 0;
+  /** Strip direction horizontal? */
+  public static boolean striphor = false;
   /** number of child <-> size weighting in (0;100). */
   public static int mapweight = 0;
   /** divide rectangles uniformly on each level. */
