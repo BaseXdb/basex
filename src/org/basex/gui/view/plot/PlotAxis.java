@@ -106,6 +106,7 @@ public final class PlotAxis {
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     type = key.kind;
+    if(type == null) return;
     if(type == Kind.CAT)
       type = Kind.TEXT;
 
