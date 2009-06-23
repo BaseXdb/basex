@@ -45,8 +45,10 @@ abstract class MapPainter {
    * Paints node contents.
    * @param g graphics reference
    * @param r rectangle array
+   * @param scale scale boarders using this factor
    */
-  abstract void drawRectangles(final Graphics g, final MapRects r);
+  abstract void drawRectangles(final Graphics g, final MapRects r, 
+      final float scale);
 
   /**
    * Reacts on a mouse over/mouse click on the focused area.

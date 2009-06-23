@@ -26,6 +26,8 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   double thumbf;
   /** Width of a space between two thumbnails. **/
   double thumbsw;
+  /** Is Leaf in Treemap? */
+  boolean isLeaf;
   
   /**
    * Default constructor.

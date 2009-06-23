@@ -52,12 +52,16 @@ public final class MapView extends View implements Runnable {
 
   /** Array of current rectangles. */
   private MapRects mainRects;
+//  /** Array of huge rectangles. */
+//  private MapRects hugeRects;
   /** Data specific map layout. */
   private MapPainter painter;
   /** Keeps the whole map layout. */
   public MapLayout layout;
-  /** Keeps LKAyout for focused rectangle. */
+  /** Keeps Layout for focused rectangle. */
   public MapLayout tinyLayout;
+//  /** Scaled Layout. */
+//  public MapLayout hugeLayout; 
   /** Text lengths. */
   private int[] textLen;
 
@@ -96,8 +100,10 @@ public final class MapView extends View implements Runnable {
   private BufferedImage hugeMap;
   /** Linear magnification. */
   private boolean constMag = false;
+  /** Draw ThumbMap. */
+  private boolean thumbMap = false;
   /** scaling. */
-  private static int fkt = 2;
+  private static int fkt = 4;
   /** Y pos tiny Map. */
   private int tinyy;
   /** X pos tiny Map. */
@@ -143,7 +149,7 @@ public final class MapView extends View implements Runnable {
           this);
       mainMap = createImage();
       zoomMap = createImage();
-      if(GUIProp.mapinteraction == 2) hugeMap = new BufferedImage(fkt
+      if(GUIProp.mapinteraction) hugeMap = new BufferedImage(fkt
           * getWidth(), fkt * getHeight(), BufferedImage.TYPE_INT_BGR);
       refreshLayout();
       repaint();
@@ -170,7 +176,11 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshMark() {
     if(getWidth() == 0 || mainMap == null) return;
-    drawMap(mainMap, mainRects);
+//    if(GUIProp.mapinteraction == 2) {
+//      painter.init(mainRects);
+//      drawMap(hugeMap, mainRects.copy());
+//    }
+    drawMap(mainMap, mainRects, 1f);
     repaint();
   }
 
@@ -201,19 +211,107 @@ public final class MapView extends View implements Runnable {
 
     // initial rectangle
     final int w = getWidth(), h = getHeight();
-
-    if(GUIProp.mapinteraction == 2) {
-      final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
-
-      calc(hrect, gui.context.current(), hugeMap);
-    }
-
+    
+    if(GUIProp.mapinteraction) {
+      // [JH] use normal rectangles to calculate hugeMap
+//      final Data data = gui.context.data();
+//      MapLayout hugeLayout = new MapLayout(data, textLen);
+//      
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-
     calc(rect, gui.context.current(), mainMap);
+      
+//      MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
+//          mainRects.get(0).level);
+//      MapRect source = new MapRect(0, 0, w, h, mainRects.get(0).pre,
+//          mainRects.get(0).level);
+//      dest.isLeaf = mainRects.get(0).isLeaf;
+//      source.isLeaf = mainRects.get(0).isLeaf;
+//      MapRects hugeRects = scaleRects(mainRects, 0, mainRects.size, dest, 
+//          source);
+      
+      // simple method only scaling all the rectangles including the borders
+      MapRects hugeRects = new MapRects();
+      for(MapRect r : mainRects) {
+        hugeRects.add(new MapRect(fkt * r.x, fkt * r.y, fkt * r.w, fkt * r.h, 
+            r.pre, r.level));
+      }
 
+      painter.init(hugeRects);
+      drawMap(hugeMap, hugeRects, fkt);
+    } else {
+      final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+      calc(rect, gui.context.current(), mainMap);
+    }
+      
+//      final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
+//      calc(hrect, gui.context.current(), hugeMap);
+//    }
+//    
+//    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+//    calc(rect, gui.context.current(), mainMap);
+    
     repaint();
   }
+  
+//  /**
+//   * Scales all the rectangles in the input list to fit into the destination 
+//   * rectangle.
+//   * 
+//   * @param rects source rectangles
+//   * @param start starting point of the list
+//   * @param end end point
+//   * @param destRect destination size
+//   * @param sourceRect source possitions of the Parent rectangle
+//   * @return list of Rectangles
+//   */
+//  private MapRects scaleRects(final MapRects rects, final int start, 
+//      final int end, final MapRect destRect, final MapRect sourceRect) {
+//    
+//    Data data = gui.context.current().data;
+//    
+//    // rectangle offsets to display border or header (bx)
+//    final int bx = layout.layout.x;
+//    final int by = layout.layout.y;
+//    final int bw = layout.layout.w;
+//    final int bh = layout.layout.h;
+//    
+//    // storing result in res
+//    MapRects res = new MapRects();
+//    res.add(destRect);
+//    if(!destRect.isLeaf) {
+//      final int xx = destRect.x + bx;
+//      final int yy = destRect.y + by;
+//      
+//      final float nhs = (float) (destRect.w - bw) /
+//  (float) (sourceRect.w - bw);
+//      final float nvs = (float) (destRect.h - bh) / 
+//  (float) (sourceRect.h - bh);
+//      
+//      int s = start + 1;
+//      int i = start + 1;
+//      
+//      while (i < end) {
+//        MapRect r = rects.get(i);
+//        int size = data.size(r.pre, data.kind(r.pre));
+//        int maxpre = i + size;
+//        while (i < rects.size && rects.get(i).pre < maxpre) i++;
+//        MapRect t = new MapRect(
+//            (int) (nhs * (r.x - (sourceRect.x + bx)) + xx), 
+//            (int) (nvs * (r.y - (sourceRect.y + by)) + yy), 
+//            (int) (nhs * r.w), (int) (nvs * r.h), 
+//            r.pre, r.level);
+//        t.isLeaf = r.isLeaf;
+//        
+//        // add results of recursion
+//        res.add(scaleRects(rects, s, i, t, r));
+//        
+//        // prepare next while loop
+//        i++;
+//        s = i;
+//      }
+//    }
+//    return res;
+//  }
 
   @Override
   public void refreshUpdate() {
@@ -346,7 +444,7 @@ public final class MapView extends View implements Runnable {
     // mainRects = layout.rectangles;
 
     painter.init(mainRects);
-    drawMap(map, mainRects);
+    drawMap(map, mainRects, 1f);
     focus();
 
     if(GUIProp.mapinfo) {
@@ -473,7 +571,7 @@ public final class MapView extends View implements Runnable {
     final int ac = AlphaComposite.SRC_OVER;
     ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
         GUIProp.zoomboxalpha / 100.0f));
-    if(GUIProp.mapinteraction == 1 && tinyMap != null) {
+    if(GUIProp.mapinteraction && thumbMap) {
 //      // set up some alpha display for the overlayed picture
 //      final int ac = AlphaComposite.SRC_OVER;
 //      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
@@ -483,58 +581,91 @@ public final class MapView extends View implements Runnable {
       // draw border
       g.setColor(Color.black);
       g.drawRect(tinyx, tinyy, tinyw, tinyh);
-    } else if(GUIProp.mapinteraction == 2 && constMag) {
-      // [JH] stop rectangle at borders
-      int dxstart = mouseX - GUIProp.fishw / 2;
-      int dxend = mouseX + GUIProp.fishw / 2;
-      if(dxstart < 0) {
-        dxstart = 0;
-        dxend = GUIProp.fishw;
-      } else if(dxend > getWidth()) {
-        dxend = getWidth();
-        dxstart = getWidth() - GUIProp.fishw;
+    } else if(GUIProp.mapinteraction && constMag) {
+        int dxstart = mouseX - GUIProp.fishw / 2;
+        int dxend = mouseX + GUIProp.fishw / 2;
+        if(dxstart < 0) {
+          dxstart = 0;
+          dxend = GUIProp.fishw;
+        } else if(dxend > getWidth()) {
+          dxend = getWidth();
+          dxstart = getWidth() - GUIProp.fishw;
+        }
+        
+        int dystart = mouseY - GUIProp.fishh / 2;
+        int dyend = mouseY + GUIProp.fishh / 2;
+        if(dystart < 0) {
+          dystart = 0;
+          dyend = GUIProp.fishh;
+        } else if(dyend > getHeight()) {
+          dyend = getHeight();
+          dystart = getHeight() - GUIProp.fishh;
+        }
+        
+        int sxstart = fkt * mouseX - GUIProp.fishw / 2;
+        int sxend = fkt * mouseX + GUIProp.fishw / 2;
+        if(sxstart < 0) {
+          sxstart = 0;
+          sxend = GUIProp.fishw;
+        } else if(sxend > hugeMap.getWidth()) {
+          sxend = hugeMap.getWidth();
+          sxstart = hugeMap.getWidth() - GUIProp.fishw;
+        }
+        
+        int systart = fkt * mouseY - GUIProp.fishh / 2;
+        int syend = fkt * mouseY + GUIProp.fishh / 2;
+        if(systart < 0) {
+          systart = 0;
+          syend = GUIProp.fishh;
+        } else if(syend > hugeMap.getHeight()) {
+          syend = hugeMap.getHeight();
+          systart = hugeMap.getHeight() - GUIProp.fishh;
+        }     
+        
+//        BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart, 
+//            sxend - sxstart, syend - systart));
+//        
+//        try {
+//          File file = new File("baseXdistorted.png");
+//          ImageIO.write(map, "png", file);
+//        } catch(IOException exc) {
+//          exc.printStackTrace();
+//        }
+//        
+//        g.drawImage(map, dxstart, dystart, dxend, dyend, 
+//            0, 0, map.getWidth(), map.getHeight(), this);
+//        
+        g.drawImage(hugeMap, dxstart, dystart, dxend, dyend, 
+            sxstart, systart, sxend, syend, this);
+        
+        // draw border
+        g.setColor(Color.black);
+        g.drawRect(dxstart, dystart, GUIProp.fishw, GUIProp.fishh);
       }
-      
-      int dystart = mouseY - GUIProp.fishh / 2;
-      int dyend = mouseY + GUIProp.fishh / 2;
-      if(dystart < 0) {
-        dystart = 0;
-        dyend = GUIProp.fishh;
-      } else if(dyend > getHeight()) {
-        dyend = getHeight();
-        dystart = getHeight() - GUIProp.fishh;
-      }
-      
-      int sxstart = fkt * mouseX - GUIProp.fishw / 2;
-      int sxend = fkt * mouseX + GUIProp.fishw / 2;
-      if(sxstart < 0) {
-        sxstart = 0;
-        sxend = GUIProp.fishw;
-      } else if(sxend > hugeMap.getWidth()) {
-        sxend = hugeMap.getWidth();
-        sxstart = hugeMap.getWidth() - GUIProp.fishw;
-      }
-      
-      int systart = fkt * mouseY - GUIProp.fishh / 2;
-      int syend = fkt * mouseY + GUIProp.fishh / 2;
-      if(systart < 0) {
-        systart = 0;
-        syend = GUIProp.fishh;
-      } else if(syend > hugeMap.getHeight()) {
-        syend = hugeMap.getHeight();
-        systart = hugeMap.getHeight() - GUIProp.fishh;
-      }     
-      
-      g.drawImage(hugeMap, dxstart, dystart, dxend, dyend, 
-          sxstart, systart, sxend, syend, this);
-
-      // draw border
-      g.setColor(Color.black);
-      g.drawRect(dxstart, dystart, GUIProp.fishw, GUIProp.fishh);
-    }
     gui.painting = false;
   }
 
+//  /**
+//   * distorts the image using something like a tanh to the polar coordinates. 
+//   * 
+//   * @param image to distort
+//   * @return distorted Image
+//   */
+//  private BufferedImage distort(final BufferedImage image) {
+//    BufferedImage i = new BufferedImage(image.getWidth(), image.getHeight(),
+//        BufferedImage.TYPE_INT_BGR);
+//    int width = image.getWidth(); int height = image.getHeight();
+//    for (int x = 0; x < width; x++) {
+//      for (int y = 0; y < height; y++) {
+//        int nX = (int) Math.tan(x - width / 2);
+//        int nY = (int) Math.tan(y - height / 2);
+//        if(nX > 0 && nX < width && nY > 0 && nY < height) 
+//          i.setRGB(nX, nY, image.getRGB(x, y));
+//      }
+//    }
+//    return i;
+//  }
+  
   /**
    * Draws image with correct scaling.
    * @param g graphics reference
@@ -593,12 +724,14 @@ public final class MapView extends View implements Runnable {
    * 
    * @param map Image to draw the map on
    * @param rects calculated rectangles
+   * @param scale scale the rectangles
    */
-  void drawMap(final BufferedImage map, final MapRects rects) {
+  void drawMap(final BufferedImage map, final MapRects rects, 
+      final float scale) {
     final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
     BaseXLayout.antiAlias(g);
-    if(rects != null) painter.drawRectangles(g, rects);
+    if(rects != null) painter.drawRectangles(g, rects, scale);
   }
 
   @Override
@@ -612,14 +745,13 @@ public final class MapView extends View implements Runnable {
     if(focus()) {
       if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
           mouseY < tinyy + tinyh)) {
-        tinyw = 0;
-        tinyh = 0;
+        thumbMap = false;
       }
       repaint();
-    } else if(GUIProp.mapinteraction == 2 && e.isControlDown()) {
+    } else if(GUIProp.mapinteraction && e.isControlDown()) {
         constMag = true;
         repaint();
-    } else if(GUIProp.mapinteraction == 2 && !e.isControlDown() && constMag) {
+    } else if(GUIProp.mapinteraction && !e.isControlDown() && constMag) {
         constMag = false;
         repaint();
     }
@@ -633,7 +765,8 @@ public final class MapView extends View implements Runnable {
     if(SwingUtilities.isLeftMouseButton(e) && focused != null) painter.mouse(
         focused, mouseX, mouseY, true);
 
-    if(GUIProp.mapinteraction == 1) {
+    if(GUIProp.mapinteraction) {
+      thumbMap = true;
       final Data data = gui.context.data();
       int screensize = getWidth() * getHeight();
       // [JH] guiprop
@@ -673,7 +806,7 @@ public final class MapView extends View implements Runnable {
       rects.add(focused);
 
       painter.init(tinyLayout.rectangles.copy());
-      drawMap(tinyMap, tinyLayout.rectangles);
+      drawMap(tinyMap, tinyLayout.rectangles, 1f);
       repaint();
     }
   }
@@ -790,9 +923,8 @@ public final class MapView extends View implements Runnable {
       tinyw = 0;
       tinyh = 0;
       repaint();
-      // [JH] needs an other key. print is not working because of global 
-      // keybinding
-    } else if(GUIProp.mapinteraction == 2 && key == KeyEvent.VK_1) {
+      // [JH] to be included only in test versions
+    } else if(GUIProp.mapinteraction && key == KeyEvent.VK_1) {
       try {
         File file1 = new File("baseXTM.png");
         ImageIO.write(mainMap, "png", file1);

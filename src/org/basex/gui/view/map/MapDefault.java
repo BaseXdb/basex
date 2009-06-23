@@ -26,9 +26,12 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final MapRects rects) {
+  void drawRectangles(final Graphics g, final MapRects rects, 
+      final float scale) {
     // some additions to set up borders
     final MapRect l = view.layout.layout;
+    l.x = (int) scale * l.x; l.y = (int) scale * l.y;
+    l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();

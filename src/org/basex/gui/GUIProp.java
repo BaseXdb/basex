@@ -159,7 +159,7 @@ public final class GUIProp {
   /** Shows real file contents in the treemap. */
   public static boolean mapfs = true;
   /** Choice of interacting with TreeeMap. */
-  public static int mapinteraction = 0;
+  public static boolean mapinteraction = false;
   /** Scaling to use in the Map oneclickfocus. */
   public static int lensscale = 2;
   /** Alpha value of the zoombox. */

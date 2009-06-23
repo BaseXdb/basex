@@ -50,10 +50,10 @@ public class SquarifiedAlgo extends MapAlgo {
           else break;
           x += w;
         }
-        tmpratio = lineRatio(tmp);
+        tmpratio = worstLineRatio(tmp);
 
         // if ar has increased discard tmp and add row
-        if(tmpratio > lineRatio(row)) {
+        if(tmpratio > rowratio) {
           // add rects of row to solution
           rects.add(row);
           rowratio = Double.MAX_VALUE;
@@ -92,7 +92,7 @@ public class SquarifiedAlgo extends MapAlgo {
           else break;
           y += h;
         }
-        tmpratio = lineRatio(tmp);
+        tmpratio = worstLineRatio(tmp);
         
         // if ar has increased discard tmp and add row
         if(tmpratio > rowratio) {

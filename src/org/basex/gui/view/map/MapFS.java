@@ -51,9 +51,12 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final MapRects rects) {
+  void drawRectangles(final Graphics g, final MapRects rects,
+      final float scale) {
     final Data data = view.gui.context.data();
     final MapRect l = view.layout.layout;
+    l.x = (int) scale * l.x; l.y = (int) scale * l.y;
+    l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);

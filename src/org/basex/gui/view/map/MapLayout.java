@@ -12,7 +12,7 @@ import org.basex.gui.view.ViewData;
  */
 class MapLayout {
   /** Font size. */
-  private final int off = GUIProp.fontsize + 4;
+  public final int off = GUIProp.fontsize + 4;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
@@ -36,14 +36,19 @@ class MapLayout {
     rectangles = new MapRects();
     
     switch(GUIProp.mapoffsets) {
+      // no title, small border
       case 1 :
         layout = new MapRect(0, 2, 0, 2); break;
+      // title, no border
       case 2 :
         layout = new MapRect(0, off, 0, off); break;
+      // title, border
       case 3 :
         layout = new MapRect(2, off - 1, 4, off + 1); break;
+      // title, large border
       case 4 :
         layout = new MapRect(off >> 2, off, off >> 1, off + (off >> 2)); break;
+      // no title, no border
       default:
         layout = new MapRect(0, 0, 0, 0); break;
     }
@@ -147,8 +152,7 @@ class MapLayout {
    * @param r parent rectangle
    * @param level indicates level which is calculated
    */
-  private void putRect(final MapRect r, final int level) {
-      rectangles.add(r);
+  public void putRect(final MapRect r, final int level) {
 
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
@@ -158,8 +162,14 @@ class MapLayout {
     
     // skip too small rectangles and meta data in file systems
     if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs && 
-        ViewData.isLeaf(data, r.pre)) return;
+        ViewData.isLeaf(data, r.pre)) {
+      r.isLeaf = true;
+      rectangles.add(r);
+      return;
+    }
 
+    r.isLeaf = false;
+    rectangles.add(r);
     final MapList ch = children(r.pre);
     if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
         ch, 0, ch.size - 1, level + 1);

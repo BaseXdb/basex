@@ -9,8 +9,7 @@ package org.basex.gui.view.map;
 public abstract class MapAlgo {
 
   /**
-   * Calculates the aspect Ratios of rectangles given in the List. Bigger 
-   * rectangles have more influence to the result.
+   * Calculates the average aspect Ratios of rectangles given in the List.
    * 
    * @param r Array of rectangles
    * @return average aspect ratio
@@ -18,20 +17,45 @@ public abstract class MapAlgo {
   static double lineRatio(final MapRects r) {
     if(r.size() == 0) return Double.MAX_VALUE;
     double ar = 0;
-    double dev = 0;
+    int dev = 0;
 
     for(MapRect rect : r) {
       if(rect.w != 0 && rect.h != 0) {
-        double d = rect.w * rect.h;
-        dev += d;
+        dev++;
         if(rect.w > rect.h) {
-          ar += d * rect.w / rect.h;
+          ar += rect.w / rect.h;
         } else {
-          ar += d * rect.h / rect.w;
+          ar += rect.h / rect.w;
         }
       }
     }
     return ar / dev;
+  }
+  
+  /**
+   * Calculates the worst aspect ratio of the rectangles given in the list.
+   *
+   * should return teh worst ar....
+   * @param r Array of rectangles
+   * @return max aspect ratio
+   */
+  static double worstLineRatio(final MapRects r) {
+    if(r.size() == 0) return Double.MAX_VALUE;
+    
+    double worstar = 0;
+    double ar = 0;
+
+    for(MapRect rect : r) {
+      if(rect.w != 0 && rect.h != 0) {
+        if(rect.w > rect.h) {
+          ar = rect.w / rect.h;
+        } else {
+          ar = rect.h / rect.w;
+        }
+      }
+      if (ar > worstar) worstar = ar;
+    }
+    return worstar;
   }
 
   /**
