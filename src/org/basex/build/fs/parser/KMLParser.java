@@ -5,11 +5,10 @@ import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+import org.basex.BaseX;
+import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.Type;
-import org.basex.io.IO;
 
 /**
  * Parser for KML files.
@@ -43,18 +42,17 @@ public class KMLParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  void readContent(final FileChannel f, final long limit) throws IOException {
-    Builder builder = getBuilder();
-    final IO io = IO.get(file.getPath());
-    final Parser parser = Parser.getXMLParser(io);
-    parser.doc = false;
-    parser.parse(builder);
+  public void readContent(final FileChannel fc, final long limit,
+      final NewFSParser fsParser) throws IOException {
+    if(fc.position() != 0 || limit != fc.size()) BaseX.notimplemented("Parsing "
+        + "framents of kml files is currently not supported");
+    fsParser.parseXML();
   }
 
   /** {@inheritDoc} */
   @Override
-  void readMeta(final FileChannel f, final long limit) {
-  // TODO Auto-generated method stub
+  public void readMeta(final FileChannel fc, final long limit,
+      final NewFSParser fsParser) {
+  // no metadata to read...
   }
-
 }

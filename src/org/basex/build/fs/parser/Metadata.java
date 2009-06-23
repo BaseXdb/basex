@@ -9,7 +9,7 @@ import static org.basex.util.Token.token;
  * Constants for file metadata and content representation.
  * @author Bastian Lemke
  */
-final class Metadata {
+public final class Metadata {
 
   /** Bytes from file to buffer. */
   public static final int DEFAULT_BUFFER_SIZE = 2048;
@@ -18,7 +18,7 @@ final class Metadata {
    * Available xml attributes.
    * @author Bastian Lemke
    */
-  enum Attribute {
+  public enum Attribute {
     /** Attribute name "type". */
     TYPE("type"),
     /** Attribute name "def". */
@@ -33,7 +33,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -111,7 +111,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -151,7 +151,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -168,7 +168,7 @@ final class Metadata {
    * Supported XML data types.
    * @author Bastian Lemke
    */
-  enum DataType {
+  public enum DataType {
     /** String value. */
     STRING("xs:string"),
     /** Boolean value. */
@@ -201,7 +201,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -218,7 +218,7 @@ final class Metadata {
    * Available precise definitions for elements.
    * @author Bastian Lemke
    */
-  enum Definition {
+  public enum Definition {
     /** Used for elements without precise definition. */
     NONE(""),
 
@@ -277,7 +277,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -294,7 +294,7 @@ final class Metadata {
    * Available MIME types.
    * @author Bastian Lemke
    */
-  enum MimeType {
+  public enum MimeType {
     /** XML. */
     XML("application/xml", "xml"),
     /** KML. */
@@ -317,7 +317,7 @@ final class Metadata {
      * Returns the xml element name as byte array.
      * @return the xml element name.
      */
-    byte[] get() {
+    public byte[] get() {
       return elem;
     }
 
@@ -325,7 +325,7 @@ final class Metadata {
      * Returns the default file suffix for the MIME type.
      * @return the default file suffix.
      */
-    byte[] getDefaultSuffix() {
+    public byte[] getDefaultSuffix() {
       return suff;
     }
 

@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
 import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
@@ -61,18 +63,21 @@ public class PNGParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  void readContent(final FileChannel f, final long limit) {
+  public void readContent(final FileChannel fc, final long limit,
+      final NewFSParser fsParser) {
   // no textual representation for png content ...
   }
 
   /** {@inheritDoc} */
   @Override
-  void readMeta(final FileChannel f, final long limit) throws IOException {
-    if(!check(f, limit)) return;
+  public void readMeta(final FileChannel fc, final long limit,
+      final NewFSParser fsParser) throws IOException {
+    if(!check(fc, limit)) return;
     byte[] width = Token.token(buf.getInt());
     byte[] height = Token.token(buf.getInt());
-    Token.token(0);
-    metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null, width);
-    metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL, null, height);
+    fsParser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null,
+        width);
+    fsParser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
+        null, height);
   }
 }

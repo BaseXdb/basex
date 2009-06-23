@@ -53,7 +53,7 @@ public final class ParserUtil {
    */
   public static byte[] convertYear(final byte[] year) {
     // TODO: check encoding
-    if(isEmpty(year) || year.length != 4) return null;
+    if(year.length != 4) return Token.EMPTY;
     for(int i = 0; i < 4; i++) {
       if(year[i] < '0' || year[i] > '9') { // not a valid number
         BaseX.debug("Invalid date value: " + Token.string(year));
@@ -77,17 +77,5 @@ public final class ParserUtil {
     final long time = file.lastModified() / 60000;
     if(time != 0) return token(time);
     else return null;
-  }
-
-  /**
-   * Checks if the array has (non-whitespace) content.
-   * @param value the byte array to check.
-   * @return true if the array has no content, false otherwise.
-   */
-  public static boolean isEmpty(final byte[] value) {
-    if(value == null || value.length == 0) return true;
-    for(byte b : value)
-      if(!Token.ws(b)) return false;
-    return true;
   }
 }

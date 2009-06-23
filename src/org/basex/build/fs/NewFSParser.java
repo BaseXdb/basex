@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,13 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
 import org.basex.build.fs.parser.ParserUtil;
+import org.basex.build.fs.parser.Metadata.Attribute;
+import org.basex.build.fs.parser.Metadata.DataType;
+import org.basex.build.fs.parser.Metadata.Definition;
+import org.basex.build.fs.parser.Metadata.Element;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
+import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.Token;
@@ -41,6 +47,11 @@ import org.basex.util.Token;
  * @author Bastian Lemke
  */
 public final class NewFSParser extends Parser {
+
+  // [BL] clean up class ...
+
+  /** If true, the <code>type=""</code> attributes are added to the XML doc. */
+  private static final boolean ADD_TYPE_ATTR = false;
 
   /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
   public static final int SIZEOFFSET = 3;
@@ -97,22 +108,23 @@ public final class NewFSParser extends Parser {
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
-    // instanciate all registered parsers for this FSParser instance
-    parserInstances = new HashMap<String, AbstractParser>();
-    for(Map.Entry<String, Class<? extends AbstractParser>> parser : //
-    AbstractParser.getAdapters().entrySet()) {
-      try {
-        AbstractParser instance = parser.getValue().newInstance();
-        instance.setFSParser(this);
-        parserInstances.put(parser.getKey(), instance);
-      } catch(InstantiationException e) {
-        BaseX.debug("Failed to instanciate parser "
-            + parser.getValue().getName());
-      } catch(IllegalAccessException e) {
-        BaseX.debug("Failed to instanciate parser "
-            + parser.getValue().getName());
+    if(Prop.fsmeta || Prop.fscont) {
+      // instanciate all registered parsers for this FSParser instance
+      parserInstances = new HashMap<String, AbstractParser>();
+      for(Map.Entry<String, Class<? extends AbstractParser>> parser : //
+      AbstractParser.getAdapters().entrySet()) {
+        try {
+          AbstractParser instance = parser.getValue().newInstance();
+          parserInstances.put(parser.getKey(), instance);
+        } catch(InstantiationException e) {
+          BaseX.debug("Failed to instanciate parser "
+              + parser.getValue().getName());
+        } catch(IllegalAccessException e) {
+          BaseX.debug("Failed to instanciate parser "
+              + parser.getValue().getName());
+        }
       }
-    }
+    } else parserInstances = null;
   }
 
   /**
@@ -263,24 +275,23 @@ public final class NewFSParser extends Parser {
   private void file(final File f) throws IOException {
     curr = f;
     if(!singlemode) builder.startElem(FILE, atts(f, false));
-    if(f.canRead() && f.isFile() && f.getName().indexOf('.') != -1) {
+    if((Prop.fsmeta || Prop.fscont) && f.canRead() && f.isFile()
+        && f.getName().indexOf('.') != -1) {
       final String name = f.getName();
       final int dot = name.lastIndexOf('.');
       final String suffix = name.substring(dot + 1).toLowerCase();
 
-      AbstractParser parser = parserInstances.get(suffix);
-      if(parser != null && f.length() > 0) {
-        if(Prop.fsmeta) {
-          if(Prop.fscont) {
-            // import metadata and content
-            parser.readMetaAndContent(f, builder);
-          } else {
-            // import only metadata
-            parser.readMeta(f, builder);
+      if(f.length() > 0) {
+        AbstractParser parser = parserInstances.get(suffix);
+        if(parser != null) {
+          FileChannel fc = new RandomAccessFile(f, "r").getChannel();
+          try {
+            parse0(parser, fc, fc.size());
+          } finally {
+            try {
+              if(fc != null) fc.close();
+            } catch(IOException e1) { /* */}
           }
-        } else if(Prop.fscont) {
-          // import only content
-          parser.readContent(f, builder);
         }
       }
     }
@@ -288,6 +299,56 @@ public final class NewFSParser extends Parser {
     if(!singlemode) builder.endElem(FILE);
     // add file size to parent folder
     sizeStack[lvl] += f.length();
+  }
+
+  /**
+   * Parses a fragment of a file.
+   * @param fc the {@link FileChannel} to read from.
+   * @param limit maximum number of bytes to read.
+   * @param name the filename (without suffix!).
+   * @param suffix the file suffix.
+   * @param offset the offset of the fragment inside the file.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void parseFileFragment(final FileChannel fc, final long limit,
+      final String name, final String suffix, final long offset)
+      throws IOException {
+    if(Prop.fsmeta || Prop.fscont) {
+      AbstractParser parser = parserInstances.get(suffix);
+      if(parser == null) return;
+      atts.reset();
+      if(name != null) {
+        StringBuilder sb = new StringBuilder(name.length() + suffix.length()
+            + 1);
+        sb.append(name).append('.').append(suffix);
+        atts.add(DataText.NAME, Token.token(sb.toString()));
+      }
+      if(suffix != null) atts.add(DataText.SUFFIX, Token.token(suffix));
+      atts.add(DataText.OFFSET, Token.token(offset));
+      atts.add(DataText.SIZE, Token.token(limit));
+      atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
+      builder.startElem(DataText.FILE, atts);
+      fc.position(offset);
+      parse0(parser, fc, limit);
+      builder.endElem(DataText.FILE);
+    }
+  }
+
+  /**
+   * Starts the parser implementation.
+   * @param parser the parser instance.
+   * @param fc the {@link FileChannel} to read from.
+   * @param limit maximum number of bytes to read.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  private void parse0(final AbstractParser parser, final FileChannel fc,
+      final long limit) throws IOException {
+    if(Prop.fsmeta) {
+      builder.nodeAndText(Element.TYPE.get(), atts.reset(), parser.getType());
+      builder.nodeAndText(Element.FORMAT.get(), atts, parser.getFormat());
+      parser.readMeta(fc, limit, this);
+    }
+    if(Prop.fscont) parser.readContent(fc, limit, this);
   }
 
   /**
@@ -340,17 +401,40 @@ public final class NewFSParser extends Parser {
     return dir.delete();
   }
 
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+
   /**
-   * Parse metadata from a part of a file.
-   * @param f the file to read from.
-   * @param suffix the suffix of the file.
-   * @param fc the file channel to read from.
-   * @param limit the maximum number of bytes to read.
-   * @throws IOException if any error occurs while reading from the file.
+   * Generates the xml representation for a name/value pair and adds it to the
+   * current file element.
+   * @param element the xml element to create.
+   * @param t the type of the xml element.
+   * @param definition the precise definition of the xml element.
+   * @param language the language of the element.
+   * @param value the value of the element.
+   * @throws IOException if any error occurs while generating the xml code.
    */
-  public void parseMeta(final File f, final String suffix,
-      final FileChannel fc, final long limit) throws IOException {
-    AbstractParser parser = parserInstances.get(suffix);
-    parser.readMeta(f, fc, limit, builder);
+  public void metaEvent(final Element element, final DataType t,
+      final Definition definition, final byte[] language, final byte[] value)
+      throws IOException {
+    if(Token.ws(value)) return;
+    atts.reset();
+    if(language != null) atts.add(Attribute.LANGUAGE.get(), language);
+    if(definition != Definition.NONE) atts.add(Attribute.DEFINITION.get(),
+        definition.get());
+    if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), t.get());
+    builder.nodeAndText(element.get(), atts, value);
+  }
+
+  /**
+   * Parse a xml file.
+   * @throws IOException if any error occurs while generating the xml code.
+   */
+  public void parseXML() throws IOException {
+    final IO i = IO.get(curr.getPath());
+    final Parser parser = Parser.getXMLParser(i);
+    parser.doc = false;
+    parser.parse(builder);
   }
 }
