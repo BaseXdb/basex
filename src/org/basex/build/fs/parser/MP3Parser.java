@@ -279,8 +279,8 @@ public class MP3Parser extends AbstractParser {
     super(SUFFIXES, Type.AUDIO, MimeType.MP3);
   }
 
-  // TODO: add support for extended ID3v2 header
-  // TODO: add support for extended tag (before ID3v1 tag)
+  // [BL] add support for extended ID3v2 header
+  // [BL] add support for extended tag (before ID3v1 tag)
 
   // ---------------------------------------------------------------------------
 
@@ -410,6 +410,7 @@ public class MP3Parser extends AbstractParser {
     // The tag begins with the string "ID3" (first three bytes)
     byte[] h = new byte[3];
     fcLimit -= ch.read(ByteBuffer.wrap(h));
+    // [BL] "? true : false" can be omitted
     return (h[0] == 'I' && h[1] == 'D' && h[2] == '3') ? true : false;
   }
 
@@ -604,7 +605,7 @@ public class MP3Parser extends AbstractParser {
    */
   private int skipEncBytes() throws IOException {
     checkRemaining(3);
-    // TODO: handle different encodings
+    // [BL] handle different encodings
     // skip text encoding description bytes
     int bytesToSkip = 0;
     if((buf.get() & 0xFF) <= 0x04) bytesToSkip++;
@@ -705,7 +706,7 @@ public class MP3Parser extends AbstractParser {
    */
   String getPicName() throws IOException {
     // there may be more than one APIC frame with the same ID in the ID3 tag
-    // TODO: avoid duplicate file names
+    // [BL] avoid duplicate file names
     checkRemaining(1);
     int typeId = buf.get() & 0xFF;
     if(typeId >= 0 && typeId < PICTURE_TYPE.length) {

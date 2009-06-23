@@ -30,7 +30,7 @@ public final class ParserUtil {
     if(milliseconds == null) return null;
     int len = milliseconds.length;
     if(len < 4) {
-      // TODO: handle short durations
+      // [BL] handle short durations
       return null; // skip values < 1s
     }
     int newLen = len + 4; // get space for 'P', 'T', '.' and 'S'
@@ -52,7 +52,7 @@ public final class ParserUtil {
    * @return the year.
    */
   public static byte[] convertYear(final byte[] year) {
-    // TODO: check encoding
+    // [BL] check encoding
     if(year.length != 4) return Token.EMPTY;
     for(int i = 0; i < 4; i++) {
       if(year[i] < '0' || year[i] > '9') { // not a valid number

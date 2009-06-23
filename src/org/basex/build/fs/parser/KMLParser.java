@@ -36,7 +36,7 @@ public class KMLParser extends AbstractParser {
   /** {@inheritDoc} */
   @Override
   boolean check(final FileChannel f, final long limit) {
-    // TODO Auto-generated method stub
+    // [BL] Auto-generated method stub
     return true;
   }
 
@@ -53,6 +53,6 @@ public class KMLParser extends AbstractParser {
   @Override
   public void readMeta(final FileChannel fc, final long limit,
       final NewFSParser fsParser) {
-  // no metadata to read...
+    // no metadata to read...
   }
 }

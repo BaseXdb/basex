@@ -239,7 +239,6 @@ public final class DataAccessNIO2 {
         tmpblock.clear();
         fc.write(tmpblock);
       } catch(IOException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
