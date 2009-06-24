@@ -6,7 +6,7 @@ package org.basex.gui.view.map;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-public class SplitAlgo extends MapAlgo {
+public class BinaryAlgo extends MapAlgo {
 
   @Override
   public MapRects calcMap(final MapRect r, final MapList ml, 
@@ -37,12 +37,11 @@ public class SplitAlgo extends MapAlgo {
       double weight;
       int ni = ns - 1;
   
-      // increment pivot until left rectangle contains more or equal
-      // than half the weight or leave with just setting it to ne - 1
-      weight = 0;      
-      for(; ni < ne;) {
-        weight += ml.weight[++ni];
-        if(weight >= sumweight / 2 || ni == ne - 1) break;
+      // setting middle of the list and calc weights
+      weight = 0;
+      ni = ns + ((ne - ns) / 2);
+      for(int i = ns; i <= ni; i++) {
+        weight += ml.weight[i];
       }
       
       int xx = r.x;
@@ -70,6 +69,6 @@ public class SplitAlgo extends MapAlgo {
   
   @Override
   public String getName() {
-    return "Split";
+    return "Binary";
   }
 }

@@ -32,6 +32,14 @@ public final class DialogMapInfo extends Dialog {
   private final BaseXLabel ntime = new BaseXLabel(" ");
   /** Execution time. */
   private final BaseXLabel otime = new BaseXLabel(" ");
+  /** New Algorithm Name. */
+  private final BaseXLabel nname = new BaseXLabel(" ");
+  /** Old Algorithm Name. */
+  private final BaseXLabel oname = new BaseXLabel(" ");
+  /** New nodes per milli second. */
+  private final BaseXLabel nnps = new BaseXLabel(" ");
+  /** Old nodes per milli second. */
+  private final BaseXLabel onps = new BaseXLabel(" ");
   /** Last time. */
   private String timeo;
   /** Last number of nodes. */
@@ -40,6 +48,8 @@ public final class DialogMapInfo extends Dialog {
   private double aaro;
   /** Last rectangle. */
   private ViewRect recto;
+  /** Last algorithm. */
+  private String nameo;
   
   /**
    * Default constructor.
@@ -49,10 +59,13 @@ public final class DialogMapInfo extends Dialog {
     super(main, "Map Information", false);
 
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(5, 3, 5, 0));
+    p.setLayout(new TableLayout(8, 3, 5, 0));
     p.add(new BaseXLabel(""));
     p.add(new BaseXLabel("New Map      ", true, true));
     p.add(new BaseXLabel("Old Map      ", true, true));
+    p.add(new BaseXLabel("Algorithmus", true, true));
+    p.add(nname);
+    p.add(oname);
     p.add(new BaseXLabel("Size: ", true, true));
     p.add(ndim);
     p.add(odim);
@@ -65,6 +78,10 @@ public final class DialogMapInfo extends Dialog {
     p.add(new BaseXLabel("Execution time: ", true, true));
     p.add(ntime);
     p.add(otime);
+    p.add(new BaseXLabel("Nodes per ms: ", true, true));
+    p.add(nnps);
+    p.add(onps);
+    p.add(new BaseXLabel("  ", true, true));
 
     //p.add(new BaseXLabel("Distance change: ", true, true));
     //p.add(dist);
@@ -81,9 +98,10 @@ public final class DialogMapInfo extends Dialog {
    * @param rect main rectangle
    * @param aar average aspect ratio
    * @param time execution time
+   * @param name of used layoutalgorithm
    */
   public void setValues(final int nn, final ViewRect rect, final double aar,
-      final String time) {
+      final String time, final String name) {
 
     final int nw = rect != null ? rect.w : 0;
     final int nh = rect != null ? rect.h : 0;
@@ -91,15 +109,23 @@ public final class DialogMapInfo extends Dialog {
     final int oh = recto != null ? recto.h : 0;
     ndim.setText(nw + " x " + nh);
     odim.setText(ow + " x " + oh);
+    nname.setText(name);
+    oname.setText(nameo);
     nsize.setText(Integer.toString(nn));
     osize.setText(Integer.toString(nno));
     naar.setText(f.format(aar));
     oaar.setText(f.format(aaro));
     ntime.setText(time);
     otime.setText(timeo);
+    
+    double nps = nn / Double.valueOf(time.replace(" ms", ""));
+    onps.setText(nnps.getText());
+    nnps.setText(f.format(nps));
+    
     timeo = time;
     recto = rect;
     aaro = aar;
     nno = nn;
+    nameo = name;
   }
 }

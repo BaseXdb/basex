@@ -138,4 +138,9 @@ public class StripAlgo extends MapAlgo{
       return rects;
     }
   }
+  
+  @Override
+  public String getName() {
+    return "Strip";
+  }
 }

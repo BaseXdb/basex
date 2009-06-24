@@ -158,10 +158,14 @@ public final class GUIProp {
 
   /** Flag for computing additional map infos. */
   public static boolean mapinfo = false;
+  /** Flag for skipping tim intensive treemap infos. */
+  public static boolean perfinfo = true;
   /** Shows real file contents in the treemap. */
   public static boolean mapfs = true;
   /** Choice of interacting with TreeeMap. */
   public static boolean mapinteraction = false;
+  /** Size of thumb focus in Mapview fraction of Mapview size. */
+  public static int mapthumbsize = 4;
   /** Scaling to use in the Map oneclickfocus. */
   public static int lensscale = 2;
   /** Alpha value of the zoombox. */

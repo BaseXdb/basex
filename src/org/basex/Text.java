@@ -1146,7 +1146,8 @@ public interface Text {
   };
   /** Predefined number of layouts. */
   String[] MAPALGO = {
-    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout"
+    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout", 
+    "Binary Layout"
   };
 
   /** Map layout-algorithm. */

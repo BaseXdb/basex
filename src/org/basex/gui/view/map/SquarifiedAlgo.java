@@ -50,7 +50,7 @@ public class SquarifiedAlgo extends MapAlgo {
           else break;
           x += w;
         }
-        tmpratio = worstLineRatio(tmp);
+        tmpratio = lineRatio(tmp);
 
         // if ar has increased discard tmp and add row
         if(tmpratio > rowratio) {
@@ -92,7 +92,7 @@ public class SquarifiedAlgo extends MapAlgo {
           else break;
           y += h;
         }
-        tmpratio = worstLineRatio(tmp);
+        tmpratio = lineRatio(tmp);
         
         // if ar has increased discard tmp and add row
         if(tmpratio > rowratio) {
@@ -126,5 +126,10 @@ public class SquarifiedAlgo extends MapAlgo {
     rects.add(row);
     
     return rects;
+  }
+  
+  @Override
+  public String getName() {
+    return "Squarified";
   }
 }

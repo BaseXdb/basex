@@ -59,7 +59,7 @@ public final class DialogMapLayout extends Dialog {
     tmp.add(border);
     p.add(tmp);
 
-    algo.setSize(tmp.getPreferredSize().width, 70);
+    algo.setSize(tmp.getPreferredSize().width, 100);
 
     // create slider
     sizeLabel = new BaseXLabel(MAPSIZE);

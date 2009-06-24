@@ -60,6 +60,7 @@ class MapLayout {
       case 1 : algo = new StripAlgo(); break;
       case 2 : algo = new SquarifiedAlgo(); break;
       case 3 : algo = new SliceDiceAlgo(); break;
+      case 4 : algo = new BinaryAlgo(); break;
       default: algo = new SplitAlgo(); break;
     }
   }

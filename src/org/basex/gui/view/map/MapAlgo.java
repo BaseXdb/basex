@@ -70,4 +70,11 @@ public abstract class MapAlgo {
    */
   abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
       final int ne, final int level);
+  
+  /**
+   * Returns the name of the algorithm used.
+   * 
+   * @return name of the alfo
+   */
+  abstract String getName();
 }

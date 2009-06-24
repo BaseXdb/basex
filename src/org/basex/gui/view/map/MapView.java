@@ -121,7 +121,6 @@ public final class MapView extends View implements Runnable {
     super(man, HELPMAP);
     setMode(Fill.NONE);
     new BaseXPopup(this, POPUP);
-    if(GUIProp.mapinfo) mapInfo = new DialogMapInfo(gui);
   }
 
   /**
@@ -145,6 +144,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     if(data != null && getWidth() != 0) {
       if(!GUIProp.showmap) return;
+      if(GUIProp.mapinfo) mapInfo = new DialogMapInfo(gui);
       painter = data.fs != null ? new MapFS(this, data.fs) : new MapDefault(
           this);
       mainMap = createImage();
@@ -447,9 +447,11 @@ public final class MapView extends View implements Runnable {
     drawMap(map, mainRects, 1f);
     focus();
 
-    if(GUIProp.mapinfo) {
+    // [JH] implement distance change, readability, ...
+    if(GUIProp.mapinfo && !GUIProp.perfinfo) {
       final double aar = MapLayout.aar(mainRects);
-      mapInfo.setValues(mainRects.size, rect, aar, p.getTimer());
+      mapInfo.setValues(mainRects.size, rect, aar, p.getTimer(), 
+          layout.algo.getName());
     }
 
     /*
@@ -769,14 +771,10 @@ public final class MapView extends View implements Runnable {
       thumbMap = true;
       final Data data = gui.context.data();
       int screensize = getWidth() * getHeight();
-      // [JH] guiprop
-      screensize = screensize / 3;
+      screensize = screensize / GUIProp.mapthumbsize;
 
-      tinyw = (int) Math.sqrt(focused.w * screensize / focused.h);
+      tinyw = (int) Math.sqrt(getWidth() * screensize / getHeight());
       tinyh = screensize / tinyw;
-      // find out if position under cursor is out of view dimensions
-      // tinyw = GUIProp.lensscale * focused.w;
-      // tinyh = GUIProp.lensscale * focused.h;
 
       // tinyy = focused.y + tinyy < getHeight() ? focused.y :
       // focused.y + focused.h - tinyh;

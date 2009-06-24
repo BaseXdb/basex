@@ -47,4 +47,9 @@ public class SliceDiceAlgo extends MapAlgo {
     }
     return rects;
   }
+  
+  @Override
+  public String getName() {
+    return "Slice and Dice";
+  }
 }
