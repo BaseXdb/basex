@@ -22,6 +22,7 @@ import org.basex.query.expr.CmpG;
 import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Context;
+import org.basex.query.expr.Delete;
 import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.FLWOR;
@@ -32,6 +33,7 @@ import org.basex.query.expr.Func;
 import org.basex.query.expr.Group;
 import org.basex.query.expr.Grp;
 import org.basex.query.expr.If;
+import org.basex.query.expr.Insert;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
 import org.basex.query.expr.Let;
@@ -41,8 +43,11 @@ import org.basex.query.expr.Ord;
 import org.basex.query.expr.Order;
 import org.basex.query.expr.Pred;
 import org.basex.query.expr.Range;
+import org.basex.query.expr.Rename;
+import org.basex.query.expr.Replace;
 import org.basex.query.expr.Root;
 import org.basex.query.expr.Satisfy;
+import org.basex.query.expr.Transform;
 import org.basex.query.expr.Treat;
 import org.basex.query.expr.Try;
 import org.basex.query.expr.TypeSwitch;
@@ -690,7 +695,11 @@ public class QueryParser extends InputParser {
     if(e == null) e = typeswitch();
     if(e == null) e = iff();
     if(e == null) e = tryCatch();
+    if(e == null) e = insert();
     if(e == null) e = deletee();
+    if(e == null) e = rename();
+    if(e == null) e = replace();
+    if(e == null) e = transform();
     if(e == null) e = or();
     return e;
   }
@@ -2450,22 +2459,122 @@ public class QueryParser extends InputParser {
     //if(!th.init()) error(NOTHES, fl);
     thes.add(th);
   }
-
+  
   /**
-   * [UP140] Parses a DeleteExpression.
+   * [UP143] Parses an InsertExpression.
+   * [UP142] Parses an InsertTargetChoiceExpr.
+   * @return query expression
+   * @throws QueryException xquery exception
+   */
+  private Expr insert() throws QueryException {
+    final int p = qp;
+    if(!consumeWS(INSERT)) return null;
+    if(!consumeWS(NODE) && !consumeWS(NODES)) {
+      qp = p;
+      return null;
+    }
+    final Expr s = check(single(), INCOMPLETE);
+    boolean in = false;
+    boolean af = false;
+    boolean be = false;
+    boolean as = false;
+    boolean last = false;
+    if(consumeWS(AS)) {
+      as = true;
+      if(!consumeWS(FIRST)) {
+        check(LAST);
+        last = true;
+      }
+      check(INTO);
+    }
+    if(consumeWS(INTO)) in = true;
+    if(consumeWS(AFTER)) af = true;
+    if(consumeWS(BEFORE)) be = true;
+    if(!(in ^ af ^ be)) error(INCOMPLETE);
+    final Expr trg = check(single(), INCOMPLETE);
+    error(UPIMPL);
+    return new Insert(s, as, last, in, af, trg);
+  }
+  
+  /**
+   * [UP144] Parses a DeleteExpression.
    * @return query expression
    * @throws QueryException xquery exception
    */
   private Expr deletee() throws QueryException {
     final int p = qp;
     if(!consumeWS(DELETE)) return null;
+    if(!consumeWS(NODE)) {
+      qp = p;
+      return null;
+    }
+    final Expr n = check(single(), INCOMPLETE);
+    error(UPIMPL);
+    return new Delete(n);
+  }
+  
+  /**
+   * [UP146] Parses a RenameExpression.
+   * @return query expression
+   * @throws QueryException xquery exception
+   */
+  private Expr rename() throws QueryException {
+    final int p = qp;
+    if(!consumeWS(RENAME)) return null;
     if(!consumeWS(NODES) && !consumeWS(NODE)) {
       qp = p;
       return null;
     }
-    final Expr expr = single();
+    final Expr trg = check(single(), INCOMPLETE);
+    if(!consumeWS(AS)) error(INCOMPLETE);
+    final Expr n = check(single(), INCOMPLETE);
     error(UPIMPL);
-    return expr;
+    return new Rename(trg, n);
+  }
+  
+  /**
+   * [UP145] Parses a ReplaceExpression.
+   * @return query expression
+   * @throws QueryException xquery exception
+   */
+  private Expr replace() throws QueryException {
+    final int p = qp;
+    if(!consumeWS(REPLACE)) return null;
+    final boolean v = consumeWS(VALUEE);
+    if(v) check(OF);
+    if(!consumeWS(NODE)) {
+      qp = p;
+      return null;
+    }
+    final Expr t = check(single(), INCOMPLETE);
+    check(WITH);
+    final Expr e = check(single(), INCOMPLETE);
+    error(UPIMPL);
+    return new Replace(t, e, v);
+  }
+  
+  /**
+   * [UP150] Parses a TransformExpression.
+   * @return query expression
+   * @throws QueryException xquery exception
+   */
+  private Expr transform() throws QueryException {
+    if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
+    ForLet[] fl = {};
+    do {
+      final Var v = new Var(varName());
+      check(ASSIGN);
+      Expr e = check(single(), INCOMPLETE);
+      ctx.vars.add(v);
+      fl = Array.add(fl, new For(e, v, null, null));
+    } while(consumeWS(COMMA));
+    check(MODIFY);
+    final Expr e1 = check(single(), INCOMPLETE);
+    check(RETURN);
+    final Expr e2 = check(single(), INCOMPLETE);
+
+    error(UPIMPL);
+    return new Transform(fl, e1, e2);
   }
 
   /**

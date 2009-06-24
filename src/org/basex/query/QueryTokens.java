@@ -13,6 +13,8 @@ public interface QueryTokens {
   // FULL-TEXT TOKENS =========================================================
   
   /** Parser token. */
+  String AFTER = "after";
+  /** Parser token. */
   String ALL = "all";
   /** Parser token. */
   String AND = "and";
@@ -28,6 +30,8 @@ public interface QueryTokens {
   String ATTRIBUTE = "attribute";
   /** Parser token. */
   String BASEURI = "base-uri";
+  /** Parser token. */
+  String BEFORE = "before";
   /** Parser token. */
   String BOUNDARY = "boundary-space";
   /** Parser token. */
@@ -48,6 +52,8 @@ public interface QueryTokens {
   String CONSTRUCTION = "construction";
   /** Parser token. */
   String CONTENT = "content";
+  /** Parser token. */
+  String COPY = "copy";
   /** Parser token. */
   String COPYNS = "copy-namespaces";
   /** Parser token. */
@@ -91,6 +97,8 @@ public interface QueryTokens {
   /** Parser token. */
   String EXTERNAL = "external";
   /** Parser token. */
+  String FIRST = "first";
+  /** Parser token. */
   String FOR = "for";
   /** Parser token. */
   String FROM = "from";
@@ -125,11 +133,19 @@ public interface QueryTokens {
   /** Parser token. */
   String INSENSITIVE = "insensitive";
   /** Parser token. */
+  String INSERT = "insert";
+//  /** Parser token. */
+//  String INSERT = "insert";
+  /** Parser token. */
   String INSTANCE = "instance";
   /** Parser token. */
   String INTERSECT = "intersect";
   /** Parser token. */
+  String INTO = "into";
+  /** Parser token. */
   String LANGUAGE = "language";
+  /** Parser token. */
+  String LAST = "last";
   /** Parser token. */
   String LAX = "lax";
   /** Parser token. */
@@ -142,6 +158,8 @@ public interface QueryTokens {
   String LOWERCASE = "lowercase";
   /** Parser token. */
   String MOD = "mod";
+  /** Parser token. */
+  String MODIFY = "modify";
   /** Parser token. */
   String MODULE = "module";
   /** Parser token. */
@@ -184,6 +202,10 @@ public interface QueryTokens {
   String PI = "processing-instruction";
   /** Parser token. */
   String RELATIONSHIP = "relationship";
+  /** Parser token. */
+  String RENAME = "rename";
+  /** Parser token. */
+  String REPLACE = "replace";
   /** Parser token. */
   String RETURN = "return";
   /** Parser token. */
@@ -242,6 +264,8 @@ public interface QueryTokens {
   String UPPERCASE = "uppercase";
   /** Parser token. */
   String VALIDATE = "validate";
+  /** Parser token. */
+  String VALUEE = "value";
   /** Parser token. */
   String VARIABLE = "variable";
   /** Parser token. */
