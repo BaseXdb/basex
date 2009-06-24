@@ -325,6 +325,7 @@ db_closeerr=Impossibile chiudere il Database.
 db_optimized=Database ottimizzato in %.
 db_dropped=Database cancellato.
 db_notdropped=Impossibile cancellare il Database.
+db_inuse=Database is currently used by other clients.
 db_notopened=Impossibile aprire il Database.
 db_opened=Database aperto in %.
 db_exported=Database esportato in %.

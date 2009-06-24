@@ -54,6 +54,20 @@ public class DataPool {
     //   will be referenced in the pool.
     return true;
   }
+  
+  /**
+   * Returns value if the checked DB is in use or not.
+   * @param db name of the database
+   * @return boolean if Db is in use
+   */
+  public boolean check(final String db) {
+    for(int i = 0; i < size; i++) {
+      if(data[i].meta.dbname.equals(db)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * Adds a data reference to the pool.

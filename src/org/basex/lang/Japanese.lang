@@ -317,6 +317,7 @@ db_closeerr=データベースを閉じる事が出来ませんでした。
 db_optimized=データベース % 最適化されました。（？）
 db_dropped=データベースは削除されました。
 db_notdropped=データベースを削除できませんでした。
+db_inuse=Database is currently used by other clients.
 db_notopened=データベースを開けませんでした。
 db_opened=データベース % を開きました。
 db_exported=データベースを % に出力しました。

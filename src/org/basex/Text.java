@@ -447,6 +447,8 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
+  /** Database is in use by a other client. */
+  String DBINUSE = lang("db_inuse");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */

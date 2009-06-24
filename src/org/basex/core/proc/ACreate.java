@@ -48,15 +48,7 @@ abstract class ACreate extends Process {
     Builder builder = null;
     try {
       if(Prop.onthefly) {
-        /* [CG]: Check ob BaseX im ServerModus und ob eine
-         * Datenbank in Benutzung ist die den gleichen Namen hat?
-         * dann Abbruch und Fehlermeldung...
-         * Wie breche ich am besten ab und gebe die Fehlermeldung an
-         * den Client zurück?
-         * das gleiche im else Fall...
-        if (Prop.server && Context.POOL.pin(db) != null) {
-          
-        }*/
+        if (Context.POOL.check(db)) return error(DBINUSE);
         builder = new MemBuilder();
         progress(builder);
         final Data data = builder.build(p, db);
@@ -64,6 +56,7 @@ abstract class ACreate extends Process {
         Context.POOL.add(data);
       } else {
         context.close();
+        if (Context.POOL.check(db)) return error(DBINUSE);
         final Performance pp = new Performance();
         builder = new DiskBuilder();
         progress(builder);

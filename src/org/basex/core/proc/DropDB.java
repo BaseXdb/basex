@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 
+import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -25,15 +26,11 @@ public final class DropDB extends Process {
   @Override
   protected boolean exec() {
     final String db = args[0];
-    /*
-     * [CG]: Check ob die zu löschende DB noch in Benutzung ist
-     * Ja: Abbruch und Fehlermeldung
-     * Nein: Droppen
-    if(Context.POOL.pin(db) != null) {
-      
-    }*/
     final Data data = context.data();
     if(data != null && data.meta.dbname.equals(db)) exec(new Close());
+    
+    // If DB is in use, dropping is not allowed.
+    if(Context.POOL.check(db)) return error(DBINUSE);
 
     return !IO.dbpath(db).exists() ? error(DBNOTFOUND, db) :
       drop(db) ? info(DBDROPPED) : error(DBNOTDROPPED);
