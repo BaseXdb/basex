@@ -25,7 +25,6 @@ public class DataPool {
   public Data pin(final String db) {
     for(int i = 0; i < size; i++) {
       if(data[i].meta.dbname.equals(db)) {
-        System.out.println("PIN");
         pins[i]++;
         return data[i];
       }
@@ -41,10 +40,8 @@ public class DataPool {
   public boolean unpin(final Data d) {
     for(int i = 0; i < size; i++) {
       if(data[i] == d) {
-        System.out.println("UNPIN");
         final boolean close = --pins[i] == 0;
         if(close) {
-          System.out.println("CLOSE");
           Array.move(data, i + 1, -1, size - i - 1);
           Array.move(pins, i + 1, -1, size - i - 1);
           size--;
@@ -77,7 +74,6 @@ public class DataPool {
    * @param d data reference
    */
   public void add(final Data d) {
-    System.out.println("ADD");
     if(size == data.length) {
       data = Array.extend(data);
       pins = Array.extend(pins);
