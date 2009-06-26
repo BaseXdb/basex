@@ -19,6 +19,8 @@ import org.xml.sax.InputSource;
 public abstract class IO {
   /** Return IO dummy instance. */
   public static final IO DUMMY = new IOContent(Token.EMPTY);
+  /** File prefix. */
+  public static final String FILE = "file://";
 
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";
@@ -323,7 +325,7 @@ public abstract class IO {
    * @return URL
    */
   public static final String url(final String path) {
-    String pre = "file://";
+    String pre = FILE;
     if(!path.startsWith("/")) {
       pre += "/";
       if(path.length() < 2 || path.charAt(1) != ':') {
@@ -332,5 +334,15 @@ public abstract class IO {
       }
     }
     return pre + path.replace('\\', '/');
+  }
+
+  /**
+   * Creates a file path from the specified URL.
+   * @param url url to be converted
+   * @return file path
+   */
+  public static final String file(final String url) {
+    final String fn = url.replaceAll(FILE, "");
+    return fn.matches("/.:.*") ? fn.substring(1) : fn;
   }
 }

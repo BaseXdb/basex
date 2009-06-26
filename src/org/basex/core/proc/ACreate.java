@@ -15,6 +15,7 @@ import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Data.Type;
 import org.basex.index.FTTrieBuilder;
 import org.basex.index.FTFuzzyBuilder;
@@ -48,26 +49,17 @@ abstract class ACreate extends Process {
     String err = null;
     Builder builder = null;
     try {
-      if(Prop.onthefly) {
-        if(Context.POOL.check(db) >= 1) return error(DBINUSE);
-        builder = new MemBuilder();
-        progress(builder);
-        final Data data = builder.build(p, db);
-        context.data(data);
-        Context.POOL.add(data);
-      } else {
-        if(Context.POOL.check(db) >= 1) return error(DBINUSE);
-        context.close();
-        final Performance pp = new Performance();
-        builder = new DiskBuilder();
-        progress(builder);
-        final Data data = builder.build(p, db);
-        if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
-        builder = null;
-        index(data);
-        context.data(data);
-        Context.POOL.add(data);
-      }
+      context.close();
+      if(Context.POOL.check(db) >= 1) return error(DBINUSE);
+      final Performance pp = new Performance();
+      builder = Prop.onthefly ? new MemBuilder() : new DiskBuilder();
+      progress(builder);
+      final Data data = builder.build(p, db);
+      if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
+      builder = null;
+      index(data);
+      context.data(data);
+      Context.POOL.add(data);
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
@@ -98,6 +90,7 @@ abstract class ACreate extends Process {
    * @throws IOException I/O exception
    */
   void index(final Data data) throws IOException {
+    if(data instanceof MemData) return;
     if(data.meta.txtindex) buildIndex(Type.TXT, data);
     if(data.meta.atvindex) buildIndex(Type.ATV, data);
     if(data.meta.ftxindex) buildIndex(Type.FTX, data);

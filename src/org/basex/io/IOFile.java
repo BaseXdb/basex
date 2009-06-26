@@ -32,7 +32,7 @@ public final class IOFile extends IO {
    * @param f file path
    */
   public IOFile(final String f) {
-    file = new File(f);
+    file = new File(file(f));
     path = file.getAbsolutePath().replace('\\', '/');
   }
 
