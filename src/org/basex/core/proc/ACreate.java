@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -48,15 +49,15 @@ abstract class ACreate extends Process {
     Builder builder = null;
     try {
       if(Prop.onthefly) {
-        if (Context.POOL.check(db)) return error(DBINUSE);
+        if(Context.POOL.check(db) >= 1) return error(DBINUSE);
         builder = new MemBuilder();
         progress(builder);
         final Data data = builder.build(p, db);
         context.data(data);
         Context.POOL.add(data);
       } else {
+        if(Context.POOL.check(db) >= 1) return error(DBINUSE);
         context.close();
-        if (Context.POOL.check(db)) return error(DBINUSE);
         final Performance pp = new Performance();
         builder = new DiskBuilder();
         progress(builder);
