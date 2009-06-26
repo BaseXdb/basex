@@ -2,7 +2,6 @@ package org.basex.build.fs.parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -86,19 +85,21 @@ public abstract class AbstractParser {
   /**
    * Tests if the file type is supported and the parser is able to read the
    * file.
-   * @param f the file to check.
+   * @param f the {@link BufferedFileChannel} to check.
    * @return true if the file is supported
    * @throws IOException if an error occurs while reading the file.
    */
-  public boolean isValid(final File f) throws IOException {
-    String name = f.getName();
-    int dotPos = name.lastIndexOf('.');
-    String suffix = name.substring(dotPos + 1).toLowerCase();
-    if(suffixes.contains(suffix)) {
-      FileChannel fc = new RandomAccessFile(f, "r").getChannel();
-      return check(fc, fc.size());
-    }
-    return false;
+  public boolean isValid(final BufferedFileChannel f) throws IOException {
+    // String name = f.getFileName();
+    // int dotPos = name.lastIndexOf('.');
+    // String suffix = name.substring(dotPos + 1).toLowerCase();
+    // if(suffixes.contains(suffix)) {
+    long pos = f.position();
+    boolean res = check(f);
+    f.position(pos);
+    return res;
+    // }
+    // return false;
   }
 
   /**
@@ -163,64 +164,35 @@ public abstract class AbstractParser {
   /**
    * <p>
    * Checks if there is a File in correct format and can be read by the parser.
-   * Checks e.g. header bytes. {@link FileChannel#position()} must point to the
-   * start of the file header.
+   * Checks e.g. header bytes.
    * </p>
-   * <p>
-   * For regular files, the FileChannel position is zero and the limit equals to
-   * the length of the file. For a file that is inside another one (e.g. a
-   * picture inside the ID3v2 tag of a mp3-file) the FileChannel position must
-   * point to the beginning of this "inner" file and the limit must be the
-   * lenght of the "inner" file.
-   * </p>
-   * 
-   * @param fc the {@link FileChannel} to read from.
-   * @param limit maximum number of bytes to read.
+   * @param bfc the {@link BufferedFileChannel} to read from.
    * @return true if the file is supported.
    * @throws IOException if an error occurs while reading from the file.
    */
-  abstract boolean check(final FileChannel fc, final long limit)
-      throws IOException;
+  abstract boolean check(final BufferedFileChannel bfc) throws IOException;
 
   /**
    * <p>
-   * Reads the metadata from a {@link FileChannel} and fires events for each
-   * key/value pair. {@link FileChannel#position()} must point to the start of
-   * the file header.
+   * Reads the metadata from a {@link BufferedFileChannel} and fires events for
+   * each key/value pair.
    * </p>
-   * <p>
-   * For regular files, the FileChannel position has to be zero and the limit
-   * equals to the length of the file. For a file that is inside another one
-   * (e.g. a picture inside the ID3v2 tag of a mp3-file) the FileChannel
-   * position must point to the beginning of this "inner" file and the limit
-   * must be the lenght of the "inner" file.
-   * </p>
-   * @param fc {@link FileChannel} to read from.
-   * @param limit maximum number of bytes to read.
+   * @param bfc {@link BufferedFileChannel} to read from.
    * @param fsParser the {@link NewFSParser} instance to fire events.
    * @throws IOException if any error occurs while reading from the file.
    * @see NewFSParser#metaEvent(Element, DataType, Definition, byte[], byte[])
    */
-  public abstract void readMeta(final FileChannel fc, final long limit,
+  public abstract void readMeta(final BufferedFileChannel bfc,
       final NewFSParser fsParser) throws IOException;
 
   /**
    * <p>
    * Reads the textual content from a {@link FileChannel} and fires events.
-   * {@link FileChannel#position()} must point to the start of the file header.
    * </p>
-   * <p>
-   * For regular files, the FileChannel position has to be zero and the limit
-   * equals to the length of the file. For a file that is inside another one
-   * (e.g. a picture inside the ID3v2 tag of a mp3-file) the FileChannel
-   * position must point to the beginning of this "inner" file and the limit
-   * must be the lenght of the "inner" file.
-   * </p>
-   * @param fc the {@link FileChannel} to read from.
-   * @param limit maximum number of bytes to read.
+   * @param bfc the {@link BufferedFileChannel} to read from.
    * @param fsParser the {@link NewFSParser} instance to write the content to.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public abstract void readContent(final FileChannel fc, final long limit,
+  public abstract void readContent(final BufferedFileChannel bfc,
       final NewFSParser fsParser) throws IOException;
 }

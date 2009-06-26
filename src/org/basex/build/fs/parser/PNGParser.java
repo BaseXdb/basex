@@ -1,8 +1,6 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,41 +41,34 @@ public class PNGParser extends AbstractParser {
   /** Lenght of the PNG header. */
   private static final int HEADER_LENGTH = HEADER.length + 8;
 
-  /** Buffer for the file content. */
-  private ByteBuffer buf;
-
   /** {@inheritDoc} */
   @Override
-  boolean check(final FileChannel f, final long limit) throws IOException {
-    if(limit < HEADER_LENGTH) return false;
-    byte[] h = new byte[HEADER_LENGTH];
-    buf = ByteBuffer.wrap(h);
-    f.read(buf);
+  boolean check(final BufferedFileChannel bfc) throws IOException {
+    if(bfc.size() < HEADER_LENGTH) return false;
     int len = HEADER.length;
+    byte[] h = new byte[len];
+    bfc.get(h);
     for(int i = 0; i < len; i++) {
       if(h[i] != HEADER[i]) return false;
     }
-    buf.position(len);
     return true;
   }
 
   /** {@inheritDoc} */
   @Override
-  public void readContent(final FileChannel fc, final long limit,
+  public void readContent(final BufferedFileChannel bfc,
       final NewFSParser fsParser) {
   // no textual representation for png content ...
   }
 
   /** {@inheritDoc} */
   @Override
-  public void readMeta(final FileChannel fc, final long limit,
+  public void readMeta(final BufferedFileChannel bfc, //
       final NewFSParser fsParser) throws IOException {
-    if(!check(fc, limit)) return;
-    byte[] width = Token.token(buf.getInt());
-    byte[] height = Token.token(buf.getInt());
+    if(!check(bfc)) return;
     fsParser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null,
-        width);
+        Token.token(bfc.getInt()));
     fsParser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
-        null, height);
+        null, Token.token(bfc.getInt()));
   }
 }

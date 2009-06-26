@@ -184,9 +184,6 @@ public final class Prop {
     try {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
       fuse = true;
-      // [BL] debug mode reintroduced to avoid that message is shown 
-      //   to all users (try setting Prop.debug = true below)
-      //BaseX config is not parsed at this time ... skipping debug mode test
       BaseX.debug("DeepFS FUSE support enabled ... OK");
     } catch(final UnsatisfiedLinkError ex) {
       BaseX.debug("Loading DeepFS library ... failed (%).", ex.getMessage());

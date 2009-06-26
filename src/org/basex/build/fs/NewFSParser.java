@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +18,7 @@ import org.basex.Text;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
+import org.basex.build.fs.parser.BufferedFileChannel;
 import org.basex.build.fs.parser.ParserUtil;
 import org.basex.build.fs.parser.Metadata.Attribute;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -69,6 +70,8 @@ public final class NewFSParser extends Parser {
   public final String mountpoint;
   /** MetadataAdapter registry. */
   private final Map<String, AbstractParser> parserInstances;
+  /** The buffer to use for parsing the file contents. */
+  private final ByteBuffer buffer;
 
   /** Root flag to parse root node or all partitions (C:, D: ...). */
   private final boolean root;
@@ -124,7 +127,11 @@ public final class NewFSParser extends Parser {
               + parser.getValue().getName());
         }
       }
-    } else parserInstances = null;
+      buffer = ByteBuffer.allocateDirect(8192);
+    } else {
+      parserInstances = null;
+      buffer = null;
+    }
   }
 
   /**
@@ -284,12 +291,12 @@ public final class NewFSParser extends Parser {
       if(f.length() > 0) {
         AbstractParser parser = parserInstances.get(suffix);
         if(parser != null) {
-          FileChannel fc = new RandomAccessFile(f, "r").getChannel();
+          BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
           try {
-            parse0(parser, fc, fc.size());
+            parse0(parser, bfc);
           } finally {
             try {
-              if(fc != null) fc.close();
+              bfc.close();
             } catch(IOException e1) { /* */}
           }
         }
@@ -303,16 +310,13 @@ public final class NewFSParser extends Parser {
 
   /**
    * Parses a fragment of a file.
-   * @param fc the {@link FileChannel} to read from.
-   * @param limit maximum number of bytes to read.
+   * @param bfc the {@link BufferedFileChannel} to read from.
    * @param name the filename (without suffix!).
    * @param suffix the file suffix.
-   * @param offset the offset of the fragment inside the file.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public void parseFileFragment(final FileChannel fc, final long limit,
-      final String name, final String suffix, final long offset)
-      throws IOException {
+  public void parseFileFragment(final BufferedFileChannel bfc,
+      final String name, final String suffix) throws IOException {
     if(Prop.fsmeta || Prop.fscont) {
       AbstractParser parser = parserInstances.get(suffix);
       if(parser == null) return;
@@ -324,12 +328,11 @@ public final class NewFSParser extends Parser {
         atts.add(DataText.NAME, Token.token(sb.toString()));
       }
       if(suffix != null) atts.add(DataText.SUFFIX, Token.token(suffix));
-      atts.add(DataText.OFFSET, Token.token(offset));
-      atts.add(DataText.SIZE, Token.token(limit));
+      atts.add(DataText.OFFSET, Token.token(bfc.absolutePosition()));
+      atts.add(DataText.SIZE, Token.token(bfc.size()));
       atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
       builder.startElem(DataText.FILE, atts);
-      fc.position(offset);
-      parse0(parser, fc, limit);
+      parse0(parser, bfc);
       builder.endElem(DataText.FILE);
     }
   }
@@ -337,18 +340,23 @@ public final class NewFSParser extends Parser {
   /**
    * Starts the parser implementation.
    * @param parser the parser instance.
-   * @param fc the {@link FileChannel} to read from.
-   * @param limit maximum number of bytes to read.
+   * @param bfc the {@link BufferedFileChannel} to read from.
    * @throws IOException if any error occurs while reading from the file.
    */
-  private void parse0(final AbstractParser parser, final FileChannel fc,
-      final long limit) throws IOException {
+  private void parse0(final AbstractParser parser, //
+      final BufferedFileChannel bfc) throws IOException {
     if(Prop.fsmeta) {
       builder.nodeAndText(Element.TYPE.get(), atts.reset(), parser.getType());
       builder.nodeAndText(Element.FORMAT.get(), atts, parser.getFormat());
-      parser.readMeta(fc, limit, this);
+      bfc.reset();
+      parser.readMeta(bfc, this);
+      bfc.finish();
     }
-    if(Prop.fscont) parser.readContent(fc, limit, this);
+    if(Prop.fscont) {
+      bfc.reset();
+      parser.readContent(bfc, this);
+      bfc.finish();
+    }
   }
 
   /**
@@ -436,5 +444,19 @@ public final class NewFSParser extends Parser {
     final Parser parser = Parser.getXMLParser(i);
     parser.doc = false;
     parser.parse(builder);
+  }
+
+  /**
+   * Checks if a parser for the given suffix is available and the file is in the
+   * correct format.
+   * @param f the {@link BufferedFileChannel} to check.
+   * @param suffix the file suffix.
+   * @return true if the data is supported.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public boolean isParseable(final BufferedFileChannel f, final String suffix)
+      throws IOException {
+    AbstractParser parser = parserInstances.get(suffix);
+    return parser == null ? false : parser.isValid(f);
   }
 }

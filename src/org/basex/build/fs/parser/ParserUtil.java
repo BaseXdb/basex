@@ -31,7 +31,7 @@ public final class ParserUtil {
     int len = milliseconds.length;
     if(len < 4) {
       // [BL] handle short durations
-      return null; // skip values < 1s
+      return Token.EMPTY; // skip values < 1s
     }
     int newLen = len + 4; // get space for 'P', 'T', '.' and 'S'
     byte[] value = new byte[newLen];
@@ -57,7 +57,7 @@ public final class ParserUtil {
     for(int i = 0; i < 4; i++) {
       if(year[i] < '0' || year[i] > '9') { // not a valid number
         BaseX.debug("Invalid date value: " + Token.string(year));
-        return null;
+        return Token.EMPTY;
       }
     }
     byte[] y = new byte[6];
@@ -76,6 +76,6 @@ public final class ParserUtil {
     // current time storage: minutes from 1.1.1970
     final long time = file.lastModified() / 60000;
     if(time != 0) return token(time);
-    else return null;
+    else return Token.EMPTY;
   }
 }

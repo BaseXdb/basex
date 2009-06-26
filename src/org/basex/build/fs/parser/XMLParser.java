@@ -1,7 +1,6 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,24 +34,24 @@ public class XMLParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  boolean check(final FileChannel f, final long limit) {
+  boolean check(final BufferedFileChannel f) {
     // [BL] Auto-generated method stub
     return true;
   }
 
   /** {@inheritDoc} */
   @Override
-  public void readContent(final FileChannel fc, final long limit,
+  public void readContent(final BufferedFileChannel f,
       final NewFSParser fsParser) throws IOException {
-    if(fc.position() != 0 || limit != fc.size()) BaseX.notimplemented("Parsing "
-        + "framents of xml files is currently not supported");
+    if(f.isSubChannel()) BaseX.notimplemented("Parsing framents of xml files "
+        + "is currently not supported");
     fsParser.parseXML();
   }
 
   /** {@inheritDoc} */
   @Override
-  public void readMeta(final FileChannel fc, final long limit,
+  public void readMeta(final BufferedFileChannel bfc, //
       final NewFSParser fsParser) {
-    // no metadata to read...
+  // no metadata to read...
   }
 }
