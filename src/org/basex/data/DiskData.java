@@ -65,6 +65,8 @@ public final class DiskData extends Data {
   private final DataAccess texts;
   /** Values access file. */
   private final DataAccess values;
+  /** Locking Flag. */
+  private boolean locked;
   
   /**
    * Default Constructor.
@@ -682,5 +684,15 @@ public final class DiskData extends Data {
    */
   private void size(final int pre, final int kind, final int v) {
     if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
+  }
+  
+  @Override
+  public boolean isLocked() {
+    return locked;
+  }
+  
+  @Override
+  public void setLocked(final boolean l) {
+    this.locked = l;
   }
 }

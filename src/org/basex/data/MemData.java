@@ -291,4 +291,15 @@ public final class MemData extends Data {
   public void update(final int pre, final byte[] text) {
     BaseX.notimplemented();
   }
+
+  @Override
+  public boolean isLocked() {
+    BaseX.notimplemented();
+    return false;
+  }
+
+  @Override
+  public void setLocked(final boolean l) {
+    BaseX.notimplemented();
+  }
 }
