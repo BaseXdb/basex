@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import javax.xml.xquery.XQConnection;
@@ -438,7 +438,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsModules = true;
     
     try {
-      xqmd.isModuleFeatureSupported();
+      supportsModules = xqmd.isModuleFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -466,7 +466,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsSerialization = true;
     
     try {
-      xqmd.isSerializationFeatureSupported();
+      supportsSerialization = xqmd.isSerializationFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -494,7 +494,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsStaticTypingExtensions = true;
     
     try {
-      xqmd.isStaticTypingExtensionsSupported();
+      supportsStaticTypingExtensions = xqmd.isStaticTypingExtensionsSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -619,7 +619,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsXQueryEncodingDecls = true;
     
     try {
-      xqmd.isXQueryEncodingDeclSupported();
+      supportsXQueryEncodingDecls = xqmd.isXQueryEncodingDeclSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -669,7 +669,7 @@ public class XQMetaDataTest extends XQJTestCase {
     XQMetaData xqmd = xqc.getMetaData();
     
     try {
-      xqmd.isXQueryEncodingSupported("UTF-8");
+      xqmd.isXQueryEncodingSupported("UTF-8");;
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -692,7 +692,7 @@ public class XQMetaDataTest extends XQJTestCase {
     XQMetaData xqmd = xqc.getMetaData();
     
     try {
-      xqmd.isUserDefinedXMLSchemaTypeSupported();
+      xqmd.isUserDefinedXMLSchemaTypeSupported();;
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }

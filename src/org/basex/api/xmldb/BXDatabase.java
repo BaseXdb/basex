@@ -71,7 +71,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   public void setProperty(final String key, final String value)
       throws XMLDBException {
     final Process proc = new Set(key, value);
-    if(!proc.execute(null)) {
+    if(!proc.execute(new Context())) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
   }

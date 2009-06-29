@@ -1,8 +1,9 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.FileInputStream;
 import java.util.Properties;
+
 import junit.framework.TestCase;
 import javax.xml.xquery.*;
 
@@ -11,10 +12,10 @@ public class XQJTestCase extends TestCase {
   protected XQDataSource xqds;
   protected XQConnection xqc;
   
-  protected void setUp() throws Exception{
+  protected void setUp() throws Exception {
     System.setProperty("com.oracle.xqj.tck.datasource", "bxq.properties");
     //System.setProperty("com.oracle.xqj.tck.datasource", "saxonxq.properties");
-    
+
     // Get the file name of the properties file
     String fileName = System.getProperty("com.oracle.xqj.tck.datasource");
     if (fileName == null)

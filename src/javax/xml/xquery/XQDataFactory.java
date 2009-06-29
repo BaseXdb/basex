@@ -1,5 +1,5 @@
 /*
- * Copyright Â© 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright © 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -9,7 +9,6 @@ import java.net.URI;
 import org.w3c.dom.Node;
 import java.io.Reader;
 import java.io.InputStream;
-import org.xml.sax.XMLReader;
 
 /** 
  * This interface represents a factory to obtain sequences,  
@@ -264,50 +263,6 @@ public interface XQDataFactory
         throws XQException;
 
  /**
-   * Creates an item from the given value.
-   *
-   * <br>
-   * <br>
-   *
-   * If the <code>XMLReader</code> produces a well-formed XML document, it results in a
-   * document node.  The kind of the input type must be <code>null</code>,
-   * <code>XQITEMKIND_DOCUMENT_ELEMENT</code> or <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
-   *
-   * <br>
-   * <br>
-   *
-   * The value is converted into an instance of the specified type according
-   * to  the rules defined in <i>14.3 Mapping a Java XML document to an
-   * XQuery document node, XQuery API for Java (XQJ) 1.0</i>.
-   *
-   * <br>
-   * <br>
-   *
-   * If the value is not well formed, or if a kind of the input type other
-   * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. 
-   *
-   * @param value                the <code>XMLReader</code> producing SAX events
-   *                             representing the document to create
-   * @param type                 the type of the value for the created
-   *                             document node. If <code>null</code> is specified,
-   *                             it behaves as if
-   *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
-   *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
-   *                             as the type parameter.  That is, the type represents the
-   *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
-   * @return                     <code>XQItem</code> representing the resulting
-   *                             item 
-   * @exception XQException      if (1) the value argument is <code>null</code>,
-   *                             (2) the conversion of the value to an XDM instance
-   *                             failed, or (3) the underlying object implementing
-   *                             the interface is closed
-   */
-   public XQItem createItemFromDocument (XMLReader value, XQItemType type) throws XQException;
- 
-
- /**
    * Creates an item from the given <code>Source</code>. An XQJ
    * implementation must at least support the following implementations:
    * <ul>
@@ -542,7 +497,7 @@ public interface XQDataFactory
     *                            <code>XQConnection</code> is created
     * @exception XQException     if (1) the specified item is <code>null</code>,
     *                            (2) the underlying object implementing the interface is
-    *                            closed
+    *                            closed, (3) the specified item is closed
     */
    public XQItem createItem(XQItem item) throws XQException;
 
@@ -559,10 +514,13 @@ public interface XQDataFactory
      * @return                    <code>XQSequence</code> representing a copy of
      *                            the input sequence
      * @exception XQException     if (1) there are errors accessing the items in
-     *                            the sequence, (2) in the case of a forward only
+     *                            the specified sequence, (2) the specified sequence
+     *                            is closed, (3) in the case of a forward only
      *                            sequence, a get or write method has already
-     *                            been invoked on the current item, or (3)
-     *                            the <code>s</code> parameter is <code>null</code>
+     *                            been invoked on the current item, (4)
+     *                            the <code>s</code> parameter is <code>null</code>,
+     *                            or (5) the underlying object implementing the
+     *                            interface is closed
      */
    public XQSequence createSequence(XQSequence s) throws XQException;
 
@@ -582,8 +540,10 @@ public interface XQDataFactory
      * @return                    <code>XQSequence</code> representing the sequence 
      *                            containing all items from the input iterator
      * @exception XQException     if (1) the conversion of any of the objects in the
-     *                            iterator to item fails, or (2)
-     *                            the <code>i</code> parameter is <code>null</code>
+     *                            iterator to item fails, (2)
+     *                            the <code>i</code> parameter is <code>null</code>,
+     *                            or (3) underlying object implementing the interface
+     *                            is closed
      */
    public XQSequence createSequence(java.util.Iterator i) throws XQException;
 
@@ -1093,7 +1053,7 @@ public interface XQDataFactory
    *  Example -
    *  <pre>
    *   XQConnection conn = ..; // An XQuery connection
-   *   XQItemType anypi = conn.createProcessingInstructionType();
+   *   XQItemType anypi = conn.createProcessingInstructionType(); 
    *   XQItemType foopi = conn.createProcessingInstructionType("foo-format");
    *
    *   XQExpression expr = conn.createExpression();

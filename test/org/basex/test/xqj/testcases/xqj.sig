@@ -95,7 +95,6 @@ public abstract javax.xml.xquery.XQItem createItemFromDocument (java.io.Reader,j
 public abstract javax.xml.xquery.XQItem createItemFromDocument (java.lang.String,java.lang.String,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract javax.xml.xquery.XQItem createItemFromDocument (javax.xml.stream.XMLStreamReader,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract javax.xml.xquery.XQItem createItemFromDocument (javax.xml.transform.Source,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
-public abstract javax.xml.xquery.XQItem createItemFromDocument (org.xml.sax.XMLReader,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract javax.xml.xquery.XQItem createItemFromDouble (double,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract javax.xml.xquery.XQItem createItemFromFloat (float,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract javax.xml.xquery.XQItem createItemFromInt (int,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
@@ -151,7 +150,6 @@ public abstract void bindDocument (javax.xml.namespace.QName,java.io.Reader,java
 public abstract void bindDocument (javax.xml.namespace.QName,java.lang.String,java.lang.String,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void bindDocument (javax.xml.namespace.QName,javax.xml.stream.XMLStreamReader,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void bindDocument (javax.xml.namespace.QName,javax.xml.transform.Source,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
-public abstract void bindDocument (javax.xml.namespace.QName,org.xml.sax.XMLReader,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void bindDouble (javax.xml.namespace.QName,double,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void bindFloat (javax.xml.namespace.QName,float,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void bindInt (javax.xml.namespace.QName,int,javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
@@ -450,7 +448,7 @@ public abstract void setBaseURI (java.lang.String) throws javax.xml.xquery.XQExc
 public abstract void setBindingMode (int) throws javax.xml.xquery.XQException
 public abstract void setBoundarySpacePolicy (int) throws javax.xml.xquery.XQException
 public abstract void setConstructionMode (int) throws javax.xml.xquery.XQException
-public abstract void setContextItemStaticType (javax.xml.xquery.XQItemType)
+public abstract void setContextItemStaticType (javax.xml.xquery.XQItemType) throws javax.xml.xquery.XQException
 public abstract void setCopyNamespacesModeInherit (int) throws javax.xml.xquery.XQException
 public abstract void setCopyNamespacesModePreserve (int) throws javax.xml.xquery.XQException
 public abstract void setDefaultCollation (java.lang.String) throws javax.xml.xquery.XQException

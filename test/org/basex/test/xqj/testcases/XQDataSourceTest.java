@@ -1,10 +1,11 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
+
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright � 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -162,8 +162,7 @@ public interface XQSequence extends XQItemAccessor
    * Calling this method on an empty sequence 
    * will return <code>0</code>.
    *
-   *
-   * @return                    cursor position
+   * @return                    position
    * @exception XQException     if (1) the sequence is forward-only, or (2)
    *                            the sequence is closed
    */

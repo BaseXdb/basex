@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -71,7 +71,7 @@ public interface XQStaticContext
    * corresponding to a specific prefix.
    *
    * @return                    <code>String</code> array containing the namespace prefixes.
-   *                            Cannot be <code>null</code>.
+   *                            Cannot be <code>null</code>
    */
   public String[] getNamespacePrefixes(); 
 
@@ -81,9 +81,10 @@ public interface XQStaticContext
    * <code>getInScopeNamespacePrefixes</code> method.
    * 
    * @param prefix              the prefix for which the namespace URI is sought. Cannot 
-   *                            be <code>null</code>.
-   * @return                    the namespace URI, <code>null</code> if the prefix is unknown.
-   * @exception XQException     if a <code>null</code> prefix is specified
+   *                            be <code>null</code>
+   * @return                    the namespace URI. Cannot be <code>null</code>
+   * @exception XQException     if a <code>null</code> prefix is specified or if the prefix
+   *                            is unknown
    */
   public String getNamespaceURI(String prefix) throws XQException;
 
@@ -93,7 +94,7 @@ public interface XQStaticContext
    * 
    * @param prefix              the prefix for the namespace URI
    * @param uri                 the namespace URI. An empty string
-   *                            undeclares the specific prefix. Cannot be <code>null</code>.
+   *                            undeclares the specific prefix. Cannot be <code>null</code>
    * @throws XQException        if (1) a <code>null</code> prefix, or (2) a <code>null</code> namespace
    *                            URI is specified
    */
@@ -104,7 +105,7 @@ public interface XQStaticContext
    * if not set.
    *
    * @return                    the URI of the default element/type namespace,
-   *                            if set, else the empty string. Cannot be <code>null</code>.
+   *                            if set, else the empty string. Cannot be <code>null</code>
    */
   public String getDefaultElementTypeNamespace();
  
@@ -151,9 +152,13 @@ public interface XQStaticContext
    * Sets the static type of the context item, specify <code>null</code>
    * to make it unspecified.
    *
-   * @param contextItemType     the static type of the context item; <code>null</code> if unspecified.
+   * @param contextItemType     the static type of the context item; 
+   *                            <code>null</code> if unspecified.
+   * @exception XQException     if the <code>contextItemType</code> is not
+   *                            a valid <code>XQItemType</code>
    */
-  public void setContextItemStaticType(XQItemType contextItemType); 
+  public void setContextItemStaticType(XQItemType contextItemType) 
+     throws XQException;
   
   /** 
     * Gets the URI of the default collation.

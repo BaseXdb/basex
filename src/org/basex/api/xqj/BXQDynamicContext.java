@@ -37,7 +37,6 @@ import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
-import org.xml.sax.XMLReader;
 
 /**
  * Java XQuery API - Dynamic Context.
@@ -102,11 +101,6 @@ abstract class BXQDynamicContext extends BXQAbstract
       final XQItemType t) throws XQException {
     valid(v, String.class);
     bind(qn, createDB(new IOContent(Token.token(v))), t);
-  }
-
-  public void bindDocument(final QName qn, final XMLReader r,
-      final XQItemType t) throws XQException {
-    bind(qn, createDB(r), t);
   }
 
   public void bindDocument(final QName qn, final XMLStreamReader sr,

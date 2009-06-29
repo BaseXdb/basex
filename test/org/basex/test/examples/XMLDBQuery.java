@@ -5,11 +5,13 @@ import org.xmldb.api.modules.*;
 import org.xmldb.api.*;
 
 /**
- * This class serves an example for executing XPath requests with the XML:DB API.
+ * This class serves an example for executing XPath requests with the
+ * XML:DB API.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author BaseX-Group
+ * @author BaseX Team
  */
-public final class XMLDBExample1 {
+public final class XMLDBQuery {
   /** Database Driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the referenced database. */

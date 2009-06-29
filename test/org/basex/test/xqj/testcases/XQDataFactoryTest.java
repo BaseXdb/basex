@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.ByteArrayInputStream;
@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,11 +26,10 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
-import org.basex.test.xqj.TestXMLFilter;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 @SuppressWarnings("all")
 public class XQDataFactoryTest extends XQJTestCase {
@@ -73,7 +73,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromAtomicValue() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "Hello world!", xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "Hello world!", xqi.getAtomicValue());
   }
 
   public void testCreateItemFromString() throws XQException {
@@ -94,13 +94,19 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromString("Hello world!", xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromString("Hello world!", xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
-
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
+    
     try {
       xqc.createItemFromString("123", xqc.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
       fail("A-XQDF-1.4: The conversion of the value to an XDM instance must fail.");
@@ -114,7 +120,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromString() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "Hello world!", xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "Hello world!", xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromString("Hello", xqc.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
@@ -144,12 +150,20 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromDocument("<e>Hello world!</e>", null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDocument("<e>Hello world!</e>", null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_ATOMIC)
+        failed = true;
+      if (xqitem.getItemType().getBaseType() != XQItemType.XQBASETYPE_BOOLEAN)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
 
     try {
       xqc.createItemFromDocument("<e>", null, null);
@@ -164,7 +178,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
   }
   
   public void testCreateItemFromDocument_Reader() throws XQException {
@@ -184,12 +199,20 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromDocument(new StringReader("<e>Hello world!</e>"), null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDocument(new StringReader("<e>Hello world!</e>"), null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_ATOMIC)
+        failed = true;
+      if (xqitem.getItemType().getBaseType() != XQItemType.XQBASETYPE_BOOLEAN)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
 
     try {
       xqc.createItemFromDocument(new StringReader("<e>"), null, null);
@@ -204,7 +227,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
   }
   
   public void testCreateItemFromDocument_InputStream() throws XQException, UnsupportedEncodingException {
@@ -222,14 +246,22 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
-
+    }
+    
+    boolean failed = false;
     try {
-      xqc.createItemFromDocument(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?><e>Hello world!</e>".getBytes("UTF-8")), null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDocument(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?><e>Hello world!</e>".getBytes("UTF-8")), null, xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_ATOMIC)
+        failed = true;
+      if (xqitem.getItemType().getBaseType() != XQItemType.XQBASETYPE_BOOLEAN)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");    
 
     try {
       xqc.createItemFromDocument(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?><e>".getBytes("UTF-8")), null, null);
@@ -244,47 +276,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
-  }
-  
-  public void testCreateItemFromDocument_XMLReader() throws XQException, SAXException {
-    XQConnection xqdf = xqds.getConnection();
-    xqdf.close();
-    try {
-      xqdf.createItemFromDocument(new TestXMLFilter("<e>Hello world!</e>"), null);
-      fail("A-XQDF-1.1: createItemFromDocument() throws an XQException when the data factory is in closed state.");
-    } catch (XQException e) {
-      // Expect an XQException
-    }
-
-    try {
-      xqc.createItemFromDocument((XMLReader)null, null);
-      fail("A-XQDF-1.2: null argument is invalid and throws an XQException.");
-    } catch (XQException e) {
-      // Expect an XQException
-    }    
-
-    try {
-      xqc.createItemFromDocument(new TestXMLFilter("<e>Hello world!</e>"), xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
-    } catch (XQException e) {
-      // Expect an XQException
-    }    
-
-    try {
-      xqc.createItemFromDocument(new TestXMLFilter("<e>"), null);
-      fail("A-XQDF-1.4: The conversion of the value to an XDM instance must fail.");
-    } catch (XQException e) {
-      // Expect an XQException
-    }    
-
-    XQItem xqi = null;
-    try {
-      xqi = xqc.createItemFromDocument(new TestXMLFilter("<e>Hello world!</e>"), null);
-    } catch (XQException e) {
-      fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
-    }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
   }
   
   public void testCreateItemFromDocument_XMLStreamReader() throws XQException {
@@ -308,12 +301,20 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromDocument(xqe.executeQuery("<e>Hello world!</e>").getSequenceAsStream(), xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDocument(xqe.executeQuery("<e>Hello world!</e>").getSequenceAsStream(), xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_ATOMIC)
+        failed = true;
+      if (xqitem.getItemType().getBaseType() != XQItemType.XQBASETYPE_BOOLEAN)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");    
 
     XQItem xqi = null;
     try {
@@ -321,7 +322,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
     
     xqe.close();
   }
@@ -343,12 +345,20 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromDocument(new StreamSource(new StringReader("<e>Hello world!</e>")), xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDocument(new StreamSource(new StringReader("<e>Hello world!</e>")), xqc.createAtomicType(XQItemType.XQBASETYPE_BOOLEAN));
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_ATOMIC)
+        failed = true;
+      if (xqitem.getItemType().getBaseType() != XQItemType.XQBASETYPE_BOOLEAN)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");     
 
     try {
       xqc.createItemFromDocument(new StreamSource(new StringReader("<e>")), null);
@@ -363,7 +373,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
 
   }
 
@@ -385,12 +396,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromObject("Hello world!", xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromObject("Hello world!", xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT."); 
 
     try {
       xqc.createItemFromObject("123", xqc.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
@@ -406,7 +423,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromObject() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful bindXXX.", "Hello world!", xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful bindXXX.", "Hello world!", xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromObject("Hello", xqc.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
@@ -429,12 +446,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromBoolean(true, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromBoolean(true, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT."); 
 
     XQItem xqi = null;
     try {
@@ -442,7 +465,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromBoolean() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "true", xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "true", xqi.getAtomicValue());
   }
   
   public void testCreateItemFromByte() throws XQException {
@@ -456,12 +479,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromByte((byte)1, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromByte((byte)1, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");  
 
     // Can't think of a way to verify A-XQDF-1.4 with the createItemFromByte() method
 
@@ -471,7 +500,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromByte() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "1", xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "1", xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromByte((byte)1, xqc.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
@@ -494,12 +523,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromDouble(1d, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromDouble(1d, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");     
 
     // Can't think of a way to verify A-XQDF-1.4 with the createItemFromDouble() method
 
@@ -525,12 +560,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromFloat(1f, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromFloat(1f, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");       
 
     // Can't think of a way to verify A-XQDF-1.4 with the createItemFromDouble() method
 
@@ -556,12 +597,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromInt(1, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromInt(1, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");       
 
     try {
       xqc.createItemFromInt(128, xqc.createAtomicType(XQItemType.XQBASETYPE_BYTE));
@@ -576,7 +623,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromInt() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromInt(1, xqc.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
@@ -598,12 +645,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromLong(1, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromLong(1, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");       
 
     try {
       xqc.createItemFromLong(128, xqc.createAtomicType(XQItemType.XQBASETYPE_BYTE));
@@ -618,7 +671,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromLong() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromLong(1, xqc.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
@@ -652,12 +705,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }    
 
+    boolean failed = false;
     try {
-      xqc.createItemFromNode(document, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromNode(document, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");       
 
     XQItem xqi = null;
     
@@ -666,7 +725,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromNode() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", "<e>Hello world!</e>", xqi.getItemAsString(null));
+    String result = xqi.getItemAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
   }
   
   public void testCreateItemFromShort() throws XQException {
@@ -679,12 +739,18 @@ public class XQDataFactoryTest extends XQJTestCase {
       // Expect an XQException
     }
 
+    boolean failed = false;
     try {
-      xqc.createItemFromShort((short)1, xqc.createCommentType());
-      fail("A-XQDF-1.3: An invalid type of the value to be bound must fail.");
+      XQItem xqitem = xqc.createItemFromShort((short)1, xqc.createCommentType());
+      // conversion succeeded, we're having implementation defined behaviour
+      // but at least the XDM instance must be of the right type.
+      if (xqitem.getItemType().getItemKind() != XQItemType.XQITEMKIND_COMMENT)
+        failed = true;
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }   
+    if (failed)
+      fail("A-XQDF-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");       
 
     try {
       xqc.createItemFromShort((short)128, xqc.createAtomicType(XQItemType.XQBASETYPE_BYTE));
@@ -699,7 +765,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createItemFromShort() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful bindXXX.", "1",xqi.getAtomicValue());
 
     try {
       xqi = xqc.createItemFromShort((short)1, xqc.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
@@ -736,9 +802,17 @@ public class XQDataFactoryTest extends XQJTestCase {
     try {
       xqresult = xqc.createItem(xqi);
     } catch (XQException e) {
-      fail("A-XQDF-1.7: createItem() failed with message: " + e.getMessage());
+      fail("A-XQDF-1.5: createItem() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.7: Successful createItem().", "Hello world!", xqresult.getItemAsString(null));
+    assertEquals("A-XQDF-1.5: Successful createItem().", "Hello world!", xqresult.getAtomicValue());
+    
+    xqi.close();
+    try {
+      xqc.createItem(xqi);
+      fail("A-XQDF-1.6: Passing a closed XQItem or XQSequence object as argument msut result in an XQException.");
+    } catch (XQException e) {
+      // Expect an XQException
+    }
   }
   
   public void testCreateSequence_FromSequence() throws XQException {
@@ -753,25 +827,36 @@ public class XQDataFactoryTest extends XQJTestCase {
     xqs = xqpe.executeQuery();
     try {
       xqdf.createSequence(xqs);
-      fail("A-XQDF-1.1: createItem() throws an XQException when the data factory is in closed state.");
+      fail("A-XQDF-1.1: createSequence() throws an XQException when the data factory is in closed state.");
     } catch (XQException e) {
       // Expect an XQException
     }
-
+    xqs.close();
+    
     try {
-      xqdf.createSequence((XQSequence)null);
+      xqc.createSequence((XQSequence)null);
       fail("A-XQDF-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
     }    
 
     XQSequence xqsresult = null;
+    xqs = xqpe.executeQuery();
     try {
       xqsresult = xqc.createSequence(xqs);
     } catch (XQException e) {
       fail("A-XQDF-1.5: createSequence() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createSequence.", "Hello world!", xqsresult.getSequenceAsString(null));
+    String result = xqsresult.getSequenceAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + "'", result.indexOf("Hello world!") != -1);
+    
+    xqs.close();
+    try {
+      xqc.createSequence(xqs);
+      fail("A-XQDF-1.6: Passing a closed XQItem or XQSequence object as argument msut result in an XQException.");
+    } catch (XQException e) {
+      // Expect an XQException
+    }
     
     xqpe.close(); 
   }
@@ -786,13 +871,13 @@ public class XQDataFactoryTest extends XQJTestCase {
     xqdf.close();
     try {
       xqdf.createSequence(list.iterator());
-      fail("A-XQDF-1.1: createItem() throws an XQException when the data factory is in closed state.");
+      fail("A-XQDF-1.1: createSequence() throws an XQException when the data factory is in closed state.");
     } catch (XQException e) {
       // Expect an XQException
     }
 
     try {
-      xqdf.createSequence((Iterator)null);
+      xqc.createSequence((Iterator)null);
       fail("A-XQDF-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
@@ -804,7 +889,8 @@ public class XQDataFactoryTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDF-1.5: createSequence() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQDF-1.5: Successful createSequence.", "Hello world! Hello world!", xqsresult.getSequenceAsString(null));
+    String result = xqsresult.getSequenceAsString(null);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + "'", result.indexOf("Hello world!") != -1);
   }
 
   public void testCreateAtomicType() throws XQException {
@@ -820,7 +906,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     }
 
     try {
-      xqdf.createAtomicType(XQItemType.XQBASETYPE_UNTYPED);
+      xqc.createAtomicType(XQItemType.XQBASETYPE_UNTYPED);
       fail("A-XQDF-2.1: createAtomicType() detects invalid xqbasetype arguments.");
     } catch (XQException e) {
       // Expect an XQException

@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.ByteArrayInputStream;
@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;

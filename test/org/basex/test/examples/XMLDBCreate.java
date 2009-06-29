@@ -6,10 +6,11 @@ import org.xmldb.api.*;
 
 /**
  * This class serves an example for creating a Database with the XML:DB API.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author BaseX-Group
+ * @author BaseX Team
  */
-public final class XMLDBExample {
+public final class XMLDBCreate {
   /** Database Driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
 

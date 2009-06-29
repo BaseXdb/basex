@@ -203,14 +203,10 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
       writeItem(((StreamResult) result).getWriter(), null);
     } else if(result instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
-      try {
-        final SAXSerializer ser = new SAXSerializer(null);
-        ser.setContentHandler(((SAXResult) result).getHandler());
-        serialize(it, ctx, ser);
-        ser.close();
-      } catch(final IOException ex) {
-        throw new BXQException(ex);
-      }
+      final SAXSerializer ser = new SAXSerializer(null);
+      ser.setContentHandler(((SAXResult) result).getHandler());
+      serialize(it, ctx, ser);
+      ser.close();
     } else {
       BaseX.notimplemented();
     }

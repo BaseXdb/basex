@@ -1,7 +1,6 @@
 /*
- * Copyright Â© 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright © 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
-
 package javax.xml.xquery;
 
 import javax.xml.namespace.QName;

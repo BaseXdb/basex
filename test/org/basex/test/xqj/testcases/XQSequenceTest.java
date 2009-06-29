@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.ByteArrayOutputStream;
@@ -7,14 +7,22 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Properties;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xquery.*;
+import javax.xml.xquery.XQConstants;
+import javax.xml.xquery.XQException;
+import javax.xml.xquery.XQExpression;
+import javax.xml.xquery.XQItem;
+import javax.xml.xquery.XQResultItem;
+import javax.xml.xquery.XQSequence;
+import javax.xml.xquery.XQStaticContext;
+
+import org.basex.test.xqj.TestContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
-import org.basex.test.xqj.TestContentHandler;
 
 @SuppressWarnings("all")
 public class XQSequenceTest extends XQJTestCase {

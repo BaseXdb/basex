@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright # 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -12,7 +12,7 @@ import java.util.Properties;
  * registered with a JNDI based naming service.
  */
 public interface ConnectionPoolXQDataSource {
-  
+	
   /**
    * Attempts to establish a physical connection to an XML datasource
    * that can be used as a pooled connection.

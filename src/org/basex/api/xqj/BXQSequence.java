@@ -300,15 +300,11 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
       writeSequence(((StreamResult) res).getWriter(), null);
     } else if(res instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
-      try {
-        final SAXSerializer ser = new SAXSerializer(null);
-        final SAXResult sax = (SAXResult) res;
-        ser.setContentHandler(sax.getHandler());
-        ser.setLexicalHandler(sax.getLexicalHandler());
-        while(next()) serialize(item().it, ctx, ser);
-      } catch(final IOException ex) {
-        throw new BXQException(ex);
-      }
+      final SAXSerializer ser = new SAXSerializer(null);
+      final SAXResult sax = (SAXResult) res;
+      ser.setContentHandler(sax.getHandler());
+      ser.setLexicalHandler(sax.getLexicalHandler());
+      while(next()) serialize(item().it, ctx, ser);
     } else {
       BaseX.notimplemented();
     }

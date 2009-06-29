@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright � 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -13,16 +13,16 @@ package javax.xml.xquery;
   */
 public interface XQSequenceType 
 {
-  /** Zero or One (?). */
-  public static final int OCC_ZERO_OR_ONE  = 1;
-  /** Exactly One. */
+  /** Zero or one occurrences. */
+  public static final int OCC_ZERO_OR_ONE  = 1;  // same as ? 
+  /** Exactly one occurrence. */
   public static final int OCC_EXACTLY_ONE  = 2;  
-  /** Zero or more (*). */
-  public static final int OCC_ZERO_OR_MORE = 3;
-  /** One or more (+). */
-  public static final int OCC_ONE_OR_MORE  = 4;
+  /** Zero or more occurrences. */
+  public static final int OCC_ZERO_OR_MORE = 3;  // same as * 
+  /** One or more occurrences. */
+  public static final int OCC_ONE_OR_MORE  = 4;  // same as + 
   /** Empty sequence. */
-  public static final int OCC_EMPTY = 5;
+  public static final int OCC_EMPTY = 5;         // empty sequence
 
   /**
     * Returns the type of the item in the sequence type.
@@ -81,7 +81,7 @@ public interface XQSequenceType
     * objects are <code>XQsequenceType</code> and:
     *
     * <ul>
-    *    <li><code>getOccurrence()</code> is equal</li>
+    *    <li><code>getItemOccurrence()</code> is equal</li>
     *    <li>if not <code>OCC_EMPTY</code>, <code>getItemType()</code>
     *        is equal</li>
     * </ul>
@@ -104,13 +104,13 @@ public interface XQSequenceType
     * algorithm must be used:
     * <pre>
     *  int hashCode;
-    *  if (getOccurrence() == XQSequenceType.OCC_EMPTY)
+    *  if (getItemOccurrence() == XQSequenceType.OCC_EMPTY)
     *  {
     *    hashCode = 1; 
     *  }
     *  else
     *  {
-    *    hashCode = getOccurrence()*31 + getItemType().hashCode();
+    *    hashCode = getItemOccurrence()*31 + getItemType().hashCode();
     *  }
     * </pre>
     *

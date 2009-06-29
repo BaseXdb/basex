@@ -1,9 +1,8 @@
-// Copyright (c) 2003, 2006, 2007, Oracle. All rights reserved.
+// Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -169,7 +168,7 @@ public class SignatureTest extends XQJTestCase {
     InputStream signatureStream = getClass().getResourceAsStream(signatureFile__);
     assertNotNull("Signature file '" + signatureFile__ + "' not found in classpath.", signatureStream);
     
-    InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
+    java.io.InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
     Reader in = new BufferedReader(signatureReader);
     int ch;
     StringBuffer expected = new StringBuffer();

@@ -6,11 +6,13 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
 /**
- * This class serves an example for executing XQuery requests using the XQuery API.
+ * This class serves an example for executing XQuery requests
+ * using the XQuery for Java API.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author BaseX-Group
+ * @author BaseX Team
  */
-public final class XQueryAPIExample {
+public final class XQJQuery {
   /** Database Driver. */
   private static final String DRIVER = "org.basex.api.xqj.BXQDataSource";
   /** Name of the referenced Document. */

@@ -28,14 +28,12 @@ import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
 import org.basex.io.CachedOutput;
 import org.basex.test.xqj.TestContentHandler;
-import org.basex.test.xqj.TestXMLFilter;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
 /**
  * This class tests some XQJ features (arbitrary samples).
@@ -173,22 +171,6 @@ public class XQJTest extends TestCase {
     try {
       conn.createItemFromByte((byte) 123,
           conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
-    } catch(final Exception ex) {
-      fail(ex.getMessage());
-    }
-  }
-
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  @Test
-  public void test8() throws Exception {
-    final XQConnection conn = conn(drv);
-    final XMLReader r = new TestXMLFilter("<e>ha</e>");
-
-    try {
-      conn.createItemFromDocument(r, null);
     } catch(final Exception ex) {
       fail(ex.getMessage());
     }
@@ -342,30 +324,6 @@ public class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
-  public void test17() throws Exception {
-    final XQConnection conn = conn(drv);
-    final String query = "declare variable $x as xs:integer external; $x";
-    final XQPreparedExpression expr = conn.prepareExpression(query);
-
-    int nr = 0;
-    final QName var = new QName("x");
-    expr.bindInt(var, 45, null);
-    XQResultSequence result = expr.executeQuery();
-    while(result.next()) nr += result.getInt();
-    result.close();
-
-    expr.bindInt(var, 54, null);
-    result = expr.executeQuery();
-    while (result.next()) nr += result.getInt();
-    result.close();
-
-    assertEquals(99, nr);
-  }
-
-  /**
-   * Test.
-   * @throws Exception exception
-   */
   public void test19() throws Exception {
     final XQConnection conn = conn(drv);
     
@@ -393,9 +351,6 @@ public class XQJTest extends TestCase {
     final XQResultSequence result = expr.executeQuery("'Hello world!'");
     result.isScrollable();
     expr.close();
-
-    final XQSequence seq = conn.createSequence(result);
-    seq.beforeFirst();
   }
 
   /**

@@ -74,7 +74,7 @@ abstract class BXQAbstract {
    * Checks if the object is open.
    * @throws XQException exception
    */
-  protected final void opened() throws XQException {
+  public final void opened() throws XQException {
     if(isClosed()) throw new BXQException(getClass().getSimpleName() + CLOSED);
   }
 

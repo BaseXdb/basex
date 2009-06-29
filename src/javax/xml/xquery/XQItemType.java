@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright 2003, 2004, 2005,  2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
@@ -20,7 +20,10 @@ import java.net.URI;
   * information about the following aspects of an item type:
   * <ul>
   * <li>The kind of the item - one of <code>XQITEMKIND_*</code> constants</li>
-  * <li>Base type from which the item is derived - one of <code>XQBASETYPE_*</code>constants</li>
+  * <li>The base type of the item - one of the <code>XQBASETYPE_*</code>
+  * constants. For atomic types this is the closest matching built-in XML
+  * Schema type, for element and attributes the closest matching built-in XML
+  * Schema type this node is based on.</li>
   * <li>Name of the node, if any</li>
   * <li>Type name, if any. If present, then also whether the typename is an anonymous type</li>
   * <li>XML Schema URI associated with the type, if any</li> 
@@ -233,8 +236,14 @@ public interface XQItemType extends XQSequenceType
  public static final int XQBASETYPE_NMTOKENS = 51;
 
   /**
-    * Returns the basic pre-defined type of the item. 
-    * One of the <code>XQBASETYPE_*</code> constants. 
+    * Returns the base type of the item. One of the <code>XQBASETYPE_*</code>
+    * constants. 
+    * <br/>
+    * <br/>
+    * XQJ defines a constant for each of the built-in schema
+    * types defined in XML Schema. For atomic types this is the closest
+    * matching built-in XML Schema type, for element and attributes the
+    * closest matching built-in XML Schema type this node is based on.
     *
     * @return int      one of the <code>XQBASETYPE_*</code> constants
     *                  indicating the basic type of the item

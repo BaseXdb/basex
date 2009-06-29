@@ -1,12 +1,11 @@
 /*
- * Copyright Â© 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ * Copyright © 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 
 package javax.xml.xquery;
 import java.io.*;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
-import org.xml.sax.XMLReader;
 
 /**  
  * <code>XQDynamicContext</code> provides access to the dynamic context as defined in
@@ -391,113 +390,6 @@ public interface XQDynamicContext
    */
   public void bindDocument(QName varName, InputStream value, String baseURI, XQItemType type) throws XQException;
 
-
- /**
-   * Binds a value to the given external variable. 
-   *
-   * <br>
-   * <br>
-   *
-   * If the <code>XMLReader</code> produces a well-formed XML document, it results in a
-   * document node.  The kind of the input type must be <code>null</code>,
-   * <code>XQITEMKIND_DOCUMENT_ELEMENT</code> or <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
-   *
-   * <br>
-   * <br>
-   *
-   * The value is converted into an instance of the specified type according
-   * to  the rules defined in <i>14.3 Mapping a Java XML document to an
-   * XQuery document node, XQuery API for Java (XQJ) 1.0</i>.
-   *
-   * <br>
-   * <br>
-   *
-   * If the value is not well formed, or if a kind of the input type other
-   * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. If the conversion fails, or if there is a
-   * mismatch between the static and dynamic types, an XQException is raised
-   * either by this method, or the execute method.
-   *
-   * <br>
-   * <br>
-   *
-   * The contract of this method is as follows. First a
-   * <code>ContentHandler</code> is passed to the XML <code>
-   * XMLReader</code>; and optionally an implementation can specify additional
-   * handlers like a <code>LexicalHandler</code>. Subsequently
-   * <code>parse(String systemId)</code> will be invoked; and as such the
-   * <code>XMLReader</code> will pass the SAX event representing the document
-   * to bind. The <code>systemId</code> argument identifies the external
-   * variable, a <code>QName</code> formatted into a <code>String</code> using
-   * the James Clark representation.
-   *
-   * <br>
-   * <br>
-   *
-   * Example - the application loads an XML document (foo.xml) using a
-   * SAX parser, this document is bound to an external variable. The XQuery
-   * returns all foo elements in the document, which are written to stdout.
-   * Assume there is an <code>XQConnection</code> connection...
-   * <pre>
-   *  ...
-   *
-   *  // Create an XMLReader, which will pass the SAX events to the XQJ
-   *  // implementation 
-   *  XMLFilter xmlReader = new XMLFilterImpl() {
-   *
-   *    public void parse(String systemId) throws IOException,
-   *    SAXException {
-   *
-   *       // foo.xml is the XML document to bind 
-   *       super.parse("foo.xml");
-   *
-   *      }        
-   *
-   *    };
-   *
-   *  // The parent XML Reader is a SAX parser, which will do the
-   *  // actual work of parsing the XML document
-   *  xmlReader.setParent(org.xml.sax.helpers.XMLReaderFactory.createXMLReader());
-   *
-   *  // Create an XQPreparedExpression
-   *  XQPreparedExpression e =  connection.prepareExpression("declare variable $doc as
-   *                       document-node(element(*, xs:untyped)) external; $doc//foo));
-   *
-   *  e.bindDocument(new QName("doc"), xmlReader);
-   *
-   *  XQResultSequence result = preparedExpression.executeQuery();
-   *
-   *  result.writeSequence(System.out);
-   *  ...
-   * </pre>
-   *
-   *
-   * @param varName              the name of the external variable to bind to,
-   *                             cannot be <code>null</code>
-   * @param value                the <code>XMLReader</code> producing SAX events
-   *                             representing the document to bind
-   * @param type                 the type of the value for the created
-   *                             document node. If <code>null</code> is specified,
-   *                             it behaves as if
-   *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
-   *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
-   *                             as the type parameter.  That is, the type represents the
-   *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
-   * @exception XQException      if (1) the <code>varName</code> or value argument
-   *                             is <code>null</code>, (2) the conversion of the
-   *                             value to an XDM instance failed, (3) in case of an
-   *                             <code>XQPreparedExpression</code>, the dynamic type
-   *                             of the bound value is not compatible with the static
-   *                             type of the variable, (4) in case of an 
-   *                             <code>XQPreparedExpression</code>, the variable is
-   *                             not defined in the prolog of the expression, (5)
-   *                             if the expression is in a closed state, or (6) the
-   *                             <code>XMLReader</code> reports an error during
-   *                             <code>parse()</code>
-   */
-  public void bindDocument(QName varName, XMLReader value, XQItemType type) throws XQException;
-
  /**
   * Binds a value to the given external variable or the context item.
   *
@@ -634,7 +526,8 @@ public interface XQDynamicContext
    *                            with the static type of the variable,
    *                            (3) in case of an <code>XQPreparedExpression</code>,
    *                            the variable is not defined in the prolog of the
-   *                            expression, or (4) the expression is in a closed state
+   *                            expression, (4) the expression is in a closed state,
+   *                            or (5) the specified item is closed
    */
   public void bindItem(QName varName, XQItem value) throws XQException;
 
@@ -656,8 +549,8 @@ public interface XQDynamicContext
    *                            with the static type of the variable,
    *                            (3) in case of an <code>XQPreparedExpression</code>,
    *                            the variable is not defined in the prolog of
-   *                            the expression, or (4) the expression is in a closed
-   *                            state
+   *                            the expression, (4) the expression is in a closed
+   *                            state, or (5) the specified sequence is closed
    */
   public void bindSequence(QName varName, XQSequence value) throws XQException;
 

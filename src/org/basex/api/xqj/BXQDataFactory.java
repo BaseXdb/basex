@@ -27,7 +27,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
-import org.xml.sax.XMLReader;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
@@ -179,12 +178,6 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     return new BXQItem(createDB(new IOContent(Token.token(v))));
   }
 
-  public BXQItem createItemFromDocument(final XMLReader r, final XQItemType it)
-      throws XQException {
-    check(Type.DOC, it);
-    return new BXQItem(createDB(r));
-  }
-
   public BXQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
     check(Type.DOC, it);
@@ -289,8 +282,10 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQSequence createSequence(final XQSequence seq) throws XQException {
     opened();
     valid(seq, XQSequence.class);
+    final BXQSequence s = (BXQSequence) seq;
+    s.opened();
     try {
-      return new BXQSequence(SeqIter.get(((BXQSequence) seq).result), this);
+      return new BXQSequence(SeqIter.get(s.result), this);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
