@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import java.awt.BorderLayout;
 import java.text.DecimalFormat;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.TableLayout;
@@ -61,9 +62,9 @@ public final class DialogMapInfo extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(8, 3, 5, 0));
     p.add(new BaseXLabel(""));
-    p.add(new BaseXLabel("New Map      ", true, true));
-    p.add(new BaseXLabel("Old Map      ", true, true));
-    p.add(new BaseXLabel("Algorithmus", true, true));
+    p.add(new BaseXLabel("New Map          ", true, true));
+    p.add(new BaseXLabel("Old Map          ", true, true));
+    p.add(new BaseXLabel("Algorithm", true, true));
     p.add(nname);
     p.add(oname);
     p.add(new BaseXLabel("Size: ", true, true));
@@ -113,12 +114,18 @@ public final class DialogMapInfo extends Dialog {
     oname.setText(nameo);
     nsize.setText(Integer.toString(nn));
     osize.setText(Integer.toString(nno));
-    naar.setText(f.format(aar));
-    oaar.setText(f.format(aaro));
+    if(GUIProp.perfinfo) {
+      naar.setText("not available");
+      oaar.setText("not available");
+    } else {
+      naar.setText(f.format(aar));
+      oaar.setText(f.format(aaro));
+    }
     ntime.setText(time);
     otime.setText(timeo);
     
-    double nps = nn / Double.valueOf(time.replace(" ms", ""));
+    double nps = nn / Double.valueOf(time.replace(" ms", "").
+        replace(" (avg)", ""));
     onps.setText(nnps.getText());
     nnps.setText(f.format(nps));
     

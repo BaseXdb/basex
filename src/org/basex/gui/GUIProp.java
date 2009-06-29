@@ -164,6 +164,8 @@ public final class GUIProp {
   public static boolean mapfs = true;
   /** Choice of interacting with TreeeMap. */
   public static boolean mapinteraction = false;
+  /** Distort map in mouse context. */
+  public static boolean mapdist = false;
   /** Size of thumb focus in Mapview fraction of Mapview size. */
   public static int mapthumbsize = 4;
   /** Scaling to use in the Map oneclickfocus. */

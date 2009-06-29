@@ -52,8 +52,8 @@ public final class MapView extends View implements Runnable {
 
   /** Array of current rectangles. */
   private MapRects mainRects;
-//  /** Array of huge rectangles. */
-//  private MapRects hugeRects;
+  /** Array of huge rectangles. */
+  private MapRects hugeRects;
   /** Data specific map layout. */
   private MapPainter painter;
   /** Keeps the whole map layout. */
@@ -217,8 +217,8 @@ public final class MapView extends View implements Runnable {
 //      final Data data = gui.context.data();
 //      MapLayout hugeLayout = new MapLayout(data, textLen);
 //      
-    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-    calc(rect, gui.context.current(), mainMap);
+      final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+      calc(rect, gui.context.current(), mainMap);
       
 //      MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
 //          mainRects.get(0).level);
@@ -230,7 +230,7 @@ public final class MapView extends View implements Runnable {
 //          source);
       
       // simple method only scaling all the rectangles including the borders
-      MapRects hugeRects = new MapRects();
+      hugeRects = new MapRects();
       for(MapRect r : mainRects) {
         hugeRects.add(new MapRect(fkt * r.x, fkt * r.y, fkt * r.w, fkt * r.h, 
             r.pre, r.level));
@@ -240,6 +240,7 @@ public final class MapView extends View implements Runnable {
       drawMap(hugeMap, hugeRects, fkt);
     } else {
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+//      final MapRect rect = new MapRect(0, 0, 1680, 1050, 0, 0);
       calc(rect, gui.context.current(), mainMap);
     }
       
@@ -433,26 +434,28 @@ public final class MapView extends View implements Runnable {
 
     final Performance p = new Performance();
 
-    // calculate new main rectangles
-    initLen();
-    layout = new MapLayout(nodes.data, textLen);
+    for(int i = 0; i < 1; i++) {
+      // calculate new main rectangles
+      initLen();
+      layout = new MapLayout(nodes.data, textLen);
+  
+      layout.makeMap(rect, new MapList(nodes.nodes.clone()), 
+          0, nodes.size() - 1, 0);
+      mainRects = layout.rectangles.copy();
+      // mainRects = layout.rectangles;
+    }
 
-    layout.makeMap(rect, new MapList(nodes.nodes.clone()), 0, nodes.size() - 1,
-        0);
-
-    mainRects = layout.rectangles.copy();
-    // mainRects = layout.rectangles;
-
+    // [JH] implement distance change, readability, ...
+    if(GUIProp.mapinfo) {
+      double aar = 0;
+      if(!GUIProp.perfinfo) aar = MapLayout.aar(mainRects);
+      mapInfo.setValues(mainRects.size, rect, aar, 
+          p.getTimer(1), layout.algo.getName());
+    }
+    
     painter.init(mainRects);
     drawMap(map, mainRects, 1f);
     focus();
-
-    // [JH] implement distance change, readability, ...
-    if(GUIProp.mapinfo && !GUIProp.perfinfo) {
-      final double aar = MapLayout.aar(mainRects);
-      mapInfo.setValues(mainRects.size, rect, aar, p.getTimer(), 
-          layout.algo.getName());
-    }
 
     /*
      * Screenshots: try { File file = new File("screenshot.png");
@@ -472,7 +475,6 @@ public final class MapView extends View implements Runnable {
       refreshInit();
       return;
     }
-
     // calculate map
     gui.painting = true;
 
@@ -744,7 +746,26 @@ public final class MapView extends View implements Runnable {
     // refresh mouse focus
     mouseX = e.getX();
     mouseY = e.getY();
-    if(focus()) {
+    if(GUIProp.mapinteraction && GUIProp.mapdist && e.isControlDown()) {
+      Graphics g = mainMap.getGraphics();
+      g.setColor(Color.black);
+      g.fillRect(0, 0, getWidth(), getHeight());
+      
+      MapRects distRects = new MapRects();
+      for(MapRect r : mainRects) {
+        int x = (int) (r.x + 100 * Math.tanh(0.2 * (r.x - mouseX)));
+        int w = (int) (r.x + r.w + 100 * Math.tanh(
+            0.2 * (r.x + r.w - mouseX)) - x);
+        int y = (int) (r.y + 100 * Math.tanh(0.2 * (r.y - mouseY)));
+        int h = (int) (r.y + r.h + 100 * Math.tanh(
+            0.2 * (r.y + r.h - mouseY)) - y);
+        distRects.add(new MapRect(x, y, w, h, r.pre, r.level));
+      }
+      mainMap.flush();
+      painter.init(distRects);
+      drawMap(mainMap, distRects, 1);
+      repaint();
+    } else if(focus()) {
       if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
           mouseY < tinyy + tinyh)) {
         thumbMap = false;
