@@ -45,6 +45,7 @@ public final class FTContent extends FTFilter {
       final int s = ft.count();
       final boolean[] bl = new boolean[s];
       for(final FTStringMatch sm : mtc) {
+        if(sm.gaps) continue;
         for(int p = sm.start; p <= sm.end; p++) bl[p] = true;
       }
       for(final boolean b : bl) if(!b) return false;

@@ -15,6 +15,8 @@ public class FTStringMatch implements Comparable<FTStringMatch> {
   public int end;
   /** Include/exclude flag. */
   public boolean not;
+  /** Gaps (contiguous) flag. */
+  public boolean gaps;
 
   /**
    * Constructor.

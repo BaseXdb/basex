@@ -40,22 +40,21 @@ public final class FTWindow extends FTFilter {
     final long w = checkItr(win, ctx);
     mtc.sort();
 
-    int end = 0;
     FTStringMatch f = null;
     for(final FTStringMatch m : mtc) {
       if(!m.not) {
         if(f == null) f = m;
-        end = m.end;
+        f.gaps |= m.end - f.end > 1;
+        f.end = m.end;
       }
     }
-    f.end = end;
 
     final FTMatch match = new FTMatch();
     for(final FTStringMatch m : mtc) {
       if(m.not) {
         match.add(m);
       } else {
-        if(pos(end, ft) - pos(m.start, ft) + 1 > w) return false;
+        if(pos(f.end, ft) - pos(m.start, ft) + 1 > w) return false;
         break;
       }
     }
@@ -75,6 +74,6 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + QueryTokens.WINDOW + "(" + win + " " + unit + ")";
+    return super.toString() + QueryTokens.WINDOW + " " + win + " " + unit;
   }
 }

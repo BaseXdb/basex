@@ -125,6 +125,7 @@ public abstract class FTFilter extends FTExpr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
+    expr[0].plan(ser);
     ser.closeElement();
   }
 

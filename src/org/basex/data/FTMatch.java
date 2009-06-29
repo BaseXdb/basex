@@ -17,7 +17,7 @@ public class FTMatch implements Iterable<FTStringMatch> {
   /** String matches. */
   FTStringMatch[] match = {};
   /** Number of entries. */
-  int size;
+  public int size;
 
   /**
    * Resets the match.
