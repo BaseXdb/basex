@@ -89,7 +89,7 @@ public interface QueryText {
   /** FORG0001: Evaluation exception. */
   Object[] DATERANGE = { FORG, 1, "%(\"%\") out of range." };
   /** FORG0001: Evaluation exception. */
-  Object[] DATEFORMAT = { FORG, 1, "Wrong % format (Example: '%')." };
+  Object[] DATEFORMAT = { FORG, 1, "Wrong % format: \"%\" (try: \"%\")." };
   /** FORG0001: Evaluation exception. */
   Object[] QNMINV = { FORG, 1, "Invalid QName: \"%\"" };
   /** FORG0002: Evaluation exception. */

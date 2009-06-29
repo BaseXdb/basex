@@ -20,7 +20,7 @@ import org.basex.query.util.Err;
  */
 public final class FTWeight extends FTExpr {
   /** Weight. */
-  Expr weight;
+  private Expr weight;
 
   /**
    * Constructor.
@@ -50,8 +50,7 @@ public final class FTWeight extends FTExpr {
     return new FTIter() {
       @Override
       public FTItem next() throws QueryException {
-        final FTItem it = expr[0].iter(ctx).next();
-        return it != null ? weight(it, ctx) : null;
+        return weight(expr[0].iter(ctx).next(), ctx);
       }
     };
   }
@@ -67,6 +66,7 @@ public final class FTWeight extends FTExpr {
       throws QueryException {
 
     // evaluate weight
+    if(item == null) return null;
     final double d = checkDbl(weight, ctx);
     if(Math.abs(d) > 1000) Err.or(FTWEIGHT, d);
     if(d == 0) item.all.size = 0;
@@ -76,7 +76,7 @@ public final class FTWeight extends FTExpr {
   
   @Override
   public boolean indexAccessible(final IndexContext ic) {
-    // no weight allowed as long as no index-based scoring exists
+    // weight makes no sense as long as no index-based scoring exists
     return false;
   }
 

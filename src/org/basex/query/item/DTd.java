@@ -91,7 +91,7 @@ public final class DTd extends Dur {
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      Err.date(type, XDTD);
+      Err.date(v, type, XDTD);
     final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
     final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;

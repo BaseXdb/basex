@@ -19,6 +19,7 @@ public final class StopWords extends Set {
    * @return true if everything went alright
    */
   public boolean read(final IO fl, final boolean e) {
+    System.out.println(fl + ": " + e);
     try {
       for(final byte[] sl : split(norm(fl.content()), ' ')) {
         if(e) delete(sl);

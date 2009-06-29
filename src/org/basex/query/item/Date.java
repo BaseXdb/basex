@@ -67,7 +67,7 @@ public abstract class Date extends Item {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      Err.date(type, e);
+      Err.date(d, type, e);
     }
   }
 
@@ -81,7 +81,7 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = DAT.matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(type, e);
+    if(!mt.matches()) Err.date(d, type, e);
     zone(mt, 5, d);
   }
 
@@ -95,13 +95,13 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(type, e);
+    if(!mt.matches()) Err.date(d, type, e);
     
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
     if(s > 59) Err.range(type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
-    if(h == 24 && ms > 0) Err.date(type, e);
+    if(h == 24 && ms > 0) Err.date(d, type, e);
     zone(mt, 6, d);
   }
 

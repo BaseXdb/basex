@@ -693,6 +693,6 @@ public final class DiskData extends Data {
   
   @Override
   public void setLocked(final boolean l) {
-    this.locked = l;
+    locked = l;
   }
 }

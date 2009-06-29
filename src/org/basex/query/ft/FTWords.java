@@ -149,7 +149,7 @@ public final class FTWords extends FTExpr {
           final int oc = opt.contains(it, ctx.fttoken, this);
           if(oc == 0) return 0;
           len += it.length;
-          o += oc / ctx.ftopt.qu.count();
+          o += oc;
         }
         break;
       case ALLWORDS:

@@ -57,7 +57,7 @@ public final class DSim extends Date {
 
     final int i = type(t);
     final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(type, EXAMPLES[i]);
+    if(!mt.matches()) Err.date(d, type, EXAMPLES[i]);
     zone(mt, ZONES[i], d);
     
     if(t == Type.MDA) {

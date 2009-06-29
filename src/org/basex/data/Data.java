@@ -14,7 +14,7 @@ import org.basex.util.TokenBuilder;
  * This class provides access to the database. The storage
  * representation depends on the underlying implementation.
  * Note that the methods of this class are optimized for performance.
- * They won't check if you ask for wrong data. If you request a text
+ * They will not check if you request wrong data. If you ask for a text
  * node, e.g., get sure your pre value actually points to a text node.
  * The same applies to the update operations; if you write an attribute
  * to an element node, your database will get messed up.
@@ -420,13 +420,13 @@ public abstract class Data {
 
   /**
    * Returns the locking situation of the data.
-   * @return boolean locked
+   * @return locked flag
    */
   public abstract boolean isLocked();
 
   /**
-   * Locks and Unlocks the Datareference.
-   * @param l boolean if Data is locked
+   * Locks and unlocks the data reference.
+   * @param l boolean if data is locked
    */
   public abstract void setLocked(final boolean l);
   

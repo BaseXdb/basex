@@ -42,12 +42,14 @@ public final class Err {
   
   /**
    * Throws a date format exception.
+   * @param i input
    * @param t expected type
    * @param ex example format
    * @throws QueryException evaluation exception
    */
-  public static void date(final Type t, final String ex) throws QueryException {
-    or(DATEFORMAT, t, ex);
+  public static void date(final byte[] i, final Type t, final String ex)
+      throws QueryException {
+    or(DATEFORMAT, t, i, ex);
   }
   
   /**

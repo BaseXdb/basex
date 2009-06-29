@@ -294,12 +294,10 @@ public final class MemData extends Data {
 
   @Override
   public boolean isLocked() {
-    BaseX.notimplemented();
     return false;
   }
 
   @Override
   public void setLocked(final boolean l) {
-    BaseX.notimplemented();
   }
 }
