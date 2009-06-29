@@ -27,21 +27,47 @@ public final class ParserUtil {
    * @return the xs:duration value or an empty array if duration < 1 second.
    */
   public static byte[] msToDuration(final byte[] milliseconds) {
-    if(milliseconds == null) return null;
+    if(Token.ws(milliseconds)) return Token.EMPTY;
     int len = milliseconds.length;
+    byte[] value;
     if(len < 4) {
-      // [BL] handle short durations
-      return Token.EMPTY; // skip values < 1s
+      value = new byte[] { 'P', 'T', '0', '.', '0', '0', '0', 'S'};
+      int offset = 7 - len;
+      for(int i = 0; i < len; i++) {
+        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
+          BaseX.debug("ParserUtil: Invalid duration: %",
+              Token.string(milliseconds));
+          return Token.EMPTY;
+        }
+        value[i + offset] = milliseconds[i];
+      }
+    } else {
+      int newLen = len + 4; // get space for 'P', 'T', '.' and 'S'
+      value = new byte[newLen];
+      int pos = 0;
+      value[pos++] = 'P';
+      value[pos++] = 'T';
+      int secLen = len - 3; // number of digits for the seconds
+      int i = 0;
+      for(; i < secLen; i++) {
+        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
+          BaseX.debug("ParserUtil: Invalid duration: %",
+              Token.string(milliseconds));
+          return Token.EMPTY;
+        }
+        value[pos++] = milliseconds[i];
+      }
+      value[pos++] = '.';
+      for(; i < len; i++) {
+        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
+          BaseX.debug("ParserUtil: Invalid duration: %",
+              Token.string(milliseconds));
+          return Token.EMPTY;
+        }
+        value[pos++] = milliseconds[i];
+      }
+      value[pos] = 'S';
     }
-    int newLen = len + 4; // get space for 'P', 'T', '.' and 'S'
-    byte[] value = new byte[newLen];
-    value[0] = 'P';
-    value[1] = 'T';
-    int secLen = len - 3; // number of digits for the seconds
-    System.arraycopy(milliseconds, 0, value, 2, secLen); // copy seconds
-    value[2 + secLen] = '.';
-    System.arraycopy(milliseconds, secLen, value, 3 + secLen, 3); // copy ms
-    value[newLen - 1] = 'S';
     return value;
   }
 

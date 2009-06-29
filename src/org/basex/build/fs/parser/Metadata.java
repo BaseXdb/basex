@@ -20,7 +20,7 @@ public final class Metadata {
    */
   public enum Attribute {
     /** Attribute name "type". */
-    TYPE("type"),
+    TYPE("xsi:type"),
     /** Attribute name "def". */
     DEFINITION("def"),
     /** Attribute name "lang". */
@@ -128,7 +128,7 @@ public final class Metadata {
    * Available metadata types.
    * @author Bastian Lemke
    */
-  enum Type {
+  public enum Type {
     /** Audio resource (e.g. MP3 file). */
     AUDIO("audio"),
     /** Text resource (e.g. plain text file). */
@@ -268,7 +268,11 @@ public final class Metadata {
     /** Size in mm. */
     MILLIMETER("millimeter"),
     /** Size in inch. */
-    INCH("inch");
+    INCH("inch"),
+    /** Dots per inch. */
+    DOTS_PER_INCH("dots per inch"),
+    /** Dots per centimeter. */
+    DOTS_PER_CM("dots per cm");
 
     /** The element name as byte array. */
     private final byte[] elem;
@@ -295,6 +299,8 @@ public final class Metadata {
    * @author Bastian Lemke
    */
   public enum MimeType {
+    /** Unknown media. */
+    UNKNOWN("unkown", ""),
     /** XML. */
     XML("application/xml", "xml"),
     /** KML. */

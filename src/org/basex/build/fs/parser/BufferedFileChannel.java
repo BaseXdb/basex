@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
 /**
@@ -24,7 +25,7 @@ import java.nio.channels.FileChannel;
 public class BufferedFileChannel {
 
   /** The default buffer size. */
-  private static final int DEFAULT_BUFFER_SIZE = 8192;
+  public static final int DEFAULT_BUFFER_SIZE = 2048;
   /** The file we are reading from. */
   private final File f;
   /** The underlying {@link FileChannel} instance. */
@@ -81,9 +82,8 @@ public class BufferedFileChannel {
     fc = new RandomAccessFile(file, "r").getChannel();
     mark = 0;
     buffer.clear();
-    rem = fc.size() - fc.read(buffer);
-    assert rem >= 0;
-    buffer.flip();
+    buffer.position(buffer.limit());
+    rem = fc.size();
     buf = buffer;
   }
 
@@ -254,10 +254,11 @@ public class BufferedFileChannel {
   /**
    * Reads <code>dst.length</code> bytes from the {@link BufferedFileChannel}.
    * @param dst the arrray to write the data to.
+   * @return the filled byte array.
    * @throws IOException if there are less than <code>dst.length</code> bytes
    *           available or any error occurs while reading from the channel.
    */
-  public void get(final byte[] dst) throws IOException {
+  public byte[] get(final byte[] dst) throws IOException {
     int bytesToRead = dst.length;
     if(buffer(bytesToRead)) {
       buf.get(dst, 0, bytesToRead);
@@ -272,6 +273,7 @@ public class BufferedFileChannel {
       rem -= fc.read(new ByteBuffer[] { tmp, buf});
       buf.flip();
     }
+    return dst;
   }
 
   /**
@@ -298,13 +300,29 @@ public class BufferedFileChannel {
    * </p>
    * <p>
    * <b> Make shure that enough at least one byte is buffered via
-   * {@link #buffer(int)}. Otherwise, a {@link BufferUnderflowException} may be
-   * thrown.</b>
+   * {@link #buffer(int) #buffer(1)}. Otherwise, a
+   * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @return The byte at the channel's current position
    */
-  public byte get() {
-    return buf.get();
+  public int get() {
+    return buf.get() & 0xFF;
+  }
+
+  /**
+   * <p>
+   * Relative <i>get</i> method. Reads two bytes at this channel's current
+   * position, and then increments the position by two.
+   * </p>
+   * <p>
+   * <b> Make shure that enough at least two bytes are buffered via
+   * {@link #buffer(int) #buffer(2)}. Otherwise, a
+   * {@link BufferUnderflowException} may be thrown.</b>
+   * </p>
+   * @return The next two bytes at the channel's current position as integer.
+   */
+  public int getShort() {
+    return (buf.get() & 0xFF) << 8 | (buf.get() & 0xFF);
   }
 
   /**
@@ -314,8 +332,8 @@ public class BufferedFileChannel {
    * </p>
    * <p>
    * <b> Make shure that enough at least four bytes are buffered via
-   * {@link #buffer(int)}. Otherwise, a {@link BufferUnderflowException} may be
-   * thrown.</b>
+   * {@link #buffer(int) #buffer(4)}. Otherwise, a
+   * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @return The next four bytes at the channel's current position as integer.
    */
@@ -388,5 +406,15 @@ public class BufferedFileChannel {
    */
   public String getFileName() {
     return f.getAbsolutePath();
+  }
+
+  /**
+   * Modifies this channel's byte order.
+   * @param order The new byte order, either {@link ByteOrder#BIG_ENDIAN
+   *          BIG_ENDIAN} or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
+   * 
+   */
+  public void setByteOrder(final ByteOrder order) {
+    buf.order(order);
   }
 }

@@ -436,7 +436,7 @@ public class MP3Parser extends AbstractParser {
     bfc.buffer(MINIMAL_FRAME_SIZE);
     byte[] frameId = new byte[4];
     // padding (some 0x00 bytes) marks correct end of frames.
-    if((frameId[0] = bfc.get()) == 0) return Integer.MAX_VALUE;
+    if((frameId[0] = (byte) bfc.get()) == 0) return Integer.MAX_VALUE;
     bfc.get(frameId, 1, 3);
     int frameSize = readSynchsafeInt();
     bfc.skip(2); // skip flags
@@ -569,7 +569,7 @@ public class MP3Parser extends AbstractParser {
     bfc.buffer(9);
     skipEncBytes();
     StringBuilder sb = new StringBuilder();
-    byte b;
+    int b;
     while((b = bfc.get()) != 0)
       sb.append((char) b);
     String string = sb.toString();

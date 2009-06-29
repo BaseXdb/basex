@@ -24,6 +24,8 @@ import org.basex.build.fs.parser.Metadata.Attribute;
 import org.basex.build.fs.parser.Metadata.DataType;
 import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
+import org.basex.build.fs.parser.Metadata.MimeType;
+import org.basex.build.fs.parser.Metadata.Type;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.data.DataText;
@@ -52,7 +54,7 @@ public final class NewFSParser extends Parser {
   // [BL] clean up class ...
 
   /** If true, the <code>type=""</code> attributes are added to the XML doc. */
-  private static final boolean ADD_TYPE_ATTR = false;
+  private static final boolean ADD_TYPE_ATTR = true;
 
   /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
   public static final int SIZEOFFSET = 3;
@@ -127,7 +129,8 @@ public final class NewFSParser extends Parser {
               + parser.getValue().getName());
         }
       }
-      buffer = ByteBuffer.allocateDirect(8192);
+      buffer = ByteBuffer.allocateDirect(BufferedFileChannel.//
+      DEFAULT_BUFFER_SIZE);
     } else {
       parserInstances = null;
       buffer = null;
@@ -180,6 +183,8 @@ public final class NewFSParser extends Parser {
         atts.add(SIZE, Token.EMPTY);
         atts.add(BACKINGSTORE, token(fsimportpath));
       }
+      if(ADD_TYPE_ATTR) builder.startNS(Token.token("xsi"),
+          Token.token("http://www.w3.org/2001/XMLSchema-instance"));
 
       builder.startElem(DEEPFS, atts);
 
@@ -346,7 +351,9 @@ public final class NewFSParser extends Parser {
   private void parse0(final AbstractParser parser, //
       final BufferedFileChannel bfc) throws IOException {
     if(Prop.fsmeta) {
-      builder.nodeAndText(Element.TYPE.get(), atts.reset(), parser.getType());
+      atts.reset();
+      if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), DataType.STRING.get());
+      builder.nodeAndText(Element.TYPE.get(), atts, parser.getType());
       builder.nodeAndText(Element.FORMAT.get(), atts, parser.getFormat());
       bfc.reset();
       parser.readMeta(bfc, this);
@@ -433,6 +440,51 @@ public final class NewFSParser extends Parser {
         definition.get());
     if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), t.get());
     builder.nodeAndText(element.get(), atts, value);
+  }
+
+  /**
+   * Generates the xml representation for a new file inside the current file
+   * node.
+   * @param name the name of the file.
+   * @param suffix the suffix of the file.
+   * @param type the type of the file.
+   * @param format the format of the file.
+   * @param absolutePosition the absolute position of the first byte of the file
+   *          inside the current file.
+   * @param size the size of the file in bytes.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void fileStartEvent(final String name, final String suffix,
+      final Type type, final MimeType format, final long absolutePosition,
+      final long size) throws IOException {
+    atts.reset();
+    if(name != null) {
+      if(suffix != null) {
+        StringBuilder sb = new StringBuilder(name.length() + suffix.length()
+            + 1);
+        sb.append(name).append('.').append(suffix);
+        atts.add(DataText.NAME, Token.token(sb.toString()));
+        atts.add(DataText.SUFFIX, Token.token(suffix));
+      } else {
+        atts.add(DataText.NAME, Token.token(name));
+      }
+    }
+    atts.add(DataText.OFFSET, Token.token(absolutePosition));
+    atts.add(DataText.SIZE, Token.token(size));
+    atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
+    builder.startElem(DataText.FILE, atts);
+    atts.reset();
+    if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), DataType.STRING.get());
+    builder.nodeAndText(Element.TYPE.get(), atts, type.get());
+    builder.nodeAndText(Element.FORMAT.get(), atts, format.get());
+  }
+
+  /**
+   * Closes the last opened file element.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void fileEndEvent() throws IOException {
+    builder.endElem(DataText.FILE);
   }
 
   /**
