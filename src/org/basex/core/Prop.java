@@ -42,11 +42,11 @@ public final class Prop {
 
   /** Supported languages. */
   public static final String[] LANGUAGES = {
-    "German", "English", "Italian", "Japanese"
+    "English", "German", "Italian", "Japanese"
   };
   /** Translation credits. */
   public static final String[] LANGCREDS = {
-    "Andreas Weiler, Project Team", "Project Team",
+    "Project Team", "Andreas Weiler, Project Team",
     "Luca Martincigh", "Kazuo Kashima" };
 
   // DATABASE & PROGRAM PATHS =================================================

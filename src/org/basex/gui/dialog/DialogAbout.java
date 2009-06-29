@@ -36,7 +36,7 @@ public final class DialogAbout extends Dialog {
     p.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 15, 22)));
 
-    BaseXLabel label = new BaseXLabel(null);
+    BaseXLabel label = new BaseXLabel("");
     label.setIcon(GUI.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
     p.add(label, BorderLayout.WEST);

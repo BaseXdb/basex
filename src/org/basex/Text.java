@@ -487,7 +487,9 @@ public interface Text {
 
   // XPATH COMMAND ============================================================
 
-  /** Query Info: Optimizing. */
+  /** Query Info: Query. */
+  String QUERYQU = lang("qu_query") + COL + S;
+  /** Query Info: Parsing. */
   String QUERYPARS = lang("qu_pars") + COL;
   /** Query Info: Optimizing. */
   String QUERYCOMP = lang("qu_comp") + COL;
@@ -501,9 +503,9 @@ public interface Text {
   String QUERYPLAN = lang("qu_plan") + COLS;
   /** Query Info: Compiler. */
   String QUERYSEP = LI;
-  /** Query Info: Plan. */
+  /** Query Info: XML Plan. */
   String PLANXML = "plan.xml";
-  /** Query Info: Plan. */
+  /** Query Info: DOT Plan. */
   String PLANDOT = "plan.dot";
 
   /** Query Info: Query. */
@@ -528,8 +530,6 @@ public interface Text {
   String QUERYMEM = lang("qu_tabmem") + ": %";
   /** Query Hits. */
   String HITS = lang("qu_hits");
-  /** Milliseconds. */
-  String MS = S + lang("qu_ms");
 
   /** Query Hits. */
   String VALHIT = "Item";

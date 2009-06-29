@@ -356,6 +356,7 @@ bye3=Divertiti.
 bye4=Alla prossima.
 
 # Query Commands
+qu_query=Query
 qu_pars=Parsing
 qu_comp=Compilando
 qu_eval=Eseguendo
@@ -363,7 +364,6 @@ qu_time=Timing
 qu_result=Risultato
 qu_plan=Query plan
 qu_hits=Hit(s)
-qu_ms=ms
 
 # Query Commands.. the following strings must have the same length
 qu_tabquery=Query     
@@ -584,7 +584,7 @@ h_searchfs=Digita qualcosa nel campo di testo per cercarlo nel tuo filesystem. L
 h_xpath=La modalità XPath permette l'inserimento di semplici richieste XPath. XPath è spesso processato più velocemente di XQuery. Il linguaggio XPath è basato su una rappresentazione ad albero del documento XML, e fornisce la possibilità di navigare lungo l'albero, selezionando i nodi secondo diversi criteri.
 h_modefilt=Se il filtraggio real-time è disattivato, schiaccia Ctrl+ENTER per filtrare i risultati delle query.
 h_map=Questa visualizzazione è chiamata TreeMap. Tutti i nodi del documento XML sono rappresentati come rettangoli, e riempiono l'intera area. I nodi possono essere evidenziati con click singolo e filtrati con doppio click. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
-h_plot=This visualization is called Scatterplot View. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
+h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.
 h_plotaxisy=With this combo box you can define the assignment to the y-axis.
 h_plotxlog=With this checkbox you can change the display of the x-axis to logarithmic.

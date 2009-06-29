@@ -1,5 +1,7 @@
 package org.basex.io;
 
+import static org.basex.Text.*;
+
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -59,6 +61,10 @@ public final class CachedOutput extends PrintOutput {
    * @return buffer
    */
   public byte[] buffer() {
+    if(finished()) {
+      final byte[] chop = Token.token(DOTS);
+      Array.copy(chop, buf, size - chop.length);
+    }
     return buf;
   }
   

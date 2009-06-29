@@ -596,6 +596,8 @@ public abstract class W3CTS {
       logFile.append(Prop.NL);
     }
     xq.close();
+    context.close();
+
     return single == null || !outname.equals(single);
   }
 

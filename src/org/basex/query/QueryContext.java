@@ -184,7 +184,7 @@ public final class QueryContext extends Progress {
       if(nodes != null) {
         // create document nodes
         final Data data = nodes.data;
-        for(int d = 0; d < docs; d++) {
+        for(int d = 0; d < nodes.size(); d++) {
           final int p = nodes.nodes[d];
           if(data.kind(p) == Data.DOC) {
             addDoc(new DBNode(data, p));
@@ -198,7 +198,7 @@ public final class QueryContext extends Progress {
 
         final SeqIter si = new SeqIter();
         if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
-          // query starts with root node - add document nodes
+          // query starts with root node - add document nodes (optimization)
           for(int d = 0; d < docs; d++) si.add(doc[d]);
         } else {
           // otherwise, add all context items

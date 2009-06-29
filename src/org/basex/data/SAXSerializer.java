@@ -31,11 +31,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   /**
    * Constructor.
    * @param res result
-   * @throws IOException exception
    */
-  public SAXSerializer(final Result res) throws IOException {
+  public SAXSerializer(final Result res) {
     result = res;
-    openElement(RESULTS);
   }
 
   /* Implements XMLReader method. */
@@ -129,8 +127,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private AttributesImpl atts;
 
   @Override
-  public void close() throws IOException {
-    closeElement();
+  public void close() {
   }
 
   @Override

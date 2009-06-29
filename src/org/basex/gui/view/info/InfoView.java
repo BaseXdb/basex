@@ -112,13 +112,15 @@ public final class InfoView extends View {
   /**
    * Processes the query info.
    * @param inf info string
+   * @param ok success flag
    */
-  public void setInfo(final byte[] inf) {
+  public void setInfo(final byte[] inf, final boolean ok) {
     final IntList il = new IntList();
     final StringList sl = new StringList();
     final StringList cmp = new StringList();
     final StringList eval = new StringList();
     final StringList pln = new StringList();
+    String err = "";
 
     final String[] split = Token.string(inf).split(Prop.NL);
     for(int i = 0; i < split.length; i++) {
@@ -127,7 +129,7 @@ public final class InfoView extends View {
       if(line.startsWith(QUERYPARSE) || line.startsWith(QUERYCOMPILE) || 
           line.startsWith(QUERYEVALUATE) || line.startsWith(QUERYPRINT) ||
           line.startsWith(QUERYTOTAL)) {
-        final int t = line.indexOf(MS);
+        final int t = line.indexOf(" ms");
         sl.add(line.substring(0, s).trim());
         il.add((int) (Double.parseDouble(line.substring(s + 1, t)) * 100));
       } else if(line.startsWith(QUERYSTRING)) {
@@ -141,6 +143,8 @@ public final class InfoView extends View {
       } else if(line.startsWith(QUERYEVAL)) {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
+      } else if(!ok) {
+        err += line;
       }
     }
 
@@ -154,7 +158,7 @@ public final class InfoView extends View {
     plan = pln;
 
     if(sl.size != 0) {
-      add(tb, "Query:  ", query);
+      add(tb, QUERYQU, query);
       add(tb, QUERYCOMP, compile);
       if(compile.size != 0) add(tb, QUERYRESULT, result);
       add(tb, QUERYPLAN, plan);
@@ -162,6 +166,9 @@ public final class InfoView extends View {
       add(tb, QUERYTIME, strings);
       tm = strings.list[il.size - 1] + ": " + Performance.getTimer(
           stat.list[il.size - 1] * 10000L * Prop.runs, Prop.runs);
+    } else if(!ok) {
+      add(tb, "Error:  ", err);
+      tm = "";
     }
 
     area.setText(tb.finish());

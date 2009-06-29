@@ -50,4 +50,9 @@ public final class BaseXLabel extends JLabel {
   public void setBorder(final int t, final int l, final int b, final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
   }
+
+  @Override
+  public void setText(final String t) {
+    if(!t.equals(getText())) super.setText(t);
+  }
 }

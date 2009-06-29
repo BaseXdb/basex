@@ -44,7 +44,7 @@ info_title=クエリー情報
 info_no=クエリーを実行して下さい。
 help_title=ヘルプ
 text_title=テキスト
-query_title=Query
+query_title=クエリー　　
 
 # Dialog Windows
 d_info=情報
@@ -348,6 +348,7 @@ bye3=また次回。
 bye4=じゃーね。
 
 # Query Commands
+qu_query=クエリー　　
 qu_pars=パース中
 qu_comp=コンパイル中 
 qu_eval=計算中
@@ -355,7 +356,6 @@ qu_time=タイミング
 qu_result=結果
 qu_plan=Query plan
 qu_hits=ヒット
-qu_ms=ミリ秒
 
 # Query Commands.. the following strings must have the same length
 qu_tabquery=クエリー　　
@@ -574,7 +574,7 @@ h_searchfs=テキストフィールドに何か入力してファイルシステ
 h_xpath=XPathモードでは簡単なXPathを入力できます。XPathは通常XQueryよりも高速に処理されます。XPath言語はXML文書を木構造で表現したものを元にその木構造を移動したり、豊富な検索条件によりノードを選択する事が出来ます。
 h_modefilt=リアルタイムフィルタリングが無効な場合、Ctrl+ENTERを押すことにより検索結果を表示できます。
 h_map=この視覚化の方法はツリーマップ（TreeMap）と呼ばれ、XML文書の全てのノードは四角で表現され、領域全体を埋めつくします。ノードをクリックするとハイライト表示され、ダブルクリックするとそのノード以下が表示されます。各要素でライトクリックするとポップアップメニューが表示されます。
-h_plot=This visualization is called Scatterplot View. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
+h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.
 h_plotaxisy=With this combo box you can define the assignment to the y-axis.
 h_plotxlog=With this checkbox you can change the display of the x-axis to logarithmic.
@@ -596,4 +596,3 @@ h_mover=各ビュー上部のバーをドラッグすることにより、ビュ
 h_tablehead=テーブルの見出しをクリックすると、その列によってソートされます。さらに、テキストフィールドに入力することによりテーブル内を検索することが出来ます。
 h_mem=このボックスはBaseXにより確保されているメモリーを表示します。ここをクリックすると、強制的にガベージコレクションを行います。\n利用可能なメモリーが少ない場合赤く表示されます。もしそれが頻繁に起こるようでしたら、Javaの-Xmx<メモリサイズ>フラグを使用してBaseXを起動して下さい。 ('java -X' で詳細な情報が得られます)
 h_guistatus=The status of the execution is shown.
-h_querycombo=Displays the opportunities for the query.

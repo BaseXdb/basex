@@ -484,7 +484,7 @@ public final class GUI extends JFrame {
       final Result result = pr.result();
       final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
-      // treat TextView different to other views
+      // treat text view different to other views
       if(ok && pr.printing()) {
         // display text view if result will not highlight any nodes
         if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
@@ -497,9 +497,16 @@ public final class GUI extends JFrame {
         }
       }
 
-      boolean feedback = main || data != null && GUIProp.showquery &&
+      final boolean feedback = main || data != null && GUIProp.showquery &&
         query.info(pr instanceof XQuery ? inf : null, ok);
       
+      // show query info
+      if(GUIProp.showinfo && (ok || main))
+        info.setInfo(Token.token(inf), ok);
+
+      //if(GUIProp.showinfo) info.setInfo(result != null ?
+      //    Token.token(inf) : Token.EMPTY);
+
       // check if query feedback was processed in the query view
       if(!ok) {
         // show error info
@@ -550,10 +557,6 @@ public final class GUI extends JFrame {
 
       // show number of hits
       setHits(result == null ? 0 : result.size());
-
-      // show query info
-      if(GUIProp.showinfo) info.setInfo(result != null ?
-          Token.token(inf) : Token.EMPTY);
 
       // show status info
       status.setText(BaseX.info(PROCTIME, time));

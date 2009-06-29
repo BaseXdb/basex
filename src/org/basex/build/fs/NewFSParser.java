@@ -247,7 +247,7 @@ public final class NewFSParser extends Parser {
   private static boolean valid(final File f) {
     try {
       return f.getPath().equals(f.getCanonicalPath());
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       BaseX.debug(f + ": " + ex.getMessage());
       return false;
     }

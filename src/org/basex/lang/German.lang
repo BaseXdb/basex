@@ -33,12 +33,9 @@ b_simple=Einfacher
 b_search=Suche
 
 # Status messages
-#s_path=Pfad
 s_ok=OK
 
 # Visualizations
-#welcome1=Willkommen!
-#welcome2=Eine kleine Einführung:\nKlicken Sie auf "Datei -> Neu..."\nund wählen Sie ein XML-Dokument aus.\nBestätigen Sie das folgende Dialogfenster\nund beachten Sie die Hilfe...
 text_find=Finde
 no_table=Tabelle für aktuelle Daten nicht verfügbar
 no_space=Zu wenig Platz
@@ -47,7 +44,7 @@ info_title=Query-Info
 info_no=Bitte starten Sie eine Anfrage...
 help_title=Hilfe
 text_title=Text
-query_title=Query
+query_title=Anfrage
 
 # Dialog Windows
 d_info=Information
@@ -357,20 +354,20 @@ bye3=Bis dann.
 bye4=Viel Spass.
 
 # Query Commands
+qu_query=Anfrage
 qu_pars=Parsing
 qu_comp=Kompilierung
-qu_eval=Evaluation
-qu_time=Zeitmessung
+qu_eval=Ausführung
+qu_time=Zeit
 qu_result=Ergebnis
 qu_plan=Ausführungsplan
 qu_hits=Treffer
-qu_ms=ms
 
 # Query Commands.. the following strings must have the same length
 qu_tabquery=Anfrage     
 qu_tabpars=Parsing     
 qu_tabcomp=Kompilierung
-qu_tabeval=Evaluation  
+qu_tabeval=Ausfuehrung 
 qu_tabfinish=Abschluss   
 qu_tabprint=Ausgabe     
 qu_tabtotal=Gesamt      

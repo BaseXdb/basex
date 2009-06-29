@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import javax.swing.Box;
 import org.basex.BaseX;
 import org.basex.data.Nodes;
@@ -26,8 +27,6 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
-import org.basex.util.Array;
-import org.basex.util.Token;
 
 /**
  * This class offers a fast text view, using the {@link BaseXText} class.
@@ -137,19 +136,16 @@ public final class TextView extends View {
    * @param nodes nodes to display
    */
   private void refreshText(final Nodes nodes) {
-    if(!GUIProp.showtext || !header.getText().equals(TEXTTIT)) return;
+    if(!GUIProp.showtext) return;
 
-    if(!gui.context.db()) {
-      setText(Token.EMPTY);
-      return;
-    }
-    
     try {
       final CachedOutput out = new CachedOutput(GUIProp.maxtext);
-      nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
+      if(nodes != null) {
+        nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
+      }
       setText(out);
       refreshed = false;
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       BaseX.debug(ex);
     }
   }
@@ -174,13 +170,9 @@ public final class TextView extends View {
     
     final byte[] buf = out.buffer();
     String head = TEXTTIT;
-    if(out.finished()) {
-      final byte[] chop = Token.token(DOTS);
-      Array.copy(chop, buf, out.size() - chop.length);
-      head += RESULTCHOP;
-    }
+    if(out.finished()) head += RESULTCHOP;
     area.setText(buf, out.size());
-    if(!header.getText().equals(head)) header.setText(head);
+    header.setText(head);
     refreshed = true;
   }
 
