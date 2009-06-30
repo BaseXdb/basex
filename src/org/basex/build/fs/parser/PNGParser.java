@@ -1,8 +1,6 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -20,19 +18,13 @@ import org.basex.util.Token;
  */
 public class PNGParser extends AbstractParser {
 
-  /** Supported file suffixes. */
-  private static final Set<String> SUFFIXES = new HashSet<String>();
-
   static {
-    SUFFIXES.add("png");
-    for(final String s : SUFFIXES) {
-      REGISTRY.put(s, PNGParser.class);
-    }
+    NewFSParser.register("png", PNGParser.class);
   }
 
   /** Standard constructor. */
   public PNGParser() {
-    super(SUFFIXES, Type.IMAGE, MimeType.PNG);
+    super(Type.IMAGE, MimeType.PNG);
   }
 
   /** PNG header. */
@@ -43,7 +35,7 @@ public class PNGParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  boolean check(final BufferedFileChannel bfc) throws IOException {
+  public boolean check(final BufferedFileChannel bfc) throws IOException {
     if(bfc.size() < HEADER_LENGTH) return false;
     int len = HEADER.length;
     byte[] h = new byte[len];

@@ -16,57 +16,135 @@ import org.basex.util.Token;
  */
 public final class ParserUtil {
 
+  /** If true, verbose debug messages are created. */
+  private static final boolean VERBOSE = true;
+
   /** Hidden constructor. */
   private ParserUtil() { /* */}
 
   /**
+   * Returns an empty array and creates a debug message if <code>VERBOSE</code>
+   * is true.
+   * @param ms the original byte array that should be converted.
+   * @return an empty byte array.
+   */
+  private static byte[] error(final byte[] ms) {
+    if(VERBOSE) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("{");
+      boolean first = true;
+      for(byte b : ms) {
+        if(first) {
+          first = false;
+          sb.append(b);
+        } else {
+          sb.append("," + b);
+        }
+      }
+      sb.append("}");
+      BaseX.debug("Invalid duration (%, %)", Token.string(ms), sb.toString());
+    }
+    return Token.EMPTY;
+  }
+
+  /**
+   * Tries to convert the given byte array to a valid xs:duration
+   * representation.
+   * @param value the byte array to convert.
+   * @param milliseconds true, if <code>value</code> represents a milliseconds
+   *          value, false if it represents a seconds value. The value of this
+   *          parameter is ignored, if <code>value</code> contains minutes and
+   *          seconds.
+   * @return the xs:duration representation or an empty array if
+   *         <code>value</code> could not be converted.
+   */
+  public static byte[] toDuration(final byte[] value, //
+      final boolean milliseconds) {
+    int len = value.length;
+    byte[] a = new byte[len];
+    int secPos = -1;
+    int pos = 0;
+    for(int i = 0; i < len; i++) {
+      byte b = value[i];
+      if(b == 0) continue;
+      if(b < '0' || b > '9') {
+        if(b != ':') return error(value);
+        if(secPos != -1) return error(value); // only one colon allowed
+        secPos = i;
+      } else {
+        a[pos++] = b;
+      }
+    }
+    if(pos == 0) return Token.EMPTY;
+    if(secPos == -1) return milliseconds ? msToDuration(a, pos)
+        : secToDuration(a, pos);
+    return minSecToDuration(a, secPos, pos);
+  }
+
+  /**
+   * Converts a byte array containing minutes and seconds to a valid xs:duration
+   * value (e.g. PT12M34S -> 12 minutes, 34 seconds).
+   * @param minSec the array containing the minutes and seconds as ASCII chars.
+   * @param secPos the position in the array that marks to start of the second
+   *          value.
+   * @param length the number of ASCII chars to read.
+   * @return the xs:duration value as byte array.
+   */
+  public static byte[] minSecToDuration(final byte[] minSec, final int secPos,
+      final int length) {
+    byte[] value = new byte[length + 4];
+    int p = 0;
+    value[p++] = 'P';
+    value[p++] = 'T';
+    if(secPos > 0) {
+      System.arraycopy(minSec, 0, value, 2, secPos); // copy minutes
+      p += secPos;
+      value[p++] = 'M';
+    }
+    // copy seconds
+    System.arraycopy(minSec, secPos, value, p, length - secPos);
+    value[length + 3] = 'S';
+    return value;
+  }
+
+  /**
+   * Converts a seconds value to a valid xs:duration value (e.g. PT123S -> 123
+   * seconds).
+   * @param seconds byte array with the seconds as ASCII chars.
+   * @param length the number of ASCII chars to read.
+   * @return the xs:duration value as byte array.
+   */
+  public static byte[] secToDuration(final byte[] seconds, final int length) {
+    byte[] value = new byte[length + 3];
+    value[0] = 'P';
+    value[1] = 'T';
+    System.arraycopy(seconds, 0, value, 2, length);
+    value[length + 2] = 'S';
+    return value;
+  }
+
+  /**
    * Converts an millisecond value to a valid XML xs:duration value, e.g.
-   * PT123.456S (123 seconds and 456 milliseconds). Values < 1 second are
-   * skipped.
-   * @param milliseconds the milliseconds value to convert.
+   * PT123.456S (123 seconds and 456 milliseconds).
+   * @param ms the milliseconds value to convert.
+   * @param length the number of ASCII chars to read.
    * @return the xs:duration value or an empty array if duration < 1 second.
    */
-  public static byte[] msToDuration(final byte[] milliseconds) {
-    if(Token.ws(milliseconds)) return Token.EMPTY;
-    int len = milliseconds.length;
+  public static byte[] msToDuration(final byte[] ms, final int length) {
     byte[] value;
-    if(len < 4) {
+    if(length < 4) {
       value = new byte[] { 'P', 'T', '0', '.', '0', '0', '0', 'S'};
-      int offset = 7 - len;
-      for(int i = 0; i < len; i++) {
-        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
-          BaseX.debug("ParserUtil: Invalid duration: %",
-              Token.string(milliseconds));
-          return Token.EMPTY;
-        }
-        value[i + offset] = milliseconds[i];
-      }
+      int offset = 7 - length;
+      System.arraycopy(ms, 0, value, offset, length);
     } else {
-      int newLen = len + 4; // get space for 'P', 'T', '.' and 'S'
-      value = new byte[newLen];
-      int pos = 0;
-      value[pos++] = 'P';
-      value[pos++] = 'T';
-      int secLen = len - 3; // number of digits for the seconds
-      int i = 0;
-      for(; i < secLen; i++) {
-        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
-          BaseX.debug("ParserUtil: Invalid duration: %",
-              Token.string(milliseconds));
-          return Token.EMPTY;
-        }
-        value[pos++] = milliseconds[i];
-      }
-      value[pos++] = '.';
-      for(; i < len; i++) {
-        if(milliseconds[i] < '0' || milliseconds[i] > '9') {
-          BaseX.debug("ParserUtil: Invalid duration: %",
-              Token.string(milliseconds));
-          return Token.EMPTY;
-        }
-        value[pos++] = milliseconds[i];
-      }
-      value[pos] = 'S';
+      value = new byte[length + 4]; // get space for 'P', 'T', '.' and 'S'
+      value[0] = 'P';
+      value[1] = 'T';
+      int secLen = length - 3;
+      System.arraycopy(ms, 0, value, 2, secLen);
+      value[2 + secLen] = '.';
+      System.arraycopy(ms, secLen, value, 3 + secLen, 3);
+      value[length + 3] = 'S';
     }
     return value;
   }

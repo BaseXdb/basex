@@ -1,8 +1,6 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
@@ -17,24 +15,18 @@ import org.basex.build.fs.parser.Metadata.Type;
  */
 public class KMLParser extends AbstractParser {
 
-  /** Supported file suffixes. */
-  private static final Set<String> SUFFIXES = new HashSet<String>();
-
   static {
-    SUFFIXES.add("kml");
-    for(final String s : SUFFIXES) {
-      REGISTRY.put(s, KMLParser.class);
-    }
+    NewFSParser.register("kml", KMLParser.class);
   }
 
   /** Standard constructor. */
   public KMLParser() {
-    super(SUFFIXES, Type.XML, MimeType.KML);
+    super(Type.XML, MimeType.KML);
   }
 
   /** {@inheritDoc} */
   @Override
-  boolean check(final BufferedFileChannel f) {
+  public boolean check(final BufferedFileChannel f) {
     // [BL] Auto-generated method stub
     return true;
   }

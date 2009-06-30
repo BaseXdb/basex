@@ -2,8 +2,6 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
@@ -31,8 +29,6 @@ public class MP3Parser extends AbstractParser {
   // ----- static stuff --------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  /** Supported file suffixes. */
-  private static final Set<String> SUFFIXES = new HashSet<String>();
   /** ID3v2 header lenght. */
   static final int HEADER_LENGTH = 10;
   /**
@@ -262,10 +258,7 @@ public class MP3Parser extends AbstractParser {
       "Publisher or Studio logotype"};
 
   static {
-    SUFFIXES.add("mp3");
-    for(String s : SUFFIXES) {
-      REGISTRY.put(s, MP3Parser.class);
-    }
+    NewFSParser.register("mp3", MP3Parser.class);
   }
 
   // ---------------------------------------------------------------------------
@@ -274,7 +267,7 @@ public class MP3Parser extends AbstractParser {
 
   /** Standard constructor. */
   public MP3Parser() {
-    super(SUFFIXES, Type.AUDIO, MimeType.MP3);
+    super(Type.AUDIO, MimeType.MP3);
   }
 
   // [BL] add support for extended ID3v2 header
@@ -289,7 +282,7 @@ public class MP3Parser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  boolean check(final BufferedFileChannel bufFC) throws IOException {
+  public boolean check(final BufferedFileChannel bufFC) throws IOException {
     bfc = bufFC;
     return checkID3v2() || checkID3v1();
   }
@@ -691,7 +684,8 @@ public class MP3Parser extends AbstractParser {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         obj.fsparser.metaEvent(Element.DURATION, DataType.DURATION,
-            Definition.NONE, null, ParserUtil.msToDuration(obj.readText(size)));
+            Definition.NONE, null, ParserUtil.toDuration(obj.readText(size),
+                true));
       }
     },
     /** */

@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.basex.BaseX;
 import org.basex.Text;
@@ -19,6 +20,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
 import org.basex.build.fs.parser.BufferedFileChannel;
+import org.basex.build.fs.parser.Loader;
 import org.basex.build.fs.parser.ParserUtil;
 import org.basex.build.fs.parser.Metadata.Attribute;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -50,6 +52,29 @@ import org.basex.util.Token;
  * @author Bastian Lemke
  */
 public final class NewFSParser extends Parser {
+
+  /** Registry for MetadataAdapter implementations. */
+  static final Map<String, Class<? extends AbstractParser>> REGISTRY = //
+  new HashMap<String, Class<? extends AbstractParser>>();
+
+  /**
+   * Register a parser implementation with the fs parser.
+   * @param suffix the suffix to register the parser implementation for.
+   * @param c the parser implementation class.
+   */
+  public static void register(final String suffix,
+      final Class<? extends AbstractParser> c) {
+    REGISTRY.put(suffix, c);
+  }
+
+  static {
+    String[] classes = Loader.load(AbstractParser.class.getPackage(),
+        Pattern.compile("^\\w{1,5}Parser$"));
+    for(String c : classes) {
+      int i = c.lastIndexOf('.') + 1;
+      BaseX.debug("Successfully loaded " + c.substring(i));
+    }
+  }
 
   // [BL] clean up class ...
 
@@ -113,26 +138,13 @@ public final class NewFSParser extends Parser {
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
+    int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
+    parserInstances = new HashMap<String, AbstractParser>(size);
+
     if(Prop.fsmeta || Prop.fscont) {
-      // instanciate all registered parsers for this FSParser instance
-      parserInstances = new HashMap<String, AbstractParser>();
-      for(Map.Entry<String, Class<? extends AbstractParser>> parser : //
-      AbstractParser.getAdapters().entrySet()) {
-        try {
-          AbstractParser instance = parser.getValue().newInstance();
-          parserInstances.put(parser.getKey(), instance);
-        } catch(InstantiationException e) {
-          BaseX.debug("Failed to instanciate parser "
-              + parser.getValue().getName());
-        } catch(IllegalAccessException e) {
-          BaseX.debug("Failed to instanciate parser "
-              + parser.getValue().getName());
-        }
-      }
-      buffer = ByteBuffer.allocateDirect(BufferedFileChannel.//
-      DEFAULT_BUFFER_SIZE);
+      buffer = ByteBuffer.allocateDirect(//
+      BufferedFileChannel.DEFAULT_BUFFER_SIZE);
     } else {
-      parserInstances = null;
       buffer = null;
     }
   }
@@ -145,6 +157,33 @@ public final class NewFSParser extends Parser {
     // [AH] pass mountpoint and backing store args to single parser
     this(path, "/mnt/deepfs", "/var/tmp/deepfs");
     singlemode = true;
+  }
+
+  /**
+   * Get a parser implementation for given file suffix.
+   * @param suffix the file suffix to get the parser for.
+   * @return the parser implementation or <code>null</code> if no implementation
+   *         is available.
+   */
+  private AbstractParser getParser(final String suffix) {
+    AbstractParser instance = parserInstances.get(suffix);
+    if(instance == null) {
+      Class<? extends AbstractParser> clazz = REGISTRY.get(suffix);
+      if(clazz == null) return null;
+      try {
+        instance = clazz.newInstance();
+        BaseX.debug("Successfully instanciated " + clazz.getSimpleName());
+      } catch(InstantiationException e) {
+        BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
+            e.getMessage());
+      } catch(IllegalAccessException e) {
+        BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
+            e.getMessage());
+      }
+      // put in hash map ... even if null
+      parserInstances.put(suffix, instance);
+    }
+    return instance;
   }
 
   /**
@@ -294,7 +333,7 @@ public final class NewFSParser extends Parser {
       final String suffix = name.substring(dot + 1).toLowerCase();
 
       if(f.length() > 0) {
-        AbstractParser parser = parserInstances.get(suffix);
+        AbstractParser parser = getParser(suffix);
         if(parser != null) {
           BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
           try {
@@ -323,7 +362,7 @@ public final class NewFSParser extends Parser {
   public void parseFileFragment(final BufferedFileChannel bfc,
       final String name, final String suffix) throws IOException {
     if(Prop.fsmeta || Prop.fscont) {
-      AbstractParser parser = parserInstances.get(suffix);
+      AbstractParser parser = getParser(suffix);
       if(parser == null) return;
       atts.reset();
       if(name != null) {
@@ -508,7 +547,11 @@ public final class NewFSParser extends Parser {
    */
   public boolean isParseable(final BufferedFileChannel f, final String suffix)
       throws IOException {
-    AbstractParser parser = parserInstances.get(suffix);
-    return parser == null ? false : parser.isValid(f);
+    AbstractParser parser = getParser(suffix);
+    if(parser == null) return false;
+    long pos = f.position();
+    boolean res = parser.check(f);
+    f.position(pos);
+    return res;
   }
 }

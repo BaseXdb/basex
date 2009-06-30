@@ -1,8 +1,6 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
@@ -17,24 +15,18 @@ import org.basex.build.fs.parser.Metadata.Type;
  */
 public class XMLParser extends AbstractParser {
 
-  /** Supported file suffixes. */
-  private static final Set<String> SUFFIXES = new HashSet<String>();
-
   static {
-    SUFFIXES.add("xml");
-    for(final String s : SUFFIXES) {
-      REGISTRY.put(s, XMLParser.class);
-    }
+    NewFSParser.register("xml", XMLParser.class);
   }
 
   /** Standard constructor. */
   public XMLParser() {
-    super(SUFFIXES, Type.XML, MimeType.XML);
+    super(Type.XML, MimeType.XML);
   }
 
   /** {@inheritDoc} */
   @Override
-  boolean check(final BufferedFileChannel f) {
+  public boolean check(final BufferedFileChannel f) {
     // [BL] Auto-generated method stub
     return true;
   }
