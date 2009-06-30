@@ -5,11 +5,15 @@ package org.basex.build.fs.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,20 +127,72 @@ public final class Loader extends ClassLoader {
     // load subsubclasses
     for(File f : subSubClasses)
       load(f);
-    // initialize classes
-    int counter = 0;
-    for(Class<?> c : foundClasses) {
-      try {
-        Class.forName(c.getName(), true, INSTANCE);
-        counter++;
-      } catch(ClassNotFoundException e) {
-        // should never occur since the package is on the classpath and we
-        // checked that the file exists.
-        BaseX.errln("Failed to load class (%)", e.getMessage());
-        break;
-      }
+    int counter = initializeClasses(foundClasses);
+    String[] classNames = new String[counter];
+    for(int i = 0; i < counter; i++) {
+      classNames[i] = foundClasses.get(i).getName();
     }
-    return foundClasses.subList(0, counter).toArray(new String[counter]);
+    return classNames;
+  }
+
+  /**
+   * <p>
+   * Load some classes from the given jar file.
+   * </p>
+   * <p>
+   * There may be restrictions for the usage of this classes (e.g. if they
+   * extend an abstract class that was loaded before with a different
+   * {@link ClassLoader}). <b>Classes that were loaded with a different
+   * {@link ClassLoader} may not be able to access fields or methods from these
+   * classes!</b>
+   * </p>
+   * <p>
+   * Whenever possible, use {@link #load(Package, Pattern)} instead of this
+   * method to avoid problems.
+   * </p>
+   * @param jar the {@link JarFile} to load the classes from.
+   * @return an array with all (binary) names of the loaded classes (e.g.
+   *         org.basex.build.fs.parser.MP3Parser). All available classes from
+   *         the package are listed here, if if they are not loaded (because
+   *         they were loaded before).
+   * @throws IOException if one of the classes could not be read.
+   */
+  public static String[] load(final JarFile jar) throws IOException {
+    Enumeration<JarEntry> e = jar.entries();
+    ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
+    ArrayList<JarEntry> subClasses = new ArrayList<JarEntry>();
+    ArrayList<JarEntry> subSubClasses = new ArrayList<JarEntry>();
+    while(e.hasMoreElements()) {
+      JarEntry entry = e.nextElement();
+      String name = entry.getName();
+      if(entry.isDirectory() || name.endsWith("MANIFEST.MF")) {
+        continue;
+      }
+      // hack to detect (sub)subclasses that must be loaded after the classes
+      if(name.contains("$")) {
+        if(name.indexOf("$") != name.lastIndexOf("$")) {
+          subSubClasses.add(entry);
+          continue;
+        }
+        subClasses.add(entry);
+        continue;
+      }
+      Class<?> c = load(jar, entry);
+      foundClasses.add(c);
+    }
+    // load subclasses
+    for(JarEntry entry : subClasses)
+      load(jar, entry);
+    // load subsubclasses
+    for(JarEntry entry : subSubClasses)
+      load(jar, entry);
+    int counter = initializeClasses(foundClasses);
+    jar.close();
+    String[] classNames = new String[counter];
+    for(int i = 0; i < counter; i++) {
+      classNames[i] = foundClasses.get(i).getName();
+    }
+    return classNames;
   }
 
   /**
@@ -149,10 +205,56 @@ public final class Loader extends ClassLoader {
     long len = f.length();
     if(len > Integer.MAX_VALUE) throw new IOException(
         "Class file too long to load.");
-    byte[] buf = new byte[(int) f.length()];
+    byte[] buf = new byte[(int) len];
     FileChannel ch = new RandomAccessFile(f, "r").getChannel();
     ch.read(ByteBuffer.wrap(buf));
     ch.close();
     return INSTANCE.defineClass(null, buf, 0, buf.length);
+  }
+
+  /**
+   * Reads the class object from the jar file.
+   * @param jar the jar file to read from.
+   * @param je the entry to read from the jar file.
+   * @return the (uninitialized) class object.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  private static Class<?> load(final JarFile jar, final JarEntry je)
+      throws IOException {
+    long len = je.getSize();
+    if(len > Integer.MAX_VALUE) throw new IOException(
+        "Class file too long to load.");
+    if(len == -1) throw new IOException("Unknown class file size.");
+    InputStream in = jar.getInputStream(je);
+    byte[] buf = new byte[(int) len];
+    int pos = 0;
+    while(len - pos > 0) {
+      int read = in.read(buf, pos, (int) len - pos);
+      if(read == -1) break;
+      pos += read;
+    }
+    return INSTANCE.defineClass(null, buf, 0, buf.length);
+  }
+
+  /**
+   * Initializes the given classes.
+   * @param classes the classes to initialize.
+   * @return the number of successfully initialized classes (breaks after the
+   *         first error).
+   */
+  private static int initializeClasses(final ArrayList<Class<?>> classes) {
+    int counter = 0;
+    for(Class<?> c : classes) {
+      try {
+        Class.forName(c.getName(), true, INSTANCE);
+        counter++;
+      } catch(ClassNotFoundException e) {
+        // should never occur since the package is on the classpath and we
+        // checked that the file exists.
+        BaseX.errln("Failed to load class (%)", e.getMessage());
+        break;
+      }
+    }
+    return counter;
   }
 }
