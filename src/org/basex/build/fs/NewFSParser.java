@@ -68,11 +68,17 @@ public final class NewFSParser extends Parser {
   }
 
   static {
-    String[] classes = Loader.load(AbstractParser.class.getPackage(),
-        Pattern.compile("^\\w{1,5}Parser$"));
-    for(String c : classes) {
-      int i = c.lastIndexOf('.') + 1;
-      BaseX.debug("Successfully loaded " + c.substring(i));
+    try {
+       Class<?>[] classes = Loader.load(AbstractParser.class.getPackage(),
+          Pattern.compile("^\\w{1,5}Parser$"));
+      for(Class<?> c : classes) {
+        String name = c.getSimpleName();
+        if(REGISTRY.containsValue(c)) {
+          BaseX.debug("Successfully loaded %", name);
+        } else BaseX.debug("Loading % ... FAILED", name);
+      }
+    } catch(IOException e) {
+      BaseX.errln("Failed to load parsers (%)", e.getMessage());
     }
   }
 
