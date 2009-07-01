@@ -352,7 +352,8 @@ public final class DiskData extends Data {
 
   @Override
   public void update(final int pre, final byte[] val) {
-    if(kind(pre) == ELEM) {
+    meta.update();
+     if(kind(pre) == ELEM) {
       tagID(pre, tags.index(val, null, false));
     } else {
       update(pre, val, true);
@@ -361,6 +362,7 @@ public final class DiskData extends Data {
 
   @Override
   public void update(final int pre, final byte[] name, final byte[] val) {
+    meta.update();
     update(pre, val, false);
     attNameID(pre, atts.index(name, val, false));
   }
@@ -396,6 +398,8 @@ public final class DiskData extends Data {
 
   @Override
   public void delete(final int pre) {
+    meta.update();
+
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
@@ -475,6 +479,8 @@ public final class DiskData extends Data {
   public void insert(final int pre, final int par, final byte[] val,
       final int kind) {
 
+    meta.update();
+
     if(kind == ELEM) {
       insertElem(pre - 1, pre - par, val, 1, 1);
     } else if(kind == DOC) {
@@ -489,6 +495,8 @@ public final class DiskData extends Data {
   public void insert(final int pre, final int par, final byte[] name,
       final byte[] val) {
 
+    meta.update();
+
     // insert attribute and increase attSize of parent element
     insertAttr(pre - 1, pre - par, name, val);
     attSize(par, ELEM, attSize(par, ELEM) + 1);
@@ -497,6 +505,8 @@ public final class DiskData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final Data dt) {
+    meta.update();
+
     // first source node to be copied; if input is a document, skip first node
     final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
     // number of nodes to be inserted

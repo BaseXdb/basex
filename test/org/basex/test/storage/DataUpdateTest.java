@@ -51,7 +51,6 @@ public abstract class DataUpdateTest {
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
     data = CreateDB.xml(IO.get(TESTFILE), dbname);
-    data.meta.update();
     size = data.meta.size;
   }
   

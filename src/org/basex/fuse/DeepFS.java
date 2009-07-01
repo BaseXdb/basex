@@ -159,7 +159,6 @@ public final class DeepFS extends DeepFuse implements DataText {
     m.addAtt(backingstoreID, 0, NOBACKING, 3);
     data.insert(1, 0, m);
     data.flush();
-    data.meta.update();
   }
 
   /**
@@ -367,7 +366,6 @@ public final class DeepFS extends DeepFuse implements DataText {
    * Refreshes the data reference and GUI.
    */
   private void refresh() {
-    data.meta.update();
     // [AH] temporarily removed..
     // if(gui != null) gui.notify.update();
     // data.flush();

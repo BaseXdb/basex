@@ -113,7 +113,7 @@ public final class MetaData {
    * Notifies the meta structures of an update.
    * Deletes/resets the indexes.
    */
-  public void update() {
+  void update() {
     txtindex = false;
     atvindex = false;
     ftxindex = false;
