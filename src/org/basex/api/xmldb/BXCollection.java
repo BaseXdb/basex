@@ -146,7 +146,6 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.dbname);
 
     // find correct value and remove the node
-    data.meta.update();
     data.delete(getResource(del.getId()).pos);
     data.flush();
   }
@@ -177,7 +176,6 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // insert document
     try {
       final Data data = ctx.data();
-      data.meta.update();
       data.insert(data.meta.size, -1, new MemBuilder().build(p, id));
       data.flush();
       ctx.update();
