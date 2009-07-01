@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import org.basex.core.Lang;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
@@ -28,6 +29,9 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class DialogPrefs extends Dialog {
+  /** Information on available languages. */
+  private static final String[][] LANGS = Lang.parse();
+
   /** Language label. */
   BaseXLabel creds;
   /** Language Combo Box. */
@@ -36,13 +40,13 @@ public final class DialogPrefs extends Dialog {
   BaseXTextField path;
 
   /** Focus checkbox. */
-  private BaseXCheckBox focus;
+  private final BaseXCheckBox focus;
   /** Show names checkbox. */
-  private BaseXCheckBox names;
+  private final BaseXCheckBox names;
   /** Simple file dialog checkbox. */
-  private BaseXCheckBox simpfd;
+  private final BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
-  private BaseXCheckBox javalook;
+  private final BaseXCheckBox javalook;
   /** Buttons. */
   private final BaseXBack buttons;
 
@@ -52,7 +56,7 @@ public final class DialogPrefs extends Dialog {
    */
   public DialogPrefs(final GUI main) {
     super(main, PREFSTITLE);
-
+    
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new TableLayout(11, 1, 0, 0));
@@ -113,7 +117,7 @@ public final class DialogPrefs extends Dialog {
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 12, 0));
 
-    lang = new BaseXCombo(Prop.LANGUAGES, HELPLANG, this);
+    lang = new BaseXCombo(LANGS[0], HELPLANG, this);
     lang.setSelectedItem(Prop.language);
 
     p.add(lang);
@@ -136,13 +140,12 @@ public final class DialogPrefs extends Dialog {
    * @return credits
    */
   private String credits(final String lng) {
-    for(int i = 0; i < Prop.LANGUAGES.length; i++) {
-      if(lng.equals(Prop.LANGUAGES[i]))
-        return "Translated by " + Prop.LANGCREDS[i];
+    for(int i = 0; i < LANGS[0].length; i++) {
+      if(lng.equals(LANGS[0][i])) return "Translated by " + LANGS[1][i];
     }
     return "";
   }
-
+  
   @Override
   public void action(final String cmd) {
     creds.setText(credits(lang.getSelectedItem().toString()));

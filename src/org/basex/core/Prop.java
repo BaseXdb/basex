@@ -40,15 +40,6 @@ public final class Prop {
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
 
-  /** Supported languages. */
-  public static final String[] LANGUAGES = {
-    "English", "German", "Italian", "Japanese"
-  };
-  /** Translation credits. */
-  public static final String[] LANGCREDS = {
-    "Project Team", "Andreas Weiler, Project Team",
-    "Luca Martincigh", "Kazuo Kashima" };
-
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
@@ -155,7 +146,7 @@ public final class Prop {
   /** Fuse support. */
   public static boolean fuse = false;
   /** FSParser implementation. If true, the new implementation is used. */
-  public static boolean newfsparser = true;
+  public static boolean newfsparser = false;
 
   /** Flag to include key names in the language strings. */
   public static boolean langkeys = false;

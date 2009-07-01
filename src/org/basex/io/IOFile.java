@@ -32,7 +32,15 @@ public final class IOFile extends IO {
    * @param f file path
    */
   public IOFile(final String f) {
-    file = new File(file(f));
+    this(new File(file(f)));
+  }
+
+  /**
+   * Constructor.
+   * @param f file reference
+   */
+  public IOFile(final File f) {
+    file = f;
     path = file.getAbsolutePath().replace('\\', '/');
   }
 
@@ -147,7 +155,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     final int l = ch != null ? ch.length : 0;
     final IO[] io = new IO[l];
-    for(int i = 0; i < l; i++) io[i] = new IOFile(ch[i].getAbsolutePath());
+    for(int i = 0; i < l; i++) io[i] = new IOFile(ch[i]);
     return io;
   }
 
