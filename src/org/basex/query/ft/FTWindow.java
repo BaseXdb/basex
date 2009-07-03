@@ -21,7 +21,7 @@ import org.basex.util.Tokenizer;
 public final class FTWindow extends FTFilter {
   /** Window. */
   private Expr win;
-  
+
   /**
    * Constructor.
    * @param e expression

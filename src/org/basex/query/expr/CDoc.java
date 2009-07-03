@@ -68,7 +68,7 @@ public final class CDoc extends CFrag {
     for(int n = 0; n < nodes.size; n++) nodes.item[n].parent(doc);
     return doc;
   }
-  
+
   /**
    * Recursively adds children of a document node.
    * @param nodes node container

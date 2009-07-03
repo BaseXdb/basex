@@ -17,7 +17,7 @@ public final class DataOutput extends OutputStream {
   private final OutputStream os;
   /** Number of written bytes. */
   private long size;
-  
+
   /**
    * Constructor writing to an output stream.
    * Writes to the stream will not be buffered.
@@ -26,7 +26,7 @@ public final class DataOutput extends OutputStream {
   public DataOutput(final OutputStream out) {
     os = out;
   }
-  
+
   /**
    * Convenience constructor.
    * A default buffer size will be used.
@@ -37,7 +37,7 @@ public final class DataOutput extends OutputStream {
   public DataOutput(final String db, final String pre) throws IOException {
     this(db, pre, 4096);
   }
-  
+
   /**
    * Convenience constructor with a specified buffer size.
    * The specified buffer size is used.
@@ -50,7 +50,7 @@ public final class DataOutput extends OutputStream {
       throws IOException {
     os = new BufferedOutput(new FileOutputStream(IO.dbfile(db, pre)), bufs);
   }
-  
+
   @Override
   public void write(final int b) throws IOException {
     os.write(b);
@@ -65,7 +65,7 @@ public final class DataOutput extends OutputStream {
   public void writeBool(final boolean b) throws IOException {
     write(b ? 1 : 0);
   }
-  
+
   /**
    * Writes a string to the output stream.
    * @param s string
@@ -185,7 +185,7 @@ public final class DataOutput extends OutputStream {
     write((byte) (v >>>  8));
     write((byte) v);
   }
- 
+
   /**
    * Return the number of written bytes.
    * This is not necessarily e.g. the file size.
@@ -194,12 +194,12 @@ public final class DataOutput extends OutputStream {
   public long size() {
     return size;
   }
-  
+
   @Override
   public void flush() throws IOException {
     os.flush();
   }
-  
+
   @Override
   public void close() throws IOException {
     os.close();

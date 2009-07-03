@@ -99,12 +99,12 @@ public final class CmpN extends Arr {
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
-    
+
     if(!a.node()) Err.type(info(), Type.NOD, a);
     if(!b.node()) Err.type(info(), Type.NOD, b);
     return Bln.get(cmp.e(a, b));
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.BLN;

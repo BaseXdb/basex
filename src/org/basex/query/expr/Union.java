@@ -60,7 +60,7 @@ public final class Union extends Arr {
 
       @Override
       public Nod next() throws QueryException {
-        if(items == null) { 
+        if(items == null) {
           items = new Nod[iter.length];
           for(int i = 0; i != iter.length; i++) next(i);
         }
@@ -76,12 +76,12 @@ public final class Union extends Arr {
           }
         }
         if(m == -1) return null;
-        
+
         final Nod it = items[m];
         next(m);
         return it;
       }
-      
+
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
         if(it != null && !it.node()) Err.nodes(Union.this);
@@ -107,7 +107,7 @@ public final class Union extends Arr {
     }
     return ni;
   }
-  
+
   @Override
   public String toString() {
     return "(" + toString(" | ") + ")";

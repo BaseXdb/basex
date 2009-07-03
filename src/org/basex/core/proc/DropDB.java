@@ -22,7 +22,7 @@ public final class DropDB extends Process {
   public DropDB(final String n) {
     super(STANDARD, n);
   }
-  
+
   @Override
   protected boolean exec() {
     final String db = args[0];
@@ -42,7 +42,7 @@ public final class DropDB extends Process {
   public static synchronized boolean drop(final String db) {
     return IO.dbdelete(db, null);
   }
-  
+
   @Override
   public String toString() {
     return Cmd.DROP.name() + " " + CmdDrop.DB + args();

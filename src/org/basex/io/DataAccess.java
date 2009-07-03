@@ -58,7 +58,7 @@ public final class DataAccess {
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
   }
-  
+
   /**
    * Closes the data access.
    * @throws IOException in case of write errors
@@ -131,7 +131,7 @@ public final class DataAccess {
   public synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
-    
+
     final byte[] b = new byte[l];
     int ll = IO.BLOCKSIZE - off;
     Buffer bf = bm.curr();
@@ -183,7 +183,7 @@ public final class DataAccess {
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position
@@ -206,7 +206,7 @@ public final class DataAccess {
     }
     return bf;
   }
-  
+
   /**
    * Writes the specified block to disk.
    * @param bf buffer to write
@@ -243,7 +243,7 @@ public final class DataAccess {
   public synchronized int read4() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
-  
+
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended

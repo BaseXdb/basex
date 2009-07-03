@@ -27,7 +27,7 @@ public final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
   private final JMenuItem[] items;
   /** Reference to main window. */
-  protected final GUI gui;
+  final GUI gui;
 
   /**
    * Initializes the menu bar.
@@ -35,10 +35,10 @@ public final class GUIMenu extends JMenuBar {
    */
   public GUIMenu(final GUI main) {
     gui = main;
-    
+
     final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       Event.META_MASK ? "meta" : "ctrl";
-    
+
     // create menu for each top level menu entries
     int c = 0;
     for(int i = 0; i < MENUBAR.length; i++)

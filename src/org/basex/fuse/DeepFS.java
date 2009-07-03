@@ -29,7 +29,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Christian Gruen, Hannes Schwarz
@@ -385,10 +385,8 @@ public final class DeepFS extends DeepFuse implements DataText {
       if(!dir && cont) qb.append("/content");
       Nodes n = xquery(qb.toString());
       if(n.size() == 0) return -1;
-      else {
-        data.delete(n.nodes[0]);
-        refresh();
-      }
+      data.delete(n.nodes[0]);
+      refresh();
     } catch(QueryException e) {
       e.printStackTrace();
       return -1;
@@ -523,8 +521,8 @@ public final class DeepFS extends DeepFuse implements DataText {
   private int insertFileNode(final String path, final int mode) {
     int ppre = parentPre(path);
     if(ppre == -1) return -1;
-    if(isRegFile(mode)) return insert(ppre, buildFileData(path, mode));
-    else return insert(ppre, buildData(path, mode));
+    return insert(ppre, isRegFile(mode) ? buildFileData(path, mode) :
+      buildData(path, mode));
   }
 
   /**

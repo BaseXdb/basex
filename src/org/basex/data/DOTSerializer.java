@@ -35,7 +35,7 @@ public final class DOTSerializer extends Serializer {
   private static final String COLCOMM = "FFFF66";
   /** Link entry. */
   private static final String COLPI = "FF6666";
-  
+
   /** Output stream. */
   public final PrintOutput out;
   /** Current level. */
@@ -77,7 +77,7 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void closeResult() { }
-  
+
   @Override
   protected void start(final byte[] t) {
     tag = t;
@@ -123,7 +123,7 @@ public final class DOTSerializer extends Serializer {
     finishElement();
     print(norm(t), COLTEXT);
   }
-  
+
   @Override
   public void text(final byte[] b, final FTPos ftp) throws IOException {
     text(b);

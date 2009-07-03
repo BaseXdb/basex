@@ -23,7 +23,7 @@ public final class Pos extends Simple {
   long min;
   /** Maximum position. */
   long max;
-  
+
   /**
    * Constructor.
    * @param mn minimum value
@@ -33,7 +33,7 @@ public final class Pos extends Simple {
     min = mn;
     max = mx;
   }
-  
+
   /**
    * Returns an position or an optimized expression.
    * @param mn minimum value
@@ -75,7 +75,7 @@ public final class Pos extends Simple {
     }
     return expr;
   }
-  
+
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
     if(ctx.item == null) Err.or(XPNOCTX, this);
@@ -109,12 +109,12 @@ public final class Pos extends Simple {
   Expr union(final Pos pos) {
     return get(Math.min(min, pos.min), Math.max(max, pos.max));
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.POS;
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.BLN;

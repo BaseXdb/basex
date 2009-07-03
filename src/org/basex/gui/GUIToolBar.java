@@ -18,8 +18,8 @@ public final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
   private final GUICommand[] cmd;
   /** Reference to main window. */
-  protected final GUI gui;
-  
+  final GUI gui;
+
   /**
    * Default Constructor.
    * @param tb toolbar commands

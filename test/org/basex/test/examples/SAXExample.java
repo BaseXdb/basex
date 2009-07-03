@@ -42,7 +42,7 @@ public final class SAXExample extends DefaultHandler {
 
     // create a database, open an existing one or throw an exception
     new Check(XMLFILE).execute(ctx, null);
-    
+
     // create query instance
     final QueryProcessor query = new QueryProcessor(QUERY, ctx.current());
     // execute query

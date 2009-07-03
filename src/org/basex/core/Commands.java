@@ -24,7 +24,7 @@ public interface Commands {
     EXIT(true), QUIT(false),
     // SERVER COMMANDS
     GETRESULT(false), GETINFO(false), STOP(false);
-    
+
     /** Flag for official (public) commands. */
     final boolean official;
 
@@ -56,7 +56,7 @@ public interface Commands {
       }
       return sb.toString();
     }
-    
+
     /**
      * Returns the specified help text for the current command.
      * @param n help offset
@@ -70,26 +70,26 @@ public interface Commands {
       }
     }
   }
-  
+
   /** Create Command definitions. */
   enum CmdCreate { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
-  
+
   /** Index Types definition. */
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
-  
+
   /** Info command definitions. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
-  
+
   /** Drop command definitions. */
   enum CmdDrop { DATABASE, DB, INDEX }
-  
+
   /** Filesystem command definitions. */
   enum CmdFS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
     L, LS, MKDIR, PWD, RM, TOUCH }
-  
+
   /** Insert command definitions. */
   enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
-  
+
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,

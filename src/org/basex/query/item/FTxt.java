@@ -7,14 +7,14 @@ import org.basex.util.Token;
 
 /**
  * Text Node Fragment.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class FTxt extends FNode {
   /** Text value. */
   private final byte[] val;
-  
+
   /**
    * Constructor.
    * @param t text value

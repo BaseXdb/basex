@@ -24,7 +24,7 @@ import org.basex.util.Token;
 
 /**
  * This view creates a flat table view on the database contents.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -71,11 +71,11 @@ public final class TableView extends View implements Runnable {
     tdata.init(data);
     refreshContext(true, false);
   }
-  
+
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
     if(!GUIProp.showtable || tdata.cols.length == 0) return;
-    
+
     tdata.context(false);
     scroll.pos(0);
     if(tdata.rows == null) return;
@@ -90,7 +90,7 @@ public final class TableView extends View implements Runnable {
       new Thread(this).start();
     }
   }
-  
+
   @Override
   public void refreshFocus() {
     if(!GUIProp.showtable || tdata.rows == null) return;
@@ -117,7 +117,7 @@ public final class TableView extends View implements Runnable {
     scroll.height(tdata.rows.size * tdata.rowH(1));
     refreshContext(false, true);
   }
-  
+
   @Override
   public void refreshUpdate() {
     refreshContext(false, true);
@@ -142,7 +142,7 @@ public final class TableView extends View implements Runnable {
     gui.updating = false;
     findFocus();
   }
-  
+
   /**
    * Sets scrollbar position for the specified pre value.
    * @param pre pre value
@@ -155,7 +155,7 @@ public final class TableView extends View implements Runnable {
     final int s = scroll.pos();
     if(y < s || y > s + h) scroll.pos(y);
   }
-  
+
   /**
    * Returns list offset for specified pre value.
    * @param pre pre value
@@ -167,7 +167,7 @@ public final class TableView extends View implements Runnable {
     }
     return -1;
   }
-  
+
   @Override
   public void mouseMoved(final MouseEvent e) {
     super.mouseMoved(e);
@@ -177,7 +177,7 @@ public final class TableView extends View implements Runnable {
     tdata.mouseY = e.getY();
     findFocus();
   }
-  
+
   /**
    * Finds the current focus.
    */
@@ -185,7 +185,7 @@ public final class TableView extends View implements Runnable {
     final int y = tdata.mouseY - header.getHeight() + scroll.pos();
     final int l = y / tdata.rowH;
     final boolean valid = y >= 0 && l < tdata.rows.size;
-    
+
     if(valid) {
       final int pre = tdata.rows.list[l];
       final Context context = gui.context;
@@ -212,16 +212,16 @@ public final class TableView extends View implements Runnable {
     gui.cursor(GUIConstants.CURSORARROW);
     gui.notify.focus(-1, null);
   }
-  
+
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     final Context context = gui.context;
     final Data data = context.data();
     if(tdata.rows == null || data.fs != null && tdata.mouseX < 20) return;
-    
+
     if(e.getY() < header.getHeight()) return;
-    
+
     final int pre = gui.focused;
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
@@ -253,7 +253,7 @@ public final class TableView extends View implements Runnable {
       }
     }
   }
-  
+
   /**
    * Performs a table query.
    */
@@ -261,7 +261,7 @@ public final class TableView extends View implements Runnable {
     final String query = tdata.find();
     if(query != null) gui.execute(new XQuery(query));
   }
-  
+
   @Override
   public void mouseClicked(final MouseEvent e) {
     final Data data = gui.context.data();
@@ -269,7 +269,7 @@ public final class TableView extends View implements Runnable {
       data.fs.launch(ViewData.parent(data, gui.focused));
     }
   }
-  
+
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(tdata.rows == null) return;
@@ -278,18 +278,18 @@ public final class TableView extends View implements Runnable {
     mouseMoved(e);
     repaint();
   }
-  
+
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
     if(tdata.rows == null) return;
 
     final int key = e.getKeyCode();
-    
+
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
     final int oldPre = tdata.getRoot(gui.context.data(), gui.focused);
     int pre = oldPre;
-    
+
     final IntList rows = tdata.rows;
     if(key == KeyEvent.VK_HOME) {
       pre = rows.list[0];
@@ -304,7 +304,7 @@ public final class TableView extends View implements Runnable {
     } else if(key == KeyEvent.VK_PAGE_DOWN) {
       pre = rows.list[Math.min(rows.size - 1, getOff(pre) + lines)];
     }
-    
+
     if(pre != oldPre) {
       setPos(pre);
       gui.notify.focus(pre, null);

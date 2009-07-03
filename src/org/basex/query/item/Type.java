@@ -66,7 +66,7 @@ public enum Type {
       return Str.get(o);
     }
   },
-  
+
   /** Normalized String type. */
   NST("normalizedString", STR, XSURI, false, false, true, false) {
     @Override
@@ -616,7 +616,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       if(o instanceof BXPI) return ((BXPI) o).getNod();
-      
+
       final ProcessingInstruction pi = (ProcessingInstruction) o;
       return new FPI(new QNm(token(pi.getNodeName())),
           token(pi.getNodeValue()), null);
@@ -640,7 +640,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
-      
+
       if(o instanceof Document) {
         try {
           final DOCWrapper p = new DOCWrapper((Document) o, "tmp");
@@ -650,7 +650,7 @@ public enum Type {
           throw new QueryException(UNDOC, ex.getMessage());
         }
       }
-        
+
       // [CG] API/add complete DOM object for document fragments
       return new FDoc(new NodIter(), EMPTY);
     }
@@ -775,7 +775,7 @@ public enum Type {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
     checkNum(it);
-    
+
     if(it.type == Type.DBL || it.type == Type.FLT) {
       final double d = it.dbl();
       if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(this, it);

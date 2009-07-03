@@ -84,7 +84,7 @@ public abstract class FTFilter extends FTExpr {
     }
     return all.size != 0;
   }
-  
+
   /**
    * Evaluates the filter expression.
    * @param ctx query context

@@ -15,7 +15,7 @@ public abstract class Progress {
   protected boolean stopped;
   /** Sub progress. */
   protected Progress sub;
-  
+
   /**
    * Returns short information on the current process or sub process.
    * @return header information
@@ -23,7 +23,7 @@ public abstract class Progress {
   public final String title() {
     return sub != null ? sub.title() : tit();
   }
-  
+
   /**
    * Returns short information on this process.
    * Can be overwritten to give more detailed information.
@@ -32,7 +32,7 @@ public abstract class Progress {
   protected String tit() {
     return INFOWAIT;
   }
-  
+
   /**
    * Returns detailed information on the current process or sub process.
    * Can be overwritten to give more detailed information.
@@ -41,7 +41,7 @@ public abstract class Progress {
   public final String detail() {
     return sub != null ? sub.detail() : det();
   }
-  
+
   /**
    * Returns short information on this process.
    * @return header information

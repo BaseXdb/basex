@@ -52,7 +52,7 @@ public final class QueryTest {
     boolean ok = true;
 
     if(ALL) {
-      // testing all kinds of combinations 
+      // testing all kinds of combinations
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftfuzzy = b == 0;
           for(int c = 0; c < 2; c++) { Prop.ftst = c == 0;
@@ -109,12 +109,12 @@ public final class QueryTest {
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
       final String cmd = qu[0] + ": " + query;
-      
+
       if(VERBOSE) err(cmd, ext);
 
       proc = new XQuery(query);
       counter++;
-      
+
       if(proc.execute(CONTEXT)) {
         Result val = proc.result();
         final Result cmp = correct ? (Result) qu[1] : null;

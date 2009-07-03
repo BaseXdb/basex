@@ -53,7 +53,7 @@ public final class CPI extends CFrag {
     final TokenBuilder tb = new TokenBuilder();
     CText.add(tb, iter);
     byte[] v = tb.finish();
-    
+
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = Token.substring(v, i);

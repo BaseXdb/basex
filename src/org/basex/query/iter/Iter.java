@@ -24,14 +24,14 @@ public abstract class Iter implements Iterable<Item> {
     @Override
     public boolean reset() { return true; }
   };
-  
+
   /**
    * Returns the next item or null if no other items are found.
    * @return resulting item
    * @throws QueryException evaluation exception
    */
   public abstract Item next() throws QueryException;
-  
+
   /**
    * Returns the specified item. Note: null is returned if the
    * item cannot be retrieved, so the returned value has to be checked.
@@ -70,7 +70,7 @@ public abstract class Iter implements Iterable<Item> {
   public boolean reverse() {
     return false;
   }
-  
+
   /**
    * Returns a sequence from all iterator values.
    * Should be called before {@link #next}.
@@ -80,7 +80,7 @@ public abstract class Iter implements Iterable<Item> {
   public Item finish() throws QueryException {
     Item i = next();
     if(i == null) return Seq.EMPTY;
-    
+
     Item[] item = { i };
     int s = 1;
     while((i = next()) != null) {

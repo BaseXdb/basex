@@ -11,7 +11,7 @@ import static org.basex.query.QueryTokens.*;
 public class Transform extends Arr {
   /** Transform expressions. */
   private ForLet[] fl;
-  
+
   /**
    * Constructor.
    * @param f for / let expressions

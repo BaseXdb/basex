@@ -31,7 +31,7 @@ public final class BaseXCombo extends JComboBox {
     super(ch);
     BaseXLayout.addDefaultKeys(this, list);
     BaseXLayout.addHelp(this, hlp);
-    
+
     if(list != null) {
       addItemListener(new ItemListener() {
         public void itemStateChanged(final ItemEvent ie) {

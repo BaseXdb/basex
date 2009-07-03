@@ -20,7 +20,7 @@ public final class FTContent extends FTFilter {
   private final boolean start;
   /** End flag. */
   private final boolean end;
-  
+
   /**
    * Constructor.
    * @param ex expression
@@ -32,7 +32,7 @@ public final class FTContent extends FTFilter {
     start = s;
     end = e;
   }
-  
+
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
@@ -58,7 +58,7 @@ public final class FTContent extends FTFilter {
   protected boolean content() {
     return end || !start;
   }
-  
+
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, token(start ? QueryTokens.START : end ?

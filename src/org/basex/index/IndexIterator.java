@@ -16,7 +16,7 @@ public abstract class IndexIterator {
     @Override
     public int next() { return 0; };
   };
-  
+
   /**
    * Returns true if more results are found.
    * @return size

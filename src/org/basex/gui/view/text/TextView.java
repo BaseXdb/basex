@@ -43,7 +43,7 @@ public final class TextView extends View {
   BaseXTextField search;
   /** Painted flag. */
   boolean refreshed;
-  
+
   /**
    * Default constructor.
    * @param man view manager
@@ -54,10 +54,10 @@ public final class TextView extends View {
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
     setFocusable(false);
-    
+
     area = new BaseXText(gui, HELPTEXT, false);
     add(area, BorderLayout.CENTER);
-    
+
     header = new BaseXLabel(TEXTTIT, true);
     final BaseXButton export = GUIToolBar.newButton(GUICommands.SAVE, gui);
     final BaseXButton root = GUIToolBar.newButton(GUICommands.HOME, gui);
@@ -85,7 +85,7 @@ public final class TextView extends View {
           area.find(search.getText(), false);
       }
     });
-    
+
     BaseXLayout.setWidth(search, 120);
     BaseXLayout.setHeight(search, (int) export.getPreferredSize().getHeight());
 
@@ -108,7 +108,7 @@ public final class TextView extends View {
 
     refreshLayout();
   }
-  
+
   @Override
   public void refreshInit() {
     area.setCaret(0);
@@ -160,14 +160,14 @@ public final class TextView extends View {
   public void refreshUpdate() {
     refreshContext(false, true);
   }
-  
+
   /**
    * Sets the output text.
    * @param out output cache
    */
   public void setText(final CachedOutput out) {
     area.setSyntax(new XMLSyntax());
-    
+
     final byte[] buf = out.buffer();
     String head = TEXTTIT;
     if(out.finished()) head += RESULTCHOP;

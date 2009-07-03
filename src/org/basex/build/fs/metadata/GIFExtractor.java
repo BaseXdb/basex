@@ -9,18 +9,18 @@ import static org.basex.build.fs.FSText.*;
 
 /**
  * GIF meta data extractor.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GIFExtractor extends AbstractExtractor {
   /** Byte array for GIF header. */
   private final byte[] data = new byte[10];
-  
+
   @Override
   public void extract(final Builder listener, final File f) throws IOException {
     BufferInput.read(f, data);
-    
+
     // check if the header is valid
     if(!Token.startsWith(data, HEADERGIF87) &&
        !Token.startsWith(data, HEADERGIF89)) return;

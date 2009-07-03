@@ -4,7 +4,7 @@ import org.basex.data.Data.Type;
 
 /**
  * This class defines access to index text tokens.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -27,7 +27,7 @@ public final class RangeToken implements IndexToken {
     min = mn;
     max = mx;
   }
-  
+
   public Type type() {
     return type;
   }

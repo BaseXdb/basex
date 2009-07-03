@@ -9,7 +9,7 @@ import org.basex.build.fs.parser.Metadata.Type;
 
 /**
  * Parser for KML files.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */

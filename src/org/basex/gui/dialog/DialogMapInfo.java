@@ -16,7 +16,7 @@ import org.basex.gui.view.ViewRect;
  */
 public final class DialogMapInfo extends Dialog {
   /** Format for decimal numbers. */
-  DecimalFormat f = new DecimalFormat("#0.00"); 
+  DecimalFormat f = new DecimalFormat("#0.00");
   /** New Dimensions. */
   private final BaseXLabel ndim = new BaseXLabel(" ");
   /** Old Dimensions. */
@@ -41,8 +41,9 @@ public final class DialogMapInfo extends Dialog {
   private final BaseXLabel nnps = new BaseXLabel(" ");
   /** Old nodes per milli second. */
   private final BaseXLabel onps = new BaseXLabel(" ");
+
   /** Last time. */
-  private String timeo;
+  private String timeo = "";
   /** Last number of nodes. */
   private int nno;
   /** Last aspect ratio. */
@@ -50,8 +51,8 @@ public final class DialogMapInfo extends Dialog {
   /** Last rectangle. */
   private ViewRect recto;
   /** Last algorithm. */
-  private String nameo;
-  
+  private String nameo = "";
+
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -123,12 +124,12 @@ public final class DialogMapInfo extends Dialog {
     }
     ntime.setText(time);
     otime.setText(timeo);
-    
+
     double nps = nn / Double.valueOf(time.replace(" ms", "").
         replace(" (avg)", ""));
     onps.setText(nnps.getText());
     nnps.setText(f.format(nps));
-    
+
     timeo = time;
     recto = rect;
     aaro = aar;

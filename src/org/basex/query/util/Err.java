@@ -39,7 +39,7 @@ public final class Err {
       throws QueryException {
     or(XPTYPE, inf, t, it.type);
   }
-  
+
   /**
    * Throws a date format exception.
    * @param i input
@@ -51,7 +51,7 @@ public final class Err {
       throws QueryException {
     or(DATEFORMAT, t, i, ex);
   }
-  
+
   /**
    * Throws an invalid value exception.
    * @param t expected type
@@ -61,7 +61,7 @@ public final class Err {
   public static void value(final Type t, final Object v) throws QueryException {
     or(INVALUE, t, v);
   }
-  
+
   /**
    * Throws a date range exception.
    * @param t expected type
@@ -71,7 +71,7 @@ public final class Err {
   public static void range(final Type t, final byte[] v) throws QueryException {
     or(DATERANGE, t, v);
   }
-  
+
   /**
    * Throws a empty sequence exception.
    * @param e calling expression
@@ -91,7 +91,7 @@ public final class Err {
     if(it1 == it2) or(TYPECMP, it1.type);
     else or(XPTYPECMP, it1.type, it2.type);
   }
-  
+
   /**
    * Throws a numeric type exception.
    * @param inf expression info
@@ -102,7 +102,7 @@ public final class Err {
       throws QueryException {
     or(XPTYPENUM, inf, it.type);
   }
-  
+
   /**
    * Throws a node exception.
    * @param ex expression
@@ -111,7 +111,7 @@ public final class Err {
   public static void nodes(final Expr ex) throws QueryException {
     or(EVALNODES, ex);
   }
-  
+
   /**
    * Throws a numeric type exception.
    * @param t expression cast type
@@ -121,7 +121,7 @@ public final class Err {
   public static void cast(final Type t, final Item it) throws QueryException {
     or(XPINVCAST, it.type, t, chop(it));
   }
-  
+
   /**
    * Chops the specified input and returns the string.
    * @param val input value

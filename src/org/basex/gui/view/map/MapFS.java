@@ -128,7 +128,7 @@ final class MapFS extends MapPainter {
           p += data.attSize(p, k);
         }
         g.setFont(mfont);
-        MapRenderer.drawText(g, cr, tb.finish());        
+        MapRenderer.drawText(g, cr, tb.finish());
       }
     }
   }
@@ -179,7 +179,7 @@ final class MapFS extends MapPainter {
         return false;
       }
     }
-    
+
     final boolean full = !isImage && rect.w >= GUIProp.fontsize * 12 &&
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
@@ -206,7 +206,7 @@ final class MapFS extends MapPainter {
           rect.x += off;
           rect.w -= off;
         }
-        
+
         final int h = MapRenderer.calcHeight(g, rect, text);
         if(img != null) {
           // [JH] review
@@ -301,7 +301,7 @@ final class MapFS extends MapPainter {
         // minimize buffer size
         final File f = new File(string(path));
         s = Math.min(s, f.length());
-        
+
         // read file contents
         fileBuf = new byte[(int) s];
         BufferInput.read(f, fileBuf);
@@ -330,9 +330,9 @@ final class MapFS extends MapPainter {
     if (s < fileBuf.length) {
       byte[] tmp = new byte[(int) s];
       System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
-      fileBuf = tmp;      
+      fileBuf = tmp;
     }
-    
+
     final int size = data.size(pre, Data.ELEM);
     rect.pos = null;
     for(int i = pre; i < pre + size; i++) {
@@ -341,7 +341,7 @@ final class MapFS extends MapPainter {
         break;
       }
     }
-    
+
     // Check if text fits in rectangle
     final int h = MapRenderer.drawText(g, rect, fileBuf, false);
     if (rect.h > h) {
@@ -370,7 +370,7 @@ final class MapFS extends MapPainter {
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
       mx - r.x < 16 && fs.isFile(r.pre) &&
       GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
-    
+
     if(active && click) fs.launch(view.gui.focused);
     return active;
   }

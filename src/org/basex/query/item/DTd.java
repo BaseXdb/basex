@@ -79,7 +79,7 @@ public final class DTd extends Dur {
     final BigDecimal s2 = sub.seconds();
     sc = BigDecimal.valueOf((d1 - d2) * DAYSECONDS).add(s1.subtract(s2));
   }
-  
+
   /**
    * Constructor.
    * @param v value
@@ -87,7 +87,7 @@ public final class DTd extends Dur {
    */
   DTd(final byte[] v) throws QueryException {
     super(Type.DTD);
-    
+
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))

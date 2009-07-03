@@ -4,13 +4,13 @@ import static org.basex.util.Token.token;
 
 /**
  * MAB2 Fields, needed for importing MAB2 data as XML.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public interface MAB2 {
   // Query tokens
-  
+
   /** Root tag. */
   byte[] ROOT = token("MEDIOVIS");
   /** Hits Attribute. */

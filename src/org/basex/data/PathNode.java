@@ -80,7 +80,7 @@ public final class PathNode {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == t) {
         c.count++;
-        c.tl += l; 
+        c.tl += l;
         return c;
       }
     }
@@ -141,7 +141,7 @@ public final class PathNode {
     }
     return c;
   }
-  
+
   @Override
   public String toString() {
     return "Node[Kind: " + kind + ", Name: " + name +

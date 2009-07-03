@@ -7,7 +7,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class provides a container for query full-text positions,
  * which is evaluated by the visualizations.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
@@ -36,7 +36,7 @@ public final class FTPosData {
     }
 
     int c = find(pre);
-    if(c < 0) { 
+    if(c < 0) {
       c = -c - 1;
       if(size == pos.length) pos = Array.extend(pos);
       Array.move(pos, c, 1, size++ - c);
@@ -46,7 +46,7 @@ public final class FTPosData {
       pos[c].union(ps.finish(), pi.finish());
     }
   }
-  
+
   /**
    * Gets full-text data from the container.
    * If no data is stored for a pre value, null is returned.

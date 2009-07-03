@@ -27,7 +27,7 @@ public final class MemBuilder extends Builder {
     data.meta = meta;
     return this;
   }
-  
+
   /**
    * Uses the specified data instance (and its indexes) for the build process.
    * @param mdata data instance
@@ -46,7 +46,7 @@ public final class MemBuilder extends Builder {
     data.initNames();
     return data;
   }
-  
+
   @Override
   public void close() { }
 

@@ -35,14 +35,14 @@ public abstract class IO {
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
 
-  /** Block size. */
+  /** Disk block/page size. */
   public static final int BLOCKSIZE = 1 << 12;
   /** Table NodeSize Power. */
   public static final int NODEPOWER = 4;
   /** Fill Factor (greater than 0.0, maximum 1.0). */
   public static final double BLOCKFILL = 1;
   /** Maximum Tree depth. */
-  public static final int MAXHEIGHT =  1 << 8;
+  public static final int MAXHEIGHT = 1 << 8;
 
   /** File path and name. */
   protected String path = "";
@@ -294,7 +294,7 @@ public abstract class IO {
 
     final File path = dbpath(db);
     if(!path.exists()) return false;
-    
+
     boolean ok = true;
     for(final File sub : path.listFiles()) {
       if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();

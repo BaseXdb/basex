@@ -14,7 +14,7 @@ public final class CachedInput extends BufferInput {
   public CachedInput(final byte[] input) {
     super(input);
   }
-  
+
   /**
    * Returns the next byte.
    * @return next byte

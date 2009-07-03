@@ -34,7 +34,7 @@ public final class XMLSyntax extends BaseXSyntax {
         quote = ch;
         return GUIConstants.COLORERROR;
       }
-      if(ch == '>') tag = false;  
+      if(ch == '>') tag = false;
       return GUIConstants.COLORS[16];
     }
     if(ch == '<') {

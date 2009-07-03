@@ -148,7 +148,7 @@ public final class FTTrieBuilder extends FTBuilder {
   }
 
   /**
-   * Converts long values split with toArray back. 
+   * Converts long values split with toArray back.
    * @param ar int[] with values
    * @param p pointer where the first value is found
    * @return long l

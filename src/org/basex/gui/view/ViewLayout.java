@@ -4,7 +4,7 @@ import org.basex.gui.layout.BaseXBack;
 
 /**
  * This is an interface for view layout components.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

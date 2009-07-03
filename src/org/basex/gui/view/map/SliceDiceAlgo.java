@@ -2,15 +2,15 @@ package org.basex.gui.view.map;
 
 /**
  * Slice-and-Dice Layout Algorithm.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
 public class SliceDiceAlgo extends MapAlgo {
   @Override
-  public MapRects calcMap(final MapRect r, final MapList ml, 
+  public MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne, final int l) {
-    
+
     // setting initial proportions
     double xx = r.x;
     double yy = r.y;
@@ -21,10 +21,10 @@ public class SliceDiceAlgo extends MapAlgo {
     int tmpy = -1;
     int tmph = -1;
     int tmpw = -1;
-    
+
     final MapRects rects = new MapRects();
     // calculate map for each rectangle on this level
-    for(int i = 0; i < ml.size; i++) {      
+    for(int i = 0; i < ml.size; i++) {
       if((l & 1) == 0) {
 //      if(r.w < r.h) {
         yy += hh;
@@ -35,10 +35,10 @@ public class SliceDiceAlgo extends MapAlgo {
         ww = ml.weight[i] * r.w;
         hh = r.h;
       }
-      
+
       if(ww > 0 && hh > 0 && (tmpx != (int) xx || tmpy != (int) yy ||
-          tmph != (int) hh || tmpw != (int) ww)) 
-        rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 
+          tmph != (int) hh || tmpw != (int) ww))
+        rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
             ml.list[i], r.level));
       tmpx = (int) xx;
       tmpy = (int) yy;
@@ -47,7 +47,7 @@ public class SliceDiceAlgo extends MapAlgo {
     }
     return rects;
   }
-  
+
   @Override
   public String getName() {
     return "Slice and Dice";

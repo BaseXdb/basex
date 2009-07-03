@@ -27,7 +27,7 @@ public final class TableDiskAccessNIO extends TableAccess {
 
   /** Temp buffer for creating a new block. */
   private final ByteBuffer tmpblock;
-  
+
   /** Current MappedByteBuffer. */
   private MappedByteBuffer currentmbb;
 
@@ -404,7 +404,7 @@ public final class TableDiskAccessNIO extends TableAccess {
       currentmbb = fc.map(FileChannel.MapMode.READ_WRITE,
           block * IO.BLOCKSIZE, IO.BLOCKSIZE);
       mbbuffer.add(currentmbb);
-      
+
     } catch(IOException e) {
       e.printStackTrace();
     }

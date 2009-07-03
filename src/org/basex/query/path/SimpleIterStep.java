@@ -31,7 +31,7 @@ public final class SimpleIterStep extends Step {
   public Expr comp(final QueryContext ctx) throws QueryException {
     return !test.comp(ctx) ? Seq.EMPTY : this;
   }
-  
+
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter();

@@ -5,7 +5,7 @@ import org.basex.BaseX;
 
 /**
  * This class indicates building exceptions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

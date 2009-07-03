@@ -29,20 +29,19 @@ public final class CachedOutput extends PrintOutput {
 
   /**
    * Constructor, specifying the maximum number of bytes to write.
-   * 256 is used as minimum value.
    * @param m maximum
    */
   public CachedOutput(final int m) {
     max = m;
   }
-  
+
   @Override
   public void write(final int b) {
     if(size == max) return;
     if(size == buf.length) buf = Array.extend(buf);
     buf[size++] = (byte) b;
   }
-  
+
   /**
    * Returns the output as byte array.
    * @return byte array
@@ -67,7 +66,7 @@ public final class CachedOutput extends PrintOutput {
     }
     return buf;
   }
-  
+
   @Override
   public String toString() {
     return Token.string(finish());

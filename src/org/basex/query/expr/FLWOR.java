@@ -66,7 +66,7 @@ public class FLWOR extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     final int vs = ctx.vars.size();
-    
+
     for(int f = 0; f != fl.length; f++) {
       final Expr e = fl[f].comp(ctx);
       if(e.e()) {
@@ -76,7 +76,7 @@ public class FLWOR extends Expr {
       }
       fl[f] = (ForLet) e;
     }
-    
+
     if(where != null) {
       where = where.comp(ctx);
       final boolean e = where.e();
@@ -92,10 +92,10 @@ public class FLWOR extends Expr {
         where = null;
       }
     }
-    if(group != null) group.comp(ctx); 
+    if(group != null) group.comp(ctx);
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
-    
+
     ctx.vars.reset(vs);
     return this;
   }
@@ -106,13 +106,13 @@ public class FLWOR extends Expr {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
-    
+
     if(order != null) {
       order.sq = seq;
       final Item m = order.iter(ctx).finish();
       if(group == null) return m.iter(); // return now
       group.sq = (m != null) ? (SeqIter) m.iter() : seq;
-    } else group.sq =  seq;
+    } else group.sq = seq;
     return group.iter(ctx);
   }
 
@@ -193,7 +193,7 @@ public class FLWOR extends Expr {
     ret.plan(ser);
     ser.closeElement();
     ser.closeElement();
-  } 
+  }
 
   @Override
   public final String toString() {

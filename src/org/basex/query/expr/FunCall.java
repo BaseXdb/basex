@@ -30,13 +30,13 @@ public final class FunCall extends Arr {
     super(a);
     id = i;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     func = ctx.fun.get(id);
     return super.comp(ctx);
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();

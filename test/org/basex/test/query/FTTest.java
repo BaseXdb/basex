@@ -20,7 +20,7 @@ public final class FTTest extends AbstractTest {
     sb.append(set("ftcs", Prop.ftcs));
     return sb.toString();
   }
-  
+
   /**
    * Returns a flag string.
    * @param key key
@@ -30,14 +30,14 @@ public final class FTTest extends AbstractTest {
   private String set(final String key, final boolean val) {
     return "set " + key + " " + BaseX.flag(val);
   }
-  
+
   /** Constructor. */
   FTTest() {
     doc =
       "<fttest>\n" +
       "  <co>\n" +
       "     <w>xml in the first sentence. second sentence. " +
-      "third sentence. fourth sentence. fifth sentence.</w>\n" + 
+      "third sentence. fourth sentence. fifth sentence.</w>\n" +
       "     <w>XML xml XmL</w>\n" +
       "     <w>we have xml databases</w>\n" +
       "     <w>XML DATABASES</w>\n" +
@@ -51,7 +51,7 @@ public final class FTTest extends AbstractTest {
       "     <s>diat-joghurt</s>\n" +
       "  </sc>\n" +
       "  <at><b>B</b>ad one</at>\n" +
-      "  <fti>adfas wordt. ook wel eens</fti>" + 
+      "  <fti>adfas wordt. ook wel eens</fti>" +
       "  <fti>wordt ook wel een s</fti>" +
       "  <fti>adfad. wordt\nook wel.eens a</fti>" +
       "  <fti>adfad wordt. ook\nwel een s adf</fti>" +
@@ -88,7 +88,7 @@ public final class FTTest extends AbstractTest {
         "false() ftcontains 'false'" },
       { "Simple 11", bool(false),
         "'text' ftcontains ''" },
-        
+
       { "FT 1", nodes(14),
         "//w[text() ftcontains 'HELLO']" },
       { "FT 2", nodes(14),
@@ -138,7 +138,7 @@ public final class FTTest extends AbstractTest {
         "//wc/w[text() ftcontains 'hello']" },
       { "Preds 12", nodes(46),
         "//mix[text()[1] ftcontains 'B']" },
-        
+
       { "AndOr 1", nodes(7, 9, 11),
         "//w[text() ftcontains 'xml' and text() ftcontains 'databases']" },
       { "AndOr 2", nodes(2),
@@ -156,7 +156,7 @@ public final class FTTest extends AbstractTest {
         "//*[text() ftcontains 'sentence' and text() ftcontains 'xml']" },
       { "AndOr 8", nodes(42, 46),
         "//mix[text() ftcontains 'A'][text() ftcontains 'B']" },
-        
+
       { "Phrase 1", nodes(7, 9, 11),
         "//w [text() ftcontains 'xml databases']" },
       { "Phrase 2", nodes(7, 9, 11),
@@ -185,7 +185,7 @@ public final class FTTest extends AbstractTest {
         "/fttest/co/w [text() ftcontains 'xml' uppercase]" },
       { "FTCaseOption 5", nodes(7),
         "/fttest/co/w [text() ftcontains 'XML DATABASES' lowercase]" },
-        
+
       { "FTWildCard 1", nodes(14),
         "/fttest/wc/w [text() ftcontains '.ello' with wildcards]" },
       { "FTWildCard 2", nodes(14),
@@ -244,7 +244,7 @@ public final class FTTest extends AbstractTest {
         "'a' ftcontains 'a.{1}' with wildcards" },
       { "FTWildCard 25", // error (wrong syntax)
         "'a' ftcontains 'a.{1-5}' with wildcards" },
-        
+
       { "FTFuzzy 1", nodes(7, 9, 11),
         "//* [text() ftcontains 'Database' with fuzzy]" },
       { "FTFuzzy 2", nodes(7, 9, 11),
@@ -299,7 +299,7 @@ public final class FTTest extends AbstractTest {
         "//w [text() ftcontains 'xml xml' occurs at least 2 times]" },
       { "FTTimes 8", nodes(),
         "//w [text() ftcontains 'xml xml' occurs at least 4 times]" },
-        
+
       { "FTAndOr 1", nodes(7, 9, 11),
         "//w [text() ftcontains 'XmL' ftand 'Databases']" },
       { "FTAndOr 2", nodes(7, 9, 11, 14),
@@ -342,7 +342,7 @@ public final class FTTest extends AbstractTest {
         "'base' ftcontains ('bases') with stemming" },
       { "FTStemming 9", bool(true),
         "'base' ftcontains ('bases' with stemming) without stemming" },
-                  
+
       { "FTLanguage 1", nodes(14),
         "//* [text() ftcontains 'hello' language 'en']" },
       { "FTLanguage 2", // error
@@ -381,7 +381,7 @@ public final class FTTest extends AbstractTest {
         "'A B' ftcontains ('B' ftor 'A') ordered" },
       { "FTOrdered 11", bool(true),
         "'A B C' ftcontains ('A' ftor 'C') ftand 'B' ordered" },
-        
+
       { "FTDistance 1", nodes(3),
         "//w [text() ftcontains 'the' ftand 'fourth' " +
         "distance exactly 2 sentences]" },
@@ -408,7 +408,7 @@ public final class FTTest extends AbstractTest {
         " ftand 'first' distance exactly 1 words ordered]" },
       { "FTDistance 9", nodes(3, 37),
         "//w [. ftcontains 'first' ftand 'second' " +
-        " ftand 'third' distance exactly 1 words ordered]" },          
+        " ftand 'third' distance exactly 1 words ordered]" },
       { "FTDistance 10", bool(true),
         "'a b' ftcontains 'a' ftand ('b') distance exactly 0 words" },
       { "FTDistance 11", bool(true),
@@ -428,7 +428,7 @@ public final class FTTest extends AbstractTest {
       { "FTWindow 4", nodes(3, 37),
         "//w [. ftcontains 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
-        
+
       { "FTScope 1", nodes(25, 27, 29, 31, 33),
         "//fti [. ftcontains 'wordt ook' same sentence]" },
       { "FTScope 2", nodes(27, 29, 33),
@@ -441,7 +441,7 @@ public final class FTTest extends AbstractTest {
         "//fti [. ftcontains 'ook' ftand 'wel' different paragraph]" },
       { "FTScope 6", bool(true),
         "'a. a b' ftcontains ('a' ftand 'b') different sentence" },
-        
+
       { "FTContent 1", nodes(3, 5, 9, 11),
         "//w [text() ftcontains 'xml' at start]" },
       { "FTContent 2", nodes(),
@@ -463,16 +463,16 @@ public final class FTTest extends AbstractTest {
       { "FTContent 10", nodes(9, 11),
         "//w [. ftcontains 'xml databases' entire content]" },
       { "FTContent 11", bool(true),
-        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" + 
+        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" +
         " ftand 'd' entire content" },
       { "FTContent 12", bool(true),
-        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" + 
+        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" +
         " ftand 'a' entire content" },
       { "FTContent 13", bool(true),
-        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" + 
+        "'a b c d' ftcontains 'a' ftand 'b' ftand 'c'" +
         " ftand 'd' entire content ordered" },
       { "FTContent 14", bool(false),
-        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" + 
+        "'a b c d' ftcontains 'd' ftand 'c' ftand 'b'" +
         " ftand 'a' entire content ordered" },
       { "FTContent 15", bool(true),
         "'a b c d' ftcontains 'a' ftand 'b' at start" },
@@ -500,7 +500,7 @@ public final class FTTest extends AbstractTest {
         "'a b' ftcontains 'a' entire content" },
       { "FTContent 27", bool(false),
         "'a b' ftcontains 'b' entire content" },
-        
+
       { "FTMildNot 1", nodes(3, 5),
         "//w [text() ftcontains 'xml' not in 'xml databases']" },
       { "FTMildNot 2", nodes(14),
@@ -519,7 +519,7 @@ public final class FTTest extends AbstractTest {
         "'a' ftcontains 'a' not in ftnot 'a'" },
       { "FTMildNot 9", nodes(3, 5, 7, 9, 11),
         "//w [text() ftcontains 'xml' not in 'we have']" },
-      
+
       { "FTUnaryNot 1", nodes(14, 37),
         "//w [text() ftcontains ftnot 'xml']" },
       { "FTUnaryNot 2", nodes(3, 5),

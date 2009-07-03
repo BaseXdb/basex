@@ -29,7 +29,7 @@ public final class DataInput extends BufferInput {
   public boolean readBool() throws IOException {
     return read() == 1;
   }
-  
+
   /**
    * Reads a string from the input stream.
    * @return string

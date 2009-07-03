@@ -66,7 +66,7 @@ public final class Undo {
   }
 
   /**
-   * Stores a string in the history. 
+   * Stores a string in the history.
    * @param str string to be stored
    * @param c cursor position
    */

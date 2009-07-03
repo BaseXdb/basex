@@ -170,7 +170,7 @@ public interface BuildText {
   byte[] IMP = token("#IMPLIED");
   /** DTD: FIXED ELEMENT. */
   byte[] FIX = token("#FIXED");
-  
+
   /** Token types. */
   enum Type {
     /** Text Node.           */ TEXT("Text"),
@@ -191,7 +191,7 @@ public interface BuildText {
 
     /** String representation of token type. */
     public String string;
-    
+
     /**
      * Enumeration constructor.
      * @param s string representation

@@ -72,7 +72,7 @@ final class ValueTree {
     pre[size] = Num.newNum(id);
     ns[size] = 1;
   }
-  
+
   /** Integer list. */
   private int[] stack = new int[1];
   /** Current iterator. */
@@ -123,7 +123,7 @@ final class ValueTree {
     }
     return l >>> 1;
   }
-  
+
   /**
    * Pushes the specified value to the stack.
    * @param n value to be pushed
@@ -132,7 +132,7 @@ final class ValueTree {
     if(spos == stack.length) stack = Array.extend(stack);
     stack[spos++] = n;
   }
-  
+
   /**
    * Pops and peeks a value from the stack.
    * @return resulting value

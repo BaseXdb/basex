@@ -13,14 +13,14 @@ import org.basex.util.Token;
 
 /**
  * Instance Test.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Instance extends Single {
   /** Instance. */
   private SeqType seq;
-  
+
   /**
    * Constructor.
    * @param e expression
@@ -38,7 +38,7 @@ public final class Instance extends Single {
     ctx.compInfo(OPTPRE, this);
     return atomic(ctx);
   }
-  
+
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
     return Bln.get(seq.instance(expr.iter(ctx)));
@@ -55,7 +55,7 @@ public final class Instance extends Single {
     expr.plan(ser);
     ser.closeElement();
   }
-  
+
   @Override
   public String toString() {
     return BaseX.info("% instance of %", expr, seq);

@@ -14,7 +14,7 @@ import org.basex.gui.layout.BaseXPanel;
 
 /**
  * This panel is added to each view to allow drag and drop operations.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -25,7 +25,7 @@ public final class ViewMover extends BaseXPanel {
   public static final Cursor HAND = new Cursor(Cursor.MOVE_CURSOR);
   /** Flag if current mover is active. */
   public boolean active;
-  
+
   /**
    * Constructor.
    * @param main reference to the main window
@@ -38,14 +38,14 @@ public final class ViewMover extends BaseXPanel {
     addMouseMotionListener(this);
     setCursor(HAND);
   }
-  
+
   @Override
   public void paintComponent(final Graphics g) {
     final Color color1 = active ? GUIConstants.COLORS[4] :
       GUIConstants.color2;
     final Color color2 = active ? GUIConstants.COLORS[20] :
       GUIConstants.COLORS[10];
-    
+
     final int w = getWidth();
     final int h = getHeight();
     g.setColor(color1);
@@ -53,7 +53,7 @@ public final class ViewMover extends BaseXPanel {
     g.setColor(color2);
     for(int x = -4; x < w; x += 4) g.drawLine(x + 4, 1, x, h - 2);
     g.drawRect(0, 0, w - 1, h - 1);
-    
+
     /*
     g.setColor(color2);
     g.fillRect(w - SIZE - 2, 0, SIZE + 2, SIZE);
@@ -69,7 +69,7 @@ public final class ViewMover extends BaseXPanel {
     final ViewPanel view = (ViewPanel) getParent();
     Component comp = view;
     while(!((comp = comp.getParent()) instanceof ViewContainer));
-    
+
     final Point a = getLocationOnScreen();
     final Point b = comp.getLocationOnScreen();
     final Point c = new Point(a.x - b.x + e.getX(), a.y - b.y + e.getY());

@@ -26,7 +26,7 @@ public final class ViewNotifier {
   public int hist;
   /** Reference to main window. */
   final GUI gui;
-  
+
   /** Zoomed rectangle history. */
   private final Nodes[] marked = new Nodes[MAXHIST];
   /** Zoomed rectangle history. */
@@ -196,7 +196,7 @@ public final class ViewNotifier {
       }
     }
     init(context, nodes, n);
-    
+
     for(final View v : view) if(v != vw) v.refreshContext(true, quick);
     gui.refreshControls();
   }
@@ -241,7 +241,7 @@ public final class ViewNotifier {
     return back ? hist > 0 ? gui.notify.queries[hist - 1] : null :
       hist < gui.notify.maxhist ? gui.notify.queries[hist + 1] : null;
   }
-  
+
   // Private Methods ==========================================================
 
   /**
@@ -255,7 +255,7 @@ public final class ViewNotifier {
     ctx.marked(mark);
     gui.focused = -1;
   }
-  
+
   /**
    * Checks the history data arrays.
    */

@@ -28,7 +28,7 @@ import org.basex.util.StringList;
 
 /**
  * Dialog window for specifying the options for importing a file system.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -75,7 +75,7 @@ public final class DialogImportFS extends Dialog {
 
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(7, 2, 6, 0));
-    
+
     path = new BaseXTextField(GUIProp.guifsimportpath, HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
@@ -98,7 +98,7 @@ public final class DialogImportFS extends Dialog {
       }
     });
     p.add(button);
-    
+
     p.add(new BaseXLabel(CREATENAME, false, true));
     p.add(new BaseXLabel(""));
 
@@ -121,7 +121,7 @@ public final class DialogImportFS extends Dialog {
       }
     });
     p.add(all);
-    
+
     backing = new BaseXTextField(GUIProp.guibackingroot, HELPFSBACKING, this);
     backing.addKeyListener(new KeyAdapter() {
       @Override
@@ -130,7 +130,7 @@ public final class DialogImportFS extends Dialog {
       }
     });
     BaseXLayout.setWidth(backing, 240);
-    
+
     mountpoint = new BaseXTextField(GUIProp.guimountpoint, HELPFSMOUNT, this);
     mountpoint.addKeyListener(new KeyAdapter() {
       @Override
@@ -145,12 +145,12 @@ public final class DialogImportFS extends Dialog {
       p.add(new BaseXLabel(""));
       p.add(backing);
       p.add(new BaseXLabel(""));
-      p.add(new BaseXLabel("DeepFS mount point:", false, true));    
+      p.add(new BaseXLabel("DeepFS mount point:", false, true));
       p.add(new BaseXLabel(""));
       p.add(mountpoint);
       p.add(new BaseXLabel(""));
     }
-    
+
     p1.add(p);
 
     info = new BaseXLabel(" ");
@@ -161,7 +161,7 @@ public final class DialogImportFS extends Dialog {
     final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(4, 1));
     p2.setBorder(8, 8, 8, 8);
-    
+
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
     p2.add(label);
     meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, this);
@@ -200,7 +200,7 @@ public final class DialogImportFS extends Dialog {
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(METAINFO, p2);
     set(tabs, BorderLayout.CENTER);
-    
+
     // create buttons
     buttons = BaseXLayout.okCancel(this);
 
@@ -221,12 +221,12 @@ public final class DialogImportFS extends Dialog {
     boolean cNam; // dbname given?
     boolean cBac = true; // backing store is existent directory?
     boolean cMou = true; // mount point is existent directory?
-    
+
     final String nm = dbname.getText().trim();
     cNam = nm.length() != 0;
     if(cNam) GUIProp.guifsdbname = nm;
     ok = cNam;
-    
+
     cAll = all.isSelected();
     if(cAll) {
       GUIProp.guifsimportpath = path.getText();
@@ -237,7 +237,7 @@ public final class DialogImportFS extends Dialog {
       cAll = p.length() != 0 && file.exists();
     }
     ok &= cAll;
-    
+
     if (Prop.fuse) {
       cBac = new File(backing.getText().trim()).isDirectory();
       ok &= cBac;
@@ -246,15 +246,15 @@ public final class DialogImportFS extends Dialog {
     }
 
     String inf = " ";
-    
+
     if (!ok) {
       if(!cMou) inf = MOUNTWHICH;
       if(!cBac) inf = BACKINGWHICH;
       if(!cAll) inf = PATHWHICH;
       if(!cNam) inf = DBWHICH;
     }
-    
-    
+
+
     ImageIcon img = null;
     if(ok) {
       ok = IO.valid(nm);
@@ -265,13 +265,13 @@ public final class DialogImportFS extends Dialog {
         img = GUI.icon("warn");
       }
     }
-    
+
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
     BaseXLayout.enableOK(buttons, BUTTONOK, ok);
   }
-  
+
   @Override
   public void close() {
     if(!ok) return;

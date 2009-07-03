@@ -59,7 +59,7 @@ public final class CText extends CFrag {
   public String info() {
     return "text constructor";
   }
-  
+
   @Override
   public String toString() {
     return toString("text");

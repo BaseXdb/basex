@@ -27,14 +27,14 @@ abstract class AbstractTest {
   String doc;
   /** Queries. */
   Object[][] queries;
-  
+
   /**
    * This method can be overwritten to return test details, which are
    * shown in case of an error.
    * @return details string
    */
   String details() { return null; }
-  
+
   /**
    * Create a container for the specified node values.
    * @param nodes node values
@@ -43,7 +43,7 @@ abstract class AbstractTest {
   static Nodes nodes(final int... nodes) {
     return new Nodes(nodes, DATA);
   }
-  
+
   /**
    * Create an iterator for the specified string.
    * @param str string
@@ -52,7 +52,7 @@ abstract class AbstractTest {
   static SeqIter string(final String str) {
     return new SeqIter(Str.get(Token.token(str)));
   }
-  
+
   /**
    * Create an iterator for the specified double.
    * @param d double value
@@ -61,7 +61,7 @@ abstract class AbstractTest {
   static SeqIter itr(final long d) {
     return new SeqIter(Itr.get(d));
   }
-  
+
   /**
    * Create an iterator for the specified double.
    * @param d double value
@@ -70,7 +70,7 @@ abstract class AbstractTest {
   static SeqIter dec(final double d) {
     return new SeqIter(Dec.get(d));
   }
-  
+
   /**
    * Create an iterator for the specified boolean.
    * @param b boolean value

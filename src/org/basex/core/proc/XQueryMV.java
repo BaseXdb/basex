@@ -34,7 +34,7 @@ public final class XQueryMV extends AQuery {
   //private boolean approx;
   /** Maximum hits. */
   private int maxhits;
-  
+
   /**
    * Constructor.
    * @param h number of hits
@@ -44,7 +44,7 @@ public final class XQueryMV extends AQuery {
   public XQueryMV(final String h, final String s, final String q) {
     super(DATAREF | PRINTING, h, s, q);
   }
-  
+
   @Override
   protected boolean exec() {
     // cache verbose flag
@@ -90,7 +90,7 @@ public final class XQueryMV extends AQuery {
         final int[] pres = res.nodes;
         final int size = res.size();
         ids = new IDSet();
-        
+
         for(int n = 0; n < size; n++) {
           // super-ordinate title found?
           int pre = data.parent(pres[n], data.kind(pres[n]));

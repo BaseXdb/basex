@@ -129,7 +129,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   @Override
   void refresh() {
     super.refresh();
-    
+
     all.help(main.gui.context.data().fs != null ? HELPSEARCHFS : HELPSEARCHXML);
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
       create();
@@ -178,7 +178,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       final String elem = combo.getSelectedItem().toString();
       if(!elem.startsWith("@")) sl.add(Token.token(elem));
     }
-    
+
     final TokenList tmp = data.path.desc(sl, true, false);
     if(tmp.size == 0) return;
 
@@ -352,7 +352,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(qu.length() == 0) {
       qu = GUIProp.filterrt || main.gui.context.root() ? "/" : ".";
     }
-    
+
     if(!force && last.equals(qu)) return;
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);

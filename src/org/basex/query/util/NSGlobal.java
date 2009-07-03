@@ -24,7 +24,7 @@ public final class NSGlobal {
     atts.add(XML, XMLURI);
     atts.add(BASEX, BXURI);
   }
-  
+
   /** Private constructor. */
   private NSGlobal() { }
 

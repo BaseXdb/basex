@@ -3,7 +3,7 @@ package org.basex.query.expr;
 
 /**
  * Insert expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
@@ -16,7 +16,7 @@ public class Insert extends Arr {
   final boolean after;
   /** Before flag. */
   final boolean before;
-  
+
   /**
    * Constructor.
    * @param src source expression
@@ -26,7 +26,7 @@ public class Insert extends Arr {
    * @param be before flag
    * @param trg target expression
    */
-  public Insert(final Expr src, final boolean fi, final boolean la, 
+  public Insert(final Expr src, final boolean fi, final boolean la,
       final boolean af, final boolean be, final Expr trg) {
     super(src, trg);
     first = fi;
@@ -34,7 +34,7 @@ public class Insert extends Arr {
     after = af;
     before = be;
   }
-  
+
   @Override
   public String toString() {
     return null;

@@ -16,7 +16,7 @@ import org.basex.gui.layout.TableLayout;
 
 /**
  * Dialog window for specifying the TreeMap layout.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -33,14 +33,14 @@ public final class DialogMapLayout extends Dialog {
   final BaseXLabel sizeLabel;
   /** devide rectangles uniformly. */
   final BaseXCheckBox s;
-  
+
   /**
    * Default constructor.
    * @param main reference to the main window
    */
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
-    
+
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(4, 1, 0, 8));
 
@@ -66,7 +66,7 @@ public final class DialogMapLayout extends Dialog {
     sizeSlider = new BaseXSlider(gui, 0, 100,
         GUIProp.mapweight, HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
-    
+
     tmp = new BaseXBack();
     tmp.setLayout(new TableLayout(2, 1));
     tmp.add(sizeLabel);
@@ -76,7 +76,7 @@ public final class DialogMapLayout extends Dialog {
     // create checkbox
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
     p.add(atts);
-    
+
     s = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE, GUIProp.mapsimple, this);
 //    p.add(s);
 
@@ -95,7 +95,7 @@ public final class DialogMapLayout extends Dialog {
     GUIProp.mapsimple = s.isSelected();
     final int sizeprp = sizeSlider.value();
     GUIProp.mapweight = sizeprp;
-    sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
+    sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ?
       MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : (fs ? MAPFSSIZE : MAPTEXTSIZE)));
 
     gui.notify.layout();

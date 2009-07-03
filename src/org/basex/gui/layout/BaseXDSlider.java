@@ -146,7 +146,7 @@ public final class BaseXDSlider extends BaseXPanel {
     setToolTip();
     repaint();
   }
-  
+
   /**
    * Sets a new tooltip.
    */

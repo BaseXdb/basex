@@ -13,7 +13,7 @@ import org.basex.util.Token;
 
 /**
  * Dialog window for displaying information about the project.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

@@ -113,7 +113,7 @@ public final class BaseXTextRenderer extends BaseXBack {
             sp = Integer.MAX_VALUE;
           } else {
             h = hh;
-            text.setCaret(sp = b ? lp : np);
+            text.setCaret(b ? lp : np);
             return b ? ly : ny;
           }
         }
@@ -246,20 +246,20 @@ public final class BaseXTextRenderer extends BaseXBack {
       y += fontH >> (ch == 0x0A ? 0 : 1);
     }
   }
-  
+
   /**
    * Writes the current string to the graphics reference.
    * @param g graphics reference
    */
   private void write(final Graphics g) {
     final int ch = word.charAt(0);
-    
+
     if(high) {
       high = false;
     } else {
       col = isEnabled() ? syntax.getColor(word) : Color.gray;
     }
-    
+
     if(y > 0 && y < h) {
       if(ch >= 0x10 && ch < 0x20) {
         final int c = ch - 0x10;
@@ -272,7 +272,7 @@ public final class BaseXTextRenderer extends BaseXBack {
         g.setColor(GUIConstants.COLORERRHIGH);
         g.fillRect(x, y - fontH + 4, wordW, fontH);
       }
-  
+
       // mark text
       int xx = x;
       if(text.markStart()) {
@@ -304,7 +304,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       } else if(ch < 0x04) {
         g.setFont(font);
       }
-  
+
       // show cursor
       if(cursor && text.edited()) {
         xx = x;
@@ -334,7 +334,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     }
     return true;
   }
-  
+
   /**
    * Paint the text cursor.
    * @param g graphics reference
@@ -392,7 +392,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     }
     repaint();
   }
-  
+
   /**
    * Returns the width of the specified character.
    * @param g graphics reference

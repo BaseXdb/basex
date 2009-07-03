@@ -15,13 +15,13 @@ import org.basex.util.Token;
 class MapList extends IntList {
   /** Weights array. */
   double[] weight;
-  
+
   /**
    * Constructor.
    */
   MapList() {
   }
-  
+
   /**
    * Constructor, specifying an initial array.
    * @param v initial list values
@@ -29,7 +29,7 @@ class MapList extends IntList {
   MapList(final int[] v) {
     super(v);
   }
-  
+
   @Override
   public void sort() {
     sort(weight, false);
@@ -42,7 +42,7 @@ class MapList extends IntList {
     weight = new double[size];
     for(int i = 0; i < size; i++) weight[i] = 1d / size;
   }
-  
+
   /**
    * Initializes the weights of each list entry, using the text length of
    * nodes or (if the array reference is null) the size attributes.
@@ -69,7 +69,7 @@ class MapList extends IntList {
     // use #children and size for weight
     if(sizeP < 1) {
       for(int i = 0; i < size; i++) {
-        weight[i] = sizeP * weight(textLen, data, i) / sum + 
+        weight[i] = sizeP * weight(textLen, data, i) / sum +
           (1 - sizeP) * ViewData.size(data, list[i]) / nchildren;
       }
     // only sizes
@@ -97,7 +97,7 @@ class MapList extends IntList {
     }
     return d > 1 ? d : 1;
   }
-  
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");

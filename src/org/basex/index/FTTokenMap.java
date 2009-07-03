@@ -5,7 +5,7 @@ import org.basex.util.Set;
 
 /**
  * This class caches sizes and pointers from full-text results.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
@@ -46,7 +46,7 @@ final class FTTokenMap extends Set {
   long getPointer(final int id) {
     return pointers[id];
   }
-  
+
   @Override
   protected void rehash() {
     super.rehash();

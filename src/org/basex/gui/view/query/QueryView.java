@@ -98,7 +98,7 @@ public final class QueryView extends View {
 
   /**
    * Updates the query panels.
-   * @param force force query execution 
+   * @param force force query execution
    */
   void update(final boolean force) {
     for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);

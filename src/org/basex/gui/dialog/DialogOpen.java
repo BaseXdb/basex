@@ -52,7 +52,7 @@ public final class DialogOpen extends Dialog {
     // create database chooser
     final StringList db = List.list();
     if(db.size == 0) return;
-    
+
     choice = new BaseXListChooser(this, db.finish(), HELPOPEN);
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 356);

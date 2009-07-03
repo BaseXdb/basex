@@ -43,7 +43,7 @@ public final class NSLocal {
       if(eq(ln, ns.key[s])) ns.delete(s);
     }
   }
-  
+
   /**
    * Assigns a uri to the specified QName.
    * @param qname qname
@@ -91,7 +91,7 @@ public final class NSLocal {
     }
     return NSGlobal.prefix(uri);
   }
-  
+
   /**
    * Finishes the creation of default namespaces.
    * @param elem default element namespace
@@ -100,7 +100,7 @@ public final class NSLocal {
     if(elem.length != 0) ns.add(EMPTY, elem);
     def = ns.size;
   }
-  
+
   /**
    * Creates a copy with the default namespaces.
    * @return copy

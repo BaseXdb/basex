@@ -8,14 +8,14 @@ import org.basex.util.Atts;
 
 /**
  * This is an abstract class for defining meta data extractors.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class AbstractExtractor {
   /** Attribute container. */
   final Atts atts = new Atts();
-  
+
   /**
    * Extracts the file content.
    * @param listener reference to the parser listener
@@ -23,7 +23,7 @@ public abstract class AbstractExtractor {
    * @throws IOException I/O exception
    */
   public abstract void extract(Builder listener, File f) throws IOException;
-  
+
   /**
    * Skips the number of specified bytes.
    * @param in input stream

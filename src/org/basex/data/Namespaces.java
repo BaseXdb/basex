@@ -103,7 +103,7 @@ public final class Namespaces extends Set {
   }
 
   // === Requesting Namespaces ================================================
-  
+
   /**
    * Returns the namespace for the specified name and pre value.
    * @param n tag/attribute name

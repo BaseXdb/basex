@@ -34,7 +34,7 @@ class MapLayout {
     data = d;
     textLen = tl;
     rectangles = new MapRects();
-    
+
     switch(GUIProp.mapoffsets) {
       // no title, small border
       case 1 :
@@ -52,10 +52,10 @@ class MapLayout {
       default:
         layout = new MapRect(0, 0, 0, 0); break;
     }
-    
+
     switch(GUIProp.mapalgo) {
       // select method to construct this treemap
-      // may should be placed in makeMap to define different method for 
+      // may should be placed in makeMap to define different method for
       // different levels
       case 1 : algo = new StripAlgo(); break;
       case 2 : algo = new SquarifiedAlgo(); break;
@@ -66,11 +66,11 @@ class MapLayout {
   }
 
   /**
-   * Computes average aspect ratio of a rectangle list. 
+   * Computes average aspect ratio of a rectangle list.
    * note: as specified by Shneiderman only leaf nodes should be checked
-   * 
+   *
    * [JH] why not weight the bigger nodes more than smaller ones???
-   * 
+   *
    * @param r array list of rectangles
    * @return aspect ratio
    */
@@ -79,7 +79,7 @@ class MapLayout {
     int nrLeaves = 0;
     for(int i = 0; i < r.size; i++) {
       final MapRect curr = r.get(i);
-      // Shneiderman would use this: children(data, curr.pre).size == 0 && 
+      // Shneiderman would use this: children(data, curr.pre).size == 0 &&
       if (curr.w != 0 && curr.h != 0) {
         nrLeaves++;
         if (curr.w > curr.h) {
@@ -109,7 +109,7 @@ class MapLayout {
     }
     return list;
   }
-  
+
   /**
    * Recursively splits rectangles.
    * @param r parent rectangle
@@ -118,7 +118,7 @@ class MapLayout {
    * @param ne end array position
    * @param level indicates level which is calculated
    */
-  void makeMap(final MapRect r, final MapList l, final int ns, final int ne, 
+  void makeMap(final MapRect r, final MapList l, final int ns, final int ne,
       final int level) {
 
     if(ne - ns == 0) {
@@ -132,7 +132,7 @@ class MapLayout {
       } else {
         nn = l.list[ne] - l.list[ns] + ViewData.size(data, l.list[ne]);
       }
-      
+
       if(GUIProp.mapsimple) {
         l.initWeights();
       } else {
@@ -147,7 +147,7 @@ class MapLayout {
       }
     }
   }
-  
+
   /**
    * One rectangle left, add it and continue with its children.
    * @param r parent rectangle
@@ -160,9 +160,9 @@ class MapLayout {
     final int y = r.y + layout.y;
     final int w = r.w - layout.w;
     final int h = r.h - layout.h;
-    
+
     // skip too small rectangles and meta data in file systems
-    if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs && 
+    if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs &&
         ViewData.isLeaf(data, r.pre)) {
       r.isLeaf = true;
       rectangles.add(r);

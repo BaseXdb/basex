@@ -22,7 +22,7 @@ import org.basex.io.IO;
 
 /**
  * Creates a new database.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -43,7 +43,7 @@ public final class CreateDB extends ACreate {
   public CreateDB(final String input, final String name) {
     super(STANDARD, input, name);
   }
-  
+
   @Override
   protected boolean exec() {
     final IO io = IO.get(args[0]);
@@ -107,7 +107,7 @@ public final class CreateDB extends ACreate {
       throw ex;
     }
   }
-  
+
   @Override
   public String toString() {
     return Cmd.CREATE.name() + " " + CmdCreate.DB + args();

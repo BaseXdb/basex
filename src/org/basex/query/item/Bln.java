@@ -8,7 +8,7 @@ import org.basex.util.Token;
 
 /**
  * Boolean item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -19,7 +19,7 @@ public final class Bln extends Item {
   public static final Bln FALSE = new Bln(false, 0);
   /** Data. */
   private final boolean val;
-  
+
   /**
    * Constructor, adding a full-text score.
    * @param b boolean value

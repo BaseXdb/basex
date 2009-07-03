@@ -14,7 +14,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class analyzes the current path and gives suggestions for code
  * completions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -42,7 +42,7 @@ public class QuerySuggest extends QueryParser {
     data = context.data();
     checkInit();
   }
-  
+
   /**
    * Sorts and returns the query suggestions.
    * @return completions
@@ -93,7 +93,7 @@ public class QuerySuggest extends QueryParser {
    */
   private void checkTest(final boolean eq) {
     if(tag == null) return;
-    
+
     final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
     boolean s = false;
     for(final PathNode p : all) {
@@ -106,7 +106,7 @@ public class QuerySuggest extends QueryParser {
     show = tag.length == 0 || s;
     curr = tmp;
   }
-  
+
   @Override
   protected void checkPred(final boolean open) {
     if(open) {

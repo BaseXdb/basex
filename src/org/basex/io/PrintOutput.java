@@ -10,7 +10,7 @@ import org.basex.util.Token;
  * This class is a stream-wrapper for textual data. Note that the internal
  * byte representation (usually UTF8) will be directly output without
  * further character conversion.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -19,10 +19,10 @@ public class PrintOutput extends OutputStream {
   protected OutputStream os;
   /** Number of bytes written. */
   protected int size;
-  
+
   /** Protected default constructor. */
   protected PrintOutput() { }
-  
+
   /**
    * Constructor, given a filename.
    * @param fn filename
@@ -31,7 +31,7 @@ public class PrintOutput extends OutputStream {
   public PrintOutput(final String fn) throws IOException {
     os = new BufferedOutput(new FileOutputStream(fn));
   }
-  
+
   /**
    * Constructor, given an output stream.
    * @param out the OutputStream to operate on
@@ -39,7 +39,7 @@ public class PrintOutput extends OutputStream {
   public PrintOutput(final OutputStream out) {
     os = out;
   }
-  
+
   @Override
   public void write(final int b) throws IOException {
     os.write(b);

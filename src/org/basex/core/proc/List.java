@@ -26,7 +26,7 @@ public final class List extends Process {
   public List() {
     super(PRINTING);
   }
-  
+
   @Override
   protected void out(final PrintOutput o) throws IOException {
     final String[] list = list().finish();

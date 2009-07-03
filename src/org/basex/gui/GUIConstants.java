@@ -35,7 +35,7 @@ public final class GUIConstants {
    * - add a corresponding command in the GUICommands class and in
    *   MENUITEMS below
    */
-  
+
   /** Internal name of the Map View. */
   public static final String MAPVIEW = "map";
   /** Internal name of the Tree View. */
@@ -54,7 +54,7 @@ public final class GUIConstants {
   public static final String PLOTVIEW = "plot";
   /** Internal name of the Tree View. */
   public static final String TREEVIEW = "tree";
-  
+
    /**
    * Default GUI Layout. The layout is formatted as follows:
    * The character 'H' or 'V' adds a new horizontal or vertical level,
@@ -81,7 +81,7 @@ public final class GUIConstants {
   // MENUBARS =================================================================
 
   /** Top menu entries. */
-  public static final String[] MENUBAR = { 
+  public static final String[] MENUBAR = {
       Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
       Text.MENUHELP };
 
@@ -110,7 +110,7 @@ public final class GUIConstants {
   };
 
   // CURSORS ==================================================================
-  
+
   /** Arrow cursor. */
   public static final Cursor CURSORARROW = new Cursor(Cursor.DEFAULT_CURSOR);
   /** Hand cursor. */
@@ -153,22 +153,22 @@ public final class GUIConstants {
 
 //  /** Fulltext color. */
 //  public static final Color COLORFT = new Color(0, 224, 0);
-  
+
   /* Colors of full-text hits.
   private static final Color[] COLORFT = new Color[] {
-    new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0), 
-    new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224), 
+    new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0),
+    new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224),
     new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
     new Color(240, 240, 0)
   };
 */
   /** Colors of full-text hits.*/
   private static final Color[] COLORFT = new Color[] {
-    new Color(0, 255, 0), new Color(255, 0, 0),  
-    new Color(127, 0, 255), new Color(255, 200, 0), new Color(255, 0, 255), 
+    new Color(0, 255, 0), new Color(255, 0, 0),
+    new Color(127, 0, 255), new Color(255, 200, 0), new Color(255, 0, 255),
     new Color(0, 255, 255), new Color(192, 192, 192), new Color(0, 0, 0)
   };
-  
+
   /** Transparent background color. */
   public static Color back;
   /** Transparent frame color. */
@@ -186,7 +186,7 @@ public final class GUIConstants {
   public static Color color4;
   /** Dark color. */
   public static Color color6;
-  
+
   /** Mark color, custom alpha value. */
   public static Color colormarkA;
   /** Second mark color, custom alpha value. */
@@ -199,7 +199,7 @@ public final class GUIConstants {
   public static Color colormark3;
   /** Fourth mark color. */
   public static Color colormark4;
-  
+
   /** Cached treemap colors. */
   public static final Color[] COLORS = new Color[IO.MAXHEIGHT];
 
@@ -209,7 +209,7 @@ public final class GUIConstants {
   public static Font dfont;
   /** Default monospace font widths. */
   public static int[] dwidth;
-  
+
   /** Large font. */
   public static Font lfont;
   /** Character large character widths. */
@@ -239,7 +239,7 @@ public final class GUIConstants {
     final int r = GUIProp.colorred;
     final int g = GUIProp.colorgreen;
     final int b = GUIProp.colorblue;
-  
+
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GUIProps.GREEN)
     color = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
@@ -248,7 +248,7 @@ public final class GUIConstants {
     color3 = new Color(col(r, 32), col(g, 32), col(b, 44));
     color4 = new Color(col(r, 48), col(g, 50), col(b, 40));
     color6 = new Color(col(r, 140), col(g, 100), col(b, 70));
-    
+
     colormarkA = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
     colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
@@ -266,7 +266,7 @@ public final class GUIConstants {
     final Color c = COLORS[16];
     back = new Color(c.getRed(), c.getGreen(), c.getBlue(),  40);
     frame = new Color(c.getRed(), c.getGreen(), c.getBlue(),  100);
-    
+
     initFonts();
   }
 
@@ -313,14 +313,13 @@ public final class GUIConstants {
     if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
   }
-  
+
   /**
    * Get fulltext color.
    * @param p pointer on token in query.
    * @return color
    */
   public static Color getFTColor(final int p) {
-    if (p == 0 || p > COLORFT.length) return COLORFT[0];
-    else return COLORFT[p - 1];
+    return COLORFT[p == 0 || p > COLORFT.length ? 0 : p - 1];
   }
 }

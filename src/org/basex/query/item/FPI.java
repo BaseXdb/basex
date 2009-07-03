@@ -2,8 +2,8 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Serializer;
-import org.basex.util.Token;
 
 /**
  * PI Node Fragment.
@@ -55,12 +55,12 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public String toString() {
-    return "<? " + Token.string(name.str()) + " " + Token.string(val) + "?>";
+  public void plan(final Serializer ser) throws IOException {
+    ser.emptyElement(this, NAM, name.str(), VAL, val);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.str(), VAL, val);
+  public String toString() {
+    return BaseX.info("<?% %?>", name.str(), val);
   }
 }

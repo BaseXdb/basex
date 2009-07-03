@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * requests and offers some simple threading to allow simultaneous database
  * requests. Add the '-h' option to get a list on all available command-line
  * arguments.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -59,7 +59,7 @@ public class BaseXServerNew {
     Prop.server = true;
 
     if(!parseArguments(args)) return;
-    
+
  // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
@@ -88,7 +88,7 @@ public class BaseXServerNew {
       }
     }
   }
-  
+
   /**
    * Stops.
    */
@@ -156,19 +156,19 @@ public class BaseXServerNew {
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
   }
-  
+
   /**
    * InputListener listens to the Console Input.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    *
    */
   class InputListener implements Runnable {
-    
+
     /** Thread. */
     Thread thread = null;
-    
+
     /**
      * Starts the Thread.
      */
@@ -210,23 +210,23 @@ public class BaseXServerNew {
           BaseX.outln();
         }
       }
-    } 
+    }
   }
-  
+
   /**
    * SessionListener listens to new Client-Server Sessions.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    *
    */
   class SessionListener implements Runnable {
-    
+
     /** Thread. */
     Thread thread = null;
     /** BaseXServerNew. */
     BaseXServerNew bx;
-   
+
     /**
      * Constructor.
      * @param b BaseXServerNew
@@ -234,7 +234,7 @@ public class BaseXServerNew {
     public SessionListener(final BaseXServerNew b) {
       this.bx = b;
     }
-    
+
     /**
      * Starts the Thread.
      */
@@ -255,9 +255,8 @@ public class BaseXServerNew {
           session.start();
           sessions.add(session);
         } catch(IOException e) {
-          if(e instanceof SocketException) {
-            return;
-          } else e.printStackTrace();
+          if(e instanceof SocketException) return;
+          e.printStackTrace();
         }
       }
     }

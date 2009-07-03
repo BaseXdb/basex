@@ -5,7 +5,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
- 
+
 /**
  * This class parses the tokens that are delivered by the
  * {@link XMLScanner} and sends them to the specified database builder.
@@ -38,7 +38,7 @@ public final class DirParser extends Parser {
     b.meta.filesize = 0;
     parse(b, io);
   }
-  
+
   /**
    * Parses the specified file or parser its children.
    * @param b builder
@@ -48,7 +48,7 @@ public final class DirParser extends Parser {
   private void parse(final Builder b, final IO path) throws IOException {
     // might slow down the process..
     // if(path.isSymLink()) return;
-    
+
     if(path.isDir()) {
       for(final IO f : path.children()) parse(b, f);
     } else {
@@ -62,7 +62,7 @@ public final class DirParser extends Parser {
       }
     }
   }
-  
+
   @Override
   public String head() {
     return parser != null ? parser.head() : "";

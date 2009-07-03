@@ -43,7 +43,7 @@ public abstract class Fun extends Arr {
   public Expr c(final QueryContext ctx) throws QueryException {
     return this;
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return func.ret;

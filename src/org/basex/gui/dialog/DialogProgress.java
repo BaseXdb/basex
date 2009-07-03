@@ -16,7 +16,7 @@ import org.basex.gui.layout.BaseXLayout;
 
 /**
  * Dialog window for displaying the progress of a process.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -46,7 +46,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
-    
+
     if(!pb) {
       BaseXLayout.setWidth(info, 600);
     } else {
@@ -55,7 +55,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
       bar.setPreferredSize(new Dimension(ww, 16));
       set(bar, BorderLayout.CENTER);
     }
-    
+
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.setBorder(10, 0, 0, 0);
@@ -63,7 +63,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
         BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
     finish(null);
-    
+
     prog = prg;
     timer.start();
   }

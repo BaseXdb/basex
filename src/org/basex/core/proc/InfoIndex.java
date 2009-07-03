@@ -41,7 +41,7 @@ public final class InfoIndex extends AInfo {
       out.println(data.info(Type.FTX));
     }
   }
-  
+
   @Override
   public String toString() {
     return Cmd.INFO.name() + " " + CmdInfo.INDEX;

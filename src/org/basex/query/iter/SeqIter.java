@@ -142,7 +142,7 @@ public final class SeqIter extends Iter implements Result {
     ctx.serialize(ser, item[n]);
     ser.closeResult();
   }
-  
+
   @Override
   public Item next() {
     return ++pos < size ? item[pos] : null;

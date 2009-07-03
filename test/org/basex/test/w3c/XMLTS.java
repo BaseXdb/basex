@@ -69,7 +69,7 @@ public final class XMLTS {
 
     new Check(FILE).execute(ctx, null);
     data = ctx.data();
-    
+
     int ok = 0;
     int wrong = 0;
 

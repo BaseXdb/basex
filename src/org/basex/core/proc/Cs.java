@@ -16,7 +16,7 @@ public final class Cs extends AQuery {
   public Cs(final String q) {
     super(DATAREF, q);
   }
-  
+
   @Override
   protected boolean exec() {
     final Nodes nodes = query(args[0], null);

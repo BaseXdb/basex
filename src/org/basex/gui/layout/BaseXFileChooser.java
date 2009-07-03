@@ -13,7 +13,7 @@ import org.basex.io.IO;
 
 /**
  * Project specific File Chooser implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -26,14 +26,14 @@ public final class BaseXFileChooser {
     /** Save file. */ FSAVE,
     /** Save file or directory. */ DSAVE,
   }
-  
+
   /** Reference to main window. */
   private GUI gui;
   /** Swing file chooser. */
-  private JFileChooser fc; 
+  private JFileChooser fc;
   /** Simple file dialog. */
   private FileDialog fd;
-  
+
   /**
    * Default Constructor.
    * @param title dialog title
@@ -42,7 +42,7 @@ public final class BaseXFileChooser {
    */
   public BaseXFileChooser(final String title, final String path,
       final GUI main) {
-    
+
     if(GUIProp.simplefd) {
       fd = new FileDialog(main, title);
       fd.setDirectory(new File(path).getPath());
@@ -54,7 +54,7 @@ public final class BaseXFileChooser {
       gui = main;
     }
   }
-  
+
   /**
    * Sets a file filter.
    * @param dsc description
@@ -64,7 +64,7 @@ public final class BaseXFileChooser {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
     else for(final String s : suf) fd.setFile("*" + s);
   }
-  
+
   /**
    * Selects a file or directory.
    * @param mode type defined by {@link Mode}
@@ -82,7 +82,7 @@ public final class BaseXFileChooser {
       return IO.get(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
         dir + "/" + fd.getFile());
     }
-    
+
     int state = 0;
     switch(mode) {
       case FOPEN:
@@ -102,12 +102,12 @@ public final class BaseXFileChooser {
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return null;
-    
+
     final IO io = IO.get(fc.getSelectedFile().getPath());
     return mode != Mode.FSAVE || !io.exists() ||
       Dialog.confirm(gui, BaseX.info(FILEREPLACE, io.name())) ? io : null;
   }
-  
+
   /**
    * Defines a file filter for XML documents.
    */
@@ -116,7 +116,7 @@ public final class BaseXFileChooser {
     private String[] suf;
     /** Description. */
     private String desc;
-    
+
     /**
      * Constructor.
      * @param s suffix
@@ -126,7 +126,7 @@ public final class BaseXFileChooser {
       suf = s;
       desc = d;
     }
-    
+
     @Override
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;

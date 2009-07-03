@@ -102,7 +102,7 @@ final class FNBaseX extends Fun {
       return new FTIndexAccess(new FTWords(data, word, ctx.ftpos == null),
           new Tokenizer(word), ic).iter(ctx);
     }
-    
+
     IndexToken it = null;
     if(type.equals(TEXT)) {
       it = new ValuesToken(true, word);

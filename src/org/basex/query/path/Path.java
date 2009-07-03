@@ -33,7 +33,7 @@ public abstract class Path extends Expr {
     if(root != null) root = root.comp(ctx);
     return this;
   }
-  
+
   /**
    * Position test.
    * @param step step array

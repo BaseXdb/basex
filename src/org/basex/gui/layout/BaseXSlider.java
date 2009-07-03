@@ -14,7 +14,7 @@ import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific Slider implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -25,7 +25,7 @@ public final class BaseXSlider extends BaseXPanel {
   private Dialog dl;
   /** Listener. */
   private ActionListener al;
-  
+
   /** Minimum slider value. */
   private int min;
   /** Maximum slider value. */
@@ -98,12 +98,12 @@ public final class BaseXSlider extends BaseXPanel {
         repaint();
       }
     });
-    
+
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
   }
-  
+
   /**
    * Returns the current value.
    * @return current value
@@ -152,7 +152,7 @@ public final class BaseXSlider extends BaseXPanel {
       repaint();
     }
   }
-  
+
   @Override
   public void keyPressed(final KeyEvent e) {
     final int code = e.getKeyCode();
@@ -176,15 +176,15 @@ public final class BaseXSlider extends BaseXPanel {
       repaint();
     }
   }
-  
+
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    
+
     final int w = getWidth();
     final int h = getHeight();
     final int hh = h / 2;
-    
+
     g.setColor(hasFocus() ? Color.white : GUIConstants.COLORCELL);
     g.fillRect(0, hh - 2, w, 4);
     g.setColor(Color.black);
@@ -193,7 +193,7 @@ public final class BaseXSlider extends BaseXPanel {
     g.setColor(GUIConstants.COLORBUTTON);
     g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
     g.drawLine(0, hh + 2, w, hh + 2);
-    
+
     final double x = (curr - min) * (w - SLIDERW) / (max - min);
     BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 5, hh + 5,
         oldCurr != -1);

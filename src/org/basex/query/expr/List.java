@@ -38,7 +38,7 @@ public class List extends Arr {
     return new Iter() {
       Iter ir;
       int e;
-      
+
       @Override
       public Item next() throws QueryException {
         while(true) {

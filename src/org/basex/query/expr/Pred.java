@@ -40,12 +40,12 @@ public class Pred extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     if(super.comp(ctx) != this) return Seq.EMPTY;
     root = root.comp(ctx);
-    
+
     if(root.e()) {
       ctx.compInfo(OPTPRE, this);
-      return Seq.EMPTY;      
+      return Seq.EMPTY;
     }
-    
+
     // No predicates.. return root
     if(pred.length == 0) return root;
     final Expr p = pred[0];
@@ -73,12 +73,12 @@ public class Pred extends Preds {
       return l != it.dbl() || e == Bln.FALSE ? Iter.EMPTY :
         new IterPred(root, pred, (Pos) e, false).iter(ctx);
     }
-    
+
     final Iter iter = ctx.iter(root);
     final Item ci = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    
+
     // cache results to support last() function
     final SeqIter si = new SeqIter();
     Item i;
@@ -102,7 +102,7 @@ public class Pred extends Preds {
     ctx.pos = cp;
     return si;
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return root.uses(u, ctx) || super.uses(u, ctx);

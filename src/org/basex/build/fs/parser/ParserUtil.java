@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.basex.build.fs.parser;
 
@@ -42,7 +42,7 @@ public final class ParserUtil {
         }
       }
       sb.append("}");
-      BaseX.debug("Invalid duration (%, %)", Token.string(ms), sb.toString());
+      BaseX.debug("Invalid duration (%, %)", ms, sb);
     }
     return Token.EMPTY;
   }
@@ -160,7 +160,7 @@ public final class ParserUtil {
     if(year.length != 4) return Token.EMPTY;
     for(int i = 0; i < 4; i++) {
       if(year[i] < '0' || year[i] > '9') { // not a valid number
-        BaseX.debug("Invalid date value: " + Token.string(year));
+        BaseX.debug("Invalid date value: %", year);
         return Token.EMPTY;
       }
     }
@@ -179,7 +179,6 @@ public final class ParserUtil {
   public static byte[] getMTime(final File file) {
     // current time storage: minutes from 1.1.1970
     final long time = file.lastModified() / 60000;
-    if(time != 0) return token(time);
-    else return Token.EMPTY;
+    return time != 0 ? token(time) : Token.EMPTY;
   }
 }

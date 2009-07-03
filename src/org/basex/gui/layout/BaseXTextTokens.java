@@ -70,7 +70,7 @@ final class BaseXTextTokens {
     int ch = Token.cp(text, ps);
     pe += Token.cl(text[ps]);
     if(sep(ch)) return true;
-    
+
     while(pe < size) {
       ch = Token.cp(text, pe);
       if(sep(ch)) break;
@@ -78,7 +78,7 @@ final class BaseXTextTokens {
     };
     return true;
   }
-  
+
   /**
    * Returns the next token.
    * @return next token
@@ -86,7 +86,7 @@ final class BaseXTextTokens {
   String nextWord() {
     return Token.string(text, ps, pe - ps);
   }
-  
+
   /**
    * Returns the current character type.
    * @param c char
@@ -130,7 +130,7 @@ final class BaseXTextTokens {
     noMark();
     return curr();
   }
-  
+
   /**
    * Moves one character back and returns the found character.
    * @return character
@@ -314,7 +314,7 @@ final class BaseXTextTokens {
   boolean error() {
     return es >= ps && es <= pe;
   }
-  
+
   /**
    * Returns if the cursor moves over the current token.
    * @param s start

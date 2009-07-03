@@ -88,16 +88,16 @@ final class MapImages {
           final int id = idCache[--loaderC];
           int ww = wCache[loaderC];
           int hh = hCache[loaderC];
-    
+
           // find new image id in cached images
           int ic = -1;
           while(++ic < MAXNR && imgid[ic] != id);
-    
+
           // check if the image exists already, or if the existing version
           // is bigger than the new one
           if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
               imgs[ic].getHeight() + 1 >= hh)) continue;
-    
+
           try {
             // database closed - quit
             final Data data = view.gui.context.data();
@@ -105,27 +105,27 @@ final class MapImages {
               loaderC = 0;
               break;
             }
-            
+
             // load image and wait until it's done
             final File f = new File(Token.string(data.fs.path(id, false)));
             BufferedImage image = ImageIO.read(f);
-            
+
             // calculate optimal image size
             final double iw = image.getWidth();
             final double ih = image.getHeight();
             final double min = Math.min(ww / iw, hh / ih);
-    
+
             // create scaled image instance
             if(min < 1) {
               ww = (int) (iw * min);
               hh = (int) (ih * min);
-    
+
               final BufferedImage bi = new BufferedImage(ww, hh,
                   BufferedImage.TYPE_INT_BGR);
               bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
               image = bi;
             }
-    
+
             // cache image
             if(ic == MAXNR) {
               ic = imgc;
@@ -134,7 +134,7 @@ final class MapImages {
             }
             imgs[ic] = image;
             imgmax[ic] = min >= 1;
-    
+
             if((loaderC & 5) == 0 && !view.gui.painting) paint();
           } catch(final Exception ex) {
             // catch and ignore any kind of exception
@@ -147,7 +147,7 @@ final class MapImages {
     };
     thread.start();
   }
-  
+
   /**
    * Refreshes the map.
    */
@@ -157,7 +157,7 @@ final class MapImages {
     final Runtime rt = Runtime.getRuntime();
     final long max = Math.max(size.width * size.height * 10L,
         rt.maxMemory() / 5);
-    
+
     // remove images if pixel limit is reached
     int imgSize = 0;
     for(int j = (imgc == 0 ? MAXNR : imgc) - 1; j != imgc;) {

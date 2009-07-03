@@ -23,7 +23,7 @@ public final class FTOrder extends FTFilter {
   public FTOrder(final FTExpr e) {
     super(e);
   }
-  
+
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {

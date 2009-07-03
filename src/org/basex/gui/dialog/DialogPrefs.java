@@ -24,7 +24,7 @@ import org.basex.io.IO;
 
 /**
  * Dialog window for changing some project's preferences.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -56,7 +56,7 @@ public final class DialogPrefs extends Dialog {
    */
   public DialogPrefs(final GUI main) {
     super(main, PREFSTITLE);
-    
+
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new TableLayout(11, 1, 0, 0));
@@ -64,7 +64,7 @@ public final class DialogPrefs extends Dialog {
 
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
-    
+
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
@@ -72,7 +72,7 @@ public final class DialogPrefs extends Dialog {
         action(null);
       }
     });
-    
+
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -81,7 +81,7 @@ public final class DialogPrefs extends Dialog {
         if(file != null) path.setText(file.getDir());
       }
     });
-    
+
     BaseXLayout.setWidth(path, 280);
     BaseXLayout.setHeight(path, button.getPreferredSize().height);
     p.add(path);
@@ -123,7 +123,7 @@ public final class DialogPrefs extends Dialog {
     p.add(lang);
     creds = new BaseXLabel(credits(Prop.language));
     p.add(creds);
-    
+
     pp.add(p);
 
     // create buttons
@@ -133,7 +133,7 @@ public final class DialogPrefs extends Dialog {
     set(pp, BorderLayout.CENTER);
     finish(null);
   }
-  
+
   /**
    * Returns the translation credits for the specified language.
    * @param lng language
@@ -145,13 +145,13 @@ public final class DialogPrefs extends Dialog {
     }
     return "";
   }
-  
+
   @Override
   public void action(final String cmd) {
     creds.setText(credits(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
-  
+
   @Override
   public void close() {
     Prop.dbpath = path.getText();

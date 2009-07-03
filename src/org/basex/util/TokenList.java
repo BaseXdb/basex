@@ -77,16 +77,6 @@ public final class TokenList implements Iterable<byte[]> {
     size = 0;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("TokenList[");
-    for(int i = 0; i < size; i++) {
-      sb.append((i == 0 ? "" : ", ") + Token.string(list[i]));
-    }
-    sb.append("]");
-    return sb.toString();
-  }
-
   /**
    * Sorts the strings.
    * @param cs respect case sensitivity
@@ -106,5 +96,15 @@ public final class TokenList implements Iterable<byte[]> {
       public byte[] next() { return list[c]; }
       public void remove() { BaseX.notexpected(); }
     };
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(getClass().getSimpleName() + "[");
+    for(int i = 0; i < size; i++) {
+      if(i != 0) tb.add(", ");
+      tb.add(list[i]);
+    }
+    return tb.add("]").toString();
   }
 }

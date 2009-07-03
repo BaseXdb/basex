@@ -171,7 +171,7 @@ public final class FTOpt extends ExprInfo {
         }
         qu.text = tmp;
       }
-      
+
       if(f) {
         count++;
         if(words.add(tpos, tpos + qu.pos - 1)) break;
@@ -244,7 +244,7 @@ public final class FTOpt extends ExprInfo {
     }
     return tl == t.length;
   }
-  
+
   @Override
   public void plan(final Serializer ser) throws IOException {
     if(is(ST)) ser.attribute(token(QueryTokens.STEMMING)  , TRUE);

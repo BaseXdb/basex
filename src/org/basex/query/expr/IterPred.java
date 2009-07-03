@@ -46,7 +46,7 @@ public final class IterPred extends Pred {
         if(iter == null) {
           iter = ctx.iter(root);
           p = 1;
-         
+
           // iterator size is known - items can be directly accessed
           if(iter.size() != -1) {
             if(last) {
@@ -93,7 +93,7 @@ public final class IterPred extends Pred {
         // reset context
         ctx.item = ci;
         ctx.pos = cp;
-        return it; 
+        return it;
       }
     };
   }

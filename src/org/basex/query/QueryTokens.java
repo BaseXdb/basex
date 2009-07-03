@@ -9,9 +9,9 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface QueryTokens {
-  
+
   // FULL-TEXT TOKENS =========================================================
-  
+
   /** Parser token. */
   String AFTER = "after";
   /** Parser token. */
@@ -72,7 +72,7 @@ public interface QueryTokens {
   String DISTANCE = "distance";
   /** Parser token. */
   String DIV = "div";
-  /** Parser token. */ 
+  /** Parser token. */
   String DOC = "doc";
   /** Parser token. */
   String DOCUMENT = "document";
@@ -170,7 +170,7 @@ public interface QueryTokens {
   String NOINHERIT = "no-inherit";
   /** Parser token. */
   String NOPRESERVE = "no-preserve";
-  /** Parser token. */ 
+  /** Parser token. */
   String NODE = "node";
   /** Parser token. */
   String NODES = "nodes";
@@ -292,7 +292,7 @@ public interface QueryTokens {
   String XQUERY = "xquery";
 
   // ERROR INFORMATION =======================================================
-  
+
   /** Skip flag for the syntax highlighter. */
   String IGNORE = null;
 
@@ -377,7 +377,7 @@ public interface QueryTokens {
   byte[] LANG = token("xml:lang");
 
   // QUERY PLAN ===============================================================
-  
+
   /** Query Plan. */
   byte[] NS = token("timer");
   /** Query Plan. */
@@ -424,7 +424,7 @@ public interface QueryTokens {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
-  
+
   /** Query Plan. */
   String ARG = "arg";
 

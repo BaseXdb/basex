@@ -10,14 +10,14 @@ import static org.basex.util.Token.*;
 
 /**
  * Delete expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public final class Delete extends Expr {
   /** Expression list. */
   private Expr expr;
-  
+
   /**
    * Constructor.
    * @param r return expression

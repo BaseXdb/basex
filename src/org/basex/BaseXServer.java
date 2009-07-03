@@ -74,7 +74,7 @@ public final class BaseXServer {
         context.close();
       }
     });
-    
+
     // this thread cleans the process stack
     new Thread() {
       @Override

@@ -68,7 +68,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
       final int p = index.next();
       final int ds = index.ns[p];
       outl.writeNum(ds);
-      
+
       // write id lists
       final byte[] tmp = index.pre[p];
       index.pre[p] = null;
@@ -80,13 +80,13 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     }
     index.pre = null;
     index.ns = null;
-    
+
     outl.close();
     outr.close();
-    
+
     return new Values(data, text);
   }
-  
+
   @Override
   public String tit() {
     return PROGINDEX;

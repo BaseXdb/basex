@@ -6,7 +6,7 @@ import org.basex.util.IntList;
 
 /**
  * This class allows a blockwise output of the database table.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
@@ -43,7 +43,7 @@ public final class TableOutput extends FileOutputStream {
     database = db;
     filename = fn;
   }
-  
+
   @Override
   public void write(final int b) throws IOException {
     if(pos == THRESHOLD) flush();

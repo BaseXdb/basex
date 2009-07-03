@@ -34,7 +34,7 @@ public final class FElem extends FNode {
   public FElem(final QNm n, final byte[] b, final Nod p) {
     this(n, new NodIter(), new NodIter(), b, new Atts(), p);
   }
-  
+
   /**
    * Constructor.
    * @param n tag name
@@ -64,7 +64,7 @@ public final class FElem extends FNode {
   public QNm qname() {
     return name;
   }
-  
+
   @Override
   public byte[] nname() {
     return name.str();
@@ -90,7 +90,7 @@ public final class FElem extends FNode {
     final byte[] tag = name.str();
     final byte[] uri = name.uri.str();
     ser.openElement(tag);
-    
+
     // remember top level namespace
     final byte[] dn = ser.dn;
     boolean xmlns = false;
@@ -106,7 +106,7 @@ public final class FElem extends FNode {
           // namespace has already been serialized
           if(nsp.contains(key)) continue;
           nsp.add(key);
-          
+
           final byte[] val = nns.val[a];
           if(key.length == 0) {
             xmlns = true;
@@ -136,12 +136,12 @@ public final class FElem extends FNode {
         }
       }
     }
-    
+
     if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) {
       ser.namespace(EMPTY, uri);
       ser.dn = uri;
     }
-    
+
     // serialize attributes
     for(int n = 0; n < atts.size; n++) {
       final Nod nod = atts.item[n];

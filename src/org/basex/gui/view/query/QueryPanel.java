@@ -43,7 +43,7 @@ abstract class QueryPanel {
    * @param force force the execution of a new query.
    */
   abstract void query(boolean force);
-  
+
   /**
    * Handles info messages resulting from a query execution.
    * @param info info message
@@ -83,7 +83,7 @@ abstract class QueryPanel {
         query(true);
       }
     });
-    
+
     filter = GUIToolBar.newButton(GUICommands.FILTER, main.gui);
     filter.addKeyListener(main);
   }

@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * Test modeling a file hierarchy in XML.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
@@ -132,7 +132,7 @@ public class DeepBaseTest {
     assertEquals("unlink", 0, dbfs.unlink("/"));
     query("/");
   }
-  
+
   /**
    * Load a pre-filled DeepFS XML instance.
    */
@@ -163,9 +163,8 @@ public class DeepBaseTest {
 
       FileInputStream f = new FileInputStream(TESTFILE);
       StringBuilder sb = new StringBuilder();
-      byte[] b = new byte[1024];
-      while(f.read(b) != -1)
-        sb.append(new String(b));
+      byte[] b = new byte[IO.BLOCKSIZE];
+      while(f.read(b) != -1) sb.append(new String(b));
       System.err.println(sb.toString());
       return sb.toString();
     } catch(Exception e) {

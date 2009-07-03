@@ -4,14 +4,14 @@ import static org.basex.query.QueryTokens.*;
 
 /**
  * Replace expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public class Replace extends Arr {
   /** 'Value of' flag. */
   private boolean value;
-  
+
   /**
    * Constructor.
    * @param t target expression
@@ -22,10 +22,10 @@ public class Replace extends Arr {
     super(t, e);
     value = v;
   }
-  
+
   @Override
   public String toString() {
-    return REPLACE + (value ? VALUEE + OF : "") + NODE + expr[0] + 
+    return REPLACE + (value ? VALUEE + OF : "") + NODE + expr[0] +
     WITH + expr[1];
   }
 }

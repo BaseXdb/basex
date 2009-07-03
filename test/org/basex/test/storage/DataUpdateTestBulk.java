@@ -43,7 +43,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
    */
   private void assertNodesDeepEqual(final Data data1, final int pre1,
       final Data data2, final int pre2) {
-    
+
     final int kind = data1.kind(pre1);
     assertEquals(kind, data2.kind(pre2));
     switch(kind) {

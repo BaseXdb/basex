@@ -31,7 +31,7 @@ public final class DialogInsert extends Dialog {
   public StringList result;
   /** Node kind. */
   public int kind;
-  
+
   /** Background panel. */
   BaseXBack back;
   /** Text area. */
@@ -67,7 +67,7 @@ public final class DialogInsert extends Dialog {
     final BaseXBack knd = new BaseXBack();
     knd.setLayout(new TableLayout(1, 5));
     final ButtonGroup group = new ButtonGroup();
-    
+
     final ActionListener al = new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         change(e.getSource());
@@ -94,7 +94,7 @@ public final class DialogInsert extends Dialog {
     change(radio[lkind]);
     finish(null);
   }
-  
+
   /**
    * Activates the specified radio button.
    * @param src button reference

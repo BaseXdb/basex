@@ -92,7 +92,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    */
   public void setViews(final boolean db) {
     views = panels[db ? 1 : 0];
-    
+
     // build layout or use default if something goes wrong
     final String lo1 = db ? GUIProp.layoutopened : GUIProp.layoutclosed;
     final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
@@ -319,7 +319,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
   }
-  
+
   /**
    * Calculates the target position.
    */

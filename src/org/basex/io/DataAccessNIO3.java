@@ -11,11 +11,11 @@ import org.basex.util.Num;
 /**
  * This class allows positional read and write access to a database file.
  *
- * NIO3: Use a ByteBuffer with a backing array. 
+ * NIO3: Use a ByteBuffer with a backing array.
  * Only for testing the read methods.
  * It reads the data through the filechannel into a ByteBuffer and returns an
  * array for further operations.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -29,13 +29,13 @@ public final class DataAccessNIO3 {
   private final RandomAccessFile file;
   /** FileChannel. */
   private final FileChannel fc;
-  
+
   /** File length. */
   private long len;
 
   /** Nio Byte Buffer. */
   private ByteBuffer bbuffer;
-  
+
   /** Buffers. */
   private final byte[][] buffer = new byte[BUFFERS][IO.BLOCKSIZE];
   /** Positions. */
@@ -95,7 +95,7 @@ public final class DataAccessNIO3 {
     }
     dirt = false;
   }
-  
+
   /**
    * Closes the data access.
    * @throws IOException in case of write errors
@@ -221,7 +221,7 @@ public final class DataAccessNIO3 {
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
-  
+
   // private methods...
 
   /**
@@ -231,7 +231,7 @@ public final class DataAccessNIO3 {
 //    System.out.println("nextBlock");
     cursor(pos[c] + IO.BLOCKSIZE);
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position
@@ -239,13 +239,13 @@ public final class DataAccessNIO3 {
   public synchronized void cursor(final long p) {
 //    System.out.println("set cursor now");
     off = (int) (p & BUFLIMIT);
-    
+
     final long ps = p - off;
     final int o = c;
     do {
       if(pos[c] == ps) return;
     } while((c = (c + 1) % BUFFERS) != o);
-    
+
     c = (o + 1) % BUFFERS;
 //    System.out.println("set cursor: " + ps + " offset: " + off + " c: " + c);
     readBlock(ps);
@@ -326,7 +326,7 @@ public final class DataAccessNIO3 {
   public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
-  
+
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended

@@ -72,7 +72,7 @@ public final class InfoView extends View {
     setMode(Fill.UP);
     setBorder(8, 8, 8, 8);
     setLayout(new BorderLayout());
-    
+
     north = new BaseXBack(Fill.NONE);
     north.setLayout(new BorderLayout());
     header = new BaseXLabel(INFOTIT);
@@ -126,7 +126,7 @@ public final class InfoView extends View {
     for(int i = 0; i < split.length; i++) {
       final String line = split[i];
       final int s = line.indexOf(':');
-      if(line.startsWith(QUERYPARSE) || line.startsWith(QUERYCOMPILE) || 
+      if(line.startsWith(QUERYPARSE) || line.startsWith(QUERYCOMPILE) ||
           line.startsWith(QUERYEVALUATE) || line.startsWith(QUERYPRINT) ||
           line.startsWith(QUERYTOTAL)) {
         final int t = line.indexOf(" ms");
@@ -234,7 +234,7 @@ public final class InfoView extends View {
         Performance.getTimer(stat.list[f] * 10000L * Prop.runs, Prop.runs));
     repaint();
   }
-  
+
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);

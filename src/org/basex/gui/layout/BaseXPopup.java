@@ -25,7 +25,7 @@ public final class BaseXPopup extends JPopupMenu {
   private GUICommand[] popup;
   /** Reference to main window. */
   final GUI gui;
-  
+
   /**
    * Constructor.
    * @param comp component reference
@@ -34,7 +34,7 @@ public final class BaseXPopup extends JPopupMenu {
   public BaseXPopup(final BaseXPanel comp, final GUICommand[] pop) {
     popup = pop;
     gui = comp.gui;
-    
+
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(final MouseEvent e) {
@@ -67,7 +67,7 @@ public final class BaseXPopup extends JPopupMenu {
       }
     }
   }
-  
+
   @Override
   public void show(final Component comp, final int x, final int y) {
     for(int b = 0; b < popup.length; b++) {

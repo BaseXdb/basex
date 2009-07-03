@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * User defined function.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -23,7 +23,7 @@ public final class Func extends Single {
   public Var[] args;
   /** Declaration flag. */
   public boolean decl;
-  
+
   /**
    * Function constructor.
    * @param v function name
@@ -36,7 +36,7 @@ public final class Func extends Single {
     args = a;
     decl = d;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
@@ -45,7 +45,7 @@ public final class Func extends Single {
     ctx.vars.reset(s);
     return this;
   }
-  
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope

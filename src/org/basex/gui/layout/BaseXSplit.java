@@ -7,7 +7,7 @@ import java.awt.LayoutManager;
 
 /**
  * Project specific Split panel implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -20,7 +20,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   private double[] t;
   /** Temporary drag position. */
   private double d;
-  
+
   /**
    * Constructor.
    * @param lay layout: horizontal = true, vertical = false
@@ -29,7 +29,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     setLayout(this);
     l = lay;
   }
-  
+
   @Override
   public Component add(final Component comp) {
     if(getComponentCount() != 0) super.add(new BaseXSplitSep(l));
@@ -43,7 +43,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     super.removeAll();
     s = null;
   }
-  
+
   /**
    * Starts split pane dragging.
    * @param p position
@@ -116,7 +116,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
       final boolean a = s == null;
       if(a) s = new double[m];
-      
+
       double v = 0;
       for(int n = 0; n < c.length; n++) {
         final boolean b = (n & 1) == 0;

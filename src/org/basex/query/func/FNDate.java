@@ -186,7 +186,7 @@ final class FNDate extends Fun {
    */
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
-    
+
     final Item i = it.u() ? new Dtm(it.str()) : check(it, Type.DTM);
     return adjust((Date) i, zon, d);
   }
@@ -221,7 +221,7 @@ final class FNDate extends Fun {
 
     final Dtm dtm = new Dtm((Dat) check(d, Type.DAT));
     final Tim tim = (Tim) check(t, Type.TIM);
-    
+
     dtm.xc.setTime(tim.xc.getHour(), tim.xc.getMinute(), tim.xc.getSecond(),
         tim.xc.getMillisecond());
 

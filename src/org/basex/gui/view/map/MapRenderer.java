@@ -211,7 +211,7 @@ final class MapRenderer {
 
     boolean l = false;
     while(r.thumbal < 2) {
-      ff = round((fftmax + fftmin)  / 2.0); // *= fac;
+      ff = round((fftmax + fftmin) / 2.0); // *= fac;
       r.thumbf = ff * GUIProp.fontsize;
       ffh = round((ffhtmax + ffhtmin) / 2.0); // *= fac;
       r.thumbfh = (byte) Math.max(1, ffh * GUIProp.fontsize);

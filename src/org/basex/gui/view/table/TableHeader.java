@@ -150,7 +150,7 @@ final class TableHeader extends BaseXPanel {
       x = ce;
     }
 
-    final boolean clicked =  nc == clickCol;
+    final boolean clicked = nc == clickCol;
     BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
     g.setColor(Color.black);

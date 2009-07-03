@@ -74,7 +74,7 @@ public final class FTWeight extends FTExpr {
     item.score(item.score() * d);
     return item;
   }
-  
+
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // weight makes no sense as long as no index-based scoring exists

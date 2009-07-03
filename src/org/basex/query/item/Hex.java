@@ -1,5 +1,6 @@
 package org.basex.query.item;
 
+import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -61,7 +62,7 @@ public final class Hex extends Item {
     val = new byte[l];
 
     for(int i = 0; i < l; i++) {
-      val[i] = (byte) (h2b(h[i << 1]) * 0x10 + h2b(h[(i << 1) + 1]));
+      val[i] = (byte) ((h2b(h[i << 1]) << 4) + h2b(h[(i << 1) + 1]));
     }
   }
 
@@ -73,7 +74,7 @@ public final class Hex extends Item {
    */
   private int h2b(final byte b) throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';
-    if((b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F')) return (b & 15) + 9;
+    if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 15) + 9;
     castErr((char) b);
     return 0;
   }
@@ -103,6 +104,6 @@ public final class Hex extends Item {
 
   @Override
   public String toString() {
-    return "\"" + Token.string(b2h()) + "\"";
+    return BaseX.info("\"%\"", b2h());
   }
 }

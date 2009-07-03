@@ -55,7 +55,7 @@ public final class Lang {
     try {
       if(DISALLOW) throw new Error("Language file was accessed.");
       if(chk) check = new HashMap<String, Boolean>();
-      
+
       final String path = SUFFIX + "/" + lang + "." + SUFFIX;
       final URL url = BaseX.class.getResource(path);
       if(url == null) {
@@ -150,7 +150,7 @@ public final class Lang {
     }
     return new String[][] { langs.finish(), creds.finish() };
   }
-  
+
   /**
    * Returns the credits from the specified file.
    * @param cont content

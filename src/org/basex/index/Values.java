@@ -29,7 +29,7 @@ public final class Values extends Index {
   final boolean text;
   /** Values file. */
   final Data data;
-  
+
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
@@ -63,14 +63,14 @@ public final class Values extends Index {
     stats.print(tb);
     return tb.finish();
   }
-  
+
   @Override
   public IndexIterator ids(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
-    
+
     final long pos = get(tok.get());
     if(pos == 0) return IndexIterator.EMPTY;
-    
+
     return new IndexIterator() {
       /** Number of results. */
       int s = idxl.readNum(pos);
@@ -85,7 +85,7 @@ public final class Values extends Index {
       public boolean more() {
         return ++c < s;
       }
-      
+
       @Override
       public int next() {
         v += idxl.readNum(p);
@@ -109,16 +109,16 @@ public final class Values extends Index {
     final double min = tok.min;
     final double max = tok.max;
 
-    final int mx = (long) max == max ? token(max).length : 0;  
+    final int mx = (long) max == max ? token(max).length : 0;
     final boolean sl = mx != 0 && (long) min == min && token(min).length == mx;
-    
+
     final IntList ids = new IntList();
     boolean found = false;
     for(int l = 0; l < size - 1; l++) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
       final double v = text ? data.textNum(pre) : data.attNum(pre);
-        
+
       if(!found) {
         found = v == v;
         if(!found || v < min || v > max) continue;
@@ -147,7 +147,7 @@ public final class Values extends Index {
       public int next() { return ids.list[p]; }
     };
   }
-  
+
   /**
    * Returns the id offset for the specified token or
    * 0 if the token is not found.

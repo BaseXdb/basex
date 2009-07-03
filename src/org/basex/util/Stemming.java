@@ -42,32 +42,32 @@ final class Stemming {
   private static final byte[] LL = token("ll");
   /** Stemming character. */
   private static final byte[] L = token("l");
-  
+
   /** Step 2. */
   private static final byte[][][] ST2 = { { token("ational"), token("ate") },
     { token("tional"), token("tion") }, { token("enci"), token("ence") },
     { token("anci"), token("ance") }, { token("izer"), token("ize") },
     { token("izer"), token("ize") }, { token("abli"), token("able") },
-    { token("alli"), token("al") }, { token("entli"), token("ent") }, 
+    { token("alli"), token("al") }, { token("entli"), token("ent") },
     { token("eli"), token("e") }, { token("ousli"), token("ous") },
-    { token("ization"), token("ize") }, { token("ization"), token("ize") }, 
-    { token("ation"), token("ate") }, { token("ator"), token("ate") }, 
+    { token("ization"), token("ize") }, { token("ization"), token("ize") },
+    { token("ation"), token("ate") }, { token("ator"), token("ate") },
     { token("alism"), token("al") }, { token("iveness"), token("ive") },
-    { token("fulness"), token("ful") }, { token("ousness"), token("ous") }, 
-    { token("aliti"), token("al") }, { token("iviti"), token("ive") }, 
+    { token("fulness"), token("ful") }, { token("ousness"), token("ous") },
+    { token("aliti"), token("al") }, { token("iviti"), token("ive") },
     { token("biliti"), token("ble") } };
   /** Step 3. */
   private static final byte[][][] ST3 = { { token("icate"), token("ic") },
-    { token("ative"), token("") }, { token("alize"), token("al") }, 
+    { token("ative"), token("") }, { token("alize"), token("al") },
     { token("alize"), token("al") }, { token("iciti"), token("ic") },
-    { token("ical"), token("ic") }, { token("ful"), token("") }, 
+    { token("ical"), token("ic") }, { token("ful"), token("") },
     { token("ness"), token("") } };
   /** Step 4. */
   private static final byte[][] ST4 = {
-    token("al"), token("ance"), token("ence"), token("er"), token("ic"), 
+    token("al"), token("ance"), token("ence"), token("er"), token("ic"),
     token("able"), token("ible"), token("ant"), token("ement"), token("ment"),
-    token("ent"), token("sion"), token("tion"), token("ou"), token("ism"), 
-    token("ate"), token("iti"), token("ous"), token("ive"), token("ize"), 
+    token("ent"), token("sion"), token("tion"), token("ou"), token("ism"),
+    token("ate"), token("iti"), token("ous"), token("ive"), token("ize"),
     token("ize")
   };
 

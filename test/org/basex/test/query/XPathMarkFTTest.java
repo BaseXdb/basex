@@ -44,7 +44,7 @@ public final class XPathMarkFTTest extends AbstractTest {
       "<Y id='n25' pre='25' post='23'>yawn</Y>" +
       "<Z id='n26' pre='26' post='24' idrefs='n8 n17'" +
       " xml:lang='it'>zuzzurellone</Z></X></A>";
-  
+
     queries = new Object[][] {
       { "A01", nodes(59, 64, 79), "//L/*" },
       { "A02", nodes(20), "//L/parent::*" },
@@ -64,7 +64,7 @@ public final class XPathMarkFTTest extends AbstractTest {
       { "F03", nodes(73), "//*[substring(., 1, 9) = 'plentiful']" },
       { "F04", nodes(68), "//*[substring-after(., 'oven') = 'ware']" },
       { "F05", nodes(73), "//*[substring-before(., 'ful') = 'plenti']" },
-      { "F06", nodes(1, 20), "//*[string-length(translate(" + 
+      { "F06", nodes(1, 20), "//*[string-length(translate(" +
         "normalize-space(.), ' ', '')) > 100]" },
       { "F07", nodes(59), "//*[concat(., ..) = ..]" },
       { "F08", nodes(1, 6, 20, 24, 39, 53, 85, 99, 113),
@@ -104,7 +104,7 @@ public final class XPathMarkFTTest extends AbstractTest {
           79, 89, 94, 103, 108, 113, 117, 122),
           "//*[@pre != @post]" },
       { "O08", nodes(6, 24, 39, 48, 53, 59, 64, 79, 85, 89, 94, 99, 103,
-          108, 113, 117, 122), "//*[((@post * @post + @pre * @pre) div " + 
+          108, 113, 117, 122), "//*[((@post * @post + @pre * @pre) div " +
           "(@post + @pre)) > ((@post - @pre) * (@post - @pre))]" },
       { "O09", nodes(6, 15, 24, 33, 43, 53, 64, 73, 85, 94, 103, 113, 122),
           "//*[@pre mod 2 = 0]" },

@@ -25,7 +25,7 @@ public class ViewRect {
    */
   public ViewRect() {
   }
-  
+
   /**
    * Simple rectangle constructor.
    * @param xx x position
@@ -39,7 +39,7 @@ public class ViewRect {
     w = ww;
     h = hh;
   }
-  
+
   /**
    * Verifies if the specified coordinates are inside the rectangle.
    * @param xx x position
@@ -50,7 +50,7 @@ public class ViewRect {
     return (xx >= x && xx <= x + w || xx >= x + w && xx <= x) &&
       (yy >= y && yy <= y + h || yy >= y + h && yy <= y);
   }
-  
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[x=" + x + ",y=" + y + ",h=" + h +

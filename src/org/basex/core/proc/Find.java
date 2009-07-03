@@ -105,7 +105,7 @@ public final class Find extends AQuery {
    */
   private static String findFS(final String term, final Context context,
       final boolean root) {
-    
+
     final String query = term.replaceAll("\\*|\\?|\\&|\"", " ") + ' ';
     String qu = query;
 

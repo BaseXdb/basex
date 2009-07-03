@@ -15,7 +15,7 @@ public final class TableMemAccess extends TableAccess {
   private long[] buf1;
   /** Long buffer array. */
   private long[] buf2;
-  
+
   /**
    * Stores the file content in a long array.
    * @param db name of the database
@@ -52,7 +52,7 @@ public final class TableMemAccess extends TableAccess {
     }
     f.close();
   }
-  
+
   /**
    * Returns a long value.
    * @param array byte array
@@ -104,12 +104,12 @@ public final class TableMemAccess extends TableAccess {
   public void write2(final int p, final int o, final int v) {
     BaseX.notimplemented();
   }
-  
+
   @Override
   public void write4(final int p, final int o, final int v) {
     BaseX.notimplemented();
   }
-  
+
   @Override
   public void write5(final int p, final int o, final long v) {
     BaseX.notimplemented();
@@ -119,12 +119,12 @@ public final class TableMemAccess extends TableAccess {
   public void delete(final int pre, final int size) {
     BaseX.notimplemented();
   }
-  
+
   @Override
   public void insert(final int pre, final byte[] entries) {
     BaseX.notimplemented();
   }
-  
+
   @Override
   public void flush() { }
 

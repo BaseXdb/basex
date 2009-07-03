@@ -47,7 +47,6 @@ public abstract class DataUpdateTest {
    * Create the database.
    */
   @Before
-  @SuppressWarnings("unused")
   public void setUp() {
     try {
       data = CreateDB.xml(IO.get(TESTFILE), dbname);
@@ -57,7 +56,7 @@ public abstract class DataUpdateTest {
     }
     size = data.meta.size;
   }
-  
+
   /**
    * Delete the test-database.
    */

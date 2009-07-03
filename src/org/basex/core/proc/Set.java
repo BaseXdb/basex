@@ -23,7 +23,7 @@ public final class Set extends Process {
   public Set(final Object option, final String val) {
     super(STANDARD, option.toString(), val);
   }
-  
+
   @Override
   protected boolean exec() {
     final String option = args[0];
@@ -32,12 +32,12 @@ public final class Set extends Process {
     try {
       s = Enum.valueOf(CmdSet.class, option);
     } catch(final Exception ex) { }
-    
+
     try {
       final Field f = Prop.class.getField(option.toLowerCase());
       final Object key = f.get(null);
       String val = args[1];
-      
+
       if(key instanceof Boolean) {
         if(s == CmdSet.INFO && ALL.equals(val)) {
           Prop.allInfo = true;

@@ -12,7 +12,7 @@ import static org.basex.build.fs.FSText.*;
 
 /**
  * JPG meta data extractor.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -43,7 +43,7 @@ public final class JPGExtractor extends EXIFExtractor {
       skip(in, skip);
     }
     skip(in, 3);
-    
+
     // extract image dimensions
     final int h = (in.read() << 8) + in.read();
     final int w = (in.read() << 8) + in.read();
@@ -63,7 +63,7 @@ public final class JPGExtractor extends EXIFExtractor {
       listener.endElem(EXIF);
       exif.clear();
     }
-    
+
     listener.endElem(IMAGE);
   }
 }

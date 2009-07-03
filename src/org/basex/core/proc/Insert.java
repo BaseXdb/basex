@@ -51,11 +51,11 @@ public final class Insert extends AUpdate {
       default:        ok = node(data, nodes, gui); break;
     }
     if(!ok) return false;
-    
+
     data.flush();
     return Prop.info ? info(INSERTINFO, nodes.size(), perf.getTimer()) : true;
   }
-  
+
   /**
    * Inserts attributes.
    * @param data data reference
@@ -89,7 +89,7 @@ public final class Insert extends AUpdate {
     }
     return true;
   }
-  
+
   /**
    * Inserts fragments.
    * @param data data reference
@@ -100,7 +100,7 @@ public final class Insert extends AUpdate {
   private boolean frag(final Data data, final Nodes nodes, final boolean gui) {
     final int pos = gui ? 0 : Token.toInt(args[1]);
     if(pos < 0) return error(POSINVALID, args[1]);
-    
+
     Data tmp;
     try {
       final IO io = IO.get(args[0]);
@@ -112,7 +112,7 @@ public final class Insert extends AUpdate {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }
-    
+
     // insert temporary instance of document
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
@@ -122,7 +122,7 @@ public final class Insert extends AUpdate {
     }
     return true;
   }
-  
+
   /**
    * Inserts nodes.
    * @param data data reference

@@ -24,7 +24,7 @@ public final class Check extends Process {
   public Check(final String name) {
     super(STANDARD, name);
   }
-  
+
   @Override
   protected boolean exec() {
     final Data data = context.data();
@@ -37,7 +37,7 @@ public final class Check extends Process {
     // open or create new database
     return !Prop.onthefly && exec(new Open(name)) || exec(new CreateDB(name));
   }
-  
+
   /**
    * Static command for getting a database reference.
    * No warnings are thrown; instead, an empty reference is returned.

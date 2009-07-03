@@ -753,8 +753,8 @@ public class QueryParser extends InputParser {
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
     return order == null && group == null ? new FLWR(fl, where, ret) :
-      new FLWOR(fl, where, 
-                order == null ? null : new Order(order), 
+      new FLWOR(fl, where,
+                order == null ? null : new Order(order),
                 group == null ? null : new Group(group), ret);
   }
 
@@ -835,10 +835,10 @@ public class QueryParser extends InputParser {
     final Ord ord = new Ord(e, desc, least);
     return order == null ? new Ord[] { ord } : Array.add(order, ord);
   }
-  
+
   /**
    * [59]* GroupingSpec (*Xquery 1.1 Draft).
-   * 
+   *
    * @param group grouping specification
    * @return new Grp array
    * @throws QueryException in case something went wrong
@@ -1244,7 +1244,7 @@ public class QueryParser extends InputParser {
 
     final Expr root = s > 0 ? new Root() : !step ? ex : null;
     if(root != ex) list = add(list, ex);
-    
+
     if(slash) {
       do {
         final boolean desc = consume('/');
@@ -1279,11 +1279,10 @@ public class QueryParser extends InputParser {
   }
 
   // Methods for query suggestions
-  
+
   /**
    * Performs an optional check init.
    */
-  @SuppressWarnings("unused")
   protected void checkInit() { }
 
   /**
@@ -1308,8 +1307,8 @@ public class QueryParser extends InputParser {
   @SuppressWarnings("unused")
   protected void checkPred(final boolean open) { }
 
-  
-  
+
+
   /**
    * [ 70] Parses a StepExpr.
    * @return query expression
@@ -2441,7 +2440,7 @@ public class QueryParser extends InputParser {
     if(ctx.thes != null) fn = ctx.thes.get(fn);
     IO fl = IO.get(fn);
 
-    if(!fl.exists() && file != null) fl = file.merge(file); 
+    if(!fl.exists() && file != null) fl = file.merge(file);
     final byte[] rel = consumeWS2(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange();
     long min = 0;
@@ -2459,7 +2458,7 @@ public class QueryParser extends InputParser {
     //if(!th.init()) error(NOTHES, fl);
     thes.add(th);
   }
-  
+
   /**
    * [UP143] Parses an InsertExpression.
    * [UP142] Parses an InsertTargetChoiceExpr.
@@ -2495,7 +2494,7 @@ public class QueryParser extends InputParser {
     error(UPIMPL);
     return new Insert(s, as, last, in, af, trg);
   }
-  
+
   /**
    * [UP144] Parses a DeleteExpression.
    * @return query expression
@@ -2512,7 +2511,7 @@ public class QueryParser extends InputParser {
     error(UPIMPL);
     return new Delete(n);
   }
-  
+
   /**
    * [UP146] Parses a RenameExpression.
    * @return query expression
@@ -2531,7 +2530,7 @@ public class QueryParser extends InputParser {
     error(UPIMPL);
     return new Rename(trg, n);
   }
-  
+
   /**
    * [UP145] Parses a ReplaceExpression.
    * @return query expression
@@ -2552,7 +2551,7 @@ public class QueryParser extends InputParser {
     error(UPIMPL);
     return new Replace(t, e, v);
   }
-  
+
   /**
    * [UP150] Parses a TransformExpression.
    * @return query expression
@@ -2634,7 +2633,7 @@ public class QueryParser extends InputParser {
    */
   void entity(final TokenBuilder tb) throws QueryException {
     final String ent = ent(tb);
-    if(ent != null)  error(ENTINVALID, ent);
+    if(ent != null) error(ENTINVALID, ent);
   }
 
   /**

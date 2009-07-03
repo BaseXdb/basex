@@ -38,7 +38,7 @@ public final class BaseXButton extends JButton {
     setOpaque(false);
     BaseXLayout.addHelp(this, hlp);
     if(d == null) return;
-      
+
     addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String text = getText();

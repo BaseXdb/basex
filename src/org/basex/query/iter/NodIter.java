@@ -110,7 +110,7 @@ public final class NodIter extends NodeIter {
       size = i;
     }
   }
-  
+
   /**
    * Recursively sorts the specified items via QuickSort
    * (derived from Java's sort algorithms).
@@ -123,7 +123,7 @@ public final class NodIter extends NodeIter {
         for(int j = i; j > s && item[j - 1].diff(item[j]) > 0; j--) s(j, j - 1);
       return;
     }
-    
+
     int m = s + (e >> 1);
     if(e > 7) {
       int l = s;

@@ -11,7 +11,7 @@ import org.basex.util.XMLToken;
 
 /**
  * QName item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -22,7 +22,7 @@ public final class QNm extends Item {
   private byte[] val;
   /** Namespace index. */
   private int ns;
-  
+
   /**
    * Empty Constructor.
    */
@@ -30,7 +30,7 @@ public final class QNm extends Item {
     super(Type.QNM);
     val = EMPTY;
   }
-  
+
   /**
    * Constructor.
    * @param n name
@@ -39,7 +39,7 @@ public final class QNm extends Item {
     this();
     name(n);
   }
-  
+
   /**
    * Constructor.
    * @param n name
@@ -61,7 +61,7 @@ public final class QNm extends Item {
     this(n);
     uri = u;
   }
-  
+
   /**
    * Convenient method for converting a Java QName to a project specific one.
    * @param qn qname
@@ -69,7 +69,7 @@ public final class QNm extends Item {
   public QNm(final QName qn) {
     this(token(qname(qn)), Uri.uri(token(qn.getNamespaceURI())));
   }
-  
+
   /**
    * Converts the specified QName to a string.
    * @param qn qname
@@ -80,7 +80,7 @@ public final class QNm extends Item {
     final String pre = qn.getPrefix();
     return pre.length() != 0 ?  pre + ":" + name : name;
   }
-  
+
   /**
    * Sets the name.
    * @param nm name
@@ -121,7 +121,7 @@ public final class QNm extends Item {
     Err.cmp(it, this);
     return 0;
   }
-  
+
   /**
    * Checks if the name contains a namespace.
    * @return result of check
@@ -129,7 +129,7 @@ public final class QNm extends Item {
   public boolean ns() {
     return ns != -1;
   }
-  
+
   /**
    * Returns the prefix.
    * @return prefix
@@ -137,7 +137,7 @@ public final class QNm extends Item {
   public byte[] pre() {
     return ns == -1 ? EMPTY : substring(val, 0, ns);
   }
-  
+
   /**
    * Returns the local name.
    * @return local name

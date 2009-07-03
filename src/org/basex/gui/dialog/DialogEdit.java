@@ -27,7 +27,7 @@ public final class DialogEdit extends Dialog {
   public StringList result;
   /** Node kind. */
   public final int kind;
-  
+
   /** Text area. */
   private BaseXTextField input;
   /** Text area. */

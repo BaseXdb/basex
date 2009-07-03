@@ -69,7 +69,7 @@ public class Tokenizer implements IndexToken {
   public Tokenizer(final byte[] txt) {
     text = txt;
   }
-  
+
   public Type type() {
     return Type.FTX;
   }
@@ -241,7 +241,8 @@ public class Tokenizer implements IndexToken {
 
   /**
    * Removes diacritics from the specified token.
-   * Note that this method does only support the first 256 unicode characters.
+   * Note that this method does only support the conversion of the standard
+   * character set.
    * @param t token to be converted
    * @param a ascii flag
    * @return converted token

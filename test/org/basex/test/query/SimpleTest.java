@@ -109,12 +109,12 @@ public final class SimpleTest extends AbstractTest {
     PRE PAR  TYPE  CONTENT
       0  -1  DOC   test.xml
       1   0  ELEM  html
-      2   1  COMM   Header 
+      2   1  COMM   Header
       3   1  ELEM  head
       4   3  ATTR  id="0"
       5   3  ELEM  title
       6   5  TEXT  XML
-      7   1  COMM   Body 
+      7   1  COMM   Body
       8   1  ELEM  body
       9   8  ATTR  id="1"
      10   8  ATTR  bgcolor="#FFFFFF"

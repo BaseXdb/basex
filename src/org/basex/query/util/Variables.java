@@ -25,7 +25,7 @@ public final class Variables extends ExprInfo {
   public void addGlobal(final Var v) {
     global.add(v);
   }
-  
+
   /**
    * Returns the global variables.
    * @return global variables
@@ -67,7 +67,7 @@ public final class Variables extends ExprInfo {
   public void reset(final int s) {
     local.size = s;
   }
-  
+
   /**
    * Compiles the variables.
    * @param ctx query context

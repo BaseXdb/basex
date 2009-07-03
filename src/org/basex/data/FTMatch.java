@@ -55,7 +55,7 @@ public class FTMatch implements Iterable<FTStringMatch> {
    * @return result of check
    */
   public boolean notin(final FTMatch mtc) {
-    for(final FTStringMatch s : this) { 
+    for(final FTStringMatch s : this) {
       for(final FTStringMatch m : mtc) if(!s.in(m)) return true;
     }
     return false;
@@ -89,7 +89,7 @@ public class FTMatch implements Iterable<FTStringMatch> {
       public void remove() { BaseX.notexpected(); }
     };
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();

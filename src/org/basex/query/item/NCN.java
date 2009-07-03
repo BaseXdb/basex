@@ -7,7 +7,7 @@ import org.basex.util.Token;
 
 /**
  * NCName item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -25,7 +25,7 @@ public final class NCN extends Str {
     while(++i != v.length) {
       final byte c = v[i];
       if(Token.letter(c)) continue;
-      if(i == 0 || !Token.digit(c) && c != '-' && c != '_' && c != '.') 
+      if(i == 0 || !Token.digit(c) && c != '-' && c != '_' && c != '.')
         Err.or(XPINVNAME, v);
     }
   }

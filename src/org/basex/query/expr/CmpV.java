@@ -105,7 +105,7 @@ public final class CmpV extends Arr {
      * @throws QueryException evaluation exception
      */
     public abstract boolean e(Item a, Item b) throws QueryException;
-    
+
     /**
      * Inverts the comparator.
      * @return inverted comparator
@@ -115,7 +115,7 @@ public final class CmpV extends Arr {
     @Override
     public String toString() { return name; }
   }
-  
+
   /** Comparator. */
   public Comp cmp;
 
@@ -143,7 +143,7 @@ public final class CmpV extends Arr {
     }
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    
+
     Expr e = this;
     if(e1.i() && e2.i()) {
       e = atomic(ctx);
@@ -186,7 +186,7 @@ public final class CmpV extends Arr {
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
-    
+
     if(!valCheck(a, b)) Err.cmp(a, b);
     return Bln.get(cmp.e(a, b));
   }

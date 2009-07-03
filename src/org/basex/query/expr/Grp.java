@@ -32,7 +32,7 @@ public class Grp extends Expr {
     seq = new SeqIter();
     expr = e;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx);
@@ -93,7 +93,7 @@ public class Grp extends Expr {
   public void plan(final Serializer ser) throws IOException {
     expr.plan(ser);
   }
-  
+
   @Override
   public String toString() {
     return expr.toString();

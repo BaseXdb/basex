@@ -10,7 +10,7 @@ import org.basex.util.Performance;
  * This class stores the reference to the currently opened database.
  * Moreover, it provides references to the currently used, marked and
  * copied node sets.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -25,14 +25,14 @@ public final class Context {
   private Nodes copied;
   /** DBPool. */
   public static final DataPool POOL = new DataPool();
-  
+
   /**
    * Constructor.
   */
   public Context() {
     Prop.read();
   }
-  
+
   /**
    * Returns true if a data reference has been set.
    * @return result of check
@@ -40,7 +40,7 @@ public final class Context {
   public boolean db() {
     return data != null;
   }
-  
+
   /**
    * Returns true if all current nodes refer to document nodes.
    * @return result of check
@@ -50,7 +50,7 @@ public final class Context {
     for(final int n : current.nodes) if(data.kind(n) != Data.DOC) return false;
     return true;
   }
-  
+
   /**
    * Returns data reference.
    * @return data reference
@@ -58,7 +58,7 @@ public final class Context {
   public Data data() {
     return data;
   }
-  
+
   /**
    * Sets a new data instance.
    * @param d data reference
@@ -73,14 +73,14 @@ public final class Context {
     marked = new Nodes(d);
     update();
   }
-  
+
   /**
    * Updates references to the document nodes.
    */
   public void update() {
     current = new Nodes(data.doc(), data);
   }
-    
+
   /**
    * Closes the database instance.
    * @return true if operation was successful
@@ -97,7 +97,7 @@ public final class Context {
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
 
         // -- close fuse instance
-        if(Prop.fuse) { 
+        if(Prop.fuse) {
           final String method = "[BaseX.close] ";
           BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
           // -- unmount running fuse.
@@ -117,7 +117,7 @@ public final class Context {
           }
           int rc = p.exitValue();
           String msg = method + "Unmount "  + d.meta.mountpoint;
-          if (rc == 0) msg = msg + " ... OK."; 
+          if (rc == 0) msg = msg + " ... OK.";
           else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
           BaseX.debug(msg);
         }
@@ -128,7 +128,7 @@ public final class Context {
       return false;
     }
   }
-  
+
   /**
    * Returns the current context set.
    * @return current context set
@@ -136,7 +136,7 @@ public final class Context {
   public Nodes current() {
     return current;
   }
-  
+
   /**
    * Sets the current context set.
    * @param curr current context set
@@ -144,7 +144,7 @@ public final class Context {
   public void current(final Nodes curr) {
     current = curr;
   }
-  
+
   /**
    * Returns the copied context set.
    * @return copied context set
@@ -152,7 +152,7 @@ public final class Context {
   public Nodes copied() {
     return copied;
   }
-  
+
   /**
    * Sets the current node set as copy.
    * @param copy current node set as copy.
@@ -160,7 +160,7 @@ public final class Context {
   public void copy(final Nodes copy) {
     copied = copy;
   }
-  
+
   /**
    * Returns the marked context set.
    * @return marked context set
@@ -168,7 +168,7 @@ public final class Context {
   public Nodes marked() {
     return marked;
   }
-  
+
   /**
    * Sets the marked context set.
    * @param mark marked context set

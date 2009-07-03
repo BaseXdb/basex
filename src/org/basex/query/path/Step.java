@@ -65,7 +65,7 @@ public class Step extends Preds {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(!test.comp(ctx)) return Seq.EMPTY;
-    
+
     final Data data = ctx.data();
     ctx.leaf = false;
     if(data != null && test.kind == Kind.NAME) {
@@ -82,7 +82,7 @@ public class Step extends Preds {
     // No predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
     final Expr p = pred[0];
-    
+
     // Position predicate
     final Pos pos = p instanceof Pos ? (Pos) p : null;
     // Last flag
@@ -135,7 +135,7 @@ public class Step extends Preds {
     }
     return ni;
   }
-  
+
   /**
    * Checks if this is a simple axis without predicates.
    * @param ax axis to be checked
@@ -170,12 +170,12 @@ public class Step extends Preds {
     }
     final boolean desc = axis == Axis.DESC;
     if(!desc && axis != Axis.CHILD) return null;
-    
+
     final ArrayList<PathNode> out = new ArrayList<PathNode>();
     for(final PathNode sn : nodes) data.path.desc(sn, out, name, kind, desc);
     return out;
   }
-  
+
   /**
    * Adds a predicate to the step.
    * @param p predicate to be added
@@ -211,7 +211,7 @@ public class Step extends Preds {
     super.plan(ser);
     ser.closeElement();
   }
-  
+
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();

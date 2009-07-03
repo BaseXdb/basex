@@ -25,7 +25,7 @@ public final class NullOutput extends PrintOutput {
   public NullOutput(final boolean s) {
     skip = s;
   }
-  
+
   @Override
   public void write(final int b) { }
 

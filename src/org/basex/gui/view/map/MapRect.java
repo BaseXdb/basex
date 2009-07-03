@@ -20,7 +20,7 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   byte thumbal;
   /** Height of a thumbnail unit.*/
   byte thumbfh;
-  /** Height of an empty line.*/ 
+  /** Height of an empty line.*/
   byte thumblh;
   /** Width of a thumbnail unit. */
   double thumbf;
@@ -28,13 +28,13 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   double thumbsw;
   /** Is Leaf in Treemap? */
   boolean isLeaf;
-  
+
   /**
    * Default constructor.
    */
   MapRect() {
   }
-  
+
   /**
    * Simple rectangle constructor.
    * @param xx x position
@@ -62,7 +62,7 @@ class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
     pre = p;
     level = l;
   }
-  
+
   /**
    * Constructor taking MapRect for position initialization.
    * @param r pos and dimension rectangle

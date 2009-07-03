@@ -53,7 +53,7 @@ public final class BaseXText extends BaseXPanel {
   final BaseXBar scroll;
   /** Popup Menu. */
   final BaseXPopup popup;
-  
+
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -124,7 +124,7 @@ public final class BaseXText extends BaseXPanel {
     final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :
         new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd() };
-    popup = new BaseXPopup(this, pop);    
+    popup = new BaseXPopup(this, pop);
   }
 
   /**
@@ -261,7 +261,7 @@ public final class BaseXText extends BaseXPanel {
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     if(!isEnabled()) return;
-    
+
     requestFocusInWindow();
     cursor(true);
 
@@ -354,8 +354,8 @@ public final class BaseXText extends BaseXPanel {
       } while(cont != null);
       return;
     }
-    
-    
+
+
     if(e.isAltDown() || c == KeyEvent.VK_SHIFT || c == KeyEvent.VK_META ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
 

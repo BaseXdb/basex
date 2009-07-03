@@ -12,7 +12,7 @@ import org.basex.gui.layout.TableLayout;
 
 /**
  * Dialog window for changing the used colors.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -47,7 +47,7 @@ public final class DialogColors extends Dialog {
     p.add(new BaseXLabel(SCHEMABLUE));
     sliderBlue = newSlider(GUIProp.colorblue);
     p.add(sliderBlue);
-    
+
     set(p, BorderLayout.CENTER);
     finish(GUIProp.colorsloc);
   }

@@ -75,7 +75,7 @@ public final class MixedPath extends Path {
     ctx.pos = cp;
     return i.iter();
   }
-  
+
   /**
    * Evaluates the location path.
    * @param ctx query context
@@ -115,7 +115,7 @@ public final class MixedPath extends Path {
     }
     return it;
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return uses(step, u, ctx);

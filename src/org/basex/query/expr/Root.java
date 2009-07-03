@@ -12,7 +12,7 @@ import org.basex.query.util.Err;
 
 /**
  * Root node.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -29,7 +29,7 @@ public final class Root extends Simple {
     }
     return ni;
   }
-  
+
   /**
    * Returns the root node of the specified item.
    * @param i input node
@@ -44,7 +44,7 @@ public final class Root extends Simple {
       n = p;
     }
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.CTX;

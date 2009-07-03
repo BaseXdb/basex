@@ -48,7 +48,7 @@ public final class XQueryExample {
     // Closes the query processor
     processor.close();
 
-    
+
     out.println("\n=== Second example: Iterating through all results");
 
     // Creates a query instance
@@ -63,7 +63,7 @@ public final class XQueryExample {
     // Closes the query processor and the output stream
     processor.close();
 
-    
+
     out.println("\n=== Third example: Using the BaseX command");
 
     // Creates a database context
@@ -71,7 +71,7 @@ public final class XQueryExample {
 
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);
-    
+
     // Closes the database
     context.close();
 

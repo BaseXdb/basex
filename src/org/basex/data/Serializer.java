@@ -143,7 +143,7 @@ public abstract class Serializer {
    */
   public final void openElement(final byte[] t, final byte[]... a)
       throws IOException {
-  
+
     finishElement();
     tags.add(t);
     nsl.add(ns.size);
@@ -254,10 +254,10 @@ public abstract class Serializer {
     final int[] parent = new int[IO.MAXHEIGHT];
     final byte[][] names = new byte[IO.MAXHEIGHT][];
     names[0] = dn;
-    
+
     int l = 0;
     int p = pre;
-    
+
     // loop through all table entries
     final int s = pre + data.size(pre, data.kind(p));
     while(p < s && !finished()) {

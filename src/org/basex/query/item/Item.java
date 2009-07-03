@@ -26,7 +26,7 @@ public abstract class Item extends Expr {
   protected double score;
   /** Data type. */
   public Type type;
-  
+
   /**
    * Constructor.
    * @param t data type.
@@ -34,7 +34,7 @@ public abstract class Item extends Expr {
   protected Item(final Type t) {
     type = t;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) {
     return this;
@@ -221,7 +221,6 @@ public abstract class Item extends Expr {
    * @return difference
    * @throws QueryException evaluation exception
    */
-  @SuppressWarnings("unused")
   public int diff(final Item it) throws QueryException {
     Err.cmp(it, this);
     return 0;
@@ -248,7 +247,7 @@ public abstract class Item extends Expr {
    * @param val cast value
    * @throws QueryException evaluation exception
    */
-  public final void castErr(final Object val) throws QueryException {
+  protected final void castErr(final Object val) throws QueryException {
     Err.or(FUNCAST, type, Err.chop(val));
   }
 
@@ -257,7 +256,6 @@ public abstract class Item extends Expr {
    * @param ser serializer
    * @throws IOException exception
    */
-  @SuppressWarnings("unused")
   public void serialize(final Serializer ser) throws IOException {
     ser.item(str());
   }
@@ -276,7 +274,7 @@ public abstract class Item extends Expr {
   public Return returned(final QueryContext ctx) {
     return type.returned();
   }
-  
+
   @Override
   public boolean duplicates(final QueryContext ctx) {
     return false;

@@ -23,7 +23,7 @@ public final class InfoDB extends AInfo {
   /** Date Format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-  
+
   /**
    * Constructor.
    */
@@ -35,7 +35,7 @@ public final class InfoDB extends AInfo {
   protected void out(final PrintOutput out) throws IOException {
     out.print(db(context.data().meta, true, true));
   }
-  
+
   /**
    * Creates a database information string.
    * @param meta meta data
@@ -45,14 +45,14 @@ public final class InfoDB extends AInfo {
    */
   public static byte[] db(final MetaData meta, final boolean header,
       final boolean index) {
-    
+
     final File dir = IO.dbpath(meta.dbname);
     long len = 0;
     if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
 
     final TokenBuilder tb = new TokenBuilder();
     final int l = maxLength(new String[] {
-        INFODBNAME, INFODBSIZE, INFODOC, INFOTIME, INFONDOCS, INFODOCSIZE, 
+        INFODBNAME, INFODBSIZE, INFODOC, INFOTIME, INFONDOCS, INFODOCSIZE,
         INFOENCODING, INFONODES, INFOHEIGHT
     }) + 1;
 
@@ -64,7 +64,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFOENCODING, meta.encoding, header, l);
     format(tb, INFONODES, Integer.toString(meta.size), header, l);
     format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
-    
+
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFODOC, meta.file.path(), header, l);
     format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
@@ -72,7 +72,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFONDOCS, Integer.toString(meta.ndocs), header, l);
     //format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
     //format(tb, INFOENTITIES, BaseX.flag(meta.entity), true, 0);
-    
+
     if(index) {
       tb.add(NL + INFOINDEX + NL);
       if(meta.oldindex) {
@@ -86,7 +86,7 @@ public final class InfoDB extends AInfo {
     }
     return tb.finish();
   }
-  
+
   @Override
   public String toString() {
     return Cmd.INFO.name() + " " + CmdInfo.DB;

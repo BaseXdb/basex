@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This index class retrieves attribute values from the index.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -35,12 +35,12 @@ public final class IndexAccess extends Simple {
     ind = i;
     ictx = ic;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       final IndexIterator it = ictx.data.ids(ind);
-      
+
       @Override
       public Item next() {
         return it.more() ? new DBNode(ictx.data, it.next()) : null;

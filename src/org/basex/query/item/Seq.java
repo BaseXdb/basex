@@ -15,7 +15,7 @@ import org.basex.util.Token;
 
 /**
  * Item sequence.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -45,7 +45,7 @@ public class Seq extends Item {
   protected Seq() {
     super(Type.EMP);
   }
-  
+
   /**
    * Constructor.
    * @param v value
@@ -55,7 +55,7 @@ public class Seq extends Item {
   public static Item get(final Item[] v, final int s) {
     return s == 0 ? EMPTY : s == 1 ? v[0] : new Seq(v, s);
   }
-  
+
   /**
    * Constructor.
    * @param v value
@@ -119,12 +119,12 @@ public class Seq extends Item {
       ser.closeResult();
     }
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.SEQ;
   }
-  
+
   @Override
   public boolean duplicates(final QueryContext ctx) {
     return size != 0;

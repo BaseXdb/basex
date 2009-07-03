@@ -42,7 +42,7 @@ public final class QueryProcessor extends Progress {
     Prop.read();
     progress(ctx);
   }
-  
+
   /**
    * XQuery Constructor.
    * @param qu query
@@ -52,7 +52,7 @@ public final class QueryProcessor extends Progress {
     this(qu);
     ctx.file = f;
   }
-  
+
   /**
    * XQuery Constructor.
    * @param qu query
@@ -71,7 +71,7 @@ public final class QueryProcessor extends Progress {
     if(!parsed) ctx.parse(query);
     parsed = true;
   }
-  
+
   /**
    * Compiles the query.
    * @throws QueryException query exception
@@ -81,7 +81,7 @@ public final class QueryProcessor extends Progress {
     if(!compiled) ctx.compile();
     compiled = true;
   }
-  
+
   /**
    * Returns a result iterator.
    * @return result iterator
@@ -91,7 +91,7 @@ public final class QueryProcessor extends Progress {
     compile();
     return ctx.iter();
   }
-  
+
   /**
    * Returns the result as an item.
    * @return result iterator
@@ -131,7 +131,7 @@ public final class QueryProcessor extends Progress {
     ctx.modules.add(ns);
     ctx.modules.add(file);
   }
-  
+
   /**
    * Sets a new query. Should be called before parsing the query.
    * @param qu query
@@ -147,7 +147,7 @@ public final class QueryProcessor extends Progress {
   public void close() throws IOException {
     ctx.close();
   }
-  
+
   /**
    * Returns query background information.
    * @return background information
@@ -157,7 +157,7 @@ public final class QueryProcessor extends Progress {
     if(Prop.allInfo) tb.add(NL + QUERYSTRING + query + NL);
     return tb.toString();
   }
-  
+
   /**
    * Returns the query plan in the dot notation.
    * @param ser serializer
@@ -168,7 +168,7 @@ public final class QueryProcessor extends Progress {
     ctx.plan(ser);
     ser.closeElement();
   }
-  
+
   @Override
   public String tit() {
     return QUERYEVAL;

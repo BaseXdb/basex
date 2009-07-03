@@ -5,7 +5,7 @@ import org.basex.util.Array;
 
 /**
  * Class for all referenced Data.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -54,7 +54,7 @@ public class DataPool {
     //   will be referenced in the pool.
     return true;
   }
-  
+
   /**
    * Returns value if the checked DB is in use or not.
    * @param db name of the database

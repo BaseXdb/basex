@@ -10,7 +10,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
- 
+
 /**
  * This class parses the tokens that are delivered by the
  * {@link XMLScanner} and sends them to the specified database builder.
@@ -47,7 +47,7 @@ public final class XMLParser extends Parser {
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token);
       } else if(scanner.type == Type.PI) {
-        builder.pi(scanner.token); 
+        builder.pi(scanner.token);
       } else if(scanner.type != Type.DTD) {
         if(!parseTag()) break;
         continue;
@@ -55,7 +55,7 @@ public final class XMLParser extends Parser {
       if(!scanner.more()) break;
     }
     scanner.finish();
-    
+
     builder.encoding(scanner.encoding);
     if(doc) builder.endDoc();
     if(Prop.debug) BaseX.err("\n");
@@ -70,7 +70,7 @@ public final class XMLParser extends Parser {
     // find opening tag
     if(scanner.type == Type.L_BR_CLOSE) {
       scanner.more();
-      
+
       // get tag name
       final byte[] tag = consumeToken(Type.TAGNAME);
       skipSpace();
@@ -136,7 +136,7 @@ public final class XMLParser extends Parser {
         t.string, scanner.type.string);
     return scanner.more();
   }
-  
+
   /**
    * Returns the token for the specified token type. If the current token
    * type is wrong, a null reference is returned.
@@ -153,7 +153,7 @@ public final class XMLParser extends Parser {
     scanner.more();
     return tok;
   }
-  
+
   /**
    * Skips optional whitespaces.
    * @throws IOException I/O Exception

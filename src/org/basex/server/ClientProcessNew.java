@@ -16,7 +16,7 @@ import org.basex.io.PrintOutput;
 /**
  * This class sends client commands to the server instance over a socket. It
  * extends the {@link AbstractProcess} class.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */

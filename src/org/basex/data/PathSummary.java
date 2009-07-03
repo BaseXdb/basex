@@ -51,7 +51,7 @@ public final class PathSummary {
   }
 
   // Summary Path creation ----------------------------------------------------
-  
+
   /**
    * Opens an element.
    * @param n name reference
@@ -78,7 +78,7 @@ public final class PathSummary {
       root.tl += tl;
     }
   }
-  
+
   /**
    * Writes the path summary to the specified output.
    * @param out output stream
@@ -163,7 +163,7 @@ public final class PathSummary {
     if(k.length != 0) tl.add(k);
     return desc(tl, d, o);
   }
-  
+
   /**
    * Returns descendant tags and attributes for the specified descendant path.
    * @param tl input steps

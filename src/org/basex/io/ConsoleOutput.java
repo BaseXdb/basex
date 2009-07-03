@@ -7,7 +7,7 @@ import java.io.PrintStream;
  * This class is a stream-wrapper for textual data. Note that the internal
  * byte representation (usually UTF8) will be directly output without
  * further character conversion.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -19,7 +19,7 @@ public final class ConsoleOutput extends PrintOutput {
   public ConsoleOutput(final PrintStream out) {
     super(new BufferedOutput(out));
   }
-  
+
   @Override
   public void close() throws IOException {
     os.flush();

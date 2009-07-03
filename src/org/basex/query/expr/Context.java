@@ -12,7 +12,7 @@ import org.basex.query.path.Step;
 
 /**
  * Context Item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -29,7 +29,7 @@ public final class Context extends Simple {
     ctx.compInfo(OPTTEXT);
     return AxisPath.get(null, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.CTX;
@@ -39,7 +39,7 @@ public final class Context extends Simple {
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Context;
   }
-  
+
   @Override
   public String toString() {
     return ".";

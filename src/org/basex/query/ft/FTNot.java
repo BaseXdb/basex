@@ -13,7 +13,7 @@ import org.basex.query.iter.FTIter;
 
 /**
  * FTUnaryNot expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath

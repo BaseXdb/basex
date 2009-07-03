@@ -13,11 +13,11 @@ import org.basex.util.Array;
  */
 final class MapRects implements Iterable<MapRect> {
   /** Value array. */
-  protected MapRect[] list;
+  MapRect[] list;
   /** Sorted values. */
-  protected MapRect[] sorted;
+  MapRect[] sorted;
   /** Number of entries. */
-  protected int size;
+  int size;
 
   /**
    * Default constructor.
@@ -94,7 +94,7 @@ final class MapRects implements Iterable<MapRect> {
     }
     return -1;
   }
-  
+
   /**
    * Creates a sorted array. If the original array is already sorted,
    * the same reference is used.

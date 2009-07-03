@@ -225,7 +225,7 @@ public final class FTFuzzy extends FTIndex {
    */
   private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
     FTIndexIterator it = FTIndexIterator.EMP;
-    
+
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;

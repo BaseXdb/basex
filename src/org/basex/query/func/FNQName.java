@@ -97,7 +97,7 @@ final class FNQName extends Fun {
     final byte[] name = trim(checkStr(q));
     if(!XMLToken.isQName(name)) Err.value(Type.QNM, q);
     final QNm nm = new QNm(name);
-    
+
     final byte[] pre = nm.pre();
     Nod n = (Nod) check(it, Type.ELM);
     nm.uri = n.qname().uri;
@@ -141,7 +141,7 @@ final class FNQName extends Fun {
       n = n.parent();
     } while(n != null && ctx.nsInherit);
 
-    
+
     final SeqIter seq = new SeqIter();
     for(final byte[] t : tl) seq.add(Str.get(t));
     return seq;

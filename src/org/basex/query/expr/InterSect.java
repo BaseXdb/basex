@@ -45,7 +45,7 @@ public final class InterSect extends Arr {
     for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
     return duplicates(ctx) ? eval(iter) : iter(iter);
   }
-  
+
   /**
    * Creates a intersect iterator.
    * @param iter iterators
@@ -70,7 +70,7 @@ public final class InterSect extends Arr {
         }
         return items[0];
       }
-      
+
       private boolean next(final int i) throws QueryException {
         final Item it = iter[i].next();
         if(it == null) return false;
@@ -80,7 +80,7 @@ public final class InterSect extends Arr {
       }
     };
   }
-  
+
   /**
    * Evaluates the iterators.
    * @param iter iterators
@@ -95,7 +95,7 @@ public final class InterSect extends Arr {
       if(!it.node()) Err.nodes(this);
       seq.add((Nod) it);
     }
-    
+
     for(int e = 1; e != expr.length; e++) {
       final NodIter res = new NodIter(true);
       final Iter ir = iter[e];
@@ -106,7 +106,7 @@ public final class InterSect extends Arr {
           if(seq.item[s].is(node)) {
             res.add(node);
             break;
-          } 
+          }
         }
       }
       seq = res;

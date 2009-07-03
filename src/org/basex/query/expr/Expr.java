@@ -15,7 +15,7 @@ import org.basex.query.util.Var;
 
 /**
  * Abstract Expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -181,7 +181,7 @@ public abstract class Expr extends ExprInfo {
   public boolean duplicates(final QueryContext ctx) {
     return !returned(ctx).single;
   }
-  
+
   /**
    * Checks if an index can be used for query evaluation.
    * @param ic index context
@@ -192,9 +192,9 @@ public abstract class Expr extends ExprInfo {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     return false;
   }
-  
+
   /**
-   * Returns an equivalent expression which accesses an index structure. 
+   * Returns an equivalent expression which accesses an index structure.
    * Must be called if {@link #indexAccessible} is implemented for an
    * expression.
    * @param ic index context

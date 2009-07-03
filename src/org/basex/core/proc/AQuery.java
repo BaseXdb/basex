@@ -113,7 +113,7 @@ abstract class AQuery extends Process {
     info(QUERYPRINTED + Performance.format(out.size()));
     //info(QUERYMEM, Performance.getMem());
   }
-  
+
   /**
    * Creates query plans.
    * @param qu query reference
@@ -122,7 +122,7 @@ abstract class AQuery extends Process {
    */
   private void plan(final QueryProcessor qu, final boolean c) throws Exception {
     if(c != Prop.compplan) return;
-    
+
     // show dot plan
     if(Prop.dotplan) {
       final CachedOutput out = new CachedOutput();

@@ -109,9 +109,9 @@ public final class SeqType {
     }
     return si.finish();
   }
-  
+
   /**
-   * Checks the sequence extension. 
+   * Checks the sequence extension.
    * @param it item
    * @return same item
    * @throws QueryException exception

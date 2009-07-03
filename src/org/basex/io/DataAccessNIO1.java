@@ -36,16 +36,16 @@ public final class DataAccessNIO1 {
 
   /** Bytebuffer window list. */
   private ByteBufferList mbytebufferlist;
-  
+
   /** Current MappedByteBuffer. */
   private MappedByteBuffer mbytebuffer;
-  
+
   /** Read Write Filechannel. */
   private final FileChannel fc;
-  
+
   /** tmp Buffer for writing. */
   private final ByteBuffer tmpblock;
-  
+
   /** Block index. */
   private int blockindex;
 
@@ -99,7 +99,7 @@ public final class DataAccessNIO1 {
   public synchronized void flush() {
     mbytebuffer.force();
   }
-  
+
   /**
    * Closes the data access.
    * @throws IOException in case of write errors
@@ -149,7 +149,7 @@ public final class DataAccessNIO1 {
 
     final byte[] b = new byte[l];
     int ll = BLOCKSIZE - off;
-    
+
     if(ll >= l) {
       for (int i = off; i < l + off; i++) {
         b[i - off] = mbytebuffer.get(i);
@@ -231,7 +231,7 @@ public final class DataAccessNIO1 {
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
-  
+
   // private methods...
 
   /**
@@ -250,20 +250,20 @@ public final class DataAccessNIO1 {
     }
     cursor(pos[c] + BLOCKSIZE);
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position
    */
   public synchronized void cursor(final long p) {
     off = (int) (p & BUFLIMIT);
-    
+
     final long ps = p - off;
     final int o = c;
     do {
       if(pos[c] == ps) return;
     } while((c = (c + 1) % BUFFERS) != o);
-    
+
     c = (o + 1) % BUFFERS;
     readBlock(ps);
   }
@@ -342,7 +342,7 @@ public final class DataAccessNIO1 {
   public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
-  
+
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended

@@ -104,7 +104,7 @@ public class DBNode extends Nod {
   public QNm qname() {
     return qname(new QNm());
   }
-  
+
   @Override
   public QNm qname(final QNm name) {
     final byte[] nm = nname();
@@ -171,7 +171,7 @@ public class DBNode extends Nod {
   public Nod parent() {
     if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
-    
+
     // check if parent constructor exists; if not, include document root node
     if(p == (root != null ? 0 : -1)) return root;
     final DBNode node = copy();

@@ -7,7 +7,7 @@ import org.basex.util.Array;
 /**
  * AllMatches full-text container,
  * referencing several {@link FTMatch} instances.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -35,7 +35,7 @@ public final class FTMatches implements Iterable<FTMatch> {
     sTokenNum = s;
     size = 0;
   }
-  
+
   /**
    * Adds a match entry.
    * @param s position
@@ -120,7 +120,7 @@ public final class FTMatches implements Iterable<FTMatch> {
       public void remove() { BaseX.notexpected(); }
     };
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();

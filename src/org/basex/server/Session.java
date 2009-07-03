@@ -27,7 +27,7 @@ import org.basex.util.Performance;
  * @author Andreas Weiler
  */
 public class Session implements Runnable {
-  
+
   /** Database Context. */
   final Context context = new Context();
   /** Socket. */
@@ -53,8 +53,8 @@ public class Session implements Runnable {
   PrintOutput out;
   /** BaseXServerNew. */
   BaseXServerNew bx;
-  
-  
+
+
   /**
    * Session.
    * @param s Socket
@@ -69,7 +69,7 @@ public class Session implements Runnable {
     this.verbose = v;
     this.bx = b;
   }
-  
+
   /**
    * Starts the Thread.
    */
@@ -79,7 +79,7 @@ public class Session implements Runnable {
       session.start();
     }
   }
-  
+
   /**
    * Handles Client Server Communication.
    * @throws IOException I/O Exception
@@ -97,7 +97,7 @@ public class Session implements Runnable {
     final int port = socket.getPort();
     String in;
     while (running) {
-      in = getMessage().trim(); 
+      in = getMessage().trim();
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
@@ -140,7 +140,7 @@ public class Session implements Runnable {
     }
     stop(true);
   }
-  
+
   /**
    * Times out a process.
    * @param proc process reference
@@ -155,7 +155,7 @@ public class Session implements Runnable {
     };
     timeout.start();
   }
-  
+
   /**
    * Returns the Message from the Client.
    * @return String
@@ -164,7 +164,7 @@ public class Session implements Runnable {
   synchronized String getMessage() throws IOException {
     return dis.readUTF();
   }
-  
+
   /**
    * Returns an answer to the client.
    * @param id session id to be returned
@@ -174,9 +174,9 @@ public class Session implements Runnable {
     dos.writeInt(id);
     dos.flush();
   }
-  
+
   /**
-   * Stops the thread. 
+   * Stops the thread.
    * @param quit check how the quit command is called
    */
   public void stop(final boolean quit) {
@@ -189,10 +189,10 @@ public class Session implements Runnable {
     }
     session = null;
   }
-  
+
   public void run() {
     try {
-      handle(); 
+      handle();
     } catch(Exception io) {
       // for forced stops
       if (io instanceof SocketException) {

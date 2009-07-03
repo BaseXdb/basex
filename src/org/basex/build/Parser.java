@@ -41,7 +41,7 @@ public abstract class Parser {
     if(s.getSystemId() == null) s.setSystemId(io.name());
     return Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
   }
-  
+
   /**
    * Parses all nodes and sends events to the specified builder.
    * @param build event listener.

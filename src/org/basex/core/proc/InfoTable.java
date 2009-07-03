@@ -69,7 +69,7 @@ public final class InfoTable extends AInfo {
    */
   public static void table(final PrintOutput out, final Data data,
       final int s, final int e) throws IOException {
-    
+
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
     tableHeader(out, data);
@@ -105,7 +105,7 @@ public final class InfoTable extends AInfo {
    */
   private static void table(final PrintOutput out, final Data data,
       final int p) throws IOException {
-    
+
     final int len = Math.max(2, numDigits(data.meta.size));
     format(out, p, len + 1);
     final int k = data.kind(p);
@@ -152,7 +152,7 @@ public final class InfoTable extends AInfo {
     for(int i = 0; i < s - t.length; i++) out.print(' ');
     out.print(t);
   }
-  
+
   @Override
   public String toString() {
     return Cmd.INFO.name() + " " + CmdInfo.TABLE + args();

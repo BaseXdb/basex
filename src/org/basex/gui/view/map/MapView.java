@@ -36,7 +36,7 @@ import org.basex.util.Tokenizer;
 
 /**
  * This view is a TreeMap implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -61,7 +61,7 @@ public final class MapView extends View implements Runnable {
   /** Keeps Layout for focused rectangle. */
   public MapLayout tinyLayout;
 //  /** Scaled Layout. */
-//  public MapLayout hugeLayout; 
+//  public MapLayout hugeLayout;
   /** Text lengths. */
   private int[] textLen;
 
@@ -198,7 +198,7 @@ public final class MapView extends View implements Runnable {
         && rectHist[hist + 1] != null
         && rectHist[hist + 1].pre == 0
         || more
-        && (context.size() != 1 
+        && (context.size() != 1
         || focused == null || context.nodes[0] != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
@@ -211,28 +211,28 @@ public final class MapView extends View implements Runnable {
 
     // initial rectangle
     final int w = getWidth(), h = getHeight();
-    
+
     if(GUIProp.mapinteraction) {
       // [JH] use normal rectangles to calculate hugeMap
 //      final Data data = gui.context.data();
 //      MapLayout hugeLayout = new MapLayout(data, textLen);
-//      
+//
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
       calc(rect, gui.context.current(), mainMap);
-      
+
 //      MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
 //          mainRects.get(0).level);
 //      MapRect source = new MapRect(0, 0, w, h, mainRects.get(0).pre,
 //          mainRects.get(0).level);
 //      dest.isLeaf = mainRects.get(0).isLeaf;
 //      source.isLeaf = mainRects.get(0).isLeaf;
-//      MapRects hugeRects = scaleRects(mainRects, 0, mainRects.size, dest, 
+//      MapRects hugeRects = scaleRects(mainRects, 0, mainRects.size, dest,
 //          source);
-      
+
       // simple method only scaling all the rectangles including the borders
       hugeRects = new MapRects();
       for(MapRect r : mainRects) {
-        hugeRects.add(new MapRect(fkt * r.x, fkt * r.y, fkt * r.w, fkt * r.h, 
+        hugeRects.add(new MapRect(fkt * r.x, fkt * r.y, fkt * r.w, fkt * r.h,
             r.pre, r.level));
       }
 
@@ -243,21 +243,21 @@ public final class MapView extends View implements Runnable {
 //      final MapRect rect = new MapRect(0, 0, 1680, 1050, 0, 0);
       calc(rect, gui.context.current(), mainMap);
     }
-      
+
 //      final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
 //      calc(hrect, gui.context.current(), hugeMap);
 //    }
-//    
+//
 //    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 //    calc(rect, gui.context.current(), mainMap);
-    
+
     repaint();
   }
-  
+
 //  /**
-//   * Scales all the rectangles in the input list to fit into the destination 
+//   * Scales all the rectangles in the input list to fit into the destination
 //   * rectangle.
-//   * 
+//   *
 //   * @param rects source rectangles
 //   * @param start starting point of the list
 //   * @param end end point
@@ -265,47 +265,47 @@ public final class MapView extends View implements Runnable {
 //   * @param sourceRect source possitions of the Parent rectangle
 //   * @return list of Rectangles
 //   */
-//  private MapRects scaleRects(final MapRects rects, final int start, 
+//  private MapRects scaleRects(final MapRects rects, final int start,
 //      final int end, final MapRect destRect, final MapRect sourceRect) {
-//    
+//
 //    Data data = gui.context.current().data;
-//    
+//
 //    // rectangle offsets to display border or header (bx)
 //    final int bx = layout.layout.x;
 //    final int by = layout.layout.y;
 //    final int bw = layout.layout.w;
 //    final int bh = layout.layout.h;
-//    
+//
 //    // storing result in res
 //    MapRects res = new MapRects();
 //    res.add(destRect);
 //    if(!destRect.isLeaf) {
 //      final int xx = destRect.x + bx;
 //      final int yy = destRect.y + by;
-//      
+//
 //      final float nhs = (float) (destRect.w - bw) /
 //  (float) (sourceRect.w - bw);
-//      final float nvs = (float) (destRect.h - bh) / 
+//      final float nvs = (float) (destRect.h - bh) /
 //  (float) (sourceRect.h - bh);
-//      
+//
 //      int s = start + 1;
 //      int i = start + 1;
-//      
+//
 //      while (i < end) {
 //        MapRect r = rects.get(i);
 //        int size = data.size(r.pre, data.kind(r.pre));
 //        int maxpre = i + size;
 //        while (i < rects.size && rects.get(i).pre < maxpre) i++;
 //        MapRect t = new MapRect(
-//            (int) (nhs * (r.x - (sourceRect.x + bx)) + xx), 
-//            (int) (nvs * (r.y - (sourceRect.y + by)) + yy), 
-//            (int) (nhs * r.w), (int) (nvs * r.h), 
+//            (int) (nhs * (r.x - (sourceRect.x + bx)) + xx),
+//            (int) (nvs * (r.y - (sourceRect.y + by)) + yy),
+//            (int) (nhs * r.w), (int) (nvs * r.h),
 //            r.pre, r.level);
 //        t.isLeaf = r.isLeaf;
-//        
+//
 //        // add results of recursion
 //        res.add(scaleRects(rects, s, i, t, r));
-//        
+//
 //        // prepare next while loop
 //        i++;
 //        s = i;
@@ -423,7 +423,7 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
-   * 
+   *
    * @param rect initial space to layout rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
@@ -438,8 +438,8 @@ public final class MapView extends View implements Runnable {
       // calculate new main rectangles
       initLen();
       layout = new MapLayout(nodes.data, textLen);
-  
-      layout.makeMap(rect, new MapList(nodes.nodes.clone()), 
+
+      layout.makeMap(rect, new MapList(nodes.nodes.clone()),
           0, nodes.size() - 1, 0);
       mainRects = layout.rectangles.copy();
       // mainRects = layout.rectangles;
@@ -449,10 +449,10 @@ public final class MapView extends View implements Runnable {
     if(GUIProp.mapinfo) {
       double aar = 0;
       if(!GUIProp.perfinfo) aar = MapLayout.aar(mainRects);
-      mapInfo.setValues(mainRects.size, rect, aar, 
+      mapInfo.setValues(mainRects.size, rect, aar,
           p.getTimer(1), layout.algo.getName());
     }
-    
+
     painter.init(mainRects);
     drawMap(map, mainRects, 1f);
     focus();
@@ -594,7 +594,7 @@ public final class MapView extends View implements Runnable {
           dxend = getWidth();
           dxstart = getWidth() - GUIProp.fishw;
         }
-        
+
         int dystart = mouseY - GUIProp.fishh / 2;
         int dyend = mouseY + GUIProp.fishh / 2;
         if(dystart < 0) {
@@ -604,7 +604,7 @@ public final class MapView extends View implements Runnable {
           dyend = getHeight();
           dystart = getHeight() - GUIProp.fishh;
         }
-        
+
         int sxstart = fkt * mouseX - GUIProp.fishw / 2;
         int sxend = fkt * mouseX + GUIProp.fishw / 2;
         if(sxstart < 0) {
@@ -614,7 +614,7 @@ public final class MapView extends View implements Runnable {
           sxend = hugeMap.getWidth();
           sxstart = hugeMap.getWidth() - GUIProp.fishw;
         }
-        
+
         int systart = fkt * mouseY - GUIProp.fishh / 2;
         int syend = fkt * mouseY + GUIProp.fishh / 2;
         if(systart < 0) {
@@ -623,24 +623,24 @@ public final class MapView extends View implements Runnable {
         } else if(syend > hugeMap.getHeight()) {
           syend = hugeMap.getHeight();
           systart = hugeMap.getHeight() - GUIProp.fishh;
-        }     
-        
-//        BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart, 
+        }
+
+//        BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart,
 //            sxend - sxstart, syend - systart));
-//        
+//
 //        try {
 //          File file = new File("baseXdistorted.png");
 //          ImageIO.write(map, "png", file);
 //        } catch(IOException exc) {
 //          exc.printStackTrace();
 //        }
-//        
-//        g.drawImage(map, dxstart, dystart, dxend, dyend, 
+//
+//        g.drawImage(map, dxstart, dystart, dxend, dyend,
 //            0, 0, map.getWidth(), map.getHeight(), this);
-//        
-        g.drawImage(hugeMap, dxstart, dystart, dxend, dyend, 
+//
+        g.drawImage(hugeMap, dxstart, dystart, dxend, dyend,
             sxstart, systart, sxend, syend, this);
-        
+
         // draw border
         g.setColor(Color.black);
         g.drawRect(dxstart, dystart, GUIProp.fishw, GUIProp.fishh);
@@ -649,8 +649,8 @@ public final class MapView extends View implements Runnable {
   }
 
 //  /**
-//   * distorts the image using something like a tanh to the polar coordinates. 
-//   * 
+//   * distorts the image using something like a tanh to the polar coordinates.
+//   *
 //   * @param image to distort
 //   * @return distorted Image
 //   */
@@ -662,13 +662,13 @@ public final class MapView extends View implements Runnable {
 //      for (int y = 0; y < height; y++) {
 //        int nX = (int) Math.tan(x - width / 2);
 //        int nY = (int) Math.tan(y - height / 2);
-//        if(nX > 0 && nX < width && nY > 0 && nY < height) 
+//        if(nX > 0 && nX < width && nY > 0 && nY < height)
 //          i.setRGB(nX, nY, image.getRGB(x, y));
 //      }
 //    }
 //    return i;
 //  }
-  
+
   /**
    * Draws image with correct scaling.
    * @param g graphics reference
@@ -724,12 +724,12 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Creates a buffered image for the treemap.
-   * 
+   *
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    * @param scale scale the rectangles
    */
-  void drawMap(final BufferedImage map, final MapRects rects, 
+  void drawMap(final BufferedImage map, final MapRects rects,
       final float scale) {
     final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
@@ -749,7 +749,7 @@ public final class MapView extends View implements Runnable {
       Graphics g = mainMap.getGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, getWidth(), getHeight());
-      
+
       MapRects distRects = new MapRects();
       for(MapRect r : mainRects) {
         int x = (int) (r.x + 100 * Math.tanh(0.2 * (r.x - mouseX)));
@@ -805,7 +805,7 @@ public final class MapView extends View implements Runnable {
 
       // tinyx = focused.x + tinyx < getWidth() ? focused.x :
       // focused.x + focused.w - tinyw;
-      if(focused.y - tinyh > 0 && mouseY < focused.y + focused.h / 2) 
+      if(focused.y - tinyh > 0 && mouseY < focused.y + focused.h / 2)
         tinyy = focused.y - tinyh;
       else if(focused.y + focused.h + tinyh < getHeight()) tinyy = focused.y
           + focused.h;

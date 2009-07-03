@@ -120,7 +120,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void setProperty(final String name, final Object value) {
     BaseX.notimplemented();
   }
-  
+
   /** Caches a tag name. */
   private String tag;
   /** Caches attributes. */
@@ -139,7 +139,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void closeResult() throws IOException {
     closeElement();
   }
-  
+
   @Override
   protected void start(final byte[] t) {
     tag = Token.string(t);
@@ -197,7 +197,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     text(b);
   }
 
-  
+
   @Override
   public void comment(final byte[] t) throws IOException {
     finishElement();

@@ -40,7 +40,7 @@ public final class Thesaurus {
     RSHIPS.add(token("UF"), token("USE"));
     RSHIPS.add(token("RT"), token("RT"));
   }
-  
+
   /** Thesaurus node. */
   static class ThesNode {
     /** Related nodes. */
@@ -97,7 +97,7 @@ public final class Thesaurus {
     min = mn;
     max = mx;
   }
-  
+
   /**
    * Initializes the thesaurus.
    * @return success flag
@@ -140,7 +140,7 @@ public final class Thesaurus {
 
   /**
    * Returns a node for the specified term.
-   * @param term term 
+   * @param term term
    * @return node
    */
   private ThesNode getNode(final byte[] term) {
@@ -152,7 +152,7 @@ public final class Thesaurus {
     }
     return node;
   }
-  
+
   /**
    * Performs a query and returns the result as nodes.
    * @param query query string
@@ -176,7 +176,7 @@ public final class Thesaurus {
       throws QueryException {
     return new QueryProcessor(query, in).iter().next().str();
   }
-  
+
   /**
    * Finds a thesaurus term.
    * @param list result list

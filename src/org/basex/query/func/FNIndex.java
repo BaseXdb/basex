@@ -54,14 +54,14 @@ public final class FNIndex extends Set {
    */
   public Fun get(final byte[] name, final byte[] uri, final Expr[] args)
       throws QueryException {
-    
+
     final int id = id(name);
     if(id != 0) {
       try {
         // create function
         final FunDef fl = funcs[id];
         if(!eq(fl.uri, uri)) return null;
-        
+
         final Fun f = fl.func.newInstance();
         f.expr = args;
         f.func = fl;

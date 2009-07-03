@@ -22,7 +22,7 @@ public final class Order extends Expr {
   SeqIter sq;
   /** Sort list. */
   Ord[] ord;
-  
+
  /**
    * Constructor.
    * @param e expressions
@@ -30,7 +30,7 @@ public final class Order extends Expr {
   public Order(final Ord[] e) {
     ord = e;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(final Ord o : ord) o.comp(ctx);
@@ -44,7 +44,7 @@ public final class Order extends Expr {
       int[] order;
       Iter ir;
       int p = -1;
-      
+
       @Override
       public Item next() throws QueryException {
         if(order == null) {
@@ -54,7 +54,7 @@ public final class Order extends Expr {
           sort(order, 0, e);
           for(final Ord o : ord) o.finish();
         }
-        
+
         while(true) {
           if(ir != null) {
             final Item i = ir.next();
@@ -102,7 +102,7 @@ public final class Order extends Expr {
    * @param e end position
    * @throws QueryException evaluation exception
    */
-  protected void sort(final int[] o, final int s, final int e) 
+  protected void sort(final int[] o, final int s, final int e)
       throws QueryException {
 
     if(e < 7) {
@@ -123,7 +123,7 @@ public final class Order extends Expr {
       }
       m = m(o, l, m, n);
     }
-    
+
     final Item[] im = new Item[ord.length];
     for(int k = 0; k < ord.length; k++) im[k] = ord[k].item(o[m]);
 
@@ -250,7 +250,8 @@ public final class Order extends Expr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" " + ORDER + " " + BY + " ");
+    final StringBuilder sb = new StringBuilder(" " + EMPTYORDER + " " +
+        BY + " ");
     for(int l = 0; l != ord.length - 1; l++) {
       sb.append((l != 0 ? ", " : "") + ord[l]);
     }

@@ -5,7 +5,7 @@ import org.basex.util.Token;
 
 /**
  * This class defines access to index text tokens.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -24,7 +24,7 @@ public final class ValuesToken implements IndexToken {
     type = t ? Type.TXT : Type.ATV;
     text = tok;
   }
-  
+
   public Type type() {
     return type;
   }

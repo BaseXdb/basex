@@ -122,7 +122,7 @@ public final class Dec extends Item {
         return val;
     }
   }
-  
+
   /**
    * Converts the given double into a decimal value.
    * @param val value to be converted
@@ -133,7 +133,7 @@ public final class Dec extends Item {
     if(val != val || val == 1 / 0d || val == -1 / 0d) Err.value(Type.DEC, val);
     return BigDecimal.valueOf(val);
   }
-  
+
   /**
    * Converts the given token into a decimal value.
    * @param val value to be converted

@@ -65,7 +65,7 @@ public final class FTAnd extends FTExpr {
 
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException { 
+      public FTItem next() throws QueryException {
         // find item with lowest pre value
         for(int i = 0; i < it.length; i++) {
           if(it[i] == null) {
@@ -121,11 +121,11 @@ public final class FTAnd extends FTExpr {
     return all;
   }
 
-  
+
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     neg = new boolean[expr.length];
-    
+
     int sum = 0;
     int n = 0;
     for(int i = 0; i < expr.length; i++) {
@@ -140,7 +140,7 @@ public final class FTAnd extends FTExpr {
     // no index access if first or all operators are negative
     return !neg[0] && n < expr.length;
   }
-  
+
   @Override
   public String toString() {
     return "(" + toString(" " + FTAND + " ") + ")";

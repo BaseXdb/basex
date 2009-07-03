@@ -10,7 +10,7 @@ import org.basex.util.Token;
 
 /**
  * Simple date item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -31,7 +31,7 @@ public final class DSim extends Date {
   private static final String[] EXAMPLES = { XYEA, XYMO, XMON, XMDA, XDAY };
   /** Date zones. */
   private static final int[] ZONES = { 3, 4, 2, 3, 2 };
-  
+
   /**
    * Constructor.
    * @param d date
@@ -59,7 +59,7 @@ public final class DSim extends Date {
     final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
     if(!mt.matches()) Err.date(d, type, EXAMPLES[i]);
     zone(mt, ZONES[i], d);
-    
+
     if(t == Type.MDA) {
       final int m = xc.getMonth() - 1;
       if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) Err.range(type, d);

@@ -58,7 +58,7 @@ import org.basex.util.StringList;
 public final class CommandParser extends InputParser {
   /** Context. */
   public Context ctx;
-  
+
   /**
    * Constructor, parsing the input queries.
    * @param in query input
@@ -111,10 +111,8 @@ public final class CommandParser extends InputParser {
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:
-            if (Prop.fuse)  
-              return new CreateFS(path(cmd), name(cmd), path(cmd), path(cmd));
-            else 
-              return new CreateFS(path(cmd), name(cmd), "no_fuse", "no_fuse");
+            if(!Prop.fuse) return new CreateFS(path(cmd), name(cmd));
+            return new CreateFS(path(cmd), name(cmd), path(cmd), path(cmd));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
         }

@@ -17,13 +17,13 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTContainsIndex extends FTContains {
-  /** Not flag. */ 
+  /** Not flag. */
   private final boolean not;
   /** Current node item. */
   private FTItem ftn;
   /** Node iterator. */
   private FTIter fti;
-  
+
   /**
    * Constructor.
    * @param e contains, select and optional ignore expression
@@ -40,7 +40,7 @@ public final class FTContainsIndex extends FTContains {
     final Iter ir = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
-    
+
     // create index iterator
     if(fti == null) {
       fti = ftexpr.iter(ctx);
@@ -60,7 +60,7 @@ public final class FTContainsIndex extends FTContains {
 
     // add entry to visualization
     if(found && ctx.ftpos != null && !not) ctx.ftpos.add(ftn.pre, ftn.all);
-    
+
     ctx.fttoken = tmp;
     return Bln.get(found ? 1 : 0);
   }

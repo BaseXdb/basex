@@ -18,7 +18,7 @@ public final class IOUrl extends IO {
   public IOUrl(final String u) {
     path = u;
   }
-  
+
   @Override
   public void cache() throws IOException {
     cache(new URL(path).openStream());
@@ -48,7 +48,7 @@ public final class IOUrl extends IO {
   public BufferInput buffer() throws IOException {
     return new BufferInput(new URL(path).openStream());
   }
-  
+
   @Override
   public IO merge(final IO f) {
     return this;

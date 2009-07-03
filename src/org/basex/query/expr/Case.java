@@ -45,7 +45,7 @@ public final class Case extends Expr {
     if(!v.eq(var)) expr = expr.remove(v);
     return this;
   }
-  
+
   /**
    * Evaluates the given sequence.
    * @param ctx query context

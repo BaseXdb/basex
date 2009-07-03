@@ -45,7 +45,7 @@ public final class QueryArea extends QueryPanel {
   ImageIcon errIcon;
   /** Last error position. */
   int err;
-  
+
   /**
    * Default constructor.
    * @param view main panel
@@ -131,7 +131,7 @@ public final class QueryArea extends QueryPanel {
       main.gui.execute(new XQuery(qu));
     }
   }
-  
+
   @Override
   void quit() { }
 
@@ -139,7 +139,7 @@ public final class QueryArea extends QueryPanel {
   boolean info(final String inf, final boolean ok) {
     BaseXLayout.enable(stop, false);
     if(inf == null) return false;
-    
+
     final String text = ok ? STATUSOK : inf.replaceAll("Stopped.*", "");
     info.setText(text);
     info.setIcon(ok ? okIcon : errIcon);
@@ -180,7 +180,7 @@ public final class QueryArea extends QueryPanel {
         if(thread == threadID) area.error(err);
       }
     }.start();
-    
+
     return true;
   }
 

@@ -29,7 +29,7 @@ public final class DropIndex extends Process {
     super(DATAREF);
     type = t;
   }
-  
+
   @Override
   protected boolean exec() {
     final Data data = context.data();
@@ -66,7 +66,7 @@ public final class DropIndex extends Process {
       return error(ex.getMessage());
     }
   }
-  
+
   @Override
   public String toString() {
     return Cmd.DROP.name() + " " + CmdDrop.INDEX + " " + type;

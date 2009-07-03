@@ -31,7 +31,7 @@ final class XMLInput {
   private int lp;
   /** Backward pointer. */
   private int pp;
-  
+
   /**
    * Constructor.
    * @param f file reference
@@ -42,7 +42,7 @@ final class XMLInput {
     in[0].encoding();
     file = f;
   }
-  
+
   /**
    * Sets a new encoding.
    * @param e encoding
@@ -82,7 +82,7 @@ final class XMLInput {
     }
     return ch;
   }
-  
+
   /**
    * Inserts some bytes in the input stream.
    * @param val values to insert
@@ -95,8 +95,8 @@ final class XMLInput {
     if(s) a(new CachedInput(Token.SPACE));
     return ip < 20;
   }
-  
-  
+
+
   /**
    * Inserts a cached input buffer.
    * @param ci buffer to be added

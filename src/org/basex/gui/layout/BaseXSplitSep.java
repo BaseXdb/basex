@@ -9,7 +9,7 @@ import org.basex.gui.GUIConstants;
 
 /**
  * This separator splits several panels and allows panel resizing.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -22,7 +22,7 @@ public final class BaseXSplitSep extends BaseXBack {
   public static Color back;
   /** Layout: horizontal = true, vertical = false. */
   private boolean l;
-  
+
   /**
    * Constructor.
    * @param lay layout: horizontal = true, vertical = false
@@ -45,13 +45,13 @@ public final class BaseXSplitSep extends BaseXBack {
     addMouseMotionListener(mouse);
     l = lay;
   }
-  
+
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     final int w = getWidth();
     final int h = getHeight();
-    
+
     g.setColor(fore);
     g.fillRect(0, 0, w, h);
     g.setColor(back);

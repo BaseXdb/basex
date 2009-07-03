@@ -236,7 +236,7 @@ public final class FolderView extends View {
     int xx = x;
 
     if(elem) {
-      final boolean large = GUIProp.fontsize > 20; 
+      final boolean large = GUIProp.fontsize > 20;
       final int off = large ? 1 : 0;
       final int yy = y - boxW - (large ? 6 : 3);
       Image box = opened[pre] ? openedBox : closedBox;
@@ -485,7 +485,7 @@ public final class FolderView extends View {
         key = open ? KeyEvent.VK_DOWN : KeyEvent.VK_UP;
       }
     }
-    
+
     if(key == KeyEvent.VK_DOWN) {
       focus = Math.min(data.meta.size - 1, focus + 1);
     } else if(key == KeyEvent.VK_UP) {

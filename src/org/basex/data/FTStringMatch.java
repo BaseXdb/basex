@@ -38,7 +38,7 @@ public class FTStringMatch implements Comparable<FTStringMatch> {
   boolean in(final FTStringMatch mtc) {
     return start >= mtc.start && end <= mtc.end;
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();

@@ -6,7 +6,7 @@ import org.basex.util.IntList;
 /**
  * Offers an iterator for the children of a node. Could as well be
  * defined as generic child iterator.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -17,7 +17,7 @@ public final class ChildIterator {
   int size;
   /** Current pre value. */
   int pre;
-  
+
   /***
    * Default Constructor.
    * @param d data reference
@@ -27,7 +27,7 @@ public final class ChildIterator {
     data = d;
     init(p);
   }
-  
+
   /**
    * Initializes the iterator.
    * @param p root pre value
@@ -37,7 +37,7 @@ public final class ChildIterator {
     size = p + data.size(p, k);
     pre = p + data.attSize(p, k);
   }
-  
+
   /**
    * Returns if the node offers more children.
    * @return result of check
@@ -45,7 +45,7 @@ public final class ChildIterator {
   public boolean more() {
     return pre < size;
   }
-  
+
   /**
    * Returns the pre value of the next child.
    * @return next child reference.
@@ -55,7 +55,7 @@ public final class ChildIterator {
     pre += data.size(pre, data.kind(pre));
     return p;
   }
-  
+
   /**
    * Returns an array with all pre values. Must be directly called after
    * creating the class instance.

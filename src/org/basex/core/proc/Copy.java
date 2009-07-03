@@ -22,11 +22,11 @@ public final class Copy extends AUpdate {
   public Copy(final String... a) {
     super(null, a);
   }
-  
+
   @Override
   protected boolean exec() {
     final boolean gui = args.length == 0;
-    
+
     final Data data = context.data();
     final int pos = gui ? 0 : Token.toInt(args[0]);
     if(pos < 0) return error(POSINVALID, args[0]);
@@ -57,10 +57,10 @@ public final class Copy extends AUpdate {
 
       for(int c = 0; c < size; c++) {
         final int pre = pre(par, pos, data);
-        
+
         // merge text nodes if necessary
         // [CG] Updates/MergeText: might not cover all cases yet
-        
+
         final int s = srcDocs[c].meta.size - 1;
         final int up = s != 0 ? -1 :
           Insert.checkText(data, pre, par, srcDocs[c].kind(s));
@@ -74,9 +74,9 @@ public final class Copy extends AUpdate {
       }
       copied += size;
     }
-    
+
     if(gui) {
-      if(context.current().size() > 1 || 
+      if(context.current().size() > 1 ||
           context.current().nodes[0] == src.nodes[0]) {
         context.current(new Nodes(0, data));
       }

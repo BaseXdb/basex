@@ -42,7 +42,7 @@ public final class GUIInput extends BaseXTextField {
   public GUIInput(final GUI main) {
     super(null);
     gui = main;
-    
+
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
@@ -80,7 +80,7 @@ public final class GUIInput extends BaseXTextField {
             if(i == 0) GUIProp.search = sl.finish();
             else if(i == 1) GUIProp.xquery = sl.finish();
             else GUIProp.commands = sl.finish();
-  
+
             // evaluate the input
             if(e.getModifiers() == 0) main.execute();
           }
@@ -197,7 +197,7 @@ public final class GUIInput extends BaseXTextField {
   private void queryPopup(final String query) {
     final Data data = gui.context.data();
     if(data == null || !data.meta.uptodate) return;
-    
+
     StringList sl = null;
     try {
       final QuerySuggest qs = new QuerySuggest(new QueryContext(), gui.context);
@@ -229,7 +229,7 @@ public final class GUIInput extends BaseXTextField {
       box.setSelectedIndex(-1);
       pop = new ComboPopup(box);
     }
-    
+
     final int w = getFontMetrics(getFont()).stringWidth(pre);
     pop.show(this, Math.min(getWidth(), w), getHeight());
   }

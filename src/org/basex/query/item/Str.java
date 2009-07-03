@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import java.math.BigDecimal;
+
+import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 
@@ -93,7 +95,7 @@ public class Str extends Item {
   public BigDecimal dec() throws QueryException {
     return Dec.parse(str());
   }
-  
+
   @Override
   @SuppressWarnings("unused")
   public boolean eq(final Item it) throws QueryException {
@@ -108,6 +110,6 @@ public class Str extends Item {
 
   @Override
   public String toString() {
-    return "\"" + Token.string(val) + "\"";
+    return BaseX.info("\"%\"", val);
   }
 }

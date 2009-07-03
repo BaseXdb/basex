@@ -10,7 +10,7 @@ import org.basex.util.Num;
 
 /**
  * This class allows positional read and write access to a database file.
- * 
+ *
  * NIO4: Use a DirectByteBuffer only for reading a Block. Basic tests shows a
  * good result. But using this method in the DataAccess environment don't bring
  * the same performance improvements.
@@ -94,7 +94,7 @@ public final class DataAccessNIO4 {
     }
     dirt = false;
   }
-  
+
   /**
    * Closes the data access.
    * @throws IOException in case of write errors
@@ -141,7 +141,7 @@ public final class DataAccessNIO4 {
   public synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
-    
+
     final byte[] b = new byte[l];
     int ll = IO.BLOCKSIZE - off;
     if(ll >= l) {
@@ -220,7 +220,7 @@ public final class DataAccessNIO4 {
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
-  
+
   // private methods...
 
   /**
@@ -229,20 +229,20 @@ public final class DataAccessNIO4 {
   private synchronized void nextBlock() {
     cursor(pos[c] + IO.BLOCKSIZE);
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position
    */
   public synchronized void cursor(final long p) {
     off = (int) (p & BUFLIMIT);
-    
+
     final long ps = p - off;
     final int o = c;
     do {
       if(pos[c] == ps) return;
     } while((c = (c + 1) % BUFFERS) != o);
-    
+
     c = (o + 1) % BUFFERS;
     readBlock(ps);
   }
@@ -327,7 +327,7 @@ public final class DataAccessNIO4 {
   public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
-  
+
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended

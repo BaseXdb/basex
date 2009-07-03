@@ -53,7 +53,7 @@ public final class Catch extends Single {
 
     final byte[] code = e.code() == null ? Token.EMPTY : Token.token(e.code());
     if(!find(code)) return null;
-    
+
     final int s = ctx.vars.size();
     if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx).clone());
     if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx).clone());

@@ -96,7 +96,7 @@ public final class IOFile extends IO {
       is = null;
       return false;
     }
-    
+
     // process gzip files
     if(path.endsWith(GZSUFFIX)) {
       if(is == null) {
@@ -107,7 +107,7 @@ public final class IOFile extends IO {
       }
       return is != null;
     }
-    
+
     // work on normal files
     return more ^= true;
   }
@@ -118,11 +118,11 @@ public final class IOFile extends IO {
    */
   private boolean zip() {
     final String suf = path.toLowerCase().replaceAll(".*\\.", ".");
-    return suf.equals(ZIPSUFFIX) || suf.equals(".docx") || 
+    return suf.equals(ZIPSUFFIX) || suf.equals(".docx") ||
       suf.equals(".xslx") || suf.equals(".pptx") ||
       suf.equals(".odt") || suf.equals(".ods") || suf.equals(".odp");
   }
-  
+
   @Override
   public InputSource inputSource() {
     return is == null ? new InputSource(url(path)) : new InputSource(is);

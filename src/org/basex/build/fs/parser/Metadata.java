@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.token;
@@ -10,10 +7,6 @@ import static org.basex.util.Token.token;
  * @author Bastian Lemke
  */
 public final class Metadata {
-
-  /** Bytes from file to buffer. */
-  public static final int DEFAULT_BUFFER_SIZE = 2048;
-
   /**
    * Available xml attributes.
    * @author Bastian Lemke

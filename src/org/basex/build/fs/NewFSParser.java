@@ -37,7 +37,7 @@ import org.basex.util.Token;
 
 /**
  * Imports/shreds/parses a file hierarchy into a BaseX database.
- * 
+ *
  * The overall process of importing a file hierarchy can be described as
  * follows:
  * <ol>
@@ -46,7 +46,7 @@ import org.basex.util.Token;
  * <li>This class {@link NewFSParser} instantiates the needed components for the
  * import process in its {@link NewFSParser#parse(Builder)} method.
  * </ol>
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Bastian Lemke
@@ -148,8 +148,7 @@ public final class NewFSParser extends Parser {
     parserInstances = new HashMap<String, AbstractParser>(size);
 
     if(Prop.fsmeta || Prop.fscont) {
-      buffer = ByteBuffer.allocateDirect(//
-      BufferedFileChannel.DEFAULT_BUFFER_SIZE);
+      buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
     } else {
       buffer = null;
     }

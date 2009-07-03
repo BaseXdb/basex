@@ -5,14 +5,14 @@ import org.basex.core.Prop;
 /**
  * This class contains properties which are used in the GUI. They are
  * initially read from and finally written to disk, except for the properties
- * following the {@link #SKIP} flag. 
- * 
+ * following the {@link #SKIP} flag.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIProp {
   // GLOBAL WINDOW OPTIONS ====================================================
-  
+
   /** Default GUI Font. */
   public static String font = "SansSerif";
   /** Default GUI Monospace Font. */
@@ -106,7 +106,7 @@ public final class GUIProp {
   public static boolean plotxlog;
   /** Logarithmic plot. */
   public static boolean plotylog;
-  
+
   /** Dialog location. */
   public static int[] maplayoutloc = { 790, 520 };
   /** Dialog location. */
@@ -157,7 +157,7 @@ public final class GUIProp {
   public static boolean fullscreen = false;
 
   /** Flag for computing additional map infos. */
-  public static boolean mapinfo = false;
+  public static boolean mapinfo = true;
   /** Flag for skipping tim intensive treemap infos. */
   public static boolean perfinfo = true;
   /** Shows real file contents in the treemap. */

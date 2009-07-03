@@ -15,7 +15,7 @@ abstract class FTIndex extends Index {
   final FTTokenMap cache = new FTTokenMap();
   /** Values file. */
   final Data data;
-  
+
   /**
    * Constructor.
    * @param d data reference
@@ -52,7 +52,7 @@ abstract class FTIndex extends Index {
           f = false;
         }
         pre = lpre;
-        
+
         all.reset(toknum);
         all.or(da.readNum(pos));
         while(++c < s && (lpre = da.readNum()) == pre) {

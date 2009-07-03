@@ -20,7 +20,7 @@ import org.basex.query.util.Var;
 public abstract class FTExpr extends Expr {
   /** Expression list. */
   public FTExpr[] expr;
-  
+
   /**
    * Constructor.
    * @param e expression
@@ -53,7 +53,7 @@ public abstract class FTExpr extends Expr {
    */
   @Override
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;
-    
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     for(final FTExpr e : expr) if(e.uses(u, ctx)) return true;
@@ -104,7 +104,7 @@ public abstract class FTExpr extends Expr {
     for(final FTExpr e : expr) e.plan(ser);
     ser.closeElement();
   }
-  
+
   /**
    * Prints the array with the specified separator.
    * @param sep separator

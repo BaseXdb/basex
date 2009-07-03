@@ -18,12 +18,12 @@ public abstract class BaseXSyntax {
     public Color getColor(final String token) { return Color.black; }
   };
 
-  /** 
+  /**
    * Initializes the highlighter.
    */
   public abstract void init();
 
-  /** 
+  /**
    * Returns the color for the current token.
    * @param token current token
    * @return color

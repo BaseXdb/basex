@@ -53,7 +53,7 @@ public final class IndexStats {
     size++;
     return oc > occMax[nr - 1] || oc < occMin[nr - 1];
   }
-  
+
   /**
    * Adds the specified token.
    * @param tx token to be added

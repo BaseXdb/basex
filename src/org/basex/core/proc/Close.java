@@ -18,7 +18,7 @@ public final class Close extends Process {
   public Close() {
     super(DATAREF);
   }
-  
+
   @Override
   protected boolean exec() {
     return context.close() ? Prop.info ? info(DBCLOSED) : true :

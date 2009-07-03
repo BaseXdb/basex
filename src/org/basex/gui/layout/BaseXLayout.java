@@ -101,7 +101,7 @@ public final class BaseXLayout {
       }
     }
   }
-  
+
   /**
    * Returns the gui reference of the specified container.
    * @param cont input container
@@ -112,7 +112,7 @@ public final class BaseXLayout {
     if(GUIProp.fullscreen) return;
     if(help != null && GUIProp.showhelp) gui(cont).help.setText(help);
   }
-  
+
   /**
    * Returns the gui reference of the specified container.
    * @param cont input container
@@ -280,7 +280,7 @@ public final class BaseXLayout {
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
     g.setColor(Color.white);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
-    
+
     fill(g, focus ? COLORCELL : Color.white, COLORCELL,
         xs + 2, ys + 2, xe - 1, ye - 1);
   }
@@ -396,7 +396,7 @@ public final class BaseXLayout {
     }
     return (ww - sw - 2) >> 1;
   }
-  
+
   /**
    * Returns the width of the specified text.
    * Cached font widths are used to speed up calculation.

@@ -80,13 +80,13 @@ public final class CmpG extends Arr {
       name = n;
       cmp = c;
     }
-    
+
     /**
      * Inverts the comparator.
      * @return inverted comparator
      */
     public abstract Comp invert();
-    
+
     @Override
     public String toString() { return name; }
   };
@@ -176,7 +176,7 @@ public final class CmpG extends Arr {
     // skip empty result
     if(is1 == 0) return Bln.FALSE;
     final boolean s1 = is1 == 1;
-    
+
     // evaluate single items
     if(s1 && expr[1].i()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
 
@@ -186,7 +186,7 @@ public final class CmpG extends Arr {
     // skip empty result
     if(is2 == 0) return Bln.FALSE;
     final boolean s2 = is2 == 1;
-    
+
     // evaluate single items
     if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
@@ -197,7 +197,7 @@ public final class CmpG extends Arr {
       while((it1 = ir1.next()) != null) if(eval(it1, it2)) return Bln.TRUE;
       return Bln.FALSE;
     }
-    
+
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
@@ -226,7 +226,7 @@ public final class CmpG extends Arr {
    * @throws QueryException thrown if the items can't be compared
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 
+    if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) &&
         !(a.n() && b.n())) Err.cmp(a, b);
     return cmp.cmp.e(a, b);
   }
@@ -258,17 +258,17 @@ public final class CmpG extends Arr {
     }
     return true;
   }
-  
+
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
     // create index access expressions
     final int il = index.length;
     final Expr[] ia = new IndexAccess[il];
     for(int i = 0; i < il; i++) ia[i] = new IndexAccess(index[i], ic);
-    
+
     // more than one string - merge index results
     final Expr root = il == 1 ? ia[0] : new Union(ia);
-    
+
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
@@ -284,7 +284,7 @@ public final class CmpG extends Arr {
     }
     return path;
   }
-  
+
   /**
    * Returns the indexable index step or null.
    * @param expr expression arguments
@@ -293,7 +293,7 @@ public final class CmpG extends Arr {
   public static Step indexStep(final Expr expr) {
     // check if index can be applied
     if(!(expr instanceof AxisPath)) return null;
-    
+
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr;
     if(path.root != null) return null;
@@ -301,7 +301,7 @@ public final class CmpG extends Arr {
     // step must not contain predicates
     return path.step[path.step.length - 1];
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.BLN;

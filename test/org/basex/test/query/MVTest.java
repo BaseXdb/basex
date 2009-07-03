@@ -30,7 +30,7 @@ public final class MVTest {
   private static final int STOPAFTER = Integer.MAX_VALUE;
   /** Query counter. */
   int curr = 0;
-  
+
   /**
    * Constructor.
    * @param db database instance
@@ -40,7 +40,7 @@ public final class MVTest {
     new Open(db).execute(context, null);
 
     // open query file
-    BufferedWriter out = 
+    BufferedWriter out =
       new BufferedWriter(new FileWriter(new File("mv1.log")));
     //final File file = new File("etc/xml/mv.txt");
     final File file = new File("mv.txt");
@@ -50,7 +50,7 @@ public final class MVTest {
     }
     Prop.serialize = true;
     Prop.info = true;
-    
+
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);
     //final InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-15");
@@ -66,7 +66,7 @@ public final class MVTest {
         String type = "node()/text()";
         String op = "ftcontains";
         String val = split[s];
-        
+
         if(val.startsWith("<")) {
           type = val.substring(1);
           if(type.equals("TYP")) op = "=";
@@ -109,10 +109,10 @@ public final class MVTest {
       } else {
         // run serialization
         proc.output(new NullOutput());
-        
+
         // extract and print processing time
         final String info = proc.info();
-        
+
         int i = info.indexOf("Total Time: ");
         int j = info.indexOf(" ms", i);
         String time = info.substring(i + "Total Time: ".length(), j);
@@ -120,7 +120,7 @@ public final class MVTest {
         i = info.indexOf("Results   : ");
         j = info.indexOf(" Item", i);
         final String nodes = info.substring(i + "Results   : ".length(), j);
-        
+
         System.out.println(time + "\t" + nodes + "\t" + query);
         out.write(nodes + "\t" + query);
         out.newLine();
@@ -129,7 +129,7 @@ public final class MVTest {
     }
     br.close();
   }
-  
+
   /**
    * Main test method.
    * @param args command line arguments (ignored)

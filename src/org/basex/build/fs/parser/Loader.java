@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.basex.build.fs.parser;
 
@@ -34,10 +34,10 @@ public final class Loader extends ClassLoader {
    *    c.isInstance(Class.forName(classname).newInstance());
    *    ...
    *  }
-   *  
+   *
    *  Also possible without instantiating the class?
    */
-  
+
   /** The ClassLoader instance to use for loading classes. */
   private static final Loader INSTANCE = new Loader();
 

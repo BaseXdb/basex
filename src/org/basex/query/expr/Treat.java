@@ -15,7 +15,7 @@ import org.basex.util.Token;
 
 /**
  * Treat as expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -32,7 +32,7 @@ public final class Treat extends Single {
     super(e);
     seq = s;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr);
@@ -49,7 +49,7 @@ public final class Treat extends Single {
 
     return new Iter() {
       Item i = it;
-      
+
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;

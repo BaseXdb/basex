@@ -150,7 +150,7 @@ final class FNId extends Fun {
     final NodeIter ch = nod.child();
     while((att = ch.next()) != null) addRef(ids, nb, att.finish());
   }
-  
+
   /**
    * Checks if the specified node has a document node as root.
    * @param nod input node

@@ -2,7 +2,7 @@ package org.basex.gui.view.map;
 
 /**
  * Interface MapAlgorithms need to implement.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
@@ -10,7 +10,7 @@ public abstract class MapAlgo {
 
   /**
    * Calculates the average aspect Ratios of rectangles given in the List.
-   * 
+   *
    * @param r Array of rectangles
    * @return average aspect ratio
    */
@@ -31,7 +31,7 @@ public abstract class MapAlgo {
     }
     return ar / dev;
   }
-  
+
   /**
    * Calculates the worst aspect ratio of the rectangles given in the list.
    *
@@ -41,7 +41,7 @@ public abstract class MapAlgo {
    */
   static double worstLineRatio(final MapRects r) {
     if(r.size() == 0) return Double.MAX_VALUE;
-    
+
     double worstar = 0;
     double ar = 0;
 
@@ -60,7 +60,7 @@ public abstract class MapAlgo {
 
   /**
    * Splits List nodes into Rectangles matching in given space.
-   * 
+   *
    * @param r parent rectangle
    * @param l children array
    * @param ns start array position
@@ -70,10 +70,10 @@ public abstract class MapAlgo {
    */
   abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
       final int ne, final int level);
-  
+
   /**
    * Returns the name of the algorithm used.
-   * 
+   *
    * @return name of the alfo
    */
   abstract String getName();

@@ -8,7 +8,7 @@ import org.basex.core.Commands.CmdCreate;
 
 /**
  * Creates a new filesystem mapping.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -22,6 +22,15 @@ public final class CreateFS extends ACreate {
   private final String mountpoint;
   /** DeepFS backing store. */
   private final String backingstore;
+
+  /**
+   * Constructor.
+   * @param path filesystem path
+   * @param name name of database
+   */
+  public CreateFS(final String path, final String name) {
+    this(path, name, "no_fuse", "no_fuse");
+  }
 
   /**
    * Constructor.

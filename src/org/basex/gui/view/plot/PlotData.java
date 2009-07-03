@@ -96,14 +96,14 @@ public final class PlotData {
     final Data data = context.data();
     final IntList tmpPres = new IntList();
     final int itmID = data.tagID(item);
-    
+
     if(!sub) {
       pres = ctx.nodes;
       Arrays.sort(pres);
       size = pres.length;
       return;
     }
-    
+
     final int[] contextPres = ctx.nodes;
     for(int i = 0; i < contextPres.length; i++) {
       int p = contextPres[i];

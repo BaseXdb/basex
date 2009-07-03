@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.basex.build.fs.parser;
 
 import java.io.EOFException;
@@ -11,6 +8,8 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+
+import org.basex.io.IO;
 
 /**
  * <p>
@@ -23,9 +22,6 @@ import java.nio.channels.FileChannel;
  * @author Bastian Lemke
  */
 public class BufferedFileChannel {
-
-  /** The default buffer size. */
-  public static final int DEFAULT_BUFFER_SIZE = 2048;
   /** The file we are reading from. */
   private final File f;
   /** The underlying {@link FileChannel} instance. */
@@ -49,7 +45,7 @@ public class BufferedFileChannel {
    *           {@link BufferedFileChannel}.
    */
   public BufferedFileChannel(final File file) throws IOException {
-    this(file, DEFAULT_BUFFER_SIZE);
+    this(file, IO.BLOCKSIZE);
   }
 
   /**
@@ -150,12 +146,10 @@ public class BufferedFileChannel {
         fc.position(fc.position() + skip);
         buf.position(buf.limit());
         rem -= skip;
-        return;
       } else {
         assert n < Integer.MAX_VALUE;
         buf.position(buf.position() + (int) n);
         rem -= n;
-        return;
       }
     } else { // n < 0
       if(n < -position()) throw new IllegalArgumentException(
@@ -167,11 +161,9 @@ public class BufferedFileChannel {
         fc.position(fc.position() + skip);
         buf.position(bufLim);
         rem -= skip + buffered;
-        return;
       } else {
         buf.position(buf.position() + (int) n);
         rem -= n;
-        return;
       }
     }
   }
@@ -412,7 +404,7 @@ public class BufferedFileChannel {
    * Modifies this channel's byte order.
    * @param order The new byte order, either {@link ByteOrder#BIG_ENDIAN
    *          BIG_ENDIAN} or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
-   * 
+   *
    */
   public void setByteOrder(final ByteOrder order) {
     buf.order(order);

@@ -9,7 +9,7 @@ import org.basex.query.iter.Iter;
 
 /**
  * If expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -23,7 +23,7 @@ public final class If extends Arr {
   public If(final Expr e, final Expr t, final Expr s) {
     super(e, t, s);
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return ctx.iter(expr[expr[0].ebv(ctx).bool() ? 1 : 2]);

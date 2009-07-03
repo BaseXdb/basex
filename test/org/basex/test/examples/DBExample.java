@@ -44,11 +44,11 @@ public final class DBExample {
 
     // XML string.
     String xml = "<xml>This is a test</xml>";
-    
+
     // Creates a database for the specified input.
     new CreateDB(xml, "DB2").execute(context, out);
 
-    
+
     out.println("=== Third example: Opens an existing database");
 
     // Opens an existing database

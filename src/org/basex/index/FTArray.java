@@ -6,7 +6,7 @@ import org.basex.util.TokenList;
 
 /**
  * Preserves a compressed trie index structure and useful functionality.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
@@ -71,7 +71,7 @@ final class FTArray {
    * Converts a long value to a int-array.
    * The first 3 bytes are stores in int[1] and
    * the fourth and fifth byte are stored in int[0]
-   * as a negative value. 
+   * as a negative value.
    * @param l long value to convert
    * @return int-array with the long value
    */
@@ -84,7 +84,7 @@ final class FTArray {
     //11111111 11111111 11111111 00000000 00000000
     //                           11111111 11111111
   }
-  
+
   /**
    * Inserts a node into the trie.
    * @param cn current node, which gets a new node
@@ -101,24 +101,23 @@ final class FTArray {
     if(cn == 0) {
       // root has successors
       if(next.list[cn].length > 3) {
-        final int p = getPointer(cn); 
-        if(Token.diff(tokens.list[next.list[next.list[cn][p]][0]][0], v[0]) 
+        final int p = getPointer(cn);
+        if(Token.diff(tokens.list[next.list[next.list[cn][p]][0]][0], v[0])
             != 0) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
           int[] e;
-          e = new int[2 + offset.length]; 
+          e = new int[2 + offset.length];
           e[0] = tokens.size;
           tokens.add(v);
           e[1] = s;
           System.arraycopy(offset, 0, e, 2, offset.length);
-          
+
           next.add(e);
           insertNodeInNextArray(cn, next.size - 1, p + 1);
           return next.size - 1;
-        } else {
-          return insertNodeSorted(next.list[cn][p], v, s, offset);
         }
+        return insertNodeSorted(next.list[cn][p], v, s, offset);
       }
     }
 
@@ -133,29 +132,28 @@ final class FTArray {
       r2 = getBytes(v, is.length, v.length);
     }
 
-    if(is !=  null) {
+    if(is != null) {
       if(r1 == null) {
         if(r2 != null) {
           // value of currentNode equals valueToInsert,
           // but valueToInset is longer
-          final int p = getPointer(cn); 
-          if(p == 0 || 
+          final int p = getPointer(cn);
+          if(p == 0 ||
             Token.diff(
                 tokens.list[next.list[next.list[cn][p]][0]][0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
             // start with the same letter than reamin2.
             int[] e;
-            e = new int[2 + offset.length]; 
+            e = new int[2 + offset.length];
             e[0] = tokens.size;
             tokens.add(r2);
             e[1] = s;
             System.arraycopy(offset, 0, e, 2, offset.length);
             next.add(e);
-            insertNodeInNextArray(cn, next.size - 1, p + 1); 
+            insertNodeInNextArray(cn, next.size - 1, p + 1);
             return next.size - 1;
-          } else {
-            return insertNodeSorted(next.list[cn][p], r2, s, offset);
           }
+          return insertNodeSorted(next.list[cn][p], r2, s, offset);
         }
 
       } else {
@@ -176,47 +174,46 @@ final class FTArray {
           oe[1] = next.size - 1;
           next.list[cn] = oe;
           return next.size - 1;
-        } else {
-          // char1 != null && char2 != null
-          // value of current node and value to insert have only one common
-          // letter update value of current node with intersection
-          tokens.list[next.list[cn][0]] = is;
-          final int[] one = next.list[cn];
-          int[] ne = new int[5];
-          ne[0] = one[0];
-          //if (r2[0] < r1[0]) {
-          if (Token.diff(r2[0], r1[0]) < 0) {
-            ne[1] = next.size;
-            ne[2] = next.size + 1;
-          } else {
-            ne[1] = next.size + 1;
-            ne[2] = next.size;
-          }
-          ne[3] = 0;
-          ne[4] = 0;
-          next.list[cn] = ne;
-
-          ne = new int[2 + offset.length]; 
-          ne[0] = tokens.size;
-          tokens.add(r2);
-
-          ne[1] = s;
-          System.arraycopy(offset, 0, ne, 2, offset.length);
-
-          next.add(ne);
-
-          ne = new int[one.length];
-          System.arraycopy(one, 0, ne, 0, ne.length);
-          ne[0] = tokens.size;
-          tokens.add(r1);
-          next.add(ne);
-          return next.size - 1;
         }
+        // char1 != null && char2 != null
+        // value of current node and value to insert have only one common
+        // letter update value of current node with intersection
+        tokens.list[next.list[cn][0]] = is;
+        final int[] one = next.list[cn];
+        int[] ne = new int[5];
+        ne[0] = one[0];
+        //if (r2[0] < r1[0]) {
+        if (Token.diff(r2[0], r1[0]) < 0) {
+          ne[1] = next.size;
+          ne[2] = next.size + 1;
+        } else {
+          ne[1] = next.size + 1;
+          ne[2] = next.size;
+        }
+        ne[3] = 0;
+        ne[4] = 0;
+        next.list[cn] = ne;
+
+        ne = new int[2 + offset.length];
+        ne[0] = tokens.size;
+        tokens.add(r2);
+
+        ne[1] = s;
+        System.arraycopy(offset, 0, ne, 2, offset.length);
+
+        next.add(ne);
+
+        ne = new int[one.length];
+        System.arraycopy(one, 0, ne, 0, ne.length);
+        ne[0] = tokens.size;
+        tokens.add(r1);
+        next.add(ne);
+        return next.size - 1;
       }
-    }  else {
+    } else {
       // abort recursion
       // no intersection between current node a value to insert
-      final int[] ne = new int[2 + offset.length]; 
+      final int[] ne = new int[2 + offset.length];
       ne[0] = tokens.size;
       tokens.add(v);
       System.arraycopy(offset, 0, ne, 2, offset.length);
@@ -239,7 +236,7 @@ final class FTArray {
   private byte[] calculateIntersection(final byte[] b1, final byte[] b2) {
     if(b1 == null || b2 == null) return null;
 
-    final int ml = b1.length < b2.length ? b1.length : b2.length; 
+    final int ml = b1.length < b2.length ? b1.length : b2.length;
     int i = -1;
     while(++i < ml && Token.diff(b1[i], b2[i]) == 0);
     return getBytes(b1, 0, i);

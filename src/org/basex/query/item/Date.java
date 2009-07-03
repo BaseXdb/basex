@@ -34,7 +34,7 @@ public abstract class Date extends Item {
   public static DatatypeFactory df;
   /** Calendar instance. */
   public XMLGregorianCalendar xc;
-  
+
   static {
     try {
       df = DatatypeFactory.newInstance();
@@ -96,7 +96,7 @@ public abstract class Date extends Item {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
     if(!mt.matches()) Err.date(d, type, e);
-    
+
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
     if(s > 59) Err.range(type, d);
@@ -169,7 +169,7 @@ public abstract class Date extends Item {
   public final Object java() {
     return xc;
   }
-  
+
   /**
    * Returns the date in seconds.
    * @return seconds
@@ -183,7 +183,7 @@ public abstract class Date extends Item {
     if(bd == null) bd = BigDecimal.valueOf(0);
     return bd.add(BigDecimal.valueOf(h * 3600 + m * 60 - z * 60 + s));
   }
-  
+
   /**
    * Returns the days.
    * @return seconds
@@ -195,7 +195,7 @@ public abstract class Date extends Item {
     long s = days(y, m, d);
     return y > 0 ? s : -s;
   }
-  
+
   /***
    * Returns days per month, considering leap years.
    * @param y year
@@ -205,7 +205,7 @@ public abstract class Date extends Item {
   private static long dpm(final int y, final int m) {
     return DAYS[m] + (m == 1 && leap(y) ? 1 : 0);
   }
-  
+
   /***
    * Checks if the specified year is a leap year.
    * @param y year

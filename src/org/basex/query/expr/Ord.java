@@ -29,7 +29,7 @@ public final class Ord extends Expr {
   boolean desc;
   /** Order for empty expressions. */
   boolean lst;
-  
+
   /**
    * Empty constructor for stable sorting.
    */
@@ -47,7 +47,7 @@ public final class Ord extends Expr {
     desc = d;
     lst = l;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(expr != null) expr = expr.comp(ctx);
@@ -108,7 +108,7 @@ public final class Ord extends Expr {
   public void plan(final Serializer ser) throws IOException {
     expr.plan(ser);
   }
-  
+
   @Override
   public String toString() {
     if(expr == null) return "";

@@ -38,14 +38,14 @@ public class FTPos {
   }
 
   /**
-   * Merges the specified position arrays. 
+   * Merges the specified position arrays.
    * @param ps positions
    * @param pi pointers
    */
   void union(final int[] ps, final byte[] pi) {
     // skip existing values
     if(Array.eq(pos, ps)) return;
-    
+
     // merge entries with the same pre value
     final int prs = ps.length;
     final int pss = pos.length;
@@ -59,7 +59,7 @@ public class FTPos {
     pos = ts;
     poi = ti;
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName());

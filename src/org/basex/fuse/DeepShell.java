@@ -16,7 +16,7 @@ import org.basex.query.QueryProcessor;
 
 /**
  * Rudimentary shell to interact with a file hierarchy stored in XML.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
@@ -147,9 +147,9 @@ public class DeepShell {
     int err = fs.rmdir(args[1]);
     if(err != 0) System.err.printf("rmdir failed. %d\n", err);
   }
-  
+
   /**
-   * Create a file if it doesn't exist yet. 
+   * Create a file if it doesn't exist yet.
    * @param args argument vector
    */
   @Command(shortcut = 'c',
@@ -162,7 +162,7 @@ public class DeepShell {
     int err = fs.create(args[1], 0100644);
     if(err < 0) System.err.printf("touch failed. %d\n", err);
   }
-  
+
   /**
    * Print short help message for available commands.
    * @param args argument vector
@@ -174,15 +174,15 @@ public class DeepShell {
       if(m.isAnnotationPresent(Command.class)) {
         Command c = m.getAnnotation(Command.class);
         if((args.length == 1 && args[0].charAt(0) == 'h')
-            || (args.length > 1 && m.getName().equals(args[1]) 
-            || (args.length > 1 && args[1].length() == 1 
+            || (args.length > 1 && m.getName().equals(args[1])
+            || (args.length > 1 && args[1].length() == 1
                 && c.shortcut() == args[1].charAt(0))))
-          System.out.printf("%-40s %-40s\n", 
-              m.getName() + " " + c.args(), 
+          System.out.printf("%-40s %-40s\n",
+              m.getName() + " " + c.args(),
               c.help() + " (" + c.shortcut() + ")");
       }
   }
-  
+
   /**
    * Leave shell.
    * @param args argument vector (not used currently)

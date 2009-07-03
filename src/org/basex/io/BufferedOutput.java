@@ -38,7 +38,7 @@ public final class BufferedOutput extends OutputStream {
     buffer = new byte[bufs];
     bufsize = bufs;
   }
-  
+
   @Override
   public void write(final int b) throws IOException {
     if(pos == bufsize) flush();

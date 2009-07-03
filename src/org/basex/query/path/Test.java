@@ -36,18 +36,18 @@ public abstract class Test {
   public QNm name;
   /** Temporary QName instance. */
   final QNm tmpq = new QNm();
-  
+
   /**
    * Optimizes and compiles the expression.
    * @param ctx query context
    * @return false if test always returns false
    * @throws QueryException evaluation exception
    */
-  @SuppressWarnings("unused") 
+  @SuppressWarnings("unused")
   public boolean comp(final QueryContext ctx) throws QueryException {
     return true;
   }
-  
+
   /**
    * Tests the specified node.
    * @param nod temporary node

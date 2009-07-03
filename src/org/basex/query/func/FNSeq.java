@@ -56,7 +56,7 @@ public final class FNSeq extends Fun {
     final Item it = expr[1].atomic(ctx);
     if(it == null) Err.empty(this);
     if(expr.length == 3) checkColl(expr[2], ctx);
-    
+
     return new Iter() {
       final Iter iter = expr[0].iter(ctx);
       int c;
@@ -81,7 +81,7 @@ public final class FNSeq extends Fun {
    */
   private Iter distinct(final QueryContext ctx) throws QueryException {
     if(expr.length == 2) checkColl(expr[1], ctx);
-    
+
     return new Iter() {
       final Iter iter = expr[0].iter(ctx);
       final ItemSet map = new ItemSet();
@@ -155,7 +155,7 @@ public final class FNSeq extends Fun {
     final long s = Math.round(checkDbl(expr[1], ctx));
     final long e = expr.length > 2 ? s + Math.round(checkDbl(expr[2], ctx)) :
       Long.MAX_VALUE;
-    
+
     final Iter iter = ctx.iter(expr[0]);
     return iter.size() != -1 ? new Iter() {
       // directly access specified items
@@ -188,10 +188,10 @@ public final class FNSeq extends Fun {
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
-    
+
     // process reversable iterator...
     if(iter.reverse()) return iter;
-    
+
     // process any other iterator...
     return new Iter() {
       final Iter si = iter.size() != -1 ? iter : SeqIter.get(iter);
@@ -216,7 +216,7 @@ public final class FNSeq extends Fun {
     if(expr.length == 3) checkColl(expr[2], ctx);
     return deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
-  
+
   /**
    * Checks items for deep equality.
    * @param iter1 first iterator
@@ -249,7 +249,7 @@ public final class FNSeq extends Fun {
         n2 = nextDeep(niter2);
         if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
         if(n1.type != n2.type) return false;
-        
+
         if(n1.type == Type.ELM && !n1.qname().eq(n2.qname())) return false;
 
         if(n1.type == Type.ATT) {
@@ -284,7 +284,7 @@ public final class FNSeq extends Fun {
     }
     return it1 == it2;
   }
-  
+
   /**
    * Returns the next node for deep comparison.
    * @param iter iterator

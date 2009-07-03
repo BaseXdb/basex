@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
  * This class provides the architecture for all internal command
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

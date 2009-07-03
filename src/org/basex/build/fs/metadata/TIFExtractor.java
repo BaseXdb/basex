@@ -10,7 +10,7 @@ import static org.basex.build.fs.FSText.*;
 
 /**
  * TIF meta data extractor.
- * 
+
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -36,10 +36,10 @@ public final class TIFExtractor extends EXIFExtractor {
     // extract image dimensions
     int c = getShort(in);
     skip(in, 4);
-    
+
     int w = -1;
     int h = -1;
-    
+
     while(c-- >= 0 && w == -1 || h == -1) {
       final int b = getShort(in);
       skip(in, 6);

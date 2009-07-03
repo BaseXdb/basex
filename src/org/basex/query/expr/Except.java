@@ -32,7 +32,7 @@ public final class Except extends Arr {
     for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
     return duplicates(ctx) ? eval(iter) : iter(iter);
   }
-  
+
   /**
    * Creates an except iterator.
    * @param iter iterators
@@ -44,7 +44,7 @@ public final class Except extends Arr {
 
       @Override
       public Nod next() throws QueryException {
-        if(items == null) { 
+        if(items == null) {
           items = new Nod[iter.length];
           for(int i = 0; i != iter.length; i++) next(i);
         }
@@ -53,7 +53,7 @@ public final class Except extends Arr {
           if (items[0] == null) return null;
           if (items[i] == null) continue;
           final int d = items[0].diff(items[i]);
-          
+
           if(d < 0) {
             if(i + 1 == items.length) {
               break;
@@ -67,11 +67,11 @@ public final class Except extends Arr {
             next(i--);
           }
         }
-        final Nod temp = items[0]; 
+        final Nod temp = items[0];
         next(0);
         return temp;
       }
-      
+
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
         if(it != null && !it.node()) Err.nodes(Except.this);
@@ -94,7 +94,7 @@ public final class Except extends Arr {
       if(!it.node()) Err.nodes(this);
       ni.add((Nod) it);
     }
-    
+
     for(int e = 1; e != expr.length; e++) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
@@ -107,7 +107,7 @@ public final class Except extends Arr {
     }
     return ni;
   }
-  
+
   @Override
   public String toString() {
     return "(" + toString(" " + EXCEPT + " ") + ")";

@@ -39,7 +39,7 @@ public final class DialogCreate extends Dialog {
   private final BaseXTextField dbname;
   /** Database info. */
   private final BaseXLabel info;
-  
+
   /** Internal XML parsing. */
   private final BaseXCheckBox intparse;
   /** Whitespace chopping. */
@@ -72,7 +72,7 @@ public final class DialogCreate extends Dialog {
     final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(7, 1));
     p1.setBorder(8, 8, 8, 8);
- 
+
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(2, 3, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + ":", false, true));
@@ -102,7 +102,7 @@ public final class DialogCreate extends Dialog {
     });
     p.add(button);
     p1.add(p);
-    
+
     final BaseXLabel l = new BaseXLabel(CREATENAME, false, true);
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
@@ -232,7 +232,7 @@ public final class DialogCreate extends Dialog {
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
-    
+
     final String pth = path();
     final IO file = IO.get(pth);
     final boolean exists = pth.length() != 0 && file.exists();
@@ -242,7 +242,7 @@ public final class DialogCreate extends Dialog {
 
     final String nm = dbname();
     ok = exists && nm.length() != 0;
-    
+
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
     ImageIcon img = null;
     if(ok) {
@@ -254,7 +254,7 @@ public final class DialogCreate extends Dialog {
         img = GUI.icon("warn");
       }
     }
-    
+
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : GUI.icon("error") : null);

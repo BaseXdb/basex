@@ -76,7 +76,7 @@ public final class For extends ForLet {
     final Var v = var.clone();
     final Var p = pos != null ? pos.clone() : null;
     final Var s = score != null ? score.clone() : null;
-    
+
     return new Iter() {
       /** Variable stack size. */
       private int vs;
@@ -84,7 +84,7 @@ public final class For extends ForLet {
       private Iter ir;
       /** Counter. */
       private int c;
-      
+
       @Override
       public Bln next() throws QueryException {
         if(ir == null) {
@@ -121,12 +121,12 @@ public final class For extends ForLet {
   boolean standard() {
     return pos == null && score == null;
   }
-  
+
   @Override
   public boolean shadows(final Var v) {
     return super.shadows(v) || !v.visible(pos) || !v.visible(score);
   }
-  
+
   @Override
   public String toString() {
     return FOR + " " + var + " " + IN + " " + expr;

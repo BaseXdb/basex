@@ -980,10 +980,10 @@ public interface Text {
   /** Entities information. */
   String DTDINFO = lang("dc_dtdinfo");
   /** Main-Memory Mode. */
-  String MMEMINFO =  lang("dc_mminfo");
+  String MMEMINFO = lang("dc_mminfo");
 
   /** Value Index information. */
-  String TXTINDEXINFO =  lang("dc_txtinfo");
+  String TXTINDEXINFO = lang("dc_txtinfo");
   /** Value Index information. */
   String ATTINDEXINFO = lang("dc_attinfo");
   /** Full-text Index information. */
@@ -998,17 +998,17 @@ public interface Text {
   String FTDCINFO = lang("dc_ftdcinfo");
 
   /** General info. */
-  String GENERALINFO =  lang("dc_general");
+  String GENERALINFO = lang("dc_general");
   /** General info. */
-  String PARSEINFO =  lang("dc_parse");
+  String PARSEINFO = lang("dc_parse");
   /** Indexing info. */
-  String NAMESINFO =  lang("dc_names");
+  String NAMESINFO = lang("dc_names");
   /** Indexing info. */
-  String INDEXINFO =  lang("dc_index");
+  String INDEXINFO = lang("dc_index");
   /** General info. */
-  String METAINFO =  lang("dc_meta");
+  String METAINFO = lang("dc_meta");
   /** Indexing info. */
-  String FTINFO =  lang("dc_ft");
+  String FTINFO = lang("dc_ft");
 
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
@@ -1146,7 +1146,7 @@ public interface Text {
   };
   /** Predefined number of layouts. */
   String[] MAPALGO = {
-    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout", 
+    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout",
     "Binary Layout"
   };
 

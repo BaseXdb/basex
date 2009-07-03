@@ -69,7 +69,7 @@ public final class TreeView extends View {
   private boolean onlyElementNodes = false;
 //  /** depth of the document. **/
 //  private int documentDepth = -1;
-  /** notified focus flag. **/ 
+  /** notified focus flag. **/
   boolean refreshedFocus = false;
 
   /**
@@ -132,7 +132,7 @@ public final class TreeView extends View {
     /** Timer */
     final Performance perf = new Performance();
     perf.initTimer();
-    
+
     /** Initialize sizes */
     fontHeight = g.getFontMetrics().getHeight();
 
@@ -278,7 +278,7 @@ public final class TreeView extends View {
     while(it.hasNext()) {
       final TreeRect r = it.next();
 
-      if(refreshedFocus ? r.pre == gui.focused : 
+      if(refreshedFocus ? r.pre == gui.focused :
         r.contains(mousePosX, mousePosY)) {
         focusedRect = r;
 

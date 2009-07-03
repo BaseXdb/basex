@@ -28,7 +28,7 @@ public final class Export extends Process {
   public Export(final String p) {
     super(DATAREF, p);
   }
-  
+
   @Override
   protected boolean exec() {
     try {
@@ -36,7 +36,7 @@ public final class Export extends Process {
       final int[] docs = data.doc();
       for(final int pre : docs) {
         IO file = IO.get(args[0]);
-        
+
         // more documents - use original name and use argument as path
         if(docs.length != 1) {
           file = file.merge(IO.get(Token.string(data.text(pre))));

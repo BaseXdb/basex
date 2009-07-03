@@ -55,7 +55,7 @@ public final class CElem extends CFrag {
     ctx.ns.size(s);
     return this;
   }
-  
+
   /**
    * Adds namespaces to the current context.
    * @param ctx query context
@@ -132,9 +132,9 @@ public final class CElem extends CFrag {
      */
     private boolean add(final QueryContext ctx, final Item it)
         throws QueryException {
-      
+
       if(it == null) return false;
-      
+
       if(it.node() && it.type != Type.TXT) {
         Nod node = (Nod) it;
 

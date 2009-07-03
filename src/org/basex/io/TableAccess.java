@@ -17,7 +17,7 @@ public abstract class TableAccess {
    * @return integer value
    */
   public abstract int read1(int p, int o);
-  
+
   /**
    * Reads a short value from the specified position and returns it as integer.
    * @param p pre value
@@ -25,7 +25,7 @@ public abstract class TableAccess {
    * @return integer value
    */
   public abstract int read2(int p, int o);
-  
+
   /**
    * Reads an integer value from the specified position.
    * @param p pre value
@@ -33,7 +33,7 @@ public abstract class TableAccess {
    * @return integer value
    */
   public abstract int read4(int p, int o);
-  
+
   /**
    * Reads an integer value from the specified position.
    * @param p pre value
@@ -41,7 +41,7 @@ public abstract class TableAccess {
    * @return integer value
    */
   public abstract long read5(int p, int o);
-  
+
   /**
    * Writes a byte to the specified position.
    * @param p pre value
@@ -49,7 +49,7 @@ public abstract class TableAccess {
    * @param v value to be written
    */
   public abstract void write1(int p, int o, int v);
-  
+
   /**
    * Writes 2 bytes to the specified position.
    * @param p pre value
@@ -57,7 +57,7 @@ public abstract class TableAccess {
    * @param v value to be written
    */
   public abstract void write2(int p, int o, int v);
-  
+
   /**
    * Writes an integer value to the specified position.
    * @param p pre value
@@ -65,7 +65,7 @@ public abstract class TableAccess {
    * @param v value to be written
    */
   public abstract void write4(int p, int o, int v);
-  
+
   /**
    * Writes a 5-byte value to the specified position.
    * @param p pre value
@@ -80,20 +80,20 @@ public abstract class TableAccess {
    * @param nr number of entries to be deleted
    */
   public abstract void delete(int pre, int nr);
-  
+
   /**
    * Insert entries.
    * @param pre pre value of node to insert after
    * @param entries array of bytes containing the entries to insert
    */
   public abstract void insert(int pre, byte[] entries);
-  
+
   /**
    * Flushes the table contents.
    * @throws IOException in case of write errors
    */
   public abstract void flush() throws IOException;
-  
+
   /**
    * Closes the table access.
    * @throws IOException in case of write errors

@@ -46,7 +46,7 @@ public final class DiskBuilder extends Builder {
     meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
-    
+
     DropDB.drop(db);
     IO.dbpath(db).mkdirs();
 
@@ -67,7 +67,7 @@ public final class DiskBuilder extends Builder {
     if(tags.size() > 0x0FFF) throw new IOException(LIMITTAGS);
     if(atts.size() > 0x0FFF) throw new IOException(LIMITATTS);
     close();
-    
+
     // close files
     final String db = meta.dbname;
     final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
@@ -89,13 +89,13 @@ public final class DiskBuilder extends Builder {
     }
     ta.close();
     in.close();
-    
+
     IO.dbfile(db, DATATMP).delete();
 
     // return database instance
     return new DiskData(db, false);
   }
-  
+
   @Override
   public void close() throws IOException {
     if(tout == null) return;
@@ -118,7 +118,7 @@ public final class DiskBuilder extends Builder {
     tout.writeInt(0);
     tout.writeInt(meta.size++);
   }
-  
+
   @Override
   public void addElem(final int t, final int s, final int dis,
       final int as, final boolean n) throws IOException {
@@ -146,7 +146,7 @@ public final class DiskBuilder extends Builder {
   @Override
   public void addText(final byte[] txt, final int dis, final byte kind)
       throws IOException {
-    
+
     tout.write(kind);
     tout.write(0);
     tout.write(0);

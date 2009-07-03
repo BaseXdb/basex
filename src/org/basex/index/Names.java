@@ -117,7 +117,7 @@ public final class Names extends Set {
 
     // print all entries in descending number of occurrences
     final int[] ids = Array.createOrder(tl, false);
-    
+
     final TokenBuilder tb = new TokenBuilder();
     tb.add(NAMINDEX + NL);
     tb.add(IDXENTRIES + (size - 1) + NL);

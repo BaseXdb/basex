@@ -48,12 +48,12 @@ final class FNAcc extends Fun {
         return super.atomic(ctx);
     }
   }
-  
+
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(expr.length == 0) return this;
     final Item it = expr[0].i() ? (Item) expr[0] : null;
-    
+
     switch(func) {
       case STRING:
         return it != null ? atomic(ctx) : this;
@@ -63,7 +63,7 @@ final class FNAcc extends Fun {
         return this;
     }
   }
-  
+
   /**
    * Converts the specified item to a double.
    * @param it input item

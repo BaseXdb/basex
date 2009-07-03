@@ -36,7 +36,7 @@ public final class StatsKey {
   public int counter;
   /** Leaf node flag. */
   public boolean leaf;
-  
+
   /**
    * Default Constructor.
    */
@@ -47,7 +47,7 @@ public final class StatsKey {
     max = Double.MIN_VALUE;
     leaf = true;
   }
-  
+
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
@@ -55,7 +55,7 @@ public final class StatsKey {
    */
   public StatsKey(final DataInput in) throws IOException {
     kind = Kind.values()[in.readNum()];
-    
+
     if(kind == Kind.INT || kind == Kind.DBL) {
       min = in.readDouble();
       max = in.readDouble();
@@ -76,7 +76,7 @@ public final class StatsKey {
    */
   public void finish(final DataOutput out) throws IOException {
     if(cats != null && cats.size() == 0) kind = Kind.NONE;
-    
+
     out.writeNum(kind.ordinal());
     if(kind == Kind.INT || kind == Kind.DBL) {
       out.writeDouble(min);
@@ -90,7 +90,7 @@ public final class StatsKey {
     out.writeBool(leaf);
     out.writeDouble(len);
   }
-  
+
   /**
    * Adds a value. All values are first treated as integer values. If a value
    * can't be converted to an integer, it is treated as double value. If

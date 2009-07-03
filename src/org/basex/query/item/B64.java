@@ -1,12 +1,14 @@
 package org.basex.query.item;
 
+import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
  * Base64Binary item.
- * 
+ * Derived from java.util.prefs.Base64.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -24,7 +26,7 @@ public final class B64 extends Item {
     super(Type.B6B);
     val = h.val;
   }
-  
+
   /**
    * Constructor.
    * @param d data
@@ -55,7 +57,7 @@ public final class B64 extends Item {
   }
 
   /**
-   * Derived from java.util.prefs.Base64.
+   * Hex to byte conversion.
    * @return base64 array
    */
   private byte[] h2b() {
@@ -91,7 +93,7 @@ public final class B64 extends Item {
     return tb.finish();
   }
 
-  /** Derived from java.util.prefs.Base64. */
+  /** Hex to byte conversion table. */
   private static final byte[] H2B = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -99,9 +101,9 @@ public final class B64 extends Item {
     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
   };
-  
+
   /**
-   * Derived from java.util.prefs.Base64.
+   * Byte to hex conversion.
    * @param s base64 array
    * @throws QueryException evaluation exception
    */
@@ -139,9 +141,9 @@ public final class B64 extends Item {
       if(m == 1) val[o++] = (byte) ((c1 << 4) | (b2h(s[c++]) >> 2));
     }
   }
-  
+
   /**
-   * Derived from java.util.prefs.Base64.
+   * Byte to hex conversion.
    * @param c character to be encoded
    * @return encoded value
    * @throws QueryException evaluation exception
@@ -153,9 +155,7 @@ public final class B64 extends Item {
     return result;
   }
 
-  /**
-   * Derived from java.util.prefs.Base64.
-   */
+  /** Byte to hex conversion table. */
   private static final byte[] B2H = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -169,6 +169,6 @@ public final class B64 extends Item {
 
   @Override
   public String toString() {
-    return "\"" + Token.string(h2b()) + "\"";
+    return BaseX.info("\"%\"", h2b());
   }
 }

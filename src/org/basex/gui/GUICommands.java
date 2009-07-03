@@ -160,7 +160,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogImportFS(gui).ok()) return;
-      final String p = GUIProp.fsall ? "/" 
+      final String p = GUIProp.fsall ? "/"
           : GUIProp.guifsimportpath.replace('\\', '/');
       final String n = GUIProp.guifsdbname;
       final String m = GUIProp.guimountpoint;
@@ -871,7 +871,7 @@ public enum GUICommands implements GUICommand {
       }
     }.start();
   }
-  
+
   /**
    * Displays a file save dialog and returns the file name or a null reference.
    * @param gui gui reference

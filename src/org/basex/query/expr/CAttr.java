@@ -106,7 +106,7 @@ public final class CAttr extends CFrag {
     ser.closeElement();
     ser.closeElement();
   }
-  
+
   @Override
   public String info() {
     return "attribute constructor";

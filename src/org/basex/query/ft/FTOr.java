@@ -59,10 +59,10 @@ public final class FTOr extends FTExpr {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
     }
-    
+
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException { 
+      public FTItem next() throws QueryException {
         // find item with smallest pre value
         int p = -1;
         for(int i = 0; i < it.length; i++) {
@@ -84,7 +84,7 @@ public final class FTOr extends FTExpr {
       }
     };
   }
-  
+
   /**
    * Merges two matches.
    * @param m1 first match list

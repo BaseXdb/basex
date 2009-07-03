@@ -74,7 +74,7 @@ public final class TableDiskAccess extends TableAccess {
     file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
   }
-  
+
   /**
    * Searches for the block containing the entry for that pre. then it
    * reads the block and returns it's offset inside the block.
@@ -100,7 +100,7 @@ public final class TableDiskAccess extends TableAccess {
       }
       if(l > h) BaseX.notexpected("Invalid Data Access [pre:" + pre +
           ",indexSize:" + indexSize + ",access:" + l + ">" + h + "]");
-      
+
       readBlock(m, fp, np);
     }
     return pre - firstPre << IO.NODEPOWER;
@@ -247,7 +247,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /* Note to delete method: Freed blocks are currently ignored. */
-  
+
   @Override
   public synchronized void delete(final int first, final int nr) {
     // mark index as dirty and get first block
@@ -300,7 +300,7 @@ public final class TableDiskAccess extends TableAccess {
     firstPre = first;
     updatePre(nr);
   }
-  
+
   /**
    * Updates the firstPre index entries.
    * @param nr number of entries to move
@@ -311,7 +311,7 @@ public final class TableDiskAccess extends TableAccess {
     count -= nr;
     nextPre = index + 1 >= indexSize ? count : firstPres[index + 1];
   }
-  
+
   @Override
   public synchronized void insert(final int pre, final byte[] entries) {
     dirty = true;
@@ -345,11 +345,11 @@ public final class TableDiskAccess extends TableAccess {
     int newBlocks = (int) Math.ceil((double) nr / NEWENTRIES) + 1;
     // in case we insert at block boundary
     if(pre == nextPre - 1) newBlocks--;
-    
+
     // resize the index
     firstPres = Array.resize(firstPres, nrBlocks, nrBlocks + newBlocks);
     blocks = Array.resize(blocks, nrBlocks, nrBlocks + newBlocks);
-    
+
     Array.move(firstPres, index + 1, newBlocks, indexSize - index - 1);
     Array.move(blocks, index + 1, newBlocks, indexSize - index - 1);
 

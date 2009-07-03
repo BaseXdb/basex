@@ -37,7 +37,7 @@ public final class ClientProcess extends AbstractProcess {
     port = p;
     proc = pr;
   }
-  
+
   @Override
   public boolean execute(final Context ctx) throws IOException {
     send(proc.toString());

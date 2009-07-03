@@ -2,7 +2,7 @@ package org.basex.fuse;
 
 /**
  * Interface to filesystem in userspace framework.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
@@ -52,7 +52,7 @@ public abstract class DeepFuse {
    * Deletes the filename portion, beginning with the last slash `/' character
    * to the end of string. FUSE always passes 'absolute, normalized' pathnames,
    * i.e., starting with a slash, redundant and trailing slashes removed.
-   * 
+   *
    * Example:
    * <ul>
    * <li>dirname("/usr/bin/trail") returns "/usr/bin"</li>
@@ -68,7 +68,7 @@ public abstract class DeepFuse {
 
   /**
    * Get file attributes.
-   * 
+   *
    * @param path to the file the stat information is requested for
    * @return int id of node/inode of the requested file
    */
@@ -83,7 +83,7 @@ public abstract class DeepFuse {
 
   /**
    * Create a file node.
-   * 
+   *
    * This is called for creation of all non-directory, non-symlink nodes. If the
    * filesystem defines a create() method, then for regular files that will be
    * called instead.
@@ -100,7 +100,7 @@ public abstract class DeepFuse {
 
   /**
    * Create a directory.
-   * 
+   *
    * @param path to directory to be created
    * @param mode permissions for directory
    * @return node id, or -1 if an error occurred (in which case, errno
@@ -110,7 +110,7 @@ public abstract class DeepFuse {
 
   /**
    * Remove a file.
-   * 
+   *
    * @param path to file to be removed
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
@@ -119,7 +119,7 @@ public abstract class DeepFuse {
 
   /**
    * Remove a directory file.
-   * 
+   *
    * @param path to file to be removed
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
@@ -128,7 +128,7 @@ public abstract class DeepFuse {
 
   /**
    * Make symbolic link to a file.
-   * 
+   *
    * @param from link source
    * @param to link target
    * @return zero on success, or -1 if an error occurred (in which case, errno
@@ -138,7 +138,7 @@ public abstract class DeepFuse {
 
   /**
    * Rename a file.
-   * 
+   *
    * @param from path to file to be renamed
    * @param to new name
    * @return zero on success, or -1 if an error occurred (in which case, errno
@@ -148,7 +148,7 @@ public abstract class DeepFuse {
 
   /**
    * Create a hard link to a file.
-   * 
+   *
    * @param name1 link source
    * @param name2 link target
    * @return zero on success, or -1 if an error occurred (in which case, errno
@@ -158,7 +158,7 @@ public abstract class DeepFuse {
 
   /**
    * Change the permission bits of a file.
-   * 
+   *
    * @param path name of the file
    * @param mode permissions to be set
    * @return zero on success, or -1 if an error occurred
@@ -167,7 +167,7 @@ public abstract class DeepFuse {
 
   /**
    * Change the owner and group of a file.
-   * 
+   *
    * @param path name of the file
    * @param uid owner
    * @param gid group
@@ -177,7 +177,7 @@ public abstract class DeepFuse {
 
   /**
    * Change the size of a file.
-   * 
+   *
    * @param path name of the file
    * @param off size to be set
    * @return zero on success, or -1 if an error occurred
@@ -186,7 +186,7 @@ public abstract class DeepFuse {
 
   /**
    * File open operation.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -194,7 +194,7 @@ public abstract class DeepFuse {
 
   /**
    * Read data from an open file.
-   * 
+   *
    * @param path name of the file
    * @param length number of bytes to read
    * @param offset from which to read
@@ -204,7 +204,7 @@ public abstract class DeepFuse {
 
   /**
    * Write data to an open file.
-   * 
+   *
    * @param path name of the file
    * @param length number of bytes to write
    * @param offset from which to write
@@ -216,7 +216,7 @@ public abstract class DeepFuse {
 
   /**
    * Get file system statistics.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -224,7 +224,7 @@ public abstract class DeepFuse {
 
   /**
    * Possibly flush cached data.
-   * 
+   *
    * BIG NOTE: This is not equivalent to fsync(). It's not a request to sync
    * dirty data.
    * @param path name of the file
@@ -234,7 +234,7 @@ public abstract class DeepFuse {
 
   /**
    * Release an open file.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -256,7 +256,7 @@ public abstract class DeepFuse {
 
   /**
    * Get extended attributes.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -264,7 +264,7 @@ public abstract class DeepFuse {
 
   /**
    * List extended attributes.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -272,7 +272,7 @@ public abstract class DeepFuse {
 
   /**
    * Remove extended attributes.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -280,7 +280,7 @@ public abstract class DeepFuse {
 
   /**
    * Open directory.
-   * 
+   *
    * @param path name of the file
    * @return the number of directories or -1 if an error occurred
    */
@@ -296,7 +296,7 @@ public abstract class DeepFuse {
 
   /**
    * Release directory.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -304,7 +304,7 @@ public abstract class DeepFuse {
 
   /**
    * Synchronize directory contents.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -312,14 +312,14 @@ public abstract class DeepFuse {
 
   /**
    * Initialize filesystem.
-   * 
+   *
    * @return zero on success, or -1 if an error occurred
   protected abstract int init();
    */
 
   /**
    * Clean up filesystem.
-   * 
+   *
    * Called on filesystem exit.
    * @return zero on success, or -1 if an error occurred
    */
@@ -327,7 +327,7 @@ public abstract class DeepFuse {
 
   /**
    * Check file access permissions.
-   * 
+   *
    * @param path name of the file
    * @param mode permission to check
    * @return zero on success, or -1 if an error occurred
@@ -336,7 +336,7 @@ public abstract class DeepFuse {
 
   /**
    * Create and open a file.
-   * 
+   *
    * @param path for the file to be created
    * @param mode of file (directory, regular file ..., permission bits)
    * @return int id of newly created file or -1 on failure
@@ -345,7 +345,7 @@ public abstract class DeepFuse {
 
   /**
    * Change the size of an open file.
-   * 
+   *
    * @param path name of the file
    * @param off new file size
    * @return zero on success, or -1 if an error occurred
@@ -354,7 +354,7 @@ public abstract class DeepFuse {
 
   /**
    * Get attributes from an open file.
-   * 
+   *
    * This method is called instead of the getattr() method if the file
    * information is available.
    * @param path name of the file
@@ -364,7 +364,7 @@ public abstract class DeepFuse {
 
   /**
    * Perform POSIX file locking operation.
-   * 
+   *
    * @param path name of the file
    * @param cmd locking command id
    * @return zero on success, or -1 if an error occurred
@@ -374,7 +374,7 @@ public abstract class DeepFuse {
   /**
    * Change the access and modification times of a file with nanosecond
    * resolution.
-   * 
+   *
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
@@ -382,7 +382,7 @@ public abstract class DeepFuse {
 
   /**
    * Map block index within file to block index within device.
-   * 
+   *
    * @param path name of the file
    * @param blocksize block size
    * @param idx block index

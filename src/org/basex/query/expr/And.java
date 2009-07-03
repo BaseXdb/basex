@@ -29,7 +29,7 @@ public final class And extends Arr {
     super.comp(ctx);
     for(int e = 0; e < expr.length; e++) {
       if(!expr[e].i()) continue;
-      
+
       if(!((Item) expr[e]).bool()) {
         // atomic items can be pre-evaluated
         ctx.compInfo(OPTFALSE, expr[e]);
@@ -81,7 +81,7 @@ public final class And extends Arr {
     // no scoring - return default boolean
     return s == 0 ? Bln.TRUE : Bln.get(s);
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.BLN;

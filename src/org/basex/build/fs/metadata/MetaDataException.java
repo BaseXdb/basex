@@ -5,7 +5,7 @@ import org.basex.BaseX;
 
 /**
  * MetaData Exception.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */

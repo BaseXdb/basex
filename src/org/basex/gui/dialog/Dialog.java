@@ -16,7 +16,7 @@ import org.basex.gui.layout.BaseXBack;
 
 /**
  * This class provides the architecture for consistent dialog windows.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -38,7 +38,7 @@ public abstract class Dialog extends JDialog {
   public Dialog(final GUI main, final String title) {
     this(main, title, true);
   }
-  
+
   /**
    * Default Constructor.
    * @param main reference to the main window
@@ -127,7 +127,7 @@ public abstract class Dialog extends JDialog {
     }
     super.dispose();
   }
-  
+
   /**
    * States if the dialog window was confirmed or canceled.
    * @return true when dialog was confirmed

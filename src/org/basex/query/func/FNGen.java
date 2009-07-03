@@ -59,7 +59,7 @@ final class FNGen extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    // ..slows it down if the document will not be used, 
+    // ..slows it down if the document will not be used,
     // but allows more optimizations
     if(func == FunDef.DOC) {
       if(!expr[0].i()) return this;
@@ -83,7 +83,7 @@ final class FNGen extends Fun {
       }
     };
   }
-  
+
   /**
    * Atomizes the specified item.
    * @param it input item

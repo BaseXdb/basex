@@ -37,7 +37,7 @@ public final class Clc extends Arr {
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    
+
     Expr e = this;
     if(e1.i() && e2.i()) e = atomic(ctx);
     if(e1.e() || e2.e()) e = Seq.EMPTY;

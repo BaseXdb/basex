@@ -12,7 +12,7 @@ import org.basex.util.Performance;
 /**
  * This is a scrollbar implementation, supporting arbitrary
  * panel heights without increasing the memory consumption.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -143,7 +143,7 @@ public final class BaseXBar extends BaseXPanel {
     // draw scroll slider
     int bh = ww - 2 + barPos;
     BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
-    
+
     bh += barSize >> 1;
     g.setColor(GUIConstants.COLORDARK);
     g.drawLine(5, bh, ww - 6, bh);
@@ -182,7 +182,7 @@ public final class BaseXBar extends BaseXPanel {
     g.setColor(focus ? Color.black : GUIConstants.COLORDARK);
     g.fillPolygon(pol[0], pol[1], 3);
   }
-  
+
   @Override
   public void mousePressed(final MouseEvent e) {
     final int y = e.getY();

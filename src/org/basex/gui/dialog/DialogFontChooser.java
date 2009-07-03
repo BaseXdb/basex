@@ -15,7 +15,7 @@ import org.basex.gui.layout.TableLayout;
 
 /**
  * Dialog window for changing the used fonts.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -30,20 +30,20 @@ public final class DialogFontChooser extends Dialog {
   private BaseXListChooser size;
   /** Anti-Aliasing mode. */
   private BaseXCombo aalias;
-  
+
   /**
    * Default Constructor.
    * @param main reference to the main window
    */
   public DialogFontChooser(final GUI main) {
     super(main, FONTTITLE, false);
-    
+
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(2, 4, 6, 6));
-    
+
     font = new BaseXListChooser(this, fonts, HELPFONT);
     font.setSize(150, 112);
     p.add(font);
@@ -65,7 +65,7 @@ public final class DialogFontChooser extends Dialog {
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new TableLayout(1, 2, 5, 5));
     pp.add(new BaseXLabel(FAALIAS));
-    
+
     final String[] combo = fullAlias() ? GUIConstants.FONTALIAS :
       new String[] { GUIConstants.FONTALIAS[0], GUIConstants.FONTALIAS[1] };
     aalias = new BaseXCombo(combo, HELPFALIAS, this);

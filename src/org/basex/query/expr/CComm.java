@@ -12,14 +12,14 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Comment fragment.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CComm extends CFrag {
   /** Two Dashes. */
   private static final byte[] DASHES = { '-', '-' };
-  
+
   /**
    * Constructor.
    * @param c comment
@@ -46,7 +46,7 @@ public final class CComm extends CFrag {
 
     return new FComm(atom, null);
   }
-  
+
   @Override
   public String info() {
     return "comment constructor";

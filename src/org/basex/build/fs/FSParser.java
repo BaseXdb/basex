@@ -86,7 +86,7 @@ public final class FSParser extends Parser {
    * Constructor.
    * @param path the traversal starts from
    * @param mp mount point for fuse
-   * @param bs path to root of backing store for BLOBs 
+   * @param bs path to root of backing store for BLOBs
    * on Windows systems. If set to true, the path reference is ignored
    */
   public FSParser(final String path, final String mp, final String bs) {
@@ -95,7 +95,7 @@ public final class FSParser extends Parser {
     Prop.entity = false;
     Prop.dtd = false;
     root = path.equals("/");
-    
+
     fsimportpath = io.path();
     fsdbname = io.name();
     backingroot = bs;
@@ -115,7 +115,7 @@ public final class FSParser extends Parser {
     meta.add(TYPEXML, new XMLExtractor());
   }
 
-  /** 
+  /**
    * Constructor to parse single file nodes.
    * @param path String to file node to parse
    */
@@ -124,7 +124,7 @@ public final class FSParser extends Parser {
     this(path, "/mnt/deepfs", "/var/tmp/deepfs");
     singlemode = true;
   }
-  
+
   /**
    * Main entry point for the import of a file hierarchy.
    * Instantiates the engine and starts the traversal.
@@ -138,14 +138,14 @@ public final class FSParser extends Parser {
 
     builder.meta.backingpath = mybackingpath;
     builder.meta.mountpoint = mountpoint;
-    
+
     // -- create backing store (DeepFS depends on it).
     if(Prop.fuse && !singlemode) {
       File bs = new File(mybackingpath);
       if (!bs.mkdirs() && bs.exists())
           throw new IOException(BACKINGEXISTS + mybackingpath);
     }
-    
+
     builder.startDoc(token(io.name()));
 
     if(singlemode) {
@@ -163,10 +163,10 @@ public final class FSParser extends Parser {
       }
 
       builder.startElem(DEEPFS, atts);
-      
+
       for(final File f : root ? File.listRoots() :
         new File[] { new File(fsimportpath).getCanonicalFile() }) {
-        
+
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
         parse(f);
@@ -176,7 +176,7 @@ public final class FSParser extends Parser {
     }
     builder.endDoc();
   }
-  
+
   /**
    * Visits files in a directory or steps further down.
    * @param d the directory to be visited.
@@ -216,16 +216,16 @@ public final class FSParser extends Parser {
       final OutputStream out = new FileOutputStream(dst);
       byte[] buf = new byte[4096];
       int len;
-  
+
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
-      
+
       in.close();
       out.close();
     } catch (final IOException e) {
       e.getMessage();
     }
   }
-  
+
   /**
    * Determines if the specified file is valid and no symbolic link.
    * @param f file to be tested.
@@ -256,7 +256,7 @@ public final class FSParser extends Parser {
     // element node, not the attributes one!
     final long size = sizeStack[lvl];
     builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(size));
-    
+
     // add file size to parent folder
     sizeStack[--lvl] += size;
   }
@@ -348,12 +348,12 @@ public final class FSParser extends Parser {
   public double prog() {
     return 0;
   }
-  
+
   /**
-   * Deletes a non-empty directory. 
+   * Deletes a non-empty directory.
    * @param dir to be deleted.
    * @return boolean true for success, false for failure.
-   * */ 
+   */
   public static boolean deleteDir(final File dir) {
     if(dir.isDirectory()) {
       for(final String child : dir.list()) {

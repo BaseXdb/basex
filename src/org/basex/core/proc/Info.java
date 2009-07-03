@@ -24,7 +24,7 @@ public final class Info extends AInfo {
   @Override
   protected void out(final PrintOutput out) throws IOException {
     Performance.gc(1);
-    
+
     final int l = maxLength(new String[] {
         INFODBPATH, INFOMEM, INFOMAINMEM, INFOINFO
     });
@@ -36,7 +36,7 @@ public final class Info extends AInfo {
     //format(tb, INFOMM, BaseX.flag(Prop.mainmem), true, l);
     format(tb, INFOINFO, BaseX.flag(Prop.info) +
         (Prop.allInfo ? " (" + INFOALL + ")" : ""), true, l);
-    
+
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFOCHOP, BaseX.flag(Prop.chop), true, 0);
     format(tb, INFOENTITY, BaseX.flag(Prop.entity), true, 0);

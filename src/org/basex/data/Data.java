@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * node, e.g., get sure your pre value actually points to a text node.
  * The same applies to the update operations; if you write an attribute
  * to an element node, your database will get messed up.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -75,21 +75,21 @@ public abstract class Data {
    */
   public final void initNames() {
     if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
-    nameID = atts.id(DataText.NAME);    
+    nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
   }
-  
+
   /**
    * Flushes the table data.
    */
   public abstract void flush();
-  
+
   /**
    * Closes the current database.
    * @throws IOException in case the database could not be closed
    */
   public abstract void close() throws IOException;
-  
+
   /**
    * Closes the specified index.
    * @param index index to be closed
@@ -289,7 +289,7 @@ public abstract class Data {
       default:  return null;
     }
   }
-  
+
   /**
    * Returns the number of indexed id references for the specified token.
    * @param token text to be found
@@ -305,7 +305,7 @@ public abstract class Data {
       default:  return Integer.MAX_VALUE;
     }
   }
-  
+
   /**
    * Returns info on the specified index structure.
    * @param type index type
@@ -321,7 +321,7 @@ public abstract class Data {
       default: return EMPTY;
     }
   }
-  
+
   /**
    * Returns the document nodes.
    * @return root nodes
@@ -369,14 +369,14 @@ public abstract class Data {
     }
     return tb.finish();
   }
-  
+
   /**
    * Updates a tag name, text node, comment or processing instruction.
    * @param pre pre of the text node to change
    * @param val value to be updated
    */
   public abstract void update(int pre, byte[] val);
-  
+
   /**
    * Updates an attribute name and value.
    * @param pre pre of node to insert after
@@ -384,13 +384,13 @@ public abstract class Data {
    * @param val attribute value
    */
   public abstract void update(int pre, byte[] name, byte[] val);
-  
+
   /**
    * Deletes a node and its descendants.
    * @param pre pre value of the node to delete
    */
   public abstract void delete(final int pre);
-  
+
   /**
    * Inserts a tag name, text node, comment or processing instruction.
    * @param pre pre value
@@ -399,7 +399,7 @@ public abstract class Data {
    * @param kind node kind
    */
   public abstract void insert(int pre, int par, byte[] val, int kind);
-  
+
   /**
    * Inserts an attribute.
    * @param pre pre value
@@ -408,7 +408,7 @@ public abstract class Data {
    * @param val attribute value
    */
   public abstract void insert(int pre, int par, byte[] name, byte[] val);
-  
+
   /**
    * Insert a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
@@ -429,5 +429,5 @@ public abstract class Data {
    * @param l boolean if data is locked
    */
   public abstract void setLocked(final boolean l);
-  
+
 }

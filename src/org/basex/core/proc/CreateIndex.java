@@ -12,7 +12,7 @@ import org.basex.data.Data.Type;
 
 /**
  * Creates a new index.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -28,7 +28,7 @@ public final class CreateIndex extends ACreate {
     super(DATAREF);
     type = t;
   }
-  
+
   @Override
   protected boolean exec() {
     try {
@@ -60,7 +60,7 @@ public final class CreateIndex extends ACreate {
       return error(ex.getMessage());
     }
   }
-  
+
   @Override
   public String toString() {
     return Cmd.CREATE.name() + " " +  CmdCreate.INDEX + " " + type;

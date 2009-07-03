@@ -5,7 +5,7 @@ import org.basex.core.Prop;
 
 /**
  * This class assembles texts which are used in the data classes.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

@@ -13,7 +13,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * SAX Parser wrapper.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -43,7 +43,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
     builder = build;
     name = xml;
   }
-  
+
   @Override
   public void startElement(final String uri, final String ln, final String qn,
       final Attributes at) throws SAXException {
@@ -144,7 +144,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
 
   // ContentHandler
   /*public void setDocumentLocator(final Locator locator) { } */
-  
+
   @Override
   public void startDocument() throws SAXException {
     try {
@@ -153,7 +153,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
       error(ex);
     }
   }
-  
+
   @Override
   public void endDocument() throws SAXException {
     try {

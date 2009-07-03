@@ -40,26 +40,26 @@ public final class NameTest extends Test {
     name = nm;
     kind = t;
   }
-  
+
   @Override
   public boolean eval(final Nod node) throws QueryException {
     // only elements and attributes will yield results
     if(node.type != type) return false;
-    
+
     // wildcard - accept all nodes
     if(kind == Kind.ALL) return true;
     // namespaces wildcard - check only name
     if(kind == Kind.NAME) return eq(ln, ln(node.nname()));
-    
+
     final QNm nm = node.qname(tmpq);
-    
+
     // name wildcard - check only namespace
     if(kind == Kind.NS) return name.uri.eq(nm.uri);
     // check everything
     return name.eq(nm);
   }
-  
-  @Override 
+
+  @Override
   public boolean comp(final QueryContext ctx) throws QueryException {
     // check namespace context
     if(ctx.ns.size() != 0) {
@@ -69,7 +69,7 @@ public final class NameTest extends Test {
     } else {
       final Data data = ctx.data();
       if(data == null) return true;
-      
+
       // check existence of namespaces in input document
       if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
         // no namespaces - check only name

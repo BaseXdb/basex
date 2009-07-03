@@ -206,10 +206,10 @@ final class FNStr extends Fun {
   private Item trans(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     final Item is = expr[1].atomic(ctx);
-    if(is == null) Err.empty(this);    
+    if(is == null) Err.empty(this);
     final byte[] sea = checkStr(is);
     final Item ir = expr[2].atomic(ctx);
-    if(ir == null) Err.empty(this);    
+    if(ir == null) Err.empty(this);
     final byte[] rep = checkStr(ir);
     return Str.get(translate(string(str), string(sea), string(rep)));
   }
@@ -238,7 +238,7 @@ final class FNStr extends Fun {
     }
     return token(tmp.toString());
   }
-  
+
   /**
    * Returns a string join.
    * @param ctx query context
@@ -247,7 +247,7 @@ final class FNStr extends Fun {
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
     final Item is = expr[1].atomic(ctx);
-    if(is == null) Err.empty(this);    
+    if(is == null) Err.empty(this);
     final byte[] sep = checkStr(is);
 
     final TokenBuilder tb = new TokenBuilder();
@@ -292,7 +292,7 @@ final class FNStr extends Fun {
     Norm norm = null;
     if(expr.length == 2) {
       final Item is = expr[1].atomic(ctx);
-      if(is == null) Err.empty(this);    
+      if(is == null) Err.empty(this);
       final byte[] n = uc(trim(checkStr(is)));
       for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);

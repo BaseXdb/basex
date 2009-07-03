@@ -22,7 +22,7 @@ public final class Delete extends Process {
   public Delete(final String... a) {
     super(DATAREF | UPDATING, a);
   }
-  
+
   @Override
   protected boolean exec() {
     final Data data = context.data();
@@ -49,7 +49,7 @@ public final class Delete extends Process {
         if(Prop.fuse) {
           final String bpath = Token.string(data.fs.path(pre, true));
           final File f = new File(bpath);
-          if (f.isDirectory())  
+          if (f.isDirectory())
             deleteDir(f);
           else if (f.isFile())
             f.delete();
@@ -57,7 +57,7 @@ public final class Delete extends Process {
         }
         data.delete(pre);
       }
-      
+
       // refresh current context
       final Nodes curr = context.current();
       if(gui && curr.size() > 1 || curr.nodes[0] == nodes.nodes[0]) {
@@ -80,5 +80,5 @@ public final class Delete extends Process {
         if(!deleteDir(new File(dir, children[i]))) return false;
     }
     return dir.delete();
-  } 
+  }
 }

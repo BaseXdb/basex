@@ -15,7 +15,7 @@ import org.basex.gui.GUIProp;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -34,7 +34,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
     BaseXLayout.addHelp(this, hlp);
     gui = main;
   }
-  
+
   public void mouseEntered(final MouseEvent e) { }
   public void mousePressed(final MouseEvent e) { }
   public void mouseReleased(final MouseEvent e) { }
@@ -45,7 +45,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
 
   public void keyPressed(final KeyEvent e) {
     if(gui.updating || !e.isAltDown()) return;
-    
+
     final int key = e.getKeyCode();
     if(key == KeyEvent.VK_LEFT) {
       GUICommands.GOBACK.execute(gui);
@@ -68,7 +68,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
       GUIProp.fontsize = 12;
       gui.notify.layout();
     }
-   
+
   }
   public void keyReleased(final KeyEvent e) { }
 

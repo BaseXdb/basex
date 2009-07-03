@@ -56,7 +56,7 @@ public final class QueryContext extends Progress {
   public IO file = Prop.xquery;
   /** Query string. */
   public String query;
-  
+
   /** Namespaces. */
   public NSLocal ns = new NSLocal();
   /** Functions. */
@@ -206,7 +206,7 @@ public final class QueryContext extends Progress {
             si.add(new DBNode(data, nodes.nodes[n]));
         }
         item = si.finish();
-        
+
         // add collection instances
         final NodIter ni = new NodIter();
         for(int d = 0; d < docs; d++) ni.add(doc[d]);
@@ -240,7 +240,7 @@ public final class QueryContext extends Progress {
     if(nodes != null) {
       final Data data = nodes.data;
       final IntList pre = new IntList();
-      
+
       while((i = it.next()) != null) {
         checkStop();
         if(!(i instanceof DBNode)) break;
@@ -248,14 +248,14 @@ public final class QueryContext extends Progress {
         if(n.data != data) break;
         pre.add(((DBNode) i).pre);
       }
-      
+
       // completed... return standard nodeset with full-text positions
       if(i == null) {
         final Nodes n = new Nodes(pre.finish(), data);
         n.ftpos = ftpos;
         return n;
       }
-      
+
       // add nodes to standard iterator
       for(int p = 0; p < pre.size; p++) ir.add(new DBNode(data, pre.list[p]));
       ir.add(i);
@@ -293,7 +293,7 @@ public final class QueryContext extends Progress {
   public void serialize(final Serializer ser, final Item i) throws IOException {
     i.serialize(ser);
   }
-  
+
   /**
    * Recursively serializes the query plan.
    * @param ser serializer
@@ -385,7 +385,7 @@ public final class QueryContext extends Progress {
 
     // get database instance
     Data data = null;
- 
+
     if(Prop.web) {
       try {
         data = Open.open(dbname);
@@ -396,13 +396,13 @@ public final class QueryContext extends Progress {
       data = check(dbname, file == null, coll);
       if(data == null) data = check(file.merge(bxw).path(), true, coll);
     }
- 
+
     // add document to array
     final DBNode node = new DBNode(data, 0);
     addDoc(node);
     return node;
   }
-  
+
   /**
    * Adds a document to the document array.
    * @param node node to be added
@@ -410,7 +410,7 @@ public final class QueryContext extends Progress {
   private void addDoc(final DBNode node) {
     if(docs == doc.length) doc = Array.extend(doc);
     doc[docs++] = node;
-    
+
   }
 
   /**
@@ -432,7 +432,7 @@ public final class QueryContext extends Progress {
       return null;
     }
   }
-  
+
   /**
    * Adds a collection instance or returns an existing one.
    * @param coll name of the collection to be returned.

@@ -29,7 +29,7 @@ public final class KindTest extends Test {
     type = t;
     name = ext;
   }
-  
+
   @Override
   public boolean eval(final Nod n) throws QueryException {
     return n.type != type ? false : name == null || n.qname(tmpq).eq(name);

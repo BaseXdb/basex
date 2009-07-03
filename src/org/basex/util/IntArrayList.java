@@ -14,23 +14,23 @@ public final class IntArrayList implements Iterable<int[]> {
   public int[][] list;
   /** Current array size. */
   public int size;
-  
+
   /**
    * Default constructor.
    */
   public IntArrayList() {
     this(8);
   }
-  
+
   /**
    * Constructor.
-   * 
+   *
    * @param is initial size of the list
    */
   public IntArrayList(final int is) {
     list = new int[is][];
   }
-  
+
   /**
    * Adds next value.
    * @param v value to be added

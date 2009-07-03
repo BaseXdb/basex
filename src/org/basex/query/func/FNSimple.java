@@ -57,12 +57,12 @@ public final class FNSimple extends Fun {
         return super.atomic(ctx);
     }
   }
-  
+
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     final boolean i = expr.length == 1 && expr[0].i();
     final boolean e = expr.length == 1 && expr[0].e();
-    
+
     switch(func) {
       case FALSE:
       case TRUE:

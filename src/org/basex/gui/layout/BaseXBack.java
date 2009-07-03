@@ -9,21 +9,21 @@ import org.basex.gui.GUIConstants.Fill;
 
 /**
  * Panel background, extending the {@link JPanel}.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
   /** Design of color gradient. */
   private Fill mode;
-  
+
   /**
    * Default Constructor.
    */
   public BaseXBack() {
     this(Fill.PLAIN);
   }
-  
+
   /**
    * Default Constructor.
    * @param m visualization mode
@@ -31,7 +31,7 @@ public class BaseXBack extends JPanel {
   public BaseXBack(final Fill m) {
     setMode(m);
   }
-  
+
   /**
    * Default Constructor.
    * @param m visualization mode
@@ -41,7 +41,7 @@ public class BaseXBack extends JPanel {
     final boolean o = mode != Fill.NONE;
     if(isOpaque() != o) setOpaque(o);
   }
-  
+
   @Override
   public void paintComponent(final Graphics g) {
     if(mode == Fill.UP || mode == Fill.DOWN) {

@@ -473,7 +473,7 @@ public final class PlotView extends View implements Runnable {
 
     final BufferedImage img = focus ? itemImgFocused : marked ?
         itemImgMarked : sub ? itemImgSub : itemImg;
-    final int size =  img.getWidth() / 2;
+    final int size = img.getWidth() / 2;
     g.drawImage(img, x1 - size, y1 - size, this);
   }
 
@@ -498,7 +498,7 @@ public final class PlotView extends View implements Runnable {
       if(plotChanged) {
         axis.calcCaption(pWidth);
         final Kind kind = plotData.xAxis.type;
-        xLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) && 
+        xLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
             Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
@@ -609,26 +609,26 @@ public final class PlotView extends View implements Runnable {
             double last = a;
             b = 2 * a;
             while(b > lim && b >= axis.min) {
-              if(adequateDistance(drawX, last, b) && 
+              if(adequateDistance(drawX, last, b) &&
                   adequateDistance(drawX, lim, b) &&
                   b < axis.max) {
-                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
+                drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
                     formatString(b, drawX));
                 last = b;
               }
               b += a;
             }
-              
+
             l++;
             a = -1 * (Math.pow(10, l));
           }
         }
-         
+
         // draw 0 label if necessary; logarithmic crap
         if(0 >= axis.min && 0 <= axis.max)
-          drawCaptionAndGrid(g, drawX, formatString(0, drawX), 
+          drawCaptionAndGrid(g, drawX, formatString(0, drawX),
               axis.calcPosition(0));
-        
+
         // draw labels > 0
         if(axis.max > 0) {
           l = 0;
@@ -642,10 +642,10 @@ public final class PlotView extends View implements Runnable {
             double last = a;
             b = 2 * a;
             while(b < lim && b <= axis.max) {
-              if(adequateDistance(drawX, last, b) && 
+              if(adequateDistance(drawX, last, b) &&
                   adequateDistance(drawX, lim, b) &&
                   b > axis.min) {
-                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), 
+                drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
                     formatString(b, drawX));
                 last = b;
               }
@@ -656,7 +656,7 @@ public final class PlotView extends View implements Runnable {
             a = Math.pow(10, l);
           }
         }
-        
+
 
       // draw LINEAR SCALE
       } else {
@@ -706,7 +706,7 @@ public final class PlotView extends View implements Runnable {
     String cap = caption;
  // if label is too long, it is is chopped to the first characters
     if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
-    
+
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
@@ -729,7 +729,7 @@ public final class PlotView extends View implements Runnable {
       g.drawLine(MARGIN[1] - fs / 2, pos + 1, w - MARGIN[3], pos + 1);
     }
   }
-  
+
   /**
    * Creates a buffered image for a given string which serves as axis caption.
    * @param g Graphics reference
@@ -742,7 +742,7 @@ public final class PlotView extends View implements Runnable {
       final String caption, final boolean im, final int imgW) {
     final int textH = g.getFontMetrics().getHeight();
     final int fs = GUIProp.fontsize;
-    
+
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
     final int imgH = 160;
@@ -756,15 +756,15 @@ public final class PlotView extends View implements Runnable {
     g2d.setColor(Color.black);
     if(im) g2d.setColor(color4);
     g2d.drawString(caption, fs, fs);
-    
+
     return img;
   }
-  
+
   /**
    * Draws intermediate grid lines without caption.
    * @param g Graphics reference
-   * @param drawX draw line for x axis 
-   * @param d relative position of grid line 
+   * @param drawX draw line for x axis
+   * @param d relative position of grid line
    * @param caption caption to draw. if cap = null, no caption is drawn
    */
   private void drawIntermediateGridLine(final Graphics g, final boolean drawX,
@@ -776,7 +776,7 @@ public final class PlotView extends View implements Runnable {
     final int fs = GUIProp.fontsize;
     final int sf = sizeFactor();
     g.setColor(back);
-    
+
     if(cap != null) {
       if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
       final int textH = g.getFontMetrics().getHeight();
@@ -790,7 +790,7 @@ public final class PlotView extends View implements Runnable {
         g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
         g.drawLine(MARGIN[1], pos, w - MARGIN[3], pos);
       }
-      
+
     } else {
       if(drawX) {
         g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);
@@ -814,12 +814,12 @@ public final class PlotView extends View implements Runnable {
       final int width = getWidth();
       final int xSpace = width - (MARGIN[1] + MARGIN[3]) - sz;
       return (int) (d * xSpace) + MARGIN[1] + sz;
-    } else {
-      final int height = getHeight();
-      if(d == -1) return height - MARGIN[2] - sz / 4;
-      final int ySpace = height - (MARGIN[0] + MARGIN[2]) - sz;
-      return ySpace - (int) (d * ySpace) + MARGIN[0];
     }
+
+    final int height = getHeight();
+    if(d == -1) return height - MARGIN[2] - sz / 4;
+    final int ySpace = height - (MARGIN[0] + MARGIN[2]) - sz;
+    return ySpace - (int) (d * ySpace) + MARGIN[0];
   }
 
   @Override
@@ -909,7 +909,7 @@ public final class PlotView extends View implements Runnable {
    * @return item focused
    */
   private boolean focus() {
-    final int size =  itemImg.getWidth() / 2;
+    final int size = itemImg.getWidth() / 2;
     int focusedPre = gui.focused;
     // if mouse pointer is outside of the plot the focused item is set to -1,
     // focus may be refreshed, if necessary

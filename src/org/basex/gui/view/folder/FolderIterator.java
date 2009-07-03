@@ -2,6 +2,7 @@ package org.basex.gui.view.folder;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.io.IO;
 
 /**
  * This is an iterator for the folder nodes.
@@ -21,7 +22,7 @@ final class FolderIterator {
   int pre;
 
   /** Stack for parent nodes. */
-  private final int[] parents = new int[256];
+  private final int[] parents = new int[IO.BLOCKSIZE];
   /** Panel height. */
   private final int height;
   /** Flag for a found context node. */

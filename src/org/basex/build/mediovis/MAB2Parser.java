@@ -207,7 +207,7 @@ public final class MAB2Parser extends Parser {
     }
     out.close();
   }
-  
+
   /**
    * Returns the next id.
    * @param in input stream
@@ -217,7 +217,7 @@ public final class MAB2Parser extends Parser {
     while(in.more()) {
       if(in.read1() != '\n') continue;
       final int n = in.read1();
-      if(n == '0' && in.read1() ==  '0' && in.read1() == '1') {
+      if(n == '0' && in.read1() == '0' && in.read1() == '1') {
         off = in.pos() - 3;
         return ident(in);
       }
@@ -529,9 +529,9 @@ public final class MAB2Parser extends Parser {
       // double cross
       if(b == -121) b = '+';
       // delimiter
-      else if(b == -84)  b = ' ';
-      else if(b == '<')  b = '[';
-      else if(b == '>')  b = ']';
+      else if(b == -84) b = ' ';
+      else if(b == '<') b = '[';
+      else if(b == '>') b = ']';
       if(b == ' ' && (space || s == 4)) continue;
       space = b == ' ';
       tmp[c++] = b;

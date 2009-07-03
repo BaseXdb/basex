@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * List entries are automatically completed if they match the first characters
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -33,7 +33,7 @@ public final class BaseXListChooser extends BaseXBack {
   String[] values;
   /** Numeric list. */
   boolean num = true;
-  
+
   /**
    * Default Constructor.
    * @param parent the notifier receives notifications when changes
@@ -47,7 +47,7 @@ public final class BaseXListChooser extends BaseXBack {
 
     // cache list values
     values = choice.clone();
-    
+
     // checks if list is purely numeric
     for(final String v : values) {
       for(int c = 0; c < v.length(); c++) {
@@ -68,13 +68,13 @@ public final class BaseXListChooser extends BaseXBack {
     });
     text.addKeyListener(new KeyAdapter() {
       boolean typed;
-      
+
       @Override
       public void keyPressed(final KeyEvent e) {
         final int oldpos = list.getSelectedIndex();
         int newpos = oldpos;
         final int page = getHeight() / getFont().getSize();
-        
+
         // process key events
         if(e.getKeyCode() == KeyEvent.VK_DOWN) {
           newpos = Math.min(oldpos + 1, values.length - 1);
@@ -108,12 +108,12 @@ public final class BaseXListChooser extends BaseXBack {
           typed = ch >= ' ' && ch != 127;
         }
       }
-      
+
       @Override
       public void keyReleased(final KeyEvent e) {
         if(typed) {
           typed = false;
-          
+
           final String txt = text.getText().trim().toLowerCase();
           int i = 0;
           for(i = 0; i < values.length; i++) {
@@ -156,7 +156,7 @@ public final class BaseXListChooser extends BaseXBack {
         }
       }
     };
-    
+
     // initialize list
     list = new JList(choice);
     list.setFocusable(false);
@@ -165,16 +165,16 @@ public final class BaseXListChooser extends BaseXBack {
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
     BaseXLayout.addHelp(list, help);
-    
+
     scroll = new JScrollPane(list,
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     add(scroll);
     setIndex(0);
   }
-  
+
   /**
-   * Chooses the specified value in the text field and list. 
+   * Chooses the specified value in the text field and list.
    * @param value the value to be set
    */
   public void setValue(final String value) {
@@ -192,7 +192,7 @@ public final class BaseXListChooser extends BaseXBack {
 
   /**
    * Returns the numeric representation of the user input. If the
-   * text field is invalid, the list entry is returned. 
+   * text field is invalid, the list entry is returned.
    * @return numeric value
    */
   public int getNum() {

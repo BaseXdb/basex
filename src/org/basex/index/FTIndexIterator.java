@@ -5,7 +5,7 @@ import org.basex.data.FTMatches;
 
 /**
  * This interface provides methods for returning index results.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

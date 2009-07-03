@@ -41,7 +41,7 @@ public abstract class Preds extends Expr {
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
       ex = Pos.get(ex, CmpV.Comp.EQ, ex);
-      
+
       if(ex.i()) {
         if(!((Item) ex).bool()) {
           ctx.compInfo(OPTFALSE, ex);
@@ -58,7 +58,7 @@ public abstract class Preds extends Expr {
     if(ct != null) ctx.item.type = ct;
     return e;
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     for(final Expr p : pred) {

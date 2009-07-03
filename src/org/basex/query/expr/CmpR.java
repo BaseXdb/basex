@@ -34,7 +34,7 @@ public final class CmpR extends Single {
   private final boolean mxi;
   /** Index container. */
   private RangeToken rt;
-  
+
   /**
    * Constructor.
    * @param e expression
@@ -51,7 +51,7 @@ public final class CmpR extends Single {
     max = mx;
     mxi = ix;
   }
-  
+
   /**
    * Returns a range or an optimized expression.
    * @param e expression
@@ -126,7 +126,7 @@ public final class CmpR extends Single {
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
       s.simple(Axis.ATTR, true);
-    
+
     // no text or attribute index applicable, min/max not included in range
     if(!text && !attr || !mni | !mxi || min == Double.NEGATIVE_INFINITY ||
         max == Double.POSITIVE_INFINITY) return false;
@@ -141,11 +141,11 @@ public final class CmpR extends Single {
       ic.data.meta.size / 5;
     return true;
   }
-  
+
   @Override
   public AxisPath indexEquivalent(final IndexContext ic) {
     final Expr root = new IndexAccess(rt, ic);
-    
+
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);
 
@@ -159,7 +159,7 @@ public final class CmpR extends Single {
     }
     return path;
   }
-  
+
   /**
    * Retrieves the statistics key for the tag/attribute name.
    * @param ic index context
@@ -169,7 +169,7 @@ public final class CmpR extends Single {
   private StatsKey getKey(final IndexContext ic, final boolean text) {
     // statistics are not up-to-date
     if(!ic.data.meta.uptodate || ic.data.ns.size() != 0) return null;
-    
+
     final AxisPath path = (AxisPath) expr;
     final int st = path.step.length;
     if(text) {
@@ -180,10 +180,10 @@ public final class CmpR extends Single {
     }
 
     final Step step = path.step[st - 1];
-    return !step.simple(Axis.ATTR, true) ? null : 
+    return !step.simple(Axis.ATTR, true) ? null :
       ic.data.atts.stat(ic.data.attNameID(((NameTest) step.test).ln));
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.BLN;

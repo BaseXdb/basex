@@ -16,7 +16,7 @@ import org.basex.util.Token;
 
 /**
  * Unary Expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -33,7 +33,7 @@ public final class Unary extends Single {
     super(e);
     minus = min;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
@@ -43,7 +43,7 @@ public final class Unary extends Single {
     }
     return expr.i() ? atomic(ctx) : this;
   }
-  
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Item it = expr.atomic(ctx);
@@ -51,7 +51,7 @@ public final class Unary extends Single {
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
     if(it.u()) return Dbl.get(minus ? -d : d);
-    
+
     if(!minus) return it;
     switch(it.type) {
       case DBL: return Dbl.get(-d);
@@ -72,7 +72,7 @@ public final class Unary extends Single {
     expr.plan(ser);
     ser.closeElement();
   }
-  
+
   @Override
   public String toString() {
     return (minus ? "-" : "") + expr;

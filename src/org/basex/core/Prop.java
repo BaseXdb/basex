@@ -76,7 +76,7 @@ public final class Prop {
   public static boolean xmlplan = false;
   /** Creates the query plan before or after compilation. */
   public static boolean compplan = true;
-  
+
   /** Format XQuery output. */
   public static boolean xqformat = true;
   /** Use internal XML parser. */
@@ -108,7 +108,7 @@ public final class Prop {
   /** Flag for iterator optimized storage within ftindex. */
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
-  
+
   /** Flag for full-text stemming. */
   public static boolean ftst = false;
   /** Flag for full-text case sensitivity. */

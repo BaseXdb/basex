@@ -5,7 +5,7 @@ import org.basex.data.FTMatches;
 
 /**
  * XQuery item representing a full-text Node.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */

@@ -47,7 +47,7 @@ final class FTHash extends Set {
     pos = Array.extend(pos);
     ns = Array.extend(ns);
   }
-  
+
   /** Integer list. */
   private IntList il;
   /** Current iterator. */

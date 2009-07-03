@@ -9,18 +9,18 @@ import static org.basex.build.fs.FSText.*;
 
 /**
  * PNG meta data extractor.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class PNGExtractor extends AbstractExtractor {
   /** Byte array for PNG header. */
   private final byte[] data = new byte[24];
-  
+
   @Override
   public void extract(final Builder listener, final File f) throws IOException {
     BufferInput.read(f, data);
-    
+
     // check if the header is valid
     if(!Token.startsWith(data, HEADERPNG)) return;
 

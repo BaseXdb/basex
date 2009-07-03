@@ -35,7 +35,6 @@ b_simple=Semplice
 b_search=Cerca
 
 # Status messages
-#s_path=Path
 s_ok=OK
 
 # Visualizations
@@ -168,7 +167,6 @@ dm_choice2=No Titolo, Bordo piccolo
 dm_choice3=Titolo, no Bordo
 dm_choice4=Titolo, Bordo piccolo
 dm_choice5=Titolo, Bordo grande
-#dm_choice5=Titolo, Bordo medio
 dm_offset=Offset
 dm_size=Dimensione determinata da
 dm_size_children=numero di figli
@@ -244,8 +242,6 @@ c_rtexec=Esecuzione Realtime
 c_rtexectt=Se quest'opzione è attiva, le query vengono eseguite alla pressione di ogni pulsante.
 c_rtfilter=Filtro Realtime
 c_rtfiltertt=Se quest'opzione è attiva, i risultati della query vengono automaticamente filtrati.
-#c_select=Seleziona tutto
-#c_selecttt=Seleziona tutti i nodi root.
 c_showbuttons=Pulsanti
 c_showbuttonstt=Attiva/Disattiva la barra dei pulsanti.
 c_showhelp=Aiuto

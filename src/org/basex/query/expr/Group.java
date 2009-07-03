@@ -13,19 +13,19 @@ import org.basex.query.util.Var;
 
 /**
  * Implementation of the group by clause.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Michael Seiferle
  */
 public class Group extends Expr {
   /** Sequence to be grouped. */
   SeqIter sq;
-  
+
   /** Resulting Sequence (Sequence Grouped). **/
   SeqIter sg;
   /** Group by specification. */
   Grp[] grp;
-  
+
   /**
    * Post grouped Tuples.
    */
@@ -38,7 +38,7 @@ public class Group extends Expr {
   public Group(final Grp[] g) {
     grp = g;
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(final Grp g : grp) g.comp(ctx);
@@ -55,7 +55,7 @@ public class Group extends Expr {
     int[] result = new int[i.length + 1];
     int counter = 0;
     for(int k = 0; k < i.length; k++) result[counter++] = i[k];
-    result[i.length] = j; 
+    result[i.length] = j;
     return result;
   }
 
@@ -84,15 +84,15 @@ public class Group extends Expr {
       return;
     }
   }
-    
-  
-  
+
+
+
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       Iter ir;
       int p = -1;
-      
+
       @Override
       public Item next() throws QueryException {
         if(groups == null) {
@@ -110,7 +110,7 @@ public class Group extends Expr {
           } else {
             if(++p == hashes.length) return null;
             final int witness = groups.get(hashes[p])[0];
-            
+
             // [MS] fill witness with all of its
             // fellow group members children
             ir = sq.item[witness].iter();
@@ -132,7 +132,7 @@ public class Group extends Expr {
    */
   public void add(final QueryContext ctx) throws QueryException {
     for(final Grp g : grp) g.add(ctx);
-    
+
   }
 
   @Override

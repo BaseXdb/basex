@@ -8,7 +8,7 @@ import org.basex.util.Array;
 
 /**
  * Node Type.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -54,7 +54,7 @@ public abstract class FNode extends Nod {
   public Nod parent() {
     return par;
   }
-  
+
   @Override
   public final NodeIter attr() {
     return iter(atts);
@@ -64,7 +64,7 @@ public abstract class FNode extends Nod {
   public final NodeMore child() {
     return iter(children);
   }
-  
+
   /**
    * Iterates all nodes of the specified iterator.
    * @param iter iterator

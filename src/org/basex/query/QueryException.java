@@ -10,7 +10,7 @@ import org.basex.util.StringList;
 
 /**
  * This class indicates exceptions during query parsing or evaluation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

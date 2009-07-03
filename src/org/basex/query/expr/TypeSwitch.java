@@ -11,7 +11,7 @@ import org.basex.query.util.Var;
 
 /**
  * Typeswitch expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -24,7 +24,7 @@ public final class TypeSwitch extends Expr {
   public Case[] cs;
   /** Variable. */
   private final Var var;
-  
+
   /**
    * Constructor.
    * @param t typeswitch expression
@@ -44,11 +44,11 @@ public final class TypeSwitch extends Expr {
     ts = ts.comp(ctx);
     return this;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter seq = SeqIter.get(ctx.iter(ts));
-    
+
     final int s = ctx.vars.size();
     for(final Case c : cs) {
       seq.reset();
@@ -75,7 +75,7 @@ public final class TypeSwitch extends Expr {
     ts = ts.remove(v);
     return this;
   }
-  
+
   @Override
   public Return returned(final QueryContext ctx) {
     final Return t = cs[0].returned(ctx);

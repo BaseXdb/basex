@@ -141,9 +141,8 @@ public class AxisPath extends Path {
         // and also a descendant or descendant-or-self step.
         return i + 1 == step.length && (step[i].axis == Axis.DESC ||
           step[i].axis == Axis.DESCORSELF);
-      } else {
-        return false;
       }
+      return false;
     }
   }
 

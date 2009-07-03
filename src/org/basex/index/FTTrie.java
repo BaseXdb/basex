@@ -470,7 +470,7 @@ public final class FTTrie extends FTIndex {
       d = FTIndexIterator.union(wc(0, sc, posw, false, f), d);
       return d;
     }
-    
+
     if(wildcard == '*') {
       // append 0 or n symbols
       // valueSearchNode == .*
@@ -503,7 +503,7 @@ public final class FTTrie extends FTIndex {
       wc(resultNode, aw, false, counter[0], 0, f);
       return FTIndexIterator.union(d, idata);
     }
-    
+
     if(wildcard == '+') {
       // append 1 or more symbols
       final int[] rne = entry(resultNode);
@@ -623,7 +623,7 @@ public final class FTTrie extends FTIndex {
       counter[1] = counter[1] - cne[0] + i;
       return cn;
     }
-    
+
     // scan successors current node
     final int pos = insPos(cne, vsn[0]);
     if(pos >= 0) return wc(cne[pos], vsn);
@@ -669,7 +669,7 @@ public final class FTTrie extends FTIndex {
         if(vsn.length == i) {
           // leaf node found with appropriate value
           if (c < d + p + r) return FTIndexIterator.EMP;
-          
+
           FTIndexIterator ld = FTIndexIterator.EMP;
           ld = iter(cdid, cne[cne.length - 1], inD, f);
           if (hasNextNodes(cne)) {
@@ -740,7 +740,7 @@ public final class FTTrie extends FTIndex {
         }
         return ld;
       }
-      
+
       FTIndexIterator ld = FTIndexIterator.EMP;
 
       if(c > d + p + r) {
@@ -771,52 +771,51 @@ public final class FTTrie extends FTIndex {
         }
       }
       return ld;
+    }
 
-    } else {
-      int[] ne = null;
-      long tdid = -1;
-      FTIndexIterator ld = FTIndexIterator.EMP;
+    int[] ne = null;
+    long tdid = -1;
+    FTIndexIterator ld = FTIndexIterator.EMP;
 
-      byte[] b;
-      if(hasNextNodes(cne)) {
-        for(int k = cne[0] + 1; k < cne.length - 1; k += 2) {
-          if (cne[k + 1] == vsn[0]) {
+    byte[] b;
+    if(hasNextNodes(cne)) {
+      for(int k = cne[0] + 1; k < cne.length - 1; k += 2) {
+        if (cne[k + 1] == vsn[0]) {
+          ne = entry(cne[k]);
+          tdid = did;
+          b = new byte[vsn.length];
+          System.arraycopy(vsn, 0, b, 0, vsn.length);
+          ld = FTIndexIterator.union(
+              fuzzy(cne[k], ne, tdid, b, d, p, r, c, f), ld);
+        }
+        if (c > d + p + r) {
+          if (ne == null) {
             ne = entry(cne[k]);
             tdid = did;
-            b = new byte[vsn.length];
-            System.arraycopy(vsn, 0, b, 0, vsn.length);
-            ld = FTIndexIterator.union(
-                fuzzy(cne[k], ne, tdid, b, d, p, r, c, f), ld);
           }
-          if (c > d + p + r) {
-            if (ne == null) {
-              ne = entry(cne[k]);
-              tdid = did;
-            }
-            // paste char
-            b = new byte[vsn.length + 1];
-            b[0] = (byte) ne[1];
-            System.arraycopy(vsn, 0, b, 1, vsn.length);
-            ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
-                b, d, p + 1, r, c, f), ld);
+          // paste char
+          b = new byte[vsn.length + 1];
+          b[0] = (byte) ne[1];
+          System.arraycopy(vsn, 0, b, 1, vsn.length);
+          ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
+              b, d, p + 1, r, c, f), ld);
 
-            if (vsn.length > 0) {
-              // delete char
-              b = new byte[vsn.length - 1];
-              System.arraycopy(vsn, 1, b, 0, b.length);
+          if (vsn.length > 0) {
+            // delete char
+            b = new byte[vsn.length - 1];
+            System.arraycopy(vsn, 1, b, 0, b.length);
+            ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
+                b, d + 1, p, r, c, f), ld);
+              // replace
+            b = new byte[vsn.length];
+            System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
+              b[0] = (byte) ne[1];
               ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
-                  b, d + 1, p, r, c, f), ld);
-                // replace
-              b = new byte[vsn.length];
-              System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
-                b[0] = (byte) ne[1];
-                ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
-                    b, d, p, r + 1, c, f), ld);
-            }
+                  b, d, p, r + 1, c, f), ld);
           }
         }
       }
-      return ld;
     }
+    return ld;
   }
 }

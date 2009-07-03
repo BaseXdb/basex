@@ -303,7 +303,7 @@ public final class GUI extends JFrame {
     setVisible(true);
     views.updateViews();
     refreshControls();
-    
+
     // start logo animation as thread
     new Thread() {
       @Override
@@ -488,7 +488,7 @@ public final class GUI extends JFrame {
       if(ok && pr.printing()) {
         // display text view if result will not highlight any nodes
         if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
-        
+
         // retrieve text result
         if(GUIProp.showtext) {
           final CachedOutput out = new CachedOutput(GUIProp.maxtext);
@@ -499,7 +499,7 @@ public final class GUI extends JFrame {
 
       final boolean feedback = main || data != null && GUIProp.showquery &&
         query.info(pr instanceof XQuery ? inf : null, ok);
-      
+
       // show query info
       if(GUIProp.showinfo && (ok || main))
         info.setInfo(Token.token(inf), ok);

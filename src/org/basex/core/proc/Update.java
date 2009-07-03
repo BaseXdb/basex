@@ -44,7 +44,7 @@ public final class Update extends AUpdate {
     data.flush();
     return Prop.info ? info(UPDATEINFO, nodes.size(), perf.getTimer()) : true;
   }
-  
+
   /**
    * Updates attributes.
    * @param data data reference
@@ -55,7 +55,7 @@ public final class Update extends AUpdate {
     final byte[] n = token(args[0]);
     final byte[] v = token(args[1]);
     if(!check(n)) return error(ATTINVALID, n);
-    
+
     // check if errors can occur
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.nodes[i];
@@ -69,14 +69,14 @@ public final class Update extends AUpdate {
         if(p != pre && att == data.attNameID(p)) return error(ATTDUPL, n);
       }
     }
-    
+
     // perform updates
     for(int i = nodes.size() - 1; i >= 0; i--) {
       data.update(nodes.nodes[i], n, v);
     }
     return true;
   }
-  
+
   /**
    * Updates nodes.
    * @param data data reference
@@ -87,7 +87,7 @@ public final class Update extends AUpdate {
     byte[] v = token(args[0]);
     final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
-    
+
     if(kind == Data.TEXT) {
       if(v.length == 0) return error(TXTINVALID, v);
     } else if(kind == Data.ELEM || pi) {
@@ -97,19 +97,19 @@ public final class Update extends AUpdate {
         v = v.length == 0 ? vv : concat(v, SPACE, vv);
       }
     }
-    
+
     // check if nodes to be updated have the same type
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k != kind) return error(UPDATENODE, CmdUpdate.values()[kind]);
     }
-    
+
     // perform updates
     for(int i = nodes.size() - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
     return true;
   }
 
-  
+
   @Override
   public String toString() {
     return name() + " " + getType() + args();

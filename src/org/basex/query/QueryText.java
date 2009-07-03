@@ -32,7 +32,7 @@ public interface QueryText {
   Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
   /** BASX0002: Evaluation exception. */
   Object[] WHICHIDX = { BASX, 2, "Unknown index: '%'." };
-  
+
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
   /** FOAR0002: Evaluation exception. */
@@ -94,7 +94,7 @@ public interface QueryText {
   Object[] QNMINV = { FORG, 1, "Invalid QName: \"%\"" };
   /** FORG0002: Evaluation exception. */
   Object[] URIINV = { FORG, 2, "Invalid URI: %" };
-  
+
   /** FORG0003: Evaluation exception. */
   Object[] ZEROONE = { FORG, 3, "Zero or one value expected." };
   /** FORG0004: Evaluation exception. */
@@ -186,7 +186,7 @@ public interface QueryText {
   Object[] NOEXPR = { XPST, 3, "Expecting expression." };
   /** XPST0003: Parsing exception. */
   Object[] WRONGCHAR = { XPST, 3, "Expecting \"%\"%." };
-  
+
   /** XPST0003: Parsing exception. */
   Object[] WRONGEND = { XPST, 3, "Expecting \"%\"." };
   /** XPST0003: Parsing exception. */
@@ -344,7 +344,7 @@ public interface QueryText {
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
-  
+
   /** Example for a Date format. */
   String XDATE = "2000-12-31";
   /** Example for a Time format. */
@@ -403,7 +403,7 @@ public interface QueryText {
   /** XQST0033: Parsing exception. */
   Object[] DUPLNSDECL = { XQST, 33, "Duplicate declaration of namespace %." };
   /** XQST0034: Parsing exception. */
-  Object[] FUNCDEFINED = { XQST, 34, 
+  Object[] FUNCDEFINED = { XQST, 34,
       "Duplicate declaration of function \"%\"." };
   /** XQST0038: Parsing exception. */
   Object[] DUPLCOLL = { XQST, 38, "Duplicate 'collation' declaration." };
@@ -477,7 +477,7 @@ public interface QueryText {
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
 
   /** XQTY0024: Parsing exception. */
-  Object[] NOATTALL = { XQTY, 24, 
+  Object[] NOATTALL = { XQTY, 24,
       "Attributes must directly follow element nodes." };
 
   /** XUST0000: Parsing exception. */

@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 
 /**
  * Expression Information.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -36,7 +36,7 @@ public abstract class ExprInfo {
   public String name() {
     return getClass().getSimpleName();
   }
-  
+
   /**
    * Recursively sends the abstract syntax of this expression to the
    * specified serializer.

@@ -24,7 +24,7 @@ public final class BoolList {
    * @param c initial size
    */
   public BoolList(final int c) {
-    list = new boolean[c];    
+    list = new boolean[c];
   }
 
   /**
@@ -46,7 +46,7 @@ public final class BoolList {
     list[p] = v;
     size = Math.max(size, p + 1);
   }
-  
+
   /**
    * Checks if all values are b.
    * @param b boolean b

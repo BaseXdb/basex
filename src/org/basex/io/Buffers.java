@@ -20,7 +20,7 @@ final class Buffers {
   Buffers() {
     for(int b = 0; b < BUFFERS; b++) buf[b] = new Buffer();
   }
-  
+
   /**
    * Returns all buffers.
    * @return buffers
@@ -28,7 +28,7 @@ final class Buffers {
   Buffer[] all() {
     return buf;
   }
-  
+
   /**
    * Returns the current buffer.
    * @return current buffer
@@ -36,7 +36,7 @@ final class Buffers {
   Buffer curr() {
     return buf[c];
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position

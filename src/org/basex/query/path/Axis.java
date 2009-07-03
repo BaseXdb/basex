@@ -12,7 +12,7 @@ import org.basex.query.iter.NodeIter;
 public enum Axis {
   // ...order is important here for parsing the Query;
   // axes with longer names are parsed first
-  
+
   /** Ancestor-or-self axis. */
   ANCORSELF("ancestor-or-self", false) {
     @Override
@@ -20,7 +20,7 @@ public enum Axis {
       return n.ancOrSelf();
     }
   },
-  
+
   /** Ancestor axis. */
   ANC("ancestor", false) {
     @Override
@@ -28,7 +28,7 @@ public enum Axis {
       return n.anc();
     }
   },
-  
+
   /** Attribute axis. */
   ATTR("attribute", true) {
     @Override
@@ -36,7 +36,7 @@ public enum Axis {
       return n.attr();
     }
   },
-  
+
   /** Child Axis. */
   CHILD("child", true) {
     @Override
@@ -44,7 +44,7 @@ public enum Axis {
       return n.child();
     }
   },
-  
+
   /** Descendant-or-self axis. */
   DESCORSELF("descendant-or-self", true) {
     @Override
@@ -52,7 +52,7 @@ public enum Axis {
       return n.descOrSelf();
     }
   },
-  
+
   /** Descendant axis. */
   DESC("descendant", true) {
     @Override
@@ -60,7 +60,7 @@ public enum Axis {
       return n.desc();
     }
   },
-  
+
   /** Following-Sibling axis. */
   FOLLSIBL("following-sibling", false) {
     @Override
@@ -68,7 +68,7 @@ public enum Axis {
       return n.follSibl();
     }
   },
-  
+
   /** Following axis. */
   FOLL("following", false) {
     @Override
@@ -76,7 +76,7 @@ public enum Axis {
       return n.foll();
     }
   },
-  
+
   /** Parent axis. */
   PARENT("parent", true) {
     @Override
@@ -84,7 +84,7 @@ public enum Axis {
       return n.par();
     }
   },
-  
+
   /** Preceding-Sibling axis. */
   PRECSIBL("preceding-sibling", false) {
     @Override
@@ -92,7 +92,7 @@ public enum Axis {
       return n.precSibl();
     }
   },
-  
+
   /** Preceding axis. */
   PREC("preceding", false) {
     @Override
@@ -130,12 +130,12 @@ public enum Axis {
    * @return node iterator
    */
   abstract NodeIter init(final Nod n);
-  
+
   @Override
   public String toString() {
     return name;
   }
-  
+
   /**
    * Inverts the axis.
    * @return inverted axis

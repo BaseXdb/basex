@@ -67,7 +67,7 @@ public final class DiskData extends Data {
   private final DataAccess values;
   /** Locking Flag. */
   private boolean locked;
-  
+
   /**
    * Default Constructor.
    * @param db name of database
@@ -89,19 +89,19 @@ public final class DiskData extends Data {
       in = new DataInput(db, DATAINFO);
       meta = new MetaData(db);
       meta.read(in);
-  
+
       // read indexes
       tags = new Names(in);
       atts = new Names(in);
       path = new PathSummary(this, in);
       ns = new Namespaces(in);
-  
+
       // main memory mode.. keep table in memory
       table = Prop.mainmem ? new TableMemAccess(db, DATATBL, meta.size) :
         new TableDiskAccess(db, DATATBL);
       texts = new DataAccess(db, DATATXT);
       values = new DataAccess(db, DATAATV);
-  
+
       if(index) {
         if(meta.txtindex) txtindex = new Values(this, true);
         if(meta.atvindex) atvindex = new Values(this, false);
@@ -429,7 +429,7 @@ public final class DiskData extends Data {
       p++;
       s = size(p, kind(p));
     }
-    
+
     // delete node from table structure and reduce document size
     table.delete(p, s);
     meta.size -= s;
@@ -511,7 +511,7 @@ public final class DiskData extends Data {
     final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
     // number of nodes to be inserted
     final int ss = dt.size(sa, dt.kind(sa));
-    
+
     // copy database entries
     for(int s = sa; s < sa + ss; s++) {
       final int k = dt.kind(s);
@@ -544,7 +544,7 @@ public final class DiskData extends Data {
     }
     // update table if no document was inserted
     if(par != 0) updateTable(pre, par, ss);
-    
+
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
   }
@@ -564,7 +564,7 @@ public final class DiskData extends Data {
     final long id = ++meta.lastid;
     final int t = tags.index(tag, null, false);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
-        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, 
+        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
     meta.size++;
@@ -695,12 +695,12 @@ public final class DiskData extends Data {
   private void size(final int pre, final int kind, final int v) {
     if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
   }
-  
+
   @Override
   public boolean isLocked() {
     return locked;
   }
-  
+
   @Override
   public void setLocked(final boolean l) {
     locked = l;

@@ -99,7 +99,7 @@ final class TableData {
     }
     init(data, -1);
   }
-  
+
   /**
    * Initializes the table data.
    * @param r optional root node (ignored if -1)
@@ -111,7 +111,7 @@ final class TableData {
     sortCol = -1;
     last = "";
     rowH = 1;
-    
+
     if(data.fs != null && root == -1) {
       root = data.tags.id(DataText.FILE);
       addCol(DataText.SUFFIX, false);
@@ -144,7 +144,7 @@ final class TableData {
    */
   void context(final boolean create) {
     if(cols.length == 0) return;
-    
+
     final Nodes n = context.current();
     final boolean r = n.size() == 1 && n.nodes[0] < 2;
     if(!create && r) {
@@ -210,7 +210,7 @@ final class TableData {
     // scan first MAXROWS root tags
     final int nRows = rows.size;
     final TableIterator ti = new TableIterator(data, this);
-    
+
     for(int l = 0, ll = Math.min(nRows, MAXROWS); l < ll; l++) {
       final int pre = rows.list[l];
 
@@ -222,20 +222,20 @@ final class TableData {
           data.attValue(ti.pre).length;
       }
     }
-    
+
     // sort columns by string lengths
     if(data.fs == null) {
       final double[] widths = new double[cs];
       for(int c = 0; c < cs; c++) widths[c] = cols[c].width;
       final int[] il = Array.createOrder(widths, false);
-      
+
       final TableCol[] cl = new TableCol[cs];
       for(int c = 0; c < cs; c++) cl[c] = cols[il[c]];
       cols = cl;
     }
     setWidths(false);
   }
-    
+
   /**
    * Sets the column widths, based on the contents.
    * @param force force zero widths
@@ -268,7 +268,7 @@ final class TableData {
     final Names index = e ? data.tags : data.atts;
     final Kind kind = index.stat(c).kind;
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
-    
+
     final byte[][] tokens = new byte[rows.size][];
     for(int r = 0; r < rows.size; r++) {
       int p = rows.list[r];
