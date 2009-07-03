@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.basex.BaseX;
 import org.basex.api.jaxp.BXNamespaceContext;
 import org.basex.data.Data;
+import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
@@ -138,7 +139,7 @@ public final class IterStreamReader implements XMLStreamReader {
   public String getElementText() throws XMLStreamException {
     checkType(START_ELEMENT);
     next();
-    
+
     final TokenBuilder tb = new TokenBuilder();
     while(kind != END_ELEMENT) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
@@ -399,7 +400,7 @@ public final class IterStreamReader implements XMLStreamReader {
       default:  kind = CHARACTERS; return;
     }
   }
-  
+
   /**
    * Reader for {@link FNode} instances.
    */
@@ -422,9 +423,9 @@ public final class IterStreamReader implements XMLStreamReader {
     /** Data size. */
     private final int s;
     /** Parent stack. */
-    private final int[] parent = new int[256];
+    private final int[] parent = new int[IO.BLOCKSIZE];
     /** Pre stack. */
-    private final int[] pre = new int[256];
+    private final int[] pre = new int[IO.BLOCKSIZE];
     /** Current level. */
     private int l;
     /** Current pre value. */
@@ -485,22 +486,22 @@ public final class IterStreamReader implements XMLStreamReader {
       type();
     }
   }
-  
+
   /** Reader for traversing {@link FNode} instances. */
   final class FNodeReader extends NodeReader {
     /** Iterator. */
-    private NodeIter[] iter = new NodeIter[256];
+    private NodeIter[] iter = new NodeIter[IO.BLOCKSIZE];
     /** Iterator. */
-    private Nod[] node = new Nod[256];
+    private Nod[] node = new Nod[IO.BLOCKSIZE];
     /** Iterator Level. */
     private int l;
-    
+
     /** Constructor. */
     FNodeReader() {
       iter[0] = ((FNode) item).self();
       hasNext();
     }
-    
+
     @Override
     boolean hasNext() {
       try {

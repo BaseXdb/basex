@@ -60,51 +60,51 @@ package org.xmldb.api.base;
  * MUST be set to ErrorCodes.VENDOR_ERROR.
  *
  * @see org.xmldb.api.base.ErrorCodes
- */ 
-public final class XMLDBException extends Exception 
-{   
+ */
+public final class XMLDBException extends Exception
+{
     /** errorCode */
    public int errorCode = ErrorCodes.UNKNOWN_ERROR;
    /** vendorErrorCode */
    public int vendorErrorCode = 0;
-   
+
    /**
     * XMLDBException
     */
    public XMLDBException () {
-   } 
-   
+   }
+
    /**
     * XMLDBException
-    * @param errorCode
+    * @param errorCode error code
     */
    public XMLDBException (int errorCode) {
       this(errorCode, 0, "");
-   } 
-   
+   }
+
    /**
     * XMLDBException
-    * @param errorCode
-    * @param message
+    * @param errorCode error code
+    * @param message error message
     */
    public XMLDBException (int errorCode, String message) {
       this(errorCode, 0, message);
-   } 
-   
+   }
+
    /**
     * XMLDBException
-    * @param errorCode
-    * @param vendorErrorCode
+    * @param errorCode error code
+    * @param vendorErrorCode vendor's error code
     */
    public XMLDBException (int errorCode, int vendorErrorCode) {
       this(errorCode, vendorErrorCode, "");
    }
-   
+
    /**
     * XMLDBException
-    * @param errorCode
-    * @param vendorErrorCode
-    * @param message
+    * @param errorCode error code
+    * @param vendorErrorCode vendor's error code
+    * @param message error message
     */
    public XMLDBException (int errorCode, int vendorErrorCode, String message) {
       super(message);

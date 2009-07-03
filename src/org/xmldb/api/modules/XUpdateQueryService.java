@@ -52,33 +52,33 @@ package org.xmldb.api.modules;
  * individuals on behalf of the XML:DB Initiative. For more information
  * on the XML:DB Initiative, please see <http://www.xmldb.org/>.
  */
- 
+
 import org.xmldb.api.base.*;
 
 /**
  * XUpdateQueryService is a <code>Service</code> that enables the execution of
- * XUpdate queries within the context of a <code>Collection</code> or against a 
+ * XUpdate queries within the context of a <code>Collection</code> or against a
  * single document stored in a collection.
  */
 public interface XUpdateQueryService extends Service {
    /**
-    * Runs a set of XUpdate operations against the collection. All selected 
+    * Runs a set of XUpdate operations against the collection. All selected
     * documents are to be updated and stored back to the repository.
     *
     * @param commands The XUpdate commands to use.
-    * @return the number of modified nodes.    
+    * @return the number of modified nodes.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
     *  specific errors that occur.<br />
     */
    long update(String commands) throws XMLDBException;
-   
+
    /**
-    * Runs a set of XUpdate operations against a resource stored in a 
+    * Runs a set of XUpdate operations against a resource stored in a
     * collection. The resource will be updated in place in the collection.
     *
     * @param commands The XUpdate commands to use.
-    * @param id The ID to use.    
+    * @param id The ID to use.
     * @return the number of modified nodes.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor

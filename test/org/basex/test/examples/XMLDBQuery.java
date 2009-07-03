@@ -5,8 +5,8 @@ import org.xmldb.api.modules.*;
 import org.xmldb.api.*;
 
 /**
- * This class serves an example for executing XPath requests with the
- * XML:DB API.
+ * This class serves an example for executing XPath requests with the XML:DB
+ * API.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
@@ -19,43 +19,40 @@ public final class XMLDBQuery {
   /** Sample query. */
   private static final String QUERY = "//li";
 
-
-   /**
+  /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-  Collection col = null;
-  try {
-         Class c = Class.forName(DRIVER);
+    Collection col = null;
+    try {
+      Class<?> c = Class.forName(DRIVER);
 
-         Database database = (Database) c.newInstance();
-             //Registers the Database.
-         DatabaseManager.registerDatabase(database);
-             //Receives the Database.
-         col = DatabaseManager.getCollection(DBNAME);
-             //Receives the XPathQueryService.
-         XPathQueryService service =
-            (XPathQueryService) col.getService("XPathQueryService", "1.0");
-             //Executes the query and receives all results.
-         ResourceSet resultSet = service.query(QUERY);
-             //Iterator for ResultSets.
-         ResourceIterator results = resultSet.getIterator();
-         while (results.hasMoreResources()) {
-                //Receives the next results.
-            Resource res = results.nextResource();
-                //Writing the result to the console.
-            System.out.println((String) res.getContent());
-         }
+      Database database = (Database) c.newInstance();
+      // Registers the Database.
+      DatabaseManager.registerDatabase(database);
+      // Receives the Database.
+      col = DatabaseManager.getCollection(DBNAME);
+      // Receives the XPathQueryService.
+      XPathQueryService service = (XPathQueryService)
+        col.getService("XPathQueryService", "1.0");
+      // Executes the query and receives all results.
+      ResourceSet resultSet = service.query(QUERY);
+      // Iterator for ResultSets.
+      ResourceIterator results = resultSet.getIterator();
+      while(results.hasMoreResources()) {
+        // Receives the next results.
+        Resource res = results.nextResource();
+        // Writing the result to the console.
+        System.out.println((String) res.getContent());
       }
-      catch (XMLDBException e) {
-         System.err.println("XML:DB Exception occured " + e.errorCode);
+    } catch(XMLDBException e) {
+      System.err.println("XML:DB Exception occured " + e.errorCode);
+    } finally {
+      if(col != null) {
+        col.close();
       }
-      finally {
-         if (col != null) {
-            col.close();
-         }
-      }
-   }
+    }
+  }
 }

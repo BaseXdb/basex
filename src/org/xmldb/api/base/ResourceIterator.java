@@ -75,7 +75,7 @@ public interface ResourceIterator {
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
     *  specific errors that occur.<br />
-    *  <code>ErrorCodes.NO_SUCH_RESOURCE</code> if the resource iterator is 
+    *  <code>ErrorCodes.NO_SUCH_RESOURCE</code> if the resource iterator is
     *  empty or all resources have already been retrieved.
     */
    Resource nextResource() throws XMLDBException;

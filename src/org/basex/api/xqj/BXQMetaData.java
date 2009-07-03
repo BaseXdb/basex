@@ -9,7 +9,7 @@ import org.basex.Text;
 
 /**
  * Java XQuery API - Meta Data.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */

@@ -75,7 +75,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     // throw exception if id was not found...
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
-  
+
   /**
    * Method for both query actions.
    * @param nodes initial node set
@@ -85,7 +85,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
    */
   private BXResourceSet query(final Nodes nodes, final String query)
       throws XMLDBException {
-    
+
     try {
       // creates a query instance
       final QueryProcessor proc = new QueryProcessor(query, nodes);

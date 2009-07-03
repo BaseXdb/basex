@@ -26,12 +26,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 @SuppressWarnings("all")
 public class XQSequenceTest extends XQJTestCase {
-  
+
   public void testAbsolute() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -41,11 +41,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -66,7 +66,7 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-2.1: absolute(2) failed", true, b);
     assertEquals("A-XQS-2.1: absolute(2) failed", 2, xqs.getInt());
-    xqe.close();    
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
@@ -77,7 +77,7 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-2.4: absolute(5) failed", false, b);
     assertEquals("A-XQS-2.4: absolute(5) failed", true, xqs.isAfterLast());
-    xqe.close();    
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
@@ -88,8 +88,8 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-2.3: absolute(0) failed", false, b);
     assertEquals("A-XQS-2.3: absolute(0) failed", true, xqs.isBeforeFirst());
-    xqe.close(); 
-    
+    xqe.close();
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -99,7 +99,7 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-2.2: absolute(-2) failed", true, b);
     assertEquals("A-XQS-2.2: absolute(-2) failed", 3, xqs.getInt());
-    xqe.close();  
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
@@ -110,13 +110,13 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-2.4: absolute(-5) failed", false, b);
     assertEquals("A-XQS-2.4: absolute(-5) failed", true, xqs.isBeforeFirst());
-    xqe.close();   
+    xqe.close();
   }
 
   public void testAfterLast() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -126,11 +126,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -150,13 +150,13 @@ public class XQSequenceTest extends XQJTestCase {
       fail("A-XQS-3.1: afterLast() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQS-3.1: afterLast() failed", true, xqs.isAfterLast());
-    xqe.close();    
+    xqe.close();
   }
 
   public void testBeforeFirst() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -166,11 +166,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -190,19 +190,19 @@ public class XQSequenceTest extends XQJTestCase {
       fail("A-XQS-4.1: beforeFirst() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQS-4.1: beforeFirst() failed", true, xqs.isBeforeFirst());
-    xqe.close();    
+    xqe.close();
   }
- 
+
   public void testClose() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XQItem xqi;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
     xqi = xqs.getItem();
-    
+
     try{
       xqs.close();
       xqs.close();
@@ -212,28 +212,28 @@ public class XQSequenceTest extends XQJTestCase {
 
     assertEquals("A-XQS-5.1: close() doesn't close sequence", true, xqs.isClosed());
     assertEquals("A-XQS-5.2: close() doesn't close items obtained from the sequence", true, xqi.isClosed());
-    
+
     xqe.close();
   }
 
   public void testIsClosed() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
-    
+
     assertEquals("A-XQS-6.1: isClosed() on open sequence", false, xqs.isClosed());
     xqs.close();
     assertEquals("A-XQS-6.2: isClosed() on closed sequence", true, xqs.isClosed());
-    
+
     xqe.close();
   }
 
   public void testCount() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -243,11 +243,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -266,13 +266,13 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-7.2: count() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
   }
 
   public void testGetPosition() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
@@ -282,11 +282,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -317,13 +317,13 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-8.4: getPosition() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
   }
 
   public void testIsOnItem() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -354,13 +354,13 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-9.2: isOnItem() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
   }
 
   public void testIsScrollable() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-   
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -379,12 +379,12 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-10.2: isScrollable() failed with message: " + e.getMessage());
     }
-    xqe.close(); 
-    
+    xqe.close();
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
@@ -392,14 +392,14 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-10.1: isScrollable() failed with message: " + e.getMessage());
     }
-    xqe.close();   
+    xqe.close();
   }
 
   public void testFirst() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -409,11 +409,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -432,10 +432,10 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-11.1: first() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-11.1: first() failed", true, b);    
+    assertEquals("A-XQS-11.1: first() failed", true, b);
     assertEquals("A-XQS-11.1: first() failed", 1, xqs.getInt());
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     try {
@@ -443,14 +443,14 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-11.2: first() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-11.2: first() failed", false, b);    
-    xqe.close();  
+    assertEquals("A-XQS-11.2: first() failed", false, b);
+    xqe.close();
   }
 
   public void testGetItem() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
@@ -471,8 +471,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    xqe.close();    
-    
+    xqe.close();
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
@@ -488,7 +488,7 @@ public class XQSequenceTest extends XQJTestCase {
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
@@ -502,20 +502,20 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-12.4: SCROLLTYPE_SCROLLABLE sequence doesn't supports getting item twice()");
     }
-    xqe.close();  
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
-    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqs.getItem() instanceof XQResultItem);   
-  }  
+    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqs.getItem() instanceof XQResultItem);
+  }
 
 
   public void testGetSequenceAsStream() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XMLStreamReader xmlReader = null;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -552,7 +552,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -569,14 +569,14 @@ public class XQSequenceTest extends XQJTestCase {
       assertEquals("A-XQS-22.1: unexpected fifth event returned by XMLStreamReader", XMLStreamReader.END_DOCUMENT, xmlReader.next());
     } catch (XMLStreamException e) {
       fail("A-XQS-22.1: XMLStreamReader.next() failed with message: " + e.getMessage());
-    }    
-    xqe.close();  
+    }
+    xqe.close();
   }
 
   public void testGetSequenceAsString() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -609,7 +609,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     String result = null;
@@ -645,11 +645,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -680,7 +680,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-13.2: isAfterLast() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
@@ -689,8 +689,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-13.4: isAfterLast() failed with message: " + e.getMessage());
     }
-    xqe.close();    
-  }  
+    xqe.close();
+  }
 
   public void testIsBeforeFirst() throws XQException {
     XQExpression xqe;
@@ -705,11 +705,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -740,7 +740,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-14.3: isBeforeFirst() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
@@ -749,13 +749,13 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-14.1: isBeforeFirst() failed with message: " + e.getMessage());
     }
-    xqe.close();    
+    xqe.close();
   }
 
   public void testIsFirst() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
@@ -765,11 +765,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -807,7 +807,7 @@ public class XQSequenceTest extends XQJTestCase {
   public void testIsLast() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
@@ -817,11 +817,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     xqs.close();
@@ -859,7 +859,7 @@ public class XQSequenceTest extends XQJTestCase {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -869,11 +869,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -892,10 +892,10 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-17.1: last() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-17.1: last() failed", true, b);    
+    assertEquals("A-XQS-17.1: last() failed", true, b);
     assertEquals("A-XQS-17.1: last() failed", 4, xqs.getInt());
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     try {
@@ -903,15 +903,15 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-17.2: last() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-17.2: last() failed", false, b);    
-    xqe.close(); 
+    assertEquals("A-XQS-17.2: last() failed", false, b);
+    xqe.close();
   }
 
   public void testNext() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2");
     xqs.close();
@@ -930,14 +930,14 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-18.1: next() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-18.1: next() failed", true, b);    
+    assertEquals("A-XQS-18.1: next() failed", true, b);
     assertEquals("A-XQS-18.1: next() failed", 1, xqs.getInt());
     try {
       b = xqs.next();
     } catch (XQException e) {
       fail("A-XQS-18.1: next() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-18.1: next() failed", true, b);    
+    assertEquals("A-XQS-18.1: next() failed", true, b);
     assertEquals("A-XQS-18.1: next() failed", 2, xqs.getInt());
     try {
       b = xqs.next();
@@ -946,19 +946,19 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-18.2: next() failed", false, b);
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     b = xqs.next();
-    assertEquals("next() failed", false, b);    
-    xqe.close(); 
+    assertEquals("next() failed", false, b);
+    xqe.close();
   }
 
   public void testPrevious() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2");
     try {
@@ -968,11 +968,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2");
     xqs.close();
@@ -992,14 +992,14 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQS-19.1: previous() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-19.1: previous() failed", true, b);    
+    assertEquals("A-XQS-19.1: previous() failed", true, b);
     assertEquals("A-XQS-19.1: previous() failed", 2, xqs.getInt());
     try {
       b = xqs.previous();
     } catch (XQException e) {
       fail("A-XQS-19.1: previous() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-19.1: previous() failed", true, b);    
+    assertEquals("A-XQS-19.1: previous() failed", true, b);
     assertEquals("A-XQS-19.1: previous() failed", 1, xqs.getInt());
     try {
       b = xqs.previous();
@@ -1008,20 +1008,20 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-19.2: previous() failed", false, b);
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     xqs.afterLast();
     b = xqs.previous();
-    assertEquals("previous() failed", false, b);    
-    xqe.close(); 
+    assertEquals("previous() failed", false, b);
+    xqe.close();
   }
 
   public void testRelative() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     boolean b = false;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     try {
@@ -1031,11 +1031,11 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     xqc.setStaticContext(xqsc);
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -1070,7 +1070,7 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-20.4: relative(2) failed", false, b);
     assertEquals("A-XQS-20.4: relative(2) failed", true, xqs.isAfterLast());
-    xqe.close();    
+    xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
@@ -1081,8 +1081,8 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-20.3: relative(0) failed", false, b);
     assertEquals("A-XQS-20.3: relative(0) failed", true, xqs.isBeforeFirst());
-    xqe.close(); 
-    
+    xqe.close();
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.afterLast();
@@ -1107,20 +1107,20 @@ public class XQSequenceTest extends XQJTestCase {
     }
     assertEquals("A-XQS-20.4: relative(-2) failed", false, b);
     assertEquals("A-XQS-20.4: relative(-2) failed", true, xqs.isBeforeFirst());
-    xqe.close();   
+    xqe.close();
   }
 
   public void testWriteSequence_OutputStream() throws XQException, UnsupportedEncodingException {
 
     // We don't expect this method ever to throw UnsupportedEncodingException, as we only request the "UTF-8" encoding.
     // However, in order to make the compiler happy, and to play it safe, add UnsupportedEncodingException to the throws clause.
-    
+
     XQExpression xqe;
     XQSequence xqs;
-    
+
     Properties prop = new Properties();
     prop.setProperty("encoding", "UTF-8");
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -1163,7 +1163,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     ByteArrayOutputStream result = new ByteArrayOutputStream();
@@ -1190,10 +1190,10 @@ public class XQSequenceTest extends XQJTestCase {
   public void testWriteSequence_Writer() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     Properties prop = new Properties();
     prop.setProperty("encoding", "UTF-8");
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -1236,7 +1236,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     StringWriter result = new StringWriter();
@@ -1263,7 +1263,7 @@ public class XQSequenceTest extends XQJTestCase {
   public void testWriteSequenceToSAX() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -1306,7 +1306,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     TestContentHandler result = new TestContentHandler();
@@ -1318,11 +1318,11 @@ public class XQSequenceTest extends XQJTestCase {
     assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + "'", result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
-  
+
   public void testWriteSequenceToResult() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.close();
@@ -1346,9 +1346,9 @@ public class XQSequenceTest extends XQJTestCase {
     }
     xqe.close();
 
- // The spec doesn't say serialization is performed according to XSLT 2.0 and XQuery 1.0 serialization. 
+ // The spec doesn't say serialization is performed according to XSLT 2.0 and XQuery 1.0 serialization.
  // As such we don't test here if the serialization process can fail.
- //   
+ //
  //   xqe = xqc.createExpression();
  //   xqs = xqe.executeQuery("<e a='Hello world!'/>/@*");
  //   try {
@@ -1368,7 +1368,7 @@ public class XQSequenceTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     StringWriter result = new StringWriter();

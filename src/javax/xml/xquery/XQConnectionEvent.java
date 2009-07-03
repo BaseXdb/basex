@@ -36,22 +36,22 @@ public class XQConnectionEvent extends EventObject {
    * @param con the pooled connection that is the source of the event
    */
   public XQConnectionEvent(PooledXQConnection con) {
-    super(con);         
+    super(con);
   }
 
   /**
    * Constructs an <code>XQConnectionEvent</code> object initialized with
-   * the given <code>PooledXQConnection</code> object and 
+   * the given <code>PooledXQConnection</code> object and
    * <code>XQException</code> object.
    *
    * @param con the pooled connection that is the source of the event
    * @param ex the XQException to be thrown to the application
    */
   public XQConnectionEvent(PooledXQConnection con, XQException ex) {
-    super(con);  
+    super(con);
     this.ex = ex;
   }
- 
+
   /**
    * Retrieves the <code>XQException</code> for this
    * <code>XQConnectionEvent</code> object.

@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API ResourceIterator implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -50,7 +50,7 @@ public class ResourceIteratorTest extends TestCase {
     // test result
     ResourceIterator iter = serv.query("/").getIterator();
     assertEquals("Result expected.", true, iter.hasMoreResources());
-    
+
     // test empty result
     iter = serv.query("//Unknown").getIterator();
     assertEquals("Result expected.", false, iter.hasMoreResources());
@@ -67,7 +67,7 @@ public class ResourceIteratorTest extends TestCase {
       size--;
     }
     assertEquals("Wrong result size.", 0, size);
-    
+
     // test if iterator delivers more results
     try {
       iter.nextResource();

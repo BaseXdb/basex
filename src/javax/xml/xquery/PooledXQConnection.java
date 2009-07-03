@@ -5,7 +5,7 @@
 package javax.xml.xquery;
 
 /**
- * An object that provides hooks for connection pool management.  
+ * An object that provides hooks for connection pool management.
  * A <code>PooledXQConnection</code> object
  * represents a physical connection to a data source.  The connection
  * can be recycled rather than being closed when an application is
@@ -26,7 +26,7 @@ package javax.xml.xquery;
  * <code>PooledXQConnection</code> object available in the pool, the
  * connection pool manager returns an <code>XQConnection</code> object that
  * is a handle to that physical connection.
- * If no <code>PooledXQConnection</code> object is available, the 
+ * If no <code>PooledXQConnection</code> object is available, the
  * connection pool manager calls the <code>ConnectionPoolXQDataSource</code>
  * method <code>getPooledConnection</code> to create a new physical connection and
  * returns a handle to it.
@@ -34,10 +34,10 @@ package javax.xml.xquery;
  * When an application closes a connection, it calls the <code>XQConnection</code>
  * method <code>close</code>. When connection pooling is being done,
  * the connection pool manager is notified because it has registered itself as
- * an <code>XQConnectionEventListener</code> object using the 
+ * an <code>XQConnectionEventListener</code> object using the
  * <code>PooledXQConnection</code> method <code>addConnectionEventListener</code>.
  * The connection pool manager deactivates the handle to
- * the <code>PooledXQConnection</code> object and returns the 
+ * the <code>PooledXQConnection</code> object and returns the
  * <code>PooledXQConnection</code> object to the pool of connections so that
  * it can be used again.  Thus, when an application closes its connection,
  * the underlying physical connection is recycled rather than being closed.
@@ -72,7 +72,7 @@ public interface PooledXQConnection {
    * @exception XQException if a datasource access error occurs
    */
   void close() throws XQException;
-      
+
   /**
    * Registers the given event listener so that it will be notified
    * when an event occurs on this <code>PooledXQConnection</code> object.
@@ -92,8 +92,8 @@ public interface PooledXQConnection {
    *
    * @param listener a component, usually the connection pool manager,
    *        that has implemented the
-   *        <code>XQConnectionEventListener</code> interface and 
-   *        been registered with this <code>PooledXQConnection</code> object as 
+   *        <code>XQConnectionEventListener</code> interface and
+   *        been registered with this <code>PooledXQConnection</code> object as
    *        a listener
    * @see #addConnectionEventListener
    */

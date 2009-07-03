@@ -32,7 +32,7 @@ public class XQItemTypeTest extends XQJTestCase {
       fail("A-XQIT-7.2: getTypeName() must throw an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
     try {
@@ -40,12 +40,12 @@ public class XQItemTypeTest extends XQJTestCase {
       fail("A-XQIT-10.2: getPIName() must throw an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
   }
-  
+
   public void testItemKindAtomic() throws XQException {
     XQItemType xqtype = xqc.createAtomicType(XQItemType.XQBASETYPE_STRING);
-    
+
     assertEquals("A-XQIT-1.1: getBaseType() returns the correct base type.", XQItemType.XQBASETYPE_STRING, xqtype.getBaseType());
     assertEquals("A-XQIT-2.1: getItemKind() returns the correct item kind.", XQItemType.XQITEMKIND_ATOMIC, xqtype.getItemKind());
     assertEquals("A-XQIT-3.1: getItemOccurrence() returns OCC_EXACTLY_ONE.", XQSequenceType.OCC_EXACTLY_ONE, xqtype.getItemOccurrence());
@@ -58,8 +58,8 @@ public class XQItemTypeTest extends XQJTestCase {
       // Expect an XQException
     }
     assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());  
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());  
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
     try {
@@ -72,17 +72,17 @@ public class XQItemTypeTest extends XQJTestCase {
 
   public void testItemKindAttribute() throws XQException {
     XQItemType xqtype = xqc.createAttributeType(new QName("http://www.xqj.org", "a"), XQItemType.XQBASETYPE_STRING);
-    
+
     assertEquals("A-XQIT-1.1: getBaseType() returns the correct base type.", XQItemType.XQBASETYPE_STRING, xqtype.getBaseType());
     assertEquals("A-XQIT-2.1: getItemKind() returns the correct item kind.", XQItemType.XQITEMKIND_ATTRIBUTE, xqtype.getItemKind());
     assertEquals("A-XQIT-3.1: getItemOccurrence() returns OCC_EXACTLY_ONE.", XQSequenceType.OCC_EXACTLY_ONE, xqtype.getItemOccurrence());
     // Not much we can test for toString()
     xqtype.toString();
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "a", xqtype.getNodeName().getLocalPart());  
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());  
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "a", xqtype.getNodeName().getLocalPart());
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
     assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());  
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());  
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
     try {
@@ -95,7 +95,7 @@ public class XQItemTypeTest extends XQJTestCase {
 
   public void testItemKindComment() throws XQException {
     XQItemType xqtype = xqc.createCommentType() ;
-    
+
     testSimpleType(xqtype, XQItemType.XQITEMKIND_COMMENT);
   }
 
@@ -108,17 +108,17 @@ public class XQItemTypeTest extends XQJTestCase {
   public void testItemKindDocumentElement() throws XQException {
     XQItemType xqtype_element = xqc.createElementType(new QName("http://www.xqj.org", "e"), XQItemType.XQBASETYPE_STRING);
     XQItemType xqtype = xqc.createDocumentElementType(xqtype_element);
-    
+
     assertEquals("A-XQIT-1.1: getBaseType() returns the correct base type.", XQItemType.XQBASETYPE_STRING, xqtype.getBaseType());
     assertEquals("A-XQIT-2.1: getItemKind() returns the correct item kind.", XQItemType.XQITEMKIND_DOCUMENT_ELEMENT, xqtype.getItemKind());
     assertEquals("A-XQIT-3.1: getItemOccurrence() returns OCC_EXACTLY_ONE.", XQSequenceType.OCC_EXACTLY_ONE, xqtype.getItemOccurrence());
     // Not much we can test for toString()
     xqtype.toString();
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());  
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());  
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
     assertEquals("A-XQIT-6.2: getSchemaURI() returns null", null, xqtype.getSchemaURI());
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());  
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());  
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
     try {
@@ -135,17 +135,17 @@ public class XQItemTypeTest extends XQJTestCase {
 
   public void testItemKindElement() throws XQException {
     XQItemType xqtype = xqc.createElementType(new QName("http://www.xqj.org", "e"), XQItemType.XQBASETYPE_STRING);
-    
+
     assertEquals("A-XQIT-1.1: getBaseType() returns the correct base type.", XQItemType.XQBASETYPE_STRING, xqtype.getBaseType());
     assertEquals("A-XQIT-2.1: getItemKind() returns the correct item kind.", XQItemType.XQITEMKIND_ELEMENT, xqtype.getItemKind());
     assertEquals("A-XQIT-3.1: getItemOccurrence() returns OCC_EXACTLY_ONE.", XQSequenceType.OCC_EXACTLY_ONE, xqtype.getItemOccurrence());
     // Not much we can test for toString()
     xqtype.toString();
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());  
-    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());  
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());
+    assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
     assertEquals("A-XQIT-6.2: getSchemaURI() returns null", null, xqtype.getSchemaURI());
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());  
-    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());  
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
+    assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
     try {
@@ -170,7 +170,7 @@ public class XQItemTypeTest extends XQJTestCase {
 
   public void testItemKindPI() throws XQException {
     XQItemType xqtype = xqc.createProcessingInstructionType("pi");
-    
+
     try {
       xqtype.getBaseType();
       fail("A-XQIT-1.2: getBaseType() must throw an XQException");
@@ -193,10 +193,10 @@ public class XQItemTypeTest extends XQJTestCase {
       fail("A-XQIT-7.2: getTypeName() must throw an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }   
+    }
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
     assertFalse("A-XQIT-9.1: isElementNillable() reports if the element is nillable.", xqtype.isElementNillable());
-    assertEquals("A-XQIT-10.1: getPIName() returns the correct name.", "pi", xqtype.getPIName());  
+    assertEquals("A-XQIT-10.1: getPIName() returns the correct name.", "pi", xqtype.getPIName());
   }
 
   public void testItemKindSchemaAttribute() throws XQException {

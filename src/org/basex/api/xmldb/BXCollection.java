@@ -32,7 +32,7 @@ import org.basex.util.Token;
 public final class BXCollection implements Collection, BXXMLDBText {
   /** Context reference. */
   Context ctx;
-  
+
   /**
    * Standard constructor.
    * @param c for Context
@@ -166,7 +166,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // document exists - delete old one first
     final Resource old = getResource(id);
     if(old != null) removeResource(getResource(id));
-    
+
     // create parser, dependent on input type
     final Object cont = xml.content;
     Parser p = null;
@@ -246,7 +246,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       final MetaData md = ctx.data().meta;
       final Field f = MetaData.class.getField(key);
       final Object k = f.get(md);
-      
+
       if(k instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) k).booleanValue() :
           val.equalsIgnoreCase(ON) || !val.equalsIgnoreCase(OFF);
@@ -260,7 +260,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
   }
-  
+
   /**
    * Checks if the specified id exists in the specified id list.
    * @param list id list

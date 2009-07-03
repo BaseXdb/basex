@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API Collection implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -72,10 +72,10 @@ public class CollectionTest extends TestCase {
     // assume existence of XPath service
     assertNotNull("XPath Implementation expected.",
         coll.getService("XPathQueryService", "1.0"));
-    
+
     // assume null reference for unknown version
     assertNull("Unknown version.", coll.getService("XPathQueryService", "3.8"));
-    
+
     // get unknown service
     final Code code = new Code() {
       Object run() throws XMLDBException {
@@ -175,7 +175,7 @@ public class CollectionTest extends TestCase {
         return coll.createResource(null, BinaryResource.RESOURCE_TYPE);
       }
     };
-    
+
     // allow vendor error for binary resources
     try {
       code.run();
@@ -188,7 +188,7 @@ public class CollectionTest extends TestCase {
   @Test
   public void testStoreResource() throws Exception {
     Resource res = coll.createResource("NoContent", XMLResource.RESOURCE_TYPE);
-    
+
     // try to store resource with missing content
     try {
       coll.storeResource(res);
@@ -220,7 +220,7 @@ public class CollectionTest extends TestCase {
     final Node node = builder.parse(new File(AllTests.DOC2));
     xml1.setContentAsDOM(node);
     coll.storeResource(xml1);
-    
+
     // store SAX stream
     XMLResource xml2 = (XMLResource) coll.createResource(
         AllTests.DOC3, XMLResource.RESOURCE_TYPE);
@@ -230,14 +230,14 @@ public class CollectionTest extends TestCase {
     coll.storeResource(xml2);
     // check number of documents
     assertEquals("Wrong number of documents.", 4,coll.getResourceCount());
-    
+
     // update document with known id
     res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
     res.setContent("<XML/>");
     coll.storeResource(res);
     // check number of documents
     assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
-    
+
     checkClosed(new Code() {
       Object run() throws XMLDBException {
         return coll.createResource("id", null);
@@ -257,18 +257,18 @@ public class CollectionTest extends TestCase {
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.NO_SUCH_RESOURCE, ex);
     }
-    
+
     coll.removeResource(coll.getResource(AllTests.DOC2));
     coll.removeResource(coll.getResource(AllTests.DOC3));
     assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
-    
+
     try {
       coll.removeResource(coll.getResource(null));
       fail("Document does not exist.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.NO_SUCH_RESOURCE, ex);
     }
-    
+
     checkClosed(new Code() {
       Object run() throws XMLDBException {
         coll.removeResource(null); return null;
@@ -281,7 +281,7 @@ public class CollectionTest extends TestCase {
     final Code code = new Code() {
       Object run() throws XMLDBException { return coll.createId(); }
     };
-    
+
     // check some ids for their uniqueness
     for(int i = 0; i < 10; i++) {
       if(coll.getResource(code.run().toString()) != null) {
@@ -297,14 +297,14 @@ public class CollectionTest extends TestCase {
     coll.close();
     assertFalse(coll.isOpen());
   }
-  
+
   @Test
   public void testClose() throws Exception {
     coll.close();
     coll.close();
     assertFalse(coll.isOpen());
   }
-  
+
   @Test
   public void testGetProperty() throws Exception {
     assertNull(coll.getProperty("ProbablyUnknown"));
@@ -313,7 +313,7 @@ public class CollectionTest extends TestCase {
     assertEquals(AllTests.COLL, coll.getProperty("dbname"));
     assertEquals("true", coll.getProperty("entity"));
   }
-  
+
   @Test
   public void testSetProperty() throws Exception {
     try {
@@ -326,7 +326,7 @@ public class CollectionTest extends TestCase {
     // the following tests are database specific...
     coll.setProperty("dbname", "NewName");
     coll.setProperty("dbname", AllTests.COLL);
-    
+
     try {
       coll.setProperty("time", "ABC");
       fail("Invalid value was assigned.");
@@ -334,7 +334,7 @@ public class CollectionTest extends TestCase {
       checkCode(ErrorCodes.VENDOR_ERROR, e);
     }
   }
-  
+
   /**
    * Compares the expected error code with the specified exception.
    * @param exp expected error code
@@ -343,7 +343,7 @@ public class CollectionTest extends TestCase {
   private void checkCode(final int exp, final XMLDBException ex) {
     assertEquals("Wrong error code.", exp, ex.errorCode);
   }
-  
+
   /**
    * Runs the specified code in a closed collection state.
    * @param code code to be executed
@@ -357,7 +357,7 @@ public class CollectionTest extends TestCase {
       checkCode(ErrorCodes.COLLECTION_CLOSED, ex);
     }
   }
-  
+
   /** Abstract class for defining arbitrary methods. */
   static abstract class Code {
     /** Method to be executed. */

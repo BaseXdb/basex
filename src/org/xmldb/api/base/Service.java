@@ -54,7 +54,7 @@ package org.xmldb.api.base;
  */
 
 /**
- * The <code>Service</code> interface provides an extension mechanism for 
+ * The <code>Service</code> interface provides an extension mechanism for
  * <code>Collection</code> implementations. It is to be implented by Service
  * instances that define their own set of methods to perform the necessary
  * action. For an example of what a functional <code>Service</code> interface
@@ -72,14 +72,14 @@ public interface Service extends Configurable {
     *  specific errors that occur.<br />
     */
    String getName() throws XMLDBException;
-   
+
    /**
     * Gets the Version attribute of the Service object
     *
     * @return The Version value
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    String getVersion() throws XMLDBException;
 

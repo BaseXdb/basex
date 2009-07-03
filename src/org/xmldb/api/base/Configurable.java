@@ -70,7 +70,7 @@ public interface Configurable {
    String getProperty(String name) throws XMLDBException;
 
    /**
-    * Sets the property <code>name</code> to have the value provided in 
+    * Sets the property <code>name</code> to have the value provided in
     * <code>value</code>.
     *
     * @param name the name of the property to set.

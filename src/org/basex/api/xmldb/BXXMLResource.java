@@ -126,7 +126,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     // specs, but many query results are not related to a document anymore.
     if(result != null)
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
-    
+
     // resource does not result from a query - return normal id
     if(id != null) return id;
     // get document root id

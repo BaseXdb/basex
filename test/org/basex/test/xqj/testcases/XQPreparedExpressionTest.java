@@ -9,7 +9,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
 
   public void testCancel() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     try {
       xqpe.cancel();
@@ -17,7 +17,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       fail("A-XQPE-1.1: cancellation of prepared expression failed with message: " + e.getMessage());
     }
 
-    
+
     xqpe.close();
     try {
       xqpe.cancel();
@@ -26,13 +26,13 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       // Expect an XQException
     }
   }
-  
+
   public void testIsClosed() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.executeQuery();
-    
+
     assertEquals("A-XQPE-2.1: isClosed() on open prepared expression", false, xqpe.isClosed());
     xqpe.close();
     assertEquals("A-XQPE-2.2: isClosed() on closed prepared expressions", true, xqpe.isClosed());
@@ -41,22 +41,22 @@ public class XQPreparedExpressionTest extends XQJTestCase {
   public void testClose() throws XQException {
     XQPreparedExpression xqpe;
     XQSequence xqs;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqs = xqpe.executeQuery();
     try {
-      xqpe.close(); 
+      xqpe.close();
       xqpe.close();
     } catch (XQException e) {
       fail("A-XQPE-3.1: closing prepared expression failed with message: " + e.getMessage());
     }
     assertEquals("A-XQPE-3.2: Closing an expression, closes any result sequences obtained from this expression", true, xqs.isClosed());
   }
- 
+
   public void testExecuteQuery() throws XQException {
     XQPreparedExpression xqpe;
     XQSequence xqs = null;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.close();
     try {
@@ -73,13 +73,13 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       fail("A-XQPE-8.2: executeQuery() failed with message: " + e.getMessage());
     }
     assertNotNull("A-XQPE-8.2: executeQuery() failed", xqs);
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testGetAllExternalVariables() throws XQException {
     XQPreparedExpression xqpe;
     QName[] extVars = null;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.close();
     try {
@@ -88,23 +88,23 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     try {
       extVars = xqpe.getAllExternalVariables();
     } catch (XQException e) {
       fail("A-XQPE-4.2: getAllExternalVariables on prepared expression without external variables failed with message: " + e.getMessage());
-    }    
+    }
     assertNotNull("A-XQPE-4.2: getAllExternalVariables on prepared expression without external variables", extVars);
     assertEquals("A-XQPE-4.2: getAllExternalVariables on prepared expression without external variables", 0, extVars.length);
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       extVars = xqpe.getAllExternalVariables();
     } catch (XQException e) {
       fail("A-XQPE-4.3: getAllExternalVariables on prepared expression with external variables failed with message: " + e.getMessage());
-    }    
+    }
     assertNotNull("A-XQPE-4.3: getAllExternalVariables on prepared expression with external variables", extVars);
     assertEquals("A-XQPE-4.3: getAllExternalVariables on prepared expression with external variables", 1, extVars.length);
     assertEquals("A-XQPE-4.3: getAllExternalVariables on prepared expression with external variables", "v", extVars[0].getLocalPart());
@@ -115,7 +115,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
   public void testGetAllUnboundExternalVariables() throws XQException {
     XQPreparedExpression xqpe;
     QName[] extVars = null;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.close();
     try {
@@ -126,7 +126,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     }
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
-    
+
     try {
       extVars = xqpe.getAllUnboundExternalVariables();
     } catch (XQException e) {
@@ -144,14 +144,14 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     }
     assertNotNull("A-XQPE-9.3: getAllUnboundExternalVariables on prepared expression without unbound variables", extVars);
     assertEquals("A-XQPE-9.3: getAllUnboundExternalVariables on prepared expression without unbound variables", 0, extVars.length);
-     
-    xqpe.close(); 
+
+    xqpe.close();
   }
-  
+
   public void testGetStaticResultType() throws XQException {
     XQPreparedExpression xqpe;
     XQSequenceType xqtype = null;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.close();
     try {
@@ -160,23 +160,23 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqtype = xqpe.getStaticResultType();
     } catch (XQException e) {
       fail("A-XQPE-5.2: getStaticResultType() failed with message: " + e.getMessage());
-    }    
+    }
     assertNotNull("A-XQPE-5.2: getStaticResultType() failed", xqtype);
     assertEquals("A-XQPE-5.2: getStaticResultType() failed", XQItemType.OCC_ZERO_OR_MORE, xqtype.getItemOccurrence());
     assertEquals("A-XQPE-5.2: getStaticResultType() failed", XQItemType.XQITEMKIND_ITEM, xqtype.getItemType().getItemKind());
-    xqpe.close();  
+    xqpe.close();
   }
-  
+
   public void testGetStaticVariableType() throws XQException {
     XQPreparedExpression xqpe;
     XQSequenceType xqtype = null;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -194,7 +194,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       // Expect an XQException
     }
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqpe.getStaticVariableType(null);
@@ -202,24 +202,24 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    xqpe.close(); 
-    
+    xqpe.close();
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqtype = xqpe.getStaticVariableType(new QName("v"));
     } catch (XQException e) {
       fail("A-XQPE-6.4: getStaticVariableType() failed with message: " + e.getMessage());
-    }    
+    }
     assertNotNull("A-XQPE-6.4: getStaticVariableType() failed", xqtype);
     assertEquals("A-XQPE-6.4: getStaticResultType() failed", XQItemType.OCC_ZERO_OR_MORE, xqtype.getItemOccurrence());
     assertEquals("A-XQPE-6.4: getStaticResultType() failed", XQItemType.XQITEMKIND_ITEM, xqtype.getItemType().getItemKind());
-    xqpe.close();  
+    xqpe.close();
   }
-  
+
   public void testGetStaticContext() throws XQException {
     XQPreparedExpression xqpe;
     XQStaticContext xqsc = null;
-    
+
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.close();
     try {
@@ -236,6 +236,6 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       fail("A-XQPE-7.2: getting static context failed with message: " + e.getMessage());
     }
     assertNotNull("A-XQPE-7.2: getting static context failed", xqsc);
-    xqpe.close(); 
+    xqpe.close();
   }
 }

@@ -59,7 +59,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
   public void testConstructor9() throws XQException {
     XQExpression xqe = xqc.createExpression();
     XQSequence xqs = xqe.executeQuery("1,2");
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56,
                                                  "moduleuri", xqs, (XQStackTraceElement[])null);
@@ -72,14 +72,14 @@ public class XQQueryExceptionTest extends XQJTestCase {
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", "moduleuri", ex.getModuleURI());
       assertTrue("A-XQQEX-1.1: XQQueryException successfully created", xqs == ex.getErrorObject());
       assertTrue("A-XQQEX-1.1: XQQueryException successfully created", null == ex.getQueryStackTrace());
-      
+
     } catch (Exception e) {
       fail("A-XQQEX-1.1: Creating XQQueryException faild with message: " + e.getMessage());
     }
-    
+
     xqs.close();
   }
-  
+
   public void testGetErrorCode() {
     try {
       XQQueryException ex = new XQQueryException("Hello world!", new QName("foo"));
@@ -87,7 +87,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-2.1: Retrieve error code from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-2.2: Error code is null when not available", null, ex.getErrorCode());
@@ -99,7 +99,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
   public void testGetErrorObject() throws XQException {
     XQExpression xqe = xqc.createExpression();
     XQSequence xqs = xqe.executeQuery("1,2");
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56,
                                                  "moduleuri", xqs, (XQStackTraceElement[])null);
@@ -109,14 +109,14 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-3.1: Retrieve error object from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-3.2: Error object is null when not available", null, ex.getErrorObject());
     } catch (Exception e) {
       fail("A-XQQEX-3.2: Retrieve error object from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     xqe.close();
   }
 
@@ -127,7 +127,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-4.1: Retrieve position from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-4.2: Position is -1 when not available", -1, ex.getPosition());
@@ -144,7 +144,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-5.1: Retrieve query stack trace from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-5.2: Query stack trace is null when not available", null, ex.getQueryStackTrace());
@@ -161,7 +161,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-6.1: Retrieve module uri from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-6.2: module uri is null when not available", null, ex.getModuleURI());
@@ -169,7 +169,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
       fail("A-XQQEX-6.2: Retrieve module uri from an XQQueryException failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetLineNumber() {
     try {
       XQQueryException ex = new XQQueryException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56);
@@ -177,7 +177,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-7.1: Retrieve line number from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-7.2: Line number is -1 when not available", -1, ex.getLineNumber());
@@ -193,7 +193,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQQEX-8.1: Retrieve column number from an XQQueryException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQQueryException ex = new XQQueryException("Hello world!");
       assertEquals("A-XQQEX-8.2: Column number is -1 when not available", -1, ex.getColumnNumber());

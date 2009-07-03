@@ -63,7 +63,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:boolean('true')");
     xqs.next();
@@ -75,7 +75,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:boolean('true')");
     xqs.next();
@@ -85,8 +85,8 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6: getBoolean on xs:boolean failed with message: " + e.getMessage());
     }
     xqe.close();
-  }  
-  
+  }
+
   public void testGetByte() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -123,7 +123,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:byte('1')");
     xqs.next();
@@ -146,7 +146,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:byte('1'), 10.0");
     xqs.next();
@@ -162,7 +162,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6: getByte on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
-  }  
+  }
 
   public void testGetDouble() throws XQException {
     XQExpression xqe;
@@ -200,7 +200,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:double('1')");
     xqs.next();
@@ -212,7 +212,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:double('1')");
     xqs.next();
@@ -222,7 +222,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6:  getDouble on xs:double failed with message: " + e.getMessage());
     }
     xqe.close();
-  }    
+  }
 
   public void testGetFloat() throws XQException {
     XQExpression xqe;
@@ -260,7 +260,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:float('1')");
     xqs.next();
@@ -272,7 +272,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:float('1')");
     xqs.next();
@@ -282,7 +282,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6: getFloat on xs:float failed with message: " + e.getMessage());
     }
     xqe.close();
-  }  
+  }
 
   public void testGetInt() throws XQException {
     XQExpression xqe;
@@ -320,7 +320,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:int('1')");
     xqs.next();
@@ -343,7 +343,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:int('1'), 10.0");
     xqs.next();
@@ -359,8 +359,8 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6: getInt on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
-  }  
-  
+  }
+
   public void testGetItemType() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -387,7 +387,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'Hello world!'");
     xqs.next();
@@ -412,7 +412,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     }
     xqe.close();
   }
-  
+
   public void testGetAtomicValue() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -438,7 +438,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'1'");
     xqs.next();
@@ -450,7 +450,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1, 1.1");
     xqs.next();
@@ -467,7 +467,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     }
     xqe.close();
   }
-  
+
   public void testGetLong() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -504,7 +504,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:long('1')");
     xqs.next();
@@ -527,7 +527,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:long('1'), 10.0");
     xqs.next();
@@ -543,8 +543,8 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-1.6: getLong on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
-  }    
-  
+  }
+
   public void testGetNode() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -582,7 +582,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>");
     xqs.next();
@@ -594,7 +594,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>, <e a=''/>/@*");
     xqs.next();
@@ -652,7 +652,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>");
     xqs.next();
@@ -662,7 +662,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       fail("A-XQIA-5.4: getNodeUri() failed with message: " + e.getMessage());
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>");
     xqs.next();
@@ -701,7 +701,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>");
     xqs.next();
@@ -713,7 +713,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e/>, 'Hello world!'");
     xqs.next();
@@ -738,7 +738,7 @@ public class XQItemAccessorTest extends XQJTestCase {
   public void testGetObject_AllTypes() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:anyURI('http://www.foo.org')," +
                            "xs:base64Binary('AAAA')," +
@@ -831,57 +831,57 @@ public class XQItemAccessorTest extends XQJTestCase {
       xqs.next();
       if (xmlGregorianCalendar != null) assertTrue(msg + "for xs:YearMonth", xmlGregorianCalendar.isInstance(xqs.getObject()));
       xqs.next();
-      assertTrue(msg + "for xs:hexBinary", xqs.getObject() instanceof byte[]); 
+      assertTrue(msg + "for xs:hexBinary", xqs.getObject() instanceof byte[]);
       xqs.next();
-      assertTrue(msg + "for xs:ID", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:ID", xqs.getObject() instanceof String);
       xqs.next();
       assertTrue(msg + "for xs:IDREF", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:int", xqs.getObject() instanceof Integer);  
+      assertTrue(msg + "for xs:int", xqs.getObject() instanceof Integer);
       xqs.next();
-      assertTrue(msg + "for xs:integer", xqs.getObject() instanceof BigInteger); 
+      assertTrue(msg + "for xs:integer", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:language", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:language", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:long", xqs.getObject() instanceof Long); 
+      assertTrue(msg + "for xs:long", xqs.getObject() instanceof Long);
       xqs.next();
-      assertTrue(msg + "for xs:Name", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:Name", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:NCName", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:NCName", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:negativeInteger", xqs.getObject() instanceof BigInteger); 
+      assertTrue(msg + "for xs:negativeInteger", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:NMTOKEN", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:NMTOKEN", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:nonNegativeInteger", xqs.getObject() instanceof BigInteger); 
+      assertTrue(msg + "for xs:nonNegativeInteger", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:nonPostiveInteger", xqs.getObject() instanceof BigInteger); 
+      assertTrue(msg + "for xs:nonPostiveInteger", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:normalizedString", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:normalizedString", xqs.getObject() instanceof String);
       xqs.next();
-      assertTrue(msg + "for xs:postiveInteger", xqs.getObject() instanceof BigInteger); 
+      assertTrue(msg + "for xs:postiveInteger", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:QName", xqs.getObject() instanceof QName); 
+      assertTrue(msg + "for xs:QName", xqs.getObject() instanceof QName);
       xqs.next();
-      assertTrue(msg + "for xs:short", xqs.getObject() instanceof Short);  
+      assertTrue(msg + "for xs:short", xqs.getObject() instanceof Short);
       xqs.next();
-      assertTrue(msg + "for xs:string", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:string", xqs.getObject() instanceof String);
       xqs.next();
       if (xmlGregorianCalendar != null) assertTrue(msg + "for xs:time", xmlGregorianCalendar.isInstance(xqs.getObject()));
       xqs.next();
-      assertTrue(msg + "for xs:token", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:token", xqs.getObject() instanceof String);
       xqs.next();
       assertTrue(msg + "for xs:unsignedByte", xqs.getObject() instanceof Short);
       xqs.next();
-      assertTrue(msg + "for xs:unsignedInt", xqs.getObject() instanceof Long); 
+      assertTrue(msg + "for xs:unsignedInt", xqs.getObject() instanceof Long);
       xqs.next();
-      assertTrue(msg + "for xs:unsignedLong", xqs.getObject() instanceof BigInteger);    
+      assertTrue(msg + "for xs:unsignedLong", xqs.getObject() instanceof BigInteger);
       xqs.next();
-      assertTrue(msg + "for xs:unsignedShort", xqs.getObject() instanceof Integer); 
+      assertTrue(msg + "for xs:unsignedShort", xqs.getObject() instanceof Integer);
       xqs.next();
       if (duration != null) assertTrue(msg + "for xs:dayTimeDuration", duration.isInstance(xqs.getObject()));
       xqs.next();
-      assertTrue(msg + "for xs:untypedAtomic", xqs.getObject() instanceof String); 
+      assertTrue(msg + "for xs:untypedAtomic", xqs.getObject() instanceof String);
       xqs.next();
       if (duration != null) assertTrue(msg + "for xs:yearMonthDuration", duration.isInstance(xqs.getObject()));
       xqs.next();
@@ -901,12 +901,12 @@ public class XQItemAccessorTest extends XQJTestCase {
        fail("A-XQIA-4.1: getObject on element() failed with message: " + e.getMessage());
     }
   }
-  
-  public void testGetItemAsStream() throws XQException { 
+
+  public void testGetItemAsStream() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XMLStreamReader xmlReader = null;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -916,7 +916,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -955,7 +955,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException or XMLStreamException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -973,14 +973,14 @@ public class XQItemAccessorTest extends XQJTestCase {
       assertEquals("A-XQIA-9.1: unexpected fifth event returned by XMLStreamReader", XMLStreamReader.END_DOCUMENT, xmlReader.next());
     } catch (XMLStreamException e) {
       fail("A-XQIA-9.1: XMLStreamReader.next() failed with message: " + e.getMessage());
-    }    
-    xqe.close();    
+    }
+    xqe.close();
   }
-  
-  public void testGetItemAsString() throws XQException { 
+
+  public void testGetItemAsString() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -990,7 +990,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1025,7 +1025,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1048,7 +1048,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     }
     xqe.close();
   }
-  
+
   public void testGetShort() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -1085,7 +1085,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:short('1')");
     xqs.next();
@@ -1108,7 +1108,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("xs:short('1'), 10.0");
     xqs.next();
@@ -1125,13 +1125,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     }
     xqe.close();
   }
-  
-  public void testInstanceOf() throws XQException { 
+
+  public void testInstanceOf() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XQItemType xqstringtype;
     XQItemType xqinttype;
-    
+
     xqstringtype = xqc.createAtomicType(XQItemType.XQBASETYPE_STRING);
     xqinttype = xqc.createAtomicType(XQItemType.XQBASETYPE_INT);
 
@@ -1156,7 +1156,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'Hello world!'");
     xqs.next();
@@ -1177,13 +1177,13 @@ public class XQItemAccessorTest extends XQJTestCase {
 
     // We don't expect this method ever to throw UnsupportedEncodingException, as we only request the "UTF-8" encoding.
     // However, in order to make the compiler happy, and to play it safe, add UnsupportedEncodingException to the throws clause.
-    
+
     XQExpression xqe;
     XQSequence xqs;
-    
+
     Properties prop = new Properties();
     prop.setProperty("encoding", "UTF-8");
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -1193,7 +1193,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1239,7 +1239,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1268,7 +1268,7 @@ public class XQItemAccessorTest extends XQJTestCase {
   public void testWriteItem_Writer() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -1278,7 +1278,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1324,7 +1324,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1349,11 +1349,11 @@ public class XQItemAccessorTest extends XQJTestCase {
     assertEquals("A-XQIA-11.2: null properties argument is equivalent to empty properties argument", result.toString(), otherResult.toString());
     xqe.close();
   }
-  
+
   public void testWriteItemToSAX() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -1363,7 +1363,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1409,7 +1409,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1422,11 +1422,11 @@ public class XQItemAccessorTest extends XQJTestCase {
     assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + "'", result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
-  
+
   public void testWriteItemToResult() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
@@ -1436,7 +1436,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
@@ -1461,9 +1461,9 @@ public class XQItemAccessorTest extends XQJTestCase {
     }
     xqe.close();
 
- // The spec doesn't say serialization is performed according to XSLT 2.0 and XQuery 1.0 serialization. 
+ // The spec doesn't say serialization is performed according to XSLT 2.0 and XQuery 1.0 serialization.
  // As such we don't test here if the serialization process can fail.
- //   
+ //
  //   xqe = xqc.createExpression();
  //   xqs = xqe.executeQuery("<e a='Hello world!'/>/@*");
  //   xqs.next();
@@ -1485,7 +1485,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       // Expect an XQException
     }
     xqe.close();
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();

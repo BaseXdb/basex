@@ -68,7 +68,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     checkAttr(it);
     return new BXQItemType(Type.ATT, qn, it);
   }
-  
+
   /**
    * Performs a type check for attribute operations.
    * @param it input type
@@ -91,7 +91,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     if(it.getItemKind() != XQItemType.XQITEMKIND_ELEMENT)
       throw new BXQException(ELM);
-    
+
     return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
   }
 
@@ -101,10 +101,10 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     if(it.getItemKind() != XQItemType.XQITEMKIND_SCHEMA_ELEMENT)
       throw new BXQException(ELM);
-    
+
     return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
   }
-  
+
   public BXQItemType createDocumentType() throws XQException {
     opened();
     return new BXQItemType(Type.DOC);
@@ -225,7 +225,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     return new BXQItem(create(v, t));
   }
-  
+
   public BXQItem createItemFromShort(final short v, final XQItemType it)
       throws XQException {
     return itr(v, Type.SHR, it);
@@ -295,7 +295,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     opened();
     valid(it, XQItemType.class);
-    
+
     if(occ < 1 || occ > 5) throw new BXQException(OCCINV);
     if(occ == XQSequenceType.OCC_EMPTY && it != null ||
         occ == XQSequenceType.OCC_EXACTLY_ONE && it == null)

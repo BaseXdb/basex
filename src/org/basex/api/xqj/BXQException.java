@@ -5,12 +5,12 @@ import org.basex.BaseX;
 
 /**
  * Java XQuery API - Exception.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 final class BXQException extends XQException {
-  /** 
+  /**
    * Constructor.
    * @param ex query exception
    */

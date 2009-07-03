@@ -52,21 +52,21 @@ package org.xmldb.api.base;
  * individuals on behalf of the XML:DB Initiative. For more information
  * on the XML:DB Initiative, please see <http://www.xmldb.org/>.
  */
- 
+
 /**
- * ErrorCodes defines XML:DB error codes that can be used to set the 
+ * ErrorCodes defines XML:DB error codes that can be used to set the
  * <code>errorCodes</code> attribute of an <code>XMLDBException</code>
  */
-public class ErrorCodes 
+public class ErrorCodes
 {
    /**
     * Set when a more detailed error can not be determined.
     */
-   public static final int UNKNOWN_ERROR = 0;   
+   public static final int UNKNOWN_ERROR = 0;
    /**
     * Set when a vendor specific error has occured.
     */
-   public static final int VENDOR_ERROR = 1;  
+   public static final int VENDOR_ERROR = 1;
    /**
     * Set if the API implementation does not support the operation being
     * invoked.
@@ -77,30 +77,30 @@ public class ErrorCodes
     * different then that for which the <code>Resource</code> was intended to
     * support.
     */
-   public static final int WRONG_CONTENT_TYPE = 3;  
+   public static final int WRONG_CONTENT_TYPE = 3;
    /**
     * Set if access to the requested <code>Collection</code> can not be granted
     * due to the lack of proper credentials.
     */
-   public static final int PERMISSION_DENIED = 4;  
+   public static final int PERMISSION_DENIED = 4;
    /**
     * Set if the URI format is invalid.
     */
-   public static final int INVALID_URI = 5;  
+   public static final int INVALID_URI = 5;
 
    /**
     * Set if the requested <code>Service</code> could not be located.
-    */   
-   public static final int NO_SUCH_SERVICE = 100;  
+    */
+   public static final int NO_SUCH_SERVICE = 100;
 
    /**
     * Set if the requested <code>Collection</code> could not be located.
-    */   
-   public static final int NO_SUCH_COLLECTION = 200;  
+    */
+   public static final int NO_SUCH_COLLECTION = 200;
    /**
     * Set if the Collection instance is in an invalid state.
     */
-   public static final int INVALID_COLLECTION = 201;  
+   public static final int INVALID_COLLECTION = 201;
    /**
     * Set when an operation is invoked against a <code>Collection</code>
     * instance that has been closed.
@@ -109,12 +109,12 @@ public class ErrorCodes
 
    /**
     * Set if the requested <code>Resource</code> could not be located.
-    */   
-   public static final int NO_SUCH_RESOURCE = 300;    
+    */
+   public static final int NO_SUCH_RESOURCE = 300;
    /**
     * Set if the <code>Resource</code> provided to an operation is invalid.
     */
-   public static final int INVALID_RESOURCE = 301;  
+   public static final int INVALID_RESOURCE = 301;
    /**
     * Set if the resource type requested is unknown to the API implementation.
     */
@@ -123,10 +123,10 @@ public class ErrorCodes
    /**
     * Set if a <code>Database</code> instance can not be located for the
     * provided URI.
-    */   
-   public static final int NO_SUCH_DATABASE = 400;  
+    */
+   public static final int NO_SUCH_DATABASE = 400;
    /**
     * Set if the <code>Database</code> instance being registered is invalid.
     */
-   public static final int INVALID_DATABASE = 401;  
+   public static final int INVALID_DATABASE = 401;
 }

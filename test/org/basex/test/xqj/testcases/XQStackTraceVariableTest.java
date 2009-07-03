@@ -8,7 +8,7 @@ import javax.xml.xquery.XQStackTraceVariable;
 public class XQStackTraceVariableTest extends XQJTestCase {
 
   public void testConstructor() {
-    try { 
+    try {
       XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
       assertEquals("A-XQSTV-1.1: XQStackTraceVariable successfully created", new QName("v"), xqstv.getQName());
       assertEquals("A-XQSTV-1.1: XQStackTraceVariable successfully created", "abc", xqstv.getValue());
@@ -16,7 +16,7 @@ public class XQStackTraceVariableTest extends XQJTestCase {
       fail("A-XQSTV-1.1: Creating XQStackTraceVariable faild with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetQName() {
     try {
       XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
@@ -25,7 +25,7 @@ public class XQStackTraceVariableTest extends XQJTestCase {
       fail("A-XQSTV-2.1: Retrieve QName from an XQStackTraceVariable failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetValue() {
     try {
       XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");

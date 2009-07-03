@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API XMLResource implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -93,7 +93,7 @@ public class XMLResourceTest extends TestCase {
     xml.setContent("<xml/>");
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
-    
+
     // overwrite document with DOM contents
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -101,7 +101,7 @@ public class XMLResourceTest extends TestCase {
     xml.setContentAsDOM(doc);
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
-    
+
     // compare content type
     assertTrue("Document expected.", xml.getContent() instanceof Document);
   }
@@ -126,14 +126,14 @@ public class XMLResourceTest extends TestCase {
     // store small document
     final XMLResource doc3 = (XMLResource) coll.createResource(AllTests.DOC3,
         XMLResource.RESOURCE_TYPE);
-    
+
     final XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(doc3.setContentAsSAX());
     reader.parse(new InputSource(AllTests.DOC3));
-    
+
     coll.storeResource(doc3);
     assertEquals("Wrong number of documents.", 3, coll.getResourceCount());
-    
+
     final Resource doc1 = coll.getResource(AllTests.DOC1);
     final Resource doc2 = coll.getResource(AllTests.DOC2);
     compare(AllTests.DOC1, doc1);
@@ -143,7 +143,7 @@ public class XMLResourceTest extends TestCase {
     coll.removeResource(doc2);
     assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
   }
-  
+
   /**
    * Compares an XML resource with a file on disk.
    * @param file file name

@@ -7,7 +7,7 @@ import org.xmldb.api.*;
 /**
  * This class serves an example for inserting a XML Document into a Database
  * using the XML:DB API.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
  */
@@ -25,7 +25,7 @@ public final class XMLDBInsert {
   public static void main(final String[] args) throws Exception {
     Collection col = null;
     try {
-      Class c = Class.forName(DRIVER);
+      Class<?> c = Class.forName(DRIVER);
 
       Database database = (Database) c.newInstance();
       // Registers the Database.

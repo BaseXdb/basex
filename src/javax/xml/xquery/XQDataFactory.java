@@ -10,18 +10,18 @@ import org.w3c.dom.Node;
 import java.io.Reader;
 import java.io.InputStream;
 
-/** 
- * This interface represents a factory to obtain sequences,  
- * item objects and types. 
+/**
+ * This interface represents a factory to obtain sequences,
+ * item objects and types.
  * <p>
- * 
+ *
  * The items, sequences and types obtained through this interface are
  * independent of any connection.   <p>
- * The items and sequences created are immutable. The <code>close</code> method can 
+ * The items and sequences created are immutable. The <code>close</code> method can
  * be called to close the item or sequence and release all resources associated
  * with this item or sequence.<p>
  */
-public interface XQDataFactory 
+public interface XQDataFactory
 {
 
  /**
@@ -55,16 +55,16 @@ public interface XQDataFactory
    * Subsequently the value is converted into an instance of the specified
    * type according to the rule defined in <i>14.2 Mapping a Java Data Type to
    * an XQuery Data Type, XQuery API for Java (XQJ) 1.0</i>. If the
-   * conversion fails, an <code>XQException</code> will be thrown. 
+   * conversion fails, an <code>XQException</code> will be thrown.
    *
-   * @param value                the value to be converted, cannot be 
+   * @param value                the value to be converted, cannot be
    *                             <code>null</code>
    * @param type                 the type of the value to be bound to the
-   *                             external variable. The default type, 
+   *                             external variable. The default type,
    *                             <code>xs:string</code>, is used in case
-   *                             <code>null</code> is specified 
+   *                             <code>null</code> is specified
    * @return                     <code>XQItem</code> representing the resulting
-   *                             item 
+   *                             item
    * @exception XQException      if (1) the <code>value</code> argument is
    *                             <code>null</code>, (2) the conversion of the
    *                             value to an XDM instance failed, or (3) the
@@ -81,8 +81,8 @@ public interface XQDataFactory
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -98,7 +98,7 @@ public interface XQDataFactory
    *
    * If the value is not well formed, or if a kind of the input type other
    * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. 
+   * defined and may raise an exception.
    *
    * @param value               the value to be converted, cannot be
    *                            <code>null</code>
@@ -109,13 +109,13 @@ public interface XQDataFactory
    *                            document node. If <code>null</code> is specified,
    *                            it behaves as if
    *                            <code>XQDataFactory.createDocumentElementType(
-   *                            XQDataFactory.createElementType(null, 
+   *                            XQDataFactory.createElementType(null,
    *                            XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                            as the type parameter.  That is, the type represents the
    *                            XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    *
    * @return                    <code>XQItem</code> representing the resulting
-   *                            item 
+   *                            item
    * @exception XQException     if (1) the value argument is <code>null</code>,
    *                            (2) the conversion of the value to an XDM instance
    *                            failed, or (3) the underlying object
@@ -130,8 +130,8 @@ public interface XQDataFactory
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -147,7 +147,7 @@ public interface XQDataFactory
    *
    * If the value is not well formed, or if a kind of the input type other
    * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. 
+   * defined and may raise an exception.
    *
    * @param value               the value to be converted, cannot be
    *                            <code>null</code>
@@ -158,12 +158,12 @@ public interface XQDataFactory
    *                            document node. If <code>null</code> is specified,
    *                            it behaves as if
    *                            <code>XQDataFactory.createDocumentElementType(
-   *                            XQDataFactory.createElementType(null, 
+   *                            XQDataFactory.createElementType(null,
    *                            XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                            as the type parameter.  That is, the type represents the
    *                            XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @return                    <code>XQItem</code> representing the resulting
-   *                             item 
+   *                             item
    * @exception XQException     if (1) the value argument is <code>null</code>,
    *                            (2) the conversion of the value to an XDM instance
    *                            failed, or (3) the underlying object
@@ -178,8 +178,8 @@ public interface XQDataFactory
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -195,7 +195,7 @@ public interface XQDataFactory
    *
    * If the value is not well formed, or if a kind of the input type other
    * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. 
+   * defined and may raise an exception.
    *
    * @param value               the value to be converted, cannot be
    *                            <code>null</code>
@@ -206,12 +206,12 @@ public interface XQDataFactory
    *                            document node. If <code>null</code> is specified,
    *                            it behaves as if
    *                            <code>XQDataFactory.createDocumentElementType(
-   *                            XQDataFactory.createElementType(null, 
+   *                            XQDataFactory.createElementType(null,
    *                            XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                            as the type parameter.  That is, the type represents the
    *                            XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @return                    <code>XQItem</code> representing the resulting
-   *                             item 
+   *                             item
    * @exception XQException     if (1) the value argument is <code>null</code>,
    *                            (2) the conversion of the value to an XDM instance
    *                            failed, or (3) the underlying object
@@ -241,19 +241,19 @@ public interface XQDataFactory
    *
    * If the value is not well formed, or if a kind of the input type other
    * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. 
+   * defined and may raise an exception.
    *
    * @param value                the value to be converted, cannot be <code>null</code>
    * @param type                 the type of the value for the created
    *                             document node. If <code>null</code> is specified,
    *                             it behaves as if
    *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
+   *                             XQDataFactory.createElementType(null,
    *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                             as the type parameter.  That is, the type represents the
    *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @return                     <code>XQItem</code> representing the resulting
-   *                             item 
+   *                             item
    * @exception XQException      if (1) the value argument is <code>null</code>, (2)
    *                             the conversion of the value to an XDM instance failed,
    *                             or (3) the underlying object implementing the interface
@@ -298,12 +298,12 @@ public interface XQDataFactory
    *                             document node. If <code>null</code> is specified,
    *                             it behaves as if
    *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
+   *                             XQDataFactory.createElementType(null,
    *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                             as the type parameter.  That is, the type represents the
    *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @return                     <code>XQItem</code> representing the resulting
-   *                             item 
+   *                             item
    * @exception XQException      if (1) the value argument is <code>null</code>, (2)
    *                             the conversion of the value to an XDM instance failed,
    *                             or (3) the underlying object implementing the interface
@@ -487,7 +487,7 @@ public interface XQDataFactory
    */
   public XQItem createItemFromShort(short value, XQItemType type) throws XQException;
 
-  /** 
+  /**
     * Creates a copy of the specified <code>XQItem</code>. This method can be used, for
     * example, to copy an <code>XQResultItem</code> object so that the new item is not
     * dependant on the connection.
@@ -537,7 +537,7 @@ public interface XQDataFactory
      * If the iterator does not return any items, then an empty sequence is created.
      *
      * @param i                   input iterator
-     * @return                    <code>XQSequence</code> representing the sequence 
+     * @return                    <code>XQSequence</code> representing the sequence
      *                            containing all items from the input iterator
      * @exception XQException     if (1) the conversion of any of the objects in the
      *                            iterator to item fails, (2)
@@ -556,13 +556,13 @@ public interface XQDataFactory
     *  XQConnection conn = ...;
     *
     *  // to create xs:integer item type
-    *  conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER); 
+    *  conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER);
     * </pre>
     *
     * @param basetype            one of the <code>XQItemType.XQBASETYPE_*</code>
     *                            constants. All basetype constants except the
-    *                            following are valid: 
-    * <pre> 
+    *                            following are valid:
+    * <pre>
     *  XQItemType.XQBASETYPE_UNTYPED
     *  XQItemType.XQBASETYPE_ANYTYPE
     *  XQItemType.XQBASETYPE_IDREFS
@@ -588,15 +588,15 @@ public interface XQDataFactory
     *  XQConnection conn = ...;
     *
     *  // to create po:hatsize atomic item type
-    *  conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER, 
-    *                  new QName("http://www.hatsizes.com", "hatsize","po"), 
+    *  conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER,
+    *                  new QName("http://www.hatsizes.com", "hatsize","po"),
     *                  new URI("http://hatschema.com"));
     * </pre>
     *
     * @param basetype            one of the <code>XQItemType.XQBASETYPE_*</code>
     *                            constants. All basetype constants except the
-    *                            following are valid: 
-    * <pre> 
+    *                            following are valid:
+    * <pre>
     *  XQItemType.XQBASETYPE_UNTYPED
     *  XQItemType.XQBASETYPE_ANYTYPE
     *  XQItemType.XQBASETYPE_IDREFS
@@ -641,22 +641,22 @@ public interface XQDataFactory
     *
     *  - attribute (person) // attribute of name person and any simple type.
     *
-    *    conn.createAttributeType(new QName("person"), XQItemType.XQBASETYPE_ANYSIMPLETYPE); 
+    *    conn.createAttributeType(new QName("person"), XQItemType.XQBASETYPE_ANYSIMPLETYPE);
     *
     *  - attribute(foo:bar) // node name foo:bar, type is any simple type
     *
-    *    conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"), 
+    *    conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"),
     *                             XQItemType.XQBASETYPE_ANYSIMPLETYPE);
     *
     *  - attribute(foo:bar, xs:integer) // node name foo:bar, type is xs:integer
     *
-    *    conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"), 
+    *    conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"),
     *                             XQItemType.XQBASETYPE_INTEGER);
     * </pre>
     *
     * @param nodename           specifies the name of the node.<code>null</code>
     *                           indicates a wildcard for the node name
-    * @param basetype           the base type of the attribute. One of the 
+    * @param basetype           the base type of the attribute. One of the
     *                           <code>XQItemType.XQBASETYPE_*</code>
     *                           other than <code>XQItemType.XQBASETYPE_UNTYPED</code>
     *                           or <code>XQItemType.XQBASETYPE_ANYTYPE</code>
@@ -670,7 +670,7 @@ public interface XQDataFactory
   public XQItemType createAttributeType(QName nodename, int basetype) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>attribute(<i>nodename</i>,<i>basetype</i>,<i>typename</i>,<i>schemaURI</i>)</code> type,
     * with the given node name, base type, schema type name and schema URI. The type name can
     * reference either pre-defined simple types or user-defined simple types.
@@ -681,39 +681,39 @@ public interface XQDataFactory
     *
     *  XQConnection conn = ..; // An XQuery connection
     *
-    *  - attribute (name, employeename) // attribute name of type employeename 
-    * 
+    *  - attribute (name, employeename) // attribute name of type employeename
+    *
     *  conn.createAttributeType(new QName("name"), XQItemType.XQBASETYPE_ANYSIMPLETYPE,
     *                           new QName("employeename"), null);
-    * 
-    *  - attribute (foo:bar, po:city) 
+    *
+    *  - attribute (foo:bar, po:city)
     *  where the prefix foo refers to the namespace http://www.foo.com and the
     *  prefix po refers to the namespace "http://www.address.com"
     *
-    *  conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"),
     *                           XQItemType.XQBASETYPE_ANYSIMPLETYPE,
     *                           new QName("http://address.com", "address","po"), null);
     *
     *  - attribute (zip, zipcode) // attribute zip of type zipchode which derives from
-    *                             // xs:string 
+    *                             // xs:string
     *
     *  conn.createAttributeType(new QName("zip"), XQItemType.XQBASETYPE_STRING,
     *                           new QName("zipcode"), null);
     *
-    *  - attribute(foo:bar, po:hatsize) 
+    *  - attribute(foo:bar, po:hatsize)
     *  where the prefix foo refers to the namespace http://www.foo.com and the
-    *  prefix po refers to the namespace "http://www.hatsizes.com" 
+    *  prefix po refers to the namespace "http://www.hatsizes.com"
     *  with schema URI "http://hatschema.com"
     *
-    *  conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createAttributeType(new QName("http://www.foo.com", "bar","foo"),
     *                  XQItemType.XQBASETYPE_INTEGER,
-    *                  new QName("http://www.hatsizes.com", "hatsize","po"), 
+    *                  new QName("http://www.hatsizes.com", "hatsize","po"),
     *                  new QName("http://hatschema.com"));
     * </pre>
     *
     * @param nodename           specifies the name of the node.<code>null</code>
     *                           indicates a wildcard for the node name
-    * @param basetype           the base type of the attribute. One of the 
+    * @param basetype           the base type of the attribute. One of the
     *                           <code>XQItemTyupe.XQBASETYPE_*</code> constants
     *                           other than <code>XQItemType.XQBASETYPE_UNTYPED</code> or
     *                           <code>XQItemType.XQBASETYPE_ANYTYPE</code>
@@ -730,7 +730,7 @@ public interface XQDataFactory
     *                           <code>XQItemType.XQBASETYPE_UNTYPED</code> or
     *                           <code>XQItemType.XQBASETYPE_ANYTYPE</code>,
     *                           (3) the schema URI is specified and the typename
-    *                           is not specified, (4) the implementation does 
+    *                           is not specified, (4) the implementation does
     *                           not support user-defined XML schema types, or (5)
     *                           if the <code>typename</code> refers to a predefinied
     *                           type and does not match <code>basetype</code>
@@ -739,9 +739,9 @@ public interface XQDataFactory
                                         QName typename, URI schemaURI) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>schema-attribute(<i>nodename</i>,<i>basetype</i>,<i>schemaURI</i>)</code> type,
-    * with the given node name, base type, and schema URI. 
+    * with the given node name, base type, and schema URI.
     * <br>
     * <br>
     * Example -
@@ -749,16 +749,16 @@ public interface XQDataFactory
     *
     *     XQConnection conn = ..; // An XQuery connection
     *
-    *     - schema-attribute (name) // schema-attribute name, found in the schema 
+    *     - schema-attribute (name) // schema-attribute name, found in the schema
     *                               // available at http://customerschema.com
     *
-    *     conn.createSchemaAttributeType(new QName("name"), 
+    *     conn.createSchemaAttributeType(new QName("name"),
     *                  XQItemType.XQBASETYPE_STRING,
     *                  new URI(http://customerschema.com));
     * </pre>
     *
     * @param nodename           specifies the name of the node
-    * @param basetype           the base type of the attribute. One of the 
+    * @param basetype           the base type of the attribute. One of the
     *                           <code>XQItemTyupe.XQBASETYPE_*</code> constants
     *                           other than <code>XQItemType.XQBASETYPE_UNTYPED</code> or
     *                           <code>XQItemType.XQBASETYPE_ANYTYPE</code>
@@ -771,25 +771,25 @@ public interface XQDataFactory
     *                           <code>XQItemType.XQBASETYPE_UNTYPED</code> or
     *                           <code>XQItemType.XQBASETYPE_ANYTYPE</code>,
     *                           (3) the underlying object implementing the interface
-    *                           is closed, or (4) the implementation does 
+    *                           is closed, or (4) the implementation does
     *                           not support user-defined XML schema types
     */
   public XQItemType createSchemaAttributeType(QName nodename, int basetype,
                                               URI schemaURI) throws XQException;
-   
+
   /**
     * Creates a new <code>XQItemType</code> object representing the XQuery
-    * <code>comment()</code> type. The <code>XQItemType</code> object will have 
+    * <code>comment()</code> type. The <code>XQItemType</code> object will have
     * the item kind set to <code>XQItemType.XQITEMKIND_COMMENT</code>.
     * <br>
     * <br>
     * Example -
     * <pre>
     *  XQConnection conn = ..; // An XQuery connection
-    *  XQItemType cmttype = conn.createCommentType(); 
+    *  XQItemType cmttype = conn.createCommentType();
     *
     *  int itemkind = cmttype.getItemKind(); // will be XQItemType.XQITEMKIND_COMMENT
-    * 
+    *
     *  XQExpression expr = conn.createExpression();
     *  XQSequence result = expr.executeQuery("&lt;!-- comments --&gt;");
     *
@@ -804,7 +804,7 @@ public interface XQDataFactory
   public XQItemType createCommentType() throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>document-node(<i>elementType</i>)</code> type containing a single element.
     * The <code>XQItemType</code> object will have the item kind set to
     * <code>XQItemType.XQITEMKIND_DOCUMENT_ELEMENT</code> and the
@@ -819,14 +819,14 @@ public interface XQDataFactory
     *                           closed or (2) the <code>elementType</code> has an item kind
     *                           different from <code>XQItemType.XQITEMKIND_ELEMENT</code>,
     *                           (3) the <code>elementType</code> argument is <code>null</code>,
-    *                           or (4) the implementation does not support user-defined XML 
+    *                           or (4) the implementation does not support user-defined XML
     *                           schema types
     */
   public XQItemType createDocumentElementType(XQItemType elementType) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
-    * <code>document-node(<i>elementType</i>)</code> type containing a single 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
+    * <code>document-node(<i>elementType</i>)</code> type containing a single
     * <code>schema-element(...)</code>. The <code>XQItemType</code> object will
     * have the item kind set to <code>XQItemType.XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code> and the
     * base type set to the item type of the input <code>elementType</code>.
@@ -841,23 +841,23 @@ public interface XQDataFactory
     *                           different from <code>XQItemType.XQITEMKIND_SCHEMA_ELEMENT</code>,
     *                           (3) the <code>elementType</code> argument is <code>null</code>,
     *                           (4) the implementation does not support user-defined XML
-    *                           schema types 
+    *                           schema types
     */
    public XQItemType createDocumentSchemaElementType(XQItemType elementType) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>document-node()</code> type. The <code>XQItemType</code> object will have the item kind
     * set to <code>XQItemType.XQITEMKIND_DOCUMENT</code>.
     *
-    * @return                   a new <code>XQItemType</code> representing the XQuery 
+    * @return                   a new <code>XQItemType</code> representing the XQuery
     *                           <code>document-node()</code> type
     * @exception XQException    if the underlying object implementing the interface is closed
     */
   public XQItemType createDocumentType() throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>element(<i>nodename</i>, <i>basetype</i>)</code> type, with the
     * given node name and base type. This method can be used to create item
     * type for elements with a pre-defined schema type.
@@ -876,24 +876,24 @@ public interface XQDataFactory
     *
     *  - element(person) // element of name person and any type.
     *
-    *  conn.createElementType(new QName("person"), XQItemType.XQBASETYPE_ANYTYPE); 
+    *  conn.createElementType(new QName("person"), XQItemType.XQBASETYPE_ANYTYPE);
     *
     *  - element(foo:bar) // node name foo:bar, type is anytype
     *
-    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"),
     *                         XQItemType.XQBASETYPE_ANYTYPE);
     *
     *  - element(foo:bar, xs:integer) // node name foo:bar, type is xs:integer
     *
-    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"),
     *                         XQItemType.XQBASETYPE_INTEGER);
     * </pre>
-    * 
+    *
     * @param nodename           specifies the name of the node. <code>null</code>
     *                           indicates a wildcard for the node name
     * @param basetype           the base type of the item. One of the
     *                           <code>XQItemType.XQBASETYPE_*</code> constants
-    * @return                   a new <code>XQItemType</code> representing the XQuery 
+    * @return                   a new <code>XQItemType</code> representing the XQuery
     *                           <code>element(<i>nodename</i>, <i>basetype</i>)</code> type
     * @exception XQException    if (1) the underlying object implementing the interface
     *                           is closed
@@ -901,7 +901,7 @@ public interface XQDataFactory
   public XQItemType createElementType(QName nodename, int basetype) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>element(<i>nodename</i>,<i>basetype</i>,<i>typename</i>,<i>schemaURI</i>,
     * <i>allowNill</i>)</code> type, given the node name, base type, schema type
     * name, schema URI, and nilled check. The type name can reference either pre-defined
@@ -913,26 +913,26 @@ public interface XQDataFactory
     *  XQConnection conn = ..; // An XQuery connection
     *
     *  - element (person, employee) // element person of type employee
-    * 
+    *
     *  conn.createElementType(new QName("person"), XQItemType.XQBASETYPE_ANYTYPE,
     *                         new QName("employee"), null ,false);
-    * 
-    *  - element(person, employee ? ) // element person of type employee, whose nilled 
-    *                                 // property may be true or false. 
-    * 
+    *
+    *  - element(person, employee ? ) // element person of type employee, whose nilled
+    *                                 // property may be true or false.
+    *
     *  conn.createElementType(new QName("person"), XQItemType.XQBASETYPE_ANYTYPE,
     *                         new QName("employee"), null ,true);
-    * 
-    *  - element(foo:bar, po:address) 
+    *
+    *  - element(foo:bar, po:address)
     *  where the prefix foo refers to the namespace http://www.foo.com and the
     *  prefix po refers to the namespace "http://www.address.com"
     *
-    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"),
     *               XQItemType.XQBASETYPE_ANYTYPE,
     *               new QName("http://address.com", "address","po"), null, false);
     *
     *  - element (zip, zipcode) // element zip of type zipchode which derives from
-    *                           // xs:string 
+    *                           // xs:string
     *
     *  conn.createElementType(new QName("zip"), XQItemType.XQBASETYPE_STRING,
     *                         new QName("zipcode"), null, false);
@@ -941,21 +941,21 @@ public interface XQDataFactory
     *
     *  conn.createElementType(null, XQItemType.XQBASETYPE_ANYTYPE, null, null, true);
     *
-    *  - element(foo:bar, po:hatsize) 
+    *  - element(foo:bar, po:hatsize)
     *  where the prefix foo refers to the namespace http://www.foo.com and the
-    *  prefix po refers to the namespace "http://www.hatsizes.com" 
+    *  prefix po refers to the namespace "http://www.hatsizes.com"
     *  with schema URI "http://hatschema.com"
     *
-    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"), 
+    *  conn.createElementType(new QName("http://www.foo.com", "bar","foo"),
     *                      XQItemType.XQBASETYPE_INTEGER,
-    *                      new QName("http://www.hatsizes.com", "hatsize","po"), 
+    *                      new QName("http://www.hatsizes.com", "hatsize","po"),
     *                      new QName("http://hatschema.com"), false);
     *
-    * </pre> 
+    * </pre>
     *
     * @param nodename           specifies the name of the element. <code>null</code>
     *                           indicates a wildcard for the node name
-    * @param basetype           the base type of the item. One of the 
+    * @param basetype           the base type of the item. One of the
     *                           <code>XQItemType.XQBASETYPE_*</code> constants
     * @param typename           the <code>QName</code> of the type. If the <code>QName</code>
     *                           refers to a predefinied type, it must match
@@ -969,7 +969,7 @@ public interface XQDataFactory
     *                           <i>allowNill</i>)</code> type
     * @exception XQException    if (1) schemaURI is specified but the typename is not
     *                           specified, (2) the underlying object implementing the
-    *                           interface is closed, (3) the implementation does 
+    *                           interface is closed, (3) the implementation does
     *                           not support user-defined XML schema types, or
     *                           (4) if the <code>typename</code> refers to a predefinied
     *                           type and does not match <code>basetype</code>
@@ -978,9 +978,9 @@ public interface XQDataFactory
                                       URI schemaURI, boolean allowNill) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
-    * <code>schema-element(<i>nodename</i>,<i>basetype</i>,<i>schemaURI</i>)</code> 
-    * type, given the node name, base type, and the schema URI. 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
+    * <code>schema-element(<i>nodename</i>,<i>basetype</i>,<i>schemaURI</i>)</code>
+    * type, given the node name, base type, and the schema URI.
     * <br>
     * <br>
     * Example -
@@ -994,17 +994,17 @@ public interface XQDataFactory
     *                         new URI("http://customerschema.com"));
     *
     *  </pre>
-    * 
+    *
     * @param nodename          specifies the name of the element
-    * @param basetype          the base type of the item. One of the 
+    * @param basetype          the base type of the item. One of the
     *                          <code>XQItemType.XQBASETYPE_*</code> constants
     * @param schemaURI         the URI to the schema. Can be <code>null</code>
     * @return                  a new <code>XQItemType</code> representing the XQuery
     *                          <code>schema-element(<i>nodename</i>,<i>basetype</i>,
     *                          <i>schemaURI</i>)</code> type
-    * @exception XQException   if (1) the node name is <code>null</code>, 
+    * @exception XQException   if (1) the node name is <code>null</code>,
     *                          (2) the underlying object implementing the
-    *                          interface is closed, or (3) the implementation does 
+    *                          interface is closed, or (3) the implementation does
     *                          not support user-defined XML schema types
     */
   public XQItemType createSchemaElementType(QName nodename, int basetype,
@@ -1020,7 +1020,7 @@ public interface XQDataFactory
     * <pre>
     *  XQConnection conn = ..; // An XQuery connection
     *  XQItemType typ = conn.createItemType(); // represents the XQuery item type "item()"
-    * </pre> 
+    * </pre>
     *
     * @return                   a new <code>XQItemType</code> representing the XQuery
     *                           item type
@@ -1042,7 +1042,7 @@ public interface XQDataFactory
   public XQItemType createNodeType() throws XQException;
 
   /**
-   * Creates a new <code>XQItemType</code> object representing the XQuery 
+   * Creates a new <code>XQItemType</code> object representing the XQuery
    * <code>processing-instruction(<i>piTarget</i>)</code> type. The <code>XQItemType</code> object
    * will have the item kind set to <code>XQItemType.XQITEMKIND_PI</code>. A
    * string literal can be passed to match the PITarget of the processing instruction
@@ -1053,28 +1053,28 @@ public interface XQDataFactory
    *  Example -
    *  <pre>
    *   XQConnection conn = ..; // An XQuery connection
-   *   XQItemType anypi = conn.createProcessingInstructionType(); 
+   *   XQItemType anypi = conn.createProcessingInstructionType();
    *   XQItemType foopi = conn.createProcessingInstructionType("foo-format");
    *
    *   XQExpression expr = conn.createExpression();
    *   XQSequence result = expr.executeQuery("&lt;?format role="output" ?&gt;");
-   * 
+   *
    *   result.next();
    *   boolean pi = result.instanceOf(anypi);  // will be true
    *   pi = result.instanceOf(foopi);  // will be false
-   * 
+   *
    *   XQExpression expr = conn.createExpression();
    *   XQSequence result = expr.executeQuery("&lt;?foo-format role="output" ?&gt;");
-   *   
+   *
    *   result.next();
    *   boolean pi = result.instanceOf(anypi);  // will be true
-   *   pi = result.instanceOf(foopi);  // will be true 
-   * </pre> 
+   *   pi = result.instanceOf(foopi);  // will be true
+   * </pre>
    *
    * @param piTarget           the string literal to match the processing
    *                           instruction's PITarget. A <code>null</code> string
    *                           value will match all processing instruction nodes
-   * @return                   a new <code>XQItemType</code> representing the XQuery 
+   * @return                   a new <code>XQItemType</code> representing the XQuery
    *                           <code>processing-instruction(<i>piTarget</i>)</code> type
    * @exception XQException    if the underlying object implementing the interface is
    *                           closed
@@ -1113,11 +1113,11 @@ public interface XQDataFactory
   public  XQSequenceType createSequenceType(XQItemType item, int occurence) throws XQException;
 
   /**
-    * Creates a new <code>XQItemType</code> object representing the XQuery 
+    * Creates a new <code>XQItemType</code> object representing the XQuery
     * <code>text()</code> type. The <code>XQItemType</code> object will have the
     * item kind set to <code>XQItemType.XQITEMKIND_TEXT</code>.
     *
-    * @return                   a new <code>XQItemType</code> representing the XQuery 
+    * @return                   a new <code>XQItemType</code> representing the XQuery
     *                           <code>text()</code> type
     * @exception XQException    if the underlying object implementing the interface is
     *                           closed

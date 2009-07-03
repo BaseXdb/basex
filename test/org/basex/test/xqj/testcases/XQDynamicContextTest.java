@@ -36,7 +36,7 @@ public class XQDynamicContextTest extends XQJTestCase {
 
   public void testGetImplicitTimeZone() throws XQException {
     XQExpression xqe;
-    
+
     xqe = xqc.createExpression();
     xqe.close();
     try {
@@ -53,12 +53,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQDC-2.1: getImplicitTimeZone() failed with message: " + e.getMessage());
     }
-    xqe.close(); 
+    xqe.close();
   }
 
   public void testBindAtomicValue() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -74,7 +74,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -83,7 +83,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.3: An invalid type of the value to be bound must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -93,7 +93,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -102,7 +102,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -112,7 +112,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -124,12 +124,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "Hello world!", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
   }
 
   public void testBindString() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -145,7 +145,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -155,7 +155,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -171,7 +171,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -180,7 +180,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -190,7 +190,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -215,12 +215,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_NCNAME, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "Hello", xqs.getObject());
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindDocument_String() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -236,7 +236,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -246,7 +246,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -256,7 +256,7 @@ public class XQDynamicContextTest extends XQJTestCase {
         fail("A-XQDC-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
     }
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqpe.bindDocument(new QName("v"), "<e>", null, null);
@@ -264,7 +264,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -273,7 +273,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -283,7 +283,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -294,12 +294,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindDocument_Reader() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -315,7 +315,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -325,7 +325,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -335,7 +335,7 @@ public class XQDynamicContextTest extends XQJTestCase {
         fail("A-XQDC-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
     }
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqpe.bindDocument(new QName("v"), new StringReader("<e>"), null, null);
@@ -343,7 +343,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -352,7 +352,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -362,7 +362,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -373,16 +373,16 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindDocument_InputStream() throws XQException, UnsupportedEncodingException {
-    
+
     // We don't expect this method ever to throw UnsupportedEncodingException, as we only request the "UTF-8" encoding.
     // However, in order to make the compiler happy, and to play it safe, add UnsupportedEncodingException to the throws clause.
-    
+
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -398,7 +398,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -408,7 +408,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -418,7 +418,7 @@ public class XQDynamicContextTest extends XQJTestCase {
         fail("A-XQDC-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
     }
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqpe.bindDocument(new QName("v"), new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?><e>".getBytes("UTF-8")), null, null);
@@ -426,7 +426,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -435,7 +435,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -445,7 +445,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -456,15 +456,15 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindDocument_XMLStreamReader() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     // expression used to create the input XMLStreamReader objects
     XQExpression xqe = xqc.createExpression();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -480,7 +480,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -490,7 +490,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -507,7 +507,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -517,7 +517,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -528,14 +528,14 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-    xqpe.close(); 
-    
+    xqpe.close();
+
     xqe.close();
   }
-  
+
   public void testBindDocument_Source() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -551,7 +551,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -561,7 +561,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -571,7 +571,7 @@ public class XQDynamicContextTest extends XQJTestCase {
         fail("A-XQDC-1.3: The conversion is subject to the following constraints. Either it fails with an XQException, either it is successful in which case it must result in an instance of XDT.");
     }
     xqpe.close();
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
       xqpe.bindDocument(new QName("v"), new StreamSource(new StringReader("<e>")), null);
@@ -579,7 +579,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -588,7 +588,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -598,7 +598,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -610,13 +610,13 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-    xqpe.close(); 
+    xqpe.close();
 
   }
-  
+
   public void testSetImplicitTimeZone() throws XQException {
     XQExpression xqe;
-    
+
     xqe = xqc.createExpression();
     xqe.close();
     try {
@@ -634,7 +634,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     xqe = xqc.createExpression();
     try {
       xqe.setImplicitTimeZone(new SimpleTimeZone(-28800000,"America/Los_Angeles"));
@@ -642,15 +642,15 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-2.1: setImplicitTimeZone() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQDC-2.1: setImplicitTimeZone() sets the timezone for this dynamic context.", -28800000, xqe.getImplicitTimeZone().getRawOffset());
-    xqe.close(); 
+    xqe.close();
   }
-  
+
   public void testBindItem() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     // Create an XQItem, which we will use subsequently to test bindItem()
     XQItem xqi = xqc.createItemFromString("Hello world!", null);
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -666,7 +666,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -675,7 +675,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -685,7 +685,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -698,7 +698,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "Hello world!", xqs.getAtomicValue());
     xqpe.close();
-    
+
     xqi.close();
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
     try {
@@ -706,18 +706,18 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.8: Passing a closed XQItem or XQSequence object as argument must result in an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
   }
-  
+
   public void testBindSequence() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     // Create an XQSequence, which we will use subsequently to test bindSequence()
     XQExpression xqe = xqc.createExpression();
     XQSequence xqs = xqc.createSequence(xqe.executeQuery("'Hello world!'"));
     xqe.close();
-    
+
     xqs.beforeFirst();
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
@@ -735,7 +735,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqs.beforeFirst();
@@ -745,7 +745,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqs.beforeFirst();
@@ -756,7 +756,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqs.beforeFirst();
@@ -770,7 +770,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs2.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "Hello world!", xqs2.getAtomicValue());
     xqpe.close();
-    
+
     xqs.close();
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
     try {
@@ -778,13 +778,13 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.8: Passing a closed XQItem or XQSequence object as argument must result in an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
   }
 
   public void testBindObject() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -800,7 +800,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -810,7 +810,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -826,7 +826,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -835,7 +835,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -845,7 +845,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -870,14 +870,14 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_NCNAME, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "Hello", xqs.getObject());
-    xqpe.close(); 
+    xqpe.close();
   }
 
   public void testBindObject_AllTypes() throws Exception {
     XQExpression xqe;
     XQSequence xqs;
 
-    
+
     String msg = "A-XQDC-4.1: bindObject implements casting rules of '14.2 Mapping a Java Data Type to an XQuery Data Type'";
 
     boolean jdk14;
@@ -890,7 +890,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
 
     xqe = xqc.createExpression();
-    
+
     xqe.bindObject(new QName("v"), Boolean.valueOf(true), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:boolean");
     xqs.next();
@@ -900,52 +900,52 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:byte");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new Float(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:float");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new Double(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:double");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new Integer(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:int");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new Long(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:long");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new Short((short)1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:short");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), "Hello world!", null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:string");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-   
+
     xqe.bindObject(new QName("v"), new BigDecimal("1"), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:decimal");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), new BigInteger("1"), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:integer");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     if (!jdk14) {
       XQExpression xqe_temp;
       XQSequence xqs_temp;
-      
-      xqe_temp = xqc.createExpression();      
+
+      xqe_temp = xqc.createExpression();
       xqs_temp = xqe_temp.executeQuery("xs:dayTimeDuration('PT5H'), " +
                                        "xs:yearMonthDuration('P1M'), " +
                                        "xs:date('2000-12-31')," +
@@ -962,70 +962,70 @@ public class XQDynamicContextTest extends XQJTestCase {
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:dayTimeDuration");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:yearMonthDuration");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:date");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:dateTime");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:gDay");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:gMonth");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:gMonthDay");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:gYear");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:gYearMonth");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:time");
       xqs.next();
       assertTrue(msg, xqs.getBoolean());
-      
+
       xqe_temp.close();
     }
-    
+
     xqe.bindObject(new QName("v"), new QName("abc"), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:QName");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();          
+
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document document = builder.newDocument();
     Element element = document.createElement("e");
@@ -1035,48 +1035,48 @@ public class XQDynamicContextTest extends XQJTestCase {
     Comment comment = document.createComment("comment");
     ProcessingInstruction pi = document.createProcessingInstruction("target", "data");
     Text text = document.createTextNode("text");
-    
+
     xqe.bindObject(new QName("v"), document, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), documentFragment, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), element, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of element()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), attribute, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of attribute()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), comment, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of comment()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), pi, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of processing-instruction()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), text, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of text()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.close();
   }
-  
+
   public void testBindBoolean() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1092,7 +1092,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1102,7 +1102,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1117,7 +1117,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -1127,7 +1127,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1140,12 +1140,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "true", xqs.getAtomicValue());
     xqpe.close();
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindByte() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1161,7 +1161,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1171,7 +1171,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1188,7 +1188,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1198,7 +1198,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1223,12 +1223,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
   }
 
   public void testBindDouble() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1244,7 +1244,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1254,7 +1254,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1271,7 +1271,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1281,7 +1281,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1295,12 +1295,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_DOUBLE, xqs.getItemType().getBaseType());
     assertTrue("A-XQDC-1.7: Successful bindXXX.", 1d == xqs.getDouble());
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindFloat() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1316,7 +1316,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1326,7 +1326,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1343,7 +1343,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1353,7 +1353,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1367,12 +1367,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_FLOAT, xqs.getItemType().getBaseType());
     assertTrue("A-XQDC-1.7: Successful bindXXX.", 1f == xqs.getFloat());
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindInt() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1388,7 +1388,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1398,7 +1398,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1414,7 +1414,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1423,7 +1423,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1433,7 +1433,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1445,7 +1445,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
@@ -1458,12 +1458,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
   }
-  
+
   public void testBindLong() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1479,7 +1479,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1489,7 +1489,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1505,7 +1505,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1514,7 +1514,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1524,7 +1524,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1549,7 +1549,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
   }
 
   public void testBindNode() throws XQException, IOException, SAXException, ParserConfigurationException {
@@ -1558,7 +1558,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder parser = factory.newDocumentBuilder();
     Document document = parser.parse(new InputSource(new StringReader("<e>Hello world!</e>")));
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1574,7 +1574,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1584,7 +1584,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1599,7 +1599,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:decimal external; $v");
@@ -1609,7 +1609,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1622,10 +1622,10 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
     xqpe.close();
   }
-  
+
   public void testBindShort() throws XQException {
     XQPreparedExpression xqpe;
-    
+
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     xqpe.close();
     try {
@@ -1641,7 +1641,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.2: null argument is invalid and throws an XQException.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     boolean bindFailed = false;
@@ -1651,7 +1651,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch (XQException e) {
       bindFailed = true;
       // Expect an XQException
-    }    
+    }
     if (!bindFailed) {
       XQSequence xqs = xqpe.executeQuery();
       xqs.next();
@@ -1667,7 +1667,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.4: The conversion of the value to an XDM instance must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1676,7 +1676,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.5: The bound variable must be declared external in the prepared expression.");
     } catch (XQException e) {
       // Expect an XQException
-    }  
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v as xs:string external; $v");
@@ -1686,7 +1686,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.6: The dynamic type of the bound value is not compatible with the static type of the variable and must fail.");
     } catch (XQException e) {
       // Expect an XQException
-    }    
+    }
     xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
@@ -1698,7 +1698,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
 
     xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
@@ -1711,6 +1711,6 @@ public class XQDynamicContextTest extends XQJTestCase {
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", "1", xqs.getAtomicValue());
-    xqpe.close(); 
+    xqpe.close();
   }
 }

@@ -1,58 +1,59 @@
 /*
- * Copyright © 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
+ * Copyright ï¿½ 2003, 2004, 2005, 2006, 2007, 2008 Oracle.  All rights reserved.
  */
 package javax.xml.xquery;
 
 import javax.xml.namespace.QName;
 
-/** 
- * <code>XQConstants</code> class provides constants that can be 
+/**
+ * <code>XQConstants</code> class provides constants that can be
  * used in the XQJ API.
  */
 public final class XQConstants
 {
+  /** Private constructor, preventing instantiation. */
   private XQConstants() {}
 
  // XQResultHoldability - one of the following constants:
- /** The constant indicating that the result sequences must be 
-   * closed when the commit on the connection is called. 
+ /** The constant indicating that the result sequences must be
+   * closed when the commit on the connection is called.
    */
  public static final int HOLDTYPE_CLOSE_CURSORS_AT_COMMIT = 2;
 
- /** The constant indicating that the result sequences must be 
-   * preserved when the commit on the connection is called. 
+ /** The constant indicating that the result sequences must be
+   * preserved when the commit on the connection is called.
    */
  public static final int HOLDTYPE_HOLD_CURSORS_OVER_COMMIT = 1;
 
  // Sequence scrollability one of the following constants:
  /** The constant indicating that the result sequence can only be scrolled
-   * forward. 
-   */ 
+   * forward.
+   */
  public static final int SCROLLTYPE_FORWARD_ONLY = 1;
 
  /** The constant indicating that the result sequence can be scrolled
-   * forward or backward and is insensitive to any updates done on the 
-   * underlying objects 
+   * forward or backward and is insensitive to any updates done on the
+   * underlying objects
    */
  public static final int SCROLLTYPE_SCROLLABLE = 2;
-  
- /** The constant indicating that the expression language used in 
-   * <code>XQConnection.prepareExpression</code> and 
-   * <code>XQExpression.execute</code> is XQuery (any version). 
-   */ 
+
+ /** The constant indicating that the expression language used in
+   * <code>XQConnection.prepareExpression</code> and
+   * <code>XQExpression.execute</code> is XQuery (any version).
+   */
  public static final int LANGTYPE_XQUERY  = 1;
 
- /** The constant indicating that the expression language used in 
-   * <code>XQConnection.prepareExpression</code> and 
+ /** The constant indicating that the expression language used in
+   * <code>XQConnection.prepareExpression</code> and
    * <code>XQExpression.execute</code> is XQueryX.
-   */ 
+   */
  public static final int LANGTYPE_XQUERYX = 2;
 
- /** The constant indicating the the boundary-space policy for expression 
+ /** The constant indicating the the boundary-space policy for expression
    * evaluation is to preserve white spaces */
  public static final int BOUNDARY_SPACE_PRESERVE = 1;
 
- /** The constant indicating the the boundary-space policy for expression 
+ /** The constant indicating the the boundary-space policy for expression
    * evaluation is to strip white spaces */
  public static final int BOUNDARY_SPACE_STRIP = 2;
 
@@ -126,7 +127,7 @@ public final class XQConstants
  /**
   *  Defines the <code>QName</code> for the context item. This is
   *  used to bind values to the context item via the bind methods
-  *  of <code>XQDynamicContext</code>. 
+  *  of <code>XQDynamicContext</code>.
   */
   public static final QName CONTEXT_ITEM = new QName("http://xqj.jcp.org", "context-item", "xqj");
 

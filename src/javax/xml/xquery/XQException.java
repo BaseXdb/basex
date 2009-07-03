@@ -5,7 +5,7 @@
 package javax.xml.xquery;
 import java.lang.Exception;
 
-/** 
+/**
  * An exception that provides information on XQJ, XQuery or other errors
  * reported by an XQJ implementation.
  * <br>
@@ -52,12 +52,13 @@ import java.lang.Exception;
  */
 public  class XQException extends Exception
 {
+  /** Vendor code. */
   private String vendorCode;
 
   /** Query exception. */
   XQException nextException;
 
-  /** 
+  /**
    * Constructs an <code>XQException</code> object with a given message.
    * An optional chain of additional <code>XQException</code> objects may be set
    * subsequently using <code>setNextException</code>.
@@ -70,7 +71,7 @@ public  class XQException extends Exception
      super(message);
   }
 
-  /** 
+  /**
    * Constructs an <code>XQException</code> object with a given message
    * and vendor code. An optional chain of additional
    * <code>XQException</code> objects may be set subsequently using
@@ -89,7 +90,7 @@ public  class XQException extends Exception
   }
 
   /**
-   * Gets the vendor code associated with this exception or <code>null</code> 
+   * Gets the vendor code associated with this exception or <code>null</code>
    * if none. A vendor code is a vendor-specific string identifying the failure in
    * a computer-comparable manner. For example, "NOCONNECT" if unable to
    * connect or "DIVBYZERO" if division by zero occurred within the XQuery.

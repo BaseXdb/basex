@@ -11,7 +11,7 @@ import javax.xml.xquery.*;
 public class XQJTestCase extends TestCase {
   protected XQDataSource xqds;
   protected XQConnection xqc;
-  
+
   protected void setUp() throws Exception {
     System.setProperty("com.oracle.xqj.tck.datasource", "bxq.properties");
     //System.setProperty("com.oracle.xqj.tck.datasource", "saxonxq.properties");
@@ -33,7 +33,7 @@ public class XQJTestCase extends TestCase {
     // remove the XQDataSourceClassName property
     // as the XQJ implementation doesn't know about it and raise an error
     p.remove("XQDataSourceClassName");
-    if (!p.isEmpty()) 
+    if (!p.isEmpty())
       // set the remaining properties
       xqds.setProperties(p);
 
@@ -41,6 +41,6 @@ public class XQJTestCase extends TestCase {
   }
 
   protected void tearDown() throws Exception {
-   xqc.close(); 
+   xqc.close();
   }
 }

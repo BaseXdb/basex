@@ -5,12 +5,12 @@
 package javax.xml.xquery;
 
 /**
- * <code>XQMetaData</code> interface provides information about the data source, 
+ * <code>XQMetaData</code> interface provides information about the data source,
  * in various aspects, such as the product name and version identification,
- * supported features, specific behaviors, user information, product limits 
+ * supported features, specific behaviors, user information, product limits
  * and so forth.
  * <br>
- * <br> 
+ * <br>
  * An object implementing this interface is obtained from the connection object
  * by calling the <code>getMetaData()</code> method, for example:
  * <br>
@@ -19,9 +19,9 @@ package javax.xml.xquery;
  *  String productVersion = metaData.getProductVersion();
     ...
  * </pre>
- * Since the metadata object depends on the connection, all its methods would 
+ * Since the metadata object depends on the connection, all its methods would
  * raise an exception if the connection it is created from is no longer valid.
- * 
+ *
  * @see XQConnection
  */
 public interface XQMetaData
@@ -54,18 +54,18 @@ public interface XQMetaData
 
    /**
     * Gets the full version of this product.
-    * The format and value of the string returned by this method is 
+    * The format and value of the string returned by this method is
     * implementation-defined.
     *
     * @return                    a string indicating the product version
     * @exception XQException     if the connection is no longer valid
     */
-   public String getProductVersion() throws XQException; 
+   public String getProductVersion() throws XQException;
 
    // (2) XQJ Specification identification
    /**
-    * Gets the major version number of XQJ specification supported by 
-    * this implementation. 
+    * Gets the major version number of XQJ specification supported by
+    * this implementation.
     *
     * @return                    an integer indicating the XQJ major version
     * @exception XQException     if the connection is no longer valid
@@ -73,8 +73,8 @@ public interface XQMetaData
    public int getXQJMajorVersion() throws XQException;
 
    /**
-    * Gets the minor version number of XQJ specification supported by 
-    * this implementation. 
+    * Gets the minor version number of XQJ specification supported by
+    * this implementation.
     *
     * @return                    an integer indicating the XQJ minor version
     * @exception XQException     if the connection is no longer valid
@@ -183,16 +183,16 @@ public interface XQMetaData
    public String getUserName() throws XQException;
 
    // (10) Product limits
-   // Define few, minimal number of methods;add more when requirements 
+   // Define few, minimal number of methods;add more when requirements
    // becomes clear
 
    /**
-    * Gets the maximum number of characters allowed in an expression in this 
+    * Gets the maximum number of characters allowed in an expression in this
     * data source.
     *
     * @return                    the maximum length of expression as an integer.
     *                            A zero value means that there is no limit or the
-    *                            limit is unknown 
+    *                            limit is unknown
     * @exception XQException     if the connection is no longer valid
     */
    public int getMaxExpressionLength() throws XQException;
@@ -202,26 +202,26 @@ public interface XQMetaData
     *
     * @return                    the maximum length of user name as an integer.
     *                            A zero value means that there is no limit or the
-    *                            limit is unknown 
+    *                            limit is unknown
     * @exception XQException     if the connection is no longer valid
     */
    public int getMaxUserNameLength() throws XQException;
-   
+
    /**
     * Query if this connection was created from a JDBC connection.
     *
     * @return                    <code>true</code>, if this connection was created
-    *                            from a JDBC connection, <code>false</code> otherwise. 
+    *                            from a JDBC connection, <code>false</code> otherwise.
     * @exception XQException     if the connection is no longer valid
     */
    public boolean wasCreatedFromJDBCConnection() throws XQException;
 
    /**
     * Query if the XQuery encoding declaration is supported by the XQJ implementation.
-    * 
+    *
     * @return                    <code>true</code> if the XQuery encoding declaration
     *                            is supported; <code>false</code> otherwise
-    * 
+    *
     * @exception XQException     if the connection is no longer valid
     */
    public boolean isXQueryEncodingDeclSupported() throws XQException;
@@ -242,7 +242,7 @@ public interface XQMetaData
     * encoding methods: 'UTF-8' and 'UTF-16', they are supported by the implementation.
     * However, this does not mean 'Shift-Js' is not supported. It might be supported.
     *
-    * @return                    a <code>java.util.Set</code> of 
+    * @return                    a <code>java.util.Set</code> of
     *                            <code>java.lang.String</code>, each of which
     *                            is an XQuery query text encoding method
     *
@@ -260,14 +260,14 @@ public interface XQMetaData
     *                            method is supported, <code>false</code> otherwise
     *
     * @exception XQException     if (1) the connection is no longer valid,
-    *                            or (2) the specified <code>encoding</code> 
+    *                            or (2) the specified <code>encoding</code>
     *                            parameter is <code>null</code>
     */
    public boolean isXQueryEncodingSupported(String encoding) throws XQException;
 
   /**
     * Check if the user defined XML schema type is supported in this connection.
-    * If this method returns <code>true</code>, then 
+    * If this method returns <code>true</code>, then
     * <code>XQItemAccessor.instanceOf(XQItemType)</code> must
     * be able to determine if the type of an <code>XQItemAccessor</code> is an
     * instance of the <code>XQItemType</code> even if either of them is a user

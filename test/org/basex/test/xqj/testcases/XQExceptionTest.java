@@ -32,7 +32,7 @@ public class XQExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQEX-2.1: Retrieve vendor code from an XQException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQException ex = new XQException("Hello world!");
       assertEquals("A-XQEX-2.2: Vendor code is null when not available", null, ex.getVendorCode());
@@ -48,7 +48,7 @@ public class XQExceptionTest extends XQJTestCase {
     } catch (Exception e) {
       fail("A-XQEX-3.1: getNextException failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQException ex1 = new XQException("Hello world!", "VendorCode");
       XQException ex2 = new XQException("Hello world!", "VendorCode");
@@ -56,7 +56,7 @@ public class XQExceptionTest extends XQJTestCase {
       assertEquals("A-XQEX-3.2: getNextException returns next exception", ex2, ex1.getNextException());
     } catch (Exception e) {
       fail("A-XQEX-3.2: getNextException failed with message: " + e.getMessage());
-    }   
+    }
   }
 
   public void testSetNextException() {
@@ -67,7 +67,7 @@ public class XQExceptionTest extends XQJTestCase {
       assertEquals("A-XQEX-4.1: setNextException sets the next exception in the chain", ex2, ex1.getNextException());
     } catch (Exception e) {
       fail("A-XQEX-4.1 : setNextException failed with message: " + e.getMessage());
-    }   
+    }
   }
-  
+
 }

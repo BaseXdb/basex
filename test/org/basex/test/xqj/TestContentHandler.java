@@ -9,7 +9,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class TestContentHandler extends DefaultHandler {
 
   public StringBuffer buffer = new StringBuffer();
-  
+
   public void characters(char[] ch, int start, int length) throws SAXException {
     for (int i = 0; i<length; i++)
       buffer.append(ch[start+i]);

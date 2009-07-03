@@ -16,7 +16,7 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API XPathQueryService implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -100,16 +100,16 @@ public class XPathQueryServiceTest extends TestCase {
       serv.query("1+");
       fail("Buggy query was accepted.");
     } catch(final XMLDBException ex) { }
-    
+
     assertEquals("Wrong result size.", 1, serv.query("/").getSize());
-    
+
     // add second document
     final Resource res = coll.createResource(AllTests.DOC2,
         XMLResource.RESOURCE_TYPE);
     res.setContent(AllTests.read(AllTests.DOC2));
     coll.storeResource(res);
     assertEquals("Wrong result size", 6, serv.query("//node()").getSize());
-    
+
     // remove second document
     coll.removeResource(res);
   }

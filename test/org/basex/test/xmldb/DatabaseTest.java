@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API Database implementation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -31,7 +31,7 @@ public class DatabaseTest extends TestCase {
   @Test
   public void testAcceptsURI() throws Exception {
     database.acceptsURI(AllTests.PATH);
-    
+
     try {
       database.acceptsURI("bla");
       fail("URI was invalid.");
@@ -86,11 +86,11 @@ public class DatabaseTest extends TestCase {
     } catch(final XMLDBException e) {
       checkCode(ErrorCodes.VENDOR_ERROR, e);
     }
-    
+
     // the following tests are database specific...
     database.setProperty("info", "on");
     database.setProperty("info", "off");
-    
+
     try {
       database.setProperty("runs", "ABC");
       fail("Invalid value was assigned.");
@@ -98,7 +98,7 @@ public class DatabaseTest extends TestCase {
       checkCode(ErrorCodes.VENDOR_ERROR, e);
     }
   }
-  
+
   /**
    * Compares the expected error code with the specified exception.
    * @param exp expected error code

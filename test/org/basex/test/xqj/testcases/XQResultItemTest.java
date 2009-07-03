@@ -5,19 +5,19 @@ import javax.xml.xquery.*;
 
 @SuppressWarnings("all")
 public class XQResultItemTest extends XQJTestCase {
-  
+
   public void testGetConnection() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XQItem xqi;
     XQResultItem xqri;
     XQConnection returned_xqc = null;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
     xqi = xqs.getItem();
-    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqi instanceof XQResultItem);   
+    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqi instanceof XQResultItem);
     xqri = (XQResultItem)xqi;
     xqri.close();
     try {
@@ -32,7 +32,7 @@ public class XQResultItemTest extends XQJTestCase {
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.next();
     xqi = xqs.getItem();
-    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqi instanceof XQResultItem);   
+    assertTrue("A-XQS-12.5: Item must be XQResultItem", xqi instanceof XQResultItem);
     xqri = (XQResultItem)xqi;
     try {
       returned_xqc = xqri.getConnection();
@@ -40,6 +40,6 @@ public class XQResultItemTest extends XQJTestCase {
       fail("A-XQRI-1.2: getConnection() failed with message: " + e.getMessage());
     }
     assertSame("A-XQRI-1.2: Successfully get the connection of a result item.", xqc, returned_xqc);
-    xqe.close(); 
+    xqe.close();
   }
 }

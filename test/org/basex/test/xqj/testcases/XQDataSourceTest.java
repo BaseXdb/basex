@@ -14,7 +14,7 @@ public class XQDataSourceTest extends XQJTestCase {
 
   public void testGetConnection() throws XQException {
     XQConnection my_xqc;
-    
+
     try {
       my_xqc = xqds.getConnection();
       my_xqc.close();
@@ -22,35 +22,35 @@ public class XQDataSourceTest extends XQJTestCase {
       fail("A-XQDS-1.1: Creating an XQConnection failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetConnection_jdbc() throws XQException {
     // optional feature, not tested.
   }
-  
+
   public void testGetConnection_uid_pwd() throws XQException {
     XQConnection my_xqc;
-    
+
     // only test the getConnection() flavour with uid/pwd if the
     // implementation supports these properties
     boolean testIt = true;
-    
+
     String uid = null;
     String pwd = null;
-    
+
     try {
       uid = xqds.getProperty("user");
       pwd = xqds.getProperty("password");
     } catch (XQException e) {
       testIt = false;
     }
-    
+
     if (testIt) {
       try {
         my_xqc = xqds.getConnection(uid, pwd);
         my_xqc.close();
       } catch (XQException e) {
         fail("A-XQDS-3.1: Creating an XQConnection specifying a uid/pwd failed with message: " + e.getMessage());
-      }     
+      }
     }
   }
 
@@ -104,7 +104,7 @@ public class XQDataSourceTest extends XQJTestCase {
   }
 
   public void testGetProperty() throws XQException {
- 
+
     try {
       xqds.getProperty(null);
       fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
@@ -124,9 +124,9 @@ public class XQDataSourceTest extends XQJTestCase {
     } catch (Exception other_e) {
       fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
     }
-    
+
     String propertyNames[] = xqds.getSupportedPropertyNames();
-    
+
     for(int i = 0; i < propertyNames.length; i++) {
       try {
         xqds.getProperty(propertyNames[i]);

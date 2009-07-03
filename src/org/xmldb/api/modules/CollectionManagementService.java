@@ -63,8 +63,8 @@ import org.xmldb.api.base.*;
  */
 public interface CollectionManagementService extends Service {
    /**
-    * Creates a new <code>Collection</code> in the database. The default 
-    * configuration of the database is determined by the implementer. The 
+    * Creates a new <code>Collection</code> in the database. The default
+    * configuration of the database is determined by the implementer. The
     * new <code>Collection</code> will be created relative to the <code>
     * Collection</code> from which the <code>CollectionManagementService</code>
     * was retrieved.
@@ -78,7 +78,7 @@ public interface CollectionManagementService extends Service {
    Collection createCollection(String name) throws XMLDBException;
 
    /**
-    * Removes a named <code>Collection</code> from the system. The 
+    * Removes a named <code>Collection</code> from the system. The
     * name for the <code>Collection</code> to remove is relative to the <code>
     * Collection</code> from which the <code>CollectionManagementService</code>
     * was retrieved.

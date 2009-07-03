@@ -13,7 +13,7 @@ import org.xmldb.api.base.XMLDBException;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class BXResourceIterator implements ResourceIterator, BXXMLDBText, 
+public final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
     Iterable<Resource> {
   /** Resources. */
   private final Iterator<Resource> res;

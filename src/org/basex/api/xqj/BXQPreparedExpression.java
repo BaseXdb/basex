@@ -33,11 +33,11 @@ public final class BXQPreparedExpression extends BXQDynamicContext
   public BXQPreparedExpression(final String input, final BXQStaticContext s,
       final BXQConnection c) throws XQQueryException {
     super(input, s, c);
-    
+
     try {
       query.parse();
     } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage(), new QName(ex.code()), 
+      throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);
     }
   }

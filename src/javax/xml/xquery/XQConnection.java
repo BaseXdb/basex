@@ -6,37 +6,37 @@ package javax.xml.xquery;
 
 import java.io.*;
 
-/** 
+/**
  * A connection (session) with a specific XQuery engine. Connections are
  * obtained through an <code>XQDataSource</code> object.
  * <p>
  * XQuery expressions are executed and results are returned within the
  * context of a connection. They are either executed through <code>XQExpression</code>
  * or <code>XQPreparedExpression</code> objects. <p>
- *  
+ *
  * <pre>
  *  XQDataSource ds;// obtain the XQuery datasource
- *  ... 
+ *  ...
  *  XQConnection conn = ds.getConnection();
  *
  *  XQPreparedExpression expr = conn.prepareExpression("for $i in ...");
  *  XQResultSequence result = expr.executeQuery();
- *  // - or - 
+ *  // - or -
  *  XQExpression expr = conn.createExpression();
  *  XQSequence result = expr.executeQuery("for $i in..");
  *
- *  // The sequence can now be iterated 
+ *  // The sequence can now be iterated
  *  while (result.next())
- *  { 
+ *  {
  *     String str  = result.getItemAsString();
  *     System.out.println(" output "+ str);
  *  }
  *  result.close();
- *  expr.close(); 
+ *  expr.close();
  *  conn.close();  // close the connection and free all resources..
- *   
+ *
  * </pre>
- * 
+ *
  * A connection holds also default values for <code>XQExpression</code> and
  * <code>XQPreparedExpression</code> properties. An application can
  * override these defaults by passing an <code>XQStaticContext</code>
@@ -58,9 +58,9 @@ import java.io.*;
  * it also changes the underlying JDBC connection.
  * <p>
  *
- * An XQJ driver is not required to provide finalizer methods for 
- * the connection and other objects. Hence it is strongly recommended that 
- * users call close method explicitly to free any resources. It is also 
+ * An XQJ driver is not required to provide finalizer methods for
+ * the connection and other objects. Hence it is strongly recommended that
+ * users call close method explicitly to free any resources. It is also
  * recommended that they do so under a final block to ensure that the object
  * is closed even when there are exceptions. Not closing this object explicitly
  * might result in serious memory leaks. <p>
@@ -72,22 +72,22 @@ import java.io.*;
  */
 public interface XQConnection extends XQDataFactory
 {
-  /** 
+  /**
    * Closes the connection. This also closes any <code>XQExpression</code> and
    * <code>XQPreparedExpression</code> obtained from this connection.
-   * Once the connection is closed, no method other than <code>close</code> 
+   * Once the connection is closed, no method other than <code>close</code>
    * or the <code>isClosed</code> method may be called on the connection object.
-   * Calling close on an <code>XQConnection</code> object that is already closed 
+   * Calling close on an <code>XQConnection</code> object that is already closed
    * has no effect.
-   * 
-   * Note that an XQJ driver is not required to provide finalizer methods for  
-   * the connection and other objects. Hence it is strongly recommended that 
-   * users call this method explicitly to free any resources. It is also 
-   * recommended that they do so under a final block to ensure that the object 
-   * is closed even when there are exceptions. 
-   * 
+   *
+   * Note that an XQJ driver is not required to provide finalizer methods for
+   * the connection and other objects. Hence it is strongly recommended that
+   * users call this method explicitly to free any resources. It is also
+   * recommended that they do so under a final block to ensure that the object
+   * is closed even when there are exceptions.
+   *
    * @exception XQException     if there is an error during closing the connection.
-   */  
+   */
   public void close() throws XQException ;
 
   /**
@@ -105,8 +105,8 @@ public interface XQConnection extends XQDataFactory
    * current value, the request is treated as a no-op.
    *
    * @param autoCommit        <code>true</code> to enable auto-commit mode;
-   *                          <code>false</code> to disable it 
-   * @exception XQException   if (1) the connection is in a closed state, 
+   *                          <code>false</code> to disable it
+   * @exception XQException   if (1) the connection is in a closed state,
    *                          or (2) auto-commit is turned off but the
    *                          implementation doesn't support transactions
    */
@@ -114,7 +114,7 @@ public interface XQConnection extends XQDataFactory
 
   /**
    * Gets the auto-commit attribute of this connection
-   * 
+   *
    * @return                  the auto-commit attribute of this connection.
    *                          <code>true</code> if the connection operates
    *                          in auto-commit mode; otherwise <code>false</code>
@@ -122,18 +122,18 @@ public interface XQConnection extends XQDataFactory
    */
   public boolean getAutoCommit() throws XQException;
 
-  /** 
+  /**
    * Makes all changes made in the current transaction permanent and releases
    * any locks held by the datasource. This method should be used only when
    * auto-commit mode is disabled.
-   * 
+   *
    * Any <code>XQResultSequence</code>, or <code>XQResultItem</code> may be
    * implicitly closed upon commit, if the holdability property of the
    * sequence is set to <code>XQConstants.HOLDTYPE_CLOSE_CURSORS_AT_COMMIT</code>.
    *
    * @exception XQException     if the connection is in a closed state
    *                             or this connection is operating in auto-commit mode
-   */  
+   */
   public void commit() throws XQException ;
 
   /**
@@ -141,7 +141,7 @@ public interface XQConnection extends XQDataFactory
    * to perform execute immediate operations with XQuery expressions.
    * The properties of the connection's default <code>XQStaticContext</code> are
    * copied to the returned <code>XQExpression</code>.
-   * 
+   *
    * @return                    <code>XQExpression</code> that can be used to execute
    *                            multiple expressions
    * @exception XQException     if the connection is in a closed state
@@ -172,8 +172,8 @@ public interface XQConnection extends XQDataFactory
    */
   public XQMetaData getMetaData() throws XQException;
 
-  /** 
-   * Checks if the connection is closed. 
+  /**
+   * Checks if the connection is closed.
    *
    * @return                    <code>true</code> if the connection is in a closed state,
    *                            <code>false</code> otherwise
@@ -189,12 +189,12 @@ public interface XQConnection extends XQDataFactory
    * @param xquery              the XQuery expression as a <code>String</code>.
    *                            Cannot be <code>null</code>
    * @return                    the prepared XQuery expression
-   * @exception XQException     if (1) the connection is in a closed state, 
+   * @exception XQException     if (1) the connection is in a closed state,
    *                            (2) there are errors preparing the expression,
    *                            or (3) the xquery parameter is <code>null</code>
    */
-  public XQPreparedExpression prepareExpression(String xquery) 
-          throws XQException; 
+  public XQPreparedExpression prepareExpression(String xquery)
+          throws XQException;
 
   /**
    * Prepares an expression for execution.  <p>
@@ -205,7 +205,7 @@ public interface XQConnection extends XQDataFactory
    * @param xquery              the XQuery expression as a <code>String</code>.
    *                            Cannot be <code>null</code>
    * @param properties          <code>XQStaticContext</code> containing
-   *                            values of expression properties. 
+   *                            values of expression properties.
    * @return                    the prepared XQuery expression
    * @exception XQException     if (1) the connection is in a closed state, or
    *                            (2) the specified argument is <code>null</code>
@@ -218,15 +218,15 @@ public interface XQConnection extends XQDataFactory
    *
    * The properties of the connection's default <code>XQStaticContext</code> are
    * copied to the returned <code>XQPreparedExpression</code>.
-   * 
+   *
    * @param xquery              the XQuery expression as a <code>Reader</code>.
    *                            Cannot be <code>null</code>
    * @return                    the prepared XQuery expression
-   * @exception XQException     if (1) the connection is in a closed state, 
+   * @exception XQException     if (1) the connection is in a closed state,
    *                            (2) there are errors preparing the expression,
    *                            or (3) the xquery parameter is <code>null</code>
    */
-  public XQPreparedExpression prepareExpression(Reader xquery) 
+  public XQPreparedExpression prepareExpression(Reader xquery)
      throws XQException;
 
   /**
@@ -251,15 +251,15 @@ public interface XQConnection extends XQDataFactory
    *
    * The properties of the connection's default <code>XQStaticContext</code> are
    * copied to the returned <code>XQPreparedExpression</code>.
-   * 
+   *
    * @param xquery              the XQuery expression as an <code>InputStream</code>.
    *                            Cannot be <code>null</code>
    * @return                    the prepared XQuery expression
-   * @exception XQException     if (1) the connection is in a closed state, 
+   * @exception XQException     if (1) the connection is in a closed state,
    *                            (2) there are errors preparing the expression
    *                            or (3) the xquery parameter is <code>null</code>
    */
-  public XQPreparedExpression prepareExpression(InputStream xquery) throws XQException; 
+  public XQPreparedExpression prepareExpression(InputStream xquery) throws XQException;
 
   /**
    * Prepares an expression for execution. <p>
@@ -276,9 +276,9 @@ public interface XQConnection extends XQDataFactory
    *                            (2) the specified argument is <code>null</code>
    */
   public XQPreparedExpression prepareExpression(InputStream xquery,
-                   XQStaticContext properties) throws XQException; 
+                   XQStaticContext properties) throws XQException;
 
-  /** 
+  /**
    * Undoes all changes made in the current transaction and releases any
    * locks held by the datasource. This method should be used only when
    * auto-commit mode is disabled.
@@ -286,7 +286,7 @@ public interface XQConnection extends XQDataFactory
    * @exception XQException     if the connection is in a closed state
    *                            or this connection is operating
    *                            in auto-commit mode
-   */  
+   */
   public void rollback() throws XQException ;
 
 
@@ -301,7 +301,7 @@ public interface XQConnection extends XQDataFactory
    * @return                    <code>XQStaticContext</code> representing the
    *                            default values for all expression properties
    *
-   * @exception XQException     if the connection is in a closed state 
+   * @exception XQException     if the connection is in a closed state
    */
   public XQStaticContext getStaticContext() throws XQException;
 
@@ -313,7 +313,7 @@ public interface XQConnection extends XQDataFactory
    * @param properties          <code>XQStaticContext</code> containing
    *                            values of expression properties
    *
-   * @exception XQException     if the connection is in a closed state 
+   * @exception XQException     if the connection is in a closed state
    */
   public void setStaticContext(XQStaticContext properties) throws XQException;
 

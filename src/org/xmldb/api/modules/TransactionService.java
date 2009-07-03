@@ -66,7 +66,7 @@ public interface TransactionService extends Service {
     *
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    void begin() throws XMLDBException;
 

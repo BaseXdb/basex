@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 
 /**
  * This class registers and runs all available XMLDB/API tests.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
@@ -30,7 +30,7 @@ public class AllTests {
   static final String LOGIN = null;
   /** Optional password. */
   static final String PW = null;
-  
+
   /** Test Documents. */
   static final String DOC1 = "first.xml";
   /** Test Documents. */
@@ -55,7 +55,7 @@ public class AllTests {
     tests.addTestSuite(XPathQueryServiceTest.class);
     return tests;
   }
-  
+
   /**
    * Initializes some implementation specific data.
    * @throws Exception exception

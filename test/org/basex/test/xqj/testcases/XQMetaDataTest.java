@@ -28,7 +28,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getProductMajorVersion();
     } catch (XQException e) {
@@ -52,7 +52,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getProductMinorVersion();
     } catch (XQException e) {
@@ -76,7 +76,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getProductName();
     } catch (XQException e) {
@@ -100,7 +100,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getProductVersion();
     } catch (XQException e) {
@@ -124,7 +124,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getXQJMajorVersion();
     } catch (XQException e) {
@@ -148,7 +148,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getXQJMinorVersion();
     } catch (XQException e) {
@@ -172,7 +172,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getXQJMinorVersion();
     } catch (XQException e) {
@@ -196,7 +196,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.isReadOnly();
     } catch (XQException e) {
@@ -204,7 +204,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsXQueryXSupported() throws XQException {   
+  public void testIsXQueryXSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -220,16 +220,16 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsXQueryX = true;
-    
+
     try {
       supportsXQueryX = xqmd.isXQueryXSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsXQueryX) {
       try {
-        String xqueryx = 
+        String xqueryx =
           "<xqx:module xmlns:xqx='http://www.w3.org/2005/XQueryX'>" +
           "  <xqx:mainModule>" +
           "    <xqx:queryBody>" +
@@ -239,7 +239,7 @@ public class XQMetaDataTest extends XQJTestCase {
           "    </xqx:queryBody>" +
           "  </xqx:mainModule>" +
           "</xqx:module>";
-        
+
         XQStaticContext xqsc = xqc.getStaticContext();
         xqsc.setQueryLanguageTypeAndVersion(XQConstants.LANGTYPE_XQUERYX);
         XQExpression xqe = xqc.createExpression(xqsc);
@@ -254,7 +254,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsTransactionSupported() throws XQException {   
+  public void testIsTransactionSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -270,13 +270,13 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsTransaction = true;
-    
+
     try {
       supportsTransaction = xqmd.isTransactionSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsTransaction) {
       try {
         xqc.setAutoCommit(false);
@@ -287,7 +287,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsStaticTypingFeatureSupported() throws XQException {   
+  public void testIsStaticTypingFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -303,13 +303,13 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsStaticTyping = true;
-    
+
     try {
       supportsStaticTyping = xqmd.isStaticTypingFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsStaticTyping) {
       try {
         // According to the XQuery Formal Semantics, the following query must result in a static type  error.
@@ -322,7 +322,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsSchemaImportFeatureSupported() throws XQException {   
+  public void testIsSchemaImportFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -338,19 +338,19 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsSchemaImport = true;
-    
+
     try {
       supportsSchemaImport = xqmd.isSchemaImportFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsSchemaImport) {
       // optional feature, not tested.
     }
   }
 
-  public void testIsSchemaValidationFeatureSupported() throws XQException {   
+  public void testIsSchemaValidationFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -366,19 +366,19 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsSchemaValidation = true;
-    
+
     try {
       supportsSchemaValidation = xqmd.isSchemaValidationFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsSchemaValidation) {
       // optional feature, not tested.
     }
   }
 
-  public void testIsFullAxisFeatureSupported() throws XQException {   
+  public void testIsFullAxisFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -394,16 +394,16 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsFullAxis = true;
-    
+
     try {
       supportsFullAxis = xqmd.isFullAxisFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsFullAxis) {
       try {
-        String xquery = 
+        String xquery =
           "let $e := <root><e1/><e2/></root>" +
           "return" +
           "  count($e/e1/following::element())";
@@ -420,7 +420,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsModuleFeatureSupported() throws XQException {   
+  public void testIsModuleFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -436,19 +436,19 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsModules = true;
-    
+
     try {
       supportsModules = xqmd.isModuleFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsModules) {
       // optional feature, not tested.
     }
   }
 
-  public void testIsSerializationFeatureSupported() throws XQException {   
+  public void testIsSerializationFeatureSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -464,19 +464,19 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsSerialization = true;
-    
+
     try {
       supportsSerialization = xqmd.isSerializationFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsSerialization) {
       // optional feature, not tested.
     }
   }
 
-  public void testIsStaticTypingExtensionsSupported() throws XQException {   
+  public void testIsStaticTypingExtensionsSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -492,13 +492,13 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsStaticTypingExtensions = true;
-    
+
     try {
       supportsStaticTypingExtensions = xqmd.isStaticTypingExtensionsSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsStaticTypingExtensions) {
       // optional feature, not tested.
     }
@@ -520,7 +520,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getUserName();
     } catch (XQException e) {
@@ -544,7 +544,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getMaxExpressionLength();
     } catch (XQException e) {
@@ -568,7 +568,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.getMaxUserNameLength();
     } catch (XQException e) {
@@ -592,7 +592,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       boolean wasFromJDBC = xqmd.wasCreatedFromJDBCConnection();
       assertFalse("A-XQMD-11.1: XQMetaData reports that the connection was not created from a JDBC Connection.", wasFromJDBC);
@@ -601,7 +601,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsXQueryEncodingDeclSupported() throws XQException {   
+  public void testIsXQueryEncodingDeclSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -617,19 +617,19 @@ public class XQMetaDataTest extends XQJTestCase {
 
     XQMetaData xqmd = xqc.getMetaData();
     boolean supportsXQueryEncodingDecls = true;
-    
+
     try {
       supportsXQueryEncodingDecls = xqmd.isXQueryEncodingDeclSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     if (supportsXQueryEncodingDecls) {
       // optional feature, not tested.
     }
   }
 
-  public void testGetSupportedXQueryEncodings() throws XQException {   
+  public void testGetSupportedXQueryEncodings() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -644,7 +644,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.isXQueryEncodingDeclSupported();
     } catch (XQException e) {
@@ -652,7 +652,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsXQueryEncodingSupported() throws XQException {   
+  public void testIsXQueryEncodingSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -667,7 +667,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.isXQueryEncodingSupported("UTF-8");;
     } catch (XQException e) {
@@ -675,7 +675,7 @@ public class XQMetaDataTest extends XQJTestCase {
     }
   }
 
-  public void testIsUserDefinedXMLSchemaTypeSupported() throws XQException {   
+  public void testIsUserDefinedXMLSchemaTypeSupported() throws XQException {
     try {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
@@ -690,13 +690,13 @@ public class XQMetaDataTest extends XQJTestCase {
     }
 
     XQMetaData xqmd = xqc.getMetaData();
-    
+
     try {
       xqmd.isUserDefinedXMLSchemaTypeSupported();;
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
-    
+
     // if user defined XML schema is supported.
     // optional feature, not tested.
   }

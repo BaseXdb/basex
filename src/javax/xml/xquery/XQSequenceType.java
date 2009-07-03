@@ -4,23 +4,23 @@
 
 package javax.xml.xquery;
 
-/** 
+/**
   * The <code>XQSequenceType</code> interface represents a sequence type as
   * <a href="http://www.w3.org/TR/xquery"><i>XQuery 1.0: An XML Query language</i></a>.
-  * 
-  * The <code>XQSequenceType</code> is the base interface for the 
-  * <code>XQItemType</code> interface and contains an occurence indicator. 
+  *
+  * The <code>XQSequenceType</code> is the base interface for the
+  * <code>XQItemType</code> interface and contains an occurence indicator.
   */
-public interface XQSequenceType 
+public interface XQSequenceType
 {
   /** Zero or one occurrences. */
-  public static final int OCC_ZERO_OR_ONE  = 1;  // same as ? 
+  public static final int OCC_ZERO_OR_ONE  = 1;  // same as ?
   /** Exactly one occurrence. */
-  public static final int OCC_EXACTLY_ONE  = 2;  
+  public static final int OCC_EXACTLY_ONE  = 2;
   /** Zero or more occurrences. */
-  public static final int OCC_ZERO_OR_MORE = 3;  // same as * 
+  public static final int OCC_ZERO_OR_MORE = 3;  // same as *
   /** One or more occurrences. */
-  public static final int OCC_ONE_OR_MORE  = 4;  // same as + 
+  public static final int OCC_ONE_OR_MORE  = 4;  // same as +
   /** Empty sequence. */
   public static final int OCC_EMPTY = 5;         // empty sequence
 
@@ -34,7 +34,7 @@ public interface XQSequenceType
   public XQItemType getItemType();
 
   /**
-    * Returns the occurrence indicator for the sequence type. 
+    * Returns the occurrence indicator for the sequence type.
     * One of:
     *
     * <p>
@@ -60,7 +60,7 @@ public interface XQSequenceType
 
   /**
     * Returns a human-readable implementation-defined string representation of
-    * the sequence type. 
+    * the sequence type.
     *
     * @return                    a <code>String</code> representation of the sequence type
     */
@@ -106,7 +106,7 @@ public interface XQSequenceType
     *  int hashCode;
     *  if (getItemOccurrence() == XQSequenceType.OCC_EMPTY)
     *  {
-    *    hashCode = 1; 
+    *    hashCode = 1;
     *  }
     *  else
     *  {

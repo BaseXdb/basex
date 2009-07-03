@@ -7,10 +7,10 @@ import java.io.*;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
-/**  
+/**
  * <code>XQDynamicContext</code> provides access to the dynamic context as defined in
  * <a href="http://www.w3.org/TR/xquery/#eval_context"><i>2.1.2
- * Dynamic Context, XQuery 1.0: An XML Query Language</i></a>. 
+ * Dynamic Context, XQuery 1.0: An XML Query Language</i></a>.
  * The following components can be accessed:
  *
  * <ul>
@@ -41,7 +41,7 @@ import org.w3c.dom.Node;
  *  e1.bindInt(new QName("i"), 200, null);
  *
  *  // this will fail as the expression has no external variable $foo
- *  e1.bindInt(new QName("foo"), 200, null); 
+ *  e1.bindInt(new QName("foo"), 200, null);
  *
  *  // this will fail as xs:double is not compatible with an external
  *  variable declared as xs:int
@@ -52,7 +52,7 @@ import org.w3c.dom.Node;
  *  XQExpression e2 = conn.createExpression();
  *
  *  // bind a value to $i and $foo
- *  e2.bindInt(new QName("i"), 200, null); 
+ *  e2.bindInt(new QName("i"), 200, null);
  *  e2.bindInt(new QName("foo"), 200, null);
  *
  *  // the value bound to $foo is ignored as the expression doesn't
@@ -65,7 +65,7 @@ import org.w3c.dom.Node;
  * <br>
  * Binding a value to the context item is achieved in the same way as binding a
  * value to an external variable. However, instead of specifying the variable's
- * name as first argument of the <code>bindXXX()</code> method, use 
+ * name as first argument of the <code>bindXXX()</code> method, use
  * {@link XQConstants#CONTEXT_ITEM XQConstants.CONTEXT_ITEM} as the first
  * argument.
  * <br>
@@ -111,7 +111,7 @@ import org.w3c.dom.Node;
  *  e.executeQuery();
  *
  *  // successful execution
- *  e.executeQuery(); 
+ *  e.executeQuery();
  * </pre>
  * <br>
  * <br>
@@ -138,13 +138,13 @@ import org.w3c.dom.Node;
  *
  *  // an error is reported during the next query
  *  // evaluation as not all external variables are bound
- *  s = e.executeQuery(); 
+ *  s = e.executeQuery();
  *
  *  while (s.next())
  *    System.out.println(s.getInt());
  * </pre>
  */
-public interface XQDynamicContext 
+public interface XQDynamicContext
 {
   /**
     * Gets the implicit timezone
@@ -165,7 +165,7 @@ public interface XQDynamicContext
    * <a href="http://www.w3.org/TR/xpath-functions/#casting-from-strings">
    * <i>17.1.1 Casting from xs:string and xs:untypedAtomic, XQuery 1.0 and
    * XPath 2.0 Functions and Operators</i></a>.
-   * If the cast fails, or if there is a mismatch between the static and 
+   * If the cast fails, or if there is a mismatch between the static and
    * dynamic types, an <code>XQException</code> is thrown either by this
    * method or during query evaluation.
    *
@@ -177,16 +177,16 @@ public interface XQDynamicContext
    *                         (2) given type is not an atomic type,
    *                         (3) the conversion of the value to an XDM instance failed,
    *                         (4) in case of an <code>XQPreparedExpression</code>,
-   *                         the dynamic type of the bound value is not compatible 
+   *                         the dynamic type of the bound value is not compatible
    *                         with the static type of the variable,
-   *                         (5) in case of an <code>XQPreparedExpression</code>, 
+   *                         (5) in case of an <code>XQPreparedExpression</code>,
    *                         the variable is not defined in the prolog of the expression,
    *                         or (6) the expression is in a closed state
    */
   public void bindAtomicValue(QName varName, String value, XQItemType type)
          throws XQException;
 
-  
+
  /**
    * Binds a value to the given external variable or the context item. The
    * value is converted into an instance of the specified type, which must
@@ -203,35 +203,35 @@ public interface XQDynamicContext
    *
    * @param varName          the name of the external variable to bind to,
    *                         cannot be <code>null</code>
-   * @param value            the value to be converted, cannot be 
+   * @param value            the value to be converted, cannot be
    *                         <code>null</code>
    * @param type             the type of the value to be bound to the
    *                         external variable. The default type,
-   *                         <code>xs:string</code>, is used in case 
+   *                         <code>xs:string</code>, is used in case
    *                         <code>null</code> is specified
    * @throws XQException     if (1) the <code>varName</code> or
    *                         <code>value</code> argument is <code>null</code>,
    *                         (2) the conversion of the value to an XDM
-   *                         instance failed, (3) in case of an 
-   *                         <code>XQPreparedExpression</code>, the dynamic 
-   *                         type of the bound value is not compatible with the 
+   *                         instance failed, (3) in case of an
+   *                         <code>XQPreparedExpression</code>, the dynamic
+   *                         type of the bound value is not compatible with the
    *                         static type of the variable, (4) in case of an
    *                         <code>XQPreparedExpression</code>, the variable
-   *                         is not defined in the prolog of the expression, 
+   *                         is not defined in the prolog of the expression,
    *                         or (5) if the expression is in a closed state
    */
   public void bindString(QName varName, String value, XQItemType type)
          throws XQException;
 
  /**
-   * Binds a value to the given external variable or the context item. 
+   * Binds a value to the given external variable or the context item.
    *
    * <br>
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -249,11 +249,11 @@ public interface XQDynamicContext
    * and dynamic types, an <code>XQException</code> is raised either by this
    * method, or during query evaluation. If the value is not well formed,
    * or if a kind of the input type other than the values list above is
-   * specified, behavior is implementation defined and may raise an exception. 
+   * specified, behavior is implementation defined and may raise an exception.
    *
    * @param varName              the name of the external variable to bind to,
    *                             cannot be <code>null</code>
-   * @param value                the value to be converted, cannot be 
+   * @param value                the value to be converted, cannot be
    *                             <code>null</code>
    * @param baseURI              an optional base URI, can be <code>null</code>. It can
    *                             be used, for example, to resolve relative URIs and to
@@ -262,16 +262,16 @@ public interface XQDynamicContext
    *                             document node. If <code>null</code> is specified,
    *                             it behaves as if
    *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
+   *                             XQDataFactory.createElementType(null,
    *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                             as the type parameter.  That is, the type represents the
    *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    *
    * @exception XQException      if (1) the <code>varName</code> or <code>value</code>
    *                             argument is <code>null</code>, (2) the
-   *                             conversion of the value to an XDM instance failed, 
+   *                             conversion of the value to an XDM instance failed,
    *                             (3) in case of an <code>XQPreparedExpression</code>,
-   *                             the dynamic type of the bound value is not compatible 
+   *                             the dynamic type of the bound value is not compatible
    *                             with the static type of the variable, (4) in case of an
    *                             <code>XQPreparedExpression</code>, the variable is not
    *                             defined in the prolog of the expression,
@@ -281,14 +281,14 @@ public interface XQDynamicContext
 
 
  /**
-   * Binds a value to the given external variable or the context item. 
+   * Binds a value to the given external variable or the context item.
    *
    * <br>
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -306,11 +306,11 @@ public interface XQDynamicContext
    * and dynamic types, an <code>XQException</code> is raised either by this
    * method, or during query evaluation. If the value is not well formed,
    * or if a kind of the input type other than the values list above is
-   * specified, behavior is implementation defined and may raise an exception. 
+   * specified, behavior is implementation defined and may raise an exception.
    *
    * @param varName              the name of the external variable to bind to,
    *                             cannot be <code>null</code>
-   * @param value                the value to be converted, cannot be 
+   * @param value                the value to be converted, cannot be
    *                             <code>null</code>
    * @param baseURI              an optional base URI, can be <code>null</code>. It can
    *                             be used, for example, to resolve relative URIs and to
@@ -319,15 +319,15 @@ public interface XQDynamicContext
    *                             document node. If <code>null</code> is specified,
    *                             it behaves as if
    *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
+   *                             XQDataFactory.createElementType(null,
    *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                             as the type parameter.  That is, the type represents the
    *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @exception XQException      if (1) the <code>varName</code> or <code>value</code>
    *                             argument is <code>null</code>, (2) the
-   *                             conversion of the value to an XDM instance failed, 
+   *                             conversion of the value to an XDM instance failed,
    *                             (3) in case of an <code>XQPreparedExpression</code>,
-   *                             the dynamic type of the bound value is not compatible 
+   *                             the dynamic type of the bound value is not compatible
    *                             with the static type of the variable, (4) in case of an
    *                             <code>XQPreparedExpression</code>, the variable is not
    *                             defined in the prolog of the expression,
@@ -336,14 +336,14 @@ public interface XQDynamicContext
   public void bindDocument(QName varName, Reader value, String baseURI, XQItemType type) throws XQException;
 
  /**
-   * Binds a value to the given external variable or the context item. 
+   * Binds a value to the given external variable or the context item.
    *
    * <br>
    * <br>
    *
    * If the value represents a well-formed XML document, it will be parsed
-   * and results in a document node. 
-   * The kind of the input type must be <code>null</code>, 
+   * and results in a document node.
+   * The kind of the input type must be <code>null</code>,
    * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, or
    * <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>.
    *
@@ -361,11 +361,11 @@ public interface XQDynamicContext
    * and dynamic types, an <code>XQException</code> is raised either by this
    * method, or during query evaluation. If the value is not well formed,
    * or if a kind of the input type other than the values list above is
-   * specified, behavior is implementation defined and may raise an exception. 
+   * specified, behavior is implementation defined and may raise an exception.
    *
    * @param varName              the name of the external variable to bind to,
    *                             cannot be <code>null</code>
-   * @param value                the value to be converted, cannot be 
+   * @param value                the value to be converted, cannot be
    *                             <code>null</code>
    * @param baseURI              an optional base URI, can be <code>null</code>. It can
    *                             be used, for example, to resolve relative URIs and to
@@ -374,15 +374,15 @@ public interface XQDynamicContext
    *                             document node. If <code>null</code> is specified,
    *                             it behaves as if
    *                             <code>XQDataFactory.createDocumentElementType(
-   *                             XQDataFactory.createElementType(null, 
+   *                             XQDataFactory.createElementType(null,
    *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                             as the type parameter.  That is, the type represents the
    *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    * @exception XQException      if (1) the <code>varName</code> or <code>value</code>
    *                             argument is <code>null</code>, (2) the
-   *                             conversion of the value to an XDM instance failed, 
+   *                             conversion of the value to an XDM instance failed,
    *                             (3) in case of an <code>XQPreparedExpression</code>,
-   *                             the dynamic type of the bound value is not compatible 
+   *                             the dynamic type of the bound value is not compatible
    *                             with the static type of the variable, (4) in case of an
    *                             <code>XQPreparedExpression</code>, the variable is not
    *                             defined in the prolog of the expression,
@@ -424,15 +424,15 @@ public interface XQDynamicContext
   *                             document node. If <code>null</code> is specified,
   *                             it behaves as if
   *                             <code>XQDataFactory.createDocumentElementType(
-  *                             XQDataFactory.createElementType(null, 
+  *                             XQDataFactory.createElementType(null,
   *                             XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
   *                             as the type parameter.  That is, the type represents the
   *                             XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
   * @exception XQException      if (1) the <code>varName</code> or <code>value</code>
   *                             argument is <code>null</code>, (2) the
-  *                             conversion of the value to an XDM instance failed, 
+  *                             conversion of the value to an XDM instance failed,
   *                             (3) in case of an <code>XQPreparedExpression</code>,
-  *                             the dynamic type of the bound value is not compatible 
+  *                             the dynamic type of the bound value is not compatible
   *                             with the static type of the variable, (4) in case of an
   *                             <code>XQPreparedExpression</code>, the variable is not
   *                             defined in the prolog of the expression,
@@ -471,8 +471,8 @@ public interface XQDynamicContext
    *
    * If the value is not well formed, or if a kind of the input type other
    * than the values list above is specified, behavior is implementation
-   * defined and may raise an exception. If the conversion fails, or if there 
-   * is a mismatch between the static and dynamic types, an <code>XQException</code> 
+   * defined and may raise an exception. If the conversion fails, or if there
+   * is a mismatch between the static and dynamic types, an <code>XQException</code>
    * is raised either by this method, or during query evaluation.
    *
    *  @param varName              the name of the external variable to bind to, cannot
@@ -482,15 +482,15 @@ public interface XQDynamicContext
    *                              document node. If <code>null</code> is specified,
    *                              it behaves as if
    *                              <code>XQDataFactory.createDocumentElementType(
-   *                              XQDataFactory.createElementType(null, 
+   *                              XQDataFactory.createElementType(null,
    *                              XQItemType.XQBASETYPE_XS_UNTYPED))</code> were passed in
    *                              as the type parameter.  That is, the type represents the
    *                              XQuery sequence type <code>document-node(element(*, xs:untyped))</code>
    *  @exception XQException      if (1) the <code>varName</code> or <code>value</code>
    *                              argument is <code>null</code>, (2) the
-   *                              conversion of the value to an XDM instance failed, 
+   *                              conversion of the value to an XDM instance failed,
    *                              (3) in case of an <code>XQPreparedExpression</code>,
-   *                              the dynamic type of the bound value is not compatible 
+   *                              the dynamic type of the bound value is not compatible
    *                              with the static type of the variable, (4) in case of an
    *                              <code>XQPreparedExpression</code>, the variable is not
    *                              defined in the prolog of the expression,
@@ -514,8 +514,8 @@ public interface XQDynamicContext
    * value is derived from the <code>XQItem</code>. In case of a mismatch
    * between the static and dynamic types, an <code>XQException</code> is
    * raised either by this method, or during query evaluation.
-   * 
-   * @param varName             the name of the external variable to bind to, 
+   *
+   * @param varName             the name of the external variable to bind to,
    *                            cannot be <code>null</code>
    *
    * @param value               the value to be bound, cannot be <code>null</code>
@@ -538,12 +538,12 @@ public interface XQDynamicContext
    * derived from the items in the sequence. In case of a mismatch between the static
    * and dynamic types, an <code>XQException</code> is be raised either by this method, or
    * during query evaluation.
-   * 
+   *
    * @param varName             the name of the external variable to bind to, cannot be
    *                            <code>null</code>
    * @param value               the value to be bound, cannot be <code>null</code>
    *
-   * @exception XQException     if (1) any of the arguments are <code>null</code>, 
+   * @exception XQException     if (1) any of the arguments are <code>null</code>,
    *                            (2) in case of an <code>XQPreparedExpression</code>,
    *                            the dynamic type of the bound value is not compatible
    *                            with the static type of the variable,
@@ -556,7 +556,7 @@ public interface XQDynamicContext
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
@@ -572,7 +572,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> or <code>value</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -584,7 +584,7 @@ public interface XQDynamicContext
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
@@ -600,7 +600,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -608,15 +608,15 @@ public interface XQDynamicContext
    *                            the variable is not defined in the prolog of the expression,
    *                            or (5) if the expression is in a closed state
    */
-  public void bindBoolean(QName varName, boolean value, XQItemType type) throws XQException; 
+  public void bindBoolean(QName varName, boolean value, XQItemType type) throws XQException;
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
-   * <code>XQException</code> is raised either by this method, or 
+   * <code>XQException</code> is raised either by this method, or
    * during query evaluation.
    *
    *
@@ -628,7 +628,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -640,7 +640,7 @@ public interface XQDynamicContext
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
@@ -656,7 +656,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -664,11 +664,11 @@ public interface XQDynamicContext
    *                            the variable is not defined in the prolog of the expression,
    *                            or (5) if the expression is in a closed state
    */
-  public void bindDouble(QName varName, double value, XQItemType type) throws XQException; 
+  public void bindDouble(QName varName, double value, XQItemType type) throws XQException;
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
@@ -684,7 +684,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -692,15 +692,15 @@ public interface XQDynamicContext
    *                            the variable is not defined in the prolog of the expression,
    *                            or (5) if the expression is in a closed state
    */
-  public void bindFloat(QName varName, float value, XQItemType type) throws XQException; 
+  public void bindFloat(QName varName, float value, XQItemType type) throws XQException;
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
-   * <code>XQException</code> is raised either by this method, or 
+   * <code>XQException</code> is raised either by this method, or
    * during query evaluations.
    *
    *
@@ -712,7 +712,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -720,15 +720,15 @@ public interface XQDynamicContext
    *                            the variable is not defined in the prolog of the expression,
    *                            or (5) if the expression is in a closed state
    */
-  public void bindInt(QName varName, int value, XQItemType type) throws XQException; 
+  public void bindInt(QName varName, int value, XQItemType type) throws XQException;
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
-   * <code>XQException</code> is raised either by this method, or 
+   * <code>XQException</code> is raised either by this method, or
    * during query evaluation.
    *
    *
@@ -740,7 +740,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -752,7 +752,7 @@ public interface XQDynamicContext
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
@@ -768,7 +768,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> or <code>value</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,
@@ -780,11 +780,11 @@ public interface XQDynamicContext
 
   /**
    * Binds a value to the given external variable or the context item. The value is
-   * converted into an instance of the specified type according to the rule defined in 
+   * converted into an instance of the specified type according to the rule defined in
    * <i>14.2 Mapping a Java Data Type to an XQuery Data Type, XQuery API for
    * Java (XQJ) 1.0</i>. If the conversion fails, or if
    * there is a mismatch between the static and dynamic types, an
-   * <code>XQException</code> is raised either by this method, or 
+   * <code>XQException</code> is raised either by this method, or
    * during query evaluation.
    *
    *
@@ -796,7 +796,7 @@ public interface XQDynamicContext
    *                            is specified
    *
    * @exception XQException     if (1) the <code>varName</code> argument
-   *                            is <code>null</code>, (2) the conversion of the value to an 
+   *                            is <code>null</code>, (2) the conversion of the value to an
    *                            XDM instance failed, (3) in case of an
    *                            <code>XQPreparedExpression</code>, the dynamic type of the bound
    *                            value is not compatible with the static type of the variable,

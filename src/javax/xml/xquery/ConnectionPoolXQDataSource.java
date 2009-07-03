@@ -23,7 +23,7 @@ public interface ConnectionPoolXQDataSource {
    * @exception XQException if a datasource access error occurs
    */
   PooledXQConnection getPooledConnection() throws XQException;
-      
+
   /**
    * Attempts to establish a physical connection to an XML datasource
    * using the supplied username and password, that can be used as a
@@ -37,14 +37,14 @@ public interface ConnectionPoolXQDataSource {
    * @exception XQException if a datasource access error occurs
    */
   PooledXQConnection getPooledConnection(String user, String password) throws XQException;
-  
-  /** 
+
+  /**
    * Gets the maximum time in seconds that this datasource can wait while
-   * attempting to connect to a database. 
-   * A value of zero means that the timeout is the default system timeout 
-   * if there is one; otherwise, it means that there is no timeout. 
-   * When a datasource object is created, the login timeout is 
-   * initially zero. 
+   * attempting to connect to a database.
+   * A value of zero means that the timeout is the default system timeout
+   * if there is one; otherwise, it means that there is no timeout.
+   * When a datasource object is created, the login timeout is
+   * initially zero.
    * It is implementation-defined whether the returned login timeout is
    * actually used by the data source implementation.
    *
@@ -53,7 +53,7 @@ public interface ConnectionPoolXQDataSource {
    */
   public int getLoginTimeout() throws XQException;
 
- /** 
+ /**
   * Retrieves the log writer for this datasource object.
   * The log writer is a character output stream to which all logging and
   * tracing messages for this datasource will be printed. This includes
@@ -71,7 +71,7 @@ public interface ConnectionPoolXQDataSource {
 
  /**
   * Returns an array containing the property names supported by this
-  * datasource. 
+  * datasource.
   *
   * @return      <code>String[]</code> an array of property names
   *              supported by this implementation
@@ -79,7 +79,7 @@ public interface ConnectionPoolXQDataSource {
 public String[] getSupportedPropertyNames();
 
 /**
-  * Sets the named property to the specified value.  
+  * Sets the named property to the specified value.
   * If a property with the same name was already set, then this method
   * will override the old value for that property with the new value.<p>
   * If the implementation does not support the given property or if it
@@ -98,7 +98,7 @@ public String[] getSupportedPropertyNames();
  /**
   * Returns the current value of the named property if set, else
   * <code>null</code>. If the implementation does not support the
-  * given property then an exception is raised. 
+  * given property then an exception is raised.
   *
   * @param name                the name of the property whose value is
   *                            needed
@@ -111,8 +111,8 @@ public String[] getSupportedPropertyNames();
 
 /**
   * Sets the data source properties from the specified <code>Properties</code>
-  * instance.  Properties set before this call will still apply but 
-  * those with the same name as any of these properties will be replaced. 
+  * instance.  Properties set before this call will still apply but
+  * those with the same name as any of these properties will be replaced.
   * Properties set after this call also apply and may
   * replace properties set during this call.<p>
   * If the implementation does not support one or more of the given
@@ -127,7 +127,7 @@ public String[] getSupportedPropertyNames();
   */
   public void setProperties(Properties props) throws XQException;
 
-  /** 
+  /**
    * Sets the maximum time in seconds that this datasource will wait while
    * attempting to connect to a database. A value of zero specifies that
    * the timeout is the default system timeout if there is one; otherwise,
@@ -141,7 +141,7 @@ public String[] getSupportedPropertyNames();
    */
   public void setLoginTimeout(int seconds) throws XQException;
 
- /** 
+ /**
   * Sets the log writer for this datasource object to the given
   * <code>java.io.PrintWriter</code> object. The log writer is a character output
   * stream to which all logging and tracing messages for this datasource

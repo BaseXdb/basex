@@ -5,21 +5,21 @@
 package javax.xml.xquery;
 import java.sql.Connection;
 import java.util.Properties;
- 
-/** 
+
+/**
  * An <code>XQDataSource</code> is a factory for <code>XQConnection</code>
  * objects. The datasource may be obtained from a JNDI source or through other means.
  * <br/>
- * The XQuery connection (<code>XQConnection</code>) objects may be created using 
+ * The XQuery connection (<code>XQConnection</code>) objects may be created using
  * an existing JDBC connection. This is an optional feature that may not be
- * supported by all implementations. If the implementation supports this 
- * mechanism, then the XQuery connection may inherit some of the JDBC 
- * connection's properties, such as login timeout, log writer etc. 
- * <br/>  
+ * supported by all implementations. If the implementation supports this
+ * mechanism, then the XQuery connection may inherit some of the JDBC
+ * connection's properties, such as login timeout, log writer etc.
+ * <br/>
  */
 public interface XQDataSource
 {
-  /** 
+  /**
     * Attempts to create a connection to an XML datasource.
     *
     * @return                    a connection to the XML datasource
@@ -28,12 +28,12 @@ public interface XQDataSource
    public XQConnection getConnection() throws XQException;
 
    /**
-     * Attempts to create a connection to an XML datasource using an 
+     * Attempts to create a connection to an XML datasource using an
      * existing JDBC connection.
-     * An XQJ implementation is not required to support this method. 
+     * An XQJ implementation is not required to support this method.
      * If it is not supported, then an exception (<code>XQException</code>)
      * is thrown. The XQJ and JDBC connections will operate under the same
-     * transaction context. 
+     * transaction context.
      *
      * @param con                 an existing JDBC connection
      * @return                    a connection to the XML datasource
@@ -45,8 +45,8 @@ public interface XQDataSource
      */
    public XQConnection getConnection(Connection con) throws XQException;
 
-  /** 
-    * Attempts to establish a connection to an XML datasource using the 
+  /**
+    * Attempts to establish a connection to an XML datasource using the
     * supplied username and password.
     *
     * @param username            the user on whose behalf the connection
@@ -55,16 +55,16 @@ public interface XQDataSource
     * @return                    a connection to the XML datasource
     * @exception XQException     if a datasource access error occurs
     */
-   public XQConnection getConnection(String username, String passwd) 
+   public XQConnection getConnection(String username, String passwd)
             throws XQException;
 
-   /** 
+   /**
     * Gets the maximum time in seconds that this datasource can wait while
-    * attempting to connect to a database. 
-    * A value of zero means that the timeout is the default system timeout 
-    * if there is one; otherwise, it means that there is no timeout. 
-    * When a XQDataSource object is created, the login timeout is 
-    * initially zero. 
+    * attempting to connect to a database.
+    * A value of zero means that the timeout is the default system timeout
+    * if there is one; otherwise, it means that there is no timeout.
+    * When a XQDataSource object is created, the login timeout is
+    * initially zero.
     * It is implementation-defined whether the returned login timeout is
     * actually used by the data source implementation.
     *
@@ -73,7 +73,7 @@ public interface XQDataSource
     */
    public int getLoginTimeout() throws XQException;
 
-  /** 
+  /**
    * Retrieves the log writer for this <code>XQDataSource</code> object.
    * The log writer is a character output stream to which all logging and
    * tracing messages for this datasource will be printed. This includes
@@ -91,9 +91,9 @@ public interface XQDataSource
 
   /**
    * Returns an array containing the property names supported by this
-   * <code>XQDataSource</code>. 
+   * <code>XQDataSource</code>.
    * Implementations that support user name and password must recognize
-   * the user name and password properties listed below. 
+   * the user name and password properties listed below.
    * <br>
    * <br>
    * <table>
@@ -111,7 +111,7 @@ public interface XQDataSource
  public String[] getSupportedPropertyNames();
 
  /**
-   * Sets the named property to the specified value.  
+   * Sets the named property to the specified value.
    * If a property with the same name was already set, then this method
    * will override the old value for that property with the new value.<p>
    * If the implementation does not support the given property or if it
@@ -131,7 +131,7 @@ public interface XQDataSource
   /**
    * Returns the current value of the named property if set, else
    * <code>null</code>. If the implementation does not support the
-   * given property then an exception is raised. 
+   * given property then an exception is raised.
    *
    * @param name                the name of the property whose value is
    *                            needed
@@ -145,8 +145,8 @@ public interface XQDataSource
 
  /**
    * Sets the data source properties from the specified <code>Properties</code>
-   * instance.  Properties set before this call will still apply but 
-   * those with the same name as any of these properties will be replaced. 
+   * instance.  Properties set before this call will still apply but
+   * those with the same name as any of these properties will be replaced.
    * Properties set after this call also apply and may
    * replace properties set during this call.<p>
    * If the implementation does not support one or more of the given
@@ -162,7 +162,7 @@ public interface XQDataSource
    */
    public void setProperties(Properties props) throws XQException;
 
-   /** 
+   /**
     * Sets the maximum time in seconds that this datasource will wait while
     * attempting to connect to a database. A value of zero specifies that
     * the timeout is the default system timeout if there is one; otherwise,
@@ -178,7 +178,7 @@ public interface XQDataSource
     */
    public void setLoginTimeout(int seconds) throws XQException;
 
-  /** 
+  /**
    * Sets the log writer for this <code>XQDataSource</code> object to the given
    * <code>java.io.PrintWriter</code> object. The log writer is a character output
    * stream to which all logging and tracing messages for this datasource

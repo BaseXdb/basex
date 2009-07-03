@@ -66,7 +66,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     query = new QueryProcessor(in);
     sc = s;
   }
-  
+
   public void bindAtomicValue(final QName qn, final String v,
       final XQItemType t) throws XQException {
     bind(qn, Str.get(valid(v, String.class)), t);
@@ -145,13 +145,13 @@ abstract class BXQDynamicContext extends BXQAbstract
 
   public void bindSequence(final QName qn, final XQSequence s)
       throws XQException {
-    
+
     valid(s, XQSequence.class);
     try {
       bind(qn, (((BXQSequence) s).result).finish(), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
-    }      
+    }
   }
 
   public void bindShort(final QName qn, final short v, final XQItemType t)
@@ -194,7 +194,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     } else {
       query.ctx.vars.addGlobal(v);
     }
-    
+
     try {
       final Type tt = check(it.type, t);
       v.bind(tt == it.type ? it : tt.e(it, null), null);
@@ -212,7 +212,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     opened();
     final QueryContext ctx = query.ctx;
     ctx.ns = sc.ctx.ns;
-    
+
     try {
       if(sc.timeout != 0) {
         new Thread() {
@@ -229,7 +229,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       if(sc.scrollable) iter = SeqIter.get(iter);
       return new BXQSequence(iter, ctx, this, (BXQConnection) par);
     } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage(), new QName(ex.code()), 
+      throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);
     } catch(final ProgressException ex) {
       throw new BXQException(TIMEOUT);

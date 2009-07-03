@@ -9,14 +9,14 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 @SuppressWarnings("all")
 public class TestXMLFilter extends XMLFilterImpl {
-  
+
   InputSource inputSource;
-  
+
   public TestXMLFilter(String document) throws SAXException {
     super(org.xml.sax.helpers.XMLReaderFactory.createXMLReader());
     inputSource = new InputSource(new StringReader(document));
   }
-  
+
   public void parse(String systemId) throws IOException, SAXException {
     super.parse(inputSource);
   }

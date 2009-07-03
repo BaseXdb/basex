@@ -14,14 +14,14 @@ import java.util.TreeSet;
 @SuppressWarnings("all")
 public class SignatureTest extends XQJTestCase {
 
-  private static String logClass(StringBuffer sb, String name) throws Exception {  
+  private static String logClass(StringBuffer sb, String name) throws Exception {
     Class c = Class.forName("javax.xml.xquery." + name);
-    
+
     // not all java VMs return information in the same order through the reflection API
     // make sure we get information always in the same order.
     TreeSet set;
     Iterator it;
-    
+
     // class
     sb.append(Modifier.toString(c.getModifiers()));
     sb.append(" ");
@@ -49,7 +49,7 @@ public class SignatureTest extends XQJTestCase {
     set = new TreeSet();
     Field[] fields = c.getFields();
     for (int i = 0; i < fields.length; i++) {
-      if (!fields[i].getDeclaringClass().equals(c)) continue; 
+      if (!fields[i].getDeclaringClass().equals(c)) continue;
       StringBuffer tmp = new StringBuffer();
       tmp.append(Modifier.toString(fields[i].getModifiers()));
       tmp.append(" ");
@@ -63,7 +63,7 @@ public class SignatureTest extends XQJTestCase {
     while (it.hasNext()) {
       sb.append((String)it.next());
     }
-    
+
     // constructors
     set = new TreeSet();
     Constructor[] constructors = c.getConstructors();
@@ -94,13 +94,13 @@ public class SignatureTest extends XQJTestCase {
     while (it.hasNext()) {
       sb.append((String)it.next());
     }
-    
+
     // methods
     set = new TreeSet();
     Method[] methods = c.getMethods();
     for (int i = 0; i < methods.length; i++) {
       StringBuffer tmp = new StringBuffer();
-      if (!methods[i].getDeclaringClass().equals(c)) continue;   
+      if (!methods[i].getDeclaringClass().equals(c)) continue;
       tmp.append(Modifier.toString(methods[i].getModifiers()));
       tmp.append(" ");
       tmp.append(methods[i].getReturnType().getName());
@@ -128,17 +128,17 @@ public class SignatureTest extends XQJTestCase {
     while (it.hasNext()) {
       sb.append((String)it.next());
     }
-    
+
     sb.append("}\r\n\r\n");
-    
+
     return sb.toString();
   }
-  
+
   public static final String signatureFile__ = "xqj.sig";
-  
+
   public void testSignatures() throws Exception {
     StringBuffer sb = new StringBuffer();
-    
+
     logClass(sb, "ConnectionPoolXQDataSource");
     logClass(sb, "PooledXQConnection");
     logClass(sb, "XQCancelledException");
@@ -164,10 +164,10 @@ public class SignatureTest extends XQJTestCase {
     logClass(sb, "XQStackTraceElement");
     logClass(sb, "XQStackTraceVariable");
     logClass(sb, "XQStaticContext");
-    
+
     InputStream signatureStream = getClass().getResourceAsStream(signatureFile__);
     assertNotNull("Signature file '" + signatureFile__ + "' not found in classpath.", signatureStream);
-    
+
     java.io.InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
     Reader in = new BufferedReader(signatureReader);
     int ch;

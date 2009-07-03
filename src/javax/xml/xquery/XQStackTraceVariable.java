@@ -15,16 +15,18 @@ import java.io.Serializable;
  * @see XQQueryException <code>XQQueryException</code>
  */
 public class XQStackTraceVariable implements Serializable {
+  /** Variable name. */
   private QName qname;
+  /** Variable value. */
   private String value;
 
-  /** 
-   * Construct a stack trace variable object. 
+  /**
+   * Construct a stack trace variable object.
    *
    * @param qname          the <code>QName of the variable in the error stack
    * @param value          a vendor specific short string representation
-   *                       of the value of the variable in the error stack 
-   */ 
+   *                       of the value of the variable in the error stack
+   */
   public XQStackTraceVariable(QName qname, String value) {
     this.qname = qname;
     this.value = value;
@@ -38,7 +40,7 @@ public class XQStackTraceVariable implements Serializable {
   public QName getQName() { return qname; }
 
  /**
-  * Gets a short string representation of the value of the 
+  * Gets a short string representation of the value of the
   * stack variable.  Representations of values are vendor specific
   * and for XML node types may be XPath descriptions such as
   * "doc("0596003870/book1.xml")/book/chapter[5]". Sequences may

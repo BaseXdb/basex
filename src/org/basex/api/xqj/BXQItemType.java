@@ -83,7 +83,7 @@ public final class BXQItemType implements XQItemType {
 
   public int getBaseType() throws BXQException {
     if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
-    
+
     if(base != -1) return base;
     for(int b = 0; b < BASE.length; b++) if(BASE[b] == type) return b;
     throw new BXQException(NOBASE);
@@ -149,9 +149,9 @@ public final class BXQItemType implements XQItemType {
   public XQItemType getItemType() {
     return this;
   }
-  
+
   /**
-   * Matches the input types against the instance type. 
+   * Matches the input types against the instance type.
    * @param types input types
    * @throws BXQException exception
    */

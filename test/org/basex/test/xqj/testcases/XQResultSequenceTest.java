@@ -5,12 +5,12 @@ import javax.xml.xquery.*;
 
 @SuppressWarnings("all")
 public class XQResultSequenceTest extends XQJTestCase {
-  
+
   public void testGetConnection() throws XQException {
     XQExpression xqe;
     XQResultSequence xqs;
     XQConnection returned_xqc = null;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
     xqs.close();
@@ -30,6 +30,6 @@ public class XQResultSequenceTest extends XQJTestCase {
       fail("A-XQRS-1.2: getConnection() failed with message: " + e.getMessage());
     }
     assertSame("A-XQRS-1.2: Successfully get the connection of a result sequence.", xqc, returned_xqc);
-    xqe.close(); 
+    xqe.close();
   }
 }

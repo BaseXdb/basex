@@ -10,7 +10,7 @@ public class XQItemTest extends XQJTestCase {
     XQExpression xqe;
     XQSequence xqs;
     XQItem xqi;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'Hello world!'");
     xqs.next();
@@ -21,24 +21,24 @@ public class XQItemTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQE-2.1: closing item failed with message: " + e.getMessage());
     }
-    xqe.close(); 
+    xqe.close();
   }
-  
+
   public void testIsClosed() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
     XQItem xqi;
-    
+
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'Hello world!'");
     xqs.next();
     xqi = xqs.getItem();
-    
+
     assertEquals("A-XQE-1.1: isClosed() on open item", false, xqi.isClosed());
     xqi.close();
     assertEquals("A-XQE-1.2: isClosed() on closed item", true, xqi.isClosed());
-    
-    xqe.close(); 
+
+    xqe.close();
   }
 }
 

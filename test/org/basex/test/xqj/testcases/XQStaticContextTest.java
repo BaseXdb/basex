@@ -13,7 +13,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     String[] prefixes = null;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       prefixes = xqsc.getNamespacePrefixes();
     } catch (Exception e) {
@@ -43,7 +43,7 @@ public class XQStaticContextTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     for (int i=0; i<prefixes.length; i++) {
       String uri = null;
       try {
@@ -67,7 +67,7 @@ public class XQStaticContextTest extends XQJTestCase {
     } catch (Exception other_e) {
       fail("A-XQSC-3.1: declareNamespace() with null argument must throw an XQException.");
     }
-    
+
     try {
       xqsc.declareNamespace("p", "http://www.xqj.org");
     } catch (XQException e) {
@@ -76,7 +76,7 @@ public class XQStaticContextTest extends XQJTestCase {
     String[] prefixes = xqsc.getNamespacePrefixes();
 	boolean found = false;
 	for (int i = 0; i<prefixes.length && !found; i++) {
-	  found = "p".equals(prefixes[i]);  
+	  found = "p".equals(prefixes[i]);
 	}
 	assertTrue("A-XQSC-3.2: Successfully declare a namespace.", found);
 	assertEquals("A-XQSC-3.2: Successfully declare a namespace.", "http://www.xqj.org", xqsc.getNamespaceURI("p"));
@@ -89,7 +89,7 @@ public class XQStaticContextTest extends XQJTestCase {
     prefixes = xqsc.getNamespacePrefixes();
 	found = false;
 	for (int i = 0; i<prefixes.length && !found; i++) {
-	  found = "p".equals(prefixes[i]);  
+	  found = "p".equals(prefixes[i]);
 	}
 	assertFalse("A-XQSC-3.2: Successfully undeclare a namespace.", found);
     try {
@@ -104,7 +104,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     String uri = null;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       uri = xqsc.getDefaultElementTypeNamespace();
     } catch (Exception e) {
@@ -125,7 +125,7 @@ public class XQStaticContextTest extends XQJTestCase {
     } catch (Exception other_e) {
       fail("A-XQSC-5.1: setDefaultElementTypeNamespace() with null argument must throw an XQException.");
     }
-    
+
     try {
       xqsc.setDefaultElementTypeNamespace("http://www.xqj.org");
     } catch (XQException e) {
@@ -147,7 +147,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     String uri = null;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       uri = xqsc.getDefaultFunctionNamespace();
     } catch (Exception e) {
@@ -176,7 +176,7 @@ public class XQStaticContextTest extends XQJTestCase {
     }
     String uri = xqsc.getDefaultFunctionNamespace();
 	assertEquals("A-XQSC-7.3: Successfully undeclare the default element/type namespace.", "", uri);
-    
+
     try {
       xqsc.setDefaultFunctionNamespace("http://www.xqj.org");
     } catch (XQException e) {
@@ -189,7 +189,7 @@ public class XQStaticContextTest extends XQJTestCase {
   public void testGetContextItemStaticType() throws XQException {
 
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try{
       xqsc.getContextItemStaticType();
     } catch (Exception e) {
@@ -200,9 +200,9 @@ public class XQStaticContextTest extends XQJTestCase {
   public void testSetContextItemStaticType() throws XQException {
 
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     XQItemType xsstring = xqc.createAtomicType(XQItemType.XQBASETYPE_STRING);
-    
+
     try {
       xqsc.setContextItemStaticType(xsstring);
     } catch (Exception e) {
@@ -220,14 +220,14 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-9.2: setContextItemStaticType() failed with message: " + e.getMessage());
     }
     xqtype = xqsc.getContextItemStaticType();
-    assertNull("A-XQSC-9.2: Successfully undeclare the static type of the context item.", xqtype);  
+    assertNull("A-XQSC-9.2: Successfully undeclare the static type of the context item.", xqtype);
   }
 
   public void testGetDefaultCollation() throws XQException {
 
     String uri = null;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       uri = xqsc.getDefaultCollation();
     } catch (Exception e) {
@@ -257,12 +257,12 @@ public class XQStaticContextTest extends XQJTestCase {
     String uri = xqsc.getDefaultCollation();
 	assertEquals("A-XQSC-11.2: Successfully set the default collation.", "http://www.w3.org/2005/xpath-functions/collation/codepoint", uri);
   }
-  
+
   public void testGetConstructionMode() throws XQException {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getConstructionMode();
     } catch (Exception e) {
@@ -292,12 +292,12 @@ public class XQStaticContextTest extends XQJTestCase {
     int mode = xqsc.getConstructionMode();
 	assertEquals("A-XQSC-13.2: Successfully set the construction mode.",XQConstants.CONSTRUCTION_MODE_PRESERVE, mode);
   }
-  
+
   public void testGetOrderingMode() throws XQException {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getOrderingMode();
     } catch (Exception e) {
@@ -332,7 +332,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getDefaultOrderForEmptySequences();
     } catch (Exception e) {
@@ -367,7 +367,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int policy = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       policy = xqsc.getBoundarySpacePolicy();
     } catch (Exception e) {
@@ -402,7 +402,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getCopyNamespacesModePreserve();
     } catch (Exception e) {
@@ -437,7 +437,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getCopyNamespacesModeInherit();
     } catch (Exception e) {
@@ -472,7 +472,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     String uri = null;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       uri = xqsc.getBaseURI();
     } catch (Exception e) {
@@ -502,12 +502,12 @@ public class XQStaticContextTest extends XQJTestCase {
     String uri = xqsc.getBaseURI();
     assertEquals("A-XQSC-25.2: Successfully declare the base uri.", "", uri);
   }
-  
+
   public void testGetBindingMode() throws XQException {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getBindingMode();
     } catch (Exception e) {
@@ -550,7 +550,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getHoldability();
     } catch (Exception e) {
@@ -585,7 +585,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int lang = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       lang = xqsc.getQueryLanguageTypeAndVersion();
     } catch (Exception e) {
@@ -622,7 +622,7 @@ public class XQStaticContextTest extends XQJTestCase {
 	      fail("A-XQSC-31.2: setQueryLanguageTypeAndVersion() failed with message: " + e.getMessage());
 	    }
 	    lang = xqsc.getQueryLanguageTypeAndVersion();
-		assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERYX, lang);	  
+		assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERYX, lang);	
 	}
   }
 
@@ -630,7 +630,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
     int mode = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       mode = xqsc.getScrollability();
     } catch (Exception e) {
@@ -660,12 +660,12 @@ public class XQStaticContextTest extends XQJTestCase {
     int mode = xqsc.getScrollability();
 	assertEquals("A-XQSC-33.2: Successfully set the scrollability.",XQConstants.SCROLLTYPE_SCROLLABLE, mode);
   }
-  
+
   public void testGetQueryTimeout() throws XQException {
 
     int timeout = -1;
     XQStaticContext xqsc = xqc.getStaticContext();
-    
+
     try {
       timeout = xqsc.getQueryTimeout();
     } catch (Exception e) {
@@ -679,7 +679,7 @@ public class XQStaticContextTest extends XQJTestCase {
     XQStaticContext xqsc = xqc.getStaticContext();
 
     int originalTimeout = xqsc.getQueryTimeout();
-    
+
     try {
       xqsc.setQueryTimeout(-1);
       fail("A-XQSC-35.1: setQueryTimeout() with invalid argument must throw an XQException.");

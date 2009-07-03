@@ -9,7 +9,7 @@ import java.lang.String;
 
 /**
  * An exception that provides information on errors occurring during the
- * evaluation of an xquery. 
+ * evaluation of an xquery.
  * <br>
  * <br>
  * Each <code>XQQueryException</code> provides several kinds of optional
@@ -38,12 +38,19 @@ import java.lang.String;
  */
 
 public class XQQueryException extends XQException {
+  /** Error code. */
   private QName errorCode;
+  /** Error object. */
   private XQSequence errorObject;
+  /** Stack trace. */
   private XQStackTraceElement[] stackTrace;
+  /** Error line. */
   private int line = -1;
+  /** Error column. */
   private int column = -1;
+  /** Error position. */
   private int position = -1;
+  /** Module URI. */
   private String moduleURI;
 
   /**
@@ -69,7 +76,7 @@ public class XQQueryException extends XQException {
    *                       <i>Appendix F, XQuery 1.0: An XML Query language</i></a>,
    *                       <a href="http://www.w3.org/TR/xpath-functions/#error-summary">
    *                       <i>Appendix C, XQuery 1.0 and XPath 2.0 Functions and Operators</i></a>,
-   *                       and its associated specifications; implementation-defined 
+   *                       and its associated specifications; implementation-defined
    *                       errors may be raised.</li>
    */
   public XQQueryException(String message, QName errorCode)
@@ -90,7 +97,7 @@ public class XQQueryException extends XQException {
    *                       <i>Appendix F, XQuery 1.0: An XML Query language</i></a>,
    *                       <a href="http://www.w3.org/TR/xpath-functions/#error-summary">
    *                       <i>Appendix C, XQuery 1.0 and XPath 2.0 Functions and Operators</i></a>,
-   *                       and its associated specifications; implementation-defined 
+   *                       and its associated specifications; implementation-defined
    *                       errors may be raised</li>
    * @param line           the line number in the query string where the error occured.
    *                       Line numbering starts at <code>1</code>. <code>-1</code> if unknown
@@ -100,7 +107,7 @@ public class XQQueryException extends XQException {
    *                       is a <code>0</code> based position. <code>-1</code> if unknown
    */
   public XQQueryException(String message, QName errorCode,
-                          int line, int column, int position) 
+                          int line, int column, int position)
   {
     super(message);
     this.errorCode = errorCode;
@@ -124,7 +131,7 @@ public class XQQueryException extends XQException {
    *                       <i>Appendix F, XQuery 1.0: An XML Query language</i></a>,
    *                       <a href="http://www.w3.org/TR/xpath-functions/#error-summary">
    *                       <i>Appendix C, XQuery 1.0 and XPath 2.0 Functions and Operators</i></a>,
-   *                       and its associated specifications; implementation-defined 
+   *                       and its associated specifications; implementation-defined
    *                       errors may be raised</li>
    * @param line           the line number in the query string where the error occured.
    *                       Line numbering starts at <code>1</code>. <code>-1</code> if unknown
@@ -134,7 +141,7 @@ public class XQQueryException extends XQException {
    *                       is a <code>0</code> based position. <code>-1</code> if unknown
    */
   public XQQueryException(String message, String vendorCode, QName errorCode,
-                          int line, int column, int position) 
+                          int line, int column, int position)
   {
     super(message, vendorCode);
     this.errorCode = errorCode;
@@ -173,13 +180,13 @@ public class XQQueryException extends XQException {
    * @param errorObject   an <code>XQSequence</code> representing the error object passed to
    *                       <code>fn:error()</code>. <code>null</code> if this error was not
    *                       triggered by <code>fn:error()</code> or when the error object is
-   *                       not available. 
+   *                       not available.
    * @param stackTrace     the XQuery stack trace where the error occurred. <code>null</code>
    *                       if not available
    */
-  public XQQueryException(String message, String vendorCode, QName errorCode, 
+  public XQQueryException(String message, String vendorCode, QName errorCode,
                           int line, int column, int position,
-                          String moduleURI, XQSequence errorObject, XQStackTraceElement[] stackTrace) 
+                          String moduleURI, XQSequence errorObject, XQStackTraceElement[] stackTrace)
   {
     super(message, vendorCode);
     this.errorCode = errorCode;
@@ -198,9 +205,9 @@ public class XQQueryException extends XQException {
   * Appendix C, XQuery 1.0 and XPath 2.0 Functions and Operators</i></a>, and
   * its associated specifications; imlementation-defined errors may also be raised;
   * finally the error code may also be specified in the query using <code>fn:error()</code>.
-  * 
+  *
   * @return                the code identifying the error, or <code>null</code>
-  *                        if not available 
+  *                        if not available
   */
   public QName getErrorCode() {
     return errorCode;
@@ -209,11 +216,11 @@ public class XQQueryException extends XQException {
  /**
   * Gets an <code>XQSequence</code> representing the error object passed to
   * <code>fn:error()</code>. Returns <code>null</code> if this error was not triggered by
-  * <code>fn:error()</code> or when the error object is not available. 
+  * <code>fn:error()</code> or when the error object is not available.
   *
   * @return                the sequence passed to <code>fn:error()</code>,
   *                        <code>null</code> if not available
-  *                        
+  *
   */
   public XQSequence getErrorObject() {
     return errorObject;
@@ -226,7 +233,7 @@ public class XQQueryException extends XQException {
   * <p>
   * This is a <code>0</code> based position. <code>-1</code> if unknown.</li>
   *
-  * @return                the character position in the query string where the 
+  * @return                the character position in the query string where the
   *                        exception occurred
   */
   public int getPosition() {
@@ -237,7 +244,7 @@ public class XQQueryException extends XQException {
  /**
   * Returns the query stack stackTrace when the exception occurred, or null if
   * none. On some implementations only the top frame may be visible.
-  * 
+  *
   * @return                the stackTrace where the exception occurred
   */
   public XQStackTraceElement[] getQueryStackTrace() {
@@ -275,7 +282,7 @@ public class XQQueryException extends XQException {
   * Column numbering starts at <code>1</code>. <code>-1</code> is returned
   * if the column number is unknown. If the implementation does not support this method,
   * it must return <code>-1</code>
-  *  
+  *
   * @return                the column number in the query string where
   *                        the error occurred
   */

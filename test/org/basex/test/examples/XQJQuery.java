@@ -8,7 +8,7 @@ import javax.xml.xquery.XQResultSequence;
 /**
  * This class serves an example for executing XQuery requests
  * using the XQuery for Java API.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
  */

@@ -326,7 +326,7 @@ public class XQJTest extends TestCase {
    */
   public void test19() throws Exception {
     final XQConnection conn = conn(drv);
-    
+
     try {
       final XQPreparedExpression expr = conn.prepareExpression(
         "declare variable $v external; $v");
@@ -398,17 +398,17 @@ public class XQJTest extends TestCase {
    */
   public void test25() throws Exception {
     final XQConnection conn = conn(drv);
-    
+
     Object[] objects = {
-        Boolean.valueOf(true), 
-        Byte.valueOf((byte) 2), 
+        Boolean.valueOf(true),
+        Byte.valueOf((byte) 2),
         new Float(3f),
-        new Double(4), 
-        Integer.valueOf(5), 
+        new Double(4),
+        Integer.valueOf(5),
         Long.valueOf(6),
-        Short.valueOf((short) 7), "8", 
+        Short.valueOf((short) 7), "8",
         new BigDecimal(9),
-        new BigInteger("10"), 
+        new BigInteger("10"),
         new QName("elf"),
     };
 

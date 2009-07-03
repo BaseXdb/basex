@@ -68,25 +68,25 @@ public interface XMLResource extends Resource {
    * RESOURCE_TYPE
    */
    public static final String RESOURCE_TYPE = "XMLResource";
-   
+
    /**
     * Returns the unique id for the parent document to this <code>Resource</code>
-    * or null if the <code>Resource</code> does not have a parent document. 
+    * or null if the <code>Resource</code> does not have a parent document.
     * <code>getDocumentId()</code> is typically used with <code>Resource</code>
     * instances retrieved using a query. It enables accessing the parent
     * document of the <code>Resource</code> even if the <code>Resource</code> is
     * a child node of the document. If the <code>Resource</code> was not
-    * obtained through a query then <code>getId()</code> and 
+    * obtained through a query then <code>getId()</code> and
     * <code>getDocumentId()</code> will return the same id.
     *
-    * @return the id for the parent document of this <code>Resource</code> or 
+    * @return the id for the parent document of this <code>Resource</code> or
     *  null if there is no parent document for this <code>Resource</code>.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    String getDocumentId() throws XMLDBException;
-   
+
    /**
     * Returns the content of the <code>Resource</code> as a DOM Node.
     *
@@ -121,13 +121,13 @@ public interface XMLResource extends Resource {
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
     *  specific errors that occur.<br />
-    *  <code>ErrorCodes.INVALID_RESOURCE</code> if the 
+    *  <code>ErrorCodes.INVALID_RESOURCE</code> if the
     *  <code>ContentHandler</code> provided is null.<br />
     */
    void getContentAsSAX(ContentHandler handler) throws XMLDBException;
 
    /**
-    * Sets the content of the <code>Resource</code> using a SAX 
+    * Sets the content of the <code>Resource</code> using a SAX
     * <code>ContentHandler</code>.
     *
     * @return a SAX <code>ContentHandler</code> that can be used to add content

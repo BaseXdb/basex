@@ -12,11 +12,11 @@ public class AllTests {
 
   public static void main(String[] args) {
     TestRunner.run(suite());
- /*  TestResult result =  new TestRunner().doRun(suite());
+ /*  TestResult result = new TestRunner().doRun(suite());
    System.out.print(result.toString());
    result = null;
   */}
-  
+
   public static Test suite() {
     TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
     suite.addTestSuite(SignatureTest.class);

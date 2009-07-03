@@ -54,10 +54,10 @@ package org.xmldb.api.base;
  */
 
 /**
- * <code>Database</code> is an encapsulation of the database driver 
+ * <code>Database</code> is an encapsulation of the database driver
  * functionality that is
  * necessary to access an XML database. Each vendor must provide their own
- * implementation of the <code>Database</code> interface. The implementation 
+ * implementation of the <code>Database</code> interface. The implementation
  * is registered with the
  * <code>DatabaseManager</code> to provide access to the resources of the XML database.
  * <p />
@@ -74,17 +74,17 @@ public interface Database extends Configurable {
     *  specific errors that occur.<br />
     */
    String getName() throws XMLDBException;
-   
+
    /**
-    * Retrieves a <code>Collection</code> instance based on the URI provided 
+    * Retrieves a <code>Collection</code> instance based on the URI provided
     * in the <code>uri</code> parameter. The format of the URI is defined in the
     * documentation for DatabaseManager.getCollection().<p/>
     *
     * Authentication is handled via username and password however it is not
     * required that the database support authentication. Databases that do not
-    * support authentication MUST ignore the 
-    * <code>username</code> and <code>password</code> if those provided are not 
-    * null. 
+    * support authentication MUST ignore the
+    * <code>username</code> and <code>password</code> if those provided are not
+    * null.
     *
     * @param uri the URI to use to locate the collection.
     * @param username the Username to use to locate the collection.
@@ -99,11 +99,11 @@ public interface Database extends Configurable {
     *  <code>ErrroCodes.PERMISSION_DENIED</code> If the <code>username</code>
     *    and <code>password</code> were not accepted by the database.
     */
-   Collection getCollection(String uri, String username, String password) 
+   Collection getCollection(String uri, String username, String password)
       throws XMLDBException;
 
    /**
-    * acceptsURI determines whether this <code>Database</code> implementation 
+    * acceptsURI determines whether this <code>Database</code> implementation
     * can handle the URI. It should return true
     * if the Database instance knows how to handle the URI and false otherwise.
     *

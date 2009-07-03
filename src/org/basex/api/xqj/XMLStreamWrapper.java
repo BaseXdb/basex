@@ -48,7 +48,7 @@ public final class XMLStreamWrapper extends Parser {
             final int as = reader.getAttributeCount();
             final Atts att = new Atts();
             for(int a = 0; a < as; a++) {
-              att.add(token(reader.getAttributeLocalName(a)), 
+              att.add(token(reader.getAttributeLocalName(a)),
                   token(reader.getAttributeValue(a)));
             }
             builder.startElem(token(reader.getLocalName()), att);

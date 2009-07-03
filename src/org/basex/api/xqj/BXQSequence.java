@@ -179,7 +179,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     opened();
     if(it != null && !next) throw new BXQException(TWICE);
     if(!next && !next()) return "";
-    
+
     final CachedOutput out = new CachedOutput();
     try {
       final XMLSerializer ser = new XMLSerializer(out);

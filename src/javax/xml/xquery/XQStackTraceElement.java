@@ -8,25 +8,30 @@ import java.io.Serializable;
 import javax.xml.namespace.QName;
 
 /**
- * This class represents a frame in a stack trace, akin to the 
- * <code>java.lang.StackTraceElement</code> but for XQuery callstacks 
+ * This class represents a frame in a stack trace, akin to the
+ * <code>java.lang.StackTraceElement</code> but for XQuery callstacks
  * instead of Java.
- * 
+ *
  * @see XQQueryException#getQueryStackTrace <code>XQQueryException.getQueryStackTrace</code>
  */
 public class XQStackTraceElement implements Serializable {
-
+  /** Module. */
   private String module;
+  /** Line. */
   private int line = -1;
+  /** Column. */
   private int column = -1;
+  /** Position. */
   private int position = -1;
+  /** Function name. */
   private QName function;
+  /** Stack trace variables. */
   private XQStackTraceVariable[] variables;
 
  /**
-  * Construct an <code>XQStackTraceElement</code> object representing 
-  * a frame in a stack trace. 
-  * 
+  * Construct an <code>XQStackTraceElement</code> object representing
+  * a frame in a stack trace.
+  *
   * @param moduleURI          the module URI containing the execution point representing
   *                           the stack trace element. <code>null</code> when it is the main
   *                           module or when the module is unknown
@@ -36,12 +41,12 @@ public class XQStackTraceElement implements Serializable {
   *                           Column numbering starts at <code>1</code>. <code>-1</code> if unknown
   * @param position           the position in the query string where the error occured. This
   *                           is a <code>0</code> based position. <code>-1<code> if unknown
-  * @param function           the <code>QName</code> of the function in which the exception occurred, 
+  * @param function           the <code>QName</code> of the function in which the exception occurred,
   *                           or <code>null</code> if it occurred outside an enclosing function
   * @param variables          the variables in scope at this execution point,
   *                           or <code>null</code> if no variable value retrieval is possible
   */
-  public XQStackTraceElement(String moduleURI, int line, int column, int position, 
+  public XQStackTraceElement(String moduleURI, int line, int column, int position,
                      QName function, XQStackTraceVariable[] variables) {
     this.module = moduleURI;
     this.line = line;
@@ -56,7 +61,7 @@ public class XQStackTraceElement implements Serializable {
   * stack trace element.
   * <code>null</code> when it is the main module or when the module is
   * unknown.
-  * 
+  *
   * @return                   the module URI containing the excution point
   *                           represented by the stack trace element or <code>null</code>
   */
@@ -107,7 +112,7 @@ public class XQStackTraceElement implements Serializable {
       return column;
     }
 
-   
+
  /**
   * Gets the <code>QName</code> of the function in which the error occurred,
   * or <code>null</code> if it occurred outside an enclosing function (in a main module).
@@ -115,7 +120,7 @@ public class XQStackTraceElement implements Serializable {
   * @return                   the <code>QName</code> of the function in which the error
   *                           occurred for this stack element or <code>null</code> if it
   *                           occurred outside an enclosing function
-  */ 
+  */
   public QName getFunctionQName() {
     return function;
   }

@@ -59,45 +59,45 @@ package org.xmldb.api.base;
  * that provides handling for a specific content type before anything useful can
  * be done.
  */
-public interface Resource {      
+public interface Resource {
    /**
-    * Returns the <code>Collection</code> instance that this resource is 
-    * associated with. All resources must exist within the context of a 
+    * Returns the <code>Collection</code> instance that this resource is
+    * associated with. All resources must exist within the context of a
     * <code>collection</code>.
     *
     * @return the collection associated with the resource.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    Collection getParentCollection() throws XMLDBException;
 
    /**
-    * Returns the unique id for this <code>Resource</code> or null if the 
-    * <code>Resource</code> is anonymous. The <code>Resource</code> will be 
+    * Returns the unique id for this <code>Resource</code> or null if the
+    * <code>Resource</code> is anonymous. The <code>Resource</code> will be
     * anonymous if it is obtained as the result of a query.
     *
     * @return the id for the Resource or null if no id exists.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    String getId() throws XMLDBException;
 
    /**
-    * Returns the resource type for this Resource. 
+    * Returns the resource type for this Resource.
     * <p />
     * XML:DB defined resource types are: <p />
     * XMLResource - all XML data stored in the database<br />
     * BinaryResource - Binary blob data stored in the database<br />
-    * 
+    *
     * @return the resource type for the Resource.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    String getResourceType() throws XMLDBException;
-   
+
    /**
     * Retrieves the content from the resource. The type of the content varies
     * depending what type of resource is being used.
@@ -105,7 +105,7 @@ public interface Resource {
     * @return the content of the resource.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    Object getContent() throws XMLDBException;
 
@@ -116,7 +116,7 @@ public interface Resource {
     * @param value the content value to set for the resource.
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
-    *  specific errors that occur.<br /> 
+    *  specific errors that occur.<br />
     */
    void setContent(Object value) throws XMLDBException;
 }

@@ -6,16 +6,16 @@ package javax.xml.xquery;
 import javax.xml.namespace.QName;
 import java.net.URI;
 
-/** 
+/**
   * The <code>XQItemType</code> interface represents an item type as defined in
   * <a href="http://www.w3.org/TR/xquery"><i>XQuery 1.0: An XML Query language</i></a>.
   *
   * <br>
   *
   * The <code>XQItemType</code> extends the <code>XQSequenceType</code> but
-  * restricts the occurrance indicator to be exactly one. This derivation allows passing  
+  * restricts the occurrance indicator to be exactly one. This derivation allows passing
   * an item type wherever a sequence type is expected, but not the other way.
-  * 
+  *
   * The <code>XQItemType</code> interface contains methods to represent
   * information about the following aspects of an item type:
   * <ul>
@@ -26,10 +26,10 @@ import java.net.URI;
   * Schema type this node is based on.</li>
   * <li>Name of the node, if any</li>
   * <li>Type name, if any. If present, then also whether the typename is an anonymous type</li>
-  * <li>XML Schema URI associated with the type, if any</li> 
+  * <li>XML Schema URI associated with the type, if any</li>
   * <li>The nillability characteristics, if any</li>
   * </ul>
-  * 
+  *
   * An instance of the <code>XQItemType</code> is a standalone
   * object that is independant of the <code>XQConnection</code> and
   * any XQuery static or dynamic context.
@@ -37,13 +37,13 @@ import java.net.URI;
 public interface XQItemType extends XQSequenceType
 {
   /** Some atomic type. */
-  public static final int XQITEMKIND_ATOMIC = 1;  
+  public static final int XQITEMKIND_ATOMIC = 1;
 
   /** Attribute node */
-  public static final int XQITEMKIND_ATTRIBUTE = 2; 
+  public static final int XQITEMKIND_ATTRIBUTE = 2;
 
   /** Comment node */
-  public static final int XQITEMKIND_COMMENT = 3;    
+  public static final int XQITEMKIND_COMMENT = 3;
 
   /** Document type (the type information represents the type of the document element) */
   public static final int XQITEMKIND_DOCUMENT = 4;
@@ -60,13 +60,13 @@ public interface XQItemType extends XQSequenceType
   public static final int XQITEMKIND_ELEMENT = 7;
 
   /** Any kind of item */
-  public static final int XQITEMKIND_ITEM = 8;  
+  public static final int XQITEMKIND_ITEM = 8;
 
   /** Some node type */
-  public static final int XQITEMKIND_NODE = 9; 
+  public static final int XQITEMKIND_NODE = 9;
 
   /** Processing instruction node */
-  public static final int XQITEMKIND_PI = 10;   
+  public static final int XQITEMKIND_PI = 10;
 
   /** Text node */
   public static final int XQITEMKIND_TEXT = 11;    // node type
@@ -79,7 +79,7 @@ public interface XQItemType extends XQSequenceType
 
 
   /** Represents the schema type xs:untyped */
-  public static final int XQBASETYPE_UNTYPED = 1; 
+  public static final int XQBASETYPE_UNTYPED = 1;
 
   /** Represents the schema type xs:anyType */
   public static final int XQBASETYPE_ANYTYPE = 2;
@@ -97,7 +97,7 @@ public interface XQItemType extends XQSequenceType
  public static final int XQBASETYPE_DAYTIMEDURATION = 6;
 
  /** Represents the schema type <code>xs:yearMonthDuration</code> */
- public static final int XQBASETYPE_YEARMONTHDURATION = 7; 
+ public static final int XQBASETYPE_YEARMONTHDURATION = 7;
 
  /** Represents the schema type <code>xs:anyURI</code> */
  public static final int XQBASETYPE_ANYURI = 8;
@@ -160,7 +160,7 @@ public interface XQItemType extends XQSequenceType
  public static final int XQBASETYPE_NOTATION =27;
 
  /** Represents the schema type <code>xs:QName</code> */
- public static final int XQBASETYPE_QNAME  = 28; 
+ public static final int XQBASETYPE_QNAME  = 28;
 
  /** Represents the schema type <code>xs:string</code> */
  public static final int XQBASETYPE_STRING =29;
@@ -223,9 +223,9 @@ public interface XQItemType extends XQSequenceType
  public static final int XQBASETYPE_ENTITY = 48;
 
  /** Represents the schema type <code>xs:IDREFS</code>.
-   * Valid only if the item kind is 
+   * Valid only if the item kind is
    * <code>XQITEMKIND_ELEMENT</code>, <code>XQITEMKIND_DOCUMENT_ELEMENT</code>,
-   * or <code>XQITEMKIND_ATTRIBUTE</code>  
+   * or <code>XQITEMKIND_ATTRIBUTE</code>
    */
  public static final int XQBASETYPE_IDREFS = 49;
 
@@ -237,7 +237,7 @@ public interface XQItemType extends XQSequenceType
 
   /**
     * Returns the base type of the item. One of the <code>XQBASETYPE_*</code>
-    * constants. 
+    * constants.
     * <br/>
     * <br/>
     * XQJ defines a constant for each of the built-in schema
@@ -259,7 +259,7 @@ public interface XQItemType extends XQSequenceType
   public int getBaseType() throws XQException;
 
   /**
-    * Returns the kind of the item. 
+    * Returns the kind of the item.
     * One of the <code>XQITEMKIND_*</code> constants.
     *
     * @return int      one of the <code>XQITEMKIND_*</code> constants
@@ -268,7 +268,7 @@ public interface XQItemType extends XQSequenceType
   public int getItemKind();
 
   /**
-    * Returns the occurrence indicator for the item type. This method 
+    * Returns the occurrence indicator for the item type. This method
     * will always return the value <code>XQSequenceType.OCC_EXACTLY_ONE</code>.
     *
     * @return int      indicating the occurrence indicator
@@ -276,22 +276,22 @@ public interface XQItemType extends XQSequenceType
   public int getItemOccurrence();
 
   /**
-    * Returns a human-readable implementation-defined 
-    * string representation of the item type. 
+    * Returns a human-readable implementation-defined
+    * string representation of the item type.
     *
     * @return String              a string representation of the item type
     */
   public String toString();
 
   /**
-    * Returns the name of the node in case the item kind is an 
+    * Returns the name of the node in case the item kind is an
     * <code>XQITEMKIND_DOCUMENT_ELEMENT</code>, <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>,
     * <code>XQITEMKIND_ELEMENT</code>, <code>XQITEMKIND_SCHEMA_ELEMENT</code>,
     * <code>XQITEMKIND_ATTRIBUTE</code>, or <code>XQITEMKIND_SCHEMA_ATTRIBUTE</code>.
     *
     * For example, in the case of  a type for <code>element "foo"</code>
-    * this will return the <code>QName foo</code>. For wildcard entries a 
-    * <code>null</code> value will be returned. 
+    * this will return the <code>QName foo</code>. For wildcard entries a
+    * <code>null</code> value will be returned.
     *
     * @return                    <code>QName</code> for the name of the element,
     *                            attribute, or document element node. <code>null</code>
@@ -299,27 +299,27 @@ public interface XQItemType extends XQSequenceType
     * @exception XQException     if the item kind is not one of:
     *                            <code>XQITEMKIND_DOCUMENT_ELEMENT</code>,
     *                            <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>,
-    *                            <code>XQITEMKIND_ELEMENT</code>, 
-    *                            <code>XQITEMKIND_SCHEMA_ELEMENT</code>, 
+    *                            <code>XQITEMKIND_ELEMENT</code>,
+    *                            <code>XQITEMKIND_SCHEMA_ELEMENT</code>,
     *                            <code>XQITEMKIND_ATTRIBUTE</code>, or
     *                            <code>XQITEMKIND_SCHEMA_ATTRIBUTE</code>
-    *                                  
+    *
     */
   public QName getNodeName() throws XQException;
 
   /**
     * Returns the schema location URI of the schema that contains the item's
-    * element or type definition. This method is implementation-definied 
+    * element or type definition. This method is implementation-definied
     * and an implementation will return a <code>null</code> value if it does
     * not support retrieving the schema location URI.
     *
-    * If the item corresponds to a validated global element in a schema, 
-    * the result will be the schema location URI to the XMLSchema containing 
-    * the element definition. Otherwise if the item is a schema validated 
-    * node, the result will be the schema location URI of the XMLSchema 
-    * containing the type definition of that node. If the item is not schema 
+    * If the item corresponds to a validated global element in a schema,
+    * the result will be the schema location URI to the XMLSchema containing
+    * the element definition. Otherwise if the item is a schema validated
+    * node, the result will be the schema location URI of the XMLSchema
+    * containing the type definition of that node. If the item is not schema
     * validated, the result is <code>null</code>
-    * 
+    *
     *
     * @return                    <code>URI</code> representing the schema
     *                            location URI of the XMLSchema containing the
@@ -332,11 +332,11 @@ public interface XQItemType extends XQSequenceType
   public URI getSchemaURI();
 
   /**
-    * Represents a type name (global or local). 
+    * Represents a type name (global or local).
     * This can be used to represent specific type name such as,
     * element foo of type hatsize. The schema type name is represented as
-    * a single <code>QName</code>. If the return type is an 
-    * anonymous type, the actual <code>QName</code> value returned is implementation 
+    * a single <code>QName</code>. If the return type is an
+    * anonymous type, the actual <code>QName</code> value returned is implementation
     * defined.
     *
     * @return                    the <code>QName</code> of the schema type in case of a
@@ -349,14 +349,14 @@ public interface XQItemType extends XQSequenceType
     *                            <code>XQITEMKIND_DOCUMENT_SCHEMA_ELEMENT</code>,
     *                            <code>XQITEMKIND_ATOMIC</code>,
     *                            <code>XQITEMKIND_ELEMENT</code>,
-    *                            <code>XQITEMKIND_SCHEMA_ELEMENT</code>, 
+    *                            <code>XQITEMKIND_SCHEMA_ELEMENT</code>,
     *                            <code>XQITEMKIND_ATTRIBUTE</code>, or
     *                            <code>XQITEMKIND_SCHEMA_ATTRIBUTE</code>
     */
   public QName getTypeName() throws XQException;
 
    /**
-    * Represents whether the item type is an anonymous type in the schema. 
+    * Represents whether the item type is an anonymous type in the schema.
     *
     * @return                   <code>true</code> if the item type is an anonymous
     *                           type in the schema, <code>false</code> otherwise
@@ -364,7 +364,7 @@ public interface XQItemType extends XQSequenceType
    public boolean isAnonymousType();
 
   /**
-    * Returns whether the element type is nillable or not. 
+    * Returns whether the element type is nillable or not.
     *
     * @return                   <code>true</code> if the element type is nillable,
     *                           <code>false</code> otherwise
@@ -414,7 +414,7 @@ public interface XQItemType extends XQSequenceType
     * @return                 <code>true</code> if the input item type object represents
     *                         the same XQuery item type, <code>false</code> otherwise
     */
-  public boolean equals(Object o); 
+  public boolean equals(Object o);
 
   /**
     * Returns a hash code consistent with the definition of the equals method.

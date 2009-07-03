@@ -54,16 +54,16 @@ package org.xmldb.api.base;
  */
 
  /**
- * ResourceSet is a container for a set of resources. Generally a 
+ * ResourceSet is a container for a set of resources. Generally a
  * <code>ResourceSet</code> is obtained as the result of a query.
  */
 public interface ResourceSet {
    /**
-    * Returns the <code>Resource</code> instance stored at the index specified 
+    * Returns the <code>Resource</code> instance stored at the index specified
     * by index.
     * <p />
-    * If the underlying implementation uses a paging or streaming optimization 
-    * for retrieving Resource instances. Calling this method MAY result in a 
+    * If the underlying implementation uses a paging or streaming optimization
+    * for retrieving Resource instances. Calling this method MAY result in a
     * block until the requested Resource has been downloaded.
     *
     * @param index the index of the resource to retrieve.
@@ -99,7 +99,7 @@ public interface ResourceSet {
    /**
     * Returns an iterator over all <code>Resource</code> instances stored in the set.
     *
-    * @return a <code>ResourceIterator</code> over all <code>Resource</code> 
+    * @return a <code>ResourceIterator</code> over all <code>Resource</code>
     *   instances in the set.
     * @exception XMLDBException with expected error codes.<br />
     * <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
@@ -108,10 +108,10 @@ public interface ResourceSet {
    ResourceIterator getIterator() throws XMLDBException;
 
    /**
-    * Returns a Resource containing an XML representation of all resources 
+    * Returns a Resource containing an XML representation of all resources
     * stored in the set. <p />
     *
-    * @return A <code>Resource</code> instance containing an XML representation 
+    * @return A <code>Resource</code> instance containing an XML representation
     *   of all set members.
     * @exception XMLDBException with expected error codes.<br />
     * <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
@@ -122,8 +122,8 @@ public interface ResourceSet {
    /**
     * Returns the number of resources contained in the set.
     * <p />
-    * If the underlying implementation uses a paging or streaming optimization 
-    * for retrieving <code>Resource</code> instances. Calling this method MAY 
+    * If the underlying implementation uses a paging or streaming optimization
+    * for retrieving <code>Resource</code> instances. Calling this method MAY
     * force the downloading of all set members before the size can be determined.
     *
     * @return The number of <code>Resource</code> instances in the set.

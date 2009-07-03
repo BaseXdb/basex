@@ -20,7 +20,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTE-1.1: Creating XQStackTraceElement faild with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetModuleURI() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), null);
@@ -29,7 +29,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTV-2.1: Retrieve module uri from an XQStackTraceElement failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetLineNumber() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), null);
@@ -38,7 +38,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTV-3.1: Retrieve line number from an XQStackTraceElement failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetColumnNumber() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), null);
@@ -47,7 +47,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTV-4.1: Retrieve column number from an XQStackTraceElement failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetPosition() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), null);
@@ -56,7 +56,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTV-5.1: Retrieve position from an XQStackTraceElement failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetFunction() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), null);
@@ -65,7 +65,7 @@ public class XQStackTraceElementTest extends XQJTestCase {
       fail("A-XQSTV-6.1: Retrieve function name from an XQStackTraceElement failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetVariables() {
     try {
       XQStackTraceElement xqste = new XQStackTraceElement("moduleuri",1,2,3, new QName("function"), new XQStackTraceVariable[] {new XQStackTraceVariable(new QName("v"), "abc")});

@@ -21,20 +21,20 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     XQExpression xqe;
     XQSequence xqs;
-    
+
     my_xqc = xqds.getConnection();
 
     xqe = my_xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3");
-    
+
     try {
-      my_xqc.close(); 
+      my_xqc.close();
       my_xqc.close();
     } catch (XQException e) {
       fail("A-XQC-1.1: closing connection failed with message: " + e.getMessage());
     }
 
-    assertEquals("A-XQC-1.2: closing a connection, closes dependent objects", true, xqe.isClosed());    
+    assertEquals("A-XQC-1.2: closing a connection, closes dependent objects", true, xqe.isClosed());
     assertEquals("A-XQC-1.2: closing a connection, closes dependent objects", true, xqs.isClosed());
   }
 
@@ -44,14 +44,14 @@ public class XQConnectionTest extends XQJTestCase {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
       my_xqc.close();
-      
+
       try {
         my_xqc.setAutoCommit(true);
         fail("A-XQC-2.1: closed connection supports setAutoCommit()");
       } catch (XQException e) {
         // Expect an XQException
       }
-    
+
       try {
         xqc.setAutoCommit(false);
         xqc.setAutoCommit(true);
@@ -67,14 +67,14 @@ public class XQConnectionTest extends XQJTestCase {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
       my_xqc.close();
-      
+
       try {
         my_xqc.getAutoCommit();
         fail("A-XQC-3.1: closed connection supports getAutoCommit()");
       } catch (XQException e) {
         // Expect an XQException
       }
-    
+
       boolean mode = false;
       try {
         mode = xqc.getAutoCommit();
@@ -82,7 +82,7 @@ public class XQConnectionTest extends XQJTestCase {
         fail("A-XQC-3.2: getAutoCommit() failed with message: " + e.getMessage());
       }
       assertTrue("A-XQC-3.2: The default auto commit mode is true.", mode);
-      
+
       mode = true;
       try {
         xqc.setAutoCommit(false);
@@ -100,7 +100,7 @@ public class XQConnectionTest extends XQJTestCase {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
       my_xqc.close();
-      
+
       try {
         my_xqc.commit();
         fail("A-XQC-4.1: closed connection supports commit()");
@@ -129,7 +129,7 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.createExpression();
       fail("A-XQC-5.1: closed connection supports creating expressions");
@@ -138,14 +138,14 @@ public class XQConnectionTest extends XQJTestCase {
     }
 
     XQExpression xqe;
-    
+
     try {
       xqe = xqc.createExpression();
       xqe.close();
     } catch (XQException e) {
       fail("A-XQC-5.2: creating an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQStaticContext xqsc = xqc.getStaticContext();
       xqsc.declareNamespace("foo", "http://www.foo.com");
@@ -164,7 +164,7 @@ public class XQConnectionTest extends XQJTestCase {
     my_xqc = xqds.getConnection();
     XQStaticContext my_xqsc = my_xqc.getStaticContext();
     my_xqc.close();
-    
+
     try {
       my_xqc.createExpression(my_xqsc);
       fail("A-XQC-5.1: closed connection supports creating expressions");
@@ -178,17 +178,17 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     XQStaticContext xqsc = xqc.getStaticContext();
     XQExpression xqe;
-    
+
     try {
      xqe = xqc.createExpression(xqsc);
      xqe.close();
     } catch (XQException e) {
       fail("A-XQC-5.2: creating an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       xqsc.declareNamespace("foo", "http://www.foo.com");
       xqe = xqc.createExpression(xqsc);
@@ -198,32 +198,32 @@ public class XQConnectionTest extends XQJTestCase {
       fail("A-XQC-5.4: Properties of the explicitly specified static context are used- failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testGetMetaData() throws XQException {
 
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.getMetaData();
       fail("A-XQC-6.1: closed connection supports getting meta data");
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
      xqc.getMetaData();
     } catch (XQException e) {
       fail("A-XQC-6.2: getting the meta data failed with message: " + e.getMessage());
     }
   }
-  
+
   public void testIsClosed() throws XQException {
-    
+
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
-    
+
     assertEquals("A-XQC-7.1: isClosed() on open connection", false, my_xqc.isClosed());
     my_xqc.close();
     assertEquals("A-XQC-7.2: isClosed() on closed connection", true, my_xqc.isClosed());
@@ -234,7 +234,7 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression("'Hello world!'");
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -251,7 +251,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
- 
+
     try {
       xqpe = xqc.prepareExpression((String)null);
       xqpe.close();
@@ -259,14 +259,14 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression("'Hello world!'");
       xqpe.close();
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQStaticContext xqsc = xqc.getStaticContext();
       xqsc.declareNamespace("foo", "http://www.foo.com");
@@ -280,12 +280,12 @@ public class XQConnectionTest extends XQJTestCase {
   }
 
   public void testPrepareExpression_XQStaticContext() throws XQException {
-    
+
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     XQStaticContext my_xqsc = my_xqc.getStaticContext();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression("'Hello world!'", my_xqsc);
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -303,7 +303,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression("'Hello world!'", (XQStaticContext)null);
       xqpe.close();
@@ -311,7 +311,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression((String)null, xqsc);
       xqpe.close();
@@ -326,7 +326,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       xqsc.declareNamespace("foo", "http://www.foo.com");
       xqpe = xqc.prepareExpression("<foo:e/>", xqsc);
@@ -342,7 +342,7 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression(new StringReader("'Hello world!'"));
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -359,7 +359,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
- 
+
     try {
       xqpe = xqc.prepareExpression((Reader)null);
       xqpe.close();
@@ -367,14 +367,14 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression(new StringReader("'Hello world!'"));
       xqpe.close();
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQStaticContext xqsc = xqc.getStaticContext();
       xqsc.declareNamespace("foo", "http://www.foo.com");
@@ -393,7 +393,7 @@ public class XQConnectionTest extends XQJTestCase {
     my_xqc = xqds.getConnection();
     XQStaticContext my_xqsc = my_xqc.getStaticContext();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression(new StringReader("'Hello world!'"), my_xqsc);
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -411,7 +411,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression(new StringReader("'Hello world!'"), (XQStaticContext)null);
       xqpe.close();
@@ -419,7 +419,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression((Reader)null, xqsc);
       xqpe.close();
@@ -434,7 +434,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       xqsc.declareNamespace("foo", "http://www.foo.com");
       xqpe = xqc.prepareExpression(new StringReader("<foo:e/>"), xqsc);
@@ -450,7 +450,7 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")));
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -467,7 +467,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
- 
+
     try {
       xqpe = xqc.prepareExpression((InputStream)null);
       xqpe.close();
@@ -475,14 +475,14 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")));
       xqpe.close();
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       XQStaticContext xqsc = xqc.getStaticContext();
       xqsc.declareNamespace("foo", "http://www.foo.com");
@@ -501,7 +501,7 @@ public class XQConnectionTest extends XQJTestCase {
     my_xqc = xqds.getConnection();
     XQStaticContext my_xqsc = my_xqc.getStaticContext();
     my_xqc.close();
-    
+
     try {
       my_xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")), my_xqsc);
       fail("A-XQC-8.1: closed connection supports preparing expressions");
@@ -519,7 +519,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")), (XQStaticContext)null);
       xqpe.close();
@@ -527,7 +527,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       // Expect an XQException
     }
-    
+
     try {
       xqpe = xqc.prepareExpression((InputStream)null, xqsc);
       xqpe.close();
@@ -542,7 +542,7 @@ public class XQConnectionTest extends XQJTestCase {
     } catch (XQException e) {
       fail("A-XQC-8.2: preparing an expression failed with message: " + e.getMessage());
     }
-    
+
     try {
       xqsc.declareNamespace("foo", "http://www.foo.com");
       xqpe = xqc.prepareExpression(new ByteArrayInputStream("<foo:e/>".getBytes("UTF-8")), xqsc);
@@ -559,7 +559,7 @@ public class XQConnectionTest extends XQJTestCase {
       XQConnection my_xqc;
       my_xqc = xqds.getConnection();
       my_xqc.close();
-      
+
       try {
         my_xqc.rollback();
         fail("A-XQC-9.1: closed connection supports rollback()");
@@ -588,7 +588,7 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
     my_xqc.close();
-    
+
     try {
       my_xqc.getStaticContext();
       fail("A-XQC-10.1: closed connection supports getting the static context");
@@ -609,7 +609,7 @@ public class XQConnectionTest extends XQJTestCase {
     my_xqc = xqds.getConnection();
     XQStaticContext my_xqsc = my_xqc.getStaticContext();
     my_xqc.close();
-    
+
     try {
       my_xqc.setStaticContext(my_xqsc);
       fail("A-XQC-11.1: closed connection supports setting the static context");

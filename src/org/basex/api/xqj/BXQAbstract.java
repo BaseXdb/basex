@@ -127,7 +127,7 @@ abstract class BXQAbstract {
    */
   protected final Item create(final Object v, final XQItemType t)
       throws XQException {
-    
+
     // check if object exists
     valid(v, Object.class);
 
@@ -139,7 +139,7 @@ abstract class BXQAbstract {
     if(e == null) throw new BXQException(CONV, v.getClass().getSimpleName());
 
     try {
-      // return item with correct type 
+      // return item with correct type
       return check(e, t).e(v);
     } catch(final QueryException ex) {
       throw new BXQException(ex);

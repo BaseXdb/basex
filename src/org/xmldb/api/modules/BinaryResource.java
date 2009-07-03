@@ -60,7 +60,7 @@ import org.xmldb.api.base.*;
  * Support for BinaryResources is optional.<p />
  *
  * The standard <code>getContent</code> method returns a <code>byte[]
- * </code> and the standard setContent expects an <code>byte[]</code>.<p /> 
+ * </code> and the standard setContent expects an <code>byte[]</code>.<p />
  */
 public interface BinaryResource extends Resource {
     /**
