@@ -6,7 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * Iterative predicate expression. Supports only one predicate.
+ * Iterative predicate expression. Supports one predicate.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Dennis Stratmann
@@ -70,10 +70,12 @@ public final class IterPred extends Pred {
           ctx.pos = p++;
         } else {
           // loop through all items
+          Item old = null;
           while((it = iter.next()) != null) {
             // set context item and position
             ctx.item = it;
             ctx.pos = p++;
+            old = it;
             final Item i = pred[0].test(ctx);
             if(i != null) {
               // item accepted.. adopt scoring value
@@ -82,7 +84,7 @@ public final class IterPred extends Pred {
             }
           }
           // returns the last item
-          if(last) it = ctx.item;
+          if(last) it = old;
         }
 
         // check if more items are to be expected

@@ -73,10 +73,10 @@ public final class FTFuzzy extends FTIndex {
     // cache token length index
     li = new DataAccess(db, DATAFTX + 'x');
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
-    int is = li.read();
+    int is = li.read1();
     while(--is >= 0) {
-      final int p = li.read();
-      tp[p] = li.readInt();
+      final int p = li.read1();
+      tp[p] = li.read4();
     }
     tp[tp.length - 1] = (int) ti.length();
   }
@@ -211,7 +211,7 @@ public final class FTFuzzy extends FTIndex {
    * @return size of the ftdata
    */
   private int size(final long pt, final int lt) {
-    return ti.readInt(pt + lt + 5);
+    return ti.read4(pt + lt + 5);
   }
 
   /**

@@ -545,8 +545,7 @@ public final class MapView extends View implements Runnable {
       if(focused != null && focused.thumb) {
         final int pre = focused.pre;
         final byte[] text = ViewData.content(data, pre, false);
-        final Tokenizer ftt = new Tokenizer(text);
-        final int[][] d = ftt.getInfo();
+        final int[][] d = Tokenizer.getInfo(text);
         focused.x += 3;
         focused.w -= 3;
 

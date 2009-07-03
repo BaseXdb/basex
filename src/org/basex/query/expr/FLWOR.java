@@ -93,8 +93,6 @@ public class FLWOR extends Expr {
       }
     }
     if(group != null) group.comp(ctx); 
-     
-    
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
     

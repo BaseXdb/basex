@@ -41,7 +41,7 @@ public final class VarCall extends Expr {
     if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)));
 
     /* Choose variables to be pre-evaluated.
-     * If a variable is pre-evaluated, it may not be subject to further
+     * If a variable is pre-evaluated, it may not be available for further
      * optimizations (IndexAceess, count, ...). On the other hand, multiple
      * evaluations of the same expression can be avoided here.
      */

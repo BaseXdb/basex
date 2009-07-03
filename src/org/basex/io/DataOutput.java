@@ -31,24 +31,24 @@ public final class DataOutput extends OutputStream {
    * Convenience constructor.
    * A default buffer size will be used.
    * @param db name of the database
-   * @param fn File to write to
+   * @param pre prefix of the database file to write to
    * @throws IOException in case of write errors
    */
-  public DataOutput(final String db, final String fn) throws IOException {
-    this(db, fn, 4096);
+  public DataOutput(final String db, final String pre) throws IOException {
+    this(db, pre, 4096);
   }
   
   /**
    * Convenience constructor with a specified buffer size.
    * The specified buffer size is used.
    * @param db name of the database
-   * @param fn name of the file to write to
+   * @param pre prefix of the database file to write to
    * @param bufs size of the buffer to use
    * @throws IOException in case of write errors
    */
-  public DataOutput(final String db, final String fn, final int bufs)
+  public DataOutput(final String db, final String pre, final int bufs)
       throws IOException {
-    os = new BufferedOutput(new FileOutputStream(IO.dbfile(db, fn)), bufs);
+    os = new BufferedOutput(new FileOutputStream(IO.dbfile(db, pre)), bufs);
   }
   
   @Override

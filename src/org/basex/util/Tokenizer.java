@@ -150,6 +150,7 @@ public class Tokenizer implements IndexToken {
     // parse token
     for(; p < l; p += cl(text[p])) {
       int c = cp(text, p);
+      // parse wildcards
       if(wc && !bs) {
         bs = c == '\\';
         if(bs) continue;
@@ -203,7 +204,7 @@ public class Tokenizer implements IndexToken {
   }
 
   /**
-   * Returns a normalized version of the token.
+   * Returns a normalized version of the specified token.
    * @param tok input token
    * @return result
    */
@@ -222,7 +223,7 @@ public class Tokenizer implements IndexToken {
    * @return original token
    */
   public byte[] orig() {
-    return substring(text, s, p);
+    return Array.create(text, s, p - s);
   }
 
   /**
@@ -290,38 +291,40 @@ public class Tokenizer implements IndexToken {
   }
 
   /**
-   * Gets full-text info out of text; needed for visualizations.
+   * Gets full-text info for the specified token; needed for visualizations.
    * int[0]: length of each token
    * int[1]: sentence info, length of each sentence
    * int[2]: paragraph info, length of each paragraph
    * int[3]: each token as int[]
    * int[4]: punctuation marks of each sentence
+   * @param t text to be parsed
    * @return int arrays
    */
-  public int[][] getInfo() {
+  public static int[][] getInfo(final byte[] t) {
+    final Tokenizer tok = new Tokenizer(t);
     final IntList[] il = new IntList[] { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;
     int lasp = 0;
     int sl = 0;
     int pl = 0;
-    while(more()) {
-      final byte[] n = orig();
+    while(tok.more()) {
+      final byte[] n = tok.orig();
       final int l = n.length;
       il[0].add(l);
-      il[3].add(n);
+      for(final byte b : n) il[3].add(b);
 
-      if(sent != lass) {
+      if(tok.sent != lass) {
         if(sl > 0) {
           il[1].add(sl);
-          il[4].add(pm);
+          il[4].add(tok.pm);
         }
-        lass = sent;
+        lass = tok.sent;
         sl = 0;
       }
-      if(para != lasp) {
+      if(tok.para != lasp) {
         if(pl > 0) il[2].add(pl);
-        lasp = para;
+        lasp = tok.para;
         pl = 0;
       }
 
@@ -329,9 +332,9 @@ public class Tokenizer implements IndexToken {
       pl += l;
     }
 
-    if(sent != lass && sl > 0) {
+    if(tok.sent != lass && sl > 0) {
       il[1].add(sl);
-      il[4].add(pm);
+      il[4].add(tok.pm);
     }
     if(pl > 0) il[2].add(pl);
 

@@ -43,8 +43,7 @@ public final class Let extends ForLet {
     if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
         expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))) {
       ctx.compInfo(OPTBIND, var);
-      //var.bind(expr, ctx);
-      var.ret = expr.returned(ctx);
+      var.bind(expr, ctx);
     } else {
       var.ret = expr.returned(ctx);
     }

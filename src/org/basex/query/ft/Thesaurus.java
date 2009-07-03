@@ -100,16 +100,15 @@ public final class Thesaurus {
   
   /**
    * Initializes the thesaurus.
-   * @param ft tokenizer
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean init(final Tokenizer ft) throws QueryException {
+  private boolean init() throws QueryException {
     try {
       final Data data = new MemBuilder().build(new DirParser(file), "");
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
-        build(new Nodes(result.nodes[n], data), ft);
+        build(new Nodes(result.nodes[n], data));
       }
     } catch(final IOException ex) {
       Err.or(NOTHES, file);
@@ -120,23 +119,22 @@ public final class Thesaurus {
   /**
    * Builds the thesaurus.
    * @param in input nodes
-   * @param ft tokenizer
    * @throws QueryException exception
    */
-  private void build(final Nodes in, final Tokenizer ft) throws QueryException {
+  private void build(final Nodes in) throws QueryException {
     final Nodes sub = nodes("*:synonym", in);
     if(sub.size() == 0) return;
 
-    final ThesNode node = getNode(ft.get(text("*:term", in)));
+    final ThesNode node = getNode(text("*:term", in));
     for(int n = 0; n < sub.size(); n++) {
       final Nodes tmp = new Nodes(sub.nodes[n], sub.data);
-      final ThesNode snode = getNode(ft.get(text("*:term", tmp)));
+      final ThesNode snode = getNode(text("*:term", tmp));
       final byte[] rs = text("*:relationship", tmp);
       node.add(snode, rs);
 
       final byte[] srs = RSHIPS.get(rs);
       if(srs != null) snode.add(node, srs);
-      build(sub, ft);
+      build(sub);
     }
   }
 
@@ -186,7 +184,7 @@ public final class Thesaurus {
    * @throws QueryException query exception
    */
   void find(final TokenList list, final Tokenizer ft) throws QueryException {
-    if(nodes.size() == 0) init(ft);
+    if(nodes.size() == 0) init();
     find(list, nodes.get(ft.text), 1);
   }
 

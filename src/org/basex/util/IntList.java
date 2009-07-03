@@ -48,14 +48,6 @@ public class IntList {
   }
 
   /**
-   * Add array of values.
-   * @param v byte[]
-   */
-  public void add(final byte[] v) {
-    for(final byte b : v) add(b);
-  }
-  
-  /**
    * Sets a value at the specified position.
    * @param v value to be added
    * @param p position

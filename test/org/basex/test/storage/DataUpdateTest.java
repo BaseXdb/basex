@@ -45,32 +45,44 @@ public abstract class DataUpdateTest {
 
   /**
    * Create the database.
-   * @throws Exception exception
    */
   @Before
   @SuppressWarnings("unused")
-  public void setUp() throws Exception {
-    data = CreateDB.xml(IO.get(TESTFILE), dbname);
+  public void setUp() {
+    try {
+      data = CreateDB.xml(IO.get(TESTFILE), dbname);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+      System.exit(1);
+    }
     size = data.meta.size;
   }
   
   /**
    * Delete the test-database.
-   * @throws Exception in case of problems.
    */
   @After
-  public void tearDown() throws Exception {
-    data.close();
-    DropDB.drop(dbname);
+  public void tearDown() {
+    try {
+      data.close();
+      DropDB.drop(dbname);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+      System.exit(1);
+    }
   }
 
   /**
    * Reload Data class.
-   * @throws Exception in case of problems.
    */
-  void reload() throws Exception {
-    data.close();
-    data = new DiskData(dbname);
+  void reload() {
+    try {
+      data.close();
+      data = new DiskData(dbname);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+      System.exit(1);
+    }
   }
 
   /**
@@ -80,17 +92,14 @@ public abstract class DataUpdateTest {
    */
   void assertByteArraysEqual(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
-    for(int i = 0; i < exp.length; i++) {
-      assertEquals(exp[i], act[i]);
-    }
+    for(int i = 0; i < exp.length; i++) assertEquals(exp[i], act[i]);
   }
 
   /**
    * Test for correct data size.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testSize() throws Exception {
+  public void testSize() {
     assertEquals("Unexpected size!", size, data.meta.size);
     reload();
     assertEquals("Unexpected size!", size, data.meta.size);

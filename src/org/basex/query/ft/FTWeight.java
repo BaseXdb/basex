@@ -11,6 +11,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Err;
+import org.basex.query.util.Var;
 
 /**
  * FTOptions expression.
@@ -78,6 +79,17 @@ public final class FTWeight extends FTExpr {
   public boolean indexAccessible(final IndexContext ic) {
     // weight makes no sense as long as no index-based scoring exists
     return false;
+  }
+
+  @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return weight.removable(v, ctx) && super.removable(v, ctx);
+  }
+
+  @Override
+  public FTExpr remove(final Var v) {
+    weight = weight.remove(v);
+    return super.remove(v);
   }
 
   @Override

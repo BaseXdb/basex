@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.util.Var;
 import org.basex.util.Tokenizer;
 
 /**
@@ -31,6 +32,12 @@ public final class FTDistance extends FTFilter {
     super(e);
     dist = d;
     unit = u;
+  }
+
+  @Override
+  public FTExpr comp(final QueryContext ctx) throws QueryException {
+    for(int d = 0; d != dist.length; d++) dist[d] = dist[d].comp(ctx);
+    return super.comp(ctx);
   }
 
   @Override
@@ -62,6 +69,19 @@ public final class FTDistance extends FTFilter {
     mtc.add(f);
     mtc.add(match);
     return true;
+  }
+
+  @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(int d = 0; d != dist.length; d++) if(!dist[d].removable(v, ctx))
+      return false;
+    return super.removable(v, ctx);
+  }
+
+  @Override
+  public FTExpr remove(final Var v) {
+    for(int d = 0; d != dist.length; d++) dist[d] = dist[d].remove(v);
+    return super.remove(v);
   }
 
   @Override

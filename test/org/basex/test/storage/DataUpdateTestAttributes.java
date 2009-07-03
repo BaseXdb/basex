@@ -14,10 +14,9 @@ import static org.junit.Assert.*;
 public final class DataUpdateTestAttributes extends DataUpdateTest {
   /**
    * Test the update of an existing attribute.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testUpdateAttribute() throws Exception {
+  public void testUpdateAttribute() {
     data.update(7, token("name"), token("junit"));
     assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("name"), data.attName(7));
@@ -30,10 +29,9 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
 
   /**
    * Test the update of an existing attribute.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testUpdateAttribute2() throws Exception {
+  public void testUpdateAttribute2() {
     data.update(8, token("id"), token("junit"));
     assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("junit"), data.attValue(8));
@@ -44,10 +42,9 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
 
   /**
    * Test the insertion of a new attribute.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testAddAttribute() throws Exception {
+  public void testAddAttribute() {
     final long nextid = data.meta.lastid;
     data.insert(9, 6, token("foo"), token("junit"));
     assertEquals(size + 1, data.meta.size);

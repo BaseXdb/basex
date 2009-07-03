@@ -196,21 +196,22 @@ public final class FTTrie extends FTIndex {
    * @return node entry from disk
    */
   private int[] entry(final long id) {
-    int sp = inS.readInt(id * 4);
-    final int ep = inS.readInt((id + 1) * 4);
+    int sp = inS.read4(id * 4);
+    final int ep = inS.read4((id + 1) * 4);
     final IntList il = new IntList();
-    final int l = inN.readByte(sp++);
+    inN.cursor(sp++);
+    final int l = inN.read1();
     il.add(l);
-    for(int j = 0; j < l; j++) il.add(inN.readByte(sp++));
+    for(int j = 0; j < l; j++) il.add(inN.read1());
+    sp += l;
 
     // inner node
     while(sp + 9 < ep) {
-      il.add(inN.readInt(sp));
-      sp += 4;
-      il.add(inN.readByte(sp));
-      sp += 1;
+      il.add(inN.read4());
+      il.add(inN.read1());
+      sp += 5;
     }
-    il.add(inN.readInt(ep - 9));
+    il.add(inN.read4(ep - 9));
     did = inN.read5(ep - 5);
     return il.finish();
   }

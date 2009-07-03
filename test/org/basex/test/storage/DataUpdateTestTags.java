@@ -14,10 +14,9 @@ import static org.junit.Assert.*;
 public final class DataUpdateTestTags extends DataUpdateTest {
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAsOnly1() throws Exception {
+  public void testInsertTagAsOnly1() {
     final long nextid = data.meta.lastid;
     insertTag(3, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -40,10 +39,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAsOnly2() throws Exception {
+  public void testInsertTagAsOnly2() {
     final long nextid = data.meta.lastid;
     insertTag(3, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -66,10 +64,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAsOnly3() throws Exception {
+  public void testInsertTagAsOnly3() {
     final long nextid = data.meta.lastid;
     insertTag(3, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -92,10 +89,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAfterAttsAsFirst() throws Exception {
+  public void testInsertTagAfterAttsAsFirst() {
     final long nextid = data.meta.lastid;
     insertTag(6, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -117,10 +113,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAfterAttsAsSecond() throws Exception {
+  public void testInsertTagAfterAttsAsSecond() {
     final long nextid = data.meta.lastid;
     insertTag(6, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -143,10 +138,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test insert as last child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testInsertTagAfterAttsAsLast() throws Exception {
+  public void testInsertTagAfterAttsAsLast() {
     final long nextid = data.meta.lastid;
     insertTag(6, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -168,10 +162,9 @@ public final class DataUpdateTestTags extends DataUpdateTest {
 
   /**
    * Test updateTagName.
-   * @throws Exception in case of problems
    */
   @Test
-  public void testUpdateTagName() throws Exception {
+  public void testUpdateTagName() {
     data.update(6, token("JUnit"));
     assertEquals((int) Data.ELEM, data.kind(6));
     assertByteArraysEqual(token("JUnit"), data.tag(6));

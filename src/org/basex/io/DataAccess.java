@@ -12,28 +12,14 @@ import org.basex.util.Num;
  * @author Christian Gruen
  */
 public final class DataAccess {
-  /** Buffer limit (buffer size - 1). */
-  private static final int BUFLIMIT = IO.BLOCKSIZE - 1;
-  /** Number of buffers. */
-  private static final int BUFFERS = 3;
-
+  /** Buffer management. */
+  private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
   private final RandomAccessFile file;
   /** File length. */
   private long len;
-
-  /** Buffers. */
-  private final byte[][] buffer = new byte[BUFFERS][IO.BLOCKSIZE];
-  /** Positions. */
-  private final long[] pos = new long[BUFFERS];
-  /** Positions. */
-  private final boolean[] dirty = new boolean[BUFFERS];
-  /** Positions. */
-  private boolean dirt;
   /** Offset. */
   private int off;
-  /** Current buffer reference. */
-  private int c;
 
   /**
    * Constructor, initializing the file reader.
@@ -61,9 +47,8 @@ public final class DataAccess {
    */
   public DataAccess(final File f) throws IOException {
     file = new RandomAccessFile(f, "rw");
-    file.read(buffer[0]);
-    for(int i = 1; i < BUFFERS; i++) pos[i] = -1;
     len = file.length();
+    cursor(0);
   }
 
   /**
@@ -71,10 +56,7 @@ public final class DataAccess {
    * @throws IOException in case of write errors
    */
   public synchronized void flush() throws IOException {
-    for(int i = 0; i < BUFFERS; i++) {
-      if(dirty[i]) writeBlock(buffer[i], pos[i]);
-    }
-    dirt = false;
+    for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
   }
   
   /**
@@ -82,7 +64,7 @@ public final class DataAccess {
    * @throws IOException in case of write errors
    */
   public synchronized void close() throws IOException {
-    if(dirt) flush();
+    flush();
     file.close();
   }
 
@@ -92,6 +74,32 @@ public final class DataAccess {
    */
   public synchronized long length() {
     return len;
+  }
+
+  /**
+   * Checks if more bytes can be read.
+   * @return result of check
+   */
+  public synchronized boolean more() {
+    return pos() < len;
+  }
+
+  /**
+   * Reads a byte value.
+   * @return integer value
+   */
+  public synchronized byte read1() {
+    return (byte) read();
+  }
+
+  /**
+   * Reads an integer value from the specified position.
+   * @param p position
+   * @return integer value
+   */
+  public synchronized int read4(final long p) {
+    cursor(p);
+    return read4();
   }
 
   /**
@@ -126,19 +134,20 @@ public final class DataAccess {
     
     final byte[] b = new byte[l];
     int ll = IO.BLOCKSIZE - off;
+    Buffer bf = bm.curr();
     if(ll >= l) {
-      System.arraycopy(buffer[c], off, b, 0, l);
+      System.arraycopy(bf.buf, off, b, 0, l);
     } else {
-      System.arraycopy(buffer[c], off, b, 0, ll);
+      System.arraycopy(bf.buf, off, b, 0, ll);
       l -= ll;
       while(l > IO.BLOCKSIZE) {
-        nextBlock();
-        System.arraycopy(buffer[c], 0, b, ll, IO.BLOCKSIZE);
-        l -= IO.BLOCKSIZE;
+        bf = next();
+        System.arraycopy(bf.buf, 0, b, ll, IO.BLOCKSIZE);
         ll += IO.BLOCKSIZE;
+        l -= IO.BLOCKSIZE;
       }
-      nextBlock();
-      System.arraycopy(buffer[c], 0, b, ll, l);
+      bf = next();
+      System.arraycopy(bf.buf, 0, b, ll, l);
     }
     return b;
   }
@@ -148,35 +157,7 @@ public final class DataAccess {
    * @return text as byte array
    */
   public synchronized long pos() {
-    return pos[c] + off;
-  }
-
-  /**
-   * Reads an integer value from the specified position.
-   * @param p position
-   * @return integer value
-   */
-  public synchronized int readInt(final long p) {
-    cursor(p);
-    return readInt();
-  }
-
-  /**
-   * Reads a byte value from the specified position.
-   * @param p position
-   * @return integer value
-   */
-  public synchronized byte readByte(final long p) {
-    cursor(p);
-    return readByte();
-  }
-
-  /**
-   * Reads a byte value.
-   * @return integer value
-   */
-  public synchronized byte readByte() {
-    return (byte) read();
+    return bm.curr().pos + off;
   }
 
   /**
@@ -203,77 +184,37 @@ public final class DataAccess {
     for(final byte b : v) write(b);
   }
   
-  // private methods...
-
-  /**
-   * Reads the next block from disk.
-   */
-  private synchronized void nextBlock() {
-    cursor(pos[c] + IO.BLOCKSIZE);
-  }
-  
   /**
    * Sets the disk cursor.
    * @param p read position
+   * @return buffer
    */
-  public synchronized void cursor(final long p) {
-    off = (int) (p & BUFLIMIT);
-    
-    final long ps = p - off;
-    final int o = c;
-    do {
-      if(pos[c] == ps) return;
-    } while((c = (c + 1) % BUFFERS) != o);
-    
-    c = (o + 1) % BUFFERS;
-    readBlock(ps);
-  }
+  public synchronized Buffer cursor(final long p) {
+    off = (int) (p & IO.BLOCKSIZE - 1);
 
-  /**
-   * Reads the block at the specified file position from disk.
-   * @param n read position
-   */
-  private synchronized void readBlock(final long n) {
-    try {
-      if(dirt) flush();
-      pos[c] = n;
-      file.seek(n);
-      file.read(buffer[c]);
-    } catch(final IOException ex) {
-      ex.printStackTrace();
+    final boolean ch = bm.cursor(p - off);
+    final Buffer bf = bm.curr();
+    if(ch) {
+      try {
+        if(bf.dirty) writeBlock(bf);
+        bf.pos = p - off;
+        file.seek(bf.pos);
+        file.read(bf.buf);
+      } catch(final IOException ex) {
+        ex.printStackTrace();
+      }
     }
+    return bf;
   }
-
+  
   /**
    * Writes the specified block to disk.
    * @param bf buffer to write
-   * @param ps file position
    * @throws IOException I/O exception
    */
-  private synchronized void writeBlock(final byte[] bf, final long ps)
-      throws IOException {
-    file.seek(ps);
-    file.write(bf);
-  }
-
-  /**
-   * Reads the next byte.
-   * @return next byte
-   */
-  public synchronized int read() {
-    if(off == IO.BLOCKSIZE) {
-      nextBlock();
-      off = 0;
-    }
-    return buffer[c][off++] & 0xFF;
-  }
-
-  /**
-   * Checks if more bytes can be read.
-   * @return result of check
-   */
-  public synchronized boolean more() {
-    return pos() < len;
+  private synchronized void writeBlock(final Buffer bf) throws IOException {
+    file.seek(bf.pos);
+    file.write(bf.buf);
   }
 
   /**
@@ -286,9 +227,9 @@ public final class DataAccess {
     case 0:
       return v;
     case 0x40:
-      return ((v - 0x40) << 8) + read();
+      return (v - 0x40 << 8) + read();
     case 0x80:
-      return ((v - 0x80) << 24) + (read() << 16) + (read() << 8) + read();
+      return (v - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
     default:
       return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
@@ -299,7 +240,7 @@ public final class DataAccess {
    * (without cursor correction).
    * @return integer value
    */
-  public synchronized int readInt() {
+  public synchronized int read4() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
   
@@ -321,17 +262,31 @@ public final class DataAccess {
   }
 
   /**
+   * Reads the next byte.
+   * @return next byte
+   */
+  private synchronized int read() {
+    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.curr();
+    return bf.buf[off++] & 0xFF;
+  }
+
+  /**
    * Writes the next byte.
    * @param b byte to be written
    */
   private synchronized void write(final int b) {
-    if(off == IO.BLOCKSIZE) {
-      nextBlock();
-      off = 0;
-    }
-    buffer[c][off++] = (byte) b;
-    if(len < pos[c] + off) len = pos[c] + off;
-    dirty[c] = true;
-    dirt = true;
+    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.curr();
+    bf.buf[off++] = (byte) b;
+    len = Math.max(len, bf.pos + off);
+    bf.dirty = true;
+  }
+
+  /**
+   * Returns the next block.
+   * @return buffer
+   */
+  private synchronized Buffer next() {
+    off = 0;
+    return cursor(bm.curr().pos + IO.BLOCKSIZE);
   }
 }

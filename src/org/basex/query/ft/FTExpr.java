@@ -67,7 +67,7 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public final FTExpr remove(final Var v) {
+  public FTExpr remove(final Var v) {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
     return this;
   }

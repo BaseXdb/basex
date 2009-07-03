@@ -23,10 +23,15 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
 
   @Before
   @Override
-  public void setUp() throws Exception {
+  public void setUp() {
     super.setUp();
     final IO file = IO.get(INSERTFILE);
-    insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
+    try {
+      insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+      System.exit(1);
+    }
   }
 
   /**

@@ -162,7 +162,7 @@ public final class BaseX extends BaseXClient {
    */
   public static String bug(final Object... ext) {
     final TokenBuilder sb = new TokenBuilder(
-        "Implementation Bug? Please send to " + MAIL);
+        "Potential Bug? Please send to " + MAIL);
     if(ext.length != 0) sb.add(" (%)", ext);
     return sb.toString();
   }

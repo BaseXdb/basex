@@ -14,10 +14,9 @@ import static org.junit.Assert.*;
 public final class DataUpdateTestDeletes extends DataUpdateTest {
   /**
    * Test deletion of a simple node.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testSimpleNodeDelete() throws Exception {
+  public void testSimpleNodeDelete() {
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParSize = data.size(2, Data.ELEM);
@@ -39,10 +38,9 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
 
   /**
    * Test deletion of a node with a child.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testCascadingDelete() throws Exception {
+  public void testCascadingDelete() {
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     data.delete(2);
@@ -61,10 +59,9 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
 
   /**
    * Test deletion of a node with a child (with text) and attribute.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testCascadingDelete2() throws Exception {
+  public void testCascadingDelete2() {
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(4, Data.ELEM);
@@ -86,10 +83,9 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
 
   /**
    * Test deletion of an attribute.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testDeleteAttribute() throws Exception {
+  public void testDeleteAttribute() {
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
     data.delete(7);
@@ -113,10 +109,9 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
   /**
    * For the sake of completeness.
    * Test deletion of a text-node.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testDeleteText() throws Exception {
+  public void testDeleteText() {
     data.delete(10);
     assertEquals(size - 1, data.meta.size);
     reload();

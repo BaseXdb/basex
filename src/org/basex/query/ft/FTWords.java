@@ -19,6 +19,7 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.query.util.Var;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
@@ -271,6 +272,24 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    if(occ != null) {
+      for(int o = 0; o != occ.length; o++) if(!occ[o].removable(v, ctx))
+        return false;
+    }
+    return query.removable(v, ctx);
+  }
+
+  @Override
+  public FTExpr remove(final Var v) {
+    if(occ != null) {
+      for(int o = 0; o != occ.length; o++) occ[o] = occ[o].remove(v);
+    }
+    query = query.remove(v);
+    return this;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     if(occ != null) {
@@ -284,7 +303,10 @@ public final class FTWords extends FTExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(query.toString());
+    final StringBuilder sb = new StringBuilder();
+    if(!(query instanceof Str)) sb.append("{ ");
+    sb.append(query.toString());
+    if(!(query instanceof Str)) sb.append(" }");
     if(occ != null) {
       sb.append(QueryTokens.OCCURS + " " + occ[0] + " " +
           QueryTokens.TO + " " + occ[1] + " " + QueryTokens.TIMES);

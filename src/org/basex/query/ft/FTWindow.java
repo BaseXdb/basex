@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
+import org.basex.query.util.Var;
 import org.basex.util.Tokenizer;
 
 /**
@@ -19,7 +20,7 @@ import org.basex.util.Tokenizer;
  */
 public final class FTWindow extends FTFilter {
   /** Window. */
-  private final Expr win;
+  private Expr win;
   
   /**
    * Constructor.
@@ -31,6 +32,12 @@ public final class FTWindow extends FTFilter {
     super(e);
     win = w;
     unit = u;
+  }
+
+  @Override
+  public FTExpr comp(final QueryContext ctx) throws QueryException {
+    win = win.comp(ctx);
+    return super.comp(ctx);
   }
 
   @Override
@@ -64,6 +71,17 @@ public final class FTWindow extends FTFilter {
     mtc.add(match);
 
     return true;
+  }
+
+  @Override
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return win.removable(v, ctx) && super.removable(v, ctx);
+  }
+
+  @Override
+  public FTExpr remove(final Var v) {
+    win = win.remove(v);
+    return super.remove(v);
   }
 
   @Override

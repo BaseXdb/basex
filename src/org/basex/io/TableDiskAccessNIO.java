@@ -32,14 +32,14 @@ public final class TableDiskAccessNIO extends TableAccess {
   private MappedByteBuffer currentmbb;
 
   /** Read Write file channel. */
-  private FileChannel fc;
+  private final FileChannel fc;
 
   /** File storing all blocks. */
   private final RandomAccessFile file;
   /** Name of the database. */
   private final String db;
   /** Filename. */
-  private final String fn;
+  private final String pref;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;
@@ -74,7 +74,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   public TableDiskAccessNIO(final String nm, final String f)
   throws IOException {
     db = nm;
-    fn = f;
+    pref = f;
 
     // READ INFO FILE AND INDEX
     final DataInput in = new DataInput(nm, f + 'i');
@@ -164,7 +164,7 @@ public final class TableDiskAccessNIO extends TableAccess {
   @Override
   public synchronized void flush() throws IOException {
     if(!indexdirty) return;
-    final DataOutput out = new DataOutput(db, fn + 'i');
+    final DataOutput out = new DataOutput(db, pref + 'i');
     out.writeNum(nrBlocks);
     out.writeNum(indexSize);
     out.writeNum(count);
@@ -181,21 +181,21 @@ public final class TableDiskAccessNIO extends TableAccess {
   }
 
   @Override
-  public synchronized int read1(final int pos, final int off) {
-    final int o = off + cursor(pos);
+  public synchronized int read1(final int pre, final int off) {
+    final int o = off + cursor(pre);
     return currentmbb.get(o) & 0xFF;
   }
 
   @Override
-  public synchronized int read2(final int pos, final int off) {
-    final int o = off + cursor(pos);
+  public synchronized int read2(final int pre, final int off) {
+    final int o = off + cursor(pre);
     return ((currentmbb.get(o) & 0xFF) << 8)
     + (currentmbb.get(o + 1) & 0xFF);
   }
 
   @Override
-  public synchronized int read4(final int pos, final int off) {
-    final int o = off + cursor(pos);
+  public synchronized int read4(final int pre, final int off) {
+    final int o = off + cursor(pre);
     return ((currentmbb.get(o) & 0xFF) << 24)
         + ((currentmbb.get(o + 1) & 0xFF) << 16)
         + ((currentmbb.get(o + 2) & 0xFF) << 8)
@@ -203,8 +203,8 @@ public final class TableDiskAccessNIO extends TableAccess {
   }
 
   @Override
-  public synchronized long read5(final int pos, final int off) {
-    final int o = off + cursor(pos);
+  public synchronized long read5(final int pre, final int off) {
+    final int o = off + cursor(pre);
     return ((long) (currentmbb.get(o) & 0xFF) << 32)
         + ((long) (currentmbb.get(o + 1) & 0xFF) << 24)
         + ((currentmbb.get(o + 2) & 0xFF) << 16)
@@ -213,21 +213,21 @@ public final class TableDiskAccessNIO extends TableAccess {
   }
 
   @Override
-  public synchronized void write1(final int pos, final int off, final int v) {
-    final int o = off + cursor(pos);
+  public synchronized void write1(final int pre, final int off, final int v) {
+    final int o = off + cursor(pre);
     currentmbb.put(o, (byte) v);
   }
 
   @Override
-  public synchronized void write2(final int pos, final int off, final int v) {
-    final int o = off + cursor(pos);
+  public synchronized void write2(final int pre, final int off, final int v) {
+    final int o = off + cursor(pre);
     currentmbb.put(o, (byte) (v >>> 8));
     currentmbb.put(o + 1, (byte) v);
   }
 
   @Override
-  public synchronized void write4(final int pos, final int off, final int v) {
-    final int o = off + cursor(pos);
+  public synchronized void write4(final int pre, final int off, final int v) {
+    final int o = off + cursor(pre);
     currentmbb.put(o, (byte) (v >>> 24));
     currentmbb.put(o + 1, (byte) (v >>> 16));
     currentmbb.put(o + 2, (byte) (v >>> 8));
@@ -235,8 +235,8 @@ public final class TableDiskAccessNIO extends TableAccess {
   }
 
   @Override
-  public synchronized void write5(final int pos, final int off, final long v) {
-    final int o = off + cursor(pos);
+  public synchronized void write5(final int pre, final int off, final long v) {
+    final int o = off + cursor(pre);
     currentmbb.put(o, (byte) (v >>> 32));
     currentmbb.put(o + 1, (byte) (v >>> 24));
     currentmbb.put(o + 2, (byte) (v >>> 16));

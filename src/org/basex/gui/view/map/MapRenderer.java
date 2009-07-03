@@ -207,8 +207,7 @@ final class MapRenderer {
     r.thumbf = ff * GUIProp.fontsize;
     r.thumbal = 0;
 
-    final Tokenizer ftt = new Tokenizer(s);
-    final int[][] data = ftt.getInfo();
+    final int[][] data = Tokenizer.getInfo(s);
 
     boolean l = false;
     while(r.thumbal < 2) {

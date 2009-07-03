@@ -131,7 +131,8 @@ public final class MAB2Parser extends Parser {
     input = new DataAccess(io.path());
 
     // check beginning of input file
-    if(input.read() != '#' || input.read() != '#' || input.read() != '#') {
+    if(input.read1() != '#' || input.read1() != '#' ||
+        input.read1() != '#') {
       throw new BuildException("Invalid MAB2 input (doesn't start with ###)");
     }
 
@@ -214,11 +215,11 @@ public final class MAB2Parser extends Parser {
    */
   private byte[] id(final DataAccess in) {
     while(in.more()) {
-      if(in.read() != '\n') continue;
-      final int n = in.read();
-      if(n == '0' && in.read() ==  '0' && in.read() == '1') {
+      if(in.read1() != '\n') continue;
+      final int n = in.read1();
+      if(n == '0' && in.read1() ==  '0' && in.read1() == '1') {
         off = in.pos() - 3;
-        return text(in);
+        return ident(in);
       }
     }
     return null;
@@ -231,11 +232,11 @@ public final class MAB2Parser extends Parser {
    */
   private byte[] par(final DataAccess in) {
     while(in.more()) {
-      if(in.read() != '\n') continue;
-      final int b1 = in.read();
+      if(in.read1() != '\n') continue;
+      final int b1 = in.read1();
       if(b1 == '#' || b1 == '\n') return null;
-      if(b1 == '0' && in.read() == '1' && in.read() == '0' ||
-         b1 == '4' && in.read() == '5' && in.read() == '3') return text(in);
+      if(b1 == '0' && in.read1() == '1' && in.read1() == '0' ||
+         b1 == '4' && in.read1() == '5' && in.read1() == '3') return ident(in);
     }
     return null;
   }
@@ -245,11 +246,11 @@ public final class MAB2Parser extends Parser {
    * @param in input stream
    * @return next text
    */
-  private byte[] text(final DataAccess in) {
-    in.read();
+  private byte[] ident(final DataAccess in) {
+    in.read1();
     int l = 0;
-    int b;
-    while((b = in.read()) >= ' ') CACHE[l++] = (byte) b;
+    byte b;
+    while((b = in.read1()) >= ' ') CACHE[l++] = b;
     return Array.finish(CACHE, l);
   }
 
@@ -265,10 +266,10 @@ public final class MAB2Parser extends Parser {
   private byte[] find(final DataAccess in, final byte delim) {
     buffer.reset();
     while(in.more()) {
-      final int c = in.read();
+      final byte c = in.read1();
       if(c == delim) return buffer.finish();
       if(c < ' ') continue;
-      buffer.add((byte) c);
+      buffer.add(c);
     }
     return null;
   }
@@ -504,7 +505,7 @@ public final class MAB2Parser extends Parser {
     final byte[] t = string(token);
     for(int i = 0; i < t.length; i++) if(t[i] == '?' || t[i] == '$') t[i] = '+';
     final TokenBuilder tb = new TokenBuilder();
-    for(byte[] lang : split(t, '+')) {
+    for(final byte[] lang : split(t, '+')) {
       final byte[] l = languages.get(lang);
       if(tb.size != 0) tb.add('+');
       tb.add(l != null ? l : t);

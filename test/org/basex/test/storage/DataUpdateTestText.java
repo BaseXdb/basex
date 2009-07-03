@@ -199,10 +199,9 @@ public final class DataUpdateTestText extends DataUpdateTest {
 
   /**
    * Test updateText.
-   * @throws Exception in case of problems
    */
   @Test
-  public void testUpdateText() throws Exception {
+  public void testUpdateText() {
     data.update(10, token("JUnit"));
     assertEquals((int) Data.TEXT, data.kind(10));
     assertByteArraysEqual(token("JUnit"), data.text(10));
@@ -212,14 +211,14 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Inserts a tag.
+   * Inserts a value in the database.
    * @param par parent node
    * @param pos inserting position
-   * @param name tag name
+   * @param val value to be inserted
    * @param kind node kind
    * @throws IOException I/O exception
    */
-  private void insertText(final int par, final int pos, final byte[] name,
+  private void insertText(final int par, final int pos, final byte[] val,
       final byte kind) throws IOException {
 
     int pre = par;
@@ -238,13 +237,10 @@ public final class DataUpdateTestText extends DataUpdateTest {
         data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
-    data.insert(pre, par, name, kind);
+    data.insert(pre, par, val, kind);
   }
 
-  /**
-   * Don't remove.
-   *
-   */
+  /** Don't remove. */
   @Test
   public void foo() {
     return;

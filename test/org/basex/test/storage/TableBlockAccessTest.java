@@ -47,13 +47,17 @@ public final class TableBlockAccessTest {
 
   /**
    * Load the JUnitTest database.
-   * @throws Exception in case of problems
    */
   @Before
-  public void setUp() throws Exception {
-    final XMLParser parser = new XMLParser(IO.get(TESTFILE));
-    size = new DiskBuilder().build(parser, DBNAME).meta.size;
-    tba = new TableDiskAccess(DBNAME, DATATBL);
+  public void setUp() {
+    try {
+      final XMLParser parser = new XMLParser(IO.get(TESTFILE));
+      size = new DiskBuilder().build(parser, DBNAME).meta.size;
+      tba = new TableDiskAccess(DBNAME, DATATBL);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
+
     final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
     for(int i = 0; i < bytecount; i++) {
@@ -88,16 +92,16 @@ public final class TableBlockAccessTest {
       final int currentNodeNumber, final int count) {
     final int startOffset = startNodeNumber << IO.NODEPOWER;
     final int currentOffset = currentNodeNumber << IO.NODEPOWER;
-    for(int i = 0; i < (count << IO.NODEPOWER); i++) {
+    for(int i = 0; i < count << IO.NODEPOWER; i++) {
       final int startByteNum = startOffset + i;
       final int currentByteNum = currentOffset + i;
       final byte startByte = storage[startByteNum];
       final byte currentByte = (byte) tba.read1(currentByteNum >> IO.NODEPOWER,
         currentByteNum % (1 << IO.NODEPOWER));
       assertEquals("Old entry " + (startByteNum >> IO.NODEPOWER)
-          + " (byte " + (startByteNum % (1 << IO.NODEPOWER))
+          + " (byte " + startByteNum % (1 << IO.NODEPOWER)
           + ") and new entry " + (currentByteNum >> IO.NODEPOWER)
-          + " (byte " + (currentByteNum % (1 << IO.NODEPOWER)) + ")",
+          + " (byte " + currentByteNum % (1 << IO.NODEPOWER) + ")",
           startByte, currentByte);
     }
   }
@@ -192,12 +196,12 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testDeleteLastBlock() {
-    tba.delete((size / nodesPerBlock) * nodesPerBlock, size % nodesPerBlock);
+    tba.delete(size / nodesPerBlock * nodesPerBlock, size % nodesPerBlock);
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - (size % nodesPerBlock));
+    assertEntrysEqual(0, 0, nodesPerBlock - size % nodesPerBlock);
     closeAndReload();
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - (size % nodesPerBlock));
+    assertEntrysEqual(0, 0, nodesPerBlock - size % nodesPerBlock);
   }
 
   /**
@@ -297,7 +301,7 @@ public final class TableBlockAccessTest {
    */
   private void assertAreInserted(final int startNum, final int count) {
     for(int i = 0; i < count; i++)
-      for(int j = 0; j < (1 << IO.NODEPOWER); j++)
+      for(int j = 0; j < 1 << IO.NODEPOWER; j++)
         assertEquals(5, tba.read1(startNum + i, j));
   }
 
@@ -315,12 +319,15 @@ public final class TableBlockAccessTest {
 
   /**
    * Drop the JUnitTest database.
-   * @throws Exception in case of problems.
    */
   @After
-  public void tearDown() throws Exception {
-    tba.close();
-    DropDB.drop(DBNAME);
+  public void tearDown() {
+    try {
+      tba.close();
+      DropDB.drop(DBNAME);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
   }
 }
 

@@ -79,78 +79,72 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private AxisPath iterator(final QueryContext ctx) {
-    // skip paths with variables...
-    if(root != null && root.uses(Use.VAR, ctx)) return this;
+    return iterable(ctx) ? new IterPath(root, step) : this;
+  }
 
-    // To check if the result of a path is in document order so that no special 
-    // ordering functions are needed and we can use the iterative evaluation,
-    // we are geared to an automaton that is provided in the paper 
-    // "Avoiding Unnecessary Ordering Operations in XPath" by
-    // Jan Hidders and Philippe Michiels.
-    
-    // Link: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.4006
-    // Page 6 - Figure 5
-    
-    // Since BaseX has a slightly different implementation, it is possible
-    // to have alternating child and parent steps or more parent steps -
-    // different than described in the paper.
-    
-    // check if root exists and has no duplicates
-    if(root == null || root.duplicates(ctx)) return this;
-    
+  /**
+   * Checks if the path is iterable.
+   * To check if the result of a path is in document order so that no special
+   * ordering functions are needed and we can use the iterative evaluation,
+   * we are geared to an automaton that is provided in the paper
+   *
+   * "Avoiding Unnecessary Ordering Operations in XPath" by
+   * Jan Hidders and Philippe Michiels (Page 6 - Figure 5).
+   *
+   * Since the implementation has a slightly different implementation,
+   * it is possible to have alternating child and parent steps or more parent
+   * steps - different than described in the paper.
+   *
+   * @param ctx context reference
+   * @return resulting operator
+   */
+  private boolean iterable(final QueryContext ctx) {
+    // skip paths with variables and roots with duplicates
+    if(root == null || root.uses(Use.VAR, ctx) || root.duplicates(ctx)) {
+      return false;
+    }
+
     int i = 0;
-    while (true) {
-      
+    while(true) {
+      final Step s = step[i];
+
       // First steps can be attribute, parent or self steps.
-      if (step[i].axis == Axis.ATTR 
-          || step[i].axis == Axis.PARENT 
-          || step[i].axis == Axis.SELF) {
-        if (++i == step.length) break;
+      if(s.axis == Axis.ATTR || s.axis == Axis.PARENT || s.axis == Axis.SELF) {
+        if(++i == step.length) return true;
         continue;
       }
-      
-      // If after only-parent steps or without any parent steps the next 
+
+      // If after only-parent steps or without any parent steps the next
       // and only step is an descendant, descendant-or-self, preceding
       // or following step, the result of the path is still in document order.
-      if (step[i].axis == Axis.DESC
-          || step[i].axis == Axis.DESCORSELF
-          || step[i].axis == Axis.FOLL
-          || step[i].axis == Axis.PREC) {
-        if (++i == step.length) break;
-        return this;
+      if(s.axis == Axis.DESC || s.axis == Axis.DESCORSELF ||
+          s.axis == Axis.FOLL || s.axis == Axis.PREC) {
+        return ++i == step.length;
       }
-      
-      // If after only-parent steps or without any parent steps the next 
+
+      // If after only-parent steps or without any parent steps the next
       // step is an attribute, child, self, preceding-sibling or
-      // following-sibling step, the result of the path is still in 
+      // following-sibling step, the result of the path is still in
       // document order.
-      if (step[i].axis == Axis.CHILD
-          || step[i].axis == Axis.FOLLSIBL
-          || step[i].axis == Axis.PRECSIBL) {
-        if (++i == step.length) break;
+      if(s.axis == Axis.CHILD || s.axis == Axis.FOLLSIBL ||
+          s.axis == Axis.PRECSIBL) {
+        if(++i == step.length) return true;
 
-        // In this state are finite attribute, child, parent or self steps 
-        // possible.
-        while (step[i].axis == Axis.ATTR
-            || step[i].axis == Axis.CHILD
-            || step[i].axis == Axis.PARENT 
-            || step[i].axis == Axis.SELF) {
-          if (++i == step.length) break;
+        // In this state finite attribute, child, parent or self steps
+        // are possible.
+        while(step[i].axis == Axis.ATTR || step[i].axis == Axis.CHILD ||
+            step[i].axis == Axis.PARENT || step[i].axis == Axis.SELF) {
+          if(++i == step.length) return true;
         }
-        // This check is necessary because of the while loop before.
-        if (i == step.length) break;
 
-        // The last step can  be a attribute, child, parent or self step,
+        // The last step can be a attribute, child, parent or self step,
         // and also a descendant or descendant-or-self step.
-        if(!step[i].axis.down) return this;
-        
+        return i + 1 == step.length && (step[i].axis == Axis.DESC ||
+          step[i].axis == Axis.DESCORSELF);
       } else {
-        return this;
+        return false;
       }
-      break;
     }
-    
-    return new IterPath(root, step);
   }
 
   @Override
@@ -213,7 +207,7 @@ public class AxisPath extends Path {
       for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
 
       if(doc) {
-        // check if no position is used 
+        // check if no position is used
         if(!pos) {
           // check index access
           Expr e = index(ctx, data);
@@ -405,7 +399,7 @@ public class AxisPath extends Path {
           result.step[sl] = result.step[sl].addPred(np);
         }
         // add inverted path as predicate to last step
-        if(inv.length != 0) {          
+        if(inv.length != 0) {
           result.step[sl] = result.step[sl].addPred(AxisPath.get(null, inv));
         }
         // add remaining steps
@@ -423,9 +417,9 @@ public class AxisPath extends Path {
     final Item c = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    
+
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
- 
+
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
       litem = it;
       ctx.item = it;
@@ -439,7 +433,7 @@ public class AxisPath extends Path {
     ctx.item = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return citem; 
+    return citem;
   }
 
   /**
