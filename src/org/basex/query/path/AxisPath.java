@@ -80,17 +80,10 @@ public class AxisPath extends Path {
    */
   private AxisPath iterator(final QueryContext ctx) {
     // skip paths with variables...
-    if(root != null && root.uses(Use.VAR, ctx)) {
-      return this;
-    }
-
-    /* Simple iterator: one downward location step or parent step
-    if(step.length == 1 && (step[0].axis.down)) {
-      return new SingleIterPath(root, step);
-    }*/
+    if(root != null && root.uses(Use.VAR, ctx)) return this;
 
     // To check if the result of a path is in document order so that no special 
-    // ordering functions are needed and we can use the SimpleIterPath, 
+    // ordering functions are needed and we can use the iterative evaluation,
     // we are geared to an automaton that is provided in the paper 
     // "Avoiding Unnecessary Ordering Operations in XPath" by
     // Jan Hidders and Philippe Michiels.
@@ -103,83 +96,61 @@ public class AxisPath extends Path {
     // different than described in the paper.
     
     // check if root exists and has no duplicates
-    boolean iter = root != null && !root.duplicates(ctx);
+    if(root == null || root.duplicates(ctx)) return this;
     
-    if (iter) {
-      int i = 0;
-      while (true) {
-        
-        // First steps can be attribute, parent or self steps.
-        if (step[i].axis == Axis.ATTR 
+    int i = 0;
+    while (true) {
+      
+      // First steps can be attribute, parent or self steps.
+      if (step[i].axis == Axis.ATTR 
+          || step[i].axis == Axis.PARENT 
+          || step[i].axis == Axis.SELF) {
+        if (++i == step.length) break;
+        continue;
+      }
+      
+      // If after only-parent steps or without any parent steps the next 
+      // and only step is an descendant, descendant-or-self, preceding
+      // or following step, the result of the path is still in document order.
+      if (step[i].axis == Axis.DESC
+          || step[i].axis == Axis.DESCORSELF
+          || step[i].axis == Axis.FOLL
+          || step[i].axis == Axis.PREC) {
+        if (++i == step.length) break;
+        return this;
+      }
+      
+      // If after only-parent steps or without any parent steps the next 
+      // step is an attribute, child, self, preceding-sibling or
+      // following-sibling step, the result of the path is still in 
+      // document order.
+      if (step[i].axis == Axis.CHILD
+          || step[i].axis == Axis.FOLLSIBL
+          || step[i].axis == Axis.PRECSIBL) {
+        if (++i == step.length) break;
+
+        // In this state are finite attribute, child, parent or self steps 
+        // possible.
+        while (step[i].axis == Axis.ATTR
+            || step[i].axis == Axis.CHILD
             || step[i].axis == Axis.PARENT 
             || step[i].axis == Axis.SELF) {
-          i++;
-          // iter is still true.
-          if (i == step.length) break;
-          continue;
+          if (++i == step.length) break;
         }
-        
-        // If after only-parent steps or without any parent steps the next 
-        // and only step is an descendant, descendant-or-self, preceding
-        // or following step, the result of the path is still in document order.
-        if (step[i].axis == Axis.DESC
-            || step[i].axis == Axis.DESCORSELF
-            || step[i].axis == Axis.FOLL
-            || step[i].axis == Axis.PREC) {
-          i++;
-          // iter is still true.
-          if (i == step.length) break;
-          else {
-            iter = false;
-            break;
-          }
-        }
-        
-        // If after only-parent steps or without any parent steps the next 
-        // step is an attribute, child, self, preceding-sibling or
-        // following-sibling step, the result of the path is still in 
-        // document order.
-        if (step[i].axis == Axis.ATTR
-            || step[i].axis == Axis.CHILD
-            || step[i].axis == Axis.FOLLSIBL
-            || step[i].axis == Axis.PRECSIBL 
-            || step[i].axis == Axis.SELF) {
-          i++;
-          // iter is still true.
-          if (i == step.length) break;
+        // This check is necessary because of the while loop before.
+        if (i == step.length) break;
 
-          // In this state are finite attribute, child, parent or self steps 
-          // possible.
-          while (step[i].axis == Axis.ATTR
-              || step[i].axis == Axis.CHILD
-              || step[i].axis == Axis.PARENT 
-              || step[i].axis == Axis.SELF) {
-            i++;
-            // iter is still true.
-            if (i == step.length) break;
-          }
-          // iter is still true.
-          // This check is necessary because of the while loop before.
-          if (i == step.length) break;
-
-          // The last step can  be a attribute, child, parent or self step,
-          // and also a descendant or descendant-or-self step.
-          iter &= step[i].axis.down;
-          
-        } else {
-          iter = false;
-          break;
-        }
-        break;
+        // The last step can  be a attribute, child, parent or self step,
+        // and also a descendant or descendant-or-self step.
+        if(!step[i].axis.down) return this;
+        
+      } else {
+        return this;
       }
+      break;
     }
     
-    if(iter) {
-      return new SimpleIterPath(root, step);
-    }
-    
-    // return null if no iterator could be created
-    return this;
+    return new IterPath(root, step);
   }
 
   @Override

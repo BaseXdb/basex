@@ -254,6 +254,7 @@ public final class FTWords extends FTExpr {
     final Tokenizer ft = new Tokenizer(txt, fto, fast);
     ic.is = 0;
     while(ft.more()) {
+      if(ft.get().length > Token.MAXLEN) return false;
       final double s = data.nrIDs(ft);
       if(s == 0) {
         ic.is = 0;

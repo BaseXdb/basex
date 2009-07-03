@@ -81,7 +81,7 @@ public final class Lang {
         br.close();
       }
     } catch(final IOException ex) {
-      BaseX.errln(ex.toString());
+      BaseX.errln(ex);
     }
   }
 
@@ -145,8 +145,8 @@ public final class Lang {
           creds.add(credits(new IOFile(f).content()));
         }
       }
-    } catch(final Exception ex) {
-      ex.printStackTrace();
+    } catch(final IOException ex) {
+      BaseX.errln(ex);
     }
     return new String[][] { langs.finish(), creds.finish() };
   }

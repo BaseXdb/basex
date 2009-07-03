@@ -250,6 +250,8 @@ public final class CmpG extends Arr {
     Item i;
     while((i = ir.next()) != null) {
       if(!(i instanceof Str)) return false;
+      final byte[] str = i.str();
+      if(str.length > Token.MAXLEN) return false;
       final ValuesToken vt = new ValuesToken(text, i.str());
       ic.is = Math.min(ic.data.nrIDs(vt), ic.is);
       index = Array.add(index, vt);

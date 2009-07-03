@@ -58,8 +58,6 @@ public abstract class Item extends Expr {
       public int size() { return 1; }
       @Override
       public Item get(final long i) { return i == 0 ? Item.this : null; }
-      @Override
-      public String toString() { return Item.this.toString(); }
     };
   }
 

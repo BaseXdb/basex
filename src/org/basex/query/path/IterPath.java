@@ -18,13 +18,13 @@ import org.basex.util.Array;
  * @author Dennis Stratmann
  * @author Christian Gruen
  */
-public final class SimpleIterPath extends AxisPath {
+public final class IterPath extends AxisPath {
   /**
    * Constructor.
    * @param r root expression
    * @param s location steps
    */
-  public SimpleIterPath(final Expr r, final Step[] s) {
+  public IterPath(final Expr r, final Step[] s) {
     super(r, s);
   }
 
