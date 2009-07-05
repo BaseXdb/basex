@@ -3,7 +3,6 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,7 +12,6 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.build.Builder;

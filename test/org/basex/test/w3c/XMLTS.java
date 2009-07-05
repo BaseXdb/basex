@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
 public final class XMLTS {
   /** Root directory. */
   private static final String ROOT = "/home/dbis/xml/xmlts/";
-    //  "h:/xmlts/";
+    // "h:/xmlts/";
   /** Path to the XQuery Test Suite. */
   private static final String FILE = ROOT +
     "oasis/oasis.xml";

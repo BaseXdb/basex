@@ -36,14 +36,6 @@ class MapList extends IntList {
   }
 
   /**
-   * Initializes the weights giving each node of this level same weight.
-   */
-  void initWeights() {
-    weight = new double[size];
-    for(int i = 0; i < size; i++) weight[i] = 1d / size;
-  }
-
-  /**
    * Initializes the weights of each list entry, using the text length of
    * nodes or (if the array reference is null) the size attributes.
    * @param textLen array holding pre values to text lengths

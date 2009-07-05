@@ -19,7 +19,7 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
- * This class loads language specific data when the {@link #lang}
+ * This class loads language specific texts when the {@link #lang}
  * method is called for the first time.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License

@@ -1,11 +1,12 @@
 package org.basex.gui.layout;
 
+import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific Textfield implementation.
@@ -22,29 +23,21 @@ public class BaseXTextField extends JTextField {
   /**
    * Default Constructor.
    * @param hlp help text
+   * @param win parent window
    */
-  public BaseXTextField(final byte[] hlp) {
-    this(null, hlp, null);
-  }
-
-  /**
-   * Default Constructor.
-   * @param hlp help text
-   * @param list listener
-   */
-  public BaseXTextField(final byte[] hlp, final Dialog list) {
-    this(null, hlp, list);
+  public BaseXTextField(final byte[] hlp, final Window win) {
+    this(null, hlp, win);
   }
 
   /**
    * Default Constructor.
    * @param txt input text
    * @param hlp help text
-   * @param list reference to the dialog listener
+   * @param win parent window
    */
-  public BaseXTextField(final String txt, final byte[] hlp, final Dialog list) {
-    BaseXLayout.addDefaultKeys(this, list);
+  public BaseXTextField(final String txt, final byte[] hlp, final Window win) {
     BaseXLayout.setWidth(this, 200);
+    BaseXLayout.addInteraction(this, null, win);
     help = hlp;
 
     if(txt != null) {
@@ -71,6 +64,39 @@ public class BaseXTextField extends JTextField {
     });
   }
 
+  /**
+   * Adds search functionality to the text field.
+   * @param area text area to search
+   */
+  void addSearch(final BaseXText area) {
+    final Font f = getFont();
+    setFont(f.deriveFont((float) f.getSize() + 2));
+    BaseXLayout.setWidth(this, 80);
+
+    addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        final String text = getText();
+        final int co = e.getKeyCode();
+        final boolean enter = co == KeyEvent.VK_ENTER;
+        if(co == KeyEvent.VK_ESCAPE || enter && text.length() == 0) {
+          area.requestFocusInWindow();
+        } else if(enter || co == KeyEvent.VK_F3) {
+          area.find(text, e.isShiftDown());
+        }
+      }
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        final String text = getText();
+        final char ch = e.getKeyChar();
+        if(ch != KeyEvent.VK_ENTER && Character.isDefined(ch))
+          area.find(text, false);
+        repaint();
+      }
+    });
+    repaint();
+  }
+  
   @Override
   public void setText(final String txt) {
     last = txt;

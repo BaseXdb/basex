@@ -265,13 +265,10 @@ public abstract class Nod extends Item {
       public Nod next() throws QueryException {
         if(ir == null) {
           final Nod r = parent();
-          if(r == null) {
-            ir = NodeIter.NONE;
-          } else {
-            ir = r.child();
-            Nod n;
-            while((n = ir.next()) != null && !n.is(Nod.this));
-          }
+          if(r == null) return null;
+          ir = r.child();
+          Nod n;
+          while((n = ir.next()) != null && !n.is(Nod.this));
         }
         return ir.next();
       }

@@ -15,7 +15,7 @@ public abstract class BaseXSyntax {
     @Override
     public void init() { }
     @Override
-    public Color getColor(final String token) { return Color.black; }
+    public Color getColor(final BaseXTextTokens tokens) { return Color.black; }
   };
 
   /**
@@ -25,8 +25,8 @@ public abstract class BaseXSyntax {
 
   /**
    * Returns the color for the current token.
-   * @param token current token
+   * @param tokens tokenizer
    * @return color
    */
-  public abstract Color getColor(final String token);
+  public abstract Color getColor(final BaseXTextTokens tokens);
 }

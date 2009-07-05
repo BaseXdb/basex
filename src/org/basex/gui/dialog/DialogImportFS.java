@@ -8,7 +8,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.ImageIcon;
-import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
@@ -21,6 +20,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
@@ -164,7 +164,7 @@ public final class DialogImportFS extends Dialog {
 
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
     p2.add(label);
-    meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, this);
+    meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, 12, this);
     p2.add(meta);
 
     label = new BaseXLabel(IMPORTFSTEXT2, false, true);
@@ -195,8 +195,7 @@ public final class DialogImportFS extends Dialog {
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
     p2.add(p);
 
-    final JTabbedPane tabs = new JTabbedPane();
-    BaseXLayout.addDefaultKeys(tabs, this);
+    final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(METAINFO, p2);
     set(tabs, BorderLayout.CENTER);

@@ -12,7 +12,7 @@ import org.basex.util.Num;
  * @author Christian Gruen
  */
 public final class DataAccess {
-  /** Buffer management. */
+  /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
   private final RandomAccessFile file;
@@ -29,15 +29,6 @@ public final class DataAccess {
    */
   public DataAccess(final String db, final String fn) throws IOException {
     this(IO.dbfile(db, fn));
-  }
-
-  /**
-   * Constructor, initializing the file reader.
-   * @param f the file to be read
-   * @throws IOException IO Exception
-   */
-  public DataAccess(final String f) throws IOException {
-    this(new File(f));
   }
 
   /**
@@ -69,6 +60,14 @@ public final class DataAccess {
   }
 
   /**
+   * Returns the current file position.
+   * @return text as byte array
+   */
+  public synchronized long pos() {
+    return bm.curr().pos + off;
+  }
+
+  /**
    * Returns file length.
    * @return file length
    */
@@ -90,6 +89,15 @@ public final class DataAccess {
    */
   public synchronized byte read1() {
     return (byte) read();
+  }
+
+  /**
+   * Reads an integer value from the specified position
+   * (without cursor correction).
+   * @return integer value
+   */
+  public synchronized int read4() {
+    return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
 
   /**
@@ -135,7 +143,7 @@ public final class DataAccess {
     final byte[] b = new byte[l];
     int ll = IO.BLOCKSIZE - off;
     Buffer bf = bm.curr();
-    if(ll >= l) {
+    if(l <= ll) {
       System.arraycopy(bf.buf, off, b, 0, l);
     } else {
       System.arraycopy(bf.buf, off, b, 0, ll);
@@ -150,14 +158,6 @@ public final class DataAccess {
       System.arraycopy(bf.buf, 0, b, ll, l);
     }
     return b;
-  }
-
-  /**
-   * Returns the current file position.
-   * @return text as byte array
-   */
-  public synchronized long pos() {
-    return bm.curr().pos + off;
   }
 
   /**
@@ -208,16 +208,6 @@ public final class DataAccess {
   }
 
   /**
-   * Writes the specified block to disk.
-   * @param bf buffer to write
-   * @throws IOException I/O exception
-   */
-  private synchronized void writeBlock(final Buffer bf) throws IOException {
-    file.seek(bf.pos);
-    file.write(bf.buf);
-  }
-
-  /**
    * Reads the next compressed number and returns it as integer.
    * @return next integer
    */
@@ -236,12 +226,13 @@ public final class DataAccess {
   }
 
   /**
-   * Reads an integer value from the specified position
-   * (without cursor correction).
-   * @return integer value
+   * Writes the specified block to disk.
+   * @param bf buffer to write
+   * @throws IOException I/O exception
    */
-  public synchronized int read4() {
-    return (read() << 24) + (read() << 16) + (read() << 8) + read();
+  private synchronized void writeBlock(final Buffer bf) throws IOException {
+    file.seek(bf.pos);
+    file.write(bf.buf);
   }
 
   /**
@@ -250,12 +241,12 @@ public final class DataAccess {
    */
   private synchronized void writeNum(final int v) {
     if(v < 0 || v > 0x3FFFFFFF) {
-      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>>  8); write(v);
+      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
     } else if(v > 0x3FFF) {
       write(v >>> 24 | 0x80); write(v >>> 16);
-      write(v >>>  8); write(v);
+      write(v >>> 8); write(v);
     } else if(v > 0x3F) {
-      write(v >>>  8 | 0x40); write(v);
+      write(v >>> 8 | 0x40); write(v);
     } else {
       write(v);
     }

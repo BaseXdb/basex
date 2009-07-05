@@ -128,7 +128,7 @@ public final class MAB2Parser extends Parser {
     }
 
     // create input reference
-    input = new DataAccess(io.path());
+    input = new DataAccess(new File(io.path()));
 
     // check beginning of input file
     if(input.read1() != '#' || input.read1() != '#' ||
@@ -570,7 +570,7 @@ public final class MAB2Parser extends Parser {
    */
   private void index(final TokenMap hash, final String fn) {
     try {
-      final DataAccess in = new DataAccess(fn);
+      final DataAccess in = new DataAccess(new File(fn));
       while(true) {
         final byte[] key = find(in, (byte) '\t');
         final byte[] val = find(in, (byte) '\n');

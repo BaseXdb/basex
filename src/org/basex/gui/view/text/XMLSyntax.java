@@ -3,6 +3,7 @@ package org.basex.gui.view.text;
 import java.awt.Color;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
+import org.basex.gui.layout.BaseXTextTokens;
 
 /**
  * This abstract class defines syntax highlighting of text panels.
@@ -23,8 +24,8 @@ public final class XMLSyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final String word) {
-    final char ch = word.length() != 0 ?  word.charAt(0) : 0;
+  public Color getColor(final BaseXTextTokens text) {
+    final int ch = text.curr();
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;

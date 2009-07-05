@@ -10,13 +10,13 @@ import org.basex.gui.view.ViewData;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-class MapLayout {
+final class MapLayout {
   /** Font size. */
-  public final int off = GUIProp.fontsize + 4;
+  private final int off = GUIProp.fontsize + 4;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
-  protected final MapAlgo algo;
+  final MapAlgo algo;
   /** Text lengths. */
   private final int[] textLen;
 
@@ -132,12 +132,7 @@ class MapLayout {
       } else {
         nn = l.list[ne] - l.list[ns] + ViewData.size(data, l.list[ne]);
       }
-
-      if(GUIProp.mapsimple) {
-        l.initWeights();
-      } else {
-        l.initWeights(textLen, nn, data);
-      }
+      l.initWeights(textLen, nn, data);
 
       // call recursion for next deeper levels
       final MapRects rects = algo.calcMap(r, l, ns, ne, level);

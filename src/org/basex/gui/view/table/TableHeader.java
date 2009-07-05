@@ -62,7 +62,7 @@ final class TableHeader extends BaseXPanel {
    * @param v view reference
    */
   TableHeader(final TableView v) {
-    super(v.gui, HELPTABLEHEAD);
+    super(HELPTABLEHEAD, v.gui);
     setMode(Fill.UP);
     tdata = v.tdata;
     view = v;
@@ -371,11 +371,8 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    super.keyTyped(e);
-    if(tdata.roots.size == 0) return;
-
-    if(box == null || inputCol == -1 || e.isAltDown()) return;
-    if(box.add(e.getKeyChar())) {
+    if(tdata.roots.size != 0 && box != null && inputCol != -1 &&
+        !e.isAltDown() && box.add(e.getKeyChar())) {
       tdata.cols[inputCol].filter = box.text;
       view.query();
     }
@@ -383,10 +380,8 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    super.keyPressed(e);
     if(tdata.roots.size == 0) return;
 
-    view.gui.checkKeys(e);
     shift = e.isShiftDown();
     alt = e.isAltDown();
     if(box == null && alt || inputCol == -1) return;

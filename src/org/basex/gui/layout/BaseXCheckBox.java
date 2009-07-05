@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
@@ -19,11 +20,11 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param hlp help text
    * @param label button title
    * @param sel initial selection state
-   * @param list reference to the dialog listener
+   * @param win parent window
    */
   public BaseXCheckBox(final String label, final byte[] hlp,
-      final boolean sel, final Dialog list) {
-    this(label, hlp, sel, 5, list);
+      final boolean sel, final Window win) {
+    this(label, hlp, sel, 1, win);
   }
 
   /**
@@ -32,23 +33,23 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param hlp help text
    * @param sel initial selection state
    * @param dist distance to next component
-   * @param list reference to the dialog listener
+   * @param win parent window
    */
   public BaseXCheckBox(final String label, final byte[] hlp,
-      final boolean sel, final int dist, final Dialog list) {
+      final boolean sel, final int dist, final Window win) {
 
     super(label, sel);
-    setMargin(new Insets(0, 0, dist, 0));
     setOpaque(false);
-    BaseXLayout.addHelp(this, hlp);
+    setMargin(new Insets(0, 0, dist, 0));
+    if(dist == 0) setFont(getFont().deriveFont(1));
+
+    BaseXLayout.addInteraction(this, hlp, win);
     if(hlp != null) setToolTipText(Token.string(hlp));
-    if(list == null) return;
 
-    BaseXLayout.addDefaultKeys(this, list);
-
+    if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        list.action(getText());
+        ((Dialog) win).action(getText());
       }
     });
   }

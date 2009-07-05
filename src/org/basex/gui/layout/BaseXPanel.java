@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -10,8 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
-import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.Dialog;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.
@@ -27,12 +27,12 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
 
   /**
    * Constructor, setting the help text.
-   * @param main reference to the main window
    * @param hlp help text
+   * @param win parent reference, {@link Dialog} or {@link GUI} instance
    */
-  protected BaseXPanel(final GUI main, final byte[] hlp) {
-    BaseXLayout.addHelp(this, hlp);
-    gui = main;
+  protected BaseXPanel(final byte[] hlp, final Window win) {
+    gui = win instanceof GUI ? (GUI) win : ((Dialog) win).gui;
+    BaseXLayout.addInteraction(this, hlp, win);
   }
 
   public void mouseEntered(final MouseEvent e) { }
@@ -43,33 +43,8 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
   public void mouseMoved(final MouseEvent e) { }
   public void mouseDragged(final MouseEvent e) { }
 
-  public void keyPressed(final KeyEvent e) {
-    if(gui.updating || !e.isAltDown()) return;
-
-    final int key = e.getKeyCode();
-    if(key == KeyEvent.VK_LEFT) {
-      GUICommands.GOBACK.execute(gui);
-    } else if(key == KeyEvent.VK_RIGHT) {
-      GUICommands.GOFORWARD.execute(gui);
-    } else if(key == KeyEvent.VK_UP) {
-      GUICommands.GOUP.execute(gui);
-    } else if(key == KeyEvent.VK_HOME) {
-      GUICommands.ROOT.execute(gui);
-    }
-  }
-
-  public void keyTyped(final KeyEvent e) {
-    if(gui.updating || !e.isControlDown()) return;
-    final char key = e.getKeyChar();
-    if(key == '+' || key == '-' || key == '=') {
-      GUIProp.fontsize = Math.max(1, GUIProp.fontsize + (key == '-' ? -1 : 1));
-      gui.notify.layout();
-    } else if(key == '0') {
-      GUIProp.fontsize = 12;
-      gui.notify.layout();
-    }
-
-  }
+  public void keyPressed(final KeyEvent e) { }
+  public void keyTyped(final KeyEvent e) { }
   public void keyReleased(final KeyEvent e) { }
 
   public void componentResized(final ComponentEvent e) { }

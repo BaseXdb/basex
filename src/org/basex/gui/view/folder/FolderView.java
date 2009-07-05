@@ -70,7 +70,7 @@ public final class FolderView extends View {
    * @param man view manager
    */
   public FolderView(final ViewNotifier man) {
-    super(man, HELPFOLDER);
+    super(HELPFOLDER, man);
     createBoxes();
     setMode(Fill.UP);
     setLayout(new BorderLayout());
@@ -157,6 +157,11 @@ public final class FolderView extends View {
     if(marked.size() != 0) jumpTo(marked.nodes[0], true);
     refreshHeight();
     repaint();
+  }
+
+  @Override
+  protected boolean visible() {
+    return GUIProp.showfolder;
   }
 
   /**

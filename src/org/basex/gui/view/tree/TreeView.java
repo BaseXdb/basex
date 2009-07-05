@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
@@ -77,7 +78,7 @@ public final class TreeView extends View {
    * @param man view manager
    */
   public TreeView(final ViewNotifier man) {
-    super(man, null);
+    super(null, man);
     new BaseXPopup(this, GUIConstants.POPUP);
   }
 
@@ -119,6 +120,11 @@ public final class TreeView extends View {
   }
 
   @Override
+  protected boolean visible() {
+    return GUIProp.showtree;
+  }
+
+  @Override
   public void paintComponent(final Graphics g) {
 
     final Data data = gui.context.data();
@@ -127,7 +133,6 @@ public final class TreeView extends View {
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
-//    documentDepth = data.meta.height;
 
     /** Timer */
     final Performance perf = new Performance();

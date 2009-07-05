@@ -11,7 +11,7 @@ final class Buffers {
   private static final int BUFFERS = 4;
   /** Buffers. */
   private final Buffer[] buf = new Buffer[BUFFERS];
-  /** Current buffer reference. */
+  /** Current buffer offset. */
   private int c;
 
   /**
@@ -38,8 +38,8 @@ final class Buffers {
   }
 
   /**
-   * Sets the disk cursor.
-   * @param p read position
+   * Chooses a buffer and sets the offset.
+   * @param p buffer pointer
    * @return true if cursor has changed
    */
   boolean cursor(final long p) {

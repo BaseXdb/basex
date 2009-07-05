@@ -288,8 +288,6 @@ public enum FunDef {
   EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", SEQ),
   /** Project specific function - returns a random number. */
   RANDOM(BXURI, FNBaseX.class, 1, 1, "random()", NUM),
-  /** XQuery function - allows a case insensitive substring search. */
-  CONTAINSLC(BXURI, FNBaseX.class, 2, 2, "containslc(item, item)", BLN),
   /** XQuery function - returns the name of the query file. */
   FILENAME(BXURI, FNBaseX.class, 0, 0, "filename()", STR),
   /** XQuery function - accesses an index. */

@@ -116,16 +116,7 @@ public enum GUICommands implements GUICommand {
       fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
-      if(file != null) {
-        Prop.xquery = file;
-        try {
-          gui.query.setQuery(file.content());
-        } catch(final IOException ex) {
-          Dialog.error(gui, XQOPERROR);
-        }
-        GUIProp.xqpath = file.getDir();
-        if(!GUIProp.showquery) SHOWSEARCH.execute(gui);
-      }
+      if(file != null) gui.query.setQuery(file);
     }
   },
 
@@ -133,8 +124,6 @@ public enum GUICommands implements GUICommand {
   XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
     public void execute(final GUI gui) {
-      if(!GUIProp.showquery) SHOWSEARCH.execute(gui);
-
       // open file chooser for XML creation
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
@@ -143,20 +132,19 @@ public enum GUICommands implements GUICommand {
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
       if(file != null) {
-        Prop.xquery = file;
+        file.suffix(IO.XQSUFFIX);
         try {
-          file.suffix(IO.XQSUFFIX);
           file.write(gui.query.getQuery());
+          gui.query.setQuery(file);
         } catch(final IOException ex) {
           Dialog.error(gui, XQSAVERROR);
         }
-        GUIProp.xqpath = file.getDir();
       }
     }
   },
 
   /** Import filesystem. */
-  IMPORTFS(false, GUIIMPORTFS, "% D", GUIIMPORTFSTT) {
+  IMPORTFS(false, GUIIMPORTFS, null, GUIIMPORTFSTT) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogImportFS(gui).ok()) return;
@@ -170,7 +158,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Export document. */
-  EXPORT(true, GUIEXPORT, "% E", GUIEXPORTTT) {
+  EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
       final IO file = save(gui);
@@ -347,18 +335,18 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Show search. */
-  SHOWSEARCH(true, GUISHOWSEARCH, "% F", GUISHOWSEARCHTT) {
+  /** Show XQuery view. */
+  SHOWXQUERY(true, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showquery ^= true;
+      GUIProp.showxquery ^= true;
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showquery);
+      BaseXLayout.select(button, GUIProp.showxquery);
     }
 
     @Override
@@ -366,7 +354,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show info. */
-  SHOWINFO(true, GUISHOWINFO, "% G", GUISHOWINFOTT) {
+  SHOWINFO(true, GUISHOWINFO, "% I", GUISHOWINFOTT) {
     @Override
     public void execute(final GUI gui) {
       GUIProp.showinfo ^= true;
@@ -382,7 +370,6 @@ public enum GUICommands implements GUICommand {
     @Override
     public boolean checked() { return true; }
   },
-
 
   /* VIEW MENU */
 
@@ -550,6 +537,24 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
+  /** Show search. */
+  SHOWEXPLORER(true, GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT) {
+    @Override
+    public void execute(final GUI gui) {
+      GUIProp.showexplore ^= true;
+      gui.layoutViews();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
+      BaseXLayout.select(button, GUIProp.showexplore);
+    }
+
+    @Override
+    public boolean checked() { return true; }
+  },
+
   /** Fullscreen mode. */
   FULL(false, GUIFULL, "F11", GUIFULLTT) {
     @Override
@@ -626,7 +631,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Color schema. */
-  COLOR(false, GUICOLOR, "% 8", GUICOLORTT) {
+  COLOR(false, GUICOLOR, null, GUICOLORTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogColors(gui);
@@ -634,7 +639,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Change fonts. */
-  FONTS(false, GUIFONTS, "% 9", GUIFONTSTT) {
+  FONTS(false, GUIFONTS, null, GUIFONTSTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogFontChooser(gui);
@@ -642,7 +647,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(true, GUIMAPLAYOUT, "% 0", GUIMAPLAYOUTTT) {
+  MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);
@@ -683,7 +688,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Database info. */
-  INFO(true, GUIINFO, "% I", GUIINFOTT) {
+  INFO(true, GUIINFO, "% D", GUIINFOTT) {
     @Override
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);

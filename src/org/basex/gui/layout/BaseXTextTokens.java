@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
 import org.basex.util.Array;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import static org.basex.util.Token.*;
 
 /**
  * This class allows the iteration on tokens.
@@ -10,11 +10,11 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class BaseXTextTokens {
+public final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
   /** Text array to be written. */
-  byte[] text = Token.EMPTY;
+  byte[] text = EMPTY;
 
   /** Text length. */
   private int size;
@@ -67,33 +67,86 @@ final class BaseXTextTokens {
     ps = pe;
 
     // find next token boundary
-    int ch = Token.cp(text, ps);
-    pe += Token.cl(text[ps]);
-    if(sep(ch)) return true;
+    int ch = cp(text, ps);
+    pe += cl(text[ps]);
+    if(!ftChar(ch)) return true;
 
     while(pe < size) {
-      ch = Token.cp(text, pe);
-      if(sep(ch)) break;
-      pe += Token.cl(text[pe]);
+      ch = cp(text, pe);
+      if(!ftChar(ch)) break;
+      pe += cl(text[pe]);
     };
     return true;
   }
 
   /**
-   * Returns the next token.
-   * @return next token
+   * Returns the token as word.
+   * @return word
    */
-  String nextWord() {
-    return Token.string(text, ps, pe - ps);
+  public String nextWord() {
+    return new String(text, ps, pe - ps);
   }
 
   /**
-   * Returns the current character type.
-   * @param c char
-   * @return true for a delimiter character
+   * Returns the length of the current word.
+   * @return length
    */
-  private boolean sep(final int c) {
-    return !Token.letterOrDigit(c);
+  int length() {
+    return pe - ps;
+  }
+
+  /**
+   * Moves one character forward.
+   * @param mark mark flag
+   * @return character
+   */
+  int next(final boolean mark) {
+    if(mark || ms == -1) return next();
+    ps = Math.max(ms, me);
+    noMark();
+    return curr();
+  }
+
+  /**
+   * Checks if the character position equals the word end.
+   * @return result of check
+   */
+  boolean more() {
+    return ps < pe;
+  }
+
+  /**
+   * Returns the current character.
+   * @return current character
+   */
+  public int curr() {
+    return ps >= size ? '\n' : cp(text, ps);
+  }
+
+  /**
+   * Moves one character forward.
+   * @return character
+   */
+  int next() {
+    final int c = curr();
+    if(ps < size) ps += cl(text[ps]);
+    return c;
+  }
+
+  /**
+   * Sets the iterator position.
+   * @param p iterator position
+   */
+  void pos(final int p) {
+    ps = p;
+  }
+
+  /**
+   * Returns the iterator position.
+   * @return iterator position
+   */
+  int pos() {
+    return ps;
   }
 
   /**
@@ -139,7 +192,7 @@ final class BaseXTextTokens {
     if(ps == 0) return '\n';
     final int p = ps;
     ps = Math.max(0, ps - 5);
-    while(ps < p && ps + Token.cl(text[ps]) < p) ps++;
+    while(ps < p && ps + cl(text[ps]) < p) ps++;
     return curr();
   }
 
@@ -154,60 +207,6 @@ final class BaseXTextTokens {
       if((nc += curr() == '\t' ? TAB : 1) >= p) return;
       next(mark);
     }
-  }
-
-  /**
-   * Moves one character forward.
-   * @param mark mark flag
-   * @return character
-   */
-  int next(final boolean mark) {
-    if(mark || ms == -1) return next();
-    ps = Math.max(ms, me);
-    noMark();
-    return curr();
-  }
-
-  /**
-   * Checks if the character position equals the word end.
-   * @return result of check
-   */
-  boolean more() {
-    return ps < pe;
-  }
-
-  /**
-   * Returns the current character.
-   * @return current character
-   */
-  int curr() {
-    return ps >= size ? '\n' : Token.cp(text, ps);
-  }
-
-  /**
-   * Moves one character forward.
-   * @return character
-   */
-  int next() {
-    final int c = curr();
-    if(ps < size) ps += Token.cl(text[ps]);
-    return c;
-  }
-
-  /**
-   * Sets the iterator position.
-   * @param p iterator position
-   */
-  void pos(final int p) {
-    ps = p;
-  }
-
-  /**
-   * Returns the iterator position.
-   * @return iterator position
-   */
-  int pos() {
-    return ps;
   }
 
   /**
@@ -232,7 +231,7 @@ final class BaseXTextTokens {
     if(size == 0) return;
     final TokenBuilder tb = new TokenBuilder();
     final int s = ms != -1 ? Math.min(ms, me) : ps;
-    final int e = ms != -1 ? Math.max(ms, me) : ps + Token.cl(text[ps]);
+    final int e = ms != -1 ? Math.max(ms, me) : ps + cl(text[ps]);
     tb.add(text, 0, s);
     if(e < size) tb.add(text, e, size);
     text = tb.finish();
@@ -272,6 +271,13 @@ final class BaseXTextTokens {
    */
   int start() {
     return ms;
+  }
+
+  /**
+   * Checks the validity of the mark.
+   */
+  void checkMark() {
+    if(ms == me) noMark();
   }
 
   /**

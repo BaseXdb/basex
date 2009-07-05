@@ -1,12 +1,7 @@
-/**
- *
- */
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
-
 import java.io.File;
-
 import org.basex.BaseX;
 import org.basex.util.Token;
 

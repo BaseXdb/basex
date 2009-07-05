@@ -60,7 +60,7 @@ public final class DialogInsert extends Dialog {
     input1 = new BaseXTextField(null, this);
     BaseXLayout.setWidth(input1, 320);
 
-    input2 = new BaseXText(gui, null, true, this);
+    input2 = new BaseXText(null, true, this);
     input2.setFont(GUIConstants.mfont);
     BaseXLayout.setWidth(input2, 320);
 

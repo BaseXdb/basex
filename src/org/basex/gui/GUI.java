@@ -5,14 +5,11 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.HashMap;
 import javax.swing.Box;
@@ -49,14 +46,15 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.ViewContainer;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewPanel;
+import org.basex.gui.view.explore.ExploreView;
 import org.basex.gui.view.folder.FolderView;
 import org.basex.gui.view.info.InfoView;
 import org.basex.gui.view.map.MapView;
 import org.basex.gui.view.plot.PlotView;
-import org.basex.gui.view.query.QueryView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
+import org.basex.gui.view.xquery.XQueryView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -86,13 +84,13 @@ public final class GUI extends JFrame {
   public final BaseXButton filter;
   /** Help dialog. */
   public DialogHelp help;
+  /** Search view. */
+  public final XQueryView query;
 
   /** Text view. */
   final TextView text;
   /** Info view. */
   final InfoView info;
-  /** Search view. */
-  final QueryView query;
 
   /** History button. */
   final BaseXButton hist;
@@ -159,15 +157,13 @@ public final class GUI extends JFrame {
     menu = new GUIMenu(this);
     if(GUIProp.showmenu) setJMenuBar(menu);
 
-    final Font fnt = new Font(GUIProp.font, 1, 15);
-
     buttons = new BaseXBack();
     buttons.setLayout(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
     buttons.add(toolbar, BorderLayout.WEST);
 
     hits = new BaseXLabel(" ");
-    hits.setFont(fnt);
+    hits.setFont(hits.getFont().deriveFont(18f));
     BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -182,7 +178,7 @@ public final class GUI extends JFrame {
     nav.setBorder(2, 2, 0, 2);
 
     mode = new BaseXCombo(new String[] {
-        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE);
+        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE, this);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
@@ -195,17 +191,11 @@ public final class GUI extends JFrame {
         refreshControls();
       }
     });
-    mode.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        checkKeys(e);
-      }
-    });
     nav.add(mode, BorderLayout.WEST);
 
     input = new GUIInput(this);
 
-    hist = new BaseXButton(icon("cmd-hist"), HELPHIST);
+    hist = new BaseXButton(icon("cmd-hist"), HELPHIST, this);
     hist.trim();
     hist.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -235,27 +225,15 @@ public final class GUI extends JFrame {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    go = new BaseXButton(icon("cmd-go"), HELPGO);
+    go = new BaseXButton(icon("cmd-go"), HELPGO, this);
     go.trim();
     go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         execute();
       }
     });
-    go.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        checkKeys(e);
-      }
-    });
 
     filter = GUIToolBar.newButton(GUICommands.FILTER, this);
-    filter.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        checkKeys(e);
-      }
-    });
 
     b = new BaseXBack();
     b.setLayout(new TableLayout(1, 3));
@@ -269,7 +247,7 @@ public final class GUI extends JFrame {
 
     // create views
     notify = new ViewNotifier(this);
-    query = new QueryView(notify);
+    query = new XQueryView(notify);
     text = new TextView(notify);
     info = new InfoView(notify, HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
@@ -282,7 +260,8 @@ public final class GUI extends JFrame {
         new ViewPanel(new TableView(notify), TABLEVIEW),
         new ViewPanel(new MapView(notify), MAPVIEW),
         new ViewPanel(new TreeView(notify), TREEVIEW),
-        new ViewPanel(query, QUERYVIEW),
+        new ViewPanel(new ExploreView(notify), EXPLOREVIEW),
+        new ViewPanel(query, XQUERYVIEW),
         new ViewPanel(info, INFOVIEW),
         textpanel
       }
@@ -315,26 +294,6 @@ public final class GUI extends JFrame {
     input.requestFocusInWindow();
   }
 
-  /**
-   * Browse in views.
-   * @param e key event
-   */
-  public void checkKeys(final KeyEvent e) {
-    if(!e.isAltDown() || !context.db()) return;
-    final int code = e.getKeyCode();
-
-    // browse back/forward
-    if(code == KeyEvent.VK_LEFT) {
-      GUICommands.GOBACK.execute(this);
-    } else if(code == KeyEvent.VK_RIGHT) {
-      GUICommands.GOFORWARD.execute(this);
-    } else if(code == KeyEvent.VK_UP) {
-      GUICommands.GOUP.execute(this);
-    } else if(code == KeyEvent.VK_HOME) {
-      GUICommands.ROOT.execute(this);
-    }
-  }
-
   @Override
   public void dispose() {
     GUIProp.maxstate = getExtendedState() == MAXIMIZED_BOTH;
@@ -344,7 +303,6 @@ public final class GUI extends JFrame {
       GUIProp.guisize[0] = getWidth();
       GUIProp.guisize[1] = getHeight();
     }
-    query.quit();
     if(context.data() == null || context.data().fs == null) context.close();
     super.dispose();
     GUIProp.write();
@@ -497,15 +455,14 @@ public final class GUI extends JFrame {
         }
       }
 
-      final boolean feedback = main || data != null && GUIProp.showquery &&
-        query.info(pr instanceof XQuery ? inf : null, ok);
+      boolean feedback = main;
+      if(!main && data != null && GUIProp.showxquery && pr instanceof XQuery) {
+        feedback = true;
+        query.info(inf, ok);
+      }
 
       // show query info
-      if(GUIProp.showinfo && (ok || main))
-        info.setInfo(Token.token(inf), ok);
-
-      //if(GUIProp.showinfo) info.setInfo(result != null ?
-      //    Token.token(inf) : Token.EMPTY);
+      if(GUIProp.showinfo && (ok || main)) info.setInfo(Token.token(inf), ok);
 
       // check if query feedback was processed in the query view
       if(!ok) {

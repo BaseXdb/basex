@@ -116,7 +116,7 @@ public final class Context {
             e.printStackTrace();
           }
           int rc = p.exitValue();
-          String msg = method + "Unmount "  + d.meta.mountpoint;
+          String msg = method + "Unmount " + d.meta.mountpoint;
           if (rc == 0) msg = msg + " ... OK.";
           else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
           BaseX.debug(msg);

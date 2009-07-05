@@ -100,7 +100,7 @@ public final class XMLSerializer extends Serializer {
     while(ftt.more()) {
       c++;
       for(int i = wl; i < ftt.p;) {
-        if(ftt.ftChar(cp(b, i)) && pp < ftp.pos.length && c == ftp.pos[pp]) {
+        if(ftChar(cp(b, i)) && pp < ftp.pos.length && c == ftp.pos[pp]) {
           // write color indicator in front of the token
           out.write(0x10 + (ftp.poi[pp++] & 0x0F));
         }
@@ -117,7 +117,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void comment(final byte[] n) throws IOException {
     finishElement();
-    if(indent) indent(false);
+    if(indent) indent(true);
     out.print(COM1);
     out.print(n);
     out.print(COM2);
@@ -126,7 +126,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
     finishElement();
-    if(indent) indent(false);
+    if(indent) indent(true);
     out.print(PI1);
     out.print(n);
     out.print(' ');

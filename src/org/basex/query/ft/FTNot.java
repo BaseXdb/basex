@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.data.FTStringMatch;
@@ -81,7 +80,7 @@ public final class FTNot extends FTExpr {
       all.add(new FTMatch());
     } else {
       for(final FTStringMatch s : m.match[i]) {
-        s.not ^= true;
+        s.n ^= true;
         for(final FTMatch tmp : not(m, i + 1)) {
           all.add(new FTMatch().add(s).add(tmp));
         }

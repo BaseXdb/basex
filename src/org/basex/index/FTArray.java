@@ -158,7 +158,7 @@ final class FTArray {
 
       } else {
         if(r2 == null) {
-          // char1 != null &&  char2 == null
+          // char1 != null && char2 == null
           // value of currentNode equals valuteToInsert,
           // but current has a longer value
           // update value of currentNode.value with intersection

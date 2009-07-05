@@ -16,6 +16,10 @@ import org.basex.gui.GUIConstants;
 public final class BaseXTextRenderer extends BaseXBack {
   /** Font. */
   private Font font;
+  /** Default font. */
+  private Font dfont;
+  /** Bold font. */
+  private Font bfont;
   /** Font height. */
   private int fontH;
   /** Character widths. */
@@ -29,8 +33,6 @@ public final class BaseXTextRenderer extends BaseXBack {
   private final BaseXBar bar;
   /** Width of current word. */
   private int wordW;
-  /** Character widths. */
-  private String word;
   /** Search term. */
   private String search;
 
@@ -132,12 +134,22 @@ public final class BaseXTextRenderer extends BaseXBack {
     return find(b, s);
   }
 
-  @Override
-  public void setFont(final Font f) {
+  /**
+   * Sets the current font.
+   * @param f font
+   */
+  private void font(final Font f) {
     font = f;
     off = f.getSize() >> 2;
     fontH = f.getSize() + off;
     fwidth = GUIConstants.fontWidths(f);
+  }
+
+  @Override
+  public void setFont(final Font f) {
+    dfont = f;
+    bfont = f.deriveFont(Font.BOLD);
+    font(f);
   }
 
   @Override
@@ -208,42 +220,43 @@ public final class BaseXTextRenderer extends BaseXBack {
     // no more words found; quit
     if(!text.moreWords()) return false;
 
-    wordW = 0;
-    word = text.nextWord();
-
     // calculate word width
-    for(int c = 0; c < word.length(); c++) {
-      final char ch = word.charAt(c);
+    int ww = 0;
+    final int p = text.pos();
+    while(text.more()) {
+      final int ch = text.next();
       // internal special codes...
       if(ch == 0x02) {
-        setFont(GUIConstants.bfont);
+        font(bfont);
       } else if(ch == 0x03) {
-        setFont(GUIConstants.font);
+        font(dfont);
       } else {
-        wordW += charW(g, ch);
+        ww += charW(g, ch);
       }
     }
+    text.pos(p);
 
     // jump to new line
-    if(x + wordW > w) {
+    if(x + ww > w) {
       x = off;
       y += fontH;
     }
-
+    wordW = ww;
+    
     // check if word has been found, and word is still visible
     return y < h;
   }
-
 
   /**
    * Finishes the current token.
    */
   private void next() {
-    x += wordW;
-    final int ch = word.length() > 0 ? word.charAt(0) : 0;
+    final int ch = text.curr();
     if(ch == 0x0A || ch == 0x0B) {
       x = off;
       y += fontH >> (ch == 0x0A ? 0 : 1);
+    } else {
+      x += wordW;
     }
   }
 
@@ -252,14 +265,13 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
-    final int ch = word.charAt(0);
-
     if(high) {
       high = false;
     } else {
-      col = isEnabled() ? syntax.getColor(word) : Color.gray;
+      col = isEnabled() ? syntax.getColor(text) : Color.gray;
     }
 
+    final int ch = text.curr();
     if(y > 0 && y < h) {
       if(ch >= 0x10 && ch < 0x20) {
         final int c = ch - 0x10;
@@ -277,8 +289,8 @@ public final class BaseXTextRenderer extends BaseXBack {
       int xx = x;
       if(text.markStart()) {
         final int p = text.pos();
-        for(int c = 0; c < word.length(); c++) {
-          final int cw = charW(g, word.charAt(c));
+        while(text.more()) {
+          final int cw = charW(g, text.curr());
           if(text.marked()) {
             g.setColor(GUIConstants.COLORS[3]);
             g.fillRect(xx, y - fontH + 4, cw, fontH);
@@ -293,14 +305,14 @@ public final class BaseXTextRenderer extends BaseXBack {
         for(int c = 0; c < search.length(); c++) {
           cw += charW(g, search.charAt(c));
         }
-        g.setColor(GUIConstants.COLORS[text.cursor() == text.pos() ? 7 : 3]);
+        g.setColor(GUIConstants.COLORS[text.cursor() == text.pos() ? 5 : 2]);
         g.fillRect(x, y - fontH + 4, cw, fontH);
       }
 
       // don't write whitespaces
       if(ch > ' ') {
         g.setColor(col);
-        g.drawString(word, x, y);
+        g.drawString(text.nextWord(), x, y);
       } else if(ch < 0x04) {
         g.setFont(font);
       }
@@ -308,13 +320,15 @@ public final class BaseXTextRenderer extends BaseXBack {
       // show cursor
       if(cursor && text.edited()) {
         xx = x;
-        for(int c = 0; c < word.length(); c++) {
-          if(text.cursor() == text.pos() + c) {
+        int p = text.pos();
+        while(text.more()) {
+          if(text.cursor() == text.pos()) {
             cursor(g, xx);
             break;
           }
-          xx += charW(g, word.charAt(c));
+          xx += charW(g, text.next());
         }
+        text.pos(p);
       }
     }
     next();
@@ -326,13 +340,15 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private boolean searched() {
     final int sl = search.length();
-    final int wl = word.length();
+    final int wl = text.length();
     if(wl < sl) return false;
-    for(int s = 0; s < sl; s++) {
-      if(Character.toLowerCase(word.charAt(s)) !=
-        search.charAt(s)) return false;
+    int p = text.pos();
+    int s = -1;
+    while(++s != sl) {
+      if(Character.toLowerCase(text.next()) != search.charAt(s)) break;
     }
-    return true;
+    text.pos(p);
+    return s == sl;
   }
 
   /**
@@ -345,6 +361,13 @@ public final class BaseXTextRenderer extends BaseXBack {
     g.drawLine(xx, y - fontH + 4, xx, y + 3);
   }
 
+  /**
+   * Finishes the selection.
+   */
+  void stopSelect() {
+    text.checkMark();
+  }
+  
   /**
    * Selects the text at the specified position.
    * @param pos current text position
@@ -400,10 +423,9 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return width
    */
   private int charW(final Graphics g, final int ch) {
-    if(ch == '\t') return fwidth[' '] * BaseXTextTokens.TAB;
-    if(ch < 32) return 0;
-    if(ch > 255 && g != null) return g.getFontMetrics().charWidth(ch);
-    return fwidth[ch & 0xFF];
+    return ch == '\t' ? fwidth[' '] * BaseXTextTokens.TAB : ch < ' ' ? 0 :
+      ch < 256 || g == null ? fwidth[ch & 0xFF] :
+      g.getFontMetrics().charWidth(ch);
   }
 
   /**

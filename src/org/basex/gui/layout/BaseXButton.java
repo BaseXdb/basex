@@ -2,6 +2,7 @@ package org.basex.gui.layout;
 
 import static org.basex.Text.*;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -22,23 +23,15 @@ public final class BaseXButton extends JButton {
    * Default Constructor.
    * @param l button title
    * @param hlp help text
+   * @param win parent window
    */
-  public BaseXButton(final String l, final byte[] hlp) {
-    this(l, hlp, null);
-  }
-
-  /**
-   * Default Constructor.
-   * @param l button title
-   * @param hlp help text
-   * @param d dialog window reference
-   */
-  public BaseXButton(final String l, final byte[] hlp, final Dialog d) {
+  public BaseXButton(final String l, final byte[] hlp, final Window win) {
     super(l);
     setOpaque(false);
-    BaseXLayout.addHelp(this, hlp);
-    if(d == null) return;
+    BaseXLayout.addInteraction(this, hlp, win);
+    if(!(win instanceof Dialog)) return;
 
+    final Dialog d = (Dialog) win;
     addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String text = getText();
@@ -57,13 +50,14 @@ public final class BaseXButton extends JButton {
 
   /**
    * Default Constructor.
-   * @param image image reference
+   * @param img image reference
    * @param hlp help text
+   * @param win parent window
    */
-  public BaseXButton(final ImageIcon image, final byte[] hlp) {
-    super(image);
+  public BaseXButton(final ImageIcon img, final byte[] hlp, final Window win) {
+    super(img);
     setOpaque(false);
-    BaseXLayout.addHelp(this, hlp);
+    BaseXLayout.addInteraction(this, hlp, win);
     if(hlp != null) setToolTipText(Token.string(hlp));
   }
 

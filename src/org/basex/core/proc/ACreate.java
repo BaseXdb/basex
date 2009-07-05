@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -106,7 +105,7 @@ abstract class ACreate extends Process {
       throws IOException {
 
     switch(i) {
-      case TXT: buildIndex(i, new ValueBuilder(true), d);  break;
+      case TXT: buildIndex(i, new ValueBuilder(true), d); break;
       case ATV: buildIndex(i, new ValueBuilder(false), d); break;
       case FTX: buildIndex(i, d.meta.ftfz ?
           new FTFuzzyBuilder() : new FTTrieBuilder(), d); break;

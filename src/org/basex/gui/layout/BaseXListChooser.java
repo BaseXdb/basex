@@ -36,14 +36,12 @@ public final class BaseXListChooser extends BaseXBack {
 
   /**
    * Default Constructor.
-   * @param parent the notifier receives notifications when changes
-   * have been taken place, when a final value has been chosen or when
-   * the user has canceled (e.g. by pressing Escape).
    * @param choice the input values for the list.
    * @param help help text
+   * @param d dialog reference
    */
-  public BaseXListChooser(final Dialog parent, final String[] choice,
-      final byte[] help) {
+  public BaseXListChooser(final String[] choice, final byte[] help,
+      final Dialog d) {
 
     // cache list values
     values = choice.clone();
@@ -59,7 +57,7 @@ public final class BaseXListChooser extends BaseXBack {
     // initialize panel
     setLayout(new TableLayout(2, 1));
     // create a text field
-    text = new BaseXTextField(help, parent);
+    text = new BaseXTextField(help, d);
     text.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -127,7 +125,7 @@ public final class BaseXListChooser extends BaseXBack {
             text.select(c, values[i].length());
           }
         }
-        parent.action(null);
+        d.action(null);
       }
     });
     add(text);
@@ -142,7 +140,7 @@ public final class BaseXListChooser extends BaseXBack {
         text.setText(list.getSelectedValue().toString());
         focus();
         text.selectAll();
-        parent.action(null);
+        d.action(null);
       }
       @Override
       public void mouseDragged(final MouseEvent e) {
@@ -151,7 +149,7 @@ public final class BaseXListChooser extends BaseXBack {
       @Override
       public void mouseClicked(final MouseEvent e) {
         if(e.getClickCount() == 2) {
-          parent.close();
+          d.close();
           return;
         }
       }
@@ -164,7 +162,7 @@ public final class BaseXListChooser extends BaseXBack {
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
-    BaseXLayout.addHelp(list, help);
+    BaseXLayout.addInteraction(list, help, d);
 
     scroll = new JScrollPane(list,
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

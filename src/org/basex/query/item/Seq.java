@@ -79,7 +79,7 @@ public class Seq extends Item {
 
   @Override
   public Iter iter() {
-    return SeqIter.get(val, size);
+    return new SeqIter(val, size);
   }
 
   @Override

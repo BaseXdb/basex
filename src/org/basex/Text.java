@@ -637,10 +637,12 @@ public interface Text {
   String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
   String INFOMAINMEM = lang("info_mainmem");
-  /** Info on Tag Index. */
-  String INFOTAGINDEX = lang("info_tagindex");
-  /** Info on Attribute value Index. */
-  String INFOATNINDEX = lang("info_atnindex");
+  /** Info on Tags. */
+  String INFOTAGS = lang("info_tags");
+  /** Info on Attributes. */
+  String INFOATTS = lang("info_atts");
+  /** Info on Namespaces. */
+  String INFONS = lang("info_ns");
   /** Info on Text Indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
@@ -666,6 +668,8 @@ public interface Text {
   String INFOOFF = lang("info_off");
   /** Error info. */
   String INFOERROR = lang("info_error") + COLS;
+  /** Error info. */
+  String INFOENTRIES = "(" + lang("info_entries") + ")";
 
   // MENU ENTRIES =============================================================
 
@@ -711,6 +715,8 @@ public interface Text {
   String GUICUT = lang("c_cut");
   /** Command Info. */
   String GUICOPY = lang("c_copy");
+  /** Command Info. */
+  String GUIALL = lang("c_all");
   /** Command Info. */
   String GUICPPATH = lang("c_cppath");
   /** Command Info. */
@@ -814,6 +820,14 @@ public interface Text {
   /** Command Info. */
   String GUISHOWBUTTONSTT = lang("c_showbuttonstt");
   /** Command Info. */
+  String GUISHOWEXPLORE = lang("c_showexplore");
+  /** Command Info. */
+  String GUISHOWEXPLORETT = lang("c_showexplorett");
+  /** Command Info. */
+  String GUISHOWFOLDER = lang("c_showfolder");
+  /** Command Info. */
+  String GUISHOWFOLDERTT = lang("c_showfoldertt");
+  /** Command Info. */
   String GUISHOWHELP = lang("c_showhelp");
   /** Command Info. */
   String GUISHOWHELPTT = lang("c_showhelptt");
@@ -834,10 +848,6 @@ public interface Text {
   /** Command Info. */
   String GUISHOWMENUTT = lang("c_showmenutt");
   /** Command Info. */
-  String GUISHOWSEARCH = lang("c_showsearch");
-  /** Command Info. */
-  String GUISHOWSEARCHTT = lang("c_showsearchtt");
-  /** Command Info. */
   String GUISHOWSTATUS = lang("c_showstatus");
   /** Command Info. */
   String GUISHOWSTATUSTT = lang("c_showstatustt");
@@ -854,9 +864,9 @@ public interface Text {
   /** Command Info. */
   String GUISHOWTEXTTT = lang("c_showtexttt");
   /** Command Info. */
-  String GUISHOWFOLDER = lang("c_showfolder");
+  String GUISHOWXQUERY = lang("c_showxquery");
   /** Command Info. */
-  String GUISHOWFOLDERTT = lang("c_showfoldertt");
+  String GUISHOWXQUERYTT = lang("c_showxquerytt");
   /** Command Info. */
   String GUIUNDO = lang("c_undo");
   /** Command Info. */
@@ -890,10 +900,6 @@ public interface Text {
   String BUTTONDROP = lang("b_drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
-  /** XQuery copy Button. */
-  String BUTTONTOXQUERY = ">> XQuery";
-  /** Text field mode - Search Modes. */
-  String[] SEARCHMODE = { "XQuery", lang("b_simple") };
 
   // STATUS BAR ===============================================================
 
@@ -915,11 +921,13 @@ public interface Text {
   /** No Query info. */
   String INFONO = lang("info_no");
   /** Query title. */
-  String QUERYTIT = lang("query_title");
+  String EXPLORETIT = lang("explore_title");
   /** Help title. */
   String HELPTIT = lang("help_title");
   /** Text title. */
   String TEXTTIT = lang("text_title");
+  /** Query title. */
+  String XQUERYTIT = "XQuery";
 
   /** Plot visualization. */
   String PLOTLOG = "log";
@@ -1089,7 +1097,7 @@ public interface Text {
   /** Simple File Dialog. */
   String SIMPLEFD = lang("dp_simplefd");
   /** Name display flag. */
-  String PREFNAMES = lang("dp_names");
+  String PREFNAME = lang("dp_names");
   /** Language preference. */
   String PREFLANG = lang("dp_lang");
 
@@ -1135,8 +1143,6 @@ public interface Text {
 
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
-  /** Simple Map Layout. */
-  String MAPSIMPLE = lang("dm_simple");
   /** Show Attributes.  */
   String MAPATTS = lang("dm_atts");
   /** Predefined number of layouts. */
@@ -1186,8 +1192,8 @@ public interface Text {
   /** Developer Names. */
   String CONTRIBUTE2 = "Andreas Weiler, Alexander Holupirek " +
     lang("da_cont2");
-  /** Developer Names. */
-  String CONTACT = lang("da_contact") + COLS + MAIL;
+  /** Translation. */
+  String TRANSLATION = lang("da_translation") + COLS;
 
   // HELP TEXTS ===============================================================
 
@@ -1220,6 +1226,8 @@ public interface Text {
   /** Help string. */
   byte[] HELPOPENINFO = token(lang("h_openinfo"));
   /** Help String. */
+  byte[] HELPRECENT = token(lang("h_recent"));
+  /** Help String. */
   byte[] HELPFALIAS = token(lang("h_falias"));
   /** Help String. */
   byte[] HELPBROWSE = token(lang("h_browse"));
@@ -1230,7 +1238,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPLANG = token(lang("h_lang"));
   /** Help String. */
-  byte[] HELPNAMES = token(lang("h_names"));
+  byte[] HELPNAME = token(lang("h_names"));
   /** Help String. */
   byte[] HELPFSNAME = token(lang("h_fsname"));
   /** Help String. */
@@ -1247,8 +1255,6 @@ public interface Text {
   byte[] HELPFSMAX = token(lang("h_fsmax"));
   /** Help String. */
   byte[] HELPMAPATTS = token(lang("h_mapatts"));
-  /** Help String. */
-  byte[] HELPMAPSIMPLE = token(lang("h_mapsimple"));
   /** Help String. */
   byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
   /** Help String. */
@@ -1308,10 +1314,6 @@ public interface Text {
   /** Help String. */
   byte[] HELPINFO = token(lang("h_info"));
   /** Help String. */
-  byte[][] HELPSEARCH = { token(lang("h_search1")), token(lang("h_search2")) };
-  /** Help String. */
-  byte[] HELPQUERYMODE = token(lang("h_querymode"));
-  /** Help String. */
   byte[] HELPSEARCHCAT = token(lang("h_searchcat"));
   /** Help String. */
   byte[] HELPCAT = token(lang("h_cat"));
@@ -1327,6 +1329,10 @@ public interface Text {
   byte[] HELPMEM = token(lang("h_mem"));
   /** Help String. */
   byte[] HELPGUISTATUS = token(lang("h_guistatus"));
+  /** Help String. */
+  byte[] HELPEXPLORE = token(lang("h_explore"));
+  /** Help String. */
+  byte[] HELPXQUERY = token(lang("h_xquery"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);

@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import java.awt.Window;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
@@ -14,32 +15,22 @@ import org.basex.gui.dialog.Dialog;
 public final class BaseXCombo extends JComboBox {
   /**
    * Constructor.
-   * @param choice combobox choice.
-   * @param hlp help text
-   */
-  public BaseXCombo(final String[] choice, final byte[] hlp) {
-    this(choice, hlp, null);
-  }
-
-  /**
-   * Constructor.
    * @param ch combobox choices.
    * @param hlp help text
-   * @param list action listener
+   * @param win parent window
    */
-  public BaseXCombo(final String[] ch, final byte[] hlp, final Dialog list) {
+  public BaseXCombo(final String[] ch, final byte[] hlp, final Window win) {
     super(ch);
-    BaseXLayout.addDefaultKeys(this, list);
-    BaseXLayout.addHelp(this, hlp);
+    BaseXLayout.addInteraction(this, hlp, win);
 
-    if(list != null) {
-      addItemListener(new ItemListener() {
-        public void itemStateChanged(final ItemEvent ie) {
-          if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
-            list.action(null);
-          }
+    if(!(win instanceof Dialog)) return;
+
+    addItemListener(new ItemListener() {
+      public void itemStateChanged(final ItemEvent ie) {
+        if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
+          ((Dialog) win).action(null);
         }
-      });
-    }
+      }
+    });
   }
 }

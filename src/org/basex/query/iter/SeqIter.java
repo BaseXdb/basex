@@ -64,7 +64,7 @@ public final class SeqIter extends Iter implements Result {
    * @param it item array
    * @param s size
    */
-  private SeqIter(final Item[] it, final int s) {
+  public SeqIter(final Item[] it, final int s) {
     item = it;
     size = s;
   }
@@ -77,16 +77,6 @@ public final class SeqIter extends Iter implements Result {
    */
   public static SeqIter get(final Iter iter) throws QueryException {
     return iter instanceof SeqIter ? (SeqIter) iter : new SeqIter(iter);
-  }
-
-  /**
-   * Constructor.
-   * @param it item array
-   * @param s size
-   * @return iterator
-   */
-  public static Iter get(final Item[] it, final int s) {
-    return s == 0 ? Iter.EMPTY : new SeqIter(it, s);
   }
 
   /**

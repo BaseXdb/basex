@@ -2,7 +2,6 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;

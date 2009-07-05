@@ -40,13 +40,13 @@ public final class GUIInput extends BaseXTextField {
    * @param main main window reference
    */
   public GUIInput(final GUI main) {
-    super(null);
+    super(null, main);
     gui = main;
 
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
-    box = new BaseXCombo(new String[] {}, null);
+    box = new BaseXCombo(new String[] {}, null, main);
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == 16) completeInput();
@@ -57,8 +57,6 @@ public final class GUIInput extends BaseXTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        main.checkKeys(e);
-
         final int count = box.getItemCount();
         final int c = e.getKeyCode();
 

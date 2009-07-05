@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
-
 import org.basex.data.FTPos;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -107,7 +106,7 @@ final class MapRenderer {
       if(ls < ftt.sent) {
         ls++;
         final int w = BaseXLayout.width(g, cw, (byte) ftt.pm);
-        if(xx + ll +  w > ww) {
+        if(xx + ll + w > ww) {
           xx = r.x;
           yy += fh;
           ll = 0;
@@ -220,7 +219,7 @@ final class MapRenderer {
       r.thumbsw = r.thumbf; // ?
       // sw = f; //Math.max(f * 0.5, 1.5);
 
-  switch(r.thumbal) {
+      switch(r.thumbal) {
         case 0:
           h = drawThumbnailsToken(g, r, data, false, 0, 0);
           break;
@@ -375,8 +374,8 @@ final class MapRenderer {
       pl += data[0][i];
       cchars += data[0][i];
       // check if rectangle fits in line - don't split token and dot
-      if(ll + wl + r.thumbsw * ((psl < data[1].length
-          && sl == data[1][psl]) ? 1 : 0) >= ww) {
+      if(ll + wl + r.thumbsw * (psl < data[1].length
+          && sl == data[1][psl] ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
         ml = 0;
@@ -476,7 +475,7 @@ final class MapRenderer {
    */
   private static boolean inRect(final double rx, final int ry,
       final double rw, final int rh, final int xx, final int yy) {
-    return xx >= rx && xx <= rx + rw  && yy >= ry && yy <= ry + rh;
+    return xx >= rx && xx <= rx + rw && yy >= ry && yy <= ry + rh;
   }
 
   /**
@@ -514,9 +513,9 @@ final class MapRenderer {
       }
 
       final int ww = nl == 1 && wl < wi ? wl : wi;
-      final int xx = x + 10 + ww  >= rx + rw ? rx + rw - ww - 2 : x + 10;
+      final int xx = x + 10 + ww >= rx + rw ? rx + rw - ww - 2 : x + 10;
       int yy = y + 28 + GUIProp.fontsize * nl + 4 < ry + rh ?
-          y + 28 :  y - ry - 4 > GUIProp.fontsize * nl ?
+          y + 28 : y - ry - 4 > GUIProp.fontsize * nl ?
               y - GUIProp.fontsize * nl : ry + rh - 4 - GUIProp.fontsize * nl;
 
       //final int ww = nl == 1 && wl < wi ? wl : wi;
@@ -609,7 +608,7 @@ final class MapRenderer {
 //          g.drawRect(r.x, yy, wl, r.thumbfh);
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
           ll = wl + (psl < data[1].length && data[1][psl] == sl ?
-              r.thumbsw :  r.thumbf);
+              r.thumbsw : r.thumbf);
         } else {
           // split token
 //          g.drawRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh);
@@ -672,7 +671,7 @@ final class MapRenderer {
           // find token color
           if(ftp != null) {
             while(pp < ftp.size() && pp > -1 && i < ftp.pos[pp]) pp--;
-            if(pp < ftp.size() &&  pp > -1  && i == ftp.pos[pp]) {
+            if(pp < ftp.size() && pp > -1 && i == ftp.pos[pp]) {
               ttcol.add(ftp.poi[pp]);
               pp++;
             } else ttcol.add(-1);
@@ -808,15 +807,13 @@ final class MapRenderer {
 
     int i = 0;
     tl = new TokenList();
-   while(i < data[0].length) {
+    while(i < data[0].length) {
       wl = 0;
       ct = 0;
       g.setColor(textc);
 
-     while(i < data[0].length &&
-          ppl < data[2].length && data[2][ppl] > pl &&
-          (psl < data[1].length && data[1][psl] > sl ||
-          psl >= data[1].length)) {
+      while(i < data[0].length && ppl < data[2].length && data[2][ppl] > pl &&
+        (psl < data[1].length && data[1][psl] > sl || psl >= data[1].length)) {
         sl += data[0][i];
         pl += data[0][i];
         lastl = (int) (data[0][i] * r.thumbf);
@@ -836,8 +833,8 @@ final class MapRenderer {
         else break;
       }
 
-     if(ct == 0) {
-       while(ll + wl >= ww) {
+      if(ct == 0) {
+        while(ll + wl >= ww) {
           if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
           wl -= ww - ll;
           ll = 0;
@@ -849,8 +846,9 @@ final class MapRenderer {
         int cttmp = 0;
         int wltmp = wl / ct;
         while(cttmp < ct) {
-          if(pp - ct + cttmp < ftp.size())
-            g.setColor(getFTColor(ftp.poi[pp - ct + cttmp]));;
+          if(pp - ct + cttmp < ftp.size()) g.setColor(getFTColor(ftp.poi[pp
+              - ct + cttmp]));
+          ;
           while(ll + wltmp >= ww) {
             if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
             wltmp -= ww - ll;
@@ -859,7 +857,7 @@ final class MapRenderer {
           }
           if(draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
           ll += wltmp;
-          wltmp = wl / ct + ((cttmp == ct - 2) ?  wl - (wl / ct) * ct : 0);
+          wltmp = wl / ct + (cttmp == ct - 2 ? wl - wl / ct * ct : 0);
           cttmp++;
         }
       }
@@ -867,13 +865,13 @@ final class MapRenderer {
       // new sentence
       if(psl < data[1].length && data[1][psl] == sl) {
         if(ll + r.thumbsw >= ww) {
-          yy += r.thumblh; //lh;
+          yy += r.thumblh; // lh;
           ll = 0;
         }
 
         if(draw) {
           g.setColor(Color.black);
-          g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh); //sw, fh);
+          g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh); // sw, fh);
           g.setColor(textc);
         }
         ll += r.thumbsw;

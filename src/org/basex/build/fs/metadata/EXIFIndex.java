@@ -104,8 +104,8 @@ public final class EXIFIndex {
       "reduction mode"))
     );
     //exifinfo.put(0x9209, new EXIFShort("Flash",
-    //    bytes("None", "Fired", "Fired without Strobe Return Light",
-    //        "Fired with Strobe Return Light")));
+    // bytes("None", "Fired", "Fired without Strobe Return Light",
+    // "Fired with Strobe Return Light")));
     info.put(0x920A, new EXIFRational("FocalLength", bytes(" mm")));
     info.put(0x920C, new EXIFUndefined("SpatialFrequencyResponse", 0));
     info.put(0x920D, new EXIFUndefined("Noise", 0));

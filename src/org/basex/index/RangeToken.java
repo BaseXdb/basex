@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import org.basex.data.Data.Type;
+import org.basex.util.Token;
 
 /**
  * This class defines access to index text tokens.
@@ -33,6 +34,6 @@ public final class RangeToken implements IndexToken {
   }
 
   public byte[] get() {
-    return null;
+    return Token.EMPTY;
   }
 }

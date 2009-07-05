@@ -31,13 +31,13 @@ public final class FTOrder extends FTFilter {
     int p = 0, s = 0;
     boolean f = true;
     for(final FTStringMatch sm : mtc) {
-      if(sm.not) continue;
+      if(sm.n) continue;
       if(f) {
-        if(p == sm.queryPos) continue;
-        p = sm.queryPos;
+        if(p == sm.q) continue;
+        p = sm.q;
       }
-      f = s <= sm.start;
-      if(f) s = sm.start;
+      f = s <= sm.s;
+      if(f) s = sm.s;
     }
     return f;
   }

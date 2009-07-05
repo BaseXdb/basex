@@ -3,9 +3,9 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -28,11 +28,9 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.dialog.Dialog;
-import org.basex.gui.view.text.TextView;
 import org.basex.util.Array;
-import org.basex.util.Token;
 import org.basex.util.Undo;
+import static org.basex.util.Token.*;
 
 /**
  * This class offers a fast text input, using the {@link BaseXTextRenderer}
@@ -41,51 +39,32 @@ import org.basex.util.Undo;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class BaseXText extends BaseXPanel {
+public class BaseXText extends BaseXPanel {
   /** Text array to be written. */
-  BaseXTextTokens text = new BaseXTextTokens(Token.EMPTY);
+  protected BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
-  final BaseXTextRenderer rend;
+  protected final BaseXTextRenderer rend;
+  /** Search field. */
+  protected BaseXTextField find;
   /** Undo history. */
-  Undo undo;
+  protected Undo undo;
 
   /** Scrollbar reference. */
-  final BaseXBar scroll;
+  protected final BaseXBar scroll;
   /** Popup Menu. */
-  final BaseXPopup popup;
+  protected final BaseXPopup popup;
 
   /**
    * Default constructor.
-   * @param main reference to the main window
-   * @param help help text
-   */
-  public BaseXText(final GUI main, final byte[] help) {
-    this(main, help, true, null);
-  }
-
-  /**
-   * Default constructor.
-   * @param main reference to the main window
-   * @param edit editable flag
-   * @param help help text
-   */
-  public BaseXText(final GUI main, final byte[] help, final boolean edit) {
-    this(main, help, edit, null);
-  }
-
-  /**
-   * Default constructor.
-   * @param main reference to the main window
    * @param help help text
    * @param edit editable flag
-   * @param list reference to the dialog listener
+   * @param win parent window
    */
-  public BaseXText(final GUI main, final byte[] help, final boolean edit,
-      final Dialog list) {
-    super(main, help);
+  public BaseXText(final byte[] help, final boolean edit, final Window win) {
+    super(help, win);
     setFocusable(true);
 
-    BaseXLayout.addDefaultKeys(this, list);
+    BaseXLayout.addInteraction(this, help, win);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addComponentListener(this);
@@ -121,10 +100,10 @@ public final class BaseXText extends BaseXPanel {
       setMode(Fill.NONE);
     }
 
-    final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :
-        new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
-        new CopyCmd(), new PasteCmd(), new DelCmd() };
-    popup = new BaseXPopup(this, pop);
+    popup = new BaseXPopup(this, edit ?
+      new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
+        new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
+      new GUICommand[] { new CopyCmd(), null, new AllCmd() });
   }
 
   /**
@@ -135,6 +114,15 @@ public final class BaseXText extends BaseXPanel {
     setText(t, t.length);
   }
 
+  /**
+   * Adds a search dialog.
+   * @param f search field
+   */
+  public void addSearch(final BaseXTextField f) {
+    f.addSearch(this);
+    find = f;
+  }
+  
   /**
    * Finds the specified term.
    * @param t output text
@@ -199,6 +187,7 @@ public final class BaseXText extends BaseXPanel {
   public void setCaret(final int p) {
     text.setCaret(p);
     showCursor(1);
+    cursor(true);
   }
 
   /**
@@ -245,7 +234,7 @@ public final class BaseXText extends BaseXPanel {
     rend.repaint();
   }
 
-  // OVERRIDDEN METHODS =======================================================
+  // MOUSE INTERACTIONS =======================================================
 
   @Override
   public void mouseEntered(final MouseEvent e) {
@@ -255,6 +244,23 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void mouseExited(final MouseEvent e) {
     gui.cursor(GUIConstants.CURSORARROW);
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    if(!SwingUtilities.isLeftMouseButton(e)) return;
+    rend.stopSelect();
+  }
+
+  @Override
+  public void mouseDragged(final MouseEvent e) {
+    if(!SwingUtilities.isLeftMouseButton(e)) return;
+
+    // selection mode
+    rend.select(scroll.pos(), e.getPoint(), true);
+
+    final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
+    if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
   }
 
   @Override
@@ -283,16 +289,16 @@ public final class BaseXText extends BaseXPanel {
    */
   private void selectWord() {
     text.pos(text.cursor());
-    final boolean ch = Character.isLetterOrDigit(text.prev(true));
+    final boolean ch = ftChar(text.prev(true));
     while(text.pos() > 0) {
       final int c = text.prev(true);
-      if(c == '\n' || ch != Character.isLetterOrDigit(c)) break;
+      if(c == '\n' || ch != ftChar(c)) break;
     }
     if(text.pos() != 0) text.next(true);
     text.startMark();
     while(text.pos() < text.size()) {
       final int c = text.curr();
-      if(c == '\n' || ch != Character.isLetterOrDigit(c)) break;
+      if(c == '\n' || ch != ftChar(c)) break;
       text.next(true);
     }
     text.endMark();
@@ -309,24 +315,7 @@ public final class BaseXText extends BaseXPanel {
     text.endMark();
   }
 
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e)) return;
-  }
-
-  @Override
-  public void mouseDragged(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e)) return;
-
-    // selection mode
-    rend.select(scroll.pos(), e.getPoint(), true);
-
-    if(e.getY() > getHeight() - 20) {
-      scroll.pos(scroll.pos() + e.getY() - getHeight() + 20);
-    } else if(e.getY() < 20) {
-      scroll.pos(scroll.pos() + e.getY() - 20);
-    }
-  }
+  // KEY INTERACTIONS =======================================================
 
   /** Last horizontal position. */
   private int col = -1;
@@ -338,23 +327,14 @@ public final class BaseXText extends BaseXPanel {
     final boolean ctrl = (Toolkit.getDefaultToolkit().
         getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
+    if(ctrl && c == KeyEvent.VK_F) {
+      if(find != null) find.requestFocusInWindow();
+      return;
+    }
     if(c == KeyEvent.VK_F3) {
       find(rend.find(shf, true));
       return;
     }
-    if(ctrl && c == KeyEvent.VK_F) {
-      // activate parent search field
-      Container cont = this;
-      do {
-        cont = cont.getParent();
-        if(cont instanceof TextView) {
-          ((TextView) cont).find();
-          e.consume();
-        }
-      } while(cont != null);
-      return;
-    }
-
 
     if(e.isAltDown() || c == KeyEvent.VK_SHIFT || c == KeyEvent.VK_META ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
@@ -400,17 +380,16 @@ public final class BaseXText extends BaseXPanel {
 
     if(c == KeyEvent.VK_RIGHT) {
       if(ctrl) {
-        final boolean ch = Character.isLetterOrDigit(text.next(shf));
-        while(text.pos() < text.size() && ch ==
-          Character.isLetterOrDigit(text.curr())) text.next(shf);
+        final boolean ch = ftChar(text.next(shf));
+        while(text.pos() < text.size() && ch == ftChar(text.curr()))
+          text.next(shf);
       } else {
         text.next(shf);
       }
     } else if(c == KeyEvent.VK_LEFT) {
       if(ctrl) {
-        final boolean ch = Character.isLetterOrDigit(text.prev(shf));
-        while(text.pos() > 0 && ch ==
-          Character.isLetterOrDigit(text.prev(shf)));
+        final boolean ch = ftChar(text.prev(shf));
+        while(text.pos() > 0 && ch == ftChar(text.prev(shf)));
         if(text.pos() != 0) text.next(shf);
       } else {
         text.prev(shf);
@@ -509,7 +488,6 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    super.keyTyped(e);
     if(undo == null) return;
 
     // not nice here.. no alternative, though
@@ -529,20 +507,19 @@ public final class BaseXText extends BaseXPanel {
         if(text.pos() == 0) return;
         text.prev();
       }
-      final boolean ld = Character.isLetterOrDigit(text.curr());
+      final boolean ld = ftChar(text.curr());
       text.delete();
       if(ctrl) {
-        while(text.pos() > 0 &&
-            ld == Character.isLetterOrDigit(text.prev())) text.delete();
+        while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
         if(text.pos() != 0) text.next();
       }
       down = false;
     } else if(ch == KeyEvent.VK_DELETE) {
       if(text.start() == -1 && text.pos() == text.size()) return;
-      final boolean ld = Character.isLetterOrDigit(text.curr());
+      final boolean ld = ftChar(text.curr());
       text.delete();
-      while(ctrl && text.pos() < text.size() &&
-          ld == Character.isLetterOrDigit(text.curr())) text.delete();
+      while(ctrl && text.pos() < text.size() && ld == ftChar(text.curr()))
+        text.delete();
     } else {
       if(ctrl) return;
       if(text.start() != -1) text.delete();
@@ -561,8 +538,9 @@ public final class BaseXText extends BaseXPanel {
         undo == null) return;
 
     undo.store(text.finish(), text.cursor());
-    e.consume();
   }
+
+  // EDITOR COMMANDS ==========================================================
 
   /**
    * Undoes the text.
@@ -750,7 +728,7 @@ public final class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Cut Command. */
+  /** Copy Command. */
   class CopyCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -799,6 +777,21 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public String desc() {
       return GUIDEL;
+    }
+  }
+
+  /** Select all Command. */
+  class AllCmd extends TextCmd {
+    @Override
+    public void execute(final GUI main) {
+      selectAll();
+    }
+    @Override
+    public void refresh(final GUI main, final AbstractButton button) {
+    }
+    @Override
+    public String desc() {
+      return GUIALL;
     }
   }
 }

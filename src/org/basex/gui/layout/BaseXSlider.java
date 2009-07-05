@@ -2,12 +2,12 @@ package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
@@ -39,47 +39,31 @@ public final class BaseXSlider extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param main reference to the main window
    * @param mn min value
    * @param mx max value
    * @param i initial value
    * @param list listener
    * @param h help text
+   * @param win reference to the main window
    */
-  public BaseXSlider(final GUI main, final ActionListener list,
-      final int mn, final int mx, final int i, final byte[] h) {
-    this(main, mn, mx, i, h);
+  public BaseXSlider(final ActionListener list, final int mn, final int mx,
+      final int i, final byte[] h, final Window win) {
+    this(mn, mx, i, h, win);
     al = list;
   }
 
   /**
    * Constructor.
-   * @param main reference to the main window
    * @param mn min value
    * @param mx max value
    * @param i initial value
-   * @param h help text
-   * @param list listener
+   * @param help help text
+   * @param win parent window
    */
-  public BaseXSlider(final GUI main, final int mn, final int mx, final int i,
-      final byte[] h, final Dialog list) {
+  public BaseXSlider(final int mn, final int mx,
+      final int i, final byte[] help, final Window win) {
 
-    this(main, mn, mx, i, h);
-    dl = list;
-    BaseXLayout.addDefaultKeys(this, dl);
-  }
-
-  /**
-   * Constructor.
-   * @param main reference to the main window
-   * @param mn min value
-   * @param mx max value
-   * @param i initial value
-   * @param h help text
-   */
-  private BaseXSlider(final GUI main, final int mn, final int mx,
-      final int i, final byte[] h) {
-    super(main, h);
+    super(help, win);
     min = mn;
     max = mx;
     curr = i;
@@ -102,7 +86,10 @@ public final class BaseXSlider extends BaseXPanel {
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
-  }
+
+    if(!(win instanceof Dialog)) return;
+    dl = (Dialog) win;
+}
 
   /**
    * Returns the current value.

@@ -31,21 +31,21 @@ public final class Info extends AInfo {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
-    format(tb, INFODBPATH, Prop.dbpath, true, l);
-    format(tb, INFOMEM, Performance.getMem(), true, l);
-    //format(tb, INFOMM, BaseX.flag(Prop.mainmem), true, l);
+    format(tb, INFODBPATH, Prop.dbpath, l);
+    format(tb, INFOMEM, Performance.getMem(), l);
+    //format(tb, INFOMM, BaseX.flag(Prop.mainmem), l);
     format(tb, INFOINFO, BaseX.flag(Prop.info) +
-        (Prop.allInfo ? " (" + INFOALL + ")" : ""), true, l);
+        (Prop.allInfo ? " (" + INFOALL + ")" : ""), l);
 
     tb.add(NL + INFOCREATE + NL);
-    format(tb, INFOCHOP, BaseX.flag(Prop.chop), true, 0);
-    format(tb, INFOENTITY, BaseX.flag(Prop.entity), true, 0);
+    format(tb, INFOCHOP, BaseX.flag(Prop.chop), 0);
+    format(tb, INFOENTITY, BaseX.flag(Prop.entity), 0);
 
     tb.add(NL + INFOINDEX + NL);
-    format(tb, INFOTEXTINDEX, BaseX.flag(Prop.textindex), true, 0);
-    format(tb, INFOATTRINDEX, BaseX.flag(Prop.attrindex), true, 0);
+    format(tb, INFOTEXTINDEX, BaseX.flag(Prop.textindex), 0);
+    format(tb, INFOATTRINDEX, BaseX.flag(Prop.attrindex), 0);
     format(tb, INFOFTINDEX, BaseX.flag(Prop.ftindex) + (Prop.ftindex &&
-        Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+        Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), 0);
     out.print(tb.finish());
   }
 }

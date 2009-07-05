@@ -74,20 +74,19 @@ final class MapDefault extends MapPainter {
       }
 
       // skip drawing of string when left space is too small
-      if(r.w >= GUIProp.fontsize && r.h >= GUIProp.fontsize) {
-        drawRectangle(g, r);
-      }
+      if(r.w > 3 && r.h >= GUIProp.fontsize) drawRectangle(g, r);
     }
   }
 
   /**
-   * Draws a single rectangle.
+   * Draws the contents of a single rectangle.
    * @param g graphics reference
    * @param rect rectangle
    */
-  void drawRectangle(final Graphics g, final MapRect rect) {
+  private void drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
+    
     final int pre = rect.pre;
     final Context context = view.gui.context;
     final Data data = context.data();

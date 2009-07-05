@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
 import org.basex.util.Num;
 
 /**
@@ -77,9 +76,6 @@ public final class DataAccessNIO4 {
     fc.read(bytebuffernio);
     bytebuffernio.clear();
     bytebuffernio.get(buffer[0]);
-//    System.out.println(buffer[0]);
-//    file.read(buffer[0]);
-//    System.out.println(buffer[0]);
     for(int i = 1; i < BUFFERS; i++) pos[i] = -1;
     len = file.length();
   }
@@ -260,10 +256,6 @@ public final class DataAccessNIO4 {
       fc.read(bytebuffernio);
       bytebuffernio.clear();
       bytebuffernio.get(buffer[c]);
-//      System.out.println(buffer[c]);
-//      file.seek(n);
-//      file.read(buffer[c]);
-//      System.out.println(buffer[c]);
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

@@ -161,12 +161,14 @@ public class Step extends Preds {
 
     if(test.type != null) {
       kind = Nod.kind(test.type);
-      if(kind == Data.PI) return null;
+      if(kind == Data.PI || kind == Data.ATTR) return null;
 
       if(test.kind == Kind.NAME) n = ((NameTest) test).ln;
-      if(n == null && test.kind != null && test.kind != Kind.ALL) return null;
-      name = n == null ? 0 : kind == Data.ELEM ? data.tagID(n) :
-        kind == Data.ATTR ? data.attNameID(n) : 0;
+      if(n == null) {
+        if(test.kind != null && test.kind != Kind.ALL) return null;
+      } else if(kind == Data.ELEM) {
+        name = data.tagID(n);
+      }
     }
     final boolean desc = axis == Axis.DESC;
     if(!desc && axis != Axis.CHILD) return null;

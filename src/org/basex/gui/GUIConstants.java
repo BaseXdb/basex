@@ -8,33 +8,48 @@ import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.UIManager;
 import org.basex.Text;
+import org.basex.gui.view.ViewPanel;
 import org.basex.io.IO;
 
 /**
  * GUI Constants used in different views.
  *
+ * To add a new view, please proceed as follows:<br/>
+ * <br/>
+ * All views have unique names, which are defined below.
+ * The following steps are necessary to add a new view
+ * (the implementation of the existing views might help you):
+ *
+ * <ul>
+ *  <li> define a unique name for your view (e.g. <code>map</code>)</li>
+ *  <li> add a string for your view, as shown below</li>
+ *  <li> add the string in the {@link #LAYOUTOPEN} string below</li>
+ *  <li> create your view implementation in a new sub package
+ *    (e.g. {@link org.basex.gui.view.map.MapView}).
+ *  <li> add a new {@link ViewPanel} instance for your view in the {@link GUI}
+ *    constructor.</li>
+ * </ul>
+ *
+ * Add some more code to allow switching on/off your view:
+ *
+ * <ul>
+ *  <li> add a boolean visibility flag with the view name included
+ *    in the {@link GUIProp} class {@link GUIProp#showmap})</li>
+ *  <li> add strings for the menu text and command description in the
+ *    {@link Text} class (e.g. {@link Text#GUISHOWMAP} an
+ *    {@link Text#GUISHOWMAPTT}).
+ *  <li> optionally add localized translations in the .lang files
+ *    (e.g. <code>c_showmap</code> and <code>c_showmaptt</code>)
+ *  <li> add a corresponding command in the {@link GUICommands} class
+ *   (e.g. {@link GUICommands#SHOWMAP})and add a reference in the
+ *   {@link #MENUITEMS} menu structure</li>
+ * </ul>
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class GUIConstants {
-  /* NAME OF VIEWS ============================================================
-   *
-   * All views have unique names, which are defined below.
-   * The following steps are necessary to add a new view
-   * (the implementation of the existing views might help you):
-   *
-   * - define a unique name for your view in lower case (e.g. "flup")
-   * - add a string for your view, as shown below
-   * - add the string in the LAYOUTOPEN string below
-   * - add a new ViewPanel instance for your view in the GUI class
-   *
-   * Add some more code to allow switching on/off your view:
-   *
-   * - add a boolean visibility flag with the view name included
-   *   in the GUIProp class (e.g. "showflup")
-   * - add a corresponding command in the GUICommands class and in
-   *   MENUITEMS below
-   */
+  // VIEW NAMES ===============================================================
 
   /** Internal name of the Map View. */
   public static final String MAPVIEW = "map";
@@ -46,14 +61,16 @@ public final class GUIConstants {
   public static final String TABLEVIEW = "table";
   /** Internal name of the Info View. */
   public static final String INFOVIEW = "info";
-  /** Internal name of the Search View. */
-  public static final String QUERYVIEW = "query";
+  /** Internal name of the Explore View. */
+  public static final String EXPLOREVIEW = "explore";
   /** Internal name of the Help View. */
   public static final String HELPVIEW = "help";
   /** Internal name of the Plot View. */
   public static final String PLOTVIEW = "plot";
   /** Internal name of the Tree View. */
   public static final String TREEVIEW = "tree";
+  /** Internal name of the XQuery View. */
+  public static final String XQUERYVIEW = "xquery";
 
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -62,8 +79,8 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " +
-    TEXTVIEW + " - V " + MAPVIEW + " " + TABLEVIEW + " " +
+  public static final String LAYOUTOPEN = "H V " + XQUERYVIEW + " " +
+    EXPLOREVIEW + " " + TEXTVIEW + " - V " + MAPVIEW + " " + TABLEVIEW + " " +
     INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
@@ -74,7 +91,7 @@ public final class GUIConstants {
   /** Toolbar entries, containing the button commands. */
   public static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
-      SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
+      SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
       SHOWTABLE, SHOWPLOT, null, SHOWHELP, INFO
   };
 
@@ -92,10 +109,11 @@ public final class GUIConstants {
     IMPORTFS, EXPORT, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
-    SHOWSEARCH, SHOWINFO, null, COPYPATH, FILTER
+    SHOWXQUERY, SHOWINFO, null, COPYPATH, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT, null, FULL
+    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT,
+    SHOWEXPLORER, null, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
@@ -151,23 +169,16 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color COLORDARK = new Color(64, 64, 64);
 
-//  /** Fulltext color. */
-//  public static final Color COLORFT = new Color(0, 224, 0);
+  /** Colors of full-text hits. */
+  public static final Color[] COLORFT = { new Color(0, 192, 0) };
 
   /* Colors of full-text hits.
-  private static final Color[] COLORFT = new Color[] {
+  private static final Color[] COLORFT = {
     new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0),
     new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224),
     new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
     new Color(240, 240, 0)
-  };
-*/
-  /** Colors of full-text hits.*/
-  private static final Color[] COLORFT = new Color[] {
-    new Color(0, 255, 0), new Color(255, 0, 0),
-    new Color(127, 0, 255), new Color(255, 200, 0), new Color(255, 0, 255),
-    new Color(0, 255, 255), new Color(192, 192, 192), new Color(0, 0, 0)
-  };
+  };*/
 
   /** Transparent background color. */
   public static Color back;

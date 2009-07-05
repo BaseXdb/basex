@@ -60,7 +60,6 @@ import org.basex.query.ft.FTContent;
 import org.basex.query.ft.FTScope;
 import org.basex.query.ft.FTDistance;
 import org.basex.query.ft.FTExpr;
-import org.basex.query.ft.FTFilter;
 import org.basex.query.ft.FTMildNot;
 import org.basex.query.ft.FTNot;
 import org.basex.query.ft.FTOpt;
@@ -74,7 +73,6 @@ import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.query.ft.FTOpt.FTMode;
-import org.basex.query.ft.FTFilter.FTUnit;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Itr;
@@ -100,6 +98,7 @@ import org.basex.util.InputParser;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
+import org.basex.util.Tokenizer.FTUnit;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
@@ -221,8 +220,7 @@ public class QueryParser extends InputParser {
     final byte[] enc = consumeWS2(ENCODING) ? lc(stringLiteral()) : null;
     if(enc != null) {
       boolean v = true;
-      for(final byte e : enc)
-        v &= letterOrDigit(e) || e == '-';
+      for(final byte e : enc) v &= ftChar(e) || e == '-';
       if(!v) error(XQUERYENC2, enc);
     }
     ctx.encoding = enc;
@@ -2088,34 +2086,40 @@ public class QueryParser extends InputParser {
         }
       } while(consume(PIPE));
 
-      Var var1 = null;
-      Var var2 = null;
-      Var var3 = null;
+      Var[] var = {};
       final int s = ctx.vars.size();
       if(consumeWS2(PAR1)) {
-        var1 = new Var(varName());
-        ctx.vars.add(var1);
+        var = addVar(var);
         if(consumeWS2(COMMA)) {
-          var2 = new Var(varName());
-          if(var1.name.eq(var2.name)) error(VARDEFINED, var2);
-          ctx.vars.add(var2);
+          var = addVar(var);
           if(consumeWS2(COMMA)) {
-            var3 = new Var(varName());
-            if(var1.name.eq(var3.name) || var2.name.eq(var3.name))
-              error(VARDEFINED, var3);
-            ctx.vars.add(var3);
+            var = addVar(var);
           }
         }
         check(PAR2);
       }
       final Expr ex = enclosed(NOENCLEXPR);
       ctx.vars.reset(s);
-      ct = Array.add(ct, new Catch(ex, codes, var1, var2, var3));
+      ct = Array.add(ct, new Catch(ex, codes, var));
     } while(consume(CATCH));
 
     return new Try(tr, ct);
   }
 
+  /**
+   * Adds a variable to the specified array.
+   * @param vars input variables
+   * @return new variable array
+   * @throws QueryException query exception
+   */
+  private Var[] addVar(final Var[] vars) throws QueryException {
+    final Var v = new Var(varName());
+    for(final Var vr : vars) if(v.name.eq(vr.name)) error(VARDEFINED, v);
+    ctx.vars.add(v);
+    final Var[] var = Array.add(vars, v);
+    return var;
+  }
+  
   /**
    * [FT144] Parses an FTSelection.
    * [FT157] Parses an FTPosFilter.
@@ -2154,8 +2158,8 @@ public class QueryParser extends InputParser {
         final boolean diff = !same && consumeWS(DIFFERENT);
         if(same || diff) {
           FTUnit unit = null;
-          if(consumeWS(SENTENCE)) unit = FTFilter.FTUnit.SENTENCE;
-          else if(consumeWS(PARAGRAPH)) unit = FTFilter.FTUnit.PARAGRAPH;
+          if(consumeWS(SENTENCE)) unit = FTUnit.SENTENCE;
+          else if(consumeWS(PARAGRAPH)) unit = FTUnit.PARAGRAPH;
           else error(INCOMPLETE);
           expr = new FTScope(expr, unit, same);
         }

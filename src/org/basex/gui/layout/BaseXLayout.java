@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -22,6 +23,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import org.basex.BaseX;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
@@ -128,7 +130,7 @@ public final class BaseXLayout {
    * @param comp component
    * @param w width
    */
-  public static void setWidth(final Container comp, final int w) {
+  public static void setWidth(final Component comp, final int w) {
     comp.setPreferredSize(new Dimension(w, comp.getPreferredSize().height));
   }
 
@@ -137,7 +139,7 @@ public final class BaseXLayout {
    * @param comp component
    * @param h height
    */
-  public static void setHeight(final Container comp, final int h) {
+  public static void setHeight(final Component comp, final int h) {
     comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, h));
   }
 
@@ -147,44 +149,81 @@ public final class BaseXLayout {
    * @param w width
    * @param h height
    */
-  public static void setSize(final Container comp, final int w, final int h) {
+  public static void setSize(final Component comp, final int w, final int h) {
     comp.setPreferredSize(new Dimension(w, h));
   }
 
   /**
-   * Adds default notifiers for ENTER and ESCAPE to the specified component.
-   * @param c the component that receives default notifications.
-   * @param l the parent dialog
-   */
-  public static void addDefaultKeys(final Container c, final Dialog l) {
-    // no dialog listener specified..
-    if(l == null) return;
-    // add default keys
-    c.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        // process key events
-        final int code = e.getKeyCode();
-        if(code == KeyEvent.VK_ENTER) {
-          final Object s = e.getSource();
-          if(!(s instanceof BaseXButton || s instanceof BaseXText)) l.close();
-        } else if(code == KeyEvent.VK_ESCAPE) {
-          l.cancel();
-        }
-      }
-    });
-  }
-
-  /**
-   * Adds a help notifier to the specified component.
+   * Adds default interactions to the specified component.
    * @param comp component
    * @param hlp help text
+   * @param par parent window
    */
-  public static void addHelp(final Component comp, final byte[] hlp) {
+  public static void addInteraction(final Component comp, final byte[] hlp,
+        final Window par) {
+
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
         help(comp, hlp);
+      }
+    });
+
+    final boolean dialog = par instanceof Dialog;
+    final GUI gui = dialog ? ((Dialog) par).gui : par instanceof GUI ?
+        (GUI) par : null;
+
+    if(dialog) {
+      // add default keys
+      final Dialog d = (Dialog) par;
+      comp.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(final KeyEvent e) {
+          // process key events
+          final int code = e.getKeyCode();
+          if(code == KeyEvent.VK_ENTER) {
+            final Object s = e.getSource();
+            if(!(s instanceof BaseXButton || s instanceof BaseXText)) d.close();
+          } else if(code == KeyEvent.VK_ESCAPE) {
+            d.cancel();
+          }
+        }
+      });
+    }
+    if(gui == null) return;
+
+    // add default keys
+    comp.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        final int code = e.getKeyCode();
+    
+        // browse back/forward
+        if(e.isAltDown() && gui.context.db()) {
+          if(code == KeyEvent.VK_LEFT) {
+            GUICommands.GOBACK.execute(gui);
+          } else if(code == KeyEvent.VK_RIGHT) {
+            GUICommands.GOFORWARD.execute(gui);
+          } else if(code == KeyEvent.VK_UP) {
+            GUICommands.GOUP.execute(gui);
+          } else if(code == KeyEvent.VK_HOME) {
+            GUICommands.ROOT.execute(gui);
+          }
+        }
+    
+        if(e.isControlDown()) {
+          int fs = GUIProp.fontsize;
+          if(code == '+' || code == '-' || code == '=') {
+            GUIProp.fontsize = Math.max(1, GUIProp.fontsize +
+                (code == '-' ? -1 : 1));
+          } else if(code == '0') {
+            GUIProp.fontsize = 12;
+          }
+          if(fs != GUIProp.fontsize) {
+            GUIConstants.initFonts();
+            gui.notify.layout();
+          }
+        }
       }
     });
   }
@@ -194,7 +233,7 @@ public final class BaseXLayout {
    * @param comp component
    * @param enable boolean flag
    */
-  public static void enable(final Container comp, final boolean enable) {
+  public static void enable(final Component comp, final boolean enable) {
     if(comp.isEnabled() != enable) comp.setEnabled(enable);
   }
 
@@ -265,7 +304,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Draw the header of the scrollbar.
+   * Draws a colored cell.
    * @param g graphics reference
    * @param xs horizontal start position
    * @param xe horizontal end position

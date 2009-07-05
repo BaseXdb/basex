@@ -11,6 +11,7 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.Tokenizer;
+import org.basex.util.Tokenizer.FTUnit;
 
 /**
  * FTWindow expression.
@@ -44,33 +45,33 @@ public final class FTWindow extends FTFilter {
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) throws QueryException {
 
-    final long w = checkItr(win, ctx);
+    final int n = (int) checkItr(win, ctx) - 1;
     mtc.sort();
 
     FTStringMatch f = null;
     for(final FTStringMatch m : mtc) {
-      if(!m.not) {
-        if(f == null) f = m;
-        f.gaps |= m.end - f.end > 1;
-        f.end = m.end;
+      if(m.n) continue;
+      if(f == null) f = m;
+      f.g |= m.e - f.e > 1;
+      f.e = m.e;
+      if(pos(f.e, ft) - pos(f.s, ft) > n) return false;
+    }
+    if(f == null) return false;
+
+    int w = n - pos(f.e, ft) + pos(f.s, ft);
+    for(int s = pos(f.s, ft) - w; s <= pos(f.s, ft); s++) {
+      boolean h = false;
+      for(final FTStringMatch m : mtc) {
+        h = m.n && pos(m.s, ft) >= s && pos(m.e, ft) <= s + w;
+        if(h) break;
+      }
+      if(!h) {
+        mtc.reset();
+        mtc.add(f);
+        return true;
       }
     }
-
-    final FTMatch match = new FTMatch();
-    for(final FTStringMatch m : mtc) {
-      if(m.not) {
-        match.add(m);
-      } else {
-        if(pos(f.end, ft) - pos(m.start, ft) + 1 > w) return false;
-        break;
-      }
-    }
-
-    mtc.reset();
-    mtc.add(f);
-    mtc.add(match);
-
-    return true;
+    return false;
   }
 
   @Override

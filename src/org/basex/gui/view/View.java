@@ -17,18 +17,18 @@ import org.basex.gui.layout.BaseXPanel;
 public abstract class View extends BaseXPanel {
   /**
    * Registers the specified view.
-   * @param man view manager
    * @param hlp help text
+   * @param man view manager
    */
-  protected View(final ViewNotifier man, final byte[] hlp) {
-    super(man.gui, hlp);
+  protected View(final byte[] hlp, final ViewNotifier man) {
+    super(hlp, man.gui);
+    setMode(GUIConstants.Fill.DOWN);
+    setFocusable(true);
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addKeyListener(this);
     addComponentListener(this);
-    setMode(GUIConstants.Fill.DOWN);
-    setFocusable(true);
     man.add(this);
   }
 
@@ -65,6 +65,12 @@ public abstract class View extends BaseXPanel {
    */
   protected abstract void refreshUpdate();
 
+  /**
+   * Returns if this view is currently visible.
+   * @return result of check.
+   */
+  protected abstract boolean visible();
+
   @Override
   public void mouseEntered(final MouseEvent e) {
     if(!gui.updating && GUIProp.mousefocus) requestFocusInWindow();
@@ -82,7 +88,6 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    super.keyPressed(e);
     if(gui.updating) return;
     final boolean ctrl = e.isControlDown();
     final boolean shift = e.isShiftDown();

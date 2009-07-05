@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
 import org.basex.util.BoolList;
 import org.basex.util.Tokenizer;
+import org.basex.util.Tokenizer.FTUnit;
 
 /**
  * FTScope expression.
@@ -38,16 +39,16 @@ public final class FTScope extends FTFilter {
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
-        if(sm.not) continue;
-        final int p = pos(sm.start, ft);
+        if(sm.n) continue;
+        final int p = pos(sm.s, ft);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
     } else {
       final BoolList bl = new BoolList();
       for(final FTStringMatch sm : mtc) {
-        if(sm.not) continue;
-        final int p = pos(sm.start, ft);
+        if(sm.n) continue;
+        final int p = pos(sm.s, ft);
         if(bl.list[p]) return false;
         bl.set(true, p);
       }

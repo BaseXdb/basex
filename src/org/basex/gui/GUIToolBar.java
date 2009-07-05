@@ -60,7 +60,7 @@ public final class GUIToolBar extends JToolBar {
     // the image equals the 'cmd-' prefix and the command in lower case
     final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
     final String info = cmd.help();
-    final BaseXButton button = new BaseXButton(icon, Token.token(info));
+    final BaseXButton button = new BaseXButton(icon, Token.token(info), gui);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         cmd.execute(gui);

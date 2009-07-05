@@ -51,7 +51,7 @@ public class DataPool {
     }
 
     // later: return false, if it is guaranteed that all data instances
-    //   will be referenced in the pool.
+    // will be referenced in the pool.
     return true;
   }
 

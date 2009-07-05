@@ -109,7 +109,7 @@ public final class ViewData {
       if(name.length != 0) return name;
     }
 
-    if(GUIProp.shownames && data.nameID != 0) {
+    if(GUIProp.showname && data.nameID != 0) {
       final byte[] att = data.attValue(data.nameID, pre);
       if(att != null) return att;
     }

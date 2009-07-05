@@ -68,9 +68,9 @@ public final class InfoView extends View {
    * @param help help text
    */
   public InfoView(final ViewNotifier man, final byte[] help) {
-    super(man, help);
+    super(help, man);
     setMode(Fill.UP);
-    setBorder(8, 8, 8, 8);
+    setBorder(6, 8, 8, 8);
     setLayout(new BorderLayout());
 
     north = new BaseXBack(Fill.NONE);
@@ -82,7 +82,7 @@ public final class InfoView extends View {
     north.add(timer, BorderLayout.SOUTH);
     add(north, BorderLayout.NORTH);
 
-    area = new BaseXText(gui, help, false);
+    area = new BaseXText(help, false, gui);
     add(area, BorderLayout.CENTER);
     refreshLayout();
   }
@@ -107,6 +107,11 @@ public final class InfoView extends View {
     header.setFont(GUIConstants.lfont);
     timer.setFont(GUIConstants.font);
     area.setFont(GUIConstants.font);
+  }
+
+  @Override
+  protected boolean visible() {
+    return GUIProp.showinfo;
   }
 
   /**
@@ -186,18 +191,14 @@ public final class InfoView extends View {
       final StringList list) {
 
     if(list.size == 0) return;
-    tb.add((byte) 0x02);
-    tb.add(head);
-    tb.add((byte) 0x03);
-    tb.add((byte) 0x0A);
+    tb.high().add(head).norm().nl();
     for(int i = 0; i < list.size; i++) {
       String line = list.list[i];
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
         Performance.getTimer(stat.list[i] * 10000L * Prop.runs, Prop.runs);
-      tb.add(line);
-      tb.add((byte) 0x0A);
+      tb.add(line).nl();
     }
-    tb.add((byte) 0x0B);
+    tb.hl();
   }
 
   /**
@@ -208,12 +209,7 @@ public final class InfoView extends View {
    */
   private void add(final TokenBuilder tb, final String head, final String txt) {
     if(txt.length() == 0) return;
-    tb.add((byte) 0x02);
-    tb.add(head);
-    tb.add((byte) 0x03);
-    tb.add(txt);
-    tb.add((byte) 0x0A);
-    tb.add((byte) 0x0B);
+    tb.high().add(head).norm().add(txt).nl().hl();
   }
 
   @Override

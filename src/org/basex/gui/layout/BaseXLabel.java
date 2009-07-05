@@ -32,15 +32,6 @@ public final class BaseXLabel extends JLabel {
   }
 
   /**
-   * Default Constructor.
-   * @param txt label text
-   * @param dist add some distance below
-   */
-  public BaseXLabel(final String txt, final boolean dist) {
-    this(txt, dist, false);
-  }
-
-  /**
    * Set label borders.
    * @param t top distance
    * @param l left distance

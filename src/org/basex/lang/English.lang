@@ -1,7 +1,7 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Project Team
 #
-# The '%' character serves as dummy for internal replacements.
+# The '%' character serves as placeholder for texts to be inserted
 
 # Start
 launch=Launching
@@ -31,7 +31,7 @@ b_drop=Drop
 b_cmd=Command
 b_xquery=XQuery
 b_browse=Browse
-b_simple=Simple
+#b_simple=Simple
 b_search=Search
 
 # Status messages
@@ -46,7 +46,7 @@ info_title=Query Info
 info_no=Please launch a query...
 help_title=Help
 text_title=Text
-query_title=Query
+explore_title=Explore
 
 # Dialog Windows
 d_info=Information
@@ -157,7 +157,6 @@ ds_green=Green
 ds_blue=Blue
 
 dm_title=Map Layout
-dm_simple=Divide rectangles uniformly
 dm_atts=Show Attributes
 dm_choice1=No Title, no Border
 dm_choice2=No Title, small Border
@@ -181,10 +180,11 @@ da_license=BSD license (ISC)
 da_dev=Main Developer
 da_cont1=Team
 da_cont2=and others
-da_contact=Contact
+da_translation=Translation
 
 c_about=About %
 c_abouttt=Displays general information on the project.
+c_all=Select All
 c_close=Close
 c_closett=Closes the current database.
 c_color=Colors
@@ -240,34 +240,36 @@ c_rtexectt=If this option is turned on, queries are executed after each key clic
 c_rtfilter=Realtime Filtering
 c_rtfiltertt=If this option is turned on, the query results are automatically filtered.
 c_showbuttons=Buttons
-c_showbuttonstt=Switches the button bar on/off.
+c_showbuttonstt=Switch the button bar on/off.
+c_showexplore=Explorer
+c_showexplorett=Show the explorer panel.
 c_showhelp=Help
-c_showhelptt=Shows the help view. which provides information on the currently focused component.
+c_showhelptt=Show the help view. which provides information on the currently focused component.
+c_showfolder=Folder
+c_showfoldertt=Show the folder visualization.
 c_showinfo=Query Info
 c_showinfott=Show the query info panel.
 c_showinput=Input Field
-c_showinputtt=Toggles the input field.
+c_showinputtt=Switch the input field on/off.
 c_showmap=Map
 c_showmaptt=Show the map visualization
 c_showmenu=Menu
-c_showmenutt=Switches the menu on/off.
-c_showsearch=Query Panel
-c_showsearchtt=Show the query panel.
+c_showmenutt=Switch the menu on/off.
 c_showstatus=Status Bar
-c_showstatustt=Switches the status bar on/off.
+c_showstatustt=Switch the status bar on/off.
 c_showtable=Table
 c_showtablett=Show the table visualization.
 c_showplot=Plot
 c_showplottt=Show the scatter-plot visualization.
 c_showtext=Text
 c_showtexttt=Show the text view.
-c_showfolder=Folder
-c_showfoldertt=Show the folder visualization.
+c_showxquery=Query Editor
+c_showxquerytt=Show the Query editor.
 c_undo=Undo
 c_xqopen=Open
 c_xqopentt=Opens an XQuery file
 c_xqsave=Save
-c_xqsavett=Saves the current XQuery
+c_xqsavett=Saves the XQuery file
 
 # Commands & Processes
 proc_time=Time Needed
@@ -418,8 +420,9 @@ info_entities=Entity Parsing
 info_serialize=Serialize
 info_xmloutput=XML Output
 info_mainmem=Main Memory Mode
-info_tagindex=Tag Index
-info_atnindex=Attribute Name Index
+info_tags=Tags
+info_atts=Attributes
+info_ns=Namespaces
 info_txtindex=Text Index
 info_atvindex=Attribute Index
 info_ftindex=Full-Text Index
@@ -432,6 +435,7 @@ info_resultchop=chopped
 info_on=ON
 info_off=OFF
 info_error=Error
+info_entries=% entries
 
 # Command Help
 ch_nohelp=Sorry, no help available.
@@ -545,6 +549,7 @@ h_opt=Press this button to optimize the database.
 h_renamedb=Press this button to rename the chosen database.
 h_opendb=Press this button to open the chosen database.
 h_openinfo=This panel displays some information on the currently selected database.
+h_recent=Recently opened files
 h_falias=All texts can be anti-aliased by choosing this checkbox.
 h_browse=Use this button to browse to a file or directory.
 h_fspath=Use this text field to enter or modify the directory to be parsed.
@@ -554,12 +559,11 @@ h_names=This option checks if tags contain a 'name' attribute. If the attribute 
 h_fsname=Enter the name of the new database in this text field.
 h_fsall=If this checkbox is chosen, the whole file system will be parsed.
 h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
-h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
+h_fsmount=DeepFS mount point. The database is mounted as filesystem in user space.
 h_meta=By choosing this checkbox, meta-data will be extracted from numerous file types. Meta-data includes e.g. the dimensions of images, ID3 tags of MP3 files or contents of email files.
 h_cont=The textual contents of files can be included in the database by choosing this checkbox. If the contents are included, they can be searched via XPath or XQuery.
 h_fsmax=Here you can choose a size limit for the included text files.
 h_mapatts= If this checkbox is turned on, attributes are included in the TreeMap.
-h_mapsimple= If this checkbox is turned on, rectangles are divided uniformly in TreeMap.
 h_maplayout=Here you can modify the layout algorithm which is used in the Map visualization.
 h_mapoff=Here you can modify the offset sizes of the rectangles.
 h_mapsize=Here you can influence how the rectangle size is calculated.
@@ -578,7 +582,7 @@ h_searchfs=Just type something in the text field to search in your filesystem. T
 h_xpath=The XPath mode allows the input of simple XPath requests. XPath is often processed faster than XQuery. The XPath language is based on a tree representation of the XML document, and provides the ability to navigate around the tree, selecting nodes by a variety of criteria.
 h_modefilt=If real-time filtering is deactivated, press Ctrl+ENTER to filter the query results.
 h_map=This visualization is called TreeMap. All nodes of the XML document are represented as rectangles, filling the complete area. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
-h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
+h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a plot representation. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.
 h_plotaxisy=With this combo box you can define the assignment to the y-axis.
 h_plotxlog=With this checkbox you can change the display of the x-axis to logarithmic.
@@ -589,9 +593,8 @@ h_folder=This visualization displays all XML nodes in folder view. Nodes can be 
 h_table=This visualization displays XML nodes in a table. If you click on a text, all nodes with the same text are highlighted. By double-clicking on a text, the query results are filtered. A popup menu will be shown by right-clicking on an element.
 h_text=This panel displays query results and other textual output.\n\nKey Shortcuts: Press '-' and '+' to change the font size of all panels. Type in any text into the find popup to launch an incremental search for it. It's an easy way to find special text points.
 h_info=This panel displays information on the compilation and evaluation of an XPath or XQuery request, including some simple profiling.
-h_search1=The XQuery input mode offers the full range of query features that is offered by the XQuery language. XQuery uses XPath expression syntax to address specific parts of an XML document. It supplements this with a SQL-like FLWOR expression for performing joins. A FLWOR expression is constructed from the five clauses after which it is named: FOR, LET, WHERE, ORDER BY, RETURN.
-h_search2=The simple search mode allows simple queries in the XML document.
-h_querymode=In this text area, you can enter any XQuery 1.0 query. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a IN //book\n where $a/topic = "BaseX"\n return $a/title"\n\nThe text area offers a history function: You can store the current input with Ctrl+ENTER and retrieve previous inputs with Ctrl+UP/DOWN.)
+h_explore=The simple search mode allows simple queries in the XML document.
+h_xquery=In this text area, you can enter any XQuery 1.0 query. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=In this combo box, all tags and attribute names of the current XML document are listed. If an entry is chosen, the query results are marked in the visualizations. If the chosen entry contains textual values, an additional widget pops up, which allows a further specification of the query.
 h_cat=This combo box lists all values of the current category. If you choose one of the values, the query is further refined.
 h_ds=Drag the left and right arrow of this double slider to restrict the values of the current query category. If you have changed the range, you can also click inside the slider to move it left and right.

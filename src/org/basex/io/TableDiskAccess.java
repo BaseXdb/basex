@@ -18,7 +18,7 @@ public final class TableDiskAccess extends TableAccess {
   /** Entries per new block. */
   private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
 
-  /** Buffer management. */
+  /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Current buffer. */
   private Buffer bf;

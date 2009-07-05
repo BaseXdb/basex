@@ -119,7 +119,7 @@ public final class Functions extends ExprInfo {
     final byte[] ln = type.ln();
     final Levenshtein ls = new Levenshtein();
     for(final Type t : Type.values()) {
-      if(t.par != null &&  ls.similar(lc(ln), lc(token(t.name))))
+      if(t.par != null && ls.similar(lc(ln), lc(token(t.name))))
         Err.or(FUNSIMILAR, ln, t.name);
     }
     Err.or(FUNCUNKNOWN, type.str());

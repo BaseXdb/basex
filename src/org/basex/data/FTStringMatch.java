@@ -8,26 +8,26 @@ package org.basex.data;
  */
 public class FTStringMatch implements Comparable<FTStringMatch> {
   /** Query position. */
-  public byte queryPos;
+  public byte q;
   /** Start position. */
-  public int start;
+  public int s;
   /** End position. */
-  public int end;
+  public int e;
   /** Include/exclude flag. */
-  public boolean not;
-  /** Gaps (contiguous) flag. */
-  public boolean gaps;
+  public boolean n;
+  /** Gaps (non-contiguous) flag. */
+  public boolean g;
 
   /**
    * Constructor.
-   * @param s start position
-   * @param e end position
-   * @param p query pos
+   * @param st start position
+   * @param en end position
+   * @param qp query pos
    */
-  FTStringMatch(final int s, final int e, final byte p) {
-    start = s;
-    end = e;
-    queryPos = p;
+  FTStringMatch(final int st, final int en, final byte qp) {
+    s = st;
+    e = en;
+    q = qp;
   }
 
   /**
@@ -36,19 +36,19 @@ public class FTStringMatch implements Comparable<FTStringMatch> {
    * @return result of check
    */
   boolean in(final FTStringMatch mtc) {
-    return start >= mtc.start && end <= mtc.end;
+    return s >= mtc.s && e <= mtc.e;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append((not ? "-" : "+") + "[" + queryPos + ": ");
-    sb.append(start == end ? "" + start : start + "-" + end);
+    sb.append((n ? "-" : "+") + "[" + q + ": ");
+    sb.append(s == e ? "" + s : s + "-" + e);
     return sb.append("]").toString();
   }
 
   public int compareTo(final FTStringMatch sm) {
-    final int s = start - sm.start;
-    return s != 0 ? s : end - sm.end;
+    final int st = s - sm.s;
+    return st != 0 ? st : e - sm.e;
   }
 }

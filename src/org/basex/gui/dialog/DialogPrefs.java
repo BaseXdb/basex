@@ -105,7 +105,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(PREFNAMES, HELPNAMES, GUIProp.shownames, this);
+    names = new BaseXCheckBox(PREFNAME, HELPNAME, GUIProp.showname, 12, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
@@ -121,7 +121,7 @@ public final class DialogPrefs extends Dialog {
     lang.setSelectedItem(Prop.language);
 
     p.add(lang);
-    creds = new BaseXLabel(credits(Prop.language));
+    creds = new BaseXLabel("");
     p.add(creds);
 
     pp.add(p);
@@ -134,21 +134,9 @@ public final class DialogPrefs extends Dialog {
     finish(null);
   }
 
-  /**
-   * Returns the translation credits for the specified language.
-   * @param lng language
-   * @return credits
-   */
-  private String credits(final String lng) {
-    for(int i = 0; i < LANGS[0].length; i++) {
-      if(lng.equals(LANGS[0][i])) return "Translated by " + LANGS[1][i];
-    }
-    return "";
-  }
-
   @Override
   public void action(final String cmd) {
-    creds.setText(credits(lang.getSelectedItem().toString()));
+    creds.setText("Translated by " + creds(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
 
@@ -157,11 +145,23 @@ public final class DialogPrefs extends Dialog {
     Prop.dbpath = path.getText();
     Prop.language = lang.getSelectedItem().toString();
     GUIProp.mousefocus = focus.isSelected();
-    GUIProp.shownames = names.isSelected();
+    GUIProp.showname = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
     GUIProp.write();
     Prop.write();
     dispose();
+  }
+
+  /**
+   * Returns the translation credits for the specified language.
+   * @param lng language
+   * @return credits
+   */
+  static String creds(final String lng) {
+    for(int i = 0; i < LANGS[0].length; i++) {
+      if(lng.equals(LANGS[0][i])) return LANGS[1][i];
+    }
+    return "";
   }
 }

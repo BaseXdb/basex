@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JRadioButton;
@@ -18,20 +19,20 @@ public final class BaseXRadio extends JRadioButton {
    * @param label button title
    * @param hlp help text
    * @param sel initial selection state
-   * @param list reference to the dialog listener
+   * @param win parent window
    */
   public BaseXRadio(final String label, final byte[] hlp,
-      final boolean sel, final Dialog list) {
+      final boolean sel, final Window win) {
 
     super(label, sel);
     setOpaque(false);
     setBorder(new EmptyBorder(0, 0, 0, 16));
-    BaseXLayout.addHelp(this, hlp);
-    BaseXLayout.addDefaultKeys(this, list);
+    BaseXLayout.addInteraction(this, hlp, win);
 
+    if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        list.action(getText());
+        ((Dialog) win).action(getText());
       }
     });
   }

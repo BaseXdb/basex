@@ -78,7 +78,7 @@ public final class BaseXBar extends BaseXPanel {
    * the displayed content needs no scrollbar.
    */
   public BaseXBar(final BaseXPanel cmp, final boolean vis) {
-    super(cmp.gui, null);
+    super(null, cmp.gui);
     comp = cmp;
     visible = vis;
     addMouseListener(this);

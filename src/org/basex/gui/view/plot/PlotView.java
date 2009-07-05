@@ -111,7 +111,7 @@ public final class PlotView extends View implements Runnable {
    * @param man view manager
    */
   public PlotView(final ViewNotifier man) {
-    super(man, HELPPLOT);
+    super(HELPPLOT, man);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
 
@@ -127,12 +127,12 @@ public final class PlotView extends View implements Runnable {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(gui, new ActionListener() {
+    dots = new BaseXSlider(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         GUIProp.plotdots = dots.value();
         refreshLayout();
       }
-    }, -10, 10, GUIProp.plotdots, HELPPLOTDOTS);
+    }, -10, 10, GUIProp.plotdots, HELPPLOTDOTS, gui);
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, HELPPLOTYLOG, false, null);
     yLog.setSelected(GUIProp.plotylog);
@@ -150,7 +150,7 @@ public final class PlotView extends View implements Runnable {
     panel.add(box, BorderLayout.NORTH);
 
     box = new Box(BoxLayout.X_AXIS);
-    xCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISX, null);
+    xCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISX, gui);
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
@@ -160,7 +160,7 @@ public final class PlotView extends View implements Runnable {
         }
       }
     });
-    yCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISY, null);
+    yCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISY, gui);
     yCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
@@ -170,7 +170,7 @@ public final class PlotView extends View implements Runnable {
         }
       }
     });
-    itemCombo = new BaseXCombo(new String[] {}, HELPPLOTITEM);
+    itemCombo = new BaseXCombo(new String[] {}, HELPPLOTITEM, gui);
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
@@ -483,7 +483,6 @@ public final class PlotView extends View implements Runnable {
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-//    Performance perf = new Performance();
     g.setColor(back);
 
     final int sz = sizeFactor();
@@ -494,7 +493,6 @@ public final class PlotView extends View implements Runnable {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     // drawing horizontal axis line
     if(drawX) {
-      //g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
       if(plotChanged) {
         axis.calcCaption(pWidth);
         final Kind kind = plotData.xAxis.type;
@@ -503,7 +501,6 @@ public final class PlotView extends View implements Runnable {
       }
     } else {
       // drawing vertical axis line
-      //g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
       if(plotChanged) {
         axis.calcCaption(pHeight);
         final Kind kind = plotData.yAxis.type;
@@ -580,7 +577,6 @@ public final class PlotView extends View implements Runnable {
 
       // return if insufficient plot space
       if(nrCaptions == 0) return;
-
 
       // if min equal max, draw min in plot middle
       if(noRange) {
@@ -896,6 +892,11 @@ public final class PlotView extends View implements Runnable {
   @Override
   protected void refreshUpdate() {
     refreshContext(false, true);
+  }
+
+  @Override
+  protected boolean visible() {
+    return GUIProp.showplot;
   }
 
   /**

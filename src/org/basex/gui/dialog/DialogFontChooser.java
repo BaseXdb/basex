@@ -44,16 +44,16 @@ public final class DialogFontChooser extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(2, 4, 6, 6));
 
-    font = new BaseXListChooser(this, fonts, HELPFONT);
+    font = new BaseXListChooser(fonts, HELPFONT, this);
     font.setSize(150, 112);
     p.add(font);
-    font2 = new BaseXListChooser(this, fonts, HELPFONT);
+    font2 = new BaseXListChooser(fonts, HELPFONT, this);
     font2.setSize(150, 112);
     p.add(font2);
-    type = new BaseXListChooser(this, FONTTYPES, HELPFONT);
+    type = new BaseXListChooser(FONTTYPES, HELPFONT, this);
     type.setSize(80, 112);
     p.add(type);
-    size = new BaseXListChooser(this, FTSZ, HELPFONT);
+    size = new BaseXListChooser(FTSZ, HELPFONT, this);
     size.setSize(50, 112);
     p.add(size);
 

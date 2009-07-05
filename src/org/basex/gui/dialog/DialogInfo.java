@@ -2,27 +2,25 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
-import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Data.Type;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Info Database Dialog.
@@ -34,13 +32,13 @@ public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
   private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
   /** Full-text indexing. */
-  private BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
   /** Full-text labels. */
-  private BaseXLabel[] fl = new BaseXLabel[4];
+  private final BaseXLabel[] fl = new BaseXLabel[4];
   /** Editable full-text options. */
-  private boolean ftedit;
+  private final boolean ftedit;
   /** Button panel. */
-  private BaseXBack buttons;
+  private final BaseXBack buttons;
   /** Optimize flag. */
   public boolean opt;
 
@@ -61,12 +59,18 @@ public final class DialogInfo extends Dialog {
     final MetaData meta = data.meta;
 
     final BaseXLabel doc = new BaseXLabel(meta.dbname);
-    doc.setFont(new Font(GUIProp.font, 0, 18));
+    doc.setFont(getFont().deriveFont(18f));
     doc.setBorder(0, 0, 5, 0);
     tab1.add(doc, BorderLayout.NORTH);
 
-    final BaseXText text = text(InfoDB.db(meta, false, false));
-    BaseXLayout.setHeight(text, 280);
+    final TokenBuilder info = InfoDB.db(meta, true, false);
+    if(data.ns.size() != 0) {
+      info.high().add(NL + INFONS + NL).norm().add(data.ns.info());
+    }
+    
+    final BaseXText text = text(info.finish());
+    text.setFont(getFont());
+    BaseXLayout.setHeight(text, 350);
     tab1.add(text, BorderLayout.CENTER);
 
     // second tab
@@ -132,8 +136,7 @@ public final class DialogInfo extends Dialog {
     }
     tab4.add(p);
 
-    final JTabbedPane tabs = new JTabbedPane();
-    BaseXLayout.addDefaultKeys(tabs, this);
+    final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, tab1);
     tabs.addTab(NAMESINFO, tab2);
     tabs.addTab(INDEXINFO, tab3);
@@ -161,7 +164,7 @@ public final class DialogInfo extends Dialog {
   private BaseXBack addIndex(final boolean tag, final Data data) {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
-    String lbl = tag ? INFOTAGINDEX : INFOATNINDEX;
+    String lbl = tag ? INFOTAGS : INFOATTS;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
     final Type index = tag ? Type.TAG : Type.ATN;
@@ -175,11 +178,10 @@ public final class DialogInfo extends Dialog {
    * @return text box
    */
   private BaseXText text(final byte[] txt) {
-    final BaseXText text = new BaseXText(gui, null, false, this);
+    final BaseXText text = new BaseXText(null, false, this);
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
     text.setText(txt);
-    text.setFocusable(false);
-    BaseXLayout.setWidth(text, 450);
+    BaseXLayout.setWidth(text, 550);
     return text;
   }
 

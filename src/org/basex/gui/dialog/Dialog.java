@@ -22,7 +22,7 @@ import org.basex.gui.layout.BaseXBack;
  */
 public abstract class Dialog extends JDialog {
   /** Reference to main window. */
-  protected final GUI gui;
+  public final GUI gui;
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */

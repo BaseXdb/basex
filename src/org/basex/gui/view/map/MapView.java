@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -118,7 +117,7 @@ public final class MapView extends View implements Runnable {
    * @param man view manager
    */
   public MapView(final ViewNotifier man) {
-    super(man, HELPMAP);
+    super(HELPMAP, man);
     setMode(Fill.NONE);
     new BaseXPopup(this, POPUP);
   }
@@ -318,6 +317,11 @@ public final class MapView extends View implements Runnable {
   public void refreshUpdate() {
     textLen = null;
     refreshContext(false, true);
+  }
+
+  @Override
+  protected boolean visible() {
+    return GUIProp.showmap;
   }
 
   /**
@@ -984,7 +988,6 @@ public final class MapView extends View implements Runnable {
   @Override
   public void keyTyped(final KeyEvent e) {
     if(gui.updating) return;
-    super.keyTyped(e);
     final char ch = e.getKeyChar();
     if(ch == '|') {
       GUIProp.mapoffsets = (GUIProp.mapoffsets + 1) % MAPOFFSETS.length;

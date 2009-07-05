@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.nio.MappedByteBuffer;
-
 import org.basex.util.Array;
 
 /**

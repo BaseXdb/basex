@@ -402,17 +402,3 @@ public final class MP3Extractor extends AbstractExtractor {
     return Array.create(input, offset, i + 1);
   }
 }
-
-// cd ~/svn/basex/ && ant -f ~/svn/basex/build_compile.xml compile_server &&
-// cd ~/svn/basex/bin/ &&
-// java org/basex/build/fs/metadata/ID3v2Extractor 1.mp3
-
-/*
- * <audio type="mp3">
- *   <id3 version="v2.3.0" unsynchronisation="yes" extendedheader="yes"
- *   experimental="no" footer="no">
- *     <artist>Fu Manchu</artist>
- *     <artist>Fu Manchu</artist>
- *   </id3>
- * </audio>
- */

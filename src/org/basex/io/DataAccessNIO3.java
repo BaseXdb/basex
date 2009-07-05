@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
 import org.basex.util.Num;
 
 /**
@@ -142,7 +141,6 @@ public final class DataAccessNIO3 {
   public synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
-//    System.out.println("l: " + l);
     final byte[] b = new byte[l];
     int ll = IO.BLOCKSIZE - off;
     if(ll >= l) {
@@ -228,7 +226,6 @@ public final class DataAccessNIO3 {
    * Reads the next block from disk.
    */
   private synchronized void nextBlock() {
-//    System.out.println("nextBlock");
     cursor(pos[c] + IO.BLOCKSIZE);
   }
 
@@ -237,7 +234,6 @@ public final class DataAccessNIO3 {
    * @param p read position
    */
   public synchronized void cursor(final long p) {
-//    System.out.println("set cursor now");
     off = (int) (p & BUFLIMIT);
 
     final long ps = p - off;
@@ -247,7 +243,6 @@ public final class DataAccessNIO3 {
     } while((c = (c + 1) % BUFFERS) != o);
 
     c = (o + 1) % BUFFERS;
-//    System.out.println("set cursor: " + ps + " offset: " + off + " c: " + c);
     readBlock(ps);
   }
 

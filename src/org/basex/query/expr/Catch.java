@@ -16,11 +16,7 @@ import org.basex.util.Token;
  */
 public final class Catch extends Single {
   /** Variable. */
-  private final Var var1;
-  /** Variable. */
-  private final Var var2;
-  /** Variable. */
-  private final Var var3;
+  private final Var[] var;
   /** Supported codes. */
   private final QNm[] codes;
 
@@ -28,17 +24,21 @@ public final class Catch extends Single {
    * Constructor.
    * @param ct catch expression
    * @param c supported error codes
-   * @param v1 first variable
-   * @param v2 second variable
-   * @param v3 third variable
+   * @param v variables
    */
-  public Catch(final Expr ct, final QNm[] c, final Var v1, final Var v2,
-      final Var v3) {
+  public Catch(final Expr ct, final QNm[] c, final Var... v) {
     super(ct);
     codes = c;
-    var1 = v1;
-    var2 = v2;
-    var3 = v3;
+    var = v;
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    final int s = ctx.vars.size();
+    for(final Var v : var) ctx.vars.add(v);
+    super.comp(ctx);
+    ctx.vars.reset(s);
+    return this;
   }
 
   /**
@@ -55,9 +55,15 @@ public final class Catch extends Single {
     if(!find(code)) return null;
 
     final int s = ctx.vars.size();
-    if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx).clone());
-    if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx).clone());
-    if(var3 != null) ctx.vars.add(var3.bind(e.iter.finish(), ctx).clone());
+    if(var.length > 0) {
+      ctx.vars.add(var[0].bind(new QNm(code), ctx).clone());
+    }
+    if(var.length > 1) {
+      ctx.vars.add(var[1].bind(Str.get(e.simple()), ctx).clone());
+    }
+    if(var.length > 2) {
+      ctx.vars.add(var[2].bind(e.iter.finish(), ctx).clone());
+    }
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);
     return iter;
@@ -80,8 +86,8 @@ public final class Catch extends Single {
 
   @Override
   public Expr remove(final Var v) {
-    return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
-      super.remove(v) : this;
+    for(final Var vr : var) if(!v.visible(vr)) return this;
+    return super.remove(v);
   }
 
   @Override

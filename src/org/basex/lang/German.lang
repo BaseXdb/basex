@@ -1,7 +1,7 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Andreas Weiler, Project Team
 #
-# The '%' character serves as dummy for internal replacements.
+# The '%' character serves as placeholder for texts to be inserted
 
 # Start
 launch=Starte
@@ -31,7 +31,7 @@ b_drop=Löschen
 b_browse=Auswahl
 b_xquery=XQuery
 b_cmd=Befehl
-b_simple=Einfacher
+#b_simple=Einfacher
 b_search=Suche
 
 # Status messages
@@ -46,7 +46,7 @@ info_title=Query-Info
 info_no=Bitte starten Sie eine Anfrage...
 help_title=Hilfe
 text_title=Text
-query_title=Anfrage
+explore_title=Explore
 
 # Dialog Windows
 d_info=Information
@@ -157,7 +157,6 @@ ds_green=Grün
 ds_blue=Blau
 
 dm_title=Map-Layout
-dm_simple=Zerlege Rechtecke gleichverteilt
 dm_atts=Zeige Attribute
 dm_choice1=Kein Titel, kein Rand
 dm_choice2=Kein Titel, kleiner Rand
@@ -181,10 +180,11 @@ da_license=BSD-Lizenz (ISC)
 da_dev=Hauptentwickler
 da_cont1=Team
 da_cont2=und andere
-da_contact=Kontakt
+da_translation=Übersetzung
 
 c_about=Über %
 c_abouttt=Zeigt allgemeine Projektinfos an.
+c_all=Alles markieren
 c_close=Schließen
 c_closett=Schließt die aktuelle Datenbank.
 c_color=Farben
@@ -241,9 +241,13 @@ c_rtfilter=Echtzeit-Filter
 c_rtfiltertt=Wenn die Option aktiviert ist, werden Suchergebnisse automatisch gefiltert.
 c_showbuttons=Buttonleiste
 c_showbuttonstt=(De-)aktiviert die Buttonleiste.
+c_showexplore=Explorer
+c_showexplorett=Zeigt den Explorer an.
+c_showfolder=Verzeichnis
+c_showfoldertt=Zeigt die Verzeichnisansicht an.
 c_showhelp=Hilfe
 c_showhelptt=Zeigt die Hilfsansicht an. Diese Ansicht bietet interaktive Informationen über die derzeit ausgewählten Komponenten.
-c_showinfo=Suchinfo
+c_showinfo=Anfrage-Info
 c_showinfott=Zeigt Informationen über die Anfrageausführung an.
 c_showinput=Eingabefeld
 c_showinputtt=(De-)aktiviert das Eingabefeld.
@@ -251,8 +255,6 @@ c_showmap=Map
 c_showmaptt=Zeigt die TreeMap-Ansicht an.
 c_showmenu=Menü
 c_showmenutt=(De-)aktiviert die Menüleiste.
-c_showsearch=Suchen
-c_showsearchtt=Zeigt das Suchfenster an.
 c_showstatus=Statusleiste
 c_showstatustt=(De-)aktiviert die Statusleiste.
 c_showtable=Tabelle
@@ -261,13 +263,13 @@ c_showplot=Plot
 c_showplottt=Zeigt die Scatterplot-Ansicht an.
 c_showtext=Text
 c_showtexttt=Zeigt die Textansicht an.
-c_showfolder=Verzeichnis
-c_showfoldertt=Zeigt die Verzeichnisansicht an.
+c_showxquery=Anfrage-Editor
+c_showxquerytt=Zeigt den Anfrage-Editor an.
 c_undo=Rückgängig
 c_xqopen=Öffnen
-c_xqopentt=Öffneet eine XQuery-Anfrage
+c_xqopentt=Öffnet eine XQuery-Datei
 c_xqsave=Speichern
-c_xqsavett=Speichert die aktuelle XQuery-Anfrage
+c_xqsavett=Speichert die XQuery-Datei
 
 # Commands & Processes
 proc_time=Benötigte Zeit
@@ -418,8 +420,9 @@ info_entities=Parsen von Entities
 info_serialize=Serialisierung 
 info_xmloutput=XML Ausgabe 
 info_mainmem=Hauptsp.-Modus
-info_tagindex=Tag-Index
-info_atnindex=Attributnamen-Index
+info_tags=Tags
+info_atts=Attribute
+info_ns=Namespaces
 info_txtindex=Text-Index
 info_atvindex=Attribut-Index
 info_ftindex=Volltext-Index
@@ -432,6 +435,7 @@ info_resultchop=gekürzt
 info_on=AN
 info_off=AUS
 info_error=Fehler
+info_entries=% Einträge
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
@@ -543,6 +547,7 @@ h_opt=Button zum Optimieren der Datenbank.
 h_renamedb=Button zum Umbenennen der Datenbank.
 h_opendb=Button zum Öffnen der ausgewählten Datenbank.
 h_openinfo=Hier werden diverse Informationen über die aktuell ausgewählte Datenbank angezeigt.
+h_recent=Zuletzt geöffnete Dateien
 h_falias=Alle Texte können durch diese Checkbox geglättet werden.
 h_browse=Durch das Dateiauswahl-Menü kann ein Verzeichnis gewählt werden.
 h_fspath=In diesem Textfeld kann das zu parsende Verzeichnis eingegeben oder verändert werden.
@@ -557,7 +562,6 @@ h_meta=Wenn diese Checkbox ausgewählt wurde, wird von vielen Dateitypen Meta-Da
 h_cont=Die textuellen Inhalte von Dateien können durch diese Checkbox in die Datenbank eingebunden werden. Wenn die Inhalte eingebunden wurden, können sie mit XPATH oder XQUERY durchsucht werden.
 h_fsmax=Hier kann ein Größenlimit für die eingebundenen Textdateien angegeben werden.
 h_mapatts=Wenn diese Checkbox ausgewählt wurde, werden auch Attribute in der TreeMap angezeigt.
-h_mapsimple=Wenn diese Checkbox ausgewählt wurde, werden die Rechtecke in der TreeMap gleichverteilt gesplittet.
 h_maplayout=Hier kann der Layout Algorithmus, welcher für die Map Visualisierung benutzt wird, verändert werden.
 h_mapoff=Hier können die Größe der Rechteckränder verändert werden.
 h_mapsize=Hier können Sie die Berechnung der Rechteckgrößen beeinflussen.
@@ -587,9 +591,8 @@ h_folder=Diese Visualisierung stellt alle XML Knoten in einer Verzeichnisdarstel
 h_table=Diese Visualisierung stellt die XML Knoten als Tabelle dar. Bei Klick auf einen Text werden alle Knoten mit demselben Text hervorgehoben. Bei einem Doppel-Klick auf einen Text werden die Anfrageergebnisse gefiltert. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
 h_text=Hier werden Anfrage-Ergebnisse und alle anderen textuellen Ausgaben dargestellt.\n\nShortcuts: Drücke '-' und '+' um die Schriftgröße in allen Anzeigefeldern zu verändern. Hier kann ein beliebiger Text in das Finden-Popup eingegeben werden um eine inkrementelle Suche zu starten. Dies ist ein einfacher Weg um spezielle Textpassagen zu finden.
 h_info=Hier werden Informationen über die Kompilierung und Evaluation von XPath und XQuery Anfragen dargestellt, inklusive einfacher Formgebung.
-h_search1=Der XQuery-Eingabe-Modus bietet die komplette Auswahl an Anfragefeaturen, welche von der XQuery Sprache angeboten werden. XQuery benutzt die XPath Ausdruckssyntax um spezielle Teile eines XML Dokuments anzusprechen. Es wird darüber hinaus mit einem SQL ähnlichen FLWOR-Ausdruck um Verbindungen zu erstellen ergänzt. Der FLWOR Ausdruck wird durch die fünf Teilausdrücke nach denen er benannt ist erstellt: FOR, LET, WHERE, ORDER BY, RETURN.
-h_search2=Der einfache Such-Modus erlaubt einfache Anfragen an das XML Dokument.
-h_querymode=In dieses Textfeld kann jede XQuery 1.0 Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a IN //book\n where $a/topic = "BaseX"\n return $a/title"\n\nDas Textfeld bietet zudem eine History Funktion an: Man kann die aktuelle Eingabe mit Ctrl+ENTER speichern und vorherige Eingaben mit Ctrl+UP/DOWN erhalten.
+h_explore=Der einfache Such-Modus erlaubt einfache Anfragen an das XML Dokument.
+h_xquery=In dieses Textfeld kann jede XQuery 1.0 Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=In dieser Kombobox werden alle Tags und Attributnamen des aktuellen XML Dokuments aufgelistet. Nachdem ein Eintrag ausgewählt wurde, werden die Anfrageergebnisse in der Visualisierung markiert. Wenn der ausgewählte Eintrag textuelle Werte enthält, wird ein zusätzliches Widget angezeigt, welches eine weitere Einschränkung der Anfrage ermöglicht.
 h_cat=Diese Kombobox listet alle Werte der aktuellen Kategorie auf. Bei Auswahl eines Wertes wird die Anfrage weiter gebildet.
 h_ds=Ziehe den linken und rechten Pfeil dieses Doppel-Sliders um die Werte der aktuellen Anfragekategorie zu beschränken. Nachdem der Bereich verändert wurde, kann man zusätzlich innerhalb des Sliders klicken um ihn nach links und rechts zu bewegen.

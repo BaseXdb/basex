@@ -9,11 +9,9 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
-import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -36,30 +34,17 @@ final class FNBaseX extends Fun {
     switch(func) {
       case EVAL:  return eval(ctx);
       case INDEX: return index(ctx);
-      default:   return super.iter(ctx);
+      default:    return super.iter(ctx);
     }
   }
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case CONTAINSLC: return contains(ctx);
       case FILENAME:   return filename(ctx);
       case RANDOM:     return random();
-      default: return super.atomic(ctx);
+      default:         return super.atomic(ctx);
     }
-  }
-
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.CONTAINSLC) {
-      final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
-      // query string is empty; return true
-      if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
-      // input string is empty; return false
-      if(expr[0].e() && i != null && i.length != 0) return Bln.FALSE;
-    }
-    return this;
   }
 
   /**
@@ -114,22 +99,6 @@ final class FNBaseX extends Fun {
       Err.or(WHICHIDX, type);
     }
     return new IndexAccess(it, ic).iter(ctx);
-  }
-
-  /**
-   * Performs the contains lower case function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Item contains(final QueryContext ctx) throws QueryException {
-    final byte[] qu = checkStr(expr[1], ctx);
-    final Iter iter = ctx.iter(expr[0]);
-    Item it;
-    while((it = iter.next()) != null) {
-      if(containslc(checkStr(it), qu)) return Bln.TRUE;
-    }
-    return Bln.FALSE;
   }
 
   /**

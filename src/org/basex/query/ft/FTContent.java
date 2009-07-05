@@ -37,16 +37,16 @@ public final class FTContent extends FTFilter {
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
     if(start) {
-      for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
+      for(final FTStringMatch sm : mtc) if(sm.s == 0) return true;
     } else if(end) {
       final int p = ft.count() - 1;
-      for(final FTStringMatch sm : mtc) if(sm.end == p) return true;
+      for(final FTStringMatch sm : mtc) if(sm.e == p) return true;
     } else {
       final int s = ft.count();
       final boolean[] bl = new boolean[s];
       for(final FTStringMatch sm : mtc) {
-        if(sm.gaps) continue;
-        for(int p = sm.start; p <= sm.end; p++) bl[p] = true;
+        if(sm.g) continue;
+        for(int p = sm.s; p <= sm.e; p++) bl[p] = true;
       }
       for(final boolean b : bl) if(!b) return false;
       return true;

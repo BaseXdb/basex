@@ -237,10 +237,10 @@ public final class FTTrie extends FTIndex {
    * @param ins byte looking for
    * @return inserting position
    */
-  private int insPos(final int[] cne, final int ins) {
+  private int insPos(final int[] cne, final byte ins) {
     int i = cne[0] + 1;
     final int s = cne.length - 1;
-    while(i < s && diff(cne[i + 1], ins) < 0) i += 2;
+    while(i < s && diff((byte) cne[i + 1], ins) < 0) i += 2;
     return i < s && cne[i + 1] == ins ? i : -1;
   }
 
@@ -353,7 +353,7 @@ public final class FTTrie extends FTIndex {
       // restart searching at node, but value-position i
       wc(node, ending, false, i + 1, 0, f);
       return;
-    } else if(j < ending.length &&  i == ne[0] + 1) {
+    } else if(j < ending.length && i == ne[0] + 1) {
       // all chars form node processed, but not all chars from processed
 
       // move pointer and go on

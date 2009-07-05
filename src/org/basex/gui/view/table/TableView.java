@@ -50,7 +50,7 @@ public final class TableView extends View implements Runnable {
    * @param man view manager
    */
   public TableView(final ViewNotifier man) {
-    super(man, HELPTABLE);
+    super(HELPTABLE, man);
     tdata = new TableData(gui.context);
     setLayout(new BorderLayout());
     header = new TableHeader(this);
@@ -121,6 +121,11 @@ public final class TableView extends View implements Runnable {
   @Override
   public void refreshUpdate() {
     refreshContext(false, true);
+  }
+
+  @Override
+  protected boolean visible() {
+    return GUIProp.showtable;
   }
 
   @Override

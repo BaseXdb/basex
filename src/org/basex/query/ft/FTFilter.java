@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
-
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.data.Serializer;
@@ -11,6 +10,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.Tokenizer;
+import org.basex.util.Tokenizer.FTUnit;
 
 /**
  * Abstract FTFilter expression.
@@ -18,21 +18,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class FTFilter extends FTExpr {
-  /** Units. */
-  public enum FTUnit {
-    /** Word unit. */      WORD,
-    /** Sentence unit. */  SENTENCE,
-    /** Paragraph unit. */ PARAGRAPH;
-
-    /**
-     * Returns a string representation.
-     * @return string representation
-     */
-    @Override
-    public String toString() { return name().toLowerCase(); }
-  }
-
+abstract class FTFilter extends FTExpr {
   /** Optional unit. */
   protected FTUnit unit = FTUnit.WORD;
 
@@ -40,7 +26,7 @@ public abstract class FTFilter extends FTExpr {
    * Constructor.
    * @param e expression
    */
-  public FTFilter(final FTExpr e) {
+  FTFilter(final FTExpr e) {
     super(e);
   }
 
@@ -112,10 +98,8 @@ public abstract class FTFilter extends FTExpr {
    * @return new position
    */
   protected final int pos(final int p, final Tokenizer ft) {
-    if(unit == FTUnit.WORD) return p;
-    ft.init();
-    while(ft.more() && ft.pos != p);
-    return unit == FTUnit.SENTENCE ? ft.sent : ft.para;
+    // ft can be zero if unit is WORD
+    return unit == FTUnit.WORD ? p : ft.pos(p, unit);
   }
 
   @Override

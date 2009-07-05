@@ -96,7 +96,7 @@ public final class ViewNotifier {
   public void focus(final int pre, final View vw) {
     if(gui.focused == pre) return;
     gui.focused = pre;
-    for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
+    for(final View v : view) if(v != vw && v.visible()) v.refreshFocus();
     if(pre != -1) gui.status.setPath(ViewData.path(gui.context.data(), pre));
   }
 
@@ -108,7 +108,7 @@ public final class ViewNotifier {
   public void mark(final Nodes mark, final View vw) {
     final Context context = gui.context;
     context.marked(mark);
-    for(final View v : view) if(v != vw && v.isValid()) v.refreshMark();
+    for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
     BaseXLayout.enable(gui.filter, context.marked().size() != 0);
     gui.refreshControls();
   }
@@ -220,7 +220,7 @@ public final class ViewNotifier {
   public void update() {
     hist = 0;
     maxhist = 0;
-    for(final View v : view) if(v.isValid()) v.refreshUpdate();
+    for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }
 

@@ -1,12 +1,16 @@
 package org.basex.data;
 
+import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.PrintOutput;
+import org.basex.util.Map;
 import org.basex.util.Set;
+import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * This class organizes the namespaces of a database.
@@ -155,16 +159,20 @@ public final class Namespaces extends Set {
    * Prints the namespace structure to the specified output stream.
    * @param out output stream
    * @param s space for pre value
+   * @param all print all namespaces or just the root entries
    * @throws IOException I/O exception
    */
-  public void print(final PrintOutput out, final int s) throws IOException {
+  public void print(final PrintOutput out, final int s, final boolean all)
+      throws IOException {
+
     if(root.ch.length == 0) return;
     out.print(s, token(TABLEPRE));
     out.print(s + 1, token(TABLEDIST));
     out.print(' ');
     out.print(token(TABLEPREF), 11);
     out.println(token(TABLEURI));
-    print(out, s, root);
+    print(out, s, root, all);
+    out.print(NL);
   }
 
   /**
@@ -172,20 +180,68 @@ public final class Namespaces extends Set {
    * @param out output stream
    * @param s space for pre value
    * @param n namespace node
+   * @param all print all namespaces or just the root entries
    * @throws IOException I/O exception
    */
-  private void print(final PrintOutput out, final int s, final NSNode n)
-    throws IOException {
+  private void print(final PrintOutput out, final int s, final NSNode n,
+      final boolean all) throws IOException {
 
     final byte[] quote = { '"' };
     for(int i = 0; i < n.key.length; i++) {
       out.print(s, token(n.pre));
       out.print(s + 1, token(n.pre - n.par.pre));
       out.print(' ');
-      out.print(concat(quote, key(n.key[i]), quote), 11);
-      out.print(key(n.val[i]));
+      out.print(concat(quote, keys[n.key[i]], quote), 11);
+      out.print(keys[n.val[i]]);
       out.println(" (" + n.val[i] + ")");
     }
-    for(final NSNode c : n.ch) print(out, s, c);
+    if(all || n.key.length == 0) {
+      for(final NSNode c : n.ch) print(out, s, c, all);
+    }
+  }
+
+  /**
+   * Prints some namespace info.
+   * @return statistics string
+   */
+  public byte[] info() {
+    if(size() == 0) return EMPTY;
+
+    final Map<TokenList> map = new Map<TokenList>();
+    info(map, root);
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] val : map.keys()) {
+      tb.add("  ");
+      final TokenList key = map.get(val);
+      key.sort(false);
+      if(key.size > 1 || key.list[0].length != 0) {
+        if(key.size != 1) tb.add("(");
+        for(int k = 0; k < key.size; k++) {
+          if(k != 0) tb.add(", ");
+          tb.add(key.list[k]);
+        }
+        if(key.size != 1) tb.add(")");
+        tb.add(" = ");
+      }
+      tb.add("\"%\"" + NL, val);
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Prints some namespace info.
+   * @param map namespace map
+   * @param n namespace node
+   */
+  public void info(final Map<TokenList> map, final NSNode n) {
+    for(int i = 0; i < n.key.length; i++) {
+      final byte[] key = keys[n.val[i]];
+      final byte[] val = keys[n.key[i]];
+      TokenList old = map.get(key);
+      if(old == null) old = new TokenList();
+      if(!old.contains(val)) old.add(val);
+      map.add(key, old);
+    }
+    for(final NSNode c : n.ch) info(map, c);
   }
 }

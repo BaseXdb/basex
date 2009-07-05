@@ -71,7 +71,7 @@ public final class DialogEdit extends Dialog {
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       setResizable(true);
-      input3 = new BaseXText(gui, null, true, this);
+      input3 = new BaseXText(null, true, this);
       input3.setText(data.text(pre));
       input3.setPreferredSize(new Dimension(320, 200));
       old1 = string(input3.getText());
@@ -97,7 +97,7 @@ public final class DialogEdit extends Dialog {
         input2 = new BaseXTextField(old2, null, this);
         b.add(input2);
       } else {
-        input3 = new BaseXText(gui, null, true, this);
+        input3 = new BaseXText(null, true, this);
         input3.setText(token(old2));
         input3.setPreferredSize(new Dimension(400, 200));
         b.add(input3);

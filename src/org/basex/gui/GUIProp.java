@@ -1,6 +1,8 @@
 package org.basex.gui;
 
 import org.basex.core.Prop;
+import org.basex.io.IO;
+import org.basex.util.StringList;
 
 /**
  * This class contains properties which are used in the GUI. They are
@@ -62,15 +64,17 @@ public final class GUIProp {
   public static boolean showtext = true;
   /** Flag for activated tree view. */
   public static boolean showfolder = false;
-  /** Flag for activated search view. */
-  public static boolean showquery = true;
+  /** Flag for activated query view. */
+  public static boolean showexplore = false;
   /** Flag for activated plot view. */
   public static boolean showplot = false;
+  /** Flag for activated xquery view. */
+  public static boolean showxquery = true;
 
   /** Flag for Java look and feel. */
   public static boolean javalook = false;
   /** Flag for dissolving name attributes. */
-  public static boolean shownames = true;
+  public static boolean showname = true;
   /** Focus follows mouse. */
   public static boolean mousefocus = false;
   /** Flag for showing the simple file dialog. */
@@ -84,8 +88,6 @@ public final class GUIProp {
   public static boolean filterrt = false;
   /** Flag for realtime context switch. */
   public static boolean execrt = true;
-  /** Maximum text size to be displayed. */
-  public static int maxtext = 1 << 21;
 
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
@@ -93,12 +95,8 @@ public final class GUIProp {
   public static int mapoffsets = 3;
   /** Map algorithm. */
   public static int mapalgo = 0;
-  /** Strip direction horizontal? */
-  public static boolean striphor = false;
-  /** number of child <-> size weighting in (0;100). */
+  /** number of children <-> size weighting in (0;100). */
   public static int mapweight = 0;
-  /** divide rectangles uniformly on each level. */
-  public static boolean mapsimple = false;
 
   /** Dot sizes in plot. */
   public static int plotdots = 0;
@@ -130,7 +128,7 @@ public final class GUIProp {
   /** Name of the mountpoint. */
   public static String guimountpoint = Prop.TMP + "deepfs";
   /** Name of the backingroot. */
-  public static String guibackingroot = Prop.TMP +  "backingstore_deepfs";
+  public static String guibackingroot = Prop.TMP + "backingstore_deepfs";
   /** Flag for importing complete file system hierarchy. */
   public static boolean fsall = false;
 
@@ -140,6 +138,8 @@ public final class GUIProp {
   public static String[] search = new String[0];
   /** Last XQuery inputs. */
   public static String[] xquery = new String[0];
+  /** Last XQuery files. */
+  public static String[] queries = new String[0];
 
   // CONFIG OPTIONS ===========================================================
 
@@ -150,15 +150,22 @@ public final class GUIProp {
   public static boolean showmenu = true;
   /** Flag for activated help view. */
   public static boolean showhelp = false;
+  /** Flag for activated tree view. */
+  public static boolean showtree = false;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;
   /** Fullscreen flag. */
   public static boolean fullscreen = false;
 
+  /** Maximum text size to be displayed. */
+  public static int maxtext = 1 << 21;
+
+  /** Strip direction horizontal? */
+  public static boolean striphor = true;
   /** Flag for computing additional map infos. */
-  public static boolean mapinfo = true;
-  /** Flag for skipping tim intensive treemap infos. */
+  public static boolean mapinfo = false;
+  /** Flag for skipping time intensive treemap infos. */
   public static boolean perfinfo = true;
   /** Shows real file contents in the treemap. */
   public static boolean mapfs = true;
@@ -172,15 +179,12 @@ public final class GUIProp {
   public static int lensscale = 2;
   /** Alpha value of the zoombox. */
   public static int zoomboxalpha = 100;
-  /** Width of the fisheyeview. */
+  /** Width of the fisheye view. */
   public static int fishw = 300;
-  /** Height of the fisheyeview. */
+  /** Height of the fisheye view. */
   public static int fishh = 200;
   /** Show file contents in TreeMap. */
   public static boolean filecont = true;
-
-  /** Flag for activated tree view. */
-  public static boolean showtree = false;
 
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + ".basexwin";
@@ -194,6 +198,7 @@ public final class GUIProp {
    */
   public static void read() {
     Prop.read(cfg, GUIProp.class.getFields());
+    files(null);
   }
 
   /**
@@ -201,5 +206,26 @@ public final class GUIProp {
    */
   public static void write() {
     Prop.write(cfg, GUIProp.class.getFields());
+  }
+  
+  /**
+   * Refreshes the list of recent query files.
+   * @param file new file
+   */
+  public static void files(final IO file) {
+    final StringList sl = new StringList();
+
+    String path = null;
+    if(file != null) {
+      path = file.path();
+      xqpath = file.getDir();
+      Prop.xquery = file;
+      sl.add(path);
+    }
+    for(int q = 0; q < queries.length && q < 9; q++) {
+      final String f = queries[q];
+      if(!f.equals(path) && IO.get(f).exists()) sl.add(f);
+    }
+    queries = sl.finish();
   }
 }

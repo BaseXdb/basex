@@ -33,17 +33,17 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
-    out.print(db(context.data().meta, true, true));
+    out.print(db(context.data().meta, false, true).finish());
   }
 
   /**
    * Creates a database information string.
    * @param meta meta data
-   * @param header add header flag
+   * @param bold header bold header flag
    * @param index add index information
    * @return info string
    */
-  public static byte[] db(final MetaData meta, final boolean header,
+  public static TokenBuilder db(final MetaData meta, final boolean bold,
       final boolean index) {
 
     final File dir = IO.dbpath(meta.dbname);
@@ -56,35 +56,37 @@ public final class InfoDB extends AInfo {
         INFOENCODING, INFONODES, INFOHEIGHT
     }) + 1;
 
-    if(header) {
-      tb.add(INFODB + NL);
-      format(tb, INFODBNAME, meta.dbname, header, l);
-    }
-    format(tb, INFODBSIZE, Performance.format(len), header, l);
-    format(tb, INFOENCODING, meta.encoding, header, l);
-    format(tb, INFONODES, Integer.toString(meta.size), header, l);
-    format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
+    final String header = (bold ?
+        new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
+    tb.add(header, INFODB);
+    format(tb, INFODBNAME, meta.dbname, l);
+    format(tb, INFODBSIZE, Performance.format(len), l);
+    format(tb, INFOENCODING, meta.encoding, l);
+    format(tb, INFONODES, Integer.toString(meta.size), l);
+    format(tb, INFOHEIGHT, Integer.toString(meta.height), l);
 
-    tb.add(NL + INFOCREATE + NL);
-    format(tb, INFODOC, meta.file.path(), header, l);
-    format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
-    format(tb, INFODOCSIZE, Performance.format(meta.filesize), header, l);
-    format(tb, INFONDOCS, Integer.toString(meta.ndocs), header, l);
-    //format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
-    //format(tb, INFOENTITIES, BaseX.flag(meta.entity), true, 0);
+    tb.add(NL);
+    tb.add(header, INFOCREATE);
+    format(tb, INFODOC, meta.file.path(), l);
+    format(tb, INFOTIME, DATE.format(new Date(meta.time)), l);
+    format(tb, INFODOCSIZE, Performance.format(meta.filesize), l);
+    format(tb, INFONDOCS, Integer.toString(meta.ndocs), l);
+    format(tb, INFOCHOP, BaseX.flag(meta.chop), 0);
+    format(tb, INFOENTITY, BaseX.flag(meta.entity), 0);
 
     if(index) {
-      tb.add(NL + INFOINDEX + NL);
+      tb.add(NL);
+      tb.add(header, INFOINDEX);
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
-        format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), true, 0);
-        format(tb, INFOATTRINDEX, BaseX.flag(meta.atvindex), true, 0);
+        format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), 0);
+        format(tb, INFOATTRINDEX, BaseX.flag(meta.atvindex), 0);
         format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) + (meta.ftxindex &&
-            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""), 0);
       }
     }
-    return tb.finish();
+    return tb;
   }
 
   @Override

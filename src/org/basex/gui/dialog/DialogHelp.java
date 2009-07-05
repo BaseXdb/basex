@@ -30,7 +30,7 @@ public final class DialogHelp extends Dialog {
     panel.setBorder(5, 5, 5, 5);
     panel.setBackground(Color.white);
 
-    area = new BaseXText(gui, Token.EMPTY, false);
+    area = new BaseXText(Token.EMPTY, false, gui);
     area.setSyntax(new XMLSyntax());
     set(area, BorderLayout.CENTER);
 

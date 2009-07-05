@@ -310,11 +310,9 @@ public abstract class IO {
    * @return result of check
    */
   public static boolean valid(final String fn) {
-    // . / * "   : < > ?
     for(int i = 0; i < fn.length(); i++) {
       final char c = fn.charAt(i);
-      if(!Token.letterOrDigit(c)
-          && (c < ' ' || c > '@' || INVALID.indexOf(c) != -1)) return false;
+      if(!Token.ftChar(c) && INVALID.indexOf(c) != -1) return false;
     }
     return true;
   }

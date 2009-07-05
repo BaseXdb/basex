@@ -1,3 +1,4 @@
+declare default element namespace "http://www.w3.org/1999/xhtml";
 declare variable $specs := "xqft-usecases";
 declare variable $sample := "xqft";
 declare variable $stopwords := "xqft-sw.txt";
@@ -30,7 +31,7 @@ declare function local:getQuery($node, $version) {
     }</query>{
       try {
         <output>{ basex:eval($xquery) }</output>
-      } catch($error) {
+      } catch *($error) {
         <error>{ $error }</error>
 			}
     }

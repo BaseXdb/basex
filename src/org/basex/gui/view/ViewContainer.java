@@ -7,7 +7,6 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -141,7 +140,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     if(w < 200 || h < 200) return;
 
     g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
-    g.setFont(new Font(GUIProp.font, 0, 22));
+    g.setFont(getFont().deriveFont(22f));
     BaseXLayout.antiAlias(g);
     BaseXLayout.drawCenter(g, VERSINFO, w, y + 30 + lh);
   }

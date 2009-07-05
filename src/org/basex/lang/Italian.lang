@@ -1,7 +1,7 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Luca Martincigh
 #
-# The '%' character serves as dummy for internal replacements.
+# The '%' character serves as placeholder for texts to be inserted
 
 # Start
 launch=Inizializzazione di 
@@ -31,7 +31,7 @@ b_drop=Cancella
 b_cmd=Comando
 b_xquery=XQuery
 b_browse=Sfoglia
-b_simple=Semplice
+#b_simple=Semplice
 b_search=Cerca
 
 # Status messages
@@ -46,7 +46,7 @@ info_title=Query Info
 info_no=Per favore lancia una Query...
 help_title=Aiuto
 text_title=Testo
-query_title=Query
+explore_title=Explore
 
 # Dialog Windows
 d_info=Informazione
@@ -104,7 +104,7 @@ dfs_title=Importa Filesystem
 dfs_all=Importa tutto
 dfs_allinfo=Importa filesystem completo
 dfs_text=Directory da importare
-dfs_text1=informazione & metadata del file
+dfs_text1=Informazione & metadata del file
 dfs_text2=Contenuti del file
 dfs_types=Tipi di file
 dfs_maxinfo=Limita l'inclusione di testo ad una dimensione data
@@ -160,7 +160,6 @@ ds_blue=Blu
 
 dm_title=Map Layout
 # ADDED
-dm_simple=Divide rectangles uniformly
 dm_atts=Mostra attributi
 dm_choice1=No Titolo, no Bordo
 dm_choice2=No Titolo, Bordo piccolo
@@ -184,10 +183,11 @@ da_license=Licenza BSD (ISC)
 da_dev=Sviluppatore principale
 da_cont1=Team
 da_cont2=ed altri
-da_contact=Contatto
+da_translation=Traduzione
 
 c_about=Su %
 c_abouttt=Mostra le informazioni generali sul progetto.
+c_all=Seleziona tutto
 c_close=Chiudi
 c_closett=Chiude il Database attuale.
 c_color=Colori
@@ -235,7 +235,7 @@ c_paste=Incolla
 c_pastett=Incolla i nodi copiati.
 c_prefs=Impostazioni
 c_prefstt=Mostra le impostazioni generali dell'applicazione.
-c_redo=Ripeti
+c_redo=Ripristina
 c_root=Home
 c_roottt=Salta al nodo root.
 c_rtexec=Esecuzione Realtime
@@ -244,8 +244,12 @@ c_rtfilter=Filtro Realtime
 c_rtfiltertt=Se quest'opzione è attiva, i risultati della query vengono automaticamente filtrati.
 c_showbuttons=Pulsanti
 c_showbuttonstt=Attiva/Disattiva la barra dei pulsanti.
+c_showexplore=Explorer
+c_showexplorett=Mostra il explorer.
 c_showhelp=Aiuto
 c_showhelptt=Mostra la schermata d'aiuto, che fornisce informazioni sui componenti selezionati.
+c_showfolder=Folder
+c_showfoldertt=Mostra la visualizazzione folder.
 c_showinfo=Info Query
 c_showinfott=mostra il pannello query info.
 c_showinput=Campo di Input
@@ -254,8 +258,6 @@ c_showmap=Map
 c_showmaptt=Mostra la visualizzazione map.
 c_showmenu=Menu
 c_showmenutt=Attiva/Disattiva il menu.
-c_showsearch=Pannello Query
-c_showsearchtt=Mostra il pannello delle query.
 c_showstatus=Barra di stato
 c_showstatustt=Attiva/Disattiva la barra di stato.
 c_showtable=Tabella
@@ -264,13 +266,13 @@ c_showplot=Plot
 c_showplottt=Mostra la visualizazzione scatter-plot.
 c_showtext=Testo
 c_showtexttt=Mostra la visualizazzione testo.
-c_showfolder=Folder
-c_showfoldertt=Mostra la visualizazzione folder.
+c_showxquery=Pannello Query
+c_showxquerytt=Mostra il pannello delle query.
 c_undo=Annulla
 c_xqopen=Apri
 c_xqopentt=Apre un file XQuery
 c_xqsave=Salva
-c_xqsavett=Salva la XQuery attuale
+c_xqsavett=Salva la file XQuery
 
 # Commands & Processes
 proc_time=Tempo necessario
@@ -422,8 +424,9 @@ info_entities=Parsing delle entità
 info_serialize=Serializza
 info_xmloutput=Output XML
 info_mainmem=Modalità Main Memory
-info_tagindex=Indice Tag
-info_atnindex=Indice nomi attributi
+info_tags=Tags
+info_atts=Attributi
+info_ns=Namespaces
 info_txtindex=Indicizza testo
 info_atvindex=Indicizza attributi
 info_ftindex=Indice full-text
@@ -436,6 +439,7 @@ info_resultchop=rimosso
 info_on=ON
 info_off=OFF
 info_error=Errore
+info_entries=% registrazioni
 
 # Command Help
 ch_nohelp=Spiacente, nessun aiuto disponibile.
@@ -549,6 +553,7 @@ h_opt=Schiaccia questo bottone per ottimizzare il database.
 h_renamedb=Schiaccia questo bottone per rinominare il database selezionato.
 h_opendb=Schiaccia questo bottone per aprire il database selezionato.
 h_openinfo=Questo pannello mostra alcune informazioni sul database attualmente selezionato.
+h_recent=File aperti recentemente
 h_falias=Si può applicare anti-aliasing a tutti i testi selezionando questa checkbox.
 h_browse=Usa questo bottone per trovare un file o una directory.
 h_fspath=Usa questo campo di testo per inserire o modificare la directori da passare al parser.
@@ -563,7 +568,6 @@ h_meta=Se si seleziona questa checkbox, i meta-data verranno estratti da numeros
 h_cont=Selezionando questa checkbox i contenuti testuali del file vengono inclusi. Se i contenuti vengono inclusi, possono essere cercati usando XPath o XQuery.
 h_fsmax=Qui è possibile definire una dimensione limite per i file di testo inclusi.
 h_mapatts= Se questa checkbox è attivata, gli attributi vengono mostrati dentro la TreeMap.
-h_mapsimple= If this checkbox is turned on, rectangles are divided uniformly in TreeMap.
 h_maplayout=Qui puoi modificare l'algoritmo di layout usato nella visualizzazione Map. I cambi si vedono immediatamente se il database è aperto.
 h_mapoff=Here you can modify the offset sizes of the rectangles.
 h_mapsize=Qui puoi definire le fondamenta del calcolo della dimensione dei rettangoli.
@@ -593,9 +597,8 @@ h_folder=Questa visualizzazione mostra tutti i nodi XML in visualizzazione folde
 h_table=Questa visualizzazione mostra tutti i nodi XML in una tabella. Cliccando su un testo, tutti i nodi con lo stesso testo vengono evidenziati. Con doppio click su un testo, i risultati della query vengono filtrati. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
 h_text=Questo pannello mostra i risultati delle query ed altro output testuale.\n\nTasti rapidi: Usa '-' e '+' per cambiare la dimensione del carattere di tutti i pannelli. Digita qualunque testo dentro il pop-up di ricerca per lanciare una ricerca incrementale. E' un buon modo per trovare punti specifici di testo.
 h_info=Questo pannello mostra informazioni sulla compilazione ed esevuzione di una richiesta XPath o XQuery.
-h_search1=La modalità di inserimento XQuery offre l'intero range di funzionalità del linguaggio XQuery. XQuery utilizza espressioni XPath per selezionare parti di un documento XML. Permette questo tramite un'espressione FLWOR simile all'SQL per permettere i join. Un'espressione FLWOR è costituita dalle cinque parti da cui prende nome: FOR, LET, WHERE, ORDER BY, RETURN.
-h_search2=La modalità di ricerca semplice consente query semplici sul documento XML.
-h_querymode=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a IN //book\n where $a/topic = "BaseX"\n return $a/title"\n\nL'area di testo offre una funzione di cronologia: Puoi memorizzare l'input attuale con Ctrl+ENTER e recuperare input precedenti con Ctrl+UP/DOWN.
+h_explore=La modalità di ricerca semplice consente query semplici sul documento XML.
+h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=In questa combo box sono elencati tutti i tag e gli attributi del documento XML in uso. Se si seleziona un elemento, i risultati della query sono evidenziati nella visualizzazione. Se l'elemento contiene valori testuali, viene visualizzata una finestra pop-up addizionale, che consente una maggiore definizione della query.
 h_cat=In questa combo box sono elencati tutti i valori della categoria attuale. Se si seleziona uno dei valori, la query è ulteriormente raffinata.
 h_ds=Trascina le frecce destra e sinistra di questo slider per restringere i valori della categoria di query attuale. Se hai cambiato il range, puoi anche cliccare dentro lo slider e muoverlo a destra o a sinistra.

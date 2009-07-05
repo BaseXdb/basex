@@ -14,14 +14,13 @@ public class Map<E> extends Set {
 
   /**
    * Indexes the specified keys and values.
+   * If the entry exists, the old value is replaced.
    * @param key key
    * @param val value
-   * @return index
    */
-  public int add(final byte[] key, final E val) {
+  public void add(final byte[] key, final E val) {
     final int i = add(key);
-    if(i > 0) values[i] = val;
-    return i > 0 ? i : -i;
+    values[Math.abs(i)] = val;
   }
 
   /**

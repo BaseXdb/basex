@@ -1,7 +1,7 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Kazuo Kashima
 #
-# The '%' character serves as dummy for internal replacements.
+# The '%' character serves as placeholder for texts to be inserted
 
 # Start
 launch=起動中
@@ -31,7 +31,7 @@ b_drop=削除
 b_cmd=コマンド
 b_xquery=XQuery
 b_browse=参照
-b_simple=簡易
+#b_simple=簡易
 b_search=検索
 
 # Status messages
@@ -46,7 +46,7 @@ info_title=クエリー情報
 info_no=クエリーを実行して下さい。
 help_title=ヘルプ
 text_title=テキスト
-query_title=クエリー　　
+explore_title=Explore
 
 # Dialog Windows
 d_info=情報
@@ -157,7 +157,6 @@ ds_green=緑
 ds_blue=青
 
 dm_title=マップレイアウト
-dm_simple=Divide rectangles uniformly
 dm_atts=属性の表示
 dm_choice1=タイトル、枠線無し
 dm_choice2=タイトル無し、枠線最細
@@ -181,10 +180,11 @@ da_license=BSD license (ISC)
 da_dev=メイン開発者
 da_cont1=チーム
 da_cont2=その他の貢献者
-da_contact=Contact
+da_translation=翻訳
 
 c_about=%について
 c_abouttt=このプロジェクトについての概要を表示します。
+c_all=全選択
 c_close=閉じる
 c_closett=現在のデータベースを閉じます。
 c_color=色
@@ -228,11 +228,11 @@ c_maplayout=マップレイアウト
 c_maplayouttt=マップレイアウトを変更します。
 c_open=開く
 c_opentt=データベースを開きます。
-c_paste=貼付け
+c_paste=ペースト
 c_pastett=以前コピーしたノードを貼付けます。
 c_prefs=設定
 c_prefstt=アプリケーションの設定を表示します。
-c_redo=Redo
+c_redo=リドゥ
 c_root=ホームへ
 c_roottt=ルートノードへ戻ります。
 c_rtexec=リアルタイムでの実行
@@ -241,6 +241,10 @@ c_rtfilter=リアルタイムフィルタリング
 c_rtfiltertt=このオプションが有効な場合、クエリー結果が自動的にフィルターされます。
 c_showbuttons=ボタン
 c_showbuttonstt=ボタンバーのオン・オフを切り替えます。
+c_showexplore=Explorer
+c_showexplorett=クエリーパネルを表示します。
+c_showfolder=ツリー
+c_showfoldertt=ツリービューを表示します。
 c_showhelp=ヘルプ
 c_showhelptt=ヘルプビューを表示します。現在フォーカスが当たっているコンポーネントに関するヘルプを表示します。
 c_showinfo=クエリー情報
@@ -251,8 +255,6 @@ c_showmap=マップ
 c_showmaptt=マップビューを表示します。
 c_showmenu=メニュー
 c_showmenutt=メニューの表示・非表示を切り替えます。
-c_showsearch=クエリーパネル
-c_showsearchtt=クエリーパネルを表示します。
 c_showstatus=ステータスバー
 c_showstatustt=ステータスバーの表示・非表示を切り替えます。
 c_showtable=テーブル
@@ -261,9 +263,9 @@ c_showplot=プロット
 c_showplottt=散布図（scatter-plot）を表示します。
 c_showtext=テキストビュー
 c_showtexttt=テキストビューを表示します。
-c_showfolder=ツリー
-c_showfoldertt=ツリービューを表示します。
-c_undo=Undo
+c_showxquery=クエリーパネル
+c_showxquerytt=クエリーパネルを表示します。
+c_undo=アンドゥ
 c_xqopen=開く
 c_xqopentt=XQueryファイルを開きます。
 c_xqsave=保存
@@ -418,8 +420,9 @@ info_entities=実体のパース
 info_serialize=シリアル化
 info_xmloutput=XML出力
 info_mainmem=メインメモリモード
-info_tagindex=タグインデックス
-info_atnindex=属性名インデックス
+info_tags=タグインデックス
+info_atts=属性名インデックス
+info_ns=名前空間
 info_txtindex=テキストインデックス
 info_atvindex=属性インデックス
 info_ftindex=全文インデックス
@@ -428,10 +431,11 @@ info_outofdated=out-of-dated
 info_db=データベース情報
 info_create=データベース作成
 info_general=一般事項
-info_resultchop=...省略さ
+info_resultchop=省略さ
 info_on=ON
 info_off=OFF
 info_error=エラー
+info_entries=% entries
 
 # Command Help
 ch_nohelp=ヘルプがありません。
@@ -543,6 +547,7 @@ h_opt=このボタンを押すとデータベースを最適化を行います�
 h_renamedb=このボタンを押して、選択したデータベースの名前を変更します。
 h_opendb=このボタンを押して、選択したデータベースを開きます。
 h_openinfo=このパネルは現在選択されているデータベースに関する情報を表示します。
+h_recent=最近オープンしたファイル
 h_falias=このチェックボックスをチェックすると、全てのテキストがアンチエイリアス化されます。
 h_browse=選択画面でディレクトリを選択します。
 h_fspath=このテキストフィールドで、処理するディレクトリ名を入力・修正します。
@@ -557,7 +562,6 @@ h_meta=このチェックボックスを選択すると、多くのファイル�
 h_cont=このチェックボックスを選択すると、ファイル内のテキスト情報をデータベースに含めることが出来ます。テキスト情報を含めた場合、それらはXPath や XQueryによって検索することが出来ます。
 h_fsmax=インポートされるテキストファイルのサイズの上限を設定します。
 h_mapatts=このチェックボックスを選択すると、属性はツリーマップの中に表示されます。
-h_mapsimple= If this checkbox is turned on, rectangles are divided uniformly in TreeMap.
 h_maplayout=ここではツリーマップビューのレイアウトアルゴリズムを変更します。データベースを開いている場合、変更は即座に反映されます。
 h_mapoff=ここではツリーマップビューの四角形の整列方法を変更します。データベースを開いている場合、変更は即座に反映されます。
 h_mapsize=Here you can influence how the rectangle size is calculated.
@@ -587,9 +591,8 @@ h_folder=全てのXMLノードを通常の木構造で表示します。ノー�
 h_table=XMLノードを表形式で表示します。テキストをクリックすると、そのテキストを持つ全てのノードがハイライト表示されます。テキストをダブルクリックすると、そのノード以下が表示されます。また各要素でライトクリックするとポップアップメニューが表示されます。
 h_text=このパネルはクエリーの結果やその他出力を表示します。\n\nキーボードショートカット:'-' と '+' で全てのパネルのフォントサイズを変更できます。任意のテキストを入力することによりインクリメンタルサーチでテキストを簡単に検索する事が出来ます。
 h_info=このパネルではXPathやXQueryのコンパイル・評価についての情報を簡単なプロファイル情報と共に表示します。
-h_search1=XQuery入力モードはXQuery言語の豊富な検索機能が使えます。XQueryはXML文書の特定部分を指定するためにXPath表現式を使用します。SQLに似たFLWOR表現式によりjoinを実行することもできます。FLWOR表現式とは以下の5つの名前から付けられています。 FOR, LET, WHERE, ORDER BY, RETURN
-h_search2=単純検索モードは簡単にXML文書内を検索できます。
-h_querymode=このテキストエリアには任意のXQuery 1.0クエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a IN //book\n where $a/topic = "BaseX"\n return $a/title"\n\nこのテキストエリアでは入力履歴が使えます。Ctrl+ENTERを押すことにより、現在の入力を保存でき、また"Ctrl+UP/DOWNにより過去の入力を取り出せます。
+h_explore=単純検索モードは簡単にXML文書内を検索できます。
+h_xquery=このテキストエリアには任意のXQuery 1.0クエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=このコンボボックスには、現在のXML文書の全てのタグと属性名が表示されます。リストから項目を選択すると他のビューで検索結果がマークされます。選択した項目がテキスト値を含んでいる場合、追加の入力画面が表示され、そこでさらに検索結果の絞り込みを行えます。
 h_cat=このコンボボックスは、現在のカテゴリーの全ての値を表示します。その中から一つ選択すると、検索結果が絞り込まれます。
 h_ds=スライダー左右の矢印をドラッグすることにより現在の検索カテゴリーの値の範囲を指定することが出来ます。範囲を指定した後、スライダー内部をクリックして左右に動かすことが出来ます。

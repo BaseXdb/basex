@@ -70,11 +70,12 @@ public final class InfoTable extends AInfo {
   public static void table(final PrintOutput out, final Data data,
       final int s, final int e) throws IOException {
 
+    final boolean all = s == 0 && e == data.meta.size;
+    data.ns.print(out, numDigits(data.meta.size) + 1, all);
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
     tableHeader(out, data);
     for(int p = ps; p < pe; p++) table(out, data, p);
-    data.ns.print(out, numDigits(data.meta.size) + 1);
   }
 
   /**

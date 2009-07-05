@@ -1,10 +1,11 @@
-package org.basex.gui.view.query;
+package org.basex.gui.view.xquery;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
+import org.basex.gui.layout.BaseXTextTokens;
 import org.basex.query.QueryTokens;
 import org.basex.query.func.FunDef;
 import org.basex.util.XMLToken;
@@ -15,11 +16,11 @@ import org.basex.util.XMLToken;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class QuerySyntax extends BaseXSyntax {
+final class XQuerySyntax extends BaseXSyntax {
   /** Error color. */
-  public static HashSet<String> keys = new HashSet<String>();
+  private static final HashSet<String> KEYS = new HashSet<String>();
   /** Error color. */
-  public static HashSet<String> funs = new HashSet<String>();
+  private static final HashSet<String> FUNC = new HashSet<String>();
   /** Variable color. */
   private static final Color VAR = new Color(0, 160, 0);
   /** Keyword. */
@@ -38,11 +39,11 @@ public final class QuerySyntax extends BaseXSyntax {
       for(final Field f : QueryTokens.class.getFields()) {
         if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
-        for(String ss : s.split("-")) keys.add(ss);
+        for(String ss : s.split("-")) KEYS.add(ss);
       }
       for(final FunDef f : FunDef.values()) {
         final String s = f.toString();
-        for(String ss : s.substring(0, s.indexOf("(")).split("-")) funs.add(ss);
+        for(String ss : s.substring(0, s.indexOf("(")).split("-")) FUNC.add(ss);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -56,8 +57,8 @@ public final class QuerySyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final String word) {
-    final char ch = word.charAt(0);
+  public Color getColor(final BaseXTextTokens text) {
+    final int ch = text.curr();
 
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
@@ -80,9 +81,10 @@ public final class QuerySyntax extends BaseXSyntax {
     }
 
     // special characters
-    if(keys.contains(word)) return GUIConstants.COLORS[16];
+    final String word = text.nextWord();
+    if(KEYS.contains(word)) return GUIConstants.COLORS[16];
     // special characters
-    if(funs.contains(word)) return FUNS;
+    if(FUNC.contains(word)) return FUNS;
 
     // special characters
     if(!XMLToken.isXMLLetterOrDigit(ch)) return KEY;

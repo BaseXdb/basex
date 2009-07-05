@@ -28,9 +28,9 @@ public final class FTPosData {
     final TokenBuilder pi = new TokenBuilder();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.start; s <= sm.end; s++) {
+        for(int s = sm.s; s <= sm.e; s++) {
           ps.add(s);
-          pi.add(sm.queryPos);
+          pi.add(sm.q);
         }
       }
     }

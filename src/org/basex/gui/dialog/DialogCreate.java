@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
-import javax.swing.JTabbedPane;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -18,6 +17,7 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
@@ -112,7 +112,7 @@ public final class DialogCreate extends Dialog {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(dbname, 300);
+    BaseXLayout.setWidth(dbname, 240);
     p1.add(dbname);
 
     info = new BaseXLabel(" ");
@@ -127,10 +127,10 @@ public final class DialogCreate extends Dialog {
     intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
         Prop.intparse, 0, this);
     p2.add(intparse);
-    p2.add(new BaseXLabel(INTPARSEINFO, true));
+    p2.add(new BaseXLabel(INTPARSEINFO, true, false));
 
     entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
-        Prop.entity, 0, this);
+        Prop.entity, this);
     p2.add(entities);
 
     dtd = new BaseXCheckBox(CREATEDTD, Token.token(DTDINFO),
@@ -140,7 +140,7 @@ public final class DialogCreate extends Dialog {
     chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
         Prop.chop, 0, this);
     p2.add(chop);
-    p2.add(new BaseXLabel(CHOPPINGINFO, true));
+    p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
 
     // create checkboxes
     final BaseXBack p3 = new BaseXBack();
@@ -150,12 +150,12 @@ public final class DialogCreate extends Dialog {
     txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
         Prop.textindex, 0, this);
     p3.add(txtindex);
-    p3.add(new BaseXLabel(TXTINDEXINFO, true));
+    p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
 
     atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
         Prop.attrindex, 0, this);
     p3.add(atvindex);
-    p3.add(new BaseXLabel(ATTINDEXINFO, true));
+    p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
     // create checkboxes
     final BaseXBack p4 = new BaseXBack();
@@ -165,18 +165,17 @@ public final class DialogCreate extends Dialog {
     ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
         Prop.ftindex, 0, this);
     p4.add(ftxindex);
-    p4.add(new BaseXLabel(FTINDEXINFO, true));
+    p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
     final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO };
     final boolean[] val = { Prop.ftfuzzy, Prop.ftst, Prop.ftcs, Prop.ftdc };
     for(int f = 0; f < ft.length; f++) {
-      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
+      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], this);
       p4.add(ft[f]);
     }
 
-    final JTabbedPane tabs = new JTabbedPane();
-    BaseXLayout.addDefaultKeys(tabs, this);
+    final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(PARSEINFO, p2);
     tabs.addTab(INDEXINFO, p3);

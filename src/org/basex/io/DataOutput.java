@@ -127,15 +127,15 @@ public final class DataOutput extends OutputStream {
    */
   public int writeNum(final int v) throws IOException {
     if(v < 0 || v > 0x3FFFFFFF) {
-      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>>  8); write(v);
+      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
       return 5;
     }
     if(v > 0x3FFF) {
-      write(v >>> 24 | 0x80); write(v >>> 16); write(v >>>  8); write(v);
+      write(v >>> 24 | 0x80); write(v >>> 16); write(v >>> 8); write(v);
       return 4;
     }
     if(v > 0x3F) {
-      write(v >>>  8 | 0x40); write(v);
+      write(v >>> 8 | 0x40); write(v);
       return 2;
     }
     write(v);

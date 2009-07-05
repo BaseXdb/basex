@@ -127,6 +127,6 @@ public final class Copy extends AUpdate {
 
   @Override
   public String toString() {
-    return name() +  " " + args[0] + " " + args[1] + ", " + args[2];
+    return name() + " " + args[0] + " " + args[1] + ", " + args[2];
   }
 }

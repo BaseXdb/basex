@@ -443,7 +443,7 @@ public final class QueryContext extends Progress {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(colls == 0) Err.or(COLLDEF);
-      return SeqIter.get(collect[0].item, collect[0].size);
+      return new SeqIter(collect[0].item, collect[0].size);
     }
 
     // invalid collection reference
@@ -454,7 +454,7 @@ public final class QueryContext extends Progress {
     while(true) {
       if(++c == colls) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
-      return SeqIter.get(collect[c].item, collect[c].size);
+      return new SeqIter(collect[c].item, collect[c].size);
     }
   }
 

@@ -24,10 +24,14 @@ public final class InfoIndex extends AInfo {
   @Override
   protected void out(final PrintOutput out) throws IOException {
     final Data data = context.data();
-    out.println(INFOTAGINDEX);
+    out.println(INFOTAGS);
     out.println(data.info(Type.TAG));
-    out.println(INFOATNINDEX);
+    out.println(INFOATTS);
     out.println(data.info(Type.ATN));
+    if(data.ns.size() != 0) {
+      out.println(INFONS);
+      out.println(data.ns.info());
+    }
     if(data.meta.txtindex) {
       out.println(INFOTEXTINDEX);
       out.println(data.info(Type.TXT));

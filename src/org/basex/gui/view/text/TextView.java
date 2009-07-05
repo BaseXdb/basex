@@ -2,10 +2,6 @@ package org.basex.gui.view.text;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.BaseX;
@@ -36,82 +32,55 @@ import org.basex.io.CachedOutput;
  */
 public final class TextView extends View {
   /** Text Area. */
-  final BaseXText area;
+  private final BaseXText area;
   /** Header string. */
-  final BaseXLabel header;
-  /** Search field. */
-  BaseXTextField search;
+  private final BaseXLabel header;
+  /** Find text field. */
+  private final BaseXTextField find;
   /** Painted flag. */
-  boolean refreshed;
+  private boolean refreshed;
 
   /**
    * Default constructor.
    * @param man view manager
    */
   public TextView(final ViewNotifier man) {
-    super(man, HELPTEXT);
+    super(HELPTEXT, man);
 
     setLayout(new BorderLayout(0, 4));
-    setBorder(4, 8, 8, 8);
+    setBorder(6, 8, 8, 8);
     setFocusable(false);
 
-    area = new BaseXText(gui, HELPTEXT, false);
-    add(area, BorderLayout.CENTER);
+    header = new BaseXLabel(TEXTTIT, true, false);
 
-    header = new BaseXLabel(TEXTTIT, true);
+    final BaseXBack back = new BaseXBack(Fill.NONE);
+    back.setLayout(new BorderLayout());
+    back.add(header, BorderLayout.CENTER);
+
     final BaseXButton export = GUIToolBar.newButton(GUICommands.SAVE, gui);
     final BaseXButton root = GUIToolBar.newButton(GUICommands.HOME, gui);
-    search = new BaseXTextField(null);
+    find = new BaseXTextField(null, gui);
+    BaseXLayout.setHeight(find, (int) root.getPreferredSize().getHeight());
 
-    final Font f = getFont();
-    search.setFont(f.deriveFont((float) f.getSize() + 2));
-    search.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        final int co = e.getKeyCode();
-        if(co == KeyEvent.VK_ESCAPE) {
-          area.requestFocusInWindow();
-        } else if(co == KeyEvent.VK_ENTER || co == KeyEvent.VK_F3) {
-          area.find(search.getText(), e.isShiftDown());
-        }
-        // ignore Control/F shortcut
-        if((Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &
-            e.getModifiers()) != 0 && co == KeyEvent.VK_F) e.consume();
-      }
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        final char ch = e.getKeyChar();
-        if(ch != KeyEvent.VK_ENTER && Character.isDefined(ch))
-          area.find(search.getText(), false);
-      }
-    });
-
-    BaseXLayout.setWidth(search, 120);
-    BaseXLayout.setHeight(search, (int) export.getPreferredSize().getHeight());
-
-    final BaseXBack back = new BaseXBack();
-    back.setMode(Fill.NONE);
-    back.setLayout(new BorderLayout());
-    back.add(header, BorderLayout.WEST);
-
-    final BaseXBack sp = new BaseXBack();
-    sp.setMode(Fill.NONE);
+    final BaseXBack sp = new BaseXBack(Fill.NONE);
     sp.setLayout(new TableLayout(1, 5));
-    sp.add(search);
+    sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
     sp.add(root);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(export);
-
     back.add(sp, BorderLayout.EAST);
     add(back, BorderLayout.NORTH);
 
+    area = new BaseXText(HELPTEXT, false, gui);
+    area.addSearch(find);
+    add(area, BorderLayout.CENTER);
+    
     refreshLayout();
   }
 
   @Override
   public void refreshInit() {
-    area.setCaret(0);
     refreshText(gui.context.current());
   }
 
@@ -161,6 +130,11 @@ public final class TextView extends View {
     refreshContext(false, true);
   }
 
+  @Override
+  protected boolean visible() {
+    return GUIProp.showtext;
+  }
+
   /**
    * Sets the output text.
    * @param out output cache
@@ -183,13 +157,6 @@ public final class TextView extends View {
   public void setText(final byte[] txt) {
     area.setSyntax(BaseXSyntax.SIMPLE);
     area.setText(txt, txt.length);
-  }
-
-  /**
-   * Activates the search field.
-   */
-  public void find() {
-    search.requestFocusInWindow();
   }
 
   /**

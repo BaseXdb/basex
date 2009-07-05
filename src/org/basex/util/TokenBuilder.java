@@ -57,9 +57,49 @@ public final class TokenBuilder {
   }
 
   /**
+   * Adds a highlight flag.
+   * This flag is evaluated by the text renderer in the frontend.
+   * @return self reference
+   */
+  public TokenBuilder high() {
+    add((byte) 0x02);
+    return this;
+  }
+
+  /**
+   * Adds a norm flag.
+   * This flag is evaluated by the text renderer in the frontend.
+   * @return self reference
+   */
+  public TokenBuilder norm() {
+    add((byte) 0x03);
+    return this;
+  }
+
+  /**
+   * Adds a new line.
+   * This flag is evaluated by the text renderer in the frontend.
+   * @return self reference
+   */
+  public TokenBuilder nl() {
+    add((byte) 0x0a);
+    return this;
+  }
+
+  /**
+   * Adds a half new line.
+   * This flag is evaluated by the text renderer in the frontend.
+   * @return self reference
+   */
+  public TokenBuilder hl() {
+    add((byte) 0x0b);
+    return this;
+  }
+
+  /**
    * Adds a single character to the token.
    * @param ch the character to be added
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final char ch) {
     addUTF(ch);
@@ -69,7 +109,7 @@ public final class TokenBuilder {
   /**
    * Adds a single character to the token.
    * @param b the character to be added
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final byte b) {
     if(size == chars.length) chars = Array.extend(chars);
@@ -102,7 +142,7 @@ public final class TokenBuilder {
   /**
    * Adds an integer to the token.
    * @param i the integer to be added
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final int i) {
     add(token(i));
@@ -112,7 +152,7 @@ public final class TokenBuilder {
   /**
    * Adds a byte array to the token.
    * @param b the character array to be added
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final byte[] b) {
     add(b, 0, b.length);
@@ -139,7 +179,7 @@ public final class TokenBuilder {
   /**
    * Adds a string to the token.
    * @param s the string to be added
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final String s) {
     add(token(s));
@@ -152,7 +192,7 @@ public final class TokenBuilder {
    * If a digit is found after %, it is interpreted as insertion position.
    * @param str query information
    * @param ext text text extensions
-   * @return instance
+   * @return self reference
    */
   public TokenBuilder add(final Object str, final Object... ext) {
     final byte[] t = str == null ? NULL : str instanceof byte[] ?

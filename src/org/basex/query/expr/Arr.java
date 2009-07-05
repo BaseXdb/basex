@@ -64,7 +64,7 @@ public abstract class Arr extends Expr {
    * @return result of check
    */
   final boolean standard(final boolean num) {
-    return expr.length == 2  && expr[0] instanceof AxisPath && expr[1].i() &&
+    return expr.length == 2 && expr[0] instanceof AxisPath && expr[1].i() &&
       (num ? ((Item) expr[1]).n() : expr[1] instanceof Str);
   }
 

@@ -58,7 +58,7 @@ public final class Token {
   public static final byte[] GT = token(">");
   /** LessThan Entity. */
   public static final byte[] LT = token("<");
-
+  
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
   /** UTF8 encoding string (variant). */
@@ -557,7 +557,7 @@ public final class Token {
    * @param tok token to be compared
    * @param tok2 second token to be compared
    * @return 0 if tokens are equal, negative if first token is smaller,
-   * positive if first token is bigger
+   *   positive if first token is bigger
    */
   public static int diff(final byte[] tok, final byte[] tok2) {
     final int l = Math.min(tok.length, tok2.length);
@@ -569,35 +569,13 @@ public final class Token {
 
   /**
    * Calculates the difference of two characters.
-   * @param tok token to be compared
-   * @param tok2 second token to be compared
-   * @return 0 if tokens are equal, negative if first token is smaller,
-   * positive if first token is bigger
+   * @param c1 first character to be compared
+   * @param c2 second character to be compared
+   * @return 0 if characters are equal, negative if first token is smaller,
+   *   positive if first character is bigger
    */
-  public static int diff(final int tok, final int tok2) {
-    return (tok & 0xFF) - (tok2 & 0xFF);
-  }
-
-  /**
-   * Checks if the first token contains the second token in lowercase.
-   * @param tok first token
-   * @param sub second token
-   * @return result of test
-   */
-  public static boolean containslc(final byte[] tok, final byte[] sub) {
-    final int sl = sub.length;
-    final int tl = tok.length;
-    // matching token is bigger than query token..
-    if(sl > tl) return false;
-    if(sl == 0) return true;
-
-    // compare tokens character wise
-    for(int t = 0; t <= tl - sl; t++) {
-      int s = -1;
-      while(++s != sl && lc(sub[s]) == lc(tok[t + s]));
-      if(s == sl) return true;
-    }
-    return false;
+  public static int diff(final byte c1, final byte c2) {
+    return (c1 & 0xFF) - (c2 & 0xFF);
   }
 
   /**
@@ -711,10 +689,10 @@ public final class Token {
   }
 
   /**
-   * Returns a subtoken of the specified token.
+   * Returns a substring of the specified token.
    * @param tok token
    * @param s start position
-   * @return subtoken
+   * @return substring
    */
   public static byte[] substring(final byte[] tok, final int s) {
     return substring(tok, s, tok.length);
@@ -857,8 +835,7 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified character is a letter.
-   * This method does not support unicode characters.
+   * Checks if the specified character is a computer letter (A - Z, a - z, _).
    * @param c the letter to be checked
    * @return result of comparison
    */
@@ -867,7 +844,7 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified character is a digit.
+   * Checks if the specified character is a digit (0 - 9).
    * @param c the letter to be checked
    * @return result of comparison
    */
@@ -876,14 +853,38 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified character is a letter or digit.
-   * This method does not support unicode characters.
+   * Checks if the specified character is a computer letter or digit.
    * @param c the letter to be checked
    * @return result of comparison
    */
   public static boolean letterOrDigit(final int c) {
     return letter(c) || digit(c);
   }
+
+  /**
+   * Returns true if the specified character is full-text letter or digit.
+   * @param ch character to be tested
+   * @return result of check
+   */
+  public static boolean ftChar(final int ch) {
+    if(ch < '0') return false;
+    if(ch < 128) return LOD[ch - '0'];
+    return Character.isLetterOrDigit(ch);
+  }
+
+  /** Letter-or-digit table for ASCII codes larger than '0'. */
+  private static final boolean[] LOD = {
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  false, false, false, false, false, false,
+    false, true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  false, false, false, false, false,
+    false, true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  true,  true,  true,  true,  true,
+    true,  true,  true,  false, false, false, false, false
+  };
 
   /**
    * Converts the specified token to upper case.
@@ -901,13 +902,12 @@ public final class Token {
 
   /**
    * Converts a character to upper case.
-   * This method does not support unicode characters.
-   *
    * @param ch character to be converted
    * @return converted character
    */
   public static int uc(final int ch) {
-    return ch < 'a' || ch > 'z' ? ch : ch - 32;
+    return ch >= 'a' && ch <= 'z' ? ch - 32 : 
+      ch > 0x7F ? Character.toUpperCase(ch) : ch;
   }
 
   /**
@@ -926,13 +926,12 @@ public final class Token {
 
   /**
    * Converts a character to lower case.
-   * This method does not support unicode characters.
-   *
    * @param ch character to be converted
    * @return converted character
    */
   public static int lc(final int ch) {
-    return ch < 'A' || ch > 'Z' ? ch : ch | 0x20;
+    return ch >= 'A' && ch <= 'Z' ? ch | 0x20 :
+      ch > 0x7F ? Character.toUpperCase(ch) : ch;
   }
 
   /**

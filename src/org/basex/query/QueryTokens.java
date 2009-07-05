@@ -134,8 +134,6 @@ public interface QueryTokens {
   String INSENSITIVE = "insensitive";
   /** Parser token. */
   String INSERT = "insert";
-//  /** Parser token. */
-//  String INSERT = "insert";
   /** Parser token. */
   String INSTANCE = "instance";
   /** Parser token. */

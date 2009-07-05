@@ -66,7 +66,7 @@ public final class BaseXDSlider extends BaseXPanel {
   public BaseXDSlider(final GUI main, final double mn, final double mx,
       final byte[] hlp, final ActionListener list) {
 
-    super(main, hlp);
+    super(hlp, main);
     listener = list;
     totMin = mn;
     totMax = mx;

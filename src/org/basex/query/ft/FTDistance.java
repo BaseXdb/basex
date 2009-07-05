@@ -11,6 +11,7 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.Tokenizer;
+import org.basex.util.Tokenizer.FTUnit;
 
 /**
  * FTDistance expression.
@@ -52,11 +53,11 @@ public final class FTDistance extends FTFilter {
     FTStringMatch sm = null;
     FTStringMatch f = null;
     for(final FTStringMatch m : mtc) {
-      if(m.not) {
+      if(m.n) {
         match.add(m);
       } else {
         if(sm != null) {
-          final int d = pos(m.start, ft) - pos(sm.end, ft) - 1;
+          final int d = pos(m.s, ft) - pos(sm.e, ft) - 1;
           if(d < min || d > max) return false;
         } else {
           f = m;
@@ -64,7 +65,7 @@ public final class FTDistance extends FTFilter {
         sm = m;
       }
     }
-    f.end = sm.end;
+    f.e = sm.e;
     mtc.reset();
     mtc.add(f);
     mtc.add(match);

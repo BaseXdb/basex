@@ -22,6 +22,15 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 final class FNStr extends Fun {
+  /** Normalization types. */
+  private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" };
+  /** Hex codes. */
+  private static final byte[] HEX = token("0123456789ABCDEF");
+  /** Reserved characters. */
+  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
+  /** Reserved characters. */
+  private static final byte[] RES = token("-._~");
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
@@ -107,17 +116,29 @@ final class FNStr extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
+    final Expr e = expr[0];
+
+    // optimize frequently used functions
     switch(func) {
-      case CONTAINS:
-        final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
-        // query string is empty; return true
-        if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
-        // input string is empty; return false
-        if(expr[0].e() && i != null && i.length != 0) return Bln.FALSE;
-        return this;
+      case UPPER:
+        return e.i() ? Str.get(uc(checkStr(e, ctx))) : this;
+      case LOWER:
+        return e.i() ? Str.get(lc(checkStr(e, ctx))) : this;
       case CONCAT:
         for(final Expr a : expr) if(!a.i()) return this;
         return concat(ctx);
+      case CONTAINS:
+        if(expr.length == 2) {
+          final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
+          // empty query string: return true
+          if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
+          // empty input string: return false
+          if(e.e() && i != null && i.length != 0) return Bln.FALSE;
+          // evaluate items
+          if(e.i() && expr[1].i()) return Bln.get(contains(
+              checkStr(e, ctx), checkStr((Item) expr[1])));
+        }
+        return this;
       default:
         return this;
     }
@@ -263,24 +284,6 @@ final class FNStr extends Fun {
     return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
   }
 
-  /** Normalization types. */
-  private enum Norm {
-    /** C Normalization.      */ C("NFC"),
-    /** D Normalization.      */ D("NFD"),
-    /** KC Normalization.     */ KC("NFKC"),
-    /** KD Normalization.     */ KD("NFKD"),
-    /** Simple Normalization. */ S("");
-    /** Name of Normalization.*/ byte[] name;
-
-    /**
-     * Constructor.
-     * @param n name
-     */
-    Norm(final String n) {
-      name = token(n);
-    }
-  }
-
   /**
    * Returns normalized unicode.
    * @param ctx query context
@@ -289,15 +292,15 @@ final class FNStr extends Fun {
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
-    Norm norm = null;
+    String norm = null;
     if(expr.length == 2) {
       final Item is = expr[1].atomic(ctx);
       if(is == null) Err.empty(this);
-      final byte[] n = uc(trim(checkStr(is)));
-      for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
+      final String n = string(uc(trim(checkStr(is))));
+      for(final String nrm : NORMS) if(nrm.equals(n)) norm = nrm;
       if(norm == null) Err.or(NORMUNI, n);
     } else {
-      //norm = Norm.C;
+      norm = NORMS[0];
     }
     // [CG] XQuery/normalize-unicode
     return Str.get(str);
@@ -309,9 +312,7 @@ final class FNStr extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item concat(final QueryContext ctx)
-      throws QueryException {
-
+  private Item concat(final QueryContext ctx) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.atomic(ctx);
@@ -319,12 +320,6 @@ final class FNStr extends Fun {
     }
     return Str.get(tb.finish());
   }
-
-  /** Reserved characters. */
-  //private static final byte[] RES = token("!#'*()-._~");
-  private static final byte[] RES = token("-._~");
-  /** Reserved characters. */
-  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
 
   /**
    * Returns a URI encoded token.
@@ -337,8 +332,7 @@ final class FNStr extends Fun {
     final TokenBuilder tb = new TokenBuilder();
     for(int t = 0; t < tl; t++) {
       final byte b = tok[t];
-      if(letterOrDigit(b) || !iri && contains(RES, b) ||
-          iri && contains(IRIRES, b)) tb.add(b);
+      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.add(b);
       else hex(tb, b);
     }
     return tb.finish();
@@ -349,7 +343,7 @@ final class FNStr extends Fun {
    * @param tok token
    * @return escaped token
    */
-  public static byte[] esc(final byte[] tok) {
+  private static byte[] esc(final byte[] tok) {
     final int tl = tok.length;
     final TokenBuilder tb = new TokenBuilder();
     for(int t = 0; t < tl; t++) {
@@ -359,9 +353,6 @@ final class FNStr extends Fun {
     }
     return tb.finish();
   }
-
-  /** Hex codes. */
-  private static final byte[] HEX = token("0123456789ABCDEF");
 
   /**
    * Adds the specified byte in hex code.

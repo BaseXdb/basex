@@ -99,11 +99,11 @@ public final class FTMatches implements Iterable<FTMatch> {
   public boolean phrase(final FTMatches all) {
     int a = 0, b = 0, c = 0;
     while(a < size && b < all.size) {
-      final int e = all.match[b].match[0].start;
-      final int d = e - match[a].match[0].end - 1;
+      final int e = all.match[b].match[0].s;
+      final int d = e - match[a].match[0].e - 1;
       if(d == 0) {
         match[c] = match[a];
-        match[c++].match[0].end = e;
+        match[c++].match[0].e = e;
       }
       if(d >= 0) a++;
       if(d <= 0) b++;

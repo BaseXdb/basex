@@ -15,7 +15,7 @@ import org.basex.util.Array;
  */
 public class FTMatch implements Iterable<FTStringMatch> {
   /** String matches. */
-  FTStringMatch[] match = {};
+  public FTStringMatch[] match = {};
   /** Number of entries. */
   public int size;
 
@@ -66,7 +66,7 @@ public class FTMatch implements Iterable<FTStringMatch> {
    * @return result of check
    */
   boolean match() {
-    for(final FTStringMatch s : this) if(s.not) return false;
+    for(final FTStringMatch s : this) if(s.n) return false;
     return true;
   }
 

@@ -14,8 +14,26 @@ import org.basex.query.ft.StemDir;
  * @author Christian Gruen
  */
 public class Tokenizer implements IndexToken {
+  /** Units. */
+  public enum FTUnit {
+    /** Word unit. */      WORD,
+    /** Sentence unit. */  SENTENCE,
+    /** Paragraph unit. */ PARAGRAPH;
+
+    /**
+     * Returns a string representation.
+     * @return string representation
+     */
+    @Override
+    public String toString() { return name().toLowerCase(); }
+  }
+
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
+  /** Cached sentence positions. */
+  private final IntList sen = new IntList(); 
+  /** Cached paragraph positions. */
+  private final IntList par = new IntList();
 
   /** Stemming dictionary. */
   public StemDir sd;
@@ -41,7 +59,7 @@ public class Tokenizer implements IndexToken {
   /** Current paragraph. */
   public int para;
   /** Current token. */
-  public int pos = -1;
+  public int pos;
 
   /** Text. */
   public byte[] text;
@@ -53,7 +71,7 @@ public class Tokenizer implements IndexToken {
   /** Character start position. */
   private int s;
   /** Number of tokens. */
-  private int count = -1;
+  private int count;
 
   /**
    * Empty constructor.
@@ -67,7 +85,7 @@ public class Tokenizer implements IndexToken {
    * @param txt text
    */
   public Tokenizer(final byte[] txt) {
-    text = txt;
+    init(txt);
   }
 
   public Type type() {
@@ -96,8 +114,12 @@ public class Tokenizer implements IndexToken {
    * @param txt text
    */
   public void init(final byte[] txt) {
-    if(text != txt) count = -1;
-    text = txt;
+    if(text != txt) {
+      count = -1;
+      text = txt;
+      sen.reset();
+      par.reset();
+    }
     init();
   }
 
@@ -174,31 +196,6 @@ public class Tokenizer implements IndexToken {
     return true;
   }
 
-  /**
-   * Returns true if the specified character is part of a token.
-   * @param ch character to be tested
-   * @return result of check
-   */
-  public boolean ftChar(final int ch) {
-    if(ch < '0') return false;
-    if(ch < 128) return LOD[ch - '0'];
-    return Character.isLetterOrDigit(ch);
-  }
-
-  /** Letter-or-digit table for ASCII codes larger than '0'. */
-  private static final boolean[] LOD = {
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  false, false, false, false, false, false,
-    false, true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  false, false, false, false, false,
-    false, true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  false, false, false, false, false
-  };
-
   public byte[] get() {
     return get(orig());
   }
@@ -237,6 +234,28 @@ public class Tokenizer implements IndexToken {
       count = pos;
     }
     return count;
+  }
+
+  /**
+   * Calculates a position value, dependent on the specified unit.
+   * Once calculated values are cached.
+   * @param w word position
+   * @param u unit
+   * @return new position
+   */
+  public final int pos(final int w, final FTUnit u) {
+    if(u == FTUnit.WORD) return w;
+
+    // if necessary, calculate sentences and paragraphs
+    final IntList il = u == FTUnit.SENTENCE ? sen : par;
+    if(sen.size == 0) {
+      init();
+      while(more()) {
+        sen.add(sent);
+        par.add(para);
+      }
+    }
+    return il.list[w];
   }
 
   /**

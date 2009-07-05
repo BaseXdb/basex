@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -14,7 +13,6 @@ import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -53,9 +51,9 @@ public final class DialogOpen extends Dialog {
     final StringList db = List.list();
     if(db.size == 0) return;
 
-    choice = new BaseXListChooser(this, db.finish(), HELPOPEN);
+    choice = new BaseXListChooser(db.finish(), HELPOPEN, this);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(130, 356);
+    choice.setSize(130, 420);
 
     final BaseXBack info = new BaseXBack();
     info.setLayout(new BorderLayout());
@@ -63,15 +61,15 @@ public final class DialogOpen extends Dialog {
         new EmptyBorder(10, 10, 10, 10)));
 
     doc = new BaseXLabel(DIALOGINFO);
-    doc.setFont(new Font(GUIProp.font, 0, 18));
+    doc.setFont(getFont().deriveFont(18f));
     doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXText(gui, HELPOPENINFO, false, this);
+    detail = new BaseXText(HELPOPENINFO, false, this);
+    detail.setFont(getFont());
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
-    detail.setFocusable(false);
 
-    BaseXLayout.setWidth(detail, 480);
+    BaseXLayout.setWidth(detail, 420);
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack();
@@ -144,7 +142,7 @@ public final class DialogOpen extends Dialog {
           in = new DataInput(db, DATAINFO);
           final MetaData meta = new MetaData(db);
           meta.read(in);
-          detail.setText(InfoDB.db(meta, false, true));
+          detail.setText(InfoDB.db(meta, true, true).finish());
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;

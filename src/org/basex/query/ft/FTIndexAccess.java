@@ -51,8 +51,6 @@ public final class FTIndexAccess extends Simple {
         final FTItem it = ir.next();
         ctx.fttoken = tmp;
 
-        //if(it != null) System.out.println(it.all);
-
         // add entry to visualization
         if(ctx.ftpos != null && it != null) ctx.ftpos.add(it.pre, it.all);
         return it;
