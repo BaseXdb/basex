@@ -7,7 +7,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Properties;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
@@ -19,7 +18,6 @@ import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQResultItem;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
-
 import org.basex.test.xqj.TestContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;

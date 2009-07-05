@@ -3,7 +3,6 @@ package org.basex.test.xqj.testcases;
 
 import java.io.FileInputStream;
 import java.util.Properties;
-
 import junit.framework.TestCase;
 import javax.xml.xquery.*;
 
