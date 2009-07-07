@@ -101,6 +101,8 @@ public final class MapView extends View implements Runnable {
   private boolean constMag = false;
   /** Draw ThumbMap. */
   private boolean thumbMap = false;
+  /** Mapdistortion. */
+  private boolean mapdist = false;
   /** scaling. */
   private static int fkt = 4;
   /** Y pos tiny Map. */
@@ -158,6 +160,10 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshFocus() {
     if(mainRects == null || gui.updating) return;
+    if(mapdist) {
+      focused = null;
+      return;
+    }
     if(gui.focused == -1 && focused != null) focused = null;
 
     final MapRect m = focused;
@@ -175,11 +181,8 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshMark() {
     if(getWidth() == 0 || mainMap == null) return;
-//    if(GUIProp.mapinteraction == 2) {
-//      painter.init(mainRects);
-//      drawMap(hugeMap, mainRects.copy());
-//    }
-    drawMap(mainMap, mainRects, 1f);
+
+    if(!mapdist) drawMap(mainMap, mainRects, 1f);
     repaint();
   }
 
@@ -252,66 +255,6 @@ public final class MapView extends View implements Runnable {
 
     repaint();
   }
-
-//  /**
-//   * Scales all the rectangles in the input list to fit into the destination
-//   * rectangle.
-//   *
-//   * @param rects source rectangles
-//   * @param start starting point of the list
-//   * @param end end point
-//   * @param destRect destination size
-//   * @param sourceRect source possitions of the Parent rectangle
-//   * @return list of Rectangles
-//   */
-//  private MapRects scaleRects(final MapRects rects, final int start,
-//      final int end, final MapRect destRect, final MapRect sourceRect) {
-//
-//    Data data = gui.context.current().data;
-//
-//    // rectangle offsets to display border or header (bx)
-//    final int bx = layout.layout.x;
-//    final int by = layout.layout.y;
-//    final int bw = layout.layout.w;
-//    final int bh = layout.layout.h;
-//
-//    // storing result in res
-//    MapRects res = new MapRects();
-//    res.add(destRect);
-//    if(!destRect.isLeaf) {
-//      final int xx = destRect.x + bx;
-//      final int yy = destRect.y + by;
-//
-//      final float nhs = (float) (destRect.w - bw) /
-//  (float) (sourceRect.w - bw);
-//      final float nvs = (float) (destRect.h - bh) /
-//  (float) (sourceRect.h - bh);
-//
-//      int s = start + 1;
-//      int i = start + 1;
-//
-//      while (i < end) {
-//        MapRect r = rects.get(i);
-//        int size = data.size(r.pre, data.kind(r.pre));
-//        int maxpre = i + size;
-//        while (i < rects.size && rects.get(i).pre < maxpre) i++;
-//        MapRect t = new MapRect(
-//            (int) (nhs * (r.x - (sourceRect.x + bx)) + xx),
-//            (int) (nvs * (r.y - (sourceRect.y + by)) + yy),
-//            (int) (nhs * r.w), (int) (nvs * r.h),
-//            r.pre, r.level);
-//        t.isLeaf = r.isLeaf;
-//
-//        // add results of recursion
-//        res.add(scaleRects(rects, s, i, t, r));
-//
-//        // prepare next while loop
-//        i++;
-//        s = i;
-//      }
-//    }
-//    return res;
-//  }
 
   @Override
   public void refreshUpdate() {
@@ -505,7 +448,7 @@ public final class MapView extends View implements Runnable {
       if(focused == null || !focused.thumb) return;
     }
 
-    if(GUIProp.mapoffsets == 0) {
+    if(GUIProp.mapoffsets == 0 && !mapdist && !constMag) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size;
       int par = ViewData.parent(data, focused.pre);
@@ -527,7 +470,7 @@ public final class MapView extends View implements Runnable {
       g.setColor(colormark3);
       g.drawRect(selBox.x, selBox.y, selBox.w, selBox.h);
       g.drawRect(selBox.x - 1, selBox.y - 1, selBox.w + 2, selBox.h + 2);
-    } else {
+    } else if(!mapdist && !constMag) {
       // paint focused rectangle
       final int x = focused.x;
       final int y = focused.y;
@@ -740,6 +683,21 @@ public final class MapView extends View implements Runnable {
     BaseXLayout.antiAlias(g);
     if(rects != null) painter.drawRectangles(g, rects, scale);
   }
+  
+  /**
+   * Transforms coordinates into distorted coordinates.
+   * 
+   * @param v coordinate
+   * @param m mouse possition
+   * @param s width/height
+   * @return new coordinate
+   */
+  private double transferFunction(final double v, final double m, 
+      final double s) {
+//    double l = 0.5;
+//    return (s + s * Math.tanh(0.02 * (v - m))) / 2 * l + v * (1.0 - l);
+    return (s * Math.tanh(0.008 * (v - m))) + m;
+  }
 
   @Override
   public void mouseMoved(final MouseEvent e) {
@@ -749,19 +707,25 @@ public final class MapView extends View implements Runnable {
     // refresh mouse focus
     mouseX = e.getX();
     mouseY = e.getY();
-    if(GUIProp.mapinteraction && GUIProp.mapdist && e.isControlDown()) {
+    if(GUIProp.mapinteraction && e.isControlDown() && mapdist) {
+      mapdist = true;
       Graphics g = mainMap.getGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, getWidth(), getHeight());
 
       MapRects distRects = new MapRects();
       for(MapRect r : mainRects) {
-        int x = (int) (r.x + 100 * Math.tanh(0.2 * (r.x - mouseX)));
-        int w = (int) (r.x + r.w + 100 * Math.tanh(
-            0.2 * (r.x + r.w - mouseX)) - x);
-        int y = (int) (r.y + 100 * Math.tanh(0.2 * (r.y - mouseY)));
-        int h = (int) (r.y + r.h + 100 * Math.tanh(
-            0.2 * (r.y + r.h - mouseY)) - y);
+//        int x = (int) (getWidth() + (getWidth() * 
+//            Math.tanh(0.01 * (r.x - mouseX))) / 2);
+//        int w = (int) (getWidth() * 
+//            Math.tanh(0.01 * (r.x + r.w - mouseX)) - x);
+//        int y = (int) (getHeight() * Math.tanh(0.01 * (r.y - mouseY)));
+//        int h = (int) (getHeight() * Math.tanh(
+//            0.01 * (r.y + r.h - mouseY)) - y);*/
+        int x = (int) transferFunction(r.x, mouseX, getWidth());
+        int y = (int) transferFunction(r.y, mouseY, getHeight());
+        int w = (int) transferFunction(r.x + r.w, mouseX, getWidth()) - x;
+        int h = (int) transferFunction(r.y + r.h, mouseY, getHeight()) - y;
         distRects.add(new MapRect(x, y, w, h, r.pre, r.level));
       }
       mainMap.flush();
@@ -774,12 +738,16 @@ public final class MapView extends View implements Runnable {
         thumbMap = false;
       }
       repaint();
+    } else if(GUIProp.mapinteraction && e.isControlDown() && GUIProp.mapdist) {
+        mapdist = true;
+        repaint();
     } else if(GUIProp.mapinteraction && e.isControlDown()) {
         constMag = true;
         repaint();
-    } else if(GUIProp.mapinteraction && !e.isControlDown() && constMag) {
+    } else if(GUIProp.mapinteraction && !e.isControlDown()) {
         constMag = false;
-        repaint();
+        mapdist = false;
+        refreshMark();
     }
   }
 
@@ -791,7 +759,7 @@ public final class MapView extends View implements Runnable {
     if(SwingUtilities.isLeftMouseButton(e) && focused != null) painter.mouse(
         focused, mouseX, mouseY, true);
 
-    if(GUIProp.mapinteraction) {
+    if(GUIProp.mapinteraction && !mapdist) {
       thumbMap = true;
       final Data data = gui.context.data();
       int screensize = getWidth() * getHeight();
@@ -830,6 +798,8 @@ public final class MapView extends View implements Runnable {
       painter.init(tinyLayout.rectangles.copy());
       drawMap(tinyMap, tinyLayout.rectangles, 1f);
       repaint();
+    } else if(mapdist) {
+      mouseMoved(e);
     }
   }
 

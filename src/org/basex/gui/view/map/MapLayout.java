@@ -76,16 +76,16 @@ final class MapLayout {
    */
   static double aar(final MapRects r) {
     double aar = 0;
-    int nrLeaves = 0;
+    int nrLeaves = 1;
     for(int i = 0; i < r.size; i++) {
       final MapRect curr = r.get(i);
-      // Shneiderman would use this: children(data, curr.pre).size == 0 &&
+      // only leaves: children(data, curr.pre).size == 0 && curr.isLeaf
       if (curr.w != 0 && curr.h != 0) {
         nrLeaves++;
         if (curr.w > curr.h) {
-          aar += curr.w / curr.h;
+          aar += (double) curr.w / (double) curr.h;
         } else {
-          aar += curr.h / curr.w;
+          aar += (double) curr.h / (double) curr.w;
         }
       }
     }
@@ -157,17 +157,19 @@ final class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if((w < off && h < off) || w < 1 || h < 1 || GUIProp.mapfs &&
+    if((w < off && h < off) || w <= 2 || h <= 2 || GUIProp.mapfs && 
         ViewData.isLeaf(data, r.pre)) {
       r.isLeaf = true;
       rectangles.add(r);
       return;
     }
 
-    r.isLeaf = false;
     rectangles.add(r);
     final MapList ch = children(r.pre);
-    if(ch.size != 0) makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
+    if(ch.size != 0) {
+      r.isLeaf = false;
+      makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
         ch, 0, ch.size - 1, level + 1);
+    }
   }
 }

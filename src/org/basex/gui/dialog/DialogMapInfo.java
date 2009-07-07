@@ -92,6 +92,8 @@ public final class DialogMapInfo extends Dialog {
     set(p, BorderLayout.NORTH);
     setResizable(true);
     finish(null);
+    nameo = "";
+    timeo = "";
   }
 
   /**

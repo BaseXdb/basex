@@ -47,9 +47,16 @@ class MapList extends IntList {
 
     // only children
     if(GUIProp.mapweight == 0) {
+      // [JH] neeeded if not all nodes of a level are to be drawn. 
+      // e.g multiple roots
       for(int i = 0; i < size; i++) {
         weight[i] = (double) ViewData.size(data, list[i]) / nchildren;
       }
+//      for(int i = 0; i < size - 1; i++) {
+//        weight[i] = (double) (list[i + 1] - list[i]) / (double) nchildren;
+//      }
+//      weight[size - 1] =  (double) ViewData.size(data, list[size - 1]) / 
+//          nchildren;
       return;
     }
 
