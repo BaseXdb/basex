@@ -1,8 +1,9 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
-import org.basex.BaseX;
+
 import org.basex.util.Token;
 
 /**
@@ -11,36 +12,8 @@ import org.basex.util.Token;
  */
 public final class ParserUtil {
 
-  /** If true, verbose debug messages are created. */
-  private static final boolean VERBOSE = true;
-
   /** Hidden constructor. */
   private ParserUtil() { /* */}
-
-  /**
-   * Returns an empty array and creates a debug message if <code>VERBOSE</code>
-   * is true.
-   * @param ms the original byte array that should be converted.
-   * @return an empty byte array.
-   */
-  private static byte[] error(final byte[] ms) {
-    if(VERBOSE) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("{");
-      boolean first = true;
-      for(byte b : ms) {
-        if(first) {
-          first = false;
-          sb.append(b);
-        } else {
-          sb.append("," + b);
-        }
-      }
-      sb.append("}");
-      BaseX.debug("Invalid duration (%, %)", ms, sb);
-    }
-    return Token.EMPTY;
-  }
 
   /**
    * Tries to convert the given byte array to a valid xs:duration
@@ -63,8 +36,8 @@ public final class ParserUtil {
       byte b = value[i];
       if(b == 0) continue;
       if(b < '0' || b > '9') {
-        if(b != ':') return error(value);
-        if(secPos != -1) return error(value); // only one colon allowed
+        if(b != ':') return Token.EMPTY;
+        if(secPos != -1) return Token.EMPTY; // only one colon allowed
         secPos = i;
       } else {
         a[pos++] = b;
@@ -151,19 +124,56 @@ public final class ParserUtil {
    * @return the year.
    */
   public static byte[] convertYear(final byte[] year) {
-    // [BL] check encoding
-    if(year.length != 4) return Token.EMPTY;
-    for(int i = 0; i < 4; i++) {
-      if(year[i] < '0' || year[i] > '9') { // not a valid number
-        BaseX.debug("Invalid date value: %", year);
+    int count = 0;
+    byte[] value = { 0, 0, 0, 0, '-', '-'};
+    for(int i = 0, max = year.length; i < max && count < 4; i++) {
+      if(Token.digit(year[i])) value[count++] = year[i];
+      else if(year[i] != 0) { // not a valid number
         return Token.EMPTY;
       }
     }
-    byte[] y = new byte[6];
-    System.arraycopy(year, 0, y, 0, 4);
-    y[4] = '-';
-    y[5] = '-';
-    return y;
+    if(count < 4) {
+      return Token.EMPTY;
+    }
+    return value;
+  }
+
+  /**
+   * Converts the byte array content (that must be of the form
+   * "YYYY:MM:DD hh:mm:ss") to a valid xs:dateTime value.
+   * @param dateTime the dateTime value to convert.
+   * @return the converted byte array.
+   */
+  public static byte[] convertDateTime(final byte[] dateTime) {
+    if(dateTime.length != 20) return Token.EMPTY;
+    int i = 0;
+    for(; i < 4; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    if(dateTime[i] != ':') return Token.EMPTY;
+    dateTime[i++] = '-';
+    for(; i < 7; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    if(dateTime[i] != ':') return Token.EMPTY;
+    dateTime[i++] = '-';
+    for(; i < 10; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    if(dateTime[i] != ' ') return Token.EMPTY;
+    dateTime[i++] = 'T';
+    for(; i < 13; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    if(dateTime[i++] != ':') return Token.EMPTY;
+    for(; i < 16; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    if(dateTime[i++] != ':') return Token.EMPTY;
+    for(; i < 19; i++) {
+      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+    }
+    return dateTime;
   }
 
   /**

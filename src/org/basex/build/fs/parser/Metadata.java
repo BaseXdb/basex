@@ -236,6 +236,8 @@ public final class Metadata {
     TEXT_WRITER("text writer"),
 
     // element "date"
+    /** Create time. */
+    CREATE_TIME("create time"),
     /** Recording time. */
     RECORDING_TIME("recording time"),
     /** Release time. */

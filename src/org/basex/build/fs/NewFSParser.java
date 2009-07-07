@@ -67,7 +67,7 @@ public final class NewFSParser extends Parser {
 
   static {
     try {
-       Class<?>[] classes = Loader.load(AbstractParser.class.getPackage(),
+      Class<?>[] classes = Loader.load(AbstractParser.class.getPackage(),
           Pattern.compile("^\\w{1,5}Parser$"));
       for(Class<?> c : classes) {
         String name = c.getSimpleName();
@@ -82,6 +82,8 @@ public final class NewFSParser extends Parser {
 
   // [BL] clean up class ...
 
+  /** If true, verbose debug messages are created (e.g. for corrupt files). */
+  public static final boolean VERBOSE = true;
   /** If true, the <code>type=""</code> attributes are added to the XML doc. */
   private static final boolean ADD_TYPE_ATTR = true;
 
@@ -175,7 +177,8 @@ public final class NewFSParser extends Parser {
       if(clazz == null) return null;
       try {
         instance = clazz.newInstance();
-        BaseX.debug("Successfully instanciated " + clazz.getSimpleName());
+        BaseX.debug("Successfully initialized parser for ." + suffix
+            + " files.");
       } catch(InstantiationException e) {
         BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
             e.getMessage());
@@ -341,6 +344,9 @@ public final class NewFSParser extends Parser {
           BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
           try {
             parse0(parser, bfc);
+          } catch(IOException e) {
+            BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
+                bfc.getFileName());
           } finally {
             try {
               bfc.close();
@@ -379,8 +385,11 @@ public final class NewFSParser extends Parser {
       atts.add(DataText.SIZE, Token.token(bfc.size()));
       atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
       builder.startElem(DataText.FILE, atts);
-      parse0(parser, bfc);
-      builder.endElem(DataText.FILE);
+      try {
+        parse0(parser, bfc);
+      } finally {
+        builder.endElem(DataText.FILE);
+      }
     }
   }
 

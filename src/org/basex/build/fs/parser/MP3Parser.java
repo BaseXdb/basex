@@ -13,12 +13,11 @@ import org.basex.util.Token;
 
 /**
  * Parser for MP3 audio files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
- *
- *
+ * 
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>
  * @see <a href="http://www.id3.org/id3v2.4.0-frames">ID3v2.4.0 frames</a>
  */
@@ -340,9 +339,10 @@ public class MP3Parser extends AbstractParser {
     bfc.get(array, 0, 30);
     if(!Token.ws(array)) fsparser.metaEvent(Element.ALBUM, DataType.STRING,
         Definition.NONE, null, array);
-    bfc.get(array, 0, 4);
+    byte[] a2 = new byte[4];
+    bfc.get(a2, 0, 4);
     if(!Token.ws(array)) fsparser.metaEvent(Element.DATE, DataType.YEAR,
-        Definition.RELEASE_TIME, null, ParserUtil.convertYear(array));
+        Definition.RELEASE_TIME, null, ParserUtil.convertYear(a2));
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
@@ -691,8 +691,8 @@ public class MP3Parser extends AbstractParser {
       void parse(final MP3Parser obj, final int s) throws IOException {
         long position = obj.bfc.position();
         String suffix = obj.readPicSuffix();
-        obj.skipPicDescription();
         String name = obj.getPicName();
+        obj.skipPicDescription();
         if(suffix == null) {
           // perhaps, MIME type is missing...
           if(obj.fsparser.isParseable(obj.bfc, "png")) suffix = "png";
@@ -710,7 +710,9 @@ public class MP3Parser extends AbstractParser {
           obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
               suffix);
         } catch(IOException e) {
-          BaseX.debug("Failed to parse APIC frame (%).", e.getMessage());
+          if(NewFSParser.VERBOSE) BaseX.debug(
+              "MP3Parser: Failed to parse APIC frame (%).",
+              e.getMessage() == null ? obj.bfc.getFileName() : e.getMessage());
         }
       }
     };

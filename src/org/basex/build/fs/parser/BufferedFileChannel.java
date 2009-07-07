@@ -148,7 +148,6 @@ public class BufferedFileChannel {
       } else {
         assert n < Integer.MAX_VALUE;
         buf.position(buf.position() + (int) n);
-        rem -= n;
       }
     } else { // n < 0
       if(n < -position()) throw new IllegalArgumentException(
@@ -256,7 +255,7 @@ public class BufferedFileChannel {
     } else { // buf is too small
       int buffered = buf.remaining();
       bytesToRead -= buffered;
-      if(rem < bytesToRead) throw new EOFException();
+      if(rem < bytesToRead) throw new EOFException(f.getAbsolutePath());
       buf.get(dst, 0, buffered); // copy buffered bytes
       buf.clear(); // clear buffer
       // read remaining bytes directly into target buffer and fill the buffer
@@ -272,8 +271,8 @@ public class BufferedFileChannel {
    * Reads <code>length</code> bytes from the {@link BufferedFileChannel}.
    * </p>
    * <p>
-   * <b> Make shure that that the buffer is large enough and that enough bytes
-   * are buffered (via {@link #buffer(int)}). Otherwise, a
+   * <b> Assure that that the buffer is large enough and that enough bytes are
+   * buffered (via {@link #buffer(int)}). Otherwise, a
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @param dst the arrray to write the data to.
@@ -290,7 +289,7 @@ public class BufferedFileChannel {
    * position, and then increments the position.
    * </p>
    * <p>
-   * <b> Make shure that enough at least one byte is buffered via
+   * <b> Assure that enough at least one byte is buffered via
    * {@link #buffer(int) #buffer(1)}. Otherwise, a
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
@@ -306,7 +305,7 @@ public class BufferedFileChannel {
    * position, and then increments the position by two.
    * </p>
    * <p>
-   * <b> Make shure that enough at least two bytes are buffered via
+   * <b> Assure that enough at least two bytes are buffered via
    * {@link #buffer(int) #buffer(2)}. Otherwise, a
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
@@ -322,7 +321,7 @@ public class BufferedFileChannel {
    * position, and then increments the position by four.
    * </p>
    * <p>
-   * <b> Make shure that enough at least four bytes are buffered via
+   * <b> Assure that enough at least four bytes are buffered via
    * {@link #buffer(int) #buffer(4)}. Otherwise, a
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
@@ -381,7 +380,7 @@ public class BufferedFileChannel {
    */
   public boolean buffer(final int n) throws IOException {
     int buffered = buf.remaining();
-    if(rem < n - buffered) throw new EOFException();
+    if(rem < n - buffered) throw new EOFException(f.getAbsolutePath());
     if(buffered < n) {
       if(n > buf.capacity()) return false;
       buf.compact();
