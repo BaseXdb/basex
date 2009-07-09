@@ -4,19 +4,15 @@
 
 		<author>
 			<personname>
-				<surname>BaseX-Team</surname>
+				<firstname>BaseX-Team</firstname>
 			</personname>
-			<affiliation>
-				<address>
-					<email>info@basex.org</email>
-				</address>
-			</affiliation>
 		</author>
 		<pubdate>June 2009</pubdate>
 		<copyright>
 			<year>2009</year>
 			<holder>DBIS, University of Konstanz</holder>
 		</copyright>
+		<legalnotice><para>Email: info@basex.org</para></legalnotice>
 
 	</info>
 	<chapter>
@@ -27,7 +23,7 @@
 		<para>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text
 			processor. It supports very large XML instances and offers a visual, interactive
 			frontend. BaseX is written in Java and freely available for download. It is developed by
-			the Database and Information Systems Group at the University of Konstanz. </para>
+			the Database and Information Systems Group at the University of Konstanz.</para>
 		<section>
 			<info>
 				<title>Prerequisites</title>
@@ -138,7 +134,7 @@
 	doc              Project documentation
 	etc              Various files for project handling
 	src              Project sources
-	.project         <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/"> Eclipse</link> project file
+	.project         <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/">Eclipse</link> project file
 	makefile         Linux Makefile
 	BaseX.jar        Public JAR file
 	license.txt      Licensing Information
@@ -278,6 +274,7 @@
 						<listitem>
 							<para>Create (create [DB|FS|INDEX] [...]): Creates database from XML or
 								filesystem, or creates index</para>
+								<para>Example: create DB factbook.xml factbook</para>
 						</listitem>
 						<listitem>
 							<para>Open (open [database]): Opens the specified [database].</para>
@@ -316,6 +313,7 @@
 						<listitem>
 							<para>XQuery (xquery [query]): Evaluates an XQuery and prints the
 								result. </para>
+								<para>Example: xquery for $i in (1,2,3) return $i</para>
 						</listitem>
 						<listitem>
 							<para>Find (find [query]): Evaluate a simple keyword [query] and print
@@ -346,11 +344,13 @@
 							<para>Delete (delete ["target"]): Delete database nodes resulting from
 								the specified [target] query. The query should be enclosed by
 								brackets.</para>
+								<para>Example: delete //*</para>
 						</listitem>
 						<listitem>
 							<para>Insert (insert [fragment|element|attribute|text|comment|pi]
 								[...]): Insert database nodes. Insert a fragment or a specific node
 								at the specified child [pos] of the specified [target] query.</para>
+								<para>Example: insert element test 0 //*</para>
 						</listitem>
 						<listitem>
 							<para>Update (update [element|attribute|text|comment|pi] [...]): Update
@@ -752,7 +752,101 @@
 				<title>Programming with BaseX API</title>
 			</info>
 
-			<para> Your Text </para>
+			<para>This chapter decribes how to implement own applications using the BaseX API.
+				So you can easily develop and expand BaseX with your own ideas and to your own needs.
+				Here you can find a few instructions to start.</para>
+				
+				<section>
+					<info>
+						<title>Creating a Database</title>
+					</info>
+					<para>To execute these examples you need to create a Main-Class and define the following:</para>
+					<programlisting>// Creates a standard output stream
+ConsoleOutput out = new ConsoleOutput(System.out);
+// Creates a new database context, referencing the database.
+Context context = new Context();
+					</programlisting>
+						<para>After defining the ConsoleOutput and the Context you can start with one of the following examples.
+							The first example shows how to create a database from a xml file.</para>
+				<figure>
+				<title>Creating a Database from a file</title>
+					<graphic fileref="code1.png"/>
+				</figure>
+				<para>The second example shows how to create a database from an input string.</para>
+				<figure>
+				<title>Creating a Database from an input string</title>
+					<graphic fileref="code2.png"/>
+				</figure>
+				<para>The third example shows how to open an existing database after you have created it.</para>
+				<figure>
+				<title>Opens an existing Database</title>
+					<graphic fileref="code3.png"/>
+				</figure>
+				<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
+				<programlisting>// Closes the database
+context.close();
+// Closes the output stream
+out.close();</programlisting>
+				</section>
+				
+				<section>
+					<info>
+						<title>Executing XQuery</title>
+					</info>
+					<para>To execute these examples you need to create a Main-Class and define the following:</para>
+					<programlisting>/** Sample query. */
+private static final String QUERY = "<xml>Test</xml>/text()";
+// Creates a standard output stream
+ConsoleOutput out = new ConsoleOutput(System.out);
+					</programlisting>
+					<para>After defining the ConsoleOutput and the Query you can start with one of the following examples.
+							The first example shows how to execute a query and create a result instances.</para>
+				<figure>
+				<title>Creating a result instance</title>
+					<graphic fileref="code4.png"/>
+				</figure>
+				<para>The second example shows how to iterate through all results.</para>
+				<figure>
+				<title>Iterating through all results</title>
+					<graphic fileref="code5.png"/>
+				</figure>
+				<para>The third example shows how to execute a Query with the BaseX Command.</para>
+				<figure>
+				<title>Using the BaseX command</title>
+					<graphic fileref="code6.png"/>
+				</figure>
+				
+				<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
+				<programlisting>// Closes the database
+context.close();
+// Closes the output stream
+out.close();</programlisting>	
+				</section>
+				
+				<section>
+					<info>
+						<title>Updating a Database</title>
+					</info>
+					<para>After you successfully created a Database you can update and modify the data on the following ways:</para>
+					<para>Insert a document:</para>
+					<programlisting>// Inserts a document into the database;
+// argument can be a file name or XML 
+// Position: 0 (ignored for documents)
+// Target  : insert on root level
+new Insert("fragment", "<doc>second</doc>", "0", "/").execute(context, out);
+					</programlisting>
+					<para>Delete:</para>
+					<programlisting>// Deletes all attributes in the database.
+new Delete("//@*").execute(context, out);
+					</programlisting>
+					<para>Insert a node:</para>
+					<programlisting>// Inserts an element fragment into the database 
+// Position: 1 = as first child
+// Target  : insert after all /doc elements...
+new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
+					</programlisting>
+					<para>You can do it the same way with new Update() and new Copy()</para>
+				</section>
 		</section>
 		<section>
 			<info>
