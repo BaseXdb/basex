@@ -182,6 +182,7 @@ public class Session implements Runnable {
   public void stop(final boolean quit) {
     if (quit) bx.sessions.remove(this);
     try {
+      context.close();
       BaseX.outln("Client " + clientId + " has logged out.");
       socket.close();
     } catch(IOException e) {

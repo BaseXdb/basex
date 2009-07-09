@@ -345,6 +345,7 @@ srv_connect=Impossibile comunicare col Server.
 srv_port=Numero porta non valido
 srv_timeout=Server timeout (% sec.).
 srv_timeerror=Your query reached the timeout.
+srv_timeerror2=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
 srv_start=avviato.\nAttendo richieste...
 srv_stop=fermato.

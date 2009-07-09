@@ -113,6 +113,8 @@ public interface Text {
   String SERVERTIME = lang("srv_timeout");
   /** Error shown in the Client Console when timeout is reached. */
   String TIMEOUTERR = lang("srv_timeerror");
+  /** Error shown in the Client Console when timeout is reached. */
+  String TIMEOUTERR2 = lang("srv_timeerror2");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */
