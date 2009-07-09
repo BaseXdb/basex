@@ -26,7 +26,8 @@ public final class DropDB extends Process {
   protected boolean exec() {
     final String db = args[0];
     final Data data = context.data();
-    if(data == null && Context.POOL.check(db) >= 1) return error(DBINUSE);
+    if((data == null && Context.POOL.check(db) > 0) ||
+        (data != null && Context.POOL.check(db) > 1)) return error(DBINUSE);
     if(data != null && data.meta.dbname.equals(db)) exec(new Close());
 
     return !IO.dbpath(db).exists() ? error(DBNOTFOUND, db) :
