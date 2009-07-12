@@ -78,12 +78,7 @@ public abstract class Process extends AbstractProcess {
       return error(PROCNODB);
     }
     if(data != null && data.isLocked()) {
-      new Thread() {
-        @Override
-        public void run() {
-          while(data.isLocked()) Performance.sleep(50);
-        }
-      }.start();
+      while(data.isLocked()) Performance.sleep(50);
     }
     if(updating()) {
       if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
