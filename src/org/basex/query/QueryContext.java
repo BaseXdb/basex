@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
+
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
@@ -375,13 +376,28 @@ public final class QueryContext extends Progress {
     // check if the database has already been opened
     final String dbname = string(db);
     for(int d = 0; d < docs; d++)
-      if(doc[d].data.meta.dbname.equals(dbname)) return doc[d];
-
+    if(doc[d].data.meta.dbname.equals(dbname)) return doc[d];
+    /*[CG]: Check if a DB with the DBName is in the POOL.
+    Data data = Context.POOL.pin(dbname);
+    if(data != null) {
+      final DBNode node = new DBNode(data, 0);
+      addDoc(node);
+      here unpin?? Context.POOL.unpin(data);
+      return node;
+    }*/
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
     for(int d = 0; d < docs; d++) {
       if(doc[d].data.meta.file.eq(bxw)) return doc[d];
     }
+    /*[CG]: Check if a DB with the filename is in the POOL. 
+    data = Context.POOL.pin(bxw);
+    if(data != null) {
+      final DBNode node = new DBNode(data, 0);
+      addDoc(node);
+      here unpin?? Context.POOL.unpin(data);
+      return node;
+    }*/
 
     // get database instance
     Data data = null;

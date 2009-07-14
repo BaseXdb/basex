@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import org.basex.data.Data;
+import org.basex.io.IO;
 import org.basex.util.Array;
 
 /**
@@ -25,6 +26,21 @@ public class DataPool {
   public Data pin(final String db) {
     for(int i = 0; i < size; i++) {
       if(data[i].meta.dbname.equals(db)) {
+        pins[i]++;
+        return data[i];
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Returns an existing data reference for the specified database, or null.
+   * @param db name of the database
+   * @return data reference
+   */
+  public Data pin(final IO db) {
+    for(int i = 0; i < size; i++) {
+      if(data[i].meta.file.eq(db)) {
         pins[i]++;
         return data[i];
       }
