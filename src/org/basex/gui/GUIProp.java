@@ -158,9 +158,6 @@ public final class GUIProp {
   /** Fullscreen flag. */
   public static boolean fullscreen = false;
 
-  /** Maximum text size to be displayed. */
-  public static int maxtext = 1 << 21;
-
   /** Strip direction horizontal? */
   public static boolean striphor = true;
   /** Flag for computing additional map infos. */

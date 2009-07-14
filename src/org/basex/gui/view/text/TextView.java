@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.gui.GUICommands;
@@ -108,7 +109,7 @@ public final class TextView extends View {
     if(!GUIProp.showtext) return;
 
     try {
-      final CachedOutput out = new CachedOutput(GUIProp.maxtext);
+      final CachedOutput out = new CachedOutput(Prop.maxtext);
       if(nodes != null) {
         nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
       }

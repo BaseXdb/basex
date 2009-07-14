@@ -104,6 +104,8 @@ public final class Prop {
   public static String createfilter = "*.xml";
   /** Number of index occurrences to print in the index info. */
   public static int indexocc = 10;
+  /** Maximum text size to be displayed. */
+  public static int maxtext = 1 << 21;
 
   /** Flag for iterator optimized storage within ftindex. */
   /** Flag for creating a fuzzy index. */

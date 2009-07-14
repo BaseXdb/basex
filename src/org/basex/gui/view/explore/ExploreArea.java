@@ -11,7 +11,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.BaseX;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.StatsKey;
@@ -319,7 +318,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     if(!force && last.equals(qu)) return;
     last = qu;
-    gui.execute(new XQuery(qu));
+    gui.xquery(qu, false);
   }
 
   /**

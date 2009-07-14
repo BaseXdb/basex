@@ -33,6 +33,7 @@ public final class VarCall extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
+    // return if variable expression has not yet been assigned
     if(var.expr == null) return this;
 
     // pre-assign static variables

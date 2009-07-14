@@ -102,7 +102,7 @@ public class Var extends Expr implements Cloneable {
   }
 
   /**
-   * Evaluates the variable.
+   * Evaluates the variable and returns the resulting item.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
@@ -119,7 +119,7 @@ public class Var extends Expr implements Cloneable {
   }
 
   /**
-   * Compares the variables for name equality.
+   * Compares the variables for reference or name equality.
    * @param v variable
    * @return result of check
    */
@@ -128,7 +128,7 @@ public class Var extends Expr implements Cloneable {
   }
 
   /**
-   * Checks if the variable is not shadowed by the variable.
+   * Checks if the variable is not shadowed by the specified variable.
    * @param v variable
    * @return result of check
    */

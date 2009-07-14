@@ -146,7 +146,8 @@ public final class BaseXServer {
           try {
             if(proc instanceof GetResult || proc instanceof GetInfo) {
               final OutputStream os = s.getOutputStream();
-              final PrintOutput out = new PrintOutput(new BufferedOutput(os));
+              final PrintOutput out = new PrintOutput(new BufferedOutput(os),
+                  Prop.web ? Prop.maxtext : Integer.MAX_VALUE);
               final int id = Math.abs(Integer.parseInt(proc.args().trim()));
               final Process c = get(id);
               if(c == null) {

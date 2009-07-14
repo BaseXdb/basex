@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.NSLocal;
 import org.basex.util.Token;
 
 /**
@@ -39,24 +38,21 @@ public final class FunCall extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
-    final NSLocal lc = ctx.ns;
-    ctx.ns = lc.copy();
-    if(func == null) func = ctx.fun.get(id);
+    if(func == null) comp(ctx);
 
+    final int s = ctx.vars.size();
     for(int a = 0; a < expr.length; a++) {
       ctx.vars.add(func.args[a].bind(ctx.iter(expr[a]).finish(), ctx).clone());
     }
     // evaluate function and reset variable scope
     final Iter ir = ctx.iter(func);
     ctx.vars.reset(s);
-    ctx.ns = lc;
     return ir;
   }
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return func != null ? func.returned(ctx) : super.returned(ctx);
+    return func.returned(ctx);
   }
 
   @Override

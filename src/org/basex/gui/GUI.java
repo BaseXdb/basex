@@ -352,18 +352,29 @@ public final class GUI extends JFrame {
       }
     } else {
       if(GUIProp.searchmode == 1 || in.startsWith("/")) {
-        // check and add default namespace
-        final Namespaces ns = context.data().ns;
-        final int def = ns.get(Token.EMPTY, 0);
-        if(def != 0) in = "declare default element namespace \"" +
-          Token.string(ns.key(def)) + "\"; " + in;
+        xquery(in, true);
       } else {
         in = Find.find(in, context, GUIProp.filterrt);
+        execute(new XQuery(in), true);
       }
-      execute(new XQuery(in), true);
     }
   }
-
+  
+  /**
+   * Launches an XQuery. Adds the default namespace, if available.
+   * @param qu query to be run
+   * @param main main window
+   */
+  public void xquery(final String qu, final boolean main) {
+    // check and add default namespace
+    final Namespaces ns = context.data().ns;
+    final int def = ns.get(Token.EMPTY, 0);
+    String in = qu;
+    if(def != 0) in = "declare default element namespace \"" +
+      Token.string(ns.key(def)) + "\"; " + in;
+    execute(new XQuery(in), main);
+  }
+  
   /**
    * Launches the specified process in a thread. The process is ignored
    * if an update operation takes place.
@@ -449,7 +460,7 @@ public final class GUI extends JFrame {
 
         // retrieve text result
         if(GUIProp.showtext) {
-          final CachedOutput out = new CachedOutput(GUIProp.maxtext);
+          final CachedOutput out = new CachedOutput(Prop.maxtext);
           pr.output(out);
           text.setText(out);
         }

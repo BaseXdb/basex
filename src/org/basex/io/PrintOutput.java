@@ -17,6 +17,8 @@ import org.basex.util.Token;
 public class PrintOutput extends OutputStream {
   /** The OutputStream we operate on. */
   protected OutputStream os;
+  /** Maximum numbers of bytes to write. */
+  protected int max = Integer.MAX_VALUE;
   /** Number of bytes written. */
   protected int size;
 
@@ -40,10 +42,19 @@ public class PrintOutput extends OutputStream {
     os = out;
   }
 
+  /**
+   * Constructor, given an output stream.
+   * @param out the OutputStream to operate on
+   * @param m maximum number of bytes to write
+   */
+  public PrintOutput(final OutputStream out, final int m) {
+    os = out;
+    max = m;
+  }
+
   @Override
   public void write(final int b) throws IOException {
-    os.write(b);
-    size++;
+    if(size++ < max) os.write(b);
   }
 
   /**

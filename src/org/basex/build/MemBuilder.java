@@ -39,10 +39,7 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public MemData finish() throws IOException {
-    // check if data ranges exceed database limits
-    if(tags.size() > 0xFFF) throw new IOException(LIMITTAGS);
-    if(atts.size() > 0xFFF) throw new IOException(LIMITATTS);
+  protected MemData finish() {
     data.initNames();
     return data;
   }

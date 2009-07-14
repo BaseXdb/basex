@@ -2005,8 +2005,8 @@ public class QueryParser extends InputParser {
       nm = trim(substring(nm, 0, i));
     }
 
-    return (t == Type.ELM || t == Type.ATT) && eq(nm, WILD) ? null :
-      new QNm(nm, ctx);
+    return (t == Type.ELM || t == Type.ATT) && nm.length == 1 && nm[0] == '*' ?
+        null : new QNm(nm, ctx);
   }
 
   /**

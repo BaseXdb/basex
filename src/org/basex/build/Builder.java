@@ -1,5 +1,6 @@
 package org.basex.build;
 
+import static org.basex.Text.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -76,7 +77,7 @@ public abstract class Builder extends Progress {
    * @return data database instance
    * @throws IOException in case of parsing or writing problems
    */
-  public abstract Data finish() throws IOException;
+  protected abstract Data finish() throws IOException;
 
   /**
    * Closes open references.
@@ -165,6 +166,17 @@ public abstract class Builder extends Progress {
       addDoc(utf8(token(db), Prop.ENCODING));
       setSize(0, meta.size);
     }
+
+    // check if data ranges exceed database limits
+    if(tags.size() > 0xFFF) throw new IOException(LIMITTAGS);
+    if(atts.size() > 0xFFF) throw new IOException(LIMITATTS);
+
+    /* [CG] INEX
+    System.out.println("Tags: " + tags.size());
+    System.out.println("Attributes: " + atts.size());
+    System.out.println("Namespaces: " + ns.size());
+    */
+
     return finish();
   }
 
@@ -340,6 +352,7 @@ public abstract class Builder extends Progress {
 
     // get tag reference
     final int tid = tags.index(tag, null, true);
+
     path.add(tid, level, Data.ELEM);
 
     // remember tag id and parent reference

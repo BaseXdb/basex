@@ -16,14 +16,11 @@ import org.basex.util.Token;
 public final class CachedOutput extends PrintOutput {
   /** Byte buffer. */
   private byte[] buf = new byte[8];
-  /** Maximum numbers of bytes to write. */
-  private final int max;
 
   /**
    * Default constructor.
    */
   public CachedOutput() {
-    this(Integer.MAX_VALUE);
   }
 
   /**

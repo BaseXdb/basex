@@ -9,8 +9,9 @@ import org.basex.util.Token;
 
 /**
  * This class stores and organizes the database table and the index structures
- * for textual content in a compressed memory structure. The storage equals the
- * disk storage in {@link DiskData}.
+ * for textual content in a compressed memory structure. The table mapping
+ * equals the disk storage in {@link DiskData}.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

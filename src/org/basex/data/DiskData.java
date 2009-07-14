@@ -17,6 +17,11 @@ import org.basex.io.TableMemAccess;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
+/* [CG] INEX:
+ * - Byte   1-2:  NSPC: Namespace (2), NS Definition flag (1) and Name (13 bits)
+ * - Byte   1-2:  NSPC: Namespace (2) and Name (13 bits)
+ */
+
 /**
  * This class stores and organizes the node table and the index structures for
  * textual content. All nodes in the table are accessed by their

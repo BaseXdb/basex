@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
-import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
@@ -264,7 +263,7 @@ public final class TableView extends View implements Runnable {
    */
   void query() {
     final String query = tdata.find();
-    if(query != null) gui.execute(new XQuery(query));
+    if(query != null) gui.xquery(query, false);
   }
 
   @Override

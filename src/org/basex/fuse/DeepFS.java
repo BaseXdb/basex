@@ -151,8 +151,8 @@ public final class DeepFS extends DeepFuse implements DataText {
   public DeepFS(final String dbname) {
     data = createEmptyDB(dbname);
     initNames();
-    MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
-    int tagID = data.tags.index(DEEPFS, null, false);
+    final MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
+    final int tagID = data.tags.index(DEEPFS, null, false);
     // tag, namespace, dist, # atts (+ 1), node size (+ 1), has namespaces
     m.addElem(tagID, 0, 1, 3, 3, false);
     m.addAtt(mountpointID, 0, NOTMOUNTED, 2);
@@ -167,7 +167,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return data reference to empty database
    */
   private Data createEmptyDB(final String n) {
-    Context ctx = new Context();
+    final Context ctx = new Context();
 
     try {
       final Parser p = new Parser(IO.get(n)) {
@@ -175,13 +175,13 @@ public final class DeepFS extends DeepFuse implements DataText {
         public void parse(final Builder build) { /* empty */}
       };
       ctx.data(CreateDB.xml(p, n));
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
 
-    Data d = ctx.data();
+    final Data d = ctx.data();
     d.fs = this;
     return d;
   }
@@ -383,11 +383,11 @@ public final class DeepFS extends DeepFuse implements DataText {
       final StringBuilder qb = new StringBuilder();
       qb.append(pn2xp(path, dir));
       if(!dir && cont) qb.append("/content");
-      Nodes n = xquery(qb.toString());
+      final Nodes n = xquery(qb.toString());
       if(n.size() == 0) return -1;
       data.delete(n.nodes[0]);
       refresh();
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       e.printStackTrace();
       return -1;
     }
@@ -400,7 +400,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return pre value of newly inserted content, -1 on failure
    */
   int insertContent(final String path) {
-    int fpre = pathPre(path);
+    final int fpre = pathPre(path);
 
     if(fpre == -1) return -1;
     return insert(fpre, buildContentData(path));
@@ -413,7 +413,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return pre value of newly inserted node
    */
   private int insert(final int pre, final MemData md) {
-    int npre = pre + data.size(pre, data.kind(pre));
+    final int npre = pre + data.size(pre, data.kind(pre));
     data.insert(npre, pre, md);
     refresh();
     return npre;
@@ -426,9 +426,9 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private int pathPre(final String path) {
     try {
-      Nodes n = xquery(pn2xp(path, false));
+      final Nodes n = xquery(pn2xp(path, false));
       return n.size() == 0 ? -1 : n.nodes[0];
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       e.printStackTrace();
       return -1;
     }
@@ -440,19 +440,20 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return MemData reference
    */
   private MemData buildContentData(final String path) {
-    MemData md = new MemData(64, data.tags, data.atts, data.ns, data.path);
+    final MemData md = new MemData(64, data.tags, data.atts, data.ns,
+        data.path);
+
     try {
-      MemBuilder mb = new MemBuilder();
+      final MemBuilder mb = new MemBuilder();
       mb.init(md);
       Prop.fscont = true;
       Prop.fsmeta = true;
-      String bpath = data.meta.backingpath + path;
+      final String bpath = data.meta.backingpath + path;
       BaseX.debug("[DataFS_parse_file] path : " + path + " -> " + bpath);
-      Parser p = Prop.newfsparser ? new NewFSParser(bpath)
+      final Parser p = Prop.newfsparser ? new NewFSParser(bpath)
           : new FSParser(bpath);
-      mb.build(p, "tmp_memdata4file");
-      return mb.finish();
-    } catch(IOException e) {
+      return (MemData) mb.build(p, "tmp_memdata4file");
+    } catch(final IOException e) {
       e.printStackTrace();
     }
     return md;
@@ -467,8 +468,8 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private MemData buildData(final String path, final int mode) {
     final String dname = basename(path);
-    int elemID = isDirFile(mode) ? dirID : unknownID;
-    MemData m = new MemData(4, data.tags, data.atts, data.ns, data.path);
+    final int elemID = isDirFile(mode) ? dirID : unknownID;
+    final MemData m = new MemData(4, data.tags, data.atts, data.ns, data.path);
     m.addElem(elemID, 0, 1, 4, 4, false);
     m.addAtt(nameID, 0, token(dname), 1);
     m.addAtt(sizeID, 0, ZERO, 2);
@@ -485,7 +486,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private MemData buildFileData(final String path, final int mode) {
     final String fname = basename(path);
-    MemData m = new MemData(6, data.tags, data.atts, data.ns, data.path);
+    final MemData m = new MemData(6, data.tags, data.atts, data.ns, data.path);
     m.addElem(fileID, 0, 1, 6, 6, false);
     m.addAtt(nameID, 0, token(fname), 1);
     final int dot = fname.lastIndexOf('.');
@@ -504,9 +505,9 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private int parentPre(final String path) {
     try {
-      Nodes n = xquery(pn2xp(dirname(path), true));
+      final Nodes n = xquery(pn2xp(dirname(path), true));
       return n.size() == 0 ? -1 : n.nodes[0];
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       e.printStackTrace();
       return -1;
     }
@@ -519,7 +520,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return pre value of newly inserted node
    */
   private int insertFileNode(final String path, final int mode) {
-    int ppre = parentPre(path);
+    final int ppre = parentPre(path);
     if(ppre == -1) return -1;
     return insert(ppre, isRegFile(mode) ? buildFileData(path, mode) :
       buildData(path, mode));
@@ -532,8 +533,8 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @return id of the newly created file or -1 on failure
    */
   int createNode(final String path, final int mode) {
-    int pre = insertFileNode(path, mode);
-    return (pre == -1) ? -1 : data.id(pre);
+    final int pre = insertFileNode(path, mode);
+    return pre == -1 ? -1 : data.id(pre);
   }
 
   @Override
@@ -581,9 +582,9 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public int getattr(final String path) {
     try {
-      Nodes n = xquery(pn2xp(path, false));
+      final Nodes n = xquery(pn2xp(path, false));
       return n.size() == 0 ? -1 : n.nodes[0];
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       e.printStackTrace();
       return -1;
     }
@@ -600,12 +601,12 @@ public final class DeepFS extends DeepFuse implements DataText {
   public int opendir(final String path) {
     try {
       final String query = "count(" + pn2xp(path, true) + "/child::*)";
-      QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data));
-      Result result = xq.query();
-      SeqIter s = (SeqIter) result;
-      Item i = s.next();
-      return (i != null) ? (int) i.itr() : -1;
-    } catch(QueryException e) {
+      final QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data));
+      final Result result = xq.query();
+      final SeqIter s = (SeqIter) result;
+      final Item i = s.next();
+      return i != null ? (int) i.itr() : -1;
+    } catch(final QueryException e) {
       e.printStackTrace();
       return -1;
     }
@@ -624,13 +625,13 @@ public final class DeepFS extends DeepFuse implements DataText {
   @Override
   public String readdir(final String path, final int offset) {
     try {
-      String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
+      final String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
           + "]/@name)";
-      QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data));
-      SeqIter s = (SeqIter) xq.query();
+      final QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data));
+      final SeqIter s = (SeqIter) xq.query();
       if(s.size() != 1) return null;
-      return (s.size() != 1) ? null : new String(((Str) s.next()).str());
-    } catch(QueryException e) {
+      return s.size() != 1 ? null : new String(((Str) s.next()).str());
+    } catch(final QueryException e) {
       e.printStackTrace();
       return null;
     }
@@ -745,7 +746,7 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   @Override
   public int release(final String path) {
-    boolean dirty = true;
+    final boolean dirty = true;
 
     final String method = "[-basex_release] ";
     BaseX.debug(method + "path: " + path);

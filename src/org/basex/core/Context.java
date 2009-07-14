@@ -95,32 +95,7 @@ public final class Context {
         copied = null;
         if(POOL.unpin(d)) d.close();
         if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
-
-        // -- close fuse instance
-        if(Prop.fuse) {
-          final String method = "[BaseX.close] ";
-          BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
-          // -- unmount running fuse.
-          for(int i = 3; i > 0; i--) {
-            Performance.sleep(1000);
-            BaseX.err(i + " .. ");
-          }
-          BaseX.debug("GO.");
-          final String cmd = "umount -f " + d.meta.mountpoint;
-          BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
-          Runtime r = Runtime.getRuntime();
-          java.lang.Process p = r.exec(cmd);
-          try {
-            p.waitFor();
-          } catch(InterruptedException e) {
-            e.printStackTrace();
-          }
-          int rc = p.exitValue();
-          String msg = method + "Unmount " + d.meta.mountpoint;
-          if (rc == 0) msg = msg + " ... OK.";
-          else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
-          BaseX.debug(msg);
-        }
+        if(Prop.fuse) closeFuse(d);
       }
       return true;
     } catch(final IOException ex) {
@@ -175,5 +150,35 @@ public final class Context {
    */
   public void marked(final Nodes mark) {
     marked = mark;
+  }
+  
+  /**
+   * Closes the fuse instance.
+   * @param d data reference
+   * @throws IOException I/O exception
+   */
+  private static void closeFuse(final Data d) throws IOException {
+    final String method = "[BaseX.close] ";
+    BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
+    // -- unmount running fuse.
+    for(int i = 3; i > 0; i--) {
+      Performance.sleep(1000);
+      BaseX.err(i + " .. ");
+    }
+    BaseX.debug("GO.");
+    final String cmd = "umount -f " + d.meta.mountpoint;
+    BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
+    Runtime r = Runtime.getRuntime();
+    java.lang.Process p = r.exec(cmd);
+    try {
+      p.waitFor();
+    } catch(InterruptedException e) {
+      e.printStackTrace();
+    }
+    int rc = p.exitValue();
+    String msg = method + "Unmount " + d.meta.mountpoint;
+    if (rc == 0) msg = msg + " ... OK.";
+    else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
+    BaseX.debug(msg);
   }
 }

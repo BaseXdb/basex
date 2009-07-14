@@ -193,13 +193,16 @@ public final class QueryContext extends Progress {
           }
         }
         if(rootDocs == 0) {
-          addDoc(new DBNode(data, 0));
-          rootDocs++;
+          for(final int p : data.doc()) {
+            addDoc(new DBNode(data, p));
+            rootDocs++;
+          }
         }
 
+        // create initial context items
         final SeqIter si = new SeqIter();
         if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
-          // query starts with root node - add document nodes (optimization)
+          // add document nodes if query starts with root node (optimization)
           for(int d = 0; d < docs; d++) si.add(doc[d]);
         } else {
           // otherwise, add all context items
