@@ -294,11 +294,11 @@ public final class MemData extends Data {
   }
 
   @Override
-  public boolean isLocked() {
-    return false;
+  public int getLock() {
+    return 0;
   }
 
   @Override
-  public void setLocked(final boolean l) {
+  public void setLock(final int l) {
   }
 }

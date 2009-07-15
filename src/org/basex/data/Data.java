@@ -422,12 +422,14 @@ public abstract class Data {
    * Returns the locking situation of the data.
    * @return locked flag
    */
-  public abstract boolean isLocked();
+  public abstract int getLock();
 
   /**
    * Locks and unlocks the data reference.
-   * @param l boolean if data is locked
+   * @param l int kind of lock
+   *        1 = read lock
+   *        2 = write lock
    */
-  public abstract void setLocked(final boolean l);
+  public abstract void setLock(final int l);
 
 }

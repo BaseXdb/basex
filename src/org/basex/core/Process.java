@@ -77,8 +77,8 @@ public abstract class Process extends AbstractProcess {
     if(data() && data == null) {
       return error(PROCNODB);
     }
-    if(data != null && data.isLocked()) {
-      while(data.isLocked()) Performance.sleep(50);
+    if(data != null && data.getLock() == 2) {
+      while(data.getLock() == 2) Performance.sleep(50);
     }
     if(updating()) {
       if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
@@ -86,10 +86,14 @@ public abstract class Process extends AbstractProcess {
     }
 
     try {
-      if(data != null) data.setLocked(true);
+      if(data != null && !name().equals("DROPDB")) {
+        data.setLock(2);
+      }
       final boolean ok = exec();
       if(updating()) context.update();
-      if(data != null) data.setLocked(false);
+      if(data != null  && !name().equals("DROPDB")) {
+        data.setLock(0);
+      }
       return ok;
     } catch(final Throwable ex) {
       // not expected...

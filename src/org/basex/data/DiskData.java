@@ -71,7 +71,7 @@ public final class DiskData extends Data {
   /** Values access file. */
   private final DataAccess values;
   /** Locking Flag. */
-  private boolean locked;
+  private int lock;
 
   /**
    * Default Constructor.
@@ -702,12 +702,12 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean isLocked() {
-    return locked;
+  public int getLock() {
+    return lock;
   }
 
   @Override
-  public void setLocked(final boolean l) {
-    locked = l;
+  public void setLock(final int l) {
+    lock = l;
   }
 }
