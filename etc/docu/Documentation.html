@@ -1,7 +1,7 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Full-Documentation of BaseX</title><link rev="made" href="0"><meta name="generator" content="DocBook XSL Stylesheets V1.74.3"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d59e1"></a>Full-Documentation of BaseX</h1></div><div><div class="author"><h3 class="author"><span class="firstname">BaseX-Team</span></h3></div></div><div><p class="copyright">Copyright © 2009 DBIS, University of Konstanz</p></div><div><div class="legalnotice"><a name="d59e29"></a><p>Email: info@basex.org</p></div></div><div><p class="pubdate">June 2009</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#d59e34">1. Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e47">1. Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e57">1.1. Operating System</a></span></dt><dt><span class="section"><a href="#d59e101">1.2. Software</a></span></dt><dt><span class="section"><a href="#d59e124">1.3. Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e160">2. Installation</a></span></dt><dt><span class="section"><a href="#d59e257">3. Quick Start</a></span></dt><dt><span class="section"><a href="#d59e306">4. Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d59e320">5. Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d59e334">6. Using BaseX as Server-Client</a></span></dt><dt><span class="section"><a href="#d59e363">7. Starting BaseX as a service</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e377">2. Working with the BaseX Console</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e387">1. Launching BaseX in console mode</a></span></dt><dt><span class="section"><a href="#d59e404">2. What can i do in the console mode?</a></span></dt><dt><span class="section"><a href="#d59e421">3. Description of the Console Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e434">3.1. Database Commands</a></span></dt><dt><span class="section"><a href="#d59e503">3.2. Query Commands</a></span></dt><dt><span class="section"><a href="#d59e541">3.3. Update Commands</a></span></dt><dt><span class="section"><a href="#d59e589">3.4. General Commands</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#d59e626">3. Working with the BaseX GUI</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e636">1. Description of all the Views in the GUI</a></span></dt><dt><span class="section"><a href="#d59e683">2. Description of the GUI Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e693">2.1. What does the Filter button exactly do?</a></span></dt><dt><span class="section"><a href="#d59e707">2.2. What is Realtime Filtering?</a></span></dt><dt><span class="section"><a href="#d59e721">2.3. How can I search without XQuery?</a></span></dt><dt><span class="section"><a href="#d59e738">2.4. The search field in the query panel and the search field right beyond the
 						buttons, do they differ?</a></span></dt><dt><span class="section"><a href="#d59e753">2.5. How can I configure the look and feel of BaseX?</a></span></dt><dt><span class="section"><a href="#d59e767">2.6. What is the Main-Memory Mode?</a></span></dt><dt><span class="section"><a href="#d59e781">2.7. How can I import my file system? What does that mean?</a></span></dt><dt><span class="section"><a href="#d59e795">2.8. How can I import my data aka how do i create a new database instance aka
 						how to shred an XML file?</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#d59e826">4. General Information</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e836">1. Location of BaseX Files</a></span></dt><dt><span class="section"><a href="#d59e850">2. How do you measure the performance of the queries?</a></span></dt><dt><span class="section"><a href="#d59e885">3. What indexing techniques are available and what do they do?</a></span></dt><dt><span class="section"><a href="#d59e923">4. How can i create a Database for a couple of XML files?</a></span></dt><dt><span class="section"><a href="#d59e956">5. Is there a way to save large results of a query in a file?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e975">5. Description of BaseX-Features</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e985">1. XQuery Implementation</a></span></dt><dt><span class="section"><a href="#d59e1005">2. XQuery Full-Text Implementation</a></span></dt><dt><span class="section"><a href="#d59e1022">3. Description of the Indexes</a></span></dt><dt><span class="section"><a href="#d59e1112">4. What about the different indexes BaseX offers: which data structures are
-					applied?</a></span></dt><dt><span class="section"><a href="#d59e1145">5. Do you support XML Updates?</a></span></dt><dt><span class="section"><a href="#d59e1159">6. What can i do if i get Exceptions on huge XML files as input?</a></span></dt><dt><span class="section"><a href="#d59e1188">7. Can i protect a DB in BaseX with a password?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e1203">6. Developer's Guide</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1213">1. Programming with BaseX API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1226">1.1. Creating a Database</a></span></dt><dt><span class="section"><a href="#d59e1283">1.2. Executing XQuery</a></span></dt><dt><span class="section"><a href="#d59e1343">1.3. Updating a Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1385">2. Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d59e1399">3. Programming with XQuery API</a></span></dt></dl></dd></dl></div><div class="list-of-figures"><p><b>List of Figures</b></p><dl><dt>6.1. <a href="#d59e1245">Creating a Database from a file</a></dt><dt>6.2. <a href="#d59e1257">Creating a Database from an input string</a></dt><dt>6.3. <a href="#d59e1268">Opens an existing Database</a></dt><dt>6.4. <a href="#d59e1305">Creating a result instance</a></dt><dt>6.5. <a href="#d59e1317">Iterating through all results</a></dt><dt>6.6. <a href="#d59e1328">Using the BaseX command</a></dt></dl></div>
+					applied?</a></span></dt><dt><span class="section"><a href="#d59e1145">5. Do you support XML Updates?</a></span></dt><dt><span class="section"><a href="#d59e1159">6. What can i do if i get Exceptions on huge XML files as input?</a></span></dt><dt><span class="section"><a href="#d59e1188">7. Can i protect a DB in BaseX with a password?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#d59e1203">6. Developer's Guide</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1213">1. Programming with BaseX API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1226">1.1. Creating a Database</a></span></dt><dt><span class="section"><a href="#d59e1283">1.2. Executing XQuery</a></span></dt><dt><span class="section"><a href="#d59e1343">1.3. Updating a Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1385">2. Programming with XML:DB API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1398">2.1. Executing XPath</a></span></dt><dt><span class="section"><a href="#d59e1426">2.2. Inserting a XML Document</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1455">3. Programming with XQuery API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1468">3.1. Executing XQuery</a></span></dt></dl></dd></dl></dd></dl></div><div class="list-of-figures"><p><b>List of Figures</b></p><dl><dt>6.1. <a href="#d59e1245">Creating a Database from a file</a></dt><dt>6.2. <a href="#d59e1257">Creating a Database from an input string</a></dt><dt>6.3. <a href="#d59e1268">Opens an existing Database</a></dt><dt>6.4. <a href="#d59e1305">Creating a result instance</a></dt><dt>6.5. <a href="#d59e1317">Iterating through all results</a></dt><dt>6.6. <a href="#d59e1328">Using the BaseX command</a></dt><dt>6.7. <a href="#d59e1417">Executing XPath</a></dt><dt>6.8. <a href="#d59e1445">Inserting a XML Document</a></dt><dt>6.9. <a href="#d59e1481">Executing XQuery</a></dt></dl></div>
 	
 	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e34"></a>Chapter&nbsp;1.&nbsp;Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e47">1. Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e57">1.1. Operating System</a></span></dt><dt><span class="section"><a href="#d59e101">1.2. Software</a></span></dt><dt><span class="section"><a href="#d59e124">1.3. Hardware</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e160">2. Installation</a></span></dt><dt><span class="section"><a href="#d59e257">3. Quick Start</a></span></dt><dt><span class="section"><a href="#d59e306">4. Starting with BaseX GUI</a></span></dt><dt><span class="section"><a href="#d59e320">5. Starting with BaseX Console</a></span></dt><dt><span class="section"><a href="#d59e334">6. Using BaseX as Server-Client</a></span></dt><dt><span class="section"><a href="#d59e363">7. Starting BaseX as a service</a></span></dt></dl></div>
 		
@@ -553,13 +553,13 @@
 				Moreover, the GUI provides a convenient way to perform updates on the data. </p>
 		</div>
 	</div>
-	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e1203"></a>Chapter&nbsp;6.&nbsp;Developer's Guide</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e1213">1. Programming with BaseX API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1226">1.1. Creating a Database</a></span></dt><dt><span class="section"><a href="#d59e1283">1.2. Executing XQuery</a></span></dt><dt><span class="section"><a href="#d59e1343">1.3. Updating a Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1385">2. Programming with XML:DB API</a></span></dt><dt><span class="section"><a href="#d59e1399">3. Programming with XQuery API</a></span></dt></dl></div>
+	<div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d59e1203"></a>Chapter&nbsp;6.&nbsp;Developer's Guide</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d59e1213">1. Programming with BaseX API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1226">1.1. Creating a Database</a></span></dt><dt><span class="section"><a href="#d59e1283">1.2. Executing XQuery</a></span></dt><dt><span class="section"><a href="#d59e1343">1.3. Updating a Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1385">2. Programming with XML:DB API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1398">2.1. Executing XPath</a></span></dt><dt><span class="section"><a href="#d59e1426">2.2. Inserting a XML Document</a></span></dt></dl></dd><dt><span class="section"><a href="#d59e1455">3. Programming with XQuery API</a></span></dt><dd><dl><dt><span class="section"><a href="#d59e1468">3.1. Executing XQuery</a></span></dt></dl></dd></dl></div>
 		
 
 		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e1213"></a>1.&nbsp;Programming with BaseX API</h2></div></div></div>
 			
 
-			<p>This chapter decribes how to implement own applications using the BaseX API.
+			<p>This section decribes how to implement own applications using the BaseX API.
 				So you can easily develop and expand BaseX with your own ideas and to your own needs.
 				Here you can find a few instructions to start.</p>
 				
@@ -652,12 +652,56 @@ new Insert("fragment", "<span style="color: red">&lt;sub&gt;&lt;/sub&gt;</span>"
 		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e1385"></a>2.&nbsp;Programming with XML:DB API</h2></div></div></div>
 			
 
-			<p> Your Text </p>
+			<p>This section decribes how to implement own applications using the XML:DB API.
+				These classes are predefined and help to use every native XML Database with the same
+				application implemented with the XML:DB API.</p>
+				
+				<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e1398"></a>2.1.&nbsp;Executing XPath</h3></div></div></div>
+					
+					<p>To execute this example you need to create a Main-Class and define the following:</p>
+					<pre class="programlisting">/** Database Driver. */
+static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+/** Name of the referenced database. */
+static final String DBNAME = "xmldb:basex://localhost:1984/input";
+/** Sample query. */
+static final String QUERY = "//li"; 
+					</pre>
+						<p>After defining the DRIVER, the DBNAME and the QUERY you can start with the following example.</p>
+				<div class="figure"><a name="d59e1417"></a><p class="title"><b>Figure&nbsp;6.7.&nbsp;Executing XPath</b></p><div class="figure-contents">
+				
+					<div><img src="code7.png" alt="Executing XPath"></div>
+				</div></div><br class="figure-break">
+				</div>
+				
+				<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e1426"></a>2.2.&nbsp;Inserting a XML Document</h3></div></div></div>
+					
+					<p>To execute this example you need to create a Main-Class and define the following:</p>
+					<pre class="programlisting">/** Database Driver. */
+static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+/** Name of the referenced database. */
+static final String DBNAME = "xmldb:basex://localhost:1984/input"; 
+					</pre>
+						<p>After defining the DRIVER and the DBNAME you can start with the following example.</p>
+				<div class="figure"><a name="d59e1445"></a><p class="title"><b>Figure&nbsp;6.8.&nbsp;Inserting a XML Document</b></p><div class="figure-contents">
+				
+					<div><img src="code8.png" alt="Inserting a XML Document"></div>
+				</div></div><br class="figure-break">
+				</div>
+				
 		</div>
-		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e1399"></a>3.&nbsp;Programming with XQuery API</h2></div></div></div>
+		<div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d59e1455"></a>3.&nbsp;Programming with XQuery API</h2></div></div></div>
 			
 
-			<p> Your Text </p>
+			<p>This section describes how to implement own applications using the XQuery API.</p>
+			
+			<div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d59e1468"></a>3.1.&nbsp;Executing XQuery</h3></div></div></div>
+					
+					<p>To execute this example you need to create a Main-Class and type the following:</p>
+				<div class="figure"><a name="d59e1481"></a><p class="title"><b>Figure&nbsp;6.9.&nbsp;Executing XQuery</b></p><div class="figure-contents">
+				
+					<div><img src="code9.png" alt="Executing XQuery"></div>
+				</div></div><br class="figure-break">
+				</div>
 		</div>
 	</div>
 </div></body></html>

@@ -752,7 +752,7 @@
 				<title>Programming with BaseX API</title>
 			</info>
 
-			<para>This chapter decribes how to implement own applications using the BaseX API.
+			<para>This section decribes how to implement own applications using the BaseX API.
 				So you can easily develop and expand BaseX with your own ideas and to your own needs.
 				Here you can find a few instructions to start.</para>
 				
@@ -853,14 +853,64 @@ new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
 				<title>Programming with XML:DB API</title>
 			</info>
 
-			<para> Your Text </para>
+			<para>This section decribes how to implement own applications using the XML:DB API.
+				These classes are predefined and help to use every native XML Database with the same
+				application implemented with the XML:DB API.</para>
+				
+				<section>
+					<info>
+						<title>Executing XPath</title>
+					</info>
+					<para>To execute this example you need to create a Main-Class and define the following:</para>
+					<programlisting>/** Database Driver. */
+static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+/** Name of the referenced database. */
+static final String DBNAME = "xmldb:basex://localhost:1984/input";
+/** Sample query. */
+static final String QUERY = "//li"; 
+					</programlisting>
+						<para>After defining the DRIVER, the DBNAME and the QUERY you can start with the following example.</para>
+				<figure>
+				<title>Executing XPath</title>
+					<graphic fileref="code7.png"/>
+				</figure>
+				</section>
+				
+				<section>
+					<info>
+						<title>Inserting a XML Document</title>
+					</info>
+					<para>To execute this example you need to create a Main-Class and define the following:</para>
+					<programlisting>/** Database Driver. */
+static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+/** Name of the referenced database. */
+static final String DBNAME = "xmldb:basex://localhost:1984/input"; 
+					</programlisting>
+						<para>After defining the DRIVER and the DBNAME you can start with the following example.</para>
+				<figure>
+				<title>Inserting a XML Document</title>
+					<graphic fileref="code8.png"/>
+				</figure>
+				</section>
+				
 		</section>
 		<section>
 			<info>
 				<title>Programming with XQuery API</title>
 			</info>
 
-			<para> Your Text </para>
+			<para>This section describes how to implement own applications using the XQuery API.</para>
+			
+			<section>
+					<info>
+						<title>Executing XQuery</title>
+					</info>
+					<para>To execute this example you need to create a Main-Class and type the following:</para>
+				<figure>
+				<title>Executing XQuery</title>
+					<graphic fileref="code9.png"/>
+				</figure>
+				</section>
 		</section>
 	</chapter>
 </book>
