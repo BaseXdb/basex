@@ -1007,7 +1007,8 @@ public final class MapView extends View implements Runnable {
         textLen[pre] = data.textLen(pre);
       } else if(kind == Data.ATTR) {
         textLen[pre] = data.attLen(pre);
-      } else if(kind == Data.ELEM || kind == Data.DOC) {
+      } else if((kind == Data.ELEM || kind == Data.DOC) && 
+          data.size(pre, kind) > 1) {
         l++;
       }
     }
