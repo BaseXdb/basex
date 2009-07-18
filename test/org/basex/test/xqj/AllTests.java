@@ -6,17 +6,26 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-
-@SuppressWarnings("all")
+/**
+ * This class registers and runs all available XQJ tests.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Christian Gruen
+ */
 public class AllTests {
 
+  /**
+   * Main method
+   * @param args (ignored) command-line arguments
+   */
   public static void main(String[] args) {
     TestRunner.run(suite());
- /*  TestResult result = new TestRunner().doRun(suite());
-   System.out.print(result.toString());
-   result = null;
-  */}
+  }
 
+  /**
+   * Adds all tests.
+   * @return test instance
+   */
   public static Test suite() {
     TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
     suite.addTestSuite(SignatureTest.class);

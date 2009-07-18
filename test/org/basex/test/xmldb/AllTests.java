@@ -9,13 +9,13 @@ import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * This class registers and runs all available XMLDB/API tests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public class AllTests {
   /** XMLDB driver. */
@@ -37,6 +37,15 @@ public class AllTests {
   static final String DOC2 = "second.xml";
   /** Test Documents. */
   static final String DOC3 = "third.xml";
+
+  /**
+   * Main method
+   * @param args (ignored) command-line arguments
+   * @throws Exception exceptions
+   */
+  public static void main(String[] args) throws Exception {
+    TestRunner.run(suite());
+  }
 
   /**
    * Registers all JUnit tests.

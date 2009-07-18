@@ -30,8 +30,9 @@ public final class XMLDBInsert {
       Database database = (Database) c.newInstance();
       // Registers the Database.
       DatabaseManager.registerDatabase(database);
-      // Receives the Database.
+      // Receives the Collection.
       col = DatabaseManager.getCollection(DBNAME);
+
       // ID for the new Document.
       String id = "NewDocument";
       // Content of the new Document.
