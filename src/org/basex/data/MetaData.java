@@ -21,9 +21,9 @@ public final class MetaData {
   /** Database name. */
   public String dbname;
   /** DeepFS mount point. */
-  public String mountpoint = "not_set_mountpoint";
+  public String mountpoint = "";
   /** DeepFS backing path. */
-  public String backingpath = "not_set_backing_path";
+  public String backingpath = "";
 
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
@@ -77,6 +77,17 @@ public final class MetaData {
   }
 
   /**
+   * Constructor, specifying the database name and the input reference.
+   * @param db database name
+   * @param in input stream
+   * @throws IOException I/O Exception
+   */
+  public MetaData(final String db, final DataInput in) throws IOException {
+    this(db);
+    read(in);
+  }
+
+  /**
    * Checks if the specified file path refers to the specified database.
    * @param path file path
    * @param db database name
@@ -126,7 +137,7 @@ public final class MetaData {
    * @param in input stream
    * @throws IOException I/O Exception
    */
-  public void read(final DataInput in) throws IOException {
+  private void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
       final String k = in.readString();
@@ -202,7 +213,7 @@ public final class MetaData {
     writeInfo(out, DBLASTID,   lastid);
     writeInfo(out, MOUNT,      mountpoint);
     writeInfo(out, BACKING,    backingpath);
-    out.writeString("");
+    out.write(0);
   }
 
   /**

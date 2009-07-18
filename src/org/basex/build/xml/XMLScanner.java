@@ -697,7 +697,8 @@ public final class XMLScanner {
 
         final XMLInput tin = input;
         try {
-          final IO file = input.file.merge(IO.get(name));
+          IO file = IO.get(input.file.dir() + "/" + name);
+          if(!file.exists()) file = input.file.merge(IO.get(name));
           cont = file.content();
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {

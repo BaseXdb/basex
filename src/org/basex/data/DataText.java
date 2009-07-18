@@ -14,9 +14,9 @@ public interface DataText {
 
   /** Database version; if it's modified, old database instances can't
    * be parsed anymore. */
-  String STORAGE = "5.02";
+  String STORAGE = "5.6";
   /** Index version; if it's modified, old indexes can't be parsed anymore. */
-  String ISTORAGE = "3";
+  String ISTORAGE = "5.6";
 
   /** Database version. */
   String DBSTORAGE = "STORAGE";
@@ -64,6 +64,14 @@ public interface DataText {
   String MOUNT = "MOUNT";
   /** FS Backing store. */
   String BACKING = "BACKING";
+  /** Tags. */
+  String DBTAGS = "TAGS";
+  /** Attributes. */
+  String DBATTS = "ATTS";
+  /** Path Summary. */
+  String DBPATH = "PATH";
+  /** Tags. */
+  String DBNS = "NS";
 
   // DEEPFS STRINGS ===========================================================
 

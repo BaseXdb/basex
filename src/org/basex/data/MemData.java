@@ -10,7 +10,7 @@ import org.basex.util.Token;
 /**
  * This class stores and organizes the database table and the index structures
  * for textual content in a compressed memory structure. The table mapping
- * equals the disk storage in {@link DiskData}.
+ * is documented in {@link DiskData}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -68,7 +68,7 @@ public final class MemData extends Data {
 
   @Override
   public int kind(final int pre) {
-    return (int) (val1[pre] >>> 56);
+    return (int) (val1[pre] >>> 56) & 0x07;
   }
 
   @Override
@@ -108,27 +108,27 @@ public final class MemData extends Data {
 
   @Override
   public int tagID(final int pre) {
-    return (int) (val1[pre] >> 40) & 0x07FF;
+    return (int) (val1[pre] >> 40) & 0xFFFF;
   }
 
   @Override
   public int tagNS(final int pre) {
-    return (int) (val1[pre] >>> 52) & 0x0F;
+    return (int) (val1[pre] >>> 60) & 0x0F;
   }
 
   @Override
   public int[] ns(final int pre) {
-    return (val1[pre] & 1L << 51) != 0 ? ns.get(pre) : Array.NOINTS;
+    return (val1[pre] & 1L << 59) != 0 ? ns.get(pre) : Array.NOINTS;
   }
 
   @Override
   public int attNameID(final int pre) {
-    return (int) (val1[pre] >> 40) & 0x07FF;
+    return (int) (val1[pre] >> 40) & 0xFFFF;
   }
 
   @Override
   public int attNS(final int pre) {
-    return (int) (val1[pre] >>> 52) & 0x0F;
+    return (int) (val1[pre] >>> 60) & 0x0F;
   }
 
   @Override
@@ -184,10 +184,10 @@ public final class MemData extends Data {
    * @param t document name
    * @param s node size (+ 1)
    */
-  public void addDoc(final byte[] t, final long s) {
+  public void addDoc(final byte[] t, final int s) {
     check();
     val1[meta.size] = ((long) DOC << 56) + textIndex(t);
-    val2[meta.size++] = (s << 32) + meta.size;
+    val2[meta.size++] = ((long) s << 32) + meta.size;
   }
 
   /**
@@ -199,12 +199,12 @@ public final class MemData extends Data {
    * @param s node size (+ 1)
    * @param ne element has namespaces
    */
-  public void addElem(final long t, final long n, final long d, final long a,
-      final long s, final boolean ne) {
+  public void addElem(final int t, final int n, final int d, final int a,
+      final int s, final boolean ne) {
     check();
-    val1[meta.size] = ((long) ELEM << 56) + (n << 52) + (ne ? 1L << 51 : 0)
-        + (t << 40) + (a << 32) + d;
-    val2[meta.size++] = (s << 32) + meta.size;
+    val1[meta.size] = ((long) n << 60) + (ne ? 1L << 59 : 0) +
+      ((long) ELEM << 56) + ((long) t << 40) + ((long) a << 32) + d;
+    val2[meta.size++] = ((long) s << 32) + meta.size;
   }
 
   /**
@@ -214,10 +214,11 @@ public final class MemData extends Data {
    * @param v attribute value
    * @param d distance
    */
-  public void addAtt(final long t, final long n, final byte[] v, final long d) {
+  public void addAtt(final int t, final int n, final byte[] v, final int d) {
     check();
-    val1[meta.size] = ((long) ATTR << 56) + (n << 52) + (t << 40) + attIndex(v);
-    val2[meta.size++] = (d << 32) + meta.size;
+    val1[meta.size] = ((long) n << 60) + ((long) ATTR << 56) +
+      ((long) t << 40) + attIndex(v);
+    val2[meta.size++] = ((long) d << 32) + meta.size;
   }
 
   /**
@@ -226,10 +227,10 @@ public final class MemData extends Data {
    * @param d distance
    * @param k node kind
    */
-  public void addText(final byte[] t, final long d, final long k) {
+  public void addText(final byte[] t, final int d, final int k) {
     check();
-    val1[meta.size] = (k << 56) + textIndex(t);
-    val2[meta.size++] = (d << 32) + meta.size;
+    val1[meta.size] = ((long) k << 56) + textIndex(t);
+    val2[meta.size++] = ((long) d << 32) + meta.size;
   }
 
   /**
@@ -237,8 +238,8 @@ public final class MemData extends Data {
    * @param pre pre reference
    * @param val value to be stored
    */
-  public void setSize(final int pre, final long val) {
-    val2[pre] = (int) val2[pre] | val << 32;
+  public void setSize(final int pre, final int val) {
+    val2[pre] = (int) val2[pre] | (long) val << 32;
   }
 
   /**

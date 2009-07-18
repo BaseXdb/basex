@@ -52,10 +52,9 @@ public final class CreateFS extends ACreate {
   protected boolean exec() {
     Prop.chop = true;
     Prop.entity = true;
-    Prop.mainmem = false;
-    return Prop.newfsparser //
-    ? build(new NewFSParser(fsimportpath, mountpoint, backingstore), dbname)
-        : build(new FSParser(fsimportpath, mountpoint, backingstore), dbname);
+    return Prop.newfsparser ?
+      build(new NewFSParser(fsimportpath, mountpoint, backingstore), dbname) :
+      build(new FSParser(fsimportpath, mountpoint, backingstore), dbname);
   }
 
   @Override

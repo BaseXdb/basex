@@ -97,9 +97,9 @@ public final class Prop {
   /** Flag for creating an attribute value index. */
   public static boolean attrindex = true;
   /** Flag for loading database table into main memory. */
+  public static boolean tablemem = false;
+  /** Flag for creating a main memory database. */
   public static boolean mainmem = false;
-  /** Flag for creating databases on-the-fly (in memory). */
-  public static boolean onthefly = false;
   /** Path for filtering XML Documents. */
   public static String createfilter = "*.xml";
   /** Number of index occurrences to print in the index info. */

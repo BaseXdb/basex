@@ -28,7 +28,6 @@ import org.basex.io.IO;
 public abstract class Builder extends Progress {
   /** Meta data on built database. */
   public MetaData meta;
-
   /** Tag name index. */
   protected Names tags;
   /** Attribute name index. */
@@ -168,8 +167,8 @@ public abstract class Builder extends Progress {
     }
 
     // check if data ranges exceed database limits
-    if(tags.size() > 0xFFF) throw new IOException(LIMITTAGS);
-    if(atts.size() > 0xFFF) throw new IOException(LIMITATTS);
+    if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
+    if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
 
     /* [CG] INEX
     System.out.println("Tags: " + tags.size());

@@ -7,9 +7,9 @@ import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
-import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
@@ -65,17 +65,11 @@ public final class DiskBuilder extends Builder {
   protected synchronized DiskData finish() throws IOException {
     close();
 
-    // close files
-    final String db = meta.dbname;
-    final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-    meta.write(out);
-    tags.write(out);
-    atts.write(out);
-    path.write(out);
-    ns.write(out);
-    out.close();
+    // write meta data
+    DiskData.write(meta, tags, atts, path, ns);
 
     // write cached size and attribute values into main table
+    final String db = meta.dbname;
     final TableAccess ta = new TableDiskAccess(db, DATATBL);
     final DataInput in = new DataInput(db, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
@@ -109,8 +103,7 @@ public final class DiskBuilder extends Builder {
   @Override
   public void addDoc(final byte[] txt) throws IOException {
     tout.write(Data.DOC);
-    tout.write(0);
-    tout.write(0);
+    tout.write2(0);
     tout.write5(inline(txt, true));
     tout.writeInt(0);
     tout.writeInt(meta.size++);
@@ -120,8 +113,8 @@ public final class DiskBuilder extends Builder {
   public void addElem(final int t, final int s, final int dis,
       final int as, final boolean n) throws IOException {
 
-    tout.write(Data.ELEM);
-    tout.write2(t + (s << 12) + (n ? 1 << 11 : 0));
+    tout.write(Data.ELEM + (s << 4) + (n ? 1 << 3 : 0));
+    tout.write2(t);
     tout.write(as);
     tout.writeInt(dis);
     tout.writeInt(as);
@@ -133,8 +126,8 @@ public final class DiskBuilder extends Builder {
   public void addAttr(final int t, final int s, final byte[] txt,
       final int dis) throws IOException {
 
-    tout.write(Data.ATTR);
-    tout.write2(t + (s << 12));
+    tout.write(Data.ATTR + (s << 4));
+    tout.write2(t);
     tout.write5(inline(txt, false));
     tout.writeInt(dis);
     tout.writeInt(meta.size++);
@@ -145,8 +138,7 @@ public final class DiskBuilder extends Builder {
       throws IOException {
 
     tout.write(kind);
-    tout.write(0);
-    tout.write(0);
+    tout.write2(0);
     tout.write5(inline(txt, true));
     tout.writeInt(dis);
     tout.writeInt(meta.size++);

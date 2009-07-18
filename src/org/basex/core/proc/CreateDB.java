@@ -85,7 +85,7 @@ public final class CreateDB extends ACreate {
    * @throws IOException exception
    */
   public static Data xml(final Parser p, final String db) throws IOException {
-    if(db == null || Prop.onthefly) return new MemBuilder().build(p, "");
+    if(db == null || Prop.mainmem) return new MemBuilder().build(p, "");
 
     final Builder builder = new DiskBuilder();
     try {

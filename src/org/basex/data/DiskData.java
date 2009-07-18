@@ -17,11 +17,6 @@ import org.basex.io.TableMemAccess;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
-/* [CG] INEX:
- * - Byte   1-2:  NSPC: Namespace (2), NS Definition flag (1) and Name (13 bits)
- * - Byte   1-2:  NSPC: Namespace (2) and Name (13 bits)
- */
-
 /**
  * This class stores and organizes the node table and the index structures for
  * textual content. All nodes in the table are accessed by their
@@ -29,31 +24,32 @@ import org.basex.util.Token;
  * <ul>
  * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
  * <li>A maximum of 2^16 different tag and attribute names is allowed</li>
+ * <li>A maximum of 2^4 different namespaces is allowed</li>
  * <li>A tag can have a maximum of 256 attributes</li>
  * </ul>
  * Each node occupies 128 bits. The current storage layout looks like follows:
  *
  * <pre>
+ * COMMON ATTRIBUTES:
+ * - Byte     0:  KIND: Node kind (0-2)
  * ELEMENT NODES:
- * - Byte     0:  KIND: Node kind (ELEM)
- * - Byte   1-2:  NSPC: Namespace (4), NS Definition flag (1) and Name (11 bits)
+ * - Byte     0:  NSPC: Namespace (4-7), NS Definition flag (3)
+ * - Byte   1-2:  NAME: Name
  * - Byte     3:  ATTS: Number of attributes
  * - Byte  4- 7:  DIST: Distance to parent node
  * - Byte  8-11:  SIZE: Number of descendants
  * - Byte 12-15:  UNID: Unique Node ID
  * DOCUMENT NODES:
- * - Byte     0:  KIND: Node kind (DOC)
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  SIZE: Number of descendants
  * - Byte 12-15:  UNID: Unique Node ID
  * TEXT NODES:
- * - Byte     0:  KIND: Node kind (TEXT/COMM/PI)
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
  * ATTRIBUTE NODES:
- * - Byte     0:  KIND: Node kind (ATTR)
- * - Byte   1-2:  NSPC: Namespace (4) and Name (11 bits)
+ * - Byte     0:  NSPC: Namespace (4-7)
+ * - Byte   1-2:  NAME: Name
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
@@ -91,18 +87,21 @@ public final class DiskData extends Data {
   public DiskData(final String db, final boolean index) throws IOException {
     DataInput in = null;
     try {
+      // read meta data and indexes
       in = new DataInput(db, DATAINFO);
-      meta = new MetaData(db);
-      meta.read(in);
+      meta = new MetaData(db, in);
 
-      // read indexes
-      tags = new Names(in);
-      atts = new Names(in);
-      path = new PathSummary(this, in);
-      ns = new Namespaces(in);
+      while(true) {
+        final String k = in.readString();
+        if(k.length() == 0) break;
+        if(k.equals(DBTAGS))      tags = new Names(in);
+        else if(k.equals(DBATTS)) atts = new Names(in);
+        else if(k.equals(DBPATH)) path = new PathSummary(this, in);
+        else if(k.equals(DBNS))   ns   = new Namespaces(in);
+      }
 
-      // main memory mode.. keep table in memory
-      table = Prop.mainmem ? new TableMemAccess(db, DATATBL, meta.size) :
+      // table main memory mode..
+      table = Prop.tablemem ? new TableMemAccess(db, DATATBL, meta.size) :
         new TableDiskAccess(db, DATATBL);
       texts = new DataAccess(db, DATATXT);
       values = new DataAccess(db, DATAATV);
@@ -127,20 +126,13 @@ public final class DiskData extends Data {
       table.flush();
       texts.flush();
       values.flush();
-      // write meta data...
-      final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-      meta.write(out);
-      tags.write(out);
-      atts.write(out);
-      path.write(out);
-      ns.write(out);
-      out.close();
+      write(meta, tags, atts, path, ns);
       meta.dirty = false;
     } catch(final IOException e) {
       e.printStackTrace();
     }
   }
-
+  
   @Override
   public synchronized void close() throws IOException {
     if(meta.dirty) flush();
@@ -196,7 +188,7 @@ public final class DiskData extends Data {
 
   @Override
   public int kind(final int pre) {
-    return table.read1(pre, 0);
+    return table.read1(pre, 0) & 0x07;
   }
 
   @Override
@@ -227,33 +219,33 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int size(final int pre, final int k) {
-    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
+  public int size(final int pre, final int kind) {
+    return kind == ELEM || kind == DOC ? table.read4(pre, 8) : 1;
   }
 
   @Override
   public int tagID(final int pre) {
-    return table.read2(pre, 1) & 0x07FF;
+    return table.read2(pre, 1);
   }
 
   @Override
   public int tagNS(final int pre) {
-    return (table.read1(pre, 1) >>> 4) & 0x0F;
+    return (table.read1(pre, 0) >>> 4) & 0x0F;
   }
 
   @Override
   public int[] ns(final int pre) {
-    return (table.read1(pre, 1) & 0x08) != 0 ? ns.get(pre) : Array.NOINTS;
+    return (table.read1(pre, 0) & 0x08) != 0 ? ns.get(pre) : Array.NOINTS;
   }
 
   @Override
   public int attNameID(final int pre) {
-    return table.read2(pre, 1) & 0x07FF;
+    return table.read2(pre, 1);
   }
 
   @Override
   public int attNS(final int pre) {
-    return (table.read1(pre, 1) >>> 4) & 0x0F;
+    return (table.read1(pre, 0) >>> 4) & 0x0F;
   }
 
   @Override
@@ -709,5 +701,33 @@ public final class DiskData extends Data {
   @Override
   public void setLock(final int l) {
     lock = l;
+  }
+
+  /**
+   * Writes the specified meta data to disk.
+   * @param meta meta data
+   * @param tags tag index
+   * @param atts attribute index
+   * @param path path summary
+   * @param ns namespaces
+   * @throws IOException I/O exception
+   */
+  public static void write(final MetaData meta, final Names tags,
+      final Names atts, final PathSummary path, final Namespaces ns)
+        throws IOException {
+
+    // write meta data
+    final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
+    meta.write(out);
+    out.writeString(DBTAGS);
+    tags.write(out);
+    out.writeString(DBATTS);
+    atts.write(out);
+    out.writeString(DBPATH);
+    path.write(out);
+    out.writeString(DBNS);
+    ns.write(out);
+    out.write(0);
+    out.close();
   }
 }

@@ -140,8 +140,7 @@ public final class DialogOpen extends Dialog {
         DataInput in = null;
         try {
           in = new DataInput(db, DATAINFO);
-          final MetaData meta = new MetaData(db);
-          meta.read(in);
+          final MetaData meta = new MetaData(db, in);
           detail.setText(InfoDB.db(meta, true, true).finish());
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

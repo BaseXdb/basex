@@ -44,8 +44,7 @@ public final class List extends Process {
         DataInput in = null;
         try {
           in = new DataInput(name, DATAINFO);
-          final MetaData md = new MetaData(name);
-          md.read(in);
+          final MetaData md = new MetaData(name, in);
           in.close();
           o.println(md.file.toString());
         } catch(final IOException ex) {

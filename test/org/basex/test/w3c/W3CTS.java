@@ -199,8 +199,9 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    //Prop.onthefly = true;
     Prop.xqformat = false;
+    Prop.mainmem = true;
+    //Prop.tablemem = true;
 
     new CreateDB(path + input).execute(context, null);
     data = context.data();
@@ -468,19 +469,19 @@ public abstract class W3CTS {
       logFile.append("\" result='");
     }
 
-    boolean rightCode = false;
+    boolean correctError = false;
     if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
       expError = error(pth + outname, expError);
       final String code = error.substring(0, Math.min(8, error.length()));
       for(final String er : SLASH.split(expError)) {
         if(code.equals(er)) {
-          rightCode = true;
+          correctError = true;
           break;
         }
       }
     }
 
-    if(rightCode) {
+    if(correctError) {
       if(print) {
         logOK.append(logStr);
         logOK.append("[Right] ");

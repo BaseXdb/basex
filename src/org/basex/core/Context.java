@@ -94,7 +94,7 @@ public final class Context {
         marked = null;
         copied = null;
         if(POOL.unpin(d)) d.close();
-        if(Prop.mainmem || Prop.onthefly) Performance.gc(1);
+        if(Prop.tablemem || Prop.mainmem) Performance.gc(1);
         if(Prop.fuse) closeFuse(d);
       }
       return true;

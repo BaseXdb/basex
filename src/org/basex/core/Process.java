@@ -81,7 +81,7 @@ public abstract class Process extends AbstractProcess {
       while(data.getLock() == 2) Performance.sleep(50);
     }
     if(updating()) {
-      if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
+      if(Prop.tablemem || Prop.mainmem) return error(PROCMM);
       if(context.data().ns.size() != 0) return error(UPDATENS);
     }
 

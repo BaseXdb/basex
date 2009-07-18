@@ -52,7 +52,7 @@ abstract class ACreate extends Process {
       context.close();
       if(Context.POOL.check(db) >= 1) return error(DBINUSE);
       final Performance pp = new Performance();
-      builder = Prop.onthefly ? new MemBuilder() : new DiskBuilder();
+      builder = Prop.mainmem ? new MemBuilder() : new DiskBuilder();
       progress(builder);
       final Data data = builder.build(p, db);
       if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());

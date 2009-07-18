@@ -64,8 +64,7 @@ public final class XMLTS {
     final Context ctx = new Context();
     Prop.textindex = false;
     Prop.attrindex = false;
-    Prop.onthefly = true;
-    Prop.mainmem = true;
+    //Prop.mainmem = true;
 
     new Check(FILE).execute(ctx, null);
     data = ctx.data();

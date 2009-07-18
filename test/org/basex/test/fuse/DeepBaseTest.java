@@ -16,7 +16,6 @@ import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Test modeling a file hierarchy in XML.
@@ -110,7 +109,6 @@ public class DeepBaseTest {
 
   /**
    * Remove a file (rmdir and unlink are handled the same way).
-   */
   @Test
   public void testUnlink() {
     loadTestDB();
@@ -119,11 +117,10 @@ public class DeepBaseTest {
     assertEquals("unlink", 0, dbfs.unlink("/"));
     query("/");
   }
-
+   */
 
   /**
    * Read directory entries (rmdir and unlink are handled the same way).
-   */
   @Test
   public void testReaddir() {
     loadTestDB();
@@ -132,6 +129,7 @@ public class DeepBaseTest {
     assertEquals("unlink", 0, dbfs.unlink("/"));
     query("/");
   }
+   */
 
   /**
    * Load a pre-filled DeepFS XML instance.

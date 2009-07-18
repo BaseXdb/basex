@@ -285,12 +285,12 @@ public class BaseXClient {
             process(new Set(CmdSet.ENTITY, OFF), false);
             ok = true;
           } else if(c == 'm' && standalone) {
-            // hidden option: activate main memory mode
-            Prop.mainmem = true;
+            // hidden option: activate table main memory mode
+            Prop.tablemem = true;
             ok = true;
           } else if(c == 'M' && standalone) {
-            // hidden option: activate on-the-fly parsing
-            Prop.onthefly = true;
+            // hidden option: activate main memory mode
+            Prop.mainmem = true;
             ok = true;
           } else if(c == 'o') {
             // specify file for result output

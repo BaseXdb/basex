@@ -35,7 +35,7 @@ public final class Check extends Process {
         return Prop.info ? info(DBINMEM) : true;
 
     // open or create new database
-    return !Prop.onthefly && exec(new Open(name)) || exec(new CreateDB(name));
+    return !Prop.mainmem && exec(new Open(name)) || exec(new CreateDB(name));
   }
 
   /**

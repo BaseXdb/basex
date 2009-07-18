@@ -203,9 +203,9 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
-      final Nodes nodes = gui.context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size() != 0 && (nodes.size() != 1 || nodes.nodes[0] != 0));
+      final Nodes n = gui.context.marked();
+      BaseXLayout.enable(button, updatable(n) &&
+          (n.size() != 1 || n.nodes[0] != 0));
     }
   },
 
@@ -239,14 +239,13 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context context = gui.context;
       // disallow copy of empty node set or root node
-      final Nodes nodes = context.marked();
-      boolean s = !Prop.mainmem && context.copied() != null && nodes != null &&
-        nodes.size() != 0 && (nodes.size() != 1 || nodes.nodes[0] != 0) &&
-        nodes.data.ns.size() == 0;
+      final Nodes n = context.marked();
+      boolean s = updatable(n) && context.copied() != null &&
+        n.size() != 0 && (n.size() != 1 || n.nodes[0] != 0);
       if(s) {
-        final Data d = nodes.data;
-        for(final int n : nodes.nodes) {
-          if(d.kind(n) != Data.ELEM) {
+        final Data d = n.data;
+        for(final int pre : n.nodes) {
+          if(d.kind(pre) != Data.ELEM) {
             s = false;
             break;
           }
@@ -267,8 +266,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size() != 0 &&
-          n.data.ns.size() == 0);
+      BaseXLayout.enable(button, updatable(n) && n.size() != 0);
     }
   },
 
@@ -285,11 +283,10 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context context = gui.context;
-      final Nodes nodes = context.marked();
+      final Nodes n = context.marked();
       final Data d = context.data();
-      BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-        nodes.size() == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
-        d.kind(nodes.nodes[0]) == Data.DOC) && nodes.data.ns.size() == 0);
+      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
+          (d.kind(n.nodes[0]) == Data.ELEM || d.kind(n.nodes[0]) == Data.DOC));
     }
   },
 
@@ -307,10 +304,9 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context context = gui.context;
-      final Nodes nodes = context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-        nodes.size() == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
-        nodes.data.ns.size() == 0);
+      final Nodes n = context.marked();
+      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
+          context.data().kind(n.nodes[0]) != Data.DOC);
     }
   },
 
@@ -896,5 +892,15 @@ public enum GUICommands implements GUICommand {
     GUIProp.createpath = file.path();
     if(single) file.suffix(IO.XMLSUFFIX);
     return file;
+  }
+  
+  /**
+   * Checks if data can be updated (disk mode, nodes defined, no namespaces).
+   * @param n node instance
+   * @return result of check
+   */
+  static boolean updatable(final Nodes n) {
+    return !Prop.tablemem && !Prop.mainmem &&
+      n != null && n.data.ns.size() == 0;
   }
 }
