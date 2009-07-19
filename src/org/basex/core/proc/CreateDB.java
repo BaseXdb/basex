@@ -32,7 +32,7 @@ public final class CreateDB extends ACreate {
    * @param input file name or XML string
    */
   public CreateDB(final String input) {
-    this(input, IO.get(input).dbname());
+    this(input, input);
   }
 
   /**
@@ -42,7 +42,7 @@ public final class CreateDB extends ACreate {
    *         a main memory instance is created
    */
   public CreateDB(final String input, final String name) {
-    super(STANDARD, input, name);
+    super(STANDARD, input, name == null ? null : IO.get(name).dbname());
   }
 
   @Override

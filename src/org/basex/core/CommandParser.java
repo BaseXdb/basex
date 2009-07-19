@@ -109,7 +109,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB: case XML:
             final String fn = path(cmd);
             final String db = name(null);
-            return new CreateDB(fn, db == null ? fn : db);
+            return db == null ? new CreateDB(fn) : new CreateDB(fn, db);
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:

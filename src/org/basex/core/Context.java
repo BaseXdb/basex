@@ -88,7 +88,7 @@ public final class Context {
         marked = null;
         copied = null;
         if(POOL.unpin(d)) d.close();
-        if(Prop.tablemem || Prop.mainmem) Performance.gc(1);
+        if(Prop.mainmem) Performance.gc(1);
       }
       return true;
     } catch(final IOException ex) {
