@@ -21,7 +21,7 @@ public final class XQuery extends AQuery {
 
   @Override
   protected boolean exec() {
-    return query(args[0] == null ? "" : args[0]);
+    return query(args[0]);
   }
 
   @Override

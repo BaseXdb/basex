@@ -56,7 +56,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    * @return property
    */
   public String prop() {
-    return "show" + (view.gui.context.db() ? "" : "start") + view;
+    return "show" + (view.gui.context.data() != null ? "" : "start") + view;
   }
 
   /**

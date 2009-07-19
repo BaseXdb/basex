@@ -6,13 +6,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.core.Progress;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
-import org.basex.core.proc.Open;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.data.FTPosData;
+import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
@@ -214,7 +214,7 @@ public final class QueryContext extends Progress {
         // add collection instances
         final NodIter ni = new NodIter();
         for(int d = 0; d < docs; d++) ni.add(doc[d]);
-        addColl(ni, token(data.meta.dbname));
+        addColl(ni, token(data.meta.name));
       }
 
       // evaluates the query and returns the result
@@ -324,6 +324,7 @@ public final class QueryContext extends Progress {
    * @throws IOException query exception
    */
   void close() throws IOException {
+    // [AW] databases must eventually be unpinned
     for(int d = rootDocs; d < docs; d++) doc[d].data.close();
   }
 
@@ -375,10 +376,15 @@ public final class QueryContext extends Progress {
           return (DBNode) collect[c].item[n];
       }
     }
+
     final String dbname = string(db);
+
+    // [AW] what happens if context == null?
+    // better place for all pin operations: addDoc(...)
+
     // check if the database has already been opened
     for(int d = 0; d < docs; d++)
-    if(doc[d].data.meta.dbname.equals(dbname)) return doc[d];
+    if(doc[d].data.meta.name.equals(dbname)) return doc[d];
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
     for(int d = 0; d < docs; d++) {
@@ -388,9 +394,10 @@ public final class QueryContext extends Progress {
     // get database instance
     Data data = null;
 
+    // [AW] following databases are not considered yet - see above
     if(Prop.web) {
       try {
-        data = Open.open(dbname);
+        data = new DiskData(dbname);
       } catch(final IOException ex) {
         Err.or(INVDOC, dbname);
       }
@@ -428,7 +435,9 @@ public final class QueryContext extends Progress {
       throws QueryException {
 
     try {
-      return Check.check(path);
+      final IO f = IO.get(path);
+      final String db = f.dbname();
+      return MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
     } catch(final IOException ex) {
       if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
       return null;
@@ -471,7 +480,7 @@ public final class QueryContext extends Progress {
       col.add(new DBNode(data, p));
       p += data.size(p, data.kind(p));
     }
-    addColl(col, token(data.meta.dbname));
+    addColl(col, token(data.meta.name));
   }
 
   /**

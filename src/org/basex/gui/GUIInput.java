@@ -69,7 +69,7 @@ public final class GUIInput extends BaseXTextField {
             final StringList sl = new StringList();
             sl.add(txt);
 
-            final int i = !main.context.db() ? 2 : GUIProp.searchmode;
+            final int i = main.context.data() == null ? 2 : GUIProp.searchmode;
             final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
                 GUIProp.xquery : GUIProp.commands;
             for(int p = 0; p < hs.length && sl.size < 10; p++) {
@@ -137,7 +137,7 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   protected boolean cmdMode() {
-    return GUIProp.searchmode == 2 || !gui.context.db() ||
+    return GUIProp.searchmode == 2 || gui.context.data() == null ||
       getText().startsWith("!");
   }
 

@@ -46,7 +46,7 @@ public final class FTTrie extends FTIndex {
    */
   public FTTrie(final Data d) throws IOException {
     super(d);
-    final String db = d.meta.dbname;
+    final String db = d.meta.name;
     inN = new DataAccess(db, DATAFTX + 'a');
     inD = new DataAccess(db, DATAFTX + 'b');
     inS = new DataAccess(db, DATAFTX + 'c');

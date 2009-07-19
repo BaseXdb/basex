@@ -16,6 +16,8 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class Context {
+  /** Database pool. */
+  public static final DataPool POOL = new DataPool();
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -24,22 +26,13 @@ public final class Context {
   private Nodes marked;
   /** Currently copied nodes. */
   private Nodes copied;
-  /** DBPool. */
-  public static final DataPool POOL = new DataPool();
 
   /**
    * Constructor.
   */
   public Context() {
+    // read database properties
     Prop.read();
-  }
-
-  /**
-   * Returns true if a data reference has been set.
-   * @return result of check
-  */
-  public boolean db() {
-    return data != null;
   }
 
   /**
@@ -66,7 +59,7 @@ public final class Context {
    */
   public void data(final Data d) {
     if(data != null) {
-      BaseX.debug("Warning: database still open.");
+      BaseX.errln("Warning: database still open.");
       close();
     }
     data = d;
@@ -96,7 +89,6 @@ public final class Context {
         copied = null;
         if(POOL.unpin(d)) d.close();
         if(Prop.tablemem || Prop.mainmem) Performance.gc(1);
-        if(Prop.fuse) closeFuse(d);
       }
       return true;
     } catch(final IOException ex) {
@@ -155,14 +147,20 @@ public final class Context {
   
   /**
    * Pins the Pool.
-   * @param dbname DBName
-   * @param fname FileName
-   * @return Data data
+   * @param name name of database
+   * @return data reference
    */
-  public Data pin(final String dbname, final IO fname) {
-    if(dbname != null) return POOL.pin(dbname);
-    if(fname != null) return POOL.pin(fname);
-    return null;
+  public Data pin(final String name) {
+    return POOL.pin(name);
+  }
+  
+  /**
+   * Pins the Pool.
+   * @param name file name
+   * @return data reference
+   */
+  public Data pin(final IO name) {
+    return POOL.pin(name);
   }
   
   /**
@@ -174,41 +172,12 @@ public final class Context {
   }
   
   /**
-   * Checks the Pool for in-use.
+   * Checks if the specified database is pinned.
    * @param db DBName
    * @return int use-status
    */
-  public int checkPool(final String db) {
-    return POOL.check(db);
+  public boolean pinned(final String db) {
+    return POOL.pinned(db);
   }
   
-  /**
-   * Closes the fuse instance.
-   * @param d data reference
-   * @throws IOException I/O exception
-   */
-  private static void closeFuse(final Data d) throws IOException {
-    final String method = "[BaseX.close] ";
-    BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
-    // -- unmount running fuse.
-    for(int i = 3; i > 0; i--) {
-      Performance.sleep(1000);
-      BaseX.err(i + " .. ");
-    }
-    BaseX.debug("GO.");
-    final String cmd = "umount -f " + d.meta.mountpoint;
-    BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
-    Runtime r = Runtime.getRuntime();
-    java.lang.Process p = r.exec(cmd);
-    try {
-      p.waitFor();
-    } catch(InterruptedException e) {
-      e.printStackTrace();
-    }
-    int rc = p.exitValue();
-    String msg = method + "Unmount " + d.meta.mountpoint;
-    if (rc == 0) msg = msg + " ... OK.";
-    else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
-    BaseX.debug(msg);
-  }
 }

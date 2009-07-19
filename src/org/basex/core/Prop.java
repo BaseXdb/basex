@@ -70,7 +70,7 @@ public final class Prop {
   public static boolean serialize = true;
   /** Flag for serialization as XML. */
   public static boolean xmloutput = false;
-  /** Dots the Query plan. */
+  /** Dots the query plan. */
   public static boolean dotplan = false;
   /** Prints a XML plan. */
   public static boolean xmlplan = false;
@@ -107,10 +107,8 @@ public final class Prop {
   /** Maximum text size to be displayed. */
   public static int maxtext = 1 << 21;
 
-  /** Flag for iterator optimized storage within ftindex. */
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
-
   /** Flag for full-text stemming. */
   public static boolean ftst = false;
   /** Flag for full-text case sensitivity. */

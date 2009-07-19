@@ -35,10 +35,10 @@ public final class Open extends Process {
     context.close();
 
     try {
-      Data data = context.pin(db, null);
+      Data data = context.pin(db);
       if(data == null) {
         // open new database instance
-        data = open(db);
+        data = new DiskData(db);
         context.addToPool(data);
       }
       context.data(data);
@@ -53,16 +53,5 @@ public final class Open extends Process {
       final String msg = ex.getMessage();
       return error(msg.length() != 0 ? msg : DBOPENERR);
     }
-  }
-
-  /**
-   * Static method for opening a database.
-   * No warnings are thrown; instead, an empty reference is returned.
-   * @param db database to be opened
-   * @return data reference
-   * @throws IOException exception
-   */
-  public static Data open(final String db) throws IOException {
-    return new DiskData(db);
   }
 }

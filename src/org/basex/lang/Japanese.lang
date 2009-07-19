@@ -315,7 +315,6 @@ pc_pos=% (%行、%列)
 
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
-db_open=データベースを開きました。
 db_closed=データベースを閉じました。
 db_closeerr=データベースを閉じる事が出来ませんでした。
 db_optimized=データベース % 最適化されました。（？）
@@ -457,9 +456,6 @@ ch_info22=- 引数無し: 一般事項の表示
 ch_info23=: データベース情報を表示します。
 ch_info24=: インデックス情報を表示します。
 ch_info25= [start end]|[query]: XMLテーブルの表示
-ch_check0=[database]
-ch_check1=[database] が存在していれば開き、もしなければ新規データベースを作成
-ch_check2=指定された [database] が存在するか確認し、\n もし存在すればデータベースを開きます。\nもし無い場合は引数はファイル名と解釈され\n新規データベースが作成されます。
 ch_close1=現在のデータベースを閉じる
 ch_close2=現在のデータベースを閉じて、メインメモリをリセットします。
 ch_list1=利用可能なデータベースの一覧
@@ -484,6 +480,9 @@ ch_xquerymv2=指定されたXPath [query] を評価し、結果を [hits] 件ま
 ch_xquery0=[query]
 ch_xquery1=XQuery [query] の評価
 ch_xquery2=XQueryを評価し、結果を表示します
+ch_run0=[file]
+ch_run1=Evaluate XQuery from [file].
+ch_run2=Evaluates an XQuery from the specified file and prints the result.
 ch_find0=[query]
 ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。

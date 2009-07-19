@@ -13,10 +13,11 @@ public interface Commands {
   /** Command definitions. */
   enum Cmd {
     // DATABASE COMMANDS
-    DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true), CHECK(false),
+    DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true),
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
-    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false), FIND(true), CS(true),
+    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false), RUN(true),
+    FIND(true), CS(true),
     // UPDATE COMMANDS
     DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS

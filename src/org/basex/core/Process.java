@@ -72,44 +72,33 @@ public abstract class Process extends AbstractProcess {
   @Override
   public final boolean execute(final Context ctx) {
     context = ctx;
-    // database does not exist...
     final Data data = context.data();
-    if(data() && data == null) {
-      return error(PROCNODB);
-    }
-    if(data != null && data.getLock() != 0) {
-      if(data.getLock() == 2) {
-        while(data.getLock() == 2) Performance.sleep(50);
-      } else if(updating()) {
+
+    // data reference needed?
+    if(data() && data == null) return error(PROCNODB);
+
+    if(data != null) {
+      // wait until update commands have been completed..
+      while(data.getLock() == 2) Performance.sleep(50);
+      // check update commands..
+      if(updating()) {
+        if(Prop.tablemem || Prop.mainmem) return error(PROCMM);
         while(data.getLock() != 0) Performance.sleep(50);
       }
     }
-    if(updating()) {
-      if(Prop.tablemem || Prop.mainmem) return error(PROCMM);
-      if(context.data().ns.size() != 0) return error(UPDATENS);
-    }
 
     try {
-      if(data != null && updating()) {
-        data.setLock(2);
-      } else if (data != null) {
-        data.setLock(1);
-      }
+      if(data != null) data.setLock(updating() ? 2 : 1);
       final boolean ok = exec();
-      if(updating()) context.update();
       return ok;
     } catch(final Throwable ex) {
+      if(data != null) data.setLock(0);
+
       // not expected...
       ex.printStackTrace();
       if(ex instanceof OutOfMemoryError) {
         Performance.gc(2);
-        if(data != null) {
-          data.setLock(0);
-        }
         return error(PROCOUTMEM);
-      }
-      if(data != null) {
-        data.setLock(0);
       }
       return error(PROCERR, this, ex.toString());
     }
@@ -125,17 +114,17 @@ public abstract class Process extends AbstractProcess {
 
   @Override
   public final void output(final PrintOutput out) throws IOException {
+    final Data data = context.data();
     try {
       if(printing()) out(out);
     } catch(final IOException ex) {
+      if(data != null) data.setLock(0);
       throw ex;
     } catch(final Exception ex) {
       out.print(ex.toString());
       BaseX.debug(ex);
     }
-    if(context.data() != null) {
-      context.data().setLock(0);
-    }
+    if(data != null) data.setLock(0);
   }
 
   /**

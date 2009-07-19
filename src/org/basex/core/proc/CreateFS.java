@@ -17,7 +17,7 @@ public final class CreateFS extends ACreate {
   /** File hierarchy to be imported. */
   private final String fsimportpath;
   /** Database name for imported file hierarchy. */
-  private final String dbname;
+  private final String name;
   /** DeepFS mount point. */
   private final String mountpoint;
   /** DeepFS backing store. */
@@ -26,24 +26,24 @@ public final class CreateFS extends ACreate {
   /**
    * Constructor.
    * @param path filesystem path
-   * @param name name of database
+   * @param db name of database
    */
-  public CreateFS(final String path, final String name) {
-    this(path, name, "no_fuse", "no_fuse");
+  public CreateFS(final String path, final String db) {
+    this(path, db, "no_fuse", "no_fuse");
   }
 
   /**
    * Constructor.
    * @param path filesystem path
-   * @param name name of database
+   * @param db name of database
    * @param mp fuse mount point
    * @param bp path to BLOB backing store
    */
-  public CreateFS(final String path, final String name, final String mp,
+  public CreateFS(final String path, final String db, final String mp,
       final String bp) {
-    super(STANDARD, path, name, mp, bp);
+    super(STANDARD, path, db, mp, bp);
     fsimportpath = path;
-    dbname = name;
+    name = db;
     mountpoint = mp;
     backingstore = bp;
   }
@@ -53,8 +53,8 @@ public final class CreateFS extends ACreate {
     Prop.chop = true;
     Prop.entity = true;
     return Prop.newfsparser ?
-      build(new NewFSParser(fsimportpath, mountpoint, backingstore), dbname) :
-      build(new FSParser(fsimportpath, mountpoint, backingstore), dbname);
+      build(new NewFSParser(fsimportpath, mountpoint, backingstore), name) :
+      build(new FSParser(fsimportpath, mountpoint, backingstore), name);
   }
 
   @Override

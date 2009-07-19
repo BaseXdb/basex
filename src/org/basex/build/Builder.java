@@ -36,11 +36,8 @@ public abstract class Builder extends Progress {
   protected Namespaces ns = new Namespaces();
   /** Tree structure. */
   protected PathSummary path = new PathSummary();
-
   /** Parser instance. */
   protected Parser parser;
-  /** Element counter. */
-  public int elms;
 
   /** Parent stack. */
   private final int[] parStack = new int[IO.MAXHEIGHT];
@@ -52,6 +49,8 @@ public abstract class Builder extends Progress {
   private boolean inDoc;
   /** Current tree height. */
   private int level;
+  /** Element counter. */
+  private int c;
 
   /**
    * Default constructor.
@@ -169,13 +168,6 @@ public abstract class Builder extends Progress {
     // check if data ranges exceed database limits
     if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
     if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
-
-    /* [CG] INEX
-    System.out.println("Tags: " + tags.size());
-    System.out.println("Attributes: " + atts.size());
-    System.out.println("Namespaces: " + ns.size());
-    */
-
     return finish();
   }
 
@@ -199,7 +191,6 @@ public abstract class Builder extends Progress {
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     inDoc = false;
-    if(Prop.debug) BaseX.err("\n");
   }
 
   /**
@@ -383,20 +374,22 @@ public abstract class Builder extends Progress {
       addAttr(an, ans, av, a + 1);
     }
 
-    // set leaf node information in index and add tag and atts to statistics
     if(level != 0) {
-      if(level == 1) {
-        if(inDoc && !Prop.fuse) error(MOREROOTS, parser.det(), tag);
-      } else {
+      if(level > 1) {
+        // set leaf node information in index
         tags.stat(tagStack[level - 1]).leaf = false;
+      } else if(inDoc) {
+        // [AH] && !Prop.fuse.. still necessary?
+        // don't allow more than one root node
+        error(MOREROOTS, parser.det(), tag);
       }
     }
     if(meta.size != 1) inDoc = true;
 
     if(Prop.debug) {
-      if(++elms % 500000 == 0) BaseX.err(" " + elms + "\n");
-      else if(elms % 50000 == 0) BaseX.err("!");
-      else if(elms % 10000 == 0) BaseX.err(".");
+      if(++c % 500000 == 0) BaseX.err(" " + c + "\n");
+      else if(c % 50000 == 0) BaseX.err("!");
+      else if(c % 10000 == 0) BaseX.err(".");
     }
 
     return pre;

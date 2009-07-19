@@ -41,7 +41,8 @@ abstract class ACreate extends Process {
   /**
    * Builds and creates a new database instance.
    * @param p parser instance
-   * @param db name of database
+   * @param db name of database; if set to null,
+   * a main memory database instance is created
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
@@ -49,13 +50,16 @@ abstract class ACreate extends Process {
     Builder builder = null;
     try {
       context.close();
-      if(context.checkPool(db) >= 1) return error(DBINUSE);
+      final boolean mem = db == null || Prop.mainmem;
+      if(!mem && context.pinned(db)) return error(DBINUSE);
+
       final Performance pp = new Performance();
-      builder = Prop.mainmem ? new MemBuilder() : new DiskBuilder();
+      builder = mem ? new MemBuilder() : new DiskBuilder();
       progress(builder);
       final Data data = builder.build(p, db);
       if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
       builder = null;
+
       index(data);
       context.data(data);
       context.addToPool(data);
@@ -70,7 +74,7 @@ abstract class ACreate extends Process {
       final String msg = ex.getMessage();
       err = BaseX.info(msg != null ? msg : args[0]);
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      BaseX.errln(ex);
       err = BaseX.info(CREATEERR, args[0]);
     }
 
@@ -123,12 +127,8 @@ abstract class ACreate extends Process {
   private void buildIndex(final Type index, final IndexBuilder
       builder, final Data data) throws IOException {
 
-    final Performance pp = new Performance();
     progress((Progress) builder);
     data.closeIndex(index);
     data.setIndex(index, builder.build(data));
-
-    if(Prop.debug) BaseX.err("- % Index: % (%)\n", index, pp.getTimer(),
-        Performance.getMem());
   }
 }

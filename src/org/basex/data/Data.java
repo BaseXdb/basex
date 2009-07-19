@@ -80,15 +80,24 @@ public abstract class Data {
   }
 
   /**
-   * Flushes the table data.
-   */
-  public abstract void flush();
-
-  /**
    * Closes the current database.
    * @throws IOException in case the database could not be closed
    */
-  public abstract void close() throws IOException;
+  public final void close() throws IOException {
+    if(fs != null) fs.close();
+    cls();
+  }
+
+  /**
+   * Internal method to close the database.
+   * @throws IOException in case the database could not be closed
+   */
+  protected abstract void cls() throws IOException;
+
+  /**
+   * Flushes the table data.
+   */
+  public abstract void flush();
 
   /**
    * Closes the specified index.

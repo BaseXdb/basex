@@ -46,7 +46,7 @@ public final class InfoDB extends AInfo {
   public static TokenBuilder db(final MetaData meta, final boolean bold,
       final boolean index) {
 
-    final File dir = IO.dbpath(meta.dbname);
+    final File dir = IO.dbpath(meta.name);
     long len = 0;
     if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
 
@@ -59,7 +59,7 @@ public final class InfoDB extends AInfo {
     final String header = (bold ?
         new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
     tb.add(header, INFODB);
-    format(tb, INFODBNAME, meta.dbname, l);
+    format(tb, INFODBNAME, meta.name, l);
     format(tb, INFODBSIZE, Performance.format(len), l);
     format(tb, INFOENCODING, meta.encoding, l);
     format(tb, INFONODES, Integer.toString(meta.size), l);

@@ -99,7 +99,7 @@ public final class TableDiskAccess extends TableAccess {
         np = m == last ? fp + ENTRIES : firstPres[m + 1];
       }
       if(l > h) BaseX.notexpected("Invalid Data Access [pre:" + pre +
-          ",indexSize:" + indexSize + ",access:" + l + ">" + h + "]");
+          ", indexSize:" + indexSize + ", access:" + l + " > " + h + "]");
 
       readBlock(m, fp, np);
     }

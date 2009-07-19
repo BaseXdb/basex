@@ -207,7 +207,7 @@ public final class GUI extends JFrame {
             popup.setVisible(false);
           }
         };
-        final int i = !context.db() ? 2 : GUIProp.searchmode;
+        final int i = context.data() == null ? 2 : GUIProp.searchmode;
         final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
             GUIProp.xquery : GUIProp.commands;
         for(final String en : hs) {
@@ -332,7 +332,8 @@ public final class GUI extends JFrame {
    */
   protected void execute() {
     String in = input.getText();
-    final boolean cmd = GUIProp.searchmode == 2 || !context.db();
+    final boolean db = context.data() != null;
+    final boolean cmd = GUIProp.searchmode == 2 || !db;
 
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
@@ -343,7 +344,6 @@ public final class GUI extends JFrame {
             if(!exec(p, p instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
-          final boolean db = context.db();
           if(!GUIProp.showstarttext && !db || !GUIProp.showtext && db) {
             GUICommands.SHOWTEXT.execute(this);
           }
@@ -613,7 +613,7 @@ public final class GUI extends JFrame {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = !context.db() ? 2 : GUIProp.searchmode;
+    final int i = context.data() == null ? 2 : GUIProp.searchmode;
     final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xquery :
       GUIProp.commands;
     hist.setEnabled(hs.length != 0);

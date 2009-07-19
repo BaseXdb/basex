@@ -37,7 +37,7 @@ public final class FTTrieBuilder extends FTBuilder {
 
   @Override
   void write(final Data data) throws IOException {
-    final String db = data.meta.dbname;
+    final String db = data.meta.name;
     final DataOutput outb = new DataOutput(db, DATAFTX + 'b');
 
     hash.init();

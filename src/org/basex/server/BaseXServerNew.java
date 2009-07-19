@@ -181,7 +181,7 @@ public class BaseXServerNew {
 
     public void run() {
       while(thread != null) {
-     // get user input
+        // get user input
         try {
           final InputStreamReader isr = new InputStreamReader(System.in);
           String com = new BufferedReader(isr).readLine().trim();
@@ -194,8 +194,8 @@ public class BaseXServerNew {
             for(int i = 0; i < size; i++) {
               Session session = sessions.get(i);
               String dbname = "No Database opened.";
-              if(session.context.db()) {
-              dbname = session.context.data().meta.dbname;
+              if(session.context.data() != null) {
+                dbname = session.context.data().meta.name;
               }
               BaseX.outln("Client " + session.clientId + ": " + dbname);
             }

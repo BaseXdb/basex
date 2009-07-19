@@ -319,7 +319,6 @@ pc_pos="%" (Linea %, Colonna %)
 
 # Database commands
 db_no=Database '%' non trovato.
-db_open=Database aperto.
 db_closed=Database chiuso.
 db_closeerr=Impossibile chiudere il Database.
 db_optimized=Database ottimizzato in %.
@@ -461,9 +460,6 @@ ch_info22=- nessun argomento: mostra informazioni globali
 ch_info23=: mostra informazioni sul Database
 ch_info24=: mostra informazioni sugli Indici
 ch_info25= [start end]|[query]: mostra tabella XML
-ch_check0=[database]
-ch_check1=Apri [database] se esiste, oppure creane uno nuovo.
-ch_check2=Controlla se il [database] specificato esiste.\n Se si, viene aperto. Altrimenti,\n l'argomento è interpretato come un nome di file, ed un nuovo\n database viene creato.
 ch_close1=Ciudi Database in uso.
 ch_close2=Chiude il Database in uso.
 ch_list1=Mostra Database disponibili.
@@ -488,6 +484,9 @@ ch_xquerymv2=Esegue la [query] XPath specificata e limita il\n numero di risulta
 ch_xquery0=[query]
 ch_xquery1=Esegui [query] XQuery.
 ch_xquery2=Esegue una query XQuery e stampa il risultato.
+ch_run0=[file]
+ch_run1=Evaluate XQuery from [file].
+ch_run2=Evaluates an XQuery from the specified file and prints the result.
 ch_find0=[query]
 ch_find1=Esegui keyword query.
 ch_find2=I seguenti modificatori possono essere usati:\n =  : cerca nodi di testo con corrispondenza esatta"\n @= : cerca attributi con corrispondenza esatta\n @  : cerca attributi

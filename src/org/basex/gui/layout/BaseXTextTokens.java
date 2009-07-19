@@ -84,7 +84,7 @@ public final class BaseXTextTokens {
    * @return word
    */
   public String nextWord() {
-    return new String(text, ps, pe - ps);
+    return string(text, ps, pe - ps);
   }
 
   /**

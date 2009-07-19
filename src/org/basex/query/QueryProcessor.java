@@ -2,7 +2,6 @@ package org.basex.query;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -34,10 +33,14 @@ public final class QueryProcessor extends Progress {
   /** Compilation flag. */
   private boolean compiled;
 
+  // [AW] context should never be null
+  //  (except for potential use cases in which no disk database will be touched)
+  
   /**
    * Default Constructor.
    * @param q query
    */
+  // [AW] should get obsolete
   public QueryProcessor(final String q) {
     query = q;
     Prop.read();
@@ -49,6 +52,7 @@ public final class QueryProcessor extends Progress {
    * @param qu query
    * @param f query file reference
    */
+  // [AW] context reference missing
   public QueryProcessor(final String qu, final IO f) {
     this(qu);
     ctx.file = f;
@@ -59,7 +63,8 @@ public final class QueryProcessor extends Progress {
    * @param qu query
    * @param n initial nodes
    */
-    public QueryProcessor(final String qu, final Nodes n) {
+  // [AW] context reference missing
+  public QueryProcessor(final String qu, final Nodes n) {
     this(qu);
     ctx.nodes = n;
   }

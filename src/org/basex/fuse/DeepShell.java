@@ -46,7 +46,7 @@ public class DeepShell {
   DeepShell() {
     BaseX.errln("DeepShell");
     fs = new DeepFS("deepshell");
-    if (fs == null) System.exit(1);
+
     // initialize/mount filesystem
     //fs.init();
     loop();

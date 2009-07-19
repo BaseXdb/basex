@@ -5,7 +5,6 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
@@ -66,7 +65,7 @@ public final class XMLTS {
     Prop.attrindex = false;
     //Prop.mainmem = true;
 
-    new Check(FILE).execute(ctx, null);
+    new CreateDB(FILE).execute(ctx, null);
     data = ctx.data();
 
     int ok = 0;

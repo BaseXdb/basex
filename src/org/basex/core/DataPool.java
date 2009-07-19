@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.util.Array;
 
@@ -25,7 +26,7 @@ public class DataPool {
    */
   public Data pin(final String db) {
     for(int i = 0; i < size; i++) {
-      if(data[i].meta.dbname.equals(db)) {
+      if(data[i].meta.name.equals(db)) {
         pins[i]++;
         return data[i];
       }
@@ -54,6 +55,9 @@ public class DataPool {
    * @return true if reference was removed from the pool
    */
   public boolean unpin(final Data d) {
+    // ignore main memory database instances
+    if(d instanceof MemData) return true;
+
     for(int i = 0; i < size; i++) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;
@@ -65,24 +69,21 @@ public class DataPool {
         return close;
       }
     }
-
-    // later: return false, if it is guaranteed that all data instances
-    // will be referenced in the pool.
-    return true;
+    // [AW] later: this should not happen anymore, as all data instances
+    // to be unpinned should be referenced in the data pool.
+    return false;
   }
 
   /**
-   * Returns value if the checked DB is in use or not.
+   * Checks if the specified database is pinned.
    * @param db name of the database
-   * @return int how many clients using the db
+   * @return result of check
    */
-  public int check(final String db) {
+  public boolean pinned(final String db) {
     for(int i = 0; i < size; i++) {
-      if(data[i].meta.dbname.equals(db)) {
-        return pins[i];
-      }
+      if(data[i].meta.name.equals(db)) return true;
     }
-    return 0;
+    return false;
   }
 
   /**
@@ -90,6 +91,9 @@ public class DataPool {
    * @param d data reference
    */
   public void add(final Data d) {
+    // ignore main memory database instances
+    if(d instanceof MemData) return;
+
     if(size == data.length) {
       data = Array.extend(data);
       pins = Array.extend(pins);

@@ -65,11 +65,8 @@ public final class DiskBuilder extends Builder {
   protected synchronized DiskData finish() throws IOException {
     close();
 
-    // write meta data
-    DiskData.write(meta, tags, atts, path, ns);
-
-    // write cached size and attribute values into main table
-    final String db = meta.dbname;
+    // copy temporary values into database table
+    final String db = meta.name;
     final TableAccess ta = new TableDiskAccess(db, DATATBL);
     final DataInput in = new DataInput(db, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
@@ -80,11 +77,10 @@ public final class DiskBuilder extends Builder {
     }
     ta.close();
     in.close();
-
     IO.dbfile(db, DATATMP).delete();
 
     // return database instance
-    return new DiskData(db, false);
+    return new DiskData(meta, tags, atts, path, ns);
   }
 
   @Override

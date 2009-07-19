@@ -1,12 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import java.io.File;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.util.Token;
 
 /**
  * Evaluates the 'delete' command.
@@ -26,6 +24,7 @@ public final class Delete extends Process {
   @Override
   protected boolean exec() {
     final Data data = context.data();
+    if(data.ns.size() != 0) return error(UPDATENS);
 
     // gui mode: use currently marked nodes
     final boolean gui = args.length == 0;
@@ -45,16 +44,7 @@ public final class Delete extends Process {
       final int size = nodes.size();
       for(int i = size - 1; i >= 0; i--) {
         final int pre = nodes.nodes[i];
-        // delete filesystem node, but before! BaseX does (invalid pre)
-        if(Prop.fuse) {
-          final String bpath = Token.string(data.fs.path(pre, true));
-          final File f = new File(bpath);
-          if (f.isDirectory())
-            deleteDir(f);
-          else if (f.isFile())
-            f.delete();
-          data.fs.nativeUnlink(Token.string(data.fs.path(pre, false)));
-        }
+        if(data.fs != null) data.fs.delete(pre);
         data.delete(pre);
       }
 
@@ -65,20 +55,7 @@ public final class Delete extends Process {
       }
       data.flush();
     }
+    context.update();
     return Prop.info ? info(DELETEINFO, nodes.size(), perf.getTimer()) : true;
-  }
-
-  /**
-   * Deletes a non-empty directory.
-   * @param dir to be deleted.
-   * @return boolean true for success, false for failure.
-   */
-  public static boolean deleteDir(final File dir) {
-    if(dir.isDirectory()) {
-      final String[] children = dir.list();
-      for(int i = 0; i < children.length; i++)
-        if(!deleteDir(new File(dir, children[i]))) return false;
-    }
-    return dir.delete();
   }
 }

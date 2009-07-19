@@ -199,7 +199,7 @@ public final class BaseXLayout {
         final int code = e.getKeyCode();
     
         // browse back/forward
-        if(e.isAltDown() && gui.context.db()) {
+        if(e.isAltDown() && gui.context.data() != null) {
           if(code == KeyEvent.VK_LEFT) {
             GUICommands.GOBACK.execute(gui);
           } else if(code == KeyEvent.VK_RIGHT) {

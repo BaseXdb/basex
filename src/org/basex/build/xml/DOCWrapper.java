@@ -133,12 +133,3 @@ public final class DOCWrapper extends Parser {
     }
   }
 }
-
-/* Materialization of DOM Tree
-  final TransformerFactory tf = TransformerFactory.newInstance();
-  final Transformer tr = tf.newTransformer();
-  final CachedOutput out = new CachedOutput();
-  tr.transform(new DOMSource((Document) o), new StreamResult(out));
-  final IOContent cont = new IOContent(out.finish());
-  return new DNode(CreateDB.xml(cont, "tmp"), 0);
-*/

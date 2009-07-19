@@ -445,7 +445,7 @@ public enum GUICommands implements GUICommand {
   SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
     public void execute(final GUI gui) {
-      if(!gui.context.db()) GUIProp.showstarttext ^= true;
+      if(gui.context.data() == null) GUIProp.showstarttext ^= true;
       else GUIProp.showtext ^= true;
       gui.layoutViews();
     }
@@ -453,8 +453,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, gui.context.db() ? GUIProp.showtext :
-        GUIProp.showstarttext);
+      BaseXLayout.select(button, gui.context.data() != null ?
+          GUIProp.showtext : GUIProp.showstarttext);
     }
 
     @Override
@@ -818,7 +818,7 @@ public enum GUICommands implements GUICommand {
   public abstract void execute(final GUI gui);
 
   public void refresh(final GUI gui, final AbstractButton button) {
-    BaseXLayout.enable(button, !data || gui.context.db());
+    BaseXLayout.enable(button, !data || gui.context.data() != null);
   }
 
   public boolean checked() { return false; }

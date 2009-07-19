@@ -19,7 +19,7 @@ import org.basex.util.Token;
  */
 public final class MetaData {
   /** Database name. */
-  public String dbname;
+  public String name;
   /** DeepFS mount point. */
   public String mountpoint = "";
   /** DeepFS backing path. */
@@ -73,7 +73,7 @@ public final class MetaData {
    * @param db database name
    */
   public MetaData(final String db) {
-    dbname = db;
+    name = db;
   }
 
   /**

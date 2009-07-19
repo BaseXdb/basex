@@ -3,12 +3,11 @@ package org.basex;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Lang;
 
 /**
  * This class contains internationalized text strings, which are used
  * throughout the project. If this class is called first, the Strings
- * are initialized by the {@link Lang} class.
+ * are initialized by the {@link org.basex.core.Lang} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -187,12 +186,6 @@ public interface Text {
     LI + CmdInfo.INDEX + lang("ch_info24") + NL +
     LI + CmdInfo.TABLE + lang("ch_info25");
   /** Command help. */
-  String CHECK0 = lang("ch_check0");
-  /** Command help. */
-  String CHECK1 = lang("ch_check1");
-  /** Command help. */
-  String CHECK2 = lang("ch_check2");
-  /** Command help. */
   String CLOSE0 = "";
   /** Command help. */
   String CLOSE1 = lang("ch_close1");
@@ -247,6 +240,12 @@ public interface Text {
   String XQUERY1 = lang("ch_xquery1");
   /** Command Help. */
   String XQUERY2 = lang("ch_xquery2");
+  /** Command help. */
+  String RUN0 = lang("ch_run0");
+  /** Command help. */
+  String RUN1 = lang("ch_run1");
+  /** Command help. */
+  String RUN2 = lang("ch_run2");
   /** Command Help. */
   String FIND0 = lang("ch_find0");
   /** Command Help. */
@@ -439,8 +438,6 @@ public interface Text {
 
   /** Database not found. */
   String DBNOTFOUND = lang("db_no");
-  /** Database is open. */
-  String DBINMEM = lang("db_open");
   /** Database closed. */
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */

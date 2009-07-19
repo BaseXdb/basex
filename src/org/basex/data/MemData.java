@@ -46,7 +46,7 @@ public final class MemData extends Data {
   public void flush() { }
 
   @Override
-  public void close() { }
+  public void cls() { }
 
   @Override
   public void closeIndex(final Type index) { }

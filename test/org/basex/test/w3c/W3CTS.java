@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -200,8 +200,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     final Context context = new Context();
     Prop.xqformat = false;
-    Prop.mainmem = true;
-    //Prop.tablemem = true;
+    //Prop.mainmem = true;
 
     new CreateDB(path + input).execute(context, null);
     data = context.data();
@@ -353,45 +352,45 @@ public abstract class W3CTS {
     final Context context = new Context();
 
     Nodes cont = nodes("*:contextItem", root);
-    if(cont.size() != 0) new Check(sources + string(
+    if(cont.size() != 0) new CreateDB(sources + string(
         data.atom(cont.nodes[0])) + ".xml").execute(context, out);
 
     final QueryProcessor xq = new QueryProcessor(in, context.current());
-    final QueryContext ctx = xq.ctx;
-    ctx.stop = stop;
-    ctx.thes = thes;
+    final QueryContext qctx = xq.ctx;
+    qctx.stop = stop;
+    qctx.thes = thes;
 
     try {
       files.add(file(nodes("*:input-file", root),
-          nodes("*:input-file/@variable", root), ctx));
+          nodes("*:input-file/@variable", root), qctx));
       files.add(file(nodes("*:input-URI", root),
-          nodes("*:input-URI/@variable", root), ctx));
-      files.add(file(nodes("*:defaultCollection", root), null, ctx));
+          nodes("*:input-URI/@variable", root), qctx));
+      files.add(file(nodes("*:defaultCollection", root), null, qctx));
 
       var(nodes("*:input-query/@name", root),
-          nodes("*:input-query/@variable", root), pth, ctx);
+          nodes("*:input-query/@variable", root), pth, qctx);
 
       for(final String s : aux("stopwords", root)) {
         String fn = stop2.get(s);
         if(fn != null) {
-          if(ctx.ftopt.sw == null) ctx.ftopt.sw = new StopWords();
-          ctx.ftopt.sw.read(IO.get(fn), false);
+          if(qctx.ftopt.sw == null) qctx.ftopt.sw = new StopWords();
+          qctx.ftopt.sw.read(IO.get(fn), false);
         }
       }
 
       for(final String s : aux("stemming-dictionary", root)) {
         String fn = stem.get(s);
         if(fn != null) {
-          if(ctx.ftopt.sd == null) ctx.ftopt.sd = new StemDir();
-          ctx.ftopt.sd.read(IO.get(fn));
+          if(qctx.ftopt.sd == null) qctx.ftopt.sd = new StemDir();
+          qctx.ftopt.sd.read(IO.get(fn));
         }
       }
 
       for(final String s : aux("thesaurus", root)) {
         String fn = thes2.get(s);
         if(fn != null) {
-          if(ctx.ftopt.th == null) ctx.ftopt.th = new ThesQuery();
-          ctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
+          if(qctx.ftopt.th == null) qctx.ftopt.th = new ThesQuery();
+          qctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
         }
       }
 
@@ -502,15 +501,18 @@ public abstract class W3CTS {
         if(result.list[s].equals(out.toString())) break;
 
         if(xml || frag) {
-          try {
-            iter.reset();
+          iter.reset();
 
-            String rin = result.list[s];
-            if(!doc || frag) {
-              if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
-              rin = "<X>" + rin + "</X>";
-            }
-            final Data rdata = CreateDB.xml(IO.get(rin), null);
+          String rin = result.list[s];
+          if(!doc || frag) {
+            if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
+            rin = "<X>" + rin + "</X>";
+          }
+
+          final Context ctx = new Context();
+          final Process cr = new CreateDB(rin, null);
+          if(cr.execute(ctx)) {
+            final Data rdata = ctx.data();
 
             final SeqIter si = new SeqIter();
             int pre = doc ? 0 : 2;
@@ -523,10 +525,10 @@ public abstract class W3CTS {
               pre += rdata.size(pre, k);
             }
             final boolean test = FNSeq.deep(iter, si);
-            rdata.close();
+            ctx.close();
             if(test) break;
-          } catch(final IOException ex) {
-            ex.printStackTrace();
+          } else {
+            BaseX.errln("Could not open %: % ", inname, cr.info());
           }
         }
       }

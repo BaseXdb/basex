@@ -59,7 +59,7 @@ public final class DropIndex extends Process {
       final Data data = context.data();
       data.flush();
       data.closeIndex(index);
-      return IO.dbdelete(data.meta.dbname, pat + "." + IO.BASEXSUFFIX) ?
+      return IO.dbdelete(data.meta.name, pat + "." + IO.BASEXSUFFIX) ?
           info(DBDROP, perf.getTimer()) : error(DBDROPERR);
     } catch(final IOException ex) {
       BaseX.debug(ex);

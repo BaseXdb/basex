@@ -32,13 +32,14 @@ public final class CreateDB extends ACreate {
    * @param input file name or XML string
    */
   public CreateDB(final String input) {
-    this(input, null);
+    this(input, IO.get(input).dbname());
   }
 
   /**
    * Constructor.
    * @param input file name or XML string
-   * @param name name of database
+   * @param name name of database; if set to null,
+   *         a main memory instance is created
    */
   public CreateDB(final String input, final String name) {
     super(STANDARD, input, name);
@@ -48,9 +49,15 @@ public final class CreateDB extends ACreate {
   protected boolean exec() {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
-    return build(new DirParser(io), args[1] == null ? io.dbname() : args[1]);
+    return build(new DirParser(io), args[1]);
   }
 
+  // [AW] the following methods two should only be called if no database
+  //  name is given. This means that main memory instances will be created,
+  //  which will be ignored by the data pool management. Main memory instances
+  //  are useful for creating temporary databases, which will not influence
+  //  the transaction management.
+  
   /**
    * Creates and returns a database for the specified XML document.
    * @param io file reference
@@ -61,18 +68,6 @@ public final class CreateDB extends ACreate {
   public static Data xml(final IO io, final String name) throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
     return xml(new DirParser(io), name);
-  }
-
-  /**
-   * Creates and returns a database from the specified SAX source.
-   * @param s sax source
-   * @param name name of database
-   * @return database instance
-   * @throws IOException exception
-   */
-  public static Data xml(final SAXSource s, final String name)
-      throws IOException {
-    return xml(new SAXWrapper(s), name);
   }
 
   /**
@@ -106,6 +101,16 @@ public final class CreateDB extends ACreate {
       DropDB.drop(db);
       throw ex;
     }
+  }
+
+  /**
+   * Creates and returns a main memory database from the specified SAX source.
+   * @param s sax source
+   * @return database instance
+   * @throws IOException exception
+   */
+  public static Data xml(final SAXSource s) throws IOException {
+    return xml(new SAXWrapper(s), null);
   }
 
   @Override

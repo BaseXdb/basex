@@ -37,7 +37,7 @@ public final class Values extends Index {
    * @throws IOException IO Exception
    */
   public Values(final Data d, final boolean txt) throws IOException {
-    final String db = d.meta.dbname;
+    final String db = d.meta.name;
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;

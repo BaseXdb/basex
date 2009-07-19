@@ -26,6 +26,8 @@ public final class Update extends AUpdate {
   @Override
   protected boolean exec() {
     final boolean gui = args[args.length - 1] == null;
+    final Data data = context.data();
+    if(data.ns.size() != 0) return error(UPDATENS);
 
     // get sources from the marked node set or the specified query
     final CmdUpdate type = getType();
@@ -34,7 +36,6 @@ public final class Update extends AUpdate {
     if(nodes == null) return false;
 
     boolean ok = false;
-    final Data data = context.data();
     switch(type) {
       case ATTRIBUTE: ok = attr(data, nodes); break;
       default:        ok = node(data, nodes); break;
@@ -42,6 +43,7 @@ public final class Update extends AUpdate {
     if(!ok) return false;
 
     data.flush();
+    context.update();
     return Prop.info ? info(UPDATEINFO, nodes.size(), perf.getTimer()) : true;
   }
 

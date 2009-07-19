@@ -66,7 +66,7 @@ public final class FTFuzzy extends FTIndex {
    */
   public FTFuzzy(final Data d) throws IOException {
     super(d);
-    final String db = d.meta.dbname;
+    final String db = d.meta.name;
     ti = new DataAccess(db, DATAFTX + 'y');
     dat = new DataAccess(db, DATAFTX + 'z');
 

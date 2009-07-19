@@ -83,7 +83,7 @@ public final class FolderView extends View {
   public void refreshInit() {
     scroll.pos(0);
 
-    if(!gui.context.db()) {
+    if(gui.context.data() == null) {
       opened = null;
     } else if(GUIProp.showfolder) {
       refreshOpenedNodes();

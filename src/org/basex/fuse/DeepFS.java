@@ -10,7 +10,6 @@ import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.FSText;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
@@ -22,9 +21,10 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
-import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.IntList;
+import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -146,10 +146,10 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   /**
    * Constructor for DeepShell and java only test cases (no mount).
-   * @param dbname name of initially empty database.
+   * @param name name of initially empty database.
    */
-  public DeepFS(final String dbname) {
-    data = createEmptyDB(dbname);
+  public DeepFS(final String name) {
+    data = createEmptyDB(name);
     initNames();
     final MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     final int tagID = data.tags.index(DEEPFS, null, false);
@@ -160,30 +160,57 @@ public final class DeepFS extends DeepFuse implements DataText {
     data.insert(1, 0, m);
     data.flush();
   }
-
+  
+  /**
+   * Closes the fuse instance.
+   * @throws IOException I/O exception
+   */
+  public void close() throws IOException {
+    if(Prop.fuse) {
+      final String method = "[BaseX.close] ";
+      BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
+      // -- unmount running fuse.
+      for(int i = 3; i > 0; i--) {
+        Performance.sleep(1000);
+        BaseX.err(i + " .. ");
+      }
+      BaseX.debug("GO.");
+      final String cmd = "umount -f " + data.meta.mountpoint;
+      BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
+      Runtime r = Runtime.getRuntime();
+      java.lang.Process p = r.exec(cmd);
+      try {
+        p.waitFor();
+      } catch(InterruptedException e) {
+        e.printStackTrace();
+      }
+      int rc = p.exitValue();
+      String msg = method + "Unmount " + data.meta.mountpoint;
+      if (rc == 0) msg = msg + " ... OK.";
+      else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
+      BaseX.debug(msg);
+    }
+  } 
   /**
    * Creates an empty database.
    * @param n name of database instance
    * @return data reference to empty database
    */
   private Data createEmptyDB(final String n) {
-    final Context ctx = new Context();
-
     try {
       final Parser p = new Parser(IO.get(n)) {
         @Override
         public void parse(final Builder build) { /* empty */}
       };
-      ctx.data(CreateDB.xml(p, n));
+      final Data d = CreateDB.xml(p, n);
+      d.fs = this;
+      return d;
     } catch(final IOException e) {
       e.printStackTrace();
     } catch(final Exception e) {
       e.printStackTrace();
     }
-
-    final Data d = ctx.data();
-    d.fs = this;
-    return d;
+    return null;
   }
 
   /**
@@ -225,10 +252,8 @@ public final class DeepFS extends DeepFuse implements DataText {
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size;
     if(s != 0) {
-      final byte[] b;
-      if(Prop.fuse) b = backing ? backingstore(il.list[s - 1])
-          : mountpoint(il.list[s - 1]);
-      else b = backingstore(il.list[s - 1]);
+      final byte[] b = Prop.fuse && !backing ? mountpoint(il.list[s - 1]) :
+        backingstore(il.list[s - 1]);
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -392,6 +417,37 @@ public final class DeepFS extends DeepFuse implements DataText {
       return -1;
     }
     return 0;
+  }
+
+  /**
+   * Deletes a non-empty directory.
+   * @param pre pre value
+   */
+  public void delete(final int pre) {
+    // delete filesystem node, but before updating the table
+    if(Prop.fuse) {
+      final String bpath = Token.string(path(pre, true));
+      final File f = new File(bpath);
+      if (f.isDirectory())
+        deleteDir(f);
+      else if (f.isFile())
+        f.delete();
+      nativeUnlink(Token.string(path(pre, false)));
+    }
+  }
+  
+  /**
+   * Deletes a non-empty directory.
+   * @param dir to be deleted.
+   * @return boolean true for success, false for failure.
+   */
+  public static boolean deleteDir(final File dir) {
+    if(dir.isDirectory()) {
+      final String[] children = dir.list();
+      for(int i = 0; i < children.length; i++)
+        if(!deleteDir(new File(dir, children[i]))) return false;
+    }
+    return dir.delete();
   }
 
   /**
@@ -629,8 +685,7 @@ public final class DeepFS extends DeepFuse implements DataText {
           + "]/@name)";
       final QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data));
       final SeqIter s = (SeqIter) xq.query();
-      if(s.size() != 1) return null;
-      return s.size() != 1 ? null : new String(((Str) s.next()).str());
+      return s.size() != 1 ? null : string(s.next().str());
     } catch(final QueryException e) {
       e.printStackTrace();
       return null;

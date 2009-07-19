@@ -42,7 +42,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public Values build(final Data data) throws IOException {
-    final String db = data.meta.dbname;
+    final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
     final int max = (int) (IO.dbfile(db, f).length() >>> 7);

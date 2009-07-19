@@ -1,6 +1,8 @@
 package org.basex.build.xml;
 
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -18,6 +20,8 @@ public final class DirParser extends Parser {
   private Parser parser;
   /** File filter. */
   private String filter;
+  /** Element counter. */
+  private int c;
 
   /**
    * Constructor.
@@ -37,6 +41,7 @@ public final class DirParser extends Parser {
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
     parse(b, io);
+    if(Prop.debug) BaseX.err("\n");
   }
 
   /**
@@ -59,6 +64,7 @@ public final class DirParser extends Parser {
         parser = Parser.getXMLParser(io);
         parser.doc = doc;
         parser.parse(b);
+        if(Prop.debug && ++c % 100 == 0) BaseX.err(";");
       }
     }
   }

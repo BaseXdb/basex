@@ -1,7 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.Context;
-import org.basex.core.proc.Check;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
 import org.basex.query.QueryProcessor;
@@ -40,8 +40,8 @@ public final class SAXExample extends DefaultHandler {
     // create database context
     final Context ctx = new Context();
 
-    // create a database, open an existing one or throw an exception
-    new Check(XMLFILE).execute(ctx, null);
+    // create a database
+    new CreateDB(XMLFILE).execute(ctx, null);
 
     // create query instance
     final QueryProcessor query = new QueryProcessor(QUERY, ctx.current());

@@ -315,7 +315,6 @@ pc_pos="%" (Zeile %, Spalte %)
 
 # Database commands
 db_no=Datenbank '%' wurde nicht gefunden.
-db_open=Datenbank ist offen.
 db_closed=Datenbank wurde geschlossen.
 db_closeerr=Datenbank konnte nicht geschlossen werden.
 db_optimized=Datenbank optimiert in %.
@@ -457,9 +456,6 @@ ch_info22=- kein Argument: zeige allgemeine Information
 ch_info23=: zeige Datenbank-Informationen
 ch_info24=: zeige Index-Informationen
 ch_info25= [Start Ende]|[Anfrage]: zeige XML Tabelle
-ch_check0=[Datenbank]
-ch_check1=Öffnen einer existierenden [Datenbank] oder Erstellen eine neue Datenbank.
-ch_check2=Überprüfe ob die angegebene [Datenbank] existiert.\nFalls ja, wird die Datenbankdatei geöffnet.\nAnsonsten wird das Argument als Dateiname\ninterpretiert und eine neue Datenbank erstellt.
 ch_close1=Schließen der aktuellen Datenbank.
 ch_close2=Schließt die aktuelle Datenbank.
 ch_list1=Anzeige aller Datenbanken.
@@ -484,6 +480,9 @@ ch_xquerymv2=Führt die angegebene XPath-[Anfrage] aus und begrenzt\ndie Anzahl 
 ch_xquery0=[Anfrage]
 ch_xquery1=Ausführung einer XQuery-Anfrage.
 ch_xquery2=Führt eine XQuery-[Anfrage] aus und zeigt das Ergebnis an.
+ch_run0=[Datei]
+ch_run1=Ausführung der [Datei] als XQuery-Anfrage.
+ch_run2=Führt die XQuery-Anfrage in der angegebenen Datei aus und zeigt das Ergebnis an.
 ch_find0=[Anfrage]
 ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen

@@ -124,7 +124,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(gui.context.db()) return;
+    if(gui.context.data() != null) return;
 
     final int w = getWidth();
     final int h = getHeight();

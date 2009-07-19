@@ -26,8 +26,9 @@ public final class Copy extends AUpdate {
   @Override
   protected boolean exec() {
     final boolean gui = args.length == 0;
-
     final Data data = context.data();
+    if(data.ns.size() != 0) return error(UPDATENS);
+
     final int pos = gui ? 0 : Token.toInt(args[0]);
     if(pos < 0) return error(POSINVALID, args[0]);
 
@@ -84,6 +85,7 @@ public final class Copy extends AUpdate {
     }
 
     data.flush();
+    context.update();
     return Prop.info ? info(INSERTINFO, copied, perf.getTimer()) : true;
   }
 

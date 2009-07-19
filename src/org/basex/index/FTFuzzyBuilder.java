@@ -61,7 +61,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void write(final Data data) throws IOException {
-    final String db = data.meta.dbname;
+    final String db = data.meta.name;
     final DataOutput outx = new DataOutput(db, DATAFTX + 'x');
     final DataOutput outy = new DataOutput(db, DATAFTX + 'y');
     final DataOutput outz = new DataOutput(db, DATAFTX + 'z');

@@ -58,7 +58,7 @@ public final class DialogInfo extends Dialog {
     final Data data = gui.context.data();
     final MetaData meta = data.meta;
 
-    final BaseXLabel doc = new BaseXLabel(meta.dbname);
+    final BaseXLabel doc = new BaseXLabel(meta.name);
     doc.setFont(getFont().deriveFont(18f));
     doc.setBorder(0, 0, 5, 0);
     tab1.add(doc, BorderLayout.NORTH);

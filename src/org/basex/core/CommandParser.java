@@ -10,7 +10,6 @@ import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdSet;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Cs;
-import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
 import org.basex.core.proc.CreateDB;
@@ -36,6 +35,7 @@ import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Ping;
 import org.basex.core.proc.Prompt;
+import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
 import org.basex.core.proc.XQueryMV;
@@ -107,7 +107,9 @@ public final class CommandParser extends InputParser {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB: case XML:
-            return new CreateDB(path(cmd), name(null));
+            final String fn = path(cmd);
+            final String db = name(null);
+            return new CreateDB(fn, db == null ? fn : db);
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:
@@ -134,8 +136,6 @@ public final class CommandParser extends InputParser {
             return new InfoTable(arg1, arg2);
         }
         break;
-      case CHECK:
-        return new Check(name(cmd));
       case CLOSE:
         return new Close();
       case LIST:
@@ -143,7 +143,7 @@ public final class CommandParser extends InputParser {
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
-            return new DropDB(name(null));
+            return new DropDB(name(cmd));
           case INDEX:
             return new DropIndex(consume(CmdIndex.class, cmd));
         }
@@ -156,6 +156,8 @@ public final class CommandParser extends InputParser {
         return new XQuery(xquery(cmd));
       case XQUERYMV:
         return new XQueryMV(number(cmd), number(cmd), xquery(cmd));
+      case RUN:
+        return new Run(path(cmd));
       case FIND:
         return new Find(string(cmd));
       case CS:

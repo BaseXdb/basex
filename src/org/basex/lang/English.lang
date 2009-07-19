@@ -315,7 +315,6 @@ pc_pos="%" (Line %, Col %)
 
 # Database commands
 db_no=Database '%' was not found.
-db_open=Database is open.
 db_closed=Database was closed.
 db_closeerr=Database could not be closed.
 db_optimized=Database optimized in %.
@@ -457,9 +456,6 @@ ch_info22=- no argument: show global information
 ch_info23=: shows database information
 ch_info24=: shows index information
 ch_info25= [start end]|[query]: show XML table
-ch_check0=[database]
-ch_check1=Open [database] if it exists, or create new database.
-ch_check2=Checks if the specified [database] exists.\n If Yes, the database is opened. If there is no such database,\n the argument is interpreted as a filename, and a new\n database is created.
 ch_close1=Close current database.
 ch_close2=Closes the current database.
 ch_list1=List available databases.
@@ -484,6 +480,9 @@ ch_xquerymv2=Evaluates the specified XPath [query] and limits the\n number of re
 ch_xquery0=[query]
 ch_xquery1=Evaluate XQuery [query].
 ch_xquery2=Evaluates an XQuery and prints the result.
+ch_run0=[file]
+ch_run1=Evaluate XQuery from [file].
+ch_run2=Evaluates an XQuery from the specified file and prints the result.
 ch_find0=[query]
 ch_find1=Evaluate a keyword query.
 ch_find2=The following modifiers can be used:\n =  : looks for exact text nodes"\n @= : looks for exact attributes\n @  : looks for attributes

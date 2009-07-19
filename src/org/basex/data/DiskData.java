@@ -61,30 +61,20 @@ import org.basex.util.Token;
  */
 public final class DiskData extends Data {
   /** Table access file. */
-  private final TableAccess table;
+  private TableAccess table;
   /** Texts access file. */
-  private final DataAccess texts;
+  private DataAccess texts;
   /** Values access file. */
-  private final DataAccess values;
+  private DataAccess values;
   /** Locking Flag. */
   private int lock;
-
+  
   /**
    * Default Constructor.
    * @param db name of database
    * @throws IOException IO Exception
    */
   public DiskData(final String db) throws IOException {
-    this(db, true);
-  }
-
-  /**
-   * Constructor, specifying if indexes are to be opened as well.
-   * @param db name of database
-   * @param index open indexes
-   * @throws IOException IO Exception
-   */
-  public DiskData(final String db, final boolean index) throws IOException {
     DataInput in = null;
     try {
       // read meta data and indexes
@@ -101,18 +91,14 @@ public final class DiskData extends Data {
       }
 
       // table main memory mode..
-      table = Prop.tablemem ? new TableMemAccess(db, DATATBL, meta.size) :
-        new TableDiskAccess(db, DATATBL);
-      texts = new DataAccess(db, DATATXT);
-      values = new DataAccess(db, DATAATV);
+      init();
 
-      if(index) {
-        if(meta.txtindex) txtindex = new Values(this, true);
-        if(meta.atvindex) atvindex = new Values(this, false);
-        if(meta.ftxindex) ftxindex = meta.ftfz ?
-            new FTFuzzy(this) : new FTTrie(this);
-      }
-      initNames();
+      // open indexes..
+      if(meta.txtindex) txtindex = new Values(this, true);
+      if(meta.atvindex) atvindex = new Values(this, false);
+      if(meta.ftxindex) ftxindex = meta.ftfz ?
+          new FTFuzzy(this) : new FTTrie(this);
+
     } catch(final IOException ex) {
       throw ex;
     } finally {
@@ -120,13 +106,67 @@ public final class DiskData extends Data {
     }
   }
 
+  /**
+   * Internal constructor, specifying all meta data.
+   * @param md meta data
+   * @param nm tags
+   * @param at attributes
+   * @param ps path summary
+   * @param n namespaces
+   * @throws IOException IO Exception
+   */
+  public DiskData(final MetaData md, final Names nm, final Names at,
+      final PathSummary ps, final Namespaces n) throws IOException {
+
+    meta = md;
+    tags = nm;
+    atts = at;
+    path = ps;
+    ns = n;
+    init();
+    write();
+  }
+
+  /**
+   * Initializes the table.
+   * @throws IOException IO Exception
+   */
+  private void init() throws IOException {
+    // table main memory mode..
+    final String db = meta.name;
+    table = Prop.tablemem ? new TableMemAccess(db, DATATBL, meta.size) :
+      new TableDiskAccess(db, DATATBL);
+    texts = new DataAccess(db, DATATXT);
+    values = new DataAccess(db, DATAATV);
+    initNames();
+  }
+
+  /**
+   * Writes all meta data to disk.
+   * @throws IOException I/O exception
+   */
+  private void write() throws IOException {
+    final DataOutput out = new DataOutput(meta.name, DATAINFO);
+    meta.write(out);
+    out.writeString(DBTAGS);
+    tags.write(out);
+    out.writeString(DBATTS);
+    atts.write(out);
+    out.writeString(DBPATH);
+    path.write(out);
+    out.writeString(DBNS);
+    ns.write(out);
+    out.write(0);
+    out.close();
+  }
+  
   @Override
   public synchronized void flush() {
     try {
       table.flush();
       texts.flush();
       values.flush();
-      write(meta, tags, atts, path, ns);
+      write();
       meta.dirty = false;
     } catch(final IOException e) {
       e.printStackTrace();
@@ -134,17 +174,8 @@ public final class DiskData extends Data {
   }
   
   @Override
-  public synchronized void close() throws IOException {
-    setLock(0);
-    if(meta.dirty) flush();
-    cls();
-  }
-
-  /**
-   * Closes the database without writing data back to disk.
-   * @throws IOException I/O exception
-   */
   public void cls() throws IOException {
+    if(meta.dirty) flush();
     table.close();
     texts.close();
     values.close();
@@ -702,33 +733,5 @@ public final class DiskData extends Data {
   @Override
   public void setLock(final int l) {
     lock = l;
-  }
-
-  /**
-   * Writes the specified meta data to disk.
-   * @param meta meta data
-   * @param tags tag index
-   * @param atts attribute index
-   * @param path path summary
-   * @param ns namespaces
-   * @throws IOException I/O exception
-   */
-  public static void write(final MetaData meta, final Names tags,
-      final Names atts, final PathSummary path, final Namespaces ns)
-        throws IOException {
-
-    // write meta data
-    final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-    meta.write(out);
-    out.writeString(DBTAGS);
-    tags.write(out);
-    out.writeString(DBATTS);
-    atts.write(out);
-    out.writeString(DBPATH);
-    path.write(out);
-    out.writeString(DBNS);
-    ns.write(out);
-    out.write(0);
-    out.close();
   }
 }

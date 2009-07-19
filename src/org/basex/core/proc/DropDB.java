@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import org.basex.core.Process;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 
 /**
@@ -25,18 +26,24 @@ public final class DropDB extends Process {
   protected boolean exec() {
     final String db = args[0];
     final Data data = context.data();
-    if((data == null && context.checkPool(db) > 0) ||
-        (data != null && context.checkPool(db) > 1)) return error(DBINUSE);
-    if(data != null && data.meta.dbname.equals(db)) exec(new Close());
 
+    // check if database is not main-memory based
+    if(!(data instanceof MemData)) {
+      // close database if still open
+      if(data != null && data.meta.name.equals(db)) context.close();
+      // check if database is still pinned
+      if(context.pinned(db)) return error(DBINUSE);
+    }
+
+    // try to drop database
     return !IO.dbpath(db).exists() ? error(DBNOTFOUND, db) :
       drop(db) ? info(DBDROPPED) : error(DBNOTDROPPED);
   }
 
   /**
-   * Delete a database.
+   * Deletes the specified database.
    * @param db database name
-   * @return success of operation
+   * @return success flag
    */
   public static synchronized boolean drop(final String db) {
     return IO.dbdelete(db, null);

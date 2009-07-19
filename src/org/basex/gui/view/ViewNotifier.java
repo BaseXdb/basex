@@ -1,10 +1,8 @@
 package org.basex.gui.view;
 
 import java.awt.Window;
-import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
@@ -59,17 +57,15 @@ public final class ViewNotifier {
    */
   public void init() {
     final Context ctx = gui.context;
-    final boolean db = ctx.db();
+    final boolean db = ctx.data() != null;
     if(db) {
       cont[0] = ctx.current();
       marked[0] = new Nodes(ctx.data());
+      /* [AH] temporarily removed..
       if(Prop.fuse) {
         BaseX.debug("[ViewNotifier] Setting gui reference in DeepFS.");
-        /* [AH] temporarily removed..
-        Data data = ctx.data();
-        data.fs.gui = gui;
-        */
-      }
+        ctx.data().fs.gui = gui;
+      }*/
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
@@ -85,7 +81,7 @@ public final class ViewNotifier {
 
     gui.views.setViews(db);
     gui.layoutViews();
-    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.dbname : ""));
+    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.name : ""));
   }
 
   /**
@@ -229,7 +225,7 @@ public final class ViewNotifier {
    */
   public void layout() {
     if(gui.help != null) gui.help.refresh();
-    if(gui.context.db()) for(final View v : view) v.refreshLayout();
+    if(gui.context.data() != null) for(final View v : view) v.refreshLayout();
   }
 
   /**
