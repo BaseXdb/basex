@@ -35,7 +35,7 @@ public final class BXPathExpression implements XPathExpression {
    * @param expr query expression
    */
   public BXPathExpression(final String expr) {
-    xproc = new QueryProcessor(expr, context.current());
+    xproc = new QueryProcessor(expr, context);
   }
 
   public String evaluate(final Object item) throws XPathExpressionException {

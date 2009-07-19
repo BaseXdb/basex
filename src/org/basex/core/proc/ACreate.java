@@ -9,7 +9,6 @@ import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
@@ -50,7 +49,7 @@ abstract class ACreate extends Process {
     Builder builder = null;
     try {
       context.close();
-      if(Context.POOL.check(db) >= 1) return error(DBINUSE);
+      if(context.checkPool(db) >= 1) return error(DBINUSE);
       final Performance pp = new Performance();
       builder = Prop.mainmem ? new MemBuilder() : new DiskBuilder();
       progress(builder);
@@ -59,7 +58,7 @@ abstract class ACreate extends Process {
       builder = null;
       index(data);
       context.data(data);
-      Context.POOL.add(data);
+      context.addToPool(data);
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);

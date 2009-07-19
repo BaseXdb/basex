@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.basex.core.proc.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -71,7 +72,7 @@ public class XQueryText extends BaseXText {
         final String xq = Token.string(qu);
         final QueryContext ctx = new QueryContext();
         if(isModule(qu)) ctx.module(xq);
-        else ctx.parse(xq);
+        else ctx.parse(xq, null);
         view.info("", true);
       } catch(final QueryException ex) {
         view.info(ex.getMessage(), false);

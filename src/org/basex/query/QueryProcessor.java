@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -32,6 +34,8 @@ public final class QueryProcessor extends Progress {
   private boolean parsed;
   /** Compilation flag. */
   private boolean compiled;
+  /** Context. */
+  private Context context;
 
   /**
    * Default Constructor.
@@ -58,9 +62,20 @@ public final class QueryProcessor extends Progress {
    * @param qu query
    * @param n initial nodes
    */
-  public QueryProcessor(final String qu, final Nodes n) {
+    public QueryProcessor(final String qu, final Nodes n) {
     this(qu);
     ctx.nodes = n;
+  }
+  
+  /**
+   * XQuery Constructor.
+   * @param qu query
+   * @param c DBContext
+   */
+  public QueryProcessor(final String qu, final Context c) {
+    this(qu);
+    context = c;
+    ctx.nodes = context.current();
   }
 
   /**
@@ -68,7 +83,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
-    if(!parsed) ctx.parse(query);
+    if(!parsed) ctx.parse(query, context);
     parsed = true;
   }
 

@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -26,8 +25,8 @@ public final class DropDB extends Process {
   protected boolean exec() {
     final String db = args[0];
     final Data data = context.data();
-    if((data == null && Context.POOL.check(db) > 0) ||
-        (data != null && Context.POOL.check(db) > 1)) return error(DBINUSE);
+    if((data == null && context.checkPool(db) > 0) ||
+        (data != null && context.checkPool(db) > 1)) return error(DBINUSE);
     if(data != null && data.meta.dbname.equals(db)) exec(new Close());
 
     return !IO.dbpath(db).exists() ? error(DBNOTFOUND, db) :

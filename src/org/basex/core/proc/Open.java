@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -36,11 +35,11 @@ public final class Open extends Process {
     context.close();
 
     try {
-      Data data = Context.POOL.pin(db);
+      Data data = context.pin(db, null);
       if(data == null) {
         // open new database instance
         data = open(db);
-        Context.POOL.add(data);
+        context.addToPool(data);
       }
       context.data(data);
 

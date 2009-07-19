@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.io.IO;
 import org.basex.util.Performance;
 
 /**
@@ -150,6 +151,35 @@ public final class Context {
    */
   public void marked(final Nodes mark) {
     marked = mark;
+  }
+  
+  /**
+   * Pins the Pool.
+   * @param dbname DBName
+   * @param fname FileName
+   * @return Data data
+   */
+  public Data pin(final String dbname, final IO fname) {
+    if(dbname != null) return POOL.pin(dbname);
+    if(fname != null) return POOL.pin(fname);
+    return null;
+  }
+  
+  /**
+   * Adds a Data to the Pool.
+   * @param d Data
+   */
+  public void addToPool(final Data d) {
+    POOL.add(d);
+  }
+  
+  /**
+   * Checks the Pool for in-use.
+   * @param db DBName
+   * @return int use-status
+   */
+  public int checkPool(final String db) {
+    return POOL.check(db);
   }
   
   /**
