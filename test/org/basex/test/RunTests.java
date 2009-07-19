@@ -19,23 +19,24 @@ import org.basex.test.xqj.AllTests;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class RunTests {
+public final class RunTests {
   /**
    * Main method
    * @param args (ignored) command-line arguments
    * @throws Exception exceptions
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     
     System.out.println("============= XMLDB Examples =============");
     // create input.xml database for XMLDB examples
-    Context ctx = new Context();
+    final Context ctx = new Context();
     new Set("chop", "true").execute(ctx);
     new CreateDB("input.xml").execute(ctx);
+    ctx.close();
+
     XMLDBCreate.main(args);
     XMLDBInsert.main(args);
     XMLDBQuery.main(args);
-    ctx.close();
     System.out.println();
 
     System.out.println("============= XMLDB Tests =============");
@@ -60,7 +61,6 @@ public class RunTests {
     System.out.println("=====>  Done.");
     System.out.println();
 
-    System.out.println("To launch the JUnit tests, please right-click on the");
-    System.out.println("BaseX test folder and choose 'Run As' -> 'Unit Test'.");
+    System.out.println("Additionally run the remaining JUnit tests.");
   }
 }

@@ -310,7 +310,7 @@ public class CollectionTest extends TestCase {
     assertNull(coll.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
-    assertEquals(AllTests.COLL, coll.getProperty("dbname"));
+    assertEquals(AllTests.COLL, coll.getProperty("name"));
     assertEquals("true", coll.getProperty("entity"));
   }
 
@@ -324,8 +324,8 @@ public class CollectionTest extends TestCase {
     }
 
     // the following tests are database specific...
-    coll.setProperty("dbname", "NewName");
-    coll.setProperty("dbname", AllTests.COLL);
+    coll.setProperty("name", "NewName");
+    coll.setProperty("name", AllTests.COLL);
 
     try {
       coll.setProperty("time", "ABC");

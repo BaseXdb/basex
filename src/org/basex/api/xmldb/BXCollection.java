@@ -60,7 +60,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   public String getName() {
-    return ctx.data().meta.dbname;
+    return ctx.data().meta.name;
   }
 
   public Service[] getServices() throws XMLDBException {
@@ -143,7 +143,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
-        ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.dbname);
+        ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     // find correct value and remove the node
     data.delete(getResource(del.getId()).pos);

@@ -37,9 +37,10 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 abstract class BXQAbstract {
-  /** Name of database instance. Open Issue: creating a main memory vs.
-   * persistent database (currently: TMP is null -> main-memory based). */
-  private static final String TMP = null;
+  /* Open Issue: user cannot specify if a temporary or persistent database
+   * is to be created. Current solution: database is created if file reference
+   * is given. */
+
   /** Closed flag. */
   protected boolean closed;
   /** Parent closer. */
@@ -220,7 +221,7 @@ abstract class BXQAbstract {
     opened();
     valid(is, InputStream.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is)), TMP));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is))));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -236,7 +237,7 @@ abstract class BXQAbstract {
     opened();
     valid(r, Reader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r)), TMP));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r))));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -252,7 +253,7 @@ abstract class BXQAbstract {
     opened();
     valid(r, XMLReader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(r, null), TMP));
+      return checkDB(CreateDB.xml(new SAXSource(r, null)));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -268,7 +269,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), TMP));
+      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), null));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -282,7 +283,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createDB(final IO io) throws BXQException {
     try {
-      return checkDB(CreateDB.xml(io, TMP));
+      return checkDB(CreateDB.xml(io, null));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
