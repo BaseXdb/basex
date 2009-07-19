@@ -135,6 +135,7 @@ public final class DiskData extends Data {
   
   @Override
   public synchronized void close() throws IOException {
+    setLock(0);
     if(meta.dirty) flush();
     cls();
   }

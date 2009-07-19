@@ -77,8 +77,12 @@ public abstract class Process extends AbstractProcess {
     if(data() && data == null) {
       return error(PROCNODB);
     }
-    if(data != null && data.getLock() == 2) {
-      while(data.getLock() == 2) Performance.sleep(50);
+    if(data != null && data.getLock() != 0) {
+      if(data.getLock() == 2) {
+        while(data.getLock() == 2) Performance.sleep(50);
+      } else if(updating()) {
+        while(data.getLock() != 0) Performance.sleep(50);
+      }
     }
     if(updating()) {
       if(Prop.tablemem || Prop.mainmem) return error(PROCMM);
@@ -86,21 +90,26 @@ public abstract class Process extends AbstractProcess {
     }
 
     try {
-      if(data != null && !name().equals("DROPDB")) {
+      if(data != null && updating()) {
         data.setLock(2);
+      } else if (data != null) {
+        data.setLock(1);
       }
       final boolean ok = exec();
       if(updating()) context.update();
-      if(data != null  && !name().equals("DROPDB")) {
-        data.setLock(0);
-      }
       return ok;
     } catch(final Throwable ex) {
       // not expected...
       ex.printStackTrace();
       if(ex instanceof OutOfMemoryError) {
         Performance.gc(2);
+        if(data != null) {
+          data.setLock(0);
+        }
         return error(PROCOUTMEM);
+      }
+      if(data != null) {
+        data.setLock(0);
       }
       return error(PROCERR, this, ex.toString());
     }
@@ -123,6 +132,9 @@ public abstract class Process extends AbstractProcess {
     } catch(final Exception ex) {
       out.print(ex.toString());
       BaseX.debug(ex);
+    }
+    if(context.data() != null) {
+      context.data().setLock(0);
     }
   }
 
