@@ -79,7 +79,7 @@ public final class QueryContext extends Progress {
   /** Full-text token counter (for visualization). */
   public byte ftoknum;
   /** Fast full-text evaluation (stop after first hit). */
-  public boolean ftfast;
+  public boolean ftfast = true;
 
   /** Scoring instance. */
   public Scoring score = new Scoring();

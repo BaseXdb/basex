@@ -66,7 +66,8 @@ public final class FLWR extends FLWOR {
     }
 
     // simplify simple return expression
-    if(where == null && fl.length == 1 && ret instanceof VarCall) {
+    if(where == null && fl.length == 1 && fl[0].standard() &&
+        ret instanceof VarCall) {
       final Var v = ((VarCall) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
         ctx.compInfo(OPTFLWOR);

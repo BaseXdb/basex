@@ -97,7 +97,8 @@ public final class FTWords extends FTExpr {
 
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
-    double s = c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.size());
+    // scoring: pass on number of tokens
+    double s = fast || c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.count());
     return new FTItem(all, s);
   }
 
@@ -135,8 +136,7 @@ public final class FTWords extends FTExpr {
     // speed up default case
     final FTOpt opt = ctx.ftopt;
     first = true;
-    if(simple) return opt.contains(txt, ctx.fttoken, this) == 0 ?
-        0 : txt.length;
+    if(simple) return opt.contains(txt, ctx.fttoken, this); // txt.length;
 
     // process special cases
     final Iter iter = ctx.iter(query);

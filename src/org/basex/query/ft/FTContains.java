@@ -48,8 +48,10 @@ public class FTContains extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx).addText(ctx);
-    ctx.ftfast = ctx.ftpos == null;
+    final boolean fast = ctx.ftfast;
+    ctx.ftfast &= ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
+    ctx.ftfast = fast;
 
     Expr e = this;
     if(expr.e()) e = Bln.FALSE;

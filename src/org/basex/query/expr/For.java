@@ -43,8 +43,8 @@ public final class For extends ForLet {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    expr = expr.comp(ctx);
     // empty sequence - empty loop
+    expr = expr.comp(ctx);
     if(expr.e()) return Seq.EMPTY;
 
     // bind variable if single value is returned and if no variables are used

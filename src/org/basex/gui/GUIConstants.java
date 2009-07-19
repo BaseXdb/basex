@@ -326,7 +326,7 @@ public final class GUIConstants {
   }
 
   /**
-   * Get fulltext color.
+   * Get full-text color.
    * @param p pointer on token in query.
    * @return color
    */
