@@ -3,7 +3,6 @@ package org.basex.test.query;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
@@ -48,6 +47,7 @@ public final class QueryTest {
     Performance p = new Performance();
     Prop.textindex = true;
     Prop.attrindex = true;
+    //Prop.mainmem = true;
     Prop.chop = true;
     boolean ok = true;
 
@@ -95,49 +95,48 @@ public final class QueryTest {
    * @return true if everything went alright
    */
   private boolean test(final AbstractTest test, final String ext) {
-    boolean ok = true;
-    final String name = test.getClass().getSimpleName();
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
+    final String name = test.getClass().getSimpleName();
     Process proc = new CreateDB(file, name);
-    if(!proc.execute(CONTEXT)) {
+    boolean ok = proc.execute(CONTEXT);
+
+    if(ok) {
+      for(final Object[] qu : test.queries) {
+        final boolean correct = qu.length == 3;
+        final String query = qu[correct ? 2 : 1].toString();
+        final String cmd = qu[0] + ": " + query;
+  
+        if(VERBOSE) err(cmd, ext);
+  
+        proc = new XQuery(query);
+        counter++;
+  
+        if(proc.execute(CONTEXT)) {
+          Result val = proc.result();
+          final Result cmp = correct ? (Result) qu[1] : null;
+          if(val instanceof Nodes && cmp instanceof Nodes) {
+            ((Nodes) cmp).data = ((Nodes) val).data;
+          }
+          if(!correct || !val.same(cmp)) {
+            err(cmd, "  Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
+                val + (ext != null ? "\n  Flags: " + ext : ""));
+            ok = false;
+            wrong++;
+            continue;
+          }
+        } else if(correct) {
+          err(qu[0].toString(), proc.info() +
+              (ext != null ? "\n  Flags: " + ext : ""));
+          wrong++;
+          ok = false;
+        }
+      }
+    } else {
       err(proc.info(), null);
       wrong++;
-      return false;
     }
 
-    for(final Object[] qu : test.queries) {
-      final boolean correct = qu.length == 3;
-      final String query = qu[correct ? 2 : 1].toString();
-      final String cmd = qu[0] + ": " + query;
-
-      if(VERBOSE) err(cmd, ext);
-
-      proc = new XQuery(query);
-      counter++;
-
-      if(proc.execute(CONTEXT)) {
-        Result val = proc.result();
-        final Result cmp = correct ? (Result) qu[1] : null;
-        if(val instanceof Nodes && cmp instanceof Nodes) {
-          ((Nodes) cmp).data = ((Nodes) val).data;
-        }
-        if(!correct || !val.same(cmp)) {
-          err(cmd, "  Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
-              val + (ext != null ? "\n  Flags: " + ext : ""));
-          ok = false;
-          wrong++;
-          continue;
-        }
-      } else if(correct) {
-        err(qu[0].toString(), proc.info() +
-            (ext != null ? "\n  Flags: " + ext : ""));
-        wrong++;
-        ok = false;
-      }
-    }
-
-    new Close().execute(CONTEXT);
-    DropDB.drop(name);
+    new DropDB(name).execute(CONTEXT);
     return ok;
   }
 

@@ -56,7 +56,7 @@ abstract class ACreate extends Process {
       final Performance pp = new Performance();
       builder = mem ? new MemBuilder() : new DiskBuilder();
       progress(builder);
-      final Data data = builder.build(p, db);
+      final Data data = builder.build(p, db == null ? "" : db);
       if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
       builder = null;
 
