@@ -2,7 +2,6 @@ package org.basex.test;
 
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Set;
 import org.basex.test.examples.DBExample;
 import org.basex.test.examples.UpdateExample;
 import org.basex.test.examples.XMLDBCreate;
@@ -27,26 +26,22 @@ public final class RunTests {
    */
   public static void main(final String[] args) throws Exception {
     
-    System.out.println("============= XMLDB Examples =============");
     // create input.xml database for XMLDB examples
     final Context ctx = new Context();
-    new Set("chop", "true").execute(ctx);
     new CreateDB("input.xml").execute(ctx);
     ctx.close();
 
-    XMLDBCreate.main(args);
-    XMLDBInsert.main(args);
-    XMLDBQuery.main(args);
+    System.out.println("============= XQJ Tests =============");
+    XQJQuery.main(args);
+    AllTests.main(args);
     System.out.println();
 
     System.out.println("============= XMLDB Tests =============");
     org.basex.test.xmldb.AllTests.main(args);
     XMLDBQuery.main(args);
-    System.out.println();
-
-    System.out.println("============= XQJ Tests =============");
-    XQJQuery.main(args);
-    AllTests.main(args);
+    XMLDBCreate.main(args);
+    XMLDBInsert.main(args);
+    XMLDBQuery.main(args);
     System.out.println();
 
     System.out.println("=============  BaseX Examples =============");
@@ -58,7 +53,7 @@ public final class RunTests {
     System.out.println("=============  XQuery Tests =============");
     QueryTest.main(args);
     System.out.println();
-    System.out.println("=====>  Done.");
+    System.out.println("=============>  Done.");
     System.out.println();
 
     System.out.println("Additionally run the remaining JUnit tests.");
