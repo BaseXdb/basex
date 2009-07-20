@@ -1,190 +1,142 @@
-<book xmlns="http://docbook.org/ns/docbook" version="5.0">
-	<info>
-		<title>Full-Documentation of BaseX</title>
+<?xml version="1.0" encoding="UTF-8"?>
 
+<article>
+	<title>BaseX - Full Documentation</title>
+
+	<articleinfo>
+		<date>July 23 2009</date>
 		<author>
-			<personname>
-				<firstname>BaseX-Team</firstname>
-			</personname>
+			<surname>BaseX Team</surname>
 		</author>
-		<pubdate>June 2009</pubdate>
 		<copyright>
-			<year>2009</year>
+			<year>2005-09</year>
 			<holder>DBIS, University of Konstanz</holder>
 		</copyright>
-		<legalnotice><para>Email: info@basex.org</para></legalnotice>
+	</articleinfo>
 
-	</info>
-	<chapter>
-		<info>
-			<title>Introduction</title>
-		</info>
-
-		<para>BaseX is a native, open-source XML database and efficient XQuery/XQuery Full Text
+	<sect1>
+		<title>Introduction</title>
+		<para>BaseX is a native, open-source XML database and efficient XPath/XQuery Full Text
 			processor. It supports very large XML instances and offers a visual, interactive
 			frontend. BaseX is written in Java and freely available for download. It is developed by
 			the Database and Information Systems Group at the University of Konstanz.</para>
-		<section>
-			<info>
-				<title>Prerequisites</title>
-			</info>
 
-			<section>
-				<info>
-					<title>Operating System</title>
-				</info>
-
+		<sect2>
+			<title>Prerequisites</title>
+			<sect3>
+				<title>Operating System</title>
 				<para>BaseX was tested on the following platforms:</para>
+
 				<itemizedlist>
-					<listitem>
-						<para>Windows 2000, XP, Vista, 7</para>
-					</listitem>
-					<listitem>
-						<para>Linux: Debian/Ubuntu, SuSE, Redhat</para>
-					</listitem>
-					<listitem>
-						<para>Max OS X (10.4+)</para>
-					</listitem>
-					<listitem>
-						<para>OpenBSD (4.3)</para>
-					</listitem>
+					<listitem>Windows 2000, XP, Vista, 7</listitem>
+					<listitem>Linux: Debian/Ubuntu, SuSE, Redhat</listitem>
+					<listitem>Max OS X (10.4+)</listitem>
+					<listitem>OpenBSD (4.3)</listitem>
 				</itemizedlist>
 				<para>Every other platform with a Java VM should be able to run BaseX.</para>
-			</section>
-			<section>
-				<info>
-					<title>Software</title>
-				</info>
+			</sect3>
 
-				<para>To run any version of BaseX, you need version 1.5 or later of the Java runtime
-					environment (JRE) or development kit (JDK).</para>
-				<para>The latest version of Java can be downloaded at <uri
-						xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.java.com"
-						>http://www.java.com</uri> or <uri
-						xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com"
-						>http://java.sun.com</uri> .</para>
-			</section>
-			<section>
-				<info>
-					<title>Hardware</title>
-				</info>
+			<sect3>
+				<title>Software</title>
+				<para>To run any version of BaseX, you need version 1.5 or later of
+				the Java runtime environment (JRE) or development kit (JDK).</para>
+				<para>The latest version of Java can be downloaded at 
+				<ulink url="http://www.java.com">www.java.com</ulink> or
+				<ulink url="http://java.sun.com">java.sun.com</ulink>.</para>
+			</sect3>
 
-				<para>BaseX works with very limited resources (400 MHz, 64 MB RAM). To work with
-					larger databases, however, you might benefit from more RAM. If you encounter
-					main memory limits, there are several things you can try: <itemizedlist>
-						<listitem>
-							<para>Increase Java's virtual memory</para>
-						</listitem>
-						<listitem>
-							<para>Switch off database indexes</para>
-						</listitem>
-						<listitem>
-							<para>Use BaseX's internal XML parser</para>
-						</listitem>
-					</itemizedlist>
+			<sect3>
+				<title>Hardware</title>
+				<para>BaseX works with very limited resources (400 MHz, 64 MB RAM).
+				To work with larger databases, however, you might benefit from more RAM.
+				If you encounter main memory limits, there are several things you can try:
+				<itemizedlist>
+					<listitem>Increase <ulink url="#XXX">Java&apos;s virtual memory</ulink></listitem>
+					<listitem>Switch off <ulink url="#XXX">database indexes</ulink></listitem>
+					<listitem>Use BaseX&apos;s <ulink url="#XXX">internal XML parser</ulink></listitem>
+				</itemizedlist>
 				</para>
-			</section>
-		</section>
-		<section>
-			<info>
-				<title>Installation</title>
-			</info>
+			</sect3>
+		</sect2>
 
-			<para>BaseX works without any installation. The following files can be <link
-					xmlns:xlink="http://www.w3.org/1999/xlink"
-					xlink:href="http://www.inf.uni-konstanz.de/dbis/basex/download.php"
-					>downloaded</link> from the homepage: <itemizedlist>
-					<listitem>
-						<para>
-							<emphasis>BaseX.jar</emphasis>: simple JAR file</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>BaseX.exe</emphasis>: a JAR file, which is wrapped into a
-							Windows executable</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>BaseX-XQJ.jar</emphasis>: <link
-								xmlns:xlink="http://www.w3.org/1999/xlink"
-								xlink:href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xqj.jar"
-								> XQuery for Java</link> Database API</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>BaseX-XMLDB.jar</emphasis>: <link
-								xmlns:xlink="http://www.w3.org/1999/xlink"
-								xlink:href="http://www.inf.uni-konstanz.de/dbis/basex/download.php?dl=BaseX55-xmldb.jar"
-								> XML:DB </link> Database API</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>BaseX-Complete.zip</emphasis>: JAR files, sources,
-							documentation and files to build the project</para>
-					</listitem>
-				</itemizedlist></para>
-			<para>The JAR file and the Windows executable can be launched with a simple
-				double-click. The "Complete" package contains the following files and directories
-				(selection):</para>
+		<sect2>
+			<title>Installation</title>
+			<para>BaseX works without any installation. The following files can be
+			<ulink url="http://www.inf.uni-konstanz.de/dbis/basex/download.php">downloaded</ulink>
+			from the homepage:</para>
+
+			<itemizedlist>
+				<listitem><emphasis>BaseX.jar</emphasis>:
+					simple JAR file</listitem>
+				<listitem><emphasis>BaseX.exe</emphasis>:
+					a JAR file, which is wrapped into a Windows executable</listitem>
+				<listitem><emphasis>BaseX-XQJ.jar</emphasis>:
+					<ulink url="#">XQuery for Java</ulink> Database API</listitem>
+				<listitem><emphasis>BaseX-XMLDB.jar</emphasis>:
+					<ulink url="#">XML:DB</ulink> Database API</listitem>
+				<listitem><emphasis>BaseX-Complete.zip</emphasis>:
+					JAR files, sources, documentation and files to build the project</listitem>
+			</itemizedlist>
+
+			<para>The JAR file and the Windows executable can be launched with a
+			simple double-click. The "Complete" package contains the following
+			files and directories (selection):</para>
+
 			<blockquote>
-				<para>
-					<emphasis>Project Directory</emphasis>
-				</para>
-				<programlisting>
-	doc              Project documentation
-	etc              Various files for project handling
-	src              Project sources
-	.project         <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org/">Eclipse</link> project file
-	makefile         Linux Makefile
-	BaseX.jar        Public JAR file
-	license.txt      Licensing Information
-	readme.txt       Project Information
-	build.xml        <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://ant.apache.org/">Ant</link> Build file
-	input.xml        XML sample document</programlisting>
+				<para><emphasis>Project Directory</emphasis></para>
+				<programlisting>doc              Project documentation
+etc              Various files for project handling
+src              Project sources
+.project         <ulink url="http://www.eclipse.org/">Eclipse</ulink> project file
+makefile         Linux <ulink url="http://en.wikipedia.org/wiki/Make_(software)">Makefile</ulink>
+BaseX.jar        Public JAR file
+license.txt      Licensing Information
+readme.txt       Project Information
+build.xml        <ulink url="http://ant.apache.org/">Ant</ulink> Build file
+input.xml        XML sample document</programlisting>
 			</blockquote>
-			<para>In the <emphasis>etc</emphasis> folder, you find Linux scripts and Windows batch
-				files which can moved into your PATH environment to speedup execution. </para>
-		</section>
-		<section>
-			<info>
-				<title>Quick Start</title>
-			</info>
 
-			<para>By double-clicking the JAR file, the graphical interface is launched. If you start
-				BaseX on the command line, or use the scripts mentioned above, you have some more
-				options: <blockquote>
-					<para>
-						<emphasis>Console version</emphasis>
-					</para>
-					<programlisting>java -cp BaseX.jar org.basex.BaseX</programlisting>
-					<para>
-						<emphasis>Running the server and a client instance</emphasis>
-					</para>
-					<programlisting>java -cp BaseX.jar org.basex.BaseXServer</programlisting>
-					<programlisting>java -cp BaseX.jar org.basex.BaseXClient</programlisting>
-					<para>
-						<emphasis>GUI version (granting more memory)</emphasis>
-					</para>
-					<programlisting>java -Xmx512m -jar BaseX.jar</programlisting>
-				</blockquote>
+			<para>In the <code>etc</code> folder, you find Linux scripts and Windows 
+			batch files which can moved into your PATH environment to speedup
+			execution.
 			</para>
-		</section>
-		<section>
+		</sect2>
+
+		<sect2>
+			<title>Quick Start</title>
+			<para>By double-clicking the JAR file, the graphical interface is launched.
+			If you start BaseX on the command line, or use the scripts mentioned above,
+			you have some more options:
+
+			<blockquote>
+				<para><emphasis>Console version</emphasis></para>
+				<programlisting>java -cp BaseX.jar org.basex.BaseX</programlisting>
+				<para><emphasis>Running the server and a client instance</emphasis></para>
+				<programlisting>java -cp BaseX.jar org.basex.BaseXServer
+java -cp BaseX.jar org.basex.BaseXClient</programlisting>
+				<para><emphasis>GUI version (granting more memory)</emphasis></para>
+				<programlisting>java -Xmx512m -jar BaseX.jar</programlisting>
+
+			</blockquote>
+			</para>
+		</sect2>
+
+		<sect2>
 			<info>
 				<title>Starting with BaseX GUI</title>
 			</info>
 			<para>Just download the BaseX.jar or BaseX.exe to start the GUI Version of BaseX. If you
 				download the source, you have to start the BaseXWin.java class.</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Starting with BaseX Console</title>
 			</info>
 			<para>Just enter java -cp BaseX.jar org.base.BaseX on the command line. The Java option
 				-Xmx... reserve more memory, and the -h flag of BaseX lists all available
 				flags.</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Using BaseX as Server-Client</title>
 			</info>
@@ -200,64 +152,61 @@
 						org.basex.BaseXClient -s server.org</para>
 				</listitem>
 			</itemizedlist>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Starting BaseX as a service</title>
 			</info>
 
 			<para/>
-		</section>
-	</chapter>
-	<chapter>
+		</sect2>
+	</sect1>
+	<sect1>
 		<info>
 			<title>Working with the BaseX Console</title>
 		</info>
 
-		<section>
+		<sect2>
 			<info>
 				<title>Launching BaseX in console mode</title>
 			</info>
 
-			<para>Enter java -Xmx512m -cp BaseX.jar org.basex.BaseX -h to get all available flags. </para>
-			<programlisting>
-				BaseX 5.5; DBIS, University of Konstanz
-				Usage: BaseX [options] [query]
-				[query] specify query file
-				-c chop whitespaces
-				-d debug mode
-				-e skip entity parsing
-				-o [file] specify output file
-				-q "cmd" send BaseX commands
-				-v/V show (all) process info
-				-x print result as xml
-				-z skip query output 
-			</programlisting>
-		</section>
+			<para>Enter java -cp BaseX.jar org.basex.BaseX -h to get all available flags. </para>
+			<programlisting>BaseX 5.6; DBIS, University of Konstanz
+Usage: BaseX [options] [query]
+  [query]    specify query file
+  -c         chop whitespaces
+  -d         debug mode
+  -e         skip entity parsing
+  -o [file]  specify output file
+  -q &lt;cmd&gt;   send BaseX commands
+  -v/V       show (all) process info
+  -x         print result as xml
+  -z         skip query output </programlisting>
+		</sect2>
 
-		<section>
+		<sect2>
 			<info>
-				<title>What can i do in the console mode?</title>
+				<title>What can I do in the console mode?</title>
 			</info>
 			<para>Type in "help" to get a list of all BaseX commands. Several commands can be
 				separated by semicolons. To evaluate commands without entering the console mode, you
 				can use the -q option on the command line. See the following example.</para>
-			<programlisting>
-				java -Xmx512m -cp BaseX.jar org.basex.BaseX -vq "create xml input.xml; xquery /"
-				
-				Database 'input' created in 155.17 ms.
-				
-				Parsing   : 110.35 ms
-				Compiling : 0.81 ms
-				Evaluating: 0.05 ms
-				Printing  : 2.06 ms
-				Total Time: 113.35 ms
-				Results   : 1 Item
-				Printed   : 360 Bytes
-			</programlisting>
-		</section>
+			<programlisting>java -Xmx512m -cp BaseX.jar org.basex.BaseX
+  -vq "create xml input.xml; xquery /"
 
-		<section>
+Database &apos;input&apos; created in 155.17 ms.
+
+Parsing   : 110.35 ms
+Compiling : 0.81 ms
+Evaluating: 0.05 ms
+Printing  : 2.06 ms
+Total Time: 113.35 ms
+Results   : 1 Item
+Printed   : 360 Bytes</programlisting>
+		</sect2>
+
+		<sect2>
 			<info>
 				<title>Description of the Console Features</title>
 			</info>
@@ -265,7 +214,7 @@
 			<para>You can type in help in the console to get a list of all BaseX commands. Several
 				commands can be separated by semicolons. To evaluate commands without entering the
 				console mode, you can use the -q option on the command line</para>
-			<section>
+			<sect3>
 				<info>
 					<title>Database Commands</title>
 				</info>
@@ -303,8 +252,8 @@
 						</listitem>
 					</itemizedlist>
 				</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>Query Commands</title>
 				</info>
@@ -326,8 +275,8 @@
 						</listitem>
 					</itemizedlist>
 				</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>Update Commands</title>
 				</info>
@@ -358,8 +307,8 @@
 						</listitem>
 					</itemizedlist>
 				</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>General Commands</title>
 				</info>
@@ -368,7 +317,7 @@
 						<listitem>
 							<para>Help (help [command]): Get help on BaseX commands. If [command] is
 								specified, information on the specific command is printed;
-								otherwise, all commands are listed. If 'all' is specified, hidden
+								otherwise, all commands are listed. If &apos;all&apos; is specified, hidden
 								commands are included. </para>
 						</listitem>
 						<listitem>
@@ -380,14 +329,14 @@
 						</listitem>
 					</itemizedlist>
 				</para>
-			</section>
-		</section>
-	</chapter>
-	<chapter>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1>
 		<info>
 			<title>Working with the BaseX GUI</title>
 		</info>
-		<section>
+		<sect2>
 			<info>
 				<title>Description of all the Views in the GUI</title>
 			</info>
@@ -418,12 +367,12 @@
 					</listitem>
 				</itemizedlist>
 			</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Description of the GUI Features</title>
 			</info>
-			<section>
+			<sect3>
 				<info>
 					<title>What does the Filter button exactly do?</title>
 				</info>
@@ -431,76 +380,74 @@
 					highlighted XML nodes, omitting all the other nodes of the document. If realtime
 					filtering is enabled, the Filter button will be disabled, and all results are
 					automatically filtered.</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>What is Realtime Filtering?</title>
 				</info>
 				<para>If realtime filtering is enabled, all visualizations directly show the query
 					results while entering the query. If this feature is disabled, the query results
 					are highlighted in the visualizations and can be ecplicitly filtered using the
-					'Filter' button.</para>
-			</section>
-			<section>
+					&apos;Filter&apos; button.</para>
+			</sect3>
+			<sect3>
 				<info>
 					<title>How can I search without XQuery?</title>
 				</info>
 				<para>The Search field triggers a simple search query in the XML document. The
 					following syntax is supported:</para>
-				<programlisting>
-					Query   Description
-					foo 	Find tags and texts containing foo
-					=foo 	Find exact matching text nodes
-					@foo 	Find attributes and attribute values
-					@=foo 	Find exact attribute values
-				</programlisting>
-			</section>
-			<section>
+				<programlisting>Query   Description
+foo 	Find tags and texts containing foo
+=foo 	Find exact matching text nodes
+@foo 	Find attributes and attribute values
+@=foo 	Find exact attribute values</programlisting>
+			</sect3>
+			<sect3>
 				<info>
 					<title>The search field in the query panel and the search field right beyond the
 						buttons, do they differ?</title>
 				</info>
 				<para>Not really, both offer the same functionality, but in the query panel there is
-					a dropdown menu where it's possible to choose tags or attributes of the XML
+					a dropdown menu where it is possible to choose tags or attributes of the XML
 					document.</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>How can I configure the look and feel of BaseX?</title>
 				</info>
 				<para>All panels are freely adjust- and dragable. Changing of colors, fonts and the
-					layout is possible via the 'Layout' entry in the 'Options' menu.</para>
-			</section>
-			<section>
+					layout is possible via the &apos;Layout&apos; entry in the &apos;Options&apos; menu.</para>
+			</sect3>
+			<sect3>
 				<info>
 					<title>What is the Main-Memory Mode?</title>
 				</info>
 				<para>The Main-Memory Mode speeds up querying but disables updates. The table data
 					is kept in memory and the text of a document is still accesseed from
 					disk.</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
 					<title>How can I import my file system? What does that mean?</title>
 				</info>
-				<para>To import a file system, go to 'File/Import Filesystem...'. You will be
+				<para>To import a file system, go to &apos;File/Import Filesystem...&apos;. You will be
 					prompted for the next steps. A file hierarchy traversal is performed and the
 					directory structure of the filesystem is mapped into an XML representation.
 					Additionally some metadata is extracted from some known file types. What you get
-					is an 'XML view' of your current file system. You can query the filesystem just
+					is an &apos;XML view&apos; of your current file system. You can query the filesystem just
 					as any other database instance. Manipulation (update, deletion) of the XML
 					database instance representing a file hierarchy has no effect on the real
 					filesystem.</para>
-			</section>
-			<section>
+			</sect3>
+			<sect3>
 				<info>
-					<title>How can I import my data aka how do i create a new database instance aka
+					<title>How can I import my data aka how do I create a new database instance aka
 						how to shred an XML file?</title>
 				</info>
 				<para>There are 2 ways:</para>
 				<itemizedlist>
 					<listitem>
-						<para>If your input data is an XML file, you can use the 'New' command.
+						<para>If your input data is an XML file, you can use the &apos;New&apos; command.
 							BaseX will create a new database with the name of your XML file. (GUI
 							only)</para>
 					</listitem>
@@ -508,23 +455,23 @@
 						<para>You can use the create command. (GUI and console)</para>
 					</listitem>
 				</itemizedlist>
-			</section>
-		</section>
-	</chapter>
-	<chapter>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1>
 		<info>
 			<title>General Information</title>
 		</info>
-		<section>
+		<sect2>
 			<info>
 				<title>Location of BaseX Files</title>
 			</info>
 			<para>The databases are stored in a BaseXData directory in your home directory. The path
 				can be changed in the GUI via the Options/Preferences menu. The two configuration
-				files .basex/.basewin are stored in the same directory. This path can't be changed
+				files .basex/.basewin are stored in the same directory. This path cannot be changed
 				by the user. </para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>How do you measure the performance of the queries?</title>
 			</info>
@@ -541,8 +488,8 @@
 					<para>GUI Mode: display performance results in the QueryInfo view</para>
 				</listitem>
 			</itemizedlist>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>What indexing techniques are available and what do they do?</title>
 			</info>
@@ -563,10 +510,10 @@
 			<para>Note that the indexes only speedup XPath and simple user queries. The query
 				processor will optimize queries completely automatic whenever possible. Expect
 				XQuery to make use of the indexes in the next official release.</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
-				<title>How can i create a Database for a couple of XML files?</title>
+				<title>How can I create a Database for a couple of XML files?</title>
 			</info>
 			<para>There are 2 ways to do this: </para>
 			<itemizedlist>
@@ -581,44 +528,40 @@
 			</itemizedlist>
 			<para>Next, you can open a collection and run an XQuery as follows: for $doc in
 				collection("dbname") return ....</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Is there a way to save large results of a query in a file?</title>
 			</info>
 			<para>The best way to save large results is to work on the command line and use the "-o"
 				flag, as shown below: </para>
-			<programlisting>
-				sample.xq: for $node in doc('dbname')//etc return $node/something
-				BaseX-Command:
-				java -cp BaseX.jar org.basex.BaseX -o result.xml sample.xq
-			</programlisting>
-		</section>
+			<programlisting>sample.xq: for $node in doc(&apos;dbname&apos;)//etc return $node/something
+BaseX-Command:
+java -cp BaseX.jar org.basex.BaseX -o result.xml sample.xq</programlisting>
+		</sect2>
 
-	</chapter>
-	<chapter>
+	</sect1>
+	<sect1>
 		<info>
 			<title>Description of BaseX-Features</title>
 		</info>
 
-		<section>
+		<sect2>
 			<info>
 				<title>XQuery Implementation</title>
 			</info>
 			<para>All XPath optimizations are integrated in XQuery and the XPath implementation was
-				obsolete and so it was replaced by XQuery. As XPath is a subset of XQuery, you won't
+				obsolete and so it was replaced by XQuery. As XPath is a subset of XQuery, you will not
 				actually notice many differences, but XQuery directly allows to work with several
-				databases/documents, so you won't have to manually change the Context references. A
+				databases/documents, so you will not have to manually change the Context references. A
 				query like...</para>
-			<programlisting>
-				for $n in 1 to 10
-				for $doc in doc( concat('document', $n) )
-				return $doc//any/path/etc 
-			</programlisting>
+			<programlisting>for $n in 1 to 10
+for $doc in doc( concat(&apos;document&apos;, $n) )
+return $doc//any/path/etc </programlisting>
 			<para>could then be used to access several databases in one query. You can just type all
 				your XPath queries in the XQuery textfield.</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>XQuery Full-Text Implementation</title>
 			</info>
@@ -626,17 +569,15 @@
 				will be evaluated much faster in XPath, and XQuery covers more features of the
 				language specification. The following example queries are based on the W3C Use
 				Cases:</para>
-			<programlisting>
-				Return all title tags which contain the word 'Usability'
-				//title[text() ftcontains 'Usability'] 
-				
-				Return all authors, containing 'Marigold'
-				for $i score $s in //author
-				where $i/text() ftcontains 'Marigold'
-				return score="{ $s }">{ $i/text() } 
-			</programlisting>
-		</section>
-		<section>
+			<programlisting>Return all title tags which contain the word &apos;Usability&apos;
+//title[text() ftcontains &apos;Usability&apos;] 
+
+Return all authors, containing &apos;Marigold&apos;
+for    $i in //author score $s
+where  $i/text() ftcontains &apos;Marigold&apos;
+return &lt;hit score="{ $s }"&gt;{ $i/text() }&lt;/hit&gt;</programlisting>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Description of the Indexes</title>
 			</info>
@@ -645,38 +586,38 @@
 			<programlisting>Text-Based Queries:</programlisting>
 			<itemizedlist>
 				<listitem>
-					<para>//node()[text() = 'Usability']</para>
+					<para>//node()[text() = &apos;Usability&apos;]</para>
 				</listitem>
 				<listitem>
-					<para>//div[p = 'Usability' or p = 'Testing']</para>
+					<para>//div[p = &apos;Usability&apos; or p = &apos;Testing&apos;]</para>
 				</listitem>
 				<listitem>
-					<para>path/to/relevant[text() = 'Usability Testing']/and/so/on</para>
+					<para>path/to/relevant[text() = &apos;Usability Testing&apos;]/and/so/on</para>
 				</listitem>
 			</itemizedlist>
 			<programlisting>Attribute Index:</programlisting>
 			<itemizedlist>
 				<listitem>
-					<para>//node()[@align = 'right']</para>
+					<para>//node()[@align = &apos;right&apos;]</para>
 				</listitem>
 				<listitem>
-					<para>descendant::elem[@id = '1']</para>
+					<para>descendant::elem[@id = &apos;1&apos;]</para>
 				</listitem>
 				<listitem>
-					<para>range/query[@id >= 5]</para>
+					<para>range/query[@id &lt;= 5]</para>
 				</listitem>
 			</itemizedlist>
 			<programlisting>Full-Text Index:</programlisting>
 			<itemizedlist>
 				<listitem>
-					<para>//node[text() ftcontains 'Usability']</para>
+					<para>//node[text() ftcontains &apos;Usability&apos;]</para>
 				</listitem>
 				<listitem>
-					<para>//node[text() ftcontains 'Usebiliti' with fuzzy]</para>
+					<para>//node[text() ftcontains &apos;Usebiliti&apos; with fuzzy]</para>
 				</listitem>
 				<listitem>
-					<para>//book[chapter ftcontains ('web' ftor 'WWW' without stemming) ftand
-						'diversity' case sensitive with stemming distance at most 5 words]</para>
+					<para>//book[chapter ftcontains (&apos;web&apos; ftor &apos;WWW&apos; without stemming) ftand
+						&apos;diversity&apos; case sensitive with stemming distance at most 5 words]</para>
 				</listitem>
 			</itemizedlist>
 			<para>The full-text index is optimized to support all full-text features of the XQuery
@@ -685,8 +626,8 @@
 				are, the more errors will be tolerated. Default "Case Sensitivity", "Stemming" and
 				"Diacritics" options will be considered in the index creation. Consequently, all
 				queries will be sped up which use the default index options.</para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>What about the different indexes BaseX offers: which data structures are
 					applied?</title>
@@ -708,20 +649,20 @@
 						search. </para>
 				</listitem>
 			</itemizedlist>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Do you support XML Updates?</title>
 			</info>
 			<para>BaseX provides internal commands to perform updates on XML (see also BaseX
 				Commands). Moreover, the GUI provides a convenient way to perform updates on the
 				data. </para>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
-				<title>What can i do if i get Exceptions on huge XML files as input?</title>
+				<title>What can I do if I get Exceptions on huge XML files as input?</title>
 			</info>
-			<para>You can try to use the internal XML parser of BaseX instead of Java's own XML
+			<para>You can try to use the internal XML parser of BaseX instead of Java&apos;s own XML
 				parser. To do this there are 2 ways: Moreover, the GUI provides a convenient way to
 				perform updates on the data. </para>
 			<itemizedlist>
@@ -732,22 +673,22 @@
 					<para>GUI Mode: File -> New -> Parsing -> Use internal XML parser</para>
 				</listitem>
 			</itemizedlist>
-		</section>
-		<section>
+		</sect2>
+		<sect2>
 			<info>
-				<title>Can i protect a DB in BaseX with a password?</title>
+				<title>Can I protect a DB in BaseX with a password?</title>
 			</info>
 			<para>No, there is no password protection inside the BaseX architecture - but (at least
 				in Linux) you can restrict the BaseX database directory to a specific user or group.
 				Moreover, the GUI provides a convenient way to perform updates on the data. </para>
-		</section>
-	</chapter>
-	<chapter>
+		</sect2>
+	</sect1>
+	<sect1>
 		<info>
-			<title>Developer's Guide</title>
+			<title>Developer&apos;s Guide</title>
 		</info>
 
-		<section>
+		<sect2>
 			<info>
 				<title>Programming with BaseX API</title>
 			</info>
@@ -755,100 +696,95 @@
 			<para>This section decribes how to implement own applications using the BaseX API.
 				So you can easily develop and expand BaseX with your own ideas and to your own needs.
 				Here you can find a few instructions to start.</para>
-				
-				<section>
-					<info>
-						<title>Creating a Database</title>
-					</info>
-					<para>To execute these examples you need to create a Main-Class and define the following:</para>
-					<programlisting>// Creates a standard output stream
+
+			<sect3>
+				<info>
+					<title>Creating a Database</title>
+				</info>
+				<para>To execute these examples you need to create a Main-Class and define the following:</para>
+				<programlisting>// Creates a standard output stream
 ConsoleOutput out = new ConsoleOutput(System.out);
 // Creates a new database context, referencing the database.
-Context context = new Context();
-					</programlisting>
-						<para>After defining the ConsoleOutput and the Context you can start with one of the following examples.
-							The first example shows how to create a database from a xml file.</para>
-				<figure>
-				<title>Creating a Database from a file</title>
-					<graphic fileref="code1.png"/>
-				</figure>
-				<para>The second example shows how to create a database from an input string.</para>
-				<figure>
-				<title>Creating a Database from an input string</title>
-					<graphic fileref="code2.png"/>
-				</figure>
-				<para>The third example shows how to open an existing database after you have created it.</para>
-				<figure>
-				<title>Opens an existing Database</title>
-					<graphic fileref="code3.png"/>
-				</figure>
-				<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
-				<programlisting>// Closes the database
+Context context = new Context();</programlisting>
+					<para>After defining the ConsoleOutput and the Context you can start with one of the following examples.
+						The first example shows how to create a database from a xml file.</para>
+			<figure>
+			<title>Creating a Database from a file</title>
+				<graphic fileref="code1.png"/>
+			</figure>
+			<para>The second example shows how to create a database from an input string.</para>
+			<figure>
+			<title>Creating a Database from an input string</title>
+				<graphic fileref="code2.png"/>
+			</figure>
+			<para>The third example shows how to open an existing database after you have created it.</para>
+			<figure>
+			<title>Opens an existing Database</title>
+				<graphic fileref="code3.png"/>
+			</figure>
+			<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
+			<programlisting>// Closes the database
 context.close();
 // Closes the output stream
 out.close();</programlisting>
-				</section>
-				
-				<section>
-					<info>
-						<title>Executing XQuery</title>
-					</info>
-					<para>To execute these examples you need to create a Main-Class and define the following:</para>
-					<programlisting>/** Sample query. */
-private static final String QUERY = "<xml>Test</xml>/text()";
+			</sect3>
+
+			<sect3>
+				<info>
+					<title>Executing XQuery</title>
+				</info>
+				<para>To execute these examples you need to create a Main-Class and define the following:</para>
+				<programlisting>/** Sample query. */
+private static final String QUERY = "&lt;xml&gt;Test&lt;/xml&gt;/text()";
 // Creates a standard output stream
-ConsoleOutput out = new ConsoleOutput(System.out);
-					</programlisting>
-					<para>After defining the ConsoleOutput and the Query you can start with one of the following examples.
-							The first example shows how to execute a query and create a result instances.</para>
-				<figure>
-				<title>Creating a result instance</title>
-					<graphic fileref="code4.png"/>
-				</figure>
-				<para>The second example shows how to iterate through all results.</para>
-				<figure>
-				<title>Iterating through all results</title>
-					<graphic fileref="code5.png"/>
-				</figure>
-				<para>The third example shows how to execute a Query with the BaseX Command.</para>
-				<figure>
-				<title>Using the BaseX command</title>
-					<graphic fileref="code6.png"/>
-				</figure>
-				
-				<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
-				<programlisting>// Closes the database
+ConsoleOutput out = new ConsoleOutput(System.out);</programlisting>
+				<para>After defining the ConsoleOutput and the Query you can start with one of the following examples.
+						The first example shows how to execute a query and create a result instances.</para>
+			<figure>
+			<title>Creating a result instance</title>
+				<graphic fileref="code4.png"/>
+			</figure>
+			<para>The second example shows how to iterate through all results.</para>
+			<figure>
+			<title>Iterating through all results</title>
+				<graphic fileref="code5.png"/>
+			</figure>
+			<para>The third example shows how to execute a Query with the BaseX Command.</para>
+			<figure>
+			<title>Using the BaseX command</title>
+				<graphic fileref="code6.png"/>
+			</figure>
+
+			<para>After all of the examples you have to close the Context and the ConsoleOutput</para>
+			<programlisting>// Closes the database
 context.close();
 // Closes the output stream
 out.close();</programlisting>	
-				</section>
-				
-				<section>
-					<info>
-						<title>Updating a Database</title>
-					</info>
-					<para>After you successfully created a Database you can update and modify the data on the following ways:</para>
-					<para>Insert a document:</para>
-					<programlisting>// Inserts a document into the database;
+			</sect3>
+
+			<sect3>
+				<info>
+					<title>Updating a Database</title>
+				</info>
+				<para>After you successfully created a Database you can update and modify the data on the following ways:</para>
+				<para>Insert a document:</para>
+				<programlisting>// Inserts a document into the database;
 // argument can be a file name or XML 
 // Position: 0 (ignored for documents)
 // Target  : insert on root level
-new Insert("fragment", "<doc>second</doc>", "0", "/").execute(context, out);
-					</programlisting>
-					<para>Delete:</para>
-					<programlisting>// Deletes all attributes in the database.
-new Delete("//@*").execute(context, out);
-					</programlisting>
-					<para>Insert a node:</para>
-					<programlisting>// Inserts an element fragment into the database 
+new Insert("fragment", "&lt;doc&gt;second&lt;/doc&gt;", "0", "/").execute(context, out);</programlisting>
+				<para>Delete:</para>
+				<programlisting>// Deletes all attributes in the database.
+new Delete("//@*").execute(context, out);</programlisting>
+				<para>Insert a node:</para>
+				<programlisting>// Inserts an element fragment into the database 
 // Position: 1 = as first child
 // Target  : insert after all /doc elements...
-new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
-					</programlisting>
-					<para>You can do it the same way with new Update() and new Copy()</para>
-				</section>
-		</section>
-		<section>
+new Insert("fragment", "&lt;sub/&gt;", "1", "/doc").execute(context, out);</programlisting>
+				<para>You can do it the same way with new Update() and new Copy()</para>
+			</sect3>
+		</sect2>
+		<sect2>
 			<info>
 				<title>Programming with XML:DB API</title>
 			</info>
@@ -856,8 +792,8 @@ new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
 			<para>This section decribes how to implement own applications using the XML:DB API.
 				These classes are predefined and help to use every native XML Database with the same
 				application implemented with the XML:DB API.</para>
-				
-				<section>
+
+				<sect3>
 					<info>
 						<title>Executing XPath</title>
 					</info>
@@ -867,16 +803,15 @@ static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
 /** Name of the referenced database. */
 static final String DBNAME = "xmldb:basex://localhost:1984/input";
 /** Sample query. */
-static final String QUERY = "//li"; 
-					</programlisting>
+static final String QUERY = "//li"; </programlisting>
 						<para>After defining the DRIVER, the DBNAME and the QUERY you can start with the following example.</para>
 				<figure>
 				<title>Executing XPath</title>
 					<graphic fileref="code7.png"/>
 				</figure>
-				</section>
-				
-				<section>
+				</sect3>
+
+				<sect3>
 					<info>
 						<title>Inserting a XML Document</title>
 					</info>
@@ -884,24 +819,23 @@ static final String QUERY = "//li";
 					<programlisting>/** Database Driver. */
 static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
 /** Name of the referenced database. */
-static final String DBNAME = "xmldb:basex://localhost:1984/input"; 
-					</programlisting>
+static final String DBNAME = "xmldb:basex://localhost:1984/input"; </programlisting>
 						<para>After defining the DRIVER and the DBNAME you can start with the following example.</para>
 				<figure>
 				<title>Inserting a XML Document</title>
 					<graphic fileref="code8.png"/>
 				</figure>
-				</section>
-				
-		</section>
-		<section>
+				</sect3>
+
+		</sect2>
+		<sect2>
 			<info>
 				<title>Programming with XQuery API</title>
 			</info>
 
 			<para>This section describes how to implement own applications using the XQuery API.</para>
-			
-			<section>
+
+			<sect3>
 					<info>
 						<title>Executing XQuery</title>
 					</info>
@@ -910,7 +844,7 @@ static final String DBNAME = "xmldb:basex://localhost:1984/input";
 				<title>Executing XQuery</title>
 					<graphic fileref="code9.png"/>
 				</figure>
-				</section>
-		</section>
-	</chapter>
-</book>
+			</sect3>
+		</sect2>
+	</sect1>
+</article>
