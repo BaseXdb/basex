@@ -44,13 +44,12 @@ public final class XMLDBInsert {
       resource.setContent(document);
       // Stores the Resource into the Database.
       col.storeResource(resource);
+      
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
       e.printStackTrace();
     } finally {
-      if(col != null) {
-        col.close();
-      }
+      if(col != null) col.close();
     }
   }
 }

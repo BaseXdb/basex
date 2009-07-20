@@ -15,7 +15,6 @@ import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
-import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -220,7 +219,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   public void close() {
-    if(ctx != null) new Close().execute(ctx);
+    if(ctx != null) ctx.close();
     ctx = null;
   }
 
