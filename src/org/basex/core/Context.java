@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.io.IO;
 import org.basex.util.Performance;
 
 /**
@@ -151,15 +150,6 @@ public final class Context {
    * @return data reference
    */
   public Data pin(final String name) {
-    return POOL.pin(name);
-  }
-  
-  /**
-   * Pins the Pool.
-   * @param name file name
-   * @return data reference
-   */
-  public Data pin(final IO name) {
     return POOL.pin(name);
   }
   

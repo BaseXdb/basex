@@ -6,6 +6,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
@@ -325,7 +327,11 @@ public final class QueryContext extends Progress {
    */
   void close() throws IOException {
     // [AW] databases must eventually be unpinned
-    for(int d = rootDocs; d < docs; d++) doc[d].data.close();
+    for(int d = rootDocs; d < docs; d++) {
+   // [AW] later replaced by context.unpin()...
+      Context.POOL.unpin(doc[d].data);
+      doc[d].data.close();
+    }
   }
 
   /**
@@ -377,12 +383,12 @@ public final class QueryContext extends Progress {
       }
     }
 
-    final String dbname = string(db);
-
     // [AW] what happens if context == null?
     // better place for all pin operations: addDoc(...)
-
+    // [CG] placed in check()??
+   
     // check if the database has already been opened
+    final String dbname = string(db);
     for(int d = 0; d < docs; d++)
     if(doc[d].data.meta.name.equals(dbname)) return doc[d];
     // check if the document has already been opened
@@ -419,7 +425,6 @@ public final class QueryContext extends Progress {
   private void addDoc(final DBNode node) {
     if(docs == doc.length) doc = Array.extend(doc);
     doc[docs++] = node;
-
   }
 
   /**
@@ -433,11 +438,15 @@ public final class QueryContext extends Progress {
    */
   private Data check(final String path, final boolean err, final boolean coll)
       throws QueryException {
-
     try {
       final IO f = IO.get(path);
       final String db = f.dbname();
-      return MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
+      // [AW] later replaced by context.pin()...
+      Data d = Context.POOL.pin(db);
+      if(d != null) return d;
+      d = MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
+      Context.POOL.add(d);
+      return d;
     } catch(final IOException ex) {
       if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
       return null;

@@ -2,7 +2,6 @@ package org.basex.core;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.io.IO;
 import org.basex.util.Array;
 
 /**
@@ -33,21 +32,6 @@ public class DataPool {
     }
     return null;
   }
-  
-  /**
-   * Returns an existing data reference for the specified database, or null.
-   * @param db name of the database
-   * @return data reference
-   */
-  public Data pin(final IO db) {
-    for(int i = 0; i < size; i++) {
-      if(data[i].meta.file.eq(db)) {
-        pins[i]++;
-        return data[i];
-      }
-    }
-    return null;
-  }
 
   /**
    * Unpins a data reference.
@@ -61,6 +45,7 @@ public class DataPool {
     for(int i = 0; i < size; i++) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;
+        System.out.println("unpin: " + pins[i]);
         if(close) {
           Array.move(data, i + 1, -1, size - i - 1);
           Array.move(pins, i + 1, -1, size - i - 1);
