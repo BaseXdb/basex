@@ -186,4 +186,17 @@ public final class ParserUtil {
     final long time = file.lastModified() / 60000;
     return time != 0 ? token(time) : Token.EMPTY;
   }
+
+  /**
+   * Checks if the given byte array only contains valid ascii chars. All invalid
+   * chars are removed.
+   * @param data the byte array to check.
+   * @return a byte array containing only valid ascii chars.
+   */
+  public static byte[] checkAscii(final byte[] data) {
+    for(int i = 0, max = data.length; i < max; i++) {
+      if(data[i] < 0) data[i] = ' ';
+    }
+    return data;
+  }
 }

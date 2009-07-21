@@ -13,6 +13,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.build.Builder;
@@ -36,7 +37,7 @@ import org.basex.util.Token;
 
 /**
  * Imports/shreds/parses a file hierarchy into a BaseX database.
- *
+ * 
  * The overall process of importing a file hierarchy can be described as
  * follows:
  * <ol>
@@ -45,7 +46,7 @@ import org.basex.util.Token;
  * <li>This class {@link NewFSParser} instantiates the needed components for the
  * import process in its {@link NewFSParser#parse(Builder)} method.
  * </ol>
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Bastian Lemke
@@ -482,13 +483,14 @@ public final class NewFSParser extends Parser {
   public void metaEvent(final Element element, final DataType t,
       final Definition definition, final byte[] language, final byte[] value)
       throws IOException {
-    if(Token.ws(value)) return;
+    byte[] data = Token.trim(value);
+    if(Token.ws(data)) return;
     atts.reset();
     if(language != null) atts.add(Attribute.LANGUAGE.get(), language);
     if(definition != Definition.NONE) atts.add(Attribute.DEFINITION.get(),
         definition.get());
     if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), t.get());
-    builder.nodeAndText(element.get(), atts, value);
+    builder.nodeAndText(element.get(), atts, data);
   }
 
   /**

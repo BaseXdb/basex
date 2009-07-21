@@ -2,6 +2,7 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
+
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -255,6 +256,23 @@ public class MP3Parser extends AbstractParser {
       "Band or artist logotype", //
       "Publisher or Studio logotype"};
 
+  /** Flag for ISO-8859-1 encoding. */
+  private static final int ENC_ISO_8859_1 = 0;
+  /**
+   * Flag for UTF-16 encoding (with BOM).
+   * 
+   * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
+   */
+  private static final int ENC_UTF_16_WITH_BOM = 1;
+  /**
+   * Flag for UTF-16 encoding (without BOM).
+   * 
+   * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
+   */
+  private static final int ENC_UTF_16_NO_BOM = 2;
+  /** Flag for UTF-8 encoding. */
+  private static final int ENC_UTF_8 = 3;
+
   static {
     NewFSParser.register("mp3", MP3Parser.class);
   }
@@ -490,17 +508,65 @@ public class MP3Parser extends AbstractParser {
   }
 
   /**
-   * Reads and parses text from the file.
+   * Reads the text encoding of the following frame from the file channel.
+   * Assure that at least one byte is buffered before calling this method.
+   * @return a string with the name of the encoding that was detected or
+   *         <code>null</code> if an invalid or unsupported encoding was
+   *         detected. If no encoding is set, an empty string is returned.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  String readEncoding() throws IOException {
+    int c = bfc.get();
+    switch(c) {
+      case ENC_ISO_8859_1:
+        return "ISO-8859-1";
+      case ENC_UTF_8:
+        return "UTF-8";
+      case ENC_UTF_16_NO_BOM:
+        BaseX.debug(
+            "MP3Parser: Unsupported text encoding (UTF-16 without BOM) found "
+                + "(%).", bfc.getFileName());
+        return null;
+      case ENC_UTF_16_WITH_BOM:
+        return "UTF-16";
+      default: // no encoding specified
+        bfc.skip(-1);
+        return "";
+    }
+  }
+
+  /**
+   * Reads and parses text from the file. Assure that at least <code>s</code>
+   * bytes are buffered before calling this method.
    * @param s number of bytes to read.
    * @return byte array with the text.
-   * @throws IOException if any error occurs while reading the file.
+   * @throws IOException if any error occurs while reading from the file.
    */
   byte[] readText(final int s) throws IOException {
-    int size = s - skipEncBytes();
-    if(size <= 0) return Token.EMPTY;
-    byte[] array = new byte[size];
-    bfc.get(array);
-    return array;
+    if(s <= 1) return Token.EMPTY;
+    return readText(s, readEncoding());
+  }
+
+  /**
+   * Reads and parses text with the given encoding from the file. Assure that at
+   * least <code>s</code> bytes are buffered before calling this method.
+   * @param s number of bytes to read.
+   * @param encoding the encoding of the text.
+   * @return byte array with the text.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  byte[] readText(final int s, final String encoding) throws IOException {
+    int size = s;
+    if(size <= 1 || encoding == null) return Token.EMPTY;
+    if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
+    else size--;
+    if(encoding.length() == 0) { // no encoding specified
+      byte[] array = new byte[size];
+      bfc.get(array);
+      return ParserUtil.checkAscii(array);
+    }
+    byte[] array = new byte[size - 1];
+    return Token.token(new String(bfc.get(array), encoding));
   }
 
   /**
@@ -546,7 +612,7 @@ public class MP3Parser extends AbstractParser {
       i++;
     while(i < size)
       value[i++] = 0;
-    return value;
+    return Token.chopNumber(value);
   }
 
   /**
@@ -660,12 +726,22 @@ public class MP3Parser extends AbstractParser {
     COMM {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        int skipped = obj.skipEncBytes() + 1;
-        byte[] lang = obj.readText(3);
-        obj.bfc.get();
+        String encoding = obj.readEncoding();
+        byte[] lang = obj.readText(3, "");
+        for(byte b : lang) {
+          if(Token.ws(b) || b == 0) {
+            lang = Token.EMPTY;
+            break;
+          }
+        }
+        int pos = 4;
+        // ignore short content description
+        while(obj.bfc.get() != 0 && ++pos < size)
+          ;
+        if(pos >= size) return;
         if(Token.ws(lang) || lang[0] == 'X') lang = null;
         obj.fsparser.metaEvent(Element.COMMENT, DataType.STRING,
-            Definition.NONE, lang, obj.readText(size - 3 - skipped));
+            Definition.NONE, lang, obj.readText(size - pos, encoding));
       }
     },
     /** */

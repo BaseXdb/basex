@@ -444,8 +444,10 @@ public class JPGParser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   private void readComment(final int size) throws IOException {
+    byte[] array = new byte[size];
+    bfc.get(array);
     fsparser.metaEvent(Element.COMMENT, DataType.STRING, Definition.NONE, null,
-        bfc.get(new byte[size]));
+        ParserUtil.checkAscii(array));
   }
 
   /**
