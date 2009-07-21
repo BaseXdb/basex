@@ -152,15 +152,11 @@ public final class FSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      if(Prop.fuse) {
-        atts.add(MOUNTPOINT  , token(mountpoint));
-        atts.add(SIZE        , Token.EMPTY);
-        atts.add(BACKINGSTORE, token(mybackingpath));
-      } else {
-        atts.add(NAME        , NOTMOUNTED);
-        atts.add(SIZE        , Token.EMPTY);
-        atts.add(BACKINGSTORE, token(fsimportpath));
-      }
+      final byte[] mnt = Prop.fuse ? token(mountpoint) : NOTMOUNTED;
+      final byte[] bck = Prop.fuse ? token(mybackingpath) : token(fsimportpath);
+      atts.add(MOUNTPOINT  , mnt);
+      atts.add(SIZE        , Token.EMPTY);
+      atts.add(BACKINGSTORE, bck);
 
       builder.startElem(DEEPFS, atts);
 

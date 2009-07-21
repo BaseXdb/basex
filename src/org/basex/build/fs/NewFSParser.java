@@ -3,6 +3,7 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -219,15 +220,12 @@ public final class NewFSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      if(Prop.fuse) {
-        atts.add(MOUNTPOINT, token(mountpoint));
-        atts.add(SIZE, Token.EMPTY);
-        atts.add(BACKINGSTORE, token(mybackingpath));
-      } else {
-        atts.add(NAME, NOTMOUNTED);
-        atts.add(SIZE, Token.EMPTY);
-        atts.add(BACKINGSTORE, token(fsimportpath));
-      }
+      final byte[] mnt = Prop.fuse ? token(mountpoint) : NOTMOUNTED;
+      final byte[] bck = Prop.fuse ? token(mybackingpath) : token(fsimportpath);
+      atts.add(MOUNTPOINT  , mnt);
+      atts.add(SIZE        , Token.EMPTY);
+      atts.add(BACKINGSTORE, bck);
+
       if(ADD_TYPE_ATTR) builder.startNS(Token.token("xsi"),
           Token.token("http://www.w3.org/2001/XMLSchema-instance"));
 
