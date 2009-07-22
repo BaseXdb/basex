@@ -344,9 +344,7 @@ public final class NewFSParser extends Parser {
             BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
                 bfc.getFileName());
           } finally {
-            try {
-              bfc.close();
-            } catch(final IOException e1) { /* */}
+            try { bfc.close(); } catch(final IOException e1) { /* */ }
           }
         }
       }

@@ -72,8 +72,8 @@ class Session implements Runnable {
   /**
    * Starts the Thread.
    */
-  synchronized void start() {
-    if (session == null) {
+  void start() {
+    if(session == null) {
       session = new Thread(this);
       session.start();
     }

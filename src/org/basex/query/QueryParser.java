@@ -2507,7 +2507,7 @@ public class QueryParser extends InputParser {
   private Expr deletee() throws QueryException {
     final int p = qp;
     if(!consumeWS(DELETE)) return null;
-    if(!consumeWS(NODE)) {
+    if(!consumeWS(NODES) && !consumeWS(NODE)) {
       qp = p;
       return null;
     }

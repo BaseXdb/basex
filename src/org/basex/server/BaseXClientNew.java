@@ -35,9 +35,13 @@ import static org.basex.core.Commands.*;
  */
 public final class BaseXClientNew {
   /** Database Context. */
-  protected final Context context = new Context();
+  final Context context = new Context();
   /** Stand-alone or Client/Server mode. */
-  protected boolean standalone;
+  boolean standalone;
+  /** Output file for queries. */
+  String output;
+  /** Console mode. */
+  boolean console = true;
 
   /** Flag for showing info on command processing. */
   private boolean info;
@@ -45,16 +49,12 @@ public final class BaseXClientNew {
   private boolean allInfo;
   /** XQuery file. */
   private String query;
-  /** Output file for queries. */
-  protected String output;
   /** User query. */
   private String commands;
   /** Server name; default is 'localhost'. */
   private String host = "localhost";
   /** Server port. */
   private int port = Prop.port;
-  /** Console mode. */
-  boolean console = true;
   /** Socket. */
   private Socket socket;
 

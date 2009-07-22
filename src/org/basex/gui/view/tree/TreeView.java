@@ -387,6 +387,7 @@ public final class TreeView extends View {
     for(int i = 0; i < size; i++) {
 
       final double boxMiddle = x + ratio / 2f;
+      // [WM] w not used in this class..
       double w = ratio;
 
       final int pre = parentList.list[i];

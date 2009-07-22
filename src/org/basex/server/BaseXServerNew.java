@@ -24,7 +24,6 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public class BaseXServerNew {
-
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
@@ -102,13 +101,13 @@ public class BaseXServerNew {
       }
     }
     try {
-        sessionListener.thread = null;
-        inputListener.thread = null;
-        serverSocket.close();
-        new Exit().execute(null);
-      } catch(final IOException e) {
-        e.printStackTrace();
-      }
+      sessionListener.thread = null;
+      inputListener.thread = null;
+      serverSocket.close();
+      new Exit().execute(null);
+    } catch(final IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -172,8 +171,8 @@ public class BaseXServerNew {
     /**
      * Starts the Thread.
      */
-    public synchronized void start() {
-      if (thread == null) {
+    public void start() {
+      if(thread == null) {
         thread = new Thread(this);
         thread.start();
       }
@@ -221,7 +220,6 @@ public class BaseXServerNew {
    *
    */
   class SessionListener implements Runnable {
-
     /** Thread. */
     Thread thread = null;
     /** BaseXServerNew. */
@@ -238,8 +236,8 @@ public class BaseXServerNew {
     /**
      * Starts the Thread.
      */
-    public synchronized void start() {
-      if (thread == null) {
+    public void start() {
+      if(thread == null) {
         thread = new Thread(this);
         thread.start();
       }
