@@ -332,10 +332,10 @@ public class XQJTest extends TestCase {
         "declare variable $v external; $v");
 
       expr.bindInt(new QName("v"), 123, null);
-      XQResultSequence result = expr.executeQuery();
+      final XQResultSequence result = expr.executeQuery();
       result.next();
       assertEquals(123, result.getInt());
-    } catch (XQException e) {
+    } catch(final XQException e) {
       fail(e.getMessage());
     }
   }
@@ -369,7 +369,7 @@ public class XQJTest extends TestCase {
    */
   public void test22() throws Exception {
     final XQConnection conn = conn(drv);
-    XQStaticContext xqsc = conn.getStaticContext();
+    final XQStaticContext xqsc = conn.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     final XQExpression expr = conn.createExpression();
     final XQResultSequence seq = expr.executeQuery("1,2,3,4");
@@ -399,7 +399,7 @@ public class XQJTest extends TestCase {
   public void test25() throws Exception {
     final XQConnection conn = conn(drv);
 
-    Object[] objects = {
+    final Object[] objects = {
         Boolean.valueOf(true),
         Byte.valueOf((byte) 2),
         new Float(3f),
@@ -412,7 +412,7 @@ public class XQJTest extends TestCase {
         new QName("elf"),
     };
 
-    for(Object o : objects) {
+    for(final Object o : objects) {
       for(int t = 1; t <= 51; t++) {
         try {
           conn.createItemFromObject(o, conn.createAtomicType(t));
@@ -434,13 +434,13 @@ public class XQJTest extends TestCase {
     final XQExpression xqe = conn.createExpression();
     XQSequence xqs;
 
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder parser = factory.newDocumentBuilder();
-    Document document = parser.parse(new InputSource(
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilder parser = factory.newDocumentBuilder();
+    final Document document = parser.parse(new InputSource(
         new StringReader("<e>Hello world!</e>")));
-    DocumentFragment frag = document.createDocumentFragment();
-    Element el1 = document.createElement("A");
-    Element el2 = document.createElement("B");
+    final DocumentFragment frag = document.createDocumentFragment();
+    final Element el1 = document.createElement("A");
+    final Element el2 = document.createElement("B");
     frag.appendChild(el1);
     frag.appendChild(el2);
 
@@ -459,7 +459,7 @@ public class XQJTest extends TestCase {
     final XQPreparedExpression expr = conn.prepareExpression(
         "declare variable $v external; $v");
 
-    XQItemType type = conn.createAtomicType(
+    final XQItemType type = conn.createAtomicType(
         XQItemType.XQBASETYPE_STRING);
     expr.bindAtomicValue(new QName("v"), "A", type);
   }

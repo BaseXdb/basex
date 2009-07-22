@@ -21,12 +21,14 @@ import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.StringList;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXCollection implements Collection, BXXMLDBText {
   /** Context reference. */
@@ -113,7 +115,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     final StringList sl = new StringList();
     final Data data = ctx.data();
-    for(int d : data.doc()) sl.add(Token.string(data.text(d)));
+    for(final int d : data.doc()) sl.add(string(data.text(d)));
     return sl.finish();
   }
 
@@ -153,7 +155,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
 
     // check if resource has any contents
-    BXXMLResource xml = checkXML(res);
+    final BXXMLResource xml = checkXML(res);
     if(res.getContent() == null)
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_EMPTY);
 
@@ -188,11 +190,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     if(id == null) return null;
     final Data data = ctx.data();
-    final byte[] idd = Token.token(id);
+    final byte[] idd = token(id);
     for(final int d : data.doc()) {
-      if(Token.eq(data.text(d), idd)) {
-        return new BXXMLResource(data, d, id, this);
-      }
+      if(eq(data.text(d), idd)) return new BXXMLResource(data, d, id, this);
     }
     return null;
   }

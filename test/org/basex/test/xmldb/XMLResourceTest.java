@@ -110,7 +110,7 @@ public class XMLResourceTest extends TestCase {
   public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
       int count = 0;
-      public void startElement(String u, String ln, String qn, Attributes a) {
+      public void startElement(final String u, final String ln, final String qn, final Attributes a) {
         count++;
       }
       public void endDocument() {

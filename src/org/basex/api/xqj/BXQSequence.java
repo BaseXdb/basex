@@ -182,11 +182,12 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
     final CachedOutput out = new CachedOutput();
     try {
-      final XMLSerializer ser = new XMLSerializer(out);
+      final XMLSerializer xml = new XMLSerializer(out);
       do {
-        final BXQItem  item = item();
-        item.serialize(item.it, ctx, ser);
+        final BXQItem item = item();
+        item.serialize(item.it, ctx, xml);
       } while(next());
+      xml.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

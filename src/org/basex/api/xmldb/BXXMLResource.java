@@ -27,8 +27,10 @@ import org.xmldb.api.modules.XMLResource;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** Collection reference. */
@@ -98,14 +100,15 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final CachedOutput out = new CachedOutput();
-        final XMLSerializer ser = new XMLSerializer(out);
+        final XMLSerializer xml = new XMLSerializer(out);
         if(data != null) {
-          new DBNode(data, pos).serialize(ser);
+          new DBNode(data, pos).serialize(xml);
         } else if(result != null) {
-          result.serialize(ser, pos);
+          result.serialize(xml, pos);
         } else {
           return null;
         }
+        xml.close();
         content = out.finish();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
@@ -132,7 +135,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     // get document root id
     int p = pos;
     while(p >= 0) {
-      int k = data.kind(p);
+      final int k = data.kind(p);
       if(k == Data.DOC) return string(data.text(p));
       p = data.parent(p, k);
     }
@@ -212,7 +215,12 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
 
     @Override
-    public void endDocument() {
+    public void endDocument() throws SAXException {
+      try {
+        xml.close();
+      } catch(final IOException ex) {
+        throw new SAXException(ex);
+      }
       res.content = out.finish();
     }
 

@@ -60,7 +60,7 @@ public class CollectionTest extends TestCase {
 
     // find XPath implementation
     boolean xpath = false;
-    for(Service s : (Service[]) code.run()) {
+    for(final Service s : (Service[]) code.run()) {
       xpath |= s instanceof XPathQueryService;
     }
     assertTrue("XPath Implementation expected.", xpath);
@@ -213,7 +213,7 @@ public class CollectionTest extends TestCase {
     coll.storeResource(res);
 
     // store DOM instance
-    XMLResource xml1 = (XMLResource) coll.createResource(
+    final XMLResource xml1 = (XMLResource) coll.createResource(
         AllTests.DOC2, XMLResource.RESOURCE_TYPE);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -222,7 +222,7 @@ public class CollectionTest extends TestCase {
     coll.storeResource(xml1);
 
     // store SAX stream
-    XMLResource xml2 = (XMLResource) coll.createResource(
+    final XMLResource xml2 = (XMLResource) coll.createResource(
         AllTests.DOC3, XMLResource.RESOURCE_TYPE);
     final XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(xml2.setContentAsSAX());

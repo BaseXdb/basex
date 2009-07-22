@@ -43,7 +43,7 @@ public class AllTests {
    * @param args (ignored) command-line arguments
    * @throws Exception exceptions
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     TestRunner.run(suite());
   }
 

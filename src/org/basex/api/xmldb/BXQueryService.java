@@ -14,8 +14,10 @@ import org.xmldb.api.modules.XPathQueryService;
 
 /**
  * Abstract QueryService definition for the XMLDB:API.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXQueryService implements XPathQueryService, BXXMLDBText {
   /** XPath service constant. */

@@ -23,8 +23,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.NSLocal;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import static org.basex.util.Token.*;
 
 /**
  * XML Stream Reader implementation.
@@ -70,7 +70,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getAttributeLocalName(final int i) {
     getAttributes();
-    return Token.string(atts.item[i].nname());
+    return string(atts.item[i].nname());
   }
 
   public QName getAttributeName(final int i) {
@@ -80,12 +80,12 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getAttributeNamespace(final int i) {
     getAttributes();
-    return Token.string(atts.item[i].qname().uri.str());
+    return string(atts.item[i].qname().uri.str());
   }
 
   public String getAttributePrefix(final int i) {
     getAttributes();
-    return Token.string(atts.item[i].qname().pre());
+    return string(atts.item[i].qname().pre());
   }
 
   public String getAttributeType(final int i) {
@@ -102,7 +102,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getAttributeValue(final int i) {
     getAttributes();
-    return Token.string(atts.item[i].str());
+    return string(atts.item[i].str());
   }
 
   public String getAttributeValue(final String s, final String s1) {
@@ -166,7 +166,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return Token.string(((Nod) item).nname());
+    return string(((Nod) item).nname());
   }
 
   public Location getLocation() {
@@ -199,8 +199,8 @@ public final class IterStreamReader implements XMLStreamReader {
   public String getNamespaceURI(final String s) {
     if(s == null) throw new IllegalArgumentException();
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
-    final byte[] uri = ns.find(Token.token(s));
-    return uri == null ? null : Token.string(uri);
+    final byte[] uri = ns.find(token(s));
+    return uri == null ? null : string(uri);
   }
 
   public String getNamespaceURI(final int i) {
@@ -211,21 +211,21 @@ public final class IterStreamReader implements XMLStreamReader {
   public String getPIData() {
     checkType(PROCESSING_INSTRUCTION);
     final byte[] val = item.str();
-    final int i = Token.indexOf(val, ' ');
-    return Token.string(i == -1 ? Token.EMPTY : Token.substring(val, i + 1));
+    final int i = indexOf(val, ' ');
+    return string(i == -1 ? EMPTY : substring(val, i + 1));
   }
 
   public String getPITarget() {
     checkType(PROCESSING_INSTRUCTION);
     final byte[] val = item.str();
-    final int i = Token.indexOf(val, ' ');
-    return Token.string(i == -1 ? val : Token.substring(val, 0, i));
+    final int i = indexOf(val, ' ');
+    return string(i == -1 ? val : substring(val, 0, i));
   }
 
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
     final QNm qn = ((Nod) item).qname();
-    return !qn.ns() ? null : Token.string(qn.pre());
+    return !qn.ns() ? null : string(qn.pre());
   }
 
   public Object getProperty(final String s) {
@@ -235,7 +235,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getText() {
     checkType(CHARACTERS, COMMENT);
-    return Token.string(item.str());
+    return string(item.str());
   }
 
   public char[] getTextCharacters() {
@@ -329,7 +329,7 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   public boolean isWhiteSpace() {
-    return isCharacters() && Token.ws(item.str());
+    return isCharacters() && ws(item.str());
   }
 
   public int next() throws XMLStreamException {
@@ -345,8 +345,8 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public int nextTag() throws XMLStreamException {
     next();
-    while((kind == CHARACTERS && isWhiteSpace()) ||
-        (kind == CDATA && isWhiteSpace()) || kind == SPACE ||
+    while(kind == CHARACTERS && isWhiteSpace() ||
+        kind == CDATA && isWhiteSpace() || kind == SPACE ||
         kind == PROCESSING_INSTRUCTION || kind == COMMENT) {
       next();
     }
@@ -436,7 +436,7 @@ public final class IterStreamReader implements XMLStreamReader {
       node = ((DBNode) item).copy();
       item = node;
       p = node.pre;
-      int k = node.data.kind(p);
+      final int k = node.data.kind(p);
       s = p + node.data.size(p, k);
       finish(k, 0);
     }
@@ -490,9 +490,9 @@ public final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   final class FNodeReader extends NodeReader {
     /** Iterator. */
-    private NodeIter[] iter = new NodeIter[IO.BLOCKSIZE];
+    private final NodeIter[] iter = new NodeIter[IO.BLOCKSIZE];
     /** Iterator. */
-    private Nod[] node = new Nod[IO.BLOCKSIZE];
+    private final Nod[] node = new Nod[IO.BLOCKSIZE];
     /** Iterator Level. */
     private int l;
 
@@ -516,7 +516,7 @@ public final class IterStreamReader implements XMLStreamReader {
           item = node[l];
           kind = END_ELEMENT;
         }
-      } catch(QueryException e) {
+      } catch(final QueryException e) {
         BaseX.notexpected();
       }
       return true;

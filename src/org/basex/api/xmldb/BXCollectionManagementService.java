@@ -14,6 +14,7 @@ import org.xmldb.api.modules.CollectionManagementService;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXCollectionManagementService implements
     CollectionManagementService, BXXMLDBText {

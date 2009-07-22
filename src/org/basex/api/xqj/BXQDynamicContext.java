@@ -148,7 +148,7 @@ abstract class BXQDynamicContext extends BXQAbstract
 
     valid(s, XQSequence.class);
     try {
-      bind(qn, (((BXQSequence) s).result).finish(), null);
+      bind(qn, ((BXQSequence) s).result.finish(), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

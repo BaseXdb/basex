@@ -13,8 +13,10 @@ import org.xmldb.api.base.XMLDBException;
 
 /**
  * Implementation of the ResourceSet Interface for the XMLDB:API.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXResourceSet implements ResourceSet, BXXMLDBText {
   /** Resources. */
@@ -53,13 +55,13 @@ public final class BXResourceSet implements ResourceSet, BXXMLDBText {
   public Resource getMembersAsResource() throws XMLDBException {
     final CachedOutput out = new CachedOutput();
     try {
-      final XMLSerializer ser = new XMLSerializer(out);
+      final XMLSerializer xml = new XMLSerializer(out);
       for(final Resource r : getIterator()) {
-        ser.openResult();
+        xml.openResult();
         out.print(r.getContent().toString());
-        ser.closeResult();
+        xml.closeResult();
       }
-      ser.close();
+      xml.close();
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
