@@ -51,7 +51,7 @@ import org.basex.util.Atts;
 public final class NewFSParser extends Parser {
 
   /** Registry for MetadataAdapter implementations. */
-  static final Map<String, Class<? extends AbstractParser>> REGISTRY = //
+  static final Map<String, Class<? extends AbstractParser>> REGISTRY =
   new HashMap<String, Class<? extends AbstractParser>>();
 
   /**
@@ -392,7 +392,7 @@ public final class NewFSParser extends Parser {
    * @param bfc the {@link BufferedFileChannel} to read from.
    * @throws IOException if any error occurs while reading from the file.
    */
-  private void parse0(final AbstractParser parser, //
+  private void parse0(final AbstractParser parser,
       final BufferedFileChannel bfc) throws IOException {
     if(Prop.fsmeta) {
       atts.reset();

@@ -21,15 +21,15 @@ public final class BufferedOutput extends OutputStream {
   private int pos;
 
   /**
-   * Constructor with a default buffersize of 4096 bytes.
+   * Constructor with a default buffer size.
    * @param outstream the OutputStream we operate on
    */
   public BufferedOutput(final OutputStream outstream) {
-    this(outstream, 4096);
+    this(outstream, IO.BLOCKSIZE);
   }
 
   /**
-   * Constructor with a specific buffersize.
+   * Constructor with a specific buffer size.
    * @param out the OutputStream we operate on
    * @param bufs buffer size
    */

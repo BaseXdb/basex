@@ -248,8 +248,8 @@ public abstract class Serializer {
    * @return last pre value
    * @throws IOException exception
    */
-  public final int node(final Data data, final int pre,
-      final FTPosData ft) throws IOException {
+  public final int node(final Data data, final int pre, final FTPosData ft)
+      throws IOException {
 
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
     final int[] parent = new int[IO.MAXHEIGHT];

@@ -23,25 +23,23 @@ public final class XMLParser extends AbstractParser {
     super(Type.XML, MimeType.XML);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel f) {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readContent(final BufferedFileChannel f,
-      final NewFSParser fsParser) throws IOException {
+  public void readContent(final BufferedFileChannel f, final NewFSParser parser)
+      throws IOException {
+
     if(f.isSubChannel()) BaseX.notimplemented("Parsing framents of xml files "
         + "is currently not supported");
-    fsParser.parseXML();
+    parser.parseXML();
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readMeta(final BufferedFileChannel bfc, //
-      final NewFSParser fsParser) {
+  public void readMeta(final BufferedFileChannel bfc,
+      final NewFSParser parser) {
     // no metadata to read...
   }
 }

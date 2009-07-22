@@ -18,6 +18,7 @@ import org.basex.util.Performance;
 
 /**
  * Abstract class for database queries.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

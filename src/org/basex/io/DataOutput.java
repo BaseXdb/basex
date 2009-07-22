@@ -35,7 +35,7 @@ public final class DataOutput extends OutputStream {
    * @throws IOException in case of write errors
    */
   public DataOutput(final String db, final String pre) throws IOException {
-    this(db, pre, 4096);
+    this(db, pre, IO.BLOCKSIZE);
   }
 
   /**

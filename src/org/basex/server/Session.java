@@ -95,7 +95,7 @@ class Session implements Runnable {
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
     String in;
-    while (running) {
+    while(running) {
       in = getMessage().trim();
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
@@ -179,7 +179,7 @@ class Session implements Runnable {
    * @param quit check how the quit command is called
    */
   void stop(final boolean quit) {
-    if (quit) bx.sessions.remove(this);
+    if(quit) bx.sessions.remove(this);
     try {
       context.close();
       BaseX.outln("Client " + clientId + " has logged out.");
@@ -196,7 +196,7 @@ class Session implements Runnable {
       handle();
     } catch(final Exception io) {
       // for forced stops
-      if (io instanceof SocketException) {
+      if(io instanceof SocketException) {
         running = false;
         stop(false);
       } else {

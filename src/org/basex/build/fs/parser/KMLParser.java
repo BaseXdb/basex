@@ -23,25 +23,23 @@ public final class KMLParser extends AbstractParser {
     super(Type.XML, MimeType.KML);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel f) {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
   public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser fsParser) throws IOException {
+      final NewFSParser parser) throws IOException {
+
     if(bfc.isSubChannel()) BaseX.notimplemented("Parsing framents of kml files "
         + "is currently not supported");
-    fsParser.parseXML();
+    parser.parseXML();
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readMeta(final BufferedFileChannel bfc, //
-      final NewFSParser fsParser) {
+  public void readMeta(final BufferedFileChannel bfc,
+      final NewFSParser parser) {
     // no metadata to read...
   }
 }

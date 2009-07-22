@@ -2524,12 +2524,12 @@ public class QueryParser extends InputParser {
   private Expr rename() throws QueryException {
     final int p = qp;
     if(!consumeWS(RENAME)) return null;
-    if(!consumeWS(NODES) && !consumeWS(NODE)) {
+    if(!consumeWS(NODE)) {
       qp = p;
       return null;
     }
     final Expr trg = check(single(), INCOMPLETE);
-    if(!consumeWS(AS)) error(INCOMPLETE);
+    check(AS);
     final Expr n = check(single(), INCOMPLETE);
     error(UPIMPL);
     return new Rename(trg, n);

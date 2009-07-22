@@ -234,7 +234,7 @@ public final class JPGParser extends AbstractParser {
   }
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
-  private static final byte[] HEADER_EXIF = //
+  private static final byte[] HEADER_EXIF =
     { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
 
   /**
@@ -246,7 +246,7 @@ public final class JPGParser extends AbstractParser {
    * <li>1 byte: major JFIF version (only v1 supported)</li>
    * </ul>
    */
-  private static final byte[] HEADER_JFIF = //
+  private static final byte[] HEADER_JFIF =
     { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
 
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
@@ -257,23 +257,21 @@ public final class JPGParser extends AbstractParser {
     super(Type.IMAGE, MimeType.JPG);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     f.buffer(4);
     int b;
     // 0xFFD8FFE0 or 0xFFD8FFE1
-    return f.get() == 0xFF //
-        && f.get() == 0xD8 //
-        && f.get() == 0xFF //
+    return f.get() == 0xFF
+        && f.get() == 0xD8
+        && f.get() == 0xFF
         && ((b = f.get()) == 0xE0 || b == 0xE1);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void readContent(final BufferedFileChannel f,
-      final NewFSParser fsParser) {
-  // no textual representation for jpg content ...
+      final NewFSParser parser) {
+    // no textual representation for jpg content ...
   }
 
   /** The {@link NewFSParser} instance to fire events. */
@@ -312,12 +310,12 @@ public final class JPGParser extends AbstractParser {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readMeta(final BufferedFileChannel f, //
-      final NewFSParser fsParser) throws IOException {
+  public void readMeta(final BufferedFileChannel f, final NewFSParser parser)
+      throws IOException {
+
     bfc = f;
-    fsparser = fsParser;
+    fsparser = parser;
     bfc.buffer(6);
     if(bfc.get() != 0xFF || bfc.get() != 0xD8) {
       if(NewFSParser.VERBOSE) BaseX.debug("JPGParser: Not a jpg file (%).",
@@ -461,10 +459,8 @@ public final class JPGParser extends AbstractParser {
     final int len = HEADER_EXIF.length;
     bfc.buffer(len + 8);
     final long pos = bfc.position();
-    if(checkNextBytes(HEADER_EXIF) && //
-        checkEndianness() && //
-        bfc.get() == 0x00 && //
-        bfc.get() == 0x2A) {
+    if(checkNextBytes(HEADER_EXIF) && checkEndianness() &&
+        bfc.get() == 0x00 && bfc.get() == 0x2A) {
 
       final int ifdOffset = bfc.getInt();
       /*

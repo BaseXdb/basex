@@ -329,10 +329,8 @@ public final class BufferedFileChannel {
    * @return The next four bytes at the channel's current position as integer.
    */
   public int getInt() {
-    return (buf.get() & 0xFF) << 24 //
-        | (buf.get() & 0xFF) << 16 //
-        | (buf.get() & 0xFF) << 8 //
-        | buf.get() & 0xFF;
+    return (buf.get() & 0xFF) << 24 | (buf.get() & 0xFF) << 16 |
+      (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**

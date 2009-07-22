@@ -311,7 +311,7 @@ public final class FTTrie extends FTIndex {
     // not processed all chars from node, but all chars from
     // ending were processed or root
     if(node == 0 || j == ending.length && i < ne[0] + 1) {
-      if (!hasNextNodes(ne)) {
+      if(!hasNextNodes(ne)) {
         countSkippedChars = 0;
         return;
       }
@@ -331,7 +331,7 @@ public final class FTTrie extends FTIndex {
       countSkippedChars = 0;
 
       // node has successors and is leaf node
-      if (hasNextNodes(ne)) {
+      if(hasNextNodes(ne)) {
         // preorder search in trie
         for(int t = ne[0] + 1; t < ne.length - 1; t += 2) {
           if(j == 1) {
@@ -345,7 +345,7 @@ public final class FTTrie extends FTIndex {
     } else if(j < ending.length && i < ne[0] + 1) {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
-      if (!hasNextNodes(ne)) {
+      if(!hasNextNodes(ne)) {
         countSkippedChars = 0;
         return;
       }
@@ -357,7 +357,7 @@ public final class FTTrie extends FTIndex {
       // all chars form node processed, but not all chars from processed
 
       // move pointer and go on
-      if (!hasNextNodes(ne)) {
+      if(!hasNextNodes(ne)) {
         countSkippedChars = 0;
         return;
       }
@@ -509,12 +509,12 @@ public final class FTTrie extends FTIndex {
       final int[] rne = entry(resultNode);
       final byte[] nvsn = new byte[vsn.length + 1];
       int l = 0;
-      if (bw != null) {
+      if(bw != null) {
         System.arraycopy(bw, 0, nvsn, 0, bw.length);
         l = bw.length;
       }
 
-      if (0 < vsn.length - posw - 2) {
+      if(0 < vsn.length - posw - 2) {
         System.arraycopy(vsn, posw + 2, nvsn, posw + 3, vsn.length - posw - 2);
       }
 
@@ -654,7 +654,7 @@ public final class FTTrie extends FTIndex {
     byte[] vsn = sn;
     int[] cne = crne;
     long cdid = crdid;
-    if (cne == null) {
+    if(cne == null) {
       cne = entry(cn);
       cdid = did;
     }
@@ -668,11 +668,11 @@ public final class FTTrie extends FTIndex {
         // node entry processed complete
         if(vsn.length == i) {
           // leaf node found with appropriate value
-          if (c < d + p + r) return FTIndexIterator.EMP;
+          if(c < d + p + r) return FTIndexIterator.EMP;
 
           FTIndexIterator ld = FTIndexIterator.EMP;
           ld = iter(cdid, cne[cne.length - 1], inD, f);
-          if (hasNextNodes(cne)) {
+          if(hasNextNodes(cne)) {
             for(int t = cne[0] + 1; t < cne.length - 1; t += 2) {
               ld = FTIndexIterator.union(fuzzy(cne[t], null, -1,
                   new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c, f), ld);
@@ -683,7 +683,7 @@ public final class FTTrie extends FTIndex {
 
         FTIndexIterator ld = FTIndexIterator.EMP;
         byte[] b;
-        if (c > d + p + r) {
+        if(c > d + p + r) {
           // delete char
           b = new byte[vsn.length - 1];
           System.arraycopy(vsn, 0, b, 0, i);
@@ -699,9 +699,9 @@ public final class FTTrie extends FTIndex {
         // scan successors currentNode
         int[] ne = null;
         long tdid = -1;
-        if (hasNextNodes(cne)) {
+        if(hasNextNodes(cne)) {
           for(int k = cne[0] + 1; k < cne.length - 1; k += 2) {
-            if (cne[k + 1] == vsn[0]) {
+            if(cne[k + 1] == vsn[0]) {
               ne = entry(cne[k]);
               tdid = did;
               b = new byte[vsn.length];
@@ -710,8 +710,8 @@ public final class FTTrie extends FTIndex {
                   fuzzy(cne[k], ne, tdid, b, d, p, r, c, f), ld);
             }
 
-            if (c > d + p + r) {
-              if (ne == null) {
+            if(c > d + p + r) {
+              if(ne == null) {
                 ne = entry(cne[k]);
                 tdid = did;
               }
@@ -722,7 +722,7 @@ public final class FTTrie extends FTIndex {
               ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
                   b, d, p + 1, r, c, f), ld);
 
-              if (vsn.length > 0) {
+              if(vsn.length > 0) {
                 // delete char
                 b = new byte[vsn.length - 1];
                 System.arraycopy(vsn, 1, b, 0, b.length);
@@ -752,7 +752,7 @@ public final class FTTrie extends FTIndex {
 
         ld = fuzzy(cn, cne, cdid, b, d, p + 1, r, c, f);
 
-        if (vsn.length > 0 && i < vsn.length) {
+        if(vsn.length > 0 && i < vsn.length) {
           // replace
           b = new byte[vsn.length];
           System.arraycopy(vsn, 0, b, 0, vsn.length);
@@ -760,7 +760,7 @@ public final class FTTrie extends FTIndex {
           b[i] = (byte) cne[i + 1];
           ld = FTIndexIterator.union(fuzzy(cn, cne, cdid,
               b, d, p, r + 1, c, f), ld);
-          if (vsn.length > 1) {
+          if(vsn.length > 1) {
             // delete char
             b = new byte[vsn.length - 1];
             System.arraycopy(vsn, 0, b, 0, i);
@@ -780,7 +780,7 @@ public final class FTTrie extends FTIndex {
     byte[] b;
     if(hasNextNodes(cne)) {
       for(int k = cne[0] + 1; k < cne.length - 1; k += 2) {
-        if (cne[k + 1] == vsn[0]) {
+        if(cne[k + 1] == vsn[0]) {
           ne = entry(cne[k]);
           tdid = did;
           b = new byte[vsn.length];
@@ -788,8 +788,8 @@ public final class FTTrie extends FTIndex {
           ld = FTIndexIterator.union(
               fuzzy(cne[k], ne, tdid, b, d, p, r, c, f), ld);
         }
-        if (c > d + p + r) {
-          if (ne == null) {
+        if(c > d + p + r) {
+          if(ne == null) {
             ne = entry(cne[k]);
             tdid = did;
           }
@@ -800,7 +800,7 @@ public final class FTTrie extends FTIndex {
           ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
               b, d, p + 1, r, c, f), ld);
 
-          if (vsn.length > 0) {
+          if(vsn.length > 0) {
             // delete char
             b = new byte[vsn.length - 1];
             System.arraycopy(vsn, 1, b, 0, b.length);

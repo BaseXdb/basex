@@ -80,13 +80,10 @@ final class MapLayout {
     for(int i = 0; i < r.size; i++) {
       final MapRect curr = r.get(i);
       // only leaves: children(data, curr.pre).size == 0 && curr.isLeaf
-      if (curr.w != 0 && curr.h != 0) {
+      if(curr.w != 0 && curr.h != 0) {
         nrLeaves++;
-        if (curr.w > curr.h) {
-          aar += (double) curr.w / (double) curr.h;
-        } else {
-          aar += (double) curr.h / (double) curr.w;
-        }
+        aar += curr.w > curr.h ? (double) curr.w / (double) curr.h :
+          (double) curr.h / (double) curr.w;
       }
     }
     return nrLeaves > 0 ? aar / nrLeaves : -1;
@@ -116,18 +113,16 @@ final class MapLayout {
    * @param l children array
    * @param ns start array position
    * @param ne end array position
-   * @param level indicates level which is calculated
    */
-  void makeMap(final MapRect r, final MapList l, final int ns, final int ne,
-      final int level) {
+  void makeMap(final MapRect r, final MapList l, final int ns, final int ne) {
 
     if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
       r.pre = l.list[ns];
-      putRect(r, level);
+      putRect(r);
     } else {
       int nn = 0;
-      if(level == 0) {
+      if(r.level == 0) {
         for(int i = 0; i < l.size; i++) nn += ViewData.size(data, l.list[i]);
       } else {
         nn = l.list[ne] - l.list[ns] + ViewData.size(data, l.list[ne]);
@@ -135,10 +130,10 @@ final class MapLayout {
       l.initWeights(textLen, nn, data);
 
       // call recursion for next deeper levels
-      final MapRects rects = algo.calcMap(r, l, ns, ne, level);
+      final MapRects rects = algo.calcMap(r, l, ns, ne);
       for(final MapRect rect : rects) {
         if(rect.x + rect.w <= r.x + r.w && rect.y + rect.h <= r.y + r.h)
-          putRect(rect, rect.level);
+          putRect(rect);
       }
     }
   }
@@ -146,9 +141,8 @@ final class MapLayout {
   /**
    * One rectangle left, add it and continue with its children.
    * @param r parent rectangle
-   * @param level indicates level which is calculated
    */
-  public void putRect(final MapRect r, final int level) {
+  public void putRect(final MapRect r) {
 
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
@@ -168,8 +162,7 @@ final class MapLayout {
     final MapList ch = children(r.pre);
     if(ch.size != 0) {
       r.isLeaf = false;
-      makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1),
-        ch, 0, ch.size - 1, level + 1);
+      makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1), ch, 0, ch.size - 1);
     }
   }
 }

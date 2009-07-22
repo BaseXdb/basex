@@ -18,22 +18,16 @@ final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   FTPos pos;
   /** Abstraction level for thumbnail. */
   byte thumbal;
-  /** Height of a thumbnail unit.*/
+  /** Height of a thumbnail unit. */
   byte thumbfh;
-  /** Height of an empty line.*/
+  /** Height of an empty line. */
   byte thumblh;
   /** Width of a thumbnail unit. */
   double thumbf;
-  /** Width of a space between two thumbnails. **/
+  /** Width of a space between two thumbnails. */
   double thumbsw;
   /** Is Leaf in Treemap? */
   boolean isLeaf;
-
-  /**
-   * Default constructor.
-   */
-  MapRect() {
-  }
 
   /**
    * Simple rectangle constructor.
@@ -67,12 +61,9 @@ final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
    * Constructor taking MapRect for position initialization.
    * @param r pos and dimension rectangle
    * @param p rectangle pre value
-   * @param l level
    */
-  MapRect(final ViewRect r, final int p, final int l) {
-    this(r.x, r.y, r.w, r.h);
-    pre = p;
-    level = l;
+  MapRect(final ViewRect r, final int p) {
+    this(r.x, r.y, r.w, r.h, p, r.level);
   }
 
   /**

@@ -15,7 +15,8 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * Database info.
+ * Evaluates the 'info database' command.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

@@ -170,8 +170,6 @@ final class MapFS extends MapPainter {
           iw *= min;
           ih *= min;
         }
-//        iw = rect.w;
-//        ih = rect.h;
         rect.x += PICOFFSET;
         rect.y += PICOFFSET;
         g.drawImage(image, rect.x + (ww - (int) iw >> 1),
@@ -213,16 +211,16 @@ final class MapFS extends MapPainter {
           // method call was
           // boolean drawRectangle(final Graphics g, final MapRect rect,
           //    final boolean mark) {
-//          if(!mark) {
-//            g.setColor(COLORS[rect.level + 1]);
-//            g.fillRect(x, rect.y, w, h);
-//          }
+          //if(!mark) {
+          //  g.setColor(COLORS[rect.level + 1]);
+          //  g.fillRect(x, rect.y, w, h);
+          //}
           g.drawImage(img, x, rect.y + 2, view);
         }
 
         g.setColor(Color.black);
         // [JH] review difference drawText - chopString
-//        MapRenderer.drawText(g, rect, text);
+        // MapRenderer.drawText(g, rect, text);
         BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2);
         if(h == GUIProp.fontsize && img != null) {
           final long size = toLong(fs.size(pre));
@@ -327,7 +325,7 @@ final class MapFS extends MapPainter {
     // draw file contents or binary information
     g.setFont(mfont);
 
-    if (s < fileBuf.length) {
+    if(s < fileBuf.length) {
       final byte[] tmp = new byte[(int) s];
       System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
       fileBuf = tmp;
@@ -344,7 +342,7 @@ final class MapFS extends MapPainter {
 
     // Check if text fits in rectangle
     final int h = MapRenderer.drawText(g, rect, fileBuf, false);
-    if (rect.h > h) {
+    if(rect.h > h) {
       final int p = BaseXLayout.centerPos(g, fileBuf, rect.w);
       if(p != -1) rect.x += p;
       rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;

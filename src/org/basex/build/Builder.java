@@ -131,8 +131,7 @@ public abstract class Builder extends Progress {
    * @param val value to be stored
    * @throws IOException in case of parsing or writing problems
    */
-  public abstract void setSize(int pre, int val)
-    throws IOException;
+  public abstract void setSize(int pre, int val) throws IOException;
 
   /**
    * Stores an attribute value to the specified table position.
@@ -140,8 +139,7 @@ public abstract class Builder extends Progress {
    * @param val value to be stored
    * @throws IOException in case of parsing or writing problems
    */
-  public abstract void setAttValue(int pre, byte[] val)
-    throws IOException;
+  public abstract void setAttValue(int pre, byte[] val) throws IOException;
 
   // Public Methods ============================================================
 

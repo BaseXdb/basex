@@ -29,7 +29,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   /** Element counter. */
   int nodes;
   /** Document flag; if true, a document node is added. */
-  public boolean doc = true;
+  boolean doc = true;
 
   // needed for XMLEntityManager: increase entity limit
   static { System.setProperty("entityExpansionLimit", "536870912"); }

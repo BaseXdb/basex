@@ -23,8 +23,7 @@ public class ViewRect {
   /**
    * Default constructor.
    */
-  public ViewRect() {
-  }
+  public ViewRect() { }
 
   /**
    * Simple rectangle constructor.

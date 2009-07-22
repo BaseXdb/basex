@@ -128,7 +128,6 @@ public final class FTTrieBuilder extends FTBuilder {
           outN.write5(next[i][j + 1]);
         } else {
           // write pointer on data
-          // if (index.bl) {
           if(lp == 0) {
             outN.write5(next[i][j + 1]);
           } else {

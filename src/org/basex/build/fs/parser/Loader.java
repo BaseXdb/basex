@@ -59,8 +59,9 @@ public final class Loader extends ClassLoader {
    * @throws IOException if the classes are located inside a JAR file and any
    *           error occurs while reading from this file.
    */
-  public static Class<?>[] load(final Package pkg, //
+  public static Class<?>[] load(final Package pkg,
       final Pattern fileNamePattern) throws IOException {
+
     final ArrayList<Class<?>> loadedClasses = new ArrayList<Class<?>>();
     try {
       final String pkgName = pkg.getName();
@@ -91,7 +92,7 @@ public final class Loader extends ClassLoader {
           // [BL] avoid sequential scan of ALL jar entries
           final JarEntry entry = e.nextElement();
           final String name = entry.getName();
-          if(name.startsWith(starts) && //
+          if(name.startsWith(starts) &&
               name.lastIndexOf('/') <= starts.length() && // skip sub-pkgs
               name.endsWith(".class")) {
             String classname = name.substring(0, name.length() - 6);

@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
@@ -74,7 +76,7 @@ public final class ClientProcess extends AbstractProcess {
    */
   private void receive(final PrintOutput o) throws IOException {
     final InputStream in = socket.getInputStream();
-    final byte[] bb = new byte[4096];
+    final byte[] bb = new byte[IO.BLOCKSIZE];
     int l = 0;
     while((l = in.read(bb)) != -1) for(int i = 0; i < l; i++) o.write(bb[i]);
   }

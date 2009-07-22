@@ -9,7 +9,7 @@ package org.basex.gui.view.map;
 final class SliceDiceAlgo extends MapAlgo {
   @Override
   MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final int l) {
+      final int ns, final int ne) {
 
     // setting initial proportions
     double xx = r.x;
@@ -25,8 +25,7 @@ final class SliceDiceAlgo extends MapAlgo {
     final MapRects rects = new MapRects();
     // calculate map for each rectangle on this level
     for(int i = 0; i < ml.size; i++) {
-      if((l & 1) == 0) {
-//      if(r.w < r.h) {
+      if((r.level & 1) == 0) {
         yy += hh;
         hh = ml.weight[i] * r.h;
         ww = r.w;

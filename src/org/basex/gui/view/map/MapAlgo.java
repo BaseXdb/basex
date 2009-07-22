@@ -53,7 +53,7 @@ public abstract class MapAlgo {
           ar = rect.h / rect.w;
         }
       }
-      if (ar > worstar) worstar = ar;
+      if(ar > worstar) worstar = ar;
     }
     return worstar;
   }
@@ -65,11 +65,10 @@ public abstract class MapAlgo {
    * @param l children array
    * @param ns start array position
    * @param ne end array position
-   * @param level indicates level which is calculated
    * @return ArrayList holding laid out rectangles
    */
   abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
-      final int ne, final int level);
+      final int ne);
 
   /**
    * Returns the name of the algorithm used.

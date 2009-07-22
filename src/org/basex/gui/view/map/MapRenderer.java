@@ -605,23 +605,23 @@ final class MapRenderer {
         if(ds) {
           // do not split token
           yy += r.thumblh;
-//          g.drawRect(r.x, yy, wl, r.thumbfh);
+          //g.drawRect(r.x, yy, wl, r.thumbfh);
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
           ll = wl + (psl < data[1].length && data[1][psl] == sl ?
               r.thumbsw : r.thumbf);
         } else {
           // split token
-//          g.drawRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh);
+          //g.drawRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh);
           ir = inRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh, x, y);
           yy += r.thumblh;
           wl -= ww - ll;
-//          g.drawRect(r.x, yy, wl, r.thumbfh);
+          //g.drawRect(r.x, yy, wl, r.thumbfh);
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
           ll = wl +
           (psl < data[1].length && data[1][psl] == sl ? r.thumbsw :  r.thumbf);
         }
       } else {
-//        g.drawRect(r.x + (int) ll, yy, wl, r.thumbfh);
+        //g.drawRect(r.x + (int) ll, yy, wl, r.thumbfh);
         ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
         ll += wl + (ds ? r.thumbf : 0);
       }

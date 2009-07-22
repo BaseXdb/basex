@@ -40,8 +40,9 @@ public final class DialogProgress extends Dialog implements ActionListener {
    * @param cnc cancel flag
    * @param prg progress reference
    */
-  public DialogProgress(final GUI main, final String msg,
-      final boolean pb, final boolean cnc, final Progress prg) {
+  public DialogProgress(final GUI main, final String msg, final boolean pb,
+      final boolean cnc, final Progress prg) {
+
     super(main, msg, false);
 
     info = new BaseXLabel(" ", true, true);

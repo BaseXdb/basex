@@ -56,7 +56,7 @@ public final class DeepShell {
   private void loop() {
     do {
       final String[] args = tokenize(input(PS1));
-      if (args.length != 0) exec(args);
+      if(args.length != 0) exec(args);
     } while(true);
   }
 

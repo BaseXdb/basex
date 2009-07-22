@@ -21,8 +21,8 @@ public final class BaseXRadio extends JRadioButton {
    * @param sel initial selection state
    * @param win parent window
    */
-  public BaseXRadio(final String label, final byte[] hlp,
-      final boolean sel, final Window win) {
+  public BaseXRadio(final String label, final byte[] hlp, final boolean sel,
+      final Window win) {
 
     super(label, sel);
     setOpaque(false);

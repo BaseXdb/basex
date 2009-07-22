@@ -186,7 +186,7 @@ public final class DeepFS extends DeepFuse implements DataText {
       }
       final int rc = p.exitValue();
       String msg = method + "Unmount " + data.meta.mountpoint;
-      if (rc == 0) msg = msg + " ... OK.";
+      if(rc == 0) msg = msg + " ... OK.";
       else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
       BaseX.debug(msg);
     }
@@ -425,14 +425,11 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @param pre pre value
    */
   public void delete(final int pre) {
-    // delete filesystem node, but before updating the table
     if(Prop.fuse) {
       final String bpath = Token.string(path(pre, true));
       final File f = new File(bpath);
-      if (f.isDirectory())
-        deleteDir(f);
-      else if (f.isFile())
-        f.delete();
+      if(f.isDirectory()) deleteDir(f);
+      else if(f.isFile()) f.delete();
       nativeUnlink(Token.string(path(pre, false)));
     }
   }
@@ -442,11 +439,9 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @param dir to be deleted.
    * @return boolean true for success, false for failure.
    */
-  public static boolean deleteDir(final File dir) {
+  private static boolean deleteDir(final File dir) {
     if(dir.isDirectory()) {
-      final String[] children = dir.list();
-      for(int i = 0; i < children.length; i++)
-        if(!deleteDir(new File(dir, children[i]))) return false;
+      for(final File ch : dir.listFiles()) if(!deleteDir(ch)) return false;
     }
     return dir.delete();
   }
@@ -458,9 +453,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   int insertContent(final String path) {
     final int fpre = pathPre(path);
-
-    if(fpre == -1) return -1;
-    return insert(fpre, buildContentData(path));
+    return fpre == -1 ? -1 : insert(fpre, buildContentData(path));
   }
 
   /**

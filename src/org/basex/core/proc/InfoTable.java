@@ -11,7 +11,8 @@ import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 
 /**
- * Database info.
+ * Evaluates the 'info table' command.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

@@ -327,8 +327,7 @@ public final class QueryContext extends Progress {
   void close() throws IOException {
     for(int d = rootDocs; d < docs; d++) {
       // [AW] later replaced by context.unpin()...
-      Context.POOL.unpin(doc[d].data);
-      doc[d].data.close();
+      if(Context.POOL.unpin(doc[d].data)) doc[d].data.close();
     }
   }
 

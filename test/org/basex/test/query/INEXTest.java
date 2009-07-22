@@ -41,8 +41,9 @@ public final class INEXTest {
       "budget1000", "budget10000"};
   /** Kind of type. */
   private final String[] type = new String[] {"focused", "thorough", "article"};
-  /** Kind of query. */
-//  private String[] query = new String[] {"automatic", "manual"};
+  /* Kind of query.
+  private String[] query = new String[] {"automatic", "manual"};
+  */
   /** Method used to sum pathes. */
   private final String xqm =
     "declare namespace basex = \"http://www.basex.com\"; " +
@@ -76,7 +77,7 @@ public final class INEXTest {
     Prop.serialize = true;
     Prop.info = true;
 
-    if (s) {
+    if(s) {
       // print header in output file
       xml.openElement(token("efficiency-submission"),
           token("participant-id"), token("1111111"),
@@ -140,7 +141,7 @@ public final class INEXTest {
         final int j = info.indexOf(" ms", i);
         final String time = info.substring(i + "Total Time: ".length() + 2, j);
 
-        if (s) {
+        if(s) {
           xml.openElement(token("topic"),
               token("topic-id"), token(tid),
               token("total_time_ms"), token(time)
@@ -151,19 +152,19 @@ public final class INEXTest {
           xml.closeElement();
 
           final Result val = proc.result();
-          if (val instanceof SeqIter) {
+          if(val instanceof SeqIter) {
             final SeqIter itr = (SeqIter) val;
             Item a;
             int r = 1;
-            while ((a = itr.next()) != null) {
-              if (a instanceof Str) {
+            while((a = itr.next()) != null) {
+              if(a instanceof Str) {
                 xml.openElement(token("path"));
                 xml.text(a.str());
                 xml.closeElement();
                 xml.openElement(token("rank"));
                 xml.text(token(r++));
                 xml.closeElement();
-              } else if (a instanceof Dbl) {
+              } else if(a instanceof Dbl) {
                 xml.openElement(token("rsv"));
                 xml.text(a.str());
                 xml.closeElement();
@@ -182,7 +183,7 @@ public final class INEXTest {
     }
     br.close();
 
-    if (s) {
+    if(s) {
       xml.closeElement();
     }
 

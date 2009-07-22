@@ -297,8 +297,9 @@ public final class Array {
    * @param ns new size
    * @return resized array
    */
-  public static boolean[] resize(final boolean[] ar,
-      final int os, final int ns) {
+  public static boolean[] resize(final boolean[] ar, final int os,
+      final int ns) {
+
     final boolean[] tmp = new boolean[ns];
     System.arraycopy(ar, 0, tmp, 0, os);
     return tmp;

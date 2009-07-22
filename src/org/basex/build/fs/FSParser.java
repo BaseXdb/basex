@@ -142,7 +142,7 @@ public final class FSParser extends Parser {
     // -- create backing store (DeepFS depends on it).
     if(Prop.fuse && !singlemode) {
       final File bs = new File(mybackingpath);
-      if (!bs.mkdirs() && bs.exists())
+      if(!bs.mkdirs() && bs.exists())
           throw new IOException(BACKINGEXISTS + mybackingpath);
     }
 
@@ -187,13 +187,13 @@ public final class FSParser extends Parser {
 
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
-        if (Prop.fuse)
+        if(Prop.fuse)
           new File(mybackingpath
             + f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
         // -- copy file to backing store
-        if (Prop.fuse)
+        if(Prop.fuse)
           copy(f.getAbsoluteFile(), new File(mybackingpath
             + f.getAbsolutePath().substring(importRootLength)));
         file(f);
@@ -210,11 +210,9 @@ public final class FSParser extends Parser {
     try {
       final InputStream in = new FileInputStream(src);
       final OutputStream out = new FileOutputStream(dst);
-      final byte[] buf = new byte[4096];
+      final byte[] buf = new byte[IO.BLOCKSIZE];
       int len;
-
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
-
       in.close();
       out.close();
     } catch(final IOException e) {
@@ -264,9 +262,9 @@ public final class FSParser extends Parser {
    */
   private void file(final File f) throws IOException {
     curr = f;
-    if (!singlemode)
+    if(!singlemode)
       builder.startElem(FILE, atts(f, false));
-    if (f.canRead()) {
+    if(f.canRead()) {
       if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
         final int dot = name.lastIndexOf('.');
@@ -302,7 +300,7 @@ public final class FSParser extends Parser {
       }
     }
 
-    if (!singlemode)
+    if(!singlemode)
       builder.endElem(FILE);
     // add file size to parent folder
     sizeStack[lvl] += f.length();

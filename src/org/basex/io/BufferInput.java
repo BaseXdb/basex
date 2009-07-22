@@ -81,7 +81,7 @@ public class BufferInput {
    * @throws IOException IO Exception
    */
   public BufferInput(final InputStream is) throws IOException {
-    this(is, new byte[4096]);
+    this(is, new byte[IO.BLOCKSIZE]);
   }
 
   /**

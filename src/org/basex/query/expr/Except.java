@@ -50,8 +50,8 @@ public final class Except extends Arr {
         }
 
         for(int i = 1; i != items.length; i++) {
-          if (items[0] == null) return null;
-          if (items[i] == null) continue;
+          if(items[0] == null) return null;
+          if(items[i] == null) continue;
           final int d = items[0].diff(items[i]);
 
           if(d < 0) {
@@ -59,7 +59,7 @@ public final class Except extends Arr {
               break;
             }
           }
-          if (d == 0) {
+          if(d == 0) {
             next(0);
             i = 0;
           }

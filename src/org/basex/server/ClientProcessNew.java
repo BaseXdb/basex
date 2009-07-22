@@ -11,6 +11,7 @@ import org.basex.core.AbstractProcess;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Process;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
@@ -82,13 +83,11 @@ final class ClientProcessNew extends AbstractProcess {
    */
   synchronized void receive(final PrintOutput o) throws IOException {
     final InputStream in = socket.getInputStream();
-    final byte[] bb = new byte[4096];
+    final byte[] bb = new byte[IO.BLOCKSIZE];
     int l = 0;
     while((l = in.read(bb)) != -1) {
-      for(int i = 0; i < l - 1; i++) {
-        o.write(bb[i]);
-      }
-      if (l < 4096) break;
+      for(int i = 0; i < l - 1; i++) o.write(bb[i]);
+      if(l < IO.BLOCKSIZE) break;
     }
   }
 }

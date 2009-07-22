@@ -9,7 +9,8 @@ import org.basex.data.Data.Type;
 import org.basex.io.PrintOutput;
 
 /**
- * Database info.
+ * Evaluates the 'info index' command.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

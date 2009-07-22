@@ -237,7 +237,7 @@ public final class DialogImportFS extends Dialog {
     }
     ok &= cAll;
 
-    if (Prop.fuse) {
+    if(Prop.fuse) {
       cBac = new File(backing.getText().trim()).isDirectory();
       ok &= cBac;
       cMou = new File(mountpoint.getText().trim()).isDirectory();
@@ -246,7 +246,7 @@ public final class DialogImportFS extends Dialog {
 
     String inf = " ";
 
-    if (!ok) {
+    if(!ok) {
       if(!cMou) inf = MOUNTWHICH;
       if(!cBac) inf = BACKINGWHICH;
       if(!cAll) inf = PATHWHICH;
@@ -281,7 +281,7 @@ public final class DialogImportFS extends Dialog {
     GUIProp.fsall = all.isSelected();
     GUIProp.guifsimportpath = path.getText();
     GUIProp.guifsdbname = dbname.getText();
-    if (Prop.fuse) {
+    if(Prop.fuse) {
       GUIProp.guimountpoint = mountpoint.getText().trim();
       GUIProp.guibackingroot = backing.getText().trim();
     }

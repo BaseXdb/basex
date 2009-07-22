@@ -59,8 +59,8 @@ public final class MapView extends View implements Runnable {
   public MapLayout layout;
   /** Keeps Layout for focused rectangle. */
   public MapLayout tinyLayout;
-//  /** Scaled Layout. */
-//  public MapLayout hugeLayout;
+  ///** Scaled Layout. */
+  //public MapLayout hugeLayout;
   /** Text lengths. */
   private int[] textLen;
 
@@ -216,20 +216,20 @@ public final class MapView extends View implements Runnable {
 
     if(GUIProp.mapinteraction) {
       // [JH] use normal rectangles to calculate hugeMap
-//      final Data data = gui.context.data();
-//      MapLayout hugeLayout = new MapLayout(data, textLen);
-//
+      // final Data data = gui.context.data();
+      // MapLayout hugeLayout = new MapLayout(data, textLen);
+
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
       calc(rect, gui.context.current(), mainMap);
 
-//      MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
-//          mainRects.get(0).level);
-//      MapRect source = new MapRect(0, 0, w, h, mainRects.get(0).pre,
-//          mainRects.get(0).level);
-//      dest.isLeaf = mainRects.get(0).isLeaf;
-//      source.isLeaf = mainRects.get(0).isLeaf;
-//      MapRects hugeRects = scaleRects(mainRects, 0, mainRects.size, dest,
-//          source);
+      //MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
+      //  mainRects.get(0).level);
+      //MapRect source = new MapRect(0, 0, w, h, mainRects.get(0).pre,
+      //  mainRects.get(0).level);
+      //dest.isLeaf = mainRects.get(0).isLeaf;
+      //source.isLeaf = mainRects.get(0).isLeaf;
+      //MapRects hugeRects = scaleRects(mainRects, 0, mainRects.size, dest,
+      //  source);
 
       // simple method only scaling all the rectangles including the borders
       hugeRects = new MapRects();
@@ -242,16 +242,15 @@ public final class MapView extends View implements Runnable {
       drawMap(hugeMap, hugeRects, fkt);
     } else {
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-//      final MapRect rect = new MapRect(0, 0, 1680, 1050, 0, 0);
       calc(rect, gui.context.current(), mainMap);
     }
 
-//      final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
-//      calc(hrect, gui.context.current(), hugeMap);
-//    }
-//
-//    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-//    calc(rect, gui.context.current(), mainMap);
+    //  final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
+    //  calc(hrect, gui.context.current(), hugeMap);
+    //}
+    //
+    //final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+    //calc(rect, gui.context.current(), mainMap);
 
     repaint();
   }
@@ -375,7 +374,6 @@ public final class MapView extends View implements Runnable {
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  // @SuppressWarnings("unchecked")
   private void calc(final MapRect rect, final Nodes nodes,
       final BufferedImage map) {
 
@@ -387,7 +385,7 @@ public final class MapView extends View implements Runnable {
       layout = new MapLayout(nodes.data, textLen);
 
       layout.makeMap(rect, new MapList(nodes.nodes.clone()),
-          0, nodes.size() - 1, 0);
+          0, nodes.size() - 1);
       mainRects = layout.rectangles.copy();
       // mainRects = layout.rectangles;
     }
@@ -522,10 +520,10 @@ public final class MapView extends View implements Runnable {
     ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
         GUIProp.zoomboxalpha / 100.0f));
     if(GUIProp.mapinteraction && thumbMap) {
-//      // set up some alpha display for the overlayed picture
-//      final int ac = AlphaComposite.SRC_OVER;
-//      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
-//          GUIProp.zoomboxalpha / 100.0f));
+      //// set up some alpha display for the overlayed picture
+      //final int ac = AlphaComposite.SRC_OVER;
+      //((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
+      //    GUIProp.zoomboxalpha / 100.0f));
 
       g.drawImage(tinyMap, tinyx, tinyy, tinyw, tinyh, this);
       // draw border
@@ -572,19 +570,19 @@ public final class MapView extends View implements Runnable {
           systart = hugeMap.getHeight() - GUIProp.fishh;
         }
 
-//        BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart,
-//            sxend - sxstart, syend - systart));
-//
-//        try {
-//          File file = new File("baseXdistorted.png");
-//          ImageIO.write(map, "png", file);
-//        } catch(IOException exc) {
-//          exc.printStackTrace();
-//        }
-//
-//        g.drawImage(map, dxstart, dystart, dxend, dyend,
-//            0, 0, map.getWidth(), map.getHeight(), this);
-//
+        //BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart,
+        //    sxend - sxstart, syend - systart));
+        //
+        //try {
+        //  File file = new File("baseXdistorted.png");
+        //  ImageIO.write(map, "png", file);
+        //} catch(IOException exc) {
+        //  exc.printStackTrace();
+        //}
+        //
+        //g.drawImage(map, dxstart, dystart, dxend, dyend,
+        //    0, 0, map.getWidth(), map.getHeight(), this);
+
         g.drawImage(hugeMap, dxstart, dystart, dxend, dyend,
             sxstart, systart, sxend, syend, this);
 
@@ -595,26 +593,26 @@ public final class MapView extends View implements Runnable {
     gui.painting = false;
   }
 
-//  /**
-//   * distorts the image using something like a tanh to the polar coordinates.
-//   *
-//   * @param image to distort
-//   * @return distorted Image
-//   */
-//  private BufferedImage distort(final BufferedImage image) {
-//    BufferedImage i = new BufferedImage(image.getWidth(), image.getHeight(),
-//        BufferedImage.TYPE_INT_BGR);
-//    int width = image.getWidth(); int height = image.getHeight();
-//    for (int x = 0; x < width; x++) {
-//      for (int y = 0; y < height; y++) {
-//        int nX = (int) Math.tan(x - width / 2);
-//        int nY = (int) Math.tan(y - height / 2);
-//        if(nX > 0 && nX < width && nY > 0 && nY < height)
-//          i.setRGB(nX, nY, image.getRGB(x, y));
-//      }
-//    }
-//    return i;
-//  }
+  ///**
+  // * distorts the image using something like a tanh to the polar coordinates.
+  // *
+  // * @param image to distort
+  // * @return distorted Image
+  // */
+  //private BufferedImage distort(final BufferedImage image) {
+  //  BufferedImage i = new BufferedImage(image.getWidth(), image.getHeight(),
+  //      BufferedImage.TYPE_INT_BGR);
+  //  int width = image.getWidth(); int height = image.getHeight();
+  //  for(int x = 0; x < width; x++) {
+  //    for(int y = 0; y < height; y++) {
+  //      int nX = (int) Math.tan(x - width / 2);
+  //      int nY = (int) Math.tan(y - height / 2);
+  //      if(nX > 0 && nX < width && nY > 0 && nY < height)
+  //        i.setRGB(nX, nY, image.getRGB(x, y));
+  //    }
+  //  }
+  //  return i;
+  //}
 
   /**
    * Draws image with correct scaling.
@@ -692,10 +690,9 @@ public final class MapView extends View implements Runnable {
    * @param s width/height
    * @return new coordinate
    */
-  private double transfer(final double v, final double m,
-      final double s) {
-//    double l = 0.5;
-//    return (s + s * Math.tanh(0.02 * (v - m))) / 2 * l + v * (1.0 - l);
+  private double transfer(final double v, final double m, final double s) {
+    //double l = 0.5;
+    //return (s + s * Math.tanh(0.02 * (v - m))) / 2 * l + v * (1.0 - l);
     return s * Math.tanh(0.008 * (v - m)) + m;
   }
 
@@ -715,13 +712,13 @@ public final class MapView extends View implements Runnable {
 
       final MapRects distRects = new MapRects();
       for(final MapRect r : mainRects) {
-//        int x = (int) (getWidth() + (getWidth() *
-//            Math.tanh(0.01 * (r.x - mouseX))) / 2);
-//        int w = (int) (getWidth() *
-//            Math.tanh(0.01 * (r.x + r.w - mouseX)) - x);
-//        int y = (int) (getHeight() * Math.tanh(0.01 * (r.y - mouseY)));
-//        int h = (int) (getHeight() * Math.tanh(
-//            0.01 * (r.y + r.h - mouseY)) - y);*/
+        //int x = (int) (getWidth() + (getWidth() *
+        //    Math.tanh(0.01 * (r.x - mouseX))) / 2);
+        //int w = (int) (getWidth() *
+        //    Math.tanh(0.01 * (r.x + r.w - mouseX)) - x);
+        //int y = (int) (getHeight() * Math.tanh(0.01 * (r.y - mouseY)));
+        //int h = (int) (getHeight() * Math.tanh(
+        //    0.01 * (r.y + r.h - mouseY)) - y);*/
         final int x = (int) transfer(r.x, mouseX, getWidth());
         final int y = (int) transfer(r.y, mouseY, getHeight());
         final int w = (int) transfer(r.x + r.w, mouseX, getWidth()) - x;
@@ -790,7 +787,7 @@ public final class MapView extends View implements Runnable {
 
       tinyLayout = new MapLayout(nodes.data, textLen);
       tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
-          nodes.size() - 1, 0);
+          nodes.size() - 1);
 
       final MapRects rects = new MapRects();
       rects.add(focused);

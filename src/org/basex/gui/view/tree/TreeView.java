@@ -24,22 +24,19 @@ import static org.basex.util.Token.*;
 
 /**
  * This class offers a real tree view.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View {
   /** Current font height. */
   private int fontHeight;
-  /** the sum of all size values of a node line. */
-  int sumNodeSizeInLine = 0;
   /** the list of all parent nodes of a node line. */
   private IntList parentList = null;
   /** array with position of the parent node. */
   private HashMap<Integer, Double> parentPos = null;
   /** array of current rectangles. */
   private ArrayList<TreeRect> rects = null;
-  /** nodes in current line. */
-  int nodeCount = 0;
   /** current mouse position x. */
   private int mousePosX = -1;
   /** current mouse position y. */
@@ -52,26 +49,24 @@ public final class TreeView extends View {
   private TreeRect focusedRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
-  /** color for nodes. **/
+  /** color for nodes. */
   private final int colorNode = 0xEDEFF7;
-  /** color for rects. **/
+  /** color for rects. */
   private final int colorRect = 0xC9CFE7;
-  /** color distance per level. **/
+  /** color distance per level. */
   private final int colorDiff = 0x121008;
-  /** color marked nodes. **/
+  /** color marked nodes. */
   private final Color markColor = new Color(0x035FC7);
-  /** color text-nodes. **/
+  /** color text-nodes. */
   private final Color textColor = new Color(0x000F87);
-  /** color highlighted nodes. **/
+  /** color highlighted nodes. */
   private final Color highlightColor = new Color(0x5D6FB7);
-  /** minimum space in rects needed for tags. **/
+  /** minimum space in rects needed for tags. */
   private final int minSpace = 35;
-  /** draw only element nodes. **/
+  /** draw only element nodes. */
   private final boolean onlyElementNodes = false;
-//  /** depth of the document. **/
-//  private int documentDepth = -1;
-  /** notified focus flag. **/
-  boolean refreshedFocus = false;
+  /** notified focus flag. */
+  private boolean refreshedFocus = false;
 
   /**
    * Default Constructor.
@@ -307,12 +302,9 @@ public final class TreeView extends View {
    * @param rootNum number of current root
    */
   private void treeView(final int root, final Graphics g, final int rootNum) {
-    final Data data = gui.context.data();
     int level = 0;
-    sumNodeSizeInLine = data.meta.size;
     parentList = new IntList();
     parentList.add(root);
-    nodeCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
       drawNodes(g, level, rootNum);
@@ -354,9 +346,7 @@ public final class TreeView extends View {
         sumNodeSize += data.size(pre, data.kind(pre));
       }
     }
-    nodeCount = nCount;
     parentList = temp;
-    sumNodeSizeInLine = sumNodeSize;
   }
 
   /**

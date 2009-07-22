@@ -7,6 +7,7 @@ import org.basex.util.Array;
 
 /**
  * Simple node Iterator, ignoring duplicates.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */

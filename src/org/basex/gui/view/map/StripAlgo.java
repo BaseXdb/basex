@@ -11,7 +11,7 @@ import org.basex.gui.GUIProp;
 final class StripAlgo extends MapAlgo{
   @Override
   MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final int l) {
+      final int ns, final int ne) {
     // stores all calculated rectangles
     final MapRects rects = new MapRects();
 
@@ -49,7 +49,8 @@ final class StripAlgo extends MapAlgo{
           w = w > 0 ? w : 1;
 
           if(yy + height <= yy + hh)
-            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i], l));
+            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i],
+                r.level));
           else break;
           x += w;
         }
@@ -71,7 +72,7 @@ final class StripAlgo extends MapAlgo{
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni) {
             row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.list[ni], l));
+                ml.list[ni], r.level));
             break;
           }
         } else {
@@ -101,7 +102,8 @@ final class StripAlgo extends MapAlgo{
         h = h > 0 ? h : 1;
 
         if(yy + height <= yy + hh)
-          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.list[i], l));
+          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.list[i],
+              r.level));
         else break;
         y += h;
       }
@@ -123,7 +125,7 @@ final class StripAlgo extends MapAlgo{
         // sometimes there has to be one rectangles to fill the left space
         if(ne == ni) {
           row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-              ml.list[ni], l));
+              ml.list[ni], r.level));
           break;
         }
       } else {

@@ -267,8 +267,7 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void update(final int pre, final byte[] attName,
-      final byte[] attValue) {
+  public void update(final int pre, final byte[] name, final byte[] v) {
     BaseX.notimplemented();
   }
 

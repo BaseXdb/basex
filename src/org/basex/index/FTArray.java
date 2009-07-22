@@ -76,7 +76,7 @@ final class FTArray {
    * @return int-array with the long value
    */
   private static int[] toArray(final long l) {
-    if (l <= Integer.MAX_VALUE) return new int[]{(int) l};
+    if(l <= Integer.MAX_VALUE) return new int[]{(int) l};
     final int w = -(int) (l & 0xFFFF);
     // 0xFFFFFF0000
     final int v = (int) (l >> 16 & 0XFFFFFF);
@@ -182,8 +182,8 @@ final class FTArray {
         final int[] one = next.list[cn];
         int[] ne = new int[5];
         ne[0] = one[0];
-        //if (r2[0] < r1[0]) {
-        if (Token.diff(r2[0], r1[0]) < 0) {
+        //if(r2[0] < r1[0]) {
+        if(Token.diff(r2[0], r1[0]) < 0) {
           ne[1] = next.size;
           ne[2] = next.size + 1;
         } else {

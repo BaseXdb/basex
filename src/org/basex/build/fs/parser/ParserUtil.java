@@ -18,15 +18,14 @@ public final class ParserUtil {
    * Tries to convert the given byte array to a valid xs:duration
    * representation.
    * @param value the byte array to convert.
-   * @param milliseconds true, if <code>value</code> represents a milliseconds
+   * @param ms true, if <code>value</code> represents a milliseconds
    *          value, false if it represents a seconds value. The value of this
    *          parameter is ignored, if <code>value</code> contains minutes and
    *          seconds.
    * @return the xs:duration representation or an empty array if
    *         <code>value</code> could not be converted.
    */
-  public static byte[] toDuration(final byte[] value, //
-      final boolean milliseconds) {
+  public static byte[] toDuration(final byte[] value, final boolean ms) {
     final int len = value.length;
     final byte[] a = new byte[len];
     int secPos = -1;
@@ -43,7 +42,7 @@ public final class ParserUtil {
       }
     }
     if(pos == 0) return EMPTY;
-    if(secPos == -1) return milliseconds ? msToDuration(a, pos)
+    if(secPos == -1) return ms ? msToDuration(a, pos)
         : secToDuration(a, pos);
     return minSecToDuration(a, secPos, pos);
   }

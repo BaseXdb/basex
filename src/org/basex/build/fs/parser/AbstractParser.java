@@ -14,7 +14,6 @@ import org.basex.build.fs.parser.Metadata.Element;
  * @author Bastian Lemke
  */
 public abstract class AbstractParser {
-
   /** The type of the file. */
   private final Metadata.Type type;
   /** The format of the file (MIME type). */
@@ -86,21 +85,21 @@ public abstract class AbstractParser {
    * each key/value pair.
    * </p>
    * @param bfc {@link BufferedFileChannel} to read from.
-   * @param fsParser the {@link NewFSParser} instance to fire events.
+   * @param parser the {@link NewFSParser} instance to fire events.
    * @throws IOException if any error occurs while reading from the file.
    * @see NewFSParser#metaEvent(Element, DataType, Definition, byte[], byte[])
    */
   public abstract void readMeta(final BufferedFileChannel bfc,
-      final NewFSParser fsParser) throws IOException;
+      final NewFSParser parser) throws IOException;
 
   /**
    * <p>
    * Reads the textual content from a {@link FileChannel} and fires events.
    * </p>
    * @param bfc the {@link BufferedFileChannel} to read from.
-   * @param fsParser the {@link NewFSParser} instance to write the content to.
+   * @param parser the {@link NewFSParser} instance to write the content to.
    * @throws IOException if any error occurs while reading from the file.
    */
   public abstract void readContent(final BufferedFileChannel bfc,
-      final NewFSParser fsParser) throws IOException;
+      final NewFSParser parser) throws IOException;
 }

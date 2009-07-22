@@ -60,8 +60,8 @@ public final class BaseXSlider extends BaseXPanel {
    * @param help help text
    * @param win parent window
    */
-  public BaseXSlider(final int mn, final int mx,
-      final int i, final byte[] help, final Window win) {
+  public BaseXSlider(final int mn, final int mx, final int i, final byte[] help,
+      final Window win) {
 
     super(help, win);
     min = mn;

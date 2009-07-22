@@ -29,31 +29,29 @@ public final class PNGParser extends AbstractParser {
   /** PNG header. */
   private static final byte[] HEADER = { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D,
       0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52 };
-  /** Lenght of the PNG header. */
+  /** Length of the PNG header. */
   private static final int HEADER_LENGTH = HEADER.length + 8;
 
-  /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel bfc) throws IOException {
     return bfc.size() >= HEADER_LENGTH &&
       eq(bfc.get(new byte[HEADER.length]), HEADER);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser fsParser) {
+      final NewFSParser parser) {
     // no textual representation for png content ...
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readMeta(final BufferedFileChannel bfc, //
-      final NewFSParser fsParser) throws IOException {
+  public void readMeta(final BufferedFileChannel bfc, final NewFSParser parser)
+      throws IOException {
+
     if(!check(bfc)) return;
-    fsParser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null,
+    parser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null,
         token(bfc.getInt()));
-    fsParser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
+    parser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
         null, token(bfc.getInt()));
   }
 }

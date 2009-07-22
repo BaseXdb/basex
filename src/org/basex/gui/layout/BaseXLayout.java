@@ -62,8 +62,8 @@ public final class BaseXLayout {
    * @param help help texts
    * @return button list
    */
-  public static BaseXBack newButtons(final Dialog dialog,
-      final boolean hor, final String[] texts, final byte[][] help) {
+  public static BaseXBack newButtons(final Dialog dialog, final boolean hor,
+      final String[] texts, final byte[][] help) {
 
     // horizontal/vertical layout
     final BaseXBack panel = new BaseXBack();

@@ -48,7 +48,7 @@ public final class MP3Parser extends AbstractParser {
    */
   static final byte[][] GENRES = new byte[][] {
       new byte[] { 66, 108, 117, 101, 115}, // Blues
-      new byte[] { 67, 108, 97, 115, 115, 105, 99, 32, 82, 111, //
+      new byte[] { 67, 108, 97, 115, 115, 105, 99, 32, 82, 111,
           99, 107}, // Classic Rock
       new byte[] { 67, 111, 117, 110, 116, 114, 121}, // Country
       new byte[] { 68, 97, 110, 99, 101}, // Dance
@@ -67,16 +67,16 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 82, 101, 103, 103, 97, 101}, // Reggae
       new byte[] { 82, 111, 99, 107}, // Rock
       new byte[] { 84, 101, 99, 104, 110, 111}, // Techno
-      new byte[] { 73, 110, 100, 117, 115, 116, 114, 105, //
+      new byte[] { 73, 110, 100, 117, 115, 116, 114, 105,
           97, 108}, // Industrial
-      new byte[] { 65, 108, 116, 101, 114, 110, 97, 116, 105, //
+      new byte[] { 65, 108, 116, 101, 114, 110, 97, 116, 105,
           118, 101}, // Alternative
       new byte[] { 83, 107, 97}, // Ska
-      new byte[] { 68, 101, 97, 116, 104, 32, 77, 101, 116, //
+      new byte[] { 68, 101, 97, 116, 104, 32, 77, 101, 116,
           97, 108}, // Death Metal
       new byte[] { 80, 114, 97, 110, 107, 115}, // Pranks
       new byte[] { 83, 111, 117, 110, 100, 116, 114, 97, 99, 107}, // Soundtrack
-      new byte[] { 69, 117, 114, 111, 45, 84, 101, 99, 104, 110, //
+      new byte[] { 69, 117, 114, 111, 45, 84, 101, 99, 104, 110,
           111}, // Euro-Techno
       new byte[] { 65, 109, 98, 105, 101, 110, 116}, // Ambient
       new byte[] { 84, 114, 105, 112, 45, 72, 111, 112}, // Trip-Hop
@@ -85,7 +85,7 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 70, 117, 115, 105, 111, 110}, // Fusion
       new byte[] { 84, 114, 97, 110, 99, 101}, // Trance
       new byte[] { 67, 108, 97, 115, 115, 105, 99, 97, 108}, // Classical
-      new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110, //
+      new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110,
           116, 97, 108}, // Instrumental
       new byte[] { 65, 99, 105, 100}, // Acid
       new byte[] { 72, 111, 117, 115, 101}, // House
@@ -98,7 +98,7 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 83, 111, 117, 108}, // Soul
       new byte[] { 80, 117, 110, 107}, // Punk
       new byte[] { 83, 112, 97, 99, 101}, // Space
-      new byte[] { 77, 101, 100, 105, 116, 97, 116, 105, //
+      new byte[] { 77, 101, 100, 105, 116, 97, 116, 105,
           118, 101}, // Meditative
       new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110, 116, 97, 108,
           32, 80, 111, 112}, // Instrumental Pop
@@ -113,13 +113,13 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 80, 111, 112, 45, 70, 111, 108, 107}, // Pop-Folk
       new byte[] { 69, 117, 114, 111, 100, 97, 110, 99, 101}, // Eurodance
       new byte[] { 68, 114, 101, 97, 109}, // Dream
-      new byte[] { 83, 111, 117, 116, 104, 101, 114, 110, 32, 82, //
+      new byte[] { 83, 111, 117, 116, 104, 101, 114, 110, 32, 82,
           111, 99, 107}, // Southern Rock
       new byte[] { 67, 111, 109, 101, 100, 121}, // Comedy
       new byte[] { 67, 117, 108, 116}, // Cult
       new byte[] { 71, 97, 110, 103, 115, 116, 97}, // Gangsta
       new byte[] { 84, 111, 112, 32, 52, 48}, // Top 40
-      new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 82, //
+      new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 82,
           97, 112}, // Christian Rap
       new byte[] { 80, 111, 112, 47, 70, 117, 110, 107}, // Pop/Funk
       new byte[] { 74, 117, 110, 103, 108, 101}, // Jungle
@@ -127,7 +127,7 @@ public final class MP3Parser extends AbstractParser {
           97, 110}, // Native American
       new byte[] { 67, 97, 98, 97, 114, 101, 116}, // Cabaret
       new byte[] { 78, 101, 119, 32, 87, 97, 118, 101}, // New Wave
-      new byte[] { 80, 115, 121, 99, 104, 97, 100, 101, 108, 105, //
+      new byte[] { 80, 115, 121, 99, 104, 97, 100, 101, 108, 105,
           99}, // Psychadelic
       new byte[] { 82, 97, 118, 101}, // Rave
       new byte[] { 83, 104, 111, 119, 116, 117, 110, 101, 115}, // Showtunes
@@ -139,15 +139,15 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 80, 111, 108, 107, 97}, // Polka
       new byte[] { 82, 101, 116, 114, 111}, // Retro
       new byte[] { 77, 117, 115, 105, 99, 97, 108}, // Musical
-      new byte[] { 82, 111, 99, 107, 32, 38, 32, 82, 111, 108, //
+      new byte[] { 82, 111, 99, 107, 32, 38, 32, 82, 111, 108,
           108}, // Rock & Roll
       new byte[] { 72, 97, 114, 100, 32, 82, 111, 99, 107}, // Hard Rock
       new byte[] { 70, 111, 108, 107}, // Folk
       new byte[] { 70, 111, 108, 107, 45, 82, 111, 99, 107}, // Folk-Rock
-      new byte[] { 78, 97, 116, 105, 111, 110, 97, 108, 32, 70, //
+      new byte[] { 78, 97, 116, 105, 111, 110, 97, 108, 32, 70,
           111, 108, 107}, // National Folk
       new byte[] { 83, 119, 105, 110, 103}, // Swing
-      new byte[] { 70, 97, 115, 116, 32, 70, 117, 115, 105, 111, //
+      new byte[] { 70, 97, 115, 116, 32, 70, 117, 115, 105, 111,
           110}, // Fast Fusion
       new byte[] { 66, 101, 98, 111, 98}, // Bebob
       new byte[] { 76, 97, 116, 105, 110}, // Latin
@@ -155,7 +155,7 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 67, 101, 108, 116, 105, 99}, // Celtic
       new byte[] { 66, 108, 117, 101, 103, 114, 97, 115, 115}, // Bluegrass
       new byte[] { 65, 118, 97, 110, 116, 103, 97, 114, 100, 101}, // Avantgarde
-      new byte[] { 71, 111, 116, 104, 105, 99, 32, 82, 111, 99, //
+      new byte[] { 71, 111, 116, 104, 105, 99, 32, 82, 111, 99,
           107}, // Gothic Rock
       new byte[] { 80, 114, 111, 103, 114, 101, 115, 115, 105, 118, 101, 32,
           82, 111, 99, 107}, // Progressive Rock
@@ -173,14 +173,14 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 83, 112, 101, 101, 99, 104}, // Speech
       new byte[] { 67, 104, 97, 110, 115, 111, 110}, // Chanson
       new byte[] { 79, 112, 101, 114, 97}, // Opera
-      new byte[] { 67, 104, 97, 109, 98, 101, 114, 32, 77, 117, //
+      new byte[] { 67, 104, 97, 109, 98, 101, 114, 32, 77, 117,
           115, 105, 99}, // Chamber Music
       new byte[] { 83, 111, 110, 97, 116, 97}, // Sonata
       new byte[] { 83, 121, 109, 112, 104, 111, 110, 121}, // Symphony
-      new byte[] { 66, 111, 111, 116, 121, 32, 66, 114, 97, //
+      new byte[] { 66, 111, 111, 116, 121, 32, 66, 114, 97,
           115, 115}, // Booty Brass
       new byte[] { 80, 114, 105, 109, 117, 115}, // Primus
-      new byte[] { 80, 111, 114, 110, 32, 71, 114, 111, 111, //
+      new byte[] { 80, 111, 114, 110, 32, 71, 114, 111, 111,
           118, 101}, // Porn Groove
       new byte[] { 83, 97, 116, 105, 114, 101}, // Satire
       new byte[] { 83, 108, 111, 119, 32, 74, 97, 109}, // Slow Jam
@@ -189,9 +189,9 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 83, 97, 109, 98, 97}, // Samba
       new byte[] { 70, 111, 108, 107, 108, 111, 114, 101}, // Folklore
       new byte[] { 66, 97, 108, 108, 97, 100}, // Ballad
-      new byte[] { 80, 111, 119, 101, 101, 114, 32, 66, 97, 108, 108, //
+      new byte[] { 80, 111, 119, 101, 101, 114, 32, 66, 97, 108, 108,
           97, 100}, // Poweer Ballad
-      new byte[] { 82, 104, 121, 116, 109, 105, 99, 32, 83, 111, 117, //
+      new byte[] { 82, 104, 121, 116, 109, 105, 99, 32, 83, 111, 117,
           108}, // Rhytmic Soul
       new byte[] { 70, 114, 101, 101, 115, 116, 121, 108, 101}, // Freestyle
       new byte[] { 68, 117, 101, 116}, // Duet
@@ -201,7 +201,7 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 69, 117, 114, 111, 45, 72, 111, 117, 115, 101}, // Euro-House
       new byte[] { 68, 97, 110, 99, 101, 32, 72, 97, 108, 108}, // Dance Hall
       new byte[] { 71, 111, 97}, // Goa
-      new byte[] { 68, 114, 117, 109, 32, 38, 32, 66, 97, 115, //
+      new byte[] { 68, 114, 117, 109, 32, 38, 32, 66, 97, 115,
           115}, // Drum & Bass
       new byte[] { 67, 108, 117, 98, 45, 72, 111, 117, 115, 101}, // Club-House
       new byte[] { 72, 97, 114, 100, 99, 111, 114, 101}, // Hardcore
@@ -213,19 +213,19 @@ public final class MP3Parser extends AbstractParser {
       new byte[] { 66, 101, 97, 116}, // Beat
       new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 71, 97, 110,
           103, 115, 116, 97, 32, 82, 97, 112}, // Christian Gangsta Rap
-      new byte[] { 72, 101, 97, 118, 121, 32, 77, 101, 116, //
+      new byte[] { 72, 101, 97, 118, 121, 32, 77, 101, 116,
           97, 108}, // Heavy Metal
-      new byte[] { 66, 108, 97, 99, 107, 32, 77, 101, 116, 97, //
+      new byte[] { 66, 108, 97, 99, 107, 32, 77, 101, 116, 97,
           108}, // Black Metal
       new byte[] { 67, 114, 111, 115, 115, 111, 118, 101, 114}, // Crossover
       new byte[] { 67, 111, 110, 116, 101, 109, 112, 111, 114, 97, 114, 121,
-          32, 67, 104, 114, 105, 115, 116, 105, //
+          32, 67, 104, 114, 105, 115, 116, 105,
           97, 110}, // Contemporary Christian
       new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 82, 111, 99,
           107}, // Christian Rock
       new byte[] { 77, 101, 114, 101, 110, 103, 117, 101}, // Merengue
       new byte[] { 83, 97, 108, 115, 97}, // Salsa
-      new byte[] { 84, 114, 97, 115, 104, 32, 77, 101, 116, //
+      new byte[] { 84, 114, 97, 115, 104, 32, 77, 101, 116,
           97, 108}, // Trash Metal
       new byte[] { 65, 110, 105, 109, 101}, // Anime
       new byte[] { 74, 112, 111, 112}, // Jpop
@@ -295,28 +295,25 @@ public final class MP3Parser extends AbstractParser {
   /** The {@link NewFSParser} instance to fire events. */
   NewFSParser fsparser;
 
-  /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel bufFC) throws IOException {
     bfc = bufFC;
     return checkID3v2() || checkID3v1();
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void readMeta(final BufferedFileChannel f, final NewFSParser fsParser)
+  public void readMeta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
-    fsparser = fsParser;
+    fsparser = parser;
     bfc = f;
     if(checkID3v2()) readMetaID3v2();
     else if(checkID3v1()) readMetaID3v1();
   }
 
-  /** {@inheritDoc} */
   @Override
   public void readContent(final BufferedFileChannel f,
-      final NewFSParser fsParser) {
-  // no textual representation for mp3 content ...
+      final NewFSParser parser) {
+    // no textual representation for mp3 content ...
   }
 
   // ---------------------------------------------------------------------------
@@ -482,10 +479,8 @@ public final class MP3Parser extends AbstractParser {
    * @return the integer.
    */
   private int readSynchsafeInt() {
-    return (bfc.get() & 0xFF) << 21 //
-        | (bfc.get() & 0xFF) << 14 //
-        | (bfc.get() & 0xFF) << 7 //
-        | bfc.get() & 0xFF;
+    return (bfc.get() & 0xFF) << 21 | (bfc.get() & 0xFF) << 14 |
+      (bfc.get() & 0xFF) << 7 | bfc.get() & 0xFF;
   }
 
   /**
@@ -781,7 +776,7 @@ public final class MP3Parser extends AbstractParser {
         }
         final int size = s - (int) (obj.bfc.position() - position);
         try {
-          obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
+          obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name,
               suffix);
         } catch(final IOException e) {
           if(NewFSParser.VERBOSE) BaseX.debug(
