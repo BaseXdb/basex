@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -326,9 +325,8 @@ public final class QueryContext extends Progress {
    * @throws IOException query exception
    */
   void close() throws IOException {
-    // [AW] databases must eventually be unpinned
     for(int d = rootDocs; d < docs; d++) {
-   // [AW] later replaced by context.unpin()...
+      // [AW] later replaced by context.unpin()...
       Context.POOL.unpin(doc[d].data);
       doc[d].data.close();
     }
@@ -383,10 +381,6 @@ public final class QueryContext extends Progress {
       }
     }
 
-    // [AW] what happens if context == null?
-    // better place for all pin operations: addDoc(...)
-    // [CG] placed in check()??
-   
     // check if the database has already been opened
     final String dbname = string(db);
     for(int d = 0; d < docs; d++)
@@ -400,10 +394,10 @@ public final class QueryContext extends Progress {
     // get database instance
     Data data = null;
 
-    // [AW] following databases are not considered yet - see above
     if(Prop.web) {
       try {
         data = new DiskData(dbname);
+        Context.POOL.add(data);
       } catch(final IOException ex) {
         Err.or(INVDOC, dbname);
       }
@@ -438,19 +432,21 @@ public final class QueryContext extends Progress {
    */
   private Data check(final String path, final boolean err, final boolean coll)
       throws QueryException {
-    try {
-      final IO f = IO.get(path);
-      final String db = f.dbname();
-      // [AW] later replaced by context.pin()...
-      Data d = Context.POOL.pin(db);
-      if(d != null) return d;
-      d = MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
-      Context.POOL.add(d);
-      return d;
-    } catch(final IOException ex) {
-      if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
-      return null;
+
+    final IO f = IO.get(path);
+    final String db = f.dbname();
+    // [AW] later replaced by context.pin()...
+    Data d = Context.POOL.pin(db);
+
+    if(d == null) {
+      try {
+        d = MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
+        Context.POOL.add(d);
+      } catch(final IOException ex) {
+        if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
+      }
     }
+    return d;
   }
 
   /**
