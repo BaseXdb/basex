@@ -50,7 +50,7 @@ abstract class BXQAbstract {
    * Constructor.
    * @param p parent reference
    */
-  public BXQAbstract(final BXQAbstract p) {
+  protected BXQAbstract(final BXQAbstract p) {
     par = p;
   }
 
@@ -75,7 +75,7 @@ abstract class BXQAbstract {
    * Checks if the object is open.
    * @throws XQException exception
    */
-  public final void opened() throws XQException {
+  protected final void opened() throws XQException {
     if(isClosed()) throw new BXQException(getClass().getSimpleName() + CLOSED);
   }
 
@@ -290,17 +290,6 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Checks the specified database instance and returns a document node.
-   * @param d database instance
-   * @return document node
-   * @throws BXQException exception
-   */
-  private DBNode checkDB(final Data d) throws BXQException {
-    valid(d, Data.class);
-    return new DBNode(d, 0);
-  }
-
-  /**
    * Serializes an item to the specified serializer.
    * @param it item
    * @param ctx context
@@ -316,6 +305,17 @@ abstract class BXQAbstract {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
+  }
+
+  /**
+   * Checks the specified database instance and returns a document node.
+   * @param d database instance
+   * @return document node
+   * @throws BXQException exception
+   */
+  private DBNode checkDB(final Data d) throws BXQException {
+    valid(d, Data.class);
+    return new DBNode(d, 0);
   }
 }
 

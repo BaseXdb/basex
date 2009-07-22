@@ -34,7 +34,7 @@ import org.xml.sax.ContentHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class BXQSequence extends BXQAbstract implements XQResultSequence {
+final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
   final Iter result;
   /** Query context. */
@@ -56,7 +56,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param c closer
    * @throws XQException xquery exception
    */
-  public BXQSequence(final Iter item, final BXQAbstract c) throws XQException {
+  BXQSequence(final Iter item, final BXQAbstract c) throws XQException {
     this(item, new QueryContext(), c, null);
   }
 
@@ -68,7 +68,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param cn connection
    * @throws XQException xquery exception
    */
-  public BXQSequence(final Iter item, final QueryContext context,
+  BXQSequence(final Iter item, final QueryContext context,
       final BXQAbstract c, final BXQConnection cn) throws XQException {
     super(c);
     result = item;

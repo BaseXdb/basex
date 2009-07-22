@@ -32,7 +32,7 @@ import org.xmldb.api.modules.XMLResource;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXXMLResource implements XMLResource, BXXMLDBText {
+final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** Collection reference. */
   private final Collection coll;
   /** String id. */
@@ -51,7 +51,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param d content data
    * @param c Collection
    */
-  public BXXMLResource(final byte[] d, final Collection c) {
+  BXXMLResource(final byte[] d, final Collection c) {
     content = d;
     coll = c;
   }
@@ -62,7 +62,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param p query counter
    * @param c Collection
    */
-  public BXXMLResource(final Result res, final int p, final Collection c) {
+  BXXMLResource(final Result res, final int p, final Collection c) {
     result = res;
     coll = c;
     pos = p;
@@ -75,8 +75,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param i id
    * @param c collection
    */
-  public BXXMLResource(final Data d, final int p, final String i,
-      final Collection c) {
+  BXXMLResource(final Data d, final int p, final String i, final Collection c) {
     id = i;
     coll = c;
     data = d;
@@ -184,13 +183,13 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** SAX Parser. */
   static final class BXSAXContentHandler extends DefaultHandler {
     /** HashMap. */
-    protected final HashMap<String, String> ns = new HashMap<String, String>();
+    final HashMap<String, String> ns = new HashMap<String, String>();
     /** Cached output. */
-    protected final CachedOutput out = new CachedOutput();
+    final CachedOutput out = new CachedOutput();
     /** Serializer. */
-    protected final XMLSerializer xml;
+    final XMLSerializer xml;
     /** XMLResource. */
-    protected BXXMLResource res;
+    BXXMLResource res;
 
     /**
      * Standard Constructor.

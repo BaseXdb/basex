@@ -1,6 +1,5 @@
 package org.basex.test.xmldb;
 
-import org.basex.api.xmldb.BXCollectionManagementService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

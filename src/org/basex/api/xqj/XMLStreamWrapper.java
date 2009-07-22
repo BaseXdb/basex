@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class XMLStreamWrapper extends Parser {
+final class XMLStreamWrapper extends Parser {
   /** Element counter. */
   int nodes;
   /** XML stream reader. */
@@ -32,7 +32,7 @@ public final class XMLStreamWrapper extends Parser {
    * Constructor.
    * @param sr stream reader
    */
-  public XMLStreamWrapper(final XMLStreamReader sr) {
+  XMLStreamWrapper(final XMLStreamReader sr) {
     super(IO.DUMMY);
     reader = sr;
   }

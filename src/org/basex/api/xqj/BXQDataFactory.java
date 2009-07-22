@@ -35,14 +35,14 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
+class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   /** Database connection. */
   protected BXQStaticContext ctx;
 
   /**
    * Constructor.
    */
-  public BXQDataFactory() {
+  protected BXQDataFactory() {
     super(null);
     ctx = new BXQStaticContext();
   }
@@ -67,17 +67,6 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     opened();
     checkAttr(it);
     return new BXQItemType(Type.ATT, qn, it);
-  }
-
-  /**
-   * Performs a type check for attribute operations.
-   * @param it input type
-   * @throws XQException exception
-   */
-  private void checkAttr(final int it) throws XQException {
-    if(it != XQItemType.XQBASETYPE_UNTYPED &&
-        it != XQItemType.XQBASETYPE_ANYTYPE) return;
-    throw new BXQException(ATT);
   }
 
   public BXQItemType createCommentType() throws XQException {
@@ -309,6 +298,17 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItemType createTextType() throws XQException {
     opened();
     return new BXQItemType(Type.TXT);
+  }
+
+  /**
+   * Performs a type check for attribute operations.
+   * @param it input type
+   * @throws XQException exception
+   */
+  private void checkAttr(final int it) throws XQException {
+    if(it != XQItemType.XQBASETYPE_UNTYPED &&
+        it != XQItemType.XQBASETYPE_ANYTYPE) return;
+    throw new BXQException(ATT);
   }
 
   /**

@@ -6,7 +6,7 @@ package org.basex.api.xqj;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public interface BXQText {
+interface BXQText {
   /** Java XQuery API version. */
   String VERSION = "1.0";
 

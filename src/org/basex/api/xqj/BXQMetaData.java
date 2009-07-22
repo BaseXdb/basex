@@ -13,7 +13,7 @@ import org.basex.Text;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class BXQMetaData extends BXQAbstract implements XQMetaData {
+final class BXQMetaData extends BXQAbstract implements XQMetaData {
   /**
    * Constructor.
    * @param c close reference

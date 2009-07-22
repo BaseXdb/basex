@@ -18,7 +18,7 @@ import org.xmldb.api.base.XMLDBException;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXResourceSet implements ResourceSet, BXXMLDBText {
+final class BXResourceSet implements ResourceSet, BXXMLDBText {
   /** Resources. */
   private final ArrayList<Resource> res = new ArrayList<Resource>();
   /** Collection reference. */
@@ -29,7 +29,7 @@ public final class BXResourceSet implements ResourceSet, BXXMLDBText {
    * @param r result
    * @param c collection
    */
-  public BXResourceSet(final Result r, final Collection c) {
+  BXResourceSet(final Result r, final Collection c) {
     // convert result into resource instances
     for(int s = 0; s < r.size(); s++) res.add(new BXXMLResource(r, s, c));
     coll = c;

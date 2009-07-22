@@ -18,7 +18,7 @@ import org.xmldb.api.base.XMLDBException;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXDatabase implements Database, BXXMLDBText {
+final class BXDatabase implements Database, BXXMLDBText {
 
   public boolean acceptsURI(final String uri) throws XMLDBException {
     return getCollectionName(uri) != null;
@@ -31,26 +31,6 @@ public final class BXDatabase implements Database, BXXMLDBText {
     final String name = getCollectionName(uri);
     final Context ctx = new Context();
     return new Open(name).execute(ctx) ? new BXCollection(ctx) : null;
-  }
-
-  /**
-   * Returns the name of a collection.
-   * @param uri input uri
-   * @return collection name
-   * @throws XMLDBException exception
-   */
-  private String getCollectionName(final String uri) throws XMLDBException {
-    // try to extract name of collection; otherwise, throw exception
-    if(uri != null) {
-      final String main = uri.startsWith(XMLDB) ? uri : XMLDB + uri;
-      if(main.startsWith(XMLDBURI)) {
-        final String host = main.substring(XMLDBURI.length());
-        if(host.startsWith(LOCALHOST)) {
-          return host.substring(LOCALHOST.length());
-        }
-      }
-    }
-    throw new XMLDBException(ErrorCodes.INVALID_URI, ERR_URI + uri);
   }
 
   public String getConformanceLevel() {
@@ -75,5 +55,25 @@ public final class BXDatabase implements Database, BXXMLDBText {
     if(!proc.execute(new Context())) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
+  }
+
+  /**
+   * Returns the name of a collection.
+   * @param uri input uri
+   * @return collection name
+   * @throws XMLDBException exception
+   */
+  private String getCollectionName(final String uri) throws XMLDBException {
+    // try to extract name of collection; otherwise, throw exception
+    if(uri != null) {
+      final String main = uri.startsWith(XMLDB) ? uri : XMLDB + uri;
+      if(main.startsWith(XMLDBURI)) {
+        final String host = main.substring(XMLDBURI.length());
+        if(host.startsWith(LOCALHOST)) {
+          return host.substring(LOCALHOST.length());
+        }
+      }
+    }
+    throw new XMLDBException(ErrorCodes.INVALID_URI, ERR_URI + uri);
   }
 }

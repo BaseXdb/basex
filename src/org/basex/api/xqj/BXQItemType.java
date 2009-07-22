@@ -15,9 +15,13 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class BXQItemType implements XQItemType {
+final class BXQItemType implements XQItemType {
+  /** Default item type. */
+  static final BXQItemType DEFAULT = new BXQItemType(
+      Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
+
   /** Base Types. */
-  static final Type[] BASE = {
+  private static final Type[] BASE = {
       null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
       Type.YMD, Type.URI, Type.B6B, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
       Type.SHR, Type.LNG, Type.DTM, Type.DEC, Type.DBL, Type.DUR, Type.FLT, //14
@@ -27,9 +31,6 @@ public final class BXQItemType implements XQItemType {
       Type.LAN, Type.NAM, Type.NCN, Type.NMT, Type.ID , Type.IDR, Type.ENT, //42
       null, null, null // 49
   };
-  /** Default item type. */
-  static final BXQItemType DEFAULT = new BXQItemType(
-      Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
   /** Name. */
   private final QName name;
   /** Base Type. */
@@ -44,7 +45,7 @@ public final class BXQItemType implements XQItemType {
    * @param b item type
    * @throws BXQException exception
    */
-  public BXQItemType(final int b) throws BXQException {
+  BXQItemType(final int b) throws BXQException {
     this(BASE[b], null, b);
     if(type == null) throw new BXQException(ATOM);
   }
@@ -53,7 +54,7 @@ public final class BXQItemType implements XQItemType {
    * Constructor.
    * @param t type
    */
-  public BXQItemType(final Type t) {
+  BXQItemType(final Type t) {
     this(t, null, -1);
   }
 
@@ -63,7 +64,7 @@ public final class BXQItemType implements XQItemType {
    * @param n name
    * @param b base type
    */
-  public BXQItemType(final Type t, final QName n, final int b) {
+  BXQItemType(final Type t, final QName n, final int b) {
     this(t, n, b, XQSequenceType.OCC_EXACTLY_ONE);
   }
 
@@ -74,7 +75,7 @@ public final class BXQItemType implements XQItemType {
    * @param b base type
    * @param o occurrence
    */
-  public BXQItemType(final Type t, final QName n, final int b, final int o) {
+  BXQItemType(final Type t, final QName n, final int b, final int o) {
     name = n;
     type = t;
     base = b;
@@ -122,14 +123,6 @@ public final class BXQItemType implements XQItemType {
     return null;
   }
 
-  /**
-   * Returns the item type.
-   * @return type.
-   */
-  public Type getType() {
-    return type;
-  }
-
   public QName getTypeName() throws BXQException {
     if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
     if(type == Type.ITEM) throw new BXQException(TYPE);
@@ -151,6 +144,14 @@ public final class BXQItemType implements XQItemType {
   }
 
   /**
+   * Returns the item type.
+   * @return type.
+   */
+  Type getType() {
+    return type;
+  }
+
+  /**
    * Matches the input types against the instance type.
    * @param types input types
    * @throws BXQException exception
@@ -162,7 +163,6 @@ public final class BXQItemType implements XQItemType {
 
   @Override
   public String toString() {
-    //"xs:" +
     return type.name;
   }
 }

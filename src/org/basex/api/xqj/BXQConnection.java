@@ -16,9 +16,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class BXQConnection extends BXQDataFactory
-    implements XQConnection {
-
+final class BXQConnection extends BXQDataFactory implements XQConnection {
   /** Database meta data. */
   private final BXQMetaData meta = new BXQMetaData(this);
   /** Boolean Value if autoCommit is enabled. */

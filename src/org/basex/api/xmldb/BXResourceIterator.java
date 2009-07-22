@@ -14,8 +14,9 @@ import org.xmldb.api.base.XMLDBException;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
+final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
     Iterable<Resource> {
+
   /** Resources. */
   private final Iterator<Resource> res;
 
@@ -23,7 +24,7 @@ public final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
    * Standard constructor with result.
    * @param r resources
    */
-  public BXResourceIterator(final ArrayList<Resource> r) {
+  BXResourceIterator(final ArrayList<Resource> r) {
     res = r.iterator();
   }
 

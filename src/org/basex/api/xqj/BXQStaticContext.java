@@ -18,7 +18,7 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class BXQStaticContext implements XQStaticContext {
+final class BXQStaticContext implements XQStaticContext {
   /** Namespaces. */
   QueryContext ctx = new QueryContext();
   /** Context item type. */

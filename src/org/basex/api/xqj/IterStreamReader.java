@@ -32,7 +32,7 @@ import static org.basex.util.Token.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class IterStreamReader implements XMLStreamReader {
+final class IterStreamReader implements XMLStreamReader {
   /** Properties. */
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
@@ -54,7 +54,7 @@ public final class IterStreamReader implements XMLStreamReader {
    * Constructor.
    * @param res result iterator
    */
-  public IterStreamReader(final Iter res) {
+  IterStreamReader(final Iter res) {
     result = res;
     // included for wrapping StreamReader into an XMLEventReader
     PROPS.put(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
@@ -370,6 +370,20 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   /**
+   * Sets the current event type.
+   */
+  void type() {
+    switch(item.type) {
+      case DOC: kind = START_DOCUMENT; return;
+      case ATT: kind = ATTRIBUTE; return;
+      case ELM: kind = START_ELEMENT; return;
+      case COM: kind = COMMENT; return;
+      case PI : kind = PROCESSING_INSTRUCTION; return;
+      default:  kind = CHARACTERS; return;
+    }
+  }
+
+  /**
    * Tests the validity of the specified types.
    * @param valid input types
    */
@@ -385,20 +399,6 @@ public final class IterStreamReader implements XMLStreamReader {
   private boolean isType(final int... valid) {
     for(final int v : valid) if(kind == v) return true;
     return false;
-  }
-
-  /**
-   * Sets the current event type.
-   */
-  protected void type() {
-    switch(item.type) {
-      case DOC: kind = START_DOCUMENT; return;
-      case ATT: kind = ATTRIBUTE; return;
-      case ELM: kind = START_ELEMENT; return;
-      case COM: kind = COMMENT; return;
-      case PI : kind = PROCESSING_INSTRUCTION; return;
-      default:  kind = CHARACTERS; return;
-    }
   }
 
   /**

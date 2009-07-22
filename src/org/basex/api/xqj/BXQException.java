@@ -24,7 +24,7 @@ final class BXQException extends XQException {
    * @param s message
    * @param e message extension
    */
-  public BXQException(final String s, final Object... e) {
+  BXQException(final String s, final Object... e) {
     super(BaseX.info(s, e));
   }
 }

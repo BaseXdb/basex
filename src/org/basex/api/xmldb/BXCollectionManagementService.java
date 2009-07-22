@@ -16,7 +16,7 @@ import org.xmldb.api.modules.CollectionManagementService;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXCollectionManagementService implements
+final class BXCollectionManagementService implements
     CollectionManagementService, BXXMLDBText {
 
   /** Service constant. */
@@ -30,7 +30,7 @@ public final class BXCollectionManagementService implements
    * Standard Constructor.
    * @param c Collection reference
    */
-  public BXCollectionManagementService(final Collection c) {
+  BXCollectionManagementService(final Collection c) {
     coll = (BXCollection) c;
   }
 

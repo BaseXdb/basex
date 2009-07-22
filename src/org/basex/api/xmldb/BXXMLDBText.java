@@ -10,7 +10,7 @@ import org.basex.core.Prop;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public interface BXXMLDBText {
+interface BXXMLDBText {
   /** DB URI. */
   String DBURI = NAMESPACE + "://";
   /** XMLDB URI. */
@@ -36,8 +36,6 @@ public interface BXXMLDBText {
   String ERR_ID = "Resource has no ID.";
   /** Error Message. */
   String ERR_UNKNOWN = "Unknown Resource: ";
-  /** Error Message. */
-  String ERR_INV = "Resource is invalid.";
   /** Error Message. */
   String ERR_CONT = "Invalid content; string expected.";
   /** Error Message. */

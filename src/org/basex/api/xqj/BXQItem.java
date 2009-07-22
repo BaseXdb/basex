@@ -39,7 +39,7 @@ import org.xml.sax.ContentHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class BXQItem extends BXQAbstract implements XQResultItem {
+final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final XQConnection conn;
   /** Query context. */
@@ -51,7 +51,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * Constructor.
    * @param item item
    */
-  public BXQItem(final Item item) {
+  BXQItem(final Item item) {
     this(item, null, new QueryContext(), null);
   }
 
@@ -62,8 +62,9 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @param context query context
    * @param connection connection reference
    */
-  public BXQItem(final Item item, final BXQAbstract c,
-      final QueryContext context, final BXQConnection connection) {
+  BXQItem(final Item item, final BXQAbstract c, final QueryContext context,
+      final BXQConnection connection) {
+
     super(c);
     conn = connection;
     ctx = context;
@@ -150,19 +151,14 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     serialize(os);
   }
 
-  /**
-   * Serializes the item to the specified output stream.
-   * @param os output stream
-   * @throws XQException exception
-   */
-  private void serialize(final OutputStream os) throws XQException {
-    try {
-      final XMLSerializer xml = new XMLSerializer(new PrintOutput(os));
-      serialize(it, ctx, xml);
-      xml.close();
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+  public void writeItemToSAX(final ContentHandler sax) throws XQException {
+    valid(sax, ContentHandler.class);
+    writeItemToResult(new SAXResult(sax));
+  }
+
+  public XQConnection getConnection() throws XQException {
+    opened();
+    return conn;
   }
 
   public void writeItem(final Writer ow, final Properties props)
@@ -173,24 +169,6 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
-  }
-
-  /**
-   * Returns the serialized output.
-   * @return cached output
-   * @throws XQException exception
-   */
-  private String serialize() throws XQException {
-    opened();
-    final CachedOutput co = new CachedOutput();
-    try {
-      final XMLSerializer xml = new XMLSerializer(co);
-      serialize(it, ctx, xml);
-      xml.close();
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
-    return co.toString();
   }
 
   public void writeItemToResult(final Result result) throws XQException {
@@ -216,14 +194,37 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     }
   }
 
-  public void writeItemToSAX(final ContentHandler sax) throws XQException {
-    valid(sax, ContentHandler.class);
-    writeItemToResult(new SAXResult(sax));
+  /**
+   * Serializes the item to the specified output stream.
+   * @param os output stream
+   * @throws XQException exception
+   */
+  private void serialize(final OutputStream os) throws XQException {
+    try {
+      final XMLSerializer xml = new XMLSerializer(new PrintOutput(os));
+      serialize(it, ctx, xml);
+      xml.close();
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
   }
 
-  public XQConnection getConnection() throws XQException {
+  /**
+   * Returns the serialized output.
+   * @return cached output
+   * @throws XQException exception
+   */
+  private String serialize() throws XQException {
     opened();
-    return conn;
+    final CachedOutput co = new CachedOutput();
+    try {
+      final XMLSerializer xml = new XMLSerializer(co);
+      serialize(it, ctx, xml);
+      xml.close();
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
+    return co.toString();
   }
 
   /**

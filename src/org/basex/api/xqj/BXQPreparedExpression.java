@@ -20,7 +20,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class BXQPreparedExpression extends BXQDynamicContext
+final class BXQPreparedExpression extends BXQDynamicContext
     implements XQPreparedExpression {
 
   /**
@@ -30,7 +30,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
    * @param c closer
    * @throws XQQueryException exception
    */
-  public BXQPreparedExpression(final String input, final BXQStaticContext s,
+  BXQPreparedExpression(final String input, final BXQStaticContext s,
       final BXQConnection c) throws XQQueryException {
     super(input, s, c);
 
@@ -68,17 +68,6 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
-  /**
-   * Returns the variable array.
-   * @return variables
-   * @throws XQException exception
-   */
-  private Var[] getVariables() throws XQException {
-    opened();
-    final Vars vars = query.ctx.vars.getGlobal();
-    return Array.finish(vars.vars, vars.size);
-  }
-
   public XQStaticContext getStaticContext() throws XQException {
     opened();
     return sc;
@@ -98,5 +87,16 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     if(var == null) throw new BXQException(VAR, nm);
     return var.type != null ? new BXQItemType(var.type.type) :
       BXQItemType.DEFAULT;
+  }
+
+  /**
+   * Returns the variable array.
+   * @return variables
+   * @throws XQException exception
+   */
+  private Var[] getVariables() throws XQException {
+    opened();
+    final Vars vars = query.ctx.vars.getGlobal();
+    return Array.finish(vars.vars, vars.size);
   }
 }

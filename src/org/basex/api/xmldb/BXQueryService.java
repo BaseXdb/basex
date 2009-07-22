@@ -19,7 +19,7 @@ import org.xmldb.api.modules.XPathQueryService;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BXQueryService implements XPathQueryService, BXXMLDBText {
+final class BXQueryService implements XPathQueryService, BXXMLDBText {
   /** XPath service constant. */
   static final String XPATH = "XPathQueryService";
   /** XQuery service constant. */
@@ -40,7 +40,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
    * @param n service name
    * @param v version
    */
-  public BXQueryService(final BXCollection c, final String n, final String v) {
+  BXQueryService(final BXCollection c, final String n, final String v) {
     coll = c;
     name = n;
     version = v;
@@ -78,6 +78,27 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setCollection(final Collection col) {
+    coll = (BXCollection) col;
+  }
+
+  public String getProperty(final String nm) {
+    return null;
+  }
+
+  public void setProperty(final String nm, final String value)
+      throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);
+  }
+
   /**
    * Method for both query actions.
    * @param nodes initial node set
@@ -101,26 +122,5 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setCollection(final Collection col) {
-    coll = (BXCollection) col;
-  }
-
-  public String getProperty(final String nm) {
-    return null;
-  }
-
-  public void setProperty(final String nm, final String value)
-      throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);
   }
 }
