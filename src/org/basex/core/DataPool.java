@@ -45,7 +45,6 @@ public class DataPool {
     for(int i = 0; i < size; i++) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;
-        System.out.println("unpin: " + pins[i]);
         if(close) {
           Array.move(data, i + 1, -1, size - i - 1);
           Array.move(pins, i + 1, -1, size - i - 1);
