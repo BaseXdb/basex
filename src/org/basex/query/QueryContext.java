@@ -396,8 +396,11 @@ public final class QueryContext extends Progress {
 
     if(Prop.web) {
       try {
-        data = new DiskData(dbname);
-        Context.POOL.add(data);
+        data = Context.POOL.pin(dbname);
+        if(data == null) {
+          data = new DiskData(dbname);
+          Context.POOL.add(data);
+        }
       } catch(final IOException ex) {
         Err.or(INVDOC, dbname);
       }
