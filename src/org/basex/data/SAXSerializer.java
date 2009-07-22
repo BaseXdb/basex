@@ -127,10 +127,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private AttributesImpl atts;
 
   @Override
-  public void close() {
-  }
-
-  @Override
   public void openResult() throws IOException {
     openElement(RESULT);
   }
@@ -141,19 +137,19 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void start(final byte[] t) {
-    tag = Token.string(t);
-    atts = new AttributesImpl();
-  }
-
-  @Override
   public void attribute(final byte[] n, final byte[] v) {
     final String an = Token.string(n);
     atts.addAttribute("", an, an, "", Token.string(v));
   }
 
   @Override
-  public void empty() throws IOException {
+  protected void start(final byte[] t) {
+    tag = Token.string(t);
+    atts = new AttributesImpl();
+  }
+
+  @Override
+  protected void empty() throws IOException {
     finish();
     try {
       content.endElement("", tag, tag);
@@ -163,7 +159,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void finish() throws IOException {
+  protected void finish() throws IOException {
     try {
       content.startElement("", tag, tag, atts);
     } catch(final SAXException ex) {
@@ -172,13 +168,17 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void close(final byte[] t) throws IOException {
+  protected void close(final byte[] t) throws IOException {
     try {
       tag = Token.string(t);
       content.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
+  }
+
+  @Override
+  protected void cls() {
   }
 
   @Override

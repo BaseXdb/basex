@@ -68,11 +68,6 @@ public final class DOTSerializer extends Serializer {
   }
 
   @Override
-  public void close() throws IOException {
-    out.println("}");
-  }
-
-  @Override
   public void openResult() { }
 
   @Override
@@ -145,6 +140,11 @@ public final class DOTSerializer extends Serializer {
   public void item(final byte[] t) throws IOException {
     finishElement();
     print(norm(t), COLITEM);
+  }
+
+  @Override
+  public void cls() throws IOException {
+    out.println("}");
   }
 
   /**

@@ -55,8 +55,9 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void close() throws IOException {
+  public void cls() throws IOException {
     if(xml) closeElement();
+    out.close();
   }
 
   @Override

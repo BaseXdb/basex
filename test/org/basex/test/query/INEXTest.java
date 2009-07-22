@@ -6,17 +6,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Result;
+import org.basex.data.XMLSerializer;
+import org.basex.io.PrintOutput;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
+import static org.basex.util.Token.*;
 
 /**
  * INEX Performance Test.
@@ -63,10 +65,9 @@ public final class INEXTest {
     // open query file
     BufferedWriter out =
       new BufferedWriter(new FileWriter(new File("INEX/INEX1.log")));
-    BufferedWriter sub =
-      new BufferedWriter(new FileWriter(new File("INEX/sub")));
+    PrintOutput sub = new PrintOutput("INEX/sub.xml");
+    XMLSerializer xml = new XMLSerializer(sub, false, true);
     
-    //final File file = new File("etc/xml/mv.txt");
     final File file = new File("INEX/co1.que");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
@@ -77,45 +78,30 @@ public final class INEXTest {
 
     if (s) {
       // print header in output file
-      sub.write("<efficiency-submission ");
-      sub.write("participant-id=\"1111111\" ");
-      sub.write("run-id=\"1111111\" ");
-      sub.write("taks=\"" + task[0] + "\" ");
-      sub.write("type=\"" + type[0] + "\" ");
-      sub.write("query=\"automatic\" ");
-      sub.write("sequential=\"yes\"");
-      sub.write(">");
-      sub.newLine();
-      sub.write("<topic-fields ");
-      sub.write("co_title=" + "\"no\" ");
-      sub.write("cas_title=" + "\"no\" ");
-      sub.write("xpath_title=" + "\"yes\" ");
-      sub.write("text_predicates=" + "\"no\" ");
-      sub.write("description=" + "\"no\" ");
-      sub.write("narrative=" + "\"no\" ");
-      sub.write("/>");
-      sub.newLine();
-      sub.write("<general_description>");
-      sub.newLine();
-      sub.write("</general_description>");
-      sub.newLine();
-      sub.write("<ranking_description>");
-      sub.newLine();
-      sub.write("</ranking_description>");
-      sub.newLine();
-      sub.write("<indexing_description>");
-      sub.newLine();
-      sub.write("</indexing_description>");
-      sub.newLine();
-      sub.write("<caching_description>");
-      sub.newLine();
-      sub.write("</caching_description>");
-      sub.newLine();
+      xml.openElement(token("efficiency-submission"), 
+          token("participant-id"), token("1111111"),
+          token("run-id"), token("1111111"),
+          token("taks"), token(task[0]),
+          token("type"), token(type[0]),
+          token("query"), token("automatic"),
+          token("sequential"), token("yes")
+      );
+      xml.emptyElement(token("topic-fields"),
+          token("co_title"), token("no"),
+          token("cas_title"), token("no"),
+          token("xpath_title"), token("yes"),
+          token("text_predicates"), token("no"),
+          token("description"), token("no"),
+          token("narrative"), token("no")
+      );
+      xml.emptyElement(token("general_description"));
+      xml.emptyElement(token("ranking_description"));
+      xml.emptyElement(token("indexing_description"));
+      xml.emptyElement(token("caching_description"));
     }
     
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);
-    //final InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-15");
     final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
     final BufferedReader br = new BufferedReader(isr);
     String line = null;
@@ -125,13 +111,17 @@ public final class INEXTest {
       final int tid = Integer.parseInt(line.substring(s0 + 1, s1));
       s0 = line.indexOf('"', s1 + 1);
       s1 = line.indexOf('"', s0 + 1);
-//      final int ctno = Integer.parseInt(line.substring(s0 + 1, s1));
       
       s0 = line.indexOf('/', s1);
       String q = line.substring(s0);
-      // [CG] I think it's faster to provide a basex function instead 
-      // of using an xquery function to sum up the path - or to store 
-      // it in the index (fastest?)
+
+      // [SG] simple query rewritings to fit queries to our index model
+      // ...some more could be added here, e.g. for (a|b)
+      q = q.replaceAll("\\. ", ".//text() ");
+      
+      // [SG] [...] basex function [...] yes, that's completely ok for the
+      //   first tests. If we discover that index storage will be advantageous.
+      //   we can still work on this later.
       q = xqm + "for $i score $s in " + q + " return (basex:sum-path($i), $s)";
       
       // process query
@@ -144,20 +134,23 @@ public final class INEXTest {
         // extract and print processing time
         final String info = proc.info();
 
+        // [SG] Total Time will only be available after calling proc.output().
+        //   Currently, Parsing time is extracted here (i = -1..)
         int i = info.indexOf("Total Time: ");
         int j = info.indexOf(" ms", i);
+        System.out.println(info);
         String time = info.substring(i + "Total Time: ".length() + 2, j);
       
         if (s) {
-          sub.write("<topic ");
-          sub.write("topic-id=\"" + tid + "\" ");
-          sub.write("total_time_ms=\"" + time + "\" ");
-          sub.write(">");
-          sub.newLine();
-          sub.write("<result>");
-          sub.newLine();
-          sub.write("<file>" + file + "</file>");
-          sub.newLine();
+          xml.openElement(token("topic"),
+              token("topic-id"), token(tid),
+              token("total_time_ms"), token(time)
+          );
+          xml.openElement(token("result"));
+          xml.openElement(token("file"));
+          xml.text(token(file.toString()));
+          xml.closeElement();
+
           Result val = proc.result();
           if (val instanceof SeqIter) {
             SeqIter itr = (SeqIter) val;
@@ -166,34 +159,34 @@ public final class INEXTest {
             int r = 1;
             while ((a = itr.next()) != null) {
               if (a instanceof Str) {
-                sub.write("<path>" + a + "</path>");
-                sub.newLine();
-                sub.write("<rank>" + r++ + "</rank>");
-                sub.newLine();
+                xml.openElement(token("path"));
+                xml.text(a.str());
+                xml.closeElement();
+                xml.openElement(token("rank"));
+                xml.text(token(r++));
+                xml.closeElement();
               } else if (a instanceof Dbl) { 
-                sub.write("<rsv>" + ((Dbl) a).dbl() + "</rsv>");
-                sub.newLine();
+                xml.openElement(token("rsv"));
+                xml.text(a.str());
+                xml.closeElement();
               }
             }
           }
-          sub.write("</result>");
-          sub.newLine();
-          sub.write("</topic>");
-          sub.newLine();
+          xml.closeElement();
+          xml.closeElement();
         }
       }
 
       if(++curr >= STOPAFTER) break;
     }
-    out.flush();
-    out.close();
     br.close();
-    if (s) {
-      sub.write("</efficiency-submission>");
-      sub.flush();
-      sub.close();
 
+    if (s) {
+      xml.closeElement();
     }
+
+    out.close();
+    xml.close();
   }
 
   /**
@@ -205,4 +198,3 @@ public final class INEXTest {
     new INEXTest(args.length == 1 ? args[0] : "pages999");
   }
 }
-

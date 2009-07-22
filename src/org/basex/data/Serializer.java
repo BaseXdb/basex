@@ -31,12 +31,6 @@ public abstract class Serializer {
   // === abstract methods =====================================================
 
   /**
-   * Finishes the serializer.
-   * @throws IOException exception
-   */
-  public abstract void close() throws IOException;
-
-  /**
    * Starts a result.
    * @throws IOException exception
    */
@@ -122,6 +116,12 @@ public abstract class Serializer {
    */
   protected abstract void close(final byte[] t) throws IOException;
 
+  /**
+   * Closes the serializer.
+   * @throws IOException exception
+   */
+  protected abstract void cls() throws IOException;
+
   // === implemented methods ==================================================
 
   /**
@@ -166,15 +166,26 @@ public abstract class Serializer {
 
   /**
    * Opens and closes an empty element.
+   * @param t tag
+   * @param a attributes
+   * @throws IOException exception
+   */
+  public final void emptyElement(final byte[] t, final byte[]... a)
+      throws IOException {
+    openElement(t);
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+    closeElement();
+  }
+
+  /**
+   * Opens and closes an empty element.
    * @param expr expression info
    * @param a attributes
    * @throws IOException exception
    */
   public final void emptyElement(final Expr expr, final byte[]... a)
       throws IOException {
-    openElement(name(expr));
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    closeElement();
+    emptyElement(name(expr), a);
   }
 
   /**
@@ -182,6 +193,7 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final void closeElement() throws IOException {
+    if(tags.size == 0) throw new IOException("All elements closed.");
     ns.size = nsl.list[--tags.size];
     if(inTag) {
       inTag = false;
@@ -192,32 +204,21 @@ public abstract class Serializer {
   }
 
   /**
+   * Closes the serializer.
+   * @throws IOException exception
+   */
+  public void close() throws IOException {
+    cls();
+    if(tags.size > 0) throw new IOException(
+        "<" + string(tags.list[tags.size]) + "> still opened");
+  }
+
+  /**
    * Tests if the serialization was interrupted.
    * @return result of check
    */
   public boolean finished() {
     return false;
-  }
-
-  /**
-   * Returns the name of the specified expression.
-   * @param expr expression
-   * @return name
-   * @throws IOException exception
-   */
-  @SuppressWarnings("unused")
-  protected byte[] name(final ExprInfo expr) throws IOException {
-    return token(expr.name());
-  }
-
-  /**
-   * Finishes a new element node.
-   * @throws IOException exception
-   */
-  protected final void finishElement() throws IOException {
-    if(!inTag) return;
-    inTag = false;
-    finish();
   }
 
   /**
@@ -340,5 +341,28 @@ public abstract class Serializer {
     // process remaining elements...
     while(--l >= 0) closeElement();
     return s;
+  }
+
+  // === protected methods ====================================================
+  
+  /**
+   * Returns the name of the specified expression.
+   * @param expr expression
+   * @return name
+   * @throws IOException exception
+   */
+  @SuppressWarnings("unused")
+  protected byte[] name(final ExprInfo expr) throws IOException {
+    return token(expr.name());
+  }
+
+  /**
+   * Finishes a new element node.
+   * @throws IOException exception
+   */
+  protected final void finishElement() throws IOException {
+    if(!inTag) return;
+    inTag = false;
+    finish();
   }
 }
