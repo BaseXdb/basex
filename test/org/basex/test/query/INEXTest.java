@@ -138,7 +138,6 @@ public final class INEXTest {
         //   Currently, Parsing time is extracted here (i = -1..)
         int i = info.indexOf("Total Time: ");
         int j = info.indexOf(" ms", i);
-        System.out.println(info);
         String time = info.substring(i + "Total Time: ".length() + 2, j);
       
         if (s) {
@@ -154,7 +153,6 @@ public final class INEXTest {
           Result val = proc.result();
           if (val instanceof SeqIter) {
             SeqIter itr = (SeqIter) val;
-            System.out.println(itr.size());
             Item a;
             int r = 1;
             while ((a = itr.next()) != null) {
@@ -174,6 +172,9 @@ public final class INEXTest {
           }
           xml.closeElement();
           xml.closeElement();
+          // [SG] ..to see the results in the output file
+          //   before the code has completely been processed..
+          sub.flush();
         }
       }
 
