@@ -25,7 +25,6 @@ public final class RunTests {
    * @throws Exception exceptions
    */
   public static void main(final String[] args) throws Exception {
-    
     // create input.xml database for XMLDB examples
     final Context ctx = new Context();
     new CreateDB("input.xml").execute(ctx);
