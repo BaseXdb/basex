@@ -67,7 +67,7 @@ final class XMLInput {
    * @throws IOException IO Exception
    */
   int next() throws IOException {
-    if(pp != 0) return last[(lp + pp++) & 0x0F];
+    if(pp != 0) return last[lp + pp++ & 0x0F];
 
     int ch = in[ip].readChar();
     while(ch == 0 && ip != 0) ch = in[--ip].readChar();

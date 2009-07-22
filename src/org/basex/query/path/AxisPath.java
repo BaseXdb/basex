@@ -209,14 +209,12 @@ public class AxisPath extends Path {
         // check if no position is used
         if(!pos) {
           // check index access
-          Expr e = index(ctx, data);
-          if(e != this) {
-            return e;
-          }
+          final Expr e = index(ctx, data);
+          if(e != this) return e;
         }
 
         // check children path rewriting
-        Expr e = children(ctx, data);
+        final Expr e = children(ctx, data);
         if(e != this) return e;
       }
     }

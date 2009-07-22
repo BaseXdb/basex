@@ -22,7 +22,7 @@ import org.basex.gui.GUICommand;
  */
 public final class BaseXPopup extends JPopupMenu {
   /** Popup reference. */
-  private GUICommand[] popup;
+  private final GUICommand[] popup;
   /** Reference to main window. */
   final GUI gui;
 

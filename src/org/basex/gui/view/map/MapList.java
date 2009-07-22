@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-class MapList extends IntList {
+final class MapList extends IntList {
   /** Weights array. */
   double[] weight;
 
@@ -47,7 +47,7 @@ class MapList extends IntList {
 
     // only children
     if(GUIProp.mapweight == 0) {
-      // [JH] neeeded if not all nodes of a level are to be drawn. 
+      // [JH] needed if not all nodes of a level are to be drawn.
       // e.g multiple roots
       for(int i = 0; i < size; i++) {
         weight[i] = (double) ViewData.size(data, list[i]) / nchildren;
@@ -99,7 +99,8 @@ class MapList extends IntList {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName() +
+        "[");
     for(int i = 0; i < size; i++) {
       sb.append((i == 0 ? "" : ", ") + list[i]);
       if(weight != null) sb.append("/" + weight[i]);

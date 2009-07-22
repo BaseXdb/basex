@@ -15,21 +15,21 @@ import java.awt.LayoutManager;
  */
 public final class TableLayout implements LayoutManager {
   /** Number of columns. */
-  private int cols;
+  private final int cols;
   /** Number of rows. */
-  private int rows;
+  private final int rows;
   /** Horizontal inset. */
-  private int insetX;
+  private final int insetX;
   /** Vertical inset. */
-  private int insetY;
+  private final int insetY;
   /** Panel width. */
   private int width;
   /** Panel height. */
   private int height;
   /** Horizontal position. */
-  private int[] posX;
+  private final int[] posX;
   /** Vertical position. */
-  private int[] posY;
+  private final int[] posY;
 
   /**
    * Creates a grid layout with the specified number of rows and columns.

@@ -12,7 +12,7 @@ import org.basex.build.fs.parser.Metadata.Type;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-public class KMLParser extends AbstractParser {
+public final class KMLParser extends AbstractParser {
 
   static {
     NewFSParser.register("kml", KMLParser.class);
@@ -26,7 +26,6 @@ public class KMLParser extends AbstractParser {
   /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel f) {
-    // [BL] Auto-generated method stub
     return true;
   }
 
@@ -43,6 +42,6 @@ public class KMLParser extends AbstractParser {
   @Override
   public void readMeta(final BufferedFileChannel bfc, //
       final NewFSParser fsParser) {
-  // no metadata to read...
+    // no metadata to read...
   }
 }

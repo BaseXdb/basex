@@ -66,7 +66,7 @@ final class TableHeader extends BaseXPanel {
     setMode(Fill.UP);
     tdata = v.tdata;
     view = v;
-    BaseXLayout.setHeight(this, (GUIProp.fontsize + 8) << 1);
+    BaseXLayout.setHeight(this, GUIProp.fontsize + 8 << 1);
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);

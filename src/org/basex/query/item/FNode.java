@@ -36,13 +36,13 @@ public abstract class FNode extends Nod {
     if(id != nod.id) {
       Nod n = this;
       while(n != null) {
-        Nod p = n.parent();
+        final Nod p = n.parent();
         if(p == nod) return 1;
         n = p;
       }
       n = nod;
       while(n != null) {
-        Nod p = n.parent();
+        final Nod p = n.parent();
         if(p == this) return -1;
         n = p;
       }

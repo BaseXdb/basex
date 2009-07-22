@@ -11,17 +11,17 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class IndexStats {
+final class IndexStats {
   /** Minimum occurrences. */
-  private int[] occMin;
+  private final int[] occMin;
   /** Maximum occurrences. */
-  private int[] occMax;
+  private final int[] occMax;
   /** Minimal occurring tokens. */
-  private byte[][] txtMin;
+  private final byte[][] txtMin;
   /** Maximal occurring tokens. */
-  private byte[][] txtMax;
+  private final byte[][] txtMax;
   /** Number of entries to print. */
-  private int nr;
+  private final int nr;
   /** Number of index entries. */
   private int size;
   /** Current number of occurrence. */

@@ -18,7 +18,7 @@ public final class BXDocBuilderFactory extends DocumentBuilderFactory {
       throws ParserConfigurationException {
     try {
       return new BXDocBuilder();
-    } catch (SAXException se) {
+    } catch(final SAXException se) {
       throw new ParserConfigurationException(se.getMessage());
     }
   }

@@ -58,7 +58,7 @@ public final class FTWindow extends FTFilter {
     }
     if(f == null) return false;
 
-    int w = n - pos(f.e, ft) + pos(f.s, ft);
+    final int w = n - pos(f.e, ft) + pos(f.s, ft);
     for(int s = pos(f.s, ft) - w; s <= pos(f.s, ft); s++) {
       boolean h = false;
       for(final FTStringMatch m : mtc) {

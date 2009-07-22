@@ -328,7 +328,7 @@ final class MapFS extends MapPainter {
     g.setFont(mfont);
 
     if (s < fileBuf.length) {
-      byte[] tmp = new byte[(int) s];
+      final byte[] tmp = new byte[(int) s];
       System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
       fileBuf = tmp;
     }

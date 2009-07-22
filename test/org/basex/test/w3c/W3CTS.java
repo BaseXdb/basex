@@ -321,7 +321,7 @@ public abstract class W3CTS {
    * @return percentage
    */
   private String pc(final int v, final int t) {
-    return (t == 0 ? 100 : (v * 10000 / t) / 100d) + "%";
+    return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
   }
 
   /**
@@ -351,7 +351,7 @@ public abstract class W3CTS {
 
     final Context context = new Context();
 
-    Nodes cont = nodes("*:contextItem", root);
+    final Nodes cont = nodes("*:contextItem", root);
     if(cont.size() != 0) new CreateDB(sources + string(
         data.atom(cont.nodes[0])) + ".xml").execute(context, out);
 
@@ -371,7 +371,7 @@ public abstract class W3CTS {
           nodes("*:input-query/@variable", root), pth, qctx);
 
       for(final String s : aux("stopwords", root)) {
-        String fn = stop2.get(s);
+        final String fn = stop2.get(s);
         if(fn != null) {
           if(qctx.ftopt.sw == null) qctx.ftopt.sw = new StopWords();
           qctx.ftopt.sw.read(IO.get(fn), false);
@@ -379,7 +379,7 @@ public abstract class W3CTS {
       }
 
       for(final String s : aux("stemming-dictionary", root)) {
-        String fn = stem.get(s);
+        final String fn = stem.get(s);
         if(fn != null) {
           if(qctx.ftopt.sd == null) qctx.ftopt.sd = new StemDir();
           qctx.ftopt.sd.read(IO.get(fn));
@@ -387,7 +387,7 @@ public abstract class W3CTS {
       }
 
       for(final String s : aux("thesaurus", root)) {
-        String fn = thes2.get(s);
+        final String fn = thes2.get(s);
         if(fn != null) {
           if(qctx.ftopt.th == null) qctx.ftopt.th = new ThesQuery();
           qctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
@@ -408,6 +408,7 @@ public abstract class W3CTS {
         doc &= it.type == Type.DOC;
         it.serialize(xml);
       }
+      xml.close();
       //System.err.println(xq.ctx.root);
 
     } catch(final QueryException ex) {
@@ -436,7 +437,7 @@ public abstract class W3CTS {
     boolean xml = false;
     boolean frag = false;
 
-    StringList result = new StringList();
+    final StringList result = new StringList();
     for(int o = 0; o < outFiles.size(); o++) {
       final String resFile = string(data.atom(outFiles.nodes[o]));
       final IO exp = IO.get(expected + pth + resFile);
@@ -516,7 +517,7 @@ public abstract class W3CTS {
 
             final SeqIter si = new SeqIter();
             int pre = doc ? 0 : 2;
-            int size = rdata.meta.size;
+            final int size = rdata.meta.size;
             while(pre < size) {
               final int k = rdata.kind(pre);
               if(k != Data.TEXT || !ws(rdata.atom(pre))) {

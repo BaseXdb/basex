@@ -18,7 +18,7 @@ import org.basex.io.IO;
  */
 public final class XMLParser extends Parser {
   /** Scanner reference. */
-  private XMLScanner scanner;
+  private final XMLScanner scanner;
   /** Builder reference. */
   private Builder builder;
 

@@ -227,7 +227,7 @@ public final class DialogCreate extends Dialog {
   @Override
   public void action(final String cmd) {
     final boolean ftx = ftxindex.isSelected();
-    for(int f = 0; f < ft.length; f++) ft[f].setEnabled(ftx);
+    for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());

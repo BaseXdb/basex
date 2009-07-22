@@ -258,7 +258,7 @@ public final class FolderView extends View {
     g.setFont(fnt);
     g.setColor(col);
 
-    int yy = y;
+    final int yy = y;
     int tw = totalW + 6;
     if(file && tw - xx > 140) {
       final long size = Token.toLong(data.fs.size(pre));
@@ -481,7 +481,7 @@ public final class FolderView extends View {
         return;
       }
 
-      if((open ^ opened[focusPre]) && (!ViewData.isLeaf(data, focusPre) ||
+      if(open ^ opened[focusPre] && (!ViewData.isLeaf(data, focusPre) ||
           data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = open;
         refreshHeight();

@@ -37,7 +37,7 @@ public final class Scoring {
    * @return result
    */
   public double and(final double o, final double n) {
-    return 1 - ((1 - o) * (1 - n));
+    return 1 - (1 - o) * (1 - n);
   }
 
   /**

@@ -87,12 +87,10 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public Node getFirstChild() {
-    // TestCase "hc_attrsetvalue1" ...correct?
     return new BXText(new FTxt(node.str(), node));
   }
 
   @Override
-  // TestCase "hc_attrchildnodes1" ...correct?
   public NodeList getChildNodes() {
     final NodIter nb = new NodIter();
     nb.add(new FTxt(node.str(), node));

@@ -320,7 +320,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       // show cursor
       if(cursor && text.edited()) {
         xx = x;
-        int p = text.pos();
+        final int p = text.pos();
         while(text.more()) {
           if(text.cursor() == text.pos()) {
             cursor(g, xx);
@@ -342,7 +342,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     final int sl = search.length();
     final int wl = text.length();
     if(wl < sl) return false;
-    int p = text.pos();
+    final int p = text.pos();
     int s = -1;
     while(++s != sl) {
       if(Character.toLowerCase(text.next()) != search.charAt(s)) break;

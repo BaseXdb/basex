@@ -52,7 +52,7 @@ public final class DiskBuilder extends Builder {
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = IO.BLOCKSIZE;
-    while(bs < meta.filesize && bs < (1 << 22)) bs <<= 1;
+    while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
 
     tout = new DataOutput(new TableOutput(db, DATATBL));
     xout = new DataOutput(db, DATATXT, bs);

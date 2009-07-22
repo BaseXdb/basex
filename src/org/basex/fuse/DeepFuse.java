@@ -44,7 +44,7 @@ public abstract class DeepFuse {
    */
   protected String basename(final String path) {
     if(path.compareTo("/") == 0) return path;
-    int s = path.lastIndexOf('/');
+    final int s = path.lastIndexOf('/');
     return path.substring(s + 1, path.length());
   }
 
@@ -62,7 +62,7 @@ public abstract class DeepFuse {
    * @return dirname of path
    */
   protected String dirname(final String path) {
-    int s = path.lastIndexOf('/');
+    final int s = path.lastIndexOf('/');
     return s > 0 ? path.substring(0, s) : "/";
   }
 

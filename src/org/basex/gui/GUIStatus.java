@@ -85,8 +85,8 @@ public final class GUIStatus extends BaseXPanel {
     final int hh = getHeight();
 
     // draw memory box
-    int xe = ww + MEMW - 3;
-    int ye = hh - 2;
+    final int xe = ww + MEMW - 3;
+    final int ye = hh - 2;
     g.setColor(Color.white);
     g.fillRect(ww, 0, MEMW - 1, hh - 2);
     g.setColor(COLORBUTTON);
@@ -99,7 +99,7 @@ public final class GUIStatus extends BaseXPanel {
     g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
 
     // print current memory usage
-    FontMetrics fm = g.getFontMetrics();
+    final FontMetrics fm = g.getFontMetrics();
     final String mem = Performance.format(used, true);
     int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
     final int h = fm.getHeight() - 2;

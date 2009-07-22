@@ -98,8 +98,8 @@ public final class FTWords extends FTExpr {
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
     // scoring: pass on number of tokens
-    double s = fast || c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.count());
-    return new FTItem(all, s);
+    return new FTItem(all, fast || c == 0 ? 0 :
+      ctx.score.word(c, ctx.fttoken.count()));
   }
 
   @Override

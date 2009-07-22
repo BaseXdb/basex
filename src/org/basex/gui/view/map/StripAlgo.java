@@ -8,9 +8,9 @@ import org.basex.gui.GUIProp;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-public class StripAlgo extends MapAlgo{
+final class StripAlgo extends MapAlgo{
   @Override
-  public MapRects calcMap(final MapRect r, final MapList ml,
+  MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne, final int l) {
     // stores all calculated rectangles
     final MapRects rects = new MapRects();
@@ -37,7 +37,7 @@ public class StripAlgo extends MapAlgo{
     if(GUIProp.striphor) {
       while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
         weight += ml.weight[ni];
-        height = (int) ((weight / sumweight) * hh);
+        height = (int) (weight / sumweight * hh);
         height = height > 0 ? height : 1;
 
         final MapRects tmp = new MapRects();
@@ -89,7 +89,7 @@ public class StripAlgo extends MapAlgo{
 
     while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
       weight += ml.weight[ni];
-      width = (int) ((weight / sumweight) * ww);
+      width = (int) (weight / sumweight * ww);
       width = width > 0 ? width : 1;
 
       final MapRects tmp = new MapRects();
@@ -139,7 +139,7 @@ public class StripAlgo extends MapAlgo{
   }
 
   @Override
-  public String getName() {
+  String getName() {
     return "Strip";
   }
 }

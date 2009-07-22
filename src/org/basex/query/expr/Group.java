@@ -52,9 +52,9 @@ public class Group extends Expr {
    * @return i UNION j
    */
   private static int[] merge(final int[]i, final int j) {
-    int[] result = new int[i.length + 1];
+    final int[] result = new int[i.length + 1];
     int counter = 0;
-    for(int k = 0; k < i.length; k++) result[counter++] = i[k];
+    for(final int r : i) result[counter++] = r;
     result[i.length] = j;
     return result;
   }
@@ -65,7 +65,7 @@ public class Group extends Expr {
   protected void group() {
     if(groups == null) groups = new HashMap<Integer, int[]>();
     Item next = null;
-    for(Grp group : this.grp) {
+    for(final Grp group : this.grp) {
       if(group == null) { continue; }
       final int lastitem = sq.size();
       for(int i = 0; i < lastitem; i++) { // check all items matching
@@ -74,10 +74,10 @@ public class Group extends Expr {
         if(next == null)
           continue;
         if(groups.containsKey(next.hash())) {
-          int[] items = groups.get(next.hash());
+          final int[] items = groups.get(next.hash());
           groups.put(next.hash(), merge(items, i));
         } else {
-          int[] vals = {i};
+          final int[] vals = {i};
           groups.put(next.hash(), vals);
         }
       }

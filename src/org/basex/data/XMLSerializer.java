@@ -143,7 +143,7 @@ public final class XMLSerializer extends Serializer {
       final byte ch = b[l];
       if((ch & 0xF0) == 0xF0 && (b[l + 1] & 0x30) != 0) {
         final int v = (ch & 0x07) << 18 | (b[++l] & 0x3F) << 12 |
-          (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
+          (b[++l] & 0x3F) << 6 | b[++l] & 0x3F;
         out.print('&');
         out.print('#');
         out.print(token(v));

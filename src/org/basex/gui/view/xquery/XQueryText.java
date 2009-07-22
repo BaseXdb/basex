@@ -20,7 +20,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class XQueryText extends BaseXText {
+final class XQueryText extends BaseXText {
   /** Error pattern. */
   private static final Pattern ERRPATTERN = Pattern.compile(
       ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
@@ -28,7 +28,7 @@ public class XQueryText extends BaseXText {
   /** Last Query. */
   private byte[] last = Token.EMPTY;
   /** View reference. */
-  private XQueryView view;
+  private final XQueryView view;
 
   /** Last error position. */
   int error = -1;
@@ -39,7 +39,7 @@ public class XQueryText extends BaseXText {
    * Constructor.
    * @param v view reference
    */
-  public XQueryText(final XQueryView v) {
+  XQueryText(final XQueryView v) {
     super(HELPXQUERY, true, v.gui);
 
     view = v;
@@ -112,7 +112,7 @@ public class XQueryText extends BaseXText {
    * @param ok true if query was successful
    * @return error position in text
    */
-  public int error(final String inf, final boolean ok) {
+  int error(final String inf, final boolean ok) {
     if(ok) {
       error = -1;
     } else {

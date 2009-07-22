@@ -10,7 +10,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class DataPool {
+public final class DataPool {
   /** Data references. */
   private Data[] data = new Data[1];
   /** Number of opened database for each reference. */
@@ -63,7 +63,7 @@ public class DataPool {
    * @param db name of the database
    * @return result of check
    */
-  public boolean pinned(final String db) {
+  boolean pinned(final String db) {
     for(int i = 0; i < size; i++) {
       if(data[i].meta.name.equals(db)) return true;
     }

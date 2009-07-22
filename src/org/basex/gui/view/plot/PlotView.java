@@ -616,7 +616,7 @@ public final class PlotView extends View implements Runnable {
             }
 
             l++;
-            a = -1 * (Math.pow(10, l));
+            a = -1 * Math.pow(10, l);
           }
         }
 

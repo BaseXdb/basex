@@ -105,8 +105,7 @@ public final class PlotData {
     }
 
     final int[] contextPres = ctx.nodes;
-    for(int i = 0; i < contextPres.length; i++) {
-      int p = contextPres[i];
+    for(int p : contextPres) {
       final int nl = p + data.size(p, Data.ELEM);
       while(p < nl) {
         final int kind = data.kind(p);

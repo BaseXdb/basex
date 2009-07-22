@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
+import org.basex.io.ConsoleOutput;
 import org.basex.query.QueryProcessor;
 
 /**
@@ -20,7 +20,7 @@ import org.basex.query.QueryProcessor;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
-public class DeepShell {
+public final class DeepShell {
 
   /** Shell command description. */
   @Retention(RetentionPolicy.RUNTIME)
@@ -37,7 +37,7 @@ public class DeepShell {
   }
 
   /** Filesystem reference. */
-  private DeepFS fs;
+  private final DeepFS fs;
 
   /** Shell prompt. */
   private static final String PS1 = "$ ";
@@ -55,7 +55,7 @@ public class DeepShell {
   /** Rudimentary shell. */
   private void loop() {
     do {
-      String[] args = tokenize(input(PS1));
+      final String[] args = tokenize(input(PS1));
       if (args.length != 0) exec(args);
     } while(true);
   }
@@ -66,12 +66,12 @@ public class DeepShell {
    */
   private void exec(final String[] args) {
     try {
-      Method[] ms = this.getClass().getMethods();
-      for(Method m : ms) {
+      final Method[] ms = this.getClass().getMethods();
+      for(final Method m : ms) {
         if(m.isAnnotationPresent(Command.class)) {
-          Command c = m.getAnnotation(Command.class);
+          final Command c = m.getAnnotation(Command.class);
           if(args[0].equals(m.getName())
-              || (args[0].length() == 1 && args[0].charAt(0) == c.shortcut())) {
+              || args[0].length() == 1 && args[0].charAt(0) == c.shortcut()) {
             m.invoke(this, (Object) args);
             return;
           }
@@ -80,7 +80,7 @@ public class DeepShell {
       BaseX.out(
           "%s: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -109,8 +109,8 @@ public class DeepShell {
    * @return argument vector
    */
   private String[] tokenize(final String line) {
-    StringTokenizer st = new StringTokenizer(line);
-    String[] toks = new String[st.countTokens()];
+    final StringTokenizer st = new StringTokenizer(line);
+    final String[] toks = new String[st.countTokens()];
     int i = 0;
     while(st.hasMoreTokens()) {
       toks[i++] = st.nextToken();
@@ -129,7 +129,7 @@ public class DeepShell {
       help(new String[] { "help", "mkdir"});
       return;
     }
-    int err = fs.mkdir(args[1], DeepFuse.S_IFDIR | 0775);
+    final int err = fs.mkdir(args[1], DeepFuse.S_IFDIR | 0775);
     if(err == -1) System.err.printf("mkdir failed. %d\n", err);
   }
 
@@ -144,7 +144,7 @@ public class DeepShell {
       help(new String[] { "help", "rmdir"});
       return;
     }
-    int err = fs.rmdir(args[1]);
+    final int err = fs.rmdir(args[1]);
     if(err != 0) System.err.printf("rmdir failed. %d\n", err);
   }
 
@@ -159,7 +159,7 @@ public class DeepShell {
       help(new String[] { "help", "touch"});
       return;
     }
-    int err = fs.create(args[1], 0100644);
+    final int err = fs.create(args[1], 0100644);
     if(err < 0) System.err.printf("touch failed. %d\n", err);
   }
 
@@ -169,14 +169,14 @@ public class DeepShell {
    */
   @Command(shortcut = 'h', help = "print this message")
   public void help(final String[] args) {
-    Method[] ms = this.getClass().getMethods();
-    for(Method m : ms)
+    final Method[] ms = this.getClass().getMethods();
+    for(final Method m : ms)
       if(m.isAnnotationPresent(Command.class)) {
-        Command c = m.getAnnotation(Command.class);
-        if((args.length == 1 && args[0].charAt(0) == 'h')
-            || (args.length > 1 && m.getName().equals(args[1])
-            || (args.length > 1 && args[1].length() == 1
-                && c.shortcut() == args[1].charAt(0))))
+        final Command c = m.getAnnotation(Command.class);
+        if(args.length == 1 && args[0].charAt(0) == 'h'
+            || args.length > 1 && m.getName().equals(args[1])
+            || args.length > 1 && args[1].length() == 1
+                && c.shortcut() == args[1].charAt(0))
           System.out.printf("%-40s %-40s\n",
               m.getName() + " " + c.args(),
               c.help() + " (" + c.shortcut() + ")");
@@ -204,11 +204,11 @@ public class DeepShell {
     try {
       Nodes n = new Nodes(0, fs.data);
       n = new QueryProcessor("/", n).queryNodes();
-      PrintOutput out = new PrintOutput(System.out);
-      n.serialize(new XMLSerializer(out, false, true));
-      out.println();
-      out.flush();
-    } catch(Exception e) {
+      final ConsoleOutput out = new ConsoleOutput(System.out);
+      final XMLSerializer xml = new XMLSerializer(out, false, true);
+      n.serialize(xml);
+      xml.close();
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

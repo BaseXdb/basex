@@ -19,6 +19,8 @@ import org.basex.BaseX;
 /**
  * Some utility methods for loading class files from folders, packages or jar
  * files.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public final class Loader extends ClassLoader {
@@ -59,41 +61,42 @@ public final class Loader extends ClassLoader {
    */
   public static Class<?>[] load(final Package pkg, //
       final Pattern fileNamePattern) throws IOException {
-    ArrayList<Class<?>> loadedClasses = new ArrayList<Class<?>>();
+    final ArrayList<Class<?>> loadedClasses = new ArrayList<Class<?>>();
     try {
-      String pkgName = pkg.getName();
+      final String pkgName = pkg.getName();
       String pkgPath = pkgName.replace('.', '/');
       if(!pkgPath.startsWith("/")) pkgPath = "/" + pkgPath;
       Matcher matcher;
-      URL pkgUrl = Loader.class.getResource(pkgPath);
+      final URL pkgUrl = Loader.class.getResource(pkgPath);
       if(pkgUrl == null) return new Class<?>[0];
-      File packageDir = new File(pkgUrl.getFile());
+      final File packageDir = new File(pkgUrl.getFile());
       if(packageDir.exists()) { // package located on disk (as directory)
-        for(File f : packageDir.listFiles()) {
+        for(final File f : packageDir.listFiles()) {
           String fileName = f.getName();
           if(!fileName.endsWith(".class")) continue;
           fileName = fileName.substring(0, fileName.length() - 6);
           matcher = fileNamePattern.matcher(fileName);
           if(matcher.matches()) {
-            String clazz = pkgName + "." + fileName;
+            final String clazz = pkgName + "." + fileName;
             loadedClasses.add(Class.forName(clazz));
           }
         }
       } else { // package is inside a JAR file
-        JarURLConnection conn = (JarURLConnection) pkgUrl.openConnection();
-        JarFile jfile = conn.getJarFile();
-        String starts = conn.getEntryName();
-        Enumeration<JarEntry> e = jfile.entries();
+        final JarURLConnection conn =
+          (JarURLConnection) pkgUrl.openConnection();
+        final JarFile jfile = conn.getJarFile();
+        final String starts = conn.getEntryName();
+        final Enumeration<JarEntry> e = jfile.entries();
         while(e.hasMoreElements()) {
           // [BL] avoid sequential scan of ALL jar entries
-          JarEntry entry = e.nextElement();
-          String name = entry.getName();
+          final JarEntry entry = e.nextElement();
+          final String name = entry.getName();
           if(name.startsWith(starts) && //
               name.lastIndexOf('/') <= starts.length() && // skip sub-pkgs
               name.endsWith(".class")) {
             String classname = name.substring(0, name.length() - 6);
-            int i = classname.lastIndexOf('/') + 1;
-            String shortName = classname.substring(i);
+            final int i = classname.lastIndexOf('/') + 1;
+            final String shortName = classname.substring(i);
             matcher = fileNamePattern.matcher(shortName);
             if(matcher.matches()) {
               if(classname.startsWith("/")) classname = classname.substring(1);
@@ -104,9 +107,9 @@ public final class Loader extends ClassLoader {
         }
 
       }
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw e;
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
       BaseX.errln("Failed to load class (%)", t.getMessage());
     }
@@ -143,13 +146,13 @@ public final class Loader extends ClassLoader {
   public static Class<?>[] load(final File directory,
       final Pattern fileNamePattern) throws IOException {
     Matcher matcher;
-    ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
-    ArrayList<File> subClasses = new ArrayList<File>();
-    ArrayList<File> subSubClasses = new ArrayList<File>();
+    final ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
+    final ArrayList<File> subClasses = new ArrayList<File>();
+    final ArrayList<File> subSubClasses = new ArrayList<File>();
     try {
       if(!directory.isDirectory()) throw new IllegalArgumentException(
           "Is not a directory.");
-      for(File f : directory.listFiles()) {
+      for(final File f : directory.listFiles()) {
         String fileName = f.getName();
         fileName = fileName.substring(0, fileName.length() - 6);
         matcher = fileNamePattern.matcher(fileName);
@@ -165,23 +168,23 @@ public final class Loader extends ClassLoader {
             subClasses.add(f);
             continue;
           }
-          Class<?> c = load(f);
+          final Class<?> c = load(f);
           foundClasses.add(c);
         }
       }
       // load subclasses
-      for(File f : subClasses)
+      for(final File f : subClasses)
         load(f);
       // load subsubclasses
-      for(File f : subSubClasses)
+      for(final File f : subSubClasses)
         load(f);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw e;
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
       BaseX.errln("Failed to load class (%)", t.getMessage());
     }
-    int counter = initializeClasses(foundClasses);
+    final int counter = initializeClasses(foundClasses);
     // return only the correctly initialized classes
     return foundClasses.subList(0, counter).toArray(new Class<?>[counter]);
   }
@@ -210,14 +213,14 @@ public final class Loader extends ClassLoader {
    * @throws IOException if one of the classes could not be read.
    */
   public static Class<?>[] load(final JarFile jar) throws IOException {
-    Enumeration<JarEntry> e = jar.entries();
-    ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
-    ArrayList<JarEntry> subClasses = new ArrayList<JarEntry>();
-    ArrayList<JarEntry> subSubClasses = new ArrayList<JarEntry>();
+    final Enumeration<JarEntry> e = jar.entries();
+    final ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
+    final ArrayList<JarEntry> subClasses = new ArrayList<JarEntry>();
+    final ArrayList<JarEntry> subSubClasses = new ArrayList<JarEntry>();
     try {
       while(e.hasMoreElements()) {
-        JarEntry entry = e.nextElement();
-        String name = entry.getName();
+        final JarEntry entry = e.nextElement();
+        final String name = entry.getName();
         if(entry.isDirectory() || name.endsWith("MANIFEST.MF")) {
           continue;
         }
@@ -230,21 +233,21 @@ public final class Loader extends ClassLoader {
           subClasses.add(entry);
           continue;
         }
-        Class<?> c = load(jar, entry);
+        final Class<?> c = load(jar, entry);
         foundClasses.add(c);
       }
       // load subclasses
-      for(JarEntry entry : subClasses)
+      for(final JarEntry entry : subClasses)
         load(jar, entry);
       // load subsubclasses
-      for(JarEntry entry : subSubClasses)
+      for(final JarEntry entry : subSubClasses)
         load(jar, entry);
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw ex;
-    } catch(Throwable t) { // catch all exceptions an JVM errors
+    } catch(final Throwable t) { // catch all exceptions an JVM errors
       BaseX.errln("Failed to load class (%)", t.getMessage());
     }
-    int counter = initializeClasses(foundClasses);
+    final int counter = initializeClasses(foundClasses);
     jar.close();
     // return only the correctly initialized classes
     return foundClasses.subList(0, counter).toArray(new Class<?>[counter]);
@@ -257,11 +260,11 @@ public final class Loader extends ClassLoader {
    * @throws IOException if any error occurs while reading from the file.
    */
   private static Class<?> load(final File f) throws IOException {
-    long len = f.length();
+    final long len = f.length();
     if(len > Integer.MAX_VALUE) throw new IOException(
         "Class file too long to load.");
-    byte[] buf = new byte[(int) len];
-    FileChannel ch = new RandomAccessFile(f, "r").getChannel();
+    final byte[] buf = new byte[(int) len];
+    final FileChannel ch = new RandomAccessFile(f, "r").getChannel();
     ch.read(ByteBuffer.wrap(buf));
     ch.close();
     return INSTANCE.defineClass(null, buf, 0, buf.length);
@@ -276,15 +279,15 @@ public final class Loader extends ClassLoader {
    */
   private static Class<?> load(final JarFile jar, final JarEntry je)
       throws IOException {
-    long len = je.getSize();
+    final long len = je.getSize();
     if(len > Integer.MAX_VALUE) throw new IOException(
         "Class file too long to load.");
     if(len == -1) throw new IOException("Unknown class file size.");
-    InputStream in = jar.getInputStream(je);
-    byte[] buf = new byte[(int) len];
+    final InputStream in = jar.getInputStream(je);
+    final byte[] buf = new byte[(int) len];
     int pos = 0;
     while(len - pos > 0) {
-      int read = in.read(buf, pos, (int) len - pos);
+      final int read = in.read(buf, pos, (int) len - pos);
       if(read == -1) break;
       pos += read;
     }
@@ -300,11 +303,11 @@ public final class Loader extends ClassLoader {
    */
   private static int initializeClasses(final ArrayList<Class<?>> classes) {
     int counter = 0;
-    for(Class<?> c : classes) {
+    for(final Class<?> c : classes) {
       try {
         Class.forName(c.getName(), true, INSTANCE);
         counter++;
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         // catch everything and break after an error.
         BaseX.errln("Failed to load class (%)", t.getMessage());
         break;

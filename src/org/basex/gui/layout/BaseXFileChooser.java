@@ -113,9 +113,9 @@ public final class BaseXFileChooser {
    */
   static class Filter extends FileFilter {
     /** Suffix. */
-    private String[] suf;
+    private final String[] suf;
     /** Description. */
-    private String desc;
+    private final String desc;
 
     /**
      * Constructor.

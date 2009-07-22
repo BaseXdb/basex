@@ -14,7 +14,7 @@ public final class Levenshtein {
   /** Maximum token size. */
   private static final int MAX = 50;
   /** Static matrix for Levenshtein distance. */
-  private int[][] m = new int[MAX + 2][MAX + 2];
+  private final int[][] m = new int[MAX + 2][MAX + 2];
 
   /**
    * Constructor.
@@ -33,7 +33,7 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub) {
-    int tl = token.length;
+    final int tl = token.length;
     if(tl == 0) return false;
     final int sl = sub.length;
 

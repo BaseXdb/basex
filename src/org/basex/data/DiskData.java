@@ -262,7 +262,7 @@ public final class DiskData extends Data {
 
   @Override
   public int tagNS(final int pre) {
-    return (table.read1(pre, 0) >>> 4) & 0x0F;
+    return table.read1(pre, 0) >>> 4 & 0x0F;
   }
 
   @Override
@@ -277,7 +277,7 @@ public final class DiskData extends Data {
 
   @Override
   public int attNS(final int pre) {
-    return (table.read1(pre, 0) >>> 4) & 0x0F;
+    return table.read1(pre, 0) >>> 4 & 0x0F;
   }
 
   @Override
@@ -372,7 +372,7 @@ public final class DiskData extends Data {
       n = q;
     }
     while(n != 0) {
-      final int q = (n * 52429) >>> 19;
+      final int q = n * 52429 >>> 19;
       num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
       n = q;
     }
@@ -453,7 +453,7 @@ public final class DiskData extends Data {
 
     // preserve empty root node
     int p = pre;
-    boolean empty = p == 0 && s == meta.size;
+    final boolean empty = p == 0 && s == meta.size;
     if(empty) {
       p++;
       s = size(p, kind(p));

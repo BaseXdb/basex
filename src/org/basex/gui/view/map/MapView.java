@@ -233,7 +233,7 @@ public final class MapView extends View implements Runnable {
 
       // simple method only scaling all the rectangles including the borders
       hugeRects = new MapRects();
-      for(MapRect r : mainRects) {
+      for(final MapRect r : mainRects) {
         hugeRects.add(new MapRect(fkt * r.x, fkt * r.y, fkt * r.w, fkt * r.h,
             r.pre, r.level));
       }
@@ -692,11 +692,11 @@ public final class MapView extends View implements Runnable {
    * @param s width/height
    * @return new coordinate
    */
-  private double transferFunction(final double v, final double m, 
+  private double transfer(final double v, final double m, 
       final double s) {
 //    double l = 0.5;
 //    return (s + s * Math.tanh(0.02 * (v - m))) / 2 * l + v * (1.0 - l);
-    return (s * Math.tanh(0.008 * (v - m))) + m;
+    return s * Math.tanh(0.008 * (v - m)) + m;
   }
 
   @Override
@@ -709,12 +709,12 @@ public final class MapView extends View implements Runnable {
     mouseY = e.getY();
     if(GUIProp.mapinteraction && e.isControlDown() && mapdist) {
       mapdist = true;
-      Graphics g = mainMap.getGraphics();
+      final Graphics g = mainMap.getGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, getWidth(), getHeight());
 
-      MapRects distRects = new MapRects();
-      for(MapRect r : mainRects) {
+      final MapRects distRects = new MapRects();
+      for(final MapRect r : mainRects) {
 //        int x = (int) (getWidth() + (getWidth() * 
 //            Math.tanh(0.01 * (r.x - mouseX))) / 2);
 //        int w = (int) (getWidth() * 
@@ -722,10 +722,10 @@ public final class MapView extends View implements Runnable {
 //        int y = (int) (getHeight() * Math.tanh(0.01 * (r.y - mouseY)));
 //        int h = (int) (getHeight() * Math.tanh(
 //            0.01 * (r.y + r.h - mouseY)) - y);*/
-        int x = (int) transferFunction(r.x, mouseX, getWidth());
-        int y = (int) transferFunction(r.y, mouseY, getHeight());
-        int w = (int) transferFunction(r.x + r.w, mouseX, getWidth()) - x;
-        int h = (int) transferFunction(r.y + r.h, mouseY, getHeight()) - y;
+        final int x = (int) transfer(r.x, mouseX, getWidth());
+        final int y = (int) transfer(r.y, mouseY, getHeight());
+        final int w = (int) transfer(r.x + r.w, mouseX, getWidth()) - x;
+        final int h = (int) transfer(r.y + r.h, mouseY, getHeight()) - y;
         distRects.add(new MapRect(x, y, w, h, r.pre, r.level));
       }
       mainMap.flush();
@@ -792,7 +792,7 @@ public final class MapView extends View implements Runnable {
       tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
           nodes.size() - 1, 0);
 
-      MapRects rects = new MapRects();
+      final MapRects rects = new MapRects();
       rects.add(focused);
 
       painter.init(tinyLayout.rectangles.copy());
@@ -918,11 +918,11 @@ public final class MapView extends View implements Runnable {
       // [JH] to be included only in test versions
     } else if(GUIProp.mapinteraction && key == KeyEvent.VK_1) {
       try {
-        File file1 = new File("baseXTM.png");
+        final File file1 = new File("baseXTM.png");
         ImageIO.write(mainMap, "png", file1);
-        File file2 = new File("baseXhugeTM.png");
+        final File file2 = new File("baseXhugeTM.png");
         ImageIO.write(hugeMap, "png", file2);
-      } catch(IOException exc) {
+      } catch(final IOException exc) {
         exc.printStackTrace();
       }
     }

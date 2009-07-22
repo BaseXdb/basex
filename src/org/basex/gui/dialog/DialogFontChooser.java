@@ -21,15 +21,15 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogFontChooser extends Dialog {
   /** Font name chooser. */
-  private BaseXListChooser font;
+  private final BaseXListChooser font;
   /** Font name chooser. */
-  private BaseXListChooser font2;
+  private final BaseXListChooser font2;
   /** Font type chooser. */
-  private BaseXListChooser type;
+  private final BaseXListChooser type;
   /** Font size chooser. */
-  private BaseXListChooser size;
+  private final BaseXListChooser size;
   /** Anti-Aliasing mode. */
-  private BaseXCombo aalias;
+  private final BaseXCombo aalias;
 
   /**
    * Default Constructor.
@@ -41,7 +41,7 @@ public final class DialogFontChooser extends Dialog {
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
-    BaseXBack p = new BaseXBack();
+    final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(2, 4, 6, 6));
 
     font = new BaseXListChooser(fonts, HELPFONT, this);

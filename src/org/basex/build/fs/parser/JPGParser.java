@@ -3,7 +3,6 @@ package org.basex.build.fs.parser;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -11,7 +10,7 @@ import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
 import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.Type;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * Parser for JPG files.
@@ -20,7 +19,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public class JPGParser extends AbstractParser {
+public final class JPGParser extends AbstractParser {
 
   static {
     NewFSParser.register("jpg", JPGParser.class);
@@ -72,12 +71,12 @@ public class JPGParser extends AbstractParser {
       @Override
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
-        int type = buf.getShort();
+        final int type = buf.getShort();
         if((type == IFD_TYPE_LONG || type == IFD_TYPE_SHORT)
             && buf.getInt() == 1) {
           obj.fsparser.metaEvent(Element.WIDTH, DataType.INTEGER,
               Definition.PIXEL, null,
-              Token.token((long) buf.getInt() & 0xFFFFFFFF));
+              token((long) buf.getInt() & 0xFFFFFFFF));
         } else error(obj, "Image width (0x0100)");
       }
     },
@@ -86,12 +85,12 @@ public class JPGParser extends AbstractParser {
       @Override
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
-        int type = buf.getShort();
+        final int type = buf.getShort();
         if((type == IFD_TYPE_LONG || type == IFD_TYPE_SHORT)
             && buf.getInt() == 1) {
           obj.fsparser.metaEvent(Element.WIDTH, DataType.INTEGER,
               Definition.PIXEL, null,
-              Token.token((long) buf.getInt() & 0xFFFFFFFF));
+              token((long) buf.getInt() & 0xFFFFFFFF));
         } else error(obj, "Image length (0x0101)");
       }
     },
@@ -114,7 +113,7 @@ public class JPGParser extends AbstractParser {
         if(buf.getShort() == IFD_TYPE_ASCII && buf.getInt() == 20) {
           obj.bfc.position(ifdOff + buf.getInt());
           obj.bfc.buffer(20);
-          byte[] data = new byte[20];
+          final byte[] data = new byte[20];
           obj.bfc.get(data);
           obj.fsparser.metaEvent(Element.DATE, DataType.DATETIME,
               Definition.CREATE_TIME, null, ParserUtil.convertDateTime(data));
@@ -137,13 +136,13 @@ public class JPGParser extends AbstractParser {
       @Override
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
-        int type = buf.getShort();
+        final int type = buf.getShort();
         byte[] value = null;
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_LONG) {
-            value = Token.token((long) buf.getInt() & 0xFFFFFFFF);
+            value = token((long) buf.getInt() & 0xFFFFFFFF);
           } else if(type == IFD_TYPE_SHORT) {
-            value = Token.token(buf.getShort() & 0xFFFF);
+            value = token(buf.getShort() & 0xFFFF);
           }
         }
         if(value != null) {
@@ -157,12 +156,12 @@ public class JPGParser extends AbstractParser {
       @Override
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
-        int type = buf.getShort();
+        final int type = buf.getShort();
         if((type == IFD_TYPE_LONG || type == IFD_TYPE_SHORT)
             && buf.getInt() == 1) {
           obj.fsparser.metaEvent(Element.HEIGHT, DataType.INTEGER,
               Definition.PIXEL, null,
-              Token.token((long) buf.getInt() & 0xFFFFFFFF));
+              token((long) buf.getInt() & 0xFFFFFFFF));
         } else error(obj, "Exif Image Height (0xA003)");
       }
     },
@@ -222,8 +221,8 @@ public class JPGParser extends AbstractParser {
    *           channel.
    */
   byte[] readAscii(final ByteBuffer buf, final long ifdOff) throws IOException {
-    int size = buf.getInt();
-    byte[] data = new byte[size];
+    final int size = buf.getInt();
+    final byte[] data = new byte[size];
     if(size <= 4) { // data is inlined
       buf.get(data);
     } else {
@@ -231,12 +230,13 @@ public class JPGParser extends AbstractParser {
       bfc.buffer(size);
       bfc.get(data);
     }
-    return Token.trim(data);
+    return trim(data);
   }
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
   private static final byte[] HEADER_EXIF = //
-  { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
+    { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
+
   /**
    * <p>
    * JFIF header.
@@ -247,7 +247,8 @@ public class JPGParser extends AbstractParser {
    * </ul>
    */
   private static final byte[] HEADER_JFIF = //
-  { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
+    { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
+
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
   private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00};
 
@@ -303,8 +304,8 @@ public class JPGParser extends AbstractParser {
    *         otherwise.
    */
   private boolean checkNextBytes(final byte[] a) {
-    int len = a.length;
-    byte[] a2 = new byte[len];
+    final int len = a.length;
+    final byte[] a2 = new byte[len];
     bfc.get(a2, 0, len);
     for(int i = 0; i < len; i++)
       if(a[i] != a2[i]) return false;
@@ -324,8 +325,8 @@ public class JPGParser extends AbstractParser {
       return;
     }
     while(bfc.get() == 0xFF) {
-      int b = bfc.get(); // segment marker
-      int size = readSize();
+      final int b = bfc.get(); // segment marker
+      final int size = readSize();
       switch(b) {
         case 0xE0: // JFIF
           readJFIF(size);
@@ -355,12 +356,12 @@ public class JPGParser extends AbstractParser {
   private void readDimensions() throws IOException {
     if(bfc.get() == 8) {
       bfc.buffer(8);
-      int width = bfc.getShort();
-      int height = bfc.getShort();
+      final int width = bfc.getShort();
+      final int height = bfc.getShort();
       fsparser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL,
-          null, Token.token(width));
+          null, token(width));
       fsparser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
-          null, Token.token(height));
+          null, token(height));
     } else {
       if(NewFSParser.VERBOSE) BaseX.debug("Wrong data precision field (%).",
           bfc.getFileName());
@@ -375,13 +376,13 @@ public class JPGParser extends AbstractParser {
    */
   private void readJFIF(final int size) throws IOException {
     bfc.buffer(16); // standard JFIF segment has 16 bytes
-    long pos = bfc.position();
+    final long pos = bfc.position();
     if(!checkNextBytes(HEADER_JFIF)) {
       bfc.position(pos);
       readJFXX(size);
       return;
     }
-    int s = size - HEADER_JFIF.length;
+    final int s = size - HEADER_JFIF.length;
 
     bfc.skip(s);
   }
@@ -393,7 +394,7 @@ public class JPGParser extends AbstractParser {
    */
   private void readJFXX(final int size) throws IOException {
     // method is only called from readJFIF() which cares about buffering
-    long pos = bfc.position();
+    final long pos = bfc.position();
     if(!checkNextBytes(HEADER_JFXX)) {
       bfc.position(pos + size);
       return;
@@ -414,7 +415,7 @@ public class JPGParser extends AbstractParser {
             MimeType.UNKNOWN, bfc.absolutePosition(), s);
         fsparser.metaEvent(Element.DESCRIPTION, DataType.STRING,
             Definition.NONE, null,
-            Token.token("Thumbnail coded using 1 byte/pixel."));
+            token("Thumbnail coded using 1 byte/pixel."));
         break;
       case 0x13: // Thumbnail coded using 3 bytes/pixel
         width = bfc.get();
@@ -424,16 +425,16 @@ public class JPGParser extends AbstractParser {
             MimeType.UNKNOWN, bfc.absolutePosition(), s);
         fsparser.metaEvent(Element.DESCRIPTION, DataType.STRING,
             Definition.NONE, null,
-            Token.token("Thumbnail coded using 3 bytes/pixel."));
+            token("Thumbnail coded using 3 bytes/pixel."));
         break;
       default:
         BaseX.debug("JPGParser: Illegal or unsupported JFIF header (%)",
             bfc.getFileName());
     }
     fsparser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL, null,
-        Token.token(width));
+        token(width));
     fsparser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
-        null, Token.token(height));
+        null, token(height));
     fsparser.fileEndEvent();
     bfc.skip(s);
   }
@@ -444,7 +445,7 @@ public class JPGParser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   private void readComment(final int size) throws IOException {
-    byte[] array = new byte[size];
+    final byte[] array = new byte[size];
     bfc.get(array);
     fsparser.metaEvent(Element.COMMENT, DataType.STRING, Definition.NONE, null,
         ParserUtil.checkAscii(array));
@@ -457,15 +458,15 @@ public class JPGParser extends AbstractParser {
    * @see <a href="http://www.Exif.org/Exif2-2.PDF">Exif 2.2</a>
    */
   private void readExif(final int size) throws IOException {
-    int len = HEADER_EXIF.length;
+    final int len = HEADER_EXIF.length;
     bfc.buffer(len + 8);
-    long pos = bfc.position();
+    final long pos = bfc.position();
     if(checkNextBytes(HEADER_EXIF) && //
         checkEndianness() && //
         bfc.get() == 0x00 && //
         bfc.get() == 0x2A) {
 
-      int ifdOffset = bfc.getInt();
+      final int ifdOffset = bfc.getInt();
       /*
        * The IFD offset value counts the number of bytes from the first byte
        * after the Exif header. At this point, 8 more bytes have been read
@@ -496,10 +497,10 @@ public class JPGParser extends AbstractParser {
    */
   void readIFD() throws IOException {
     bfc.buffer(2);
-    long pos = bfc.position() - 8;
-    int numFields = bfc.getShort();
+    final long pos = bfc.position() - 8;
+    final int numFields = bfc.getShort();
     // one field contains 12 bytes
-    byte[] buf = new byte[numFields * 12];
+    final byte[] buf = new byte[numFields * 12];
     bfc.get(buf);
     for(int i = 0; i < numFields; i++) {
       readField(pos, ByteBuffer.wrap(buf, i * 12, 12));
@@ -518,9 +519,9 @@ public class JPGParser extends AbstractParser {
     final int tagNr = data.getShort() & 0xFFFF;
     try {
       // System.out.println("h" + Integer.toHexString(tagNr));
-      IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
+      final IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
       tag.parse(this, ifdOffset, data);
-    } catch(IllegalArgumentException e) { /* */}
+    } catch(final IllegalArgumentException e) { /* */}
   }
 
   /**
@@ -529,8 +530,8 @@ public class JPGParser extends AbstractParser {
    * @return true if the endianness bytes are valid, false otherwise.
    */
   private boolean checkEndianness() {
-    int b1 = bfc.get();
-    int b2 = bfc.get();
+    final int b1 = bfc.get();
+    final int b2 = bfc.get();
     if(b1 == 0x49 && b2 == 0x49) {
       bfc.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       return true;

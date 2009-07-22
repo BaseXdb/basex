@@ -95,9 +95,9 @@ public final class BXPathExpression implements XPathExpression {
     }
 
     try {
-      CachedOutput out = new CachedOutput();
+      final CachedOutput out = new CachedOutput();
       item.serialize(new XMLSerializer(out));
-      String val = out.toString();
+      final String val = out.toString();
       if(res == XPathConstants.NUMBER) return Double.valueOf(val);
       if(res == XPathConstants.STRING) return val;
       if(res == XPathConstants.BOOLEAN) return Boolean.valueOf(val);

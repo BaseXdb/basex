@@ -119,7 +119,7 @@ public final class Satisfy extends Expr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    for(int i = 0; i < fl.length; i++) sb.append(" " + fl[i]);
+    for(final For f : fl) sb.append(" " + f);
     return sb.append(" " + SATISFIES + " " + sat).toString();
   }
 }

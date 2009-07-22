@@ -214,7 +214,7 @@ public final class Order extends Expr {
       throws QueryException {
     return d(o, a, b) < 0 ?
         (d(o, b, c) < 0 ? b : d(o, a, c) < 0 ? c : a) :
-        (d(o, b, c) > 0 ? b : d(o, a, c) > 0 ? c : a);
+        d(o, b, c) > 0 ? b : d(o, a, c) > 0 ? c : a;
   }
 
   /**

@@ -27,9 +27,9 @@ public final class BaseXSlider extends BaseXPanel {
   private ActionListener al;
 
   /** Minimum slider value. */
-  private int min;
+  private final int min;
   /** Maximum slider value. */
-  private int max;
+  private final int max;
   /** Current slider value. */
   private int curr;
   /** Current slider value. */

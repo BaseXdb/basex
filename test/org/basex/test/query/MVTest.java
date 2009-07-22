@@ -40,7 +40,7 @@ public final class MVTest {
     new Open(db).execute(context, null);
 
     // open query file
-    BufferedWriter out =
+    final BufferedWriter out =
       new BufferedWriter(new FileWriter(new File("mv1.log")));
     //final File file = new File("etc/xml/mv.txt");
     final File file = new File("mv.txt");
@@ -115,7 +115,7 @@ public final class MVTest {
 
         int i = info.indexOf("Total Time: ");
         int j = info.indexOf(" ms", i);
-        String time = info.substring(i + "Total Time: ".length(), j);
+        final String time = info.substring(i + "Total Time: ".length(), j);
         //time = time.replace('.', ',');
         i = info.indexOf("Results   : ");
         j = info.indexOf(" Item", i);

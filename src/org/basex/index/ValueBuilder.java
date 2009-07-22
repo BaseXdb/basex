@@ -46,7 +46,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
     final int max = (int) (IO.dbfile(db, f).length() >>> 7);
-    while(cap < max && cap < (1 << 24)) cap <<= 1;
+    while(cap < max && cap < 1 << 24) cap <<= 1;
 
     total = data.meta.size;
     final int type = text ? Data.TEXT : Data.ATTR;

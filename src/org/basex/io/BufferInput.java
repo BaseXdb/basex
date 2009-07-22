@@ -193,8 +193,8 @@ public class BufferInput {
     // support encodings..
     byte ch = readByte();
     // comparison by references
-    if(enc == UTF16LE) return (ch & 0xFF) | ((readByte() & 0xFF) << 8);
-    if(enc == UTF16BE) return ((ch & 0xFF) << 8) | readByte() & 0xFF;
+    if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;
+    if(enc == UTF16BE) return (ch & 0xFF) << 8 | readByte() & 0xFF;
     if(enc == UTF8) {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;

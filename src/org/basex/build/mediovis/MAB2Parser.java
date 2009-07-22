@@ -16,7 +16,6 @@ import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.TokenMap;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -123,7 +122,7 @@ public final class MAB2Parser extends Parser {
 
     // find maximum mediovis id
     for(int i = 1; i <= mvids.size(); i++) {
-      final int id = Token.toInt(mvids.value(i));
+      final int id = toInt(mvids.value(i));
       if(maxid < id) maxid = id;
     }
 
@@ -318,13 +317,13 @@ public final class MAB2Parser extends Parser {
       if(l > 3) {
         if(line[0] == '#') continue;
 
-        final int n = Token.toInt(line, 0, 3);
+        final int n = toInt(line, 0, 3);
         if(n == 1) {
           if(bibID == null) {
             bibID = string(line);
             mvID = mvids.get(bibID);
             if(mvID == null) {
-              mvID = Token.token(++maxid);
+              mvID = token(++maxid);
               mvids.add(bibID, mvID);
             }
           }
@@ -379,7 +378,7 @@ public final class MAB2Parser extends Parser {
         atts.reset();
         atts.add(MV_ID, mvID);
         atts.add(BIB_ID, bibID);
-        if(sub != 0 && !Prop.mab2flat) atts.add(MAX, Token.token(sub));
+        if(sub != 0 && !Prop.mab2flat) atts.add(MAX, token(sub));
 
         // merge super and sub titles
         if(last != null) {
@@ -470,11 +469,11 @@ public final class MAB2Parser extends Parser {
     }
     if(i - 5 != j) return yr;
 
-    int oy = yr != null ? Token.toInt(yr) : 0;
+    int oy = yr != null ? toInt(yr) : 0;
     if(oy >= 1400 && oy <= 1950) return yr;
 
     final byte[] y = Array.create(line, j + 1, 4);
-    oy = Token.toInt(y);
+    oy = toInt(y);
     return oy >= 1500 && oy <= 2050 ? y : yr;
   }
 

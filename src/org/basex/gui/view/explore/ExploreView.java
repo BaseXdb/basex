@@ -67,7 +67,7 @@ public final class ExploreView extends View {
     filter = GUIToolBar.newButton(GUICommands.FILTER, gui);
     filter.addKeyListener(this);
 
-    BaseXBack sp = new BaseXBack(Fill.NONE);
+    final BaseXBack sp = new BaseXBack(Fill.NONE);
     sp.setLayout(new TableLayout(1, 5));
     sp.add(go);
     sp.add(Box.createHorizontalStrut(1));

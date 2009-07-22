@@ -4,6 +4,8 @@ import static org.basex.util.Token.token;
 
 /**
  * Constants for file metadata and content representation.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public final class Metadata {
@@ -250,11 +252,11 @@ public final class Metadata {
     TABLE_OF_CONTENTS("table of contents"),
 
     // element "audience"
-    /** Receipient of the document. */
-    RECEIPIENT("receipient"),
-    /** Carbon copy receipient. */
+    /** Recipient of the document. */
+    RECIPIENT("recipient"),
+    /** Carbon copy recipient. */
     CC("cc"),
-    /** Blind carbon copy receipient. */
+    /** Blind carbon copy recipient. */
     BCC("bcc"),
 
     // elements "width" and "height"

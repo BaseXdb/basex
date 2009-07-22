@@ -13,7 +13,7 @@ import org.basex.util.Tokenizer;
  */
 public final class ThesQuery {
   /** Thesaurus root references. */
-  private ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
+  private final ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
 
   /**
    * Merges two thesaurus definitions.

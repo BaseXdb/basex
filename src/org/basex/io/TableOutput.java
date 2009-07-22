@@ -33,7 +33,7 @@ public final class TableOutput extends FileOutputStream {
 
   /**
    * Initializes the output.
-   * DBSUFFIX will be added to all filenames.
+   * The database suffix will be added to all filenames.
    * @param db name of the database
    * @param fn the file to be written to
    * @throws IOException IO Exception

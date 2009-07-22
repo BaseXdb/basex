@@ -28,8 +28,6 @@ public interface FSText {
   byte[] TYPEBMP = token("bmp");
   /** JPEG suffix. */
   byte[] TYPEJPEG = token("jpeg");
-  /** TIF suffix. */
-  byte[] TYPETIF = token("tif");
   /** EML suffix. */
   byte[] TYPEEML = token("eml");
   /** MBS suffix. */
@@ -66,10 +64,6 @@ public interface FSText {
 
   /** ID3v2 error message. */
   String ID3V2ERROR = "- ID3 Tags not found (%)";
-  /** ID3v2 parsing stopped. */
-  String ID3SIZE1 = "- ID3 '%' -> '%' Tag Size = % (%)";
-  /** ID3v2 parsing stopped. */
-  String ID3SIZE2 = "- ID3 '%' Tag Size = % (%)";
   /** ID3v2 invalid. */
   String ID3INVALID = "- ID3 Header invalid (%)";
   /** ID3v2 parsing stopped. */
@@ -89,8 +83,6 @@ public interface FSText {
   byte[] MP3EMPH = token("Emphasis");
   /** MP3 info. */
   byte[] MP3SEC = token("Seconds");
-  /** MP3 info. */
-  byte[] MP3PAD = token("Padding");
   /** MP3 info. */
   byte[] MP3ENCODE = token("Encoding");
 
@@ -124,8 +116,6 @@ public interface FSText {
   byte[] MP3XING = token("Xing");
   /** ID3v2.x.y version number. */
   byte[] ID3VERS = token("version");
-  /** ID3v2.x.y flag info id3v2.4.0-structure.txt l.144ff. */
-  byte[] ID3FLAG_UNSYNC = token("unsynchronised");
   /** ID3v2.x.y flag info id3v2.4.0-structure.txt l.151ff. */
   byte[] ID3FLAG_EXTHEA = token("extendedheader");
   /** ID3v2.x.y flag info id3v2.4.0-structure.txt l.159ff. */
@@ -150,8 +140,6 @@ public interface FSText {
   byte[] EMAIL = token("Mail");
   /** Email section. */
   byte[] EMLBODY = token("Section");
-  /** Email section. */
-  byte[] EMLATTACHMENT = token("Section");
 
   /** Email subject info. */
   byte[] EMLSUBJECT = token("Subject");

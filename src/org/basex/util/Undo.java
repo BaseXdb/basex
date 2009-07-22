@@ -10,9 +10,9 @@ public final class Undo {
   /** Maximum number of strings to be stored. */
   private static final int MAX = 200;
   /** String history. */
-  private byte[][] hist = new byte[MAX][];
+  private final byte[][] hist = new byte[MAX][];
   /** Cursor history. */
-  private int[] cur = new int[MAX];
+  private final int[] cur = new int[MAX];
   /** Maximum of stored entries. */
   private int max;
   /** History position. */

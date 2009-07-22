@@ -95,9 +95,9 @@ public class BaseXServerNew {
   public void stop() {
     for(int i = 0; i < sessions.size(); i++) {
       try {
-        Session s = sessions.get(i);
+        final Session s = sessions.get(i);
         s.socket.close();
-      } catch(IOException e) {
+      } catch(final IOException e) {
         e.printStackTrace();
       }
     }
@@ -106,7 +106,7 @@ public class BaseXServerNew {
         inputListener.thread = null;
         serverSocket.close();
         new Exit().execute(null);
-      } catch(IOException e) {
+      } catch(final IOException e) {
         e.printStackTrace();
       }
   }
@@ -184,15 +184,15 @@ public class BaseXServerNew {
         // get user input
         try {
           final InputStreamReader isr = new InputStreamReader(System.in);
-          String com = new BufferedReader(isr).readLine().trim();
+          final String com = new BufferedReader(isr).readLine().trim();
           if(com.equals("stop")) {
             stop();
           } else if(com.equals("list")) {
-            int size = sessions.size();
+            final int size = sessions.size();
             BaseX.outln("Number of Clients: " + size);
             BaseX.outln("List of Clients:");
             for(int i = 0; i < size; i++) {
-              Session session = sessions.get(i);
+              final Session session = sessions.get(i);
               String dbname = "No Database opened.";
               if(session.context.data() != null) {
                 dbname = session.context.data().meta.name;
@@ -251,10 +251,10 @@ public class BaseXServerNew {
         try {
           s = serverSocket.accept();
           lastid++;
-          Session session = new Session(s, lastid, verbose, bx);
+          final Session session = new Session(s, lastid, verbose, bx);
           session.start();
           sessions.add(session);
-        } catch(IOException e) {
+        } catch(final IOException e) {
           if(e instanceof SocketException) return;
           e.printStackTrace();
         }

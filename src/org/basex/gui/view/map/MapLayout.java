@@ -157,7 +157,7 @@ final class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if((w < off && h < off) || w <= 2 || h <= 2 || GUIProp.mapfs && 
+    if(w < off && h < off || w <= 2 || h <= 2 || GUIProp.mapfs && 
         ViewData.isLeaf(data, r.pre)) {
       r.isLeaf = true;
       rectangles.add(r);

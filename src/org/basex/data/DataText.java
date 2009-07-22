@@ -44,8 +44,6 @@ public interface DataText {
   String DBTXTINDEX = "TXTINDEX";
   /** Attribute indexing. */
   String DBATVINDEX = "ATVINDEX";
-  /** Word indexing. */
-  String DBWRDINDEX = "WRDINDEX";
   /** Full-text indexing. */
   String DBFTXINDEX = "FTXINDEX";
   /** Full-text fuzzy indexing. */

@@ -10,7 +10,7 @@ import static org.basex.query.QueryTokens.*;
  */
 public class Replace extends Arr {
   /** 'Value of' flag. */
-  private boolean value;
+  private final boolean value;
 
   /**
    * Constructor.

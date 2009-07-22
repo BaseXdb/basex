@@ -9,7 +9,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTPos {
+public final class FTPos {
   /** Positions. */
   public int[] pos;
   /** Pointers. */

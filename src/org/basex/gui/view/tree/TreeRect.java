@@ -7,8 +7,7 @@ import org.basex.gui.view.ViewRect;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
-public class TreeRect extends ViewRect {
-
+final class TreeRect extends ViewRect {
   /**
    * array containing all pre values inside the rectangle.
    */

@@ -212,7 +212,7 @@ public final class BaseXLayout {
         }
     
         if(e.isControlDown()) {
-          int fs = GUIProp.fontsize;
+          final int fs = GUIProp.fontsize;
           if(code == '+' || code == '-' || code == '=') {
             GUIProp.fontsize = Math.max(1, GUIProp.fontsize +
                 (code == '-' ? -1 : 1));
@@ -433,7 +433,7 @@ public final class BaseXLayout {
       sw += width(g, cw, cp(s, k));
       if(sw >= ww) return -1;
     }
-    return (ww - sw - 2) >> 1;
+    return ww - sw - 2 >> 1;
   }
 
   /**

@@ -17,7 +17,7 @@ public final class Dec extends Item {
   /** Zero value. */
   public static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
-  private BigDecimal val;
+  private final BigDecimal val;
 
   /**
    * Constructor.

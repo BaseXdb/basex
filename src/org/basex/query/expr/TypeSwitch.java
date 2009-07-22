@@ -17,7 +17,7 @@ import org.basex.query.util.Var;
  */
 public final class TypeSwitch extends Expr {
   /** Default return expression. */
-  private Expr ret;
+  private final Expr ret;
   /** Typeswitch expression. */
   private Expr ts;
   /** Expression list. */

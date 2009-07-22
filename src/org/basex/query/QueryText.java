@@ -488,8 +488,6 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTCAST = "Casting %";
-  /** Optimization info. */
   String OPTDESC = "Merging descendant-or-self step(s)";
   /** Optimization info. */
   String OPTPRE = "Pre-evaluating %";
@@ -523,8 +521,6 @@ public interface QueryText {
   String OPTRNGINDEX = "Applying range index";
   /** Optimization info. */
   String OPTEMPTY = "Removing empty sequences.";
-  /** Optimization info. */
-  String OPTPOS = "Adding position predicate";
   /** Optimization info. */
   String OPTNOINDEX = "Removing path with no index results";
   /** Optimization info. */

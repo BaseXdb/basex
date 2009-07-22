@@ -10,7 +10,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ChildIterator {
+final class ChildIterator {
   /** Data reference. */
   final Data data;
   /** Maximum size. */
@@ -23,7 +23,7 @@ public final class ChildIterator {
    * @param d data reference
    * @param p value of directory node
    */
-  public ChildIterator(final Data d, final int p) {
+  ChildIterator(final Data d, final int p) {
     data = d;
     init(p);
   }
@@ -32,7 +32,7 @@ public final class ChildIterator {
    * Initializes the iterator.
    * @param p root pre value
    */
-  public void init(final int p) {
+  void init(final int p) {
     final int k = data.kind(p);
     size = p + data.size(p, k);
     pre = p + data.attSize(p, k);
@@ -42,7 +42,7 @@ public final class ChildIterator {
    * Returns if the node offers more children.
    * @return result of check
    */
-  public boolean more() {
+  boolean more() {
     return pre < size;
   }
 
@@ -50,7 +50,7 @@ public final class ChildIterator {
    * Returns the pre value of the next child.
    * @return next child reference.
    */
-  public int next() {
+  int next() {
     final int p = pre;
     pre += data.size(pre, data.kind(pre));
     return p;
@@ -61,7 +61,7 @@ public final class ChildIterator {
    * creating the class instance.
    * @return children array
    */
-  public int[] all() {
+  int[] all() {
     final IntList il = new IntList();
     while(more()) il.add(next());
     return il.finish();

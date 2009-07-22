@@ -141,7 +141,7 @@ public final class FSParser extends Parser {
 
     // -- create backing store (DeepFS depends on it).
     if(Prop.fuse && !singlemode) {
-      File bs = new File(mybackingpath);
+      final File bs = new File(mybackingpath);
       if (!bs.mkdirs() && bs.exists())
           throw new IOException(BACKINGEXISTS + mybackingpath);
     }
@@ -210,14 +210,14 @@ public final class FSParser extends Parser {
     try {
       final InputStream in = new FileInputStream(src);
       final OutputStream out = new FileOutputStream(dst);
-      byte[] buf = new byte[4096];
+      final byte[] buf = new byte[4096];
       int len;
 
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
 
       in.close();
       out.close();
-    } catch (final IOException e) {
+    } catch(final IOException e) {
       e.getMessage();
     }
   }

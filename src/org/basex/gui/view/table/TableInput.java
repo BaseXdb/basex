@@ -14,7 +14,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class TableInput implements Runnable {
+final class TableInput implements Runnable {
   /** Panel reference. */
   final BaseXPanel panel;
   /** Flashing cursor. */

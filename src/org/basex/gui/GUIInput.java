@@ -145,7 +145,7 @@ public final class GUIInput extends BaseXTextField {
    * Completes the input with the current combobox choice.
    */
   protected void completeInput() {
-    Object sel = box.getSelectedItem();
+    final Object sel = box.getSelectedItem();
     if(sel == null) return;
     final String suf = sel.toString();
     final int pl = pre.length();

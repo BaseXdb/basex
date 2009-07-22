@@ -2,7 +2,6 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DataType;
@@ -10,19 +9,19 @@ import org.basex.build.fs.parser.Metadata.Definition;
 import org.basex.build.fs.parser.Metadata.Element;
 import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.Type;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * Parser for MP3 audio files.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
- * 
+ *
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>
  * @see <a href="http://www.id3.org/id3v2.4.0-frames">ID3v2.4.0 frames</a>
  */
-public class MP3Parser extends AbstractParser {
+public final class MP3Parser extends AbstractParser {
 
   // ---------------------------------------------------------------------------
   // ----- static stuff --------------------------------------------------------
@@ -234,27 +233,27 @@ public class MP3Parser extends AbstractParser {
   };
 
   /** All available picture types for APIC frames. */
-  private static final String[] PICTURE_TYPE = new String[] { "Other", //
-      "file icon", //
-      "Other file icon", //
-      "Front cover", //
-      "Back cover", //
-      "Leaflet page", //
-      "Media - e.g. label side of CD", //
-      "Lead artist or lead performer or soloist", //
-      "Artist or performer", //
-      "Conductor", //
-      "Band or Orchestra", //
-      "Composer", //
-      "Lyricist or text writer", //
-      "Recording Location", //
-      "During recording", //
-      "During performance", //
-      "Movie or video screen capture", //
-      "A bright coloured fish", //
-      "Illustration", //
-      "Band or artist logotype", //
-      "Publisher or Studio logotype"};
+  private static final String[] PICTURE_TYPE = new String[] { "Other",
+    "file icon",
+    "Other file icon",
+    "Front cover",
+    "Back cover",
+    "Leaflet page",
+    "Media - e.g. label side of CD",
+    "Lead artist or lead performer or soloist",
+    "Artist or performer",
+    "Conductor",
+    "Band or Orchestra",
+    "Composer",
+    "Lyricist or text writer",
+    "Recording Location",
+    "During recording",
+    "During performance",
+    "Movie or video screen capture",
+    "A bright coloured fish",
+    "Illustration",
+    "Band or artist logotype",
+    "Publisher or Studio logotype"};
 
   /** Flag for ISO-8859-1 encoding. */
   private static final int ENC_ISO_8859_1 = 0;
@@ -331,7 +330,7 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the file.
    */
   private boolean checkID3v1() throws IOException {
-    long size = bfc.size();
+    final long size = bfc.size();
     if(size < 128) return false;
     // ID3v1 tags are located at the end of the file (last 128 bytes)
     // The tag begins with the string "TAG" (first three bytes)
@@ -347,31 +346,31 @@ public class MP3Parser extends AbstractParser {
    */
   private void readMetaID3v1() throws IOException {
     // tag is already buffered by checkID3v1()
-    byte[] array = new byte[30];
+    final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
-    if(!Token.ws(array)) fsparser.metaEvent(Element.TITLE, DataType.STRING,
+    if(!ws(array)) fsparser.metaEvent(Element.TITLE, DataType.STRING,
         Definition.NONE, null, array);
     bfc.get(array, 0, 30);
-    if(!Token.ws(array)) fsparser.metaEvent(Element.CREATOR, DataType.STRING,
+    if(!ws(array)) fsparser.metaEvent(Element.CREATOR, DataType.STRING,
         Definition.ARTIST, null, array);
     bfc.get(array, 0, 30);
-    if(!Token.ws(array)) fsparser.metaEvent(Element.ALBUM, DataType.STRING,
+    if(!ws(array)) fsparser.metaEvent(Element.ALBUM, DataType.STRING,
         Definition.NONE, null, array);
-    byte[] a2 = new byte[4];
+    final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
-    if(!Token.ws(array)) fsparser.metaEvent(Element.DATE, DataType.YEAR,
+    if(!ws(array)) fsparser.metaEvent(Element.DATE, DataType.YEAR,
         Definition.RELEASE_TIME, null, ParserUtil.convertYear(a2));
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
         fsparser.metaEvent(Element.TRACK, DataType.INTEGER, Definition.NONE,
-            null, Token.token(array[29]));
+            null, token(array[29]));
         array[29] = 0;
       }
     }
-    if(!Token.ws(array)) fsparser.metaEvent(Element.COMMENT, DataType.STRING,
+    if(!ws(array)) fsparser.metaEvent(Element.COMMENT, DataType.STRING,
         Definition.NONE, null, array);
-    int genreId = bfc.get() & 0xFF;
+    final int genreId = bfc.get() & 0xFF;
     if(genreId != 0) {
       fsparser.metaEvent(Element.GENRE, DataType.STRING, Definition.NONE, null,
           getGenre(genreId));
@@ -389,7 +388,7 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the file.
    */
   private boolean checkID3v2() throws IOException {
-    int size = HEADER_LENGTH + MINIMAL_FRAME_SIZE;
+    final int size = HEADER_LENGTH + MINIMAL_FRAME_SIZE;
     if(bfc.size() < size) return false;
     // ID3v2 tags are usually located at the beginning of the file.
     // The tag begins with the string "ID3" (first three bytes)
@@ -398,7 +397,7 @@ public class MP3Parser extends AbstractParser {
   }
 
   /**
-   * Reads the ID3v2 metadata from the file. The behaviour is undefined if there
+   * Reads the ID3v2 metadata from the file. The behavior is undefined if there
    * is no ID3v2 tag available, therefore {@link #checkID3v1()} should always be
    * called before.
    * @throws IOException if any error occurs while reading the ID3v2 tag.
@@ -411,7 +410,7 @@ public class MP3Parser extends AbstractParser {
     while(size >= MINIMAL_FRAME_SIZE) {
       // abort if all "interesting" frames have been read
       // if(remainingFrames == 0) break;
-      int res = readID3v2Frame();
+      final int res = readID3v2Frame();
       if(res > 0) {
         size -= res;
         // remainingFrames--;
@@ -444,18 +443,18 @@ public class MP3Parser extends AbstractParser {
    */
   private int readID3v2Frame() throws IOException {
     bfc.buffer(MINIMAL_FRAME_SIZE);
-    byte[] frameId = new byte[4];
+    final byte[] frameId = new byte[4];
     // padding (some 0x00 bytes) marks correct end of frames.
     if((frameId[0] = (byte) bfc.get()) == 0) return Integer.MAX_VALUE;
     bfc.get(frameId, 1, 3);
-    int frameSize = readSynchsafeInt();
+    final int frameSize = readSynchsafeInt();
     bfc.skip(2); // skip flags
     Frame frame;
     try {
-      frame = Frame.valueOf(Token.string(frameId));
+      frame = Frame.valueOf(string(frameId));
       frame.parse(this, frameSize);
       return frameSize;
-    } catch(IllegalArgumentException e) {
+    } catch(final IllegalArgumentException e) {
       return -frameSize;
     }
   }
@@ -471,7 +470,7 @@ public class MP3Parser extends AbstractParser {
    * @return the textual representation of the genre.
    */
   static byte[] getGenre(final int b) {
-    return b < GENRES.length && b >= 0 ? GENRES[b] : Token.EMPTY;
+    return b < GENRES.length && b >= 0 ? GENRES[b] : EMPTY;
   }
 
   /**
@@ -486,7 +485,7 @@ public class MP3Parser extends AbstractParser {
     return (bfc.get() & 0xFF) << 21 //
         | (bfc.get() & 0xFF) << 14 //
         | (bfc.get() & 0xFF) << 7 //
-        | (bfc.get() & 0xFF);
+        | bfc.get() & 0xFF;
   }
 
   /**
@@ -516,7 +515,7 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   String readEncoding() throws IOException {
-    int c = bfc.get();
+    final int c = bfc.get();
     switch(c) {
       case ENC_ISO_8859_1:
         return "ISO-8859-1";
@@ -543,8 +542,7 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   byte[] readText(final int s) throws IOException {
-    if(s <= 1) return Token.EMPTY;
-    return readText(s, readEncoding());
+    return s <= 1 ? EMPTY : readText(s, readEncoding());
   }
 
   /**
@@ -557,16 +555,16 @@ public class MP3Parser extends AbstractParser {
    */
   byte[] readText(final int s, final String encoding) throws IOException {
     int size = s;
-    if(size <= 1 || encoding == null) return Token.EMPTY;
+    if(size <= 1 || encoding == null) return EMPTY;
     if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
     else size--;
     if(encoding.length() == 0) { // no encoding specified
-      byte[] array = new byte[size];
+      final byte[] array = new byte[size];
       bfc.get(array);
       return ParserUtil.checkAscii(array);
     }
-    byte[] array = new byte[size - 1];
-    return Token.token(new String(bfc.get(array), encoding));
+    final byte[] array = new byte[size - 1];
+    return token(new String(bfc.get(array), encoding));
   }
 
   /**
@@ -576,18 +574,18 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the file.
    */
   byte[] readGenre(final int s) throws IOException {
-    byte[] value = readText(s);
+    final byte[] value = readText(s);
     int id;
-    if(!Token.ws(value)) {
+    if(!ws(value)) {
       if(value[0] == '(') { // ignore brackets around genre id
         int limit = 1;
         while(value[limit] >= '0' && value[limit] <= '9' && limit < s)
           limit++;
-        id = Token.toInt(value, 1, limit);
-      } else id = Token.toInt(value);
+        id = toInt(value, 1, limit);
+      } else id = toInt(value);
       return id == Integer.MIN_VALUE ? value : getGenre(id);
     }
-    return Token.EMPTY;
+    return EMPTY;
   }
 
   /**
@@ -600,19 +598,19 @@ public class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the file.
    */
   byte[] readTrack(final int s) throws IOException {
-    byte[] value = readText(s);
-    int size = value.length;
-    if(size == 0) return Token.EMPTY;
+    final byte[] value = readText(s);
+    final int size = value.length;
+    if(size == 0) return EMPTY;
     int i = 0;
     while(i < size && (value[i] < '0' || value[i] > '9')) {
       value[i++] = 0;
     }
-    if(i >= size) return Token.EMPTY;
+    if(i >= size) return EMPTY;
     while(i < size && value[i] >= '0' && value[i] <= '9')
       i++;
     while(i < size)
       value[i++] = 0;
-    return Token.chopNumber(value);
+    return chopNumber(value);
   }
 
   /**
@@ -623,7 +621,7 @@ public class MP3Parser extends AbstractParser {
   String readPicSuffix() throws IOException {
     bfc.buffer(9);
     skipEncBytes();
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     int b;
     while((b = bfc.get()) != 0)
       sb.append((char) b);
@@ -648,7 +646,7 @@ public class MP3Parser extends AbstractParser {
     // there may be more than one APIC frame with the same ID in the ID3 tag
     // [BL] avoid duplicate file names
     bfc.buffer(1);
-    int typeId = bfc.get() & 0xFF;
+    final int typeId = bfc.get() & 0xFF;
     if(typeId >= 0 && typeId < PICTURE_TYPE.length) {
       return PICTURE_TYPE[typeId];
     }
@@ -663,7 +661,7 @@ public class MP3Parser extends AbstractParser {
     while(true) {
       try {
         if(bfc.get() == 0) break;
-      } catch(BufferUnderflowException e) {
+      } catch(final BufferUnderflowException e) {
         bfc.buffer(1);
       }
     }
@@ -715,8 +713,8 @@ public class MP3Parser extends AbstractParser {
     TCON {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        byte[] value = obj.readGenre(size);
-        if(!Token.ws(value)) {
+        final byte[] value = obj.readGenre(size);
+        if(!ws(value)) {
           obj.fsparser.metaEvent(Element.GENRE, DataType.STRING,
               Definition.NONE, null, value);
         }
@@ -726,11 +724,11 @@ public class MP3Parser extends AbstractParser {
     COMM {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        String encoding = obj.readEncoding();
+        final String encoding = obj.readEncoding();
         byte[] lang = obj.readText(3, "");
-        for(byte b : lang) {
-          if(Token.ws(b) || b == 0) {
-            lang = Token.EMPTY;
+        for(final byte b : lang) {
+          if(ws(b) || b == 0) {
+            lang = EMPTY;
             break;
           }
         }
@@ -739,7 +737,7 @@ public class MP3Parser extends AbstractParser {
         while(obj.bfc.get() != 0 && ++pos < size)
           ;
         if(pos >= size) return;
-        if(Token.ws(lang) || lang[0] == 'X') lang = null;
+        if(ws(lang) || lang[0] == 'X') lang = null;
         obj.fsparser.metaEvent(Element.COMMENT, DataType.STRING,
             Definition.NONE, lang, obj.readText(size - pos, encoding));
       }
@@ -765,9 +763,9 @@ public class MP3Parser extends AbstractParser {
     APIC {
       @Override
       void parse(final MP3Parser obj, final int s) throws IOException {
-        long position = obj.bfc.position();
+        final long position = obj.bfc.position();
         String suffix = obj.readPicSuffix();
-        String name = obj.getPicName();
+        final String name = obj.getPicName();
         obj.skipPicDescription();
         if(suffix == null) {
           // perhaps, MIME type is missing...
@@ -781,11 +779,11 @@ public class MP3Parser extends AbstractParser {
             return;
           }
         }
-        int size = s - (int) (obj.bfc.position() - position);
+        final int size = s - (int) (obj.bfc.position() - position);
         try {
           obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
               suffix);
-        } catch(IOException e) {
+        } catch(final IOException e) {
           if(NewFSParser.VERBOSE) BaseX.debug(
               "MP3Parser: Failed to parse APIC frame (%).",
               e.getMessage() == null ? obj.bfc.getFileName() : e.getMessage());

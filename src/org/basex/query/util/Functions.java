@@ -21,7 +21,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.Levenshtein;
-import org.basex.util.Token;
 
 /**
  * Global expression context.
@@ -65,13 +64,13 @@ public final class Functions extends ExprInfo {
     }
 
     // check Java functions - not supported in server mode
-    if(!Prop.server && Token.startsWith(uri, JAVAPRE)) {
-      final String c = Token.string(Token.substring(uri, JAVAPRE.length));
+    if(!Prop.server && startsWith(uri, JAVAPRE)) {
+      final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);
       sb.append(".");
       boolean dash = false;
-      for(final char b : Token.string(ln).toCharArray()) {
+      for(final char b : string(ln).toCharArray()) {
         if(dash) {
           sb.append(Character.toUpperCase(b));
           dash = false;
@@ -99,7 +98,7 @@ public final class Functions extends ExprInfo {
     // find local function
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      if(Token.eq(ln, qn.ln()) && eq(uri, qn.uri.str()) &&
+      if(eq(ln, qn.ln()) && eq(uri, qn.uri.str()) &&
           args.length == func[l].args.length) return new FunCall(l, args);
     }
 
@@ -148,7 +147,7 @@ public final class Functions extends ExprInfo {
       final byte[] u = qn.uri.str();
       final byte[] nm = qn.ln();
 
-      if(Token.eq(ln, nm) && eq(uri, u) &&
+      if(eq(ln, nm) && eq(uri, u) &&
           fun.args.length == func[l].args.length) {
         if(!func[l].decl) {
           func[l] = fun;
@@ -189,13 +188,13 @@ public final class Functions extends ExprInfo {
    */
   public void funError(final QNm name) throws QueryException {
     // find function
-    final byte[] nm = Token.lc(name.ln());
+    final byte[] nm = lc(name.ln());
     FNIndex.get().error(nm);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     for(int n = 0; n < size; n++) {
-      if(ls.similar(nm, Token.lc(func[n].var.name.ln())))
+      if(ls.similar(nm, lc(func[n].var.name.ln())))
         Err.or(FUNSIMILAR, name.str(), func[n].var.name.str());
     }
   }

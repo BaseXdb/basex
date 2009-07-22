@@ -157,7 +157,7 @@ public final class Values extends Index {
   private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
-      final int m = (l + h) >>> 1;
+      final int m = l + h >>> 1;
       final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
       final int pre = idxl.readNum();

@@ -127,7 +127,7 @@ public final class DialogMapInfo extends Dialog {
     ntime.setText(time);
     otime.setText(timeo);
 
-    double nps = nn / Double.valueOf(time.replace(" ms", "").
+    final double nps = nn / Double.valueOf(time.replace(" ms", "").
         replace(" (avg)", ""));
     onps.setText(nnps.getText());
     nnps.setText(f.format(nps));

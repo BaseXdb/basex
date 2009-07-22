@@ -12,9 +12,9 @@ import org.basex.BaseX;
  */
 public final class TableMemAccess extends TableAccess {
   /** Long buffer array. */
-  private long[] buf1;
+  private final long[] buf1;
   /** Long buffer array. */
-  private long[] buf2;
+  private final long[] buf2;
 
   /**
    * Stores the file content in a long array.
@@ -68,7 +68,7 @@ public final class TableMemAccess extends TableAccess {
        ((long) (array[j + 4] & 0xFF) << 24) +
        ((array[j + 5] & 0xFF) << 16) +
        ((array[j + 6] & 0xFF) <<  8) +
-       ((array[j + 7] & 0xFF));
+       (array[j + 7] & 0xFF);
   }
 
   @Override

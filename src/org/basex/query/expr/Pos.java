@@ -60,7 +60,7 @@ public final class Pos extends Simple {
 
     if(!arg.i()) return expr;
 
-    Item it = (Item) arg;
+    final Item it = (Item) arg;
     if(it.n()) {
       final long p = it.itr();
       final boolean ex = p == it.dbl();

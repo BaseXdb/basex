@@ -2146,8 +2146,8 @@ public class QueryParser extends InputParser {
         if(r == null) error(FTRANGE);
         expr = new FTDistance(expr, r, ftUnit());
       } else if(consumeWS(AT)) {
-        boolean start = consumeWS(START);
-        boolean end = !start && consumeWS(END);
+        final boolean start = consumeWS(START);
+        final boolean end = !start && consumeWS(END);
         if(!start && !end) error(INCOMPLETE);
         expr = new FTContent(expr, start, end);
       } else if(consumeWS(ENTIRE)) {
@@ -2567,7 +2567,7 @@ public class QueryParser extends InputParser {
     do {
       final Var v = new Var(varName());
       check(ASSIGN);
-      Expr e = check(single(), INCOMPLETE);
+      final Expr e = check(single(), INCOMPLETE);
       ctx.vars.add(v);
       fl = Array.add(fl, new For(e, v, null, null));
     } while(consumeWS(COMMA));

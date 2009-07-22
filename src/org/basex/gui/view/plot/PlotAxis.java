@@ -113,7 +113,7 @@ public final class PlotAxis {
     final int[] items = plotData.pres;
     if(items.length < 1) return;
     co = new double[items.length];
-    byte[][] vals = new byte[items.length][];
+    final byte[][] vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
       byte[] value = getValue(items[i]);
       if(type == Kind.TEXT && value.length > TEXTLENGTH) {
@@ -154,7 +154,7 @@ public final class PlotAxis {
     while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
 
     // count number of unique values
-    Set set = new Set();
+    final Set set = new Set();
     for(final byte[] v : vals) set.add(v);
     nrCats = set.size();
     if(i > 0) nrCats--;
@@ -177,7 +177,7 @@ public final class PlotAxis {
       // calculating positions for all items with value b in current category.
       while(i < l) {
         // centering items if only a single category exists (.5d)
-        final double d = nrCats != 1 ? (1.0d / (nrCats - 1)) * p : .5d;
+        final double d = nrCats != 1 ? 1.0d / (nrCats - 1) * p : .5d;
         co[tmpI[i]] = d;
         i++;
       }
@@ -215,7 +215,7 @@ public final class PlotAxis {
     final Data data = plotData.context.data();
     if(data.fs != null && !isTag && attrID == data.fs.mtimeID) {
       range = ln(max - min);
-      return 1 - (1 / range * (ln(max - d)));
+      return 1 - 1 / range * ln(max - d);
     }
 
     range = logMax - logMin;
@@ -226,9 +226,9 @@ public final class PlotAxis {
       // (needed for mirroring, s.a.)
       final double p = 1 / (logMin + logMax) * logMin;
       if(d == 0) return p;
-      if(d < 0) return 1.0d - (1 - p) - (1.0d / logMin * ln(d) * p);
+      if(d < 0) return 1.0d - (1 - p) - 1.0d / logMin * ln(d) * p;
 
-      return p + (1.0d / logMax * ln(d) * (1 - p));
+      return p + 1.0d / logMax * ln(d) * (1 - p);
     }
 
     // case 2 and 0
@@ -319,20 +319,20 @@ public final class PlotAxis {
     if(range < 1) {
       final double dec = 1.0d / range;
       double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 1) * 2;
-      final double fac = (int) (Math.pow(10, pow));
+      final double fac = (int) Math.pow(10, pow);
       final double tmin = min * fac;
       final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
 
-      pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-      calculatedCaptionStep = (int) (Math.pow(10, pow));
+      pow = range < 10 ? 0 : (int) Math.floor(Math.log10(range) + .5d) - 1;
+      calculatedCaptionStep = (int) Math.pow(10, pow);
       calculatedCaptionStep /= fac;
       return;
     }
 
     final int pow = range < 10 ? 0 :
-      (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-    calculatedCaptionStep = (int) (Math.pow(10, pow));
+      (int) Math.floor(Math.log10(range) + .5d) - 1;
+    calculatedCaptionStep = (int) Math.pow(10, pow);
   }
 
   /**
@@ -377,7 +377,7 @@ public final class PlotAxis {
         nrCaptions = (int) (range / actlCaptionStep);
       }
       // calculate first value to be drawn
-      startvalue = min + (actlCaptionStep - (min % actlCaptionStep));
+      startvalue = min + actlCaptionStep - min % actlCaptionStep;
       if(startvalue - min < actlCaptionStep / 4) startvalue += actlCaptionStep;
 
       // type == TEXT / CAT

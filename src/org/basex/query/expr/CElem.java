@@ -103,7 +103,7 @@ public final class CElem extends CFrag {
       if(uri.length != 0) {
         final byte[] key = tname.pre();
         if(!eq(key, XML)) {
-          int i = nsp.get(key);
+          final int i = nsp.get(key);
           if(i == -1 || !eq(nsp.val[i], uri)) nsp.add(key, uri);
         }
       }

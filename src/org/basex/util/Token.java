@@ -190,14 +190,12 @@ public final class Token {
     // 110xxxxx 10xxxxxx
     final int c = v >> 4;
     int l = p;
-    if(c == 12 || c == 13)
-      return (v & 0x1F) << 6 | (t[++l] & 0x3F);
+    if(c == 12 || c == 13) return (v & 0x1F) << 6 | t[++l] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx
-    if(c == 14) return (v & 0x0F) << 12 |
-      (t[++l] & 0x3F) << 6 | (t[++l] & 0x3F);
+    if(c == 14) return (v & 0x0F) << 12 | (t[++l] & 0x3F) << 6 | t[++l] & 0x3F;
     // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
     return (v & 0x07) << 18 | (t[++l] & 0x3F) << 12 |
-      (t[++l] & 0x3F) << 6 | (t[++l] & 0x3F);
+      (t[++l] & 0x3F) << 6 | t[++l] & 0x3F;
   }
 
   /**
@@ -257,7 +255,7 @@ public final class Token {
       n = q;
     }
     while(n != 0) {
-      final int q = (n * 52429) >>> 19;
+      final int q = n * 52429 >>> 19;
       num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
       n = q;
     }

@@ -325,13 +325,13 @@ public class IntList {
   private int m(final int a, final int b, final int c) {
     return list[a] < list[b] ?
       (list[b] < list[c] ? b : list[a] < list[c] ? c : a) :
-      (list[b] > list[c] ? b : list[a] > list[c] ? c : a);
+      list[b] > list[c] ? b : list[a] > list[c] ? c : a;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "[");
-    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + list[i]);
-    return sb.append("]").toString();
+    final TokenBuilder sb = new TokenBuilder(getClass().getSimpleName() + "[");
+    for(int i = 0; i < size; i++) sb.add((i == 0 ? "" : ",") + list[i]);
+    return sb.add("]").toString();
   }
 }

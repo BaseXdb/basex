@@ -44,7 +44,7 @@ public final class QueryTest {
    * Constructor.
    */
   private QueryTest() {
-    Performance p = new Performance();
+    final Performance p = new Performance();
     Prop.textindex = true;
     Prop.attrindex = true;
     //Prop.mainmem = true;
@@ -112,7 +112,7 @@ public final class QueryTest {
         counter++;
   
         if(proc.execute(CONTEXT)) {
-          Result val = proc.result();
+          final Result val = proc.result();
           final Result cmp = correct ? (Result) qu[1] : null;
           if(val instanceof Nodes && cmp instanceof Nodes) {
             ((Nodes) cmp).data = ((Nodes) val).data;

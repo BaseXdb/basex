@@ -6,7 +6,7 @@ package org.basex.data;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTStringMatch implements Comparable<FTStringMatch> {
+public final class FTStringMatch implements Comparable<FTStringMatch> {
   /** Query position. */
   public byte q;
   /** Start position. */

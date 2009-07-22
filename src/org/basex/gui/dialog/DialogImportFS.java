@@ -47,17 +47,17 @@ public final class DialogImportFS extends Dialog {
   /** Database info. */
   private final BaseXLabel info;
   /** Parsing complete filesystem. */
-  private BaseXCheckBox all;
+  private final BaseXCheckBox all;
   /** Browse button. */
-  private BaseXButton button;
+  private final BaseXButton button;
   /** ID3 parsing. */
-  private BaseXCheckBox meta;
+  private final BaseXCheckBox meta;
   /** Context inclusion. */
-  private BaseXCheckBox cont;
+  private final BaseXCheckBox cont;
   /** Button panel. */
-  private BaseXBack buttons;
+  private final BaseXBack buttons;
   /** ComboBox. */
-  private BaseXCombo maxsize;
+  private final BaseXCombo maxsize;
 
   /**
    * Default Constructor.

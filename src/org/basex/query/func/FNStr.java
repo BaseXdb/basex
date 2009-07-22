@@ -101,7 +101,7 @@ final class FNStr extends Fun {
         if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] str = checkStr(e, ctx);
         final byte[] sa = checkStr(expr[1], ctx);
-        int pa = indexOf(str, sa);
+        final int pa = indexOf(str, sa);
         return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
           Str.ZERO;
       case SUBBEFORE:
@@ -362,6 +362,6 @@ final class FNStr extends Fun {
   private static void hex(final TokenBuilder tb, final byte b) {
     tb.add('%');
     tb.add(HEX[(b & 0xFF) >> 4]);
-    tb.add(HEX[(b & 0xFF) & 15]);
+    tb.add(HEX[b & 0xFF & 15]);
   }
 }

@@ -87,8 +87,8 @@ public final class CommandParser extends InputParser {
     if(!more()) return list;
 
     while(true) {
-      Cmd cmd = consume(Cmd.class, null);
-      Process proc = parse(cmd);
+      final Cmd cmd = consume(Cmd.class, null);
+      final Process proc = parse(cmd);
       list = Array.add(list, proc);
       consumeWS();
       if(!more()) return list;

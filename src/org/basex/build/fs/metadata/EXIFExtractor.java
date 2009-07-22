@@ -91,7 +91,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
   private void scan(final int start) throws MetaDataException {
     final int entries = getShort(start);
     final int s = start + 2;
-    final int end = s + (entries * 0x0C);
+    final int end = s + entries * 0x0C;
 
     for(int e = s; e < end; e += 0x0C) {
       final int tagnr = getShort(e); // Tag Number
@@ -172,7 +172,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
           } else {
             final int i = Integer.parseInt(vv[0]);
             final double d = Double.parseDouble(vv[1]);
-            v = Token.token((int) ((i / d) * 10000) / 10.0);
+            v = Token.token((int) (i / d * 10000) / 10.0);
           }
           exif.add(EXPOS);
           exif.add(v);

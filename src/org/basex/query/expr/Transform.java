@@ -10,7 +10,7 @@ import static org.basex.query.QueryTokens.*;
  */
 public class Transform extends Arr {
   /** Transform expressions. */
-  private ForLet[] fl;
+  private final ForLet[] fl;
 
   /**
    * Constructor.
@@ -27,7 +27,7 @@ public class Transform extends Arr {
   @Override
   public String toString() {
     String s = "";
-    for(ForLet t : fl) {
+    for(final ForLet t : fl) {
       s += t.var + ASSIGN + t.expr;
     }
     return COPY + s + MODIFY + expr[0] + RETURN + expr[1];

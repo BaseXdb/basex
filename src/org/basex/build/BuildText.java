@@ -17,8 +17,6 @@ public interface BuildText {
   String CLOSINGTAG = "%: </%> found, </%> expected.";
   /** Builder error: Tag Mismatch. */
   String MOREROOTS = "%: More than one root node: '<%>'";
-  /** Builder error: Attribute Duplicates. */
-  String DUPLATT = "%: Tag contains duplicate attribute '%'.";
   /** Parser Error. */
   String PARSEINVALID = "%: % expected, % found.";
 

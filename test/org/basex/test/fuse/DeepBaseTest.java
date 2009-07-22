@@ -136,11 +136,11 @@ public class DeepBaseTest {
    */
   private void loadTestDB() {
     try {
-      Context ctx = new Context();
+      final Context ctx = new Context();
       ctx.data(CreateDB.xml(new XMLParser(
           IO.get("test/org/basex/test/fuse/getattrtest.xml")), "DBNAME"));
       dbfs.data = ctx.data();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
       fail("Problem loading test database.");
     }
@@ -155,17 +155,17 @@ public class DeepBaseTest {
     try {
       Nodes n = new Nodes(0, dbfs.data);
       n = new QueryProcessor(query, n).queryNodes();
-      PrintOutput out = new PrintOutput(TESTFILE);
-      n.serialize(new XMLSerializer(out));
-      out.flush();
+      final XMLSerializer xml = new XMLSerializer(new PrintOutput(TESTFILE));
+      n.serialize(xml);
+      xml.close();
 
-      FileInputStream f = new FileInputStream(TESTFILE);
-      StringBuilder sb = new StringBuilder();
-      byte[] b = new byte[IO.BLOCKSIZE];
+      final FileInputStream f = new FileInputStream(TESTFILE);
+      final StringBuilder sb = new StringBuilder();
+      final byte[] b = new byte[IO.BLOCKSIZE];
       while(f.read(b) != -1) sb.append(new String(b));
       System.err.println(sb.toString());
       return sb.toString();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       return "";
     }

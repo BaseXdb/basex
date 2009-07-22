@@ -19,7 +19,7 @@ import org.basex.util.Token;
  */
 public final class Instance extends Single {
   /** Instance. */
-  private SeqType seq;
+  private final SeqType seq;
 
   /**
    * Constructor.

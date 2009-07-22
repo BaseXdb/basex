@@ -18,9 +18,10 @@ import org.basex.io.IO;
  * This implementation is optimized for sequential reading of a file or a
  * fragment of a file.
  * </p>
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-public class BufferedFileChannel {
+public final class BufferedFileChannel {
   /** The file we are reading from. */
   private final File f;
   /** The underlying {@link FileChannel} instance. */
@@ -123,7 +124,7 @@ public class BufferedFileChannel {
    */
   public BufferedFileChannel subChannel(final int bytesToRead)
       throws IOException {
-    long remaining = bytesToRead - buf.remaining();
+    final long remaining = bytesToRead - buf.remaining();
     if(remaining > rem) throw new IllegalArgumentException(
         "Requested number of bytes to read is too large.");
     rem -= remaining;
@@ -137,11 +138,11 @@ public class BufferedFileChannel {
    */
   public void skip(final long n) throws IOException {
     if(n == 0) return;
-    int buffered = buf.remaining();
+    final int buffered = buf.remaining();
     if(n > 0) {
       if(rem + buffered < n) throw new EOFException(f.getAbsolutePath());
       if(buffered < n) {
-        long skip = n - buffered;
+        final long skip = n - buffered;
         fc.position(fc.position() + skip);
         buf.position(buf.limit());
         rem -= skip;
@@ -152,10 +153,10 @@ public class BufferedFileChannel {
     } else { // n < 0
       if(n < -position()) throw new IllegalArgumentException(
           "Negative channel " + "position");
-      int bPos = buf.position();
+      final int bPos = buf.position();
       if(bPos < -n) {
-        int bufLim = buf.limit();
-        long skip = n - bufLim;
+        final int bufLim = buf.limit();
+        final long skip = n - bufLim;
         fc.position(fc.position() + skip);
         buf.position(bufLim);
         rem -= skip + buffered;
@@ -228,8 +229,8 @@ public class BufferedFileChannel {
    * @throws IOException if any error occurs while reading from the channel.
    */
   public void reset() throws IOException {
-    int bPos = buf.position();
-    long offset = absolutePosition() - mark;
+    final int bPos = buf.position();
+    final long offset = absolutePosition() - mark;
     if(offset == 0) return;
     assert offset > 0;
     if(bPos < offset) {
@@ -253,13 +254,13 @@ public class BufferedFileChannel {
     if(buffer(bytesToRead)) {
       buf.get(dst, 0, bytesToRead);
     } else { // buf is too small
-      int buffered = buf.remaining();
+      final int buffered = buf.remaining();
       bytesToRead -= buffered;
       if(rem < bytesToRead) throw new EOFException(f.getAbsolutePath());
       buf.get(dst, 0, buffered); // copy buffered bytes
       buf.clear(); // clear buffer
       // read remaining bytes directly into target buffer and fill the buffer
-      ByteBuffer tmp = ByteBuffer.wrap(dst, buffered, bytesToRead);
+      final ByteBuffer tmp = ByteBuffer.wrap(dst, buffered, bytesToRead);
       rem -= fc.read(new ByteBuffer[] { tmp, buf});
       buf.flip();
     }
@@ -312,7 +313,7 @@ public class BufferedFileChannel {
    * @return The next two bytes at the channel's current position as integer.
    */
   public int getShort() {
-    return (buf.get() & 0xFF) << 8 | (buf.get() & 0xFF);
+    return (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**
@@ -331,7 +332,7 @@ public class BufferedFileChannel {
     return (buf.get() & 0xFF) << 24 //
         | (buf.get() & 0xFF) << 16 //
         | (buf.get() & 0xFF) << 8 //
-        | (buf.get() & 0xFF);
+        | buf.get() & 0xFF;
   }
 
   /**
@@ -348,7 +349,7 @@ public class BufferedFileChannel {
    * @see #close()
    */
   public void finish() throws IOException {
-    long len = buf.remaining() + rem;
+    final long len = buf.remaining() + rem;
     skip(len);
   }
 
@@ -379,7 +380,7 @@ public class BufferedFileChannel {
    * @throws IOException if any error occurs while reading the file.
    */
   public boolean buffer(final int n) throws IOException {
-    int buffered = buf.remaining();
+    final int buffered = buf.remaining();
     if(rem < n - buffered) throw new EOFException(f.getAbsolutePath());
     if(buffered < n) {
       if(n > buf.capacity()) return false;

@@ -9,10 +9,10 @@ import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
+import static org.basex.util.Token.*;
 
 /**
  * Evaluates the 'find' command.
@@ -79,13 +79,13 @@ public final class Find extends AQuery {
         preds += "[@* ftcontains \"" + term.substring(1) + "\"]";
         term = term.substring(1);
         // add valid name tests
-        if(XMLToken.isName(Token.token(term))) {
+        if(XMLToken.isName(token(term))) {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
         preds += "[text() ftcontains \"" + term + "\"]";
         // add valid name tests
-        if(XMLToken.isName(Token.token(term))) {
+        if(XMLToken.isName(token(term))) {
           pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
         }
         // add name test...
@@ -145,7 +145,7 @@ public final class Find extends AQuery {
       String t = qu.substring(0, i);
 
       if(size) {
-        t = Long.toString(calcNum(Token.token(t)));
+        t = Long.toString(calcNum(token(t)));
       } else {
         // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");
@@ -188,9 +188,9 @@ public final class Find extends AQuery {
     for(int i = 0; i < filter.size; i++) {
       final String[] spl = split(filter.list[i]);
       for(final String s : spl) {
-        byte[] term = Token.token(s);
-        if(Token.contains(term, '"')) term = Token.replace(term, '\"', ' ');
-        term = Token.trim(term);
+        byte[] term = token(s);
+        if(contains(term, '"')) term = replace(term, '\"', ' ');
+        term = trim(term);
         if(term.length == 0) continue;
         tb.add("[");
 
@@ -200,7 +200,7 @@ public final class Find extends AQuery {
 
         if(term[0] == '<' || term[0] == '>') {
           tb.add(term[0]);
-          tb.add(calcNum(Token.substring(term, 1)));
+          tb.add(calcNum(substring(term, 1)));
         } else {
           tb.add(" ftcontains \"");
           tb.add(term);
@@ -210,7 +210,7 @@ public final class Find extends AQuery {
       }
     }
     return tb.size == 0 ? "." : (root ? "/" : "") +
-      "descendant-or-self::" + Token.string(tag) + tb;
+      "descendant-or-self::" + string(tag) + tb;
   }
 
   /**
@@ -221,8 +221,8 @@ public final class Find extends AQuery {
    */
   private static long calcNum(final byte[] tok) {
     int tl = tok.length;
-    final int s1 = tok.length < 1 ? 0 : Token.lc(tok[tl - 1]);
-    final int s2 = tok.length < 2 ? 0 : Token.lc(tok[tl - 2]);
+    final int s1 = tok.length < 1 ? 0 : lc(tok[tl - 1]);
+    final int s2 = tok.length < 2 ? 0 : lc(tok[tl - 2]);
     int f = 0;
 
     // evaluate suffixes
@@ -232,7 +232,7 @@ public final class Find extends AQuery {
     if(s1 == 'b' && s2 == 'k') { tl -= 2; f = 10; }
     if(s1 == 'b' && s2 == 'm') { tl -= 2; f = 20; }
     if(s1 == 'b' && s2 == 'g') { tl -= 2; f = 30; }
-    final long i = Token.toLong(tok, 0, tl) << f;
+    final long i = toLong(tok, 0, tl) << f;
     return i == Long.MIN_VALUE ? 0 : i;
   }
 

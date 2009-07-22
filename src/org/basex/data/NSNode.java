@@ -5,7 +5,12 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
 
-/** Document node. */
+/**
+ * This class provides a single namespace node.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Christian Gruen
+ */
 final class NSNode {
   /** Children. */
   NSNode[] ch;
@@ -91,7 +96,7 @@ final class NSNode {
     if(ch.length == 0) return this;
     int l = 0, m = 0, h = ch.length - 1;
     while(l <= h) { // binary search
-      m = (l + h) >>> 1;
+      m = l + h >>> 1;
       final int v = ch[m].pre;
       if(v == p) return ch[m];
       if(v < p) l = m + 1;

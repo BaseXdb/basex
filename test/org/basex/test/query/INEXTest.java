@@ -37,14 +37,14 @@ public final class INEXTest {
   /** Flag for short output. */
   private final boolean s = true;
   /** Kind of task. */
-  private String[] task = new String[] {"adhoc", "budget10", "budget100", 
+  private final String[] task = new String[] {"adhoc", "budget10", "budget100", 
       "budget1000", "budget10000"};
   /** Kind of type. */
-  private String[] type = new String[] {"focused", "thorough", "article"};
+  private final String[] type = new String[] {"focused", "thorough", "article"};
   /** Kind of query. */
 //  private String[] query = new String[] {"automatic", "manual"};
   /** Method used to sum pathes. */
-  private String xqm = 
+  private final String xqm = 
     "declare namespace basex = \"http://www.basex.com\"; " +  
     "declare function basex:sum-path ( $n as node()? )  as xs:string { " + 
     " string-join( for $a in $n/ancestor-or-self::* " + 
@@ -63,10 +63,10 @@ public final class INEXTest {
     new Open(db).execute(context, null);
 
     // open query file
-    BufferedWriter out =
+    final BufferedWriter out =
       new BufferedWriter(new FileWriter(new File("INEX/INEX1.log")));
-    PrintOutput sub = new PrintOutput("INEX/sub.xml");
-    XMLSerializer xml = new XMLSerializer(sub, false, true);
+    final PrintOutput sub = new PrintOutput("INEX/sub.xml");
+    final XMLSerializer xml = new XMLSerializer(sub, false, true);
     
     final File file = new File("INEX/co1.que");
     if(!file.exists()) {
@@ -136,9 +136,9 @@ public final class INEXTest {
 
         // [SG] Total Time will only be available after calling proc.output().
         //   Currently, Parsing time is extracted here (i = -1..)
-        int i = info.indexOf("Total Time: ");
-        int j = info.indexOf(" ms", i);
-        String time = info.substring(i + "Total Time: ".length() + 2, j);
+        final int i = info.indexOf("Total Time: ");
+        final int j = info.indexOf(" ms", i);
+        final String time = info.substring(i + "Total Time: ".length() + 2, j);
       
         if (s) {
           xml.openElement(token("topic"),
@@ -150,9 +150,9 @@ public final class INEXTest {
           xml.text(token(file.toString()));
           xml.closeElement();
 
-          Result val = proc.result();
+          final Result val = proc.result();
           if (val instanceof SeqIter) {
-            SeqIter itr = (SeqIter) val;
+            final SeqIter itr = (SeqIter) val;
             Item a;
             int r = 1;
             while ((a = itr.next()) != null) {

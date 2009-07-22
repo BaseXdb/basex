@@ -60,7 +60,7 @@ public final class BaseXBar extends BaseXPanel {
   /** Scrollbar slider offset. */
   private int barOffset;
   /** Flag for permanent scrollbar visibility. */
-  private boolean visible;
+  private final boolean visible;
 
   /**
    * Default Constructor. By default, the scrollbar is switched off

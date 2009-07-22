@@ -21,7 +21,7 @@ public final class BaseXSplitSep extends BaseXBack {
   /** Color background. */
   public static Color back;
   /** Layout: horizontal = true, vertical = false. */
-  private boolean l;
+  private final boolean l;
 
   /**
    * Constructor.

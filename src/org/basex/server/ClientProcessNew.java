@@ -20,11 +20,11 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class ClientProcessNew extends AbstractProcess {
+final class ClientProcessNew extends AbstractProcess {
   /** Process reference. */
-  private Process proc;
+  private final Process proc;
   /** Socket instance. */
-  private Socket socket;
+  private final Socket socket;
   /** Last socket reference. */
   private int last;
 
@@ -33,7 +33,7 @@ public final class ClientProcessNew extends AbstractProcess {
    * @param s Socket
    * @param pr process
    */
-  public ClientProcessNew(final Socket s, final Process pr) {
+  ClientProcessNew(final Socket s, final Process pr) {
     this.socket = s;
     this.proc = pr;
   }
@@ -43,7 +43,7 @@ public final class ClientProcessNew extends AbstractProcess {
     try {
       send(proc.toString());
       last = new DataInputStream(socket.getInputStream()).readInt();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       if(e instanceof SocketException || e instanceof EOFException) {
         return false;
       }
@@ -70,7 +70,7 @@ public final class ClientProcessNew extends AbstractProcess {
    * @throws IOException I/O Exception
    */
   synchronized void send(final String command) throws IOException {
-    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+    final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
     out.writeUTF(command);
     out.flush();
   }
@@ -80,8 +80,7 @@ public final class ClientProcessNew extends AbstractProcess {
    * @param o output stream
    * @throws IOException I/O Exception
    */
-  synchronized void receive(final PrintOutput o)
-  throws IOException {
+  synchronized void receive(final PrintOutput o) throws IOException {
     final InputStream in = socket.getInputStream();
     final byte[] bb = new byte[4096];
     int l = 0;

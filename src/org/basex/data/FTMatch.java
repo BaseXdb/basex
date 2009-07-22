@@ -13,11 +13,11 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class FTMatch implements Iterable<FTStringMatch> {
+public final class FTMatch implements Iterable<FTStringMatch> {
   /** String matches. */
-  public FTStringMatch[] match = {};
+  FTStringMatch[] match = {};
   /** Number of entries. */
-  public int size;
+  int size;
 
   /**
    * Resets the match.

@@ -27,9 +27,9 @@ import org.xml.sax.XMLReader;
  */
 public final class BXDocBuilder extends DocumentBuilder {
   /** Parser instance. */
-  private SAXParserFactory factory;
+  private final SAXParserFactory factory;
   /** Parser instance. */
-  private XMLReader parser;
+  private final XMLReader parser;
 
   /**
    * Constructor.

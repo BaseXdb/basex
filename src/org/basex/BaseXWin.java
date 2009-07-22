@@ -155,7 +155,7 @@ public final class BaseXWin {
 
     final Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
     final Dimension p = wait.getSize();
-    wait.setLocation((s.width - p.width) >> 1, (s.height - p.height) >> 1);
+    wait.setLocation(s.width - p.width >> 1, s.height - p.height >> 1);
     wait.setVisible(true);
     return wait;
   }

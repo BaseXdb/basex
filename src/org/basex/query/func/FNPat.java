@@ -159,7 +159,7 @@ final class FNPat extends Fun {
     for(int i = 0; i < pt.length; i++) {
       final byte b = pt[i];
       tb.add(b);
-      if(b == '\\' && (i + 1 != pt.length && pt[i + 1] == ' ')) tb.add(b);
+      if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') tb.add(b);
     }
 
     String str = tb.toString();

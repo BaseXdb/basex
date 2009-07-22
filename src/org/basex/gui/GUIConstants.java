@@ -288,7 +288,7 @@ public final class GUIConstants {
    * @return converted color value
    */
   private static int col(final int c, final int f) {
-    return Math.max(0, 255 - (c * f / 10));
+    return Math.max(0, 255 - c * f / 10);
   }
 
   /**

@@ -23,7 +23,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class TableContent extends BaseXBack {
+final class TableContent extends BaseXBack {
   /** Scrollbar reference. */
   private final BaseXBar scroll;
   /** View reference. */
@@ -138,7 +138,7 @@ public final class TableContent extends BaseXBack {
       }
 
       // add dots if content is too long
-      for(int t = 0; t < tb.length; t++) if(tb[t].size > 100) tb[t].add("...");
+      for(final TokenBuilder t : tb) if(t.size > 100) t.add("...");
 
       // draw row contents
       byte[] focusStr = null;

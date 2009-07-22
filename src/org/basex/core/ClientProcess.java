@@ -16,7 +16,7 @@ import org.basex.io.PrintOutput;
  */
 public final class ClientProcess extends AbstractProcess {
   /** Process reference. */
-  private Process proc;
+  private final Process proc;
   /** Host name. */
   private final String host;
   /** Port number. */

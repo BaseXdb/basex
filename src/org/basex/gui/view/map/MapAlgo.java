@@ -14,12 +14,12 @@ public abstract class MapAlgo {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  static double lineRatio(final MapRects r) {
+  protected static double lineRatio(final MapRects r) {
     if(r.size() == 0) return Double.MAX_VALUE;
     double ar = 0;
     int dev = 0;
 
-    for(MapRect rect : r) {
+    for(final MapRect rect : r) {
       if(rect.w != 0 && rect.h != 0) {
         dev++;
         if(rect.w > rect.h) {
@@ -34,18 +34,18 @@ public abstract class MapAlgo {
 
   /**
    * Calculates the worst aspect ratio of the rectangles given in the list.
+   * Should return the worst ar....
    *
-   * should return teh worst ar....
    * @param r Array of rectangles
    * @return max aspect ratio
    */
-  static double worstLineRatio(final MapRects r) {
+  protected static double worstLineRatio(final MapRects r) {
     if(r.size() == 0) return Double.MAX_VALUE;
 
     double worstar = 0;
     double ar = 0;
 
-    for(MapRect rect : r) {
+    for(final MapRect rect : r) {
       if(rect.w != 0 && rect.h != 0) {
         if(rect.w > rect.h) {
           ar = rect.w / rect.h;

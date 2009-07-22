@@ -87,7 +87,7 @@ public final class Except extends Arr {
    * @throws QueryException query exception
    */
   private NodeIter eval(final Iter[] iter) throws QueryException {
-    NodIter ni = new NodIter(true);
+    final NodIter ni = new NodIter(true);
 
     Item it;
     while((it = iter[0].next()) != null) {
@@ -98,7 +98,7 @@ public final class Except extends Arr {
     for(int e = 1; e != expr.length; e++) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!(it.node())) Err.nodes(this);
+        if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < ni.size; s++) {
           if(ni.item[s].is(node)) ni.delete(s--);

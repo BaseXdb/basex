@@ -8,7 +8,7 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class TableIterator {
+final class TableIterator {
   /** Table data. */
   private final TableData tdata;
   /** Data reference. */

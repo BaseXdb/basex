@@ -40,7 +40,8 @@ public final class Func extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    for(int a = 0; a < args.length; a++) ctx.vars.add(args[a]);
+    for(final Var arg : args)
+      ctx.vars.add(arg);
     expr = expr.comp(ctx);
     ctx.vars.reset(s);
     return this;

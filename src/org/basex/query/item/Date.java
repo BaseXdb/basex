@@ -147,7 +147,7 @@ public abstract class Date extends Item {
     final long d1 = days();
     final long d2 = ((Date) it).days();
     return d1 == d2 && seconds().doubleValue() ==
-      (((Date) it).seconds()).doubleValue();
+      ((Date) it).seconds().doubleValue();
     //return d1 == d2 && seconds().equals(((Date) it).seconds());
   }
 
@@ -192,7 +192,7 @@ public abstract class Date extends Item {
     final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
     final int m = xc.getMonth() == UNDEF ? 0 : xc.getMonth() - 1;
     final int d = xc.getDay() == UNDEF ? 0 : xc.getDay() - 1;
-    long s = days(y, m, d);
+    final long s = days(y, m, d);
     return y > 0 ? s : -s;
   }
 

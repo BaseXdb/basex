@@ -23,7 +23,7 @@ import org.xml.sax.XMLReader;
  */
 public final class SAXWrapper extends Parser {
   /** Optional XML reader. */
-  private SAXSource source;
+  private final SAXSource source;
   /** Parser reference. */
   private SAX2Data sax;
 

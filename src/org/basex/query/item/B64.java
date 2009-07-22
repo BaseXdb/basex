@@ -35,7 +35,7 @@ public final class B64 extends Item {
   public B64(final byte[] d) throws QueryException {
     super(Type.B6B);
     final TokenBuilder tb = new TokenBuilder();
-    for(byte c : d) if(c < 0 || c > ' ') tb.add(c);
+    for(final byte c : d) if(c < 0 || c > ' ') tb.add(c);
     b2h(tb.finish());
   }
 
@@ -72,8 +72,8 @@ public final class B64 extends Item {
       final int b1 = val[c++] & 0xff;
       final int b2 = val[c++] & 0xff;
       tb.add(H2B[b0 >> 2]);
-      tb.add(H2B[(b0 << 4) & 0x3f | (b1 >> 4)]);
-      tb.add(H2B[(b1 << 2) & 0x3f | (b2 >> 6)]);
+      tb.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
+      tb.add(H2B[b1 << 2 & 0x3f | b2 >> 6]);
       tb.add(H2B[b2 & 0x3f]);
     }
 
@@ -81,12 +81,12 @@ public final class B64 extends Item {
       final int b0 = val[c++] & 0xff;
       tb.add(H2B[b0 >> 2]);
       if(p == 1) {
-        tb.add(H2B[(b0 << 4) & 0x3f]);
+        tb.add(H2B[b0 << 4 & 0x3f]);
         tb.add("==");
       } else {
         final int b1 = val[c++] & 0xff;
-        tb.add(H2B[(b0 << 4) & 0x3f | (b1 >> 4)]);
-        tb.add(H2B[(b1 << 2) & 0x3f]);
+        tb.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
+        tb.add(H2B[b1 << 2 & 0x3f]);
         tb.add('=');
       }
     }
@@ -129,16 +129,16 @@ public final class B64 extends Item {
       final int c1 = b2h(s[c++]);
       final int c2 = b2h(s[c++]);
       final int c3 = b2h(s[c++]);
-      val[o++] = (byte) ((c0 << 2) | (c1 >> 4));
-      val[o++] = (byte) ((c1 << 4) | (c2 >> 2));
-      val[o++] = (byte) ((c2 << 6) | c3);
+      val[o++] = (byte) (c0 << 2 | c1 >> 4);
+      val[o++] = (byte) (c1 << 4 | c2 >> 2);
+      val[o++] = (byte) (c2 << 6 | c3);
     }
 
     if(m != 0) {
       final int c0 = b2h(s[c++]);
       final int c1 = b2h(s[c++]);
-      val[o++] = (byte) ((c0 << 2) | (c1 >> 4));
-      if(m == 1) val[o++] = (byte) ((c1 << 4) | (b2h(s[c++]) >> 2));
+      val[o++] = (byte) (c0 << 2 | c1 >> 4);
+      if(m == 1) val[o++] = (byte) (c1 << 4 | b2h(s[c++]) >> 2);
     }
   }
 

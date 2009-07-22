@@ -6,9 +6,9 @@ package org.basex.gui.view.map;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-public class SliceDiceAlgo extends MapAlgo {
+final class SliceDiceAlgo extends MapAlgo {
   @Override
-  public MapRects calcMap(final MapRect r, final MapList ml,
+  MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne, final int l) {
 
     // setting initial proportions
@@ -49,7 +49,7 @@ public class SliceDiceAlgo extends MapAlgo {
   }
 
   @Override
-  public String getName() {
+  String getName() {
     return "Slice and Dice";
   }
 }

@@ -170,6 +170,6 @@ final class FNId extends Fun {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return (u == Use.CTX && expr.length == 1) || super.uses(u, ctx);
+    return u == Use.CTX && expr.length == 1 || super.uses(u, ctx);
   }
 }

@@ -114,7 +114,7 @@ public class FLWOR extends Expr {
       order.sq = seq;
       final Item m = order.iter(ctx).finish();
       if(group == null) return m.iter(); // return now
-      group.sq = (m != null) ? (SeqIter) m.iter() : seq;
+      group.sq = m != null ? (SeqIter) m.iter() : seq;
     } else group.sq = seq;
     return group.iter(ctx);
   }

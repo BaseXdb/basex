@@ -1,7 +1,7 @@
 package org.basex.io;
 
 /**
- * This class offers a simple buffer management.
+ * This class provides a simple, clock-based buffer management.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -64,7 +64,7 @@ public final class Performance {
    * @return execution time
    */
   public static String getTimer(final long time, final int runs) {
-    return (time / runs / 10000) / 100d + " ms" + (runs > 1 ? " (avg)" : "");
+    return time / runs / 10000 / 100d + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**
@@ -106,9 +106,9 @@ public final class Performance {
    */
   private static String format(final long size, final boolean det,
       final int off) {
-    if(size > (1L << (30 + off))) return ((size + (1L << 29)) >> 30) + " GB";
-    if(size > (1L << (20 + off))) return ((size + (1L << 19)) >> 20) + " MB";
-    if(size > (1L << (10 + off))) return ((size + (1L <<  9)) >> 10) + " KB";
+    if(size > 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";
+    if(size > 1L << 20 + off) return (size + (1L << 19) >> 20) + " MB";
+    if(size > 1L << 10 + off) return (size + (1L <<  9) >> 10) + " KB";
     return size + (det ? " Bytes" : " B");
   }
 

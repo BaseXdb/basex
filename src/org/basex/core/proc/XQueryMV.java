@@ -125,21 +125,20 @@ public final class XQueryMV extends AQuery {
 
   @Override
   protected void out(final PrintOutput o) throws IOException {
-    PrintOutput out = Prop.serialize ? o : new NullOutput();
-
     for(int i = 0; i < Prop.runs; i++) {
-      if(i != 0) out = new NullOutput();
-      show(new XMLSerializer(out, false, true));
+      show(i == 0 && Prop.serialize ? o : new NullOutput());
     }
     if(Prop.info) outInfo(o, maxhits);
   }
 
   /**
    * Returns an MedioVis XML document.
-   * @param ser serializer
+   * @param out output reference
    * @throws IOException exception
    */
-  private void show(final XMLSerializer ser) throws IOException {
+  private void show(final PrintOutput out) throws IOException {
+    XMLSerializer xml = new XMLSerializer(out, false, true);
+    
     // get index references for mediovis attributes
     final Data data = context.data();
     final int bibid = data.attNameID(MAB2.BIB_ID);
@@ -150,10 +149,10 @@ public final class XQueryMV extends AQuery {
     final int size = res.size();
 
     // write root tag
-    ser.openElement(MAB2.ROOT);
-    ser.attribute(MAB2.HITS, Token.token(maxhits));
-    ser.attribute(MAB2.MAX, Token.token(size));
-    //ser.attribute(MAB2.APPROX, Token.token(approx));
+    xml.openElement(MAB2.ROOT);
+    xml.attribute(MAB2.HITS, Token.token(maxhits));
+    xml.attribute(MAB2.MAX, Token.token(size));
+    //xml.attribute(MAB2.APPROX, Token.token(approx));
 
     // loop through titles
     for(int i = 0; i < maxhits; i++) {
@@ -162,7 +161,7 @@ public final class XQueryMV extends AQuery {
 
       // write medium tag
       final int max = (int) attNum(data, maxid, medium.list[0]);
-      ser.openElement(MAB2.MEDIUM, MAB2.MV_ID, mv,
+      xml.openElement(MAB2.MEDIUM, MAB2.MV_ID, mv,
           MAB2.BIB_ID, data.attValue(bibid, medium.list[0]),
           MAB2.MAX, Token.token(max));
 
@@ -171,12 +170,12 @@ public final class XQueryMV extends AQuery {
       int pp = par + data.attSize(par, data.kind(par));
       while(pp != data.meta.size) {
         if(data.tagID(pp) == medid) break;
-        pp = ser.node(data, pp);
+        pp = xml.node(data, pp);
       }
 
       // print subordinate titles of query results first
       final int maxsubs = Math.min(medium.size, sub + 1);
-      for(int s = 1; s < maxsubs; s++) ser.node(data, medium.list[s]);
+      for(int s = 1; s < maxsubs; s++) xml.node(data, medium.list[s]);
 
       // print remaining subordinate titles
       final int leftsubs = Math.min(sub, max) - maxsubs + 1;
@@ -186,16 +185,17 @@ public final class XQueryMV extends AQuery {
           m++;
           pp += data.size(pp, data.kind(pp));
         } else {
-          pp = ser.node(data, pp);
+          pp = xml.node(data, pp);
           s++;
         }
       }
       // close medium
-      ser.closeElement();
+      xml.closeElement();
     }
 
     // close root tag
-    if(maxhits != 0) ser.closeElement();
+    if(maxhits != 0) xml.closeElement();
+    xml.close();
   }
 
   /**

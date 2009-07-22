@@ -177,14 +177,14 @@ public final class DeepFS extends DeepFuse implements DataText {
       BaseX.debug("GO.");
       final String cmd = "umount -f " + data.meta.mountpoint;
       BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
-      Runtime r = Runtime.getRuntime();
-      java.lang.Process p = r.exec(cmd);
+      final Runtime r = Runtime.getRuntime();
+      final java.lang.Process p = r.exec(cmd);
       try {
         p.waitFor();
-      } catch(InterruptedException e) {
+      } catch(final InterruptedException e) {
         e.printStackTrace();
       }
-      int rc = p.exitValue();
+      final int rc = p.exitValue();
       String msg = method + "Unmount " + data.meta.mountpoint;
       if (rc == 0) msg = msg + " ... OK.";
       else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";

@@ -26,8 +26,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class Session implements Runnable {
-
+class Session implements Runnable {
   /** Database Context. */
   final Context context = new Context();
   /** Socket. */
@@ -62,7 +61,7 @@ public class Session implements Runnable {
    * @param v Verbose Mode
    * @param b BaseXServerNew
    */
-  public Session(final Socket s, final int c, final boolean v,
+  Session(final Socket s, final int c, final boolean v,
       final BaseXServerNew b) {
     this.clientId = c;
     this.socket = s;
@@ -73,7 +72,7 @@ public class Session implements Runnable {
   /**
    * Starts the Thread.
    */
-  public synchronized void start() {
+  synchronized void start() {
     if (session == null) {
       session = new Thread(this);
       session.start();
@@ -115,9 +114,9 @@ public class Session implements Runnable {
         running = false;
         break;
       }
-      Process proc = pr;
+      final Process proc = pr;
       if(proc instanceof GetResult || proc instanceof GetInfo) {
-        Process c = core;
+        final Process c = core;
         if(c == null) {
           out.print(BaseX.info(SERVERTIME, Prop.timeout));
         } else if(proc instanceof GetResult) {
@@ -179,13 +178,13 @@ public class Session implements Runnable {
    * Stops the thread.
    * @param quit check how the quit command is called
    */
-  public void stop(final boolean quit) {
+  void stop(final boolean quit) {
     if (quit) bx.sessions.remove(this);
     try {
       context.close();
       BaseX.outln("Client " + clientId + " has logged out.");
       socket.close();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
     }
     timeout.interrupt();
@@ -195,7 +194,7 @@ public class Session implements Runnable {
   public void run() {
     try {
       handle();
-    } catch(Exception io) {
+    } catch(final Exception io) {
       // for forced stops
       if (io instanceof SocketException) {
         running = false;

@@ -125,7 +125,7 @@ public abstract class Fun extends Arr {
       ser.emptyElement(this, NAM, Token.token(func.desc));
     } else {
       ser.openElement(this, NAM, Token.token(func.desc));
-      for(Expr arg : expr) arg.plan(ser);
+      for(final Expr arg : expr) arg.plan(ser);
       ser.closeElement();
     }
   }

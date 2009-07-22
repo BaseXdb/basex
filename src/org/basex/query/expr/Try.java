@@ -45,8 +45,8 @@ public final class Try extends Single {
           if(it == null) it = ctx.iter(expr);
           return it.next();
         } catch(final QueryException ex) {
-          for(int c = 0; c < ctch.length; c++) {
-            it = ctch[c].iter(ctx, ex);
+          for(final Catch c : ctch) {
+            it = c.iter(ctx, ex);
             if(it != null) return it.next();
           }
           throw ex;

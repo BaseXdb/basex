@@ -1,13 +1,12 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
-
 import java.io.File;
-
-import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public final class ParserUtil {
@@ -28,22 +27,22 @@ public final class ParserUtil {
    */
   public static byte[] toDuration(final byte[] value, //
       final boolean milliseconds) {
-    int len = value.length;
-    byte[] a = new byte[len];
+    final int len = value.length;
+    final byte[] a = new byte[len];
     int secPos = -1;
     int pos = 0;
     for(int i = 0; i < len; i++) {
-      byte b = value[i];
+      final byte b = value[i];
       if(b == 0) continue;
       if(b < '0' || b > '9') {
-        if(b != ':') return Token.EMPTY;
-        if(secPos != -1) return Token.EMPTY; // only one colon allowed
+        if(b != ':') return EMPTY;
+        if(secPos != -1) return EMPTY; // only one colon allowed
         secPos = i;
       } else {
         a[pos++] = b;
       }
     }
-    if(pos == 0) return Token.EMPTY;
+    if(pos == 0) return EMPTY;
     if(secPos == -1) return milliseconds ? msToDuration(a, pos)
         : secToDuration(a, pos);
     return minSecToDuration(a, secPos, pos);
@@ -60,7 +59,7 @@ public final class ParserUtil {
    */
   public static byte[] minSecToDuration(final byte[] minSec, final int secPos,
       final int length) {
-    byte[] value = new byte[length + 4];
+    final byte[] value = new byte[length + 4];
     int p = 0;
     value[p++] = 'P';
     value[p++] = 'T';
@@ -83,7 +82,7 @@ public final class ParserUtil {
    * @return the xs:duration value as byte array.
    */
   public static byte[] secToDuration(final byte[] seconds, final int length) {
-    byte[] value = new byte[length + 3];
+    final byte[] value = new byte[length + 3];
     value[0] = 'P';
     value[1] = 'T';
     System.arraycopy(seconds, 0, value, 2, length);
@@ -102,13 +101,13 @@ public final class ParserUtil {
     byte[] value;
     if(length < 4) {
       value = new byte[] { 'P', 'T', '0', '.', '0', '0', '0', 'S'};
-      int offset = 7 - length;
+      final int offset = 7 - length;
       System.arraycopy(ms, 0, value, offset, length);
     } else {
       value = new byte[length + 4]; // get space for 'P', 'T', '.' and 'S'
       value[0] = 'P';
       value[1] = 'T';
-      int secLen = length - 3;
+      final int secLen = length - 3;
       System.arraycopy(ms, 0, value, 2, secLen);
       value[2 + secLen] = '.';
       System.arraycopy(ms, secLen, value, 3 + secLen, 3);
@@ -125,15 +124,15 @@ public final class ParserUtil {
    */
   public static byte[] convertYear(final byte[] year) {
     int count = 0;
-    byte[] value = { 0, 0, 0, 0, '-', '-'};
+    final byte[] value = { 0, 0, 0, 0, '-', '-'};
     for(int i = 0, max = year.length; i < max && count < 4; i++) {
-      if(Token.digit(year[i])) value[count++] = year[i];
+      if(digit(year[i])) value[count++] = year[i];
       else if(year[i] != 0) { // not a valid number
-        return Token.EMPTY;
+        return EMPTY;
       }
     }
     if(count < 4) {
-      return Token.EMPTY;
+      return EMPTY;
     }
     return value;
   }
@@ -145,33 +144,33 @@ public final class ParserUtil {
    * @return the converted byte array.
    */
   public static byte[] convertDateTime(final byte[] dateTime) {
-    if(dateTime.length != 20) return Token.EMPTY;
+    if(dateTime.length != 20) return EMPTY;
     int i = 0;
     for(; i < 4; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
-    if(dateTime[i] != ':') return Token.EMPTY;
+    if(dateTime[i] != ':') return EMPTY;
     dateTime[i++] = '-';
     for(; i < 7; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
-    if(dateTime[i] != ':') return Token.EMPTY;
+    if(dateTime[i] != ':') return EMPTY;
     dateTime[i++] = '-';
     for(; i < 10; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
-    if(dateTime[i] != ' ') return Token.EMPTY;
+    if(dateTime[i] != ' ') return EMPTY;
     dateTime[i++] = 'T';
     for(; i < 13; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
-    if(dateTime[i++] != ':') return Token.EMPTY;
+    if(dateTime[i++] != ':') return EMPTY;
     for(; i < 16; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
-    if(dateTime[i++] != ':') return Token.EMPTY;
+    if(dateTime[i++] != ':') return EMPTY;
     for(; i < 19; i++) {
-      if(!Token.digit(dateTime[i])) return Token.EMPTY;
+      if(!digit(dateTime[i])) return EMPTY;
     }
     return dateTime;
   }
@@ -184,7 +183,7 @@ public final class ParserUtil {
   public static byte[] getMTime(final File file) {
     // current time storage: minutes from 1.1.1970
     final long time = file.lastModified() / 60000;
-    return time != 0 ? token(time) : Token.EMPTY;
+    return time != 0 ? token(time) : EMPTY;
   }
 
   /**

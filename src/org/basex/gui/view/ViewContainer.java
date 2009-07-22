@@ -70,7 +70,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   /** Temporary mouse position. */
   private Point sp;
   /** Temporary rectangle position. */
-  private int[] pos = new int[4];
+  private final int[] pos = new int[4];
 
   /**
    * Constructor.

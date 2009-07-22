@@ -34,7 +34,7 @@ public final class XQueryExample {
     out.println("=== First example: Creating a result instance");
 
     // Creates a result serializer
-    XMLSerializer serializer = new XMLSerializer(out);
+    XMLSerializer xml = new XMLSerializer(out);
 
     // Creates a query instance
     QueryProcessor processor = new QueryProcessor(QUERY);
@@ -43,7 +43,7 @@ public final class XQueryExample {
     Result result = processor.query();
 
     // Serializes the result
-    result.serialize(serializer);
+    result.serialize(xml);
 
     // Closes the query processor
     processor.close();
@@ -58,9 +58,9 @@ public final class XQueryExample {
     Iter iterator = processor.iter();
 
     // Uses an iterator to serialize the result
-    for(Item item : iterator) item.serialize(serializer);
+    for(Item item : iterator) item.serialize(xml);
 
-    // Closes the query processor and the output stream
+    // Closes the query processor
     processor.close();
 
 
@@ -72,11 +72,11 @@ public final class XQueryExample {
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);
 
+    // Closes the serializer (and output stream)
+    xml.close();
+
     // Closes the database
     context.close();
-
-    // Closes the output stream
-    out.close();
   }
 }
 

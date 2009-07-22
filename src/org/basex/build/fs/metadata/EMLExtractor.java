@@ -218,7 +218,7 @@ public final class EMLExtractor extends AbstractExtractor {
         final int n1 = hex2num(text[i++]);
         final int n2 = hex2num(text[i]);
         if(n1 < 0 || n2 < 0) continue;
-        c = (byte) ((n1 << 4) | n2);
+        c = (byte) (n1 << 4 | n2);
       }
       tmp.add(c);
     }

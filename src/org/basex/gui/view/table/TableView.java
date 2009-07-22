@@ -38,11 +38,11 @@ public final class TableView extends View implements Runnable {
   final TableData tdata;
 
   /** Table header. */
-  private TableHeader header;
+  private final TableHeader header;
   /** Table content area. */
-  private TableContent content;
+  private final TableContent content;
   /** Table scrollbar. */
-  private BaseXBar scroll;
+  private final BaseXBar scroll;
 
   /**
    * Default constructor.

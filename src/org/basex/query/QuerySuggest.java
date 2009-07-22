@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  */
 public class QuerySuggest extends QueryParser {
   /** Data reference. */
-  private Data data;
+  private final Data data;
   /** All current path nodes. */
   private Stack<ArrayList<PathNode>> stack;
   /** All current path nodes. */

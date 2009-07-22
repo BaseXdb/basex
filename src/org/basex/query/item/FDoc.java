@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class FDoc extends FNode {
   /** Base URI. */
-  private byte[] base;
+  private final byte[] base;
 
   /**
    * Constructor.

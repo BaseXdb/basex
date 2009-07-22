@@ -9,7 +9,7 @@ import org.basex.gui.view.ViewRect;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
+final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   /** File Type. */
   short type = -1;
   /** Thumbnail view. */

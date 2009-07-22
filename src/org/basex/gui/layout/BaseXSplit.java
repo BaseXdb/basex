@@ -13,7 +13,7 @@ import java.awt.LayoutManager;
  */
 public final class BaseXSplit extends BaseXBack implements LayoutManager {
   /** Layout: horizontal = true, vertical = false. */
-  private boolean l;
+  private final boolean l;
   /** Panel positions. */
   private double[] s;
   /** Temporary panel positions. */
@@ -111,7 +111,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       final Component[] c = getComponents();
       final int h = getHeight();
       final int w = getWidth();
-      final int m = (c.length + 1) >> 1;
+      final int m = c.length + 1 >> 1;
       final double p = (l ? w : h) - (m - 1) * BaseXSplitSep.SIZE;
 
       final boolean a = s == null;
@@ -121,7 +121,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       for(int n = 0; n < c.length; n++) {
         final boolean b = (n & 1) == 0;
         double z = BaseXSplitSep.SIZE;
-        if(b) z = s[n >> 1] == 0 ? (int) (p / m) : (s[n >> 1] * p);
+        if(b) z = s[n >> 1] == 0 ? (int) (p / m) : s[n >> 1] * p;
         final int y = (int) v;
         c[n].setBounds(l ? y : 0, l ? 0 : y, l ? (int) z : w, l ? h : (int) z);
         if(a && b) s[n >> 1] = z / p;

@@ -302,8 +302,8 @@ public final class XMLScanner {
           else if(!input.add(r, false)) error(RECENT);
         } else {
           if(c == ']') {
-            if((consume()) == ']') {
-              if((consume()) == '>') error(CONTCDATA);
+            if(consume() == ']') {
+              if(consume() == '>') error(CONTCDATA);
               prev(1);
             }
             prev(1);

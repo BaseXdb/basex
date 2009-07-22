@@ -86,7 +86,7 @@ final class MapRects implements Iterable<MapRect> {
     int l = 0;
     int h = size - 1;
     while(l <= h) {
-      final int m = (l + h) >>> 1;
+      final int m = l + h >>> 1;
       final int c = sorted[m].pre - p;
       if(c == 0) return m;
       if(c < 0) l = m + 1;

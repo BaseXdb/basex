@@ -33,7 +33,7 @@ import static org.basex.core.Commands.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class BaseXClientNew {
+public final class BaseXClientNew {
   /** Database Context. */
   protected final Context context = new Context();
   /** Stand-alone or Client/Server mode. */
@@ -78,7 +78,7 @@ public class BaseXClientNew {
     if(!parseArguments(args)) return;
     try {
       socket = new Socket(host, port);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       BaseX.errln(SERVERERR);
     }
     run();
@@ -87,7 +87,7 @@ public class BaseXClientNew {
   /**
    * Runs the application, dependent on the command-line arguments.
    */
-  final void run() {
+  void run() {
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
@@ -163,7 +163,7 @@ public class BaseXClientNew {
    * @param force tells if quit was forced
    * (e.g., by pressing CTRL-c).
    */
-  protected final void quit(final boolean force) {
+  protected void quit(final boolean force) {
     if(!force) BaseX.outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
@@ -177,10 +177,10 @@ public class BaseXClientNew {
     try {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) {
-          AbstractProcess proc = getProcess(p);
+          final AbstractProcess proc = getProcess(p);
           try {
             return proc.execute(context);
-          } catch(IOException e) {
+          } catch(final IOException e) {
             e.printStackTrace();
           }
         }
@@ -214,7 +214,7 @@ public class BaseXClientNew {
    * @param v verbose flag
    * @return true if operation was successful
    */
-  protected final boolean process(final Process p, final boolean v) {
+  protected boolean process(final Process p, final boolean v) {
     final AbstractProcess proc = getProcess(p);
     try {
       final boolean ok = proc.execute(context);
@@ -268,7 +268,7 @@ public class BaseXClientNew {
    * @param args command line arguments
    * @return true if arguments have been correctly parsed
    */
-  protected final boolean parseArguments(final String[] args) {
+  protected boolean parseArguments(final String[] args) {
     boolean ok = true;
 
     // loop through all arguments
@@ -399,7 +399,7 @@ public class BaseXClientNew {
    * @param ex exception reference
    * @param msg message
    */
-  protected final void error(final Exception ex, final String msg) {
+  protected void error(final Exception ex, final String msg) {
     BaseX.errln((console ? "" : INFOERROR) + msg);
     BaseX.debug(ex);
   }

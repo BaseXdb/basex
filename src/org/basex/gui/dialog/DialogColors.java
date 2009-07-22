@@ -20,11 +20,11 @@ public final class DialogColors extends Dialog {
   /** Maximum color range. */
   private static final int MAXCOLOR = 32;
   /** Slider reference. */
-  private BaseXSlider sliderRed;
+  private final BaseXSlider sliderRed;
   /** Slider reference. */
-  private BaseXSlider sliderGreen;
+  private final BaseXSlider sliderGreen;
   /** Slider reference. */
-  private BaseXSlider sliderBlue;
+  private final BaseXSlider sliderBlue;
 
   /**
    * Default constructor.

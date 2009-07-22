@@ -31,11 +31,11 @@ import org.basex.util.Token;
  */
 public final class DialogOpen extends Dialog {
   /** List of currently available databases. */
-  private BaseXListChooser choice;
+  private final BaseXListChooser choice;
   /** Information panel. */
-  private BaseXLabel doc;
+  private final BaseXLabel doc;
   /** Information panel. */
-  private BaseXText detail;
+  private final BaseXText detail;
   /** Buttons. */
   private BaseXBack buttons;
 
@@ -49,7 +49,6 @@ public final class DialogOpen extends Dialog {
 
     // create database chooser
     final StringList db = List.list();
-    if(db.size == 0) return;
 
     choice = new BaseXListChooser(db.finish(), HELPOPEN, this);
     set(choice, BorderLayout.CENTER);
@@ -95,6 +94,8 @@ public final class DialogOpen extends Dialog {
 
     set(pp, BorderLayout.EAST);
     action(null);
+    if(db.size == 0) return;
+
     finish(null);
   }
 
@@ -112,7 +113,7 @@ public final class DialogOpen extends Dialog {
    * @return result of check
    */
   public boolean nodb() {
-    return choice == null;
+    return choice.getIndex() == -1;
   }
 
   @Override
