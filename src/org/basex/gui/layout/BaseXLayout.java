@@ -197,7 +197,7 @@ public final class BaseXLayout {
       @Override
       public void keyPressed(final KeyEvent e) {
         final int code = e.getKeyCode();
-    
+
         // browse back/forward
         if(e.isAltDown() && gui.context.data() != null) {
           if(code == KeyEvent.VK_LEFT) {
@@ -210,7 +210,7 @@ public final class BaseXLayout {
             GUICommands.ROOT.execute(gui);
           }
         }
-    
+
         if(e.isControlDown()) {
           final int fs = GUIProp.fontsize;
           if(code == '+' || code == '-' || code == '=') {

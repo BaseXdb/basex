@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;

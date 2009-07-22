@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-launch=Inizializzazione di 
+launch=Inizializzazione di
 wait=Attendi
 version=Versione %
 

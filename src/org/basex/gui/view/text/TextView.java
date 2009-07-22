@@ -76,7 +76,7 @@ public final class TextView extends View {
     area = new BaseXText(HELPTEXT, false, gui);
     area.addSearch(find);
     add(area, BorderLayout.CENTER);
-    
+
     refreshLayout();
   }
 

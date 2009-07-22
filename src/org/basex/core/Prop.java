@@ -146,7 +146,7 @@ public final class Prop {
   /** Fuse support. */
   public static boolean fuse = false;
   /** FSParser implementation. If true, the new implementation is used. */
-  public static boolean newfsparser = true;
+  public static boolean newfsparser = false;
 
   /** Flag to include key names in the language strings. */
   public static boolean langkeys = false;

@@ -14,7 +14,7 @@ import static org.basex.util.Token.*;
 
 /**
  * Parser for JPG files.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke

@@ -35,7 +35,7 @@ public final class QueryProcessor extends Progress {
 
   // [AW] context should never be null
   //  (except for potential use cases in which no disk database will be touched)
-  
+
   /**
    * Default Constructor.
    * @param q query

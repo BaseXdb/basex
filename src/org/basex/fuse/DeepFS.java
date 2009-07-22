@@ -160,7 +160,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     data.insert(1, 0, m);
     data.flush();
   }
-  
+
   /**
    * Closes the fuse instance.
    * @throws IOException I/O exception
@@ -190,7 +190,8 @@ public final class DeepFS extends DeepFuse implements DataText {
       else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
       BaseX.debug(msg);
     }
-  } 
+  }
+
   /**
    * Creates an empty database.
    * @param n name of database instance
@@ -435,7 +436,7 @@ public final class DeepFS extends DeepFuse implements DataText {
       nativeUnlink(Token.string(path(pre, false)));
     }
   }
-  
+
   /**
    * Deletes a non-empty directory.
    * @param dir to be deleted.

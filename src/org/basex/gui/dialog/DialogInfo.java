@@ -67,7 +67,7 @@ public final class DialogInfo extends Dialog {
     if(data.ns.size() != 0) {
       info.high().add(NL + INFONS + NL).norm().add(data.ns.info());
     }
-    
+
     final BaseXText text = text(info.finish());
     text.setFont(getFont());
     BaseXLayout.setHeight(text, 350);

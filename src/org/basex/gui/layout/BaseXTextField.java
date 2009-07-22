@@ -96,7 +96,7 @@ public class BaseXTextField extends JTextField {
     });
     repaint();
   }
-  
+
   @Override
   public void setText(final String txt) {
     last = txt;

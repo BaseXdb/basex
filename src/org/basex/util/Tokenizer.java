@@ -31,7 +31,7 @@ public class Tokenizer implements IndexToken {
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
   /** Cached sentence positions. */
-  private final IntList sen = new IntList(); 
+  private final IntList sen = new IntList();
   /** Cached paragraph positions. */
   private final IntList par = new IntList();
 

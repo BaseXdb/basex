@@ -68,7 +68,7 @@ public final class DiskData extends Data {
   private DataAccess values;
   /** Locking Flag. */
   private int lock;
-  
+
   /**
    * Default Constructor.
    * @param db name of database
@@ -159,7 +159,7 @@ public final class DiskData extends Data {
     out.write(0);
     out.close();
   }
-  
+
   @Override
   public synchronized void flush() {
     try {
@@ -172,7 +172,7 @@ public final class DiskData extends Data {
       e.printStackTrace();
     }
   }
-  
+
   @Override
   public void cls() throws IOException {
     if(meta.dirty) flush();

@@ -122,7 +122,7 @@ public class BaseXText extends BaseXPanel {
     f.addSearch(this);
     find = f;
   }
-  
+
   /**
    * Finds the specified term.
    * @param t output text

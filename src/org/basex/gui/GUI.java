@@ -359,7 +359,7 @@ public final class GUI extends JFrame {
       }
     }
   }
-  
+
   /**
    * Launches an XQuery. Adds the default namespace, if available.
    * @param qu query to be run
@@ -374,7 +374,7 @@ public final class GUI extends JFrame {
       Token.string(ns.key(def)) + "\"; " + in;
     execute(new XQuery(in), main);
   }
-  
+
   /**
    * Launches the specified process in a thread. The process is ignored
    * if an update operation takes place.

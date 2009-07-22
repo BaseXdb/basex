@@ -344,7 +344,7 @@ public abstract class Serializer {
   }
 
   // === protected methods ====================================================
-  
+
   /**
    * Returns the name of the specified expression.
    * @param expr expression

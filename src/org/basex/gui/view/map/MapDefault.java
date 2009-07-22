@@ -86,7 +86,7 @@ final class MapDefault extends MapPainter {
   private void drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
-    
+
     final int pre = rect.pre;
     final Context context = view.gui.context;
     final Data data = context.data();

@@ -41,7 +41,7 @@ public final class DataPool {
   public boolean unpin(final Data d) {
     // ignore main memory database instances
     if(d instanceof MemData) return false;
-    
+
     for(int i = 0; i < size; i++) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;

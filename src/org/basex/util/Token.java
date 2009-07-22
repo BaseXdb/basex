@@ -58,7 +58,7 @@ public final class Token {
   public static final byte[] GT = token(">");
   /** LessThan Entity. */
   public static final byte[] LT = token("<");
-  
+
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
   /** UTF8 encoding string (variant). */
@@ -904,7 +904,7 @@ public final class Token {
    * @return converted character
    */
   public static int uc(final int ch) {
-    return ch >= 'a' && ch <= 'z' ? ch - 32 : 
+    return ch >= 'a' && ch <= 'z' ? ch - 32 :
       ch > 0x7F ? Character.toUpperCase(ch) : ch;
   }
 

@@ -893,7 +893,7 @@ public enum GUICommands implements GUICommand {
     if(single) file.suffix(IO.XMLSUFFIX);
     return file;
   }
-  
+
   /**
    * Checks if data can be updated (disk mode, nodes defined, no namespaces).
    * @param n node instance

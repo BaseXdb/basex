@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.core.proc.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -96,7 +95,7 @@ final class XQueryText extends BaseXText {
       showError();
     }
   }
-  
+
   /**
    * Returns true if the specified query is a module.
    * @param qu query to check
@@ -117,7 +116,7 @@ final class XQueryText extends BaseXText {
       error = -1;
     } else {
       error = last.length;
-      
+
       final Matcher m = ERRPATTERN.matcher(inf);
       int el = 0;
       int ec = 0;
@@ -125,7 +124,7 @@ final class XQueryText extends BaseXText {
         el = Integer.parseInt(m.group(1));
         ec = Integer.parseInt(m.group(2));
       }
-  
+
       // find approximate error position
       final int ll = error;
       for(int i = 0, l = 1, c = 1; i < ll; c++, i++) {
@@ -142,7 +141,7 @@ final class XQueryText extends BaseXText {
     showError();
     return error;
   }
-  
+
   /**
    * Highlights the error.
    */

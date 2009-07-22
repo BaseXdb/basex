@@ -105,12 +105,12 @@ public final class QueryTest {
         final boolean correct = qu.length == 3;
         final String query = qu[correct ? 2 : 1].toString();
         final String cmd = qu[0] + ": " + query;
-  
+
         if(VERBOSE) err(cmd, ext);
-  
+
         proc = new XQuery(query);
         counter++;
-  
+
         if(proc.execute(CONTEXT)) {
           final Result val = proc.result();
           final Result cmp = correct ? (Result) qu[1] : null;

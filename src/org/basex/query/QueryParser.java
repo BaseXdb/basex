@@ -2119,7 +2119,7 @@ public class QueryParser extends InputParser {
     final Var[] var = Array.add(vars, v);
     return var;
   }
-  
+
   /**
    * [FT144] Parses an FTSelection.
    * [FT157] Parses an FTPosFilter.

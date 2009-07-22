@@ -204,7 +204,7 @@ public final class GUIProp {
   public static void write() {
     Prop.write(cfg, GUIProp.class.getFields());
   }
-  
+
   /**
    * Refreshes the list of recent query files.
    * @param file new file

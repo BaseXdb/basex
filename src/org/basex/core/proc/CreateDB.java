@@ -57,7 +57,7 @@ public final class CreateDB extends ACreate {
   //  which will be ignored by the data pool management. Main memory instances
   //  are useful for creating temporary databases, which will not influence
   //  the transaction management.
-  
+
   /**
    * Creates and returns a database for the specified XML document.
    * @param io file reference

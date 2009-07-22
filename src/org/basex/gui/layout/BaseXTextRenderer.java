@@ -242,7 +242,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       y += fontH;
     }
     wordW = ww;
-    
+
     // check if word has been found, and word is still visible
     return y < h;
   }
@@ -367,7 +367,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   void stopSelect() {
     text.checkMark();
   }
-  
+
   /**
    * Selects the text at the specified position.
    * @param pos current text position

@@ -259,13 +259,13 @@ public final class MP3Parser extends AbstractParser {
   private static final int ENC_ISO_8859_1 = 0;
   /**
    * Flag for UTF-16 encoding (with BOM).
-   * 
+   *
    * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
    */
   private static final int ENC_UTF_16_WITH_BOM = 1;
   /**
    * Flag for UTF-16 encoding (without BOM).
-   * 
+   *
    * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
    */
   private static final int ENC_UTF_16_NO_BOM = 2;

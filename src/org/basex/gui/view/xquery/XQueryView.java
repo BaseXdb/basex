@@ -72,7 +72,7 @@ public final class XQueryView extends View {
     final BaseXBack back = new BaseXBack(Fill.NONE);
     back.setLayout(new BorderLayout());
     back.add(header, BorderLayout.CENTER);
-    
+
     final BaseXButton open = GUIToolBar.newButton(GUICommands.XQOPEN, gui);
     final BaseXButton save = GUIToolBar.newButton(GUICommands.XQSAVE, gui);
     final BaseXTextField find = new BaseXTextField(null, gui);
@@ -164,7 +164,7 @@ public final class XQueryView extends View {
     sp.add(filter);
     south.add(sp, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
-    
+
     refreshLayout();
   }
 

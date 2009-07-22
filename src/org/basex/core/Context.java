@@ -143,7 +143,7 @@ public final class Context {
   public void marked(final Nodes mark) {
     marked = mark;
   }
-  
+
   /**
    * Pins the Pool.
    * @param name name of database
@@ -152,7 +152,7 @@ public final class Context {
   public Data pin(final String name) {
     return POOL.pin(name);
   }
-  
+
   /**
    * Adds a Data to the Pool.
    * @param d Data
@@ -160,7 +160,7 @@ public final class Context {
   public void addToPool(final Data d) {
     POOL.add(d);
   }
-  
+
   /**
    * Checks if the specified database is pinned.
    * @param db DBName
@@ -169,5 +169,4 @@ public final class Context {
   public boolean pinned(final String db) {
     return POOL.pinned(db);
   }
-  
 }

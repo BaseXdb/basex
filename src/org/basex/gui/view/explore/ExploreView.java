@@ -77,7 +77,7 @@ public final class ExploreView extends View {
 
     search = new ExploreArea(this);
     add(search, BorderLayout.CENTER);
-    
+
     refreshLayout();
   }
 
@@ -113,7 +113,7 @@ public final class ExploreView extends View {
   protected boolean visible() {
     return GUIProp.showexplore;
   }
-  
+
   @Override
   public void keyPressed(final KeyEvent e) {
     if(e.isAltDown()) super.keyPressed(e);

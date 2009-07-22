@@ -683,16 +683,16 @@ public final class MapView extends View implements Runnable {
     BaseXLayout.antiAlias(g);
     if(rects != null) painter.drawRectangles(g, rects, scale);
   }
-  
+
   /**
    * Transforms coordinates into distorted coordinates.
-   * 
+   *
    * @param v coordinate
    * @param m mouse possition
    * @param s width/height
    * @return new coordinate
    */
-  private double transfer(final double v, final double m, 
+  private double transfer(final double v, final double m,
       final double s) {
 //    double l = 0.5;
 //    return (s + s * Math.tanh(0.02 * (v - m))) / 2 * l + v * (1.0 - l);
@@ -715,9 +715,9 @@ public final class MapView extends View implements Runnable {
 
       final MapRects distRects = new MapRects();
       for(final MapRect r : mainRects) {
-//        int x = (int) (getWidth() + (getWidth() * 
+//        int x = (int) (getWidth() + (getWidth() *
 //            Math.tanh(0.01 * (r.x - mouseX))) / 2);
-//        int w = (int) (getWidth() * 
+//        int w = (int) (getWidth() *
 //            Math.tanh(0.01 * (r.x + r.w - mouseX)) - x);
 //        int y = (int) (getHeight() * Math.tanh(0.01 * (r.y - mouseY)));
 //        int h = (int) (getHeight() * Math.tanh(
@@ -1007,7 +1007,7 @@ public final class MapView extends View implements Runnable {
         textLen[pre] = data.textLen(pre);
       } else if(kind == Data.ATTR) {
         textLen[pre] = data.attLen(pre);
-      } else if((kind == Data.ELEM || kind == Data.DOC) && 
+      } else if((kind == Data.ELEM || kind == Data.DOC) &&
           data.size(pre, kind) > 1) {
         l++;
       }

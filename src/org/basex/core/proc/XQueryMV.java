@@ -138,7 +138,7 @@ public final class XQueryMV extends AQuery {
    */
   private void show(final PrintOutput out) throws IOException {
     XMLSerializer xml = new XMLSerializer(out, false, true);
-    
+
     // get index references for mediovis attributes
     final Data data = context.data();
     final int bibid = data.attNameID(MAB2.BIB_ID);

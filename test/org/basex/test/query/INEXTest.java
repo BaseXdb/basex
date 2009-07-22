@@ -37,20 +37,20 @@ public final class INEXTest {
   /** Flag for short output. */
   private final boolean s = true;
   /** Kind of task. */
-  private final String[] task = new String[] {"adhoc", "budget10", "budget100", 
+  private final String[] task = new String[] {"adhoc", "budget10", "budget100",
       "budget1000", "budget10000"};
   /** Kind of type. */
   private final String[] type = new String[] {"focused", "thorough", "article"};
   /** Kind of query. */
 //  private String[] query = new String[] {"automatic", "manual"};
   /** Method used to sum pathes. */
-  private final String xqm = 
-    "declare namespace basex = \"http://www.basex.com\"; " +  
-    "declare function basex:sum-path ( $n as node()? )  as xs:string { " + 
-    " string-join( for $a in $n/ancestor-or-self::* " + 
+  private final String xqm =
+    "declare namespace basex = \"http://www.basex.com\"; " +
+    "declare function basex:sum-path ( $n as node()? )  as xs:string { " +
+    " string-join( for $a in $n/ancestor-or-self::* " +
     " let $ssn := $a/../*[name() = name($a)] " +
-    " return concat(name($a),'[',basex:index-of($ssn,$a),']'), '/')};" +  
-    "declare function basex:index-of (" + 
+    " return concat(name($a),'[',basex:index-of($ssn,$a),']'), '/')};" +
+    "declare function basex:index-of (" +
     " $n as node()* , $ntf as node() )  as xs:integer* { " +
      "  for $s in (1 to count($n)) return $s[$n[$s] is $ntf]} ;";
 
@@ -67,7 +67,7 @@ public final class INEXTest {
       new BufferedWriter(new FileWriter(new File("INEX/INEX1.log")));
     final PrintOutput sub = new PrintOutput("INEX/sub.xml");
     final XMLSerializer xml = new XMLSerializer(sub, false, true);
-    
+
     final File file = new File("INEX/co1.que");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
@@ -78,7 +78,7 @@ public final class INEXTest {
 
     if (s) {
       // print header in output file
-      xml.openElement(token("efficiency-submission"), 
+      xml.openElement(token("efficiency-submission"),
           token("participant-id"), token("1111111"),
           token("run-id"), token("1111111"),
           token("taks"), token(task[0]),
@@ -99,7 +99,7 @@ public final class INEXTest {
       xml.emptyElement(token("indexing_description"));
       xml.emptyElement(token("caching_description"));
     }
-    
+
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);
     final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
@@ -111,19 +111,19 @@ public final class INEXTest {
       final int tid = Integer.parseInt(line.substring(s0 + 1, s1));
       s0 = line.indexOf('"', s1 + 1);
       s1 = line.indexOf('"', s0 + 1);
-      
+
       s0 = line.indexOf('/', s1);
       String q = line.substring(s0);
 
       // [SG] simple query rewritings to fit queries to our index model
       // ...some more could be added here, e.g. for (a|b)
       q = q.replaceAll("\\. ", ".//text() ");
-      
+
       // [SG] [...] basex function [...] yes, that's completely ok for the
       //   first tests. If we discover that index storage will be advantageous.
       //   we can still work on this later.
       q = xqm + "for $i score $s in " + q + " return (basex:sum-path($i), $s)";
-      
+
       // process query
       final Process proc = new XQuery(q);
 
@@ -139,7 +139,7 @@ public final class INEXTest {
         final int i = info.indexOf("Total Time: ");
         final int j = info.indexOf(" ms", i);
         final String time = info.substring(i + "Total Time: ".length() + 2, j);
-      
+
         if (s) {
           xml.openElement(token("topic"),
               token("topic-id"), token(tid),
@@ -163,7 +163,7 @@ public final class INEXTest {
                 xml.openElement(token("rank"));
                 xml.text(token(r++));
                 xml.closeElement();
-              } else if (a instanceof Dbl) { 
+              } else if (a instanceof Dbl) {
                 xml.openElement(token("rsv"));
                 xml.text(a.str());
                 xml.closeElement();

@@ -188,17 +188,17 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   public void actionPerformed(final ActionEvent e) {
     if(e != null) {
       final Object source = e.getSource();
-    
+
       // find modified component
       int cp = 0;
       final int cs = panel.getComponentCount();
       for(int c = 0; c < cs; c++) if(panel.getComponent(c) == source) cp = c;
-    
+
       if((cp & 1) == 0) {
         // ComboBox with tags/attributes
         final BaseXCombo combo = (BaseXCombo) source;
         panel.remove(cp + 1);
-    
+
         final Data data = gui.context.data();
         final boolean selected = combo.getSelectedIndex() != 0;
         if(selected) {
