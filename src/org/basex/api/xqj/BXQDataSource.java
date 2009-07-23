@@ -15,7 +15,7 @@ import org.basex.core.Prop;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-final class BXQDataSource implements XQDataSource {
+public final class BXQDataSource implements XQDataSource {
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** Timeout. */
@@ -24,7 +24,7 @@ final class BXQDataSource implements XQDataSource {
   /**
    * Constructor.
    */
-  BXQDataSource() {
+  public BXQDataSource() {
     Prop.read();
   }
 

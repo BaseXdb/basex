@@ -18,7 +18,7 @@ import org.xmldb.api.base.XMLDBException;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-final class BXDatabase implements Database, BXXMLDBText {
+public final class BXDatabase implements Database, BXXMLDBText {
 
   public boolean acceptsURI(final String uri) throws XMLDBException {
     return getCollectionName(uri) != null;
