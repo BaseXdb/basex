@@ -155,9 +155,9 @@ public class DeepBaseTest {
     try {
       Nodes n = new Nodes(0, dbfs.data);
       n = new QueryProcessor(query, n).queryNodes();
-      final XMLSerializer xml = new XMLSerializer(new PrintOutput(TESTFILE));
-      n.serialize(xml);
-      xml.close();
+      final PrintOutput out = new PrintOutput(TESTFILE);
+      n.serialize(new XMLSerializer(out));
+      out.close();
 
       final FileInputStream f = new FileInputStream(TESTFILE);
       final StringBuilder sb = new StringBuilder();

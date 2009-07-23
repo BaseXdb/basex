@@ -65,7 +65,7 @@ public class Group extends Expr {
   protected void group() {
     if(groups == null) groups = new HashMap<Integer, int[]>();
     Item next = null;
-    for(final Grp group : this.grp) {
+    for(final Grp group : grp) {
       if(group == null) { continue; }
       final int lastitem = sq.size();
       for(int i = 0; i < lastitem; i++) { // check all items matching
@@ -116,10 +116,6 @@ public class Group extends Expr {
             ir = sq.item[witness].iter();
           }
         }
-      }
-      @Override
-      public String toString() {
-        return Group.this.toString();
       }
     };
   }

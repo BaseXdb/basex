@@ -27,17 +27,16 @@ public final class DropDB extends Process {
     final String db = args[0];
     final Data data = context.data();
 
-    // check if database is not main-memory based
-    if(!(data instanceof MemData)) {
-      // close database if still open
-      if(data != null && data.meta.name.equals(db)) context.close();
-      // check if database is still pinned
-      if(context.pinned(db)) return error(DBINUSE);
-    }
+    // close database if still open and not in main memory
+    if(data != null && !(data instanceof MemData) && data.meta.name.equals(db))
+      context.close();
+
+    // check if database is still pinned
+    if(context.pinned(db)) return error(DBINUSE);
 
     // try to drop database
     return !IO.dbpath(db).exists() ? error(DBNOTFOUND, db) :
-      drop(db) ? info(DBDROPPED) : error(DBNOTDROPPED);
+      drop(db) ? info(DBDROPPED, db) : error(DBNOTDROPPED);
   }
 
   /**

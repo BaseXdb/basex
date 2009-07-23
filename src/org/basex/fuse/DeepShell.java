@@ -66,7 +66,7 @@ public final class DeepShell {
    */
   private void exec(final String[] args) {
     try {
-      final Method[] ms = this.getClass().getMethods();
+      final Method[] ms = getClass().getMethods();
       for(final Method m : ms) {
         if(m.isAnnotationPresent(Command.class)) {
           final Command c = m.getAnnotation(Command.class);
@@ -169,7 +169,7 @@ public final class DeepShell {
    */
   @Command(shortcut = 'h', help = "print this message")
   public void help(final String[] args) {
-    final Method[] ms = this.getClass().getMethods();
+    final Method[] ms = getClass().getMethods();
     for(final Method m : ms)
       if(m.isAnnotationPresent(Command.class)) {
         final Command c = m.getAnnotation(Command.class);

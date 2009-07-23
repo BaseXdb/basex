@@ -65,10 +65,6 @@ public final class Order extends Expr {
           }
         }
       }
-      @Override
-      public String toString() {
-        return Order.this.toString();
-      }
     };
   }
 

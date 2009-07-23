@@ -33,7 +33,7 @@ public abstract class DataUpdateTest {
   Data data;
 
   /**
-   * Delete the test-database.
+   * Initializes the test class.
    */
   @BeforeClass
   public static final void setUpBeforeClass() {
@@ -50,11 +50,11 @@ public abstract class DataUpdateTest {
   public void setUp() {
     try {
       data = CreateDB.xml(IO.get(TESTFILE), dbname);
+      size = data.meta.size;
     } catch(final Exception ex) {
       ex.printStackTrace();
       System.exit(1);
     }
-    size = data.meta.size;
   }
 
   /**
@@ -67,7 +67,6 @@ public abstract class DataUpdateTest {
       DropDB.drop(dbname);
     } catch(final Exception ex) {
       ex.printStackTrace();
-      System.exit(1);
     }
   }
 

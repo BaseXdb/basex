@@ -50,7 +50,7 @@ public final class XQueryMV extends AQuery {
     // cache verbose flag
     hits = Token.toInt(args[0]);
     sub = Token.toInt(args[1]);
-    final String query = args[2] + "[position() <= " + (hits * sub) + "]";
+    final String query = args[2] + "[position() <= " + hits * sub + "]";
 
     long pars = 0;
     long comp = 0;
@@ -137,7 +137,7 @@ public final class XQueryMV extends AQuery {
    * @throws IOException exception
    */
   private void show(final PrintOutput out) throws IOException {
-    XMLSerializer xml = new XMLSerializer(out, false, true);
+    final XMLSerializer xml = new XMLSerializer(out, false, true);
 
     // get index references for mediovis attributes
     final Data data = context.data();

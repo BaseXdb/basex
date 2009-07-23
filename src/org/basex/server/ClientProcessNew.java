@@ -35,8 +35,8 @@ final class ClientProcessNew extends AbstractProcess {
    * @param pr process
    */
   ClientProcessNew(final Socket s, final Process pr) {
-    this.socket = s;
-    this.proc = pr;
+    socket = s;
+    proc = pr;
   }
 
   @Override

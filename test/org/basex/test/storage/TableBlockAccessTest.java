@@ -7,7 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.basex.build.DiskBuilder;
 import org.basex.build.xml.XMLParser;
+import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
+import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import static org.junit.Assert.*;
@@ -20,29 +22,32 @@ import static org.basex.data.DataText.*;
  * @author Tim Petrowsky
  */
 public final class TableBlockAccessTest {
-  /** Test file size. */
-  private int size;
-  /** BlockStorage. */
-  private TableDiskAccess tba;
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/JUnit.xml";
   /** Test database name. */
-  private static final String DBNAME = "JUnitTest";
+  private final String dbname = getClass().getSimpleName();
+  /** BlockStorage. */
+  private TableDiskAccess tba;
+  /** Test file size. */
+  private int size;
   /** Starting storage. */
   private byte[] storage;
   /** Max entries per block. */
-  private int maxEntriesPerBlock;
+  private int entries;
   /** Expected blocks in file. */
   private int blocks;
   /** Nodes per block. */
   private int nodesPerBlock;
 
   /**
-   * Delete old JUnitTest databases.
+   * Initializes the test class.
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    DropDB.drop(DBNAME);
+    Prop.read();
+    Prop.textindex = false;
+    Prop.attrindex = false;
+    Prop.chop = true;
   }
 
   /**
@@ -52,8 +57,10 @@ public final class TableBlockAccessTest {
   public void setUp() {
     try {
       final XMLParser parser = new XMLParser(IO.get(TESTFILE));
-      size = new DiskBuilder().build(parser, DBNAME).meta.size;
-      tba = new TableDiskAccess(DBNAME, DATATBL);
+      final Data data = new DiskBuilder().build(parser, dbname);
+      size = data.meta.size;
+      data.close();
+      tba = new TableDiskAccess(dbname, DATATBL);
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -63,10 +70,22 @@ public final class TableBlockAccessTest {
     for(int i = 0; i < bytecount; i++) {
       storage[i] = (byte) tba.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
-    maxEntriesPerBlock = IO.BLOCKSIZE >>> IO.NODEPOWER;
-    blocks = (int) Math.ceil(size /
-        Math.floor(maxEntriesPerBlock * IO.BLOCKFILL));
-    nodesPerBlock = (int) (maxEntriesPerBlock * IO.BLOCKFILL);
+    entries = IO.BLOCKSIZE >>> IO.NODEPOWER;
+    blocks = (int) Math.ceil(size / Math.floor(entries * IO.BLOCKFILL));
+    nodesPerBlock = (int) (entries * IO.BLOCKFILL);
+  }
+
+  /**
+   * Drop the JUnitTest database.
+   */
+  @After
+  public void tearDown() {
+    try {
+      tba.close();
+      DropDB.drop(dbname);
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
   /**
@@ -76,7 +95,7 @@ public final class TableBlockAccessTest {
     try {
       tba.close();
       tba = null;
-      tba = new TableDiskAccess(DBNAME, DATATBL);
+      tba = new TableDiskAccess(dbname, DATATBL);
     } catch(final IOException e) {
       fail();
     }
@@ -263,16 +282,16 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testInsertMany() {
-    tba.insert(3, getTestEntries(maxEntriesPerBlock - 1));
-    assertEquals(size + maxEntriesPerBlock - 1, tba.size());
+    tba.insert(3, getTestEntries(entries - 1));
+    assertEquals(size + entries - 1, tba.size());
     assertEntrysEqual(0, 0, 4);
-    assertAreInserted(4, maxEntriesPerBlock - 1);
-    assertEntrysEqual(4, 4 + maxEntriesPerBlock - 1, size - 4);
+    assertAreInserted(4, entries - 1);
+    assertEntrysEqual(4, 4 + entries - 1, size - 4);
     closeAndReload();
-    assertEquals(size + maxEntriesPerBlock - 1, tba.size());
+    assertEquals(size + entries - 1, tba.size());
     assertEntrysEqual(0, 0, 4);
-    assertAreInserted(4, maxEntriesPerBlock - 1);
-    assertEntrysEqual(4, 4 + maxEntriesPerBlock - 1, size - 4);
+    assertAreInserted(4, entries - 1);
+    assertEntrysEqual(4, 4 + entries - 1, size - 4);
   }
 
   /**
@@ -308,26 +327,13 @@ public final class TableBlockAccessTest {
   /**
    * Create a test-byte array containing the specified number of entries. All
    * bytes are set to (byte)5.
-   * @param entries number of Entries to create
+   * @param e number of Entries to create
    * @return byte array containing the number of entries (all bytes 5)
    */
-  private byte[] getTestEntries(final int entries) {
-    final byte[] result = new byte[entries << IO.NODEPOWER];
+  private byte[] getTestEntries(final int e) {
+    final byte[] result = new byte[e << IO.NODEPOWER];
     for(int i = 0; i < result.length; i++) result[i] = (byte) 5;
     return result;
-  }
-
-  /**
-   * Drop the JUnitTest database.
-   */
-  @After
-  public void tearDown() {
-    try {
-      tba.close();
-      DropDB.drop(DBNAME);
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
   }
 }
 

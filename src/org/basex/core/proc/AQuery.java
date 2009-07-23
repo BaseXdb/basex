@@ -93,7 +93,7 @@ abstract class AQuery extends Process {
       final XMLSerializer xml = new XMLSerializer(i == 0 && Prop.serialize ?
           o : new NullOutput(!Prop.serialize), Prop.xmloutput, p);
       result.serialize(xml);
-      if(Prop.xmloutput) xml.closeElement();
+      xml.close();
     }
     if(Prop.runs > 0) {
       if(Prop.info) outInfo(o, result.size());

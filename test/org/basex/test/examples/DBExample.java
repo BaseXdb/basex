@@ -60,6 +60,12 @@ public final class DBExample {
     // Closes the database
     context.close();
 
+    out.println("=== Deleting databases");
+
+    // Deletes the created databases.
+    new DropDB("DB1").execute(context, out);
+    new DropDB("DB2").execute(context, out);
+    
     // Closes the output stream
     out.close();
   }

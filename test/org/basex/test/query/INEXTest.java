@@ -187,8 +187,9 @@ public final class INEXTest {
       xml.closeElement();
     }
 
-    out.close();
     xml.close();
+    sub.close();
+    out.close();
   }
 
   /**

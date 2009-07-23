@@ -63,10 +63,10 @@ class Session implements Runnable {
    */
   Session(final Socket s, final int c, final boolean v,
       final BaseXServerNew b) {
-    this.clientId = c;
-    this.socket = s;
-    this.verbose = v;
-    this.bx = b;
+    clientId = c;
+    socket = s;
+    verbose = v;
+    bx = b;
   }
 
   /**
@@ -84,7 +84,7 @@ class Session implements Runnable {
    * @throws IOException I/O Exception
    */
   private void handle() throws IOException {
-    BaseX.outln("Login from Client " + clientId);
+    BaseX.outln("Login from Client %.", clientId);
     final Performance perf = new Performance();
     final InetAddress addr = socket.getInetAddress();
     final String ha = addr.getHostAddress();

@@ -59,7 +59,7 @@ public class BaseXServerNew {
 
     if(!parseArguments(args)) return;
 
- // guarantee correct shutdown...
+    // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
@@ -94,8 +94,7 @@ public class BaseXServerNew {
   public void stop() {
     for(int i = 0; i < sessions.size(); i++) {
       try {
-        final Session s = sessions.get(i);
-        s.socket.close();
+        sessions.get(i).socket.close();
       } catch(final IOException e) {
         e.printStackTrace();
       }
@@ -201,7 +200,7 @@ public class BaseXServerNew {
           } else if(com.equals("help")) {
             BaseX.outln("-list     Lists all Clients connected to the Server"
                 + NL + "-stop     Stops the Server");
-          } else {
+          } else if(com.length() > 0) {
             BaseX.outln("No such command");
           }
         } catch(final Exception ex) {
@@ -230,7 +229,7 @@ public class BaseXServerNew {
      * @param b BaseXServerNew
      */
     public SessionListener(final BaseXServerNew b) {
-      this.bx = b;
+      bx = b;
     }
 
     /**
@@ -245,11 +244,9 @@ public class BaseXServerNew {
 
     public void run() {
       while(thread != null) {
-        Socket s;
         try {
-          s = serverSocket.accept();
-          lastid++;
-          final Session session = new Session(s, lastid, verbose, bx);
+          final Socket s = serverSocket.accept();
+          final Session session = new Session(s, ++lastid, verbose, bx);
           session.start();
           sessions.add(session);
         } catch(final IOException e) {
