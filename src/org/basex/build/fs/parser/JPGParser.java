@@ -14,7 +14,7 @@ import static org.basex.util.Token.*;
 
 /**
  * Parser for JPG files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
@@ -88,7 +88,7 @@ public final class JPGParser extends AbstractParser {
         final int type = buf.getShort();
         if((type == IFD_TYPE_LONG || type == IFD_TYPE_SHORT)
             && buf.getInt() == 1) {
-          obj.fsparser.metaEvent(Element.WIDTH, DataType.INTEGER,
+          obj.fsparser.metaEvent(Element.HEIGHT, DataType.INTEGER,
               Definition.PIXEL, null,
               token((long) buf.getInt() & 0xFFFFFFFF));
         } else error(obj, "Image length (0x0101)");
@@ -151,7 +151,7 @@ public final class JPGParser extends AbstractParser {
         } else error(obj, "Exif Image Width (0xA002)");
       }
     },
-    /** Exif Image Width. */
+    /** Exif Image Height. */
     ha003 {
       @Override
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
@@ -354,12 +354,12 @@ public final class JPGParser extends AbstractParser {
   private void readDimensions() throws IOException {
     if(bfc.get() == 8) {
       bfc.buffer(8);
-      final int width = bfc.getShort();
       final int height = bfc.getShort();
-      fsparser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL,
-          null, token(width));
+      final int width = bfc.getShort();
       fsparser.metaEvent(Element.HEIGHT, DataType.INTEGER, Definition.PIXEL,
           null, token(height));
+      fsparser.metaEvent(Element.WIDTH, DataType.INTEGER, Definition.PIXEL,
+          null, token(width));
     } else {
       if(NewFSParser.VERBOSE) BaseX.debug("Wrong data precision field (%).",
           bfc.getFileName());
@@ -459,8 +459,10 @@ public final class JPGParser extends AbstractParser {
     final int len = HEADER_EXIF.length;
     bfc.buffer(len + 8);
     final long pos = bfc.position();
-    if(checkNextBytes(HEADER_EXIF) && checkEndianness() &&
-        bfc.get() == 0x00 && bfc.get() == 0x2A) {
+    if(checkNextBytes(HEADER_EXIF)
+    	&& checkEndianness()
+    	&& bfc.get() == 0x00
+    	&& bfc.get() == 0x2A) {
 
       final int ifdOffset = bfc.getInt();
       /*
