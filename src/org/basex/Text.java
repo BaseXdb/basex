@@ -109,7 +109,7 @@ public interface Text {
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
   /** Error shown in the Client Console when timeout is reached. */
-  String SERVERTIME = lang("srv_timeeout");
+  String SERVERTIME = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */
