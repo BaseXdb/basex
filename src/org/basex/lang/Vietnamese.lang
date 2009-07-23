@@ -337,9 +337,7 @@ cs_client=Người dùng
 # Server Info
 srv_connect=Không liên lạc được với máy chủ.
 srv_port=Số cổng không hiệu lực
-srv_timeout=Máy chủ hết giới hạn thời gian (% sec.).
-srv_timeerror=Lệnh hỏi của bạn đã hết giới hạn thời gian.
-srv_timeerror2=Lệnh hỏi của bạn đã hết giới hạn thời gian.
+srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
 srv_bind=Máy chủ đang chạy hay không được phép.
 srv_start=đã khời dộng.\nĐang chờ yêu cầu...
 srv_stop=đã dừng.

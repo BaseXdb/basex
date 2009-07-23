@@ -67,7 +67,7 @@ abstract class ACreate extends Process {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
-      return error(Prop.server ? TIMEOUTERR2 : CANCELCREATE);
+      return error(Prop.server ? SERVERTIME : CANCELCREATE);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();

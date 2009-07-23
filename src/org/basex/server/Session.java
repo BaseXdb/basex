@@ -118,7 +118,7 @@ class Session implements Runnable {
       if(proc instanceof GetResult || proc instanceof GetInfo) {
         final Process c = core;
         if(c == null) {
-          out.print(BaseX.info(SERVERTIME, Prop.timeout));
+          out.print(BaseX.info(SERVERTIME));
         } else if(proc instanceof GetResult) {
           // the client requests result of the last process
           c.output(out);
@@ -187,6 +187,7 @@ class Session implements Runnable {
     } catch(final IOException e) {
       e.printStackTrace();
     }
+    // [AW] timeout can be zero if called after exception by run()
     timeout.interrupt();
     session = null;
   }
@@ -195,12 +196,13 @@ class Session implements Runnable {
     try {
       handle();
     } catch(final IOException io) {
-      // for forced stops
+      io.printStackTrace();
+
+      // [AW] for forced stops - should be prevented
+      // (happens e.g. if the client is run via the -q argument: bxc -q "info")
       if(io instanceof SocketException) {
         running = false;
         stop(false);
-      } else {
-        io.printStackTrace();
       }
     }
   }

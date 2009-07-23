@@ -108,12 +108,8 @@ public interface Text {
   String SERVERSTOPPED = "Server " + lang("srv_stop");
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
-  /** Server timeout. */
-  String SERVERTIME = lang("srv_timeout");
   /** Error shown in the Client Console when timeout is reached. */
-  String TIMEOUTERR = lang("srv_timeerror");
-  /** Error shown in the Client Console when timeout is reached. */
-  String TIMEOUTERR2 = lang("srv_timeerror2");
+  String SERVERTIME = lang("srv_timeeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */

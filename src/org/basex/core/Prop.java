@@ -197,12 +197,11 @@ public final class Prop {
 
   /**
    * Assigns the properties from the specified file to the field array.
-   * @param filename file to be read
+   * @param fn file to be read
    * @param fields fields to be assigned
    */
-  public static synchronized void read(final String filename,
-      final Field[] fields) {
-    final File file = new File(filename);
+  public static synchronized void read(final String fn, final Field[] fields) {
+    final File file = new File(fn);
     if(!file.exists()) return;
 
     try {
@@ -214,20 +213,20 @@ public final class Prop {
         if(line.length() == 0 || line.charAt(0) == '#') continue;
         final int d = line.indexOf('=');
         if(d < 0) {
-          BaseX.errln("Can't guess what \"%\" means in \"%\"", line, filename);
+          BaseX.errln("Can't guess what \"%\" means in \"%\"", line, fn);
           continue;
         }
         final String key = line.substring(0, d).trim().toLowerCase();
         final String val = line.substring(d + 1).trim();
 
         if(!assign(fields, key, val)) {
-          BaseX.errln("\"%\" ignored in \"%\"", line, filename);
+          BaseX.errln("\"%\" ignored in \"%\"", line, fn);
         }
       }
       br.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);
-      BaseX.errln("% could not be read.", filename);
+      BaseX.errln("% could not be read.", fn);
     }
   }
 
@@ -293,12 +292,11 @@ public final class Prop {
 
   /**
    * Writes the properties from field array to the specified file.
-   * @param filename file to be read
+   * @param fn file to be read
    * @param fields fields to be assigned
    */
-  public static synchronized void write(final String filename,
-      final Field[] fields) {
-    final File file = new File(filename);
+  public static synchronized void write(final String fn, final Field[] fields) {
+    final File file = new File(fn);
 
     try {
       // caches options specified by the user
@@ -306,9 +304,7 @@ public final class Prop {
       if(file.exists()) {
         final BufferedReader br = new BufferedReader(new FileReader(file));
         String line = null;
-        while((line = br.readLine()) != null) {
-          if(line.equals(PROPUSER)) break;
-        }
+        while((line = br.readLine()) != null) if(line.equals(PROPUSER)) break;
         while((line = br.readLine()) != null) {
           user.append(line);
           user.append(NL);
@@ -340,10 +336,11 @@ public final class Prop {
         }
       }
 
-      bw.write(NL + PROPUSER + NL + user);
+      bw.write(NL + PROPUSER + NL);
+      bw.write(user.toString());
       bw.close();
     } catch(final Exception ex) {
-      BaseX.errln("% could not be written.", filename);
+      BaseX.errln("% could not be written.", fn);
       ex.printStackTrace();
     }
   }
