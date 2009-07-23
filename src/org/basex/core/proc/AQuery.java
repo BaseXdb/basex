@@ -49,7 +49,7 @@ abstract class AQuery extends Process {
 
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qp = new QueryProcessor(query == null ? "" : query, context.current());
+        qp = new QueryProcessor(query, context.current());
         progress(qp);
 
         qp.parse();
@@ -93,10 +93,12 @@ abstract class AQuery extends Process {
       final XMLSerializer xml = new XMLSerializer(i == 0 && Prop.serialize ?
           o : new NullOutput(!Prop.serialize), Prop.xmloutput, p);
       result.serialize(xml);
-      xml.close();
+      if(Prop.xmloutput) xml.closeElement();
     }
-    if(Prop.info) outInfo(o, result.size());
-    qp.close();
+    if(Prop.runs > 0) {
+      if(Prop.info) outInfo(o, result.size());
+      qp.close();
+    }
   }
 
   /**

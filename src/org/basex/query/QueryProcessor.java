@@ -147,7 +147,7 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Parses the specified query and returns the result.
+   * Closes the processor.
    * @throws IOException query exception
    */
   public void close() throws IOException {

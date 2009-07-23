@@ -182,7 +182,7 @@ class Session implements Runnable {
     if(quit) bx.sessions.remove(this);
     try {
       context.close();
-      BaseX.outln("Client " + clientId + " has logged out.");
+      BaseX.outln("Client % has logged out.", clientId);
       socket.close();
     } catch(final IOException e) {
       e.printStackTrace();
@@ -194,13 +194,13 @@ class Session implements Runnable {
   public void run() {
     try {
       handle();
-    } catch(final Exception io) {
+    } catch(final IOException io) {
       // for forced stops
       if(io instanceof SocketException) {
         running = false;
         stop(false);
       } else {
-      io.printStackTrace();
+        io.printStackTrace();
       }
     }
   }
