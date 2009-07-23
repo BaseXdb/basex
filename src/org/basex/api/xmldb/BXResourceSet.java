@@ -61,7 +61,6 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
         out.print(r.getContent().toString());
         xml.closeResult();
       }
-      xml.close();
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

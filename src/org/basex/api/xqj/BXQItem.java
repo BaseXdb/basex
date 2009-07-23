@@ -201,9 +201,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private void serialize(final OutputStream os) throws XQException {
     try {
-      final XMLSerializer xml = new XMLSerializer(new PrintOutput(os));
-      serialize(it, ctx, xml);
-      xml.close();
+      final PrintOutput out = new PrintOutput(os);
+      serialize(it, ctx, new XMLSerializer(out));
+      out.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -218,9 +218,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     opened();
     final CachedOutput co = new CachedOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(co);
-      serialize(it, ctx, xml);
-      xml.close();
+      serialize(it, ctx, new XMLSerializer(co));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

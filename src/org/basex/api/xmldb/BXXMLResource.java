@@ -107,7 +107,6 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         } else {
           return null;
         }
-        xml.close();
         content = out.finish();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
@@ -214,12 +213,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
 
     @Override
-    public void endDocument() throws SAXException {
-      try {
-        xml.close();
-      } catch(final IOException ex) {
-        throw new SAXException(ex);
-      }
+    public void endDocument() {
       res.content = out.finish();
     }
 
