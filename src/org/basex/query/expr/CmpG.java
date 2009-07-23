@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.IndexToken;
+import org.basex.data.Data.Type;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -16,7 +16,6 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.path.Axis;
@@ -93,8 +92,8 @@ public final class CmpG extends Arr {
 
   /** Comparator. */
   public Comp cmp;
-  /** Index type. */
-  private IndexToken[] index = {};
+  /** Index expression. */
+  private IndexAccess[] iacc = {};
 
   /**
    * Constructor.
@@ -238,7 +237,8 @@ public final class CmpG extends Arr {
     if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
         expr[1] instanceof Seq)) return false;
 
-    final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
+    final boolean text = ic.data.meta.txtindex &&
+      s.test.type == org.basex.query.item.Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
       s.simple(Axis.ATTR, true);
 
@@ -247,32 +247,29 @@ public final class CmpG extends Arr {
 
     // loop through all strings
     final Iter ir = expr[1].iter(ic.ctx);
-    Item i;
-    while((i = ir.next()) != null) {
-      if(!(i instanceof Str)) return false;
-      final byte[] str = i.str();
-      if(str.length > Token.MAXLEN) return false;
-      final ValuesToken vt = new ValuesToken(text, i.str());
-      ic.is = Math.min(ic.data.nrIDs(vt), ic.is);
-      index = Array.add(index, vt);
+    Item it;
+    while((it = ir.next()) != null) {
+      // allow arbitrary expressions here? it.returned(ctx) == Return.STR...
+      final boolean str = it instanceof Str;
+      if(!str || it.str().length > Token.MAXLEN) return false;
+
+      final Type type = text ? Type.TXT : Type.ATV;
+      ic.is = Math.max(ic.is, !str ? ic.data.meta.size / 10 :
+          ic.data.nrIDs(new ValuesToken(type, it.str())));
+      iacc = Array.add(iacc, new IndexAccess(it, type, ic));
     }
     return true;
   }
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
-    // create index access expressions
-    final int il = index.length;
-    final Expr[] ia = new IndexAccess[il];
-    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(index[i], ic);
-
     // more than one string - merge index results
-    final Expr root = il == 1 ? ia[0] : new Union(ia);
+    final Expr root = iacc.length == 1 ? iacc[0] : new Union(iacc);
 
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(index[0].type() == org.basex.data.Data.Type.TXT) {
+    if(iacc[0].type == Type.TXT) {
       ic.ctx.compInfo(OPTTXTINDEX);
     } else {
       ic.ctx.compInfo(OPTATVINDEX);

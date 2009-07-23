@@ -23,7 +23,7 @@ public final class UpdateExample {
   public static void main(final String[] args) throws Exception {
 
     // Creates a standard output stream
-    ConsoleOutput out = new ConsoleOutput(System.out);
+    PrintOutput out = new PrintOutput(System.out);
 
     // Creates a new context
     Context context = new Context();

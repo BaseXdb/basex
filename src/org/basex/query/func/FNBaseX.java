@@ -4,8 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
-import org.basex.index.IndexToken;
-import org.basex.index.ValuesToken;
+import org.basex.data.Data.Type;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,7 +16,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.util.Tokenizer;
 
 /**
  * Project specific functions.
@@ -84,21 +82,20 @@ final class FNBaseX extends Fun {
 
     if(type.equals(FULLTEXT)) {
       if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
-      return new FTIndexAccess(new FTWords(data, word, ctx.ftpos == null),
-          new Tokenizer(word), ic).iter(ctx);
+      return new FTIndexAccess(new FTWords(
+          data, word, ctx.ftpos == null), ic).iter(ctx);
+    }
+    if(type.equals(TEXT)) {
+      if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
+      return new IndexAccess(expr[0], Type.TXT, ic).iter(ctx);
+    }
+    if(type.equals(ATTRIBUTE)) {
+      if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
+      return new IndexAccess(expr[0], Type.ATV, ic).iter(ctx);
     }
 
-    IndexToken it = null;
-    if(type.equals(TEXT)) {
-      it = new ValuesToken(true, word);
-      if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
-    } else if(type.equals(ATTRIBUTE)) {
-      it = new ValuesToken(false, word);
-      if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
-    } else {
-      Err.or(WHICHIDX, type);
-    }
-    return new IndexAccess(it, ic).iter(ctx);
+    Err.or(WHICHIDX, type);
+    return null;
   }
 
   /**

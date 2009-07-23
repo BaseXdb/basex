@@ -17,7 +17,6 @@ import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.io.CachedOutput;
-import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
@@ -205,7 +204,7 @@ public class BaseXClient {
       final boolean ok = proc.execute(context);
       if(ok && p.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
-            new ConsoleOutput(System.out);
+            new PrintOutput(System.out);
         proc.output(out);
         out.close();
       }

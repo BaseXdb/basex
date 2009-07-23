@@ -79,6 +79,7 @@ public final class CmpR extends Single {
       final Expr e = c.expr[0];
       final double d = ((Item) c.expr[1]).dbl();
       switch(c instanceof CmpG ? ((CmpG) c).cmp.cmp : ((CmpV) c).cmp) {
+        case EQ: return new CmpR(e, d, true, d, true);
         case GE: return new CmpR(e, d, true, Double.POSITIVE_INFINITY, true);
         case GT: return new CmpR(e, d, false, Double.POSITIVE_INFINITY, true);
         case LE: return new CmpR(e, Double.NEGATIVE_INFINITY, true, d, true);
@@ -128,7 +129,7 @@ public final class CmpR extends Single {
       s.simple(Axis.ATTR, true);
 
     // no text or attribute index applicable, min/max not included in range
-    if(!text && !attr || !mni | !mxi || min == Double.NEGATIVE_INFINITY ||
+    if(!text && !attr || !mni || !mxi || min == Double.NEGATIVE_INFINITY ||
         max == Double.POSITIVE_INFINITY) return false;
 
     final StatsKey key = getKey(ic, text);
@@ -144,7 +145,7 @@ public final class CmpR extends Single {
 
   @Override
   public AxisPath indexEquivalent(final IndexContext ic) {
-    final Expr root = new IndexAccess(rt, ic);
+    final Expr root = new RangeAccess(rt, ic);
 
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);

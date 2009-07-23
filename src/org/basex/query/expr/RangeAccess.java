@@ -3,12 +3,11 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.data.Data.Type;
 import org.basex.index.IndexIterator;
-import org.basex.index.ValuesToken;
+import org.basex.index.IndexToken;
+import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -16,33 +15,30 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * This index class retrieves texts and attribute values from the index.
+ * This index class retrieves range values from the index.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class IndexAccess extends Single {
+public final class RangeAccess extends Simple {
+  /** Index type. */
+  final IndexToken ind;
   /** Index context. */
   final IndexContext ictx;
-  /** Access type. */
-  final Type type;
 
   /**
    * Constructor.
-   * @param e index expression
-   * @param t access type
+   * @param i index reference
    * @param ic index context
    */
-  public IndexAccess(final Expr e, final Type t, final IndexContext ic) {
-    super(e);
-    type = t;
+  public RangeAccess(final IndexToken i, final IndexContext ic) {
+    ind = i;
     ictx = ic;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final ValuesToken ind = new ValuesToken(type, expr.atomic(ctx).str());
       final IndexIterator it = ictx.data.ids(ind);
 
       @Override
@@ -69,16 +65,19 @@ public final class IndexAccess extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(type.toString()));
-    expr.plan(ser);
+    ser.openElement(this, TYPE, Token.token(ind.type().toString()));
+    final RangeToken rt = (RangeToken) ind;
+    ser.attribute(MIN, Token.token(rt.min));
+    ser.attribute(MAX, Token.token(rt.max));
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(name());
-    tb.add("(" + type + ", ");
-    tb.add(expr);
+    tb.add("(" + ind.type() + ", ");
+    final RangeToken rt = (RangeToken) ind;
+    tb.add(rt.min + "-" + rt.max);
     return tb.add(")").toString();
   }
 }

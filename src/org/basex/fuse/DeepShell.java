@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.io.ConsoleOutput;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 
 /**
@@ -204,7 +204,7 @@ public final class DeepShell {
     try {
       Nodes n = new Nodes(0, fs.data);
       n = new QueryProcessor("/", n).queryNodes();
-      final ConsoleOutput out = new ConsoleOutput(System.out);
+      final PrintOutput out = new PrintOutput(System.out);
       final XMLSerializer xml = new XMLSerializer(out, false, true);
       n.serialize(xml);
       xml.close();

@@ -58,6 +58,8 @@ public final class IterStep extends Step {
 
         Nod temp = null;
         while(true) {
+          ctx.checkStop();
+
           if(ir == null) {
             final Item i = iter.next();
             if(i == null) break;

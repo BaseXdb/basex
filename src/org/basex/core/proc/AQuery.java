@@ -90,9 +90,8 @@ abstract class AQuery extends Process {
    */
   protected void out(final PrintOutput o, final boolean p) throws IOException {
     for(int i = 0; i < Prop.runs; i++) {
-      final XMLSerializer xml = i == 0 ? new XMLSerializer(Prop.serialize ?
-          o : new NullOutput(), Prop.xmloutput, p) : new XMLSerializer(
-              new NullOutput(!Prop.serialize), Prop.xmloutput, Prop.xqformat);
+      final XMLSerializer xml = new XMLSerializer(i == 0 && Prop.serialize ?
+          o : new NullOutput(!Prop.serialize), Prop.xmloutput, p);
       result.serialize(xml);
       xml.close();
     }

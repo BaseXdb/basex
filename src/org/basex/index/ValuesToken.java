@@ -20,8 +20,8 @@ public final class ValuesToken implements IndexToken {
    * @param t index type
    * @param tok token
    */
-  public ValuesToken(final boolean t, final byte[] tok) {
-    type = t ? Type.TXT : Type.ATV;
+  public ValuesToken(final Type t, final byte[] tok) {
+    type = t;
     text = tok;
   }
 

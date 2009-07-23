@@ -52,7 +52,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting item or
-   * a null reference.
+   * a <code>null</code> reference.
    * If this method is not overwritten, {@link #iter} must be implemented.
    * @param ctx query context
    * @return iterator

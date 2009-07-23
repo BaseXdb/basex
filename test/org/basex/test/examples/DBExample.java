@@ -23,7 +23,7 @@ public final class DBExample {
   public static void main(final String[] args) throws Exception {
 
     // Creates a standard output stream
-    ConsoleOutput out = new ConsoleOutput(System.out);
+    PrintOutput out = new PrintOutput(System.out);
 
     // Creates a new database context, referencing the database.
     Context context = new Context();

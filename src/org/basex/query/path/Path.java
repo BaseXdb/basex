@@ -44,6 +44,7 @@ public abstract class Path extends Expr {
   protected boolean uses(final Expr[] step, final Use use,
       final QueryContext ctx) {
 
+    //if(use == Use.POS) return false;
     if(use == Use.CTX && root == null) return true;
     for(final Expr s : step) if(s.uses(use, ctx)) return true;
     return root != null && root.uses(use, ctx);

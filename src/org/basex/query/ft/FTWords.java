@@ -111,8 +111,8 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast);
           // more than one token: deactivate fast processing
+          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast);
           ft.fast &= ft.count() == 1;
           ft.init();
           while(ft.more()) {

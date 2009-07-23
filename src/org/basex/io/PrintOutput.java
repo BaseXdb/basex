@@ -149,7 +149,10 @@ public class PrintOutput extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    if(os != null) os.close();
+    if(os != null) {
+      if(os == System.out || os == System.err) os.flush();
+      else os.close();
+    }
   }
 
   /**

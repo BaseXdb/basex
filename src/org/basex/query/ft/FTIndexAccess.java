@@ -10,7 +10,6 @@ import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
-import org.basex.util.Tokenizer;
 
 /**
  * FTContains expression with index access.
@@ -21,21 +20,16 @@ import org.basex.util.Tokenizer;
 public final class FTIndexAccess extends Simple {
   /** Full-text expression. */
   final FTExpr ftexpr;
-  /** Full-text parser. */
-  final Tokenizer ft;
   /** Index context. */
   final IndexContext ictx;
 
   /**
    * Constructor.
    * @param ex contains, select and optional ignore expression
-   * @param ftt tokenizer
    * @param ic index context
    */
-  public FTIndexAccess(final FTExpr ex, final Tokenizer ftt,
-      final IndexContext ic) {
+  public FTIndexAccess(final FTExpr ex, final IndexContext ic) {
     ftexpr = ex;
-    ft = ftt;
     ictx = ic;
   }
 
@@ -46,12 +40,8 @@ public final class FTIndexAccess extends Simple {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Tokenizer tmp = ctx.fttoken;
-        ctx.fttoken = ft;
-        final FTItem it = ir.next();
-        ctx.fttoken = tmp;
-
         // add entry to visualization
+        final FTItem it = ir.next();
         if(ctx.ftpos != null && it != null) ctx.ftpos.add(it.pre, it.all);
         return it;
       }

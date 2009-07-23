@@ -108,7 +108,7 @@ public class FTContains extends Expr {
     if(ic.seq) return new FTContainsIndex(expr, ie, ic.not);
 
     // standard index evaluation; first expression will always be an axis path
-    return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ft, ic), ic.step);
+    return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ic), ic.step);
   }
 
   @Override

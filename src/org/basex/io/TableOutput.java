@@ -8,6 +8,7 @@ import org.basex.util.IntList;
  * This class allows a blockwise output of the database table.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Christian Gruen
  * @author Tim Petrowsky
  */
 public final class TableOutput extends FileOutputStream {
@@ -23,13 +24,13 @@ public final class TableOutput extends FileOutputStream {
   /** Position inside buffer. */
   private int pos;
   /** Block Count. */
-  private int blockCount;
+  private int bcount;
   /** First pre value of current block. */
-  private int firstPre;
+  private int fpre;
   /** Name of the database. */
-  private String database;
+  private String name;
   /** Current Filename. */
-  private String filename;
+  private String file;
 
   /**
    * Initializes the output.
@@ -40,8 +41,8 @@ public final class TableOutput extends FileOutputStream {
    */
   public TableOutput(final String db, final String fn) throws IOException {
     super(IO.dbfile(db, fn));
-    database = db;
-    filename = fn;
+    name = db;
+    file = fn;
   }
 
   @Override
@@ -54,9 +55,9 @@ public final class TableOutput extends FileOutputStream {
   public void flush() throws IOException {
     if(pos == 0) return;
     super.write(buffer);
-    firstPres.add(firstPre);
-    blocks.add(blockCount++);
-    firstPre += pos >>> IO.NODEPOWER;
+    firstPres.add(fpre);
+    blocks.add(bcount++);
+    fpre += pos >>> IO.NODEPOWER;
     pos = 0;
   }
 
@@ -65,14 +66,14 @@ public final class TableOutput extends FileOutputStream {
     flush();
     super.close();
 
-    final DataOutput info = new DataOutput(database, filename + 'i');
-    info.writeNum(blockCount);
-    info.writeNum(blockCount);
-    info.writeNum(firstPre);
-    info.writeNum(blockCount);
-    for(int i = 0; i < blockCount; i++) info.writeNum(firstPres.list[i]);
-    info.writeNum(blockCount);
-    for(int i = 0; i < blockCount; i++) info.writeNum(blocks.list[i]);
+    final DataOutput info = new DataOutput(name, file + 'i');
+    info.writeNum(bcount);
+    info.writeNum(bcount);
+    info.writeNum(fpre);
+    info.writeNum(bcount);
+    for(int i = 0; i < bcount; i++) info.writeNum(firstPres.list[i]);
+    info.writeNum(bcount);
+    for(int i = 0; i < bcount; i++) info.writeNum(blocks.list[i]);
     info.close();
   }
 }

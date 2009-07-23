@@ -29,7 +29,7 @@ public final class XQueryExample {
   public static void main(final String[] args) throws Exception {
 
     // Creates a standard output stream
-    ConsoleOutput out = new ConsoleOutput(System.out);
+    PrintOutput out = new PrintOutput(System.out);
 
     out.println("=== First example: Creating a result instance");
 

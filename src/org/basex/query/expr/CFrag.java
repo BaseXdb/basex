@@ -17,6 +17,18 @@ public abstract class CFrag extends Arr {
     super(n);
   }
 
+  /*
+   * Pre-evaluates the fragment if possible.
+   * @param ctx query context
+   * @return expression
+   * @throws QueryException query exception
+  protected final Expr item(final QueryContext ctx) throws QueryException {
+    for(final Expr e : expr) if(!e.i()) return this;
+    ctx.compInfo(OPTPRE, this);
+    return atomic(ctx);
+  }
+   */
+
   @Override
   public final boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.FRG || super.uses(u, ctx);
