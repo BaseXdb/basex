@@ -460,9 +460,9 @@ public final class JPGParser extends AbstractParser {
     bfc.buffer(len + 8);
     final long pos = bfc.position();
     if(checkNextBytes(HEADER_EXIF)
-    	&& checkEndianness()
-    	&& bfc.get() == 0x00
-    	&& bfc.get() == 0x2A) {
+        && checkEndianness()
+        && bfc.get() == 0x00
+        && bfc.get() == 0x2A) {
 
       final int ifdOffset = bfc.getInt();
       /*
@@ -506,7 +506,7 @@ public final class JPGParser extends AbstractParser {
   }
 
   /**
-   * Read a single tag field from the IFD array.
+   * Reads a single tag field from the IFD array.
    * @param ifdOffset position of the first IFD byte.
    * @param data the {@link ByteBuffer} containing the field data.
    * @throws IOException if any error occurs while reading from the file
@@ -523,7 +523,7 @@ public final class JPGParser extends AbstractParser {
   }
 
   /**
-   * Check if the two endianness bytes are correct and set the ByteBuffer's
+   * Checks if the two endianness bytes are correct and set the ByteBuffer's
    * endianness according to these bytes.
    * @return true if the endianness bytes are valid, false otherwise.
    */

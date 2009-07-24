@@ -14,7 +14,7 @@ import org.basex.gui.GUIConstants.Fill;
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
-  /** Design of color gradient. */
+  /** Fill mode. */
   private Fill mode;
 
   /**
@@ -25,7 +25,7 @@ public class BaseXBack extends JPanel {
   }
 
   /**
-   * Default Constructor.
+   * Constructor, specifying the fill mode.
    * @param m visualization mode
    */
   public BaseXBack(final Fill m) {
@@ -33,7 +33,7 @@ public class BaseXBack extends JPanel {
   }
 
   /**
-   * Default Constructor.
+   * Sets the specified fill mode.
    * @param m visualization mode
    */
   public final void setMode(final Fill m) {
@@ -55,7 +55,7 @@ public class BaseXBack extends JPanel {
   }
 
   /**
-   * Set an empty border.
+   * Sets an empty border with the specified margins.
    * @param t top distance
    * @param l left distance
    * @param b bottom distance

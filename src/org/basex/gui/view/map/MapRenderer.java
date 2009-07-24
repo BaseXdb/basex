@@ -318,7 +318,7 @@ final class MapRenderer {
   }
 
   /**
-   * Round a value.
+   * Rounds a value.
    * @param a double to round
    * @return rounded double
    */
@@ -557,7 +557,7 @@ final class MapRenderer {
   }
 
   /**
-   * Calculate a text using thumbnail visualization.
+   * Calculates a text using thumbnail visualization.
    * @param r rectangle
    * @param data full-text to be drawn
    * @param sen flag for sentence or paragraph

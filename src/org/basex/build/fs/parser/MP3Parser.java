@@ -484,7 +484,7 @@ public final class MP3Parser extends AbstractParser {
   }
 
   /**
-   * Skip the text encoding description bytes.
+   * Skips the text encoding description bytes.
    * @return the number of skipped bytes.
    * @throws IOException if any error occurs while reading from the file.
    */
@@ -649,7 +649,7 @@ public final class MP3Parser extends AbstractParser {
   }
 
   /**
-   * Skip the picture description.
+   * Skips the picture description.
    * @throws IOException if any error occurs while reading from the file.
    */
   void skipPicDescription() throws IOException {

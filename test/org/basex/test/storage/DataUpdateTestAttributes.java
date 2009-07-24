@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public final class DataUpdateTestAttributes extends DataUpdateTest {
   /**
-   * Test the update of an existing attribute.
+   * Tests the update of an existing attribute.
    */
   @Test
   public void testUpdateAttribute() {
@@ -28,7 +28,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
   }
 
   /**
-   * Test the update of an existing attribute.
+   * Tests the update of an existing attribute.
    */
   @Test
   public void testUpdateAttribute2() {
@@ -41,7 +41,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
   }
 
   /**
-   * Test the insertion of a new attribute.
+   * Tests the insertion of a new attribute.
    */
   @Test
   public void testAddAttribute() {
@@ -69,5 +69,4 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
     assertByteArraysEqual(token("foo"), data.attName(9));
     assertByteArraysEqual(token("junit"), data.attValue(9));
   }
-
 }

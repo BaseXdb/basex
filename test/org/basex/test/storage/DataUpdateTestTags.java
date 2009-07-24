@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public final class DataUpdateTestTags extends DataUpdateTest {
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAsOnly1() {
@@ -38,7 +38,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAsOnly2() {
@@ -63,7 +63,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAsOnly3() {
@@ -88,7 +88,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAfterAttsAsFirst() {
@@ -112,7 +112,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAfterAttsAsSecond() {
@@ -137,7 +137,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    */
   @Test
   public void testInsertTagAfterAttsAsLast() {
@@ -161,7 +161,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   }
 
   /**
-   * Test updateTagName.
+   * Tests updateTagName.
    */
   @Test
   public void testUpdateTagName() {

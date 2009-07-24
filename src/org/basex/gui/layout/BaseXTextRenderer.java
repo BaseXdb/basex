@@ -352,7 +352,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
-   * Paint the text cursor.
+   * Paints the text cursor.
    * @param g graphics reference
    * @param xx x position
    */

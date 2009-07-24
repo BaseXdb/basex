@@ -121,19 +121,17 @@ public final class TreeView extends View {
 
   @Override
   public void paintComponent(final Graphics g) {
-
-    final Data data = gui.context.data();
-    /** Set the paint Component */
     super.paintComponent(g);
+
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
 
-    /** Timer */
+    // timer
     final Performance perf = new Performance();
     perf.initTimer();
 
-    /** Initialize sizes */
+    // initializes sizes
     fontHeight = g.getFontMetrics().getHeight();
 
     if(windowSizeChanged()) {
@@ -150,6 +148,7 @@ public final class TreeView extends View {
     g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
     // highlights the focused node
+    final Data data = gui.context.data();
     if(focus()) {
       final TreeRect r = focusedRect;
       g.setColor(markColor);
@@ -212,16 +211,13 @@ public final class TreeView extends View {
               break;
             }
           }
-
         }
       }
-
     }
-
   }
 
   /**
-   * creates a new translucent BufferedImage.
+   * Creates a new translucent BufferedImage.
    * @return new translucent BufferedImage
    */
   private BufferedImage createImage() {

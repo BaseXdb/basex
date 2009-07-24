@@ -419,7 +419,7 @@ public abstract class Data {
   public abstract void insert(int pre, int par, byte[] name, byte[] val);
 
   /**
-   * Insert a data instance at the specified pre value.
+   * Inserts a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
    * @param pre value at which to insert new data
    * @param par parent pre value of node

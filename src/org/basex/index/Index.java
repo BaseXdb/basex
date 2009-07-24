@@ -31,7 +31,7 @@ public abstract class Index {
   public abstract int nrIDs(final IndexToken tok);
 
   /**
-   * Close the index.
+   * Closes the index.
    * @throws IOException in case of write errors
    */
   @SuppressWarnings("unused")

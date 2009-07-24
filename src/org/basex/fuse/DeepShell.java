@@ -21,7 +21,6 @@ import org.basex.query.QueryProcessor;
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public final class DeepShell {
-
   /** Shell command description. */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)
@@ -104,7 +103,7 @@ public final class DeepShell {
   }
 
   /**
-   * Tokenize argument line.
+   * Tokenizes argument line.
    * @param line string to split in tokens
    * @return argument vector
    */
@@ -119,7 +118,7 @@ public final class DeepShell {
   }
 
   /**
-   * Make new directory.
+   * Makes new directory.
    * @param args argument vector
    */
   @Command(shortcut = 'm',
@@ -134,7 +133,7 @@ public final class DeepShell {
   }
 
   /**
-   * Remove existing directory.
+   * Removes existing directory.
    * @param args argument vector
    */
   @Command(shortcut = 'r',
@@ -149,7 +148,7 @@ public final class DeepShell {
   }
 
   /**
-   * Create a file if it doesn't exist yet.
+   * Creates a file if it doesn't exist yet.
    * @param args argument vector
    */
   @Command(shortcut = 'c',
@@ -164,7 +163,7 @@ public final class DeepShell {
   }
 
   /**
-   * Print short help message for available commands.
+   * Prints short help message for available commands.
    * @param args argument vector
    */
   @Command(shortcut = 'h', help = "print this message")

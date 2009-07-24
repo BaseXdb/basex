@@ -75,14 +75,14 @@ public abstract class TableAccess {
   public abstract void write5(int p, int o, long v);
 
   /**
-   * Delete a range of entries.
+   * Deletes a range of entries.
    * @param pre pre value of the first node to delete
    * @param nr number of entries to be deleted
    */
   public abstract void delete(int pre, int nr);
 
   /**
-   * Insert entries.
+   * Inserts entries.
    * @param pre pre value of node to insert after
    * @param entries array of bytes containing the entries to insert
    */

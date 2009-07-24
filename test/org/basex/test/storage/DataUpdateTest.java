@@ -44,7 +44,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Create the database.
+   * Creates the database.
    */
   @Before
   public void setUp() {
@@ -58,7 +58,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Delete the test-database.
+   * Deletes the test-database.
    */
   @After
   public void tearDown() {
@@ -71,7 +71,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Reload Data class.
+   * Reloads the database.
    */
   void reload() {
     try {
@@ -84,7 +84,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Test byte-arrays for equality.
+   * Tests byte-arrays for equality.
    * @param exp expected value
    * @param act actual value
    */
@@ -94,7 +94,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Test for correct data size.
+   * Tests for correct data size.
    */
   @Test
   public void testSize() {

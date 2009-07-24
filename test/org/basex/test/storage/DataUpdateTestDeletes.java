@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public final class DataUpdateTestDeletes extends DataUpdateTest {
   /**
-   * Test deletion of a simple node.
+   * Tests deletion of a simple node.
    */
   @Test
   public void testSimpleNodeDelete() {
@@ -37,7 +37,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
   }
 
   /**
-   * Test deletion of a node with a child.
+   * Tests deletion of a node with a child.
    */
   @Test
   public void testCascadingDelete() {
@@ -58,7 +58,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
   }
 
   /**
-   * Test deletion of a node with a child (with text) and attribute.
+   * Tests deletion of a node with a child (with text) and attribute.
    */
   @Test
   public void testCascadingDelete2() {
@@ -82,7 +82,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
   }
 
   /**
-   * Test deletion of an attribute.
+   * Tests deletion of an attribute.
    */
   @Test
   public void testDeleteAttribute() {
@@ -108,7 +108,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
 
   /**
    * For the sake of completeness.
-   * Test deletion of a text-node.
+   * Tests deletion of a text-node.
    */
   @Test
   public void testDeleteText() {

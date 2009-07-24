@@ -36,7 +36,7 @@ abstract class AbstractTest {
   String details() { return null; }
 
   /**
-   * Create a container for the specified node values.
+   * Creates a container for the specified node values.
    * @param nodes node values
    * @return node array
    */
@@ -45,7 +45,7 @@ abstract class AbstractTest {
   }
 
   /**
-   * Create an iterator for the specified string.
+   * Creates an iterator for the specified string.
    * @param str string
    * @return literal
    */
@@ -54,7 +54,7 @@ abstract class AbstractTest {
   }
 
   /**
-   * Create an iterator for the specified double.
+   * Creates an iterator for the specified double.
    * @param d double value
    * @return literal
    */
@@ -63,7 +63,7 @@ abstract class AbstractTest {
   }
 
   /**
-   * Create an iterator for the specified double.
+   * Creates an iterator for the specified double.
    * @param d double value
    * @return literal
    */
@@ -72,7 +72,7 @@ abstract class AbstractTest {
   }
 
   /**
-   * Create an iterator for the specified boolean.
+   * Creates an iterator for the specified boolean.
    * @param b boolean value
    * @return literal
    */

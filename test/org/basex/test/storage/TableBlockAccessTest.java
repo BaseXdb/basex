@@ -51,7 +51,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Load the JUnitTest database.
+   * Loads the JUnitTest database.
    */
   @Before
   public void setUp() {
@@ -76,7 +76,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Drop the JUnitTest database.
+   * Drops the JUnitTest database.
    */
   @After
   public void tearDown() {
@@ -89,7 +89,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Close and reload storage.
+   * Closes and reloads storage.
    */
   private void closeAndReload() {
     try {
@@ -102,7 +102,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Compare old with new entries.
+   * Compares old with new entries.
    * @param startNodeNumber first old entry to compare
    * @param currentNodeNumber first new entry to compare
    * @param count number of entries to compare
@@ -126,7 +126,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test size of file.
+   * Tests size of file.
    */
   @Test
   public void testSize() {
@@ -140,7 +140,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test delete.
+   * Tests delete.
    */
   @Test
   public void testDeleteOneNode() {
@@ -155,7 +155,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test delete at beginning.
+   * Tests delete at beginning.
    */
   @Test
   public void testDeleteAtBeginning() {
@@ -168,7 +168,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test delete at end.
+   * Tests delete at end.
    */
   @Test
   public void testDeleteAtEnd() {
@@ -181,7 +181,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Delete first block.
+   * Deletes first block.
    */
   @Test
   public void testDeleteFirstBlock() {
@@ -194,7 +194,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Delete the second block.
+   * Deletes the second block.
    */
   @Test
   public void testDeleteSecondBlock() {
@@ -211,7 +211,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Delete the last block.
+   * Deletes the last block.
    */
   @Test
   public void testDeleteLastBlock() {
@@ -224,7 +224,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Delete the second block with some surrounding nodes.
+   * Deletes the second block with some surrounding nodes.
    */
   @Test
   public void testDeleteSecondBlockAndSurroundingNodes() {
@@ -243,7 +243,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test basic insertion.
+   * Tests basic insertion.
    */
   @Test
   public void testSimpleInsert() {
@@ -260,7 +260,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test inserting multiple entries.
+   * Tests inserting multiple entries.
    */
   @Test
   public void testInsertMultiple() {
@@ -278,7 +278,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test inserting multiple entries.
+   * Tests inserting multiple entries.
    */
   @Test
   public void testInsertMany() {
@@ -295,7 +295,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Test inserting multiple entries.
+   * Tests inserting multiple entries.
    */
   @Test
   public void testInsertAtBlockBoundary() {
@@ -314,7 +314,7 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Assert that the chosen entries are inserted by a test case.
+   * Asserts that the chosen entries are inserted by a test case.
    * @param startNum first entry
    * @param count number of entries
    */
@@ -325,8 +325,8 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Create a test-byte array containing the specified number of entries. All
-   * bytes are set to (byte)5.
+   * Creates a test-byte array containing the specified number of entries.
+   * All bytes are set to (byte) 5.
    * @param e number of Entries to create
    * @return byte array containing the number of entries (all bytes 5)
    */

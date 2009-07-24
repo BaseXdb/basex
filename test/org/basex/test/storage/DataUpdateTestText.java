@@ -14,7 +14,7 @@ import org.junit.Test;
  */
 public final class DataUpdateTestText extends DataUpdateTest {
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test
@@ -68,7 +68,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test
@@ -95,7 +95,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test
@@ -120,7 +120,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test
@@ -146,7 +146,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test
@@ -171,7 +171,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert text before text.
+   * Tests insert text before text.
    * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
@@ -180,7 +180,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert text before text.
+   * Tests insert text before text.
    * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
@@ -189,7 +189,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test insert text before text.
+   * Tests insert text before text.
    * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
@@ -198,7 +198,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   }
 
   /**
-   * Test updateText.
+   * Tests updateText.
    */
   @Test
   public void testUpdateText() {

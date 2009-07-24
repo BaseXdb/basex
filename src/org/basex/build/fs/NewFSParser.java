@@ -55,7 +55,7 @@ public final class NewFSParser extends Parser {
     new HashMap<String, Class<? extends AbstractParser>>();
 
   /**
-   * Register a parser implementation with the fs parser.
+   * Registers a parser implementation with the fs parser.
    * @param suffix the suffix to register the parser implementation for.
    * @param c the parser implementation class.
    */
@@ -164,7 +164,7 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Get a parser implementation for given file suffix.
+   * Gets a parser implementation for given file suffix.
    * @param suffix the file suffix to get the parser for.
    * @return the parser implementation or <code>null</code> if no implementation
    *         is available.
@@ -518,7 +518,7 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Parse a xml file.
+   * Parses a xml file.
    * @throws IOException if any error occurs while generating the xml code.
    */
   public void parseXML() throws IOException {

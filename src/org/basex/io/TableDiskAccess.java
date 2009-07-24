@@ -48,7 +48,7 @@ public final class TableDiskAccess extends TableAccess {
   private int index = -1;
   /** Number of entries in the storage. */
   private int count;
-  /** Whether the index is dirty. */
+  /** Dirty index flag. */
   private boolean dirty;
 
   /**
@@ -415,7 +415,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Return the entryCount; needed for JUnit tests.
+   * Returns the entryCount; needed for JUnit tests.
    * @return number of entries in storage.
    */
   public synchronized int size() {
@@ -423,7 +423,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Return the number of used blocks; needed for JUnit tests.
+   * Returns the number of used blocks; needed for JUnit tests.
    * @return number of used blocks.
    */
   public synchronized int blocks() {

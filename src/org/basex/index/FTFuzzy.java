@@ -195,7 +195,7 @@ public final class FTFuzzy extends FTIndex {
   }
 
   /**
-   * Get the pointer on ftdata for a token.
+   * Gets the pointer on ftdata for a token.
    * @param pt pointer on token
    * @param lt length of the token
    * @return int pointer on ftdata

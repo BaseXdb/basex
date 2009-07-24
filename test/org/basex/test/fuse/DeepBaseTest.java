@@ -18,7 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * Test modeling a file hierarchy in XML.
+ * Tests modeling a file hierarchy in XML.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
@@ -32,7 +32,7 @@ public class DeepBaseTest {
   private DeepFS dbfs;
 
   /**
-   * Create the database.
+   * Creates the database.
    * @throws Exception exception
    */
   @Before
@@ -43,7 +43,7 @@ public class DeepBaseTest {
   }
 
   /**
-   * Clean up.
+   * Cleans up.
    */
   @After
   public void tearDown() {
@@ -53,7 +53,7 @@ public class DeepBaseTest {
   }
 
   /**
-   * Make some directories and test return code and composed XML.
+   * Makes some directories and test return code and composed XML.
    * [AH] update test case
    */
   //@Test
@@ -75,7 +75,7 @@ public class DeepBaseTest {
   }
 
   /**
-   * Create regular file and check id returned.
+   * Creates regular file and check id returned.
    * [AH] update test case
    */
   //@Test
@@ -104,8 +104,8 @@ public class DeepBaseTest {
     assertEquals("getattr", -1, dbfs.getattr("/a/b/x/cfile"));
   }
 
-  /**
-   * Remove a file (rmdir and unlink are handled the same way).
+  /*
+   * Removes a file (rmdir and unlink are handled the same way).
   @Test
   public void testUnlink() {
     loadTestDB();
@@ -116,8 +116,8 @@ public class DeepBaseTest {
   }
    */
 
-  /**
-   * Read directory entries (rmdir and unlink are handled the same way).
+  /*
+   * Reads directory entries (rmdir and unlink are handled the same way).
   @Test
   public void testReaddir() {
     loadTestDB();
@@ -129,7 +129,7 @@ public class DeepBaseTest {
    */
 
   /**
-   * Load a pre-filled DeepFS XML instance.
+   * Loads a pre-filled DeepFS XML instance.
    */
   private void loadTestDB() {
     try {
@@ -144,7 +144,7 @@ public class DeepBaseTest {
   }
 
   /**
-   * Evaluate XQuery and return result as string.
+   * Evaluates XQuery and return result as string.
    * @param query to execute
    * @return result as string
    */

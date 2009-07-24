@@ -174,7 +174,7 @@ public final class DataAccess {
   }
 
   /**
-   * Append a value to the file and return it's offset.
+   * Appends a value to the file and return it's offset.
    * @param p write position
    * @param v byte array to be appended
    */
@@ -236,7 +236,7 @@ public final class DataAccess {
   }
 
   /**
-   * Append a value to the file and return it's offset.
+   * Appends a value to the file and return it's offset.
    * @param v number to be appended
    */
   private synchronized void writeNum(final int v) {

@@ -35,7 +35,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   }
 
   /**
-   * Test nodes for deep equality (including atts/children).
+   * Tests nodes for deep equality (including atts/children).
    * @param data1 first node data
    * @param pre1 first node pre
    * @param data2 second node data
@@ -70,7 +70,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   }
 
   /**
-   * Test nodes for correct parent reference.
+   * Tests nodes for correct parent reference.
    * @param par parent value
    * @param pre pre value
    * @param d node data
@@ -80,7 +80,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   }
 
   /**
-   * Test bulk insertion.
+   * Tests bulk insertion.
    */
   @Test
   public void testBulkInsertSmall() {
@@ -91,7 +91,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   }
 
   /**
-   * Test bulk insertion.
+   * Tests bulk insertion.
    */
   @Test
   public void testBulkInsertLarge() {

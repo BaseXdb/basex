@@ -27,7 +27,7 @@ public final class EMLExtractor extends AbstractExtractor {
   /** Header key. */
   private static final Pattern KEYPAT = Pattern.compile("^([A-Za-z-]+): (.*)");
 
-  /** Mapping the month to numbers. */
+  /** Mapping of months to numbers. */
   private static final byte[][] MMONTHS = { token("Jan"), token("Feb"),
       token("Mar"), token("Apr"), token("May"), token("Jun"), token("Jul"),
       token("Aug"), token("Sep"), token("Oct"), token("Nov"), token("Dec") };

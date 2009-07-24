@@ -187,7 +187,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Return the number of written bytes.
+   * Returns the number of written bytes.
    * This is not necessarily e.g. the file size.
    * @return number of written bytes
    */
