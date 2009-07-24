@@ -265,7 +265,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), null));
+      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr)));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -279,7 +279,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createDB(final IO io) throws BXQException {
     try {
-      return checkDB(CreateDB.xml(io, null));
+      return checkDB(CreateDB.xml(io));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

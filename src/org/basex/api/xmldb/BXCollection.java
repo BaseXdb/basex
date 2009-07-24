@@ -49,9 +49,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public BXCollection(final String name) throws XMLDBException {
     try {
       ctx = new Context();
-      final Data data = CreateDB.xml(Parser.emptyParser(IO.get(name)), name);
-      ctx.data(data);
-      ctx.addToPool(data);
+      ctx.data(CreateDB.xml(ctx, Parser.emptyParser(IO.get(name)), name));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
