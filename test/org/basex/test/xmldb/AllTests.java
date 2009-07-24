@@ -33,11 +33,11 @@ public class AllTests {
   /** Optional password. */
   static final String PW = null;
 
-  /** Test Documents. */
+  /** Test Document. */
   static final String DOC1 = "first.xml";
-  /** Test Documents. */
+  /** Test Document. */
   static final String DOC2 = "second.xml";
-  /** Test Documents. */
+  /** Test Document. */
   static final String DOC3 = "third.xml";
 
   /** Collection. */
