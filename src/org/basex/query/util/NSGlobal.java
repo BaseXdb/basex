@@ -45,7 +45,7 @@ public final class NSGlobal {
    * @param uri URI
    * @return prefix
    */
-  public static byte[] prefix(final byte[] uri) {
+  static byte[] prefix(final byte[] uri) {
     for(int s = atts.size - 1; s >= 0; s--) {
       if(eq(atts.val[s], uri)) return atts.key[s];
     }

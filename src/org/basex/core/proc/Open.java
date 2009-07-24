@@ -6,7 +6,6 @@ import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
 
@@ -27,9 +26,8 @@ public final class Open extends Process {
 
   @Override
   protected boolean exec() {
-    final String db = args[0].replaceAll("(.*)\\..*", "$1");
-    if(!IO.dbpath(db).exists() && !db.equals(DataText.S_DEEPFS))
-      return error(DBNOTFOUND, db);
+    final String db = args[0];
+    if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
 
     // close old database
     context.close();

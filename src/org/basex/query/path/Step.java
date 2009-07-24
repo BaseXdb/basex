@@ -79,18 +79,18 @@ public class Step extends Preds {
 
     if(e != this) return Seq.EMPTY;
 
-    // No predicates.. evaluate via simple iterator
+    // no predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
     final Expr p = pred[0];
 
-    // Position predicate
+    // position predicate
     final Pos pos = p instanceof Pos ? (Pos) p : null;
-    // Last flag
+    // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
-    // Multiple Predicates or POS
+    // multiple Predicates or POS
     if(pred.length > 1 || !last && pos == null &&
         uses(Use.POS, ctx)) return this;
-    // Use iterative evaluation
+    // use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }
 

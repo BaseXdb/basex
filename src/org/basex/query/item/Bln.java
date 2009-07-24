@@ -101,7 +101,7 @@ public final class Bln extends Item {
    * @return result of check
    * @throws QueryException evaluation exception
    */
-  public static boolean check(final byte[] str) throws QueryException {
+  static boolean check(final byte[] str) throws QueryException {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;

@@ -342,18 +342,4 @@ public final class FSParser extends Parser {
   public double prog() {
     return 0;
   }
-
-  /**
-   * Deletes a non-empty directory.
-   * @param dir to be deleted.
-   * @return boolean true for success, false for failure.
-   */
-  public static boolean deleteDir(final File dir) {
-    if(dir.isDirectory()) {
-      for(final String child : dir.list()) {
-        if(!deleteDir(new File(dir, child))) return false;
-      }
-    }
-    return dir.delete();
-  }
 }

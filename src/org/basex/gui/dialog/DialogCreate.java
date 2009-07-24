@@ -250,13 +250,13 @@ public final class DialogCreate extends Dialog {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
-        img = GUI.icon("warn");
+        img = BaseXLayout.icon("warn");
       }
     }
 
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
-    info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
+    info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
     filter.setEnabled(exists && file.isDir());
 
     BaseXLayout.enableOK(buttons, BUTTONOK, ok);

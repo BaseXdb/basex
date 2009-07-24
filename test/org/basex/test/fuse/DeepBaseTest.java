@@ -24,15 +24,12 @@ import org.junit.Before;
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public class DeepBaseTest {
-
   /** Name of test database. */
-  private static final String DBNAME = "DeepBaseTestDB";
-
+  private static final String DBNAME = DeepBaseTest.class.getSimpleName();
   /** File name for test output. */
   private static final String TESTFILE = "/tmp/deepbasetest.xml";
-
   /** DeepBase reference to test. */
-  DeepFS dbfs;
+  private DeepFS dbfs;
 
   /**
    * Create the database.
@@ -138,7 +135,7 @@ public class DeepBaseTest {
     try {
       final Context ctx = new Context();
       ctx.data(CreateDB.xml(new XMLParser(
-          IO.get("test/org/basex/test/fuse/getattrtest.xml")), "DBNAME"));
+          IO.get("test/org/basex/test/fuse/getattrtest.xml")), DBNAME));
       dbfs.data = ctx.data();
     } catch(final IOException e) {
       e.printStackTrace();

@@ -18,7 +18,7 @@ public final class XMLExtractor extends AbstractExtractor {
   public void extract(final Builder listener, final File f) throws IOException {
     listener.startElem(XML, atts.reset());
     final IO io = IO.get(f.getPath());
-    final Parser parser = Parser.getXMLParser(io);
+    final Parser parser = Parser.xmlParser(io);
     parser.doc = false;
     parser.parse(listener);
     listener.endElem(XML);

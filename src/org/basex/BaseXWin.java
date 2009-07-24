@@ -66,11 +66,9 @@ public final class BaseXWin {
 
         // open specified document or database
         if(args.length != 0) {
-          String db = args[0].replace('\\', '/');
-          if(db.endsWith(IO.BASEXSUFFIX)) {
-            db = db.replaceAll("^.*/(.*)/.*", "$1");
-          }
+          final String db = args[0].replace('\\', '/');
           gui.execute(new CreateDB(db));
+          GUIProp.createpath = IO.get(db).path();
         }
         // close wait panel
         wait.dispose();
@@ -81,7 +79,7 @@ public final class BaseXWin {
   /**
    * Initializes the GUI.
    */
-  public static void init() {
+  static void init() {
     try {
       // ..added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
@@ -92,7 +90,7 @@ public final class BaseXWin {
           UIManager.getSystemLookAndFeelClassName());
 
       if(GUIProp.javalook) {
-        // apply non-bold fonts in Java look & feel
+        // apply non-bold fonts to Java's L&F
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();
         while(en.hasMoreElements()) {
@@ -106,24 +104,6 @@ public final class BaseXWin {
       ToolTipManager.sharedInstance().setDismissDelay(20000);
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
-
-      /*
-      for(java.lang.reflect.Field f : java.awt.SystemColor.class.getFields()) {
-        final Object o = f.get(null);
-        //if(!(o instanceof java.awt.SystemColor)) continue;
-        final Color c = (Color) o;
-        BaseX.outln("%: %,%,%", f, c.getRed(), c.getGreen(), c.getBlue());
-      }*/
-
-      /*
-      final UIDefaults def = UIManager.getDefaults();
-      final Enumeration<?> en = def.keys();
-      while(en.hasMoreElements()) {
-        final Object k = en.nextElement();
-        final Object v = def.get(k);
-        BaseX.outln("%: % (%)", k, v,
-            v != null ? v.getClass().getSimpleName() : null);
-      }*/
     } catch(final Exception e) {
       e.printStackTrace();
     }

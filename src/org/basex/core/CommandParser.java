@@ -243,7 +243,7 @@ public final class CommandParser extends InputParser {
       case EXIT:
       case QUIT:
         return new Exit();
-      default: // DUMMY CASES
+      default:
     }
     return null;
   }

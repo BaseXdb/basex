@@ -52,7 +52,7 @@ public final class NewFSParser extends Parser {
 
   /** Registry for MetadataAdapter implementations. */
   static final Map<String, Class<? extends AbstractParser>> REGISTRY =
-  new HashMap<String, Class<? extends AbstractParser>>();
+    new HashMap<String, Class<? extends AbstractParser>>();
 
   /**
    * Register a parser implementation with the fs parser.
@@ -446,20 +446,6 @@ public final class NewFSParser extends Parser {
     return 0;
   }
 
-  /**
-   * Deletes a non-empty directory.
-   * @param dir to be deleted.
-   * @return boolean true for success, false for failure.
-   * */
-  public static boolean deleteDir(final File dir) {
-    if(dir.isDirectory()) {
-      for(final String child : dir.list()) {
-        if(!deleteDir(new File(dir, child))) return false;
-      }
-    }
-    return dir.delete();
-  }
-
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
@@ -537,7 +523,7 @@ public final class NewFSParser extends Parser {
    */
   public void parseXML() throws IOException {
     final IO i = IO.get(curr.getPath());
-    final Parser parser = Parser.getXMLParser(i);
+    final Parser parser = Parser.xmlParser(i);
     parser.doc = false;
     parser.parse(builder);
   }

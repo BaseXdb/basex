@@ -15,7 +15,7 @@ import org.basex.query.util.Err;
  */
 public final class Dec extends Item {
   /** Zero value. */
-  public static final Dec ZERO = new Dec(BigDecimal.ZERO);
+  private static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
   private final BigDecimal val;
 
@@ -129,7 +129,7 @@ public final class Dec extends Item {
    * @return double value
    * @throws QueryException possible converting exception
    */
-  public static BigDecimal parse(final double val) throws QueryException {
+  static BigDecimal parse(final double val) throws QueryException {
     if(val != val || val == 1 / 0d || val == -1 / 0d) Err.value(Type.DEC, val);
     return BigDecimal.valueOf(val);
   }
@@ -140,7 +140,7 @@ public final class Dec extends Item {
    * @return double value
    * @throws QueryException possible converting exception
    */
-  public static BigDecimal parse(final byte[] val) throws QueryException {
+  static BigDecimal parse(final byte[] val) throws QueryException {
     if(contains(val, 'e') || contains(val, 'E')) Err.or(FUNCAST, Type.DEC, val);
     try {
       return new BigDecimal(string(val).trim());

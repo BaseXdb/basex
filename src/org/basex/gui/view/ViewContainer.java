@@ -80,7 +80,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   public ViewContainer(final GUI main, final ViewPanel[][] p) {
     setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
-    logo = GUI.image("logo");
+    logo = BaseXLayout.image("logo");
     panels = p;
     gui = main;
   }

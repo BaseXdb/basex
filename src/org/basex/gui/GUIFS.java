@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
+
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Token;
 
 /**
@@ -254,7 +256,7 @@ public final class GUIFS {
    */
   private static Image add(final String name, final MediaTracker tracker,
       final Toolkit tk, final int n) {
-    final Image img = tk.getImage(GUI.imageURL("file-" + name));
+    final Image img = tk.getImage(BaseXLayout.imageURL("file-" + name));
     tracker.addImage(img, n);
     return img;
   }

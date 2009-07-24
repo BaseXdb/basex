@@ -190,7 +190,7 @@ public final class MetaData {
    * @param out output stream
    * @throws IOException IO Exception
    */
-  public synchronized void write(final DataOutput out) throws IOException {
+  synchronized void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTORAGE,  STORAGE);
     writeInfo(out, IDBSTORAGE, ISTORAGE);
     writeInfo(out, DBFNAME,    file.path());

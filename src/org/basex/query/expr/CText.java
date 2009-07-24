@@ -44,7 +44,7 @@ public final class CText extends CFrag {
    * @param iter iterator
    * @throws QueryException query exception
    */
-  public static void add(final TokenBuilder tb, final Iter iter)
+  static void add(final TokenBuilder tb, final Iter iter)
       throws QueryException {
     boolean more = false;
     Item it = null;

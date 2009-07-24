@@ -20,7 +20,7 @@ abstract class AUpdate extends Process {
    * @param t update type
    * @param a arguments
    */
-  AUpdate(final String t, final String... a) {
+  protected AUpdate(final String t, final String... a) {
     super(DATAREF | UPDATING, a);
     type = t;
   }
@@ -32,7 +32,7 @@ abstract class AUpdate extends Process {
    * @param data data reference
    * @return pre value
    */
-  static int pre(final int par, final int pos, final Data data) {
+  protected static int pre(final int par, final int pos, final Data data) {
     int k = data.kind(par);
     if(pos == 0) return par + data.size(par, k);
     int pre = par + data.attSize(par, k);
@@ -48,7 +48,7 @@ abstract class AUpdate extends Process {
    * @param name name to be checked
    * @return result of check
    */
-  public static boolean check(final byte[] name) {
+  protected static boolean check(final byte[] name) {
     if(name.length == 0) return false;
     int i = -1;
     while(++i != name.length) {

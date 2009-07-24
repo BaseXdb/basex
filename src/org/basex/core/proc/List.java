@@ -59,7 +59,7 @@ public final class List extends Process {
   }
 
   /**
-   * Returns the list of available databases.
+   * Returns a list of all databases.
    * @return available databases.
    */
   public static StringList list() {
@@ -67,7 +67,6 @@ public final class List extends Process {
     final StringList db = new StringList();
 
     final IO dir = IO.get(Prop.dbpath);
-    // no database directory found...
     if(!dir.exists()) return db;
 
     for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());

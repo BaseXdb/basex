@@ -11,12 +11,12 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Dbl extends Item {
-  /** Zero value. */
-  public static final Dbl ZERO = new Dbl(0);
-  /** Zero value. */
-  public static final Dbl ONE = new Dbl(1);
   /** Invalid value. */
   public static final Dbl NAN = new Dbl(Double.NaN);
+  /** Zero value. */
+  private static final Dbl ZERO = new Dbl(0);
+  /** Zero value. */
+  private static final Dbl ONE = new Dbl(1);
   /** Data. */
   private final double val;
 
@@ -107,7 +107,7 @@ public final class Dbl extends Item {
    * @return double value
    * @throws QueryException possible converting exception
    */
-  public static double parse(final byte[] val) throws QueryException {
+  static double parse(final byte[] val) throws QueryException {
     try {
       return Double.parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {

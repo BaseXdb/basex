@@ -145,7 +145,7 @@ public final class Context {
   }
 
   /**
-   * Pins the Pool.
+   * Pins the pool.
    * @param name name of database
    * @return data reference
    */
@@ -154,8 +154,8 @@ public final class Context {
   }
 
   /**
-   * Adds a Data to the Pool.
-   * @param d Data
+   * Adds the specified data reference to the pool.
+   * @param d data reference
    */
   public void addToPool(final Data d) {
     POOL.add(d);
@@ -163,7 +163,7 @@ public final class Context {
 
   /**
    * Checks if the specified database is pinned.
-   * @param db DBName
+   * @param db name of database
    * @return int use-status
    */
   public boolean pinned(final String db) {

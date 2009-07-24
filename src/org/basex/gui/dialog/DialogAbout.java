@@ -15,6 +15,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 
 /**
@@ -38,7 +39,7 @@ public final class DialogAbout extends Dialog {
         new EmptyBorder(10, 10, 15, 22)));
 
     BaseXLabel label = new BaseXLabel("");
-    label.setIcon(GUI.icon("logo"));
+    label.setIcon(BaseXLayout.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
     p.add(label, BorderLayout.WEST);
 

@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
@@ -145,7 +144,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   }
 
   /**
-   * Constructor for DeepShell and java only test cases (no mount).
+   * Constructor for {@link DeepShell} and java only test cases (no mount).
    * @param name name of initially empty database.
    */
   public DeepFS(final String name) {
@@ -199,11 +198,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    */
   private Data createEmptyDB(final String n) {
     try {
-      final Parser p = new Parser(IO.get(n)) {
-        @Override
-        public void parse(final Builder build) { /* empty */}
-      };
-      final Data d = CreateDB.xml(p, n);
+      final Data d = CreateDB.xml(Parser.emptyParser(IO.get(n)), n);
       d.fs = this;
       return d;
     } catch(final IOException e) {
@@ -339,11 +334,26 @@ public final class DeepFS extends DeepFuse implements DataText {
     }
   }
 
+  /**
+   * Deletes a non-empty directory.
+   * @param pre pre value
+   */
+  public void delete(final int pre) {
+    if(Prop.fuse) {
+      final String bpath = Token.string(path(pre, true));
+      final File f = new File(bpath);
+      if(f.isDirectory()) deleteDir(f);
+      else if(f.isFile()) f.delete();
+      nativeUnlink(Token.string(path(pre, false)));
+    }
+  }
+
   /*
    * ------------------------------------------------------------------------
    * FUSE utility methods.
    * ------------------------------------------------------------------------
    */
+
   /**
    * Processes the query string and print result.
    * @param query to process
@@ -418,20 +428,6 @@ public final class DeepFS extends DeepFuse implements DataText {
       return -1;
     }
     return 0;
-  }
-
-  /**
-   * Deletes a non-empty directory.
-   * @param pre pre value
-   */
-  public void delete(final int pre) {
-    if(Prop.fuse) {
-      final String bpath = Token.string(path(pre, true));
-      final File f = new File(bpath);
-      if(f.isDirectory()) deleteDir(f);
-      else if(f.isFile()) f.delete();
-      nativeUnlink(Token.string(path(pre, false)));
-    }
   }
 
   /**

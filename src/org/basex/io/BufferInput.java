@@ -46,14 +46,11 @@ public class BufferInput {
    * Fills the specified array with the beginning of the specified file.
    * @param file the file to be read
    * @param cont byte array
-   * @return number of read bytes
    * @throws IOException IO Exception
    */
-  public static int read(final File file, final byte[] cont)
+  public static void read(final File file, final byte[] cont)
       throws IOException {
-    final BufferInput bi = new BufferInput(file, cont);
-    bi.close();
-    return bi.size;
+    new BufferInput(file, cont).close();
   }
 
   /**

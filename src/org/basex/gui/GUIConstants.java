@@ -141,6 +141,8 @@ public final class GUIConstants {
   public static final Cursor CURSORMOVEV = new Cursor(Cursor.N_RESIZE_CURSOR);
   /** Text cursor. */
   public static final Cursor CURSORTEXT = new Cursor(Cursor.TEXT_CURSOR);
+  /** Move cursor. */
+  public static final Cursor CURSORMOVE = new Cursor(Cursor.MOVE_CURSOR);
 
   /** Background fill options. */
   public static enum Fill {

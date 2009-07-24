@@ -11,15 +11,21 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+
 import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import org.basex.BaseX;
 import org.basex.gui.GUI;
@@ -37,9 +43,13 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
+  /** Cached images. */
+  private static final HashMap<String, ImageIcon> IMAGES =
+    new HashMap<String, ImageIcon>();
   /** Date Format. */
-  public static final SimpleDateFormat DATE =
+  private static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy hh:mm");
+
   /** Private constructor. */
   private BaseXLayout() { }
 
@@ -149,7 +159,7 @@ public final class BaseXLayout {
    * @param w width
    * @param h height
    */
-  public static void setSize(final Component comp, final int w, final int h) {
+  static void setSize(final Component comp, final int w, final int h) {
     comp.setPreferredSize(new Dimension(w, h));
   }
 
@@ -159,7 +169,7 @@ public final class BaseXLayout {
    * @param hlp help text
    * @param par parent window
    */
-  public static void addInteraction(final Component comp, final byte[] hlp,
+  static void addInteraction(final Component comp, final byte[] hlp,
         final Window par) {
 
     comp.addMouseListener(new MouseAdapter() {
@@ -244,6 +254,40 @@ public final class BaseXLayout {
    */
   public static void select(final AbstractButton but, final boolean select) {
     if(but.isSelected() != select) but.setSelected(select);
+  }
+
+  /**
+   * Returns the specified image as icon.
+   * @param name name of icon
+   * @return icon
+   */
+  public static ImageIcon icon(final String name) {
+    ImageIcon img = IMAGES.get(name);
+    if(img != null) return img;
+    img = new ImageIcon(image(name));
+    IMAGES.put(name, img);
+    return img;
+  }
+
+  /**
+   * Returns the specified image.
+   * @param name name of image
+   * @return image
+   */
+  public static Image image(final String name) {
+    return Toolkit.getDefaultToolkit().getImage(imageURL(name));
+  }
+
+  /**
+   * Returns the image url.
+   * @param name name of image
+   * @return url
+   */
+  public static URL imageURL(final String name) {
+    final String path = "img/" + name + ".png";
+    final URL url = GUI.class.getResource(path);
+    if(url == null) BaseX.errln("Not found: " + path);
+    return url;
   }
 
   /**
@@ -361,7 +405,7 @@ public final class BaseXLayout {
    */
   public static void drawTooltip(final Graphics g, final String tt,
       final int x, final int y, final int w, final int c) {
-    final int tw = BaseXLayout.width(g, tt);
+    final int tw = width(g, tt);
     final int th = g.getFontMetrics().getHeight();
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(GUIConstants.COLORS[c]);

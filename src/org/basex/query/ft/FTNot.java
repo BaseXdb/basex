@@ -64,7 +64,7 @@ public final class FTNot extends FTExpr {
    * @param m match
    * @return resulting matches
    */
-  public static FTMatches not(final FTMatches m) {
+  static FTMatches not(final FTMatches m) {
     return not(m, 0);
   }
 

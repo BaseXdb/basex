@@ -6,14 +6,10 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.HashMap;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -130,7 +126,7 @@ public final class GUI extends JFrame {
    */
   public GUI() {
     setTitle(Text.TITLE);
-    setIconImage(image("icon"));
+    setIconImage(BaseXLayout.image("icon"));
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
@@ -195,8 +191,7 @@ public final class GUI extends JFrame {
 
     input = new GUIInput(this);
 
-    hist = new BaseXButton(icon("cmd-hist"), HELPHIST, this);
-    hist.trim();
+    hist = new BaseXButton(this, "hist", HELPHIST);
     hist.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu popup = new JPopupMenu("History");
@@ -225,15 +220,14 @@ public final class GUI extends JFrame {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    go = new BaseXButton(icon("cmd-go"), HELPGO, this);
-    go.trim();
+    go = new BaseXButton(this, "go", HELPGO);
     go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         execute();
       }
     });
 
-    filter = GUIToolBar.newButton(GUICommands.FILTER, this);
+    filter = BaseXButton.command(GUICommands.FILTER, this);
 
     b = new BaseXBack();
     b.setLayout(new TableLayout(1, 3));
@@ -651,44 +645,6 @@ public final class GUI extends JFrame {
    */
   public void setHits(final long n) {
     hits.setText(n + " " + HITS);
-  }
-
-  /**
-   * Returns the specified image as icon.
-   * @param name name of icon
-   * @return icon
-   */
-  public static ImageIcon icon(final String name) {
-    return new ImageIcon(image(name));
-  }
-
-  /** Cached images. */
-  private static final HashMap<String, Image> IMAGES =
-    new HashMap<String, Image>();
-
-  /**
-   * Returns the specified image.
-   * @param name name of image
-   * @return image
-   */
-  public static Image image(final String name) {
-    Image img = IMAGES.get(name);
-    if(img != null) return img;
-    img = Toolkit.getDefaultToolkit().getImage(imageURL(name));
-    IMAGES.put(name, img);
-    return img;
-  }
-
-  /**
-   * Returns the image url.
-   * @param name name of image
-   * @return url
-   */
-  public static URL imageURL(final String name) {
-    final String path = "img/" + name + ".png";
-    final URL url = GUI.class.getResource(path);
-    if(url == null) BaseX.errln("Not found: " + path);
-    return url;
   }
 
   /**

@@ -51,7 +51,7 @@ public final class PathSummary {
     data = d;
   }
 
-  // Summary Path creation ----------------------------------------------------
+  // Summary Path creation ====================================================
 
   /**
    * Opens an element.
@@ -90,7 +90,7 @@ public final class PathSummary {
     if(root != null) root.finish(out);
   }
 
-  // Summary Path traversal ---------------------------------------------------
+  // Summary Path traversal ===================================================
 
   /**
    * Returns all children or descendants of the specified nodes.

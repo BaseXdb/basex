@@ -195,7 +195,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       for(int c = 0; c < cs; c++) if(panel.getComponent(c) == source) cp = c;
 
       if((cp & 1) == 0) {
-        // ComboBox with tags/attributes
+        // combo box with tags/attributes
         final BaseXCombo combo = (BaseXCombo) source;
         panel.remove(cp + 1);
 

@@ -12,11 +12,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIToolBar;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBack;
@@ -37,9 +35,9 @@ import org.basex.io.IO;
  */
 public final class XQueryView extends View {
   /** Ok icon. */
-  private static final ImageIcon OKICON = GUI.icon("ok");
+  private static final ImageIcon OKICON = BaseXLayout.icon("ok");
   /** Error icon. */
-  private static final ImageIcon ERRICON = GUI.icon("error");
+  private static final ImageIcon ERRICON = BaseXLayout.icon("error");
 
   /** Header string. */
   private final BaseXLabel header;
@@ -73,14 +71,12 @@ public final class XQueryView extends View {
     back.setLayout(new BorderLayout());
     back.add(header, BorderLayout.CENTER);
 
-    final BaseXButton open = GUIToolBar.newButton(GUICommands.XQOPEN, gui);
-    final BaseXButton save = GUIToolBar.newButton(GUICommands.XQSAVE, gui);
+    final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
+    final BaseXButton save = BaseXButton.command(GUICommands.XQSAVE, gui);
     final BaseXTextField find = new BaseXTextField(null, gui);
     BaseXLayout.setHeight(find, (int) open.getPreferredSize().getHeight());
 
-    final BaseXButton hist = new BaseXButton(GUI.icon("cmd-hist"),
-        HELPRECENT, gui);
-    hist.trim();
+    final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
     hist.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu popup = new JPopupMenu("History");
@@ -132,8 +128,7 @@ public final class XQueryView extends View {
     south.add(info, BorderLayout.CENTER);
     BaseXLayout.enable(info, false);
 
-    stop = new BaseXButton(GUI.icon("cmd-stop"), HELPSTOP, gui);
-    stop.trim();
+    stop = new BaseXButton(gui, "stop", HELPSTOP);
     stop.addKeyListener(this);
     stop.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -143,8 +138,7 @@ public final class XQueryView extends View {
     });
     BaseXLayout.enable(stop, false);
 
-    go = new BaseXButton(GUI.icon("cmd-go"), HELPGO, gui);
-    go.trim();
+    go = new BaseXButton(gui, "go", HELPGO);
     go.addKeyListener(this);
     go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -152,7 +146,7 @@ public final class XQueryView extends View {
       }
     });
 
-    filter = GUIToolBar.newButton(GUICommands.FILTER, gui);
+    filter = BaseXButton.command(GUICommands.FILTER, gui);
     filter.addKeyListener(this);
 
     sp = new BaseXBack(Fill.NONE);

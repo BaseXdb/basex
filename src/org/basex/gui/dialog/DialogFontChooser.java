@@ -83,8 +83,8 @@ public final class DialogFontChooser extends Dialog {
    * Checks if the Java version supports all anti-aliasing variants.
    * @return result of check
    */
-  public static boolean fullAlias() {
-    // Check out Java 1.6 rendering; if not available, use default rendering
+  private static boolean fullAlias() {
+    // check if Java 1.6 rendering is available; if not, use default rendering
     try {
       RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
       return true;
@@ -92,7 +92,6 @@ public final class DialogFontChooser extends Dialog {
       return false;
     }
   }
-
 
   @Override
   public void action(final String cmd) {

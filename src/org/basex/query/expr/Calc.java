@@ -251,7 +251,7 @@ public enum Calc {
    * @param b second item
    * @return type
    */
-  public static final Type type(final Item a, final Item b) {
+  static final Type type(final Item a, final Item b) {
     if(a.type == DBL || b.type == DBL || a.u() || b.u()) return DBL;
     if(a.type == FLT || b.type == FLT) return FLT;
     if(a.type == DEC || b.type == DEC) return DEC;

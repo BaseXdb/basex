@@ -164,7 +164,7 @@ final class FNPat extends Fun {
 
     String str = tb.toString();
     if(str.indexOf('[') != -1 && str.indexOf('-') != -1) {
-      // Replace classes by single characters to support Unicode matches
+      // replace classes by single characters to support Unicode matches
       while(true) {
         final Matcher mt = CLS.matcher(str);
         if(!mt.matches()) break;
@@ -177,7 +177,7 @@ final class FNPat extends Fun {
         }
       }
 
-      // Remove excluded characters in classes
+      // remove excluded characters in classes
       while(true) {
         final Matcher mt = CLSEX.matcher(str);
         if(!mt.matches()) break;

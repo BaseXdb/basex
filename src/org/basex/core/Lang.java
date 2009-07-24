@@ -51,7 +51,7 @@ public final class Lang {
    * @param lang language
    * @param chk check flag
    */
-  public static void read(final String lang, final boolean chk) {
+  private static void read(final String lang, final boolean chk) {
     try {
       if(DISALLOW) throw new Error("Language file was accessed.");
       if(chk) check = new HashMap<String, Boolean>();

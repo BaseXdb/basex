@@ -72,7 +72,7 @@ public final class CAttr extends CFrag {
    * @return result
    * @throws QueryException query exception
    */
-  public static QNm name(final QueryContext ctx, final Item i)
+  static QNm name(final QueryContext ctx, final Item i)
       throws QueryException {
 
     QNm name = null;

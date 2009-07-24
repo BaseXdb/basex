@@ -114,7 +114,7 @@ public final class Functions extends ExprInfo {
    * @param type type as string
    * @throws QueryException query exception
    */
-  public static void typeErr(final QNm type) throws QueryException {
+  private static void typeErr(final QNm type) throws QueryException {
     final byte[] ln = type.ln();
     final Levenshtein ls = new Levenshtein();
     for(final Type t : Type.values()) {

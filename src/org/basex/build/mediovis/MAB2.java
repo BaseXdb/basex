@@ -9,16 +9,12 @@ import static org.basex.util.Token.token;
  * @author Christian Gruen
  */
 public interface MAB2 {
-  // Query tokens
-
   /** Root tag. */
   byte[] ROOT = token("MEDIOVIS");
   /** Hits Attribute. */
   byte[] HITS = token("hits");
   /** Approximate Hits Attribute. */
   byte[] APPROX = token("appr");
-
-  // XML database tokens
 
   /** Root Tag. */
   byte[] LIBRARY = token("LIBRARY");

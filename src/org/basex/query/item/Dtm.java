@@ -13,8 +13,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Dtm extends Date {
-  /** Slider width. */
-  public static final SimpleDateFormat DATE = new SimpleDateFormat(
+  /** Date format. */
+  private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd'T'hh:mm:ss.S");
 
   /**

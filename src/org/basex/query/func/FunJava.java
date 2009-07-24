@@ -166,7 +166,7 @@ public final class FunJava extends Arr {
    * @param par Java type
    * @return xquery type
    */
-  public static Type type(final Class<?> par) {
+  private static Type type(final Class<?> par) {
     for(int j = 0; j < JAVA.length; j++) if(par == JAVA[j]) return XQUERY[j];
     return Type.JAVA;
   }

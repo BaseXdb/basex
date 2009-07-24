@@ -36,10 +36,22 @@ public abstract class Parser {
    * @return xml parser
    * @throws IOException io exception
    */
-  public static Parser getXMLParser(final IO io) throws IOException {
+  public static Parser xmlParser(final IO io) throws IOException {
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
     return Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
+  }
+
+  /**
+   * Returns a parser instance for creating empty databases.
+   * @param io io reference
+   * @return parser
+   */
+  public static Parser emptyParser(final IO io) {
+    return new Parser(io) {
+      @Override
+      public void parse(final Builder build) { /* empty */ }
+    };
   }
 
   /**

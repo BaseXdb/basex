@@ -25,7 +25,7 @@ public final class ParserUtil {
    * @return the xs:duration representation or an empty array if
    *         <code>value</code> could not be converted.
    */
-  public static byte[] toDuration(final byte[] value, final boolean ms) {
+  static byte[] toDuration(final byte[] value, final boolean ms) {
     final int len = value.length;
     final byte[] a = new byte[len];
     int secPos = -1;
@@ -56,7 +56,7 @@ public final class ParserUtil {
    * @param length the number of ASCII chars to read.
    * @return the xs:duration value as byte array.
    */
-  public static byte[] minSecToDuration(final byte[] minSec, final int secPos,
+  private static byte[] minSecToDuration(final byte[] minSec, final int secPos,
       final int length) {
     final byte[] value = new byte[length + 4];
     int p = 0;
@@ -80,7 +80,7 @@ public final class ParserUtil {
    * @param length the number of ASCII chars to read.
    * @return the xs:duration value as byte array.
    */
-  public static byte[] secToDuration(final byte[] seconds, final int length) {
+  private static byte[] secToDuration(final byte[] seconds, final int length) {
     final byte[] value = new byte[length + 3];
     value[0] = 'P';
     value[1] = 'T';
@@ -96,7 +96,7 @@ public final class ParserUtil {
    * @param length the number of ASCII chars to read.
    * @return the xs:duration value or an empty array if duration < 1 second.
    */
-  public static byte[] msToDuration(final byte[] ms, final int length) {
+  private static byte[] msToDuration(final byte[] ms, final int length) {
     byte[] value;
     if(length < 4) {
       value = new byte[] { 'P', 'T', '0', '.', '0', '0', '0', 'S'};
@@ -121,7 +121,7 @@ public final class ParserUtil {
    * @param year the year value to convert
    * @return the year.
    */
-  public static byte[] convertYear(final byte[] year) {
+  static byte[] convertYear(final byte[] year) {
     int count = 0;
     final byte[] value = { 0, 0, 0, 0, '-', '-'};
     for(int i = 0, max = year.length; i < max && count < 4; i++) {
@@ -142,7 +142,7 @@ public final class ParserUtil {
    * @param dateTime the dateTime value to convert.
    * @return the converted byte array.
    */
-  public static byte[] convertDateTime(final byte[] dateTime) {
+  static byte[] convertDateTime(final byte[] dateTime) {
     if(dateTime.length != 20) return EMPTY;
     int i = 0;
     for(; i < 4; i++) {
@@ -191,7 +191,7 @@ public final class ParserUtil {
    * @param data the byte array to check.
    * @return a byte array containing only valid ascii chars.
    */
-  public static byte[] checkAscii(final byte[] data) {
+  static byte[] checkAscii(final byte[] data) {
     for(int i = 0, max = data.length; i < max; i++) {
       if(data[i] < 0) data[i] = ' ';
     }

@@ -46,15 +46,15 @@ public class Pred extends Preds {
       return Seq.EMPTY;
     }
 
-    // No predicates.. return root
+    // no predicates.. return root
     if(pred.length == 0) return root;
     final Expr p = pred[0];
 
-    // Position predicate
+    // position predicate
     final Pos pos = p instanceof Pos ? (Pos) p : null;
-    // Last flag
+    // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
-    // Use iterative evaluation
+    // use iterative evaluation
     if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx)))
         return new IterPred(root, pred, pos, last);
 
@@ -84,7 +84,7 @@ public class Pred extends Preds {
     Item i;
     while((i = iter.next()) != null) si.add(i);
 
-    // evaluates predicates
+    // evaluate predicates
     for(final Expr p : pred) {
       ctx.size = si.size();
       ctx.pos = 1;

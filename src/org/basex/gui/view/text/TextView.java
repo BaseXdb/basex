@@ -11,7 +11,6 @@ import org.basex.data.XMLSerializer;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIToolBar;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -58,8 +57,8 @@ public final class TextView extends View {
     back.setLayout(new BorderLayout());
     back.add(header, BorderLayout.CENTER);
 
-    final BaseXButton export = GUIToolBar.newButton(GUICommands.SAVE, gui);
-    final BaseXButton root = GUIToolBar.newButton(GUICommands.HOME, gui);
+    final BaseXButton export = BaseXButton.command(GUICommands.SAVE, gui);
+    final BaseXButton root = BaseXButton.command(GUICommands.HOME, gui);
     find = new BaseXTextField(null, gui);
     BaseXLayout.setHeight(find, (int) root.getPreferredSize().getHeight());
 

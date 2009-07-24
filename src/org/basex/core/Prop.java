@@ -189,7 +189,7 @@ public final class Prop {
    * Reads the configuration file and initializes the project properties. The
    * file is located in the user's home directory.
    */
-  public static void read() {
+  public static synchronized void read() {
     if(read) return;
     read(CONFIGFILE, Prop.class.getFields());
     read = true;
@@ -286,7 +286,7 @@ public final class Prop {
   /**
    * Writes the configuration file.
    */
-  public static void write() {
+  public static synchronized void write() {
     write(CONFIGFILE, Prop.class.getFields());
   }
 

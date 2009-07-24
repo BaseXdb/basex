@@ -3,7 +3,6 @@ package org.basex.gui.view;
 import static org.basex.Text.*;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -18,25 +17,23 @@ import org.basex.gui.layout.BaseXPanel;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ViewMover extends BaseXPanel {
+final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  public static final int SIZE = 8;
-  /** Move cursor. */
-  public static final Cursor HAND = new Cursor(Cursor.MOVE_CURSOR);
+  private static final int SIZE = 8;
   /** Flag if current mover is active. */
-  public boolean active;
+  private boolean active;
 
   /**
    * Constructor.
    * @param main reference to the main window
    */
-  public ViewMover(final GUI main) {
+  ViewMover(final GUI main) {
     super(HELPMOVER, main);
     setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), SIZE));
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
-    setCursor(HAND);
+    setCursor(GUIConstants.CURSORMOVE);
   }
 
   @Override

@@ -108,13 +108,13 @@ public class AxisPath extends Path {
     while(true) {
       final Step s = step[i];
 
-      // First steps can be attribute, parent or self steps.
+      // first steps can be attribute, parent or self steps.
       if(s.axis == Axis.ATTR || s.axis == Axis.PARENT || s.axis == Axis.SELF) {
         if(++i == step.length) return true;
         continue;
       }
 
-      // If after only-parent steps or without any parent steps the next
+      // if after only-parent steps or without any parent steps the next
       // and only step is an descendant, descendant-or-self, preceding
       // or following step, the result of the path is still in document order.
       if(s.axis == Axis.DESC || s.axis == Axis.DESCORSELF ||
@@ -122,7 +122,7 @@ public class AxisPath extends Path {
         return ++i == step.length;
       }
 
-      // If after only-parent steps or without any parent steps the next
+      // if after only-parent steps or without any parent steps the next
       // step is an attribute, child, self, preceding-sibling or
       // following-sibling step, the result of the path is still in
       // document order.
@@ -130,14 +130,14 @@ public class AxisPath extends Path {
           s.axis == Axis.PRECSIBL) {
         if(++i == step.length) return true;
 
-        // In this state finite attribute, child, parent or self steps
+        // in this state finite attribute, child, parent or self steps
         // are possible.
         while(step[i].axis == Axis.ATTR || step[i].axis == Axis.CHILD ||
             step[i].axis == Axis.PARENT || step[i].axis == Axis.SELF) {
           if(++i == step.length) return true;
         }
 
-        // The last step can be a attribute, child, parent or self step,
+        // the last step can be a attribute, child, parent or self step,
         // and also a descendant or descendant-or-self step.
         return i + 1 == step.length && (step[i].axis == Axis.DESC ||
           step[i].axis == Axis.DESCORSELF);

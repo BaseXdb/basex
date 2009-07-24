@@ -94,10 +94,10 @@ abstract class EXIFExtractor extends AbstractExtractor {
     final int end = s + entries * 0x0C;
 
     for(int e = s; e < end; e += 0x0C) {
-      final int tagnr = getShort(e); // Tag Number
-      int format = getShort(e + 2); // Data Format
+      final int tagnr = getShort(e); // tag Number
+      int format = getShort(e + 2); // data Format
 
-      // Exit Offset - SubIFD
+      // exit Offset - SubIFD
       if(tagnr == 0x8769) {
         scan(getInt(e + 8));
         continue;
@@ -111,7 +111,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
         continue;
       }
 
-      // UserComment - kinda hacky as it's actually of type 'Undefined'
+      // userComment - kinda hacky as it's actually of type 'Undefined'
       if(tagnr == 0x9286) format = EXIFIndex.STRING;
 
       if(format != inf.format) {

@@ -12,7 +12,7 @@ import org.basex.util.Token;
  */
 public final class Flt extends Item {
   /** Zero value. */
-  public static final Flt ZERO = new Flt(0);
+  private static final Flt ZERO = new Flt(0);
   /** Data. */
   private final float val;
 
@@ -92,7 +92,7 @@ public final class Flt extends Item {
    * @return double value
    * @throws QueryException possible converting exception
    */
-  public static float parse(final byte[] val) throws QueryException {
+  static float parse(final byte[] val) throws QueryException {
     try {
       return Float.parseFloat(Token.string(val));
     } catch(final NumberFormatException ex) {

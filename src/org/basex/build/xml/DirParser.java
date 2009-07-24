@@ -60,7 +60,7 @@ public final class DirParser extends Parser {
       while(path.more()) {
         if(!path.name().matches(filter)) continue;
         b.meta.filesize += io.length();
-        parser = Parser.getXMLParser(io);
+        parser = Parser.xmlParser(io);
         parser.doc = doc;
         parser.parse(b);
         if(Prop.debug && ++c % 100 == 0) BaseX.err(";");

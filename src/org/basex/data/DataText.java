@@ -73,8 +73,6 @@ public interface DataText {
 
   // DEEPFS STRINGS ===========================================================
 
-  /** DeepFS tag. */
-  String S_DEEPFS = "deepfs";
   /** Time of last modification. */
   String S_NAME = "name";
   /** Time of last modification. */
@@ -85,7 +83,7 @@ public interface DataText {
   String S_SUFFIX = "suffix";
 
   /** DeepFS token. */
-  byte[] DEEPFS = token(S_DEEPFS);
+  byte[] DEEPFS = token("deepfs");
   /** Directory tag. */
   byte[] DIR = token("dir");
   /** File tag. */

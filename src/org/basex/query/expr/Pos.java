@@ -40,7 +40,7 @@ public final class Pos extends Simple {
    * @param mx minimum value
    * @return expression
    */
-  public static Expr get(final long mn, final long mx) {
+  static Expr get(final long mn, final long mx) {
     // suppose that positions always fit in int values..
     return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
       Bln.TRUE : new Pos(mn, mx);
@@ -55,7 +55,7 @@ public final class Pos extends Simple {
    * @return resulting expression
    * @throws QueryException evaluation exception
    */
-  public static Expr get(final Expr expr, final Comp cmp, final Expr arg)
+  static Expr get(final Expr expr, final Comp cmp, final Expr arg)
       throws QueryException {
 
     if(!arg.i()) return expr;

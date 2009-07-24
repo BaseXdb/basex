@@ -7,11 +7,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Box;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIToolBar;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -55,8 +53,7 @@ public final class ExploreView extends View {
     back.setLayout(new BorderLayout());
     back.add(header, BorderLayout.CENTER);
 
-    go = new BaseXButton(GUI.icon("cmd-go"), HELPGO, gui);
-    go.trim();
+    go = new BaseXButton(gui, "go", HELPGO);
     go.addKeyListener(this);
     go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -64,7 +61,7 @@ public final class ExploreView extends View {
       }
     });
 
-    filter = GUIToolBar.newButton(GUICommands.FILTER, gui);
+    filter = BaseXButton.command(GUICommands.FILTER, gui);
     filter.addKeyListener(this);
 
     final BaseXBack sp = new BaseXBack(Fill.NONE);

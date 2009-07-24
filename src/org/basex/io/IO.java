@@ -20,11 +20,6 @@ import org.xml.sax.InputSource;
 public abstract class IO {
   /** Return IO dummy instance. */
   public static final IO DUMMY = new IOContent(Token.EMPTY);
-  /** File prefix. */
-  public static final String FILE = "file://";
-
-  /** Invalid file characters. */
-  private static final String INVALID = " \"*./:<>?";
   /** BaseX Suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
@@ -35,6 +30,11 @@ public abstract class IO {
   public static final String ZIPSUFFIX = ".zip";
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
+
+  /** File prefix. */
+  private static final String PREFILE = "file://";
+  /** Invalid file characters. */
+  private static final String INVALID = " \"*./:<>?";
 
   /** Disk block/page size. */
   public static final int BLOCKSIZE = 1 << 12;
@@ -324,7 +324,7 @@ public abstract class IO {
    * @return URL
    */
   public static final String url(final String path) {
-    String pre = FILE;
+    String pre = PREFILE;
     if(!path.startsWith("/")) {
       pre += "/";
       if(path.length() < 2 || path.charAt(1) != ':') {
@@ -340,8 +340,8 @@ public abstract class IO {
    * @param url url to be converted
    * @return file path
    */
-  public static final String file(final String url) {
-    final String fn = url.replaceAll(FILE, "");
+  static final String file(final String url) {
+    final String fn = url.replaceAll(PREFILE, "");
     return fn.matches("/.:.*") ? fn.substring(1) : fn;
   }
 }

@@ -45,7 +45,7 @@ public abstract class FTIndexIterator extends IndexIterator {
    * @param i2 second index array iterator to merge
    * @return IndexArrayIterator
    */
-  public static FTIndexIterator union(final FTIndexIterator i1,
+  static FTIndexIterator union(final FTIndexIterator i1,
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {

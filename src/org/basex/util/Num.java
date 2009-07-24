@@ -27,19 +27,6 @@ public final class Num {
   }
 
   /**
-   * Creates a new number array.
-   * @param val initial value to be stored
-   * @return new number array
-   */
-  public static byte[] simpleNum(final int val) {
-    final int len = len(val);
-    final byte[] array = new byte[len];
-    add(array, val, 0, len);
-    return array;
-  }
-
-
-  /**
    * Compresses and writes an integer value to the specified array and
    * returns the array.
    * @param array array
@@ -53,66 +40,6 @@ public final class Num {
     add(tmp, val, pos, len);
     size(tmp, pos + len);
     return tmp;
-  }
-
-  /**
-   * Creates and returns a compressed array from the specified integer array,
-   * omitting the size value.
-   *
-   * @param vals values to be written
-   * @return new array
-   */
-  public static byte[] create(final int[] vals) {
-    final int vl = vals.length;
-    byte[] tmp = new byte[vl << 1];
-    int pos = 0;
-    for(int i = 0; i < vl; i++) {
-      final int len = len(vals[i]);
-      tmp = check(tmp, pos, len);
-      add(tmp, vals[i], pos, len);
-      pos += len;
-    }
-    return pos == tmp.length ? tmp : Array.finish(tmp, pos);
-  }
-
-  /**
-   * Resizes the specified array by 12,5%.
-   * @param tmp array to be resized
-   * @param pos current array position
-   * @param len length of new entry
-   * @return new array
-   */
-  private static byte[] check(final byte[] tmp, final int pos, final int len) {
-    final int s = tmp.length;
-    if(pos + len < s) return tmp;
-    final byte[] t = new byte[s + Math.max(len, s >> 3)];
-    System.arraycopy(tmp, 0, t, 0, s);
-    return t;
-  }
-
-  /**
-   * Compresses and writes an integer value to the specified byte array.
-   * @param array array
-   * @param v value to be written
-   * @param p position
-   * @param l value length
-   */
-  private static void add(final byte[] array, final int v, final int p,
-      final int l) {
-    int i = p;
-    if(l == 5) {
-      array[i++] = (byte) 0xC0;
-      array[i++] = (byte) (v >>> 24);
-      array[i++] = (byte) (v >>> 16);
-      array[i++] = (byte) (v >>> 8);
-    } else if(l == 4) {
-      array[i++] = (byte) (v >>> 24 | 0x80);
-      array[i++] = (byte) (v >>> 16);
-      array[i++] = (byte) (v >>> 8);
-    } else if(l == 2) {
-      array[i++] = (byte) (v >>> 8 | 0x40);
-    }
-    array[i++] = (byte) v;
   }
 
   /**
@@ -155,6 +82,48 @@ public final class Num {
     return v == 0 ? 1 : v == 1 ? 2 : v == 2 ? 4 : 5;
   }
 
+  // PRIVATE STATIC METHODS ===================================================
+
+  /**
+   * Resizes the specified array by 12,5%.
+   * @param tmp array to be resized
+   * @param pos current array position
+   * @param len length of new entry
+   * @return new array
+   */
+  private static byte[] check(final byte[] tmp, final int pos, final int len) {
+    final int s = tmp.length;
+    if(pos + len < s) return tmp;
+    final byte[] t = new byte[s + Math.max(len, s >> 3)];
+    System.arraycopy(tmp, 0, t, 0, s);
+    return t;
+  }
+
+  /**
+   * Compresses and writes an integer value to the specified byte array.
+   * @param array array
+   * @param v value to be written
+   * @param p position
+   * @param l value length
+   */
+  private static void add(final byte[] array, final int v, final int p,
+      final int l) {
+    int i = p;
+    if(l == 5) {
+      array[i++] = (byte) 0xC0;
+      array[i++] = (byte) (v >>> 24);
+      array[i++] = (byte) (v >>> 16);
+      array[i++] = (byte) (v >>> 8);
+    } else if(l == 4) {
+      array[i++] = (byte) (v >>> 24 | 0x80);
+      array[i++] = (byte) (v >>> 16);
+      array[i++] = (byte) (v >>> 8);
+    } else if(l == 2) {
+      array[i++] = (byte) (v >>> 8 | 0x40);
+    }
+    array[i++] = (byte) v;
+  }
+
   /**
    * Writes the specified length in the first bytes of the specified array.
    * @param array array
@@ -172,7 +141,7 @@ public final class Num {
    * @param v integer value
    * @return value length
    */
-  public static int len(final int v) {
+  private static int len(final int v) {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 }

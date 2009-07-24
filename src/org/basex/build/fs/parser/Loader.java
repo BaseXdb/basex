@@ -2,12 +2,8 @@ package org.basex.build.fs.parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -36,8 +32,8 @@ public final class Loader extends ClassLoader {
    *  Also possible without instantiating the class?
    */
 
-  /** The ClassLoader instance to use for loading classes. */
-  private static final Loader INSTANCE = new Loader();
+  /* The ClassLoader instance to use for loading classes.
+  private static final Loader INSTANCE = new Loader(); */
 
   /** Hidden constructor. */
   private Loader() { /* */}
@@ -117,7 +113,7 @@ public final class Loader extends ClassLoader {
     return loadedClasses.toArray(new Class<?>[loadedClasses.size()]);
   }
 
-  /**
+  /*
    * <p>
    * Load some classes from the given directory that is not on the classpath. If
    * one of the classes is already loaded, nothing is done (but the class will
@@ -143,8 +139,7 @@ public final class Loader extends ClassLoader {
    *          pattern.
    * @return an array with all the loaded classes.
    * @throws IOException if any error occurs while reading from a file.
-   */
-  public static Class<?>[] load(final File directory,
+  private static Class<?>[] load(final File directory,
       final Pattern fileNamePattern) throws IOException {
     Matcher matcher;
     final ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
@@ -189,8 +184,9 @@ public final class Loader extends ClassLoader {
     // return only the correctly initialized classes
     return foundClasses.subList(0, counter).toArray(new Class<?>[counter]);
   }
+   */
 
-  /**
+  /*
    * <p>
    * Load some classes from the given jar file. If one of the classes is already
    * loaded, nothing is done (but the class will be included in the results).
@@ -212,8 +208,7 @@ public final class Loader extends ClassLoader {
    * @param jar the {@link JarFile} to load the classes from.
    * @return an array with all the loaded classes.
    * @throws IOException if one of the classes could not be read.
-   */
-  public static Class<?>[] load(final JarFile jar) throws IOException {
+  private static Class<?>[] load(final JarFile jar) throws IOException {
     final Enumeration<JarEntry> e = jar.entries();
     final ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
     final ArrayList<JarEntry> subClasses = new ArrayList<JarEntry>();
@@ -253,13 +248,13 @@ public final class Loader extends ClassLoader {
     // return only the correctly initialized classes
     return foundClasses.subList(0, counter).toArray(new Class<?>[counter]);
   }
+   */
 
-  /**
+  /*
    * Reads a single class from the file.
    * @param f the file to read from.
    * @return the (uninitialized) class.
    * @throws IOException if any error occurs while reading from the file.
-   */
   private static Class<?> load(final File f) throws IOException {
     final long len = f.length();
     if(len > Integer.MAX_VALUE) throw new IOException(
@@ -270,14 +265,14 @@ public final class Loader extends ClassLoader {
     ch.close();
     return INSTANCE.defineClass(null, buf, 0, buf.length);
   }
+   */
 
-  /**
+  /*
    * Reads a single class from the jar file.
    * @param jar the jar file to read from.
    * @param je the entry to read from the jar file.
    * @return the (uninitialized) class.
    * @throws IOException if any error occurs while reading from the file.
-   */
   private static Class<?> load(final JarFile jar, final JarEntry je)
       throws IOException {
     final long len = je.getSize();
@@ -294,14 +289,14 @@ public final class Loader extends ClassLoader {
     }
     return INSTANCE.defineClass(null, buf, 0, buf.length);
   }
+   */
 
-  /**
+  /*
    * Initializes the given classes. Breaks after the first error. Subsequent
    * classes are not initialized.
    * @param classes the classes to initialize.
    * @return the number of successfully initialized classes (breaks after the
    *         first error).
-   */
   private static int initializeClasses(final ArrayList<Class<?>> classes) {
     int counter = 0;
     for(final Class<?> c : classes) {
@@ -316,4 +311,5 @@ public final class Loader extends ClassLoader {
     }
     return counter;
   }
+   */
 }
