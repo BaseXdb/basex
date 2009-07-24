@@ -34,6 +34,8 @@ public final class XMLTS {
   private boolean verbose;
   /** Data reference. */
   private Data data;
+  /** Context. */
+  private Context context;
 
   /**
    * Main method of the test class.
@@ -135,6 +137,6 @@ public final class XMLTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new QueryProcessor(qu, root).queryNodes();
+    return new QueryProcessor(qu, root, context).queryNodes();
   }
 }

@@ -145,6 +145,8 @@ public abstract class W3CTS {
 
   /** Data reference. */
   private Data data;
+  /** Context. */
+  private Context context;
 
   /**
    * Constructor.
@@ -198,7 +200,7 @@ public abstract class W3CTS {
     final String dat = sdf.format(Calendar.getInstance().getTime());
 
     final Performance perf = new Performance();
-    final Context context = new Context();
+    context = new Context();
     Prop.xqformat = false;
     //Prop.mainmem = true;
 
@@ -349,13 +351,14 @@ public abstract class W3CTS {
     final TokenBuilder files = new TokenBuilder();
     final CachedOutput out = new CachedOutput();
 
-    final Context context = new Context();
+    context = new Context();
 
     final Nodes cont = nodes("*:contextItem", root);
     if(cont.size() != 0) new CreateDB(sources + string(
         data.atom(cont.nodes[0])) + ".xml").execute(context, out);
 
-    final QueryProcessor xq = new QueryProcessor(in, context.current());
+    final QueryProcessor xq = new QueryProcessor(in, context.current(),
+        context);
     final QueryContext qctx = xq.ctx;
     qctx.stop = stop;
     qctx.thes = thes;
@@ -692,7 +695,7 @@ public abstract class W3CTS {
     for(int c = 0; c < nod.size(); c++) {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
-      final QueryProcessor xq = new QueryProcessor(in);
+      final QueryProcessor xq = new QueryProcessor(in, context);
       final Item item = xq.eval();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
       ctx.vars.addGlobal(v.bind(item, ctx));
@@ -770,7 +773,7 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new QueryProcessor(qu, root).queryNodes();
+    return new QueryProcessor(qu, root, context).queryNodes();
   }
 
   /**

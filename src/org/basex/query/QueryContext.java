@@ -59,7 +59,6 @@ public final class QueryContext extends Progress {
   /** Reference to the query file. */
   public IO file = Prop.xquery;
   /** Database context. */
-  // [AW] this should always be set..
   public Context context;
   /** Query string. */
   public String query;

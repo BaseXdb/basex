@@ -271,12 +271,12 @@ public final class BaseXWebServer {
         xq = map.get(key);
         if(xq == null) {
           final String query = Token.string(req.file.content());
-          xq = new QueryProcessor(query, req.file);
+          xq = new QueryProcessor(query, req.file, context);
           map.put(key, xq);
         }
       } else {
         final String query = Token.string(req.file.content());
-        xq = new QueryProcessor(query, req.file);
+        xq = new QueryProcessor(query, req.file, context);
       }
 
       // assign parameters to the xquery processor

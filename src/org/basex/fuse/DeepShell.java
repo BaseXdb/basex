@@ -36,6 +36,8 @@ public final class DeepShell {
 
   /** Filesystem reference. */
   private final DeepFS fs;
+  /** Context. */
+  private Context ctx;
 
   /** Shell prompt. */
   private static final String PS1 = "$ ";
@@ -43,7 +45,7 @@ public final class DeepShell {
   /** Constructor. */
   DeepShell() {
     BaseX.errln("DeepShell");
-    final Context ctx = new Context();
+    ctx = new Context();
     fs = new DeepFS(ctx, "deepshell");
 
     // initialize/mount filesystem
@@ -203,7 +205,7 @@ public final class DeepShell {
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
       Nodes n = new Nodes(0, fs.data);
-      n = new QueryProcessor("/", n).queryNodes();
+      n = new QueryProcessor("/", n, ctx).queryNodes();
       final PrintOutput out = new PrintOutput(System.out);
       final XMLSerializer xml = new XMLSerializer(out, false, true);
       n.serialize(xml);

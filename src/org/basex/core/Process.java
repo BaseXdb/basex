@@ -190,7 +190,8 @@ public abstract class Process extends AbstractProcess {
   protected final Nodes query(final String q, final String err) {
     try {
       final String query = q == null ? "" : q;
-      final QueryProcessor qu = new QueryProcessor(query, context.current());
+      final QueryProcessor qu = new QueryProcessor(query, context.current(),
+          context);
       progress(qu);
       final Nodes nodes = qu.queryNodes();
       // check if all result nodes are tags

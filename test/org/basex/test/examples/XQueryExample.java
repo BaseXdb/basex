@@ -35,7 +35,7 @@ public final class XQueryExample {
     out.println("=== First version: Creating a result instance");
 
     // Creates a query instance
-    QueryProcessor processor = new QueryProcessor(QUERY);
+    QueryProcessor processor = new QueryProcessor(QUERY, context);
     // Executes the query.
     Result result = processor.query();
     // Creates a result serializer
@@ -50,7 +50,7 @@ public final class XQueryExample {
     out.println("\n=== Second version: Iterating through all results");
 
     // Creates a query instance
-    processor = new QueryProcessor(QUERY);
+    processor = new QueryProcessor(QUERY, context);
     // Returns a query iterator
     Iter iter = processor.iter();
     // Creates a result serializer
