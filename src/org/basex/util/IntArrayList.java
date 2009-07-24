@@ -11,9 +11,9 @@ import org.basex.BaseX;
  */
 public final class IntArrayList implements Iterable<int[]> {
   /** Value array. */
-  public int[][] list;
+  int[][] list;
   /** Current array size. */
-  public int size;
+  int size;
 
   /**
    * Default constructor.
@@ -38,6 +38,32 @@ public final class IntArrayList implements Iterable<int[]> {
   public void add(final int[] v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param p position
+   * @return value
+   */
+  public int[] get(final int p) {
+    return list[p];
+  }
+
+  /**
+   * Sets the specified value at the specified position.
+   * @param v value
+   * @param p position
+   */
+  public void set(final int[] v, final int p) {
+    list[p] = v;
   }
 
   public Iterator<int[]> iterator() {

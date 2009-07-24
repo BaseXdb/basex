@@ -50,7 +50,7 @@ public final class PlotData {
     final Data data = context.data();
     final TokenList tl = new TokenList();
     for(final byte[] k : data.path.desc(EMPTY, true, true)) {
-      if(getCategories(k).size > 1) tl.add(k);
+      if(getCategories(k).size() > 1) tl.add(k);
     }
     return tl;
   }

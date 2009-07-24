@@ -522,7 +522,7 @@ public class QueryParser extends InputParser {
 
     if(modLoaded.contains(uri)) error(DUPLMODULE, name.uri);
     try {
-      if(fl.size == 0) {
+      if(fl.size() == 0) {
         boolean found = false;
         for(int n = 0, ns = ctx.modules.size(); n < ns; n += 2) {
           if(ctx.modules.get(n).equals(string(uri))) {
@@ -533,8 +533,8 @@ public class QueryParser extends InputParser {
         }
         if(!found) error(NOMODULE, uri);
       }
-      for(int n = 0; n < fl.size; n++) {
-        module(string(fl.list[n]), name.uri);
+      for(int n = 0, ns = fl.size(); n < ns; n++) {
+        module(string(fl.get(n)), name.uri);
         modLoaded.add(uri);
       }
     } catch(final StackOverflowError ex) {

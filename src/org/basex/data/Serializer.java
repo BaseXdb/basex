@@ -193,13 +193,15 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final void closeElement() throws IOException {
-    if(tags.size == 0) throw new IOException("All elements closed.");
-    ns.size = nsl.get(--tags.size);
+    if(tags.size() == 0) throw new IOException("All elements closed.");
+    final int s = tags.size() - 1;
+    tags.size(s);
+    ns.size = nsl.get(s);
     if(inTag) {
       inTag = false;
       empty();
     } else {
-      close(tags.list[tags.size]);
+      close(tags.get(tags.size()));
     }
   }
 
@@ -209,8 +211,8 @@ public abstract class Serializer {
    */
   public void close() throws IOException {
     cls();
-    if(tags.size > 0) throw new IOException(
-        "<" + string(tags.list[tags.size]) + "> still opened");
+    if(tags.size() > 0) throw new IOException(
+        "<" + string(tags.get(tags.size())) + "> still opened");
   }
 
   /**
@@ -226,7 +228,7 @@ public abstract class Serializer {
    * @return level
    */
   public final int level() {
-    return tags.size;
+    return tags.size();
   }
 
   /**
@@ -314,7 +316,7 @@ public abstract class Serializer {
             }
             pp = data.parent(pp, k);
             k = data.kind(pp);
-          } while(k == Data.ELEM && l == 0 && tags.size == 1);
+          } while(k == Data.ELEM && l == 0 && tags.size() == 1);
 
           // check namespace of current element
           final byte[] key = pre(name);

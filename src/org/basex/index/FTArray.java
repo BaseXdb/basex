@@ -44,13 +44,14 @@ final class FTArray {
    * @return Id on next[currentNode]
    */
   private int insertNodeInNextArray(final int cn, final int ti, final int ip) {
-    final int[] tmp = new int[next.list[cn].length + 1];
-    System.arraycopy(next.list[cn], 0, tmp, 0, ip);
+    final int[] cnn = next.get(cn);
+    final int[] tmp = new int[cnn.length + 1];
+    System.arraycopy(cnn, 0, tmp, 0, ip);
     // insert node
     tmp[ip] = ti;
     // copy remain
-    System.arraycopy(next.list[cn], ip, tmp, ip + 1, tmp.length - ip - 1);
-    next.list[cn] = tmp;
+    System.arraycopy(cnn, ip, tmp, ip + 1, tmp.length - ip - 1);
+    next.set(tmp, cn);
     return ip;
   }
 
@@ -98,33 +99,33 @@ final class FTArray {
       final int[] offset) {
 
     // currentNode is root node
+    final int[] cnn = next.get(cn);
     if(cn == 0) {
       // root has successors
-      if(next.list[cn].length > 3) {
+      if(cnn.length > 3) {
         final int p = getPointer(cn);
-        if(Token.diff(tokens.list[next.list[next.list[cn][p]][0]][0], v[0])
+        if(Token.diff(tokens.get(next.get(cnn[p])[0])[0], v[0])
             != 0) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
           int[] e;
           e = new int[2 + offset.length];
-          e[0] = tokens.size;
+          e[0] = tokens.size();
           tokens.add(v);
           e[1] = s;
           System.arraycopy(offset, 0, e, 2, offset.length);
 
           next.add(e);
-          insertNodeInNextArray(cn, next.size - 1, p + 1);
-          return next.size - 1;
+          insertNodeInNextArray(cn, next.size() - 1, p + 1);
+          return next.size() - 1;
         }
-        return insertNodeSorted(next.list[cn][p], v, s, offset);
+        return insertNodeSorted(cnn[p], v, s, offset);
       }
     }
 
-    final byte[] is = next.list[cn][0] == -1 ?
-        null : calculateIntersection(tokens.list[next.list[cn][0]], v);
-    byte[] r1 = next.list[cn][0] == -1 ?
-        null : tokens.list[next.list[cn][0]];
+    final byte[] is = cnn[0] == -1 ?
+        null : calculateIntersection(tokens.get(cnn[0]), v);
+    byte[] r1 = cnn[0] == -1 ? null : tokens.get(next.get(cn)[0]);
     byte[] r2 = v;
 
     if(is != null) {
@@ -140,20 +141,20 @@ final class FTArray {
           final int p = getPointer(cn);
           if(p == 0 ||
             Token.diff(
-                tokens.list[next.list[next.list[cn][p]][0]][0], r2[0]) != 0) {
+                tokens.get(next.get(cnn[p])[0])[0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
             // start with the same letter than reamin2.
             int[] e;
             e = new int[2 + offset.length];
-            e[0] = tokens.size;
+            e[0] = tokens.size();
             tokens.add(r2);
             e[1] = s;
             System.arraycopy(offset, 0, e, 2, offset.length);
             next.add(e);
-            insertNodeInNextArray(cn, next.size - 1, p + 1);
-            return next.size - 1;
+            insertNodeInNextArray(cn, next.size() - 1, p + 1);
+            return next.size() - 1;
           }
-          return insertNodeSorted(next.list[cn][p], r2, s, offset);
+          return insertNodeSorted(cnn[p], r2, s, offset);
         }
 
       } else {
@@ -163,39 +164,38 @@ final class FTArray {
           // but current has a longer value
           // update value of currentNode.value with intersection
           final int[] oe = new int [3 + offset.length];
-          tokens.list[next.list[cn][0]] = is;
-          oe[0] = next.list[cn][0];
+          tokens.set(is, cnn[0]);
+          oe[0] = cnn[0];
           System.arraycopy(offset, 0, oe, 3, offset.length);
           oe[2] = s;
 
-          next.list[cn][0] = tokens.size;
+          cnn[0] = tokens.size();
           tokens.add(r1);
-          next.add(next.list[cn]);
-          oe[1] = next.size - 1;
-          next.list[cn] = oe;
-          return next.size - 1;
+          next.add(cnn);
+          oe[1] = next.size() - 1;
+          next.set(oe, cn);
+          return next.size() - 1;
         }
         // char1 != null && char2 != null
         // value of current node and value to insert have only one common
         // letter update value of current node with intersection
-        tokens.list[next.list[cn][0]] = is;
-        final int[] one = next.list[cn];
+        tokens.set(is, cnn[0]);
         int[] ne = new int[5];
-        ne[0] = one[0];
+        ne[0] = cnn[0];
         //if(r2[0] < r1[0]) {
         if(Token.diff(r2[0], r1[0]) < 0) {
-          ne[1] = next.size;
-          ne[2] = next.size + 1;
+          ne[1] = next.size();
+          ne[2] = next.size() + 1;
         } else {
-          ne[1] = next.size + 1;
-          ne[2] = next.size;
+          ne[1] = next.size() + 1;
+          ne[2] = next.size();
         }
         ne[3] = 0;
         ne[4] = 0;
-        next.list[cn] = ne;
+        next.set(ne, cn);
 
         ne = new int[2 + offset.length];
-        ne[0] = tokens.size;
+        ne[0] = tokens.size();
         tokens.add(r2);
 
         ne[1] = s;
@@ -203,26 +203,26 @@ final class FTArray {
 
         next.add(ne);
 
-        ne = new int[one.length];
-        System.arraycopy(one, 0, ne, 0, ne.length);
-        ne[0] = tokens.size;
+        ne = new int[cnn.length];
+        System.arraycopy(cnn, 0, ne, 0, ne.length);
+        ne[0] = tokens.size();
         tokens.add(r1);
         next.add(ne);
-        return next.size - 1;
+        return next.size() - 1;
       }
     } else {
       // abort recursion
       // no intersection between current node a value to insert
       final int[] ne = new int[2 + offset.length];
-      ne[0] = tokens.size;
+      ne[0] = tokens.size();
       tokens.add(v);
       System.arraycopy(offset, 0, ne, 2, offset.length);
       ne[1] = s;
 
       next.add(ne);
-      final int p = next.list[cn].length - 2;
-      insertNodeInNextArray(cn, next.size - 1, p);
-      return next.size - 1;
+      final int p = cnn.length - 2;
+      insertNodeInNextArray(cn, next.size() - 1, p);
+      return next.size() - 1;
     }
     return -1;
   }
@@ -267,7 +267,7 @@ final class FTArray {
    * @return index of the data pointer
    */
   private int getPointer(final int cn) {
-    final int[] nl = next.list[cn];
+    final int[] nl = next.get(cn);
     return nl[nl.length - 1] >= 0 ? nl.length - 3 : nl.length - 4;
   }
 }

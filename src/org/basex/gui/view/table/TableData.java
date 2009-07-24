@@ -126,8 +126,8 @@ final class TableData {
       addCol(FSText.BITRATE, true);
       addCol(FSText.SECONDS, true);
     } else {
-      if(r == -1 && roots.size == 0) return;
-      if(root == -1) root = data.tags.id(roots.list[0]);
+      if(r == -1 && roots.size() == 0) return;
+      if(root == -1) root = data.tags.id(roots.get(0));
       for(final byte[] k : data.path.desc(data.tags.key(root), true, true)) {
         final boolean elem = !startsWith(k, '@');
         final byte[] key = delete(k, '@');

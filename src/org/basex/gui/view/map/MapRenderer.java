@@ -424,13 +424,13 @@ final class MapRenderer {
     double ll = 0; // line length
     double e = 0;
 
-    final Color textc = draw ? COLORS[r.level + 4] : null;
+    final Color textc = COLORS[r.level + 4];
     int count = 0;
     int pp = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     int cchars = 0;
-    ttcol = new IntList();
+    final IntList tcol = new IntList();
     final TokenList tl = new TokenList();
     int ml = 0;
     for(int i = 0; i < data[0].length; i++) {
@@ -477,12 +477,12 @@ final class MapRenderer {
         if(ftp != null) {
           while(pp < ftp.size() && count > ftp.pos[pp]) pp++;
           if(pp < ftp.size() && count == ftp.pos[pp]) {
-            ttcol.add(ftp.poi[pp]);
+            tcol.add(ftp.poi[pp]);
             pp++;
           } else {
-            ttcol.add(-1);
+            tcol.add(-1);
           }
-        } else ttcol.add(-1);
+        } else tcol.add(-1);
 
         if(k < tok.length) {
           tok[k] = '.';
@@ -688,7 +688,7 @@ final class MapRenderer {
           tl.add(toks[j]);
           ttcol.add(tc[j]);
         }
-        ul = tl.size - 1;
+        ul = tl.size() - 1;
         ll = 0;
 
         pp = pps;
@@ -776,7 +776,7 @@ final class MapRenderer {
   static void drawToolTip(final Graphics g, final int x, final int y,
       final MapRect mr, final TokenList tl) {
 
-    if(tl != null && tl.size > 0) {
+    if(tl != null && tl.size() > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
       int wl = 0;
@@ -784,10 +784,11 @@ final class MapRenderer {
       int nl = 1;
       int wi = mr.w / 2;
       final IntList len = new IntList();
-      for(int i = 0; i < tl.size; i++) {
+      for(int i = 0; i < tl.size(); i++) {
         l = 0;
-        for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n])) {
-          l += BaseXLayout.width(g, cw, cp(tl.list[i], n));
+        byte[] tok = tl.get(i);
+        for(int n = 0, ns = tok.length; n < ns; n += cl(tok[n])) {
+          l += BaseXLayout.width(g, cw, cp(tok, n));
         }
         if(wl + l + sw < wi) wl += l + sw;
         else {
@@ -813,22 +814,22 @@ final class MapRenderer {
 
       g.setColor(COLORS[20]);
       wl = 0;
-      for(int i = 0; i < tl.size; i++) {
+      for(int i = 0, is = tl.size(); i < is; i++) {
         l = len.get(i);
         if(wl + l + sw >= wi) {
           yy += GUIProp.fontsize + 1;
           wl = 0;
         }
-        final boolean pm = !ftChar(tl.list[i][tl.list[i].length - 1]);
+        final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);
         if(ttcol.get(i) > -1) {
           g.setColor(getFTColor(ttcol.get(i)));
-          g.drawString(string(tl.list[i]), xx + wl, yy);
+          g.drawString(string(tl.get(i)), xx + wl, yy);
           if(ul > -1 && i == ul)
             g.drawLine(xx + wl, yy + 1, xx + wl + l, yy + 1);
           g.setColor(COLORS[24]);
           wl += l;
         } else {
-          g.drawString(string(tl.list[i]), xx + wl, yy);
+          g.drawString(string(tl.get(i)), xx + wl, yy);
           if(ul > -1 && i == ul)
             g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
           wl += l;

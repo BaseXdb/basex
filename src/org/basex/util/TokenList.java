@@ -14,9 +14,9 @@ import org.basex.BaseX;
  */
 public final class TokenList implements Iterable<byte[]> {
   /** Value array. */
-  public byte[][] list;
+  byte[][] list;
   /** Current array size. */
-  public int size;
+  int size;
 
   /**
    * Default constructor.
@@ -40,6 +40,40 @@ public final class TokenList implements Iterable<byte[]> {
   public void add(final byte[] v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Sets the number of entries.
+   * @param s number of entries
+   */
+  public void size(final int s) {
+    size = s;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param p position
+   * @return value
+   */
+  public byte[] get(final int p) {
+    return list[p];
+  }
+
+  /**
+   * Sets the specified value at the specified position.
+   * @param v value
+   * @param p position
+   */
+  public void set(final byte[] v, final int p) {
+    list[p] = v;
   }
 
   /**

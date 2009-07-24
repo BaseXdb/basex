@@ -393,7 +393,7 @@ public final class TreeView extends View {
       //
       // while(ratio < 2) {
       //
-      // int p = parentList.list[++i];
+      // int p = parentList.get(++i);
       //
       // if(p == -1) {
       // continue;

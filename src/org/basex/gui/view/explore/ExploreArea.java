@@ -142,7 +142,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
 
     final TokenList tmp = data.path.desc(sl, true, false);
-    if(tmp.size == 0) return;
+    if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.finish());
     final BaseXCombo cm = new BaseXCombo(keys, HELPSEARCHCAT, gui);

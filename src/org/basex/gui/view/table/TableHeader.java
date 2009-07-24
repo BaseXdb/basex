@@ -291,7 +291,7 @@ final class TableHeader extends BaseXPanel {
    * @param e event reference
    */
   private void chooseRoot(final MouseEvent e) {
-    if(tdata.roots.size == 0) return;
+    if(tdata.roots.size() == 0) return;
 
     final Data data = view.gui.context.data();
     final JPopupMenu popup = new JPopupMenu("Items");
@@ -370,7 +370,7 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(tdata.roots.size != 0 && box != null && inputCol != -1 &&
+    if(tdata.roots.size() != 0 && box != null && inputCol != -1 &&
         !e.isAltDown() && box.add(e.getKeyChar())) {
       tdata.cols[inputCol].filter = box.text;
       view.query();
@@ -379,7 +379,7 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(tdata.roots.size == 0) return;
+    if(tdata.roots.size() == 0) return;
 
     shift = e.isShiftDown();
     alt = e.isAltDown();
@@ -407,7 +407,7 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(tdata.roots == null || tdata.roots.size == 0) return;
+    if(tdata.roots == null || tdata.roots.size() == 0) return;
     shift = e.isShiftDown();
     alt = e.isAltDown();
   }

@@ -4,7 +4,9 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.IntArrayList;
 import org.basex.util.Num;
+import org.basex.util.TokenList;
 
 /**
  * This class builds an index for text contents in a compressed trie.
@@ -68,8 +70,8 @@ public final class FTTrieBuilder extends FTBuilder {
 
     hash = null;
 
-    final byte[][] tokens = index.tokens.list;
-    final int[][] next = index.next.list;
+    final TokenList tokens = index.tokens;
+    final IntArrayList next = index.next;
 
     // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
     // l = length of the token t1, ..., tl
@@ -95,47 +97,48 @@ public final class FTTrieBuilder extends FTBuilder {
       // write token
       outN.write((byte) -1);
       // write next pointer
-      int j = 1;
-      for(; j < next[0].length - 2; j++) {
-        outN.writeInt(next[0][j]); // pointer
+      int j = 1, js = next.get(0).length - 2;
+      for(; j < js; j++) {
+        outN.writeInt(next.get(0)[j]); // pointer
         // first char of next node
-        outN.write(tokens[next[next[0][j]][0]][0]);
+        outN.write(tokens.get(next.get(next.get(0)[j])[0])[0]);
       }
 
-      outN.writeInt(next[0][j]); // data size
+      outN.writeInt(next.get(0)[j]); // data size
       outN.write5(-1); // pointer on data - root has no data
       outS.writeInt(s);
-      s += 2L + (next[0].length - 3) * 5L + 9L;
+      s += 2L + (next.get(0).length - 3) * 5L + 9L;
       // all other nodes
-      final int il = index.next.size;
+      final int il = next.size();
       for(int i = 1; i < il; i++) {
+        final int[] nxt = next.get(i);
         // check pointer on data needs 1 or 2 ints
-        final int lp = next[i][next[i].length - 1] > -1 ? 0 : -1;
+        final int lp = nxt[nxt.length - 1] > -1 ? 0 : -1;
         // write token size as byte
-        outN.write((byte) tokens[next[i][0]].length);
+        outN.write((byte) tokens.get(nxt[0]).length);
         // write token
-        outN.write(tokens[next[i][0]]);
+        outN.write(tokens.get(nxt[0]));
         // write next pointer
         j = 1;
-        for(; j < next[i].length - 2 + lp; j++) {
-          outN.writeInt(next[i][j]); // pointer
+        for(; j < nxt.length - 2 + lp; j++) {
+          outN.writeInt(nxt[j]); // pointer
           // first char of next node
-          outN.write(tokens[next[next[i][j]][0]][0]);
+          outN.write(tokens.get(next.get(nxt[j])[0])[0]);
         }
-        outN.writeInt(next[i][j]); // data size
-        if(next[i][j] == 0 && next[i][j + 1] == 0) {
+        outN.writeInt(nxt[j]); // data size
+        if(nxt[j] == 0 && nxt[j + 1] == 0) {
           // node has no data
-          outN.write5(next[i][j + 1]);
+          outN.write5(nxt[j + 1]);
         } else {
           // write pointer on data
           if(lp == 0) {
-            outN.write5(next[i][j + 1]);
+            outN.write5(nxt[j + 1]);
           } else {
-            outN.write5(toLong(next[i], next[i].length - 2));
+            outN.write5(toLong(nxt, nxt.length - 2));
           }
         }
         outS.writeInt(s);
-        s += 1L + tokens[next[i][0]].length * 1L + (next[i].length - 3 + lp)
+        s += 1L + tokens.get(nxt[0]).length * 1L + (nxt.length - 3 + lp)
             * 5L + 9L;
       }
     }

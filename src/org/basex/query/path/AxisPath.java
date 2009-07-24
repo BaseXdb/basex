@@ -251,11 +251,11 @@ public class AxisPath extends Path {
       }
 
       // build new steps
-      int ts = tl.size;
+      int ts = tl.size();
       final Step[] steps = new Step[ts + step.length - i - 1];
       for(int t = 0; t <= ts - 1; t++) {
         final Expr[] preds = t == ts - 1 ? step[i].pred : new Expr[] {};
-        final byte[] n = tl.list[ts - t - 1];
+        final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false) :
           new NameTest(new QNm(n), Kind.NAME, false);
         steps[t] = Step.get(Axis.CHILD, nt, preds);

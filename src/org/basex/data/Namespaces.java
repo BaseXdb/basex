@@ -214,13 +214,14 @@ public final class Namespaces extends Set {
       tb.add("  ");
       final TokenList key = map.get(val);
       key.sort(false);
-      if(key.size > 1 || key.list[0].length != 0) {
-        if(key.size != 1) tb.add("(");
-        for(int k = 0; k < key.size; k++) {
+      final int ks = key.size();
+      if(ks > 1 || key.get(0).length != 0) {
+        if(key.size() != 1) tb.add("(");
+        for(int k = 0; k < ks; k++) {
           if(k != 0) tb.add(", ");
-          tb.add(key.list[k]);
+          tb.add(key.get(k));
         }
-        if(key.size != 1) tb.add(")");
+        if(ks != 1) tb.add(")");
         tb.add(" = ");
       }
       tb.add("\"%\"" + NL, val);
