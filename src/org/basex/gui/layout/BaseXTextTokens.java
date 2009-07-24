@@ -219,7 +219,7 @@ public final class BaseXTextTokens {
     for(final char c : ch) tb.addUTF(c);
     tb.add(text, ps, size);
     text = tb.finish();
-    size = tb.size;
+    size = tb.size();
     for(int c = 0; c < ch.length; c++) next();
   }
 
@@ -235,7 +235,7 @@ public final class BaseXTextTokens {
     tb.add(text, 0, s);
     if(e < size) tb.add(text, e, size);
     text = tb.finish();
-    size = tb.size;
+    size = tb.size();
     ps = s;
     noMark();
   }

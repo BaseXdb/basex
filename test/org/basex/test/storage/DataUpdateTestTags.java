@@ -17,6 +17,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAsOnly1() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -42,6 +43,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAsOnly2() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -67,6 +69,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAsOnly3() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -92,6 +95,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsFirst() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -116,6 +120,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsSecond() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -141,6 +146,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsLast() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -165,6 +171,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
    */
   @Test
   public void testUpdateTagName() {
+    final Data data = ctx.data();
     data.update(6, token("JUnit"));
     assertEquals((int) Data.ELEM, data.kind(6));
     assertByteArraysEqual(token("JUnit"), data.tag(6));
@@ -191,6 +198,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   private void insertTag(final int par, final int pos,
       final byte[] name, final int kind) {
     int root = par;
+    final Data data = ctx.data();
     if(pos == 0) {
       root = par + data.size(par, kind);
     } else {

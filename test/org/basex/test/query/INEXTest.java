@@ -117,7 +117,7 @@ public final class INEXTest {
       // extract content id
       s0 = line.indexOf('"', s1 + 1);
       s1 = line.indexOf('"', s0 + 1);
-      final int ctid = Integer.parseInt(line.substring(s0 + 1, s1));
+      //final int ctid = Integer.parseInt(line.substring(s0 + 1, s1));
       // extract query
       s0 = line.indexOf('/', s1);
       String q = line.substring(s0);
@@ -253,14 +253,14 @@ public final class INEXTest {
           }
         } 
         
-        if (b[i] == ']' && tl.size > 0) {
+        if (b[i] == ']' && tl.size() > 0) {
           // rewrite query
-          byte[][] n = new byte[tl.size][];
+          byte[][] n = new byte[tl.size()][];
           int l;
           // calculate size for new query
           int size = 0;
           for (int j = 0; j < n.length; j++) 
-            size += path.length + tl.list[j].length 
+            size += path.length + tl.get(j).length 
               + 1 + i - c + ((j + 1 < n.length) ? 4 : 0);
           
           final byte[] bn = new byte[bs + 2 + size + b.length - i];
@@ -268,11 +268,11 @@ public final class INEXTest {
           System.arraycopy(b, 0, bn, 0, bs + 1);
           int os = bs + 1;
           for (int j = 0; j < n.length; j++) {
-            final int tokl = tl.list[j].length;
+            final int tokl = tl.get(j).length;
             l = tokl + 1 + i - c;
             n[j] = new byte[l];
             // copy dedicated element name
-            System.arraycopy(tl.list[j], 0, n[j], 0, tokl);
+            System.arraycopy(tl.get(j), 0, n[j], 0, tokl);
             n[j][tokl] = ' ';
             // copy expression after dedicated path
             System.arraycopy(b, c, n[j], tokl + 1, i - c);
@@ -309,31 +309,31 @@ public final class INEXTest {
           }
           i++;
         }
-        if (tl.size > 0) {
+        if (tl.size() > 0) {
           final byte[] tok = new byte[i - s];
           System.arraycopy(b, s, tok, 0, tok.length);
           tl.add(tok);          
         }
         
         int size = 0;
-        for (int k = 0; k < tl.size; k++) {
-          size += j + s + tl.list[k].length + b.length - 
-          i + ((k < tl.size - 1) ? 3 : 0);
+        for (int k = 0; k < tl.size(); k++) {
+          size += j + s + tl.get(k).length + b.length - 
+          i + ((k < tl.size() - 1) ? 3 : 0);
         }
         
         final byte[] bn = new byte[size];
         int off = 0;
-        for (int k = 0; k < tl.size; k++) {
+        for (int k = 0; k < tl.size(); k++) {
           // copy path
           System.arraycopy(b, 0, bn, off, j);
           off += j;
           // copy element
-          System.arraycopy(tl.list[k], 0, bn, off, tl.list[k].length);
-          off += tl.list[k].length;
+          System.arraycopy(tl.get(k), 0, bn, off, tl.get(k).length);
+          off += tl.get(k).length;
           // copy lasting
           System.arraycopy(b, i + 1, bn, off, b.length - i - 1);
           off += b.length - i - 1;
-          if (k < tl.size - 1) {
+          if (k < tl.size() - 1) {
             System.arraycopy(new byte[]{' ', 'o', 'r', ' '}, 0, bn, off, 4);
             off += 4;
           }
@@ -349,9 +349,8 @@ public final class INEXTest {
   /**
    * Main test method.
    * @param args command line arguments (ignored)
-   * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String[] args) {
     /*System.out.println(replaceDedicatedNodes("//(p|sec)[. ftcontains " +
       "(\"Vincent\" ftand \"van|\" ftand \"Gogh\")]//image[. " +
       "ftcontains (\"sunflowers\")]"));

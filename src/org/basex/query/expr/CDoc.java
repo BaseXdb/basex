@@ -43,7 +43,7 @@ public final class CDoc extends CFrag {
       if(it.node() && it.type != Type.TXT) {
         if(it.type == Type.ATT) Err.or(XPATT);
 
-        if(text.size != 0) {
+        if(text.size() != 0) {
           nodes.add(new FTxt(text.finish(), null));
           text.reset();
         }
@@ -54,12 +54,12 @@ public final class CDoc extends CFrag {
         }
         more = false;
       } else {
-        if(more && text.size != 0 && it.type != Type.TXT) text.add(' ');
+        if(more && text.size() != 0 && it.type != Type.TXT) text.add(' ');
         text.add(it.str());
         more = it.type != Type.TXT;
       }
     }
-    if(text.size != 0) {
+    if(text.size() != 0) {
       nodes.add(new FTxt(text.finish(), null));
       text.reset();
     }

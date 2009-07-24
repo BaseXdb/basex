@@ -84,6 +84,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
    */
   @Test
   public void testBulkInsertSmall() {
+    final Data data = ctx.data();
     insert(6, 2, Copy.copy(insertData, 3));
     assertEquals(size + 4, data.meta.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
@@ -95,6 +96,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
    */
   @Test
   public void testBulkInsertLarge() {
+    final Data data = ctx.data();
     insert(6, 2, Copy.copy(insertData, 5));
     assertEquals(size + 2, data.meta.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
@@ -110,6 +112,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   private void insert(final int par, final int pos, final Data tmp) {
     // find inserting position
     int pre = par;
+    final Data data = ctx.data();
     int k = data.kind(pre);
     if(pos == 0) {
       pre += data.size(pre, k);

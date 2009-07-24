@@ -119,8 +119,8 @@ final class TableContent extends BaseXBack {
             fcol = c;
 
         // add content to column (skip too long contents)...
-        if(tb[c].size < 100) {
-          if(tb[c].size != 0) tb[c].add("; ");
+        if(tb[c].size() < 100) {
+          if(tb[c].size() != 0) tb[c].add("; ");
           if(ti.elem) {
             tb[c].add(data.text(ti.pre));
           } else {
@@ -138,7 +138,7 @@ final class TableContent extends BaseXBack {
       }
 
       // add dots if content is too long
-      for(final TokenBuilder t : tb) if(t.size > 100) t.add("...");
+      for(final TokenBuilder t : tb) if(t.size() > 100) t.add("...");
 
       // draw row contents
       byte[] focusStr = null;
@@ -150,7 +150,7 @@ final class TableContent extends BaseXBack {
         final double ce = x + cw;
 
         if(ce != 0) {
-          final byte[] str = tb[c].size != 0 ? tb[c].finish() : null;
+          final byte[] str = tb[c].size() != 0 ? tb[c].finish() : null;
           if(str != null) {
             if(data.fs != null && tdata.cols[c].id == data.fs.suffixID) {
               g.drawImage(GUIFS.images(str, false), (int) x + 2,

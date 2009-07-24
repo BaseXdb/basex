@@ -2,11 +2,12 @@ package org.basex.test.storage;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
+import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
-import org.basex.data.Data;
-import org.basex.data.DiskData;
+import org.basex.core.proc.Open;
 import org.basex.io.IO;
 import org.junit.After;
 import org.junit.Before;
@@ -21,16 +22,15 @@ import org.junit.Test;
  */
 public abstract class DataUpdateTest {
   /** JUnit tag. */
-  static final byte[] JUNIT = token("junit");
+  protected static final byte[] JUNIT = token("junit");
   /** Test file we do updates with. */
-  static final String TESTFILE = "etc/xml/test.xml";
+  private static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
-  final String dbname = getClass().getSimpleName();
-
+  private final String dbname = getClass().getSimpleName();
+  /** Database context. */
+  protected Context ctx;
   /** Test file size in nodes. */
-  int size;
-  /** Data. */
-  Data data;
+  protected int size;
 
   /**
    * Initializes the test class.
@@ -49,8 +49,9 @@ public abstract class DataUpdateTest {
   @Before
   public void setUp() {
     try {
-      data = CreateDB.xml(IO.get(TESTFILE), dbname);
-      size = data.meta.size;
+      ctx = new Context();
+      ctx.data(CreateDB.xml(ctx, IO.get(TESTFILE), dbname));
+      size = ctx.data().meta.size;
     } catch(final Exception ex) {
       ex.printStackTrace();
       System.exit(1);
@@ -63,7 +64,7 @@ public abstract class DataUpdateTest {
   @After
   public void tearDown() {
     try {
-      data.close();
+      ctx.close();
       DropDB.drop(dbname);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -74,13 +75,8 @@ public abstract class DataUpdateTest {
    * Reloads the database.
    */
   void reload() {
-    try {
-      data.close();
-      data = new DiskData(dbname);
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-      System.exit(1);
-    }
+    new Close().execute(ctx);
+    new Open(dbname).execute(ctx);
   }
 
   /**
@@ -98,8 +94,8 @@ public abstract class DataUpdateTest {
    */
   @Test
   public void testSize() {
-    assertEquals("Unexpected size!", size, data.meta.size);
+    assertEquals("Unexpected size!", size, ctx.data().meta.size);
     reload();
-    assertEquals("Unexpected size!", size, data.meta.size);
+    assertEquals("Unexpected size!", size, ctx.data().meta.size);
   }
 }

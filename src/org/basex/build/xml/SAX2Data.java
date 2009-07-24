@@ -115,7 +115,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
    * @throws IOException I/O exception
    */
   private void finishText() throws IOException {
-    if(tb.size != 0) {
+    if(tb.size() != 0) {
       builder.text(tb, false);
       tb.reset();
     }

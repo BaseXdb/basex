@@ -723,7 +723,7 @@ public final class Token {
     for(int i = 0; i < l; i++) {
       final byte c = tok[i];
       if(c == sep) {
-        if(sb.size != 0) {
+        if(sb.size() != 0) {
           split[s++] = sb.finish();
           sb.reset();
         }
@@ -731,7 +731,7 @@ public final class Token {
         sb.add(c);
       }
     }
-    if(sb.size != 0) split[s++] = sb.finish();
+    if(sb.size() != 0) split[s++] = sb.finish();
     return Array.finish(split, s);
   }
 

@@ -12,6 +12,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
@@ -52,35 +53,32 @@ public final class CreateDB extends ACreate {
     return build(new DirParser(io), args[1]);
   }
 
-  // [AW] the following methods two should only be called if no database
-  //  name is given. This means that main memory instances will be created,
-  //  which will be ignored by the data pool management. Main memory instances
-  //  are useful for creating temporary databases, which will not influence
-  //  the transaction management.
-
   /**
    * Creates and returns a database for the specified XML document.
+   * @param ctx database context
    * @param io file reference
    * @param name name of the database to be created
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final IO io, final String name) throws IOException {
+  public static Data xml(final Context ctx, final IO io, final String name)
+      throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(new DirParser(io), name);
+    return xml(ctx, new DirParser(io), name);
   }
 
   /**
-   * Creates and returns a database for the specified XML document.
-   * If building fails, an empty reference is returned.
+   * Creates and returns a database instance for the specified XML document.
+   * @param ctx database context
    * @param p xml parser
    * @param db name of the database to be created; if db is <code>null</code>,
    * a main memory instance is created
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final Parser p, final String db) throws IOException {
-    if(db == null || Prop.mainmem) return new MemBuilder().build(p, "");
+  public static Data xml(final Context ctx, final Parser p, final String db)
+      throws IOException {
+    if(Prop.mainmem) return xml(p);
 
     final Builder builder = new DiskBuilder();
     try {
@@ -91,6 +89,9 @@ public final class CreateDB extends ACreate {
         new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
         new FTFuzzyBuilder().build(data) : new FTTrieBuilder().build(data));
+
+      // [AW] null test should be removed if query processor handles context
+      if(ctx != null) ctx.addToPool(data);
       return data;
     } catch(final IOException ex) {
       try {
@@ -104,13 +105,35 @@ public final class CreateDB extends ACreate {
   }
 
   /**
+   * Creates and returns a main memory database from the specified parser.
+   * @param p xml parser
+   * a main memory instance is created
+   * @return database instance
+   * @throws IOException exception
+   */
+  public static Data xml(final Parser p) throws IOException {
+    return new MemBuilder().build(p, "");
+  }
+
+  /**
+   * Creates and returns a main memory database from the specified XML document.
+   * @param io file reference
+   * @return database instance
+   * @throws IOException exception
+   */
+  public static Data xml(final IO io) throws IOException {
+    if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
+    return xml(new DirParser(io));
+  }
+
+  /**
    * Creates and returns a main memory database from the specified SAX source.
    * @param s sax source
    * @return database instance
    * @throws IOException exception
    */
   public static Data xml(final SAXSource s) throws IOException {
-    return xml(new SAXWrapper(s), null);
+    return xml(new SAXWrapper(s));
   }
 
   @Override

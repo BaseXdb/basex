@@ -113,7 +113,7 @@ public final class CElem extends CFrag {
         final Iter iter = ctx.iter(e);
         while(add(ctx, iter.next()));
       }
-      if(text.size != 0) children.add(new FTxt(text.finish(), null));
+      if(text.size() != 0) children.add(new FTxt(text.finish(), null));
 
       final FElem node = new FElem(tname, children, ats, base, nsp, null);
       for(int n = 0; n < children.size; n++) children.item[n].parent(node);
@@ -140,7 +140,7 @@ public final class CElem extends CFrag {
 
         if(it.type == Type.ATT) {
           // text has already been added - no attribute allowed anymore
-          if(text.size != 0 || children.size != 0) Err.or(NOATTALL);
+          if(text.size() != 0 || children.size != 0) Err.or(NOATTALL);
 
           // split attribute name
           final QNm name = node.qname();
@@ -165,7 +165,7 @@ public final class CElem extends CFrag {
           while((ch = iter.next()) != null) add(ctx, ch);
         } else {
           // add text node
-          if(text.size != 0) {
+          if(text.size() != 0) {
             children.add(new FTxt(text.finish(), null));
             text.reset();
           }

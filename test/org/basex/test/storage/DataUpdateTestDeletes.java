@@ -17,6 +17,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
    */
   @Test
   public void testSimpleNodeDelete() {
+    final Data data = ctx.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParSize = data.size(2, Data.ELEM);
@@ -41,6 +42,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
    */
   @Test
   public void testCascadingDelete() {
+    final Data data = ctx.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     data.delete(2);
@@ -62,6 +64,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
    */
   @Test
   public void testCascadingDelete2() {
+    final Data data = ctx.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(4, Data.ELEM);
@@ -86,6 +89,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
    */
   @Test
   public void testDeleteAttribute() {
+    final Data data = ctx.data();
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
     data.delete(7);
@@ -112,6 +116,7 @@ public final class DataUpdateTestDeletes extends DataUpdateTest {
    */
   @Test
   public void testDeleteText() {
+    final Data data = ctx.data();
     data.delete(10);
     assertEquals(size - 1, data.meta.size);
     reload();

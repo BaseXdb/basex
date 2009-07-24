@@ -10,12 +10,12 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public final class TokenBuilder {
-  /** Current token size. */
-  public int size;
+  /** Character array. */
+  private byte[] chars;
   /** Entity flag. */
   public boolean ent;
-  /** Character array. */
-  public byte[] chars;
+  /** Current token size. */
+  private int size;
 
   /**
    * Empty constructor.
@@ -47,6 +47,14 @@ public final class TokenBuilder {
   public TokenBuilder(final byte[] str) {
     chars = str;
     size = str.length;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
   }
 
   /**

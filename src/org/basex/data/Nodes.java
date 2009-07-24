@@ -78,7 +78,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Sets the specified values.
+   * Sets the specified nodes.
    * @param n values
    */
   public void set(final int[] n) {

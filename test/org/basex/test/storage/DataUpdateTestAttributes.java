@@ -17,6 +17,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
    */
   @Test
   public void testUpdateAttribute() {
+    final Data data = ctx.data();
     data.update(7, token("name"), token("junit"));
     assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("name"), data.attName(7));
@@ -32,6 +33,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
    */
   @Test
   public void testUpdateAttribute2() {
+    final Data data = ctx.data();
     data.update(8, token("id"), token("junit"));
     assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("junit"), data.attValue(8));
@@ -45,6 +47,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
    */
   @Test
   public void testAddAttribute() {
+    final Data data = ctx.data();
     final long nextid = data.meta.lastid;
     data.insert(9, 6, token("foo"), token("junit"));
     assertEquals(size + 1, data.meta.size);

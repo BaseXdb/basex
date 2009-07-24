@@ -454,7 +454,7 @@ public final class EXIFIndex {
         final TokenBuilder tb = new TokenBuilder();
         for(int i = 0; i < 4; i++) {
           if(val[i] > 0x30 && val[i] < 0x3A) {
-            if(tb.size != 0) tb.add('.');
+            if(tb.size() != 0) tb.add('.');
             tb.add(val[i]);
           }
         }

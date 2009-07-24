@@ -449,7 +449,7 @@ public abstract class W3CTS {
     String expError = text("*:expected-error/text()", root);
 
     final StringBuilder log = new StringBuilder(pth + inname + ".xq");
-    if(files.size != 0) {
+    if(files.size() != 0) {
       log.append(" [");
       log.append(files);
       log.append("]");
@@ -653,7 +653,7 @@ public abstract class W3CTS {
     for(int c = 0; c < nod.size(); c++) {
       final byte[] nm = data.atom(nod.nodes[c]);
       final String src = srcs.get(string(nm));
-      if(tb.size != 0) tb.add(", ");
+      if(tb.size() != 0) tb.add(", ");
       tb.add(nm);
 
       if(src == null) {

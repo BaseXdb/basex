@@ -292,7 +292,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       }
 
       if(attr) {
-        if(tb.size == 0) tb.add("//*");
+        if(tb.size() == 0) tb.add("//*");
         if(pattern.length() == 0) pattern = PATSIMPLE;
       } else {
         tb.add("//" + key);

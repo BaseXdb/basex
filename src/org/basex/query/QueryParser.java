@@ -1640,7 +1640,7 @@ public class QueryParser extends InputParser {
         tb.add(delim);
       } while(true);
 
-      if(tb.size != 0) attv = add(attv, Str.get(tb.finish()));
+      if(tb.size() != 0) attv = add(attv, Str.get(tb.finish()));
 
       if(eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);

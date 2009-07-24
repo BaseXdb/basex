@@ -209,7 +209,7 @@ public final class Find extends AQuery {
         tb.add("]");
       }
     }
-    return tb.size == 0 ? "." : (root ? "/" : "") +
+    return tb.size() == 0 ? "." : (root ? "/" : "") +
       "descendant-or-self::" + string(tag) + tb;
   }
 

@@ -6,12 +6,14 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Open;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.data.FTPosData;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
@@ -56,6 +58,9 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> thes;
   /** Reference to the query file. */
   public IO file = Prop.xquery;
+  /** Database context. */
+  // [AW] this should always be set..
+  public Context context;
   /** Query string. */
   public String query;
 
@@ -326,10 +331,7 @@ public final class QueryContext extends Progress {
    * @throws IOException query exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs; d++) {
-      // [AW] later replaced by context.unpin()...
-      if(Context.POOL.unpin(doc[d].data)) doc[d].data.close();
-    }
+    for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
   }
 
   /**
@@ -382,9 +384,9 @@ public final class QueryContext extends Progress {
     }
 
     // check if the database has already been opened
-    final String dbname = string(db);
+    final String name = string(db);
     for(int d = 0; d < docs; d++)
-    if(doc[d].data.meta.name.equals(dbname)) return doc[d];
+    if(doc[d].data.meta.name.equals(name)) return doc[d];
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
     for(int d = 0; d < docs; d++) {
@@ -396,16 +398,12 @@ public final class QueryContext extends Progress {
 
     if(Prop.web) {
       try {
-        data = Context.POOL.pin(dbname);
-        if(data == null) {
-          data = new DiskData(dbname);
-          Context.POOL.add(data);
-        }
+        data = Open.open(context, name);
       } catch(final IOException ex) {
-        Err.or(INVDOC, dbname);
+        Err.or(INVDOC, name);
       }
     } else {
-      data = check(dbname, file == null, coll);
+      data = check(name, file == null, coll);
       if(data == null) data = check(file.merge(bxw).path(), true, coll);
     }
 
@@ -437,14 +435,24 @@ public final class QueryContext extends Progress {
       throws QueryException {
 
     final IO f = IO.get(path);
-    final String db = f.dbname();
-    // [AW] later replaced by context.pin()...
-    Data d = Context.POOL.pin(db);
+    final String name = f.dbname();
 
+    // [AW] this test should be removed if query context has database context
+    if(context == null) {
+      try {
+        return MetaData.found(path, name) ? Open.open(context, name) :
+          CreateDB.xml(context, f, name);
+      } catch(final IOException ex) {
+        if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
+      }
+    }
+    // [AW] ...test end
+
+    Data d = context.pin(name);
     if(d == null) {
       try {
-        d = MetaData.found(path, db) ? new DiskData(db) : CreateDB.xml(f, db);
-        Context.POOL.add(d);
+        d = MetaData.found(path, name) ? Open.open(context, name) :
+          CreateDB.xml(context, f, name);
       } catch(final IOException ex) {
         if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
       }

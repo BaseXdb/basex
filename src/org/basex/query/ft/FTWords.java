@@ -184,7 +184,7 @@ public final class FTWords extends FTExpr {
           tb.add(' ');
         }
         o += opt.contains(tb.finish(), ctx.fttoken, this);
-        len += tb.size;
+        len += tb.size();
         break;
     }
 

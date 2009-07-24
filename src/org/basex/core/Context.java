@@ -16,7 +16,7 @@ import org.basex.util.Performance;
  */
 public final class Context {
   /** Database pool. */
-  public static final DataPool POOL = new DataPool();
+  private static final DataPool POOL = new DataPool();
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -151,6 +151,15 @@ public final class Context {
    */
   public Data pin(final String name) {
     return POOL.pin(name);
+  }
+
+  /**
+   * Unpins a data reference.
+   * @param d data reference
+   * @return true if reference was removed from the pool
+   */
+  public boolean unpin(final Data d) {
+    return POOL.unpin(d);
   }
 
   /**

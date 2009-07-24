@@ -8,6 +8,7 @@ import org.basex.build.xml.XMLParser;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.fuse.DeepFS;
@@ -30,6 +31,8 @@ public class DeepBaseTest {
   private static final String TESTFILE = "/tmp/deepbasetest.xml";
   /** DeepBase reference to test. */
   private DeepFS dbfs;
+  /** Database context. */
+  private Context ctx;
 
   /**
    * Creates the database.
@@ -38,8 +41,8 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    dbfs = new DeepFS(DBNAME);
-    //dbfs.init();
+    ctx = new Context();
+    dbfs = new DeepFS(ctx, DBNAME);
   }
 
   /**
@@ -47,6 +50,7 @@ public class DeepBaseTest {
    */
   @After
   public void tearDown() {
+    ctx.close();
     dbfs.destroy();
     DropDB.drop(DBNAME);
     new File(TESTFILE).delete();
@@ -120,7 +124,7 @@ public class DeepBaseTest {
    * Reads directory entries (rmdir and unlink are handled the same way).
   @Test
   public void testReaddir() {
-    loadTestDB();
+    loadTestDB(ctx);
     assertEquals("unlink", 0, dbfs.unlink("/afile"));
     query("/");
     assertEquals("unlink", 0, dbfs.unlink("/"));
@@ -133,10 +137,10 @@ public class DeepBaseTest {
    */
   private void loadTestDB() {
     try {
-      final Context ctx = new Context();
-      ctx.data(CreateDB.xml(new XMLParser(
-          IO.get("test/org/basex/test/fuse/getattrtest.xml")), DBNAME));
-      dbfs.data = ctx.data();
+      final Data data = CreateDB.xml(ctx, new XMLParser(
+          IO.get("test/org/basex/test/fuse/getattrtest.xml")), DBNAME);
+      ctx.data(data);
+      dbfs.data = data;
     } catch(final IOException e) {
       e.printStackTrace();
       fail("Problem loading test database.");

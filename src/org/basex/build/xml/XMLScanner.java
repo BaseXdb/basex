@@ -539,7 +539,7 @@ public final class XMLScanner {
    */
   private void completeRef(final TokenBuilder entity) throws IOException {
     int ch = consume();
-    while(entity.size < 10 && ch >= ' ' && ch != ';') {
+    while(entity.size() < 10 && ch >= ' ' && ch != ';') {
       entity.addUTF(ch);
       ch = consume();
     }
@@ -645,7 +645,7 @@ public final class XMLScanner {
     int c;
     while(isLetterOrDigit(c = nextChar())) name.addUTF(c);
     prev(1);
-    if(name.size == 0) error(INVNAME);
+    if(name.size() == 0) error(INVNAME);
     return name.finish();
   }
 
@@ -994,7 +994,7 @@ public final class XMLScanner {
       prev(1);
     }
     check((char) d);
-    if(enc.size == 0) error(DECLENCODE, enc);
+    if(enc.size() == 0) error(DECLENCODE, enc);
     final String e = string(enc.finish());
     input.encoding(e);
     return e;

@@ -19,6 +19,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAsOnly1() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(3, 0, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -46,6 +47,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAsOnly2() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(3, 1, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -73,6 +75,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAsOnly3() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(3, 2, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -100,6 +103,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsFirst() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(6, 1, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -125,6 +129,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsSecond() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(6, 2, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -151,6 +156,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsLast() throws Exception {
+    final Data data = ctx.data();
     final int nextid = data.meta.lastid;
     insertText(6, 0, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -202,6 +208,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
    */
   @Test
   public void testUpdateText() {
+    final Data data = ctx.data();
     data.update(10, token("JUnit"));
     assertEquals((int) Data.TEXT, data.kind(10));
     assertByteArraysEqual(token("JUnit"), data.text(10));
@@ -221,6 +228,7 @@ public final class DataUpdateTestText extends DataUpdateTest {
   private void insertText(final int par, final int pos, final byte[] val,
       final byte kind) throws IOException {
 
+    final Data data = ctx.data();
     int pre = par;
     int k = data.kind(pre);
     if(pos == 0) {

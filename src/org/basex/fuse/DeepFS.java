@@ -9,6 +9,7 @@ import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.FSText;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
@@ -146,9 +147,10 @@ public final class DeepFS extends DeepFuse implements DataText {
   /**
    * Constructor for {@link DeepShell} and java only test cases (no mount).
    * @param name name of initially empty database.
+   * @param ctx database context
    */
-  public DeepFS(final String name) {
-    data = createEmptyDB(name);
+  public DeepFS(final Context ctx, final String name) {
+    data = createEmptyDB(ctx, name);
     initNames();
     final MemData m = new MemData(3, data.tags, data.atts, data.ns, data.path);
     final int tagID = data.tags.index(DEEPFS, null, false);
@@ -158,6 +160,26 @@ public final class DeepFS extends DeepFuse implements DataText {
     m.addAtt(backingstoreID, 0, NOBACKING, 3);
     data.insert(1, 0, m);
     data.flush();
+  }
+
+  /**
+   * Creates an empty database.
+   * @param n name of database instance
+   * @param ctx database context
+   * @return data reference to empty database
+   */
+  private Data createEmptyDB(final Context ctx, final String n) {
+    try {
+      final Data d = CreateDB.xml(ctx, Parser.emptyParser(IO.get(n)), n);
+      ctx.data(d);
+      d.fs = this;
+      return d;
+    } catch(final IOException e) {
+      e.printStackTrace();
+    } catch(final Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**
@@ -189,24 +211,6 @@ public final class DeepFS extends DeepFuse implements DataText {
       else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
       BaseX.debug(msg);
     }
-  }
-
-  /**
-   * Creates an empty database.
-   * @param n name of database instance
-   * @return data reference to empty database
-   */
-  private Data createEmptyDB(final String n) {
-    try {
-      final Data d = CreateDB.xml(Parser.emptyParser(IO.get(n)), n);
-      d.fs = this;
-      return d;
-    } catch(final IOException e) {
-      e.printStackTrace();
-    } catch(final Exception e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   /**

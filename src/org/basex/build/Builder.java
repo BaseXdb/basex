@@ -259,13 +259,13 @@ public abstract class Builder extends Progress {
     final boolean out = !inDoc || level == 1;
     if(!w) {
       if(out) error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
-    } else if(t.size == 0 || out) {
+    } else if(t.size() == 0 || out) {
       return;
     }
 
     // chop whitespaces in text nodes
     if(meta.chop) t.chop();
-    if(t.size != 0) addText(t, Data.TEXT);
+    if(t.size() != 0) addText(t, Data.TEXT);
   }
 
   /**

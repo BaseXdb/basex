@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 import org.basex.BaseX;
+import org.basex.core.Context;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -42,11 +43,13 @@ public final class DeepShell {
   /** Constructor. */
   DeepShell() {
     BaseX.errln("DeepShell");
-    fs = new DeepFS("deepshell");
+    final Context ctx = new Context();
+    fs = new DeepFS(ctx, "deepshell");
 
     // initialize/mount filesystem
     //fs.init();
     loop();
+    ctx.close();
   }
 
   /** Rudimentary shell. */
