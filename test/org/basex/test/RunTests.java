@@ -29,6 +29,7 @@ public final class RunTests {
     // create input.xml database for XQJ/XMLDB examples
     final Context ctx = new Context();
     new CreateDB("input.xml").execute(ctx);
+    ctx.close();
 
     System.out.println("============= XQJ Tests =============");
     XQJQuery.main(args);
@@ -57,8 +58,5 @@ public final class RunTests {
     System.out.println();
 
     System.out.println("Additionally run the remaining JUnit tests.");
-
-    // Deletes the databases.
-    ctx.close();
   }
 }
