@@ -65,16 +65,6 @@ public final class BoolList {
   }
 
   /**
-   * Checks if all values are b.
-   * @param b boolean b
-   * @return boolean all b
-   */
-  public boolean all(final boolean b) {
-    for(final boolean bl : list) if(bl != b) return false;
-    return true;
-  }
-
-  /**
    * Finishes the int array.
    * @return int array
    */

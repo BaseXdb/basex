@@ -1,7 +1,6 @@
 package org.basex.gui.view.tree;
 
 import org.basex.data.Data;
-import org.basex.util.IntList;
 
 /**
  * Offers an iterator for the children of a node. Could as well be
@@ -54,16 +53,5 @@ final class ChildIterator {
     final int p = pre;
     pre += data.size(pre, data.kind(pre));
     return p;
-  }
-
-  /**
-   * Returns an array with all pre values. Must be directly called after
-   * creating the class instance.
-   * @return children array
-   */
-  int[] all() {
-    final IntList il = new IntList();
-    while(more()) il.add(next());
-    return il.finish();
   }
 }

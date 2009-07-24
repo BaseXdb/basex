@@ -33,12 +33,30 @@ public abstract class MapAlgo {
   }
 
   /**
+   * Splits List nodes into Rectangles matching in given space.
+   *
+   * @param r parent rectangle
+   * @param l children array
+   * @param ns start array position
+   * @param ne end array position
+   * @return ArrayList holding laid out rectangles
+   */
+  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
+      final int ne);
+
+  /**
+   * Returns the name of the algorithm used.
+   *
+   * @return name of the alfo
+   */
+  abstract String getName();
+
+  /*
    * Calculates the worst aspect ratio of the rectangles given in the list.
    * Should return the worst ar....
    *
    * @param r Array of rectangles
    * @return max aspect ratio
-   */
   protected static double worstLineRatio(final MapRects r) {
     if(r.size() == 0) return Double.MAX_VALUE;
 
@@ -57,23 +75,5 @@ public abstract class MapAlgo {
     }
     return worstar;
   }
-
-  /**
-   * Splits List nodes into Rectangles matching in given space.
-   *
-   * @param r parent rectangle
-   * @param l children array
-   * @param ns start array position
-   * @param ne end array position
-   * @return ArrayList holding laid out rectangles
    */
-  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
-      final int ne);
-
-  /**
-   * Returns the name of the algorithm used.
-   *
-   * @return name of the alfo
-   */
-  abstract String getName();
 }

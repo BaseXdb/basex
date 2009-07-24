@@ -84,10 +84,6 @@ public interface Commands {
   /** Drop command definitions. */
   enum CmdDrop { DATABASE, DB, INDEX }
 
-  /** Filesystem command definitions. */
-  enum CmdFS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
-    L, LS, MKDIR, PWD, RM, TOUCH }
-
   /** Insert command definitions. */
   enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
 

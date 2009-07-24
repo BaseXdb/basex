@@ -303,14 +303,6 @@ public class Tokenizer implements IndexToken {
   }
 
   /**
-   * Returns the text size.
-   * @return size
-   */
-  public int size() {
-    return text.length;
-  }
-
-  /**
    * Gets full-text info for the specified token; needed for visualizations.
    * int[0]: length of each token
    * int[1]: sentence info, length of each sentence

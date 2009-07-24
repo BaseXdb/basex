@@ -20,14 +20,6 @@ public abstract class AbstractParser {
   private final Metadata.MimeType format;
 
   /**
-   * Returns the type of the adapter (e.g. Sound, Mail, Text, ...) as string.
-   * @return the type of the adapter.
-   */
-  public String getTypeString() {
-    return type.name();
-  }
-
-  /**
    * Returns the type of the adapter (e.g. Sound, Mail, Text, ...) as byte
    * array.
    * @return the type of the adapter.
@@ -37,20 +29,28 @@ public abstract class AbstractParser {
   }
 
   /**
-   * Returns the format of the adapter (the MIME type) as string.
-   * @return the format of the adapter.
-   */
-  public String getFormatString() {
-    return format.name();
-  }
-
-  /**
    * Returns the format of the adapter (the MIME type) as byte array.
    * @return the format of the adapter.
    */
   public byte[] getFormat() {
     return format.get();
   }
+
+  /*
+   * Returns the type of the adapter (e.g. Sound, Mail, Text, ...) as string.
+   * @return the type of the adapter.
+  public String getTypeString() {
+    return type.name();
+  }
+   */
+
+  /*
+   * Returns the format of the adapter (the MIME type) as string.
+   * @return the format of the adapter.
+  public String getFormatString() {
+    return format.name();
+  }
+  */
 
   // ---------------------------------------------------------------------------
   // ----- constructor / abstract methods for parser implementations -----------

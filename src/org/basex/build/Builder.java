@@ -65,10 +65,9 @@ public abstract class Builder extends Progress {
   /**
    * Initializes the database construction.
    * @param db name of database
-   * @return builder instance
    * @throws IOException in case of parsing or writing problems
    */
-  public abstract Builder init(String db) throws IOException;
+  public abstract void init(String db) throws IOException;
 
   /**
    * Finishes the build process and returns a database reference.

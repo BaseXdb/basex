@@ -27,10 +27,8 @@ public final class DeepShell {
   public @interface Command {
     /** Description of expected arguments. */
     String args() default "";
-
     /** Shortcut key for command. */
     char shortcut();
-
     /** Short help message. */
     String help();
   }

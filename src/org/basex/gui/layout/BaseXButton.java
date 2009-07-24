@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.dialog.Dialog;
@@ -49,19 +47,6 @@ public final class BaseXButton extends JButton {
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) d.cancel();
       }
     });
-  }
-
-  /**
-   * Default Constructor.
-   * @param img image reference
-   * @param hlp help text
-   * @param win parent window
-   */
-  public BaseXButton(final ImageIcon img, final byte[] hlp, final Window win) {
-    super(img);
-    setOpaque(false);
-    BaseXLayout.addInteraction(this, hlp, win);
-    if(hlp != null) setToolTipText(Token.string(hlp));
   }
 
   /**

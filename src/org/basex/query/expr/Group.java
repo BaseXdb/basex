@@ -20,9 +20,6 @@ import org.basex.query.util.Var;
 public class Group extends Expr {
   /** Sequence to be grouped. */
   SeqIter sq;
-
-  /** Resulting Sequence (Sequence Grouped). **/
-  SeqIter sg;
   /** Group by specification. */
   Grp[] grp;
 

@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class DOTSerializer extends Serializer {
   /** Compact flag. */
-  public static final boolean COMPACT = false;
+  private static final boolean COMPACT = false;
   /** Node entry. */
   private static final String NODE = "node% [label=\"%\" color=\"#%\"];";
   /** Link entry. */
@@ -37,7 +37,7 @@ public final class DOTSerializer extends Serializer {
   private static final String COLPI = "FF6666";
 
   /** Output stream. */
-  public final PrintOutput out;
+  private final PrintOutput out;
   /** Current level. */
   private int level;
   /** Cached children. */

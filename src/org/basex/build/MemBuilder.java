@@ -16,7 +16,7 @@ public final class MemBuilder extends Builder {
   private MemData data;
 
   @Override
-  public MemBuilder init(final String db) {
+  public void init(final String db) {
     // always index values in main memory mode
     meta = new MetaData(db);
     meta.txtindex = true;
@@ -25,17 +25,14 @@ public final class MemBuilder extends Builder {
     meta.file = parser.io;
     data = new MemData(64, tags, atts, ns, path);
     data.meta = meta;
-    return this;
   }
 
   /**
    * Uses the specified data instance (and its indexes) for the build process.
    * @param mdata data instance
-   * @return builder
    */
-  public MemBuilder init(final MemData mdata) {
+  public void init(final MemData mdata) {
     data = mdata;
-    return this;
   }
 
   @Override

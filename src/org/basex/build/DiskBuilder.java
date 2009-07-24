@@ -41,7 +41,7 @@ public final class DiskBuilder extends Builder {
   private int ssize;
 
   @Override
-  public DiskBuilder init(final String db) throws IOException {
+  public void init(final String db) throws IOException {
     meta = new MetaData(db);
     meta.file = parser.io;
     meta.filesize = meta.file.length();
@@ -58,7 +58,6 @@ public final class DiskBuilder extends Builder {
     xout = new DataOutput(db, DATATXT, bs);
     vout = new DataOutput(db, DATAATV, bs);
     sout = new DataOutput(db, DATATMP, bs);
-    return this;
   }
 
   @Override
