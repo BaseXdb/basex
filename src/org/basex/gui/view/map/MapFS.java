@@ -5,7 +5,6 @@ import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
@@ -133,14 +132,8 @@ final class MapFS extends MapPainter {
     }
   }
 
-  /**
-   * Paint single rectangle.
-   * @param g graphics reference
-   * @param rect rectangle
-   * @return meta data flag
-   */
+  @Override
   boolean drawRectangle(final Graphics g, final MapRect rect) {
-
     final Context context = view.gui.context;
     final Data data = context.data();
     final int o = GUIProp.fontsize;
@@ -189,54 +182,24 @@ final class MapFS extends MapPainter {
     g.setFont(tag ? fullsize == 1 ? lfont : font : mfont);
 
     // determine icon size
-    final Image img = file ? GUIFS.images(name, fullsize) : null;
+    final Image icon = file ? GUIFS.images(name, fullsize) : null;
     final int fh = g.getFontMetrics().getHeight();
 
     if(fullsize == 0) {
       // Rectangle display
-      if(img == null && !file) {
-        g.setColor(Color.black);
-        BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w);
-      } else {
-        final int x = rect.x;
-        int w = rect.w;
-        if(img != null) {
-          rect.x += off;
-          rect.w -= off;
-        }
+      if(icon != null) {
+        g.drawImage(icon, rect.x, rect.y + 2, view);
+        rect.x += off;
+        rect.w -= off;
+      }
+      g.setColor(Color.black);
+      BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2);
+      rect.y += o;
+      rect.h -= o;
 
-        final int h = MapRenderer.calcHeight(g, rect, text);
-        if(img != null) {
-          // [JH] review
-          // method call was
-          // boolean drawRectangle(final Graphics g, final MapRect rect,
-          //    final boolean mark) {
-          //if(!mark) {
-          //  g.setColor(COLORS[rect.level + 1]);
-          //  g.fillRect(x, rect.y, w, h);
-          //}
-          g.drawImage(img, x, rect.y + 2, view);
-        }
-
-        g.setColor(Color.black);
-        // [JH] review difference drawText - chopString
-        // MapRenderer.drawText(g, rect, text);
-        BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2);
-        if(h == GUIProp.fontsize && img != null) {
-          final long size = toLong(fs.size(pre));
-          final byte[] info = token(Performance.format(size, false));
-          w = BaseXLayout.width(g, info);
-          if(BaseXLayout.width(g, text) < rect.w - w - 10) {
-            final int ox = rect.x;
-            rect.x += rect.w - w - 2;
-            BaseXLayout.chopString(g, info, rect.x, rect.y, rect.w);
-            rect.x = ox;
-          }
-        }
-        rect.y += h;
-        rect.h -= h;
-        rect.x -= o;
-        rect.w += o;
+      if(icon != null) {
+        rect.x -= off;
+        rect.w += off;
       }
       rect.x += 3;
       rect.w -= 3;
@@ -248,7 +211,7 @@ final class MapFS extends MapPainter {
         // Fullscreen Mode
         g.setColor(COLORS[rect.level + 2]);
         g.fillRect(rect.x + 2, rect.y + 2, rect.w - 5, fh + 12);
-        g.drawImage(img, rect.x + 6, rect.y + 6, view);
+        g.drawImage(icon, rect.x + 6, rect.y + 6, view);
         rect.y += 18;
         rect.h -= 18;
         g.setColor(Color.black);
@@ -261,13 +224,14 @@ final class MapFS extends MapPainter {
 
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);
-        if(w + sw + 40 < rect.w) {
+        if(w + sw + 48 < rect.w) {
           g.setColor(COLORS[rect.level + 10]);
           BaseXLayout.chopString(g, token(info),
               rect.x + rect.w - sw, rect.y, rect.w);
         }
         rect.x += 10;
         rect.y += 30;
+        rect.w -= 10;
         rect.h -= 38;
       } else {
         rect.x += 12;
@@ -279,8 +243,6 @@ final class MapFS extends MapPainter {
       }
     }
     if(!file || rect.w < o << 1 || rect.h < o << 1) return false;
-
-    g.setColor(Color.black);
 
     rect.y += o >> 1;
     rect.h -= o >> 1;
@@ -323,8 +285,6 @@ final class MapFS extends MapPainter {
     }
 
     // draw file contents or binary information
-    g.setFont(mfont);
-
     if(s < fileBuf.length) {
       final byte[] tmp = new byte[(int) s];
       System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
@@ -340,24 +300,20 @@ final class MapFS extends MapPainter {
       }
     }
 
-    // Check if text fits in rectangle
-    final int h = MapRenderer.drawText(g, rect, fileBuf, false);
-    if(rect.h > h) {
-      final int p = BaseXLayout.centerPos(g, fileBuf, rect.w);
-      if(p != -1) rect.x += p;
-      rect.y += (rect.h - h) / 2 - 1; //(rect.h - GUIProp.fontsize) / 2 - 1;
-      final Color c = g.getColor();
-      final Font f = g.getFont();
-      g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
-      g.setFont(mfont);
-      MapRenderer.drawText(g, rect, fileBuf);
-      g.setColor(c);
-      g.setFont(f);
-    } else {
-      rect.thumb = true;
-      MapRenderer.drawThumbnails(g, rect, fileBuf);
-    }
+    g.setColor(Color.black);
+    g.setFont(mfont);
 
+    try {
+      // check if text fits in rectangle
+      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf) >= rect.h;
+      if(rect.thumb) {
+        MapRenderer.drawThumbnails(g, rect, fileBuf);
+      } else {
+        MapRenderer.drawText(g, rect, fileBuf);
+      }
+    } catch(final Exception ex) {
+      // ignore errors for binary files which have been interpreted as texts
+    }
     return false;
   }
 

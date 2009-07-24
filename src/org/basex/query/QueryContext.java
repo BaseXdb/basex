@@ -262,7 +262,8 @@ public final class QueryContext extends Progress {
       }
 
       // add nodes to standard iterator
-      for(int p = 0; p < pre.size; p++) ir.add(new DBNode(data, pre.list[p]));
+      for(int p = 0, ps = pre.size(); p < ps; p++)
+        ir.add(new DBNode(data, pre.get(p)));
       ir.add(i);
     }
 

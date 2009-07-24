@@ -71,9 +71,9 @@ public final class TableOutput extends FileOutputStream {
     info.writeNum(bcount);
     info.writeNum(fpre);
     info.writeNum(bcount);
-    for(int i = 0; i < bcount; i++) info.writeNum(firstPres.list[i]);
+    for(int i = 0; i < bcount; i++) info.writeNum(firstPres.get(i));
     info.writeNum(bcount);
-    for(int i = 0; i < bcount; i++) info.writeNum(blocks.list[i]);
+    for(int i = 0; i < bcount; i++) info.writeNum(blocks.get(i));
     info.close();
   }
 }

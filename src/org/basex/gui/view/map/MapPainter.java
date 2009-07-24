@@ -42,13 +42,21 @@ abstract class MapPainter {
   }
 
   /**
-   * Paints node contents.
+   * Draws the specified rectangles.
    * @param g graphics reference
    * @param r rectangle array
    * @param scale scale boarders using this factor
    */
   abstract void drawRectangles(final Graphics g, final MapRects r,
       final float scale);
+
+  /**
+   * Draws a single rectangle.
+   * @param g graphics reference
+   * @param rect rectangle to be drawn
+   * @return if space is left in the paint area
+   */
+  abstract boolean drawRectangle(final Graphics g, final MapRect rect);
 
   /**
    * Reacts on a mouse over/mouse click on the focused area.

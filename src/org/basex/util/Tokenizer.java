@@ -248,14 +248,14 @@ public class Tokenizer implements IndexToken {
 
     // if necessary, calculate sentences and paragraphs
     final IntList il = u == FTUnit.SENTENCE ? sen : par;
-    if(sen.size == 0) {
+    if(sen.size() == 0) {
       init();
       while(more()) {
         sen.add(sent);
         par.add(para);
       }
     }
-    return il.list[w];
+    return il.get(w);
   }
 
   /**

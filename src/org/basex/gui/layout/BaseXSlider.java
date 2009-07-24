@@ -102,9 +102,6 @@ public final class BaseXSlider extends BaseXPanel {
   @Override
   public void mouseMoved(final MouseEvent e) {
     mouseX = e.getX();
-    final double x = (curr - min) * (getWidth() - SLIDERW) / (max - min);
-    setCursor(mouseX >= x && mouseX < x + SLIDERW ?
-       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
   @Override

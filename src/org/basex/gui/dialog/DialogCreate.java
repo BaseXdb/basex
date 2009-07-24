@@ -183,7 +183,7 @@ public final class DialogCreate extends Dialog {
     set(tabs, BorderLayout.CENTER);
 
     // create buttons
-    buttons = BaseXLayout.okCancel(this);
+    buttons = okCancel(this);
     set(buttons, BorderLayout.SOUTH);
 
     action(null);
@@ -259,7 +259,7 @@ public final class DialogCreate extends Dialog {
     info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
     filter.setEnabled(exists && file.isDir());
 
-    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, BUTTONOK, ok);
   }
 
   @Override

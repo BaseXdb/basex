@@ -185,8 +185,8 @@ public final class Find extends AQuery {
       final BoolList elem, final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < filter.size; i++) {
-      final String[] spl = split(filter.list[i]);
+    for(int i = 0, is = filter.size(); i < is; i++) {
+      final String[] spl = split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);
         if(contains(term, '"')) term = replace(term, '\"', ' ');
@@ -194,7 +194,7 @@ public final class Find extends AQuery {
         if(term.length == 0) continue;
         tb.add("[");
 
-        final boolean elm = elem.list[i];
+        final boolean elm = elem.get(i);
         tb.add(elm ? ".//" : "@");
         tb.add(cols.list[i]);
 

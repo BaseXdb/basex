@@ -9,7 +9,6 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.io.IO;
 import org.basex.util.StringList;
@@ -58,7 +57,7 @@ public final class DialogRename extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    buttons = BaseXLayout.okCancel(this);
+    buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
 
@@ -75,7 +74,7 @@ public final class DialogRename extends Dialog {
       if(!ok && nm.length() != 0) inf = RENAMEINVALID;
     }
     info.setText(inf);
-    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, BUTTONOK, ok);
   }
 
 

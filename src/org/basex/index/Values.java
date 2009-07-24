@@ -142,9 +142,9 @@ public final class Values extends Index {
     return new IndexIterator() {
       int p = -1;
       @Override
-      public boolean more() { return ++p < ids.size; }
+      public boolean more() { return ++p < ids.size(); }
       @Override
-      public int next() { return ids.list[p]; }
+      public int next() { return ids.get(p); }
     };
   }
 

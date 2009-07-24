@@ -5,14 +5,20 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.TableLayout;
 
 /**
  * This class provides the architecture for consistent dialog windows.
@@ -134,6 +140,67 @@ public abstract class Dialog extends JDialog {
    */
   public final boolean ok() {
     return ok;
+  }
+
+  /**
+   * Creates a OK and CANCEL button.
+   * @param dialog reference to the component, reacting on button clicks.
+   * @return button list
+   */
+  protected static BaseXBack okCancel(final Dialog dialog) {
+    return newButtons(dialog, true,
+        new String[] { BUTTONOK, BUTTONCANCEL },
+        new byte[][] { HELPOK, HELPCANCEL });
+  }
+
+  /**
+   * Creates a new button list.
+   * @param dialog reference to the component, reacting on button clicks.
+   * @param hor horizontal alignment
+   * @param texts button names
+   * @param help help texts
+   * @return button list
+   */
+  protected static BaseXBack newButtons(final Dialog dialog, final boolean hor,
+      final String[] texts, final byte[][] help) {
+
+    // horizontal/vertical layout
+    final BaseXBack panel = new BaseXBack();
+    if(hor) {
+      panel.setBorder(12, 0, 0, 0);
+      panel.setLayout(new TableLayout(1, texts.length, 8, 0));
+    } else {
+      panel.setBorder(0, 0, 0, 0);
+      panel.setLayout(new GridLayout(texts.length, 1, 0, 3));
+    }
+    for(int i = 0; i < texts.length; i++) {
+      panel.add(new BaseXButton(texts[i], help[i], dialog));
+    }
+
+    final BaseXBack buttons = new BaseXBack();
+    buttons.setLayout(new BorderLayout());
+    buttons.add(panel, hor ? BorderLayout.EAST : BorderLayout.NORTH);
+    return buttons;
+  }
+
+  /**
+   * Enables/disables a button in the specified panel.
+   * @param panel button panel
+   * @param label button label
+   * @param enabled enabled/disabled
+   */
+  protected static void enableOK(final JComponent panel, final String label,
+      final boolean enabled) {
+    for(final Component c : panel.getComponents()) {
+      if(!(c instanceof JComponent)) {
+        continue;
+      } else if(!(c instanceof BaseXButton)) {
+        enableOK((JComponent) c, label, enabled);
+      } else {
+        final BaseXButton b = (BaseXButton) c;
+        if(b.getText().equals(label)) BaseXLayout.enable(b, enabled);
+      }
+    }
   }
 
   /**

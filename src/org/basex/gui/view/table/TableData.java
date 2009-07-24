@@ -208,11 +208,11 @@ final class TableData {
     final int cs = cols.length;
 
     // scan first MAXROWS root tags
-    final int nRows = rows.size;
+    final int nRows = rows.size();
     final TableIterator ti = new TableIterator(data, this);
 
     for(int l = 0, ll = Math.min(nRows, MAXROWS); l < ll; l++) {
-      final int pre = rows.list[l];
+      final int pre = rows.get(l);
 
       // find all row contents
       ti.init(pre);
@@ -269,9 +269,9 @@ final class TableData {
     final Kind kind = index.stat(c).kind;
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
 
-    final byte[][] tokens = new byte[rows.size][];
-    for(int r = 0; r < rows.size; r++) {
-      int p = rows.list[r];
+    final byte[][] tokens = new byte[rows.size()][];
+    for(int r = 0, rs = rows.size(); r < rs; r++) {
+      int p = rows.get(r);
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {
         final int k = data.kind(p);

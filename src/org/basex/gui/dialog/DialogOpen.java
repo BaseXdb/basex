@@ -81,11 +81,11 @@ public final class DialogOpen extends Dialog {
     p.setLayout(new BorderLayout());
 
     if(drop) {
-      buttons = BaseXLayout.newButtons(this, true,
+      buttons = newButtons(this, true,
           new String[] { BUTTONDROP, BUTTONCANCEL },
           new byte[][] { HELPDROP, HELPCANCEL });
     } else {
-      buttons = BaseXLayout.newButtons(this, true,
+      buttons = newButtons(this, true,
           new String[] { BUTTONRENAME, BUTTONOPEN, BUTTONCANCEL },
           new byte[][] { HELPRENAMEDB, HELPOPENDB, HELPCANCEL });
     }
@@ -94,7 +94,7 @@ public final class DialogOpen extends Dialog {
 
     set(pp, BorderLayout.EAST);
     action(null);
-    if(db.size == 0) return;
+    if(db.size() == 0) return;
 
     finish(null);
   }
@@ -135,7 +135,7 @@ public final class DialogOpen extends Dialog {
       final String db = choice.getValue().trim();
       ok = db.length() != 0 && IO.dbpath(db).exists();
       if(ok) doc.setText(db);
-      BaseXLayout.enableOK(buttons, BUTTONDROP, ok);
+      enableOK(buttons, BUTTONDROP, ok);
 
       if(ok) {
         DataInput in = null;
@@ -150,8 +150,8 @@ public final class DialogOpen extends Dialog {
           try { if(in != null) in.close(); } catch(final IOException e) { }
         }
       }
-      BaseXLayout.enableOK(buttons, BUTTONOPEN, ok);
-      BaseXLayout.enableOK(buttons, BUTTONRENAME, ok);
+      enableOK(buttons, BUTTONOPEN, ok);
+      enableOK(buttons, BUTTONRENAME, ok);
     }
   }
 

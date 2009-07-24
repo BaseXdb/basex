@@ -144,7 +144,7 @@ public final class DialogInfo extends Dialog {
 
     set(tabs, BorderLayout.CENTER);
 
-    buttons = BaseXLayout.newButtons(this, true,
+    buttons = newButtons(this, true,
         new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
         new byte[][] { HELPOPT, HELPOK, HELPCANCEL });
     set(buttons, BorderLayout.SOUTH);
@@ -208,7 +208,7 @@ public final class DialogInfo extends Dialog {
         fl[f].setEnabled(ftx);
       }
     }
-    BaseXLayout.enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
+    enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
   }
 
   @Override

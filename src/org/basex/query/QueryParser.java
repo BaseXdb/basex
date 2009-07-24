@@ -524,9 +524,9 @@ public class QueryParser extends InputParser {
     try {
       if(fl.size == 0) {
         boolean found = false;
-        for(int n = 0; n < ctx.modules.size; n += 2) {
-          if(ctx.modules.list[n].equals(string(uri))) {
-            module(ctx.modules.list[n + 1], name.uri);
+        for(int n = 0, ns = ctx.modules.size(); n < ns; n += 2) {
+          if(ctx.modules.get(n).equals(string(uri))) {
+            module(ctx.modules.get(n + 1), name.uri);
             modLoaded.add(uri);
             found = true;
           }

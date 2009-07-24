@@ -8,9 +8,9 @@ package org.basex.util;
  */
 public final class BoolList {
   /** Value array. */
-  public boolean[] list;
+  private boolean[] list;
   /** Current array size. */
-  public int size;
+  private int size;
 
   /**
    * Default constructor.
@@ -34,6 +34,23 @@ public final class BoolList {
   public void add(final boolean v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param p position
+   * @return value
+   */
+  public boolean get(final int p) {
+    return list[p];
   }
 
   /**

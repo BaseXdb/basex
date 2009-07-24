@@ -160,13 +160,13 @@ public final class XQueryMV extends AQuery {
       final IntList medium = ids.get(mv);
 
       // write medium tag
-      final int max = (int) attNum(data, maxid, medium.list[0]);
+      final int max = (int) attNum(data, maxid, medium.get(0));
       xml.openElement(MAB2.MEDIUM, MAB2.MV_ID, mv,
-          MAB2.BIB_ID, data.attValue(bibid, medium.list[0]),
+          MAB2.BIB_ID, data.attValue(bibid, medium.get(0)),
           MAB2.MAX, Token.token(max));
 
       // print medium
-      final int par = medium.list[0];
+      final int par = medium.get(0);
       int pp = par + data.attSize(par, data.kind(par));
       while(pp != data.meta.size) {
         if(data.tagID(pp) == medid) break;
@@ -174,14 +174,14 @@ public final class XQueryMV extends AQuery {
       }
 
       // print subordinate titles of query results first
-      final int maxsubs = Math.min(medium.size, sub + 1);
-      for(int s = 1; s < maxsubs; s++) xml.node(data, medium.list[s]);
+      final int maxsubs = Math.min(medium.size(), sub + 1);
+      for(int s = 1; s < maxsubs; s++) xml.node(data, medium.get(s));
 
       // print remaining subordinate titles
       final int leftsubs = Math.min(sub, max) - maxsubs + 1;
       int m = 1;
       for(int s = 0; s < leftsubs;) {
-        if(m < maxsubs && medium.list[m] == pp) {
+        if(m < maxsubs && medium.get(m) == pp) {
           m++;
           pp += data.size(pp, data.kind(pp));
         } else {

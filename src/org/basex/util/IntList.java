@@ -10,9 +10,9 @@ import java.util.Arrays;
  */
 public class IntList {
   /** Value array. */
-  public int[] list;
+  protected int[] list;
   /** Number of entries. */
-  public int size;
+  protected int size;
 
   /**
    * Default constructor.
@@ -45,6 +45,23 @@ public class IntList {
   public void add(final int v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param p position
+   * @return value
+   */
+  public int get(final int p) {
+    return list[p];
   }
 
   /**

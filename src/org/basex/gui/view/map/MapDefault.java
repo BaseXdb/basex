@@ -73,17 +73,13 @@ final class MapDefault extends MapPainter {
         g.drawLine(r.x, r.y + r.h, r.x + r.w, r.y + r.h);
       }
 
-      // skip drawing of string when left space is too small
+      // skip drawing of string if there is no space
       if(r.w > 3 && r.h >= GUIProp.fontsize) drawRectangle(g, r);
     }
   }
 
-  /**
-   * Draws the contents of a single rectangle.
-   * @param g graphics reference
-   * @param rect rectangle
-   */
-  private void drawRectangle(final Graphics g, final MapRect rect) {
+  @Override
+  boolean drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
 
@@ -92,7 +88,6 @@ final class MapDefault extends MapPainter {
     final Data data = context.data();
     final Nodes current = context.current();
     final int kind = data.kind(pre);
-    rect.thumb = false;
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       // show full path in top rectangle
@@ -108,24 +103,15 @@ final class MapDefault extends MapPainter {
       g.setFont(mfont);
       final byte[] text = ViewData.content(data, pre, false);
 
-      final int p = BaseXLayout.centerPos(g, text, rect.w);
-      if(p != -1) {
-        final int h = MapRenderer.drawText(g, rect, text, false);
-        rect.x += p;
-        rect.y += (rect.h - h) / 2 - 1;
-        MapRenderer.drawText(g, rect, text);
-        rect.x -= p;
-        rect.y -= (rect.h - h) / 2 - 1;
+      rect.thumb = MapRenderer.calcHeight(g, rect, text) >= rect.h;
+      if(rect.thumb) {
+        MapRenderer.drawThumbnails(g, rect, text);
       } else {
-        if(MapRenderer.calcHeight(g, rect, text) < rect.h) {
-          MapRenderer.drawText(g, rect, text);
-        } else {
-          MapRenderer.drawThumbnails(g, rect, text);
-          rect.thumb = true;
-        }
+        MapRenderer.drawText(g, rect, text);
       }
     }
     rect.x -= 3;
     rect.w += 3;
+    return true;
   }
 }

@@ -53,7 +53,7 @@ public final class INEXTest {
     " return concat(name($a),'[',basex:index-of($ssn,$a),']'), '/')};" +
     "declare function basex:index-of (" +
     " $n as node()* , $ntf as node() )  as xs:integer* { " +
-     "  for $s in (1 to count($n)) return $s[$n[$s] is $ntf]} ;";
+     "  for $s in (1 to count($n)) return $s[$n[$s] is $ntf]};";
 
   /**
    * Constructor.

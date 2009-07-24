@@ -1,16 +1,13 @@
 package org.basex.gui.layout;
 
-import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -23,10 +20,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import org.basex.BaseX;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
@@ -52,67 +46,6 @@ public final class BaseXLayout {
 
   /** Private constructor. */
   private BaseXLayout() { }
-
-  /**
-   * Creates a OK and CANCEL button.
-   * @param dialog reference to the component, reacting on button clicks.
-   * @return button list
-   */
-  public static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, true,
-        new String[] { BUTTONOK, BUTTONCANCEL },
-        new byte[][] { HELPOK, HELPCANCEL });
-  }
-
-  /**
-   * Creates a new button list.
-   * @param dialog reference to the component, reacting on button clicks.
-   * @param hor horizontal alignment
-   * @param texts button names
-   * @param help help texts
-   * @return button list
-   */
-  public static BaseXBack newButtons(final Dialog dialog, final boolean hor,
-      final String[] texts, final byte[][] help) {
-
-    // horizontal/vertical layout
-    final BaseXBack panel = new BaseXBack();
-    if(hor) {
-      panel.setBorder(12, 0, 0, 0);
-      panel.setLayout(new TableLayout(1, texts.length, 8, 0));
-    } else {
-      panel.setBorder(0, 0, 0, 0);
-      panel.setLayout(new GridLayout(texts.length, 1, 0, 3));
-    }
-    for(int i = 0; i < texts.length; i++) {
-      panel.add(new BaseXButton(texts[i], help[i], dialog));
-    }
-
-    final BaseXBack buttons = new BaseXBack();
-    buttons.setLayout(new BorderLayout());
-    buttons.add(panel, hor ? BorderLayout.EAST : BorderLayout.NORTH);
-    return buttons;
-  }
-
-  /**
-   * Enables/disables a button in the specified panel.
-   * @param panel button panel
-   * @param label button label
-   * @param enabled enabled/disabled
-   */
-  public static void enableOK(final JComponent panel, final String label,
-      final boolean enabled) {
-    for(final Component c : panel.getComponents()) {
-      if(!(c instanceof JComponent)) {
-        continue;
-      } else if(!(c instanceof BaseXButton)) {
-        enableOK((JComponent) c, label, enabled);
-      } else {
-        final BaseXButton b = (BaseXButton) c;
-        if(b.getText().equals(label)) enable(b, enabled);
-      }
-    }
-  }
 
   /**
    * Returns the gui reference of the specified container.
@@ -245,15 +178,6 @@ public final class BaseXLayout {
    */
   public static void enable(final Component comp, final boolean enable) {
     if(comp.isEnabled() != enable) comp.setEnabled(enable);
-  }
-
-  /**
-   * Selects or de-selects the specified component.
-   * @param but component
-   * @param select selection flag
-   */
-  public static void select(final AbstractButton but, final boolean select) {
-    if(but.isSelected() != select) but.setSelected(select);
   }
 
   /**
@@ -462,25 +386,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Calculates if the string fits in one line; if yes, returns the
-   * horizontal start position. Otherwise, returns -1.
-   * @param g graphics reference
-   * @param s string to be checked
-   * @param ww maximum width
-   * @return result of check
-   */
-  public static int centerPos(final Graphics g, final byte[] s, final int ww) {
-    final int[] cw = fontWidths(g.getFont());
-    int sw = 0;
-    final int j = s.length;
-    for(int k = 0; k < j; k += cl(s[k])) {
-      sw += width(g, cw, cp(s, k));
-      if(sw >= ww) return -1;
-    }
-    return ww - sw - 2 >> 1;
-  }
-
-  /**
    * Returns the width of the specified text.
    * Cached font widths are used to speed up calculation.
    * @param g graphics reference
@@ -503,7 +408,7 @@ public final class BaseXLayout {
   /**
    * Returns the character width of the specified character.
    * @param g graphics reference
-   * @param cw character array
+   * @param cw array with character widths
    * @param c character
    * @return character width
    */

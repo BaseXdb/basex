@@ -494,17 +494,17 @@ public abstract class W3CTS {
       ok++;
     } else if(error == null) {
       boolean inspect = false;
-      int s = -1;
-      while(++s < result.size) {
+      int s = -1, rs = result.size();
+      while(++s < rs) {
         inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
             INSPECT);
 
-        if(result.list[s].equals(out.toString())) break;
+        if(result.get(s).equals(out.toString())) break;
 
         if(xml || frag) {
           iter.reset();
 
-          String rin = result.list[s];
+          String rin = result.get(s);
           if(!doc || frag) {
             if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
             rin = "<X>" + rin + "</X>";
@@ -534,12 +534,12 @@ public abstract class W3CTS {
         }
       }
 
-      if(s == result.size && !inspect) {
+      if(s == result.size() && !inspect) {
         if(print) {
           if(outFiles.size() == 0) result.add(error(pth + outname, expError));
           logErr.append(logStr);
           logErr.append("[" + testid + " ] ");
-          logErr.append(norm(result.list[0]));
+          logErr.append(norm(result.get(0)));
           logErr.append(Prop.NL);
           logErr.append("[Wrong] ");
           logErr.append(norm(out.toString()));
@@ -583,7 +583,7 @@ public abstract class W3CTS {
         if(print) {
           logErr2.append(logStr);
           logErr2.append("[" + testid + " ] ");
-          logErr2.append(norm(result.list[0]));
+          logErr2.append(norm(result.get(0)));
           logErr2.append(Prop.NL);
           logErr2.append("[Wrong] ");
           logErr2.append(norm(error));

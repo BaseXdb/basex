@@ -302,7 +302,7 @@ public final class TreeView extends View {
     parentList = new IntList();
     parentList.add(root);
     parentPos = null;
-    while(parentList.size > 0) {
+    while(parentList.size() > 0) {
       drawNodes(g, level, rootNum);
       getNextNodeLine();
       level++;
@@ -314,13 +314,13 @@ public final class TreeView extends View {
    */
   private void getNextNodeLine() {
     final Data data = gui.context.data();
-    final int l = parentList.size;
+    final int l = parentList.size();
     final IntList temp = new IntList();
     int sumNodeSize = 0;
     int nCount = 0; // counts nodes
 
     for(int i = 0; i < l; i++) {
-      final int p = parentList.list[i];
+      final int p = parentList.get(i);
 
       if(p == -1) {
         continue;
@@ -356,7 +356,7 @@ public final class TreeView extends View {
     final int h = fontHeight;
     final int numberOfRoots = gui.context.current().nodes.length;
     final Data data = gui.context.data();
-    final int size = parentList.size;
+    final int size = parentList.size();
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
     final int y = 1 * level * fontHeight * 2;
     final int screenWidth = getSize().width - 1;
@@ -376,7 +376,7 @@ public final class TreeView extends View {
       // [WM] w not used in this class..
       double w = ratio;
 
-      final int pre = parentList.list[i];
+      final int pre = parentList.get(i);
 
       if(pre == -1) {
         x += ratio;

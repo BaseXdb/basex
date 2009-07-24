@@ -162,15 +162,15 @@ public final class InfoView extends View {
     evaluate = eval;
     plan = pln;
 
-    if(sl.size != 0) {
+    if(sl.size() != 0) {
       add(tb, QUERYQU, query);
       add(tb, QUERYCOMP, compile);
-      if(compile.size != 0) add(tb, QUERYRESULT, result);
+      if(compile.size() != 0) add(tb, QUERYRESULT, result);
       add(tb, QUERYPLAN, plan);
       add(tb, QUERYEVAL, evaluate);
       add(tb, QUERYTIME, strings);
-      tm = strings.list[il.size - 1] + ": " + Performance.getTimer(
-          stat.list[il.size - 1] * 10000L * Prop.runs, Prop.runs);
+      tm = strings.get(il.size() - 1) + ": " + Performance.getTimer(
+          stat.get(il.size() - 1) * 10000L * Prop.runs, Prop.runs);
     } else if(!ok) {
       add(tb, "Error:  ", err);
       tm = "";
@@ -190,12 +190,12 @@ public final class InfoView extends View {
   private void add(final TokenBuilder tb, final String head,
       final StringList list) {
 
-    if(list.size == 0) return;
+    if(list.size() == 0) return;
     tb.high().add(head).norm().nl();
-    for(int i = 0; i < list.size; i++) {
-      String line = list.list[i];
+    for(int i = 0, is = list.size(); i < is; i++) {
+      String line = list.get(i);
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
-        Performance.getTimer(stat.list[i] * 10000L * Prop.runs, Prop.runs);
+        Performance.getTimer(stat.get(i) * 10000L * Prop.runs, Prop.runs);
       tb.add(line).nl();
     }
     tb.hl();
@@ -214,7 +214,7 @@ public final class InfoView extends View {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    final int l = stat.size;
+    final int l = stat.size();
     if(l == 0) return;
 
     focus = -1;
@@ -226,15 +226,15 @@ public final class InfoView extends View {
     }
 
     final int f = focus == -1 ? l - 1 : focus;
-    timer.setText(f == -1 ? "" : " " + strings.list[f] + ": " +
-        Performance.getTimer(stat.list[f] * 10000L * Prop.runs, Prop.runs));
+    timer.setText(f == -1 ? "" : " " + strings.get(f) + ": " +
+        Performance.getTimer(stat.get(f) * 10000L * Prop.runs, Prop.runs));
     repaint();
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    final int l = stat.size;
+    final int l = stat.size();
     if(l == 0) return;
     BaseXLayout.antiAlias(g);
 
@@ -245,7 +245,7 @@ public final class InfoView extends View {
 
     // find maximum value
     int m = 0;
-    for(int i = 0; i < l; i++) m = Math.max(m, stat.list[i]);
+    for(int i = 0; i < l; i++) m = Math.max(m, stat.get(i));
 
     // draw focused bar
     final int by = 10;
@@ -262,7 +262,7 @@ public final class InfoView extends View {
     for(int i = 0; i < l; i++) {
       final int bx = w - bw + bs * i;
       g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
-      final int p = Math.max(1, stat.list[i] * bh / m);
+      final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
       g.setColor(COLORS[8]);
       g.drawRect(bx, by + bh - p, bs, p - 1);

@@ -72,7 +72,7 @@ public final class GUIInput extends BaseXTextField {
             final int i = main.context.data() == null ? 2 : GUIProp.searchmode;
             final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
                 GUIProp.xquery : GUIProp.commands;
-            for(int p = 0; p < hs.length && sl.size < 10; p++) {
+            for(int p = 0; p < hs.length && sl.size() < 10; p++) {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
             if(i == 0) GUIProp.search = sl.finish();
@@ -215,7 +215,7 @@ public final class GUIInput extends BaseXTextField {
    * @param sl strings to be added
    */
   private void createCombo(final StringList sl) {
-    if(sl == null || sl.size == 0) {
+    if(sl == null || sl.size() == 0) {
       //box.setSelectedItem(null);
       pop.setVisible(false);
       return;
@@ -238,9 +238,9 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   private boolean comboChanged(final StringList sl) {
-    if(sl.size != box.getItemCount()) return true;
-    for(int i = 0; i < sl.size; i++) {
-      if(!sl.list[i].equals(box.getItemAt(i))) return true;
+    if(sl.size() != box.getItemCount()) return true;
+    for(int i = 0, is = sl.size(); i < is; i++) {
+      if(!sl.get(i).equals(box.getItemAt(i))) return true;
     }
     return false;
   }

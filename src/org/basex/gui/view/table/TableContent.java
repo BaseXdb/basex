@@ -69,7 +69,7 @@ final class TableContent extends BaseXBack {
     int mpos = 0;
 
     final int nCols = tdata.cols.length;
-    final int nRows = tdata.rows.size;
+    final int nRows = tdata.rows.size();
     final int rowH = tdata.rowH;
 
     final TableIterator ti = new TableIterator(data, tdata);
@@ -83,10 +83,10 @@ final class TableContent extends BaseXBack {
 
     while(++l < nRows) {
       // skip when all visible rows have been painted or if data has changed
-      if(posY > h || l >= tdata.rows.size) break;
+      if(posY > h || l >= tdata.rows.size()) break;
       posY += rowH;
 
-      final int pre = tdata.rows.list[l];
+      final int pre = tdata.rows.get(l);
       while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
 
       // draw line

@@ -31,6 +31,7 @@ import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
 /**
@@ -488,30 +489,15 @@ public final class MapView extends View implements Runnable {
       }
 
       if(focused != null && focused.thumb) {
-        final int pre = focused.pre;
-        final byte[] text = ViewData.content(data, pre, false);
-        final int[][] d = Tokenizer.getInfo(text);
         focused.x += 3;
         focused.w -= 3;
-
-        boolean sen = false;
-        boolean spc = false;
-        switch(focused.thumbal) {
-          case 0:
-            sen = true;
-            spc = true;
-            break;
-          case 1:
-            sen = true;
-            break;
-          case 2:
-            break;
-        }
-        MapRenderer.calculateThumbnailsToolTip(focused, d, sen, mouseX, mouseY,
-            getWidth(), g, spc);
-
-        MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), getHeight(),
-            getWidth());
+        final boolean sen = focused.thumbal < 2;
+        final boolean spc = focused.thumbal < 1;
+        final byte[] text = ViewData.content(data, focused.pre, false);
+        final TokenList tl = MapRenderer.calculateThumbnailsToolTip(focused,
+            Tokenizer.getInfo(text), sen, mouseX, mouseY, getWidth(), g, spc);
+        final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
+        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl);
         focused.x -= 3;
         focused.w += 3;
       }

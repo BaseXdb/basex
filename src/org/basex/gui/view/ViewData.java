@@ -61,9 +61,9 @@ public final class ViewData {
     sb.add("doc(\"");
     sb.add(content(data, p, true));
     sb.add("\")");
-    for(int i = il.size - 1; i >= 0; i--) {
+    for(int i = il.size() - 1; i >= 0; i--) {
       sb.add('/');
-      sb.add(content(data, il.list[i], true));
+      sb.add(content(data, il.get(i), true));
     }
     return sb.finish();
   }

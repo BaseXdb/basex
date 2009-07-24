@@ -80,7 +80,7 @@ public final class TableView extends View implements Runnable {
     if(tdata.rows == null) return;
 
     if(quick) {
-      scroll.height(tdata.rows.size * tdata.rowH(1));
+      scroll.height(tdata.rows.size() * tdata.rowH(1));
       findFocus();
       repaint();
     } else {
@@ -113,7 +113,7 @@ public final class TableView extends View implements Runnable {
   public void refreshLayout() {
     if(!GUIProp.showtable || tdata.rows == null) return;
 
-    scroll.height(tdata.rows.size * tdata.rowH(1));
+    scroll.height(tdata.rows.size() * tdata.rowH(1));
     refreshContext(false, true);
   }
 
@@ -139,7 +139,7 @@ public final class TableView extends View implements Runnable {
   public void run() {
     zoomstep = ZOOM.length;
     while(--zoomstep >= 0) {
-      scroll.height(tdata.rows.size * tdata.rowH(ZOOM[zoomstep]));
+      scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
       repaint();
       Performance.sleep(25);
     }
@@ -166,8 +166,8 @@ public final class TableView extends View implements Runnable {
    * @return offset
    */
   private int getOff(final int pre) {
-    for(int n = 0; n < tdata.rows.size; n++) {
-      if(tdata.rows.list[n] == pre) return n;
+    for(int n = 0, ns = tdata.rows.size(); n < ns; n++) {
+      if(tdata.rows.get(n) == pre) return n;
     }
     return -1;
   }
@@ -188,10 +188,10 @@ public final class TableView extends View implements Runnable {
   private void findFocus() {
     final int y = tdata.mouseY - header.getHeight() + scroll.pos();
     final int l = y / tdata.rowH;
-    final boolean valid = y >= 0 && l < tdata.rows.size;
+    final boolean valid = y >= 0 && l < tdata.rows.size();
 
     if(valid) {
-      final int pre = tdata.rows.list[l];
+      final int pre = tdata.rows.get(l);
       final Context context = gui.context;
       final TableIterator it = new TableIterator(context.data(), tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
@@ -296,17 +296,17 @@ public final class TableView extends View implements Runnable {
 
     final IntList rows = tdata.rows;
     if(key == KeyEvent.VK_HOME) {
-      pre = rows.list[0];
+      pre = rows.get(0);
     } else if(key == KeyEvent.VK_END) {
-      pre = rows.list[rows.size - 1];
+      pre = rows.get(rows.size() - 1);
     } else if(key == KeyEvent.VK_UP) {
-      pre = rows.list[Math.max(0, getOff(pre) - 1)];
+      pre = rows.get(Math.max(0, getOff(pre) - 1));
     } else if(key == KeyEvent.VK_DOWN) {
-      pre = rows.list[Math.min(rows.size - 1, getOff(pre) + 1)];
+      pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + 1));
     } else if(key == KeyEvent.VK_PAGE_UP) {
-      pre = rows.list[Math.max(0, getOff(pre) - lines)];
+      pre = rows.get(Math.max(0, getOff(pre) - lines));
     } else if(key == KeyEvent.VK_PAGE_DOWN) {
-      pre = rows.list[Math.min(rows.size - 1, getOff(pre) + lines)];
+      pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + lines));
     }
 
     if(pre != oldPre) {

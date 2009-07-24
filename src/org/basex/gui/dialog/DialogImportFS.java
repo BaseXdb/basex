@@ -201,7 +201,7 @@ public final class DialogImportFS extends Dialog {
     set(tabs, BorderLayout.CENTER);
 
     // create buttons
-    buttons = BaseXLayout.okCancel(this);
+    buttons = okCancel(this);
 
     set(buttons, BorderLayout.SOUTH);
 
@@ -268,7 +268,7 @@ public final class DialogImportFS extends Dialog {
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
-    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, BUTTONOK, ok);
   }
 
   @Override

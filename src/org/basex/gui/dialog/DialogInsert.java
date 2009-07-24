@@ -88,7 +88,7 @@ public final class DialogInsert extends Dialog {
     back.setBorder(10, 0, 0, 0);
 
     set(back, BorderLayout.CENTER);
-    set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
+    set(okCancel(this), BorderLayout.SOUTH);
 
     setResizable(true);
     change(radio[lkind]);

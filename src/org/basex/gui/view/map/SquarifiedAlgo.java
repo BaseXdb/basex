@@ -46,7 +46,7 @@ final class SquarifiedAlgo extends MapAlgo {
             (int) (ml.weight[i] / weight * ww);
           w = w > 0 ? w : 1;
           if(x + w <= xx + ww)
-            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.list[i],
+            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.get(i),
                 r.level));
           else break;
           x += w;
@@ -69,7 +69,7 @@ final class SquarifiedAlgo extends MapAlgo {
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni) {
             row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.list[ni], r.level));
+                ml.get(ni), r.level));
             break;
           }
         } else {
@@ -89,7 +89,7 @@ final class SquarifiedAlgo extends MapAlgo {
             (int) (ml.weight[i] / weight * hh);
           h = h > 0 ? h : 1;
           if(y + h <= yy + hh)
-            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.list[i],
+            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i),
                 r.level));
           else break;
           y += h;
@@ -112,7 +112,7 @@ final class SquarifiedAlgo extends MapAlgo {
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni) {
             row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.list[ni], r.level));
+                ml.get(ni), r.level));
             break;
           }
         } else {

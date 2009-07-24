@@ -49,7 +49,7 @@ public final class FTScope extends FTFilter {
       for(final FTStringMatch sm : mtc) {
         if(sm.n) continue;
         final int p = pos(sm.s, ft);
-        if(bl.list[p]) return false;
+        if(bl.get(p)) return false;
         bl.set(true, p);
       }
     }

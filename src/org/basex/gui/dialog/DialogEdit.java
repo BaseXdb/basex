@@ -10,7 +10,6 @@ import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -109,7 +108,7 @@ public final class DialogEdit extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     // create buttons
-    buttons = BaseXLayout.okCancel(this);
+    buttons = okCancel(this);
     set(buttons, BorderLayout.SOUTH);
     finish(null);
   }

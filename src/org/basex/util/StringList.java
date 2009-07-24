@@ -13,9 +13,9 @@ import org.basex.BaseX;
  */
 public final class StringList implements Iterable<String> {
   /** Current string array. */
-  public String[] list = new String[8];
+  String[] list = new String[8];
   /** Number of strings. */
-  public int size;
+  int size;
 
   /**
    * Adds a string to the array.
@@ -24,6 +24,23 @@ public final class StringList implements Iterable<String> {
   public void add(final String s) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = s;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param p position
+   * @return value
+   */
+  public String get(final int p) {
+    return list[p];
   }
 
   /**

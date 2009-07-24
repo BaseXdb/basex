@@ -176,7 +176,6 @@ final class TableHeader extends BaseXPanel {
     final int w = getWidth() - BaseXBar.SIZE;
     if(header(e.getY())) {
       moveC = colSep(w, mouseX);
-      cursor = moveC != -1 ? CURSORMOVEH : CURSORHAND;
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;

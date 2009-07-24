@@ -127,7 +127,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     // create buttons
-    buttons = BaseXLayout.okCancel(this);
+    buttons = okCancel(this);
     set(buttons, BorderLayout.SOUTH);
 
     set(pp, BorderLayout.CENTER);

@@ -118,14 +118,15 @@ final class MapLayout {
 
     if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
-      r.pre = l.list[ns];
+      r.pre = l.get(ns);
       putRect(r);
     } else {
       int nn = 0;
       if(r.level == 0) {
-        for(int i = 0; i < l.size; i++) nn += ViewData.size(data, l.list[i]);
+        for(int i = 0, is = l.size(); i < is; i++)
+          nn += ViewData.size(data, l.get(i));
       } else {
-        nn = l.list[ne] - l.list[ns] + ViewData.size(data, l.list[ne]);
+        nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }
       l.initWeights(textLen, nn, data);
 
@@ -160,9 +161,10 @@ final class MapLayout {
 
     rectangles.add(r);
     final MapList ch = children(r.pre);
-    if(ch.size != 0) {
+    final int cs = ch.size();
+    if(cs != 0) {
       r.isLeaf = false;
-      makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1), ch, 0, ch.size - 1);
+      makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1), ch, 0, cs - 1);
     }
   }
 }

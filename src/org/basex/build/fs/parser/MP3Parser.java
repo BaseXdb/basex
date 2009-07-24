@@ -729,8 +729,7 @@ public final class MP3Parser extends AbstractParser {
         }
         int pos = 4;
         // ignore short content description
-        while(obj.bfc.get() != 0 && ++pos < size)
-          ;
+        while(obj.bfc.get() != 0 && ++pos < size);
         if(pos >= size) return;
         if(ws(lang) || lang[0] == 'X') lang = null;
         obj.fsparser.metaEvent(Element.COMMENT, DataType.STRING,

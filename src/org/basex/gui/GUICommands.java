@@ -342,7 +342,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showxquery);
+      select(button, GUIProp.showxquery);
     }
 
     @Override
@@ -360,7 +360,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showinfo);
+      select(button, GUIProp.showinfo);
     }
 
     @Override
@@ -380,7 +380,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showmenu);
+      select(button, GUIProp.showmenu);
     }
 
     @Override
@@ -398,7 +398,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showbuttons);
+      select(button, GUIProp.showbuttons);
     }
 
     @Override
@@ -416,7 +416,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showinput);
+      select(button, GUIProp.showinput);
     }
 
     @Override
@@ -434,7 +434,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showstatus);
+      select(button, GUIProp.showstatus);
     }
 
     @Override
@@ -453,7 +453,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, gui.context.data() != null ?
+      select(button, gui.context.data() != null ?
           GUIProp.showtext : GUIProp.showstarttext);
     }
 
@@ -472,7 +472,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showmap);
+      select(button, GUIProp.showmap);
     }
 
     @Override
@@ -490,7 +490,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showfolder);
+      select(button, GUIProp.showfolder);
     }
 
     @Override
@@ -508,7 +508,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showtable);
+      select(button, GUIProp.showtable);
     }
 
     @Override
@@ -526,7 +526,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showplot);
+      select(button, GUIProp.showplot);
     }
 
     @Override
@@ -544,7 +544,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showexplore);
+      select(button, GUIProp.showexplore);
     }
 
     @Override
@@ -561,7 +561,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.fullscreen);
+      select(button, GUIProp.fullscreen);
     }
 
     @Override
@@ -582,7 +582,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.execrt);
+      select(button, GUIProp.execrt);
     }
 
     @Override
@@ -619,7 +619,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.filterrt);
+      select(button, GUIProp.filterrt);
     }
 
     @Override
@@ -676,7 +676,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      BaseXLayout.select(button, GUIProp.showhelp);
+      select(button, GUIProp.showhelp);
     }
 
     @Override
@@ -892,6 +892,15 @@ public enum GUICommands implements GUICommand {
     GUIProp.createpath = file.path();
     if(single) file.suffix(IO.XMLSUFFIX);
     return file;
+  }
+
+  /**
+   * Selects or de-selects the specified component.
+   * @param but component
+   * @param select selection flag
+   */
+  static void select(final AbstractButton but, final boolean select) {
+    if(but.isSelected() != select) but.setSelected(select);
   }
 
   /**

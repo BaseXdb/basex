@@ -28,7 +28,7 @@ final class BinaryAlgo extends MapAlgo {
 
     if(ne - ns == 0) {
       final MapRects rects = new MapRects();
-      rects.add(new MapRect(r, ml.list[ns]));
+      rects.add(new MapRect(r, ml.get(ns)));
       return rects;
     }
 

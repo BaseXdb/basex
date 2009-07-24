@@ -115,7 +115,6 @@ public final class BaseXDSlider extends BaseXPanel {
     center = mouX + ARROW > r.xs && mouX < r.xe;
     oldMin = encode(min);
     oldMax = encode(max);
-    setCursor(left || right ? CURSORHAND : CURSORARROW);
   }
 
   @Override

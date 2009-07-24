@@ -104,10 +104,10 @@ public final class DOTSerializer extends Serializer {
   @Override
   public void close(final byte[] t) throws IOException {
     if(--level < 0) return;
-    final int c = nodes.list[level];
+    final int c = nodes.get(level);
     final IntList il = children[level];
-    for(int i = 0; i < il.size; i++) {
-      out.println(BaseX.info(LINK, c, il.list[i]));
+    for(int i = 0, is = il.size(); i < is; i++) {
+      out.println(BaseX.info(LINK, c, il.get(i)));
     }
     color = null;
     il.reset();

@@ -194,7 +194,7 @@ public abstract class Serializer {
    */
   public final void closeElement() throws IOException {
     if(tags.size == 0) throw new IOException("All elements closed.");
-    ns.size = nsl.list[--tags.size];
+    ns.size = nsl.get(--tags.size);
     if(inTag) {
       inTag = false;
       empty();

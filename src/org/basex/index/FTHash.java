@@ -87,6 +87,6 @@ final class FTHash extends Set {
    * @return pointer
    */
   int next() {
-    return il.list[it];
+    return il.get(it);
   }
 }
