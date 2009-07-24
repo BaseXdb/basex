@@ -63,8 +63,8 @@ abstract class BXQDynamicContext extends BXQAbstract
   protected BXQDynamicContext(final String in, final BXQStaticContext s,
       final BXQConnection c) {
     super(c);
-    query = new QueryProcessor(in);
     sc = s;
+    query = new QueryProcessor(in, sc.context);
   }
 
   public void bindAtomicValue(final QName qn, final String v,
