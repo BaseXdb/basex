@@ -14,7 +14,7 @@ import org.basex.util.Token;
  * Java XQuery API - Connection.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 final class BXQConnection extends BXQDataFactory implements XQConnection {
   /** Database meta data. */
@@ -34,8 +34,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
       throws XQException {
     opened();
     valid(sc, XQStaticContext.class);
-    final BXQStaticContext bsc = (BXQStaticContext) sc;
-    return new BXQExpression(bsc, this);
+    return new BXQExpression((BXQStaticContext) sc, this);
   }
 
   public boolean getAutoCommit() {

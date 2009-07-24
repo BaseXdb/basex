@@ -37,10 +37,6 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 abstract class BXQAbstract {
-  /* Open Issue: user cannot specify if a temporary or persistent database
-   * is to be created. Current solution: database is created if file reference
-   * is given. */
-
   /** Closed flag. */
   protected boolean closed;
   /** Parent closer. */

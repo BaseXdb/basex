@@ -23,7 +23,7 @@ public class AllTests {
   }
 
   /**
-   * Adds all tests.
+   * Registers all JUnit tests.
    * @return test instance
    */
   public static Test suite() {

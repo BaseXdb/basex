@@ -18,7 +18,7 @@ import org.basex.util.Array;
  * Java XQuery API - Prepared Expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 final class BXQPreparedExpression extends BXQDynamicContext
     implements XQPreparedExpression {

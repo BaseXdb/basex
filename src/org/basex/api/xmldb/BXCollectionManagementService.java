@@ -45,9 +45,11 @@ final class BXCollectionManagementService implements
     return new BXCollection(name);
   }
 
-  public void removeCollection(final String name) {
-    // apply context reference to possibly close database first
-    new DropDB(name).execute(coll.ctx);
+  public void removeCollection(final String name) throws XMLDBException {
+    final DropDB drop = new DropDB(name);
+    if(!drop.execute(coll.ctx)) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, drop.info());
+    }
   }
 
   public String getName() {

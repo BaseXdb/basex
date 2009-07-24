@@ -9,7 +9,6 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.BinaryResource;
 import org.xmldb.api.modules.XMLResource;
 import org.basex.BaseX;
-import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
@@ -50,11 +49,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public BXCollection(final String name) throws XMLDBException {
     try {
       ctx = new Context();
-      final Parser p = new Parser(IO.get(name)) {
-        @Override
-        public void parse(final Builder build) { }
-      };
-      ctx.data(CreateDB.xml(p, name));
+      final Data data = CreateDB.xml(Parser.emptyParser(IO.get(name)), name);
+      ctx.data(data);
+      ctx.addToPool(data);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

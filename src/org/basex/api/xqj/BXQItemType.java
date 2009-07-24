@@ -13,7 +13,7 @@ import org.basex.util.Token;
  * Java XQuery API - Item type.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 final class BXQItemType implements XQItemType {
   /** Default item type. */

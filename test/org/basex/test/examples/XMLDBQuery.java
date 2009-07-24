@@ -50,9 +50,7 @@ public final class XMLDBQuery {
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
     } finally {
-      if(col != null) {
-        col.close();
-      }
+      if(col != null) col.close();
     }
   }
 }

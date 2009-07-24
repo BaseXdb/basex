@@ -12,7 +12,9 @@ import org.xmldb.api.*;
  */
 public final class XMLDBCreate {
   /** Database Driver. */
-  private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+  public static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+  /** Name of the collection. */
+  public static final String COLL = "XMLDBCollection";
 
   /**
    * Main method of the example class.
@@ -23,11 +25,15 @@ public final class XMLDBCreate {
     try {
       Class<?> c = Class.forName(DRIVER);
       Database database = (Database) c.newInstance();
-      // Registers the Database.
+      // Register the Database.
       DatabaseManager.registerDatabase(database);
 
-      // Creates a new collection = Database with the ID = New Database.
-      new BXCollection("Collection");
+      // Create a new collection
+      BXCollection coll = new BXCollection(COLL);
+
+      // Close the connection
+      coll.close();
+
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
     }

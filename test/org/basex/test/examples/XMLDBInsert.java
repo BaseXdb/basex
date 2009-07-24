@@ -34,9 +34,9 @@ public final class XMLDBInsert {
       col = DatabaseManager.getCollection(DBNAME);
 
       // ID for the new Document.
-      String id = "NewDocument";
+      String id = "SecondDoc";
       // Content of the new Document.
-      String document = "<xml>This is the new Document!</xml>";
+      String document = "<xml>This is the second document.</xml>";
       // Creates a new XMLResource with the ID.
       XMLResource resource = (XMLResource) col.createResource(id,
           XMLResource.RESOURCE_TYPE);

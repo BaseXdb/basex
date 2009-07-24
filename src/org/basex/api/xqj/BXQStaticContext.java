@@ -6,6 +6,8 @@ import static org.basex.util.Token.*;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
+
+import org.basex.core.Context;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
@@ -19,8 +21,10 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 final class BXQStaticContext implements XQStaticContext {
-  /** Namespaces. */
+  /** Query context. */
   QueryContext ctx = new QueryContext();
+  /** Database context. */
+  Context context = new Context();
   /** Context item type. */
   XQItemType type;
   /** Forward flag. */

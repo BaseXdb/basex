@@ -2,6 +2,7 @@ package org.basex.test;
 
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.test.examples.DBExample;
 import org.basex.test.examples.UpdateExample;
 import org.basex.test.examples.XMLDBCreate;
@@ -25,10 +26,9 @@ public final class RunTests {
    * @throws Exception exceptions
    */
   public static void main(final String[] args) throws Exception {
-    // create input.xml database for XMLDB examples
+    // create input.xml database for XQJ/XMLDB examples
     final Context ctx = new Context();
     new CreateDB("input.xml").execute(ctx);
-    ctx.close();
 
     System.out.println("============= XQJ Tests =============");
     XQJQuery.main(args);
@@ -41,6 +41,7 @@ public final class RunTests {
     XMLDBCreate.main(args);
     XMLDBInsert.main(args);
     XMLDBQuery.main(args);
+    new DropDB(XMLDBCreate.COLL).execute(ctx);
     System.out.println();
 
     System.out.println("=============  BaseX Examples =============");
@@ -56,5 +57,8 @@ public final class RunTests {
     System.out.println();
 
     System.out.println("Additionally run the remaining JUnit tests.");
+
+    // Deletes the databases.
+    ctx.close();
   }
 }

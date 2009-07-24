@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.api.xmldb.BXCollection;
+import org.basex.core.proc.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
+import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,8 +24,8 @@ public class AllTests {
   static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Database/document path. */
   static final String URL = "xmldb:basex://localhost:1984/";
-  /** Collection. */
-  static final String COLL = "collection";
+  /** Name of the collection. */
+  static final String COLL = "XMLDB";
   /** Database/document path. */
   static final String PATH = URL + COLL;
   /** Optional login. */
@@ -37,6 +39,9 @@ public class AllTests {
   static final String DOC2 = "second.xml";
   /** Test Documents. */
   static final String DOC3 = "third.xml";
+
+  /** Collection. */
+  static Collection coll;
 
   /**
    * Main method
@@ -69,12 +74,26 @@ public class AllTests {
    * Initializes some implementation specific data.
    * @throws Exception exception
    */
-  private static void init() throws Exception {
+  static void init() throws Exception {
     // create an initial collection for testing
-    final Collection coll = new BXCollection(COLL);
+    coll = new BXCollection(COLL);
     final Resource res = coll.createResource(DOC1, XMLResource.RESOURCE_TYPE);
     res.setContent(read(DOC1));
     coll.storeResource(res);
+    coll.close();
+
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        try {
+          coll.close();
+          DropDB.drop(COLL);
+        } catch(final XMLDBException ex) {
+          ex.printStackTrace();
+        }
+      }
+    });
   }
 
   /**

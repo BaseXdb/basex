@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 @SuppressWarnings("all")
 public class CollectionManagementServiceTest extends TestCase {
   /** Temporary collection. */
-  static final String TEMP = "temp";
+  static final String TEMP = "XMLDBTemp";
   /** Test document. */
   static final String TEST = "test";
   /** Collection. */

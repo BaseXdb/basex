@@ -13,7 +13,7 @@ import org.basex.core.Prop;
  * Java XQuery API - Data Source.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BXQDataSource implements XQDataSource {
   /** Log output (currently ignored). */
