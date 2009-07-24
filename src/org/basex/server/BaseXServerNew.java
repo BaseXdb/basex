@@ -7,11 +7,9 @@ import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import org.basex.BaseX;
 import org.basex.core.Prop;
-import org.basex.core.proc.Exit;
 import org.basex.util.Token;
 
 /**
@@ -19,7 +17,7 @@ import org.basex.util.Token;
  * requests and offers some simple threading to allow simultaneous database
  * requests. Add the '-h' option to get a list on all available command-line
  * arguments.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -64,7 +62,8 @@ public class BaseXServerNew {
       @Override
       public void run() {
         // interrupt running processes
-        for(final Session ss : sessions) ss.core.stop();
+        for(final Session ss : sessions)
+          ss.core.stop();
         Prop.write();
       }
     });
@@ -89,22 +88,31 @@ public class BaseXServerNew {
   }
 
   /**
-   * Stops.
+   * Stops the ServerSocket Listener.
+   * @throws IOException I/O Exception
    */
-  public void stop() {
-    for(int i = 0; i < sessions.size(); i++) {
-      try {
-        sessions.get(i).socket.close();
-      } catch(final IOException e) {
-        e.printStackTrace();
-      }
+  public void stop() throws IOException {
+    running = false;
+    inputListener.thread.interrupt();
+    inputListener = null;
+    for (int i = 0; i < sessions.size(); i++) {
+      sessions.get(i).stop(false);
     }
     try {
-      sessionListener.thread = null;
-      inputListener.thread = null;
+      // dummy Socket for breaking the accept block
+      new Socket("localhost", Prop.port);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Closes everything up.
+   */
+  public void close() {
+    try {
       serverSocket.close();
-      new Exit().execute(null);
-    } catch(final IOException e) {
+    } catch(IOException e) {
       e.printStackTrace();
     }
   }
@@ -157,10 +165,10 @@ public class BaseXServerNew {
 
   /**
    * InputListener listens to the Console Input.
-   *
+   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
-   *
+   * 
    */
   class InputListener implements Runnable {
 
@@ -171,14 +179,12 @@ public class BaseXServerNew {
      * Starts the Thread.
      */
     public void start() {
-      if(thread == null) {
-        thread = new Thread(this);
-        thread.start();
-      }
+      thread = new Thread(this);
+      thread.start();
     }
 
     public void run() {
-      while(thread != null) {
+      while(running) {
         // get user input
         try {
           final InputStreamReader isr = new InputStreamReader(System.in);
@@ -213,10 +219,10 @@ public class BaseXServerNew {
 
   /**
    * SessionListener listens to new Client-Server Sessions.
-   *
+   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
-   *
+   * 
    */
   class SessionListener implements Runnable {
     /** Thread. */
@@ -236,21 +242,22 @@ public class BaseXServerNew {
      * Starts the Thread.
      */
     public void start() {
-      if(thread == null) {
-        thread = new Thread(this);
-        thread.start();
-      }
+      thread = new Thread(this);
+      thread.start();
     }
 
     public void run() {
-      while(thread != null) {
+      while(running) {
         try {
           final Socket s = serverSocket.accept();
-          final Session session = new Session(s, ++lastid, verbose, bx);
-          session.start();
-          sessions.add(session);
+          if(!running) {
+            close();
+          } else {
+            final Session session = new Session(s, ++lastid, verbose, bx);
+            session.start();
+            sessions.add(session);
+          }
         } catch(final IOException e) {
-          if(e instanceof SocketException) return;
           e.printStackTrace();
         }
       }

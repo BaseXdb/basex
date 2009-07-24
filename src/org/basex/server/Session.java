@@ -6,7 +6,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import org.basex.BaseX;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -97,6 +96,7 @@ class Session implements Runnable {
     String in;
     while(running) {
       in = getMessage().trim();
+      if(in.equals("end")) break;
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
@@ -137,7 +137,7 @@ class Session implements Runnable {
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
-    stop(true);
+    close();
   }
 
   /**
@@ -158,10 +158,13 @@ class Session implements Runnable {
   /**
    * Returns the Message from the Client.
    * @return String
-   * @throws IOException I/O Exception
    */
-  synchronized String getMessage() throws IOException {
-    return dis.readUTF();
+  synchronized String getMessage() {
+    try {
+      return dis.readUTF();
+    } catch(IOException e) {
+      return "end";
+    }
   }
 
   /**
@@ -173,37 +176,38 @@ class Session implements Runnable {
     dos.writeInt(id);
     dos.flush();
   }
+  
+  /**
+   * Stop.
+   * @param quit check how the quit command is called
+   * @throws IOException I/O Exception
+   */
+  public void stop(final boolean quit) throws IOException {
+    running = false;
+    if(quit) bx.sessions.remove(this);
+    dis.close();
+  }
 
   /**
-   * Stops the thread.
-   * @param quit check how the quit command is called
+   * Closes.
    */
-  void stop(final boolean quit) {
-    if(quit) bx.sessions.remove(this);
+  public void close() {
+    context.close();
+    BaseX.outln("Client % has logged out.", clientId);
+    timeout = null;
+    session = null;
     try {
-      context.close();
-      BaseX.outln("Client % has logged out.", clientId);
       socket.close();
-    } catch(final IOException e) {
+    } catch(IOException e) {
       e.printStackTrace();
     }
-    // [AW] timeout can be zero if called after exception by run()
-    timeout.interrupt();
-    session = null;
   }
 
   public void run() {
     try {
       handle();
-    } catch(final IOException io) {
-      io.printStackTrace();
-
-      // [AW] for forced stops - should be prevented
-      // (happens e.g. if the client is run via the -q argument: bxc -q "info")
-      if(io instanceof SocketException) {
-        running = false;
-        stop(false);
-      }
+    } catch(IOException e) {
+      e.printStackTrace();
     }
   }
 }
