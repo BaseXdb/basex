@@ -1,5 +1,7 @@
 package org.basex;
 
+import static org.basex.Text.*;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,20 +10,18 @@ import java.util.Random;
 import org.basex.core.AbstractProcess;
 import org.basex.core.ClientProcess;
 import org.basex.core.CommandParser;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Commands.CmdSet;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
-import org.basex.io.IO;
 import org.basex.io.CachedOutput;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
-import static org.basex.Text.*;
-import static org.basex.core.Commands.*;
 
 /**
  * This is the starter class for the client console mode.
@@ -32,8 +32,6 @@ import static org.basex.core.Commands.*;
  * @author Christian Gruen
  */
 public class BaseXClient {
-  /** Database Context. */
-  protected final Context context = new Context();
   /** Stand-alone or Client/Server mode. */
   protected boolean standalone;
 
@@ -44,7 +42,7 @@ public class BaseXClient {
   /** XQuery file. */
   private String query;
   /** Output file for queries. */
-  protected String output;
+  private String output;
   /** User query. */
   private String commands;
   /** Server name; default is 'localhost'. */
@@ -52,7 +50,7 @@ public class BaseXClient {
   /** Server port. */
   private int port = Prop.port;
   /** Console mode. */
-  boolean console = true;
+  private boolean console = true;
 
   /**
    * Main method of the <code>BaseXClient</code>, launching a local
@@ -79,15 +77,6 @@ public class BaseXClient {
    * Runs the application, dependent on the command-line arguments.
    */
   final void run() {
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        Prop.write();
-        context.close();
-      }
-    });
-
     if(allInfo || info)
       process(new Set(CmdSet.INFO, allInfo ? ALL : ON), false);
 
@@ -201,7 +190,7 @@ public class BaseXClient {
   protected final boolean process(final Process p, final boolean v) {
     final AbstractProcess proc = getProcess(p);
     try {
-      final boolean ok = proc.execute(context);
+      final boolean ok = execute(proc);
       if(ok && p.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
             new PrintOutput(System.out);
@@ -236,6 +225,16 @@ public class BaseXClient {
       error(ex, SERVERERR);
     }
     return false;
+  }
+
+  /**
+   * Executes the specified process.
+   * @param proc process
+   * @return true if operation was successful
+   * @throws IOException I/O exception
+   */
+  protected boolean execute(final AbstractProcess proc) throws IOException {
+    return proc.execute(null);
   }
 
   /**

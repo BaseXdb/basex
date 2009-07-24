@@ -37,6 +37,6 @@ public final class Close extends Process {
   public static void close(final Context ctx, final Data data)
       throws IOException {
     // [AW] null test should be removed if query processor handles context
-    if(ctx != null && ctx.unpin(data)) data.close();
+    if(ctx == null || ctx.unpin(data)) data.close();
   }
 }

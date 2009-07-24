@@ -16,7 +16,7 @@ import org.basex.util.Performance;
  */
 public final class Context {
   /** Database pool. */
-  private static final DataPool POOL = new DataPool();
+  private final DataPool pool = new DataPool();
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -86,7 +86,7 @@ public final class Context {
         current = null;
         marked = null;
         copied = null;
-        if(POOL.unpin(d)) d.close();
+        if(pool.unpin(d)) d.close();
         if(Prop.mainmem) Performance.gc(1);
       }
       return true;
@@ -150,7 +150,7 @@ public final class Context {
    * @return data reference
    */
   public Data pin(final String name) {
-    return POOL.pin(name);
+    return pool.pin(name);
   }
 
   /**
@@ -159,7 +159,7 @@ public final class Context {
    * @return true if reference was removed from the pool
    */
   public boolean unpin(final Data d) {
-    return POOL.unpin(d);
+    return pool.unpin(d);
   }
 
   /**
@@ -167,7 +167,7 @@ public final class Context {
    * @param d data reference
    */
   public void addToPool(final Data d) {
-    POOL.add(d);
+    pool.add(d);
   }
 
   /**
@@ -176,6 +176,6 @@ public final class Context {
    * @return int use-status
    */
   public boolean pinned(final String db) {
-    return POOL.pinned(db);
+    return pool.pinned(db);
   }
 }

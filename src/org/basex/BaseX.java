@@ -1,7 +1,11 @@
 package org.basex;
 
 import static org.basex.Text.*;
+
+import java.io.IOException;
+
 import org.basex.core.AbstractProcess;
+import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.util.Token;
@@ -17,6 +21,9 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class BaseX extends BaseXClient {
+  /** Database Context. */
+  final Context context = new Context();
+
   /**
    * Main method, launching the stand-alone console mode.
    * Use <code>-h</code> to get a list of all available command-line
@@ -31,6 +38,20 @@ public final class BaseX extends BaseXClient {
   public void init(final String[] args) {
     standalone = true;
     super.init(args);
+
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        Prop.write();
+        context.close();
+      }
+    });
+  }
+
+  @Override
+  protected boolean execute(final AbstractProcess proc) throws IOException {
+    return proc.execute(context);
   }
 
   @Override
