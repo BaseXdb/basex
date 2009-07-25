@@ -11,6 +11,7 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.GetInfo;
 import org.basex.core.proc.GetResult;
@@ -194,7 +195,7 @@ class Session implements Runnable {
   public void stop(final boolean s) {
     running = false;
     if(s) bxs.sessions.remove(this);
-    context.closeDB();
+    new Close().execute(context);
     BaseX.outln("Client % has logged out.", clientId);
     timeout = null;
     session = null;
