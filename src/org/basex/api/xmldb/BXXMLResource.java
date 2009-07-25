@@ -44,7 +44,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** Data reference. */
   Data data;
   /** Pre value or result position. */
-  int pos;
+  int pre;
 
   /**
    * Constructor for generated results.
@@ -65,7 +65,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   BXXMLResource(final Result res, final int p, final Collection c) {
     result = res;
     coll = c;
-    pos = p;
+    pre = p;
   }
 
   /**
@@ -79,7 +79,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     id = i;
     coll = c;
     data = d;
-    pos = p;
+    pre = p;
   }
 
   public Collection getParentCollection() {
@@ -101,9 +101,9 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         final CachedOutput out = new CachedOutput();
         final XMLSerializer xml = new XMLSerializer(out);
         if(data != null) {
-          new DBNode(data, pos).serialize(xml);
+          new DBNode(data, pre).serialize(xml);
         } else if(result != null) {
-          result.serialize(xml, pos);
+          result.serialize(xml, pre);
         } else {
           return null;
         }
@@ -131,7 +131,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     // resource does not result from a query - return normal id
     if(id != null) return id;
     // get document root id
-    int p = pos;
+    int p = pre;
     while(p >= 0) {
       final int k = data.kind(p);
       if(k == Data.DOC) return string(data.text(p));
@@ -141,7 +141,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   public Node getContentAsDOM() {
-    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pos));
+    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pre));
     return (Node) content;
   }
 

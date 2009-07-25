@@ -4,8 +4,8 @@ import static org.basex.Text.*;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
+import org.basex.io.IO;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.ErrorCodes;
@@ -29,8 +29,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final Context ctx = new Context();
-    return new Open(name).execute(ctx) ? new BXCollection(ctx) : null;
+    final boolean exists = IO.dbpath(name).exists();
+    return exists ? new BXCollection(name, exists) : null;
   }
 
   public String getConformanceLevel() {

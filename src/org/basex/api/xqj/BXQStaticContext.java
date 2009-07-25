@@ -21,10 +21,10 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 final class BXQStaticContext implements XQStaticContext {
-  /** Query context. */
-  QueryContext ctx = new QueryContext();
   /** Database context. */
-  Context context = new Context();
+  final Context context = new Context();
+  /** Query context. */
+  QueryContext ctx = new QueryContext(context);
   /** Context item type. */
   XQItemType type;
   /** Forward flag. */

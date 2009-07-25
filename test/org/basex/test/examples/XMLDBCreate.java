@@ -24,12 +24,18 @@ public final class XMLDBCreate {
   public static void main(final String[] args) throws Exception {
     try {
       Class<?> c = Class.forName(DRIVER);
-      Database database = (Database) c.newInstance();
+      Database db = (Database) c.newInstance();
       // Register the Database.
-      DatabaseManager.registerDatabase(database);
+      DatabaseManager.registerDatabase(db);
 
       // Create a new collection
-      BXCollection coll = new BXCollection(COLL);
+      BXCollection coll = new BXCollection(COLL, false);
+
+      // Close the connection
+      coll.close();
+
+      // Open an existing collection
+      coll = new BXCollection(COLL, true);
 
       // Close the connection
       coll.close();

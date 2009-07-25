@@ -42,7 +42,7 @@ final class BXCollectionManagementService implements
    * @throws XMLDBException exception
    */
   public Collection createCollection(final String name) throws XMLDBException {
-    return new BXCollection(name);
+    return new BXCollection(name, false);
   }
 
   public void removeCollection(final String name) throws XMLDBException {

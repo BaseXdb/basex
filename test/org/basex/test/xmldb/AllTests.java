@@ -7,7 +7,6 @@ import org.basex.api.xmldb.BXCollection;
 import org.basex.core.proc.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -76,7 +75,7 @@ public class AllTests {
    */
   static void init() throws Exception {
     // create an initial collection for testing
-    coll = new BXCollection(COLL);
+    coll = new BXCollection(COLL, false);
     final Resource res = coll.createResource(DOC1, XMLResource.RESOURCE_TYPE);
     res.setContent(read(DOC1));
     coll.storeResource(res);
@@ -86,12 +85,8 @@ public class AllTests {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        try {
-          coll.close();
-          DropDB.drop(COLL);
-        } catch(final XMLDBException ex) {
-          ex.printStackTrace();
-        }
+        System.out.println("ALLTESTS");
+        DropDB.drop(COLL);
       }
     });
   }

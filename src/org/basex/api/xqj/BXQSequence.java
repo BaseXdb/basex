@@ -56,8 +56,8 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param c closer
    * @throws XQException xquery exception
    */
-  BXQSequence(final Iter item, final BXQAbstract c) throws XQException {
-    this(item, new QueryContext(), c, null);
+  BXQSequence(final Iter item, final BXQDataFactory c) throws XQException {
+    this(item, new QueryContext(c.ctx.context), c, null);
   }
 
   /**

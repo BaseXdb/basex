@@ -41,7 +41,7 @@ import org.xml.sax.ContentHandler;
  */
 final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
-  private final XQConnection conn;
+  private final BXQConnection conn;
   /** Query context. */
   private final QueryContext ctx;
   /** Item. */
@@ -49,10 +49,11 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   /**
    * Constructor.
+   * @param c close reference
    * @param item item
    */
-  BXQItem(final Item item) {
-    this(item, null, new QueryContext(), null);
+  BXQItem(final Item item, final BXQDataFactory c) {
+    this(item, c, new QueryContext(c.ctx.context), null);
   }
 
   /**

@@ -8,13 +8,13 @@ import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.BinaryResource;
 import org.xmldb.api.modules.XMLResource;
-import org.basex.BaseX;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
@@ -31,25 +31,19 @@ import static org.basex.util.Token.*;
  */
 public final class BXCollection implements Collection, BXXMLDBText {
   /** Context reference. */
-  Context ctx;
+  Context ctx = new Context();
 
   /**
-   * Standard constructor.
-   * @param c for Context
-   */
-  public BXCollection(final Context c) {
-    ctx = c;
-  }
-
-  /**
-   * Constructor to create a collection for the specified document.
+   * Constructor to create/open a collection.
    * @param name name of the database
+   * @param open open existing database
    * @throws XMLDBException exception
    */
-  public BXCollection(final String name) throws XMLDBException {
+  public BXCollection(final String name, final boolean open)
+      throws XMLDBException {
     try {
-      ctx = new Context();
-      ctx.data(CreateDB.xml(ctx, Parser.emptyParser(IO.get(name)), name));
+      ctx.openDB(open ? Open.open(ctx, name) :
+        CreateDB.xml(ctx, Parser.emptyParser(IO.get(name)), name));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -142,7 +136,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     // find correct value and remove the node
-    data.delete(getResource(del.getId()).pos);
+    data.delete(getResource(del.getId()).pre);
     data.flush();
   }
 
@@ -176,7 +170,6 @@ public final class BXCollection implements Collection, BXXMLDBText {
       data.flush();
       ctx.update();
     } catch(final IOException ex) {
-      BaseX.debug(ex);
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
     }
   }
