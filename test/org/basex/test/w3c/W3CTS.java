@@ -203,7 +203,7 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     Prop.xqformat = false;
-    //Prop.mainmem = true;
+    Prop.mainmem = true;
 
     new CreateDB(path + input).execute(context);
     data = context.data();

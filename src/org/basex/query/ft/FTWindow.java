@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
+import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -83,6 +84,11 @@ public final class FTWindow extends FTFilter {
   public FTExpr remove(final Var v) {
     win = win.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean indexAccessible(final IndexContext ic) {
+    return false;
   }
 
   @Override

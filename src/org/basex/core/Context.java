@@ -2,7 +2,6 @@ package org.basex.core;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.util.Performance;
 
 /**
  * This class stores the reference to the currently opened database.
@@ -59,7 +58,7 @@ public final class Context {
   }
 
   /**
-   * Sets a new data instance.
+   * Sets the specified data instance as current database.
    * @param d data reference
    */
   public synchronized void openDB(final Data d) {
@@ -70,14 +69,13 @@ public final class Context {
   }
 
   /**
-   * Closes the database context.
+   * Removes the current database context.
    */
   public synchronized void closeDB() {
     data = null;
     current = null;
     marked = null;
     copied = null;
-    if(Prop.mainmem) Performance.gc(1);
   }
 
   /**

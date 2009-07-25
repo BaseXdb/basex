@@ -7,13 +7,10 @@ package org.basex.fuse;
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public abstract class DeepFuse {
-
-    /** Type of file mask. (sys/stat.h) */
+  /** Type of file mask. (sys/stat.h) */
   protected static final int S_IFMT = 0170000;
-
   /** Type of directory. (sys/stat.h) */
   protected static final int S_IFDIR = 0040000;
-
   /** Regular file type. */
   protected static final int S_IFREG = 0100000;
 
@@ -43,9 +40,7 @@ public abstract class DeepFuse {
    * @return filename of path
    */
   protected String basename(final String path) {
-    if(path.compareTo("/") == 0) return path;
-    final int s = path.lastIndexOf('/');
-    return path.substring(s + 1, path.length());
+    return path.equals("/") ? path : path.substring(path.lastIndexOf('/') + 1);
   }
 
   /**

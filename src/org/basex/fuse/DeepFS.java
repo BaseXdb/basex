@@ -71,6 +71,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
    * ------------------------------------------------------------------------
    */
+
   /**
    * Mount database as FUSE.
    * @param mp path where to mount BaseX.
@@ -121,7 +122,6 @@ public final class DeepFS extends DeepFuse implements DataText {
 
     final String mountpoint = d.meta.mountpoint;
     final String backingpath = d.meta.backingpath;
-
     initNames();
 
     if(Prop.fuse) {
@@ -695,103 +695,86 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   @Override
   public int access(final String path, final int mode) {
-
     return 0;
   }
 
   @Override
   public int bmap(final String path, final long blocksize, final long idx) {
-
     return 0;
   }
 
   @Override
   public int chmod(final String path, final int mode) {
-
     return 0;
   }
 
   @Override
   public int chown(final String path, final int uid, final int gid) {
-
     return 0;
   }
 
   @Override
   public int fgetattr(final String path) {
-
     return 0;
   }
 
   @Override
   public int flush(final String path) {
-
     return 0;
   }
 
   @Override
   public int fsync(final String path) {
-
     return 0;
   }
 
   @Override
   public int fsyncdir(final String path) {
-
     return 0;
   }
 
   @Override
   public int ftruncate(final String path, final long off) {
-
     return 0;
   }
 
   @Override
   public int getxattr(final String path) {
-
     return 0;
   }
 
   @Override
   public int link(final String name1, final String name2) {
-
     return 0;
   }
 
   @Override
   public int listxattr(final String path) {
-
     return 0;
   }
 
   @Override
   public int lock(final String path, final int cmd) {
-
     return 0;
   }
 
   @Override
   public int mknod(final String path, final int mode, final int dev) {
-
     return 0;
   }
 
   @Override
   public int open(final String path) {
-
     return 0;
   }
 
   @Override
   public byte[] read(final String path, final int length, final int offset) {
-
     return null;
   }
 
   @Override
   public String readlink(final String path) {
-
     return null;
   }
 
@@ -806,56 +789,47 @@ public final class DeepFS extends DeepFuse implements DataText {
       delete(path, false, true);
       insertContent(path);
     }
-
     return 0;
   }
 
   @Override
   public int releasedir(final String path) {
-
     return 0;
   }
 
   @Override
   public int removexattr(final String path) {
-
     return 0;
   }
 
   @Override
   public int setxattr(final String path) {
-
     return 0;
   }
 
   @Override
   public int statfs(final String path) {
-
     return 0;
   }
 
   @Override
   public int symlink(final String from, final String to) {
-
     return 0;
   }
 
   @Override
   public int truncate(final String path, final long off) {
-
     return 0;
   }
 
   @Override
   public int utimens(final String path) {
-
     return 0;
   }
 
   @Override
   public int write(final String path, final int length, final int offset,
       final byte[] mydata) {
-
     return 0;
   }
 }
