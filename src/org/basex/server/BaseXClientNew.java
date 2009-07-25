@@ -74,10 +74,10 @@ public final class BaseXClientNew {
     if(!parseArguments(args)) return;
     try {
       socket = new Socket(host, port);
+      run();
     } catch(final IOException e) {
       BaseX.errln(SERVERERR);
-    }
-    run();
+    } 
   }
 
   /**
@@ -151,6 +151,12 @@ public final class BaseXClientNew {
    * (e.g., by pressing CTRL-c).
    */
   protected void quit(final boolean force) {
+    final AbstractProcess proc = getProcess(new Exit());
+    try {
+      proc.execute(null);
+    } catch(final IOException e) {
+      e.printStackTrace();
+    }
     if(!force) BaseX.outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
@@ -165,13 +171,6 @@ public final class BaseXClientNew {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) {
           return false;
-          /* [AW] this should probably happen in quit()
-          final AbstractProcess proc = getProcess(p);
-          try {
-            return proc.execute(context);
-          } catch(final IOException e) {
-            e.printStackTrace();
-          }*/
         }
         final boolean qu = p instanceof XQuery;
         if(!process(p, info || qu && Prop.xmlplan)) break;

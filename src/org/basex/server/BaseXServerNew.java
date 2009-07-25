@@ -98,7 +98,7 @@ public class BaseXServerNew {
     inputListener.thread.interrupt();
     inputListener = null;
     for (int i = 0; i < sessions.size(); i++) {
-      sessions.get(i).stop(false);
+      sessions.get(i).close();
     }
     try {
       // dummy Socket for breaking the accept block

@@ -50,7 +50,7 @@ class Session implements Runnable {
   /** PrintOutput. */
   PrintOutput out;
   /** BaseXServerNew. */
-  BaseXServerNew bx;
+  BaseXServerNew bxs;
 
 
   /**
@@ -65,7 +65,7 @@ class Session implements Runnable {
     clientId = c;
     socket = s;
     verbose = v;
-    bx = b;
+    bxs = b;
   }
 
   /**
@@ -93,10 +93,13 @@ class Session implements Runnable {
     dos = new DataOutputStream(socket.getOutputStream());
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
-    String in;
+    String in = "";
     while(running) {
       in = getMessage().trim();
-      if(in.equals("end")) break;
+      if(in.equals("end")) {
+        stop(false);
+        break;
+      }
       if(verbose) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
@@ -111,7 +114,7 @@ class Session implements Runnable {
       if(pr instanceof Exit) {
         send(0);
         // interrupt running processes
-        running = false;
+        stop(true);
         break;
       }
       final Process proc = pr;
@@ -137,7 +140,6 @@ class Session implements Runnable {
       }
       if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
-    close();
   }
 
   /**
@@ -179,19 +181,19 @@ class Session implements Runnable {
   
   /**
    * Stop.
-   * @param quit check how the quit command is called
    * @throws IOException I/O Exception
    */
-  public void stop(final boolean quit) throws IOException {
-    running = false;
-    if(quit) bx.sessions.remove(this);
+  public void close() throws IOException {
     dis.close();
   }
 
   /**
    * Closes.
+   * @param s boolean
    */
-  public void close() {
+  public void stop(final boolean s) {
+    running = false;
+    if(s) bxs.sessions.remove(this);
     context.closeDB();
     BaseX.outln("Client % has logged out.", clientId);
     timeout = null;
