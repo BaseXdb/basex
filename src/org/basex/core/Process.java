@@ -73,7 +73,6 @@ public abstract class Process extends AbstractProcess {
   public final boolean execute(final Context ctx) {
     context = ctx;
     final Data data = context.data();
-
     // data reference needed?
     if(data() && data == null) return error(PROCNODB);
 
@@ -90,6 +89,7 @@ public abstract class Process extends AbstractProcess {
     try {
       if(data != null) data.setLock(updating() ? 2 : 1);
       final boolean ok = exec();
+      if(data != null && !printing()) data.setLock(0);
       return ok;
     } catch(final Throwable ex) {
       if(data != null) data.setLock(0);
