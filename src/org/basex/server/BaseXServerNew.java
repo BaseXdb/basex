@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import org.basex.BaseX;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.util.Token;
 
@@ -22,6 +23,8 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public class BaseXServerNew {
+  /** Database Context. */
+  final Context context = new Context();
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
@@ -62,9 +65,8 @@ public class BaseXServerNew {
       @Override
       public void run() {
         // interrupt running processes
-        for(final Session ss : sessions)
-          ss.core.stop();
-        Prop.write();
+        for(final Session s : sessions) s.core.stop();
+        context.close();
       }
     });
 

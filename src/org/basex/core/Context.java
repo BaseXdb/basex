@@ -1,7 +1,5 @@
 package org.basex.core;
 
-import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.util.Performance;
@@ -16,7 +14,7 @@ import org.basex.util.Performance;
  */
 public final class Context {
   /** Database pool. */
-  private final DataPool pool = new DataPool();
+  private static final DataPool POOL = new DataPool();
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -28,10 +26,18 @@ public final class Context {
 
   /**
    * Constructor.
-  */
+   */
   public Context() {
     // read database properties
     Prop.read();
+  }
+
+  /**
+   * Closes the database instance.
+   */
+  public void close() {
+    POOL.close();
+    Prop.write();
   }
 
   /**
@@ -56,11 +62,7 @@ public final class Context {
    * Sets a new data instance.
    * @param d data reference
    */
-  public void data(final Data d) {
-    if(data != null) {
-      BaseX.errln("Warning: database still open.");
-      close();
-    }
+  public synchronized void openDB(final Data d) {
     data = d;
     copied = null;
     marked = new Nodes(d);
@@ -68,32 +70,21 @@ public final class Context {
   }
 
   /**
+   * Closes the database context.
+   */
+  public synchronized void closeDB() {
+    data = null;
+    current = null;
+    marked = null;
+    copied = null;
+    if(Prop.mainmem) Performance.gc(1);
+  }
+
+  /**
    * Updates references to the document nodes.
    */
   public void update() {
     current = new Nodes(data.doc(), data);
-  }
-
-  /**
-   * Closes the database instance.
-   * @return true if operation was successful
-   */
-  public synchronized boolean close() {
-    try {
-      if(data != null) {
-        final Data d = data;
-        data = null;
-        current = null;
-        marked = null;
-        copied = null;
-        if(pool.unpin(d)) d.close();
-        if(Prop.mainmem) Performance.gc(1);
-      }
-      return true;
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return false;
-    }
   }
 
   /**
@@ -150,7 +141,7 @@ public final class Context {
    * @return data reference
    */
   public Data pin(final String name) {
-    return pool.pin(name);
+    return POOL.pin(name);
   }
 
   /**
@@ -159,7 +150,7 @@ public final class Context {
    * @return true if reference was removed from the pool
    */
   public boolean unpin(final Data d) {
-    return pool.unpin(d);
+    return POOL.unpin(d);
   }
 
   /**
@@ -167,7 +158,7 @@ public final class Context {
    * @param d data reference
    */
   public void addToPool(final Data d) {
-    pool.add(d);
+    POOL.add(d);
   }
 
   /**
@@ -176,6 +167,6 @@ public final class Context {
    * @return int use-status
    */
   public boolean pinned(final String db) {
-    return pool.pinned(db);
+    return POOL.pinned(db);
   }
 }

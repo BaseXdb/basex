@@ -43,7 +43,6 @@ public final class BaseX extends BaseXClient {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        Prop.write();
         context.close();
       }
     });

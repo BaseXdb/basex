@@ -49,7 +49,7 @@ abstract class AQuery extends Process {
 
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qp = new QueryProcessor(query, context.current(), context);
+        qp = new QueryProcessor(query, context);
         progress(qp);
 
         qp.parse();

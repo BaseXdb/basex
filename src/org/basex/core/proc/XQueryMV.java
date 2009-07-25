@@ -60,7 +60,7 @@ public final class XQueryMV extends AQuery {
     QueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = new QueryProcessor(query, context.current(), context);
+        qu = new QueryProcessor(query, context);
         progress(qu);
 
         qu.parse();

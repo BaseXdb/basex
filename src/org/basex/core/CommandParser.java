@@ -305,7 +305,7 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
-      final QueryParser p = new QueryParser(new QueryContext());
+      final QueryParser p = new QueryParser(new QueryContext(ctx));
       p.init(qu);
       p.qp = qp;
       p.parse(null, false);

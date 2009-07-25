@@ -19,9 +19,10 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -62,6 +63,15 @@ import org.basex.util.TokenList;
 public abstract class W3CTS {
   // Try "ulimit -n 65536" if Linux tells you "Too many open files."
 
+  /** Inspect flag. */
+  private static final byte[] INSPECT = token("Inspect");
+  /** Fragment flag. */
+  private static final byte[] FRAGMENT = token("Fragment");
+  /** XML flag. */
+  private static final byte[] XML = token("XML");
+  /** Replacement pattern. */
+  private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
+
   /** History Path. */
   private final String pathhis;
   /** Log File. */
@@ -73,6 +83,9 @@ public abstract class W3CTS {
   /** Path to the XQuery Test Suite. */
   private String path = "";
 
+  /** Database context. */
+  final Context context = new Context();
+
   /** Query Path. */
   private String queries;
   /** Expected Results. */
@@ -83,18 +96,9 @@ public abstract class W3CTS {
   private String report;
   /** Test Sources. */
   private String sources;
-  /** Inspect flag. */
-  private static final byte[] INSPECT = token("Inspect");
-  /** Fragment flag. */
-  private static final byte[] FRAGMENT = token("Fragment");
-  /** XML flag. */
-  private static final byte[] XML = token("XML");
 
   /** Maximum length of result output. */
   private static int maxout = 500;
-
-  /** Replacement pattern. */
-  private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
 
   /** Query filter string. */
   private String single;
@@ -145,8 +149,6 @@ public abstract class W3CTS {
 
   /** Data reference. */
   private Data data;
-  /** Context. */
-  private Context context;
 
   /**
    * Constructor.
@@ -200,11 +202,10 @@ public abstract class W3CTS {
     final String dat = sdf.format(Calendar.getInstance().getTime());
 
     final Performance perf = new Performance();
-    context = new Context();
     Prop.xqformat = false;
     //Prop.mainmem = true;
 
-    new CreateDB(path + input).execute(context, null);
+    new CreateDB(path + input).execute(context);
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
@@ -272,7 +273,6 @@ public abstract class W3CTS {
     BaseX.outln();
 
     final String time = perf.getTimer();
-
     final int total = ok + ok2 + err + err2;
 
     BaseX.outln("Writing log file...\n");
@@ -314,6 +314,8 @@ public abstract class W3CTS {
     BaseX.out("Conformance (w/empty results): ");
     BaseX.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
     BaseX.outln("Total Time: " + time);
+
+    context.close();
   }
 
   /**
@@ -342,7 +344,6 @@ public abstract class W3CTS {
     if(verbose) BaseX.outln("- " + outname);
 
     final IO file = IO.get(queries + pth + inname + ".xq");
-
     final String in = read(file);
     String error = null;
     SeqIter iter = null;
@@ -351,14 +352,15 @@ public abstract class W3CTS {
     final TokenBuilder files = new TokenBuilder();
     final CachedOutput out = new CachedOutput();
 
-    context = new Context();
-
     final Nodes cont = nodes("*:contextItem", root);
-    if(cont.size() != 0) new CreateDB(sources + string(
-        data.atom(cont.nodes[0])) + ".xml").execute(context, out);
+    Nodes curr = null;
+    if(cont.size() != 0) {
+      final Data d = Open.check(context, sources + string(
+          data.atom(cont.nodes[0])) + ".xml");
+      curr = new Nodes(d.doc(), d);
+    }
 
-    final QueryProcessor xq = new QueryProcessor(in, context.current(),
-        context);
+    final QueryProcessor xq = new QueryProcessor(in, curr, context);
     final QueryContext qctx = xq.ctx;
     qctx.stop = stop;
     qctx.thes = thes;
@@ -412,7 +414,6 @@ public abstract class W3CTS {
         it.serialize(xml);
       }
       xml.close();
-      //System.err.println(xq.ctx.root);
 
     } catch(final QueryException ex) {
       error = ex.getMessage();
@@ -513,27 +514,20 @@ public abstract class W3CTS {
             rin = "<X>" + rin + "</X>";
           }
 
-          final Context ctx = new Context();
-          final Process cr = new CreateDB(rin, null);
-          if(cr.execute(ctx)) {
-            final Data rdata = ctx.data();
-
-            final SeqIter si = new SeqIter();
-            int pre = doc ? 0 : 2;
-            final int size = rdata.meta.size;
-            while(pre < size) {
-              final int k = rdata.kind(pre);
-              if(k != Data.TEXT || !ws(rdata.atom(pre))) {
-                si.add(new DBNode(rdata, pre));
-              }
-              pre += rdata.size(pre, k);
+          final Data rdata = CreateDB.xml(IO.get(rin));
+          final SeqIter si = new SeqIter();
+          int pre = doc ? 0 : 2;
+          final int size = rdata.meta.size;
+          while(pre < size) {
+            final int k = rdata.kind(pre);
+            if(k != Data.TEXT || !ws(rdata.atom(pre))) {
+              si.add(new DBNode(rdata, pre));
             }
-            final boolean test = FNSeq.deep(iter, si);
-            ctx.close();
-            if(test) break;
-          } else {
-            BaseX.errln("Could not open %: % ", inname, cr.info());
+            pre += rdata.size(pre, k);
           }
+          final boolean test = FNSeq.deep(iter, si);
+          rdata.close();
+          if(test) break;
         }
       }
 
@@ -603,8 +597,8 @@ public abstract class W3CTS {
       logFile.append(Prop.NL);
     }
     xq.close();
-    context.close();
 
+    if(curr != null) Close.close(context, curr.data);
     return single == null || !outname.equals(single);
   }
 

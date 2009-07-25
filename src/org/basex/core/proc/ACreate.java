@@ -48,7 +48,8 @@ abstract class ACreate extends Process {
     String err = null;
     Builder builder = null;
     try {
-      context.close();
+      new Close().execute(context);
+
       final boolean mem = db == null || Prop.mainmem;
       if(!mem && context.pinned(db)) return error(DBINUSE);
 
@@ -60,7 +61,7 @@ abstract class ACreate extends Process {
       builder = null;
 
       index(data);
-      context.data(data);
+      context.openDB(data);
       context.addToPool(data);
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {

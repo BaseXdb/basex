@@ -173,7 +173,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   private Data createEmptyDB(final Context ctx, final String n) {
     try {
       final Data d = CreateDB.xml(ctx, Parser.emptyParser(IO.get(n)), n);
-      ctx.data(d);
+      ctx.openDB(d);
       d.fs = this;
       return d;
     } catch(final IOException e) {
@@ -367,7 +367,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @throws QueryException on failure
    */
   Nodes xquery(final String query) throws QueryException {
-    return new QueryProcessor(query, new Nodes(0, data), context).queryNodes();
+    return new QueryProcessor(query, context).queryNodes();
   }
 
   /**
@@ -653,8 +653,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   public int opendir(final String path) {
     try {
       final String query = "count(" + pn2xp(path, true) + "/child::*)";
-      final QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data),
-          context);
+      final QueryProcessor xq = new QueryProcessor(query, context);
       final Result result = xq.query();
       final SeqIter s = (SeqIter) result;
       final Item i = s.next();
@@ -680,8 +679,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     try {
       final String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
           + "]/@name)";
-      final QueryProcessor xq = new QueryProcessor(query, new Nodes(0, data),
-          context);
+      final QueryProcessor xq = new QueryProcessor(query, context);
       final SeqIter s = (SeqIter) xq.query();
       return s.size() != 1 ? null : string(s.next().str());
     } catch(final QueryException e) {

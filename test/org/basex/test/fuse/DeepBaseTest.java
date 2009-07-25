@@ -16,6 +16,7 @@ import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 
 /**
@@ -29,10 +30,10 @@ public class DeepBaseTest {
   private static final String DBNAME = DeepBaseTest.class.getSimpleName();
   /** File name for test output. */
   private static final String TESTFILE = "/tmp/deepbasetest.xml";
+  /** Database context. */
+  private static Context ctx = new Context();
   /** DeepBase reference to test. */
   private DeepFS dbfs;
-  /** Database context. */
-  private Context ctx;
 
   /**
    * Creates the database.
@@ -41,7 +42,6 @@ public class DeepBaseTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    ctx = new Context();
     dbfs = new DeepFS(ctx, DBNAME);
   }
 
@@ -50,10 +50,18 @@ public class DeepBaseTest {
    */
   @After
   public void tearDown() {
-    ctx.close();
+    ctx.closeDB();
     dbfs.destroy();
     DropDB.drop(DBNAME);
     new File(TESTFILE).delete();
+  }
+
+  /**
+   * Deletes the test-database.
+   */
+  @AfterClass
+  public static void finish() {
+    ctx.close();
   }
 
   /**
@@ -139,7 +147,7 @@ public class DeepBaseTest {
     try {
       final Data data = CreateDB.xml(ctx, new XMLParser(
           IO.get("test/org/basex/test/fuse/getattrtest.xml")), DBNAME);
-      ctx.data(data);
+      ctx.openDB(data);
       dbfs.data = data;
     } catch(final IOException e) {
       e.printStackTrace();
@@ -154,8 +162,7 @@ public class DeepBaseTest {
    */
   private String query(final String query) {
     try {
-      Nodes n = new Nodes(0, dbfs.data);
-      n = new QueryProcessor(query, n, ctx).queryNodes();
+      final Nodes n = new QueryProcessor(query, ctx).queryNodes();
       final PrintOutput out = new PrintOutput(TESTFILE);
       n.serialize(new XMLSerializer(out));
       out.close();

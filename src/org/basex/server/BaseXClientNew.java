@@ -9,7 +9,6 @@ import java.util.Random;
 import org.basex.BaseX;
 import org.basex.core.AbstractProcess;
 import org.basex.core.CommandParser;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
@@ -33,8 +32,6 @@ import static org.basex.core.Commands.*;
  * @author Andreas Weiler
  */
 public final class BaseXClientNew {
-  /** Database Context. */
-  final Context context = new Context();
   /** Stand-alone or Client/Server mode. */
   boolean standalone;
   /** Output file for queries. */
@@ -87,15 +84,6 @@ public final class BaseXClientNew {
    * Runs the application, dependent on the command-line arguments.
    */
   void run() {
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        Prop.write();
-        context.close();
-      }
-    });
-
     if(allInfo || info)
       process(new Set(CmdSet.INFO, allInfo ? ALL : ON), false);
 
@@ -176,12 +164,14 @@ public final class BaseXClientNew {
     try {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) {
+          return false;
+          /* [AW] this should probably happen in quit()
           final AbstractProcess proc = getProcess(p);
           try {
             return proc.execute(context);
           } catch(final IOException e) {
             e.printStackTrace();
-          }
+          }*/
         }
         final boolean qu = p instanceof XQuery;
         if(!process(p, info || qu && Prop.xmlplan)) break;
@@ -216,7 +206,7 @@ public final class BaseXClientNew {
   protected boolean process(final Process p, final boolean v) {
     final AbstractProcess proc = getProcess(p);
     try {
-      final boolean ok = proc.execute(context);
+      final boolean ok = proc.execute(null);
       if(ok && p.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
             new PrintOutput(System.out);

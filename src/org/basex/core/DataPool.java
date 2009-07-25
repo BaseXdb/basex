@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.Array;
@@ -85,5 +87,17 @@ public final class DataPool {
     data[size] = d;
     pins[size] = 1;
     size++;
+  }
+
+  /**
+   * Closes all data references.
+   */
+  public void close() {
+    try {
+      for(int i = 0; i < size; i++) data[i].close();
+      size = 0;
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+    }
   }
 }

@@ -68,7 +68,7 @@ public final class UpdateExample {
 
     // Closes the output stream
     out.close();
-    // Closes the database
+    // Closes the database context
     context.close();
   }
 }

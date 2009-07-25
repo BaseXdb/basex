@@ -29,14 +29,11 @@ public final class Open extends Process {
 
   @Override
   protected boolean exec() {
-    // close old database
-    context.close();
-
-    final String db = args[0];
+    new Close().execute(context);
 
     try {
-      final Data data = open(context, db);
-      context.data(data);
+      final Data data = open(context, args[0]);
+      context.openDB(data);
 
       if(Prop.info) {
         if(data.meta.oldindex) info(INDUPDATE + NL);
@@ -73,5 +70,21 @@ public final class Open extends Process {
       ctx.addToPool(data);
     }
     return data;
+  }
+  
+  /**
+   * Opens the specified database; if it does not exist, create a new
+   * database instance.
+   * @param ctx database context
+   * @param path document path
+   * @return data reference
+   * @throws IOException I/O exception
+   */
+  public static Data check(final Context ctx, final String path)
+      throws IOException {
+
+    final IO f = IO.get(path);
+    final String db = f.dbname();
+    return IO.dbpath(db).exists() ? open(ctx, db) : CreateDB.xml(ctx, f, db);
   }
 }

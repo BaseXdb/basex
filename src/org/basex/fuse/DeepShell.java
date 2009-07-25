@@ -34,10 +34,10 @@ public final class DeepShell {
     String help();
   }
 
-  /** Filesystem reference. */
-  private final DeepFS fs;
   /** Context. */
-  private Context ctx;
+  private final Context ctx = new Context();
+  /** Filesystem reference. */
+  private final DeepFS fs = new DeepFS(ctx, "deepshell");
 
   /** Shell prompt. */
   private static final String PS1 = "$ ";
@@ -45,10 +45,6 @@ public final class DeepShell {
   /** Constructor. */
   DeepShell() {
     BaseX.errln("DeepShell");
-    ctx = new Context();
-    fs = new DeepFS(ctx, "deepshell");
-
-    // initialize/mount filesystem
     //fs.init();
     loop();
     ctx.close();
@@ -204,8 +200,7 @@ public final class DeepShell {
   @Command(shortcut = 's', help = "print file hierarchy as XML")
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
-      Nodes n = new Nodes(0, fs.data);
-      n = new QueryProcessor("/", n, ctx).queryNodes();
+      final Nodes n = new QueryProcessor("/", ctx).queryNodes();
       final PrintOutput out = new PrintOutput(System.out);
       final XMLSerializer xml = new XMLSerializer(out, false, true);
       n.serialize(xml);

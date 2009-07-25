@@ -192,7 +192,7 @@ class Session implements Runnable {
    * Closes.
    */
   public void close() {
-    context.close();
+    context.closeDB();
     BaseX.outln("Client % has logged out.", clientId);
     timeout = null;
     session = null;

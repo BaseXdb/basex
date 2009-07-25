@@ -4,12 +4,13 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Process;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
-import org.basex.io.IO;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,14 +22,15 @@ import org.junit.Test;
  * @author Tim Petrowsky
  */
 public abstract class DataUpdateTest {
-  /** JUnit tag. */
-  protected static final byte[] JUNIT = token("junit");
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
-  private final String dbname = getClass().getSimpleName();
+  private static final String DBNAME = DataUpdateTest.class.getSimpleName();
+
+  /** JUnit tag. */
+  protected static final byte[] JUNIT = token("junit");
   /** Database context. */
-  protected Context ctx;
+  protected static final Context CONTEXT = new Context();
   /** Test file size in nodes. */
   protected int size;
 
@@ -37,10 +39,17 @@ public abstract class DataUpdateTest {
    */
   @BeforeClass
   public static final void setUpBeforeClass() {
-    Prop.read();
     Prop.textindex = false;
     Prop.attrindex = false;
     Prop.chop = true;
+  }
+  
+  /**
+   * Deletes the test-database.
+   */
+  @AfterClass
+  public static void finish() {
+    CONTEXT.close();
   }
 
   /**
@@ -48,14 +57,8 @@ public abstract class DataUpdateTest {
    */
   @Before
   public void setUp() {
-    try {
-      ctx = new Context();
-      ctx.data(CreateDB.xml(ctx, IO.get(TESTFILE), dbname));
-      size = ctx.data().meta.size;
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-      System.exit(1);
-    }
+    exec(new CreateDB(TESTFILE, DBNAME));
+    size = CONTEXT.data().meta.size;
   }
 
   /**
@@ -63,20 +66,16 @@ public abstract class DataUpdateTest {
    */
   @After
   public void tearDown() {
-    try {
-      ctx.close();
-      DropDB.drop(dbname);
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
+    exec(new Close());
+    exec(new DropDB(DBNAME));
   }
 
   /**
    * Reloads the database.
    */
-  void reload() {
-    new Close().execute(ctx);
-    new Open(dbname).execute(ctx);
+  protected void reload() {
+    exec(new Close());
+    exec(new Open(DBNAME));
   }
 
   /**
@@ -84,7 +83,7 @@ public abstract class DataUpdateTest {
    * @param exp expected value
    * @param act actual value
    */
-  void assertByteArraysEqual(final byte[] exp, final byte[] act) {
+  protected void assertByteArraysEqual(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
     for(int i = 0; i < exp.length; i++) assertEquals(exp[i], act[i]);
   }
@@ -94,8 +93,20 @@ public abstract class DataUpdateTest {
    */
   @Test
   public void testSize() {
-    assertEquals("Unexpected size!", size, ctx.data().meta.size);
+    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
     reload();
-    assertEquals("Unexpected size!", size, ctx.data().meta.size);
+    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
+  }
+
+  /**
+   * Executes the specified command. Gives feedback and stops the test
+   * if errors occur.
+   * @param proc process instance
+   */
+  private void exec(final Process proc) {
+    if(!proc.execute(CONTEXT)) {
+      System.out.println(proc.info());
+      System.exit(1);
+    }
   }
 }

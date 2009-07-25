@@ -61,7 +61,7 @@ import org.basex.util.Token;
  */
 public final class DiskData extends Data {
   /** Table access file. */
-  private TableAccess table;
+  public TableAccess table;
   /** Texts access file. */
   private DataAccess texts;
   /** Values access file. */

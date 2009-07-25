@@ -24,7 +24,7 @@ public final class TableDiskAccess extends TableAccess {
   private Buffer bf;
 
   /** File storing all blocks. */
-  private final RandomAccessFile file;
+  public final RandomAccessFile file;
   /** Filename prefix. */
   private final String pref;
   /** Name of the database. */

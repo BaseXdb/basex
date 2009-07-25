@@ -69,7 +69,7 @@ final class XQueryText extends BaseXText {
       try {
         last = qu;
         final String xq = Token.string(qu);
-        final QueryContext ctx = new QueryContext();
+        final QueryContext ctx = new QueryContext(gui.context);
         if(isModule(qu)) ctx.module(xq);
         else ctx.parse(xq);
         view.info("", true);

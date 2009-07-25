@@ -68,9 +68,8 @@ public final class BaseXServer {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        // interrupt running processes
-        for(final BaseXSession ss : sess) ss.core.stop();
-        Prop.write();
+        // stop running processes
+        for(final BaseXSession s : sess) s.core.stop();
         context.close();
       }
     });
@@ -90,7 +89,6 @@ public final class BaseXServer {
       final ServerSocket server = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) serve(server);
-      context.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);
       if(ex instanceof BindException) {

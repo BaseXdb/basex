@@ -302,8 +302,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
 
     String qu = tb.toString();
+    final boolean root = gui.context.root();
     if(qu.length() != 0) {
-      if(!GUIProp.filterrt && !gui.context.root()) qu = "." + qu;
+      if(!GUIProp.filterrt && !root) qu = "." + qu;
     }
 
     String simple = all.getText().trim();
@@ -312,9 +313,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       qu = qu.length() != 0 ? simple + " | " + qu : simple;
     }
 
-    if(qu.length() == 0) {
-      qu = GUIProp.filterrt || gui.context.root() ? "/" : ".";
-    }
+    if(qu.length() == 0) qu = GUIProp.filterrt || root ? "/" : ".";
 
     if(!force && last.equals(qu)) return;
     last = qu;

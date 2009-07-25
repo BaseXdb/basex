@@ -9,7 +9,6 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.io.IO;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
@@ -27,7 +26,7 @@ public final class QueryProcessor extends Progress {
   /** Query Info: Plan. */
   private static final byte[] PLAN = Token.token("QueryPlan");
   /** Expression context. */
-  public final QueryContext ctx = new QueryContext();
+  public final QueryContext ctx;
   /** Initial node set. */
   public String query;
   /** Parsed flag. */
@@ -35,44 +34,26 @@ public final class QueryProcessor extends Progress {
   /** Compilation flag. */
   private boolean compiled;
 
-  // [AW] context should never be null
-  //  (except for potential use cases in which no disk database will be touched)
-
   /**
    * Default Constructor.
-   * @param q query
-   * @param c Context
-   */
-  // [AW] should get obsolete
-  public QueryProcessor(final String q, final Context c) {
-    query = q;
-    Prop.read();
-    progress(ctx);
-    ctx.context = c;
-  }
-
-  /**
-   * XQuery Constructor.
    * @param qu query
-   * @param f query file reference
-   * @param c Context
+   * @param c database context
    */
-  // [AW] context reference missing
-  public QueryProcessor(final String qu, final IO f, final Context c) {
-    this(qu, c);
-    ctx.file = f;
+  public QueryProcessor(final String qu, final Context c) {
+    this(qu, c.current(), c);
   }
 
   /**
    * XQuery Constructor.
    * @param qu query
    * @param n initial nodes
-   * @param c Context
+   * @param c database context
    */
-  // [AW] context reference missing
   public QueryProcessor(final String qu, final Nodes n, final Context c) {
-    this(qu, c);
+    query = qu;
+    ctx = new QueryContext(c);
     ctx.nodes = n;
+    progress(ctx);
   }
 
   /**

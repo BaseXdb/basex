@@ -29,7 +29,7 @@ public final class DropDB extends Process {
 
     // close database if still open and not in main memory
     if(data != null && !(data instanceof MemData) && data.meta.name.equals(db))
-      context.close();
+      new Close().execute(context);
 
     // check if database is still pinned
     if(context.pinned(db)) return error(DBINUSE);

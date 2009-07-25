@@ -52,7 +52,7 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Iter eval(final QueryContext ctx) throws QueryException {
-    final QueryContext qt = new QueryContext();
+    final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(checkStr(expr[0], ctx)));
     qt.compile();
     return qt.iter();
