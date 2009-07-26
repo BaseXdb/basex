@@ -1,14 +1,18 @@
 package org.basex.server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.basex.core.Context;
+import org.basex.BaseX;
+import org.basex.core.AbstractProcess;
+import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
+import org.basex.io.PrintOutput;
 
 /**
  * Test the 4 Locking Cases.
@@ -24,8 +28,11 @@ public final class LockingTest {
   Socket socket2;
   /** Read Query. */
   String read;
-  /** Context. */
-  Context ctx = new Context();
+  /** Server Thread. */
+  Thread st;
+  /** BaseXServer. */
+  BaseXServerNew bxs;
+  
   /**
    * Main method, launching the Test.
    * @param args command line arguments
@@ -54,24 +61,47 @@ public final class LockingTest {
    * Starts the Server.
    */
   private void startTheServer() {
-    new Thread() {
+    st = new Thread() {
       @Override
       public void run() {
-        new BaseXServerNew("-v");
+        bxs = new BaseXServerNew("-v");
       }
-    }.start();
+    };
+    st.start();
   }
   
   /**
    * Starts the Tests.
    */
   private void startTests() {
-    new Open("factbook").execute(ctx);
-    new ClientProcessNew(socket1, new XQuery(read)).execute(ctx);
-    new ClientProcessNew(socket2, new XQuery(read)).execute(ctx);
-    new ClientProcessNew(socket1, new Insert("element", "aa", "0",
-        "//members")).execute(ctx);
-    new ClientProcessNew(socket2, new Delete("//aa")).execute(ctx);
-    new ClientProcessNew(socket1, new XQuery(read)).execute(ctx);
+    exe(socket1, new Open("factbook"));
+    exe(socket2, new Open("factbook"));
+    exe(socket1, new XQuery(read));
+    exe(socket2, new XQuery(read));
+    exe(socket1, new Insert("element", "aa", "0", "//members"));
+    exe(socket2, new Delete("//aa"));
+    exe(socket1, new XQuery(read));
+    BaseX.out("\nEnd of Tests\n");
+  }
+  
+  /**
+   * Executes the Process with the specified Socket.
+   * @param s Socket
+   * @param p Process
+   */
+  private void exe(final Socket s, final Process p) {
+    final AbstractProcess proc = new ClientProcessNew(s, p);
+    try {
+      final boolean ok = proc.execute(null);
+      if(ok && p.printing()) {
+        final PrintOutput out = new PrintOutput(System.out);
+        proc.output(out);
+        out.close();
+      }
+    } catch(final FileNotFoundException ex) {
+      ex.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
+    }
   }
 }
