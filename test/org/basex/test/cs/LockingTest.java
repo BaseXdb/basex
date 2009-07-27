@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.test.cs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.PrintOutput;
+import org.basex.server.BaseXServerNew;
+import org.basex.server.ClientProcessNew;
 
 /**
  * Test the 4 Locking Cases.

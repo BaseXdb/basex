@@ -332,9 +332,8 @@ public final class INEXTest {
   /**
    * Main test method.
    * @param args command line arguments (ignored)
-   * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String[] args) {
 //    new INEXTest("pages999", false);
     
     System.out.println("1.: " + replaceElements(

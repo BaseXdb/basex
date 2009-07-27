@@ -21,7 +21,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-final class ClientProcessNew extends AbstractProcess {
+public final class ClientProcessNew extends AbstractProcess {
   /** Process reference. */
   private final Process proc;
   /** Socket instance. */
@@ -34,7 +34,7 @@ final class ClientProcessNew extends AbstractProcess {
    * @param s Socket
    * @param pr process
    */
-  ClientProcessNew(final Socket s, final Process pr) {
+  public ClientProcessNew(final Socket s, final Process pr) {
     socket = s;
     proc = pr;
   }
