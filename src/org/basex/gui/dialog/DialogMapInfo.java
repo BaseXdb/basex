@@ -103,7 +103,7 @@ public final class DialogMapInfo extends Dialog {
    * @param rect main rectangle
    * @param aar average aspect ratio
    * @param time execution time
-   * @param name of used layoutalgorithm
+   * @param name of used layout algorithm
    */
   public void setValues(final int nn, final ViewRect rect, final double aar,
       final String time, final String name) {
@@ -118,7 +118,7 @@ public final class DialogMapInfo extends Dialog {
     oname.setText(nameo);
     nsize.setText(Integer.toString(nn));
     osize.setText(Integer.toString(nno));
-    if(GUIProp.perfinfo) {
+    if(gui.prop.is(GUIProp.PERFINFO)) {
       naar.setText("not available");
       oaar.setText("not available");
     } else {

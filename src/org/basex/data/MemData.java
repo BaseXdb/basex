@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
@@ -28,14 +29,15 @@ public final class MemData extends Data {
    * @param att attribute name index
    * @param n namespaces
    * @param s path summary
+   * @param pr database properties
    */
   public MemData(final int cap, final Names tag, final Names att,
-      final Namespaces n, final PathSummary s) {
+      final Namespaces n, final PathSummary s, final Prop pr) {
     val1 = new long[cap];
     val2 = new long[cap];
     txtindex = new MemValues();
     atvindex = new MemValues();
-    meta = new MetaData("");
+    meta = new MetaData("", pr);
     tags = tag;
     atts = att;
     ns = n;

@@ -27,7 +27,7 @@ import org.basex.util.StringList;
  */
 public final class GUIInput extends BaseXTextField {
   /** Reference to main window. */
-  private final GUI gui;
+  final GUI gui;
   /** BasicComboPopup Menu. */
   ComboPopup pop;
   /** JComboBox. */
@@ -69,15 +69,17 @@ public final class GUIInput extends BaseXTextField {
             final StringList sl = new StringList();
             sl.add(txt);
 
-            final int i = main.context.data() == null ? 2 : GUIProp.searchmode;
-            final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
-                GUIProp.xquery : GUIProp.commands;
+            final GUIProp gprop = gui.prop;
+            final int i = main.context.data() == null ? 2 :
+              gprop.num(GUIProp.SEARCHMODE);
+            final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
+              i == 1 ? gprop.strings(GUIProp.XQUERY) :
+              gprop.strings(GUIProp.COMMANDS);
             for(int p = 0; p < hs.length && sl.size() < 10; p++) {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
-            if(i == 0) GUIProp.search = sl.finish();
-            else if(i == 1) GUIProp.xquery = sl.finish();
-            else GUIProp.commands = sl.finish();
+            gprop.set(i == 0 ? GUIProp.SEARCH : i == 1 ? GUIProp.XQUERY :
+              GUIProp.COMMANDS, sl.finish());
 
             // evaluate the input
             if(e.getModifiers() == 0) main.execute();
@@ -119,7 +121,7 @@ public final class GUIInput extends BaseXTextField {
         } else {
           showPopup();
           // skip commands
-          if(GUIProp.execrt && !cmdMode()) main.execute();
+          if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
         }
       }
     });
@@ -137,8 +139,8 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   protected boolean cmdMode() {
-    return GUIProp.searchmode == 2 || gui.context.data() == null ||
-      getText().startsWith("!");
+    return gui.prop.num(GUIProp.SEARCHMODE) == 2 ||
+      gui.context.data() == null || getText().startsWith("!");
   }
 
   /**
@@ -160,10 +162,10 @@ public final class GUIInput extends BaseXTextField {
    */
   protected void showPopup() {
     final String query = getText();
+    final int mode = gui.prop.num(GUIProp.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
-    } else if(GUIProp.searchmode == 1 ||
-        GUIProp.searchmode == 0 && query.startsWith("/")) {
+    } else if(mode == 1 || mode == 0 && query.startsWith("/")) {
       queryPopup(query);
     } else {
       pop.setVisible(false);

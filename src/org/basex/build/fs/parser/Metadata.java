@@ -762,7 +762,7 @@ public class Metadata {
     try {
       dt = token(XML_SCHEMA_PREFIX + ":"
           + duration.getXMLSchemaType().getLocalPart());
-    } catch(final IllegalStateException e) {
+    } catch(final IllegalStateException ex) {
       dt = DATA_TYPE_DURATION;
     }
     return recycle(k, v, dt);

@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -29,7 +30,7 @@ public final class DialogRename extends Dialog {
   /** Info label. */
   final BaseXLabel info;
   /** Available databases. */
-  final StringList db = List.list();
+  final StringList db;
 
   /**
    * Default Constructor.
@@ -39,6 +40,7 @@ public final class DialogRename extends Dialog {
   public DialogRename(final GUI main, final String dbname) {
     super(main, RENAMETITLE);
     old = dbname;
+    db = List.list(main.context);
 
     info = new BaseXLabel(" ");
     info.setForeground(GUIConstants.COLORERROR);
@@ -77,11 +79,11 @@ public final class DialogRename extends Dialog {
     enableOK(buttons, BUTTONOK, ok);
   }
 
-
   @Override
   public void close() {
     if(!ok) return;
     super.close();
-    IO.dbpath(old).renameTo(IO.dbpath(name.getText().trim()));
+    final Prop prop = gui.context.prop;
+    prop.dbpath(old).renameTo(prop.dbpath(name.getText().trim()));
   }
 }

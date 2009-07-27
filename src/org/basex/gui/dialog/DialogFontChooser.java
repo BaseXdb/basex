@@ -57,10 +57,11 @@ public final class DialogFontChooser extends Dialog {
     size.setSize(50, 112);
     p.add(size);
 
-    font.setValue(GUIProp.font);
-    font2.setValue(GUIProp.monofont);
-    type.setValue(FONTTYPES[GUIProp.fonttype]);
-    size.setValue(Integer.toString(GUIProp.fontsize));
+    final GUIProp gprop = gui.prop;
+    font.setValue(gprop.get(GUIProp.FONT));
+    font2.setValue(gprop.get(GUIProp.MONOFONT));
+    type.setValue(FONTTYPES[gprop.num(GUIProp.FONTTYPE)]);
+    size.setValue(Integer.toString(gui.prop.num(GUIProp.FONTSIZE)));
 
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new TableLayout(1, 2, 5, 5));
@@ -69,13 +70,13 @@ public final class DialogFontChooser extends Dialog {
     final String[] combo = fullAlias() ? GUIConstants.FONTALIAS :
       new String[] { GUIConstants.FONTALIAS[0], GUIConstants.FONTALIAS[1] };
     aalias = new BaseXCombo(combo, HELPFALIAS, this);
-    aalias.setSelectedIndex(GUIProp.fontalias);
+    aalias.setSelectedIndex(gprop.num(GUIProp.FONTALIAS));
 
     pp.add(aalias);
     p.add(pp);
     set(p, BorderLayout.CENTER);
 
-    finish(GUIProp.fontsloc);
+    finish(gprop.nums(GUIProp.FONTSLOC));
     font.focus();
   }
 
@@ -88,19 +89,20 @@ public final class DialogFontChooser extends Dialog {
     try {
       RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
       return true;
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return false;
     }
   }
 
   @Override
   public void action(final String cmd) {
-    GUIProp.font = font.getValue();
-    GUIProp.monofont = font2.getValue();
-    GUIProp.fonttype = type.getIndex();
-    GUIProp.fontsize = size.getNum();
-    GUIProp.fontalias = aalias.getSelectedIndex();
-    GUIConstants.initFonts();
+    final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.FONT, font.getValue());
+    gprop.set(GUIProp.MONOFONT, font2.getValue());
+    gprop.set(GUIProp.FONTTYPE, type.getIndex());
+    gprop.set(GUIProp.FONTSIZE, size.getNum());
+    gprop.set(GUIProp.FONTALIAS, aalias.getSelectedIndex());
+    GUIConstants.initFonts(gprop);
     gui.notify.layout();
   }
 }

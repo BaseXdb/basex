@@ -12,12 +12,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.gui.GUI;
@@ -46,29 +46,28 @@ public final class BaseXWin {
     System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);
 
     // read properties
-    Prop.read();
+    final Context ctx = new Context();
+    final GUIProp gprop = new GUIProp();
+    ctx.prop.set(Prop.CHOP, true);
     Prop.gui = true;
-    Prop.xqerrcode = false;
-    Prop.chop = true;
-    GUIProp.read();
 
     // show waiting panel and wait some time to allow repainting
     final JFrame wait = waitPanel();
     Performance.sleep(50);
-    GUIConstants.init();
+    GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         // initialize look and feel
-        init();
+        init(gprop);
         // open main window
-        gui = new GUI();
+        gui = new GUI(ctx, gprop);
 
         // open specified document or database
         if(args.length != 0) {
           final String db = args[0].replace('\\', '/');
           gui.execute(new CreateDB(db));
-          GUIProp.createpath = IO.get(db).path();
+          gprop.set(GUIProp.CREATEPATH, IO.get(db).path());
         }
         // close wait panel
         wait.dispose();
@@ -78,19 +77,22 @@ public final class BaseXWin {
 
   /**
    * Initializes the GUI.
+   * @param prop gui properties
    */
-  static void init() {
+  static void init(final GUIProp prop) {
     try {
-      // ..added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
+      // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
-      // set system specific look & feel
-      // temporary: avoid GTK problems in Ubuntu 7.10/other distributions
-      UIManager.setLookAndFeel(GUIProp.javalook ?
+      // set specified look & feel
+      final boolean java = prop.is(GUIProp.JAVALOOK);
+      UIManager.setLookAndFeel(java ?
           UIManager.getCrossPlatformLookAndFeelClassName() :
           UIManager.getSystemLookAndFeelClassName());
+      // refresh views when windows are resized
+      Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
-      if(GUIProp.javalook) {
-        // apply non-bold fonts to Java's L&F
+      if(java) {
+        // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();
         while(en.hasMoreElements()) {
@@ -99,13 +101,8 @@ public final class BaseXWin {
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(0));
         }
       }
-
-      // delay tooltip disappearance
-      ToolTipManager.sharedInstance().setDismissDelay(20000);
-      // refresh views when windows are resized
-      Toolkit.getDefaultToolkit().setDynamicLayout(true);
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
   }
 

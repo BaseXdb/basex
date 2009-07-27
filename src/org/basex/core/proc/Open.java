@@ -1,13 +1,11 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
@@ -29,17 +27,13 @@ public final class Open extends Process {
 
   @Override
   protected boolean exec() {
-    new Close().execute(context);
-
+    exec(new Close());
     try {
       final Data data = open(context, args[0]);
       context.openDB(data);
 
-      if(Prop.info) {
-        if(data.meta.oldindex) info(INDUPDATE + NL);
-        info(DBOPENED, perf.getTimer());
-      }
-      return true;
+      if(data.meta.oldindex) info(INDUPDATE);
+      return info(DBOPENED, perf.getTimer());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();
@@ -58,15 +52,12 @@ public final class Open extends Process {
       throws IOException {
 
     // check if document exists
-    if(!IO.dbpath(db).exists())
+    if(!ctx.prop.dbpath(db).exists())
       throw new FileNotFoundException(BaseX.info(DBNOTFOUND, db));
-
-    // [AW] null test should be removed if query processor handles context
-    if(ctx == null) return new DiskData(db);
 
     Data data = ctx.pin(db);
     if(data == null) {
-      data = new DiskData(db);
+      data = new DiskData(db, ctx.prop);
       ctx.addToPool(data);
     }
     return data;
@@ -85,6 +76,7 @@ public final class Open extends Process {
 
     final IO f = IO.get(path);
     final String db = f.dbname();
-    return IO.dbpath(db).exists() ? open(ctx, db) : CreateDB.xml(ctx, f, db);
+    return ctx.prop.dbpath(db).exists() ?
+        open(ctx, db) : CreateDB.xml(ctx, f, db);
   }
 }

@@ -1,12 +1,6 @@
 package org.basex.core;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import org.basex.BaseX;
 import org.basex.io.IO;
 
@@ -17,9 +11,8 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Prop {
-
-  // STATIC PROPERTIES ========================================================
+public final class Prop extends AProp {
+  // CONSTANTS ================================================================
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
@@ -41,101 +34,12 @@ public final class Prop {
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
 
-  // DATABASE & PROGRAM PATHS =================================================
+  // STATIC PROPERTIES ========================================================
 
-  /** Database path. */
-  public static String dbpath = HOME + "BaseXData";
-  /** Web Server path. */
-  public static String webpath = WORK + "web";
-  /** Path to dotty. */
-  public static String dotty = "dotty";
-  /** Language Name (currently: English or German). */
-  public static String language = "English";
-  /** Port for client/server communication. */
-  public static int port = 1984;
-  /** Port for web server. */
-  public static int webport = 8080;
-
-  // TRANSIENT OPTIONS ========================================================
-
-  /** The following options are not saved/read; don't remove this flag. */
-  public static final boolean SKIP = true;
-
-  /** Debug mode. */
-  public static boolean debug = false;
-  /** Short query info. */
-  public static boolean info = false;
-  /** Detailed query info. */
-  public static boolean allInfo = false;
-  /** Flag for serializing query results. */
-  public static boolean serialize = true;
-  /** Flag for serialization as XML. */
-  public static boolean xmloutput = false;
-  /** Dots the query plan. */
-  public static boolean dotplan = false;
-  /** Prints a XML plan. */
-  public static boolean xmlplan = false;
-  /** Creates the query plan before or after compilation. */
-  public static boolean compplan = true;
-
-  /** Format XQuery output. */
-  public static boolean xqformat = true;
-  /** Use internal XML parser. */
-  public static boolean intparse = false;
-  /** Flag for parsing DTDs in internal parser. */
-  public static boolean dtd = true;
-  /** Flag for entity parsing in internal parser. */
-  public static boolean entity = true;
-
-  /** Number of query executions. */
-  public static int runs = 1;
-  /** Flag for whitespace chopping. */
-  public static boolean chop = false;
-  /** Flag for creating a full-text index. */
-  public static boolean ftindex = false;
-  /** Flag for creating a text index. */
-  public static boolean textindex = true;
-  /** Flag for creating an attribute value index. */
-  public static boolean attrindex = true;
-  /** Flag for loading database table into main memory. */
-  public static boolean tablemem = false;
-  /** Flag for creating a main memory database. */
-  public static boolean mainmem = false;
-  /** Path for filtering XML Documents. */
-  public static String createfilter = "*.xml";
-  /** Number of index occurrences to print in the index info. */
-  public static int indexocc = 10;
-  /** Maximum text size to be displayed. */
-  public static int maxtext = 1 << 21;
-
-  /** Flag for creating a fuzzy index. */
-  public static boolean ftfuzzy = true;
-  /** Flag for full-text stemming. */
-  public static boolean ftst = false;
-  /** Flag for full-text case sensitivity. */
-  public static boolean ftcs = false;
-  /** Flag for full-text diacritics. */
-  public static boolean ftdc = false;
-
-  /** Flow for showing the XQuery error code. */
-  public static boolean xqerrcode = true;
-  /** Last XQuery file. */
-  public static IO xquery;
-
-  /** Flag for importing file contents. */
-  public static boolean fscont = false;
-  /** Flag for importing file metadata. */
-  public static boolean fsmeta = false;
-  /** Maximum size for textual imports. */
-  public static int fstextmax = 10240;
-
-  /** Levenshtein default error. */
-  public static int lserr = 0;
-  /** Flag for creating flat MAB2 data. */
-  public static boolean mab2flat = false;
-
-  /** Server timeout in seconds. */
-  public static int timeout = 3600;
+  /** Language (changed after restart). */
+  public static String language;
+  /** Flag for showing language keys. */
+  public static boolean langkeys;
 
   /** Server mode (shouldn't be overwritten by property file). */
   public static boolean server = false;
@@ -146,30 +50,155 @@ public final class Prop {
 
   /** Fuse support. */
   public static boolean fuse = false;
-  /** FSParser implementation. If true, the new implementation is used. */
-  public static boolean newfsparser = false;
+  /** Debug mode. */
+  public static boolean debug = false;
+  /** Last XQuery file. */
+  public static IO xquery;
 
+  /** Property information. */
+  static final String PROPHEADER = "# BaseX Property File." + NL +
+      "# This here will be overwritten every time, but" + NL + 
+      "# you can set your own options at the end of the file." + NL;
+  /** Property information. */
+  static final String PROPUSER = "# User defined section";
+
+  // The following properties will be saved to disk:
+
+  // DATABASE & PROGRAM PATHS =================================================
+
+  /** Database path. */
+  public static final Object[] DBPATH = { "DBPATH", HOME + "BaseXData" };
+  /** Web Server path. */
+  public static final Object[] WEBPATH = { "WEBPATH", WORK + "web" };
+  /** Path to dotty. */
+  public static final Object[] DOTTY = { "DOTTY", "dotty" };
+
+  /** Language Name (currently: English or German). */
+  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag to include key names in the language strings. */
-  public static boolean langkeys = false;
+  public static final Object[] LANGKEYS = { "LANGKEYS", false };
+
+  /** Host for client/server communication. */
+  public static final Object[] HOST = { "HOST", "localhost" };
+  /** Port for client/server communication. */
+  public static final Object[] PORT = { "PORT", 1984 };
+  /** Port for web server. */
+  public static final Object[] WEBPORT = { "WEBPORT", 8080 };
+
+  // TRANSIENT OPTIONS ========================================================
+
+  /** The following options are not saved to disk; don't remove this flag. */
+  public static final Object[] SKIP = { "SKIP", true };
+
+  /** Debug mode. */
+  public static final Object[] DEBUG = { "DEBUG", false };
+  /** Short query info. */
+  public static final Object[] INFO = { "INFO", false };
+  /** Detailed query info. */
+  public static final Object[] ALLINFO = { "ALLINFO", false };
+  /** Flag for serializing query results. */
+  public static final Object[] SERIALIZE = { "SERIALIZE", true };
+  /** Flag for serialization as XML. */
+  public static final Object[] XMLOUTPUT = { "XMLOUTPUT", false };
+  /** Dots the query plan. */
+  public static final Object[] DOTPLAN = { "DOTPLAN", false };
+  /** Prints a XML plan. */
+  public static final Object[] XMLPLAN = { "XMLPLAN", false };
+  /** Creates the query plan before or after compilation. */
+  public static final Object[] COMPPLAN = { "COMPPLAN", true };
+
+  /** Format XQuery output. */
+  public static final Object[] XQFORMAT = { "XQFORMAT", true };
+  /** Use internal XML parser. */
+  public static final Object[] INTPARSE = { "INTPARSE", false };
+  /** Flag for parsing DTDs in internal parser. */
+  public static final Object[] DTD = { "DTD", true };
+  /** Flag for entity parsing in internal parser. */
+  public static final Object[] ENTITY = { "ENTITY", true };
+
+  /** Number of query executions. */
+  public static final Object[] RUNS = { "RUNS", 1 };
+  /** Flag for whitespace chopping. */
+  public static final Object[] CHOP = { "CHOP", false };
+  /** Flag for creating a full-text index. */
+  public static final Object[] FTINDEX = { "FTINDEX", false };
+  /** Flag for creating a text index. */
+  public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
+  /** Flag for creating an attribute value index. */
+  public static final Object[] ATTRINDEX = { "ATTRINDEX", true };
+  /** Flag for loading database table into main memory. */
+  public static final Object[] TABLEMEM = { "TABLEMEM", false };
+  /** Flag for creating a main memory database. */
+  public static final Object[] MAINMEM = { "MAINMEM", false };
+  /** Path for filtering XML Documents. */
+  public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
+  /** Number of index occurrences to print in the index info. */
+  public static final Object[] INDEXOCC = { "INDEXOCC", 10 };
+  /** Maximum text size to be displayed. */
+  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
+
+  /** Flag for creating a fuzzy index. */
+  public static final Object[] FTFUZZY = { "FTFUZZY", true };
+  /** Flag for full-text stemming. */
+  public static final Object[] FTST = { "FTST", false };
+  /** Flag for full-text case sensitivity. */
+  public static final Object[] FTCS = { "FTCS", false };
+  /** Flag for full-text diacritics. */
+  public static final Object[] FTDC = { "FTDC", false };
+
+  /** Flag for importing file contents. */
+  public static final Object[] FSCONT = { "FSCONT", false };
+  /** Flag for importing file metadata. */
+  public static final Object[] FSMETA = { "FSMETA", false };
+  /** Maximum size for textual imports. */
+  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
+
+  /** Levenshtein default error. */
+  public static final Object[] LSERR = { "LSERR", 0 };
+  /** Flag for creating flat MAB2 data. */
+  public static final Object[] MAB2FLAT = { "MAB2flat", false };
+
+  /** Server timeout in seconds. */
+  public static final Object[] TIMEOUT = { "TIMEOUT", 3600 };
+
+  /** FSParser implementation. If true, the new implementation is used. */
+  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
 
   // WEBSERVER OPTIONS ========================================================
 
   /** PHP Path. */
-  public static String phppath = "php";
+  public static final Object[] PHPPATH = { "PHPPATH", "php" };
 
-  // CONFIG OPTIONS ===========================================================
+  /**
+   * Constructor.
+   */
+  public Prop() {
+    super("");
+    
+    // set static properties
+    language = get(LANGUAGE);
+    langkeys = is(LANGKEYS);
+  }
 
-  /** Property information. */
-  private static final String PROPHEADER = "# BaseX Property File." + NL
-      + "# This here will be overwritten every time, but" + NL
-      + "# you can set your own options at the end of the file." + NL;
-  /** Property information. */
-  private static final String PROPUSER = "# User defined section";
+  /**
+   * Adds the database suffix to the specified filename and creates
+   * a file instance.
+   * @param db name of the database
+   * @param file filename
+   * @return database filename
+   */
+  public File dbfile(final String db, final String file) {
+    return new File(get(DBPATH) + '/' + db + '/' + file + IO.BASEXSUFFIX);
+  }
 
-  /** Default path to the BaseX configuration file. */
-  private static final String CONFIGFILE = HOME + IO.BASEXSUFFIX;
-  /** Remembers if the config file has already been read. */
-  private static boolean read;
+  /**
+   * Returns a file instance for the current database path.
+   * @param db name of the database
+   * @return database filename
+   */
+  public File dbpath(final String db) {
+    return new File(get(DBPATH) + '/' + db);
+  }
 
   /** Load DeepFS dynamic library and set FUSE support flag. */
   static {
@@ -177,171 +206,6 @@ public final class Prop {
       System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
       fuse = true;
       BaseX.debug("DeepFS FUSE support enabled ... OK");
-    } catch(final UnsatisfiedLinkError ex) {
-      BaseX.debug("Loading DeepFS library ... failed (%).", ex.getMessage());
-    }
-  }
-
-  /** Private constructor, preventing class instantiation. */
-  private Prop() { }
-
-  /**
-   * Reads the configuration file and initializes the project properties. The
-   * file is located in the user's home directory.
-   */
-  public static synchronized void read() {
-    if(read) return;
-    read(CONFIGFILE, Prop.class.getFields());
-    read = true;
-  }
-
-  /**
-   * Assigns the properties from the specified file to the field array.
-   * @param fn file to be read
-   * @param fields fields to be assigned
-   */
-  public static synchronized void read(final String fn, final Field[] fields) {
-    final File file = new File(fn);
-    if(!file.exists()) return;
-
-    try {
-      final BufferedReader br = new BufferedReader(new FileReader(file));
-      String line = null;
-
-      while((line = br.readLine()) != null) {
-        line = line.trim();
-        if(line.length() == 0 || line.charAt(0) == '#') continue;
-        final int d = line.indexOf('=');
-        if(d < 0) {
-          BaseX.errln("Can't guess what \"%\" means in \"%\"", line, fn);
-          continue;
-        }
-        final String key = line.substring(0, d).trim().toLowerCase();
-        final String val = line.substring(d + 1).trim();
-
-        if(!assign(fields, key, val)) {
-          BaseX.errln("\"%\" ignored in \"%\"", line, fn);
-        }
-      }
-      br.close();
-    } catch(final Exception ex) {
-      BaseX.debug(ex);
-      BaseX.errln("% could not be read.", fn);
-    }
-  }
-
-  /**
-   * Assigns the specified keys and values to one the specified fields.
-   * @param fields field array
-   * @param key key
-   * @param value value
-   * @throws IllegalAccessException exception
-   * @return true if field could be assigned
-   */
-  private static boolean assign(final Field[] fields, final String key,
-      final String value) throws IllegalAccessException {
-
-    // extract numeric value in key
-    String k = key;
-    int num = 0;
-    for(int s = 0; s < k.length(); s++) {
-      if(Character.isDigit(k.charAt(s))) {
-        num = Integer.parseInt(k.substring(s));
-        k = k.substring(0, s);
-        break;
-      }
-    }
-
-    // parse all fields
-    for(final Field f : fields) {
-      final String name = f.getName();
-
-      // field found...
-      if(name.equals(k.toLowerCase())) {
-        final String t = f.getType().getSimpleName();
-        // assign value
-        if(t.equals("boolean")) {
-          f.setBoolean(null, Boolean.parseBoolean(value));
-        } else if(t.equals("String")) {
-          f.set(null, value);
-        } else if(t.equals("int")) {
-          f.setInt(null, Integer.parseInt(value));
-        } else if(t.equals("String[]")) {
-          if(num == 0) {
-            f.set(null, new String[Integer.parseInt(value)]);
-          } else {
-            ((String[]) f.get(null))[num - 1] = value;
-          }
-        } else if(t.equals("int[]")) {
-          ((int[]) f.get(null))[num] = Integer.parseInt(value);
-        } else {
-          BaseX.errln("Can't write property \"%\".", f);
-        }
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Writes the configuration file.
-   */
-  public static synchronized void write() {
-    write(CONFIGFILE, Prop.class.getFields());
-  }
-
-  /**
-   * Writes the properties from field array to the specified file.
-   * @param fn file to be read
-   * @param fields fields to be assigned
-   */
-  public static synchronized void write(final String fn, final Field[] fields) {
-    final File file = new File(fn);
-
-    try {
-      // caches options specified by the user
-      final StringBuilder user = new StringBuilder();
-      if(file.exists()) {
-        final BufferedReader br = new BufferedReader(new FileReader(file));
-        String line = null;
-        while((line = br.readLine()) != null) if(line.equals(PROPUSER)) break;
-        while((line = br.readLine()) != null) {
-          user.append(line);
-          user.append(NL);
-        }
-        br.close();
-      }
-
-      final BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-      bw.write(PROPHEADER + NL);
-
-      for(final Field f : fields) {
-        final String name = f.getName();
-        if(name.equals("SKIP")) break;
-        if(Modifier.isFinal(f.getModifiers())) continue;
-
-        if(f.get(null) instanceof String[]) {
-          final String[] str = (String[]) f.get(null);
-          bw.write(name + " = " + str.length + NL);
-          for(int i = 0; i < str.length; i++) {
-            if(str[i] != null) bw.write(name + (i + 1) + " = " + str[i] + NL);
-          }
-        } else if(f.get(null) instanceof int[]) {
-          final int[] num = (int[]) f.get(null);
-          for(int i = 0; i < num.length; i++) {
-            bw.write(name + i + " = " + num[i] + NL);
-          }
-        } else {
-          bw.write(name + " = " + f.get(null) + NL);
-        }
-      }
-
-      bw.write(NL + PROPUSER + NL);
-      bw.write(user.toString());
-      bw.close();
-    } catch(final Exception ex) {
-      BaseX.errln("% could not be written.", fn);
-      ex.printStackTrace();
-    }
+    } catch(final UnsatisfiedLinkError ex) { /* empty */ }
   }
 }

@@ -75,7 +75,7 @@ final class FNAcc extends Fun {
     double d = Double.NaN;
     try {
       if(it.type != Type.URI && (it.s() || it.n() || it.u())) d = it.dbl();
-    } catch(final QueryException e) { }
+    } catch(final QueryException ex) { }
 
     return Dbl.get(d);
   }

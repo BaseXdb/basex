@@ -27,6 +27,12 @@ abstract class AQuery extends Process {
   protected final Performance per = new Performance();
   /** Performance measurements. */
   protected QueryProcessor qp;
+  /** Parsing time. */
+  protected long pars;
+  /** Compilation time. */
+  protected long comp = 0;
+  /** Evaluation time. */
+  protected long eval = 0;
 
   /**
    * Constructor.
@@ -43,12 +49,9 @@ abstract class AQuery extends Process {
    * @return query instance
    */
   protected final boolean query(final String query) {
-    long pars = 0;
-    long comp = 0;
-    long eval = 0;
-
+    final int runs = prop.num(Prop.RUNS);
     try {
-      for(int i = 0; i < Prop.runs; i++) {
+      for(int i = 0; i < runs; i++) {
         qp = new QueryProcessor(query, context);
         progress(qp);
 
@@ -60,16 +63,11 @@ abstract class AQuery extends Process {
         comp += per.getTime();
         result = qp.query();
         eval += per.getTime();
-        if(i + 1 < Prop.runs) qp.close();
+        if(i + 1 < runs) qp.close();
       }
 
       // dump some query info
-      if(Prop.info) {
-        info(NL + qp.info());
-        info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
-        info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
-        info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
-      }
+      execInfo();
       return true;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
@@ -82,34 +80,46 @@ abstract class AQuery extends Process {
     }
   }
 
-  /**
-   * Outputs the result.
-   * @param o output stream
-   * @param p pretty printing
-   * @throws IOException exception
-   */
-  protected void out(final PrintOutput o, final boolean p) throws IOException {
-    for(int i = 0; i < Prop.runs; i++) {
-      final XMLSerializer xml = new XMLSerializer(i == 0 && Prop.serialize ?
-          o : new NullOutput(!Prop.serialize), Prop.xmloutput, p);
+  @Override
+  protected void out(final PrintOutput o) throws IOException {
+    final boolean pretty = prop.is(Prop.XQFORMAT);
+    final int runs = prop.num(Prop.RUNS);
+    final boolean ser = prop.is(Prop.SERIALIZE);
+    for(int i = 0; i < runs; i++) {
+      final XMLSerializer xml = new XMLSerializer(i == 0 && ser ?
+          o : new NullOutput(!ser), prop.is(Prop.XMLOUTPUT), pretty);
       result.serialize(xml);
       xml.close();
     }
-    if(Prop.runs > 0) {
-      if(Prop.info) outInfo(o, result.size());
+    if(runs > 0) {
+      outInfo(o, result.size());
       qp.close();
     }
+    if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) o.println();
   }
 
   /**
-   * Adds query information to the information string.
+   * Adds evaluation information to the information string.
+   */
+  protected final void execInfo() {
+    final int runs = prop.num(Prop.RUNS);
+    final String opt = qp.info(prop.is(Prop.ALLINFO));
+    if(opt.length() != 0) info(opt);
+    info(QUERYPARSE + Performance.getTimer(pars, runs));
+    info(QUERYCOMPILE + Performance.getTimer(comp, runs));
+    info(QUERYEVALUATE + Performance.getTimer(eval, runs));
+  }
+
+  /**
+   * Adds output information to the information string.
    * @param out output stream
    * @param hits information
    */
   protected final void outInfo(final PrintOutput out, final long hits) {
-    info(QUERYPRINT + per.getTimer(Prop.runs) + NL);
-    info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
-    info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
+    final int runs = prop.num(Prop.RUNS);
+    info(QUERYPRINT + per.getTimer(runs));
+    info(QUERYTOTAL + perf.getTimer(runs));
+    info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS));
     info(QUERYPRINTED + Performance.format(out.size()));
     //info(QUERYMEM, Performance.getMem());
   }
@@ -121,24 +131,24 @@ abstract class AQuery extends Process {
    * @throws Exception exception
    */
   private void plan(final QueryProcessor qu, final boolean c) throws Exception {
-    if(c != Prop.compplan) return;
+    if(c != prop.is(Prop.COMPPLAN)) return;
 
     // show dot plan
-    if(Prop.dotplan) {
+    if(prop.is(Prop.DOTPLAN)) {
       final CachedOutput out = new CachedOutput();
       final DOTSerializer ser = new DOTSerializer(out);
       qu.plan(ser);
       ser.close();
       IO.get(PLANDOT).write(out.finish());
-      new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
+      new ProcessBuilder(prop.get(Prop.DOTTY), PLANDOT).start().waitFor();
       //f.delete();
     }
     // dump query plan
-    if(Prop.xmlplan) {
+    if(prop.is(Prop.XMLPLAN)) {
       final CachedOutput out = new CachedOutput();
       qu.plan(new XMLSerializer(out, false, true));
-      info(NL + QUERYPLAN + NL);
-      info(out + NL);
+      info(QUERYPLAN);
+      info.add(out.toString());
     }
     // reset timer
     per.getTime();

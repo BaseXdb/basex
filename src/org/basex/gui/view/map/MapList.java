@@ -1,7 +1,6 @@
 package org.basex.gui.view.map;
 
 import org.basex.data.Data;
-import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -41,12 +40,14 @@ final class MapList extends IntList {
    * @param textLen array holding pre values to text lengths
    * @param nchildren reference number of nodes
    * @param data reference
+   * @param w weight
    */
-  void initWeights(final int[] textLen, final int nchildren, final Data data) {
+  void initWeights(final int[] textLen, final int nchildren, final Data data,
+      final int w) {
     weight = new double[size];
 
     // only children
-    if(GUIProp.mapweight == 0) {
+    if(w == 0) {
       // [JH] needed if not all nodes of a level are to be drawn.
       // e.g multiple roots
       for(int i = 0; i < size; i++) {
@@ -61,7 +62,7 @@ final class MapList extends IntList {
     }
 
     // summarize sizes
-    final double sizeP = GUIProp.mapweight / 100d;
+    final double sizeP = w / 100d;
     long sum = 0;
     for(int i = 0; i < size; i++) sum += weight(textLen, data, i);
 

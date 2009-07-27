@@ -304,7 +304,6 @@ pc_indexatt=Indexing Attributes
 pc_indexftx=Indexing Full-Text
 pc_parse="%" (% Nodes parsed)
 pc_created=Database '%' created in %.
-pc_tbl=Table created in %.
 pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
@@ -315,7 +314,7 @@ pc_pos="%" (Line %, Col %)
 
 # Database commands
 db_no=Database '%' was not found.
-db_closed=Database was closed.
+db_closed=Database '%' was closed.
 db_closeerr=Database could not be closed.
 db_optimized=Database optimized in %.
 db_dropped=Database '%' was dropped.

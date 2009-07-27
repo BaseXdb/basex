@@ -4,6 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
@@ -41,8 +43,9 @@ public final class Values extends Index {
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
-    idxl = new DataAccess(db, file + 'l');
-    idxr = new DataAccess(db, file + 'r');
+    final Prop pr = data.meta.prop;
+    idxl = new DataAccess(db, file + 'l', pr);
+    idxr = new DataAccess(db, file + 'r', pr);
     size = idxl.readNum();
   }
 
@@ -52,7 +55,7 @@ public final class Values extends Index {
     tb.add(TXTINDEX + NL);
     final long l = idxl.length() + idxr.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IndexStats stats = new IndexStats();
+    final IndexStats stats = new IndexStats(data.meta.prop);
     for(int m = 0; m < size; m++) {
       final int oc = idxl.readNum(idxr.read5(m * 5L));
       if(stats.adding(oc)) {

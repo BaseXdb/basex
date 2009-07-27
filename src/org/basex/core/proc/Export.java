@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
@@ -47,7 +46,7 @@ public final class Export extends Process {
         out.close();
 
       }
-      return Prop.info ? info(DBEXPORTED, perf.getTimer()) : true;
+      return info(DBEXPORTED, perf.getTimer());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

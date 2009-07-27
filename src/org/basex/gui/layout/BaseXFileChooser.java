@@ -43,7 +43,7 @@ public final class BaseXFileChooser {
   public BaseXFileChooser(final String title, final String path,
       final GUI main) {
 
-    if(GUIProp.simplefd) {
+    if(main.prop.is(GUIProp.SIMPLEFD)) {
       fd = new FileDialog(main, title);
       fd.setDirectory(new File(path).getPath());
     } else {

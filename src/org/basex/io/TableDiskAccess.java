@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.util.Array;
 
 /**
@@ -29,6 +30,8 @@ public final class TableDiskAccess extends TableAccess {
   private final String pref;
   /** Name of the database. */
   private final String db;
+  /** Database properties. */
+  private final Prop prop;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;
@@ -55,14 +58,17 @@ public final class TableDiskAccess extends TableAccess {
    * Constructor.
    * @param nm name of the database
    * @param f prefix for all files (no ending)
+   * @param pr database properties
    * @throws IOException in case files cannot be read
    */
-  public TableDiskAccess(final String nm, final String f) throws IOException {
+  public TableDiskAccess(final String nm, final String f, final Prop pr)
+      throws IOException {
     db = nm;
     pref = f;
+    prop = pr;
 
     // READ INFO FILE AND INDEX
-    final DataInput in = new DataInput(nm, f + 'i');
+    final DataInput in = new DataInput(pr.dbfile(nm, f + 'i'));
     nrBlocks = in.readNum();
     indexSize = in.readNum();
     count = in.readNum();
@@ -71,7 +77,7 @@ public final class TableDiskAccess extends TableAccess {
     in.close();
 
     // INITIALIZE FILE
-    file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
+    file = new RandomAccessFile(pr.dbfile(nm, f), "rw");
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
   }
 
@@ -159,7 +165,7 @@ public final class TableDiskAccess extends TableAccess {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
 
     if(dirty) {
-      final DataOutput out = new DataOutput(db, pref + 'i');
+      final DataOutput out = new DataOutput(prop.dbfile(db, pref + 'i'));
       out.writeNum(nrBlocks);
       out.writeNum(indexSize);
       out.writeNum(count);
@@ -392,8 +398,8 @@ public final class TableDiskAccess extends TableAccess {
   private synchronized void newBlock() {
     try {
       if(bf.dirty) writeBlock(bf);
-    } catch(final IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
     bf.pos = nrBlocks++;
     bf.dirty = true;

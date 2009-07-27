@@ -38,7 +38,7 @@ public abstract class Date extends Item {
   static {
     try {
       df = DatatypeFactory.newInstance();
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       BaseX.notexpected();
     }
   }

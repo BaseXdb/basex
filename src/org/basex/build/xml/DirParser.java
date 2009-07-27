@@ -25,11 +25,12 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param f file reference
+   * @param pr database properties
    */
-  public DirParser(final IO f) {
-    super(f);
+  public DirParser(final IO f, final Prop pr) {
+    super(f, pr);
     if(f.isDir()) {
-      filter = Prop.createfilter.replaceAll("\\*", ".*");
+      filter = pr.get(Prop.CREATEFILTER).replaceAll("\\*", ".*");
       if(!filter.contains(".")) filter = ".*" + filter + ".*";
     } else {
       filter = ".*";
@@ -60,7 +61,7 @@ public final class DirParser extends Parser {
       while(path.more()) {
         if(!path.name().matches(filter)) continue;
         b.meta.filesize += io.length();
-        parser = Parser.xmlParser(io);
+        parser = Parser.xmlParser(io, prop);
         parser.doc = doc;
         parser.parse(b);
         if(Prop.debug && ++c % 100 == 0) BaseX.err(";");

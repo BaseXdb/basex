@@ -22,6 +22,8 @@ import org.basex.util.TokenMap;
  * @author Andreas Weiler
  */
 public final class XMLScanner {
+  /** PublicID characters. */
+  private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
   /** Verbose mode. */
   private static final boolean VERBOSE = false;
   /** Quote Entity. */
@@ -56,6 +58,10 @@ public final class XMLScanner {
   private final TokenMap ents;
   /** Index for all PEReferences. */
   private final TokenMap pents;
+  /** Entity flag. */
+  private final boolean entity;
+  /** DTD flag. */
+  private final boolean dtd;
   /** Parameter entity parsing. */
   private boolean pe;
 
@@ -74,9 +80,10 @@ public final class XMLScanner {
   /**
    * Initializes the scanner.
    * @param f input file
+   * @param pr database properties
    * @throws IOException I/O Exception
    */
-  public XMLScanner(final IO f) throws IOException {
+  public XMLScanner(final IO f, final Prop pr) throws IOException {
     input = new XMLInput(f);
     ents = new TokenMap();
     ents.add(E_AMP, AMP);
@@ -85,6 +92,8 @@ public final class XMLScanner {
     ents.add(E_LT, LT);
     ents.add(E_GT, GT);
     pents = new TokenMap();
+    entity = pr.is(Prop.ENTITY);
+    dtd = pr.is(Prop.DTD);
 
     if(consume(DOCDECL)) {
       // process document declaration...
@@ -468,13 +477,13 @@ public final class XMLScanner {
   private byte[] ref(final boolean f) throws IOException {
     // scans numeric entities
     if(consume('#')) { // [66]
-      final TokenBuilder entity = new TokenBuilder();
+      final TokenBuilder ent = new TokenBuilder();
       int b = 10;
       int ch = nextChar();
-      entity.addUTF(ch);
+      ent.addUTF(ch);
       if(ch == 'x') {
         b = 16;
-        entity.addUTF(ch = nextChar());
+        ent.addUTF(ch = nextChar());
       }
       int n = 0;
       do {
@@ -482,29 +491,29 @@ public final class XMLScanner {
         final boolean h = b == 16 && (ch >= 'a' && ch <= 'f' ||
             ch >= 'A' && ch <= 'F');
         if(!m && !h) {
-          completeRef(entity);
-          if(Prop.entity) error(INVALIDENTITY, entity);
+          completeRef(ent);
+          if(entity) error(INVALIDENTITY, ent);
           return EMPTY;
         }
         n *= b;
         n += ch & 15;
         if(!m) n += 9;
-        entity.addUTF(ch = nextChar());
+        ent.addUTF(ch = nextChar());
       } while(ch != ';');
 
       if(!valid(n)) {
-        if(Prop.entity) error(INVALIDENTITY, entity);
+        if(entity) error(INVALIDENTITY, ent);
         return EMPTY;
       }
-      entity.reset();
-      entity.addUTF(n);
-      return entity.finish();
+      ent.reset();
+      ent.addUTF(n);
+      return ent.finish();
     }
 
     // scans predefined entities // [68]
-    final byte[] name = name(Prop.entity);
+    final byte[] name = name(entity);
     if(!consume(';')) {
-      if(Prop.entity) error(INVALIDENTITY, name);
+      if(entity) error(INVALIDENTITY, name);
       return EMPTY;
     }
 
@@ -512,7 +521,7 @@ public final class XMLScanner {
 
     final byte[] en = ents.get(name);
     if(en != null) return en;
-    if(Prop.entity) error(UNKNOWNENTITY, name);
+    if(entity) error(UNKNOWNENTITY, name);
     return EMPTY;
   }
 
@@ -528,19 +537,19 @@ public final class XMLScanner {
 
     final byte[] en = pents.get(name);
     if(en != null) return en;
-    if(Prop.entity) error(UNKNOWNENTITY, name);
+    if(entity) error(UNKNOWNENTITY, name);
     return name;
   }
 
   /**
    * Adds some characters to the entity.
-   * @param entity token builder
+   * @param ent token builder
    * @throws IOException Build Exception
    */
-  private void completeRef(final TokenBuilder entity) throws IOException {
+  private void completeRef(final TokenBuilder ent) throws IOException {
     int ch = consume();
-    while(entity.size() < 10 && ch >= ' ' && ch != ';') {
-      entity.addUTF(ch);
+    while(ent.size() < 10 && ch >= ' ' && ch != ';') {
+      ent.addUTF(ch);
       ch = consume();
     }
   }
@@ -693,7 +702,7 @@ public final class XMLScanner {
         while((ch = nextChar()) != qu) tok.addUTF(ch);
         if(!f) return null;
         final String name = string(tok.finish());
-        if(!Prop.dtd && r) return cont;
+        if(!dtd && r) return cont;
 
         final XMLInput tin = input;
         try {
@@ -732,10 +741,6 @@ public final class XMLScanner {
     }
     return cont;
   }
-
-
-  /** PublicID characters. */
-  private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
 
   /**
    * Scans an public ID literal. [12]

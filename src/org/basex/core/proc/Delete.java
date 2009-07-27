@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 
@@ -56,6 +55,6 @@ public final class Delete extends Process {
       data.flush();
     }
     context.update();
-    return Prop.info ? info(DELETEINFO, nodes.size(), perf.getTimer()) : true;
+    return info(DELETEINFO, nodes.size(), perf.getTimer());
   }
 }

@@ -10,6 +10,7 @@ import org.basex.api.dom.BXDoc;
 import org.basex.api.dom.BXDomImpl;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.w3c.dom.DOMImplementation;
@@ -27,6 +28,8 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class BXDocBuilder extends DocumentBuilder {
+  /** Database context. */
+  private final Context ctx = new Context();
   /** Parser instance. */
   private final SAXParserFactory factory;
   /** Parser instance. */
@@ -69,8 +72,8 @@ public final class BXDocBuilder extends DocumentBuilder {
   public Document parse(final InputSource is) throws IOException {
     final SAXSource source = new SAXSource(parser, is);
     final String id = is.getSystemId();
-    final Data data = new MemBuilder().build(
-        new SAXWrapper(source), id == null ? "tmp" : id);
+    final Data data = new MemBuilder(
+        new SAXWrapper(source, ctx.prop)).build(id == null ? "tmp" : id);
     return new BXDoc(new DBNode(data, 0));
   }
 

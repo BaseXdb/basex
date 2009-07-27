@@ -38,17 +38,18 @@ public final class DialogMapLayout extends Dialog {
    */
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
-
+    
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(4, 1, 0, 8));
 
     // create list
-    algo = new BaseXListChooser(MAPALGO, HELPMAPLAYOUT, this);
+    algo = new BaseXListChooser(MAPALG, HELPMAPLAYOUT, this);
     p.add(algo);
 
     // create drop down
-    border = new BaseXCombo(MAPOFFSETS, HELPMAPOFF, this);
-    border.setSelectedIndex(GUIProp.mapoffsets);
+    final GUIProp gprop = gui.prop;
+    border = new BaseXCombo(MAPOFFSET, HELPMAPOFF, this);
+    border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
 
     BaseXBack tmp = new BaseXBack();
     tmp.setLayout(new TableLayout(1, 3));
@@ -62,7 +63,7 @@ public final class DialogMapLayout extends Dialog {
     // create slider
     sizeLabel = new BaseXLabel(MAPSIZE);
     sizeSlider = new BaseXSlider(0, 100,
-        GUIProp.mapweight, HELPMAPSIZE, this);
+        gprop.num(GUIProp.MAPWEIGHT), HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
     tmp = new BaseXBack();
@@ -72,23 +73,25 @@ public final class DialogMapLayout extends Dialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
+    atts = new BaseXCheckBox(MAPATT, HELPMAPATTS,
+        gprop.is(GUIProp.MAPATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);
-    finish(GUIProp.maplayoutloc);
+    finish(gprop.nums(GUIProp.MAPLAYOUTLOC));
 
-    algo.setIndex(GUIProp.mapalgo);
+    algo.setIndex(gprop.num(GUIProp.MAPALGO));
   }
 
   @Override
   public void action(final String cmd) {
     final boolean fs = gui.context.data().fs != null;
-    GUIProp.mapoffsets = border.getSelectedIndex();
-    GUIProp.mapalgo = algo.getIndex();
-    GUIProp.mapatts = atts.isSelected();
+    final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());
+    gprop.set(GUIProp.MAPALGO, algo.getIndex());
+    gprop.set(GUIProp.MAPATTS, atts.isSelected());
     final int sizeprp = sizeSlider.value();
-    GUIProp.mapweight = sizeprp;
+    gprop.set(GUIProp.MAPWEIGHT, sizeprp);
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ?
       MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : fs ? MAPFSSIZE : MAPTEXTSIZE));
 

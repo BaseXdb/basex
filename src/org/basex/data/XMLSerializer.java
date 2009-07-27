@@ -96,7 +96,7 @@ public final class XMLSerializer extends Serializer {
   public void text(final byte[] b, final FTPos ftp) throws IOException {
     finishElement();
     int c = -1, pp = 0, wl = 0;
-    final Tokenizer ftt = new Tokenizer(b);
+    final Tokenizer ftt = new Tokenizer(b, null);
     while(ftt.more()) {
       c++;
       for(int i = wl; i < ftt.p;) {

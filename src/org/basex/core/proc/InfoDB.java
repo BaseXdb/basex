@@ -9,7 +9,6 @@ import org.basex.BaseX;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.MetaData;
-import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -47,7 +46,7 @@ public final class InfoDB extends AInfo {
   public static TokenBuilder db(final MetaData meta, final boolean bold,
       final boolean index) {
 
-    final File dir = IO.dbpath(meta.name);
+    final File dir = meta.prop.dbpath(meta.name);
     long len = 0;
     if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
 

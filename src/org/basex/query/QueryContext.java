@@ -44,7 +44,7 @@ import org.basex.util.Tokenizer;
 /**
  * This abstract query expression provides the architecture
  * for a compiled query.
- *
+// *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -87,7 +87,7 @@ public final class QueryContext extends Progress {
   /** Scoring instance. */
   public Scoring score = new Scoring();
   /** Current full-text options. */
-  public FTOpt ftopt = new FTOpt();
+  public FTOpt ftopt;
   /** Current full-text token. */
   public Tokenizer fttoken;
 
@@ -154,6 +154,8 @@ public final class QueryContext extends Progress {
   private int rootDocs;
   /** Number of documents. */
   private int docs;
+  /** Info flag. */
+  final boolean inf;
 
   /**
    * Constructor.
@@ -161,6 +163,8 @@ public final class QueryContext extends Progress {
    */
   public QueryContext(final Context ctx) {
     context = ctx;
+    ftopt = new FTOpt(ctx.prop);
+    inf = ctx.prop.is(Prop.ALLINFO);
   }
   
   /**
@@ -229,11 +233,13 @@ public final class QueryContext extends Progress {
       }
 
       // evaluates the query and returns the result
-      if(Prop.allInfo) compInfo(QUERYCOMP);
+      if(inf) compInfo(QUERYCOMP);
       fun.comp(this);
       vars.comp(this);
       root = root.comp(this);
-      if(Prop.allInfo) compInfo(QUERYRESULT + "%", root);
+      if(inf) {
+        compInfo(QUERYRESULT + "%" + NL, root);
+      }
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);
@@ -345,7 +351,7 @@ public final class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public void compInfo(final String string, final Object... ext) {
-    if(!Prop.allInfo) return;
+    if(!inf) return;
     if(!firstOpt) info.add(QUERYSEP);
     firstOpt = false;
     info.add(string, ext);
@@ -358,7 +364,7 @@ public final class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public void evalInfo(final String string, final Object... ext) {
-    if(!Prop.allInfo) return;
+    if(!inf) return;
     if(firstEval) {
       info.add(NL);
       info.add(QUERYEVAL);

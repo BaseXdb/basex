@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 
 /**
@@ -25,11 +26,12 @@ public final class XMLParser extends Parser {
   /**
    * Constructor.
    * @param f file reference
+   * @param pr database properties
    * @throws IOException I/O Exception
    */
-  public XMLParser(final IO f) throws IOException {
-    super(f);
-    scanner = new XMLScanner(f);
+  public XMLParser(final IO f, final Prop pr) throws IOException {
+    super(f, pr);
+    scanner = new XMLScanner(f, pr);
   }
 
   @Override

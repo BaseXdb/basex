@@ -18,7 +18,7 @@ import static org.basex.build.fs.FSText.*;
  */
 public final class JPGExtractor extends EXIFExtractor {
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     final BufferedInputStream in =
       new BufferedInputStream(new FileInputStream(f));
 
@@ -51,19 +51,19 @@ public final class JPGExtractor extends EXIFExtractor {
     in.close();
 
     // open image tag
-    listener.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
+    build.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
 
-    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
-    listener.nodeAndText(HEIGHT, atts, Token.token(h));
+    build.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    build.nodeAndText(HEIGHT, atts, Token.token(h));
 
     if(!exif.isEmpty()) {
-      listener.startElem(EXIF, atts.reset());
+      build.startElem(EXIF, atts.reset());
       final Iterator<byte[]> it = exif.iterator();
-      while(it.hasNext()) listener.nodeAndText(it.next(), atts, it.next());
-      listener.endElem(EXIF);
+      while(it.hasNext()) build.nodeAndText(it.next(), atts, it.next());
+      build.endElem(EXIF);
       exif.clear();
     }
 
-    listener.endElem(IMAGE);
+    build.endElem(IMAGE);
   }
 }

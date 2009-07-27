@@ -241,8 +241,8 @@ public final class GUIFS {
       images[0][0] = add("unknown", tracker, tk, i++);
       images[1][0] = add("unknown2", tracker, tk, i++);
       tracker.waitForAll();
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
   }
 

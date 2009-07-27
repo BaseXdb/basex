@@ -16,7 +16,7 @@ import static org.basex.build.fs.FSText.*;
  */
 public final class TIFExtractor extends EXIFExtractor {
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     final BufferedInputStream in =
       new BufferedInputStream(new FileInputStream(f));
 
@@ -50,9 +50,9 @@ public final class TIFExtractor extends EXIFExtractor {
     if(w == -1 || h == -1) return;
 
     // open image tag
-    listener.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
-    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
-    listener.nodeAndText(HEIGHT, atts, Token.token(h));
-    listener.endElem(IMAGE);
+    build.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
+    build.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    build.nodeAndText(HEIGHT, atts, Token.token(h));
+    build.endElem(IMAGE);
   }
 }

@@ -46,7 +46,7 @@ public final class Castable extends Single {
       final Item it = expr.atomic(ctx);
       seq.cast(it, this, ctx);
       return Bln.TRUE;
-    } catch(final QueryException e) {
+    } catch(final QueryException ex) {
       return Bln.FALSE;
     }
   }

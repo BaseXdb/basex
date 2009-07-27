@@ -295,7 +295,7 @@ public class QueryParser extends InputParser {
         } else if(consumeWS(NSPACE)) {
           namespaceDecl();
         } else if(consumeWS(FTOPTION)) {
-          final FTOpt opt = new FTOpt();
+          final FTOpt opt = new FTOpt(ctx.context.prop);
           while(ftMatchOption(opt));
           ctx.ftopt.compile(opt);
         } else {
@@ -755,7 +755,6 @@ public class QueryParser extends InputParser {
                 order == null ? null : new Order(order),
                 group == null ? null : new Group(group), ret);
   }
-
 
   /**
    * [ 34] Parses a ForClause.
@@ -1304,8 +1303,6 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   protected void checkPred(final boolean open) { }
-
-
 
   /**
    * [ 70] Parses a StepExpr.
@@ -2236,7 +2233,7 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftPrimaryWithOptions(final boolean prg) throws QueryException {
     FTExpr expr = ftPrimary(prg);
-    final FTOpt fto = new FTOpt();
+    final FTOpt fto = new FTOpt(ctx.context.prop);
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
     if(consumeWS(WEIGHT)) expr = new FTWeight(expr, range());
@@ -2458,7 +2455,7 @@ public class QueryParser extends InputParser {
         error(THESRNG);
       }
     }
-    final Thesaurus th = new Thesaurus(fl, rel, min, max);
+    final Thesaurus th = new Thesaurus(fl, rel, min, max, ctx.context);
     //if(!th.init()) error(NOTHES, fl);
     thes.add(th);
   }

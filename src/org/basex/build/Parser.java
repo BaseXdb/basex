@@ -19,36 +19,44 @@ public abstract class Parser {
   protected final Atts atts = new Atts();
   /** Document flag; if true, a document node is added. */
   public boolean doc = true;
+  /** Database properties. */
+  public Prop prop;
   /** Input file. */
   public IO io;
 
   /**
    * Constructor.
    * @param f file reference.
+   * @param p database properties
    */
-  protected Parser(final IO f) {
+  protected Parser(final IO f, final Prop p) {
     io = f;
+    prop = p;
   }
 
   /**
    * Returns an XML parser instance.
    * @param io io reference
+   * @param prop database properties
    * @return xml parser
    * @throws IOException io exception
    */
-  public static Parser xmlParser(final IO io) throws IOException {
+  public static Parser xmlParser(final IO io, final Prop prop)
+      throws IOException {
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
-    return Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
+    return prop.is(Prop.INTPARSE) ? new XMLParser(io, prop) :
+      new SAXWrapper(s, prop);
   }
 
   /**
    * Returns a parser instance for creating empty databases.
    * @param io io reference
+   * @param pr database properties
    * @return parser
    */
-  public static Parser emptyParser(final IO io) {
-    return new Parser(io) {
+  public static Parser emptyParser(final IO io, final Prop pr) {
+    return new Parser(io, pr) {
       @Override
       public void parse(final Builder build) { /* empty */ }
     };
@@ -56,7 +64,7 @@ public abstract class Parser {
 
   /**
    * Parses all nodes and sends events to the specified builder.
-   * @param build event listener.
+   * @param build database builder
    * @throws IOException I/O exception
    */
   public abstract void parse(Builder build) throws IOException;

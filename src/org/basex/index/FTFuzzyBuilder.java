@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
@@ -39,6 +40,14 @@ public final class FTFuzzyBuilder extends FTBuilder {
   private byte isize = 1;
 
   /**
+   * Constructor.
+   * @param pr database properties
+   */
+  public FTFuzzyBuilder(final Prop pr) {
+    super(pr);
+  }
+
+  /**
    * Builds the index structure and returns an index instance.
    * @param data data reference
    * @return index instance
@@ -62,9 +71,10 @@ public final class FTFuzzyBuilder extends FTBuilder {
   @Override
   void write(final Data data) throws IOException {
     final String db = data.meta.name;
-    final DataOutput outx = new DataOutput(db, DATAFTX + 'x');
-    final DataOutput outy = new DataOutput(db, DATAFTX + 'y');
-    final DataOutput outz = new DataOutput(db, DATAFTX + 'z');
+    final Prop pr = data.meta.prop;
+    final DataOutput outx = new DataOutput(pr.dbfile(db, DATAFTX + 'x'));
+    final DataOutput outy = new DataOutput(pr.dbfile(db, DATAFTX + 'y'));
+    final DataOutput outz = new DataOutput(pr.dbfile(db, DATAFTX + 'z'));
 
     // write index size
     outx.write(isize);

@@ -161,7 +161,7 @@ public class Var extends Expr implements Cloneable {
   public Var clone() {
     try {
       return (Var) super.clone();
-    } catch(final CloneNotSupportedException e) {
+    } catch(final CloneNotSupportedException ex) {
       return null;
     }
   }

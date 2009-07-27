@@ -18,7 +18,7 @@ public final class BMPExtractor extends AbstractExtractor {
   private final byte[] data = new byte[26];
 
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     BufferInput.read(f, data);
 
     // check if the header is valid
@@ -31,9 +31,9 @@ public final class BMPExtractor extends AbstractExtractor {
       ((data[23] & 0xFF) << 8) + (data[22] & 0xFF);
 
     // open image tag
-    listener.startElem(IMAGE, atts.set(TYPE, TYPEBMP));
-    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
-    listener.nodeAndText(HEIGHT, atts, Token.token(h));
-    listener.endElem(IMAGE);
+    build.startElem(IMAGE, atts.set(TYPE, TYPEBMP));
+    build.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    build.nodeAndText(HEIGHT, atts, Token.token(h));
+    build.endElem(IMAGE);
   }
 }

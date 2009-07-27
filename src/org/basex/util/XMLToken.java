@@ -59,7 +59,6 @@ public final class XMLToken {
     return isFirstLetter(ch) || digit(ch) || ch == '-' || ch == '.';
   }
 
-
   /**
    * Checks if the specified token is a valid NCName.
    * @param v value to be checked

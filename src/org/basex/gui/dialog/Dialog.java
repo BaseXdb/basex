@@ -9,12 +9,10 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLayout;
@@ -129,7 +127,7 @@ public abstract class Dialog extends JDialog {
       final Container par = getParent();
       loc[0] = getX() - par.getX();
       loc[1] = getY() - par.getY();
-      GUIProp.write();
+      gui.prop.write();
     }
     super.dispose();
   }

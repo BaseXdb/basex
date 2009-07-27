@@ -50,7 +50,7 @@ public final class CreateDB extends ACreate {
   protected boolean exec() {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
-    return build(new DirParser(io), args[1]);
+    return build(new DirParser(io, prop), args[1]);
   }
 
   /**
@@ -64,7 +64,7 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Context ctx, final IO io, final String name)
       throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(ctx, new DirParser(io), name);
+    return xml(ctx, new DirParser(io, ctx.prop), name);
   }
 
   /**
@@ -78,28 +78,29 @@ public final class CreateDB extends ACreate {
    */
   public static Data xml(final Context ctx, final Parser p, final String db)
       throws IOException {
-    if(Prop.mainmem) return xml(p);
 
-    final Builder builder = new DiskBuilder();
+    if(ctx.prop.is(Prop.MAINMEM)) return xml(p);
+
+    final Builder builder = new DiskBuilder(p);
+    final Prop pr = p.prop;
     try {
-      final Data data = builder.build(p, db);
+      final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(Type.TXT,
         new ValueBuilder(true).build(data));
       if(data.meta.atvindex) data.setIndex(Type.ATV,
         new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
-        new FTFuzzyBuilder().build(data) : new FTTrieBuilder().build(data));
+        new FTFuzzyBuilder(pr).build(data) : new FTTrieBuilder(pr).build(data));
 
-      // [AW] null test should be removed if query processor handles context
-      if(ctx != null) ctx.addToPool(data);
+      ctx.addToPool(data);
       return data;
     } catch(final IOException ex) {
       try {
         builder.close();
-      } catch(final IOException e) {
-        BaseX.debug(e);
+      } catch(final IOException exx) {
+        BaseX.debug(exx);
       }
-      DropDB.drop(db);
+      DropDB.drop(db, ctx.prop);
       throw ex;
     }
   }
@@ -107,33 +108,34 @@ public final class CreateDB extends ACreate {
   /**
    * Creates and returns a main memory database from the specified parser.
    * @param p xml parser
-   * a main memory instance is created
    * @return database instance
    * @throws IOException exception
    */
   public static Data xml(final Parser p) throws IOException {
-    return new MemBuilder().build(p, "");
+    return new MemBuilder(p).build("");
   }
 
   /**
    * Creates and returns a main memory database from the specified XML document.
    * @param io file reference
+   * @param pr database properties
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final IO io) throws IOException {
+  public static Data xml(final IO io, final Prop pr) throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(new DirParser(io));
+    return xml(new DirParser(io, pr));
   }
 
   /**
    * Creates and returns a main memory database from the specified SAX source.
    * @param s sax source
+   * @param pr database properties
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final SAXSource s) throws IOException {
-    return xml(new SAXWrapper(s));
+  public static Data xml(final SAXSource s, final Prop pr) throws IOException {
+    return xml(new SAXWrapper(s, pr));
   }
 
   @Override

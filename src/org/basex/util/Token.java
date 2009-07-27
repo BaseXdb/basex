@@ -150,8 +150,8 @@ public final class Token {
   private static byte[] utf8(final String s) {
     try {
       return s.getBytes(UTF8);
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
       return EMPTY;
     }
   }
@@ -319,7 +319,6 @@ public final class Token {
         DD.format(d) : SD.format(d)));
   }
 
-
   /**
    * Creates a byte array representation from the specified float value.
    * @param f float value to be converted
@@ -407,7 +406,7 @@ public final class Token {
   private static double dbl(final byte[] to) {
     try {
       return Double.parseDouble(string(to));
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return Double.NaN;
     }
   }

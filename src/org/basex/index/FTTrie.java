@@ -47,9 +47,10 @@ public final class FTTrie extends FTIndex {
   public FTTrie(final Data d) throws IOException {
     super(d);
     final String db = d.meta.name;
-    inN = new DataAccess(db, DATAFTX + 'a');
-    inD = new DataAccess(db, DATAFTX + 'b');
-    inS = new DataAccess(db, DATAFTX + 'c');
+    final Prop pr = d.meta.prop;
+    inN = new DataAccess(db, DATAFTX + 'a', pr);
+    inD = new DataAccess(db, DATAFTX + 'b', pr);
+    inS = new DataAccess(db, DATAFTX + 'c', pr);
   }
 
   @Override
@@ -61,7 +62,7 @@ public final class FTTrie extends FTIndex {
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IndexStats stats = new IndexStats();
+    final IndexStats stats = new IndexStats(data.meta.prop);
     addOccs(0, stats, EMPTY);
     stats.print(tb);
     return tb.finish();
@@ -95,7 +96,7 @@ public final class FTTrie extends FTIndex {
 
     // support fuzzy search
     if(ft.fz) {
-      int k = Prop.lserr;
+      int k = data.meta.prop.num(Prop.LSERR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(0, null, -1, tok, 0, 0, 0, k, ft.fast);
     }

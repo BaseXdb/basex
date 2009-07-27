@@ -78,8 +78,8 @@ public final class DeepShell {
       BaseX.out(
           "%s: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -89,7 +89,7 @@ public final class DeepShell {
    * @return user input
    */
   private String input(final String prompt) {
-    System.out.print(prompt);
+    System.out.println(prompt);
     // get user input
     try {
       final InputStreamReader isr = new InputStreamReader(System.in);
@@ -205,8 +205,8 @@ public final class DeepShell {
       final XMLSerializer xml = new XMLSerializer(out, false, true);
       n.serialize(xml);
       xml.close();
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
   }
 

@@ -35,10 +35,10 @@ public final class DialogHelp extends Dialog {
     set(area, BorderLayout.CENTER);
 
     setResizable(true);
-    final int[] size = GUIProp.helpsize;
+    final int[] size = main.prop.nums(GUIProp.HELPSIZE);
     setPreferredSize(new Dimension(size[0], size[1]));
 
-    finish(GUIProp.helploc);
+    finish(main.prop.nums(GUIProp.HELPLOC));
     refresh();
   }
 
@@ -57,9 +57,8 @@ public final class DialogHelp extends Dialog {
 
   @Override
   public void close() {
-    GUIProp.showhelp = false;
-    GUIProp.helpsize[0] = getWidth();
-    GUIProp.helpsize[1] = getHeight();
+    gui.prop.set(GUIProp.SHOWHELP, false);
+    gui.prop.set(GUIProp.HELPSIZE, new int[] { getWidth(), getHeight() });
     gui.refreshControls();
     gui.help = null;
     dispose();

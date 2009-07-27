@@ -303,7 +303,6 @@ pc_indexatt=Đang index thuộc tính
 pc_indexftx=Đang index nội dung
 pc_parse="%" (% Nodes parsed)
 pc_created=Cơ sở dữ liệu '%' đã được tạo trong %.
-pc_tbl=Bản (table) đã được tạo trong in %.
 pc_filenf=Tệp và thư mục "%" không tìm thấy.
 pc_pathnf=Tệp hay thư mục không tìm thấy.
 pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
@@ -314,7 +313,7 @@ pc_pos="%" (Dòng %, Cột %)
 
 # Database commands
 db_no=Cơ sở dữ liệu '%' không tìm thấy.
-db_closed=Cơ sở dữ liệu đã được đóng.
+db_closed=Cơ sở dữ liệu '%' đã được đóng.
 db_closeerr=Cơ sở dữ liệu không đóng được.
 db_optimized=Cơ sở dữ liệu tối ưu trong %.
 db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.

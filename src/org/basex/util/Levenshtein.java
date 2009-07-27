@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import org.basex.core.Prop;
-
 /**
  * Levenshtein implementation, based on
  * "Levenshtein [1965], Binary codes capable of correcting spurious insertions
@@ -30,9 +28,10 @@ public final class Levenshtein {
    * Compares two character arrays for similarity.
    * @param token token to be compared
    * @param sub second token to be compared
+   * @param err number of allowed errors; dynamic calculation if value is 0
    * @return true if the arrays are similar
    */
-  public boolean similar(final byte[] token, final byte[] sub) {
+  public boolean similar(final byte[] token, final byte[] sub, final int err) {
     final int tl = token.length;
     if(tl == 0) return false;
     final int sl = sub.length;
@@ -41,8 +40,7 @@ public final class Levenshtein {
     if(sl < 4 || tl > MAX || sl > MAX) return eq(token, tl, sub);
 
     // skip different tokens with too different lengths
-    int k = Prop.lserr;
-    if(k == 0) k = Math.max(1, sl >> 2);
+    int k = err == 0 ? Math.max(1, sl >> 2) : err;
     return Math.abs(sl - tl) <= k && ls(token, tl, sub, k);
   }
 

@@ -53,9 +53,11 @@ public final class BaseXLayout {
    * @param help help text
    */
   public static void help(final Component cont, final byte[] help) {
-    if(GUIProp.mousefocus) cont.requestFocusInWindow();
-    if(GUIProp.fullscreen) return;
-    if(help != null && GUIProp.showhelp) gui(cont).help.setText(help);
+    final GUI gui = gui(cont);
+    final GUIProp gprop = gui.prop;
+    if(gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
+    if(gprop.is(GUIProp.FULLSCREEN)) return;
+    if(help != null && gprop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
   }
 
   /**
@@ -63,7 +65,7 @@ public final class BaseXLayout {
    * @param cont input container
    * @return gui
    */
-  private static GUI gui(final Component cont) {
+  static GUI gui(final Component cont) {
     final Container c = cont.getParent();
     return c instanceof GUI ? (GUI) c : gui(c);
   }
@@ -155,15 +157,17 @@ public final class BaseXLayout {
         }
 
         if(e.isControlDown()) {
-          final int fs = GUIProp.fontsize;
+          final GUIProp prop = gui(comp).prop;
+          final int fs = prop.num(GUIProp.FONTSIZE);
+          int nfs = fs;
           if(code == '+' || code == '-' || code == '=') {
-            GUIProp.fontsize = Math.max(1, GUIProp.fontsize +
-                (code == '-' ? -1 : 1));
+            nfs = Math.max(1, fs + (code == '-' ? -1 : 1));
           } else if(code == '0') {
-            GUIProp.fontsize = 12;
+            nfs = 12;
           }
-          if(fs != GUIProp.fontsize) {
-            GUIConstants.initFonts();
+          if(fs != nfs) {
+            prop.set(GUIProp.FONTSIZE, nfs);
+            GUIConstants.initFonts(prop);
             gui.notify.layout();
           }
         }
@@ -295,14 +299,15 @@ public final class BaseXLayout {
   /**
    * Enables/Disables anti-aliasing.
    * @param g graphics reference
+   * @param pr database properties
    */
-  public static void antiAlias(final Graphics g) {
+  public static void antiAlias(final Graphics g, final GUIProp pr) {
     try {
       ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
           RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
-          GUIConstants.FONTALIAS[GUIProp.fontalias]).get(null));
-    } catch(final Exception e) {
-      BaseX.errln(e);
+          GUIConstants.FONTALIAS[pr.num(GUIProp.FONTALIAS)]).get(null));
+    } catch(final Exception ex) {
+      BaseX.errln(ex);
     }
   }
 
@@ -355,10 +360,11 @@ public final class BaseXLayout {
    * @param x x coordinate
    * @param y y coordinate
    * @param w width
+   * @param fs font size
    * @return width of printed string
    */
   public static int chopString(final Graphics g, final byte[] s,
-      final int x, final int y, final int w) {
+      final int x, final int y, final int w, final int fs) {
 
     if(w < 12) return w;
     final int[] cw = fontWidths(g.getFont());
@@ -372,7 +378,7 @@ public final class BaseXLayout {
         if(fw + ww >= w - 4) {
           j = Math.max(1, k - l);
           if(k > 1) fw -= width(g, cw, cp(s, k - 1));
-          g.drawString("..", x + fw, y + GUIProp.fontsize);
+          g.drawString("..", x + fw, y + fs);
           break;
         }
         fw += ww;
@@ -381,7 +387,7 @@ public final class BaseXLayout {
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }
-    g.drawString(string(s, 0, j), x, y + GUIProp.fontsize);
+    g.drawString(string(s, 0, j), x, y + fs);
     return fw;
   }
 

@@ -45,10 +45,10 @@ public final class CreateIndex extends ACreate {
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
-          data.meta.ftfz = Prop.ftfuzzy;
-          data.meta.ftst = Prop.ftst;
-          data.meta.ftcs = Prop.ftcs;
-          data.meta.ftdc = Prop.ftdc;
+          data.meta.ftfz = prop.is(Prop.FTFUZZY);
+          data.meta.ftst = prop.is(Prop.FTST);
+          data.meta.ftcs = prop.is(Prop.FTCS);
+          data.meta.ftdc = prop.is(Prop.FTDC);
           index = Type.FTX;
           break;
       }

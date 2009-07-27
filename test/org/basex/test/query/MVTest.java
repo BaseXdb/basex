@@ -48,8 +48,7 @@ public final class MVTest {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
-    Prop.serialize = true;
-    Prop.info = true;
+    context.prop.set(Prop.INFO, true);
 
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);

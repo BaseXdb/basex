@@ -76,8 +76,8 @@ public final class NewFSParser extends Parser {
           BaseX.debug("Successfully loaded %", name);
         } else BaseX.debug("Loading % ... FAILED", name);
       }
-    } catch(final IOException e) {
-      BaseX.errln("Failed to load parsers (%)", e.getMessage());
+    } catch(final IOException ex) {
+      BaseX.errln("Failed to load parsers (%)", ex.getMessage());
     }
   }
 
@@ -127,12 +127,14 @@ public final class NewFSParser extends Parser {
    * @param mp mount point for fuse
    * @param bs path to root of backing store for BLOBs on Windows systems. If
    *          set to true, the path reference is ignored
+   * @param pr database properties
    */
-  public NewFSParser(final String path, final String mp, final String bs) {
-    super(IO.get(path));
-    Prop.intparse = true;
-    Prop.entity = false;
-    Prop.dtd = false;
+  public NewFSParser(final String path, final String mp, final String bs,
+      final Prop pr) { 
+    super(IO.get(path), pr);
+    prop.set(Prop.INTPARSE, true);
+    prop.set(Prop.ENTITY, false);
+    prop.set(Prop.DTD, false);
     root = path.equals("/");
 
     fsimportpath = io.path();
@@ -141,7 +143,7 @@ public final class NewFSParser extends Parser {
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
-    if(Prop.fsmeta || Prop.fscont) {
+    if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
       final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
       parserInstances = new HashMap<String, AbstractParser>(size);
       buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
@@ -154,10 +156,11 @@ public final class NewFSParser extends Parser {
   /**
    * Constructor to parse single file nodes.
    * @param path String to file node to parse
+   * @param pr database properties
    */
-  public NewFSParser(final String path) {
+  public NewFSParser(final String path, final Prop pr) {
     // [AH] pass mountpoint and backing store args to single parser
-    this(path, "/mnt/deepfs", "/var/tmp/deepfs");
+    this(path, "/mnt/deepfs", "/var/tmp/deepfs", pr);
     singlemode = true;
   }
 
@@ -176,12 +179,12 @@ public final class NewFSParser extends Parser {
         instance = clazz.newInstance();
         BaseX.debug("Successfully initialized parser for ." + suffix
             + " files.");
-      } catch(final InstantiationException e) {
+      } catch(final InstantiationException ex) {
         BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
-            e.getMessage());
-      } catch(final IllegalAccessException e) {
+            ex.getMessage());
+      } catch(final IllegalAccessException ex) {
         BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
-            e.getMessage());
+            ex.getMessage());
       }
       // put in hash map ... even if null
       parserInstances.put(suffix, instance);
@@ -289,8 +292,8 @@ public final class NewFSParser extends Parser {
       chIn.transferTo(0, chIn.size(), chOut);
       chIn.close();
       chOut.close();
-    } catch(final IOException e) {
-      e.getMessage();
+    } catch(final IOException ex) {
+      ex.getMessage();
     }
   }
 
@@ -346,8 +349,8 @@ public final class NewFSParser extends Parser {
 
     if(!singlemode) {
       builder.startElem(FILE, atts);
-      if((Prop.fsmeta || Prop.fscont) && f.canRead() && f.isFile()
-          && f.getName().indexOf('.') != -1) {
+      if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead() &&
+          f.isFile() && f.getName().indexOf('.') != -1) {
         final int dot = name.lastIndexOf('.');
         final String suffix = name.substring(dot + 1).toLowerCase();
         if(size > 0) {
@@ -356,7 +359,7 @@ public final class NewFSParser extends Parser {
             final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
             try {
               parse0(parser, bfc);
-            } catch(final IOException e) {
+            } catch(final IOException ex) {
               BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
                   bfc.getFileName());
             } finally {
@@ -383,7 +386,7 @@ public final class NewFSParser extends Parser {
    */
   public void parseFileFragment(final BufferedFileChannel bfc,
       final String name, final String suffix) throws IOException {
-    if(Prop.fsmeta || Prop.fscont) {
+    if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
       final AbstractParser parser = getParser(suffix);
       final long offset = bfc.absolutePosition();
       final long size = bfc.size();
@@ -391,7 +394,7 @@ public final class NewFSParser extends Parser {
       if(parser != null) {
         try {
           parse0(parser, bfc);
-        } catch(final IOException e) {
+        } catch(final IOException ex) {
           BaseX.debug(
               "Failed to parse file fragment (file: %, offset: %, length: %)",
               bfc.getFileName(), offset, size);
@@ -411,10 +414,10 @@ public final class NewFSParser extends Parser {
   private void parse0(final AbstractParser parser, final BufferedFileChannel bf)
       throws IOException {
     bf.reset();
-    if(Prop.fsmeta) {
-      if(Prop.fscont) parser.readMetaAndContent(bf, this);
+    if(prop.is(Prop.FSMETA)) {
+      if(prop.is(Prop.FSCONT)) parser.readMetaAndContent(bf, this);
       else parser.readMeta(bf, this);
-    } else if(Prop.fscont) parser.readContent(bf, this);
+    } else if(prop.is(Prop.FSCONT)) parser.readContent(bf, this);
     bf.finish();
   }
 
@@ -502,7 +505,7 @@ public final class NewFSParser extends Parser {
    */
   public void parseXML() throws IOException {
     final IO i = IO.get(curr.getPath());
-    final Parser parser = Parser.xmlParser(i);
+    final Parser parser = Parser.xmlParser(i, prop);
     parser.doc = false;
     parser.parse(builder);
   }

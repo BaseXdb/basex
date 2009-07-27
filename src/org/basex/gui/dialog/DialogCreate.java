@@ -59,7 +59,7 @@ public final class DialogCreate extends Dialog {
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
-  private final StringList db = List.list();
+  private final StringList db;
 
   /**
    * Default Constructor.
@@ -68,6 +68,10 @@ public final class DialogCreate extends Dialog {
   public DialogCreate(final GUI main) {
     super(main, CREATEADVTITLE);
 
+    db = List.list(main.context);
+    final Prop prop = gui.context.prop;
+    final GUIProp gprop = gui.prop;
+    
     // create panels
     final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(7, 1));
@@ -76,10 +80,10 @@ public final class DialogCreate extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(2, 3, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + ":", false, true));
-    p.add(new BaseXLabel(CREATEFILTER + ":", false, true));
+    p.add(new BaseXLabel(CREATEFILT + ":", false, true));
     p.add(new BaseXLabel(""));
 
-    path = new BaseXTextField(GUIProp.createpath, null, this);
+    path = new BaseXTextField(gprop.get(GUIProp.CREATEPATH), null, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -87,7 +91,7 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(path, 240);
     p.add(path);
 
-    filter = new BaseXTextField(Prop.createfilter, null, this);
+    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), null, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -107,7 +111,7 @@ public final class DialogCreate extends Dialog {
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
     dbname = new BaseXTextField(null, this);
-    dbname.setText(IO.get(GUIProp.createpath).dbname());
+    dbname.setText(IO.get(gprop.get(GUIProp.CREATEPATH)).dbname());
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -125,20 +129,20 @@ public final class DialogCreate extends Dialog {
     p2.setBorder(8, 8, 8, 8);
 
     intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
-        Prop.intparse, 0, this);
+        prop.is(Prop.INTPARSE), 0, this);
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, true, false));
 
     entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
-        Prop.entity, this);
+        prop.is(Prop.ENTITY), this);
     p2.add(entities);
 
     dtd = new BaseXCheckBox(CREATEDTD, Token.token(DTDINFO),
-        Prop.entity, 12, this);
+        prop.is(Prop.DTD), 12, this);
     p2.add(dtd);
 
     chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
-        Prop.chop, 0, this);
+        prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
 
@@ -148,12 +152,12 @@ public final class DialogCreate extends Dialog {
     p3.setBorder(8, 8, 8, 8);
 
     txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
-        Prop.textindex, 0, this);
+        prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
 
     atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
-        Prop.attrindex, 0, this);
+        prop.is(Prop.ATTRINDEX), 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
@@ -163,13 +167,15 @@ public final class DialogCreate extends Dialog {
     p4.setBorder(8, 8, 8, 8);
 
     ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        Prop.ftindex, 0, this);
+        prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
     final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO };
-    final boolean[] val = { Prop.ftfuzzy, Prop.ftst, Prop.ftcs, Prop.ftdc };
+    final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
+        prop.is(Prop.FTCS), prop.is(Prop.FTDC)
+    };
     for(int f = 0; f < ft.length; f++) {
       ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], this);
       p4.add(ft[f]);
@@ -194,8 +200,9 @@ public final class DialogCreate extends Dialog {
    * Choose an XML document or directory.
    */
   public void choose() {
+    final GUIProp gprop = gui.prop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        GUIProp.createpath, gui);
+        gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
     fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIX);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
@@ -204,7 +211,7 @@ public final class DialogCreate extends Dialog {
     if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname());
-      GUIProp.createpath = file.getDir();
+      gprop.set(GUIProp.CREATEPATH, file.getDir());
     }
   }
 
@@ -235,9 +242,7 @@ public final class DialogCreate extends Dialog {
     final String pth = path();
     final IO file = IO.get(pth);
     final boolean exists = pth.length() != 0 && file.exists();
-    if(exists) {
-      GUIProp.createpath = file.path();
-    }
+    if(exists) gui.prop.set(GUIProp.CREATEPATH, file.path());
 
     final String nm = dbname();
     ok = exists && nm.length() != 0;
@@ -266,17 +271,18 @@ public final class DialogCreate extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    Prop.chop = chop.isSelected();
-    Prop.createfilter = filter.getText();
-    Prop.entity = entities.isSelected();
-    Prop.dtd = dtd.isSelected();
-    Prop.textindex = txtindex.isSelected();
-    Prop.attrindex = atvindex.isSelected();
-    Prop.ftindex = ftxindex.isSelected();
-    Prop.intparse = intparse.isSelected();
-    Prop.ftfuzzy = ft[0].isSelected();
-    Prop.ftst = ft[1].isSelected();
-    Prop.ftcs = ft[2].isSelected();
-    Prop.ftdc = ft[3].isSelected();
+    final Prop prop = gui.context.prop;
+    prop.set(Prop.CHOP, chop.isSelected());
+    prop.set(Prop.CREATEFILTER, filter.getText());
+    prop.set(Prop.ENTITY, entities.isSelected());
+    prop.set(Prop.DTD, dtd.isSelected());
+    prop.set(Prop.TEXTINDEX, txtindex.isSelected());
+    prop.set(Prop.ATTRINDEX, atvindex.isSelected());
+    prop.set(Prop.FTINDEX, ftxindex.isSelected());
+    prop.set(Prop.INTPARSE, intparse.isSelected());
+    prop.set(Prop.FTFUZZY, ft[0].isSelected());
+    prop.set(Prop.FTST, ft[1].isSelected());
+    prop.set(Prop.FTCS, ft[2].isSelected());
+    prop.set(Prop.FTDC, ft[3].isSelected());
   }
 }

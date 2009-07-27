@@ -88,7 +88,7 @@ public final class FNIndex extends Set {
     final byte[] nm = lc(name);
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; k++) {
-      if(ls.similar(nm, lc(keys[k]))) Err.or(FUNSIMILAR, name, keys[k]);
+      if(ls.similar(nm, lc(keys[k]), 0)) Err.or(FUNSIMILAR, name, keys[k]);
     }
   }
 

@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.util.Token;
 import org.basex.util.Tokenizer;
@@ -13,14 +14,22 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class FTBuilder extends Progress implements IndexBuilder {
+abstract class FTBuilder extends Progress implements IndexBuilder {
   /** Word parser. */
-  final Tokenizer wp = new Tokenizer();
+  final Tokenizer wp;
   /** Total parsing value. */
   int total;
   /** Current parsing value. */
   int id;
 
+  /**
+   * Constructor.
+   * @param pr database properties
+   */
+  protected FTBuilder(final Prop pr) {
+    wp = new Tokenizer(pr);
+  }
+  
   /**
    * Extracts and indexes words from the specified data reference.
    * @param data data reference

@@ -202,8 +202,8 @@ public abstract class W3CTS {
     final String dat = sdf.format(Calendar.getInstance().getTime());
 
     final Performance perf = new Performance();
-    Prop.xqformat = false;
-    Prop.mainmem = true;
+    context.prop.set(Prop.XQFORMAT, false);
+    context.prop.set(Prop.MAINMEM, false);
 
     new CreateDB(path + input).execute(context);
     data = context.data();
@@ -279,25 +279,25 @@ public abstract class W3CTS {
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(pathlog), UTF8));
     bw.write("TEST RESULTS ==================================================");
-    bw.write(Prop.NL + Prop.NL + "Total #Queries: " + total + Prop.NL);
-    bw.write("Correct / Empty Results: " + ok + " / " + ok2 + Prop.NL);
+    bw.write(NL + NL + "Total #Queries: " + total + NL);
+    bw.write("Correct / Empty Results: " + ok + " / " + ok2 + NL);
     bw.write("Conformance (w/Empty Results): ");
-    bw.write(pc(ok, total) + " / " + pc(ok + ok2, total) + Prop.NL);
-    bw.write("Wrong Results / Errors: " + err + " / " + err2 + Prop.NL);
-    //bw.write("Total Time: " + time + Prop.NL + Prop.NL);
+    bw.write(pc(ok, total) + " / " + pc(ok + ok2, total) + NL);
+    bw.write("Wrong Results / Errors: " + err + " / " + err2 + NL);
+    //bw.write("Total Time: " + time + NL + NL);
     bw.write("WRONG =========================================================");
-    bw.write(Prop.NL + Prop.NL + logErr + Prop.NL);
+    bw.write(NL + NL + logErr + NL);
     bw.write("WRONG (ERRORS) ================================================");
-    bw.write(Prop.NL + Prop.NL + logErr2 + Prop.NL);
+    bw.write(NL + NL + logErr2 + NL);
     bw.write("CORRECT? (EMPTY) ==============================================");
-    bw.write(Prop.NL + Prop.NL + logOK2 + Prop.NL);
+    bw.write(NL + NL + logOK2 + NL);
     bw.write("CORRECT =======================================================");
-    bw.write(Prop.NL + Prop.NL + logOK + Prop.NL);
+    bw.write(NL + NL + logOK + NL);
     bw.write("===============================================================");
     bw.close();
 
     bw = new BufferedWriter(new FileWriter(pathhis, true));
-    bw.write(dat + "\t" + ok + "\t" + ok2 + "\t" + err + "\t" + err2 + Prop.NL);
+    bw.write(dat + "\t" + ok + "\t" + ok2 + "\t" + err + "\t" + err2 + NL);
     bw.close();
 
     if(reporting) {
@@ -395,7 +395,7 @@ public abstract class W3CTS {
         final String fn = thes2.get(s);
         if(fn != null) {
           if(qctx.ftopt.th == null) qctx.ftopt.th = new ThesQuery();
-          qctx.ftopt.th.add(new Thesaurus(IO.get(fn)));
+          qctx.ftopt.th.add(new Thesaurus(IO.get(fn), context));
         }
       }
 
@@ -406,7 +406,8 @@ public abstract class W3CTS {
       }
 
       // evaluate and serialize query
-      final XMLSerializer xml = new XMLSerializer(out, false, Prop.xqformat);
+      final XMLSerializer xml = new XMLSerializer(out, false,
+          context.prop.is(Prop.XQFORMAT));
       iter = SeqIter.get(xq.iter());
       Item it;
       while((it = iter.next()) != null) {
@@ -458,11 +459,11 @@ public abstract class W3CTS {
       log.append(files);
       log.append("]");
     }
-    log.append(Prop.NL);
+    log.append(NL);
 
     /** Remove comments. */
     log.append(norm(in));
-    log.append(Prop.NL);
+    log.append(NL);
     final String logStr = log.toString();
     final boolean print = currTime || !logStr.contains("current-") &&
         !logStr.contains("implicit-timezone");
@@ -490,8 +491,8 @@ public abstract class W3CTS {
         logOK.append(logStr);
         logOK.append("[Right] ");
         logOK.append(norm(error));
-        logOK.append(Prop.NL);
-        logOK.append(Prop.NL);
+        logOK.append(NL);
+        logOK.append(NL);
         addLog(pth, outname + ".log", error);
       }
       if(reporting) logFile.append("pass");
@@ -514,7 +515,7 @@ public abstract class W3CTS {
             rin = "<X>" + rin + "</X>";
           }
 
-          final Data rdata = CreateDB.xml(IO.get(rin));
+          final Data rdata = CreateDB.xml(IO.get(rin), context.prop);
           final SeqIter si = new SeqIter();
           int pre = doc ? 0 : 2;
           final int size = rdata.meta.size;
@@ -537,11 +538,11 @@ public abstract class W3CTS {
           logErr.append(logStr);
           logErr.append("[" + testid + " ] ");
           logErr.append(norm(result.get(0)));
-          logErr.append(Prop.NL);
+          logErr.append(NL);
           logErr.append("[Wrong] ");
           logErr.append(norm(out.toString()));
-          logErr.append(Prop.NL);
-          logErr.append(Prop.NL);
+          logErr.append(NL);
+          logErr.append(NL);
           addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) logFile.append("fail");
@@ -551,8 +552,8 @@ public abstract class W3CTS {
           logOK.append(logStr);
           logOK.append("[Right] ");
           logOK.append(norm(out.toString()));
-          logOK.append(Prop.NL);
-          logOK.append(Prop.NL);
+          logOK.append(NL);
+          logOK.append(NL);
           addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
         }
         if(reporting) {
@@ -567,11 +568,11 @@ public abstract class W3CTS {
           logOK2.append(logStr);
           logOK2.append("[" + testid + " ] ");
           logOK2.append(norm(expError));
-          logOK2.append(Prop.NL);
+          logOK2.append(NL);
           logOK2.append("[Rght?] ");
           logOK2.append(norm(error));
-          logOK2.append(Prop.NL);
-          logOK2.append(Prop.NL);
+          logOK2.append(NL);
+          logOK2.append(NL);
           addLog(pth, outname + ".log", error);
         }
         if(reporting) logFile.append("pass");
@@ -581,11 +582,11 @@ public abstract class W3CTS {
           logErr2.append(logStr);
           logErr2.append("[" + testid + " ] ");
           logErr2.append(norm(result.get(0)));
-          logErr2.append(Prop.NL);
+          logErr2.append(NL);
           logErr2.append("[Wrong] ");
           logErr2.append(norm(error));
-          logErr2.append(Prop.NL);
-          logErr2.append(Prop.NL);
+          logErr2.append(NL);
+          logErr2.append(NL);
           addLog(pth, outname + ".log", error);
         }
         if(reporting) logFile.append("fail");
@@ -594,7 +595,7 @@ public abstract class W3CTS {
     }
     if(reporting) {
       logFile.append("'/>");
-      logFile.append(Prop.NL);
+      logFile.append(NL);
     }
     xq.close();
 
@@ -747,7 +748,6 @@ public abstract class W3CTS {
     return sb.toString();
   }
 
-
   /**
    * Returns the resulting auxiliary uri in multiple strings.
    * @param role role
@@ -793,7 +793,7 @@ public abstract class W3CTS {
     String line;
     while((line = br.readLine()) != null) {
       bw.write(line);
-      bw.write(Prop.NL);
+      bw.write(NL);
     }
     br.close();
   }

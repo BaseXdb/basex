@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import org.basex.core.Prop;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
@@ -80,7 +79,7 @@ public final class GUIStatus extends BaseXPanel {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
 
     final int ww = getWidth() - MEMW;
     final int hh = getHeight();
@@ -132,9 +131,9 @@ public final class GUIStatus extends BaseXPanel {
       max = rt.maxMemory();
       used = occ - rt.freeMemory();
 
-      final String inf = MEMTOTAL + Performance.format(max, true) + Prop.NL
-          + MEMRESERVED + Performance.format(occ, true) + Prop.NL + MEMUSED
-          + Performance.format(used, true) + Prop.NL + Prop.NL + MEMHELP;
+      final String inf = MEMTOTAL + Performance.format(max, true) + NL
+          + MEMRESERVED + Performance.format(occ, true) + NL + MEMUSED
+          + Performance.format(used, true) + NL + NL + MEMHELP;
 
       Dialog.info(gui, inf);
     }

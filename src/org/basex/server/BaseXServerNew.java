@@ -21,14 +21,15 @@ import org.basex.util.Token;
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public class BaseXServerNew {
   /** Database Context. */
-  final Context context = new Context();
+  public final Context context = new Context();
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
-  boolean verbose = false;
+  boolean verbose;
   /** Last Id from a client. */
   int lastid = 0;
   /** Current client connections. */
@@ -71,7 +72,7 @@ public class BaseXServerNew {
     });
 
     try {
-      serverSocket = new ServerSocket(Prop.port);
+      serverSocket = new ServerSocket(context.prop.num(Prop.PORT));
       BaseX.outln(SERVERSTART);
       inputListener = new InputListener();
       inputListener.start();
@@ -97,14 +98,13 @@ public class BaseXServerNew {
     running = false;
     inputListener.thread.interrupt();
     inputListener = null;
-    for (int i = 0; i < sessions.size(); i++) {
-      sessions.get(i).close();
-    }
+    for (int i = 0; i < sessions.size(); i++) sessions.get(i).close();
+
     try {
       // dummy Socket for breaking the accept block
-      new Socket("localhost", Prop.port);
-    } catch(IOException e) {
-      e.printStackTrace();
+      new Socket("localhost", context.prop.num(Prop.PORT));
+    } catch(IOException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -114,8 +114,8 @@ public class BaseXServerNew {
   public void close() {
     try {
       serverSocket.close();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(IOException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -145,7 +145,7 @@ public class BaseXServerNew {
               BaseX.errln(SERVERPORT + args[a].substring(i));
               break;
             }
-            Prop.port = p;
+            context.prop.set(Prop.PORT, p);
             i = args[a].length();
             ok = true;
           } else if(c == 'd') {
@@ -186,12 +186,14 @@ public class BaseXServerNew {
     }
 
     public void run() {
+      BaseX.outln();
       while(running) {
         // get user input
         try {
+          BaseX.out("> ");
           final InputStreamReader isr = new InputStreamReader(System.in);
           final String com = new BufferedReader(isr).readLine().trim();
-          if(com.equals("stop")) {
+          if(com.equals("stop") || com.equals("exit")) {
             stop();
           } else if(com.equals("list")) {
             final int size = sessions.size();
@@ -259,8 +261,8 @@ public class BaseXServerNew {
             session.start();
             sessions.add(session);
           }
-        } catch(final IOException e) {
-          e.printStackTrace();
+        } catch(final IOException ex) {
+          ex.printStackTrace();
         }
       }
     }

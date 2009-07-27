@@ -44,14 +44,15 @@ public final class Catch extends Single {
   /**
    * Catch iterator.
    * @param ctx query context
-   * @param e thrown exception
+   * @param ex thrown exception
    * @return resulting item
    * @throws QueryException evaluation exception
    */
-  public Iter iter(final QueryContext ctx, final QueryException e)
+  public Iter iter(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
-    final byte[] code = e.code() == null ? Token.EMPTY : Token.token(e.code());
+    final String cd = ex.code();
+    final byte[] code = cd == null ? Token.EMPTY : Token.token(cd);
     if(!find(code)) return null;
 
     final int s = ctx.vars.size();
@@ -59,10 +60,10 @@ public final class Catch extends Single {
       ctx.vars.add(var[0].bind(new QNm(code), ctx).clone());
     }
     if(var.length > 1) {
-      ctx.vars.add(var[1].bind(Str.get(e.simple()), ctx).clone());
+      ctx.vars.add(var[1].bind(Str.get(ex.simple()), ctx).clone());
     }
     if(var.length > 2) {
-      ctx.vars.add(var[2].bind(e.iter.finish(), ctx).clone());
+      ctx.vars.add(var[2].bind(ex.iter.finish(), ctx).clone());
     }
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);

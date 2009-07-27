@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import org.basex.data.FTPos;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -32,10 +31,12 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
+   * @param fs font size
    * @return last height that was occupied
    */
-  static int calcHeight(final Graphics g, final MapRect r, final byte[] s) {
-    return drawText(g, r, s, false);
+  static int calcHeight(final Graphics g, final MapRect r, final byte[] s,
+      final int fs) {
+    return drawText(g, r, s, false, fs);
   }
 
   /**
@@ -43,10 +44,12 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
+   * @param fs font size
    * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final MapRect r, final byte[] s) {
-    return drawText(g, r, s, true);
+  static int drawText(final Graphics g, final MapRect r, final byte[] s,
+      final int fs) {
+    return drawText(g, r, s, true, fs);
   }
 
   /**
@@ -55,21 +58,22 @@ final class MapRenderer {
    * @param r rectangle
    * @param s text to be drawn
    * @param draw draw text (otherwise: just calculate space)
+   * @param fs font size
    * @return height of the text
    */
   private static int drawText(final Graphics g, final MapRect r,
-      final byte[] s, final boolean draw) {
+      final byte[] s, final boolean draw, final int fs) {
 
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());
-    final int fh = (int) (1.2 * GUIProp.fontsize);
+    final int fh = (int) (1.2 * fs);
     final int ws = BaseXLayout.width(g, cw, ' ');
     final Color textc = g.getColor();
 
     int xx = r.x;
     int yy = r.y + fh;
     final int ww = r.w;
-    final Tokenizer ftt = new Tokenizer(s);
+    final Tokenizer ftt = new Tokenizer(s, null);
 
     // get index on first pre value
     int count = 0;
@@ -135,13 +139,13 @@ final class MapRenderer {
    * Draws a text using thumbnail visualization.
    * Calculates the needed space and chooses an abstraction level.
    * Token/Sentence/Paragraphs
-   *
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
+   * @param fs font size
    */
   static void drawThumbnails(final Graphics g, final MapRect r,
-      final byte[] s) {
+      final byte[] s, final int fs) {
 
     // thumbnail width
     final double ffmax = 0.25;
@@ -157,11 +161,11 @@ final class MapRenderer {
     double fftmin = ffmin, fftmax = ffmax, ffhtmin = ffhmin,
            ffhtmax = ffhmax, flhtmin = flhmin, flhtmax = flhmax;
     double bff = ffmax, bffh = ffhmax, bflh = flhmax;
-    byte lhmi = (byte) Math.max(3, ffh * GUIProp.fontsize);
-    byte fhmi = (byte) Math.max(6, (flh + ffh) * GUIProp.fontsize);
+    byte lhmi = (byte) Math.max(3, ffh * fs);
+    byte fhmi = (byte) Math.max(6, (flh + ffh) * fs);
 
     int h = r.h;
-    r.thumbf = ff * GUIProp.fontsize;
+    r.thumbf = ff * fs;
     r.thumbal = 0;
 
     final int[][] data = Tokenizer.getInfo(s);
@@ -169,35 +173,32 @@ final class MapRenderer {
     boolean l = false;
     while(r.thumbal < 2) {
       ff = round((fftmax + fftmin) / 2);
-      r.thumbf = ff * GUIProp.fontsize;
+      r.thumbf = ff * fs;
       ffh = round((ffhtmax + ffhtmin) / 2);
-      r.thumbfh = (byte) Math.max(1, ffh * GUIProp.fontsize);
+      r.thumbfh = (byte) Math.max(1, ffh * fs);
       flh = round((flhtmax + flhtmin) / 2);
-      r.thumblh = (byte) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+      r.thumblh = (byte) Math.max(1, (flh + ffh) * fs);
       r.thumbsw = r.thumbf;
 
       switch(r.thumbal) {
         case 0:
-          h = drawThumbnailsToken(g, r, data, false, 0, 0);
+          h = drawThumbnailsToken(g, r, data, false, 0, 0, fs);
           break;
-        case 1:
-          h = drawThumbnailsSentence(g, r, data, true, false);
-          break;
-        case 2:
-          h = drawThumbnailsSentence(g, r, data, false, false);
+        case 1: case 2:
+          h = drawThumbnailsSentence(g, r, data, r.thumbal == 1, false);
           break;
       }
 
       if(h >= r.h || ge(ff, ffmax) || ge(ffh, ffhmax) || ge(flh, flhmax)) {
         if(l) {
           // use last setup to draw
-          r.thumbf = bff * GUIProp.fontsize;
-          r.thumbfh = (byte) Math.max(1, bffh * GUIProp.fontsize);
-          r.thumblh = (byte) Math.max(1, (bflh + bffh) * GUIProp.fontsize);
+          r.thumbf = bff * fs;
+          r.thumbfh = (byte) Math.max(1, bffh * fs);
+          r.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
           r.thumbsw = r.thumbf;
           switch(r.thumbal) {
             case 0:
-              drawThumbnailsToken(g, r, data, true, 0, 0);
+              drawThumbnailsToken(g, r, data, true, 0, 0, fs);
               return;
             case 1: case 2:
               drawThumbnailsSentence(g, r, data, r.thumbal == 1, true);
@@ -408,10 +409,12 @@ final class MapRenderer {
    * @param x x-value of the cursor
    * @param y y-value of the cursor
    * @param draw boolean for drawing (used for calculating the height)
+   * @param fs font size
    * @return heights
    */
   private static int drawThumbnailsToken(final Graphics g, final MapRect r,
-      final int[][] data, final boolean draw, final int x, final int y) {
+      final int[][] data, final boolean draw, final int x, final int y,
+      final int fs) {
 
     final double xx = r.x;
     final double ww = r.w;
@@ -463,12 +466,11 @@ final class MapRenderer {
         g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
       }
 
-
       // check if cursor is inside the rect
       if(x > 0 && y > 0
           && (inRect((int) (xx + ll) + 1, yy, wl, r.thumbfh, x, y) || ml > 0)) {
         ul = -1;
-        ml = ml == 0 ? getTooltipLength((int) ww) : ml;
+        ml = ml == 0 ? getTooltipLength((int) ww, fs) : ml;
         final byte[] tok = new byte[data[0][i] + 2 < ml ? data[0][i] : ml];
         int k = 0;
         for(; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
@@ -513,7 +515,6 @@ final class MapRenderer {
       ll += r.thumbf;
       wl = 0;
 
-
       if(ppl < data[2].length && pl == data[2][ppl]) {
         // new paragraph
         yy += r.thumblh;
@@ -528,10 +529,11 @@ final class MapRenderer {
   /**
    * Get tooltip length.
    * @param ww int width
+   * @param fs font size
    * @return tooltip length
    */
-  private static int getTooltipLength(final int ww) {
-    return ww / GUIProp.fontsize + 2;
+  private static int getTooltipLength(final int ww, final int fs) {
+    return ww / fs + 2;
   }
 
   /**
@@ -772,9 +774,10 @@ final class MapRenderer {
    * @param y y-value
    * @param mr view rectangle
    * @param tl token list
+   * @param fs font size
    */
   static void drawToolTip(final Graphics g, final int x, final int y,
-      final MapRect mr, final TokenList tl) {
+      final MapRect mr, final TokenList tl, final int fs) {
 
     if(tl != null && tl.size() > 0) {
       final int[] cw = fontWidths(g.getFont());
@@ -801,23 +804,20 @@ final class MapRenderer {
 
       final int ww = nl == 1 && wl < wi ? wl : wi;
       final int xx = x + 10 + ww >= mr.x + mr.w ? mr.x + mr.w - ww - 2 : x + 10;
-      int yy = y + 28 + GUIProp.fontsize * nl + 4 < mr.y + mr.h ?
-          y + 28 : y - mr.y - 4 > GUIProp.fontsize * nl ? y -
-          GUIProp.fontsize * nl : mr.y + mr.h - 4 - GUIProp.fontsize * nl;
+      int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
+        y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
 
       g.setColor(COLORS[10]);
-      g.drawRect(xx - 3, yy - GUIProp.fontsize - 1, ww + 3,
-          GUIProp.fontsize * nl + 7);
+      g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
       g.setColor(COLORS[0]);
-      g.fillRect(xx - 2, yy - GUIProp.fontsize, ww + 2,
-          GUIProp.fontsize * nl + 6);
+      g.fillRect(xx - 2, yy - fs, ww + 2, fs * nl + 6);
 
       g.setColor(COLORS[20]);
       wl = 0;
       for(int i = 0, is = tl.size(); i < is; i++) {
         l = len.get(i);
         if(wl + l + sw >= wi) {
-          yy += GUIProp.fontsize + 1;
+          yy += fs + 1;
           wl = 0;
         }
         final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);

@@ -19,7 +19,6 @@ import org.basex.index.FTTrieBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
-import org.basex.util.Performance;
 
 /**
  * Abstract class for database creation.
@@ -48,22 +47,18 @@ abstract class ACreate extends Process {
     String err = null;
     Builder builder = null;
     try {
-      new Close().execute(context);
+      exec(new Close());
 
-      final boolean mem = db == null || Prop.mainmem;
+      final boolean mem = db == null || prop.is(Prop.MAINMEM);
       if(!mem && context.pinned(db)) return error(DBINUSE);
 
-      final Performance pp = new Performance();
-      builder = mem ? new MemBuilder() : new DiskBuilder();
+      builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
       progress(builder);
-      final Data data = builder.build(p, db == null ? "" : db);
-      if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
-      builder = null;
-
+      final Data data = builder.build(db == null ? "" : db);
       index(data);
       context.openDB(data);
       context.addToPool(data);
-      return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
+      return info(DBCREATED, db, perf.getTimer());
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.io);
@@ -83,7 +78,7 @@ abstract class ACreate extends Process {
     } catch(final IOException ex) {
       BaseX.debug(ex);
     }
-    DropDB.drop(db);
+    DropDB.drop(db, prop);
     return error(err);
   }
 
@@ -92,8 +87,7 @@ abstract class ACreate extends Process {
    * @param data data reference
    * @throws IOException I/O exception
    */
-  void index(final Data data) throws IOException {
-    if(data instanceof MemData) return;
+  protected void index(final Data data) throws IOException {
     if(data.meta.txtindex) buildIndex(Type.TXT, data);
     if(data.meta.atvindex) buildIndex(Type.ATV, data);
     if(data.meta.ftxindex) buildIndex(Type.FTX, data);
@@ -105,14 +99,14 @@ abstract class ACreate extends Process {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  void buildIndex(final Type i, final Data d)
-      throws IOException {
-
+  protected void buildIndex(final Type i, final Data d) throws IOException {
+    if(d instanceof MemData) return;
+    final Prop pr = d.meta.prop;
     switch(i) {
       case TXT: buildIndex(i, new ValueBuilder(true), d); break;
       case ATV: buildIndex(i, new ValueBuilder(false), d); break;
       case FTX: buildIndex(i, d.meta.ftfz ?
-          new FTFuzzyBuilder() : new FTTrieBuilder(), d); break;
+          new FTFuzzyBuilder(pr) : new FTTrieBuilder(pr), d); break;
       default: break;
     }
   }

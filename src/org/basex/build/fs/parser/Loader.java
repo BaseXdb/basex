@@ -104,8 +104,8 @@ public final class Loader extends ClassLoader {
         }
 
       }
-    } catch(final IOException e) {
-      throw e;
+    } catch(final IOException ex) {
+      throw ex;
     } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
       BaseX.errln("Failed to load class (%)", t.getMessage());

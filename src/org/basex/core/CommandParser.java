@@ -7,7 +7,6 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.core.Commands.CmdSet;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -57,15 +56,7 @@ import org.basex.util.StringList;
  */
 public final class CommandParser extends InputParser {
   /** Context. */
-  public Context ctx;
-
-  /**
-   * Constructor, parsing the input queries.
-   * @param in query input
-   */
-  public CommandParser(final String in) {
-    init(in);
-  }
+  public final Context ctx;
 
   /**
    * Constructor, parsing the input queries.
@@ -73,8 +64,8 @@ public final class CommandParser extends InputParser {
    * @param c context
    */
   public CommandParser(final String in, final Context c) {
-    this(in);
     ctx = c;
+    init(in);
   }
 
   /**
@@ -109,7 +100,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB: case XML:
             final String fn = path(cmd);
             final String db = name(null);
-            return db == null ? new CreateDB(fn) : new CreateDB(fn, db);
+            return new CreateDB(fn, db == null ? fn : db);
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:
@@ -200,34 +191,12 @@ public final class CommandParser extends InputParser {
       case SET:
         final String opt = name(cmd).toUpperCase();
         String val = string(null, false);
-        try {
-          final Object o = Prop.class.getField(opt.toLowerCase()).get(null);
-          if(val != null) {
-            if(o instanceof Boolean) {
-              val = val.toUpperCase();
-              final boolean info = opt.equals(CmdSet.INFO.name());
-              if(!val.equals(ON) && !val.equals(OFF) &&
-                  !(info && val.equals(ALL))) {
-                final StringList sl = new StringList();
-                sl.add(OFF);
-                sl.add(ON);
-                if(info) sl.add(ALL);
-                help(sl, cmd);
-              }
-            } else if(o instanceof Integer) {
-              if(toInt(val) == Integer.MIN_VALUE) help(null, cmd);
-            }
-          }
-          return new Set(opt, val);
-        } catch(final IllegalAccessException ex) {
-          help(list(CmdSet.class, opt), cmd);
-        } catch(final NoSuchFieldException ex) {
-          help(list(CmdSet.class, opt), cmd);
-        }
-        break;
+        final Object type = ctx.prop.object(opt.toUpperCase());
+        if(type == null) help(null, cmd);
+        return new Set(opt, val);
       case HELP:
         String hc = name(null);
-        if(hc != null && !hc.toUpperCase().equals(ALL)) {
+        if(hc != null) {
           qp = qm;
           hc = consume(Cmd.class, cmd).toString();
         }
@@ -387,7 +356,7 @@ public final class CommandParser extends InputParser {
     for(final Enum<?> e : cmp.getEnumConstants()) {
       if(e instanceof Cmd && !((Cmd) e).official) continue;
       final byte[] sm = lc(token(e.name()));
-      if(ls.similar(name, sm)) error(alt, CMDSIMILAR, name, sm);
+      if(ls.similar(name, sm, 0)) error(alt, CMDSIMILAR, name, sm);
     }
 
     if(par == null) error(alt, CMDWHICH, token);
@@ -402,7 +371,7 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private void help(final StringList alt, final Cmd cmd) throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true, true));
+    error(alt, PROCSYNTAX, cmd.help(true));
   }
 
   /**

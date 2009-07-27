@@ -20,9 +20,10 @@ final class MapDefault extends MapPainter {
   /**
    * Constructor.
    * @param m map reference.
+   * @param pr gui properties
    */
-  MapDefault(final MapView m) {
-    super(m);
+  MapDefault(final MapView m, final GUIProp pr) {
+    super(m, pr);
   }
 
   @Override
@@ -36,6 +37,7 @@ final class MapDefault extends MapPainter {
     final int hh = view.getWidth();
     final Data data = view.gui.context.data();
 
+    final int off = prop.num(GUIProp.MAPOFFSETS);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
@@ -52,8 +54,8 @@ final class MapDefault extends MapPainter {
       r.pos = view.gui.context.marked().ftpos.get(pre);
       g.setColor(mark ? col : COLORS[lvl]);
 
-      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||
-          ViewData.isLeaf(data, pre)) {
+      if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
+          ViewData.isLeaf(prop, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..
@@ -74,7 +76,7 @@ final class MapDefault extends MapPainter {
       }
 
       // skip drawing of string if there is no space
-      if(r.w > 3 && r.h >= GUIProp.fontsize) drawRectangle(g, r);
+      if(r.w > 3 && r.h >= prop.num(GUIProp.FONTSIZE)) drawRectangle(g, r);
     }
   }
 
@@ -88,26 +90,27 @@ final class MapDefault extends MapPainter {
     final Data data = context.data();
     final Nodes current = context.current();
     final int kind = data.kind(pre);
+    final int fsz = prop.num(GUIProp.FONTSIZE);
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       // show full path in top rectangle
       final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
         current.size() == 1 && pre != 0 && pre == current.nodes[0] ?
-            ViewData.path(data, pre) : ViewData.tag(data, pre);
+            ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
 
       g.setColor(Color.black);
       g.setFont(font);
-      BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w);
+      BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w, fsz);
     } else {
       g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
       g.setFont(mfont);
       final byte[] text = ViewData.content(data, pre, false);
 
-      rect.thumb = MapRenderer.calcHeight(g, rect, text) >= rect.h;
+      rect.thumb = MapRenderer.calcHeight(g, rect, text, fsz) >= rect.h;
       if(rect.thumb) {
-        MapRenderer.drawThumbnails(g, rect, text);
+        MapRenderer.drawThumbnails(g, rect, text, fsz);
       } else {
-        MapRenderer.drawText(g, rect, text);
+        MapRenderer.drawText(g, rect, text, fsz);
       }
     }
     rect.x -= 3;

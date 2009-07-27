@@ -304,7 +304,6 @@ pc_indexatt=Indiziere Attribute
 pc_indexftx=Indiziere Volltext
 pc_parse="%" (% Knoten eingelesen)
 pc_created=Datenbank '%' erzeugt in %.
-pc_tbl=Tabelle erzeugt in %.
 pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
@@ -315,7 +314,7 @@ pc_pos="%" (Zeile %, Spalte %)
 
 # Database commands
 db_no=Datenbank '%' wurde nicht gefunden.
-db_closed=Datenbank wurde geschlossen.
+db_closed=Datenbank '%' wurde geschlossen.
 db_closeerr=Datenbank konnte nicht geschlossen werden.
 db_optimized=Datenbank optimiert in %.
 db_dropped=Datenbank '%' wurde gelöscht.

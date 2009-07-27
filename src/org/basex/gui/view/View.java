@@ -73,7 +73,8 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(!gui.updating && GUIProp.mousefocus) requestFocusInWindow();
+    if(!gui.updating && gui.prop.is(GUIProp.MOUSEFOCUS))
+      requestFocusInWindow();
   }
 
   @Override

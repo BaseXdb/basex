@@ -14,6 +14,8 @@ import org.basex.data.Nodes;
 public final class Context {
   /** Database pool. */
   private static final DataPool POOL = new DataPool();
+  /** Sets the main properties. */
+  public final Prop prop;
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -27,8 +29,15 @@ public final class Context {
    * Constructor.
    */
   public Context() {
-    // read database properties
-    Prop.read();
+    this(new Prop());
+  }
+
+  /**
+   * Constructor, defining an initial property file.
+   * @param p property file
+   */
+  public Context(final Prop p) {
+    prop = p;
   }
 
   /**
@@ -36,7 +45,7 @@ public final class Context {
    */
   public void close() {
     POOL.close();
-    Prop.write();
+    prop.write();
   }
 
   /**

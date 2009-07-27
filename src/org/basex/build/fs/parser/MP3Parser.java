@@ -364,8 +364,8 @@ public final class MP3Parser extends AbstractParser {
         final Date d = SDF.parse(new String(a2));
         fsparser.metaEvent(meta.setDate(DateField.dateReleased,
             ParserUtil.convertDate(d)));
-      } catch(final ParseException e) {
-        if(NewFSParser.VERBOSE) BaseX.debug(e.getMessage());
+      } catch(final ParseException ex) {
+        if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
       }
     }
     bfc.get(array, 0, 30);
@@ -453,7 +453,7 @@ public final class MP3Parser extends AbstractParser {
       frame = Frame.valueOf(string(frameId));
       frame.parse(this, frameSize);
       return frameSize;
-    } catch(final IllegalArgumentException e) {
+    } catch(final IllegalArgumentException ex) {
       return -frameSize;
     }
   }
@@ -662,7 +662,7 @@ public final class MP3Parser extends AbstractParser {
     while(true) {
       try {
         if(bfc.get() == 0) break;
-      } catch(final BufferUnderflowException e) {
+      } catch(final BufferUnderflowException ex) {
         bfc.buffer(1);
       }
     }
@@ -710,8 +710,8 @@ public final class MP3Parser extends AbstractParser {
           obj.meta.setDate(DateField.dateReleased, //
               ParserUtil.convertDate(d));
           obj.fsparser.metaEvent(obj.meta);
-        } catch(final ParseException e) {
-          if(NewFSParser.VERBOSE) BaseX.debug(e.getMessage());
+        } catch(final ParseException ex) {
+          if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
         }
       }
     },
@@ -784,10 +784,10 @@ public final class MP3Parser extends AbstractParser {
         try {
           obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
               suffix);
-        } catch(final IOException e) {
+        } catch(final IOException ex) {
           if(NewFSParser.VERBOSE) BaseX.debug(
-              "MP3Parser: Failed to parse APIC frame (%).",
-              e.getMessage() == null ? obj.bfc.getFileName() : e.getMessage());
+            "MP3Parser: Failed to parse APIC frame (%).",
+            ex.getMessage() == null ? obj.bfc.getFileName() : ex.getMessage());
         }
       }
     };

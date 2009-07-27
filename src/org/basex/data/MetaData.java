@@ -18,6 +18,9 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class MetaData {
+  /** Properties. */
+  public final Prop prop;
+
   /** Database name. */
   public String name;
   /** DeepFS mount point. */
@@ -38,24 +41,24 @@ public final class MetaData {
   /** Modification time. */
   public long time;
   /** Flag for whitespace chopping. */
-  public boolean chop = Prop.chop;
+  public boolean chop;
   /** Flag for entity parsing. */
-  public boolean entity = Prop.entity;
+  public boolean entity;
   /** Flag for creating a text index. */
-  public boolean txtindex = Prop.textindex;
+  public boolean txtindex;
   /** Flag for creating a attribute value index. */
-  public boolean atvindex = Prop.attrindex;
+  public boolean atvindex;
   /** Flag for creating a full-text index. */
-  public boolean ftxindex = Prop.ftindex;
+  public boolean ftxindex;
 
   /** Flag for fuzzy indexing. */
-  public boolean ftfz = Prop.ftfuzzy;
+  public boolean ftfz;
   /** Flag for full-text stemming. */
-  public boolean ftst = Prop.ftst;
+  public boolean ftst;
   /** Flag for full-text case sensitivity. */
-  public boolean ftcs = Prop.ftcs;
+  public boolean ftcs;
   /** Flag for full-text diacritics removal. */
-  public boolean ftdc = Prop.ftdc;
+  public boolean ftdc;
 
   /** Flag for removed index structures. */
   public boolean uptodate = true;
@@ -71,19 +74,32 @@ public final class MetaData {
   /**
    * Constructor, specifying the database name.
    * @param db database name
+   * @param pr database properties
    */
-  public MetaData(final String db) {
+  public MetaData(final String db, final Prop pr) {
     name = db;
+    prop = pr;
+    chop = prop.is(Prop.CHOP);
+    entity = prop.is(Prop.ENTITY);
+    txtindex = prop.is(Prop.TEXTINDEX);
+    atvindex = prop.is(Prop.ATTRINDEX);
+    ftxindex = prop.is(Prop.FTINDEX);
+    ftfz = prop.is(Prop.FTFUZZY);
+    ftst = prop.is(Prop.FTST);
+    ftcs = prop.is(Prop.FTCS);
+    ftdc = prop.is(Prop.FTCS);
   }
 
   /**
    * Constructor, specifying the database name and the input reference.
    * @param db database name
    * @param in input stream
+   * @param pr database properties
    * @throws IOException I/O Exception
    */
-  public MetaData(final String db, final DataInput in) throws IOException {
-    this(db);
+  public MetaData(final String db, final DataInput in, final Prop pr)
+      throws IOException {
+    this(db, pr);
     read(in);
   }
 
@@ -91,16 +107,18 @@ public final class MetaData {
    * Checks if the specified file path refers to the specified database.
    * @param path file path
    * @param db database name
+   * @param pr database properties
    * @return result of check
    */
-  public static boolean found(final String path, final String db) {
+  public static boolean found(final String path, final String db,
+      final Prop pr) {
     // true is returned if path and database name are equal and if the db exists
-    if(path.equals(db) && IO.dbpath(db).exists()) return true;
+    if(path.equals(db) && pr.dbpath(db).exists()) return true;
 
     DataInput in = null;
     try {
       // match filename of database instance
-      in = new DataInput(db, DATAINFO);
+      in = new DataInput(pr.dbfile(db, DATAINFO));
       String str = "", k;
       IO f = null;
       long t = 0;
@@ -116,7 +134,7 @@ public final class MetaData {
       BaseX.debug(ex);
       return false;
     } finally {
-      try { if(in != null) in.close(); } catch(final IOException e) { }
+      try { if(in != null) in.close(); } catch(final IOException ex) { }
     }
   }
 
@@ -220,12 +238,12 @@ public final class MetaData {
    * Writes a boolean property to the specified output.
    * @param out output stream
    * @param k key
-   * @param prop property to write
+   * @param pr property to write
    * @throws IOException in case the info could not be written
    */
   private void writeInfo(final DataOutput out, final String k,
-      final boolean prop) throws IOException {
-    writeInfo(out, k, prop ? "1" : "0");
+      final boolean pr) throws IOException {
+    writeInfo(out, k, pr ? "1" : "0");
   }
 
   /**

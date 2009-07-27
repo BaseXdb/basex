@@ -9,8 +9,8 @@ import java.net.Socket;
 import org.basex.BaseX;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Process;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.GetInfo;
@@ -21,56 +21,55 @@ import org.basex.query.QueryException;
 import org.basex.util.Performance;
 
 /**
- * Session for a Client Server Connection.
+ * Session for a client-server connection.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-class Session implements Runnable {
-  /** Database Context. */
+final class Session implements Runnable {
+  /** Database context. */
   final Context context = new Context();
   /** Socket. */
-  Socket socket;
-  /** ClientId. */
-  int clientId;
+  final Socket socket;
+  /** Client id. */
+  final int clientId;
   /** Verbose mode. */
-  boolean verbose;
+  final boolean info;
   /** Core. */
   Process core;
-  /** Timeout Thread. */
+  /** Timeout thread. */
   Thread timeout;
-  /** Session Thread. */
+  /** Session thread. */
   Thread session = null;
 
-  /** Flag for Session. */
+  /** Flag for session. */
   boolean running = true;
-  /** DataOutputStream. */
+  /** Output stream. */
   DataOutputStream dos;
-  /** DataInputStream. */
+  /** Input stream. */
   DataInputStream dis;
-  /** PrintOutput. */
+  /** Print output. */
   PrintOutput out;
-  /** BaseXServerNew. */
+  /** Server reference. */
   BaseXServerNew bxs;
-
 
   /**
    * Session.
-   * @param s Socket
-   * @param c ClientId
-   * @param v Verbose Mode
-   * @param b BaseXServerNew
+   * @param s socket
+   * @param c client id
+   * @param i verbose Mode
+   * @param b server reference
    */
-  Session(final Socket s, final int c, final boolean v,
+  Session(final Socket s, final int c, final boolean i,
       final BaseXServerNew b) {
     clientId = c;
     socket = s;
-    verbose = v;
+    info = i;
     bxs = b;
   }
 
   /**
-   * Starts the Thread.
+   * Starts the thread.
    */
   void start() {
     if(session == null) {
@@ -80,31 +79,32 @@ class Session implements Runnable {
   }
 
   /**
-   * Handles Client Server Communication.
-   * @throws IOException I/O Exception
+   * Handles client-server communication.
+   * @throws IOException I/O exception
    */
   private void handle() throws IOException {
-    BaseX.outln("Login from Client %.", clientId);
+    if(info) BaseX.outln("Login from Client %.", clientId);
     final Performance perf = new Performance();
     final InetAddress addr = socket.getInetAddress();
     final String ha = addr.getHostAddress();
     final int sp = socket.getPort();
+
     // get command and arguments
     dis = new DataInputStream(socket.getInputStream());
     dos = new DataOutputStream(socket.getOutputStream());
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
-    String in = "";
+
     while(running) {
-      in = getMessage().trim();
+      final String in = getMessage().trim();
       if(in.equals("end")) {
         stop(false);
         break;
       }
-      if(verbose) BaseX.outln("[%:%] %", ha, port, in);
+      if(info) BaseX.outln("[%:%] %", ha, port, in);
       Process pr = null;
       try {
-        pr = new CommandParser(in).parse()[0];
+        pr = new CommandParser(in, context).parse()[0];
       } catch(final QueryException ex) {
         pr = new Process(0) { };
         pr.error(ex.extended());
@@ -139,7 +139,7 @@ class Session implements Runnable {
         send(proc.execute(context) ? sp : -sp);
         timeout.interrupt();
       }
-      if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
+      if(info) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
   }
 
@@ -151,7 +151,7 @@ class Session implements Runnable {
     timeout = new Thread() {
       @Override
       public void run() {
-        Performance.sleep(Prop.timeout * 1000);
+        Performance.sleep(context.prop.num(Prop.TIMEOUT) * 1000);
         proc.stop();
       }
     };
@@ -159,13 +159,14 @@ class Session implements Runnable {
   }
 
   /**
-   * Returns the Message from the Client.
+   * Returns the message from the client.
    * @return String
    */
   synchronized String getMessage() {
     try {
       return dis.readUTF();
-    } catch(IOException e) {
+    } catch(final IOException ex) {
+      ex.printStackTrace();
       return "end";
     }
   }
@@ -181,7 +182,7 @@ class Session implements Runnable {
   }
   
   /**
-   * Stop.
+   * Stops the session.
    * @throws IOException I/O Exception
    */
   public void close() throws IOException {
@@ -189,28 +190,28 @@ class Session implements Runnable {
   }
 
   /**
-   * Closes.
+   * Closes the session.
    * @param s boolean
    */
   public void stop(final boolean s) {
     running = false;
     if(s) bxs.sessions.remove(this);
     new Close().execute(context);
-    BaseX.outln("Client % has logged out.", clientId);
+    if(info) BaseX.outln("Client % has logged out.", clientId);
     timeout = null;
     session = null;
     try {
       socket.close();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
 
   public void run() {
     try {
       handle();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
 }

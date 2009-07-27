@@ -120,22 +120,6 @@ public final class Array {
     return b;
   }
 
-  
-  
-  /**
-   * Resizes an array and adds an entry at the end.
-   * @param ar array to be resized
-   * @param e entry to be added
-   * @return finished array
-   */
-  public static byte[] add(final byte[] ar, final byte[] e) {
-    final int sar = ar.length;
-    final int se = e.length;
-    final byte[] b = resize(ar, sar, sar + se);
-    System.arraycopy(e, 0, b, sar, se);
-    return b;
-  }
-  
   /**
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
@@ -144,15 +128,15 @@ public final class Array {
    * @param s1 end position in e
    * @return finished array
    */
-  public static byte[] add(final byte[] ar, final byte[] e, 
-      final int s0, final int s1) {
+  public static byte[] add(final byte[] ar, final byte[] e, final int s0,
+      final int s1) {
     final int sar = ar.length;
     final int se = s1 - s0;
     final byte[] b = resize(ar, sar, sar + se);
     System.arraycopy(e, s0, b, sar, se);
     return b;
   }
-  
+
   /**
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized

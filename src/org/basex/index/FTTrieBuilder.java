@@ -2,6 +2,8 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.IntArrayList;
@@ -22,6 +24,14 @@ public final class FTTrieBuilder extends FTBuilder {
   private FTHash hash = new FTHash();
 
   /**
+   * Constructor.
+   * @param pr database properties
+   */
+  public FTTrieBuilder(final Prop pr) {
+    super(pr);
+  }
+
+  /**
    * Builds the index structure and returns an index instance.
    * @param data data reference
    * @return index instance
@@ -40,7 +50,8 @@ public final class FTTrieBuilder extends FTBuilder {
   @Override
   void write(final Data data) throws IOException {
     final String db = data.meta.name;
-    final DataOutput outb = new DataOutput(db, DATAFTX + 'b');
+    final Prop pr = data.meta.prop;
+    final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));
 
     hash.init();
 
@@ -79,10 +90,10 @@ public final class FTTrieBuilder extends FTBuilder {
     // v1= the first byte of each token n1 points, ...
     // s = size of pre values saved at pointer p
     // [byte, byte[l], byte, int, byte, ..., int, long]
-    final DataOutput outN = new DataOutput(db, DATAFTX + 'a');
+    final DataOutput outN = new DataOutput(pr.dbfile(db, DATAFTX + 'a'));
     // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
     // each node entries size is stored here
-    final DataOutput outS = new DataOutput(db, DATAFTX + 'c');
+    final DataOutput outS = new DataOutput(pr.dbfile(db, DATAFTX + 'c'));
 
     // document contains any text nodes -> empty index created;
     // only root node is kept

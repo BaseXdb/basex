@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -86,10 +85,11 @@ public final class FTWindow extends FTFilter {
     return super.remove(v);
   }
 
+  /* [CG] FT: check sequential scan with NOT combinations
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     return false;
-  }
+  }*/
 
   @Override
   public void plan(final Serializer ser) throws IOException {

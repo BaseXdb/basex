@@ -24,11 +24,10 @@ public final class Help extends Process {
   @Override
   protected void out(final PrintOutput out) throws IOException {
     try {
-      out.print(Cmd.valueOf(args[0]).help(true, true));
+      out.print(Cmd.valueOf(args[0]).help(true));
     } catch(final Exception ex) {
       out.println(CMDHELP);
-      final boolean all = ALL.equalsIgnoreCase(args[0]);
-      for(final Cmd c : Cmd.values()) out.print(c.help(false, all));
+      for(final Cmd c : Cmd.values()) out.print(c.help(false));
     }
   }
 }

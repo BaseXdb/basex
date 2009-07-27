@@ -29,13 +29,14 @@ public final class CreateMAB extends ACreate {
     final IO file = IO.get(args[0]);
     if(!file.exists()) return error(FILEWHICH, file);
 
-    Prop.chop = true;
-    Prop.entity = true;
-    Prop.textindex = true;
-    Prop.attrindex = true;
-    Prop.ftindex = true;
+    prop.set(Prop.CHOP, true);
+    prop.set(Prop.ENTITY, true);
+    prop.set(Prop.TEXTINDEX, true);
+    prop.set(Prop.ATTRINDEX, true);
+    prop.set(Prop.FTINDEX, true);
     final String db = args.length > 1 ? args[1] : null;
-    return build(new MAB2Parser(file), db == null ? file.dbname() : db);
+    return build(new MAB2Parser(file, prop),
+        db == null ? file.dbname() : db);
   }
 
   @Override

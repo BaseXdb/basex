@@ -116,14 +116,14 @@ public final class TreeView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showtree;
+    return gui.prop.is(GUIProp.SHOWTREE);
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
 

@@ -93,7 +93,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     views = panels[db ? 1 : 0];
 
     // build layout or use default if something goes wrong
-    final String lo1 = db ? GUIProp.layoutopened : GUIProp.layoutclosed;
+    final String lo1 = gui.prop.get(db ?
+        GUIProp.LAYOUTOPENED : GUIProp.LAYOUTCLOSED);
     final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
     if(!buildLayout(lo1)) buildLayout(lo2);
   }
@@ -109,8 +110,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     repaint();
 
     final String lay = layout.layoutString();
-    if(views == panels[0]) GUIProp.layoutclosed = lay; // comp. by reference
-    else GUIProp.layoutopened = lay;
+    gui.prop.set(views == panels[0] ?
+        GUIProp.LAYOUTCLOSED : GUIProp.LAYOUTOPENED, lay);
   }
 
   public void run() {
@@ -141,7 +142,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
     g.setFont(getFont().deriveFont(22f));
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
     BaseXLayout.drawCenter(g, VERSINFO, w, y + 30 + lh);
   }
 
@@ -269,7 +270,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    */
   private ViewPanel getTarget() {
     for(final ViewPanel view : views) {
-      if(view.isVisible() && new Rectangle(absoluteLocation(view),
+      if(view.isVisible() && new Rectangle(absLoc(view),
           view.getSize()).contains(sp)) return view;
     }
     return null;
@@ -280,7 +281,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @param comp component
    * @return absolute location
    */
-  private Point absoluteLocation(final Component comp) {
+  private Point absLoc(final Component comp) {
     Component c = comp;
     final Point p = c.getLocation();
     do {
@@ -298,7 +299,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     out = sp.x < 0 || sp.y < 0 || sp.x > getWidth() || sp.y > getHeight();
 
-    final Point p = absoluteLocation(source);
+    final Point p = absLoc(source);
     ((Graphics2D) g).setStroke(STROKE);
 
     if(!out) {
@@ -336,7 +337,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     // paint panel which is currently moved somewhere else
     if(target != null && target != source) {
-      final Rectangle tr = new Rectangle(absoluteLocation(target),
+      final Rectangle tr = new Rectangle(absLoc(target),
           target.getSize());
       final int minx = tr.width >> 1;
       final int miny = tr.height >> 1;
@@ -427,7 +428,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       }
       if(nv == views.length) return true;
       BaseX.errln("Missing Views: " + cnstr);
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       BaseX.errln("Could not build layout: " + cnstr);
     }
     return false;

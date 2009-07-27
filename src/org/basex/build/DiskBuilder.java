@@ -3,6 +3,7 @@ package org.basex.build;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -40,24 +41,33 @@ public final class DiskBuilder extends Builder {
   /** Database size stream (counter). */
   private int ssize;
 
+  /**
+   * Constructor.
+   * @param p parser
+   */
+  public DiskBuilder(final Parser p) {
+    super(p);
+  }
+
   @Override
   public void init(final String db) throws IOException {
-    meta = new MetaData(db);
+    final Prop pr = parser.prop;
+    meta = new MetaData(db, pr);
     meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
 
-    DropDB.drop(db);
-    IO.dbpath(db).mkdirs();
+    DropDB.drop(db, pr);
+    pr.dbpath(db).mkdirs();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = IO.BLOCKSIZE;
     while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
 
-    tout = new DataOutput(new TableOutput(db, DATATBL));
-    xout = new DataOutput(db, DATATXT, bs);
-    vout = new DataOutput(db, DATAATV, bs);
-    sout = new DataOutput(db, DATATMP, bs);
+    tout = new DataOutput(new TableOutput(db, DATATBL, pr));
+    xout = new DataOutput(pr.dbfile(db, DATATXT), bs);
+    vout = new DataOutput(pr.dbfile(db, DATAATV), bs);
+    sout = new DataOutput(pr.dbfile(db, DATATMP), bs);
   }
 
   @Override
@@ -66,8 +76,8 @@ public final class DiskBuilder extends Builder {
 
     // copy temporary values into database table
     final String db = meta.name;
-    final TableAccess ta = new TableDiskAccess(db, DATATBL);
-    final DataInput in = new DataInput(db, DATATMP);
+    final TableAccess ta = new TableDiskAccess(db, DATATBL, parser.prop);
+    final DataInput in = new DataInput(parser.prop.dbfile(db, DATATMP));
     for(int pre = 0; pre < ssize; pre++) {
       final boolean sz = in.readBool();
       final int p = in.readNum();
@@ -76,7 +86,7 @@ public final class DiskBuilder extends Builder {
     }
     ta.close();
     in.close();
-    IO.dbfile(db, DATATMP).delete();
+    parser.prop.dbfile(db, DATATMP).delete();
 
     // return database instance
     return new DiskData(meta, tags, atts, path, ns);

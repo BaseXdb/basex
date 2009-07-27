@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,24 +32,22 @@ public final class DataOutput extends OutputStream {
    * Convenience constructor.
    * A default buffer size will be used.
    * @param db name of the database
-   * @param pre prefix of the database file to write to
    * @throws IOException in case of write errors
    */
-  public DataOutput(final String db, final String pre) throws IOException {
-    this(db, pre, IO.BLOCKSIZE);
+  public DataOutput(final File db) throws IOException {
+    this(db, IO.BLOCKSIZE);
   }
 
   /**
    * Convenience constructor with a specified buffer size.
    * The specified buffer size is used.
    * @param db name of the database
-   * @param pre prefix of the database file to write to
    * @param bufs size of the buffer to use
    * @throws IOException in case of write errors
    */
-  public DataOutput(final String db, final String pre, final int bufs)
+  public DataOutput(final File db, final int bufs)
       throws IOException {
-    os = new BufferedOutput(new FileOutputStream(IO.dbfile(db, pre)), bufs);
+    os = new BufferedOutput(new FileOutputStream(db), bufs);
   }
 
   @Override

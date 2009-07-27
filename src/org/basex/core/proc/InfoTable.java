@@ -1,9 +1,9 @@
 package org.basex.core.proc;
 
+import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
@@ -127,7 +127,7 @@ public final class InfoTable extends AInfo {
       out.print(data.attValue(p));
       out.print(ATT2);
     }
-    out.print(Prop.NL);
+    out.print(NL);
   }
 
   /**

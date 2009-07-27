@@ -18,11 +18,11 @@ public abstract class AbstractExtractor {
 
   /**
    * Extracts the file content.
-   * @param listener reference to the parser listener
+   * @param build reference to the database builder
    * @param f file to be visited
    * @throws IOException I/O exception
    */
-  public abstract void extract(Builder listener, File f) throws IOException;
+  public abstract void extract(Builder build, File f) throws IOException;
 
   /**
    * Skips the number of specified bytes.

@@ -1,6 +1,7 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.Text.*;
+
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,7 +64,7 @@ final class XQueryText extends BaseXText {
   void parse() {
     final byte[] qu = getText();
     final boolean mod = isModule(qu);
-    if(GUIProp.execrt && !mod) {
+    if(gui.prop.is(GUIProp.EXECRT) && !mod) {
       query(false);
     } else {
       try {

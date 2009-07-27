@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.core.Prop;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
@@ -18,9 +19,6 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
-  /** Levenshtein reference. */
-  private Levenshtein ls;
-
   /** Words mode. */
   public enum FTMode {
     /** All option. */       ALL,
@@ -44,11 +42,6 @@ public final class FTOpt extends ExprInfo {
   /** Fuzzy flag. */
   public static final int FZ = 6;
 
-  /** Flag values. */
-  private final boolean[] flag = new boolean[FZ + 1];
-  /** States which flags are assigned. */
-  private final boolean[] set = new boolean[flag.length];
-
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stopwords. */
@@ -58,9 +51,27 @@ public final class FTOpt extends ExprInfo {
   /** Language. */
   public byte[] ln;
 
-  /** Full-text tokenizer. */
-  final Tokenizer qu = new Tokenizer();
+  /** Flag values. */
+  private final boolean[] flag = new boolean[FZ + 1];
+  /** States which flags are assigned. */
+  private final boolean[] set = new boolean[flag.length];
 
+  /** Levenshtein reference. */
+  private Levenshtein ls;
+  /** Full-text tokenizer. */
+  private final Tokenizer qu;
+  /** Levenshtein error. */
+  private final int lserr;
+
+  /**
+   * Constructor.
+   * @param pr database properties
+   */
+  public FTOpt(final Prop pr) {
+    qu = new Tokenizer(pr);
+    lserr = pr.num(Prop.LSERR);
+  }
+  
   /**
    * Compiles the full-text options, inheriting the options of the argument.
    * @param opt parent full-text options
@@ -126,7 +137,6 @@ public final class FTOpt extends ExprInfo {
     tk.sd = sd;
     tk.init();
 
-    if(is(FZ) && ls == null) ls = new Levenshtein();
     // assign options to query
     qu.init(q);
     qu.st = tk.st;
@@ -139,6 +149,8 @@ public final class FTOpt extends ExprInfo {
     qu.wc = is(WC);
     qu.fz = is(FZ);
 
+    if(qu.fz && ls == null) ls = new Levenshtein();
+    
     int count = 0;
     while(tk.more()) {
       final int tp = tk.p;
@@ -157,7 +169,7 @@ public final class FTOpt extends ExprInfo {
         final byte[] s = qu.get();
         if(sw != null && sw.id(s) != 0) continue;
 
-        f = qu.fz ? ls.similar(t, s) : qu.wc ? wc(t, s, 0, 0) : eq(t, s);
+        f = qu.fz ? ls.similar(t, s, lserr) : qu.wc ? wc(t, s, 0, 0) : eq(t, s);
         if(!f) break;
       }
 

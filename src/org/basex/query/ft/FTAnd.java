@@ -120,7 +120,6 @@ public final class FTAnd extends FTExpr {
     return all;
   }
 
-
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     neg = new boolean[expr.length];

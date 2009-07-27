@@ -3,8 +3,8 @@ package org.basex.test.storage;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.Process;
+import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
@@ -39,9 +39,10 @@ public abstract class DataUpdateTest {
    */
   @BeforeClass
   public static final void setUpBeforeClass() {
-    Prop.textindex = false;
-    Prop.attrindex = false;
-    Prop.chop = true;
+    final Prop prop = CONTEXT.prop;
+    prop.set(Prop.TEXTINDEX, false);
+    prop.set(Prop.ATTRINDEX, false);
+    prop.set(Prop.CHOP, true);
   }
   
   /**

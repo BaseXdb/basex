@@ -19,9 +19,9 @@ public final class CreateFS extends ACreate {
   /** Database name for imported file hierarchy. */
   private final String name;
   /** DeepFS mount point. */
-  private final String mountpoint;
+  private final String mount;
   /** DeepFS backing store. */
-  private final String backingstore;
+  private final String store;
 
   /**
    * Constructor.
@@ -44,17 +44,17 @@ public final class CreateFS extends ACreate {
     super(STANDARD, path, db, mp, bp);
     fsimportpath = path;
     name = db;
-    mountpoint = mp;
-    backingstore = bp;
+    mount = mp;
+    store = bp;
   }
 
   @Override
   protected boolean exec() {
-    Prop.chop = true;
-    Prop.entity = true;
-    return Prop.newfsparser ?
-      build(new NewFSParser(fsimportpath, mountpoint, backingstore), name) :
-      build(new FSParser(fsimportpath, mountpoint, backingstore), name);
+    prop.set(Prop.CHOP, true);
+    prop.set(Prop.ENTITY, true);
+    return prop.is(Prop.NEWFSPARSER) ?
+      build(new NewFSParser(fsimportpath, mount, store, prop), name) :
+      build(new FSParser(fsimportpath, mount, store, prop), name);
   }
 
   @Override

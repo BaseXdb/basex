@@ -67,11 +67,11 @@ public final class FTFuzzy extends FTIndex {
   public FTFuzzy(final Data d) throws IOException {
     super(d);
     final String db = d.meta.name;
-    ti = new DataAccess(db, DATAFTX + 'y');
-    dat = new DataAccess(db, DATAFTX + 'z');
+    ti = new DataAccess(db, DATAFTX + 'y', d.meta.prop);
+    dat = new DataAccess(db, DATAFTX + 'z', d.meta.prop);
 
     // cache token length index
-    li = new DataAccess(db, DATAFTX + 'x');
+    li = new DataAccess(db, DATAFTX + 'x', d.meta.prop);
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read1();
     while(--is >= 0) {
@@ -91,7 +91,7 @@ public final class FTFuzzy extends FTIndex {
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats();
+    final IndexStats stats = new IndexStats(data.meta.prop);
     addOccs(stats);
     stats.print(tb);
     return tb.finish();
@@ -125,7 +125,7 @@ public final class FTFuzzy extends FTIndex {
 
     // support fuzzy search
     if(ft.fz) {
-      int k = Prop.lserr;
+      int k = data.meta.prop.num(Prop.LSERR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(tok, k, ft.fast);
     }
@@ -230,6 +230,7 @@ public final class FTFuzzy extends FTIndex {
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;
 
+    int err = data.meta.prop.num(Prop.LSERR);
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
@@ -237,7 +238,7 @@ public final class FTFuzzy extends FTIndex {
       int r = -1;
       do r = tp[i++]; while(r == -1);
       while(p < r) {
-        if(ls.similar(ti.readBytes(p, p + s), tok)) {
+        if(ls.similar(ti.readBytes(p, p + s), tok, err)) {
           it = FTIndexIterator.union(
               iter(pointer(p, s), size(p, s), dat, f), it);
         }

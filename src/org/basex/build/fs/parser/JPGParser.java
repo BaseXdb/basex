@@ -291,8 +291,8 @@ public final class JPGParser extends AbstractParser {
       final XMLGregorianCalendar gcal = ParserUtil.convertDate(d);
       meta.setDate(field, gcal);
       fsparser.metaEvent(meta);
-    } catch(final ParseException e) {
-      if(NewFSParser.VERBOSE) BaseX.debug(e.getMessage());
+    } catch(final ParseException ex) {
+      if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
     }
   }
 

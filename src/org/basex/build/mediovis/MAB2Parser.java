@@ -43,7 +43,9 @@ public final class MAB2Parser extends Parser {
   private final TokenMap posters = new TokenMap();
   /** Genre assignments. */
   private final TokenMap genres = new TokenMap();
-  /** Builder listener. */
+  /** Flat database creation. */
+  private final boolean flat;
+  /** Database builder. */
   private Builder builder;
   /** MAB2 input. */
   private DataAccess input;
@@ -102,9 +104,11 @@ public final class MAB2Parser extends Parser {
   /**
    * Constructor.
    * @param fn filename of the XML document
+   * @param pr database properties
    */
-  public MAB2Parser(final IO fn) {
-    super(fn);
+  public MAB2Parser(final IO fn, final Prop pr) {
+    super(fn, pr);
+    flat = prop.is(Prop.MAB2FLAT);
   }
 
   @Override
@@ -186,7 +190,7 @@ public final class MAB2Parser extends Parser {
       for(int j = 0; j < entry.size; j++) {
         addEntry(input, entry.children[j], 0, l);
       }
-      if(entry.size != 0 && pos != 0 && !Prop.mab2flat) builder.endElem(MEDIUM);
+      if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
     }
 
     if(Prop.debug) {
@@ -378,7 +382,7 @@ public final class MAB2Parser extends Parser {
         atts.reset();
         atts.add(MV_ID, mvID);
         atts.add(BIB_ID, bibID);
-        if(sub != 0 && !Prop.mab2flat) atts.add(MAX, token(sub));
+        if(sub != 0 && !flat) atts.add(MAX, token(sub));
 
         // merge super and sub titles
         if(last != null) {
@@ -413,8 +417,7 @@ public final class MAB2Parser extends Parser {
         addTag(GENRE, genres.get(mvID));
         addTag(STATUS, status.get(bibID));
         addTag(LENDINGS, lendings.get(bibID));
-        if(sub == 0 || Prop.mab2flat) builder.endElem(MEDIUM);
-
+        if(sub == 0 || flat) builder.endElem(MEDIUM);
         return title;
       }
     }
@@ -576,7 +579,7 @@ public final class MAB2Parser extends Parser {
         if(key == null) break;
         hash.add(key, val);
       }
-    } catch(final IOException e) {
+    } catch(final IOException ex) {
       BaseX.debug(new File(fn).getAbsolutePath() + " not found.");
     }
   }

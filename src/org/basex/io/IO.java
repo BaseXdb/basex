@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import org.basex.BaseX;
@@ -263,46 +262,6 @@ public abstract class IO {
   }
 
   // STATIC METHODS ===========================================================
-
-  /**
-   * Adds the database suffix to the specified filename and creates
-   * a file instance.
-   * @param db name of the database
-   * @param file filename
-   * @return database filename
-   */
-  public static File dbfile(final String db, final String file) {
-    return new File(Prop.dbpath + '/' + db + '/' + file + BASEXSUFFIX);
-  }
-
-  /**
-   * Returns a file instance for the current database path.
-   * @param db name of the database
-   * @return database filename
-   */
-  public static File dbpath(final String db) {
-    return new File(Prop.dbpath + '/' + db);
-  }
-
-  /**
-   * Recursively deletes a directory.
-   * @param db database to delete
-   * @param pat file pattern
-   * @return success of operation
-   */
-  public static synchronized boolean dbdelete(final String db,
-      final String pat) {
-
-    final File path = dbpath(db);
-    if(!path.exists()) return false;
-
-    boolean ok = true;
-    for(final File sub : path.listFiles()) {
-      if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();
-    }
-    if(pat == null) ok &= path.delete();
-    return ok;
-  }
 
   /**
    * Checks if the specified filename is valid; allows only letters,

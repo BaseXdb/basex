@@ -27,7 +27,8 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
     super.setUp();
     final IO file = IO.get(INSERTFILE);
     try {
-      insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
+      final XMLParser parser = new XMLParser(file, CONTEXT.prop);
+      insertData = new MemBuilder(parser).build(INSERTFILE);
     } catch(final Exception ex) {
       ex.printStackTrace();
       System.exit(1);

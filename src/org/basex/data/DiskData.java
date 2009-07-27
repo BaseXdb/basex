@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.index.FTFuzzy;
@@ -72,21 +73,22 @@ public final class DiskData extends Data {
   /**
    * Default Constructor.
    * @param db name of database
+   * @param pr database properties
    * @throws IOException IO Exception
    */
-  public DiskData(final String db) throws IOException {
+  public DiskData(final String db, final Prop pr) throws IOException {
     DataInput in = null;
     try {
       // read meta data and indexes
-      in = new DataInput(db, DATAINFO);
-      meta = new MetaData(db, in);
+      in = new DataInput(pr.dbfile(db, DATAINFO));
+      meta = new MetaData(db, in, pr);
 
       while(true) {
         final String k = in.readString();
         if(k.length() == 0) break;
         if(k.equals(DBTAGS))      tags = new Names(in);
         else if(k.equals(DBATTS)) atts = new Names(in);
-        else if(k.equals(DBPATH)) path = new PathSummary(this, in);
+        else if(k.equals(DBPATH))  path = new PathSummary(in);
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
       }
 
@@ -102,7 +104,7 @@ public final class DiskData extends Data {
     } catch(final IOException ex) {
       throw ex;
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException e) { }
+      if(in != null) try { in.close(); } catch(final IOException ex) { }
     }
   }
 
@@ -134,10 +136,11 @@ public final class DiskData extends Data {
   private void init() throws IOException {
     // table main memory mode..
     final String db = meta.name;
-    table = Prop.tablemem ? new TableMemAccess(db, DATATBL, meta.size) :
-      new TableDiskAccess(db, DATATBL);
-    texts = new DataAccess(db, DATATXT);
-    values = new DataAccess(db, DATAATV);
+    table = meta.prop.is(Prop.TABLEMEM) ?
+      new TableMemAccess(db, DATATBL, meta.size, meta.prop) :
+      new TableDiskAccess(db, DATATBL, meta.prop);
+    texts = new DataAccess(db, DATATXT, meta.prop);
+    values = new DataAccess(db, DATAATV, meta.prop);
     initNames();
   }
 
@@ -146,7 +149,8 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final DataOutput out = new DataOutput(meta.name, DATAINFO);
+    final File file = meta.prop.dbfile(meta.name, DATAINFO);
+    final DataOutput out = new DataOutput(file);
     meta.write(out);
     out.writeString(DBTAGS);
     tags.write(out);
@@ -168,8 +172,8 @@ public final class DiskData extends Data {
       values.flush();
       write();
       meta.dirty = false;
-    } catch(final IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
 

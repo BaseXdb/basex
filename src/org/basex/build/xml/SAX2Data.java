@@ -173,8 +173,8 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   /*public void skippedEntity(final String name) { } */
 
   // ErrorHandler
-  /* public void warning(final SAXParseException e) { } */
-  /* public void fatalError(final SAXParseException e) { } */
+  /* public void warning(final SAXParseException ex) { } */
+  /* public void fatalError(final SAXParseException ex) { } */
 
   // LexicalHandler
   public void startDTD(final String n, final String pid, final String sid) {

@@ -1,6 +1,7 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -86,7 +87,7 @@ public final class XQueryView extends View {
           }
         };
 
-        final String[] hs = GUIProp.queries;
+        final String[] hs = gui.prop.strings(GUIProp.QUERIES);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -183,9 +184,9 @@ public final class XQueryView extends View {
 
   @Override
   protected void refreshMark() {
-    BaseXLayout.enable(go, !GUIProp.execrt);
+    BaseXLayout.enable(go, !gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked();
-    BaseXLayout.enable(filter, !GUIProp.filterrt &&
+    BaseXLayout.enable(filter, !gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -195,7 +196,7 @@ public final class XQueryView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showxquery;
+    return gui.prop.is(GUIProp.SHOWXQUERY);
   }
 
   /**
@@ -203,7 +204,7 @@ public final class XQueryView extends View {
    * @param file query file
    */
   public void setQuery(final IO file) {
-    GUIProp.files(file);
+    gui.prop.files(file);
     try {
       setQuery(file.content());
     } catch(final IOException ex) {
@@ -216,7 +217,7 @@ public final class XQueryView extends View {
    * @param qu query
    */
   public void setQuery(final byte[] qu) {
-    if(!GUIProp.showxquery) GUICommands.SHOWXQUERY.execute(gui);
+    if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
     text.setText(qu);
     text.query(true);
   }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 
 /**
@@ -20,15 +19,18 @@ public final class Close extends Process {
    * Constructor.
    */
   public Close() {
-    super(DATAREF);
+    super(0);
   }
 
   @Override
   protected boolean exec() {
     try {
-      close(context, context.data());
+      final Data data = context.data();
+      if(data == null) return true;
+      final String name = data.meta.name;
+      close(context, data);
       context.closeDB();
-      return !Prop.info || info(DBCLOSED);
+      return info(DBCLOSED, name);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(DBCLOSEERR);
@@ -43,7 +45,6 @@ public final class Close extends Process {
    */
   public static void close(final Context ctx, final Data data)
       throws IOException {
-    // [AW] null test should be removed if query processor handles context
-    if(data != null && (ctx == null || ctx.unpin(data))) data.close();
+    if(ctx.unpin(data)) data.close();
   }
 }

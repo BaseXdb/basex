@@ -19,7 +19,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.io.DataInput;
-import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -48,7 +47,7 @@ public final class DialogOpen extends Dialog {
     super(main, drop ? DROPTITLE : OPENTITLE);
 
     // create database chooser
-    final StringList db = List.list();
+    final StringList db = List.list(main.context);
 
     choice = new BaseXListChooser(db.finish(), HELPOPEN, this);
     set(choice, BorderLayout.CENTER);
@@ -120,34 +119,34 @@ public final class DialogOpen extends Dialog {
   public void action(final String cmd) {
     if(BUTTONRENAME.equals(cmd)) {
       new DialogRename(gui, choice.getValue());
-      choice.setData(List.list().finish());
+      choice.setData(List.list(gui.context).finish());
     } else if(BUTTONOPEN.equals(cmd)) {
       close();
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
       if(db.length() == 0) return;
       if(Dialog.confirm(this, BaseX.info(DROPCONF, db))) {
-        DropDB.drop(db);
-        choice.setData(List.list().finish());
+        DropDB.drop(db, gui.context.prop);
+        choice.setData(List.list(gui.context).finish());
         choice.requestFocusInWindow();
       }
     } else {
       final String db = choice.getValue().trim();
-      ok = db.length() != 0 && IO.dbpath(db).exists();
+      ok = db.length() != 0 && gui.context.prop.dbpath(db).exists();
       if(ok) doc.setText(db);
       enableOK(buttons, BUTTONDROP, ok);
 
       if(ok) {
         DataInput in = null;
         try {
-          in = new DataInput(db, DATAINFO);
-          final MetaData meta = new MetaData(db, in);
+          in = new DataInput(gui.context.prop.dbfile(db, DATAINFO));
+          final MetaData meta = new MetaData(db, in, gui.context.prop);
           detail.setText(InfoDB.db(meta, true, true).finish());
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try { if(in != null) in.close(); } catch(final IOException e) { }
+          try { if(in != null) in.close(); } catch(final IOException ex) { }
         }
       }
       enableOK(buttons, BUTTONOPEN, ok);

@@ -2,6 +2,8 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.util.IntList;
 
 /**
@@ -15,34 +17,42 @@ public final class TableOutput extends FileOutputStream {
   /** Buffer Threshold. */
   private static final int THRESHOLD = (int) Math.floor(IO.BLOCKFILL
       * (IO.BLOCKSIZE >>> IO.NODEPOWER)) << IO.NODEPOWER;
+
   /** Buffer. */
   private final byte[] buffer = new byte[THRESHOLD];
   /** Index Entries. */
-  private IntList firstPres = new IntList();
+  private final IntList firstPres = new IntList();
   /** Index Entries. */
-  private IntList blocks = new IntList();
+  private final IntList blocks = new IntList();
+
+  /** Name of the database. */
+  private final String name;
+  /** Current Filename. */
+  private final String file;
+  /** Database properties. */
+  private final Prop prop;
+
   /** Position inside buffer. */
   private int pos;
   /** Block Count. */
   private int bcount;
   /** First pre value of current block. */
   private int fpre;
-  /** Name of the database. */
-  private String name;
-  /** Current Filename. */
-  private String file;
 
   /**
    * Initializes the output.
    * The database suffix will be added to all filenames.
    * @param db name of the database
    * @param fn the file to be written to
+   * @param pr database properties
    * @throws IOException IO Exception
    */
-  public TableOutput(final String db, final String fn) throws IOException {
-    super(IO.dbfile(db, fn));
+  public TableOutput(final String db, final String fn, final Prop pr)
+      throws IOException {
+    super(pr.dbfile(db, fn));
     name = db;
     file = fn;
+    prop = pr;
   }
 
   @Override
@@ -66,7 +76,7 @@ public final class TableOutput extends FileOutputStream {
     flush();
     super.close();
 
-    final DataOutput info = new DataOutput(name, file + 'i');
+    final DataOutput info = new DataOutput(prop.dbfile(name, file + 'i'));
     info.writeNum(bcount);
     info.writeNum(bcount);
     info.writeNum(fpre);

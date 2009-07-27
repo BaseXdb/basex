@@ -18,7 +18,7 @@ public final class GIFExtractor extends AbstractExtractor {
   private final byte[] data = new byte[10];
 
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     BufferInput.read(f, data);
 
     // check if the header is valid
@@ -26,15 +26,15 @@ public final class GIFExtractor extends AbstractExtractor {
        !Token.startsWith(data, HEADERGIF89)) return;
 
     // open image tag
-    listener.startElem(IMAGE, atts.set(TYPE, TYPEGIF));
+    build.startElem(IMAGE, atts.set(TYPE, TYPEGIF));
 
     // extract image dimensions
     final int w = (data[6] & 0xFF) + ((data[7] & 0xFF) << 8);
     final int h = (data[8] & 0xFF) + ((data[9] & 0xFF) << 8);
 
-    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
-    listener.nodeAndText(HEIGHT, atts, Token.token(h));
+    build.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    build.nodeAndText(HEIGHT, atts, Token.token(h));
 
-    listener.endElem(IMAGE);
+    build.endElem(IMAGE);
   }
 }

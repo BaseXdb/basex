@@ -1,6 +1,8 @@
 package org.basex.io;
 
+import java.io.File;
 import java.io.IOException;
+
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -13,12 +15,11 @@ import org.basex.util.Token;
 public final class DataInput extends BufferInput {
   /**
    * Initializes the file reader.
-   * @param db name of the database
    * @param file the file to be read
    * @throws IOException IO Exception
    */
-  public DataInput(final String db, final String file) throws IOException {
-    super(IO.dbfile(db, file));
+  public DataInput(final File file) throws IOException {
+    super(file);
   }
 
   /**

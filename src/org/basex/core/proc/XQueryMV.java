@@ -30,8 +30,6 @@ public final class XQueryMV extends AQuery {
   private int hits;
   /** Maximum subhits. */
   private int sub;
-  /** Approximate hits. */
-  //private boolean approx;
   /** Maximum hits. */
   private int maxhits;
 
@@ -51,15 +49,12 @@ public final class XQueryMV extends AQuery {
     hits = Token.toInt(args[0]);
     sub = Token.toInt(args[1]);
     final String query = args[2] + "[position() <= " + hits * sub + "]";
-
-    long pars = 0;
-    long comp = 0;
-    long eval = 0;
     long fini = 0;
 
     QueryProcessor qu = null;
+    final int runs = prop.num(Prop.RUNS);
     try {
-      for(int i = 0; i < Prop.runs; i++) {
+      for(int i = 0; i < runs; i++) {
         qu = new QueryProcessor(query, context);
         progress(qu);
 
@@ -72,13 +67,6 @@ public final class XQueryMV extends AQuery {
 
         final Nodes ns = (Nodes) result;
         result = new Nodes(ns.nodes, ns.data);
-
-        /* no results found.. try approximate search
-        boolean approx = result.size == 0;
-        if(approx) {
-          arg = arg.replaceAll(" ftcontains ", " ~> ");
-          result = qu.query(arg, context.current);
-        }*/
 
         // get index references for mediovis attributes
         final Data data = context.data();
@@ -109,26 +97,21 @@ public final class XQueryMV extends AQuery {
         maxhits = ids.size();
         fini += per.getTime();
       }
-      if(Prop.info) {
-        info(qu.info());
-        info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
-        info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
-        info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
-        info(QUERYFINISH + Performance.getTimer(fini, Prop.runs) + NL);
-      }
+      execInfo();
+      return info(QUERYFINISH + Performance.getTimer(fini, runs));
     } catch(final Exception ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }
-    return true;
   }
 
   @Override
   protected void out(final PrintOutput o) throws IOException {
-    for(int i = 0; i < Prop.runs; i++) {
-      show(i == 0 && Prop.serialize ? o : new NullOutput());
+    final int runs = prop.num(Prop.RUNS);
+    for(int i = 0; i < runs; i++) {
+      show(i == 0 && prop.is(Prop.SERIALIZE) ? o : new NullOutput());
     }
-    if(Prop.info) outInfo(o, maxhits);
+    if(prop.is(Prop.INFO)) outInfo(o, maxhits);
   }
 
   /**

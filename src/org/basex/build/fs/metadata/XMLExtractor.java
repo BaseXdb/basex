@@ -15,12 +15,12 @@ import org.basex.io.IO;
  */
 public final class XMLExtractor extends AbstractExtractor {
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
-    listener.startElem(XML, atts.reset());
+  public void extract(final Builder build, final File f) throws IOException {
+    build.startElem(XML, atts.reset());
     final IO io = IO.get(f.getPath());
-    final Parser parser = Parser.xmlParser(io);
+    final Parser parser = Parser.xmlParser(io, build.parser.prop);
     parser.doc = false;
-    parser.parse(listener);
-    listener.endElem(XML);
+    parser.parse(build);
+    build.endElem(XML);
   }
 }

@@ -1,7 +1,7 @@
 package org.basex.data;
 
+import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Prop;
 
 /**
  * This class assembles texts which are used in the data classes.
@@ -181,7 +181,7 @@ public interface DataText {
   /** URI header. */
   String TABLEURI = "NAMESPACE";
   /** Fifth table Header. */
-  String TABLEKIND = "  KIND  CONTENT" + Prop.NL;
+  String TABLEKIND = "  KIND  CONTENT" + NL;
   /** Table Kinds. */
   String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
 

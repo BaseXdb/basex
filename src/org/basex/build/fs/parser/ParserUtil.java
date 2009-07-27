@@ -31,8 +31,8 @@ public final class ParserUtil {
   static {
     try {
       factory = DatatypeFactory.newInstance();
-    } catch(final DatatypeConfigurationException e) {
-      BaseX.debug(e.getMessage());
+    } catch(final DatatypeConfigurationException ex) {
+      BaseX.debug(ex.getMessage());
     }
   }
 

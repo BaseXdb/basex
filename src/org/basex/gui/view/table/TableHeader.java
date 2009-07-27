@@ -66,7 +66,7 @@ final class TableHeader extends BaseXPanel {
     setMode(Fill.UP);
     tdata = v.tdata;
     view = v;
-    BaseXLayout.setHeight(this, GUIProp.fontsize + 8 << 1);
+    BaseXLayout.setHeight(this, gui.prop.num(GUIProp.FONTSIZE) + 8 << 1);
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);
@@ -88,7 +88,7 @@ final class TableHeader extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -99,6 +99,7 @@ final class TableHeader extends BaseXPanel {
       return;
     }
 
+    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
     final int bs = BaseXBar.SIZE;
     int w = getWidth();
     final int h = getHeight();
@@ -129,7 +130,7 @@ final class TableHeader extends BaseXPanel {
 
       final int off = clicked ? 1 : 0;
       BaseXLayout.chopString(g, tdata.cols[n].name,
-          (int) x + 4 + off, 2 + off, (int) cw);
+          (int) x + 4 + off, 2 + off, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
         if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off,
@@ -163,7 +164,7 @@ final class TableHeader extends BaseXPanel {
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };
     x += (bs - BaseXLayout.width(g, reset)) / 2;
-    BaseXLayout.chopString(g, reset, (int) x + o, hh + o + 1, w);
+    BaseXLayout.chopString(g, reset, (int) x + o, hh + o + 1, w, fsz);
   }
 
   @Override
@@ -179,7 +180,7 @@ final class TableHeader extends BaseXPanel {
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;
-      if(GUIProp.mousefocus) {
+      if(gui.prop.is(GUIProp.MOUSEFOCUS)) {
         final int col = tdata.column(w, mouseX);
         if(col != -1) filter(col);
       }
@@ -265,7 +266,7 @@ final class TableHeader extends BaseXPanel {
           } else {
             // sort data in current column
             view.gui.cursor(CURSORWAIT);
-            tdata.asc = tdata.sortCol == clickCol ? !tdata.asc : true;
+            tdata.asc = tdata.sortCol != clickCol || !tdata.asc;
             tdata.sortCol = clickCol;
             tdata.sort();
             view.gui.cursor(CURSORARROW, true);

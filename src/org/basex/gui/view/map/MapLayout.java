@@ -12,7 +12,7 @@ import org.basex.gui.view.ViewData;
  */
 final class MapLayout {
   /** Font size. */
-  private final int off = GUIProp.fontsize + 4;
+  private final int off;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
@@ -24,18 +24,23 @@ final class MapLayout {
   final MapRects rectangles;
   /** Layout rectangle. */
   final MapRect layout;
+  /** Widow properties. */
+  final GUIProp prop;
 
   /**
    * Constructor.
    * @param d data reference to use in this layout
    * @param tl text lengths array
+   * @param pr gui properties
    */
-  MapLayout(final Data d, final int[] tl) {
+  MapLayout(final Data d, final int[] tl, final GUIProp pr) {
     data = d;
     textLen = tl;
+    prop = pr;
     rectangles = new MapRects();
+    off = prop.num(GUIProp.FONTSIZE) + 4;
 
-    switch(GUIProp.mapoffsets) {
+    switch(prop.num(GUIProp.MAPOFFSETS)) {
       // no title, small border
       case 1 :
         layout = new MapRect(0, 2, 0, 2); break;
@@ -53,7 +58,7 @@ final class MapLayout {
         layout = new MapRect(0, 0, 0, 0); break;
     }
 
-    switch(GUIProp.mapalgo) {
+    switch(prop.num(GUIProp.MAPALGO)) {
       // select method to construct this treemap
       // may should be placed in makeMap to define different method for
       // different levels
@@ -98,7 +103,7 @@ final class MapLayout {
     final MapList list = new MapList();
 
     final int last = par + ViewData.size(data, par);
-    final boolean atts = GUIProp.mapatts && data.fs == null;
+    final boolean atts = prop.is(GUIProp.MAPATTS) && data.fs == null;
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);
@@ -128,7 +133,7 @@ final class MapLayout {
       } else {
         nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }
-      l.initWeights(textLen, nn, data);
+      l.initWeights(textLen, nn, data, prop.num(GUIProp.MAPWEIGHT));
 
       // call recursion for next deeper levels
       final MapRects rects = algo.calcMap(r, l, ns, ne);
@@ -152,8 +157,8 @@ final class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if(w < off && h < off || w <= 2 || h <= 2 || GUIProp.mapfs &&
-        ViewData.isLeaf(data, r.pre)) {
+    if(w < off && h < off || w <= 2 || h <= 2 || prop.is(GUIProp.MAPFS) &&
+        ViewData.isLeaf(prop, data, r.pre)) {
       r.isLeaf = true;
       rectangles.add(r);
       return;

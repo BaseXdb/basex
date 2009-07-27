@@ -17,8 +17,6 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 public final class PathSummary {
-  /** Data reference. */
-  private Data data;
   /** Parent stack. */
   private PathNode[] stack;
   /** Root node. */
@@ -42,16 +40,14 @@ public final class PathSummary {
 
   /**
    * Constructor, specifying an input file.
-   * @param d data reference
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public PathSummary(final Data d, final DataInput in) throws IOException {
+  public PathSummary(final DataInput in) throws IOException {
     if(in.readBool()) root = new PathNode(in, null);
-    data = d;
   }
 
-  // Summary Path creation ====================================================
+  // Path Summary creation ====================================================
 
   /**
    * Opens an element.
@@ -90,7 +86,7 @@ public final class PathSummary {
     if(root != null) root.finish(out);
   }
 
-  // Summary Path traversal ===================================================
+  // Path Summary traversal ===================================================
 
   /**
    * Returns all children or descendants of the specified nodes.
@@ -155,24 +151,28 @@ public final class PathSummary {
   /**
    * Returns descendant tags and attributes for the specified start key.
    * @param k input key
+   * @param data data reference
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final byte[] k, final boolean d, final boolean o) {
+  public TokenList desc(final byte[] k, final Data data, final boolean d,
+      final boolean o) {
     final TokenList tl = new TokenList();
     if(k.length != 0) tl.add(k);
-    return desc(tl, d, o);
+    return desc(tl, data, d, o);
   }
 
   /**
    * Returns descendant tags and attributes for the specified descendant path.
    * @param tl input steps
+   * @param data data reference
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final TokenList tl, final boolean d, final boolean o) {
+  public TokenList desc(final TokenList tl, final Data data, final boolean d,
+      final boolean o) {
     // follow the specified descendant/child steps
     ArrayList<PathNode> in = desc(root(), true);
 

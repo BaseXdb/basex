@@ -34,16 +34,7 @@ import org.basex.util.StringList;
  */
 public final class DialogImportFS extends Dialog {
   /** Available databases. */
-  private final StringList db = List.list();
-  /** Directory path. */
-  BaseXTextField path;
-  /** Database name. */
-  BaseXTextField dbname;
-  /** Backing path. */
-  BaseXTextField backing;
-  /** Mountpoint path. */
-  BaseXTextField mountpoint;
-
+  private final StringList db;
   /** Database info. */
   private final BaseXLabel info;
   /** Parsing complete filesystem. */
@@ -59,12 +50,22 @@ public final class DialogImportFS extends Dialog {
   /** ComboBox. */
   private final BaseXCombo maxsize;
 
+  /** Directory path. */
+  final BaseXTextField path;
+  /** Database name. */
+  BaseXTextField dbname;
+  /** Backing path. */
+  BaseXTextField backing;
+  /** Mountpoint path. */
+  BaseXTextField mountpoint;
+
   /**
    * Default Constructor.
    * @param main reference to the main window
    */
   public DialogImportFS(final GUI main) {
     super(main, IMPORTFSTITLE);
+    db = List.list(main.context);
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
@@ -76,7 +77,10 @@ public final class DialogImportFS extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(7, 2, 6, 0));
 
-    path = new BaseXTextField(GUIProp.guifsimportpath, HELPFSPATH, this);
+    final Prop prop = gui.context.prop;
+    final GUIProp gprop = gui.prop;
+    path = new BaseXTextField(gprop.get(GUIProp.FSIMPORTPATH),
+        HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -102,7 +106,7 @@ public final class DialogImportFS extends Dialog {
     p.add(new BaseXLabel(CREATENAME, false, true));
     p.add(new BaseXLabel(""));
 
-    dbname = new BaseXTextField(GUIProp.guifsdbname, HELPFSNAME, this);
+    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), HELPFSNAME, this);
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -112,7 +116,8 @@ public final class DialogImportFS extends Dialog {
     BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
 
-    all = new BaseXCheckBox(IMPORTALL, HELPFSALL, GUIProp.fsall, this);
+    all = new BaseXCheckBox(IMPORTALL, HELPFSALL,
+        gprop.is(GUIProp.FSALL), this);
     all.setToolTipText(IMPORTALLINFO);
     all.setBorder(new EmptyBorder(4, 4, 0, 0));
     all.addActionListener(new ActionListener() {
@@ -122,7 +127,8 @@ public final class DialogImportFS extends Dialog {
     });
     p.add(all);
 
-    backing = new BaseXTextField(GUIProp.guibackingroot, HELPFSBACKING, this);
+    backing = new BaseXTextField(gprop.get(GUIProp.FSBACKING),
+        HELPFSBACKING, this);
     backing.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -131,7 +137,8 @@ public final class DialogImportFS extends Dialog {
     });
     BaseXLayout.setWidth(backing, 240);
 
-    mountpoint = new BaseXTextField(GUIProp.guimountpoint, HELPFSMOUNT, this);
+    mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT),
+        HELPFSMOUNT, this);
     mountpoint.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -164,7 +171,8 @@ public final class DialogImportFS extends Dialog {
 
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
     p2.add(label);
-    meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, 12, this);
+    meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, prop.is(Prop.FSMETA),
+        12, this);
     p2.add(meta);
 
     label = new BaseXLabel(IMPORTFSTEXT2, false, true);
@@ -173,7 +181,7 @@ public final class DialogImportFS extends Dialog {
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    cont = new BaseXCheckBox(IMPORTCONT, HELPCONT, Prop.fscont, this);
+    cont = new BaseXCheckBox(IMPORTCONT, HELPCONT, prop.is(Prop.FSCONT), this);
     cont.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         action(null);
@@ -184,7 +192,7 @@ public final class DialogImportFS extends Dialog {
     maxsize = new BaseXCombo(IMPORTFSMAX, HELPFSMAX, this);
     maxsize.setToolTipText(IMPORTFSMAXINFO);
 
-    final int m = Prop.fstextmax;
+    final int m = prop.num(Prop.FSTEXTMAX);
     int i = -1;
     while(++i < IMPORTFSMAXSIZE.length - 1) {
       if(IMPORTFSMAXSIZE[i] == m) break;
@@ -216,20 +224,20 @@ public final class DialogImportFS extends Dialog {
     BaseXLayout.enable(button, sel);
     BaseXLayout.enable(maxsize, cont.isSelected());
 
-    boolean cAll; // import all is choosen?
+    boolean cAll; // import all is chosen?
     boolean cNam; // dbname given?
     boolean cBac = true; // backing store is existent directory?
     boolean cMou = true; // mount point is existent directory?
 
+    final GUIProp prop = gui.prop;
     final String nm = dbname.getText().trim();
     cNam = nm.length() != 0;
-    if(cNam) GUIProp.guifsdbname = nm;
+    if(cNam) prop.set(GUIProp.FSDBNAME, nm);
     ok = cNam;
 
     cAll = all.isSelected();
-    if(cAll) {
-      GUIProp.guifsimportpath = path.getText();
-    }
+    if(cAll) prop.set(GUIProp.FSIMPORTPATH, path.getText());
+
     if(!cAll && cNam) {
       final String p = path.getText().trim();
       final IO file = IO.get(p);
@@ -253,7 +261,6 @@ public final class DialogImportFS extends Dialog {
       if(!cNam) inf = DBWHICH;
     }
 
-
     ImageIcon img = null;
     if(ok) {
       ok = IO.valid(nm);
@@ -275,17 +282,18 @@ public final class DialogImportFS extends Dialog {
   public void close() {
     if(!ok) return;
 
-    Prop.fscont = cont.isSelected();
-    Prop.fsmeta = meta.isSelected();
-    Prop.fstextmax = IMPORTFSMAXSIZE[maxsize.getSelectedIndex()];
-    GUIProp.fsall = all.isSelected();
-    GUIProp.guifsimportpath = path.getText();
-    GUIProp.guifsdbname = dbname.getText();
+    final Prop prop = gui.context.prop;
+    prop.set(Prop.FSCONT, cont.isSelected());
+    prop.set(Prop.FSMETA, meta.isSelected());
+    prop.set(Prop.FSTEXTMAX, IMPORTFSMAXSIZE[maxsize.getSelectedIndex()]);
+    final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.FSALL, all.isSelected());
+    gprop.set(GUIProp.FSIMPORTPATH, path.getText());
+    gprop.set(GUIProp.FSDBNAME, dbname.getText());
     if(Prop.fuse) {
-      GUIProp.guimountpoint = mountpoint.getText().trim();
-      GUIProp.guibackingroot = backing.getText().trim();
+      gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
+      gprop.set(GUIProp.FSBACKING, backing.getText().trim());
     }
-
     super.close();
   }
 }

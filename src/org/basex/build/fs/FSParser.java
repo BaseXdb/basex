@@ -69,7 +69,7 @@ public final class FSParser extends Parser {
   /** Root flag to parse root node or all partitions (C:, D: ...). */
   private final boolean root;
   /** Path to root of the backing store for this import. */
-  public final String mybackingpath;
+  public final String backingpath;
   /** Reference to the database builder. */
   private Builder builder;
   /** The currently processed file. */
@@ -87,20 +87,22 @@ public final class FSParser extends Parser {
    * @param path the traversal starts from
    * @param mp mount point for fuse
    * @param bs path to root of backing store for BLOBs
+   * @param pr database properties
    * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final String path, final String mp, final String bs) {
-    super(IO.get(path));
-    Prop.intparse = true;
-    Prop.entity = false;
-    Prop.dtd = false;
+  public FSParser(final String path, final String mp, final String bs,
+      final Prop pr) {
+    super(IO.get(path), pr);
+    prop.set(Prop.INTPARSE, true);
+    prop.set(Prop.ENTITY, false);
+    prop.set(Prop.DTD, false);
     root = path.equals("/");
 
     fsimportpath = io.path();
     fsdbname = io.name();
     backingroot = bs;
     mountpoint = mp;
-    mybackingpath = backingroot + Prop.SEP + fsdbname;
+    backingpath = backingroot + Prop.SEP + fsdbname;
 
     meta.add(TYPEGIF, new GIFExtractor());
     meta.add(TYPEPNG, new PNGExtractor());
@@ -118,10 +120,11 @@ public final class FSParser extends Parser {
   /**
    * Constructor to parse single file nodes.
    * @param path String to file node to parse
+   * @param pr database properties
    */
-  public FSParser(final String path) {
+  public FSParser(final String path, final Prop pr) {
     // [AH] pass mountpoint and backing store args to single parser
-    this(path, "/mnt/deepfs", "/var/tmp/deepfs");
+    this(path, "/mnt/deepfs", "/var/tmp/deepfs", pr);
     singlemode = true;
   }
 
@@ -136,14 +139,14 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    builder.meta.backingpath = mybackingpath;
+    builder.meta.backingpath = backingpath;
     builder.meta.mountpoint = mountpoint;
 
     // -- create backing store (DeepFS depends on it).
     if(Prop.fuse && !singlemode) {
-      final File bs = new File(mybackingpath);
+      final File bs = new File(backingpath);
       if(!bs.mkdirs() && bs.exists())
-          throw new IOException(BACKINGEXISTS + mybackingpath);
+          throw new IOException(BACKINGEXISTS + backingpath);
     }
 
     builder.startDoc(token(io.name()));
@@ -153,7 +156,7 @@ public final class FSParser extends Parser {
     } else {
       atts.reset();
       final byte[] mnt = Prop.fuse ? token(mountpoint) : NOTMOUNTED;
-      final byte[] bck = Prop.fuse ? token(mybackingpath) : token(fsimportpath);
+      final byte[] bck = Prop.fuse ? token(backingpath) : token(fsimportpath);
       atts.add(MOUNTPOINT  , mnt);
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
@@ -188,13 +191,13 @@ public final class FSParser extends Parser {
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
         if(Prop.fuse)
-          new File(mybackingpath
+          new File(backingpath
             + f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
         // -- copy file to backing store
         if(Prop.fuse)
-          copy(f.getAbsoluteFile(), new File(mybackingpath
+          copy(f.getAbsoluteFile(), new File(backingpath
             + f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
@@ -215,8 +218,8 @@ public final class FSParser extends Parser {
       while((len = in.read(buf)) > 0) out.write(buf, 0, len);
       in.close();
       out.close();
-    } catch(final IOException e) {
-      e.getMessage();
+    } catch(final IOException ex) {
+      ex.getMessage();
     }
   }
 
@@ -265,7 +268,7 @@ public final class FSParser extends Parser {
     if(!singlemode)
       builder.startElem(FILE, atts(f, false));
     if(f.canRead()) {
-      if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
+      if(prop.is(Prop.FSMETA) && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
         final int dot = name.lastIndexOf('.');
         final byte[] suffix = lc(token(name.substring(dot + 1)));
@@ -281,9 +284,9 @@ public final class FSParser extends Parser {
       }
 
       // import textual content
-      if(Prop.fscont && f.isFile()) {
+      if(prop.is(Prop.FSCONT) && f.isFile()) {
         // initialize cache for textual contents
-        final int l = (int) Math.min(f.length(), Prop.fstextmax);
+        final int l = (int) Math.min(f.length(), prop.num(Prop.FSTEXTMAX));
         final byte[] cc = new byte[l];
         BufferInput.read(f, cc);
         int c = -1;

@@ -83,7 +83,7 @@ final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   public MapRect clone() {
     try {
       return (MapRect) super.clone();
-    } catch(final CloneNotSupportedException e) {
+    } catch(final CloneNotSupportedException ex) {
       return null;
     }
   }

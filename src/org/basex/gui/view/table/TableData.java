@@ -33,6 +33,8 @@ final class TableData {
 
   /** Context reference. */
   final Context context;
+  /** Window properties. */
+  final GUIProp gprop;
   /** Root nodes. */
   TokenList roots;
   /** Rows of the main table. */
@@ -78,9 +80,11 @@ final class TableData {
   /**
    * Initializes the table data.
    * @param ctx context
+   * @param pr gui properties
    */
-  TableData(final Context ctx) {
+  TableData(final Context ctx, final GUIProp pr) {
     context = ctx;
+    gprop = pr;
   }
 
   /**
@@ -89,9 +93,9 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
-    for(final byte[] k : data.path.desc(Token.EMPTY, true, true)) {
+    for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
       int c = 0;
-      for(final byte[] kk : data.path.desc(k, true, false)) {
+      for(final byte[] kk : data.path.desc(k, data, true, false)) {
         final Names index = !startsWith(kk, '@') ? data.tags : data.atts;
         if(index.stat(index.id(delete(kk, '@'))).leaf) c++;
       }
@@ -128,7 +132,8 @@ final class TableData {
     } else {
       if(r == -1 && roots.size() == 0) return;
       if(root == -1) root = data.tags.id(roots.get(0));
-      for(final byte[] k : data.path.desc(data.tags.key(root), true, true)) {
+      for(final byte[] k : data.path.desc(
+          data.tags.key(root), data, true, true)) {
         final boolean elem = !startsWith(k, '@');
         final byte[] key = delete(k, '@');
         final Names index = elem ? data.tags : data.atts;
@@ -346,7 +351,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tags.key(root), GUIProp.filterrt || r);
+        data.tags.key(root), gprop.is(GUIProp.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;
@@ -358,7 +363,7 @@ final class TableData {
    * @return row height
    */
   int rowH(final double f) {
-    rowH = Math.max(1, (int) (f * GUIProp.fontsize * 7 / 4));
+    rowH = Math.max(1, (int) (f * gprop.num(GUIProp.FONTSIZE) * 7 / 4));
     return rowH;
   }
 }

@@ -1,5 +1,7 @@
 package org.basex.test.query;
 
+import org.basex.core.AProp;
+
 /**
  * XPathMark Simple Tests.
  *
@@ -104,34 +106,37 @@ public final class SimpleTest extends AbstractTest {
       { "Func 3 Error", "contains(.)" },
       { "Func 3 Error", "contains(. .)" }
     };
-
-    /** TABLE REPRESENTATION
-    PRE PAR  TYPE  CONTENT
-      0  -1  DOC   test.xml
-      1   0  ELEM  html
-      2   1  COMM   Header
-      3   1  ELEM  head
-      4   3  ATTR  id="0"
-      5   3  ELEM  title
-      6   5  TEXT  XML
-      7   1  COMM   Body
-      8   1  ELEM  body
-      9   8  ATTR  id="1"
-     10   8  ATTR  bgcolor="#FFFFFF"
-     11   8  ATTR  text="#000000"
-     12   8  ATTR  link="#0000CC"
-     13   8  ELEM  h1
-     14  13  TEXT  Databases & XML
-     15   8  ELEM  div
-     16  15  ATTR  align="right"
-     17  15  ELEM  b
-     18  17  TEXT  Assignments
-     19  15  ELEM  ul
-     20  19  ELEM  li
-     21  20  TEXT  Exercise 1
-     22  19  ELEM  li
-     23  22  TEXT  Exercise 2
-     24   1  PI    pi bogus
-    */
   }
+
+  @Override
+  String details(final AProp prop) { return ""; }
+
+  /* TABLE REPRESENTATION
+  PRE PAR  TYPE  CONTENT
+    0  -1  DOC   test.xml
+    1   0  ELEM  html
+    2   1  COMM   Header
+    3   1  ELEM  head
+    4   3  ATTR  id="0"
+    5   3  ELEM  title
+    6   5  TEXT  XML
+    7   1  COMM   Body
+    8   1  ELEM  body
+    9   8  ATTR  id="1"
+   10   8  ATTR  bgcolor="#FFFFFF"
+   11   8  ATTR  text="#000000"
+   12   8  ATTR  link="#0000CC"
+   13   8  ELEM  h1
+   14  13  TEXT  Databases & XML
+   15   8  ELEM  div
+   16  15  ATTR  align="right"
+   17  15  ELEM  b
+   18  17  TEXT  Assignments
+   19  15  ELEM  ul
+   20  19  ELEM  li
+   21  20  TEXT  Exercise 1
+   22  19  ELEM  li
+   23  22  TEXT  Exercise 2
+   24   1  PI    pi bogus
+  */
 }

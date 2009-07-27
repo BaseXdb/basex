@@ -1,6 +1,7 @@
 package org.basex.gui.view.table;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -10,8 +11,8 @@ import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
@@ -50,7 +51,7 @@ public final class TableView extends View implements Runnable {
    */
   public TableView(final ViewNotifier man) {
     super(HELPTABLE, man);
-    tdata = new TableData(gui.context);
+    tdata = new TableData(gui.context, gui.prop);
     setLayout(new BorderLayout());
     header = new TableHeader(this);
     add(header, BorderLayout.NORTH);
@@ -66,14 +67,14 @@ public final class TableView extends View implements Runnable {
     tdata.rows = null;
 
     final Data data = gui.context.data();
-    if(!GUIProp.showtable || data == null) return;
+    if(!visible() || data == null) return;
     tdata.init(data);
     refreshContext(true, false);
   }
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!GUIProp.showtable || tdata.cols.length == 0) return;
+    if(!visible() || tdata.cols.length == 0) return;
 
     tdata.context(false);
     scroll.pos(0);
@@ -92,13 +93,13 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshFocus() {
-    if(!GUIProp.showtable || tdata.rows == null) return;
+    if(!visible() || tdata.rows == null) return;
     repaint();
   }
 
   @Override
   public void refreshMark() {
-    if(!GUIProp.showtable || tdata.rows == null) return;
+    if(!visible() || tdata.rows == null) return;
 
     final Context context = gui.context;
     final Nodes marked = context.marked();
@@ -111,7 +112,7 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshLayout() {
-    if(!GUIProp.showtable || tdata.rows == null) return;
+    if(!visible() || tdata.rows == null) return;
 
     scroll.height(tdata.rows.size() * tdata.rowH(1));
     refreshContext(false, true);
@@ -124,13 +125,13 @@ public final class TableView extends View implements Runnable {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showtable;
+    return gui.prop.is(GUIProp.SHOWTABLE);
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(tdata.rows == null && GUIProp.showtable) refreshInit();
+    if(tdata.rows == null && visible()) refreshInit();
   }
 
   /**
@@ -175,7 +176,7 @@ public final class TableView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     super.mouseMoved(e);
-    if(!GUIProp.showtable || tdata.rows == null) return;
+    if(!visible() || tdata.rows == null) return;
 
     tdata.mouseX = e.getX();
     tdata.mouseY = e.getY();

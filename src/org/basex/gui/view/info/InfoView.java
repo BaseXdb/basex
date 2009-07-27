@@ -111,7 +111,7 @@ public final class InfoView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showinfo;
+    return gui.prop.is(GUIProp.SHOWINFO);
   }
 
   /**
@@ -127,7 +127,7 @@ public final class InfoView extends View {
     final StringList pln = new StringList();
     String err = "";
 
-    final String[] split = Token.string(inf).split(Prop.NL);
+    final String[] split = Token.string(inf).split(NL);
     for(int i = 0; i < split.length; i++) {
       final String line = split[i];
       final int s = line.indexOf(':');
@@ -162,6 +162,7 @@ public final class InfoView extends View {
     evaluate = eval;
     plan = pln;
 
+    final int runs = gui.context.prop.num(Prop.RUNS);
     if(sl.size() != 0) {
       add(tb, QUERYQU, query);
       add(tb, QUERYCOMP, compile);
@@ -170,7 +171,7 @@ public final class InfoView extends View {
       add(tb, QUERYEVAL, evaluate);
       add(tb, QUERYTIME, strings);
       tm = strings.get(il.size() - 1) + ": " + Performance.getTimer(
-          stat.get(il.size() - 1) * 10000L * Prop.runs, Prop.runs);
+          stat.get(il.size() - 1) * 10000L * runs, runs);
     } else if(!ok) {
       add(tb, "Error:  ", err);
       tm = "";
@@ -190,12 +191,13 @@ public final class InfoView extends View {
   private void add(final TokenBuilder tb, final String head,
       final StringList list) {
 
+    final int runs = gui.context.prop.num(Prop.RUNS);
     if(list.size() == 0) return;
     tb.high().add(head).norm().nl();
     for(int i = 0, is = list.size(); i < is; i++) {
       String line = list.get(i);
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
-        Performance.getTimer(stat.get(i) * 10000L * Prop.runs, Prop.runs);
+        Performance.getTimer(stat.get(i) * 10000L * runs, runs);
       tb.add(line).nl();
     }
     tb.hl();
@@ -225,9 +227,10 @@ public final class InfoView extends View {
       }
     }
 
+    final int runs = gui.context.prop.num(Prop.RUNS);
     final int f = focus == -1 ? l - 1 : focus;
     timer.setText(f == -1 ? "" : " " + strings.get(f) + ": " +
-        Performance.getTimer(stat.get(f) * 10000L * Prop.runs, Prop.runs));
+        Performance.getTimer(stat.get(f) * 10000L * runs, runs));
     repaint();
   }
 
@@ -236,11 +239,11 @@ public final class InfoView extends View {
     super.paintComponent(g);
     final int l = stat.size();
     if(l == 0) return;
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
 
     h = north.getHeight();
     w = getWidth() - 8;
-    bw = GUIProp.fontsize * 2 + w / 10;
+    bw = gui.prop.num(GUIProp.FONTSIZE) * 2 + w / 10;
     bs = bw / l;
 
     // find maximum value

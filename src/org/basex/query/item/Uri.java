@@ -52,7 +52,7 @@ public final class Uri extends Str {
       final java.net.URI base = new URI(Token.string(val));
       final URI uri = base.resolve(Token.string(add.val));
       return uri(Token.token(uri.toString()));
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return this;
     }
   }
@@ -73,7 +73,7 @@ public final class Uri extends Str {
     try {
       new URI(Token.string(val));
       return true;
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return false;
     }
   }

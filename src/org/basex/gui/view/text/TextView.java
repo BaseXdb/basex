@@ -9,8 +9,8 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.gui.GUICommands;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -105,10 +105,11 @@ public final class TextView extends View {
    * @param nodes nodes to display
    */
   private void refreshText(final Nodes nodes) {
-    if(!GUIProp.showtext) return;
+    if(!visible()) return;
 
     try {
-      final CachedOutput out = new CachedOutput(Prop.maxtext);
+      final CachedOutput out = new CachedOutput(
+          gui.context.prop.num(Prop.MAXTEXT));
       if(nodes != null) {
         nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
       }
@@ -132,7 +133,7 @@ public final class TextView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showtext;
+    return gui.prop.is(GUIProp.SHOWTEXT);
   }
 
   /**

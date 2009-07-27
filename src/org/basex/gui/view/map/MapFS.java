@@ -41,10 +41,11 @@ final class MapFS extends MapPainter {
   /**
    * Constructor.
    * @param m map reference.
+   * @param pr gui properties
    * @param f fs reference
    */
-  MapFS(final MapView m, final DeepFS f) {
-    super(m);
+  MapFS(final MapView m, final DeepFS f, final GUIProp pr) {
+    super(m, pr);
     fs = f;
     if(images == null) images = new MapImages(m);
   }
@@ -58,8 +59,10 @@ final class MapFS extends MapPainter {
     l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
-    final int min = Math.max(GUIProp.fontsize, 16);
+    final int min = Math.max(prop.num(GUIProp.FONTSIZE), 16);
 
+    final int off = prop.num(GUIProp.MAPOFFSETS);
+    final int fsz = prop.num(GUIProp.FONTSIZE);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
@@ -78,8 +81,8 @@ final class MapFS extends MapPainter {
       else if(full || col == null) col = COLORS[lvl];
       g.setColor(col);
 
-      if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.mapoffsets < 2 ||
-          ViewData.isLeaf(data, pre)) {
+      if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
+          ViewData.isLeaf(prop, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..
@@ -127,7 +130,7 @@ final class MapFS extends MapPainter {
           p += data.attSize(p, k);
         }
         g.setFont(mfont);
-        MapRenderer.drawText(g, cr, tb.finish());
+        MapRenderer.drawText(g, cr, tb.finish(), fsz);
       }
     }
   }
@@ -136,7 +139,7 @@ final class MapFS extends MapPainter {
   boolean drawRectangle(final Graphics g, final MapRect rect) {
     final Context context = view.gui.context;
     final Data data = context.data();
-    final int o = GUIProp.fontsize;
+    final int fsz = prop.num(GUIProp.FONTSIZE);
     final int pre = rect.pre;
     final int kind = data.kind(pre);
     final boolean tag = kind == Data.ELEM || kind == Data.DOC;
@@ -147,7 +150,7 @@ final class MapFS extends MapPainter {
     final Nodes current = context.current();
     final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
       current.size() == 1 && pre != 0 && !file && pre == current.nodes[0] ?
-          ViewData.path(data, pre) : ViewData.tag(data, pre);
+          ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
 
     // image display
     final boolean isImage = GUIFS.mime(name) == GUIFS.Type.IMAGE;
@@ -171,11 +174,11 @@ final class MapFS extends MapPainter {
       }
     }
 
-    final boolean full = !isImage && rect.w >= GUIProp.fontsize * 12 &&
-      rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
-      rect.h == view.getHeight();
+    final boolean full = !isImage && rect.w >= prop.num(GUIProp.FONTSIZE) * 12
+      && rect.h >= prop.num(GUIProp.FONTSIZE) * 8 || rect.w == view.getWidth()
+      && rect.h == view.getHeight();
 
-    final int fullsize = full && file && GUIProp.mapfs ? 1 : 0;
+    final int fullsize = full && file && prop.is(GUIProp.MAPFS) ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);
@@ -193,9 +196,9 @@ final class MapFS extends MapPainter {
         rect.w -= off;
       }
       g.setColor(Color.black);
-      BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2);
-      rect.y += o;
-      rect.h -= o;
+      BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w - 2, fsz);
+      rect.y += fsz;
+      rect.h -= fsz;
 
       if(icon != null) {
         rect.x -= off;
@@ -216,7 +219,7 @@ final class MapFS extends MapPainter {
         rect.h -= 18;
         g.setColor(Color.black);
         final int w = BaseXLayout.chopString(g, text, rect.x + off + 3,
-            rect.y, rect.w - off - 3);
+            rect.y, rect.w - off - 3, fsz);
 
         final long size = toLong(fs.size(pre));
         final String info = GUIFS.desc(text, dir) + ", " +
@@ -227,7 +230,7 @@ final class MapFS extends MapPainter {
         if(w + sw + 48 < rect.w) {
           g.setColor(COLORS[rect.level + 10]);
           BaseXLayout.chopString(g, token(info),
-              rect.x + rect.w - sw, rect.y, rect.w);
+              rect.x + rect.w - sw, rect.y, rect.w, fsz);
         }
         rect.x += 10;
         rect.y += 30;
@@ -239,13 +242,14 @@ final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(Color.black);
-        MapRenderer.drawText(g, rect, data.text(pre));
+        MapRenderer.drawText(g, rect, data.text(pre),
+            prop.num(GUIProp.FONTSIZE));
       }
     }
-    if(!file || rect.w < o << 1 || rect.h < o << 1) return false;
+    if(!file || rect.w < fsz << 1 || rect.h < fsz << 1) return false;
 
-    rect.y += o >> 1;
-    rect.h -= o >> 1;
+    rect.y += fsz >> 1;
+    rect.h -= fsz >> 1;
 
     // prepare content display; read in first bytes
     long s = 0;
@@ -256,7 +260,7 @@ final class MapFS extends MapPainter {
 
       if(!binary) {
         // approximate number of bytes that will be displayed
-        s = Math.max(0, rect.h * rect.w / o * 4 / mfwidth['A']);
+        s = Math.max(0, rect.h * rect.w / fsz * 4 / mfwidth['A']);
 
         // minimize buffer size
         final File f = new File(string(path));
@@ -305,11 +309,11 @@ final class MapFS extends MapPainter {
 
     try {
       // check if text fits in rectangle
-      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf) >= rect.h;
+      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
       if(rect.thumb) {
-        MapRenderer.drawThumbnails(g, rect, fileBuf);
+        MapRenderer.drawThumbnails(g, rect, fileBuf, fsz);
       } else {
-        MapRenderer.drawText(g, rect, fileBuf);
+        MapRenderer.drawText(g, rect, fileBuf, fsz);
       }
     } catch(final Exception ex) {
       // ignore errors for binary files which have been interpreted as texts
@@ -331,7 +335,7 @@ final class MapFS extends MapPainter {
 
   @Override
   void init(final MapRects rects) {
-    final int off = Math.max(GUIProp.fontsize, 16);
+    final int off = Math.max(prop.num(GUIProp.FONTSIZE), 16);
     for(final MapRect r : rects) {
       if(r.w > off && r.h > off && fs.isFile(r.pre)) {
         final byte[] name = fs.name(r.pre);

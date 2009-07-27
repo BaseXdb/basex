@@ -38,11 +38,11 @@ public class Tokenizer implements IndexToken {
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stemming flag. */
-  public boolean st = Prop.ftst;
+  public boolean st;
   /** Diacritics flag. */
-  public boolean dc = Prop.ftdc;
+  public boolean dc;
   /** Sensitivity flag. */
-  public boolean cs = Prop.ftcs;
+  public boolean cs;
   /** Uppercase flag. */
   public boolean uc;
   /** Lowercase flag. */
@@ -75,17 +75,24 @@ public class Tokenizer implements IndexToken {
 
   /**
    * Empty constructor.
+   * @param pr (optional) database properties
    */
-  public Tokenizer() {
-    this(Token.EMPTY);
+  public Tokenizer(final Prop pr) {
+    this(Token.EMPTY, pr);
   }
 
   /**
    * Constructor.
+   * @param pr (optional) database properties
    * @param txt text
    */
-  public Tokenizer(final byte[] txt) {
+  public Tokenizer(final byte[] txt, final Prop pr) {
     init(txt);
+    if(pr != null) {
+      st = pr.is(Prop.FTST);
+      dc = pr.is(Prop.FTDC);
+      cs = pr.is(Prop.FTCS);
+    }
   }
 
   public Type type() {
@@ -97,9 +104,11 @@ public class Tokenizer implements IndexToken {
    * @param txt text
    * @param fto full-text options
    * @param f fast evaluation
+   * @param pr database properties
    */
-  public Tokenizer(final byte[] txt, final FTOpt fto, final boolean f) {
-    this(txt);
+  public Tokenizer(final byte[] txt, final FTOpt fto, final boolean f,
+      final Prop pr) {
+    this(txt, pr);
     lc = fto.is(FTOpt.LC);
     uc = fto.is(FTOpt.UC);
     cs = fto.is(FTOpt.CS);
@@ -313,7 +322,7 @@ public class Tokenizer implements IndexToken {
    * @return int arrays
    */
   public static int[][] getInfo(final byte[] t) {
-    final Tokenizer tok = new Tokenizer(t);
+    final Tokenizer tok = new Tokenizer(t, null);
     final IntList[] il = new IntList[] { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;

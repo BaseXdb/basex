@@ -110,7 +110,6 @@ public final class Lang {
     return val;
   }
 
-
   /**
    * Parse all available language files and return the names and credits.
    * @return language arrays

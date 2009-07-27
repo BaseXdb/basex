@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
+import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
 import org.basex.io.BufferedOutput;
@@ -93,7 +94,8 @@ public final class BaseXWebServer {
     try {
       if(!parseArguments(args)) return;
 
-      final ServerSocket server = new ServerSocket(Prop.webport);
+      final ServerSocket server = new ServerSocket(
+          context.prop.num(Prop.WEBPORT));
       BaseX.outln(WSERVERSTART);
       while(running) serve(server);
       BaseX.outln(WSERVERSTOPPED);
@@ -194,7 +196,8 @@ public final class BaseXWebServer {
     if(input == null) return new Request(400);
 
     // decode input...
-    return new Request(URLDecoder.decode(input.replaceAll("&", "|"), "UTF-8"));
+    return new Request(URLDecoder.decode(input.replaceAll("&", "|"), "UTF-8"),
+        context.prop);
   }
 
   /**
@@ -310,13 +313,14 @@ public final class BaseXWebServer {
     // using a helper script to pass arguments
     final String phphelp = "<?$f=$argv[1];$s=preg_split('/ /',$argv[2]);" +
       "for($i=0;$i<sizeof($s);$i+=2){$_GET[$s[$i]]=$s[$i+1];}include($f);?>";
-    final IO file = IO.get(Prop.webpath + "/php.tmp");
+    final IO file = IO.get(context.prop.get(Prop.WEBPATH) + "/php.tmp");
     file.write(Token.token(phphelp));
 
     final StringBuilder args = new StringBuilder();
     for(final String[] arg : req.args) args.append(arg[0] + " " + arg[1] + " ");
 
-    eval(s, Prop.phppath, file.path(), req.file.path(), args.toString());
+    eval(s, context.prop.get(Prop.PHPPATH), file.path(), req.file.path(),
+        args.toString());
     file.delete();
   }
 
@@ -380,7 +384,8 @@ public final class BaseXWebServer {
    * @return path
    */
   protected String absPath(final IO f) {
-    return f.path().replace(Prop.webpath.replace('\\', '/'), "");
+    final String path = context.prop.get(Prop.WEBPATH);
+    return f.path().replace(path.replace('\\', '/'), "");
   }
 
   /**
@@ -409,7 +414,7 @@ public final class BaseXWebServer {
               BaseX.errln(SERVERPORT + args[a].substring(i));
               break;
             }
-            Prop.webport = p;
+            context.prop.set(Prop.WEBPORT, p);
             i = args[a].length();
             ok = true;
           } else if(c == 'c') {
@@ -428,7 +433,8 @@ public final class BaseXWebServer {
       } else if(args[a].equals("stop")) {
         try {
           // send the stop command
-          final Socket s = new Socket("localhost", Prop.webport);
+          final Socket s = new Socket("localhost",
+              context.prop.num(Prop.WEBPORT));
           s.getOutputStream().write(Token.token("STOP\n\n"));
           s.close();
         } catch(final Exception ex) {
@@ -466,14 +472,15 @@ public final class BaseXWebServer {
     /**
      * Constructor.
      * @param fn filename
+     * @param prop database properties
      */
-    Request(final String fn) {
+    Request(final String fn, final AProp prop) {
       // no file specified - try alternatives
-      file = IO.get(Prop.webpath + "/" + fn);
+      file = IO.get(prop.get(Prop.WEBPATH) + "/" + fn);
 
       if(file.isDir()) {
         for(final String index : INDEXFILES) {
-          final IO f = IO.get(Prop.webpath + "/" + fn + "/" + index);
+          final IO f = IO.get(prop.get(Prop.WEBPATH) + "/" + fn + "/" + index);
           if(f.exists()) {
             code = 302;
             file = f;
@@ -496,7 +503,7 @@ public final class BaseXWebServer {
       }
 
       i = f.indexOf(".");
-      file = IO.get(Prop.webpath + "/" + f);
+      file = IO.get(prop.get(Prop.WEBPATH) + "/" + f);
       suf = i != -1 ? f.substring(i + 1) : "";
 
       if(!file.exists()) code = 404;

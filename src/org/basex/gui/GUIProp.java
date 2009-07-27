@@ -1,5 +1,6 @@
 package org.basex.gui;
 
+import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.StringList;
@@ -12,217 +13,212 @@ import org.basex.util.StringList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class GUIProp {
-  // GLOBAL WINDOW OPTIONS ====================================================
+public final class GUIProp extends AProp {
+  // The following properties will be saved to disk:
+
+  // DATABASE & PROGRAM PATHS =================================================
 
   /** Default GUI Font. */
-  public static String font = "SansSerif";
+  public static final Object[] FONT = { "FONT", "SansSerif" };
   /** Default GUI Monospace Font. */
-  public static String monofont = "Monospaced";
-  /** Font type = plain, bold, italics). */
-  public static int fonttype = 0;
+  public static final Object[] MONOFONT = { "MONOFONT", "Monospaced" };
+  /** Font TYPE = plain, bold, italics). */
+  public static final Object[] FONTTYPE = { "FONTTYPE", 0 };
   /** Font size. */
-  public static int fontsize = 12;
+  public static final Object[] FONTSIZE = { "FONTSIZE", 12 };
   /** Anti-aliasing mode. */
-  public static int fontalias = 0;
+  public static final Object[] FONTALIAS = { "FONTALIAS", 0 };
 
   /** Red GUI color factor. */
-  public static int colorred = 18;
+  public static final Object[] COLORRED = { "COLORRED", 18 };
   /** Green GUI color factor. */
-  public static int colorgreen = 16;
+  public static final Object[] COLORGREEN = { "COLORGREEN", 16 };
   /** Blue GUI color factor. */
-  public static int colorblue = 8;
+  public static final Object[] COLORBLUE = { "COLORBLUE", 8 };
 
   // MAIN WINDOW OPTIONS ======================================================
 
   /** GUI height. */
-  public static int[] guisize = { 1004, 748 };
+  public static final Object[] GUISIZE = { "GUISIZE", new int[] { 1004, 748 } };
   /** GUI position. */
-  public static int[] guiloc = { 10, 10 };
+  public static final Object[] GUILOC = { "GUILOC", new int[] { 10, 10 } };
   /** Flag for maximized GUI window. */
-  public static boolean maxstate = false;
+  public static final Object[] MAXSTATE = { "MAXSTATE", false };
 
   /** Flag for displaying buttons in the GUI window. */
-  public static boolean showbuttons = true;
+  public static final Object[] SHOWBUTTONS = { "SHOWBUTTONS", true };
   /** Flag for displaying the text field in the GUI window. */
-  public static boolean showinput = true;
+  public static final Object[] SHOWINPUT = { "SHOWINPUT", true };
   /** Flag for displaying the status bar in the GUI window. */
-  public static boolean showstatus = true;
+  public static final Object[] SHOWSTATUS = { "SHOWSTATUS", true };
 
   /** GUI Layout. */
-  public static String layoutclosed = GUIConstants.LAYOUTCLOSE;
+  public static final Object[] LAYOUTCLOSED =
+    { "LAYOUTCLOSED", GUIConstants.LAYOUTCLOSE };
   /** GUI Layout. */
-  public static String layoutopened = GUIConstants.LAYOUTOPEN;
+  public static final Object[] LAYOUTOPENED =
+    { "LAYOUTOPENED", GUIConstants.LAYOUTOPEN };
 
   /** Flag for activated info view. */
-  public static boolean showinfo = false;
+  public static final Object[] SHOWINFO = { "SHOWINFO", false };
   /** Flag for activated map view. */
-  public static boolean showmap = true;
+  public static final Object[] SHOWMAP = { "SHOWMAP", true };
   /** Flag for activated table view. */
-  public static boolean showtable = false;
+  public static final Object[] SHOWTABLE = { "SHOWTABLE", false };
   /** Flag for activated result view. */
-  public static boolean showtext = true;
+  public static final Object[] SHOWTEXT = { "SHOWTEXT", true };
   /** Flag for activated tree view. */
-  public static boolean showfolder = false;
+  public static final Object[] SHOWFOLDER = { "SHOWFOLDER", false };
   /** Flag for activated query view. */
-  public static boolean showexplore = false;
+  public static final Object[] SHOWEXPLORE = { "SHOWEXPLORE", false };
   /** Flag for activated plot view. */
-  public static boolean showplot = false;
+  public static final Object[] SHOWPLOT = { "SHOWPLOT", false };
   /** Flag for activated xquery view. */
-  public static boolean showxquery = true;
+  public static final Object[] SHOWXQUERY = { "SHOWXQUERY", true };
 
   /** Flag for Java look and feel. */
-  public static boolean javalook = false;
+  public static final Object[] JAVALOOK = { "JAVALOOK", false };
   /** Flag for dissolving name attributes. */
-  public static boolean showname = true;
+  public static final Object[] SHOWNAME = { "SHOWNAME", true };
   /** Focus follows mouse. */
-  public static boolean mousefocus = false;
+  public static final Object[] MOUSEFOCUS = { "MOUSEFOCUS", false };
   /** Flag for showing the simple file dialog. */
-  public static boolean simplefd = false;
+  public static final Object[] SIMPLEFD = { "SIMPLEFD", false };
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
   /** Current input mode in global text field (Search, XQuery, Command). */
-  public static int searchmode = 0;
+  public static final Object[] SEARCHMODE = { "SEARCHMODE", 0 };
   /** Flag for realtime context switch. */
-  public static boolean filterrt = false;
+  public static final Object[] FILTERRT = { "FILTERRT", false };
   /** Flag for realtime context switch. */
-  public static boolean execrt = true;
+  public static final Object[] EXECRT = { "EXECRT", true };
 
   /** Show attributes in treemap. */
-  public static boolean mapatts = false;
+  public static final Object[] MAPATTS = { "MAPATTS", false };
   /** Treemap Offsets. */
-  public static int mapoffsets = 3;
+  public static final Object[] MAPOFFSETS = { "MAPOFFSETS", 3 };
   /** Map algorithm. */
-  public static int mapalgo = 0;
-  /** number of children <-> size weighting in (0;100). */
-  public static int mapweight = 0;
+  public static final Object[] MAPALGO = { "MAPALGO", 0 };
+  /** number of children <-> size weight in (0;100). */
+  public static final Object[] MAPWEIGHT = { "MAPWEIGHT", 0 };
 
   /** Dot sizes in plot. */
-  public static int plotdots = 0;
+  public static final Object[] PLOTDOTS = { "PLOTDOTS", 0 };
   /** Logarithmic plot. */
-  public static boolean plotxlog;
+  public static final Object[] PLOTXLOG = { "PLOTXLOG", false };
   /** Logarithmic plot. */
-  public static boolean plotylog;
+  public static final Object[] PLOTYLOG = { "PLOTYLOG", false };
 
   /** Dialog location. */
-  public static int[] maplayoutloc = { 790, 520 };
+  public static final Object[] MAPLAYOUTLOC =
+    { "MAPLAYOUTLOC", new int[] { 790, 520 } };
   /** Dialog location. */
-  public static int[] fontsloc = { 10, 530 };
+  public static final Object[] FONTSLOC =
+    { "FONTSLOC", new int[] { 10, 530 } };
   /** Dialog location. */
-  public static int[] colorsloc = { 530, 620 };
+  public static final Object[] COLORSLOC =
+    { "COLORSLOC", new int[] { 530, 620 } };
   /** Dialog location. */
-  public static int[] helploc = { 690, 484 };
+  public static final Object[] HELPLOC =
+    { "HELPLOC", new int[] { 690, 484 } };
   /** Dialog size. */
-  public static int[] helpsize = { 300, 250 };
+  public static final Object[] HELPSIZE =
+    { "HELPSIZE", new int[] { 300, 250 } };
 
   /** Path for creating new XML Documents. */
-  public static String createpath = Prop.WORK;
+  public static final Object[] CREATEPATH = { "CREATEPATH", Prop.WORK };
   /** Path for XQuery files. */
-  public static String xqpath = Prop.WORK;
-  /** Path for importing the file system. */
-  public static String guifsimportpath = Prop.WORK;
+  public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
 
+  /** Path for importing the file system. */
+  public static final Object[] FSIMPORTPATH = { "FSIMPORTPATH", Prop.WORK };
   /** Name of the filesystem database. */
-  public static String guifsdbname = "Filesystem";
+  public static final Object[] FSDBNAME = { "FSDBNAME", "Filesystem" };
   /** Name of the mountpoint. */
-  public static String guimountpoint = Prop.TMP + "deepfs";
+  public static final Object[] FSMOUNT = { "FSMOUNT", Prop.TMP + "deepfs" };
   /** Name of the backingroot. */
-  public static String guibackingroot = Prop.TMP + "backingstore_deepfs";
+  public static final Object[] FSBACKING =
+    { "FSBACKING", Prop.TMP + "backingstore_deepfs" };
   /** Flag for importing complete file system hierarchy. */
-  public static boolean fsall = false;
+  public static final Object[] FSALL = { "FSALL", false };
 
   /** Last command inputs. */
-  public static String[] commands = new String[0];
+  public static final Object[] COMMANDS = { "COMMANDS", new String[0] };
   /** Last keyword inputs. */
-  public static String[] search = new String[0];
+  public static final Object[] SEARCH = { "SEARCH", new String[0] };
   /** Last XQuery inputs. */
-  public static String[] xquery = new String[0];
+  public static final Object[] XQUERY = { "XQUERY", new String[0] };
   /** Last XQuery files. */
-  public static String[] queries = new String[0];
+  public static final Object[] QUERIES = { "QUERIES", new String[0] };
 
   // CONFIG OPTIONS ===========================================================
 
-  /** Following options are not saved/read; don't remove this flag. */
-  public static final boolean SKIP = true;
+  /** The following options are not saved to disk; don't remove this flag. */
+  public static final Object[] SKIP = { "SKIP", true };
 
   /** Flag for displaying the menu in the GUI window. */
-  public static boolean showmenu = true;
+  public static final Object[] SHOWMENU = { "SHOWMENU", true };
   /** Flag for activated help view. */
-  public static boolean showhelp = false;
+  public static final Object[] SHOWHELP = { "SHOWHELP", false };
   /** Flag for activated tree view. */
-  public static boolean showtree = false;
+  public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
   /** Flag for activated result view after starting. */
-  public static boolean showstarttext = false;
+  public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
   /** Fullscreen flag. */
-  public static boolean fullscreen = false;
+  public static final Object[] FULLSCREEN = { "FULLSCREEN", false };
 
-  /** Strip direction horizontal? */
-  public static boolean striphor = true;
   /** Flag for computing additional map infos. */
-  public static boolean mapinfo = false;
+  public static final Object[] MAPINFO = { "MAPINFO", false };
   /** Flag for skipping time intensive treemap infos. */
-  public static boolean perfinfo = true;
+  public static final Object[] PERFINFO = { "PERFINFO", true };
   /** Shows real file contents in the treemap. */
-  public static boolean mapfs = true;
+  public static final Object[] MAPFS = { "MAPFS", true };
   /** Choice of interacting with TreeeMap. */
-  public static boolean mapinteraction = false;
+  public static final Object[] MAPINTERACTION = { "MAPINTERACTION", false };
   /** Distort map in mouse context. */
-  public static boolean mapdist = false;
-  /** Size of thumb focus in Mapview fraction of Mapview size. */
-  public static int mapthumbsize = 4;
-  /** Scaling to use in the Map oneclickfocus. */
-  public static int lensscale = 2;
-  /** Alpha value of the zoombox. */
-  public static int zoomboxalpha = 100;
+  public static final Object[] MAPDIST = { "MAPDIST", false };
+  /** Size of thumb focus in map view fraction of total size. */
+  public static final Object[] MAPTHUMBSIZE = { "MAPTHUMBSIZE", 4 };
+  /** Scaling to use in the Map One-click-focus. */
+  public static final Object[] LENSSCALE = { "LENSSCALE", 2 };
+  /** Alpha value of the zoom box. */
+  public static final Object[] ZOOMBOXALPHA = { "ZOOMBOXALPHA", 100 };
   /** Width of the fisheye view. */
-  public static int fishw = 300;
+  public static final Object[] FISHW = { "FISHW", 300 };
   /** Height of the fisheye view. */
-  public static int fishh = 200;
+  public static final Object[] FISHH = { "FISHH", 200 };
   /** Show file contents in TreeMap. */
-  public static boolean filecont = true;
-
-  /** Default path to the BaseX configuration file. */
-  private static String cfg = Prop.HOME + ".basexwin";
-
-  /** Private constructor, preventing class instantiation. */
-  private GUIProp() { }
+  public static final Object[] FILECONT = { "FILECONT", true };
 
   /**
-   * Reads in the GUI configuration file and initializes the properties.
-   * The file is located in the user's home directory.
+   * Constructor.
    */
-  public static void read() {
-    Prop.read(cfg, GUIProp.class.getFields());
+  public GUIProp() {
+    super("win");
     files(null);
   }
-
-  /**
-   * Writes the configuration file.
-   */
-  public static void write() {
-    Prop.write(cfg, GUIProp.class.getFields());
-  }
-
+  
   /**
    * Refreshes the list of recent query files.
    * @param file new file
    */
-  public static void files(final IO file) {
+  public void files(final IO file) {
     final StringList sl = new StringList();
 
     String path = null;
     if(file != null) {
       path = file.path();
-      xqpath = file.getDir();
+      set(XQPATH, file.getDir());
       Prop.xquery = file;
       sl.add(path);
     }
-    for(int q = 0; q < queries.length && q < 9; q++) {
-      final String f = queries[q];
+    final String[] qu = strings(QUERIES);
+    for(int q = 0; q < qu.length && q < 9; q++) {
+      final String f = qu[q];
       if(!f.equals(path) && IO.get(f).exists()) sl.add(f);
     }
-    queries = sl.finish();
+    set(QUERIES, sl.finish());
   }
 }

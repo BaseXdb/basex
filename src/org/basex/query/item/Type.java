@@ -16,6 +16,7 @@ import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DOCWrapper;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -643,8 +644,10 @@ public enum Type {
 
       if(o instanceof Document) {
         try {
-          final DOCWrapper p = new DOCWrapper((Document) o, "tmp");
-          final Data data = new MemBuilder().build(p, "tmp");
+          // [CG] API/should be use instance properties
+          final Prop prop = new Prop();
+          final DOCWrapper p = new DOCWrapper((Document) o, "tmp", prop);
+          final Data data = new MemBuilder(p).build("tmp");
           return new DBNode(data, 0);
         } catch(final IOException ex) {
           throw new QueryException(UNDOC, ex.getMessage());

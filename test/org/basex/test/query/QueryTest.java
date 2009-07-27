@@ -2,6 +2,7 @@ package org.basex.test.query;
 
 import org.basex.core.Context;
 import org.basex.core.Process;
+import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
@@ -45,20 +46,21 @@ public final class QueryTest {
    */
   private QueryTest() {
     final Performance p = new Performance();
-    Prop.textindex = true;
-    Prop.attrindex = true;
-    //Prop.mainmem = true;
-    Prop.chop = true;
+    final Prop prop = CONTEXT.prop;
+    prop.set(Prop.TEXTINDEX, true);
+    prop.set(Prop.ATTRINDEX, true);
+    //prop.set(MAINMEM, true);
+    prop.set(Prop.CHOP, true);
     boolean ok = true;
 
     if(ALL) {
       // testing all kinds of combinations
-      for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
-        for(int b = 0; b < 2; b++) { Prop.ftfuzzy = b == 0;
-          for(int c = 0; c < 2; c++) { Prop.ftst = c == 0;
-            for(int d = 0; d < 2; d++) { Prop.ftdc = d == 0;
-              for(int e = 0; e < 2; e++) { Prop.ftcs = e == 0;
-                ok &= test();
+      for(int a = 0; a < 2; a++) { prop.set(Prop.FTINDEX, a == 0);
+        for(int b = 0; b < 2; b++) { prop.set(Prop.FTFUZZY, b == 0);
+          for(int c = 0; c < 2; c++) { prop.set(Prop.FTST, c == 0);
+            for(int d = 0; d < 2; d++) { prop.set(Prop.FTDC, d == 0);
+              for(int e = 0; e < 2; e++) { prop.set(Prop.FTCS, e == 0);
+                ok &= test(prop);
               }
             }
           }
@@ -66,12 +68,12 @@ public final class QueryTest {
       }
     } else {
       // single test
-      Prop.ftindex = false;
-      Prop.ftfuzzy = false;
-      Prop.ftst = false;
-      Prop.ftdc = false;
-      Prop.ftcs = false;
-      ok &= test();
+      prop.set(Prop.FTINDEX, false);
+      prop.set(Prop.FTFUZZY, false);
+      prop.set(Prop.FTST, false);
+      prop.set(Prop.FTDC, false);
+      prop.set(Prop.FTCS, false);
+      ok &= test(prop);
     }
 
     System.out.println(ok ? "All tests correct." : wrong + " Wrong results...");
@@ -80,11 +82,12 @@ public final class QueryTest {
 
   /**
    * Tests the specified query implementation.
+   * @param prop database properties
    * @return true if everything went alright
    */
-  private boolean test() {
+  private boolean test(final AProp prop) {
     boolean ok = true;
-    for(final AbstractTest test : TESTS) ok &= test(test, test.details());
+    for(final AbstractTest test : TESTS) ok &= test(test, test.details(prop));
     return ok;
   }
 

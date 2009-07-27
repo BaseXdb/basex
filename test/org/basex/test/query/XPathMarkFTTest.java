@@ -1,5 +1,7 @@
 package org.basex.test.query;
 
+import org.basex.core.AProp;
+
 /**
  * XPathMark Functional Tests.
  *
@@ -133,7 +135,10 @@ public final class XPathMarkFTTest extends AbstractTest {
     };
   }
 
-  /** TABLE REPRESENTATION
+  @Override
+  String details(final AProp prop) { return ""; }
+
+  /* TABLE REPRESENTATION
   POS  PAR  TYPE  CONTENT
     0   -1  DOC   test.xml
     1    0  ELEM  A

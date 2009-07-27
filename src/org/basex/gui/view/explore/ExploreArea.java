@@ -101,7 +101,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(panel.getComponentCount() != 0) return;
 
     final Data data = gui.context.data();
-    if(!GUIProp.showexplore || data == null) return;
+    if(!gui.prop.is(GUIProp.SHOWEXPLORE) || data == null) return;
     addKeys(gui.context.data());
     panel.revalidate();
     panel.repaint();
@@ -141,7 +141,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(!elem.startsWith("@")) sl.add(Token.token(elem));
     }
 
-    final TokenList tmp = data.path.desc(sl, true, false);
+    final TokenList tmp = data.path.desc(sl, data, true, false);
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.finish());
@@ -246,7 +246,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param force force the execution of a new query.
    */
   void query(final boolean force) {
-    if(!force && !GUIProp.execrt) return;
+    if(!force && !gui.prop.is(GUIProp.EXECRT)) return;
 
     final TokenBuilder tb = new TokenBuilder();
     final Data data = gui.context.data();
@@ -303,17 +303,16 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     String qu = tb.toString();
     final boolean root = gui.context.root();
-    if(qu.length() != 0) {
-      if(!GUIProp.filterrt && !root) qu = "." + qu;
-    }
+    final boolean rt = gui.prop.is(GUIProp.FILTERRT);
+    if(qu.length() != 0 && !rt && !root) qu = "." + qu;
 
     String simple = all.getText().trim();
     if(simple.length() != 0) {
-      simple = Find.find(simple, gui.context, GUIProp.filterrt);
+      simple = Find.find(simple, gui.context, rt);
       qu = qu.length() != 0 ? simple + " | " + qu : simple;
     }
 
-    if(qu.length() == 0) qu = GUIProp.filterrt || root ? "/" : ".";
+    if(qu.length() == 0) qu = rt || root ? "/" : ".";
 
     if(!force && last.equals(qu)) return;
     last = qu;

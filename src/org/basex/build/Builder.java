@@ -26,6 +26,9 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
+  /** Parser instance. */
+  public final Parser parser;
+
   /** Meta data on built database. */
   public MetaData meta;
   /** Tag name index. */
@@ -36,8 +39,6 @@ public abstract class Builder extends Progress {
   protected Namespaces ns = new Namespaces();
   /** Tree structure. */
   protected PathSummary path = new PathSummary();
-  /** Parser instance. */
-  protected Parser parser;
 
   /** Parent stack. */
   private final int[] parStack = new int[IO.MAXHEIGHT];
@@ -53,9 +54,11 @@ public abstract class Builder extends Progress {
   private int c;
 
   /**
-   * Default constructor.
+   * Constructor.
+   * @param p parser
    */
-  protected Builder() {
+  protected Builder(final Parser p) {
+    parser = p;
     tags = new Names();
     atts = new Names();
   }
@@ -144,13 +147,11 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database by running the specified parser.
-   * @param p parser instance
    * @param db name of database
    * @return data database instance
    * @throws IOException in case of parsing or writing problems
    */
-  public final Data build(final Parser p, final String db) throws IOException {
-    parser = p;
+  public final Data build(final String db) throws IOException {
     init(db);
 
     // add document node and parse document

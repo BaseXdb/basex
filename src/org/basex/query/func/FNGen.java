@@ -49,7 +49,7 @@ final class FNGen extends Fun {
           try {
             ctx.doc(file, false);
             return Bln.TRUE;
-          } catch(final QueryException e) { }
+          } catch(final QueryException ex) { }
         }
         return Bln.FALSE;
       default:

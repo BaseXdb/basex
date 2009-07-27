@@ -53,14 +53,14 @@ public final class EMLExtractor extends AbstractExtractor {
   private String mBodyType = "";
 
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     mIn = new BufferedReader(new FileReader(f));
 
     // check for mbox format
     readLine();
     mIsMultiMail = mCurrLine.startsWith("From ") && mCurrLine.contains("@");
 
-    while(getSingleMailData(listener));
+    while(getSingleMailData(build));
 
     mIn.close();
     mContentType = null;
@@ -68,17 +68,17 @@ public final class EMLExtractor extends AbstractExtractor {
 
   /**
    * Extracts metadata of a single email.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @return false if no more mails are found
    * @throws IOException I/O exception
    */
-  private boolean getSingleMailData(final Builder listener) throws IOException {
-    listener.startElem(EMAIL, atts.reset());
+  private boolean getSingleMailData(final Builder build) throws IOException {
+    build.startElem(EMAIL, atts.reset());
 
     // catch exceptions and insert them into tree to find the part of
     // the mail which caused problem
     mBoundary = "";
-    getHeaderData(listener);
+    getHeaderData(build);
 
     if(mBoundary.length() != 0) {
       // currently, mContextType can still be empty..
@@ -90,12 +90,12 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     // parse all mail parts (can be just one)
-    while(getBodyData(listener));
+    while(getBodyData(build));
 
     // need to reset if email is mbox format
     mMultiPart = false;
 
-    listener.endElem(EMAIL);
+    build.endElem(EMAIL);
 
     while(readLine() && mCurrLine.length() == 0);
     return mCurrLine != null;
@@ -103,11 +103,11 @@ public final class EMLExtractor extends AbstractExtractor {
 
   /**
    * Extracts the body text of an email.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @return true if more parts are found
    * @throws IOException I/O exception
    */
-  private boolean getBodyData(final Builder listener) throws IOException {
+  private boolean getBodyData(final Builder build) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
 
     final boolean bound = mBoundary.length() != 0;
@@ -124,10 +124,10 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     // write body tag & content
-    listener.startElem(EMLBODY, atts.set(TYPE, token(mBodyType)));
-    listener.text(quotePrint ?
+    build.startElem(EMLBODY, atts.set(TYPE, token(mBodyType)));
+    build.text(quotePrint ?
         new TokenBuilder(decodeQP(tb.finish())) : tb, false);
-    listener.endElem(EMLBODY);
+    build.endElem(EMLBODY);
 
     // reset encoding flag
     quotePrint = false;
@@ -138,32 +138,32 @@ public final class EMLExtractor extends AbstractExtractor {
   /**
    * A method to locate problems and add the error
    * message to the xml tree. (for testing only)
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @param s the error message to be printed
    * @throws IOException I/O exception
    */
-  private void printException(final Builder listener, final String s)
+  private void printException(final Builder build, final String s)
       throws IOException {
-    listener.nodeAndText(token("Exception"), atts.reset(), token(s));
+    build.nodeAndText(token("Exception"), atts.reset(), token(s));
   }
 
   /**
    * Extracts the header information of an email.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void getHeaderData(final Builder listener) throws IOException {
+  private void getHeaderData(final Builder build) throws IOException {
     do {
-      checkHeaderLine(listener);
+      checkHeaderLine(build);
     } while(mCurrLine.length() != 0);
   }
 
   /**
    * Checks the current header line for attributes.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void checkHeaderLine(final Builder listener) throws IOException {
+  private void checkHeaderLine(final Builder build) throws IOException {
     // some attributes treated separately due to syntax e.g.
 
     String type = "";
@@ -175,24 +175,24 @@ public final class EMLExtractor extends AbstractExtractor {
 
     boolean readNext = true;
     if(type.equals("from")) {
-      getSender(listener);
+      getSender(build);
     } else if(type.equals("date")) {
-      getDate(listener);
+      getDate(build);
     } else if(type.equals("subject")) {
-      getSubject(listener);
+      getSubject(build);
       readNext = false;
     } else if(type.equals("to")) {
-      getReceivers(listener);
+      getReceivers(build);
       readNext = false;
     } else if(type.equals("content-type") || mCurrLine.contains("boundary=")) {
-      getEmailContentType(listener);
+      getEmailContentType(build);
     } else if(type.equals("content-transfer-encoding")) {
       getEncoding();
     } else {
       // check simple attributes
       for(int i = 0; i < EMLATTR.length; i++) {
         if(type.equals(EMLATTR[i])) {
-          listener.nodeAndText(ATTRIBUTETOKENS[i], atts.reset(),
+          build.nodeAndText(ATTRIBUTETOKENS[i], atts.reset(),
               token(mCurrLine));
           return;
         }
@@ -270,16 +270,16 @@ public final class EMLExtractor extends AbstractExtractor {
 
   /**
    * Gets the overall content-type of an email.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void getEmailContentType(final Builder listener) throws IOException {
+  private void getEmailContentType(final Builder build) throws IOException {
     for(final String type : mCurrLine.split(";")) {
       if(!type.contains("=")) {
         // store content type
         final String contentType = type.toLowerCase();
         mContentType = contentType.split("/")[0];
-        listener.nodeAndText(EMLCONTENTTYPE, atts.reset(), token(contentType));
+        build.nodeAndText(EMLCONTENTTYPE, atts.reset(), token(contentType));
       } else if(type.trim().startsWith("boundary=")) {
         // store boundary
         mBoundary = type.split("boundary=")[1];
@@ -297,10 +297,10 @@ public final class EMLExtractor extends AbstractExtractor {
 
   /**
    * Extracts the addresses the email was sent to.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void getReceivers(final Builder listener) throws IOException {
+  private void getReceivers(final Builder build) throws IOException {
     final StringBuilder addressPool = new StringBuilder();
     addressPool.append(mCurrLine);
 
@@ -310,16 +310,16 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     for(final Matcher m = MAILPATTERN.matcher(addressPool); m.find();) {
-      listener.nodeAndText(EMLTO, atts.reset(), token(m.group()));
+      build.nodeAndText(EMLTO, atts.reset(), token(m.group()));
     }
   }
 
   /**
    * Extracts the subject information and decodes it, if MIME-encoded.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void getSubject(final Builder listener) throws IOException {
+  private void getSubject(final Builder build) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mCurrLine);
     while(readLine() && mCurrLine.length() != 0 && !mCurrLine.contains(": ")) {
@@ -349,28 +349,28 @@ public final class EMLExtractor extends AbstractExtractor {
         if(text[i] == 0x5f) text[i] = 0x20;
       }
     }
-    listener.nodeAndText(EMLSUBJECT, atts.reset(), text);
+    build.nodeAndText(EMLSUBJECT, atts.reset(), text);
   }
 
   /**
    * Extracts the address of the email sender.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    * @throws IOException I/O exception
    */
-  private void getSender(final Builder listener) throws IOException {
+  private void getSender(final Builder build) throws IOException {
     final Matcher m = MAILPATTERN.matcher(mCurrLine);
     if(m.find()) {
-      listener.nodeAndText(EMLFROM, atts.reset(), token(m.group()));
+      build.nodeAndText(EMLFROM, atts.reset(), token(m.group()));
     } else {
-      printException(listener, mCurrLine);
+      printException(build, mCurrLine);
     }
   }
 
   /**
    * Extracts the date information of an email.
-   * @param listener Builder reference
+   * @param build reference to the database builder
    */
-  private void getDate(final Builder listener) {
+  private void getDate(final Builder build) {
     final byte[][] date = split(token(mCurrLine), ' ');
 
     // supported date format: (day,)? dd (mm|month) yyyy tt:tt:tt (zone)?
@@ -392,8 +392,8 @@ public final class EMLExtractor extends AbstractExtractor {
       final GregorianCalendar cal = new GregorianCalendar(toInt(yea),
           toInt(mon), toInt(day), toInt(tim[0]), toInt(tim[1]), toInt(tim[2]));
       final long min = cal.getTimeInMillis() / 60000;
-      listener.emptyElem(EMLDATE, atts.set(EMLTIME, token(min)));
-    } catch(final Exception e) {
+      build.emptyElem(EMLDATE, atts.set(EMLTIME, token(min)));
+    } catch(final Exception ex) {
       BaseX.debug("EMLExtractor.getDate: " + mCurrLine);
     }
   }

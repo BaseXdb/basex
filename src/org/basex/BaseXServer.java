@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import org.basex.core.ClientProcess;
+import org.basex.core.ClientLauncher;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -86,7 +86,7 @@ public final class BaseXServer {
     }.start();
 
     try {
-      final ServerSocket server = new ServerSocket(Prop.port);
+      final ServerSocket server = new ServerSocket(context.prop.num(Prop.PORT));
       BaseX.outln(SERVERSTART);
       while(running) serve(server);
     } catch(final Exception ex) {
@@ -121,7 +121,7 @@ public final class BaseXServer {
 
       Process pr = null;
       try {
-        pr = new CommandParser(in).parse()[0];
+        pr = new CommandParser(in, context).parse()[0];
       } catch(final QueryException ex) {
         pr = new Process(0) { };
         pr.error(ex.extended());
@@ -145,11 +145,13 @@ public final class BaseXServer {
             if(proc instanceof GetResult || proc instanceof GetInfo) {
               final OutputStream os = s.getOutputStream();
               final PrintOutput out = new PrintOutput(new BufferedOutput(os),
-                  Prop.web ? Prop.maxtext : Integer.MAX_VALUE);
+                  Prop.web ? context.prop.num(Prop.MAXTEXT) :
+                    Integer.MAX_VALUE);
               final int id = Math.abs(Integer.parseInt(proc.args().trim()));
               final Process c = get(id);
               if(c == null) {
-                out.print(BaseX.info(SERVERTIME, Prop.timeout));
+                out.print(BaseX.info(SERVERTIME,
+                    context.prop.num(Prop.TIMEOUT)));
               } else if(proc instanceof GetResult) {
                 // the client requests result of the last process
                 c.output(out);
@@ -193,7 +195,7 @@ public final class BaseXServer {
   synchronized void clean() {
     final long t = System.nanoTime();
     for(int i = 0; i < sess.size(); i++) {
-      if(t - sess.get(i).time > Prop.timeout * 1000000000L) {
+      if(t - sess.get(i).time > context.prop.num(Prop.TIMEOUT) * 1000000000L) {
         final BaseXSession s = sess.remove(sess.size() - 1);
         if(i != sess.size()) sess.set(i--, s);
         s.stop();
@@ -249,7 +251,7 @@ public final class BaseXServer {
               BaseX.errln(SERVERPORT + args[a].substring(i));
               break;
             }
-            Prop.port = p;
+            context.prop.set(Prop.PORT, p);
             i = args[a].length();
             ok = true;
           } else if(c == 'd') {
@@ -264,8 +266,7 @@ public final class BaseXServer {
         }
       } else if(args[a].equals("stop")) {
         try {
-          // run new process, sending the stop command
-          new ClientProcess("localhost", Prop.port, new Exit()).execute(null);
+          new ClientLauncher(new Exit(), context.prop).execute();
           BaseX.outln(SERVERSTOPPED);
         } catch(final Exception ex) {
           if(ex instanceof IOException) BaseX.errln(SERVERERR);

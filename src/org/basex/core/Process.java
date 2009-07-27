@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Process extends AbstractProcess {
+public abstract class Process extends Progress {
   /** Commands flag: standard. */
   protected static final int STANDARD = 0;
   /** Commands flag: printing command. */
@@ -32,6 +32,10 @@ public abstract class Process extends AbstractProcess {
 
   /** Command arguments. */
   public String[] args;
+  /** Database context. */
+  protected Context context;
+  /** Database properties. */
+  protected Prop prop;
 
   /** Container for query information. */
   protected TokenBuilder info = new TokenBuilder();
@@ -39,8 +43,6 @@ public abstract class Process extends AbstractProcess {
   protected Performance perf = new Performance();
   /** Temporary query result. */
   protected Result result;
-  /** Current context. */
-  protected Context context;
   /** Command properties. */
   private final int props;
 
@@ -66,12 +68,18 @@ public abstract class Process extends AbstractProcess {
 
     if(!execute(ctx)) throw new RuntimeException(info());
     output(out);
-    if(Prop.info) out.println(info());
+    if(ctx.prop.is(Prop.INFO)) out.println(info());
   }
 
-  @Override
+  /**
+   * Executes the process and returns a success flag.
+   * @param ctx query context
+   * @return success flag
+   */
   public final boolean execute(final Context ctx) {
     context = ctx;
+    prop = ctx.prop;
+    
     final Data data = context.data();
     // data reference needed?
     if(data() && data == null) return error(PROCNODB);
@@ -81,7 +89,8 @@ public abstract class Process extends AbstractProcess {
       while(data.getLock() == 2) Performance.sleep(50);
       // check update commands..
       if(updating()) {
-        if(Prop.tablemem || Prop.mainmem) return error(PROCMM);
+        if(prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM))
+          return error(PROCMM);
         while(data.getLock() != 0) Performance.sleep(50);
       }
     }
@@ -112,7 +121,12 @@ public abstract class Process extends AbstractProcess {
     return true;
   }
 
-  @Override
+  /**
+   * Serializes the textual results.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+
   public final void output(final PrintOutput out) throws IOException {
     final Data data = context.data();
     try {
@@ -136,7 +150,11 @@ public abstract class Process extends AbstractProcess {
   protected void out(final PrintOutput out) throws IOException {
   }
 
-  @Override
+  /**
+   * Returns process info.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
   public final void info(final PrintOutput out) throws IOException {
     out.print(info.toString());
   }
@@ -150,6 +168,7 @@ public abstract class Process extends AbstractProcess {
   public final boolean error(final String msg, final Object... ext) {
     info.reset();
     info.add(msg == null ? "" : msg, ext);
+    info.add(NL);
     return false;
   }
 
@@ -160,7 +179,10 @@ public abstract class Process extends AbstractProcess {
    * @return true
    */
   public final boolean info(final String str, final Object... ext) {
-    info.add(str, ext);
+    if(prop.is(Prop.INFO)) {
+      info.add(str, ext);
+      info.add(NL);
+    }
     return true;
   }
 
@@ -237,11 +259,11 @@ public abstract class Process extends AbstractProcess {
 
   /**
    * Checks the specified command property.
-   * @param prop property to be checked
+   * @param pr property to be checked
    * @return result of check
    */
-  private boolean check(final int prop) {
-    return (props & prop) != 0;
+  private boolean check(final int pr) {
+    return (props & pr) != 0;
   }
 
   /**
@@ -254,8 +276,6 @@ public abstract class Process extends AbstractProcess {
     progress(proc);
     final boolean ok = proc.execute(context);
     info = proc.info;
-    perf = proc.perf;
-    result = proc.result;
     return ok;
   }
 

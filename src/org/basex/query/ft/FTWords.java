@@ -112,7 +112,8 @@ public final class FTWords extends FTExpr {
       public FTItem next() {
         if(iat == null) {
           // more than one token: deactivate fast processing
-          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast);
+          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
+              ctx.context.prop);
           ft.fast &= ft.count() == 1;
           ft.init();
           while(ft.more()) {
@@ -252,7 +253,7 @@ public final class FTWords extends FTExpr {
     }
 
     // summarize number of hits; break loop if no hits are expected
-    final Tokenizer ft = new Tokenizer(txt, fto, fast);
+    final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
     ic.is = 0;
     while(ft.more()) {
       if(ft.get().length > Token.MAXLEN) return false;

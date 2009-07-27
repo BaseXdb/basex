@@ -3,9 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -34,10 +32,5 @@ public final class Run extends AQuery {
       final String msg = ex.getMessage();
       return error(msg != null ? msg : args[0]);
     }
-  }
-
-  @Override
-  protected void out(final PrintOutput o) throws IOException {
-    out(o, Prop.xqformat);
   }
 }

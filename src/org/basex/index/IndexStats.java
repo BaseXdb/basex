@@ -29,9 +29,10 @@ final class IndexStats {
 
   /**
    * Default constructor.
+   * @param prop database properties
    */
-  IndexStats() {
-    nr = Prop.indexocc;
+  IndexStats(final Prop prop) {
+    nr = prop.num(Prop.INDEXOCC);
     occMin = new int[nr];
     occMax = new int[nr];
     txtMin = new byte[nr][];

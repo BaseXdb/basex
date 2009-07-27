@@ -96,7 +96,6 @@ final class XMLInput {
     return ip < 20;
   }
 
-
   /**
    * Inserts a cached input buffer.
    * @param ci buffer to be added

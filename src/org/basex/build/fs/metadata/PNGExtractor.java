@@ -18,14 +18,14 @@ public final class PNGExtractor extends AbstractExtractor {
   private final byte[] data = new byte[24];
 
   @Override
-  public void extract(final Builder listener, final File f) throws IOException {
+  public void extract(final Builder build, final File f) throws IOException {
     BufferInput.read(f, data);
 
     // check if the header is valid
     if(!Token.startsWith(data, HEADERPNG)) return;
 
     // open image tag
-    listener.startElem(IMAGE, atts.set(TYPE, TYPEPNG));
+    build.startElem(IMAGE, atts.set(TYPE, TYPEPNG));
 
     // extract image dimensions
     final int w = ((data[16] & 0xFF) << 24) + ((data[17] & 0xFF) << 16) +
@@ -33,8 +33,8 @@ public final class PNGExtractor extends AbstractExtractor {
     final int h = ((data[20] & 0xFF) << 24) + ((data[21] & 0xFF) << 16) +
       ((data[22] & 0xFF) << 8) + (data[23] & 0xFF);
 
-    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
-    listener.nodeAndText(HEIGHT, atts, Token.token(h));
-    listener.endElem(IMAGE);
+    build.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    build.nodeAndText(HEIGHT, atts, Token.token(h));
+    build.endElem(IMAGE);
   }
 }

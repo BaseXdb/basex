@@ -15,15 +15,23 @@ public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
 
+  /**
+   * Constructor.
+   * @param p parser
+   */
+  public MemBuilder(final Parser p) {
+    super(p);
+  }
+  
   @Override
   public void init(final String db) {
     // always index values in main memory mode
-    meta = new MetaData(db);
+    meta = new MetaData(db, parser.prop);
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.io;
-    data = new MemData(64, tags, atts, ns, path);
+    data = new MemData(64, tags, atts, ns, path, parser.prop);
     data.meta = meta;
   }
 

@@ -79,8 +79,7 @@ public final class INEXTest {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
-    Prop.serialize = true;
-    Prop.info = true;
+    context.prop.set(Prop.INFO, true);
 
     if(s) {
       // print header in output file

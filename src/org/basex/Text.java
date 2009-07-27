@@ -35,6 +35,10 @@ public interface Text {
   String ON = "ON";
   /** Off flag. */
   String OFF = "OFF";
+  /** On flag. */
+  String TRUE = "TRUE";
+  /** Off flag. */
+  String FALSE = "FALSE";
   /** All flag. */
   String ALL = "ALL";
 
@@ -47,7 +51,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMESPACE + ".org";
   /** Code version. */
-  String VERSION = "5.6 beta 6";
+  String VERSION = "5.6 beta 7";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version Information. */
@@ -91,9 +95,7 @@ public interface Text {
   String LOCALINFO = CONSOLEINFO + NL +
     "Usage: BaseX [options] [query]" + NL +
     "  [query]    specify query file" + NL +
-    "  -c         chop whitespaces" + NL +
     "  -d         debug mode" + NL +
-    "  -e         skip entity parsing" + NL +
     "  -o [file]  specify output file" + NL +
     "  -q<cmd>    send BaseX commands" + NL +
     "  -v/V       show (all) process info" + NL +
@@ -413,9 +415,6 @@ public interface Text {
 
   /** Database created. */
   String DBCREATED = lang("pc_created");
-
-  /** Create information. */
-  String CREATETABLE = lang("pc_tbl");
   /** Parse error. */
   String CREATEERR = lang("pc_err");
 
@@ -937,7 +936,7 @@ public interface Text {
   /** Dialog title for choosing a file. */
   String CREATETITLE = lang("dc_title");
   /** Database creation filter. */
-  String CREATEFILTER = lang("dc_filter");
+  String CREATEFILT = lang("dc_filter");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
   /** XML File Description. */
@@ -1090,7 +1089,7 @@ public interface Text {
   /** Focus. */
   String PREFFOCUS = lang("dp_focus");
   /** Simple File Dialog. */
-  String SIMPLEFD = lang("dp_simplefd");
+  String SIMPLEFILE = lang("dp_simplefd");
   /** Name display flag. */
   String PREFNAME = lang("dp_names");
   /** Language preference. */
@@ -1139,14 +1138,14 @@ public interface Text {
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
   /** Show Attributes.  */
-  String MAPATTS = lang("dm_atts");
+  String MAPATT = lang("dm_atts");
   /** Predefined number of layouts. */
-  String[] MAPOFFSETS = {
+  String[] MAPOFFSET = {
     lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
     lang("dm_choice4"), lang("dm_choice5")
   };
   /** Predefined number of layouts. */
-  String[] MAPALGO = {
+  String[] MAPALG = {
     "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout",
     "Binary Layout"
   };
@@ -1265,7 +1264,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPFOCUS = token(lang("h_focus"));
   /** Help String. */
-  byte[] HELPSIMPLEFD = token(lang("h_simplefd"));
+  byte[] HELPSIMPLEFILE = token(lang("h_simplefd"));
   /** Help String. */
   byte[] HELPOPEN = token(lang("h_open"));
   /** Help String. */

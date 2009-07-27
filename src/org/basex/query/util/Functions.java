@@ -118,7 +118,7 @@ public final class Functions extends ExprInfo {
     final byte[] ln = type.ln();
     final Levenshtein ls = new Levenshtein();
     for(final Type t : Type.values()) {
-      if(t.par != null && ls.similar(lc(ln), lc(token(t.name))))
+      if(t.par != null && ls.similar(lc(ln), lc(token(t.name)), 0))
         Err.or(FUNSIMILAR, ln, t.name);
     }
     Err.or(FUNCUNKNOWN, type.str());
@@ -194,7 +194,7 @@ public final class Functions extends ExprInfo {
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     for(int n = 0; n < size; n++) {
-      if(ls.similar(nm, lc(func[n].var.name.ln())))
+      if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
         Err.or(FUNSIMILAR, name.str(), func[n].var.name.str());
     }
   }

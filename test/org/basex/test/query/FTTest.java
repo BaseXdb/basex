@@ -1,6 +1,7 @@
 package org.basex.test.query;
 
 import org.basex.BaseX;
+import org.basex.core.AProp;
 import org.basex.core.Prop;
 
 /**
@@ -10,17 +11,6 @@ import org.basex.core.Prop;
  * @author Christian Gruen
  */
 public final class FTTest extends AbstractTest {
-  @Override
-  String details() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(set("ftindex", Prop.ftindex) + ";");
-    sb.append(set("ftfuzzy", Prop.ftfuzzy) + ";");
-    sb.append(set("ftst", Prop.ftst) + ";");
-    sb.append(set("ftdc", Prop.ftdc) + ";");
-    sb.append(set("ftcs", Prop.ftcs));
-    return sb.toString();
-  }
-
   /**
    * Returns a flag string.
    * @param key key
@@ -553,59 +543,70 @@ public final class FTTest extends AbstractTest {
         "//fti [text() ftcontains 'adf' ftor ftnot 'adf']" },
 
     };
-
-    /** TABLE REPRESENTATION
-    PRE DIS SIZ ATS  NS  KIND  CONTENT
-      0   1  46   1   0  DOC   tmp
-      1   1  45   1   0  ELEM  fttest
-      2   1  11   1   0  ELEM  co
-      3   1   2   1   0  ELEM  w
-      4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
-        third sentence. fourth sentence. fifth sentence.
-      5   3   2   1   0  ELEM  w
-      6   1   1   1   0  TEXT  XML xml XmL
-      7   5   2   1   0  ELEM  w
-      8   1   1   1   0  TEXT  we have xml databases
-      9   7   2   1   0  ELEM  w
-     10   1   1   1   0  TEXT  XML DATABASES
-     11   9   2   1   0  ELEM  w
-     12   1   1   1   0  TEXT  XML & Databases
-     13  12   3   1   0  ELEM  wc
-     14   1   2   1   0  ELEM  w
-     15   1   1   1   0  TEXT  hello
-     16  15   5   1   0  ELEM  sc
-     17   1   2   1   0  ELEM  s
-     18   1   1   1   0  TEXT  diät-joghurt
-     19   3   2   1   0  ELEM  s
-     20   1   1   1   0  TEXT  diat-joghurt
-     21  20   4   1   0  ELEM  at
-     22   1   2   1   0  ELEM  b
-     23   1   1   1   0  TEXT  B
-     24   3   1   1   0  TEXT  ad one
-     25  24   2   1   0  ELEM  fti
-     26   1   1   1   0  TEXT  adfas wordt. ook wel eens
-     27  26   2   1   0  ELEM  fti
-     28   1   1   1   0  TEXT  wordt ook wel een s
-     29  28   2   1   0  ELEM  fti
-     30   1   1   1   0  TEXT  adfad. wordt
-    ook wel.eens a
-     31  30   2   1   0  ELEM  fti
-     32   1   1   1   0  TEXT  adfad wordt. ook
-    wel een s adf
-     33  32   2   1   0  ELEM  fti
-     34   1   1   1   0  TEXT  adfad wordt ook. wel een s
-     35  34   2   2   0  ELEM  atr
-     36   1   1   1   0  ATTR  key="value"
-     37  36   2   1   0  ELEM  w
-     38   1   1   1   0  TEXT  the fifth sentence. fourth sentence.
-       third sentence. second sentence. first sentence.
-     39   1   1   1   0  ELEM  wld
-     40   1   2   1   0  ELEM  wld
-     41   1   1   1   0  TEXT  yeah
-     42  41   4   1   0  ELEM  mix
-     43   1   1   1   0  TEXT  A
-     44   2   1   1   0  ELEM  sub
-     45   3   1   1   0  TEXT  B
-     */
   }
+
+  @Override
+  String details(final AProp prop) {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(set("ftindex", prop.is(Prop.FTINDEX)) + ";");
+    sb.append(set("ftfuzzy", prop.is(Prop.FTFUZZY)) + ";");
+    sb.append(set("ftst", prop.is(Prop.FTST)) + ";");
+    sb.append(set("ftdc", prop.is(Prop.FTCS)) + ";");
+    sb.append(set("ftcs", prop.is(Prop.FTCS)));
+    return sb.toString();
+  }
+
+  /** TABLE REPRESENTATION
+  PRE DIS SIZ ATS  NS  KIND  CONTENT
+    0   1  46   1   0  DOC   tmp
+    1   1  45   1   0  ELEM  fttest
+    2   1  11   1   0  ELEM  co
+    3   1   2   1   0  ELEM  w
+    4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
+      third sentence. fourth sentence. fifth sentence.
+    5   3   2   1   0  ELEM  w
+    6   1   1   1   0  TEXT  XML xml XmL
+    7   5   2   1   0  ELEM  w
+    8   1   1   1   0  TEXT  we have xml databases
+    9   7   2   1   0  ELEM  w
+   10   1   1   1   0  TEXT  XML DATABASES
+   11   9   2   1   0  ELEM  w
+   12   1   1   1   0  TEXT  XML & Databases
+   13  12   3   1   0  ELEM  wc
+   14   1   2   1   0  ELEM  w
+   15   1   1   1   0  TEXT  hello
+   16  15   5   1   0  ELEM  sc
+   17   1   2   1   0  ELEM  s
+   18   1   1   1   0  TEXT  diät-joghurt
+   19   3   2   1   0  ELEM  s
+   20   1   1   1   0  TEXT  diat-joghurt
+   21  20   4   1   0  ELEM  at
+   22   1   2   1   0  ELEM  b
+   23   1   1   1   0  TEXT  B
+   24   3   1   1   0  TEXT  ad one
+   25  24   2   1   0  ELEM  fti
+   26   1   1   1   0  TEXT  adfas wordt. ook wel eens
+   27  26   2   1   0  ELEM  fti
+   28   1   1   1   0  TEXT  wordt ook wel een s
+   29  28   2   1   0  ELEM  fti
+   30   1   1   1   0  TEXT  adfad. wordt
+  ook wel.eens a
+   31  30   2   1   0  ELEM  fti
+   32   1   1   1   0  TEXT  adfad wordt. ook
+  wel een s adf
+   33  32   2   1   0  ELEM  fti
+   34   1   1   1   0  TEXT  adfad wordt ook. wel een s
+   35  34   2   2   0  ELEM  atr
+   36   1   1   1   0  ATTR  key="value"
+   37  36   2   1   0  ELEM  w
+   38   1   1   1   0  TEXT  the fifth sentence. fourth sentence.
+     third sentence. second sentence. first sentence.
+   39   1   1   1   0  ELEM  wld
+   40   1   2   1   0  ELEM  wld
+   41   1   1   1   0  TEXT  yeah
+   42  41   4   1   0  ELEM  mix
+   43   1   1   1   0  TEXT  A
+   44   2   1   1   0  ELEM  sub
+   45   3   1   1   0  TEXT  B
+   */
 }

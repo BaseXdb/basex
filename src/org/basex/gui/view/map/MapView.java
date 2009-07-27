@@ -144,14 +144,15 @@ public final class MapView extends View implements Runnable {
     zoomStep = 0;
 
     final Data data = gui.context.data();
+    final GUIProp gprop = gui.prop;
     if(data != null && getWidth() != 0) {
-      if(!GUIProp.showmap) return;
-      if(GUIProp.mapinfo) mapInfo = new DialogMapInfo(gui);
-      painter = data.fs != null ? new MapFS(this, data.fs) : new MapDefault(
-          this);
+      if(!gprop.is(GUIProp.SHOWMAP)) return;
+      if(gprop.is(GUIProp.MAPINFO)) mapInfo = new DialogMapInfo(gui);
+      painter = data.fs != null ? new MapFS(this, data.fs, gprop) :
+        new MapDefault(this, gprop);
       mainMap = createImage();
       zoomMap = createImage();
-      if(GUIProp.mapinteraction) hugeMap = new BufferedImage(fkt
+      if(gprop.is(GUIProp.MAPINTERACTION)) hugeMap = new BufferedImage(fkt
           * getWidth(), fkt * getHeight(), BufferedImage.TYPE_INT_BGR);
       refreshLayout();
       repaint();
@@ -189,7 +190,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!GUIProp.showmap) {
+    if(!gui.prop.is(GUIProp.SHOWMAP)) {
       mainRects = null;
       return;
     }
@@ -215,7 +216,7 @@ public final class MapView extends View implements Runnable {
     // initial rectangle
     final int w = getWidth(), h = getHeight();
 
-    if(GUIProp.mapinteraction) {
+    if(gui.prop.is(GUIProp.MAPINTERACTION)) {
       // [JH] use normal rectangles to calculate hugeMap
       // final Data data = gui.context.data();
       // MapLayout hugeLayout = new MapLayout(data, textLen);
@@ -264,7 +265,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showmap;
+    return gui.prop.is(GUIProp.SHOWMAP);
   }
 
   /**
@@ -383,7 +384,7 @@ public final class MapView extends View implements Runnable {
     for(int i = 0; i < 1; i++) {
       // calculate new main rectangles
       initLen();
-      layout = new MapLayout(nodes.data, textLen);
+      layout = new MapLayout(nodes.data, textLen, gui.prop);
 
       layout.makeMap(rect, new MapList(nodes.nodes.clone()),
           0, nodes.size() - 1);
@@ -392,9 +393,9 @@ public final class MapView extends View implements Runnable {
     }
 
     // [JH] implement distance change, readability, ...
-    if(GUIProp.mapinfo) {
+    if(gui.prop.is(GUIProp.MAPINFO)) {
       double aar = 0;
-      if(!GUIProp.perfinfo) aar = MapLayout.aar(mainRects);
+      if(!gui.prop.is(GUIProp.PERFINFO)) aar = MapLayout.aar(mainRects);
       mapInfo.setValues(mainRects.size, rect, aar,
           p.getTimer(1), layout.algo.getName());
     }
@@ -405,7 +406,7 @@ public final class MapView extends View implements Runnable {
 
     /*
      * Screenshots: try { File file = new File("screenshot.png");
-     * ImageIO.write(mainMap, "png", file); } catch(IOException e) {
+     * ImageIO.write(mainMap, "png", file); } catch(IOException ex) {
      * e.printStackTrace(); }
      */
   }
@@ -413,6 +414,8 @@ public final class MapView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();
+    final GUIProp gprop = gui.prop;
+    
     if(data == null || data.meta.size == 0) {
       super.paintComponent(g);
       return;
@@ -447,7 +450,7 @@ public final class MapView extends View implements Runnable {
       if(focused == null || !focused.thumb) return;
     }
 
-    if(GUIProp.mapoffsets == 0 && !mapdist && !constMag) {
+    if(gprop.num(GUIProp.MAPOFFSETS) == 0 && !mapdist && !constMag) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size;
       int par = ViewData.parent(data, focused.pre);
@@ -480,10 +483,10 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
-      BaseXLayout.antiAlias(g);
+      BaseXLayout.antiAlias(g, gui.prop);
       g.setFont(font);
       if(data.kind(focused.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.tag(data, focused.pre));
+        String tt = Token.string(ViewData.tag(gprop, data, focused.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
       }
@@ -497,85 +500,88 @@ public final class MapView extends View implements Runnable {
         final TokenList tl = MapRenderer.calculateThumbnailsToolTip(focused,
             Tokenizer.getInfo(text), sen, mouseX, mouseY, getWidth(), g, spc);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
-        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl);
+        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,
+            gprop.num(GUIProp.FONTSIZE));
         focused.x -= 3;
         focused.w += 3;
       }
     }
     final int ac = AlphaComposite.SRC_OVER;
     ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
-        GUIProp.zoomboxalpha / 100.0f));
-    if(GUIProp.mapinteraction && thumbMap) {
-      //// set up some alpha display for the overlayed picture
+        gprop.num(GUIProp.ZOOMBOXALPHA) / 100.0f));
+    if(gprop.is(GUIProp.MAPINTERACTION) && thumbMap) {
+      //// set up some alpha display for the overlaid picture
       //final int ac = AlphaComposite.SRC_OVER;
       //((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac,
-      //    GUIProp.zoomboxalpha / 100.0f));
+      //    gprop.num(ZOOMBOXALPHA) / 100.0f));
 
       g.drawImage(tinyMap, tinyx, tinyy, tinyw, tinyh, this);
       // draw border
       g.setColor(Color.black);
       g.drawRect(tinyx, tinyy, tinyw, tinyh);
-    } else if(GUIProp.mapinteraction && constMag) {
-        int dxstart = mouseX - GUIProp.fishw / 2;
-        int dxend = mouseX + GUIProp.fishw / 2;
-        if(dxstart < 0) {
-          dxstart = 0;
-          dxend = GUIProp.fishw;
-        } else if(dxend > getWidth()) {
-          dxend = getWidth();
-          dxstart = getWidth() - GUIProp.fishw;
-        }
-
-        int dystart = mouseY - GUIProp.fishh / 2;
-        int dyend = mouseY + GUIProp.fishh / 2;
-        if(dystart < 0) {
-          dystart = 0;
-          dyend = GUIProp.fishh;
-        } else if(dyend > getHeight()) {
-          dyend = getHeight();
-          dystart = getHeight() - GUIProp.fishh;
-        }
-
-        int sxstart = fkt * mouseX - GUIProp.fishw / 2;
-        int sxend = fkt * mouseX + GUIProp.fishw / 2;
-        if(sxstart < 0) {
-          sxstart = 0;
-          sxend = GUIProp.fishw;
-        } else if(sxend > hugeMap.getWidth()) {
-          sxend = hugeMap.getWidth();
-          sxstart = hugeMap.getWidth() - GUIProp.fishw;
-        }
-
-        int systart = fkt * mouseY - GUIProp.fishh / 2;
-        int syend = fkt * mouseY + GUIProp.fishh / 2;
-        if(systart < 0) {
-          systart = 0;
-          syend = GUIProp.fishh;
-        } else if(syend > hugeMap.getHeight()) {
-          syend = hugeMap.getHeight();
-          systart = hugeMap.getHeight() - GUIProp.fishh;
-        }
-
-        //BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart,
-        //    sxend - sxstart, syend - systart));
-        //
-        //try {
-        //  File file = new File("baseXdistorted.png");
-        //  ImageIO.write(map, "png", file);
-        //} catch(IOException exc) {
-        //  exc.printStackTrace();
-        //}
-        //
-        //g.drawImage(map, dxstart, dystart, dxend, dyend,
-        //    0, 0, map.getWidth(), map.getHeight(), this);
-
-        g.drawImage(hugeMap, dxstart, dystart, dxend, dyend,
-            sxstart, systart, sxend, syend, this);
-
-        // draw border
-        g.setColor(Color.black);
-        g.drawRect(dxstart, dystart, GUIProp.fishw, GUIProp.fishh);
+    } else if(gprop.is(GUIProp.MAPINTERACTION) && constMag) {
+      int fishw = gprop.num(GUIProp.FISHW);
+      int fishh = gprop.num(GUIProp.FISHH);
+      int dxstart = mouseX - fishw / 2;
+      int dxend = mouseX + fishw / 2;
+      if(dxstart < 0) {
+        dxstart = 0;
+        dxend = fishw;
+      } else if(dxend > getWidth()) {
+        dxend = getWidth();
+        dxstart = getWidth() - fishw;
       }
+
+      int dystart = mouseY - fishh / 2;
+      int dyend = mouseY + fishh / 2;
+      if(dystart < 0) {
+        dystart = 0;
+        dyend = fishh;
+      } else if(dyend > getHeight()) {
+        dyend = getHeight();
+        dystart = getHeight() - fishh;
+      }
+
+      int sxstart = fkt * mouseX - fishw / 2;
+      int sxend = fkt * mouseX + fishw / 2;
+      if(sxstart < 0) {
+        sxstart = 0;
+        sxend = fishw;
+      } else if(sxend > hugeMap.getWidth()) {
+        sxend = hugeMap.getWidth();
+        sxstart = hugeMap.getWidth() - fishw;
+      }
+
+      int systart = fkt * mouseY - fishh / 2;
+      int syend = fkt * mouseY + fishh / 2;
+      if(systart < 0) {
+        systart = 0;
+        syend = fishh;
+      } else if(syend > hugeMap.getHeight()) {
+        syend = hugeMap.getHeight();
+        systart = hugeMap.getHeight() - fishh;
+      }
+
+      //BufferedImage map = distort(hugeMap.getSubimage(sxstart, systart,
+      //    sxend - sxstart, syend - systart));
+      //
+      //try {
+      //  File file = new File("baseXdistorted.png");
+      //  ImageIO.write(map, "png", file);
+      //} catch(IOException exc) {
+      //  exc.printStackTrace();
+      //}
+      //
+      //g.drawImage(map, dxstart, dystart, dxend, dyend,
+      //    0, 0, map.getWidth(), map.getHeight(), this);
+
+      g.drawImage(hugeMap, dxstart, dystart, dxend, dyend,
+          sxstart, systart, sxend, syend, this);
+
+      // draw border
+      g.setColor(Color.black);
+      g.drawRect(dxstart, dystart, fishw, fishh);
+    }
     gui.painting = false;
   }
 
@@ -655,7 +661,6 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Creates a buffered image for the treemap.
-   *
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    * @param scale scale the rectangles
@@ -664,15 +669,14 @@ public final class MapView extends View implements Runnable {
       final float scale) {
     final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
     if(rects != null) painter.drawRectangles(g, rects, scale);
   }
 
   /**
    * Transforms coordinates into distorted coordinates.
-   *
    * @param v coordinate
-   * @param m mouse possition
+   * @param m mouse position
    * @param s width/height
    * @return new coordinate
    */
@@ -685,12 +689,25 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     if(gui.updating) return;
-
+    
     super.mouseMoved(e);
     // refresh mouse focus
     mouseX = e.getX();
     mouseY = e.getY();
-    if(GUIProp.mapinteraction && e.isControlDown() && mapdist) {
+    
+    if(!gui.prop.is(GUIProp.MAPINTERACTION) || !e.isControlDown()) {
+      if(focus()) {
+        if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
+            mouseY < tinyy + tinyh)) {
+          thumbMap = false;
+        }
+        repaint();
+      } else {
+        constMag = false;
+        mapdist = false;
+        refreshMark();
+      }
+    } else if(mapdist) {
       mapdist = true;
       final Graphics g = mainMap.getGraphics();
       g.setColor(Color.black);
@@ -715,22 +732,12 @@ public final class MapView extends View implements Runnable {
       painter.init(distRects);
       drawMap(mainMap, distRects, 1);
       repaint();
-    } else if(focus()) {
-      if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
-          mouseY < tinyy + tinyh)) {
-        thumbMap = false;
-      }
+    } else if(gui.prop.is(GUIProp.MAPDIST)) {
+      mapdist = true;
       repaint();
-    } else if(GUIProp.mapinteraction && e.isControlDown() && GUIProp.mapdist) {
-        mapdist = true;
-        repaint();
-    } else if(GUIProp.mapinteraction && e.isControlDown()) {
-        constMag = true;
-        repaint();
-    } else if(GUIProp.mapinteraction && !e.isControlDown()) {
-        constMag = false;
-        mapdist = false;
-        refreshMark();
+    } else {
+      constMag = true;
+      repaint();
     }
   }
 
@@ -742,11 +749,11 @@ public final class MapView extends View implements Runnable {
     if(SwingUtilities.isLeftMouseButton(e) && focused != null) painter.mouse(
         focused, mouseX, mouseY, true);
 
-    if(GUIProp.mapinteraction && !mapdist) {
+    if(gui.prop.is(GUIProp.MAPINTERACTION) && !mapdist) {
       thumbMap = true;
       final Data data = gui.context.data();
       int screensize = getWidth() * getHeight();
-      screensize = screensize / GUIProp.mapthumbsize;
+      screensize = screensize / gui.prop.num(GUIProp.MAPTHUMBSIZE);
 
       tinyw = (int) Math.sqrt(getWidth() * screensize / getHeight());
       tinyh = screensize / tinyw;
@@ -771,7 +778,7 @@ public final class MapView extends View implements Runnable {
       final Nodes nodes = new Nodes(focused.pre, data);
       tinyMap = new BufferedImage(tinyw, tinyh, BufferedImage.TYPE_INT_BGR);
 
-      tinyLayout = new MapLayout(nodes.data, textLen);
+      tinyLayout = new MapLayout(nodes.data, textLen, gui.prop);
       tinyLayout.makeMap(rect, new MapList(nodes.nodes.clone()), 0,
           nodes.size() - 1);
 
@@ -875,23 +882,24 @@ public final class MapView extends View implements Runnable {
     final Nodes current = context.current();
 
     int pre = current.nodes[0];
+    final GUIProp prop = gui.prop;
     if(key == KeyEvent.VK_R) {
       final Random rnd = new Random();
       do {
         pre = rnd.nextInt(size);
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
+      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
       gui.notify.jump(new Nodes(pre, data));
     } else if(key == KeyEvent.VK_N) {
       // jump to next node
       do {
         pre = (pre + 1) % size;
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
+      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
       gui.notify.jump(new Nodes(pre, data));
     } else if(key == KeyEvent.VK_P) {
       // jump to previous node
       do {
         pre = (pre == 0 ? size : pre) - 1;
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
+      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
 
       gui.notify.jump(new Nodes(pre, data));
     } else if(key == KeyEvent.VK_ESCAPE) {
@@ -899,7 +907,7 @@ public final class MapView extends View implements Runnable {
       tinyh = 0;
       repaint();
       // [JH] to be included only in test versions
-    } else if(GUIProp.mapinteraction && key == KeyEvent.VK_1) {
+    } else if(gui.prop.is(GUIProp.MAPINTERACTION) && key == KeyEvent.VK_1) {
       try {
         final File file1 = new File("baseXTM.png");
         ImageIO.write(mainMap, "png", file1);
@@ -916,15 +924,16 @@ public final class MapView extends View implements Runnable {
 
     if(focused == null) focused = mainRects.get(0).clone();
 
-    int o = GUIProp.fontsize + 4;
+    final int fs = gui.prop.num(GUIProp.FONTSIZE);
+    int o = fs + 4;
     if(key == KeyEvent.VK_UP) {
-      mouseY = focused.y + (shift ? focused.h - GUIProp.fontsize : 0) - 1;
+      mouseY = focused.y + (shift ? focused.h - fs : 0) - 1;
       if(shift) mouseX = focused.x + (focused.w >> 1);
     } else if(key == KeyEvent.VK_DOWN) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
     } else if(key == KeyEvent.VK_LEFT) {
-      mouseX = focused.x + (shift ? focused.w - GUIProp.fontsize : 0) - 1;
+      mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
     } else if(key == KeyEvent.VK_RIGHT) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
@@ -943,7 +952,8 @@ public final class MapView extends View implements Runnable {
     if(gui.updating) return;
     final char ch = e.getKeyChar();
     if(ch == '|') {
-      GUIProp.mapoffsets = (GUIProp.mapoffsets + 1) % MAPOFFSETS.length;
+      gui.prop.set(GUIProp.MAPOFFSETS,
+        (gui.prop.num(GUIProp.MAPOFFSETS) + 1) % MAPOFFSET.length);
       gui.notify.layout();
     }
   }
@@ -964,7 +974,8 @@ public final class MapView extends View implements Runnable {
     painter.reset();
 
     final Data data = gui.context.current().data;
-    if(data.fs != null || textLen != null || GUIProp.mapweight == 0) return;
+    if(data.fs != null || textLen != null ||
+        gui.prop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];

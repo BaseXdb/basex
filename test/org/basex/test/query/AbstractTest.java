@@ -1,5 +1,7 @@
 package org.basex.test.query;
 
+import org.basex.core.AProp;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
@@ -21,8 +23,9 @@ import org.basex.util.Token;
  */
 abstract class AbstractTest {
   /** Dummy data reference. */
-  static final Data DATA = new MemData(1, new Names(), new Names(),
-      new Namespaces(), new PathSummary());
+  // [CG] PROPS: check null reference
+  private static final Data DATA = new MemData(1, new Names(), new Names(),
+      new Namespaces(), new PathSummary(), new Prop());
   /** Document. */
   String doc;
   /** Queries. */
@@ -31,9 +34,10 @@ abstract class AbstractTest {
   /**
    * This method can be overwritten to return test details, which are
    * shown in case of an error.
+   * @param prop database properties
    * @return details string
    */
-  String details() { return null; }
+  abstract String details(final AProp prop);
 
   /**
    * Creates a container for the specified node values.

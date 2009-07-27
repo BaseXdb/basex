@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-
 /**
  * Insert expression.
  *

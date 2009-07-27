@@ -215,9 +215,10 @@ public final class DialogInfo extends Dialog {
   public void close() {
     super.close();
     if(!ftedit) return;
-    Prop.ftfuzzy = ft[0].isSelected();
-    Prop.ftst = ft[1].isSelected();
-    Prop.ftcs = ft[2].isSelected();
-    Prop.ftdc = ft[3].isSelected();
+    final Prop prop = gui.context.prop;
+    prop.set(Prop.FTFUZZY, ft[0].isSelected());
+    prop.set(Prop.FTST, ft[1].isSelected());
+    prop.set(Prop.FTDC, ft[2].isSelected());
+    prop.set(Prop.FTCS, ft[3].isSelected());
   }
 }

@@ -33,23 +33,24 @@ public final class DialogColors extends Dialog {
   public DialogColors(final GUI main) {
     super(main, SCHEMATITLE, false);
 
+    final GUIProp gprop = gui.prop;
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(SCHEMARED));
-    sliderRed = newSlider(GUIProp.colorred);
+    sliderRed = newSlider(gprop.num(GUIProp.COLORRED));
     p.add(sliderRed);
 
     p.add(new BaseXLabel(SCHEMAGREEN));
-    sliderGreen = newSlider(GUIProp.colorgreen);
+    sliderGreen = newSlider(gprop.num(GUIProp.COLORGREEN));
     p.add(sliderGreen);
 
     p.add(new BaseXLabel(SCHEMABLUE));
-    sliderBlue = newSlider(GUIProp.colorblue);
+    sliderBlue = newSlider(gprop.num(GUIProp.COLORBLUE));
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
-    finish(GUIProp.colorsloc);
+    finish(gprop.nums(GUIProp.COLORSLOC));
   }
 
   /**
@@ -66,9 +67,10 @@ public final class DialogColors extends Dialog {
 
   @Override
   public void action(final String cmd) {
-    GUIProp.colorred = MAXCOLOR - sliderRed.value();
-    GUIProp.colorgreen = MAXCOLOR - sliderGreen.value();
-    GUIProp.colorblue = MAXCOLOR - sliderBlue.value();
+    final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
+    gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());
+    gprop.set(GUIProp.COLORBLUE, MAXCOLOR - sliderBlue.value());
     gui.updateLayout();
   }
 }

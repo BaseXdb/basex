@@ -82,8 +82,6 @@ public class Group extends Expr {
     }
   }
 
-
-
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
@@ -116,7 +114,6 @@ public class Group extends Expr {
       }
     };
   }
-
 
   /**
    * Adds the items to be grouped.

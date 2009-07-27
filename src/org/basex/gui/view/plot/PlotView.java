@@ -120,25 +120,25 @@ public final class PlotView extends View implements Runnable {
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, HELPPLOTXLOG, false, null);
-    xLog.setSelected(GUIProp.plotxlog);
+    xLog.setSelected(gui.prop.is(GUIProp.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        GUIProp.plotxlog ^= true;
+        gui.prop.invert(GUIProp.PLOTXLOG);
         refreshUpdate();
       }
     });
     dots = new BaseXSlider(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        GUIProp.plotdots = dots.value();
+        gui.prop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
       }
-    }, -10, 10, GUIProp.plotdots, HELPPLOTDOTS, gui);
+    }, -10, 10, gui.prop.num(GUIProp.PLOTDOTS), HELPPLOTDOTS, gui);
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, HELPPLOTYLOG, false, null);
-    yLog.setSelected(GUIProp.plotylog);
+    yLog.setSelected(gui.prop.is(GUIProp.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        GUIProp.plotylog ^= true;
+        gui.prop.invert(GUIProp.PLOTYLOG);
         refreshUpdate();
       }
     });
@@ -235,8 +235,8 @@ public final class PlotView extends View implements Runnable {
   private BufferedImage itemImage(final boolean focus,
       final boolean marked, final boolean markedSub) {
 
-    final int size = Math.max(1,
-        GUIProp.fontsize + GUIProp.plotdots + (focus ? 2 :
+    final int size = Math.max(1, gui.prop.num(GUIProp.FONTSIZE) +
+        gui.prop.num(GUIProp.PLOTDOTS) + (focus ? 2 :
           marked || markedSub ? 0 : -2));
     final BufferedImage img = new BufferedImage(size, size,
         Transparency.TRANSLUCENT);
@@ -299,7 +299,7 @@ public final class PlotView extends View implements Runnable {
     if(data == null) return;
 
     super.paintComponent(g);
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
 
     if(plotData == null) {
       refreshInit();
@@ -348,7 +348,7 @@ public final class PlotView extends View implements Runnable {
         if(x.length() != 0 && y.length() != 0) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
         final int xa = calcCoordinate(true, x1) + 15;
-        int ya = calcCoordinate(false, y1) + GUIProp.plotdots;
+        int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
         final byte[] nm = data.attValue(data.nameID, gui.focused);
@@ -359,7 +359,7 @@ public final class PlotView extends View implements Runnable {
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {
-            ya += 2 * textH - GUIProp.plotdots;
+            ya += 2 * textH - gui.prop.num(GUIProp.PLOTDOTS);
           }
           if(xa > w - lw)
             BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, ww, 10);
@@ -519,9 +519,7 @@ public final class PlotView extends View implements Runnable {
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
-
     g.setFont(font);
-
 
     // draw axis and assignment for TEXT data
     if(type == Kind.TEXT) {
@@ -566,8 +564,6 @@ public final class PlotView extends View implements Runnable {
         drawCaptionAndGrid(g, drawX,
             string(axis.getValue(plotData.pres[j])), op);
       }
-
-
       // axis is drawn for numerical data, type INT/DBL
     } else {
       final boolean noRange = axis.max - axis.min == 0;
@@ -652,9 +648,7 @@ public final class PlotView extends View implements Runnable {
             a = Math.pow(10, l);
           }
         }
-
-
-      // draw LINEAR SCALE
+        // draw LINEAR SCALE
       } else {
         // draw captions between min and max
         double d = axis.calcPosition(axis.startvalue);
@@ -707,7 +701,7 @@ public final class PlotView extends View implements Runnable {
     final int h = getHeight();
     final int w = getWidth();
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = GUIProp.fontsize;
+    final int fs = gui.prop.num(GUIProp.FONTSIZE);
     final int imgW = BaseXLayout.width(g, cap) + fs;
     final BufferedImage img = createCaptionImage(g, cap, false, imgW);
 
@@ -737,7 +731,7 @@ public final class PlotView extends View implements Runnable {
   private BufferedImage createCaptionImage(final Graphics g,
       final String caption, final boolean im, final int imgW) {
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = GUIProp.fontsize;
+    final int fs = gui.prop.num(GUIProp.FONTSIZE);
 
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
@@ -769,7 +763,7 @@ public final class PlotView extends View implements Runnable {
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
-    final int fs = GUIProp.fontsize;
+    final int fs = gui.prop.num(GUIProp.FONTSIZE);
     final int sf = sizeFactor();
     g.setColor(back);
 
@@ -820,14 +814,14 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-    if(!GUIProp.showplot) return;
+    if(!gui.prop.is(GUIProp.SHOWPLOT)) return;
 
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
         nextContext : gui.context.current(), !more || !rightClick);
-    plotData.xAxis.log = GUIProp.plotxlog;
+    plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);
     plotData.xAxis.refreshAxis();
-    plotData.yAxis.log = GUIProp.plotylog;
+    plotData.yAxis.log = gui.prop.is(GUIProp.PLOTYLOG);
     plotData.yAxis.refreshAxis();
 
     nextContext = null;
@@ -849,7 +843,7 @@ public final class PlotView extends View implements Runnable {
 
     final Data data = gui.context.data();
     if(data != null) {
-      if(!GUIProp.showplot) return;
+      if(!gui.prop.is(GUIProp.SHOWPLOT)) return;
 
       plotData = new PlotData(gui.context);
 
@@ -896,7 +890,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showplot;
+    return gui.prop.is(GUIProp.SHOWPLOT);
   }
 
   /**
@@ -983,8 +977,8 @@ public final class PlotView extends View implements Runnable {
    * Returns a standardized size factor for painting the plot.
    * @return size value
    */
-  private static int sizeFactor() {
-    return Math.max(2, GUIProp.fontsize * 2);
+  private int sizeFactor() {
+    return Math.max(2, gui.prop.num(GUIProp.FONTSIZE) * 2);
   }
 
   /**

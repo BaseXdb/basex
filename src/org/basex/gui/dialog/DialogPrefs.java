@@ -65,7 +65,9 @@ public final class DialogPrefs extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
 
-    path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
+    final Prop prop = gui.context.prop;
+    final GUIProp gprop = gui.prop;
+    path = new BaseXTextField(prop.get(Prop.DBPATH), HELPDBPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -93,19 +95,23 @@ public final class DialogPrefs extends Dialog {
     pp.add(label);
 
     // checkbox for realtime mouse focus
-    javalook = new BaseXCheckBox(PREFLF, HELPLF, GUIProp.javalook, this);
+    javalook = new BaseXCheckBox(PREFLF, HELPLF,
+        gprop.is(GUIProp.JAVALOOK), this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS, GUIProp.mousefocus, this);
+    focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS,
+        gprop.is(GUIProp.MOUSEFOCUS), this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLEFD, HELPSIMPLEFD, GUIProp.simplefd, this);
+    simpfd = new BaseXCheckBox(SIMPLEFILE, HELPSIMPLEFILE,
+        gprop.is(GUIProp.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(PREFNAME, HELPNAME, GUIProp.showname, 12, this);
+    names = new BaseXCheckBox(PREFNAME, HELPNAME,
+        gprop.is(GUIProp.SHOWNAME), 12, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
@@ -118,7 +124,7 @@ public final class DialogPrefs extends Dialog {
     p.setLayout(new TableLayout(1, 2, 12, 0));
 
     lang = new BaseXCombo(LANGS[0], HELPLANG, this);
-    lang.setSelectedItem(Prop.language);
+    lang.setSelectedItem(prop.get(Prop.LANGUAGE));
 
     p.add(lang);
     creds = new BaseXLabel("");
@@ -142,14 +148,16 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void close() {
-    Prop.dbpath = path.getText();
-    Prop.language = lang.getSelectedItem().toString();
-    GUIProp.mousefocus = focus.isSelected();
-    GUIProp.showname = names.isSelected();
-    GUIProp.simplefd = simpfd.isSelected();
-    GUIProp.javalook = javalook.isSelected();
-    GUIProp.write();
-    Prop.write();
+    final Prop prop = gui.context.prop;
+    prop.set(Prop.DBPATH, path.getText());
+    prop.set(Prop.LANGUAGE, lang.getSelectedItem().toString());
+    final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
+    gprop.set(GUIProp.SHOWNAME, names.isSelected());
+    gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
+    gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
+    prop.write();
+    gprop.write();
     dispose();
   }
 

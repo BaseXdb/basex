@@ -63,9 +63,9 @@ public final class XMLTS {
     }
 
     final Context ctx = new Context();
-    Prop.textindex = false;
-    Prop.attrindex = false;
-    //Prop.mainmem = true;
+    context.prop.set(Prop.TEXTINDEX, false);
+    context.prop.set(Prop.ATTRINDEX, false);
+    //context.prop.set(MAINMEM, true);
 
     new CreateDB(FILE).execute(ctx, null);
     data = ctx.data();
@@ -82,7 +82,7 @@ public final class XMLTS {
       final String uri = text("@URI", srcRoot);
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
-      Prop.intparse = true;
+      context.prop.set(Prop.INTPARSE, true);
       Process proc = new CreateDB(PATH + uri);
       final boolean success = proc.execute(ctx);
       final boolean correct = valid == success;
@@ -93,7 +93,7 @@ public final class XMLTS {
         if(verbose) {
           String inf = proc.info();
           if(inf.length() != 0) BaseX.outln("[BASEX ] " + inf);
-          Prop.intparse = false;
+          context.prop.set(Prop.INTPARSE, false);
           new Close().execute(ctx);
           proc = new CreateDB(PATH + uri);
           proc.execute(ctx);

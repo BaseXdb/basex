@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 
 /**
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
@@ -14,6 +15,11 @@ import org.basex.gui.GUIConstants;
  * @author Christian Gruen
  */
 public final class BaseXTextRenderer extends BaseXBack {
+  /** Vertical start position. */
+  private final BaseXBar bar;
+  /** GUI properties. */
+  private final GUIProp prop;
+
   /** Font. */
   private Font font;
   /** Default font. */
@@ -29,8 +35,6 @@ public final class BaseXTextRenderer extends BaseXBack {
   /** Color highlighting flag. */
   private boolean high;
 
-  /** Vertical start position. */
-  private final BaseXBar bar;
   /** Width of current word. */
   private int wordW;
   /** Search term. */
@@ -58,11 +62,14 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Constructor.
    * @param t text to be drawn
    * @param b scrollbar reference
+   * @param pr gui properties
    */
-  BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
+  BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b,
+      final GUIProp pr) {
     setMode(GUIConstants.Fill.NONE);
     setFont(GUIConstants.dfont);
     text = t;
+    prop = pr;
     bar = b;
   }
 
@@ -205,7 +212,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param pos current text position
    */
   void write(final Graphics g, final int pos) {
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, prop);
     init(g, pos);
     while(more(g)) write(g);
     if(cursor && text.cursor() == text.size()) cursor(g, x);

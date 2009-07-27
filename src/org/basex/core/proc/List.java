@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;
@@ -29,7 +30,7 @@ public final class List extends Process {
 
   @Override
   protected void out(final PrintOutput o) throws IOException {
-    final String[] list = list().finish();
+    final String[] list = list(context).finish();
     final int ml = maxLength(list) + 2;
 
     if(list.length == 0) {
@@ -43,14 +44,14 @@ public final class List extends Process {
         o.print(Token.token(name), ml);
         DataInput in = null;
         try {
-          in = new DataInput(name, DATAINFO);
-          final MetaData md = new MetaData(name, in);
+          in = new DataInput(prop.dbfile(name, DATAINFO));
+          final MetaData md = new MetaData(name, in, prop);
           in.close();
           o.println(md.file.toString());
         } catch(final IOException ex) {
           o.println(INFODBERR);
         } finally {
-          try { if(in != null) in.close(); } catch(final IOException e) { }
+          try { if(in != null) in.close(); } catch(final IOException ex) { }
         }
       }
       o.print(t.finish());
@@ -60,13 +61,14 @@ public final class List extends Process {
 
   /**
    * Returns a list of all databases.
+   * @param ctx context reference
    * @return available databases.
    */
-  public static StringList list() {
+  public static StringList list(final Context ctx) {
     // create database list
     final StringList db = new StringList();
 
-    final IO dir = IO.get(Prop.dbpath);
+    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return db;
 
     for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());

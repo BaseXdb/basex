@@ -23,19 +23,21 @@ public final class ViewData {
   /**
    * Checks if the specified node is a leaf node
    * (text node or file element or file tag).
-   * @param data data reference
+   * @param prop gui properties
+   * @param d data reference
    * @param pre pre value
    * @return result of comparison
    */
-  public static boolean isLeaf(final Data data, final int pre) {
-    final int kind = data.kind(pre);
+  public static boolean isLeaf(final GUIProp prop, final Data d,
+      final int pre) {
+    final int kind = d.kind(pre);
     if(kind == Data.ATTR) return true;
-    if(data.fs != null && data.fs.isFile(pre)) return true;
+    if(d.fs != null && d.fs.isFile(pre)) return true;
 
-    final boolean atts = GUIProp.mapatts && data.fs == null;
-    final int last = pre + (atts ? 1 : data.attSize(pre, kind));
-    return last == data.meta.size || data.parent(pre, kind) >=
-      data.parent(last, data.kind(last));
+    final boolean atts = prop.is(GUIProp.MAPATTS) && d.fs == null;
+    final int last = pre + (atts ? 1 : d.attSize(pre, kind));
+    return last == d.meta.size || d.parent(pre, kind) >=
+      d.parent(last, d.kind(last));
   }
 
   /**
@@ -99,17 +101,20 @@ public final class ViewData {
   /**
    * Returns the tag name of the specified node.
    * Note that the pre value must reference an element node.
+   * @param prop gui properties
    * @param data data reference
    * @param pre pre value
    * @return name
    */
-  public static byte[] tag(final Data data, final int pre) {
+  public static byte[] tag(final GUIProp prop, final Data data,
+      final int pre) {
+
     if(data.fs != null) {
       final byte[] name = data.fs.name(pre);
       if(name.length != 0) return name;
     }
 
-    if(GUIProp.showname && data.nameID != 0) {
+    if(prop.is(GUIProp.SHOWNAME) && data.nameID != 0) {
       final byte[] att = data.attValue(data.nameID, pre);
       if(att != null) return att;
     }

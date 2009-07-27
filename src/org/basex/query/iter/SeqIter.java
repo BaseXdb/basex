@@ -118,7 +118,7 @@ public final class SeqIter extends Iter implements Result {
           !item[i].eq(sb.item[i])) return false;
       }
       return true;
-    } catch(final QueryException e) {
+    } catch(final QueryException ex) {
       return false;
     }
   }

@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Prop;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -44,7 +43,7 @@ public final class Update extends AUpdate {
 
     data.flush();
     context.update();
-    return Prop.info ? info(UPDATEINFO, nodes.size(), perf.getTimer()) : true;
+    return info(UPDATEINFO, nodes.size(), perf.getTimer());
   }
 
   /**
@@ -110,7 +109,6 @@ public final class Update extends AUpdate {
     for(int i = nodes.size() - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
     return true;
   }
-
 
   @Override
   public String toString() {

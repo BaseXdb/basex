@@ -2,10 +2,8 @@ package org.basex.query;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
-import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
@@ -143,11 +141,12 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Returns query background information.
+   * @param all show all information
    * @return background information
    */
-  public String info() {
+  public String info(final boolean all) {
     final TokenBuilder tb = new TokenBuilder(ctx.info());
-    if(Prop.allInfo) tb.add(NL + QUERYSTRING + query + NL);
+    if(all) tb.add(QUERYSTRING + query);
     return tb.toString();
   }
 

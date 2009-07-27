@@ -1,14 +1,12 @@
 package org.basex.gui.view.map;
 
-import org.basex.gui.GUIProp;
-
 /**
  * StripLayout Algorithm.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser
  */
-final class StripAlgo extends MapAlgo{
+final class StripAlgo extends MapAlgo {
   @Override
   MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne) {
@@ -33,60 +31,6 @@ final class StripAlgo extends MapAlgo{
     double sumweight = 1;
     double tmpratio;
     double rowratio = Double.MAX_VALUE;
-
-    if(GUIProp.striphor) {
-      while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
-        weight += ml.weight[ni];
-        height = (int) (weight / sumweight * hh);
-        height = height > 0 ? height : 1;
-
-        final MapRects tmp = new MapRects();
-
-        double x = xx;
-        for(int i = start; i <= ni; i++) {
-          int w = i == ni ? (int) (xx + ww - x) :
-            (int) (ml.weight[i] / weight * ww);
-          w = w > 0 ? w : 1;
-
-          if(yy + height <= yy + hh)
-            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.get(i),
-                r.level));
-          else break;
-          x += w;
-        }
-        tmpratio = lineRatio(tmp);
-
-        // if ar has increased discard tmp and add row
-        if(tmpratio > rowratio) {
-          // add rects of row to solution
-          rects.add(row);
-          rowratio = Double.MAX_VALUE;
-          // preparing next line
-          hh -= row.get(0).h;
-          yy += row.get(0).h;
-          tmp.reset();
-          row.reset();
-          start = ni;
-          sumweight -= weight - ml.weight[ni];
-          weight = 0;
-          // sometimes there has to be one rectangles to fill the left space
-          if(ne == ni) {
-            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.get(ni), r.level));
-            break;
-          }
-        } else {
-          row = tmp;
-          rowratio = tmpratio;
-          ni++;
-        }
-      }
-      // adding last row
-      for(final MapRect rect : row) rect.h = (int) hh;
-      rects.add(row);
-
-      return rects;
-    }
 
     while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
       weight += ml.weight[ni];

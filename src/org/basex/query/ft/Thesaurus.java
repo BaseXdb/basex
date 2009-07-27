@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
+import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
@@ -28,6 +29,8 @@ public final class Thesaurus {
   private final Map<ThesNode> nodes = new Map<ThesNode>();
   /** Relationships. */
   private static final Map<byte[]> RSHIPS = new Map<byte[]>();
+  /** Database properties. */
+  private final Context ctx;
 
   static {
     RSHIPS.add(token("NT"), token("BT"));
@@ -79,9 +82,10 @@ public final class Thesaurus {
   /**
    * Constructor.
    * @param fl file reference
+   * @param c database context
    */
-  public Thesaurus(final IO fl) {
-    this(fl, EMPTY, 0, Long.MAX_VALUE);
+  public Thesaurus(final IO fl, final Context c) {
+    this(fl, EMPTY, 0, Long.MAX_VALUE, c);
   }
 
   /**
@@ -90,12 +94,15 @@ public final class Thesaurus {
    * @param rs relationship
    * @param mn minimum level
    * @param mx maximum level
+   * @param c database context
    */
-  public Thesaurus(final IO fl, final byte[] rs, final long mn, final long mx) {
+  public Thesaurus(final IO fl, final byte[] rs, final long mn, final long mx,
+      final Context c) {
     file = fl;
     rel = rs;
     min = mn;
     max = mx;
+    ctx = c;
   }
 
   /**
@@ -105,7 +112,7 @@ public final class Thesaurus {
    */
   private boolean init() throws QueryException {
     try {
-      final Data data = new MemBuilder().build(new DirParser(file), "");
+      final Data data = new MemBuilder(new DirParser(file, ctx.prop)).build("");
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
         build(new Nodes(result.nodes[n], data));
@@ -162,7 +169,7 @@ public final class Thesaurus {
    */
   private Nodes nodes(final String query, final Nodes in)
       throws QueryException {
-    return new QueryProcessor(query, in, null).queryNodes();
+    return new QueryProcessor(query, in, ctx).queryNodes();
   }
 
   /**
@@ -174,7 +181,7 @@ public final class Thesaurus {
    */
   private byte[] text(final String query, final Nodes in)
       throws QueryException {
-    return new QueryProcessor(query, in, null).iter().next().str();
+    return new QueryProcessor(query, in, ctx).iter().next().str();
   }
 
   /**

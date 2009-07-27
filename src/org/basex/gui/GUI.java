@@ -66,7 +66,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class GUI extends JFrame {
   /** Database Context. */
-  public final Context context = new Context();
+  public final Context context;
+  /** GUI properties. */
+  public final GUIProp prop;
   /** View Manager. */
   public final ViewNotifier notify;
 
@@ -123,19 +125,23 @@ public final class GUI extends JFrame {
 
   /**
    * Default Constructor.
+   * @param ctx context reference
+   * @param gprops gui properties
    */
-  public GUI() {
+  public GUI(final Context ctx, final GUIProp gprops) {
+    context = ctx;
+    prop = gprops;
     setTitle(Text.TITLE);
     setIconImage(BaseXLayout.image("icon"));
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int w = GUIProp.guisize[0];
-    final int h = GUIProp.guisize[1];
-    final int x = Math.max(0, Math.min(scr.width - w, GUIProp.guiloc[0]));
-    final int y = Math.max(0, Math.min(scr.height - h, GUIProp.guiloc[1]));
-    setBounds(x, y, w, h);
-    if(GUIProp.maxstate) {
+    final int[] ps = prop.nums(GUIProp.GUILOC);
+    final int[] sz = prop.nums(GUIProp.GUISIZE);
+    final int x = Math.max(0, Math.min(scr.width - sz[0], ps[0]));
+    final int y = Math.max(0, Math.min(scr.height - sz[1], ps[1]));
+    setBounds(x, y, sz[0], sz[1]);
+    if(prop.is(GUIProp.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
@@ -151,7 +157,7 @@ public final class GUI extends JFrame {
 
     // add menu bar
     menu = new GUIMenu(this);
-    if(GUIProp.showmenu) setJMenuBar(menu);
+    if(prop.is(GUIProp.SHOWMENU)) setJMenuBar(menu);
 
     buttons = new BaseXBack();
     buttons.setLayout(new BorderLayout());
@@ -167,7 +173,7 @@ public final class GUI extends JFrame {
     b.add(hits);
 
     buttons.add(b, BorderLayout.EAST);
-    if(GUIProp.showbuttons) control.add(buttons, BorderLayout.CENTER);
+    if(prop.is(GUIProp.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
     nav = new BaseXBack();
     nav.setLayout(new BorderLayout(5, 0));
@@ -180,9 +186,9 @@ public final class GUI extends JFrame {
     mode.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final int s = mode.getSelectedIndex();
-        if(s == GUIProp.searchmode || !mode.isEnabled()) return;
+        if(s == prop.num(GUIProp.SEARCHMODE) || !mode.isEnabled()) return;
 
-        GUIProp.searchmode = s;
+        prop.set(GUIProp.SEARCHMODE, s);
         input.setText("");
         refreshControls();
       }
@@ -202,9 +208,10 @@ public final class GUI extends JFrame {
             popup.setVisible(false);
           }
         };
-        final int i = context.data() == null ? 2 : GUIProp.searchmode;
-        final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
-            GUIProp.xquery : GUIProp.commands;
+        final int i = context.data() == null ? 2 :
+          prop.num(GUIProp.SEARCHMODE);
+        final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
+            prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -236,7 +243,7 @@ public final class GUI extends JFrame {
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
-    if(GUIProp.showinput) control.add(nav, BorderLayout.SOUTH);
+    if(prop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
 
     // create views
@@ -268,7 +275,7 @@ public final class GUI extends JFrame {
 
     // add status bar
     status = new GUIStatus(this);
-    if(GUIProp.showstatus) top.add(status, BorderLayout.SOUTH);
+    if(prop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     add(top);
@@ -290,15 +297,14 @@ public final class GUI extends JFrame {
 
   @Override
   public void dispose() {
-    GUIProp.maxstate = getExtendedState() == MAXIMIZED_BOTH;
-    if(!GUIProp.maxstate) {
-      GUIProp.guiloc[0] = getX();
-      GUIProp.guiloc[1] = getY();
-      GUIProp.guisize[0] = getWidth();
-      GUIProp.guisize[1] = getHeight();
+    final boolean max = getExtendedState() == MAXIMIZED_BOTH;
+    prop.set(GUIProp.MAXSTATE, max);
+    if(!max) {
+      prop.set(GUIProp.GUILOC, new int[] { getX(), getY() });
+      prop.set(GUIProp.GUISIZE, new int[] { getWidth(), getHeight() });
     }
-    GUIProp.write();
     super.dispose();
+    prop.write();
     context.close();
   }
 
@@ -326,28 +332,30 @@ public final class GUI extends JFrame {
   protected void execute() {
     String in = input.getText();
     final boolean db = context.data() != null;
-    final boolean cmd = GUIProp.searchmode == 2 || !db;
+    final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
       if(in.length() > i) {
         try {
-          for(final Process p : new CommandParser(in.substring(i)).parse()) {
+          for(final Process p : new CommandParser(in.substring(i),
+              context).parse()) {
             if(!exec(p, p instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
-          if(!GUIProp.showstarttext && !db || !GUIProp.showtext && db) {
+          if(!prop.is(GUIProp.SHOWSTARTTEXT) && !db ||
+             !prop.is(GUIProp.SHOWTEXT) && db) {
             GUICommands.SHOWTEXT.execute(this);
           }
           text.setText(new TokenBuilder(ex.getMessage()).finish());
         }
       }
     } else {
-      if(GUIProp.searchmode == 1 || in.startsWith("/")) {
+      if(prop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
         xquery(in, true);
       } else {
-        in = Find.find(in, context, GUIProp.filterrt);
+        in = Find.find(in, context, prop.is(GUIProp.FILTERRT));
         execute(new XQuery(in), true);
       }
     }
@@ -452,21 +460,24 @@ public final class GUI extends JFrame {
         if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
 
         // retrieve text result
-        if(GUIProp.showtext) {
-          final CachedOutput out = new CachedOutput(Prop.maxtext);
+        if(prop.is(GUIProp.SHOWTEXT)) {
+          final CachedOutput out = new CachedOutput(
+              context.prop.num(Prop.MAXTEXT));
           pr.output(out);
           text.setText(out);
         }
       }
 
       boolean feedback = main;
-      if(!main && data != null && GUIProp.showxquery && pr instanceof XQuery) {
+      if(!main && data != null && prop.is(GUIProp.SHOWXQUERY) &&
+          pr instanceof XQuery) {
         feedback = true;
         query.info(inf, ok);
       }
 
       // show query info
-      if(GUIProp.showinfo && (ok || main)) info.setInfo(Token.token(inf), ok);
+      if(prop.is(GUIProp.SHOWINFO) && (ok || main))
+        info.setInfo(Token.token(inf), ok);
 
       // check if query feedback was processed in the query view
       if(!ok) {
@@ -491,10 +502,10 @@ public final class GUI extends JFrame {
         // update command
         notify.update();
       } else if(result != null) {
-        if(context.current() != current || GUIProp.filterrt) {
+        if(context.current() != current || prop.is(GUIProp.FILTERRT)) {
           // refresh context
           if(nodes != null) {
-            notify.context((Nodes) result, GUIProp.filterrt, null);
+            notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
           }
         } else if(marked != null) {
           // refresh highlight
@@ -554,7 +565,7 @@ public final class GUI extends JFrame {
    * Refreshes the layout.
    */
   public void updateLayout() {
-    init();
+    init(prop);
     repaint();
     notify.layout();
   }
@@ -606,9 +617,9 @@ public final class GUI extends JFrame {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = context.data() == null ? 2 : GUIProp.searchmode;
-    final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xquery :
-      GUIProp.commands;
+    final int i = context.data() == null ? 2 : prop.num(GUIProp.SEARCHMODE);
+    final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
+        prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
     hist.setEnabled(hs.length != 0);
   }
 
@@ -619,17 +630,17 @@ public final class GUI extends JFrame {
     final Data data = context.data();
     final boolean db = data != null;
     final int t = mode.getSelectedIndex();
-    final int s = !db ? 2 : GUIProp.searchmode;
+    final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);
 
-    final boolean inf = GUIProp.showinfo;
-    Prop.allInfo = inf;
-    Prop.xmlplan = inf;
-    Prop.info = inf;
+    final boolean inf = prop.is(GUIProp.SHOWINFO);
+    context.prop.set(Prop.ALLINFO, inf);
+    context.prop.set(Prop.XMLPLAN, inf);
+    context.prop.set(Prop.INFO, inf);
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(db);
-    go.setEnabled(s == 2 || !GUIProp.execrt);
+    go.setEnabled(s == 2 || !prop.is(GUIProp.EXECRT));
 
     if(s != t) {
       mode.setSelectedIndex(s);
@@ -650,7 +661,7 @@ public final class GUI extends JFrame {
    * Turns fullscreen mode on/off.
    */
   public void fullscreen() {
-    fullscreen(!GUIProp.fullscreen);
+    fullscreen(!prop.is(GUIProp.FULLSCREEN));
   }
 
   /**
@@ -659,7 +670,7 @@ public final class GUI extends JFrame {
    */
   public void fullscreen(final boolean full) {
     if(full ^ fullscr == null) {
-      if(!GUIProp.showmenu) GUICommands.SHOWMENU.execute(this);
+      if(!prop.is(GUIProp.SHOWMENU)) GUICommands.SHOWMENU.execute(this);
       return;
     }
 
@@ -680,18 +691,19 @@ public final class GUI extends JFrame {
       fullscr.removeAll();
       fullscr.dispose();
       fullscr = null;
-      if(!GUIProp.showbuttons) control.add(buttons, BorderLayout.CENTER);
-      if(!GUIProp.showinput) control.add(nav, BorderLayout.SOUTH);
-      if(!GUIProp.showstatus) top.add(status, BorderLayout.SOUTH);
+      if(!prop.is(GUIProp.SHOWBUTTONS))
+        control.add(buttons, BorderLayout.CENTER);
+      if(!prop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+      if(!prop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
       setJMenuBar(menu);
       add(top);
     }
 
-    GUIProp.showmenu = !full;
-    GUIProp.showbuttons = !full;
-    GUIProp.showinput = !full;
-    GUIProp.showstatus = !full;
-    GUIProp.fullscreen = full;
+    prop.set(GUIProp.SHOWMENU, !full);
+    prop.set(GUIProp.SHOWBUTTONS, !full);
+    prop.set(GUIProp.SHOWINPUT, !full);
+    prop.set(GUIProp.SHOWSTATUS, !full);
+    prop.set(GUIProp.FULLSCREEN, !full);
 
     GraphicsEnvironment.getLocalGraphicsEnvironment().
       getDefaultScreenDevice().setFullScreenWindow(fullscr);

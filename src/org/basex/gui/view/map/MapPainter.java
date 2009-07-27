@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.
@@ -13,14 +14,18 @@ import org.basex.gui.GUIConstants;
  */
 abstract class MapPainter {
   /** Graphics reference. */
-  MapView view;
+  final MapView view;
+  /** Window properties. */
+  final GUIProp prop;
 
   /**
    * Constructor.
    * @param m map reference.
+   * @param pr gui properties
    */
-  MapPainter(final MapView m) {
+  MapPainter(final MapView m, final GUIProp pr) {
     view = m;
+    prop = pr;
   }
 
   /**

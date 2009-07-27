@@ -55,7 +55,7 @@ public final class Insert extends AUpdate {
 
     data.flush();
     context.update();
-    return Prop.info ? info(INSERTINFO, nodes.size(), perf.getTimer()) : true;
+    return info(INSERTINFO, nodes.size(), perf.getTimer());
   }
 
   /**
@@ -106,10 +106,11 @@ public final class Insert extends AUpdate {
     Data tmp;
     try {
       final IO io = IO.get(args[0]);
-      final Parser parser = Prop.intparse || io instanceof IOContent ?
-          new XMLParser(io) : new SAXWrapper(new SAXSource(io.inputSource()));
+      final Parser parser = prop.is(Prop.INTPARSE) ||
+        io instanceof IOContent ? new XMLParser(io, prop) :
+        new SAXWrapper(new SAXSource(io.inputSource()), prop);
 
-      tmp = new MemBuilder().build(parser, io.dbname());
+      tmp = new MemBuilder(parser).build(io.dbname());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

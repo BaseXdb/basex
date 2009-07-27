@@ -49,7 +49,7 @@ public final class PlotData {
   TokenList getItems() {
     final Data data = context.data();
     final TokenList tl = new TokenList();
-    for(final byte[] k : data.path.desc(EMPTY, true, true)) {
+    for(final byte[] k : data.path.desc(EMPTY, data, true, true)) {
       if(getCategories(k).size() > 1) tl.add(k);
     }
     return tl;
@@ -63,7 +63,7 @@ public final class PlotData {
   TokenList getCategories(final byte[] it) {
     final Data data = context.data();
     final TokenList tl = new TokenList();
-    for(final byte[] k : data.path.desc(it, true, false)) {
+    for(final byte[] k : data.path.desc(it, data, true, false)) {
       final Names index = startsWith(k, '@') ? data.atts : data.tags;
       if(index.stat(index.id(delete(k, '@'))).kind != Kind.NONE) tl.add(k);
     }

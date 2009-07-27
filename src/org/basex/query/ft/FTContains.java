@@ -33,7 +33,7 @@ public class FTContains extends Expr {
   /** Full-text expression. */
   FTExpr ftexpr;
   /** Full-text parser. */
-  Tokenizer ft = new Tokenizer();
+  Tokenizer ft;
 
   /**
    * Constructor.
@@ -52,6 +52,7 @@ public class FTContains extends Expr {
     ctx.ftfast &= ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
+    ft = new Tokenizer(ctx.context.prop);
 
     Expr e = this;
     if(expr.e()) e = Bln.FALSE;

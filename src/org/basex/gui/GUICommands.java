@@ -112,7 +112,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
-          GUIProp.xqpath, gui);
+          gui.prop.get(GUIProp.XQPATH), gui);
       fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
@@ -127,7 +127,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
-          fn == null ? GUIProp.xqpath : fn, gui);
+          fn == null ? gui.prop.get(GUIProp.XQPATH) : fn, gui);
       fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
@@ -148,11 +148,12 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogImportFS(gui).ok()) return;
-      final String p = GUIProp.fsall ? "/"
-          : GUIProp.guifsimportpath.replace('\\', '/');
-      final String n = GUIProp.guifsdbname;
-      final String m = GUIProp.guimountpoint;
-      final String b = GUIProp.guibackingroot;
+      final GUIProp gprop = gui.prop;
+      final String p = gprop.is(GUIProp.FSALL) ? "/"
+          : gui.prop.get(GUIProp.FSIMPORTPATH).replace('\\', '/');
+      final String n = gprop.get(GUIProp.FSDBNAME);
+      final String m = gprop.get(GUIProp.FSMOUNT);
+      final String b = gprop.get(GUIProp.FSBACKING);
       progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
     }
   },
@@ -204,7 +205,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(n) &&
+      BaseXLayout.enable(button, updatable(gui, n) &&
           (n.size() != 1 || n.nodes[0] != 0));
     }
   },
@@ -240,7 +241,7 @@ public enum GUICommands implements GUICommand {
       final Context context = gui.context;
       // disallow copy of empty node set or root node
       final Nodes n = context.marked();
-      boolean s = updatable(n) && context.copied() != null &&
+      boolean s = updatable(gui, n) && context.copied() != null &&
         n.size() != 0 && (n.size() != 1 || n.nodes[0] != 0);
       if(s) {
         final Data d = n.data;
@@ -266,7 +267,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(n) && n.size() != 0);
+      BaseXLayout.enable(button, updatable(gui, n) && n.size() != 0);
     }
   },
 
@@ -285,7 +286,7 @@ public enum GUICommands implements GUICommand {
       final Context context = gui.context;
       final Nodes n = context.marked();
       final Data d = context.data();
-      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
+      BaseXLayout.enable(button, updatable(gui, n) && n.size() == 1 &&
           (d.kind(n.nodes[0]) == Data.ELEM || d.kind(n.nodes[0]) == Data.DOC));
     }
   },
@@ -305,7 +306,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context context = gui.context;
       final Nodes n = context.marked();
-      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
+      BaseXLayout.enable(button, updatable(gui, n) && n.size() == 1 &&
           context.data().kind(n.nodes[0]) != Data.DOC);
     }
   },
@@ -335,14 +336,14 @@ public enum GUICommands implements GUICommand {
   SHOWXQUERY(true, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showxquery ^= true;
+      gui.prop.invert(GUIProp.SHOWXQUERY);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showxquery);
+      select(button, gui.prop.is(GUIProp.SHOWXQUERY));
     }
 
     @Override
@@ -353,14 +354,14 @@ public enum GUICommands implements GUICommand {
   SHOWINFO(true, GUISHOWINFO, "% I", GUISHOWINFOTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showinfo ^= true;
+      gui.prop.invert(GUIProp.SHOWINFO);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showinfo);
+      select(button, gui.prop.is(GUIProp.SHOWINFO));
     }
 
     @Override
@@ -373,14 +374,15 @@ public enum GUICommands implements GUICommand {
   SHOWMENU(false, GUISHOWMENU, null, GUISHOWMENUTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showmenu ^= true;
-      gui.updateControl(gui.menu, GUIProp.showmenu, BorderLayout.NORTH);
+      gui.prop.invert(GUIProp.SHOWMENU);
+      gui.updateControl(gui.menu, gui.prop.is(GUIProp.SHOWMENU),
+          BorderLayout.NORTH);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showmenu);
+      select(button, gui.prop.is(GUIProp.SHOWMENU));
     }
 
     @Override
@@ -391,14 +393,15 @@ public enum GUICommands implements GUICommand {
   SHOWBUTTONS(false, GUISHOWBUTTONS, null, GUISHOWBUTTONSTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showbuttons ^= true;
-      gui.updateControl(gui.buttons, GUIProp.showbuttons, BorderLayout.CENTER);
+      gui.prop.invert(GUIProp.SHOWBUTTONS);
+      gui.updateControl(gui.buttons, gui.prop.is(GUIProp.SHOWBUTTONS),
+          BorderLayout.CENTER);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showbuttons);
+      select(button, gui.prop.is(GUIProp.SHOWBUTTONS));
     }
 
     @Override
@@ -409,14 +412,14 @@ public enum GUICommands implements GUICommand {
   SHOWINPUT(false, GUISHOWINPUT, null, GUISHOWINPUTTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showinput ^= true;
-      gui.updateControl(gui.nav, GUIProp.showinput, BorderLayout.SOUTH);
+      gui.updateControl(gui.nav, gui.prop.invert(GUIProp.SHOWINPUT),
+          BorderLayout.SOUTH);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showinput);
+      select(button, gui.prop.is(GUIProp.SHOWINPUT));
     }
 
     @Override
@@ -427,14 +430,14 @@ public enum GUICommands implements GUICommand {
   SHOWSTATUS(false, GUISHOWSTATUS, null, GUISHOWSTATUSTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showstatus ^= true;
-      gui.updateControl(gui.status, GUIProp.showstatus, BorderLayout.SOUTH);
+      gui.updateControl(gui.status, gui.prop.invert(GUIProp.SHOWSTATUS),
+          BorderLayout.SOUTH);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showstatus);
+      select(button, gui.prop.is(GUIProp.SHOWSTATUS));
     }
 
     @Override
@@ -445,8 +448,8 @@ public enum GUICommands implements GUICommand {
   SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
     public void execute(final GUI gui) {
-      if(gui.context.data() == null) GUIProp.showstarttext ^= true;
-      else GUIProp.showtext ^= true;
+      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTTEXT);
+      else gui.prop.invert(GUIProp.SHOWTEXT);
       gui.layoutViews();
     }
 
@@ -454,7 +457,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
       select(button, gui.context.data() != null ?
-          GUIProp.showtext : GUIProp.showstarttext);
+          gui.prop.is(GUIProp.SHOWTEXT) : gui.prop.is(GUIProp.SHOWSTARTTEXT));
     }
 
     @Override
@@ -465,14 +468,14 @@ public enum GUICommands implements GUICommand {
   SHOWMAP(true, GUISHOWMAP, "% 2", GUISHOWMAPTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showmap ^= true;
+      gui.prop.invert(GUIProp.SHOWMAP);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showmap);
+      select(button, gui.prop.is(GUIProp.SHOWMAP));
     }
 
     @Override
@@ -483,14 +486,14 @@ public enum GUICommands implements GUICommand {
   SHOWFOLDER(true, GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showfolder ^= true;
+      gui.prop.invert(GUIProp.SHOWFOLDER);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showfolder);
+      select(button, gui.prop.is(GUIProp.SHOWFOLDER));
     }
 
     @Override
@@ -501,14 +504,14 @@ public enum GUICommands implements GUICommand {
   SHOWTABLE(true, GUISHOWTABLE, "% 4", GUISHOWTABLETT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showtable ^= true;
+      gui.prop.invert(GUIProp.SHOWTABLE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showtable);
+      select(button, gui.prop.is(GUIProp.SHOWTABLE));
     }
 
     @Override
@@ -519,14 +522,14 @@ public enum GUICommands implements GUICommand {
   SHOWPLOT(true, GUISHOWPLOT, "% 5", GUISHOWPLOTTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showplot ^= true;
+      gui.prop.invert(GUIProp.SHOWPLOT);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showplot);
+      select(button, gui.prop.is(GUIProp.SHOWPLOT));
     }
 
     @Override
@@ -537,14 +540,14 @@ public enum GUICommands implements GUICommand {
   SHOWEXPLORER(true, GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.showexplore ^= true;
+      gui.prop.invert(GUIProp.SHOWEXPLORE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showexplore);
+      select(button, gui.prop.is(GUIProp.SHOWEXPLORE));
     }
 
     @Override
@@ -561,7 +564,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.fullscreen);
+      select(button, gui.prop.is(GUIProp.FULLSCREEN));
     }
 
     @Override
@@ -574,7 +577,7 @@ public enum GUICommands implements GUICommand {
   RTEXEC(true, GUIRTEXEC, null, GUIRTEXECTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.execrt ^= true;
+      gui.prop.invert(GUIProp.EXECRT);
       gui.refreshControls();
       gui.notify.layout();
     }
@@ -582,7 +585,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.execrt);
+      select(button, gui.prop.is(GUIProp.EXECRT));
     }
 
     @Override
@@ -593,14 +596,14 @@ public enum GUICommands implements GUICommand {
   RTFILTER(true, GUIRTFILTER, null, GUIRTFILTERTT) {
     @Override
     public void execute(final GUI gui) {
-      GUIProp.filterrt ^= true;
+      final boolean rt = gui.prop.invert(GUIProp.FILTERRT);
       gui.refreshControls();
       gui.notify.layout();
 
       final Context context = gui.context;
       final boolean root = context.root();
 
-      if(!GUIProp.filterrt) {
+      if(!rt) {
         if(!root) {
           gui.notify.context(new Nodes(0, context.data()), true, null);
           gui.notify.mark(context.current(), null);
@@ -619,7 +622,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.filterrt);
+      select(button, gui.prop.is(GUIProp.FILTERRT));
     }
 
     @Override
@@ -664,8 +667,8 @@ public enum GUICommands implements GUICommand {
   SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(!GUIProp.showhelp) {
-        GUIProp.showhelp = true;
+      if(!gui.prop.is(GUIProp.SHOWHELP)) {
+        gui.prop.set(GUIProp.SHOWHELP, true);
         gui.help = new DialogHelp(gui);
         gui.refreshControls();
       } else {
@@ -676,7 +679,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, GUIProp.showhelp);
+      select(button, gui.prop.is(GUIProp.SHOWHELP));
     }
 
     @Override
@@ -881,7 +884,7 @@ public enum GUICommands implements GUICommand {
   static IO save(final GUI gui) {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
-        GUIProp.createpath, gui);
+        gui.prop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
     final boolean single = gui.context.data().doc().length == 1;
@@ -889,7 +892,7 @@ public enum GUICommands implements GUICommand {
       BaseXFileChooser.Mode.DSAVE);
     if(file == null) return null;
 
-    GUIProp.createpath = file.path();
+    gui.prop.set(GUIProp.CREATEPATH, file.path());
     if(single) file.suffix(IO.XMLSUFFIX);
     return file;
   }
@@ -905,11 +908,13 @@ public enum GUICommands implements GUICommand {
 
   /**
    * Checks if data can be updated (disk mode, nodes defined, no namespaces).
+   * @param gui gui reference
    * @param n node instance
    * @return result of check
    */
-  static boolean updatable(final Nodes n) {
-    return !Prop.tablemem && !Prop.mainmem &&
+  static boolean updatable(final GUI gui, final Nodes n) {
+    final Prop prop = gui.context.prop;
+    return !prop.is(Prop.TABLEMEM) && !prop.is(Prop.MAINMEM) &&
       n != null && n.data.ns.size() == 0;
   }
 }

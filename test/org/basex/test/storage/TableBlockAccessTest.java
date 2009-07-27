@@ -25,7 +25,10 @@ public final class TableBlockAccessTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/JUnit.xml";
   /** Test database name. */
-  private final String dbname = getClass().getSimpleName();
+  private static final String DBNAME =
+    TableBlockAccessTest.class.getSimpleName();
+  /** Test file we do updates with. */
+  private static final Prop PROP = new Prop();
   /** BlockStorage. */
   private TableDiskAccess tba;
   /** Test file size. */
@@ -37,17 +40,16 @@ public final class TableBlockAccessTest {
   /** Expected blocks in file. */
   private int blocks;
   /** Nodes per block. */
-  private int nodesPerBlock;
+  private int nodes;
 
   /**
    * Initializes the test class.
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    Prop.read();
-    Prop.textindex = false;
-    Prop.attrindex = false;
-    Prop.chop = true;
+    PROP.set(Prop.TEXTINDEX, false);
+    PROP.set(Prop.ATTRINDEX, false);
+    PROP.set(Prop.CHOP, true);
   }
 
   /**
@@ -56,11 +58,11 @@ public final class TableBlockAccessTest {
   @Before
   public void setUp() {
     try {
-      final XMLParser parser = new XMLParser(IO.get(TESTFILE));
-      final Data data = new DiskBuilder().build(parser, dbname);
+      final XMLParser parser = new XMLParser(IO.get(TESTFILE), PROP);
+      final Data data = new DiskBuilder(parser).build(DBNAME);
       size = data.meta.size;
       data.close();
-      tba = new TableDiskAccess(dbname, DATATBL);
+      tba = new TableDiskAccess(DBNAME, DATATBL, PROP);
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -72,7 +74,7 @@ public final class TableBlockAccessTest {
     }
     entries = IO.BLOCKSIZE >>> IO.NODEPOWER;
     blocks = (int) Math.ceil(size / Math.floor(entries * IO.BLOCKFILL));
-    nodesPerBlock = (int) (entries * IO.BLOCKFILL);
+    nodes = (int) (entries * IO.BLOCKFILL);
   }
 
   /**
@@ -82,7 +84,7 @@ public final class TableBlockAccessTest {
   public void tearDown() {
     try {
       tba.close();
-      DropDB.drop(dbname);
+      DropDB.drop(DBNAME, PROP);
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -94,9 +96,8 @@ public final class TableBlockAccessTest {
   private void closeAndReload() {
     try {
       tba.close();
-      tba = null;
-      tba = new TableDiskAccess(dbname, DATATBL);
-    } catch(final IOException e) {
+      tba = new TableDiskAccess(DBNAME, DATATBL, PROP);
+    } catch(final IOException ex) {
       fail();
     }
   }
@@ -185,12 +186,12 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testDeleteFirstBlock() {
-    tba.delete(0, nodesPerBlock);
+    tba.delete(0, nodes);
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(nodesPerBlock, 0, size - nodesPerBlock);
+    assertEntrysEqual(nodes, 0, size - nodes);
     closeAndReload();
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(nodesPerBlock, 0, size - nodesPerBlock);
+    assertEntrysEqual(nodes, 0, size - nodes);
   }
 
   /**
@@ -198,16 +199,16 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testDeleteSecondBlock() {
-    tba.delete(nodesPerBlock, nodesPerBlock);
+    tba.delete(nodes, nodes);
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock);
-    assertEntrysEqual(2 * nodesPerBlock, nodesPerBlock, size - 2
-        * nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes);
+    assertEntrysEqual(2 * nodes, nodes, size - 2
+        * nodes);
     closeAndReload();
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock);
-    assertEntrysEqual(2 * nodesPerBlock, nodesPerBlock, size - 2
-        * nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes);
+    assertEntrysEqual(2 * nodes, nodes, size - 2
+        * nodes);
   }
 
   /**
@@ -215,12 +216,12 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testDeleteLastBlock() {
-    tba.delete(size / nodesPerBlock * nodesPerBlock, size % nodesPerBlock);
+    tba.delete(size / nodes * nodes, size % nodes);
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - size % nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes - size % nodes);
     closeAndReload();
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - size % nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes - size % nodes);
   }
 
   /**
@@ -228,18 +229,18 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testDeleteSecondBlockAndSurroundingNodes() {
-    tba.delete(nodesPerBlock - 1, nodesPerBlock + 2);
-    assertEquals(size - 2 - nodesPerBlock, tba.size());
+    tba.delete(nodes - 1, nodes + 2);
+    assertEquals(size - 2 - nodes, tba.size());
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - 1);
-    assertEntrysEqual(2 * nodesPerBlock + 1, nodesPerBlock - 1, size - 2
-        * nodesPerBlock - 1);
+    assertEntrysEqual(0, 0, nodes - 1);
+    assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2
+        * nodes - 1);
     closeAndReload();
-    assertEquals(size - 2 - nodesPerBlock, tba.size());
+    assertEquals(size - 2 - nodes, tba.size());
     assertEquals(blocks - 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock - 1);
-    assertEntrysEqual(2 * nodesPerBlock + 1, nodesPerBlock - 1, size - 2
-        * nodesPerBlock - 1);
+    assertEntrysEqual(0, 0, nodes - 1);
+    assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2
+        * nodes - 1);
   }
 
   /**
@@ -299,18 +300,18 @@ public final class TableBlockAccessTest {
    */
   @Test
   public void testInsertAtBlockBoundary() {
-    tba.insert(nodesPerBlock - 1, getTestEntries(nodesPerBlock));
-    assertEquals(size + nodesPerBlock, tba.size());
+    tba.insert(nodes - 1, getTestEntries(nodes));
+    assertEquals(size + nodes, tba.size());
     assertEquals(blocks + 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock);
-    assertAreInserted(nodesPerBlock, nodesPerBlock);
-    assertEntrysEqual(nodesPerBlock, 2 * nodesPerBlock, size - nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes);
+    assertAreInserted(nodes, nodes);
+    assertEntrysEqual(nodes, 2 * nodes, size - nodes);
     closeAndReload();
-    assertEquals(size + nodesPerBlock, tba.size());
+    assertEquals(size + nodes, tba.size());
     assertEquals(blocks + 1, tba.blocks());
-    assertEntrysEqual(0, 0, nodesPerBlock);
-    assertAreInserted(nodesPerBlock, nodesPerBlock);
-    assertEntrysEqual(nodesPerBlock, 2 * nodesPerBlock, size - nodesPerBlock);
+    assertEntrysEqual(0, 0, nodes);
+    assertAreInserted(nodes, nodes);
+    assertEntrysEqual(nodes, 2 * nodes, size - nodes);
   }
 
   /**
@@ -332,7 +333,7 @@ public final class TableBlockAccessTest {
    */
   private byte[] getTestEntries(final int e) {
     final byte[] result = new byte[e << IO.NODEPOWER];
-    for(int i = 0; i < result.length; i++) result[i] = (byte) 5;
+    for(int i = 0; i < result.length; i++) result[i] = 5;
     return result;
   }
 }

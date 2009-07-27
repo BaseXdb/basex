@@ -1,6 +1,7 @@
 package org.basex.gui.view.explore;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -88,9 +89,9 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshMark() {
-    BaseXLayout.enable(go, !GUIProp.execrt);
+    BaseXLayout.enable(go, !gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked();
-    BaseXLayout.enable(filter, !GUIProp.filterrt &&
+    BaseXLayout.enable(filter, !gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -108,7 +109,7 @@ public final class ExploreView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showexplore;
+    return gui.prop.is(GUIProp.SHOWEXPLORE);
   }
 
   @Override

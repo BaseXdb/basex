@@ -86,7 +86,7 @@ public class BaseXText extends BaseXPanel {
 
     setLayout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
-    rend = new BaseXTextRenderer(text, scroll);
+    rend = new BaseXTextRenderer(text, scroll, gui.prop);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);

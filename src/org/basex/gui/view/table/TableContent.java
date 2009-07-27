@@ -9,8 +9,8 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
@@ -56,11 +56,12 @@ final class TableContent extends BaseXBack {
 
     gui.painting = true;
 
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
     g.setFont(GUIConstants.font);
 
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
+    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
 
     final Context context = tdata.context;
     final Data data = context.data();
@@ -108,7 +109,7 @@ final class TableContent extends BaseXBack {
       g.setColor(Color.black);
 
       // skip drawing of text during animation
-      if(rowH < GUIProp.fontsize) continue;
+      if(rowH < fsz) continue;
 
       // find all row contents
       ti.init(pre);
@@ -162,7 +163,8 @@ final class TableContent extends BaseXBack {
               fx = (int) x;
               focusStr = str;
             }
-            BaseXLayout.chopString(g, str, (int) x + 1, posY + 2, (int) cw - 4);
+            BaseXLayout.chopString(g, str, (int) x + 1, posY + 2,
+                (int) cw - 4, fsz);
             tb[c].reset();
           }
         }
@@ -177,7 +179,7 @@ final class TableContent extends BaseXBack {
           g.setColor(GUIConstants.COLORS[col + 2]);
           g.fillRect(fx - 2, posY, sw, rowH - 1);
           g.setColor(Color.black);
-          BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw);
+          BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
           // cache focused string
           focusedString = string(focusStr);

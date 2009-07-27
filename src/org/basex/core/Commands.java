@@ -40,16 +40,15 @@ public interface Commands {
     /**
      * Returns a help string.
      * @param detail show details
-     * @param all show all commands (also hidden ones)
      * @return string
      */
-    public final String help(final boolean detail, final boolean all) {
+    public final String help(final boolean detail) {
       final StringBuilder sb = new StringBuilder();
 
       final Object args = help(0);
       if(name().startsWith("DUMMY")) {
         sb.append(NL + args + NL + NL);
-      } else if(args != null && (official || detail || all)) {
+      } else if(args != null && (official || detail)) {
         sb.append(name().toLowerCase() + " " + args + NL + "  " + help(1) + NL);
         if(detail) sb.append(NL + help(2) + NL);
       } else {

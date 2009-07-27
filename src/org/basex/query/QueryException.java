@@ -45,7 +45,8 @@ public class QueryException extends Exception {
    */
   public QueryException(final Object[] s, final Object... e) {
     this(s[2], e);
-    if(!Prop.xqerrcode) return;
+    // skip error codes in gui mode
+    if(Prop.gui) return;
     code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 

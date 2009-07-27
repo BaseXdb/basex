@@ -7,7 +7,7 @@ import org.basex.data.MemData;
 import org.basex.util.Array;
 
 /**
- * Class for all referenced Data.
+ * Class for all referenced data.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
@@ -55,8 +55,6 @@ public final class DataPool {
         return close;
       }
     }
-    // [AW] later: this should not happen anymore, as all data instances
-    // to be unpinned should be referenced in the data pool.
     return false;
   }
 
@@ -95,9 +93,9 @@ public final class DataPool {
   public void close() {
     try {
       for(int i = 0; i < size; i++) data[i].close();
-      size = 0;
     } catch(final IOException ex) {
       BaseX.debug(ex);
     }
+    size = 0;
   }
 }

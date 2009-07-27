@@ -52,7 +52,7 @@ public class DeepBaseTest {
   public void tearDown() {
     ctx.closeDB();
     dbfs.destroy();
-    DropDB.drop(DBNAME);
+    DropDB.drop(DBNAME, ctx.prop);
     new File(TESTFILE).delete();
   }
 
@@ -145,12 +145,13 @@ public class DeepBaseTest {
    */
   private void loadTestDB() {
     try {
-      final Data data = CreateDB.xml(ctx, new XMLParser(
-          IO.get("test/org/basex/test/fuse/getattrtest.xml")), DBNAME);
+      final String path = "test/org/basex/test/fuse/getattrtest.xml";
+      final XMLParser parser = new XMLParser(IO.get(path), ctx.prop);
+      final Data data = CreateDB.xml(ctx, parser, DBNAME);
       ctx.openDB(data);
       dbfs.data = data;
-    } catch(final IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
       fail("Problem loading test database.");
     }
   }
@@ -173,8 +174,8 @@ public class DeepBaseTest {
       while(f.read(b) != -1) sb.append(new String(b));
       System.err.println(sb.toString());
       return sb.toString();
-    } catch(final Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
       return "";
     }
   }

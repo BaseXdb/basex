@@ -1,7 +1,6 @@
 package org.basex.gui.view;
 
 import java.awt.BorderLayout;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 
 /**
@@ -33,7 +32,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    */
   public void setVisibility() {
     try {
-      setVisible(GUIProp.class.getField(prop()).getBoolean(null));
+      setVisible(((Boolean) view.gui.prop.object(prop())).booleanValue());
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -44,7 +43,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    */
   public void delete() {
     try {
-      GUIProp.class.getField(prop()).setBoolean(null, false);
+      view.gui.prop.set(prop(), false);
       view.gui.layoutViews();
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -56,7 +55,8 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    * @return property
    */
   public String prop() {
-    return "show" + (view.gui.context.data() != null ? "" : "start") + view;
+    return "SHOW" + (view.gui.context.data() != null ? "" : "START") +
+      view.getName().toUpperCase();
   }
 
   /**

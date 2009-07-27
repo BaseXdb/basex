@@ -4,9 +4,9 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.io.IO;
 import org.basex.util.Num;
 import org.basex.util.Token;
 
@@ -45,7 +45,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
-    final int max = (int) (IO.dbfile(db, f).length() >>> 7);
+    final int max = (int) (data.meta.prop.dbfile(db, f).length() >>> 7);
     while(cap < max && cap < 1 << 24) cap <<= 1;
 
     total = data.meta.size;
@@ -60,9 +60,10 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     index.init();
 
     final int hs = index.size;
-    final DataOutput outl = new DataOutput(db, f + 'l');
+    final Prop pr = data.meta.prop;
+    final DataOutput outl = new DataOutput(pr.dbfile(db, f + 'l'));
     outl.writeNum(hs);
-    final DataOutput outr = new DataOutput(db, f + 'r');
+    final DataOutput outr = new DataOutput(pr.dbfile(db, f + 'r'));
     while(index.more()) {
       outr.write5(outl.size());
       final int p = index.next();

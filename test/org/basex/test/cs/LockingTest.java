@@ -3,9 +3,7 @@ package org.basex.test.cs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
-
 import org.basex.BaseX;
-import org.basex.core.AbstractProcess;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Delete;
@@ -14,7 +12,7 @@ import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.PrintOutput;
 import org.basex.server.BaseXServerNew;
-import org.basex.server.ClientProcessNew;
+import org.basex.server.ClientLauncherNew;
 
 /**
  * Test the 4 Locking Cases.
@@ -49,10 +47,12 @@ public final class LockingTest {
   private LockingTest() {
     startTheServer();
     try {
-      socket1 = new Socket("localhost", Prop.port);
-      socket2 = new Socket("localhost", Prop.port);
-    } catch(IOException e) {
-      e.printStackTrace();
+      final int port = bxs.context.prop.num(Prop.PORT);
+      final String host = bxs.context.prop.get(Prop.HOST);
+      socket1 = new Socket(host, port);
+      socket2 = new Socket(host, port);
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
     read = "for $country in //country for $city in //city where" +
     " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
@@ -92,12 +92,12 @@ public final class LockingTest {
    * @param p Process
    */
   private void exe(final Socket s, final Process p) {
-    final AbstractProcess proc = new ClientProcessNew(s, p);
+    final ClientLauncherNew proc = new ClientLauncherNew(p, s);
     try {
-      final boolean ok = proc.execute(null);
+      final boolean ok = proc.execute();
       if(ok && p.printing()) {
         final PrintOutput out = new PrintOutput(System.out);
-        proc.output(out);
+        proc.out(out);
         out.close();
       }
     } catch(final FileNotFoundException ex) {

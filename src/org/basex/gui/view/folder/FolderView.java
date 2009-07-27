@@ -2,6 +2,7 @@ package org.basex.gui.view.folder;
 
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -85,7 +86,7 @@ public final class FolderView extends View {
 
     if(gui.context.data() == null) {
       opened = null;
-    } else if(GUIProp.showfolder) {
+    } else if(gui.prop.is(GUIProp.SHOWFOLDER)) {
       refreshOpenedNodes();
       refreshHeight();
       repaint();
@@ -124,7 +125,7 @@ public final class FolderView extends View {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!GUIProp.showfolder) return;
+    if(!gui.prop.is(GUIProp.SHOWFOLDER)) return;
 
     startY = 0;
     scroll.pos(0);
@@ -161,7 +162,7 @@ public final class FolderView extends View {
 
   @Override
   protected boolean visible() {
-    return GUIProp.showfolder;
+    return gui.prop.is(GUIProp.SHOWFOLDER);
   }
 
   /**
@@ -183,7 +184,7 @@ public final class FolderView extends View {
 
     super.paintComponent(g);
     if(opened == null) return;
-    BaseXLayout.antiAlias(g);
+    BaseXLayout.antiAlias(g, gui.prop);
 
     gui.painting = true;
     startY = -scroll.pos();
@@ -229,7 +230,7 @@ public final class FolderView extends View {
     final boolean fs = data.fs != null;
     final boolean file = fs && data.fs.isFile(pre);
     final boolean dir = fs && data.fs.isDir(pre);
-    final byte[] name = file || dir ? ViewData.tag(data, pre) :
+    final byte[] name = file || dir ? ViewData.tag(gui.prop, data, pre) :
       ViewData.content(data, pre, false);
 
     int p = gui.focused;
@@ -241,7 +242,7 @@ public final class FolderView extends View {
     int xx = x;
 
     if(elem) {
-      final boolean large = GUIProp.fontsize > 20;
+      final boolean large = gui.prop.num(GUIProp.FONTSIZE) > 20;
       final int off = large ? 1 : 0;
       final int yy = y - boxW - (large ? 6 : 3);
       Image box = opened[pre] ? openedBox : closedBox;
@@ -266,7 +267,8 @@ public final class FolderView extends View {
       tw -= BaseXLayout.width(g, text) + 10;
       g.drawString(text, tw, yy);
     }
-    BaseXLayout.chopString(g, name, xx, yy - GUIProp.fontsize, tw - xx - 10);
+    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
+    BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
 
     if(gui.focused == pre) {
       g.setColor(color6);
@@ -310,7 +312,7 @@ public final class FolderView extends View {
    * @param open opened folder
    */
   void jumpTo(final int pre, final boolean open) {
-    if(getWidth() == 0 || !GUIProp.showfolder) return;
+    if(getWidth() == 0 || !gui.prop.is(GUIProp.SHOWFOLDER)) return;
 
     if(open) {
       int p = pre;
@@ -338,7 +340,7 @@ public final class FolderView extends View {
    * Creates click boxes.
    */
   private void createBoxes() {
-    final int s = GUIProp.fontsize;
+    final int s = gui.prop.num(GUIProp.FONTSIZE);
     boxMargin = s >> 2;
     lineH = s + boxMargin;
     boxW = s - boxMargin;
@@ -481,8 +483,8 @@ public final class FolderView extends View {
         return;
       }
 
-      if(open ^ opened[focusPre] && (!ViewData.isLeaf(data, focusPre) ||
-          data.attSize(focusPre, kind) > 1)) {
+      if(open ^ opened[focusPre] && (!ViewData.isLeaf(gui.prop, data, focusPre)
+          || data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = open;
         refreshHeight();
         repaint();

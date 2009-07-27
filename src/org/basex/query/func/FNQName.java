@@ -141,7 +141,6 @@ final class FNQName extends Fun {
       n = n.parent();
     } while(n != null && ctx.nsInherit);
 
-
     final SeqIter seq = new SeqIter();
     for(final byte[] t : tl) seq.add(Str.get(t));
     return seq;

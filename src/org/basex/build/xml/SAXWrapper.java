@@ -8,6 +8,7 @@ import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.ProgressException;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
@@ -30,9 +31,10 @@ public final class SAXWrapper extends Parser {
   /**
    * Constructor.
    * @param s sax source
+   * @param pr database properties
    */
-  public SAXWrapper(final SAXSource s) {
-    super(IO.get(s.getSystemId()));
+  public SAXWrapper(final SAXSource s, final Prop pr) {
+    super(IO.get(s.getSystemId()), pr);
     source = s;
   }
 

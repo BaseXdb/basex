@@ -197,7 +197,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     text(b);
   }
 
-
   @Override
   public void comment(final byte[] t) throws IOException {
     finishElement();
