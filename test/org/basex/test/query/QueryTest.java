@@ -49,7 +49,7 @@ public final class QueryTest {
     final Prop prop = CONTEXT.prop;
     prop.set(Prop.TEXTINDEX, true);
     prop.set(Prop.ATTRINDEX, true);
-    //prop.set(MAINMEM, true);
+    prop.set(Prop.MAINMEM, true);
     prop.set(Prop.CHOP, true);
     boolean ok = true;
 

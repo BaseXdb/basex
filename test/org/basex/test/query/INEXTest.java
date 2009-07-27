@@ -66,7 +66,7 @@ public final class INEXTest {
    * @throws Exception exception
    */
   private INEXTest(final String db, final boolean exe) throws Exception {
-    new Open(db).execute(context, null);
+    new Open(db).execute(context);
 
     // open query file
     final BufferedWriter out =

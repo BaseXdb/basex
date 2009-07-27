@@ -37,7 +37,7 @@ public final class MVTest {
    * @throws Exception exception
    */
   private MVTest(final String db) throws Exception {
-    new Open(db).execute(context, null);
+    new Open(db).execute(context);
 
     // open query file
     final BufferedWriter out =

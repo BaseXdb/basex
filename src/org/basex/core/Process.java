@@ -68,7 +68,7 @@ public abstract class Process extends Progress {
 
     if(!execute(ctx)) throw new RuntimeException(info());
     output(out);
-    if(ctx.prop.is(Prop.INFO)) out.println(info());
+    if(ctx.prop.is(Prop.INFO)) out.print(info());
   }
 
   /**

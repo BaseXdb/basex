@@ -143,7 +143,7 @@ public final class Prop extends AProp {
   public static final Object[] FTST = { "FTST", false };
   /** Flag for full-text case sensitivity. */
   public static final Object[] FTCS = { "FTCS", false };
-  /** Flag for full-text diacritics. */
+  /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
 
   /** Flag for importing file contents. */

@@ -41,7 +41,7 @@ public final class SAXExample extends DefaultHandler {
     final Context ctx = new Context();
 
     // create a database
-    new CreateDB(XMLFILE).execute(ctx, null);
+    new CreateDB(XMLFILE).execute(ctx);
 
     // create query instance
     final QueryProcessor query = new QueryProcessor(QUERY, ctx);
