@@ -33,7 +33,7 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
   public void executeCommand(final String cmd) throws XQException {
     opened();
     try {
-      new CommandParser(cmd).parse();
+      new CommandParser(cmd, sc.context).parse();
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

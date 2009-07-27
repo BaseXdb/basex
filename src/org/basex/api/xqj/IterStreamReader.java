@@ -516,7 +516,7 @@ final class IterStreamReader implements XMLStreamReader {
           item = node[l];
           kind = END_ELEMENT;
         }
-      } catch(final QueryException e) {
+      } catch(final QueryException ex) {
         BaseX.notexpected();
       }
       return true;

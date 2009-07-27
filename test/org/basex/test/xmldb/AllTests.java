@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.api.xmldb.BXCollection;
+import org.basex.core.Context;
 import org.basex.core.proc.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
@@ -75,7 +76,8 @@ public class AllTests {
    */
   static void init() throws Exception {
     // create an initial collection for testing
-    coll = new BXCollection(COLL, false);
+    final Context ctx = new Context();
+    coll = new BXCollection(COLL, false, ctx);
     final Resource res = coll.createResource(DOC1, XMLResource.RESOURCE_TYPE);
     res.setContent(read(DOC1));
     coll.storeResource(res);
@@ -85,8 +87,7 @@ public class AllTests {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        System.out.println("ALLTESTS");
-        DropDB.drop(COLL);
+        DropDB.drop(COLL, ctx.prop);
       }
     });
   }

@@ -43,7 +43,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final BXQConnection conn;
   /** Query context. */
-  private final QueryContext ctx;
+  private final QueryContext qctx;
   /** Item. */
   Item it;
 
@@ -68,7 +68,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
     super(c);
     conn = connection;
-    ctx = context;
+    qctx = context;
     it = item;
   }
 
@@ -185,7 +185,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
         // SAXResult.. serialize result to underlying parser
         final SAXSerializer ser = new SAXSerializer(null);
         ser.setContentHandler(((SAXResult) result).getHandler());
-        serialize(it, ctx, ser);
+        serialize(it, qctx, ser);
         ser.close();
       } catch(final IOException ex) {
         throw new BXQException(ex);
@@ -203,7 +203,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   private void serialize(final OutputStream os) throws XQException {
     try {
       final PrintOutput out = new PrintOutput(os);
-      serialize(it, ctx, new XMLSerializer(out));
+      serialize(it, qctx, new XMLSerializer(out));
       out.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
@@ -219,7 +219,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     opened();
     final CachedOutput co = new CachedOutput();
     try {
-      serialize(it, ctx, new XMLSerializer(co));
+      serialize(it, qctx, new XMLSerializer(co));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

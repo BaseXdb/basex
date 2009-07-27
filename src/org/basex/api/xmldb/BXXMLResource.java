@@ -174,8 +174,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     try {
       // ..might be replaced by a custom SAX Content Handler in future.
       return new BXSAXContentHandler(this);
-    } catch(final IOException e) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, e.getMessage());
+    } catch(final IOException ex) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
   }
 

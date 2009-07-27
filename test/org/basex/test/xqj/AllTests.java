@@ -18,16 +18,16 @@ public class AllTests {
    * Main method
    * @param args (ignored) command-line arguments
    */
-  public static void main(final String[] args) {
+  public static void main(String[] args) {
     TestRunner.run(suite());
   }
 
   /**
-   * Registers all JUnit tests.
+   * Adds all tests.
    * @return test instance
    */
   public static Test suite() {
-    final TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
+    TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
     suite.addTestSuite(SignatureTest.class);
     suite.addTestSuite(XQConnectionTest.class);
     suite.addTestSuite(XQDataFactoryTest.class);

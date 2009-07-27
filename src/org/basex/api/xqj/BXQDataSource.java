@@ -7,7 +7,6 @@ import java.util.Properties;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
-import org.basex.core.Prop;
 
 /**
  * Java XQuery API - Data Source.
@@ -20,13 +19,6 @@ public final class BXQDataSource implements XQDataSource {
   private PrintWriter log;
   /** Timeout. */
   private int timeout;
-
-  /**
-   * Constructor.
-   */
-  public BXQDataSource() {
-    Prop.read();
-  }
 
   public BXQConnection getConnection() {
     return new BXQConnection();

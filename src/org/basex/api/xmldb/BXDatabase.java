@@ -2,10 +2,9 @@ package org.basex.api.xmldb;
 
 import static org.basex.Text.*;
 import org.basex.core.Context;
-import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Process;
 import org.basex.core.proc.Set;
-import org.basex.io.IO;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.ErrorCodes;
@@ -19,6 +18,8 @@ import org.xmldb.api.base.XMLDBException;
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database, BXXMLDBText {
+  /** Context reference. */
+  Context ctx = new Context();
 
   public boolean acceptsURI(final String uri) throws XMLDBException {
     return getCollectionName(uri) != null;
@@ -29,8 +30,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = IO.dbpath(name).exists();
-    return exists ? new BXCollection(name, exists) : null;
+    final boolean exists = ctx.prop.dbpath(name).exists();
+    return exists ? new BXCollection(name, exists, ctx) : null;
   }
 
   public String getConformanceLevel() {
@@ -43,8 +44,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   public String getProperty(final String key) {
     try {
-      return Prop.class.getField(key).get(null).toString();
-    } catch(final Exception e) {
+      return ((Object[]) Prop.class.getField(key).get(null))[1].toString();
+    } catch(final Exception ex) {
       return null;
     }
   }

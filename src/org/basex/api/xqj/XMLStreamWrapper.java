@@ -10,6 +10,7 @@ import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.ProgressException;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
@@ -31,9 +32,10 @@ final class XMLStreamWrapper extends Parser {
   /**
    * Constructor.
    * @param sr stream reader
+   * @param pr database properties
    */
-  XMLStreamWrapper(final XMLStreamReader sr) {
-    super(IO.DUMMY);
+  XMLStreamWrapper(final XMLStreamReader sr, final Prop pr) {
+    super(IO.DUMMY, pr);
     reader = sr;
   }
 

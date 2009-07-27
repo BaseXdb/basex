@@ -319,8 +319,8 @@ public class CollectionTest extends TestCase {
     try {
       coll.setProperty("ProbablyUnknown", "on");
       fail("Invalid key was assigned.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.VENDOR_ERROR, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.VENDOR_ERROR, ex);
     }
 
     // the following tests are database specific...
@@ -330,8 +330,8 @@ public class CollectionTest extends TestCase {
     try {
       coll.setProperty("time", "ABC");
       fail("Invalid value was assigned.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.VENDOR_ERROR, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.VENDOR_ERROR, ex);
     }
   }
 

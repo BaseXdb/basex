@@ -37,6 +37,8 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 abstract class BXQAbstract {
+  /** Database connection. */
+  protected BXQStaticContext ctx;
   /** Closed flag. */
   protected boolean closed;
   /** Parent closer. */
@@ -217,7 +219,8 @@ abstract class BXQAbstract {
     opened();
     valid(is, InputStream.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is))));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is)),
+          ctx.context.prop));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -233,7 +236,8 @@ abstract class BXQAbstract {
     opened();
     valid(r, Reader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r))));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r)),
+          ctx.context.prop));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -249,7 +253,7 @@ abstract class BXQAbstract {
     opened();
     valid(r, XMLReader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(r, null)));
+      return checkDB(CreateDB.xml(new SAXSource(r, null), ctx.context.prop));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -265,7 +269,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr)));
+      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr, ctx.context.prop)));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -279,7 +283,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createDB(final IO io) throws BXQException {
     try {
-      return checkDB(CreateDB.xml(io));
+      return checkDB(CreateDB.xml(io, ctx.context.prop));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -288,16 +292,16 @@ abstract class BXQAbstract {
   /**
    * Serializes an item to the specified serializer.
    * @param it item
-   * @param ctx context
+   * @param qctx query context
    * @param ser serializer
    * @throws XQException exception
    */
-  protected void serialize(final Item it, final QueryContext ctx,
+  protected void serialize(final Item it, final QueryContext qctx,
       final Serializer ser) throws XQException {
     opened();
     try {
       if(it.type == Type.ATT) throw new BXQException(ATTR);
-      ctx.serialize(ser, it);
+      qctx.serialize(ser, it);
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

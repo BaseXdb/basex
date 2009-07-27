@@ -210,8 +210,8 @@ abstract class BXQDynamicContext extends BXQAbstract
    */
   protected XQResultSequence execute() throws XQException {
     opened();
-    final QueryContext ctx = query.ctx;
-    ctx.ns = sc.ctx.ns;
+    final QueryContext qctx = query.ctx;
+    qctx.ns = sc.ctx.ns;
 
     try {
       if(sc.timeout != 0) {
@@ -219,15 +219,15 @@ abstract class BXQDynamicContext extends BXQAbstract
           @Override
           public void run() {
             Performance.sleep(sc.timeout * 1000);
-            ctx.stop();
+            qctx.stop();
           }
         }.start();
       }
       query.parse();
-      ctx.compile();
-      Iter iter = ctx.iter();
+      qctx.compile();
+      Iter iter = qctx.iter();
       if(sc.scrollable) iter = SeqIter.get(iter);
-      return new BXQSequence(iter, ctx, this, (BXQConnection) par);
+      return new BXQSequence(iter, qctx, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);

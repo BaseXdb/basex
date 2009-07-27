@@ -40,8 +40,8 @@ public final class XMLDBCreate {
       // Close the connection
       coll.close();
 
-    } catch(XMLDBException e) {
-      System.err.println("XML:DB Exception occured " + e.errorCode);
+    } catch(XMLDBException ex) {
+      System.err.println("XML:DB Exception occured " + ex.errorCode);
     }
   }
 }

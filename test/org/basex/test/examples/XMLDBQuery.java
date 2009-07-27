@@ -47,8 +47,8 @@ public final class XMLDBQuery {
         // Writing the result to the console.
         System.out.println((String) res.getContent());
       }
-    } catch(XMLDBException e) {
-      System.err.println("XML:DB Exception occured " + e.errorCode);
+    } catch(XMLDBException ex) {
+      System.err.println("XML:DB Exception occured " + ex.errorCode);
     } finally {
       if(coll != null) coll.close();
     }

@@ -335,8 +335,8 @@ public class XQJTest extends TestCase {
       final XQResultSequence result = expr.executeQuery();
       result.next();
       assertEquals(123, result.getInt());
-    } catch(final XQException e) {
-      fail(e.getMessage());
+    } catch(final XQException ex) {
+      fail(ex.getMessage());
     }
   }
 

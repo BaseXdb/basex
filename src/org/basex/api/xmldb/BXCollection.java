@@ -20,7 +20,7 @@ import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.StringList;
-import static org.basex.util.Token.*;
+import org.basex.util.Token;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
@@ -31,7 +31,7 @@ import static org.basex.util.Token.*;
  */
 public final class BXCollection implements Collection, BXXMLDBText {
   /** Context reference. */
-  Context ctx = new Context();
+  Context ctx;
 
   /**
    * Constructor to create/open a collection.
@@ -41,9 +41,24 @@ public final class BXCollection implements Collection, BXXMLDBText {
    */
   public BXCollection(final String name, final boolean open)
       throws XMLDBException {
+
+    this(name, open, new Context());
+  }
+
+  /**
+   * Constructor to create/open a collection.
+   * @param name name of the database
+   * @param open open existing database
+   * @param c database context
+   * @throws XMLDBException exception
+   */
+  public BXCollection(final String name, final boolean open, final Context c)
+      throws XMLDBException {
+
+    ctx = c;
     try {
       ctx.openDB(open ? Open.open(ctx, name) :
-        CreateDB.xml(ctx, Parser.emptyParser(IO.get(name)), name));
+        CreateDB.xml(ctx, Parser.emptyParser(IO.get(name), ctx.prop), name));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -104,7 +119,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     final StringList sl = new StringList();
     final Data data = ctx.data();
-    for(final int d : data.doc()) sl.add(string(data.text(d)));
+    for(final int d : data.doc()) sl.add(Token.string(data.text(d)));
     return sl.finish();
   }
 
@@ -160,13 +175,14 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // create parser, dependent on input type
     final Object cont = xml.content;
     Parser p = null;
-    if(cont instanceof Document) p = new DOCWrapper((Document) cont, id);
-    else p = new DirParser(new IOContent((byte[]) cont, id));
+    if(cont instanceof Document) p =
+      new DOCWrapper((Document) cont, id, ctx.prop);
+    else p = new DirParser(new IOContent((byte[]) cont, id), ctx.prop);
 
     // insert document
     try {
       final Data data = ctx.data();
-      data.insert(data.meta.size, -1, new MemBuilder().build(p, id));
+      data.insert(data.meta.size, -1, new MemBuilder(p).build(id));
       data.flush();
       ctx.update();
     } catch(final IOException ex) {
@@ -178,9 +194,10 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     if(id == null) return null;
     final Data data = ctx.data();
-    final byte[] idd = token(id);
+    final byte[] idd = Token.token(id);
     for(final int d : data.doc()) {
-      if(eq(data.text(d), idd)) return new BXXMLResource(data, d, id, this);
+      if(Token.eq(data.text(d), idd))
+        return new BXXMLResource(data, d, id, this);
     }
     return null;
   }
@@ -215,7 +232,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     try {
       return MetaData.class.getField(key).get(ctx.data().meta).toString();
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return null;
     }
   }
@@ -236,14 +253,14 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
       if(k instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) k).booleanValue() :
-          val.equalsIgnoreCase(ON) || !val.equalsIgnoreCase(OFF);
+          val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
         f.setBoolean(md, b);
       } else if(k instanceof Integer) {
         f.setInt(md, Integer.parseInt(val));
       } else {
         f.set(md, val);
       }
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
   }

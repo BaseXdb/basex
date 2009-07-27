@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
-
 import org.basex.core.Context;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;

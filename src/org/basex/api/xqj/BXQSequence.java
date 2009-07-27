@@ -38,7 +38,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
   final Iter result;
   /** Query context. */
-  private final QueryContext ctx;
+  private final QueryContext qctx;
   /** Current result. */
   private BXQItem it;
   /** Iterator position. */
@@ -72,7 +72,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final BXQAbstract c, final BXQConnection cn) throws XQException {
     super(c);
     result = item;
-    ctx = context;
+    qctx = context;
     conn = cn;
     scrollable = cn == null || cn.getStaticContext().
       getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
@@ -185,7 +185,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final XMLSerializer xml = new XMLSerializer(out);
       do {
         final BXQItem item = item();
-        item.serialize(item.it, ctx, xml);
+        item.serialize(item.it, qctx, xml);
       } while(next());
       xml.close();
     } catch(final IOException ex) {
@@ -245,7 +245,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final Item i = result.next();
       next = i != null;
       pos++;
-      it = new BXQItem(i, this, ctx, conn);
+      it = new BXQItem(i, this, qctx, conn);
       if(!next) pos = -1;
       return next;
     } catch(final QueryException ex) {
@@ -305,7 +305,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final SAXResult sax = (SAXResult) res;
       ser.setContentHandler(sax.getHandler());
       ser.setLexicalHandler(sax.getLexicalHandler());
-      while(next()) serialize(item().it, ctx, ser);
+      while(next()) serialize(item().it, qctx, ser);
     } else {
       BaseX.notimplemented();
     }

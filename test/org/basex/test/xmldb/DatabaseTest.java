@@ -35,8 +35,8 @@ public class DatabaseTest extends TestCase {
     try {
       database.acceptsURI("bla");
       fail("URI was invalid.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.INVALID_URI, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.INVALID_URI, ex);
     }
   }
 
@@ -49,8 +49,8 @@ public class DatabaseTest extends TestCase {
     try {
       database.getCollection("bla", AllTests.LOGIN, AllTests.PW);
       fail("URI was invalid.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.INVALID_URI, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.INVALID_URI, ex);
     }
     // get database from database manager
     DatabaseManager.registerDatabase(database);
@@ -83,8 +83,8 @@ public class DatabaseTest extends TestCase {
     try {
       database.setProperty("ProbablyUnknown", "on");
       fail("Invalid key was assigned.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.VENDOR_ERROR, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.VENDOR_ERROR, ex);
     }
 
     // the following tests are database specific...
@@ -94,8 +94,8 @@ public class DatabaseTest extends TestCase {
     try {
       database.setProperty("runs", "ABC");
       fail("Invalid value was assigned.");
-    } catch(final XMLDBException e) {
-      checkCode(ErrorCodes.VENDOR_ERROR, e);
+    } catch(final XMLDBException ex) {
+      checkCode(ErrorCodes.VENDOR_ERROR, ex);
     }
   }
 

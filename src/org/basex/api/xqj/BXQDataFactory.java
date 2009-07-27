@@ -36,9 +36,6 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
  * @author Christian Gruen
  */
 class BXQDataFactory extends BXQAbstract implements XQDataFactory {
-  /** Database connection. */
-  protected BXQStaticContext ctx;
-
   /**
    * Constructor.
    */
