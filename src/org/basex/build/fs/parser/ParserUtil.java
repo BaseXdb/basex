@@ -1,188 +1,148 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.basex.BaseX;
+import org.basex.build.fs.NewFSParser;
+import org.basex.build.fs.parser.Metadata.DateField;
+import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public final class ParserUtil {
 
+  /** Factory to create date and duration values. */
+  private static DatatypeFactory factory = null;
+
+  static {
+    try {
+      factory = DatatypeFactory.newInstance();
+    } catch(final DatatypeConfigurationException e) {
+      BaseX.debug(e.getMessage());
+    }
+  }
+
   /** Hidden constructor. */
   private ParserUtil() { /* */}
 
   /**
-   * Tries to convert the given byte array to a valid xs:duration
-   * representation.
+   * Converts a duration value in milliseconds to an {@link Duration} instance.
+   * @param milliseconds the number of milliseconds to convert.
+   * @return the {@link Duration} instance or <code>null</code> if the
+   *         conversion fails.
+   */
+  public static Duration convertMsDuration(final int milliseconds) {
+    return factory == null ? null : factory.newDuration(milliseconds);
+  }
+
+  /**
+   * Checks if the value is of the form <code>mm:ss</code> or if it is a
+   * milliseconds value and returns a {@link Duration} instance.
    * @param value the byte array to convert.
-   * @param ms true, if <code>value</code> represents a milliseconds
-   *          value, false if it represents a seconds value. The value of this
-   *          parameter is ignored, if <code>value</code> contains minutes and
-   *          seconds.
-   * @return the xs:duration representation or an empty array if
-   *         <code>value</code> could not be converted.
+   * @return the {@link Duration} instance or <code>null</code> if the
+   *         conversion fails.
    */
-  static byte[] toDuration(final byte[] value, final boolean ms) {
-    final int len = value.length;
-    final byte[] a = new byte[len];
-    int secPos = -1;
-    int pos = 0;
-    for(int i = 0; i < len; i++) {
-      final byte b = value[i];
-      if(b == 0) continue;
-      if(b < '0' || b > '9') {
-        if(b != ':') return EMPTY;
-        if(secPos != -1) return EMPTY; // only one colon allowed
-        secPos = i;
-      } else {
-        a[pos++] = b;
-      }
-    }
-    if(pos == 0) return EMPTY;
-    if(secPos == -1) return ms ? msToDuration(a, pos)
-        : secToDuration(a, pos);
-    return minSecToDuration(a, secPos, pos);
+  public static Duration convertDuration(final byte[] value) {
+    return Token.contains(value, ':') ? convertMinSecDuration(value)
+        : convertMsDuration(toInt(value));
   }
 
   /**
-   * Converts a byte array containing minutes and seconds to a valid xs:duration
-   * value (e.g. PT12M34S -> 12 minutes, 34 seconds).
-   * @param minSec the array containing the minutes and seconds as ASCII chars.
-   * @param secPos the position in the array that marks to start of the second
-   *          value.
-   * @param length the number of ASCII chars to read.
-   * @return the xs:duration value as byte array.
+   * Converts a duration value of the form <code>mm:ss</code> to an
+   * {@link Duration} instance.
+   * @param minSec the byte array containing the duration value.
+   * @return the {@link Duration} instance or <code>null</code> if the
+   *         conversion fails.
    */
-  private static byte[] minSecToDuration(final byte[] minSec, final int secPos,
-      final int length) {
-    final byte[] value = new byte[length + 4];
-    int p = 0;
-    value[p++] = 'P';
-    value[p++] = 'T';
-    if(secPos > 0) {
-      System.arraycopy(minSec, 0, value, 2, secPos); // copy minutes
-      p += secPos;
-      value[p++] = 'M';
-    }
-    // copy seconds
-    System.arraycopy(minSec, secPos, value, p, length - secPos);
-    value[length + 3] = 'S';
-    return value;
-  }
-
-  /**
-   * Converts a seconds value to a valid xs:duration value (e.g. PT123S -> 123
-   * seconds).
-   * @param seconds byte array with the seconds as ASCII chars.
-   * @param length the number of ASCII chars to read.
-   * @return the xs:duration value as byte array.
-   */
-  private static byte[] secToDuration(final byte[] seconds, final int length) {
-    final byte[] value = new byte[length + 3];
-    value[0] = 'P';
-    value[1] = 'T';
-    System.arraycopy(seconds, 0, value, 2, length);
-    value[length + 2] = 'S';
-    return value;
-  }
-
-  /**
-   * Converts an millisecond value to a valid XML xs:duration value, e.g.
-   * PT123.456S (123 seconds and 456 milliseconds).
-   * @param ms the milliseconds value to convert.
-   * @param length the number of ASCII chars to read.
-   * @return the xs:duration value or an empty array if duration < 1 second.
-   */
-  private static byte[] msToDuration(final byte[] ms, final int length) {
-    byte[] value;
-    if(length < 4) {
-      value = new byte[] { 'P', 'T', '0', '.', '0', '0', '0', 'S'};
-      final int offset = 7 - length;
-      System.arraycopy(ms, 0, value, offset, length);
-    } else {
-      value = new byte[length + 4]; // get space for 'P', 'T', '.' and 'S'
-      value[0] = 'P';
-      value[1] = 'T';
-      final int secLen = length - 3;
-      System.arraycopy(ms, 0, value, 2, secLen);
-      value[2 + secLen] = '.';
-      System.arraycopy(ms, secLen, value, 3 + secLen, 3);
-      value[length + 3] = 'S';
-    }
-    return value;
-  }
-
-  /**
-   * Checks if the byte array contains a valid year and returns the year in
-   * {@link Metadata.DataType#YEAR} format.
-   * @param year the year value to convert
-   * @return the year.
-   */
-  static byte[] convertYear(final byte[] year) {
-    int count = 0;
-    final byte[] value = { 0, 0, 0, 0, '-', '-'};
-    for(int i = 0, max = year.length; i < max && count < 4; i++) {
-      if(digit(year[i])) value[count++] = year[i];
-      else if(year[i] != 0) { // not a valid number
-        return EMPTY;
-      }
-    }
-    if(count < 4) {
-      return EMPTY;
-    }
-    return value;
-  }
-
-  /**
-   * Converts the byte array content (that must be of the form
-   * "YYYY:MM:DD hh:mm:ss") to a valid xs:dateTime value.
-   * @param dateTime the dateTime value to convert.
-   * @return the converted byte array.
-   */
-  static byte[] convertDateTime(final byte[] dateTime) {
-    if(dateTime.length != 20) return EMPTY;
+  public static Duration convertMinSecDuration(final byte[] minSec) {
+    if(factory == null) return null;
+    byte b;
     int i = 0;
-    for(; i < 4; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
+    final int max = minSec.length;
+    if(max == 0) return null;
+    b = minSec[0];
+    // skip whitespaces
+    while(i < max) {
+      if(b >= '0' && b <= ':') break;
+      b = minSec[++i];
     }
-    if(dateTime[i] != ':') return EMPTY;
-    dateTime[i++] = '-';
-    for(; i < 7; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
+    final int startPos = i;
+    // read minutes
+    int mins = 0;
+    while(i < max) {
+      if(b == ':') {
+        if(i != startPos) mins = toInt(minSec, startPos, i);
+        break;
+      }
+      b = minSec[++i];
     }
-    if(dateTime[i] != ':') return EMPTY;
-    dateTime[i++] = '-';
-    for(; i < 10; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
-    }
-    if(dateTime[i] != ' ') return EMPTY;
-    dateTime[i++] = 'T';
-    for(; i < 13; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
-    }
-    if(dateTime[i++] != ':') return EMPTY;
-    for(; i < 16; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
-    }
-    if(dateTime[i++] != ':') return EMPTY;
-    for(; i < 19; i++) {
-      if(!digit(dateTime[i])) return EMPTY;
-    }
-    return dateTime;
+    if(mins == Integer.MIN_VALUE || NewFSParser.VERBOSE) BaseX.debug(
+        "ParserUtil: Invalid min value in minSec duration (%)", string(minSec));
+    // read seconds
+    final int secs = toInt(minSec, ++i, max);
+    if(secs == Integer.MIN_VALUE || NewFSParser.VERBOSE) BaseX.debug(
+        "ParserUtil: Invalid sec value in minSec duration (%)", string(minSec));
+    final int milliseconds = secs * 1000 + mins * 60000;
+    return factory.newDuration(milliseconds);
   }
 
   /**
-   * Calculates the mtime value for the file.
-   * @param file the file to calculate the mtime for.
-   * @return the mtime value.
+   * Converts a time value to an {@link XMLGregorianCalendar} instance. The
+   * {@link DatatypeFactory} <code>factory</code> has to be initialized.
+   * @param time the time value to convert.
+   * @return {@link XMLGregorianCalendar} representing the time value
    */
-  public static byte[] getMTime(final File file) {
-    // current time storage: minutes from 1.1.1970
-    final long time = file.lastModified() / 60000;
-    return time != 0 ? token(time) : EMPTY;
+  private static XMLGregorianCalendar getGCal(final long time) {
+    if(time == 0) return null;
+    final GregorianCalendar gc = new GregorianCalendar();
+    gc.setTimeInMillis(time);
+    return factory.newXMLGregorianCalendar(gc);
+  }
+
+  /**
+   * Converts a date value to an {@link XMLGregorianCalendar} instance.
+   * @param date the {@link Date} value to convert.
+   * @return the {@link XMLGregorianCalendar} instance or <code>null</code> if
+   *         the conversion fails.
+   */
+  public static XMLGregorianCalendar convertDate(final Date date) {
+    final GregorianCalendar gc = new GregorianCalendar();
+    gc.setTime(date);
+    return factory == null ? null : factory.newXMLGregorianCalendar(gc);
+  }
+
+  /**
+   * Writes the date values of the file to the parser.
+   * @param parser the {@link NewFSParser} instance to fire
+   *          {@link NewFSParser#metaEvent(Metadata)} events.
+   * @param meta the metadata item to use.
+   * @param file the file to read time values from.
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  public static void fireDateEvents(final NewFSParser parser,
+      final Metadata meta, final File file) throws IOException {
+    if(factory == null) return;
+    XMLGregorianCalendar xmlCal;
+    final long time = file.lastModified();
+    if(time != 0) {
+      xmlCal = getGCal(time);
+      meta.setDate(DateField.dateModified, xmlCal);
+      parser.metaEvent(meta);
+    }
   }
 
   /**

@@ -2,70 +2,45 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+
 import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.parser.Metadata.DataType;
-import org.basex.build.fs.parser.Metadata.Definition;
-import org.basex.build.fs.parser.Metadata.Element;
+import org.basex.build.fs.parser.Metadata.MetaType;
 
 /**
  * Abstract class for metadata extractors / file parsers.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public abstract class AbstractParser {
   /** The type of the file. */
-  private final Metadata.Type type;
-  /** The format of the file (MIME type). */
-  private final Metadata.MimeType format;
+  private final Metadata type;
+  /** The MIME type of the file. */
+  private final Metadata format;
 
   /**
-   * Returns the type of the adapter (e.g. Sound, Mail, Text, ...) as byte
-   * array.
-   * @return the type of the adapter.
+   * Constructor for initializing a parser.
+   * @param t the type of the file.
+   * @param m the MIME type of the file.
    */
-  public byte[] getType() {
-    return type.get();
+  protected AbstractParser(final MetaType t, final String m) {
+    type = new Metadata(t);
+    format = new Metadata(m);
   }
 
   /**
-   * Returns the format of the adapter (the MIME type) as byte array.
-   * @return the format of the adapter.
+   * Constructor for initializing a parser.
+   * @param t the type of the file.
+   * @param m the MIME type of the file (as byte array).
    */
-  public byte[] getFormat() {
-    return format.get();
+  protected AbstractParser(final MetaType t, final byte[] m) {
+    type = new Metadata(t);
+    format = new Metadata(m);
   }
-
-  /*
-   * Returns the type of the adapter (e.g. Sound, Mail, Text, ...) as string.
-   * @return the type of the adapter.
-  public String getTypeString() {
-    return type.name();
-  }
-   */
-
-  /*
-   * Returns the format of the adapter (the MIME type) as string.
-   * @return the format of the adapter.
-  public String getFormatString() {
-    return format.name();
-  }
-  */
 
   // ---------------------------------------------------------------------------
   // ----- constructor / abstract methods for parser implementations -----------
   // ---------------------------------------------------------------------------
-
-  /**
-   * Constructor for initializing a parser.
-   * @param adapterType the type of the file.
-   * @param adapterFormat the format of the file (MIME type).
-   */
-  protected AbstractParser(final Metadata.Type adapterType,
-      final Metadata.MimeType adapterFormat) {
-    type = adapterType;
-    format = adapterFormat;
-  }
 
   /**
    * <p>
@@ -87,9 +62,62 @@ public abstract class AbstractParser {
    * @param bfc {@link BufferedFileChannel} to read from.
    * @param parser the {@link NewFSParser} instance to fire events.
    * @throws IOException if any error occurs while reading from the file.
-   * @see NewFSParser#metaEvent(Element, DataType, Definition, byte[], byte[])
+   * @see NewFSParser#metaEvent(Metadata)
    */
-  public abstract void readMeta(final BufferedFileChannel bfc,
+  public void readMeta(final BufferedFileChannel bfc, final NewFSParser parser)
+      throws IOException {
+    parser.metaEvent(type);
+    parser.metaEvent(format);
+    meta(bfc, parser);
+  }
+
+  /**
+   * <p>
+   * Reads metadata and content from a {@link BufferedFileChannel} and fires
+   * events for each key-value pair.
+   * </p>
+   * <p>
+   * Does the same as the two method calls:
+   * 
+   * <pre>
+   * {@link #readMeta(BufferedFileChannel, NewFSParser)};
+   * {@link #readContent(BufferedFileChannel, NewFSParser)};
+   * </pre>
+   * 
+   * but is potentially much more efficient (depends on the actual parser
+   * implementation).
+   * </p>
+   * <p>
+   * The order of the fired elements may differ from the two separate method
+   * calls.
+   * </p>
+   * @param bfc the {@link BufferedFileChannel} to read from.
+   * @param parser the {@link NewFSParser} instance to write the content to.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void readMetaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
+    readMeta(bfc, parser);
+    bfc.finish();
+    bfc.reset();
+    readContent(bfc, parser);
+  }
+
+  // ---------------------------------------------------------------------------
+  // ----- abstract methods ----------------------------------------------------
+  // ---------------------------------------------------------------------------
+
+  /**
+   * <p>
+   * Reads the metadata from a {@link BufferedFileChannel} and fires events for
+   * each key/value pair.
+   * </p>
+   * @param bfc {@link BufferedFileChannel} to read from.
+   * @param parser the {@link NewFSParser} instance to fire events.
+   * @throws IOException if any error occurs while reading from the file.
+   * @see NewFSParser#metaEvent(Metadata)
+   */
+  protected abstract void meta(final BufferedFileChannel bfc,
       final NewFSParser parser) throws IOException;
 
   /**

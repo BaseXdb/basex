@@ -3,6 +3,7 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +13,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.build.Builder;
@@ -19,36 +21,36 @@ import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
 import org.basex.build.fs.parser.BufferedFileChannel;
 import org.basex.build.fs.parser.Loader;
+import org.basex.build.fs.parser.Metadata;
 import org.basex.build.fs.parser.ParserUtil;
-import org.basex.build.fs.parser.Metadata.Attribute;
-import org.basex.build.fs.parser.Metadata.DataType;
-import org.basex.build.fs.parser.Metadata.Definition;
-import org.basex.build.fs.parser.Metadata.Element;
-import org.basex.build.fs.parser.Metadata.MimeType;
-import org.basex.build.fs.parser.Metadata.Type;
+import org.basex.build.fs.parser.Metadata.IntField;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.util.Atts;
+import org.basex.util.TokenBuilder;
 
 /**
  * Imports/shreds/parses a file hierarchy into a BaseX database.
- *
+ * 
  * The overall process of importing a file hierarchy can be described as
  * follows:
  * <ol>
  * <li>The import is invoked by the {@link CreateFS} command. To import on the
  * command line type: <tt>$ create fs [path] [dbname]</tt></li>
- * <li>This class {@link NewFSParser} instantiates the needed components for the
- * import process in its {@link NewFSParser#parse(Builder)} method.
+ * <li>This class {@link NewFSParser} instantiates the parsers to extract
+ * metadata and content from files.
  * </ol>
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Bastian Lemke
  */
 public final class NewFSParser extends Parser {
+
+  /** Metadata item. */
+  Metadata meta = new Metadata();
 
   /** Registry for MetadataAdapter implementations. */
   static final Map<String, Class<? extends AbstractParser>> REGISTRY =
@@ -79,19 +81,15 @@ public final class NewFSParser extends Parser {
     }
   }
 
-  // [BL] clean up class ...
-
   /** If true, verbose debug messages are created (e.g. for corrupt files). */
   public static final boolean VERBOSE = true;
   /** If true, the <code>type=""</code> attributes are added to the XML doc. */
-  private static final boolean ADD_TYPE_ATTR = true;
+  private static final boolean ADD_ATTS = true;
 
-  /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
-  public static final int SIZEOFFSET = 3;
+  /** Empty attribute array. */
+  private static final Atts EMPTY_ATTS = new Atts();
   /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
-  /** Pre value stack. */
-  private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Path to root of the backing store. */
   private final String fsimportpath;
   /** Name of the database and backingroot sub directory. */
@@ -143,12 +141,12 @@ public final class NewFSParser extends Parser {
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
-    final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
-    parserInstances = new HashMap<String, AbstractParser>(size);
-
     if(Prop.fsmeta || Prop.fscont) {
+      final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
+      parserInstances = new HashMap<String, AbstractParser>(size);
       buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
     } else {
+      parserInstances = null;
       buffer = null;
     }
   }
@@ -220,11 +218,10 @@ public final class NewFSParser extends Parser {
       atts.reset();
       final byte[] mnt = Prop.fuse ? token(mountpoint) : NOTMOUNTED;
       final byte[] bck = Prop.fuse ? token(mybackingpath) : token(fsimportpath);
-      atts.add(MOUNTPOINT  , mnt);
-      atts.add(SIZE        , EMPTY);
+      atts.add(MOUNTPOINT, mnt);
       atts.add(BACKINGSTORE, bck);
 
-      if(ADD_TYPE_ATTR) builder.startNS(token("xsi"),
+      if(ADD_ATTS) builder.startNS(token("xsi"),
           token("http://www.w3.org/2001/XMLSchema-instance"));
 
       builder.startElem(DEEPFS, atts);
@@ -235,11 +232,23 @@ public final class NewFSParser extends Parser {
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
         parse(f);
-        builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
+        addFSAtts(f, sizeStack[0]);
       }
       builder.endElem(DEEPFS);
     }
     builder.endDoc();
+  }
+
+  /**
+   * Adds the size node to the current node.
+   * @param f the current file.
+   * @param size the size to set.
+   * @throws IOException I/O exception.
+   */
+  private void addFSAtts(final File f, final long size) throws IOException {
+    meta.setLong(IntField.fsSize, size);
+    metaEvent(meta);
+    ParserUtil.fireDateEvents(this, meta, f);
   }
 
   /**
@@ -305,16 +314,19 @@ public final class NewFSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void dir(final File f) throws IOException {
-    preStack[++lvl] = builder.startElem(DIR, atts(f, false));
-    sizeStack[lvl] = 0;
+    atts.reset();
+    atts.add(NAME, token(f.getName()));
+    builder.startElem(DIR, atts);
+    sizeStack[++lvl] = 0;
     parse(f);
-    builder.endElem(DIR);
 
     // calling builder actualization
     // take into account that stored pre value is the one of the
     // element node, not the attributes one!
     final long size = sizeStack[lvl];
-    builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(size));
+    addFSAtts(f, size);
+
+    builder.endElem(DIR);
 
     // add file size to parent folder
     sizeStack[--lvl] += size;
@@ -327,32 +339,39 @@ public final class NewFSParser extends Parser {
    */
   private void file(final File f) throws IOException {
     curr = f;
-    if(!singlemode) builder.startElem(FILE, atts(f, false));
-    if((Prop.fsmeta || Prop.fscont) && f.canRead() && f.isFile()
-        && f.getName().indexOf('.') != -1) {
-      final String name = f.getName();
-      final int dot = name.lastIndexOf('.');
-      final String suffix = name.substring(dot + 1).toLowerCase();
+    atts.reset();
+    final String name = f.getName();
+    final long size = f.length();
+    atts.add(NAME, token(name));
 
-      if(f.length() > 0) {
-        final AbstractParser parser = getParser(suffix);
-        if(parser != null) {
-          final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
-          try {
-            parse0(parser, bfc);
-          } catch(final IOException e) {
-            BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
-                bfc.getFileName());
-          } finally {
-            try { bfc.close(); } catch(final IOException e1) { /* */ }
+    if(!singlemode) {
+      builder.startElem(FILE, atts);
+      if((Prop.fsmeta || Prop.fscont) && f.canRead() && f.isFile()
+          && f.getName().indexOf('.') != -1) {
+        final int dot = name.lastIndexOf('.');
+        final String suffix = name.substring(dot + 1).toLowerCase();
+        if(size > 0) {
+          final AbstractParser parser = getParser(suffix);
+          if(parser != null) {
+            final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
+            try {
+              parse0(parser, bfc);
+            } catch(final IOException e) {
+              BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
+                  bfc.getFileName());
+            } finally {
+              try {
+                bfc.close();
+              } catch(final IOException e1) { /* */}
+            }
           }
         }
       }
+      addFSAtts(f, size);
+      builder.endElem(FILE);
     }
-
-    if(!singlemode) builder.endElem(FILE);
     // add file size to parent folder
-    sizeStack[lvl] += f.length();
+    sizeStack[lvl] += size;
   }
 
   /**
@@ -366,69 +385,37 @@ public final class NewFSParser extends Parser {
       final String name, final String suffix) throws IOException {
     if(Prop.fsmeta || Prop.fscont) {
       final AbstractParser parser = getParser(suffix);
-      if(parser == null) return;
-      atts.reset();
-      if(name != null) {
-        final StringBuilder sb = new StringBuilder(name.length() +
-            suffix.length() + 1).append(name).append('.').append(suffix);
-        atts.add(DataText.NAME, token(sb.toString()));
+      final long offset = bfc.absolutePosition();
+      final long size = bfc.size();
+      fileStartEvent(name, suffix, offset);
+      if(parser != null) {
+        try {
+          parse0(parser, bfc);
+        } catch(final IOException e) {
+          BaseX.debug(
+              "Failed to parse file fragment (file: %, offset: %, length: %)",
+              bfc.getFileName(), offset, size);
+          bfc.finish();
+        }
       }
-      if(suffix != null) atts.add(DataText.SUFFIX, token(suffix));
-      atts.add(DataText.OFFSET, token(bfc.absolutePosition()));
-      atts.add(DataText.SIZE, token(bfc.size()));
-      atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
-      builder.startElem(DataText.FILE, atts);
-      try {
-        parse0(parser, bfc);
-      } finally {
-        builder.endElem(DataText.FILE);
-      }
+      fileEndEvent(size);
     }
   }
 
   /**
    * Starts the parser implementation.
    * @param parser the parser instance.
-   * @param bfc the {@link BufferedFileChannel} to read from.
+   * @param bf the {@link BufferedFileChannel} to read from.
    * @throws IOException if any error occurs while reading from the file.
    */
-  private void parse0(final AbstractParser parser,
-      final BufferedFileChannel bfc) throws IOException {
+  private void parse0(final AbstractParser parser, final BufferedFileChannel bf)
+      throws IOException {
+    bf.reset();
     if(Prop.fsmeta) {
-      atts.reset();
-      if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), DataType.STRING.get());
-      builder.nodeAndText(Element.TYPE.get(), atts, parser.getType());
-      builder.nodeAndText(Element.FORMAT.get(), atts, parser.getFormat());
-      bfc.reset();
-      parser.readMeta(bfc, this);
-      bfc.finish();
-    }
-    if(Prop.fscont) {
-      bfc.reset();
-      parser.readContent(bfc, this);
-      bfc.finish();
-    }
-  }
-
-  /**
-   * Constructs attributes for file and directory tags.
-   * @param f file name
-   * @param r root flag
-   * @return attributes as byte[][]
-   */
-  private Atts atts(final File f, final boolean r) {
-    final String name = r ? f.getPath() : f.getName();
-    final int s = name.lastIndexOf('.');
-    // (values will be smaller than 1GB and will thus be inlined in the storage)
-    final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
-
-    atts.reset();
-    atts.add(NAME, token(name));
-    atts.add(SUFFIX, suf);
-    atts.add(SIZE, token(f.length()));
-    final byte[] time = ParserUtil.getMTime(f);
-    if(time != null) atts.add(MTIME, time);
-    return atts;
+      if(Prop.fscont) parser.readMetaAndContent(bf, this);
+      else parser.readMeta(bf, this);
+    } else if(Prop.fscont) parser.readContent(bf, this);
+    bf.finish();
   }
 
   @Override
@@ -446,31 +433,35 @@ public final class NewFSParser extends Parser {
     return 0;
   }
 
+  /**
+   * Deletes a non-empty directory.
+   * @param dir to be deleted.
+   * @return boolean true for success, false for failure.
+   * */
+  public static boolean deleteDir(final File dir) {
+    if(dir.isDirectory()) {
+      for(final String child : dir.list()) {
+        if(!deleteDir(new File(dir, child))) return false;
+      }
+    }
+    return dir.delete();
+  }
+
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
 
   /**
-   * Generates the xml representation for a name/value pair and adds it to the
+   * Generates the xml representation for a key-value pair and adds it to the
    * current file element.
-   * @param element the xml element to create.
-   * @param t the type of the xml element.
-   * @param definition the precise definition of the xml element.
-   * @param language the language of the element.
-   * @param value the value of the element.
+   * @param m the {@link Metadata} object containing all metadata information.
    * @throws IOException if any error occurs while generating the xml code.
    */
-  public void metaEvent(final Element element, final DataType t,
-      final Definition definition, final byte[] language, final byte[] value)
-      throws IOException {
-    final byte[] data = trim(value);
+  public void metaEvent(final Metadata m) throws IOException {
+    final byte[] data = m.getValue();
     if(ws(data)) return;
-    atts.reset();
-    if(language != null) atts.add(Attribute.LANGUAGE.get(), language);
-    if(definition != Definition.NONE) atts.add(Attribute.DEFINITION.get(),
-        definition.get());
-    if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), t.get());
-    builder.nodeAndText(element.get(), atts, data);
+    System.out.println(m);
+    builder.nodeAndText(m.getKey(), ADD_ATTS ? m.getAtts() : EMPTY_ATTS, data);
   }
 
   /**
@@ -478,42 +469,30 @@ public final class NewFSParser extends Parser {
    * node.
    * @param name the name of the file.
    * @param suffix the suffix of the file.
-   * @param type the type of the file.
-   * @param format the format of the file.
-   * @param absolutePosition the absolute position of the first byte of the file
-   *          inside the current file.
-   * @param size the size of the file in bytes.
+   * @param offset the absolute position of the first byte of the file inside
+   *          the current file.
    * @throws IOException if any error occurs while reading from the file.
    */
   public void fileStartEvent(final String name, final String suffix,
-      final Type type, final MimeType format, final long absolutePosition,
-      final long size) throws IOException {
+      final long offset) throws IOException {
     atts.reset();
-    if(name != null) {
-      if(suffix != null) {
-        final StringBuilder sb = new StringBuilder(name.length() +
-            suffix.length() + 1).append(name).append('.').append(suffix);
-        atts.add(DataText.NAME, token(sb.toString()));
-        atts.add(DataText.SUFFIX, token(suffix));
-      } else {
-        atts.add(DataText.NAME, token(name));
-      }
-    }
-    atts.add(DataText.OFFSET, token(absolutePosition));
-    atts.add(DataText.SIZE, token(size));
-    atts.add(DataText.MTIME, ParserUtil.getMTime(curr));
-    builder.startElem(DataText.FILE, atts);
-    atts.reset();
-    if(ADD_TYPE_ATTR) atts.add(Attribute.TYPE.get(), DataType.STRING.get());
-    builder.nodeAndText(Element.TYPE.get(), atts, type.get());
-    builder.nodeAndText(Element.FORMAT.get(), atts, format.get());
+    final byte[] n = name == null ? UNKNOWN : token(name);
+    final int suffLen = suffix == null ? 0 : suffix.length() + 1;
+    final TokenBuilder tb = new TokenBuilder(n.length + suffLen);
+    tb.add(n);
+    if(suffix != null) tb.add('.').add(suffix);
+    atts.add(NAME, tb.finish());
+    atts.add(OFFSET, token(offset));
+    builder.startElem(FILE, atts);
   }
 
   /**
    * Closes the last opened file element.
+   * @param size the size of the file in bytes.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public void fileEndEvent() throws IOException {
+  public void fileEndEvent(final long size) throws IOException {
+    addFSAtts(curr, size);
     builder.endElem(DataText.FILE);
   }
 

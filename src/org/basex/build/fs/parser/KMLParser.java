@@ -1,14 +1,15 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
+import org.basex.build.fs.parser.Metadata.MetaType;
 import org.basex.build.fs.parser.Metadata.MimeType;
-import org.basex.build.fs.parser.Metadata.Type;
 
 /**
  * Parser for KML files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -20,7 +21,7 @@ public final class KMLParser extends AbstractParser {
 
   /** Standard constructor. */
   public KMLParser() {
-    super(Type.XML, MimeType.KML);
+    super(MetaType.XML, MimeType.KML.get());
   }
 
   @Override
@@ -38,8 +39,7 @@ public final class KMLParser extends AbstractParser {
   }
 
   @Override
-  public void readMeta(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
-    // no metadata to read...
+  public void meta(final BufferedFileChannel bfc, final NewFSParser parser) {
+  // no metadata to read...
   }
 }
