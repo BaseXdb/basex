@@ -19,6 +19,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
+import org.basex.util.Array;
 import org.basex.util.TokenList;
 
 import static org.basex.util.Token.*;
@@ -61,9 +62,10 @@ public final class INEXTest {
   /**
    * Constructor.
    * @param db database instance
+   * @param exe boolean for execution of the queries
    * @throws Exception exception
    */
-  private INEXTest(final String db) throws Exception {
+  private INEXTest(final String db, final boolean exe) throws Exception {
     new Open(db).execute(context, null);
 
     // open query file
@@ -117,67 +119,72 @@ public final class INEXTest {
       // extract content id
       s0 = line.indexOf('"', s1 + 1);
       s1 = line.indexOf('"', s0 + 1);
-      //final int ctid = Integer.parseInt(line.substring(s0 + 1, s1));
+//      final int ctid = Integer.parseInt(line.substring(s0 + 1, s1));
       // extract query
       s0 = line.indexOf('/', s1);
       String q = line.substring(s0);
 
-      q = q.replaceAll("\\. ", ".//text() ");
-      q = replaceDedicatedNodes(q);
+//      q = q.replaceAll("\\. ", ".//text() ");
+      System.out.println(q);
+      q = replaceElements(q);
+      System.out.println(q);
       
-      q = xqm + "for $i score $s in " + q 
-        + " order by $s return (basex:sum-path($i), $s)";
-
-      // process query
-      final Process proc = new XQuery(q);
-
-      if(!proc.execute(context)) {
-        System.out.println("- " + proc.info());
-        System.out.println("Query: " + q);
-      } else {
-        // extract and print processing time
-        final String info = proc.info();
-        proc.output(new NullOutput());
-        final int i = info.indexOf("Evaluating: ");
-        final int j = info.indexOf(" ms", i);
-        final String time = info.substring(i + "Evaluating: ".length() + 2, j);
-
-        if(s) {
-          xml.openElement(token("topic"),
-              token("topic-id"), token(tid),
-              token("total_time_ms"), token(time)
-          );
-          xml.openElement(token("result"));
-          xml.openElement(token("file"));
-          xml.text(token(file.toString()));
-          xml.closeElement();
-
-          final Result val = proc.result();
-          if(val instanceof SeqIter) {
-            final SeqIter itr = (SeqIter) val;
-            Item a;
-            int r = 1;
-            while((a = itr.next()) != null) {
-              if(a instanceof Str) {
-                xml.openElement(token("path"));
-                xml.text(a.str());
-                xml.closeElement();
-                xml.openElement(token("rank"));
-                xml.text(token(r++));
-                xml.closeElement();
-              } else if(a instanceof Dbl) {
-                xml.openElement(token("rsv"));
-                xml.text(a.str());
-                xml.closeElement();
+      if (exe) {
+        q = xqm + "for $i score $s in " + q 
+          + " order by $s return (basex:sum-path($i), $s)";
+  
+        // process query
+        final Process proc = new XQuery(q);
+  
+        if(!proc.execute(context)) {
+          System.out.println("- " + proc.info());
+          System.out.println("Query: " + q);
+        } else {
+          // extract and print processing time
+          final String info = proc.info();
+          proc.output(new NullOutput());
+          final int i = info.indexOf("Evaluating: ");
+          final int j = info.indexOf(" ms", i);
+          final String time = info.substring(i 
+              + "Evaluating: ".length() + 2, j);
+  
+          if(s) {
+            xml.openElement(token("topic"),
+                token("topic-id"), token(tid),
+                token("total_time_ms"), token(time)
+            );
+            xml.openElement(token("result"));
+            xml.openElement(token("file"));
+            xml.text(token(file.toString()));
+            xml.closeElement();
+  
+            final Result val = proc.result();
+            if(val instanceof SeqIter) {
+              final SeqIter itr = (SeqIter) val;
+              Item a;
+              int r = 1;
+              while((a = itr.next()) != null) {
+                if(a instanceof Str) {
+                  xml.openElement(token("path"));
+                  xml.text(a.str());
+                  xml.closeElement();
+                  xml.openElement(token("rank"));
+                  xml.text(token(r++));
+                  xml.closeElement();
+                } else if(a instanceof Dbl) {
+                  xml.openElement(token("rsv"));
+                  xml.text(a.str());
+                  xml.closeElement();
+                }
               }
             }
+            xml.closeElement();
+            xml.closeElement();
+            sub.flush();
           }
-          xml.closeElement();
-          xml.closeElement();
-          sub.flush();
         }
       }
-
+      
       if(++curr >= STOPAFTER) break;
     }
     br.close();
@@ -198,164 +205,149 @@ public final class INEXTest {
    * @param str Sting query to be replaced
    * @return replaced query String
    */
-  private static String replaceDedicatedNodes(final String str) {
-    byte[] text = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
+    private static String replaceElements(final String str) {
     byte[] b = str.getBytes();
-    
-    int bs = -1, st = -1, c = -1;
-    boolean f = false;
-    TokenList tl = new TokenList();
-    byte[] path = null;
-    
-    for (int i = 0; i < b.length; i++) {
-      if (b[i] == '.' && i + 1 < b.length) {
-        if (b[i + 1] != '/') {
-          final byte[] bn = new byte[b.length + 1 + text.length];
-          System.arraycopy(b, 0, bn, 0, i + 1);
-          bn[i + 1] = '/';
-          System.arraycopy(text, 0, bn, i + 2, text.length);
-          System.out.println(new String(bn));
-          System.arraycopy(b, i + 1, bn, i + 2 + text.length, b.length - i - 1);
-          b = bn;          
-        } else {
-          i++;
-          while (i < b.length && b[i] != ' ') i++;
-          final byte[] bn = new byte[b.length + text.length];
-          System.arraycopy(b, 0, bn, 0, i);
-          System.arraycopy(text, 0, bn, i, text.length);
-          System.arraycopy(b, i, bn, i + text.length, b.length - i); 
-          b = bn;
-        }
-      } else if (b[i] == '[') {        
-        bs = i;
-      } else if (bs > -1) {
-        if (b[i] == '(') {
-          st = i + 1;
-          if (path == null) {
-            // copy path before dedicated elements
-            path = new byte[i - bs - 1];
-            System.arraycopy(b, bs + 1, path, 0, path.length);
-          }
-        } else if (st > -1) {
-          if (b[i] == '|' || f && b[i] == ')') {
-            // copy dedicated element names
-            byte[] tok = new byte[i - st + text.length];
-            System.arraycopy(b, st, tok, 0, i - st);
-            System.arraycopy(text, 0, tok, i - st, text.length);
-            tl.add(tok);            
-            st = i + 1;
-            f = true;
-            if (b[i] == ')') {
-              st = -1;
-              f = false;
-              c = i + 1;
-            }
-          }
-        } 
-        
-        if (b[i] == ']' && tl.size() > 0) {
-          // rewrite query
-          byte[][] n = new byte[tl.size()][];
-          int l;
-          // calculate size for new query
-          int size = 0;
-          for (int j = 0; j < n.length; j++) 
-            size += path.length + tl.get(j).length 
-              + 1 + i - c + ((j + 1 < n.length) ? 4 : 0);
+    final byte[] or = new byte[]{' ', 'o', 'r', ' '};
+    final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
+    int i = 0;
+    int sp = -1, sb = -1, sbb = -1, os = -1, ebb = -1;
+    byte[] path = new byte[]{};;
+    TokenList tl;
+    while(i < b.length) {
+      switch (b[i]) {
+        case '/': 
+          sp = sp == -1 ? i : sp;
+          break;
+        case '(':
+          if (b[i + 1] == ')') break;
+          sb = i;
           
-          final byte[] bn = new byte[bs + 2 + size + b.length - i];
-          // place path before predicate
-          System.arraycopy(b, 0, bn, 0, bs + 1);
-          int os = bs + 1;
-          for (int j = 0; j < n.length; j++) {
-            final int tokl = tl.get(j).length;
-            l = tokl + 1 + i - c;
-            n[j] = new byte[l];
-            // copy dedicated element name
-            System.arraycopy(tl.get(j), 0, n[j], 0, tokl);
-            n[j][tokl] = ' ';
-            // copy expression after dedicated path
-            System.arraycopy(b, c, n[j], tokl + 1, i - c);
-            // place path before dedicated element
-            System.arraycopy(path, 0, bn, os, path.length);
-            os += path.length;
-            // place dedicated element and expression
-            System.arraycopy(n[j], 0, bn, os, l);
-            os += l;
-            if (j + 1 < n.length) {
-              // place or expression
-              System.arraycopy(new byte[]{' ', 'o', 'r', ' '}, 0, bn, os, 4);
-              os += 4;
-            }
-          }
-          // place lasting expressions after the processed predicate
-          System.arraycopy(b, i, bn, os, b.length - i);
-          // init values for next predicate
-          i = bn.length - (b.length - i);
-          b = bn;
+          path = new byte[i - sp];
+          System.arraycopy(b, sp, path, 0, path.length);
+          
           tl = new TokenList();
-        } 
-      } else if (b[i] == '/' && i + 1 < b.length && i + 2 < b.length 
-          &&  b[i + 1] == '/' &&  b[i + 2] == '(') {
-        i += 3;
-        final int j = i - 1;
-        int s = i;
-        while (i < b.length && b[i] != ')') {
-          if (b[i] == '|') {
-            final byte[] tok = new byte[i - s];
-            System.arraycopy(b, s, tok, 0, tok.length);
+          os = i + 1;
+          while (i < b.length && b[i] != ')') {
+            if (b[i] == '|') {
+              final byte[] tok = new byte[i - os];
+              System.arraycopy(b, os, tok, 0, tok.length);
+              tl.add(tok);
+              os = i + 1;
+            }
+            i++;
+          }
+          if (tl.size() > 0) {
+            final byte[] tok = new byte[i - os];
+            System.arraycopy(b, os, tok, 0, tok.length);
             tl.add(tok);
-            s = i + 1;
+            
+            // backup path
+            path = new byte[sb - sp];
+            System.arraycopy(b, sp, path, 0, path.length);
           }
           i++;
-        }
-        if (tl.size() > 0) {
-          final byte[] tok = new byte[i - s];
-          System.arraycopy(b, s, tok, 0, tok.length);
-          tl.add(tok);          
-        }
-        
-        int size = 0;
-        for (int k = 0; k < tl.size(); k++) {
-          size += j + s + tl.get(k).length + b.length - 
-          i + ((k < tl.size() - 1) ? 3 : 0);
-        }
-        
-        final byte[] bn = new byte[size];
-        int off = 0;
-        for (int k = 0; k < tl.size(); k++) {
-          // copy path
-          System.arraycopy(b, 0, bn, off, j);
-          off += j;
-          // copy element
-          System.arraycopy(tl.get(k), 0, bn, off, tl.get(k).length);
-          off += tl.get(k).length;
-          // copy lasting
-          System.arraycopy(b, i + 1, bn, off, b.length - i - 1);
-          off += b.length - i - 1;
-          if (k < tl.size() - 1) {
-            System.arraycopy(new byte[]{' ', 'o', 'r', ' '}, 0, bn, off, 4);
-            off += 4;
+          
+          // check if predicate before or after ( | )
+          if (sbb > -1 && ebb > -1) {
+            // predicate before ( | )
+            os = 0;
+            byte[] bn = new byte[]{};
+            final byte[][] tok = tl.finish();
+            for (int k = 0; k < tok.length; k++) {
+              bn = Array.add(bn, b, 0, ebb + 1);
+              bn = Array.add(bn, b, ebb + 1, sb);
+              bn = Array.add(bn, tok[k], 0, tok[k].length);
+              if (k < tl.size() - 1) 
+                bn = Array.add(bn, or, 0, or.length);
+            }
+            i = bn.length;
+            b = bn;
+          } else if (sbb == -1 && ebb == -1) {
+            // predicate after ( | )
+            sbb = i;
+            while (sbb < b.length && b[sbb] != '[') sbb++;
+            byte[] bn = new byte[]{};
+            final byte[][] tok = tl.finish();
+            for (int k = 0; k < tok.length; k++) {
+              bn = Array.add(bn, b, 0, sb);
+              bn = Array.add(bn, tok[k], 0, tok[k].length);
+              bn = Array.add(bn, b, sbb, b.length);
+              if (k < tok.length - 1) 
+                bn = Array.add(bn, or, 0, or.length);
+            }
+            i = sb;
+            b = bn;            
+          } else {
+            // ( | ) inside predicate
+            ebb = i + 1;
+            while (ebb < b.length && b[ebb] != ']') ebb++;
+            byte[] bn = new byte[]{};
+            final byte[][] tok = tl.finish();
+            bn = Array.add(bn, b, 0, sbb);
+            for (int k = 0; k < tl.size(); k++) {
+              bn = Array.add(bn, b, sbb + (k == 0 ? 0 : 1), sb);
+              bn = Array.add(bn, tok[k], 0, tok[k].length);
+              bn = Array.add(bn, b, i, ebb);
+              if (k < tok.length - 1) 
+                bn = Array.add(bn, or, 0, or.length);
+            }
+            bn = Array.add(bn, b, ebb, b.length);
+            b = bn;
           }
-          System.out.println(new String(bn));
-        }
-        b = bn;
-        i++;
+          break;
+        case '[': 
+          sbb = i;
+          break;
+        case ']': 
+          ebb = i;
+          break;
+        case '.':
+          if (b[i + 1] != '/') {
+            // . => .//text()
+            final byte[] bn = new byte[b.length + 1 + txt.length];
+            System.arraycopy(b, 0, bn, 0, i + 1);
+            bn[i + 1] = '/';
+            System.arraycopy(txt, 0, bn, i + 2, txt.length);
+            System.arraycopy(b, i + 1, bn, i + 2 + txt.length, 
+                b.length - i - 1);
+            b = bn;
+          } else {
+            // .//foo => .//foo/text()
+            final int j = i;
+            while(i < b.length && b[i] != ' ') i++;
+            final byte[] bn = new byte[b.length + txt.length];
+            System.arraycopy(b, 0, bn, 0, i);
+            System.arraycopy(txt, 0, bn, i, txt.length);
+            System.arraycopy(b, i, bn, i + txt.length, b.length - i);
+            b = bn;
+            i = j;
+          }
+        break;
       }
+      i++;
     }
     return new String(b);
   }
-
+  
   /**
    * Main test method.
    * @param args command line arguments (ignored)
+   * @throws Exception exception
    */
-  public static void main(final String[] args) {
-    /*System.out.println(replaceDedicatedNodes("//(p|sec)[. ftcontains " +
-      "(\"Vincent\" ftand \"van|\" ftand \"Gogh\")]//image[. " +
-      "ftcontains (\"sunflowers\")]"));
-   */ System.out.println(replaceDedicatedNodes("//sec[. ftcontains " +
-        "(\"Vincent\" ftand \"van|\" ftand \"Gogh\")]"));
-    //new INEXTest(args.length == 1 ? args[0] : "pages999");
+  public static void main(final String[] args) throws Exception {
+//    new INEXTest("pages999", false);
+    
+    System.out.println("1.: " + replaceElements(
+        "//sec[. ftcontains \"b\" ] or //sec[. ftcontains \"c\" ]"));
+    System.out.println("2.: " + replaceElements(
+        "//sec[.//ab ftcontains \"b\" ]")); 
+    System.out.println("3.: " + replaceElements(
+        "//sec[.//(a|b) ftcontains \"b\" ]"));
+    System.out.println("4.: " + replaceElements(
+        "//(a|b)[. ftcontains \"b\" ]"));
+    System.out.println("5.: " + replaceElements(
+      "//(a|b)[.//cd ftcontains \"b\" ]"));
+    System.out.println("6.: " + replaceElements(
+      "//a[.//d ftcontains \"b\" ]//(e|f)"));   
   }
 }
