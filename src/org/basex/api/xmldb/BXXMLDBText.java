@@ -18,7 +18,8 @@ interface BXXMLDBText {
   /** XMLDB URI. */
   String XMLDBURI = XMLDB + DBURI;
   /** Localhost Name. */
-  String LOCALHOST = "localhost:" + Prop.PORT + "/";
+  String LOCALHOST = "localhost:" + Integer.parseInt(Prop.PORT[1].toString()) +
+  "/";
   /** Conformance Level of the implementation. */
   String CONFORMANCE_LEVEL = "0";
 

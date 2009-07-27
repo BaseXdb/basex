@@ -50,6 +50,7 @@ abstract class BXQAbstract {
    */
   protected BXQAbstract(final BXQAbstract p) {
     par = p;
+    if(par != null) ctx = p.ctx;
   }
 
   /**

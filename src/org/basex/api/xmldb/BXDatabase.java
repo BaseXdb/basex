@@ -44,7 +44,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   public String getProperty(final String key) {
     try {
-      return ((Object[]) Prop.class.getField(key).get(null))[1].toString();
+      final String prop = key.toUpperCase();
+      return ((Object[]) Prop.class.getField(prop).get(null))[1].toString();
     } catch(final Exception ex) {
       return null;
     }
