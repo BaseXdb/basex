@@ -1,7 +1,6 @@
 package org.basex.api.xmldb;
 
 import static org.basex.Text.*;
-import org.basex.core.Prop;
 
 /**
  * This class organizes textual information for the XMLDB API.
@@ -18,8 +17,7 @@ interface BXXMLDBText {
   /** XMLDB URI. */
   String XMLDBURI = XMLDB + DBURI;
   /** Localhost Name. */
-  String LOCALHOST = "localhost:" + Integer.parseInt(Prop.PORT[1].toString()) +
-  "/";
+  String LOCALHOST = "localhost:1984/";
   /** Conformance Level of the implementation. */
   String CONFORMANCE_LEVEL = "0";
 
