@@ -91,7 +91,7 @@ public class BaseXServerNew {
   }
 
   /**
-   * Stops the ServerSocket Listener.
+   * Stops the server socket listener.
    * @throws IOException I/O Exception
    */
   public void stop() throws IOException {
@@ -166,7 +166,7 @@ public class BaseXServerNew {
   }
 
   /**
-   * InputListener listens to the Console Input.
+   * Listens to the console input.
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
@@ -220,7 +220,7 @@ public class BaseXServerNew {
   }
 
   /**
-   * SessionListener listens to new Client-Server Sessions.
+   * Listens to new client-server sessions.
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
@@ -232,14 +232,14 @@ public class BaseXServerNew {
 
     /**
      * Constructor.
-     * @param b BaseXServerNew
+     * @param b server reference
      */
     public SessionListener(final BaseXServerNew b) {
       bx = b;
     }
 
     /**
-     * Starts the Thread.
+     * Starts the thread.
      */
     public void start() {
       thread = new Thread(this);

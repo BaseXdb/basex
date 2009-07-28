@@ -217,7 +217,6 @@ public final class FTFuzzy extends FTIndex {
   /**
    * Performs a fuzzy search for token, with e maximal number
    * of errors e.
-   *
    * @param tok token looking for
    * @param k number of errors allowed
    * @param f fast evaluation
@@ -249,7 +248,7 @@ public final class FTFuzzy extends FTIndex {
   }
 
   /**
-   * Get pre- and pos values, stored for token out of index.
+   * Gets pre- and pos values, stored for token out of index.
    * @param tok token looking for
    * @param f fast evaluation
    * @return iterator
