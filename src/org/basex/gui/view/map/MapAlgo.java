@@ -10,7 +10,6 @@ public abstract class MapAlgo {
 
   /**
    * Calculates the average aspect Ratios of rectangles given in the List.
-   *
    * @param r Array of rectangles
    * @return average aspect ratio
    */
@@ -34,7 +33,6 @@ public abstract class MapAlgo {
 
   /**
    * Splits List nodes into Rectangles matching in given space.
-   *
    * @param r parent rectangle
    * @param l children array
    * @param ns start array position
@@ -46,7 +44,6 @@ public abstract class MapAlgo {
 
   /**
    * Returns the name of the algorithm used.
-   *
    * @return name of the alfo
    */
   abstract String getName();
@@ -54,7 +51,6 @@ public abstract class MapAlgo {
   /*
    * Calculates the worst aspect ratio of the rectangles given in the list.
    * Should return the worst ar....
-   *
    * @param r Array of rectangles
    * @return max aspect ratio
   protected static double worstLineRatio(final MapRects r) {

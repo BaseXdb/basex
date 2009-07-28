@@ -362,7 +362,6 @@ public class Metadata {
 
     /**
      * Constructor for initializing the enum instance with the given value.
-     *
      * @param v the value to set.
      */
     DateType(final String v) {

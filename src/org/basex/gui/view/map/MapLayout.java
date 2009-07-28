@@ -73,12 +73,10 @@ final class MapLayout {
   /**
    * Computes average aspect ratio of a rectangle list.
    * note: as specified by Shneiderman only leaf nodes should be checked
-   *
-   * [JH] why not weight the bigger nodes more than smaller ones???
-   *
    * @param r array list of rectangles
    * @return aspect ratio
    */
+  // [JH] why not weight the bigger nodes more than smaller ones???
   static double aar(final MapRects r) {
     double aar = 0;
     int nrLeaves = 1;

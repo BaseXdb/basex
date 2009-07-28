@@ -160,7 +160,7 @@ final class Session implements Runnable {
 
   /**
    * Returns the message from the client.
-   * @return String
+   * @return message
    */
   synchronized String getMessage() {
     try {
@@ -183,7 +183,7 @@ final class Session implements Runnable {
 
   /**
    * Stops the session.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public void close() throws IOException {
     dis.close();

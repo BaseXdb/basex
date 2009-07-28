@@ -371,7 +371,6 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
-   *
    * @param rect initial space to layout rects in
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on

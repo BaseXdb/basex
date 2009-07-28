@@ -87,14 +87,11 @@ public class AxisPath extends Path {
    * To check if the result of a path is in document order so that no special
    * ordering functions are needed and we can use the iterative evaluation,
    * we are geared to an automaton that is provided in the paper
-   *
    * "Avoiding Unnecessary Ordering Operations in XPath" by
    * Jan Hidders and Philippe Michiels (Page 6 - Figure 5).
-   *
    * Since the implementation has a slightly different implementation,
    * it is possible to have alternating child and parent steps or more parent
    * steps - different than described in the paper.
-   *
    * @param ctx context reference
    * @return resulting operator
    */

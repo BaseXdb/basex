@@ -37,7 +37,6 @@ final class FTArray {
 
   /**
    * Inserts a node in the next array.
-   *
    * @param cn int current node
    * @param ti int id to insert
    * @param ip int position where to insert ti
@@ -57,7 +56,6 @@ final class FTArray {
 
   /**
    * Inserts a token into the trie. The tokens have to be sorted!!
-   *
    * @param v value, which is to be inserted
    * @param s size of the data the node will have
    * @param offset file offset where to read the data

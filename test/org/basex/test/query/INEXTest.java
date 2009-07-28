@@ -206,7 +206,6 @@ public final class INEXTest {
   /**
    * Replace dedicated nodes by an or expression.
    * [(a|b) ftcontains "c"] => [a ftcontains "c" or [b ftcontains "c"]
-   *
    * @param str Sting query to be replaced
    * @return replaced query String
    */

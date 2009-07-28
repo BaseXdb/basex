@@ -15,7 +15,6 @@ final class BinaryAlgo extends MapAlgo {
 
   /**
    * Uses recursive SplitLayout algorithm to divide rectangles on one level.
-   *
    * @param r parent rectangle
    * @param ml children array
    * @param ns start array position

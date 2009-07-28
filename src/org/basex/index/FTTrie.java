@@ -233,7 +233,6 @@ public final class FTTrie extends FTIndex {
    * 0 if any successor exists, or 0 is inserting position
    * n here to insert
    * n and found = true, if nth item is occupied and here to insert
-   *
    * @param cne current node entry
    * @param ins byte looking for
    * @return inserting position
@@ -261,7 +260,6 @@ public final class FTTrie extends FTIndex {
    * ending starts
    * pointerEnding shows the position comparison between ending and
    * value[nodeId] starts
-   *
    * @param node id on node
    * @param ending ending of value
    * @param lastFound boolean if value was found in last run
@@ -403,7 +401,6 @@ public final class FTTrie extends FTIndex {
    * Supports different wildcard operators: ., .+, .* and .?.
    * PosWildCard points on bytes[], at position, where .  is situated
    * recCall flags recursive calls
-   *
    * @param cn current node
    * @param sn value looking for
    * @param posw wildcards position

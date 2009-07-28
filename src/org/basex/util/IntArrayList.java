@@ -24,7 +24,6 @@ public final class IntArrayList implements Iterable<int[]> {
 
   /**
    * Constructor.
-   *
    * @param is initial size of the list
    */
   public IntArrayList(final int is) {
