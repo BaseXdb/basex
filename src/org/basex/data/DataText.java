@@ -3,6 +3,8 @@ package org.basex.data;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 
+import org.basex.build.fs.NewFSParser;
+
 /**
  * This class assembles texts which are used in the data classes.
  *
@@ -83,11 +85,11 @@ public interface DataText {
   String S_SUFFIX = "suffix";
 
   /** DeepFS token. */
-  byte[] DEEPFS = token("deepfs");
+  byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");
   /** Directory tag. */
-  byte[] DIR = token("dir");
+  byte[] DIR = NewFSParser.NS.FS.tag("dir");
   /** File tag. */
-  byte[] FILE = token("file");
+  byte[] FILE = NewFSParser.NS.FS.tag("file");
   /** Unknown tag (place holder). */
   byte[] UNKNOWN = token("unknown");
 

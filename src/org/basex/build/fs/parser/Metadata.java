@@ -3,11 +3,13 @@ package org.basex.build.fs.parser;
 import static org.basex.util.Token.token;
 import static org.basex.util.Token.string;
 import static org.basex.util.Token.trim;
+import static org.basex.build.fs.NewFSParser.NS;
 
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.basex.util.Atts;
+import org.basex.util.Token;
 
 /**
  * Metadata key-value pairs.
@@ -18,7 +20,6 @@ import org.basex.util.Atts;
 public class Metadata {
 
   // ----- Constants -----------------------------------------------------------
-
   /** xml:lang attribute. */
   private static final byte[] XML_LANG = token("xml:lang");
   /** xml:space attribute. */
@@ -27,27 +28,26 @@ public class Metadata {
   private static final byte[] XML_BASE = token("xml:base");
   /** xml:id attribute. */
   private static final byte[] XML_ID = token("xml:id");
-  /** XML schema prefix. */
-  public static final String XML_SCHEMA_PREFIX = "xs";
+
   /** XML data type attribute name. */
-  private static final byte[] DATA_TYPE = token("xsi:type");
-  /** Metadata type element. */
-  static final byte[] TYPE = token("type");
-  /** Metadata format element. */
-  static final byte[] FORMAT = token("format");
+  private static final byte[] DATA_TYPE = NS.XSI.tag("type");
   /** String data type. */
-  static final byte[] DATA_TYPE_STRING = token(XML_SCHEMA_PREFIX + ":string");
+  static final byte[] DATA_TYPE_STRING = NS.XS.tag("string");
   /** Short data type. */
-  static final byte[] DATA_TYPE_SHORT = token(XML_SCHEMA_PREFIX + ":short");
+  static final byte[] DATA_TYPE_SHORT = NS.XS.tag("short");
   /** Integer data type. */
-  static final byte[] DATA_TYPE_INTEGER = token(XML_SCHEMA_PREFIX + ":integer");
+  static final byte[] DATA_TYPE_INTEGER = NS.XS.tag("integer");
   /** Long data type. */
-  static final byte[] DATA_TYPE_LONG = token(XML_SCHEMA_PREFIX + ":long");
-  /** Duration metadata key. */
-  static final byte[] DURATION = token("duration");
+  static final byte[] DATA_TYPE_LONG = NS.XS.tag("long");
   /** Duration metadata xml data type. */
-  static final byte[] DATA_TYPE_DURATION = token(XML_SCHEMA_PREFIX
-      + ":duration");
+  static final byte[] DATA_TYPE_DURATION = NS.XS.tag("duration");
+
+  /** Metadata type element. */
+  public static final byte[] TYPE = NS.DCTERMS.tag("type");
+  /** Metadata format element. */
+  public static final byte[] FORMAT = NS.DCTERMS.tag("format");
+  /** Duration metadata key. */
+  public static final byte[] DURATION = NS.FSMETA.tag("duration");
 
   // ----- Enums ---------------------------------------------------------------
 
@@ -183,80 +183,57 @@ public class Metadata {
    */
   public enum StringField {
     /** Abstract. */
-    Abstract("abstract"),
+    ABSTRACT(NS.DCTERMS, "abstract"),
     /** Album name. */
-    album,
+    ALBUM(NS.FSMETA, "album"),
     /** Alternative title. */
-    alternativeTitle,
-    /** Author. */
-    author,
+    ALTERNATIVE(NS.DCTERMS, "alternative"),
     /** Blind carbon copy receiver. */
-    bcc,
+    HIDDEN_RECEIVER(NS.FSMETA, "hiddenReceiver"),
     /** Carbon copy receiver. */
-    cc,
-    /** Comment. */
-    comment,
-    /** Composer. */
-    composer,
+    COPY_RECEIVER(NS.FSMETA, "copyReceiver"),
     /** Contributor. */
-    contributor,
+    CONTRIBUTOR(NS.DCTERMS, "contributor"),
     /** Creator. */
-    creator,
+    CREATOR(NS.DCTERMS, "creator"),
     /** Description. */
-    description,
+    DESCRIPTION(NS.DCTERMS, "description"),
     /** Sender. */
-    from,
+    SENDER(NS.FSMETA, "sender"),
     /** Genre. */
-    genre,
+    GENRE(NS.FSMETA, "genre"),
     /** Unique identifier. */
-    identifier,
+    IDENTIFIER(NS.DCTERMS, "identifier"),
     /** Keyword. */
-    keyword,
+    KEYWORD(NS.FSMETA, "keyword"),
     /**
      * Language.
      * @see <a href="http://www.ietf.org/rfc/rfc4646.txt">RFC 4646</a>
      */
-    language,
+    LANGUAGE(NS.DCTERMS, "language"),
     /** Textual description of the location. */
-    location,
-    /** Person that wrote the lyrics. */
-    lyricist,
-    /** Organization. */
-    organization,
-    /** Original creator. */
-    originalCreator,
+    SPATIAL(NS.DCTERMS, "spatial"),
     /** Publisher. */
-    publisher,
+    PUBLISHER(NS.DCTERMS, "publisher"),
     /** Message or document subject. */
-    subject,
-    /** Subtitle. */
-    subTitle,
+    SUBJECT(NS.DCTERMS, "subject"),
     /** Table of contents. */
-    tableOfContents,
-    /** Text writer. */
-    textWriter,
+    TABLE_OF_CONTENTS(NS.DCTERMS, "tableOfContents"),
     /** Title. */
-    title,
+    TITLE(NS.DCTERMS, "title"),
     /** Receiver. */
-    to,
-    /** Version number. */
-    version;
+    RECEIVER(NS.FSMETA, "receiver");
 
     /** The enum value as byte array. */
     private final byte[] val;
 
-    /** Standard constructor for initializing the enum instance. */
-    StringField() {
-      val = token(toString());
-    }
-
     /**
-     * Constructor for initializing the enum instance with the given value.
-     * 
-     * @param v the value to set.
+     * Standard constructor for initializing the enum instance.
+     * @param ns the namespace of the item.
+     * @param name the name of the item.
      */
-    StringField(final String v) {
-      val = token(v);
+    StringField(final NS ns, final String name) {
+      val = ns.tag(name);
     }
 
     /**
@@ -274,39 +251,34 @@ public class Metadata {
    */
   public enum IntField {
     /** User ID of the owner of the file. */
-    fsOwnerUserId,
+    FS_OWNER_USER_ID(NS.FSMETA, "fsOwnerUserId"),
     /** Group ID of the owner of the file. */
-    fsOwnerGroupId,
+    FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId"),
     /** Size of the file in the file system. */
-    fsSize,
+    FS_SIZE(NS.FSMETA, "fsSize"),
     /** Height in millimeters. */
-    mmHeight,
+    MM_HEIGHT(NS.FSMETA, "mmHeight"),
     /** Width in millimeters. */
-    mmWidth,
+    MM_WIDTH(NS.FSMETA, "mmWidth"),
     /** Number of pages. */
-    numberOfPages,
+    NUMBER_OF_PAGES(NS.FSMETA, "numberOfPages"),
     /** Height in pixels. */
-    pixelHeight,
+    PIXEL_HEIGHT(NS.FSMETA, "pixelHeight"),
     /** Width in pixels. */
-    pixelWidth,
+    PIXEL_WIDTH(NS.FSMETA, "pixelWidth"),
     /** Track number. */
-    track;
+    TRACK(NS.FSMETA, "track");
 
     /** The enum value as byte array. */
     private final byte[] val;
 
-    /** Standard constructor for initializing the enum instance. */
-    IntField() {
-      val = token(toString());
-    }
-
     /**
-     * Constructor for initializing the enum instance with the given value.
-     * 
-     * @param v the value to set.
+     * Standard constructor for initializing the enum instance.
+     * @param ns the namespace of the item.
+     * @param name the name of the item.
      */
-    IntField(final String v) {
-      val = token(v);
+    IntField(final NS ns, final String name) {
+      val = ns.tag(name);
     }
 
     /**
@@ -324,21 +296,15 @@ public class Metadata {
    */
   public enum DateField {
     /** Date of the last change made to a metadata attribute. */
-    dateAttributeChanged,
+    DATE_ATTRIBUTE_MODIFIED(NS.FSMETA, "dateAttributeModified"),
     /** Date of the last change made to the content. */
-    dateModified,
+    DATE_CONTENT_MODIFIED(NS.FSMETA, "dateContentModified"),
     /** Date of the last usage. */
-    dateLastUsed,
-    /** Date of the recording. */
-    dateRecorded,
-    /** Release date. */
-    dateReleased,
+    DATE_LAST_USED(NS.FSMETA, "dateLastUsed"),
     /** Date when the content was created. */
-    dateCreated,
-    /** Submission date. */
-    dateSubmitted,
-    /** Date of acception. */
-    dateAccepted;
+    DATE_CREATED(NS.FSMETA, "dateCreated"),
+    /** Other date. */
+    DATE(NS.DCTERMS, "date");
 
     /** The enum value as byte array. */
     private final byte[] val;
@@ -349,12 +315,12 @@ public class Metadata {
     }
 
     /**
-     * Constructor for initializing the enum instance with the given value.
-     * 
-     * @param v the value to set.
+     * Standard constructor for initializing the enum instance.
+     * @param ns the namespace of the item.
+     * @param name the name of the item.
      */
-    DateField(final String v) {
-      val = token(v);
+    DateField(final NS ns, final String name) {
+      val = ns.tag(name);
     }
 
     /**
@@ -445,7 +411,9 @@ public class Metadata {
   }
 
   /** Standard constructor. */
-  public Metadata() { /* outsmarted the formatter ;-) */}
+  public Metadata() {
+    value = Token.EMPTY;
+  }
 
   /**
    * Initializes the metadata object as special XML element "type".
@@ -736,17 +704,15 @@ public class Metadata {
 
   /**
    * Re-initializes the metadata object as date item.
-   * @param field the metadata key.
+   * @param f the metadata key.
    * @param gcal the {@link XMLGregorianCalendar} instance to take the date
    *          value from.
    * @return the metadata item.
    */
-  public Metadata setDate(final DateField field,
-      final XMLGregorianCalendar gcal) {
-    final byte[] k = field.get();
+  public Metadata setDate(final DateField f, final XMLGregorianCalendar gcal) {
+    final byte[] k = f.get();
     final byte[] v = token(gcal.toXMLFormat());
-    final byte[] dt = token(XML_SCHEMA_PREFIX + ":"
-        + gcal.getXMLSchemaType().getLocalPart());
+    final byte[] dt = NS.XS.tag(gcal.getXMLSchemaType().getLocalPart());
     return recycle(k, v, dt);
   }
 
@@ -760,8 +726,7 @@ public class Metadata {
     final byte[] v = token(duration.toString());
     byte[] dt;
     try {
-      dt = token(XML_SCHEMA_PREFIX + ":"
-          + duration.getXMLSchemaType().getLocalPart());
+      dt = NS.XS.tag(duration.getXMLSchemaType().getLocalPart());
     } catch(final IllegalStateException ex) {
       dt = DATA_TYPE_DURATION;
     }

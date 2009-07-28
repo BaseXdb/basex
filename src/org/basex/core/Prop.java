@@ -163,7 +163,12 @@ public final class Prop extends AProp {
 
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
-
+  /**
+   * Spotlight integration. If true, on mac platforms spotlight index is used
+   * instead of the internal parser implementations.
+   */
+  public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false};
+  
   // WEBSERVER OPTIONS ========================================================
 
   /** PHP Path. */

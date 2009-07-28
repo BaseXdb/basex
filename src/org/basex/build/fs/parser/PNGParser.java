@@ -47,7 +47,7 @@ public final class PNGParser extends AbstractParser {
       throws IOException {
     if(!check(bfc)) return;
     final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setInt(IntField.pixelWidth, bfc.getInt()));
-    parser.metaEvent(meta.setInt(IntField.pixelHeight, bfc.getInt()));
+    parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, bfc.getInt()));
+    parser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, bfc.getInt()));
   }
 }

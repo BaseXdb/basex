@@ -83,11 +83,11 @@ public final class JPGParser extends AbstractParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.pixelWidth,
+            obj.meta.setShort(IntField.PIXEL_WIDTH,
                 (short) (buf.getShort() & 0xFFFF));
             buf.getShort(); // empty two bytes
           } else if(type == IFD_TYPE_LONG) {
-            obj.meta.setInt(IntField.pixelWidth, buf.getInt() & 0xFFFFFFFF);
+            obj.meta.setInt(IntField.PIXEL_WIDTH, buf.getInt() & 0xFFFFFFFF);
           } else error(obj, "Image width (0x0100)");
           obj.fsparser.metaEvent(obj.meta);
         } else error(obj, "Image width (0x0100)");
@@ -101,10 +101,10 @@ public final class JPGParser extends AbstractParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.pixelHeight,
+            obj.meta.setShort(IntField.PIXEL_HEIGHT,
                 (short) (buf.getShort() & 0xFFFF));
           } else if(type == IFD_TYPE_LONG) {
-            obj.meta.setInt(IntField.pixelHeight, buf.getInt() & 0xFFFFFFFF);
+            obj.meta.setInt(IntField.PIXEL_HEIGHT, buf.getInt() & 0xFFFFFFFF);
           } else error(obj, "Image length (0x0101)");
           obj.fsparser.metaEvent(obj.meta);
         } else error(obj, "Image length (0x0101)");
@@ -116,7 +116,7 @@ public final class JPGParser extends AbstractParser {
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          obj.meta.setString(StringField.description, obj.readAscii(buf,
+          obj.meta.setString(StringField.DESCRIPTION, obj.readAscii(buf,
               ifdOff));
           obj.fsparser.metaEvent(obj.meta);
         } else error(obj, "Image description (0x010E)");
@@ -132,7 +132,7 @@ public final class JPGParser extends AbstractParser {
           obj.bfc.buffer(20);
           final byte[] data = new byte[20];
           obj.bfc.get(data);
-          obj.dateEvent(DateField.dateCreated, data);
+          obj.dateEvent(DateField.DATE_CREATED, data);
         } else error(obj, "DateTime (0x0132)");
       }
     },
@@ -142,7 +142,7 @@ public final class JPGParser extends AbstractParser {
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          obj.meta.setString(StringField.creator, //
+          obj.meta.setString(StringField.CREATOR, //
               obj.readAscii(buf, ifdOff));
           obj.fsparser.metaEvent(obj.meta);
         } else error(obj, "Creator (0x013B)");
@@ -156,10 +156,10 @@ public final class JPGParser extends AbstractParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_LONG) {
-            obj.meta.setLong(IntField.pixelWidth,
+            obj.meta.setLong(IntField.PIXEL_WIDTH,
                 (long) buf.getInt() & 0xFFFFFFFF);
           } else if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.pixelWidth,
+            obj.meta.setShort(IntField.PIXEL_WIDTH,
                 (short) (buf.getShort() & 0xFFFF));
           } else error(obj, "Exif Image Width (0xA002)");
         } else error(obj, "Exif Image Width (0xA002)");
@@ -174,10 +174,10 @@ public final class JPGParser extends AbstractParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_LONG) {
-            obj.meta.setLong(IntField.pixelHeight,
+            obj.meta.setLong(IntField.PIXEL_HEIGHT,
                 (long) buf.getInt() & 0xFFFFFFFF);
           } else if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.pixelHeight,
+            obj.meta.setShort(IntField.PIXEL_HEIGHT,
                 (short) (buf.getShort() & 0xFFFF));
           } else error(obj, "Exif Image Height (0xA003)");
         } else error(obj, "Exif Image Height (0xA003)");
@@ -395,8 +395,8 @@ public final class JPGParser extends AbstractParser {
       bfc.buffer(8);
       final int height = bfc.getShort();
       final int width = bfc.getShort();
-      fsparser.metaEvent(meta.setInt(IntField.pixelHeight, height));
-      fsparser.metaEvent(meta.setInt(IntField.pixelWidth, width));
+      fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
+      fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
     } else {
       if(NewFSParser.VERBOSE) BaseX.debug("Wrong data precision field (%).",
           bfc.getFileName());
@@ -449,7 +449,7 @@ public final class JPGParser extends AbstractParser {
         s -= 2;
         fsparser.fileStartEvent("Thumbnail", null, bfc.absolutePosition());
         fsparser.metaEvent(new Metadata(MetaType.IMAGE));
-        fsparser.metaEvent(meta.setString(StringField.description,
+        fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 1 byte/pixel."));
         break;
       case 0x13: // Thumbnail coded using 3 bytes/pixel
@@ -458,15 +458,15 @@ public final class JPGParser extends AbstractParser {
         s -= 2;
         fsparser.fileStartEvent("Thumbnail", null, bfc.absolutePosition());
         fsparser.metaEvent(new Metadata(MetaType.IMAGE));
-        fsparser.metaEvent(meta.setString(StringField.description,
+        fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 3 bytes/pixel."));
         break;
       default:
         BaseX.debug("JPGParser: Illegal or unsupported JFIF header (%)",
             bfc.getFileName());
     }
-    fsparser.metaEvent(meta.setInt(IntField.pixelWidth, width));
-    fsparser.metaEvent(meta.setInt(IntField.pixelHeight, height));
+    fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
+    fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
     fsparser.fileEndEvent(s);
     bfc.skip(s);
   }
@@ -479,7 +479,7 @@ public final class JPGParser extends AbstractParser {
   private void readComment(final int size) throws IOException {
     final byte[] array = new byte[size];
     bfc.get(array);
-    fsparser.metaEvent(meta.setString(StringField.comment,
+    fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
         ParserUtil.checkAscii(array)));
   }
 

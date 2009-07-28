@@ -140,7 +140,7 @@ public final class ParserUtil {
     final long time = file.lastModified();
     if(time != 0) {
       xmlCal = getGCal(time);
-      meta.setDate(DateField.dateModified, xmlCal);
+      meta.setDate(DateField.DATE_CONTENT_MODIFIED, xmlCal);
       parser.metaEvent(meta);
     }
   }

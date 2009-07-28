@@ -49,12 +49,89 @@ import org.basex.util.TokenBuilder;
  */
 public final class NewFSParser extends Parser {
 
-  /** Metadata item. */
-  Metadata meta = new Metadata();
+  // ----- Namespaces ----------------------------------------------------------
+  /** All namespaces used in {@link NewFSParser}. */
+  public enum NS {
+    /** XML schema namespace. */
+    XS("xs", "http://www.w3.org/2001/XMLSchema"),
+    /** XML schema instance namespace. */
+    XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+    /** DeepFS filesystem namespace. */
+    FS("fs", "http://www.deepfs.org/fs/1.0/"),
+    /** DeepFS metadata namespace. */
+    FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
+    /** Dublin Core metadata terms namespace. */
+    DCTERMS("dcterms", "http://purl.org/dc/terms/");
+
+    /** The namespace prefix. */
+    private byte[] prefix;
+    /** The namespace URI. */
+    private byte[] uri;
+
+    /**
+     * Initialize a namespace instance.
+     * @param p the prefix.
+     * @param u the URI.
+     */
+    NS(final String p, final String u) {
+      prefix = token(p);
+      uri = token(u);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder str = new StringBuilder("xmlns");
+      if(prefix.length > 0) {
+        str.append(':');
+        str.append(string(prefix));
+      }
+      str.append("=\"");
+      str.append(string(uri));
+      str.append("\"");
+      return str.toString();
+    }
+
+    // /**
+    // * Returns the namespace's unique URI.
+    // * @return the URI.
+    // */
+    // public byte[] uri() {
+    // return uri;
+    // }
+    //
+    // /**
+    // * Returns the namespace's prefix.
+    // * @return the prefix.
+    // */
+    // public byte[] prefix() {
+    // return prefix;
+    // }
+
+    /**
+     * Calls {@link Builder#startNS(byte[], byte[])}.
+     * @param b the builder instance.
+     */
+    public void start(final Builder b) {
+      b.startNS(prefix, uri);
+    }
+
+    /**
+     * Converts the xml element into a byte array containing the correct
+     * namespace prefix.
+     * @param element the xml element to convert.
+     * @return the converted element as byte array;
+     */
+    public byte[] tag(final String element) {
+      if(prefix.length == 0) return token(element);
+      return concat(prefix, new byte[] { ':'}, token(element));
+    }
+  }
+
+  // ---------------------------------------------------------------------------
 
   /** Registry for MetadataAdapter implementations. */
-  static final Map<String, Class<? extends AbstractParser>> REGISTRY =
-    new HashMap<String, Class<? extends AbstractParser>>();
+  static final Map<String, Class<? extends AbstractParser>>
+  /**/REGISTRY = new HashMap<String, Class<? extends AbstractParser>>();
 
   /**
    * Registers a parser implementation with the fs parser.
@@ -65,6 +142,9 @@ public final class NewFSParser extends Parser {
       final Class<? extends AbstractParser> c) {
     REGISTRY.put(suffix, c);
   }
+
+  /** Spotlight extractor. */
+  private SpotlightExtractor spotlight;
 
   static {
     try {
@@ -121,6 +201,9 @@ public final class NewFSParser extends Parser {
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
 
+  /** Metadata item. */
+  Metadata meta = new Metadata();
+
   /**
    * Constructor.
    * @param path the traversal starts from
@@ -130,7 +213,7 @@ public final class NewFSParser extends Parser {
    * @param pr database properties
    */
   public NewFSParser(final String path, final String mp, final String bs,
-      final Prop pr) { 
+      final Prop pr) {
     super(IO.get(path), pr);
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
@@ -144,13 +227,17 @@ public final class NewFSParser extends Parser {
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
     if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
-      final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
-      parserInstances = new HashMap<String, AbstractParser>(size);
-      buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
-    } else {
-      parserInstances = null;
-      buffer = null;
+      if(prop.is(Prop.SPOTLIGHT)) {
+        spotlight = new SpotlightExtractor(this);
+      } else {
+        final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
+        parserInstances = new HashMap<String, AbstractParser>(size);
+        buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
+        return;
+      }
     }
+    parserInstances = null;
+    buffer = null;
   }
 
   /**
@@ -224,8 +311,15 @@ public final class NewFSParser extends Parser {
       atts.add(MOUNTPOINT, mnt);
       atts.add(BACKINGSTORE, bck);
 
-      if(ADD_ATTS) builder.startNS(token("xsi"),
-          token("http://www.w3.org/2001/XMLSchema-instance"));
+      // define namespaces
+      NS.FS.start(builder);
+      if(prop.is(Prop.FSMETA)) {
+        NS.FSMETA.start(builder);
+        NS.DCTERMS.start(builder);
+      }
+      if(ADD_ATTS) {
+        NS.XSI.start(builder);
+      }
 
       builder.startElem(DEEPFS, atts);
 
@@ -249,7 +343,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException I/O exception.
    */
   private void addFSAtts(final File f, final long size) throws IOException {
-    meta.setLong(IntField.fsSize, size);
+    meta.setLong(IntField.FS_SIZE, size);
     metaEvent(meta);
     ParserUtil.fireDateEvents(this, meta, f);
   }
@@ -342,35 +436,39 @@ public final class NewFSParser extends Parser {
    */
   private void file(final File f) throws IOException {
     curr = f;
-    atts.reset();
-    final String name = f.getName();
     final long size = f.length();
-    atts.add(NAME, token(name));
 
     if(!singlemode) {
+      atts.reset();
+      final String name = f.getName();
+      atts.add(NAME, token(name));
       builder.startElem(FILE, atts);
-      if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead() &&
-          f.isFile() && f.getName().indexOf('.') != -1) {
-        final int dot = name.lastIndexOf('.');
-        final String suffix = name.substring(dot + 1).toLowerCase();
-        if(size > 0) {
-          final AbstractParser parser = getParser(suffix);
-          if(parser != null) {
-            final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
-            try {
-              parse0(parser, bfc);
-            } catch(final IOException ex) {
-              BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
-                  bfc.getFileName());
-            } finally {
+      if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
+          && f.isFile()) {
+        if(prop.is(Prop.SPOTLIGHT)) {
+          spotlight.parse(f);
+        } else if(name.indexOf('.') != -1) { // internal parser
+          final int dot = name.lastIndexOf('.');
+          final String suffix = name.substring(dot + 1).toLowerCase();
+          if(size > 0) {
+            final AbstractParser parser = getParser(suffix);
+            if(parser != null) {
+              final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
               try {
-                bfc.close();
-              } catch(final IOException e1) { /* */}
+                parse0(parser, fc);
+              } catch(final IOException e) {
+                BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
+                    fc.getFileName());
+              } finally {
+                try {
+                  fc.close();
+                } catch(final IOException e1) { /* */}
+              }
             }
           }
-        }
+          addFSAtts(f, size); // only for internal parser
+        } // end internal parser
       }
-      addFSAtts(f, size);
       builder.endElem(FILE);
     }
     // add file size to parent folder
@@ -463,7 +561,6 @@ public final class NewFSParser extends Parser {
   public void metaEvent(final Metadata m) throws IOException {
     final byte[] data = m.getValue();
     if(ws(data)) return;
-    System.out.println(m);
     builder.nodeAndText(m.getKey(), ADD_ATTS ? m.getAtts() : EMPTY_ATTS, data);
   }
 
