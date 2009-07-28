@@ -193,7 +193,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     /**
      * Standard Constructor.
      * @param r resource
-     * @throws IOException exception
+     * @throws IOException I/O exception
      */
     BXSAXContentHandler(final BXXMLResource r) throws IOException {
       xml = new XMLSerializer(out);
