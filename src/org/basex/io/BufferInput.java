@@ -246,7 +246,7 @@ public class BufferInput {
   }
 
   /**
-   * Set input length.
+   * Sets the input length.
    * @param l input length
    */
   public final void length(final long l) {

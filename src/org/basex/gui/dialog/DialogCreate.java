@@ -197,7 +197,7 @@ public final class DialogCreate extends Dialog {
   }
 
   /**
-   * Choose an XML document or directory.
+   * Opens a file dialog to choose an XML document or directory.
    */
   public void choose() {
     final GUIProp gprop = gui.prop;
@@ -216,7 +216,7 @@ public final class DialogCreate extends Dialog {
   }
 
   /**
-   * Returns the chosen XML file or directory.
+   * Returns the chosen XML file or directory path.
    * @return file or directory
    */
   public String path() {

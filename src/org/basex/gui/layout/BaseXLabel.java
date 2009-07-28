@@ -11,15 +11,15 @@ import javax.swing.border.EmptyBorder;
  */
 public final class BaseXLabel extends JLabel {
   /**
-   * Default Constructor.
-   * @param label button title
+   * Constructor.
+   * @param txt label text
    */
-  public BaseXLabel(final String label) {
-    this(label, false, false);
+  public BaseXLabel(final String txt) {
+    this(txt, false, false);
   }
 
   /**
-   * Default Constructor.
+   * Constructor.
    * @param txt label text
    * @param dist distance to next component
    * @param bold bold flag
@@ -32,7 +32,7 @@ public final class BaseXLabel extends JLabel {
   }
 
   /**
-   * Set label borders.
+   * Sets the label borders.
    * @param t top distance
    * @param l left distance
    * @param b bottom distance

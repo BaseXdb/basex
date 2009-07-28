@@ -277,7 +277,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   }
 
   /**
-   * Calculate absolute location for the specified point and component.
+   * Calculates the absolute location for the specified point and component.
    * @param comp component
    * @return absolute location
    */

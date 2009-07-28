@@ -21,7 +21,7 @@ public class BaseXTextField extends JTextField {
   byte[] help;
 
   /**
-   * Default Constructor.
+   * Constructor.
    * @param hlp help text
    * @param win parent window
    */
@@ -30,7 +30,7 @@ public class BaseXTextField extends JTextField {
   }
 
   /**
-   * Default Constructor.
+   * Constructor.
    * @param txt input text
    * @param hlp help text
    * @param win parent window

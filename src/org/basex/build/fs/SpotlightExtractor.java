@@ -122,7 +122,7 @@ public class SpotlightExtractor {
   }
 
   /**
-   * Initialize the spotlight extractor.
+   * Initializes the spotlight extractor.
    * @param fsParser the parser instance to fire events.
    */
   public SpotlightExtractor(final NewFSParser fsParser) {

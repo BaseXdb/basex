@@ -319,7 +319,7 @@ public abstract class W3CTS {
   }
 
   /**
-   * Calculate percentage of correct queries.
+   * Calculates the percentage of correct queries.
    * @param v value
    * @param t total value
    * @return percentage

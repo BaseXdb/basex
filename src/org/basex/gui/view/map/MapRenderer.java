@@ -527,7 +527,7 @@ final class MapRenderer {
   }
 
   /**
-   * Get tooltip length.
+   * Calculates a tooltip length.
    * @param ww int width
    * @param fs font size
    * @return tooltip length

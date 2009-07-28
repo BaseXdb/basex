@@ -192,7 +192,7 @@ public final class FTTrie extends FTIndex {
   }
 
   /**
-   * Read node entry from disk.
+   * Reads a node entry from disk.
    * @param id on node array (in main memory)
    * @return node entry from disk
    */

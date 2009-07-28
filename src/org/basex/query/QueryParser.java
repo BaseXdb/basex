@@ -2627,7 +2627,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parse and convert entities.
+   * Parses and converts entities.
    * @param tb token builder
    * @throws QueryException xquery exception
    */

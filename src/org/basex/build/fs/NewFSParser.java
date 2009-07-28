@@ -69,7 +69,7 @@ public final class NewFSParser extends Parser {
     private byte[] uri;
 
     /**
-     * Initialize a namespace instance.
+     * Initializes a namespace instance.
      * @param p the prefix.
      * @param u the URI.
      */

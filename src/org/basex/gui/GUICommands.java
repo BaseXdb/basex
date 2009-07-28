@@ -63,7 +63,7 @@ public enum GUICommands implements GUICommand {
 
   /* FILE MENU */
 
-  /** Create database. */
+  /** Opens a dialog to create a new database. */
   CREATE(false, GUICREATE, "% N", GUICREATETT) {
     @Override
     public void execute(final GUI gui) {
@@ -76,7 +76,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Open database. */
+  /** Opens a dialog to open a database. */
   OPEN(false, GUIOPEN, "% O", GUIOPENTT) {
     @Override
     public void execute(final GUI gui) {
@@ -90,7 +90,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Drop database. */
+  /** Opens a dialog to drop databases. */
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
@@ -98,7 +98,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Reset database. */
+  /** Closes the database. */
   CLOSE(true, GUICLOSE, "% W", GUICLOSETT) {
     @Override
     public void execute(final GUI gui) {
@@ -106,7 +106,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Open XQuery. */
+  /** Opens an XQuery file. */
   XQOPEN(true, GUIXQOPEN, "% R", GUIXQOPENTT) {
     @Override
     public void execute(final GUI gui) {
@@ -120,7 +120,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Save XQuery. */
+  /** Saves the current XQuery. */
   XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
     public void execute(final GUI gui) {
@@ -143,7 +143,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Import filesystem. */
+  /** Opens a dialog to import the filesystem. */
   IMPORTFS(false, GUIIMPORTFS, null, GUIIMPORTFSTT) {
     @Override
     public void execute(final GUI gui) {
@@ -158,7 +158,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Export document. */
+  /** Exports a document. */
   EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -167,7 +167,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Save result text. */
+  /** Saves the result text. */
   SAVE(true, GUIEXPORT, "", GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -182,7 +182,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Exit BaseX. */
+  /** Exits the application. */
   EXIT(false, GUIEXIT, null, GUIEXITTT) {
     @Override
     public void execute(final GUI gui) {
@@ -192,7 +192,7 @@ public enum GUICommands implements GUICommand {
 
   /* EDIT COMMANDS */
 
-  /** Copy the currently marked nodes. */
+  /** Copies the currently marked nodes. */
   COPY(true, GUICOPY, "", GUICOPYTT) {
     @Override
     public void execute(final GUI gui) {
@@ -210,7 +210,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Copy the current path. */
+  /** Copies the current path. */
   COPYPATH(true, GUICPPATH, "% shift C", GUICPPATHTT) {
     @Override
     public void execute(final GUI gui) {
@@ -229,7 +229,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Paste the copied nodes. */
+  /** Pastes the copied nodes. */
   PASTE(true, GUIPASTE, "", GUIPASTETT) {
     @Override
     public void execute(final GUI gui) {
@@ -256,7 +256,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Delete the currently marked nodes. */
+  /** Deletes the currently marked nodes. */
   DELETE(true, GUIDELETE, "", GUIDELETETT) {
     @Override
     public void execute(final GUI gui) {
@@ -271,7 +271,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Insert new nodes. */
+  /** Inserts new nodes. */
   INSERT(true, GUIINSERT, "", GUIINSERTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -291,7 +291,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Copy the currently marked nodes. */
+  /** Opens a dialog to edit the currently marked nodes. */
   EDIT(true, GUIEDIT, "", GUIEDITTT) {
     @Override
     public void execute(final GUI gui) {
@@ -311,7 +311,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Filter currently marked nodes. */
+  /** Filters the currently marked nodes. */
   FILTER(true, GUIFILTER, "% ENTER", GUIFILTERTT) {
     @Override
     public void execute(final GUI gui) {
@@ -332,7 +332,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Show XQuery view. */
+  /** Shows the XQuery view. */
   SHOWXQUERY(true, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
     @Override
     public void execute(final GUI gui) {
@@ -350,7 +350,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show info. */
+  /** Shows info. */
   SHOWINFO(true, GUISHOWINFO, "% I", GUISHOWINFOTT) {
     @Override
     public void execute(final GUI gui) {
@@ -370,7 +370,7 @@ public enum GUICommands implements GUICommand {
 
   /* VIEW MENU */
 
-  /** Show menu. */
+  /** Shows the menu. */
   SHOWMENU(false, GUISHOWMENU, null, GUISHOWMENUTT) {
     @Override
     public void execute(final GUI gui) {
@@ -389,7 +389,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show buttons. */
+  /** Shows the buttons. */
   SHOWBUTTONS(false, GUISHOWBUTTONS, null, GUISHOWBUTTONSTT) {
     @Override
     public void execute(final GUI gui) {
@@ -426,7 +426,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Status Bar. */
+  /** Shows the status bar. */
   SHOWSTATUS(false, GUISHOWSTATUS, null, GUISHOWSTATUSTT) {
     @Override
     public void execute(final GUI gui) {
@@ -444,7 +444,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Text View. */
+  /** Shows the text view. */
   SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -464,7 +464,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show map. */
+  /** Shows the map. */
   SHOWMAP(true, GUISHOWMAP, "% 2", GUISHOWMAPTT) {
     @Override
     public void execute(final GUI gui) {
@@ -482,7 +482,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Tree View. */
+  /** Shows the tree view. */
   SHOWFOLDER(true, GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT) {
     @Override
     public void execute(final GUI gui) {
@@ -500,7 +500,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Table View. */
+  /** Shows the table view. */
   SHOWTABLE(true, GUISHOWTABLE, "% 4", GUISHOWTABLETT) {
     @Override
     public void execute(final GUI gui) {
@@ -518,7 +518,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Plot View. */
+  /** Shows the plot view. */
   SHOWPLOT(true, GUISHOWPLOT, "% 5", GUISHOWPLOTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -536,7 +536,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show search. */
+  /** Shows the explorer view. */
   SHOWEXPLORER(true, GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT) {
     @Override
     public void execute(final GUI gui) {
@@ -637,7 +637,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Change fonts. */
+  /** Changes the fonts. */
   FONTS(false, GUIFONTS, null, GUIFONTSTT) {
     @Override
     public void execute(final GUI gui) {
@@ -653,7 +653,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Database path. */
+  /** Shows a preference dialog. */
   PREFS(false, GUIPREFS, "% P", GUIPREFSTT) {
     @Override
     public void execute(final GUI gui) {
@@ -663,7 +663,7 @@ public enum GUICommands implements GUICommand {
 
   /* HELP MENU */
 
-  /** Show Help. */
+  /** Shows the help window. */
   SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
     @Override
     public void execute(final GUI gui) {
@@ -686,7 +686,7 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Show Database info. */
+  /** Shows database info. */
   INFO(true, GUIINFO, "% D", GUIINFOTT) {
     @Override
     public void execute(final GUI gui) {
@@ -714,17 +714,17 @@ public enum GUICommands implements GUICommand {
     }
 
     /**
-     * Builds the create command.
+     * Returns a process for creating/dropping the specified index.
      * @param create create flag
      * @param index name of index
-     * @return process
+     * @return process reference
      */
     private Process cmd(final boolean create, final CmdIndex index) {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
 
-  /** Show about information. */
+  /** Shows the "about" information. */
   ABOUT(false, GUIABOUT, null, GUIABOUTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -734,7 +734,7 @@ public enum GUICommands implements GUICommand {
 
   /* BROWSE COMMANDS */
 
-  /** Go one step back. */
+  /** Goes one step back. */
   GOBACK(true, GUIGOBACK, "alt LEFT", GUIGOBACKTT) {
     @Override
     public void execute(final GUI gui) {
@@ -750,7 +750,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Go one step forward. */
+  /** Goes one step forward. */
   GOFORWARD(true, GUIGOFORWARD, "alt RIGHT", GUIGOFORWARDTT) {
     @Override
     public void execute(final GUI gui) {
@@ -766,7 +766,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Go one level up. */
+  /** Goes one level up. */
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
     public void execute(final GUI gui) {
@@ -779,7 +779,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Go to root node. */
+  /** Goes to the root node. */
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -787,7 +787,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Go to root node. */
+  /** Displays the root node in the text view. */
   HOME(true, GUIROOT, null, GUIROOTTT) {
     @Override
     public void execute(final GUI gui) {
@@ -898,7 +898,7 @@ public enum GUICommands implements GUICommand {
   }
 
   /**
-   * Selects or de-selects the specified component.
+   * Selects or deselects the specified component.
    * @param but component
    * @param select selection flag
    */

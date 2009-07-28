@@ -298,7 +298,8 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Check if the path expression can be replaced with an index access.
+   * If possible, returns an expression which accesses the index.
+   * Otherwise, returns the original expression.
    * @param ctx query context
    * @param data data reference
    * @return resulting expression

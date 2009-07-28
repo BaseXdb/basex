@@ -144,7 +144,7 @@ public final class QueryTest {
   }
 
   /**
-   * Print specified string to standard output.
+   * Prints the specified string to standard output.
    * @param info short info
    * @param detail detailed info
    */
