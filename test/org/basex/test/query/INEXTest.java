@@ -74,7 +74,7 @@ public final class INEXTest {
     final PrintOutput sub = new PrintOutput("INEX/sub.xml");
     final XMLSerializer xml = new XMLSerializer(sub, false, true);
 
-    final File file = new File("INEX/co1.que");
+    final File file = new File("INEX/co.que");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
@@ -124,17 +124,18 @@ public final class INEXTest {
       String q = line.substring(s0);
 
 //      q = q.replaceAll("\\. ", ".//text() ");
-      System.out.println(q);
+      final String qo = q;
       q = replaceElements(q);
-      System.out.println(q);
       
       if (exe) {
         q = xqm + "for $i score $s in " + q 
           + " order by $s return (basex:sum-path($i), $s)";
   
+//        Prop.allInfo = true;
+        context.prop.set(Prop.ALLINFO, true); 
         // process query
         final Process proc = new XQuery(q);
-  
+        
         if(!proc.execute(context)) {
           System.out.println("- " + proc.info());
           System.out.println("Query: " + q);
@@ -142,6 +143,12 @@ public final class INEXTest {
           // extract and print processing time
           final String info = proc.info();
           proc.output(new NullOutput());
+          if (info.indexOf("Applying full-text index") < 0) { 
+            System.out.println("No index usage: " + qo);
+            System.out.println(q);
+            System.out.println("****");
+            
+          }
           final int i = info.indexOf("Evaluating: ");
           final int j = info.indexOf(" ms", i);
           final String time = info.substring(i 
@@ -207,6 +214,7 @@ public final class INEXTest {
     private static String replaceElements(final String str) {
     byte[] b = str.getBytes();
     final byte[] or = new byte[]{' ', 'o', 'r', ' '};
+    final byte[] co = new byte[]{' ', ',', ' '};
     final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
     int i = 0;
     int sp = -1, sb = -1, sbb = -1, os = -1, ebb = -1;
@@ -218,8 +226,16 @@ public final class INEXTest {
           sp = sp == -1 ? i : sp;
           break;
         case '(':
-          if (b[i + 1] == ')') break;
           sb = i;
+          i++;
+          if (b[i] == ')' || b[i] == ' ') break;
+          boolean f = false;
+          while(i < b.length && b[i] != ')' && !f) { 
+            f = b[i] == '"' || b[i] == '\'';
+            i++;
+          }
+          if (f) break;
+          i = sb;
           
           path = new byte[i - sp];
           System.arraycopy(b, sp, path, 0, path.length);
@@ -257,7 +273,7 @@ public final class INEXTest {
               bn = Array.add(bn, b, ebb + 1, sb);
               bn = Array.add(bn, tok[k], 0, tok[k].length);
               if (k < tl.size() - 1) 
-                bn = Array.add(bn, or, 0, or.length);
+                bn = Array.add(bn, co, 0, co.length);
             }
             i = bn.length;
             b = bn;
@@ -279,7 +295,12 @@ public final class INEXTest {
           } else {
             // ( | ) inside predicate
             ebb = i + 1;
-            while (ebb < b.length && b[ebb] != ']') ebb++;
+            while (ebb < b.length && !(b[ebb] == ']' || 
+                ebb + 2 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'o' 
+                  && b[ebb + 2] == 'r' ||
+                ebb + 3 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'a' 
+                  && b[ebb + 2] == 'n' && b[ebb + 3] == 'd'
+                  )) ebb++;
             byte[] bn = new byte[]{};
             final byte[][] tok = tl.finish();
             bn = Array.add(bn, b, 0, sbb);
@@ -292,6 +313,7 @@ public final class INEXTest {
             }
             bn = Array.add(bn, b, ebb, b.length);
             b = bn;
+            ebb = -1; // new
           }
           break;
         case '[': 
@@ -299,6 +321,15 @@ public final class INEXTest {
           break;
         case ']': 
           ebb = i;
+          break;
+        case 'o':
+          if (ebb > 0 && i + 1 < b.length && b[i + 1] == 'r') {
+            sp = -1;
+            sb = -1; 
+            sbb = -1; 
+            os = -1; 
+            ebb = -1;
+          }
           break;
         case '.':
           if (b[i + 1] != '/') {
@@ -314,6 +345,10 @@ public final class INEXTest {
             // .//foo => .//foo/text()
             final int j = i;
             while(i < b.length && b[i] != ' ') i++;
+            if (b.length - 6 > 0 && b[i - 6] == 't' && b[i - 5] == 'e' 
+              && b[i - 4] == 'x' && b[i - 3] == 't' && b[i - 2] == '(' 
+              && b[i - 1] == ')') break;
+              
             final byte[] bn = new byte[b.length + txt.length];
             System.arraycopy(b, 0, bn, 0, i);
             System.arraycopy(txt, 0, bn, i, txt.length);
@@ -331,11 +366,11 @@ public final class INEXTest {
   /**
    * Main test method.
    * @param args command line arguments (ignored)
+   * @throws Exception exception
    */
-  public static void main(final String[] args) {
-//    new INEXTest("pages999", false);
-    
-    System.out.println("1.: " + replaceElements(
+  public static void main(final String[] args) throws Exception {
+    new INEXTest("pages999", true);
+  /*  System.out.println("1.: " + replaceElements(
         "//sec[. ftcontains \"b\" ] or //sec[. ftcontains \"c\" ]"));
     System.out.println("2.: " + replaceElements(
         "//sec[.//ab ftcontains \"b\" ]")); 
@@ -346,6 +381,20 @@ public final class INEXTest {
     System.out.println("5.: " + replaceElements(
       "//(a|b)[.//cd ftcontains \"b\" ]"));
     System.out.println("6.: " + replaceElements(
-      "//a[.//d ftcontains \"b\" ]//(e|f)"));   
+      "//a[.//d ftcontains \"b\" ]//(e|f)"));
+    System.out.println("7.: " + replaceElements(
+      "//(a|b)[.//(c|d) ftcontains \"bla\"]"));
+    System.out.println("8.: " + replaceElements(
+      "article[. ftcontains (\"Nobel\" ftand \"prize\")]"));
+    System.out.println("9.: " + replaceElements(
+    "article[.//(a|b) ftcontains \"Nobel\" and 
+    .//st ftcontains (\"references\" ]"));
+    System.out.println("10.: " + replaceElements(
+    "//article[.//(sec|p) ftcontains (\"mean\" ftand \"average\" " +
+    "ftand \"precision\") and ( .//st ftcontains (\"references\") " +
+    "or .//st ftcontains (\"see\" ftand \"also\") ) and .//image " +
+    "ftcontains (\"precision\" ftand \"recall\")]"));
+
+  /* */
   }
 }
