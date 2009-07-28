@@ -124,7 +124,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     final String backingpath = d.meta.backingpath;
     initNames();
 
-    if(Prop.fuse) {
+    if(data.meta.prop.is(Prop.FUSE)) {
       final File mp = new File(mountpoint);
       final File bp = new File(backingpath);
       /* --- prepare, (ie., potentially make) mountpoint & backing store --- */
@@ -191,7 +191,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @throws IOException I/O exception
    */
   public void close() throws IOException {
-    if(Prop.fuse) {
+    if(data.meta.prop.is(Prop.FUSE)) {
       final String method = "[BaseX.close] ";
       BaseX.debug(method + "Initiating DeepFS shutdown sequence ");
       // -- unmount running fuse.
@@ -256,8 +256,8 @@ public final class DeepFS extends DeepFuse implements DataText {
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size();
     if(s != 0) {
-      final byte[] b = Prop.fuse && !backing ? mountpoint(il.get(s - 1)) :
-        backingstore(il.get(s - 1));
+      final byte[] b = data.meta.prop.is(Prop.FUSE) && !backing ?
+          mountpoint(il.get(s - 1)) : backingstore(il.get(s - 1));
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -347,7 +347,7 @@ public final class DeepFS extends DeepFuse implements DataText {
    * @param pre pre value
    */
   public void delete(final int pre) {
-    if(Prop.fuse) {
+    if(data.meta.prop.is(Prop.FUSE)) {
       final String bpath = Token.string(path(pre, true));
       final File f = new File(bpath);
       if(f.isDirectory()) deleteDir(f);

@@ -143,7 +143,8 @@ public final class FSParser extends Parser {
     builder.meta.mountpoint = mountpoint;
 
     // -- create backing store (DeepFS depends on it).
-    if(Prop.fuse && !singlemode) {
+    final boolean fuse = prop.is(Prop.FUSE);
+    if(fuse && !singlemode) {
       final File bs = new File(backingpath);
       if(!bs.mkdirs() && bs.exists())
           throw new IOException(BACKINGEXISTS + backingpath);
@@ -155,8 +156,8 @@ public final class FSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      final byte[] mnt = Prop.fuse ? token(mountpoint) : NOTMOUNTED;
-      final byte[] bck = Prop.fuse ? token(backingpath) : token(fsimportpath);
+      final byte[] mnt = fuse ? token(mountpoint) : NOTMOUNTED;
+      final byte[] bck = fuse ? token(backingpath) : token(fsimportpath);
       atts.add(MOUNTPOINT  , mnt);
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
@@ -185,20 +186,19 @@ public final class FSParser extends Parser {
     final File[] files = d.listFiles();
     if(files == null) return;
 
+    final boolean fuse = prop.is(Prop.FUSE);
     for(final File f : files) {
       if(!valid(f)) continue;
 
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
-        if(Prop.fuse)
-          new File(backingpath
-            + f.getAbsolutePath().substring(importRootLength)).mkdir();
+        if(fuse) new File(backingpath +
+            f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
         // -- copy file to backing store
-        if(Prop.fuse)
-          copy(f.getAbsoluteFile(), new File(backingpath
-            + f.getAbsolutePath().substring(importRootLength)));
+        if(fuse) copy(f.getAbsoluteFile(), new File(backingpath +
+            f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
     }

@@ -48,8 +48,6 @@ public final class Prop extends AProp {
   /** Web Server mode (shouldn't be overwritten by property file). */
   public static boolean web = false;
 
-  /** Fuse support. */
-  public static boolean fuse = false;
   /** Debug mode. */
   public static boolean debug = false;
   /** Last XQuery file. */
@@ -163,6 +161,8 @@ public final class Prop extends AProp {
 
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
+  /** Fuse support. */
+  public static final Object[] FUSE = { "FUSE", false };
   /**
    * Spotlight integration. If true, on mac platforms spotlight index is used
    * instead of the internal parser implementations.
@@ -183,6 +183,16 @@ public final class Prop extends AProp {
     // set static properties
     language = get(LANGUAGE);
     langkeys = is(LANGKEYS);
+
+    /** Load DeepFS dynamic library and set FUSE support flag. */
+    try {
+      if(is(FUSE)) {
+        System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
+        BaseX.debug("DeepFS FUSE support enabled ... OK");
+      }
+    } catch(final UnsatisfiedLinkError ex) {
+      set(FUSE, false);
+    }
   }
 
   /**
@@ -203,14 +213,5 @@ public final class Prop extends AProp {
    */
   public File dbpath(final String db) {
     return new File(get(DBPATH) + '/' + db);
-  }
-
-  /** Load DeepFS dynamic library and set FUSE support flag. */
-  static {
-    try {
-      System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
-      fuse = true;
-      BaseX.debug("DeepFS FUSE support enabled ... OK");
-    } catch(final UnsatisfiedLinkError ex) { /* empty */ }
   }
 }

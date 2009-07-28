@@ -147,7 +147,7 @@ public final class DialogImportFS extends Dialog {
     });
     BaseXLayout.setWidth(mountpoint, 240);
 
-    if(Prop.fuse) {
+    if(prop.is(Prop.FUSE)) {
       p.add(new BaseXLabel("Backing store:", false, true));
       p.add(new BaseXLabel(""));
       p.add(backing);
@@ -245,7 +245,7 @@ public final class DialogImportFS extends Dialog {
     }
     ok &= cAll;
 
-    if(Prop.fuse) {
+    if(prop.is(Prop.FUSE)) {
       cBac = new File(backing.getText().trim()).isDirectory();
       ok &= cBac;
       cMou = new File(mountpoint.getText().trim()).isDirectory();
@@ -267,7 +267,7 @@ public final class DialogImportFS extends Dialog {
       if(!ok) {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
-        inf = Prop.fuse ? RENAMEOVERBACKING : RENAMEOVER;
+        inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
         img = BaseXLayout.icon("warn");
       }
     }
@@ -290,7 +290,7 @@ public final class DialogImportFS extends Dialog {
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSIMPORTPATH, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());
-    if(Prop.fuse) {
+    if(prop.is(Prop.FUSE)) {
       gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
       gprop.set(GUIProp.FSBACKING, backing.getText().trim());
     }

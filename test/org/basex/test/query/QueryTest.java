@@ -27,7 +27,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = true;
+  private static final boolean ALL = false;
   /** Wrong results counter. */
   private int wrong;
   /** Query counter. */
@@ -68,7 +68,7 @@ public final class QueryTest {
       }
     } else {
       // single test
-      prop.set(Prop.FTINDEX, false);
+      prop.set(Prop.FTINDEX, true);
       prop.set(Prop.FTFUZZY, false);
       prop.set(Prop.FTST, false);
       prop.set(Prop.FTDC, false);
