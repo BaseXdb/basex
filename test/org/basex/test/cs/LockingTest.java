@@ -15,13 +15,12 @@ import org.basex.server.BaseXServerNew;
 import org.basex.server.ClientLauncherNew;
 
 /**
- * Test the 4 Locking Cases.
+ * This class tests the four locking cases.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
 public final class LockingTest {
-  
   /** Socket from Client1.*/
   Socket socket1;
   /** Socket from Client2. */
@@ -32,17 +31,17 @@ public final class LockingTest {
   Thread st;
   /** BaseXServer. */
   BaseXServerNew bxs;
-  
+
   /**
-   * Main method, launching the Test.
+   * Main method, launching the test.
    * @param args command line arguments
    */
   public static void main(final String[] args) {
     new LockingTest();
   }
-  
+
   /**
-   * Private Constructor.
+   * Private constructor.
    */
   private LockingTest() {
     startTheServer();
@@ -58,9 +57,9 @@ public final class LockingTest {
     " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
     startTests();
   }
-  
+
   /**
-   * Starts the Server.
+   * Starts the server.
    */
   private void startTheServer() {
     st = new Thread() {
@@ -71,9 +70,9 @@ public final class LockingTest {
     };
     st.start();
   }
-  
+
   /**
-   * Starts the Tests.
+   * Starts the tests.
    */
   private void startTests() {
     exe(socket1, new Open("factbook"));
@@ -85,11 +84,11 @@ public final class LockingTest {
     exe(socket1, new XQuery(read));
     BaseX.out("\nEnd of Tests\n");
   }
-  
+
   /**
-   * Executes the Process with the specified Socket.
+   * Executes the process with the specified socket.
    * @param s Socket
-   * @param p Process
+   * @param p process
    */
   private void exe(final Socket s, final Process p) {
     final ClientLauncherNew proc = new ClientLauncherNew(p, s);

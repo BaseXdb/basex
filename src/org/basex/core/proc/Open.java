@@ -40,7 +40,7 @@ public final class Open extends Process {
       return error(msg.length() != 0 ? msg : DBOPENERR);
     }
   }
-  
+
   /**
    * Opens the specified database.
    * @param ctx database context
@@ -62,7 +62,7 @@ public final class Open extends Process {
     }
     return data;
   }
-  
+
   /**
    * Opens the specified database; if it does not exist, create a new
    * database instance.

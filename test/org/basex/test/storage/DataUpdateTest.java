@@ -44,9 +44,9 @@ public abstract class DataUpdateTest {
     prop.set(Prop.ATTRINDEX, false);
     prop.set(Prop.CHOP, true);
   }
-  
+
   /**
-   * Deletes the test-database.
+   * Closes the test database.
    */
   @AfterClass
   public static void finish() {
@@ -63,7 +63,7 @@ public abstract class DataUpdateTest {
   }
 
   /**
-   * Deletes the test-database.
+   * Deletes the test database.
    */
   @After
   public void tearDown() {

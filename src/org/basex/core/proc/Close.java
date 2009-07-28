@@ -36,7 +36,7 @@ public final class Close extends Process {
       return error(DBCLOSEERR);
     }
   }
-  
+
   /**
    * Closes the specified database.
    * @param ctx database context

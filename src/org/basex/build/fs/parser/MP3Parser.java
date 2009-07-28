@@ -28,11 +28,11 @@ import static org.basex.util.Token.*;
  * <li>extended tag (before ID3v1 tag)</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
- * 
+ *
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>
  * @see <a href="http://www.id3.org/id3v2.4.0-frames">ID3v2.4.0 frames</a>
  */
@@ -262,13 +262,11 @@ public final class MP3Parser extends AbstractParser {
   private static final int ENC_ISO_8859_1 = 0;
   /**
    * Flag for UTF-16 encoding (with BOM).
-   * 
    * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
    */
   private static final int ENC_UTF_16_WITH_BOM = 1;
   /**
    * Flag for UTF-16 encoding (without BOM).
-   * 
    * @see <a href="http://en.wikipedia.org/wiki/UTF-16/UCS-2">Wikipedia</a>
    */
   private static final int ENC_UTF_16_NO_BOM = 2;

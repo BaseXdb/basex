@@ -30,7 +30,7 @@ public final class BaseXClient extends BaseX {
   public BaseXClient() {
     super(false);
   }
-  
+
   @Override
   protected ALauncher launcher(final Process pr) {
     return new ClientLauncher(pr, context.prop);

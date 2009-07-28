@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
 
 /**
  * Parser for PNG files.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */

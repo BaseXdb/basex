@@ -199,7 +199,7 @@ public final class GUIProp extends AProp {
     super("win");
     files(null);
   }
-  
+
   /**
    * Refreshes the list of recent query files.
    * @param file new file

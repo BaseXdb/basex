@@ -55,7 +55,7 @@ public final class Prop extends AProp {
 
   /** Property information. */
   static final String PROPHEADER = "# BaseX Property File." + NL +
-      "# This here will be overwritten every time, but" + NL + 
+      "# This here will be overwritten every time, but" + NL +
       "# you can set your own options at the end of the file." + NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
@@ -168,7 +168,7 @@ public final class Prop extends AProp {
    * instead of the internal parser implementations.
    */
   public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false};
-  
+
   // WEBSERVER OPTIONS ========================================================
 
   /** PHP Path. */
@@ -179,7 +179,7 @@ public final class Prop extends AProp {
    */
   public Prop() {
     super("");
-    
+
     // set static properties
     language = get(LANGUAGE);
     langkeys = is(LANGKEYS);

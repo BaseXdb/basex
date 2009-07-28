@@ -180,7 +180,7 @@ final class Session implements Runnable {
     dos.writeInt(id);
     dos.flush();
   }
-  
+
   /**
    * Stops the session.
    * @throws IOException I/O Exception

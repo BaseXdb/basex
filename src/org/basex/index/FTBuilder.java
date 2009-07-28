@@ -29,7 +29,7 @@ abstract class FTBuilder extends Progress implements IndexBuilder {
   protected FTBuilder(final Prop pr) {
     wp = new Tokenizer(pr);
   }
-  
+
   /**
    * Extracts and indexes words from the specified data reference.
    * @param data data reference

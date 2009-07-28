@@ -8,7 +8,7 @@ import org.basex.build.fs.parser.Metadata.MetaType;
 
 /**
  * Abstract class for metadata extractors / file parsers.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -78,12 +78,12 @@ public abstract class AbstractParser {
    * </p>
    * <p>
    * Does the same as the two method calls:
-   * 
+   *
    * <pre>
    * {@link #readMeta(BufferedFileChannel, NewFSParser)};
    * {@link #readContent(BufferedFileChannel, NewFSParser)};
    * </pre>
-   * 
+   *
    * but is potentially much more efficient (depends on the actual parser
    * implementation).
    * </p>

@@ -19,7 +19,7 @@ import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */

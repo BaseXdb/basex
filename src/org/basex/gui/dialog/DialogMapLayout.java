@@ -38,7 +38,7 @@ public final class DialogMapLayout extends Dialog {
    */
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
-    
+
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(4, 1, 0, 8));
 

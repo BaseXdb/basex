@@ -22,7 +22,7 @@ public final class MemBuilder extends Builder {
   public MemBuilder(final Parser p) {
     super(p);
   }
-  
+
   @Override
   public void init(final String db) {
     // always index values in main memory mode

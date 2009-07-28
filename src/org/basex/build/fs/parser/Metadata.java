@@ -13,7 +13,7 @@ import org.basex.util.Token;
 
 /**
  * Metadata key-value pairs.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -362,7 +362,7 @@ public class Metadata {
 
     /**
      * Constructor for initializing the enum instance with the given value.
-     * 
+     *
      * @param v the value to set.
      */
     DateType(final String v) {

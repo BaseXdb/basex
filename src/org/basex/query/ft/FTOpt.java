@@ -71,7 +71,7 @@ public final class FTOpt extends ExprInfo {
     qu = new Tokenizer(pr);
     lserr = pr.num(Prop.LSERR);
   }
-  
+
   /**
    * Compiles the full-text options, inheriting the options of the argument.
    * @param opt parent full-text options
@@ -150,7 +150,7 @@ public final class FTOpt extends ExprInfo {
     qu.fz = is(FZ);
 
     if(qu.fz && ls == null) ls = new Levenshtein();
-    
+
     int count = 0;
     while(tk.more()) {
       final int tp = tk.p;

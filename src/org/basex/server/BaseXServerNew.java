@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * requests and offers some simple threading to allow simultaneous database
  * requests. Add the '-h' option to get a list on all available command-line
  * arguments.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  * @author Christian Gruen
@@ -167,10 +167,8 @@ public class BaseXServerNew {
 
   /**
    * InputListener listens to the Console Input.
-   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
-   * 
    */
   class InputListener implements Runnable {
 
@@ -223,10 +221,8 @@ public class BaseXServerNew {
 
   /**
    * SessionListener listens to new Client-Server Sessions.
-   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
-   * 
    */
   class SessionListener implements Runnable {
     /** Thread. */

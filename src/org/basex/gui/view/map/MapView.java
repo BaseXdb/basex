@@ -415,7 +415,7 @@ public final class MapView extends View implements Runnable {
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();
     final GUIProp gprop = gui.prop;
-    
+
     if(data == null || data.meta.size == 0) {
       super.paintComponent(g);
       return;
@@ -689,12 +689,12 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     if(gui.updating) return;
-    
+
     super.mouseMoved(e);
     // refresh mouse focus
     mouseX = e.getX();
     mouseY = e.getY();
-    
+
     if(!gui.prop.is(GUIProp.MAPINTERACTION) || !e.isControlDown()) {
       if(focus()) {
         if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&

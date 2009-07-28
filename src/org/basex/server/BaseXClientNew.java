@@ -20,7 +20,7 @@ import org.basex.core.proc.Exit;
 public final class BaseXClientNew extends BaseX {
   /** Socket reference. */
   final Socket socket;
-  
+
   /**
    * Main method of the <code>BaseXClient</code>, launching a local
    * client instance that sends all commands to a server instance.
@@ -33,7 +33,7 @@ public final class BaseXClientNew extends BaseX {
       new BaseXClientNew().run(args);
     } catch(final IOException ex) {
       BaseX.errln(SERVERERR);
-    } 
+    }
   }
 
   /**
@@ -55,7 +55,7 @@ public final class BaseXClientNew extends BaseX {
     }
     super.quit(force);
   }
-  
+
   @Override
   protected ALauncher launcher(final Process pr) {
     return new ClientLauncherNew(pr, socket);

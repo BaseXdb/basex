@@ -21,7 +21,7 @@ public abstract class ALauncher {
   protected ALauncher(final Process pr) {
     proc = pr;
   }
-  
+
   /**
    * Executes a command.
    * @return success of operation

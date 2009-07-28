@@ -79,7 +79,7 @@ public abstract class Process extends Progress {
   public final boolean execute(final Context ctx) {
     context = ctx;
     prop = ctx.prop;
-    
+
     final Data data = context.data();
     // data reference needed?
     if(data() && data == null) return error(PROCNODB);

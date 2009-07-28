@@ -60,7 +60,7 @@ public final class BaseXButton extends JButton {
     setOpaque(false);
     BaseXLayout.addInteraction(this, hlp, gui);
     if(hlp != null) setToolTipText(Token.string(hlp));
-    
+
     // trim horizontal button margins
     final Insets in = getMargin();
     in.left /= 4;

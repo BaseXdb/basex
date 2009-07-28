@@ -23,7 +23,7 @@ public abstract class AProp {
   private final HashMap<String, Object> props = new HashMap<String, Object>();
   /** Property file. */
   private final String filename;
-  
+
   /**
    * Constructor.
    * Reads the configuration file and initializes the project properties. The
@@ -46,7 +46,7 @@ public abstract class AProp {
 
     final File file = new File(filename);
     if(!file.exists()) return;
-    
+
     try {
       final BufferedReader br = new BufferedReader(new FileReader(file));
       String line = null;

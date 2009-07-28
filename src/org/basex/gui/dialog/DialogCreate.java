@@ -71,7 +71,7 @@ public final class DialogCreate extends Dialog {
     db = List.list(main.context);
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
-    
+
     // create panels
     final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(7, 1));

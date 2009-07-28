@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.basex.build.fs;
 

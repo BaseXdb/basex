@@ -302,7 +302,7 @@ public final class GUIConstants {
    */
   public static void initFonts(final GUIProp prop) {
     final Container comp = new Container();
-    
+
     final String f = prop.get(GUIProp.FONT);
     final int type = prop.num(GUIProp.FONTTYPE);
     final int size = prop.num(GUIProp.FONTSIZE);

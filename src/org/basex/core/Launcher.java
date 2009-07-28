@@ -23,7 +23,7 @@ public class Launcher extends ALauncher {
     super(pr);
     context = ctx;
   }
-  
+
   @Override
   public boolean execute() {
     return proc.execute(context);

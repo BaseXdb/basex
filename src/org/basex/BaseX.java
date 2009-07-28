@@ -82,7 +82,7 @@ public class BaseX {
     // arguments were successfully parsed...
     if(parseArguments(args)) {
       if(console) set(Prop.INFO, ON);
-  
+
       if(file != null) {
         // query file contents
         final String query = content();
@@ -354,7 +354,7 @@ public class BaseX {
   }
 
   // GLOBAL STATIC METHODS ====================================================
-  
+
   /**
    * Global method, replacing all % characters
    * (see {@link TokenBuilder#add(Object, Object...)} for details.

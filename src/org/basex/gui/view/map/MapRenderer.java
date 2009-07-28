@@ -99,7 +99,7 @@ final class MapRenderer {
 
       for(int n = 0; n < tok.length; n += cl(tok[n]))
         wl += BaseXLayout.width(g, cw, cp(tok, n));
-      
+
       if(ll + wl >= ww) {
         xx = r.x;
         if(ll != 0) yy += fh;
@@ -550,7 +550,7 @@ final class MapRenderer {
       final double rw, final int rh, final int xx, final int yy) {
     return xx >= rx && xx <= rx + rw && yy >= ry && yy <= ry + rh;
   }
-  
+
   /**
    * Calculates a text using thumbnail visualization.
    * @param r rectangle

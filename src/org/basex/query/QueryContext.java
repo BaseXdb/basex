@@ -166,7 +166,7 @@ public final class QueryContext extends Progress {
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
   }
-  
+
   /**
    * Parses the specified query.
    * @param q input query
@@ -447,7 +447,7 @@ public final class QueryContext extends Progress {
       throws QueryException {
 
     try {
-      return Open.check(context, path);        
+      return Open.check(context, path);
     } catch(final IOException ex) {
       if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
       return null;

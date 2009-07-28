@@ -47,7 +47,7 @@ public final class INEXTest {
   private final String[] type = new String[] {"focused", "thorough", "article"};
   /** Kind of query. */
   private String[] query = new String[] {"automatic", "manual"};
-  
+
   /** Method used to sum pathes. */
   private final String xqm =
     "declare namespace basex = \"http://www.basex.com\"; " +
@@ -126,16 +126,16 @@ public final class INEXTest {
 //      q = q.replaceAll("\\. ", ".//text() ");
       final String qo = q;
       q = replaceElements(q);
-      
+
       if (exe) {
-        q = xqm + "for $i score $s in " + q 
+        q = xqm + "for $i score $s in " + q
           + " order by $s return (basex:sum-path($i), $s)";
-  
+
 //        Prop.allInfo = true;
-        context.prop.set(Prop.ALLINFO, true); 
+        context.prop.set(Prop.ALLINFO, true);
         // process query
         final Process proc = new XQuery(q);
-        
+
         if(!proc.execute(context)) {
           System.out.println("- " + proc.info());
           System.out.println("Query: " + q);
@@ -143,17 +143,16 @@ public final class INEXTest {
           // extract and print processing time
           final String info = proc.info();
           proc.output(new NullOutput());
-          if (info.indexOf("Applying full-text index") < 0) { 
+          if (info.indexOf("Applying full-text index") < 0) {
             System.out.println("No index usage: " + qo);
             System.out.println(q);
             System.out.println("****");
-            
           }
           final int i = info.indexOf("Evaluating: ");
           final int j = info.indexOf(" ms", i);
-          final String time = info.substring(i 
+          final String time = info.substring(i
               + "Evaluating: ".length() + 2, j);
-  
+
           if(s) {
             xml.openElement(token("topic"),
                 token("topic-id"), token(tid),
@@ -163,7 +162,7 @@ public final class INEXTest {
             xml.openElement(token("file"));
             xml.text(token(file.toString()));
             xml.closeElement();
-  
+
             final Result val = proc.result();
             if(val instanceof SeqIter) {
               final SeqIter itr = (SeqIter) val;
@@ -190,7 +189,7 @@ public final class INEXTest {
           }
         }
       }
-      
+
       if(++curr >= STOPAFTER) break;
     }
     br.close();
@@ -203,11 +202,11 @@ public final class INEXTest {
     sub.close();
     out.close();
   }
-  
+
   /**
    * Replace dedicated nodes by an or expression.
    * [(a|b) ftcontains "c"] => [a ftcontains "c" or [b ftcontains "c"]
-   * 
+   *
    * @param str Sting query to be replaced
    * @return replaced query String
    */
@@ -218,11 +217,11 @@ public final class INEXTest {
     final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
     int i = 0;
     int sp = -1, sb = -1, sbb = -1, os = -1, ebb = -1;
-    byte[] path = new byte[]{};;
+    byte[] path = new byte[]{};
     TokenList tl;
     while(i < b.length) {
       switch (b[i]) {
-        case '/': 
+        case '/':
           sp = sp == -1 ? i : sp;
           break;
         case '(':
@@ -230,16 +229,16 @@ public final class INEXTest {
           i++;
           if (b[i] == ')' || b[i] == ' ') break;
           boolean f = false;
-          while(i < b.length && b[i] != ')' && !f) { 
+          while(i < b.length && b[i] != ')' && !f) {
             f = b[i] == '"' || b[i] == '\'';
             i++;
           }
           if (f) break;
           i = sb;
-          
+
           path = new byte[i - sp];
           System.arraycopy(b, sp, path, 0, path.length);
-          
+
           tl = new TokenList();
           os = i + 1;
           while (i < b.length && b[i] != ')') {
@@ -255,13 +254,13 @@ public final class INEXTest {
             final byte[] tok = new byte[i - os];
             System.arraycopy(b, os, tok, 0, tok.length);
             tl.add(tok);
-            
+
             // backup path
             path = new byte[sb - sp];
             System.arraycopy(b, sp, path, 0, path.length);
           }
           i++;
-          
+
           // check if predicate before or after ( | )
           if (sbb > -1 && ebb > -1) {
             // predicate before ( | )
@@ -272,7 +271,7 @@ public final class INEXTest {
               bn = Array.add(bn, b, 0, ebb + 1);
               bn = Array.add(bn, b, ebb + 1, sb);
               bn = Array.add(bn, tok[k], 0, tok[k].length);
-              if (k < tl.size() - 1) 
+              if (k < tl.size() - 1)
                 bn = Array.add(bn, co, 0, co.length);
             }
             i = bn.length;
@@ -287,18 +286,18 @@ public final class INEXTest {
               bn = Array.add(bn, b, 0, sb);
               bn = Array.add(bn, tok[k], 0, tok[k].length);
               bn = Array.add(bn, b, sbb, b.length);
-              if (k < tok.length - 1) 
+              if (k < tok.length - 1)
                 bn = Array.add(bn, or, 0, or.length);
             }
             i = sb;
-            b = bn;            
+            b = bn;
           } else {
             // ( | ) inside predicate
             ebb = i + 1;
-            while (ebb < b.length && !(b[ebb] == ']' || 
-                ebb + 2 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'o' 
+            while (ebb < b.length && !(b[ebb] == ']' ||
+                ebb + 2 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'o'
                   && b[ebb + 2] == 'r' ||
-                ebb + 3 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'a' 
+                ebb + 3 < b.length && b[ebb] == ' ' && b[ebb + 1] == 'a'
                   && b[ebb + 2] == 'n' && b[ebb + 3] == 'd'
                   )) ebb++;
             byte[] bn = new byte[]{};
@@ -308,7 +307,7 @@ public final class INEXTest {
               bn = Array.add(bn, b, sbb + (k == 0 ? 0 : 1), sb);
               bn = Array.add(bn, tok[k], 0, tok[k].length);
               bn = Array.add(bn, b, i, ebb);
-              if (k < tok.length - 1) 
+              if (k < tok.length - 1)
                 bn = Array.add(bn, or, 0, or.length);
             }
             bn = Array.add(bn, b, ebb, b.length);
@@ -316,18 +315,18 @@ public final class INEXTest {
             ebb = -1; // new
           }
           break;
-        case '[': 
+        case '[':
           sbb = i;
           break;
-        case ']': 
+        case ']':
           ebb = i;
           break;
         case 'o':
           if (ebb > 0 && i + 1 < b.length && b[i + 1] == 'r') {
             sp = -1;
-            sb = -1; 
-            sbb = -1; 
-            os = -1; 
+            sb = -1;
+            sbb = -1;
+            os = -1;
             ebb = -1;
           }
           break;
@@ -338,17 +337,17 @@ public final class INEXTest {
             System.arraycopy(b, 0, bn, 0, i + 1);
             bn[i + 1] = '/';
             System.arraycopy(txt, 0, bn, i + 2, txt.length);
-            System.arraycopy(b, i + 1, bn, i + 2 + txt.length, 
+            System.arraycopy(b, i + 1, bn, i + 2 + txt.length,
                 b.length - i - 1);
             b = bn;
           } else {
             // .//foo => .//foo/text()
             final int j = i;
             while(i < b.length && b[i] != ' ') i++;
-            if (b.length - 6 > 0 && b[i - 6] == 't' && b[i - 5] == 'e' 
-              && b[i - 4] == 'x' && b[i - 3] == 't' && b[i - 2] == '(' 
+            if (b.length - 6 > 0 && b[i - 6] == 't' && b[i - 5] == 'e'
+              && b[i - 4] == 'x' && b[i - 3] == 't' && b[i - 2] == '('
               && b[i - 1] == ')') break;
-              
+
             final byte[] bn = new byte[b.length + txt.length];
             System.arraycopy(b, 0, bn, 0, i);
             System.arraycopy(txt, 0, bn, i, txt.length);
@@ -362,7 +361,7 @@ public final class INEXTest {
     }
     return new String(b);
   }
-  
+
   /**
    * Main test method.
    * @param args command line arguments (ignored)
@@ -373,7 +372,7 @@ public final class INEXTest {
   /*  System.out.println("1.: " + replaceElements(
         "//sec[. ftcontains \"b\" ] or //sec[. ftcontains \"c\" ]"));
     System.out.println("2.: " + replaceElements(
-        "//sec[.//ab ftcontains \"b\" ]")); 
+        "//sec[.//ab ftcontains \"b\" ]"));
     System.out.println("3.: " + replaceElements(
         "//sec[.//(a|b) ftcontains \"b\" ]"));
     System.out.println("4.: " + replaceElements(
@@ -387,7 +386,7 @@ public final class INEXTest {
     System.out.println("8.: " + replaceElements(
       "article[. ftcontains (\"Nobel\" ftand \"prize\")]"));
     System.out.println("9.: " + replaceElements(
-    "article[.//(a|b) ftcontains \"Nobel\" and 
+    "article[.//(a|b) ftcontains \"Nobel\" and
     .//st ftcontains (\"references\" ]"));
     System.out.println("10.: " + replaceElements(
     "//article[.//(sec|p) ftcontains (\"mean\" ftand \"average\" " +
