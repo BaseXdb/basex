@@ -147,7 +147,7 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Return the contents of the specified reader as a string.
+   * Returns the contents of the specified reader as a string.
    * @param r reader
    * @return string
    * @throws BXQException exception
@@ -167,7 +167,7 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Return the contents of the specified input stream as a string.
+   * Returns the contents of the specified input stream as a string.
    * @param is input stream
    * @return string
    * @throws BXQException exception
