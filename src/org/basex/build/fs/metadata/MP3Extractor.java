@@ -124,7 +124,7 @@ public final class MP3Extractor extends AbstractExtractor {
    * Returns the frames in a list.
    * @param size number of frames
    * @return frames in a list structure
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private List<byte[]> getID3V2(final int size) throws IOException {
     final List<byte[]> frames = new ArrayList<byte[]>();
@@ -313,7 +313,7 @@ public final class MP3Extractor extends AbstractExtractor {
    * @param builder builder reference
    * @param tag tag
    * @param value text value
-   * @throws IOException in case of parse or write problems
+   * @throws IOException I/O exception
    */
   private void add(final Builder builder, final byte[] tag, final byte[] value)
       throws IOException {
@@ -325,7 +325,7 @@ public final class MP3Extractor extends AbstractExtractor {
    * Adds the header and technical info to the MP3 file.
    * @param builder builder reference
    * @param size header size
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void getTechInfo(final Builder builder, final int size)
       throws IOException {

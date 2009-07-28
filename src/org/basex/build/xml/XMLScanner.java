@@ -81,7 +81,7 @@ public final class XMLScanner {
    * Initializes the scanner.
    * @param f input file
    * @param pr database properties
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public XMLScanner(final IO f, final Prop pr) throws IOException {
     input = new XMLInput(f);
@@ -116,7 +116,7 @@ public final class XMLScanner {
   /**
    * Reads and interprets the next token from the input stream.
    * @return true if the document scanning has been completed.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   boolean more() throws IOException {
     // gets next character from the input stream
@@ -151,7 +151,7 @@ public final class XMLScanner {
 
   /**
    * Finishes file scanning.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   void finish() throws IOException {
     input.finish();
@@ -161,7 +161,7 @@ public final class XMLScanner {
   /**
    * Scans XML content.
    * @param ch current character
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void scanCONTENT(final int ch) throws IOException {
     // parse TEXT
@@ -576,7 +576,7 @@ public final class XMLScanner {
   /**
    * Reads next character or throws an exception if all bytes have been read.
    * @return next character
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private int consume() throws IOException {
     while(true) {
@@ -600,7 +600,7 @@ public final class XMLScanner {
    * Consumes the specified character.
    * @param ch character to be found
    * @return true if token was found
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private boolean consume(final char ch) throws IOException {
     if(consume() == ch) return true;
@@ -612,7 +612,7 @@ public final class XMLScanner {
    * Consumes the specified token.
    * @param tok token to be found
    * @return true if token was found
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private boolean consume(final byte[] tok) throws IOException {
     for(int t = 0; t < tok.length; t++) {
@@ -629,7 +629,7 @@ public final class XMLScanner {
    * Consumes an XML name. [5]
    * @param f force parsing
    * @return name
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private byte[] name(final boolean f) throws IOException {
     final TokenBuilder name = new TokenBuilder();
@@ -660,7 +660,7 @@ public final class XMLScanner {
 
   /**
    * Scans doc type definitions. [28]
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void dtd() throws IOException {
     if(!prolog) error(TYPEAFTER);
@@ -682,7 +682,7 @@ public final class XMLScanner {
    * @param f full flag
    * @param r root flag
    * @return id
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private byte[] externalID(final boolean f, final boolean r)
       throws IOException {
@@ -758,7 +758,7 @@ public final class XMLScanner {
   /**
    * Scans an external subset declaration. [31]
    * @return true if a declaration was found
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private boolean extSubsetDecl() throws IOException {
     boolean found = false;
@@ -795,7 +795,7 @@ public final class XMLScanner {
   /**
    * Scans a markup declaration. [29]
    * @return true if a declaration was found
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private boolean markupDecl() throws IOException {
     if(consume(ENT)) { // [70]
@@ -938,7 +938,7 @@ public final class XMLScanner {
    * Scans an entity value. [9]
    * @param p pe reference flag
    * @return value
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private byte[] entityValue(final boolean p) throws IOException {
     final int qu = consume();

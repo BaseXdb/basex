@@ -95,7 +95,7 @@ public final class MetaData {
    * @param db database name
    * @param in input stream
    * @param pr database properties
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public MetaData(final String db, final DataInput in, final Prop pr)
       throws IOException {
@@ -153,7 +153,7 @@ public final class MetaData {
   /**
    * Opens the metadata for the current database and returns the table size.
    * @param in input stream
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";

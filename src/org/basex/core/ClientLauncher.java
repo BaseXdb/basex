@@ -58,7 +58,7 @@ public final class ClientLauncher extends ALauncher {
   /**
    * Sends the specified command and argument over the network.
    * @param command command to be sent
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void send(final String command) throws IOException {
     socket = new Socket(host, port);
@@ -68,7 +68,7 @@ public final class ClientLauncher extends ALauncher {
   /**
    * Receives an input stream over the network.
    * @param o output stream
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void receive(final PrintOutput o) throws IOException {
     final InputStream in = socket.getInputStream();

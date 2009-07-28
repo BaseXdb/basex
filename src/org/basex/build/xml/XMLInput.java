@@ -35,7 +35,7 @@ final class XMLInput {
   /**
    * Constructor.
    * @param f file reference
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   XMLInput(final IO f) throws IOException {
     in[0] = f.buffer();
@@ -46,7 +46,7 @@ final class XMLInput {
   /**
    * Sets a new encoding.
    * @param e encoding
-   * @throws IOException IO Exception
+   * @throws IOException I/O exception
    */
   public void encoding(final String e) throws IOException {
     in[0].encoding(e);
@@ -64,7 +64,7 @@ final class XMLInput {
   /**
    * Reads the next character from the cached input buffers.
    * @return next character
-   * @throws IOException IO Exception
+   * @throws IOException I/O exception
    */
   int next() throws IOException {
     if(pp != 0) return last[lp + pp++ & 0x0F];
@@ -112,7 +112,7 @@ final class XMLInput {
 
   /**
    * Finishes file input.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   void finish() throws IOException {
     in[0].close();

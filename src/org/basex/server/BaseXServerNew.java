@@ -92,7 +92,7 @@ public class BaseXServerNew {
 
   /**
    * Stops the server socket listener.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public void stop() throws IOException {
     running = false;

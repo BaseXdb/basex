@@ -27,7 +27,7 @@ public final class XMLParser extends Parser {
    * Constructor.
    * @param f file reference
    * @param pr database properties
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public XMLParser(final IO f, final Prop pr) throws IOException {
     super(f, pr);
@@ -62,7 +62,7 @@ public final class XMLParser extends Parser {
 
   /**
    * Parses an XML tag.
-   * @throws IOException in case of parse or write problems
+   * @throws IOException I/O exception
    * @return result of scanner step
    */
   private boolean parseTag() throws IOException {
@@ -128,7 +128,7 @@ public final class XMLParser extends Parser {
    * Checks if the current token matches the specified type.
    * @param t token type to be checked
    * @return result of scanner step
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private boolean consume(final Type t) throws IOException {
     if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
@@ -141,7 +141,7 @@ public final class XMLParser extends Parser {
    * type is wrong, a null reference is returned.
    * @param t token type
    * @return token or null if the token type is wrong
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private byte[] consumeToken(final Type t) throws IOException {
     if(scanner.type != t) {
@@ -155,7 +155,7 @@ public final class XMLParser extends Parser {
 
   /**
    * Skips optional whitespaces.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void skipSpace() throws IOException {
     if(scanner.type == Type.WS) scanner.more();

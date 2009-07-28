@@ -427,7 +427,7 @@ public final class MAB2Parser extends Parser {
    * Adds a tag and a content node.
    * @param tag tag to be added
    * @param cont content to be added
-   * @throws IOException in case of parse or write problems
+   * @throws IOException I/O exception
    */
   private void addTag(final byte[] tag, final byte[] cont) throws IOException {
     if(cont != null) builder.nodeAndText(tag, atts.reset(), cont);
