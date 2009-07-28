@@ -21,7 +21,6 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.DialogMapInfo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.ViewNotifier;
@@ -78,8 +77,6 @@ public final class MapView extends View implements Runnable {
   /** Zooming speed. */
   private int zoomSpeed;
 
-  /** Info Dialog. */
-  private DialogMapInfo mapInfo;
   /** Horizontal mouse position. */
   private int mouseX = -1;
   /** Vertical mouse position. */
@@ -147,7 +144,6 @@ public final class MapView extends View implements Runnable {
     final GUIProp gprop = gui.prop;
     if(data != null && getWidth() != 0) {
       if(!gprop.is(GUIProp.SHOWMAP)) return;
-      if(gprop.is(GUIProp.MAPINFO)) mapInfo = new DialogMapInfo(gui);
       painter = data.fs != null ? new MapFS(this, data.fs, gprop) :
         new MapDefault(this, gprop);
       mainMap = createImage();
@@ -378,8 +374,6 @@ public final class MapView extends View implements Runnable {
   private void calc(final MapRect rect, final Nodes nodes,
       final BufferedImage map) {
 
-    final Performance p = new Performance();
-
     for(int i = 0; i < 1; i++) {
       // calculate new main rectangles
       initLen();
@@ -389,14 +383,6 @@ public final class MapView extends View implements Runnable {
           0, nodes.size() - 1);
       mainRects = layout.rectangles.copy();
       // mainRects = layout.rectangles;
-    }
-
-    // [JH] implement distance change, readability, ...
-    if(gui.prop.is(GUIProp.MAPINFO)) {
-      double aar = 0;
-      if(!gui.prop.is(GUIProp.PERFINFO)) aar = MapLayout.aar(mainRects);
-      mapInfo.setValues(mainRects.size, rect, aar,
-          p.getTimer(1), layout.algo.getName());
     }
 
     painter.init(mainRects);

@@ -169,8 +169,6 @@ public final class GUIProp extends AProp {
   /** Fullscreen flag. */
   public static final Object[] FULLSCREEN = { "FULLSCREEN", false };
 
-  /** Flag for computing additional map infos. */
-  public static final Object[] MAPINFO = { "MAPINFO", false };
   /** Flag for skipping time intensive treemap infos. */
   public static final Object[] PERFINFO = { "PERFINFO", true };
   /** Shows real file contents in the treemap. */
