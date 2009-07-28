@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -8,6 +9,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Data.Type;
 
 /**
@@ -31,8 +33,9 @@ public final class CreateIndex extends ACreate {
 
   @Override
   protected boolean exec() {
+    final Data data = context.data();
+    if(data instanceof MemData) return error(PROCMM);
     try {
-      final Data data = context.data();
       Type index = null;
       switch(type) {
         case TEXT:

@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -55,7 +56,7 @@ abstract class ACreate extends Process {
       progress(builder);
       final Data data = builder.build(db == null ? "" : db);
       builder = null;
-      index(data);
+      if(!(data instanceof MemData)) index(data);
       context.openDB(data);
       context.addToPool(data);
       return info(DBCREATED, db, perf.getTimer());
@@ -100,7 +101,6 @@ abstract class ACreate extends Process {
    * @throws IOException I/O exception
    */
   protected void buildIndex(final Type i, final Data d) throws IOException {
-    if(d instanceof MemData) return;
     final Prop pr = d.meta.prop;
     IndexBuilder builder = null;
     switch(i) {
