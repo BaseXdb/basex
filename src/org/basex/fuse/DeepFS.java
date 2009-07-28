@@ -167,14 +167,14 @@ public final class DeepFS extends DeepFuse implements DataText {
 
   /**
    * Creates an empty database.
-   * @param n name of database instance
+   * @param name name of database instance
    * @param ctx database context
    * @return data reference to empty database
    */
-  private Data createEmptyDB(final Context ctx, final String n) {
+  private Data createEmptyDB(final Context ctx, final String name) {
     try {
       final Data d = CreateDB.xml(ctx,
-          Parser.emptyParser(IO.get(n), ctx.prop), n);
+          Parser.emptyParser(IO.get(name), ctx.prop), name);
       ctx.openDB(d);
       d.fs = this;
       return d;
@@ -507,7 +507,7 @@ public final class DeepFS extends DeepFuse implements DataText {
       final MemBuilder mb = new MemBuilder(p);
       mb.init(md);
       BaseX.debug("[DataFS_parse_file] path : " + path + " -> " + bpath);
-      return (MemData) mb.build("tmp_memdata4file");
+      return (MemData) mb.build();
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

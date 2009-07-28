@@ -87,7 +87,7 @@ public abstract class Progress {
   /**
    * Checks if the progress was interrupted; if yes, sends a runtime exception.
    */
-  public final void checkStop() {
+  public void checkStop() {
     if(stopped) throw new ProgressException();
   }
 }

@@ -49,15 +49,15 @@ public final class DialogImportFS extends Dialog {
   private final BaseXBack buttons;
   /** ComboBox. */
   private final BaseXCombo maxsize;
+  /** Backing path. */
+  private final BaseXTextField backing;
+  /** Mountpoint path. */
+  private final BaseXTextField mountpoint;
 
   /** Directory path. */
   final BaseXTextField path;
   /** Database name. */
-  BaseXTextField dbname;
-  /** Backing path. */
-  BaseXTextField backing;
-  /** Mountpoint path. */
-  BaseXTextField mountpoint;
+  final BaseXTextField dbname;
 
   /**
    * Default Constructor.

@@ -2,7 +2,6 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.util.Token;
@@ -14,7 +13,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-abstract class FTBuilder extends Progress implements IndexBuilder {
+abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
   final Tokenizer wp;
   /** Total parsing value. */
@@ -24,18 +23,19 @@ abstract class FTBuilder extends Progress implements IndexBuilder {
 
   /**
    * Constructor.
+   * @param d data reference
    * @param pr database properties
    */
-  protected FTBuilder(final Prop pr) {
+  protected FTBuilder(final Data d, final Prop pr) {
+    super(d);
     wp = new Tokenizer(pr);
   }
 
   /**
    * Extracts and indexes words from the specified data reference.
-   * @param data data reference
    * @throws IOException IO exception
    */
-  final void index(final Data data) throws IOException {
+  final void index() throws IOException {
     total = data.meta.size;
     for(id = 0; id < total; id++) {
       if(data.kind(id) == Data.TEXT) {
@@ -48,7 +48,7 @@ abstract class FTBuilder extends Progress implements IndexBuilder {
         }
       }
     }
-    write(data);
+    write();
   }
 
   /**
@@ -59,10 +59,9 @@ abstract class FTBuilder extends Progress implements IndexBuilder {
 
   /**
    * Writes the index data to disk.
-   * @param data data reference
    * @throws IOException I/O exception
    */
-  abstract void write(final Data data) throws IOException;
+  abstract void write() throws IOException;
 
   @Override
   public final String tit() {

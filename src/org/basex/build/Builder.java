@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Progress;
+import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -147,6 +148,15 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database by running the specified parser.
+   * @return data database instance
+   * @throws IOException in case of parsing or writing problems
+   */
+  public final Data build() throws IOException {
+    return build("");
+  }
+    
+  /**
+   * Builds the database by running the specified parser.
    * @param db name of database
    * @return data database instance
    * @throws IOException in case of parsing or writing problems
@@ -236,7 +246,11 @@ public abstract class Builder extends Progress {
    * @throws IOException in case of parsing or writing problems
    */
   public final void endElem(final byte[] tag) throws IOException {
-    checkStop();
+    if(stopped) {
+      close();
+      throw new ProgressException();
+    }
+
     final byte[] t = utf8(tag, meta.encoding);
     if(--level == 0 || tags.id(t) != tagStack[level])
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));

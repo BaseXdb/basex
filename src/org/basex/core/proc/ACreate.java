@@ -9,7 +9,6 @@ import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Process;
-import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -55,6 +54,7 @@ abstract class ACreate extends Process {
       builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
       progress(builder);
       final Data data = builder.build(db == null ? "" : db);
+      builder = null;
       index(data);
       context.openDB(data);
       context.addToPool(data);
@@ -63,7 +63,7 @@ abstract class ACreate extends Process {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
-      return error(Prop.server ? SERVERTIME : CANCELCREATE);
+      err = Prop.server ? SERVERTIME : CANCELCREATE;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();
@@ -72,13 +72,13 @@ abstract class ACreate extends Process {
       BaseX.errln(ex);
       err = BaseX.info(CREATEERR, args[0]);
     }
-
     try {
       if(builder != null) builder.close();
     } catch(final IOException ex) {
       BaseX.debug(ex);
     }
     DropDB.drop(db, prop);
+
     return error(err);
   }
 
@@ -102,27 +102,15 @@ abstract class ACreate extends Process {
   protected void buildIndex(final Type i, final Data d) throws IOException {
     if(d instanceof MemData) return;
     final Prop pr = d.meta.prop;
+    IndexBuilder builder = null;
     switch(i) {
-      case TXT: buildIndex(i, new ValueBuilder(true), d); break;
-      case ATV: buildIndex(i, new ValueBuilder(false), d); break;
-      case FTX: buildIndex(i, d.meta.ftfz ?
-          new FTFuzzyBuilder(pr) : new FTTrieBuilder(pr), d); break;
+      case TXT: builder = new ValueBuilder(d, true); break;
+      case ATV: builder = new ValueBuilder(d, false); break;
+      case FTX: builder = d.meta.ftfz ?
+          new FTFuzzyBuilder(d, pr) : new FTTrieBuilder(d, pr); break;
       default: break;
     }
-  }
-
-  /**
-   * Builds a new index.
-   * @param index index to be built.
-   * @param builder builder instance
-   * @param data data reference
-   * @throws IOException I/O exception
-   */
-  private void buildIndex(final Type index, final IndexBuilder
-      builder, final Data data) throws IOException {
-
-    progress((Progress) builder);
-    data.closeIndex(index);
-    data.setIndex(index, builder.build(data));
+    progress(builder);
+    d.setIndex(i, builder.build());
   }
 }

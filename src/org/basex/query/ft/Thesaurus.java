@@ -112,7 +112,7 @@ public final class Thesaurus {
    */
   private boolean init() throws QueryException {
     try {
-      final Data data = new MemBuilder(new DirParser(file, ctx.prop)).build("");
+      final Data data = new MemBuilder(new DirParser(file, ctx.prop)).build();
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
         build(new Nodes(result.nodes[n], data));

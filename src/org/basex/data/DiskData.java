@@ -189,8 +189,8 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void closeIndex(final Type index) throws IOException {
-    switch(index) {
+  public void closeIndex(final Type type) throws IOException {
+    switch(type) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
       case FTX: if(ftxindex != null) ftxindex.close(); break;

@@ -110,7 +110,7 @@ public final class Insert extends AUpdate {
         io instanceof IOContent ? new XMLParser(io, prop) :
         new SAXWrapper(new SAXSource(io.inputSource()), prop);
 
-      tmp = new MemBuilder(parser).build(io.dbname());
+      tmp = new MemBuilder(parser).build();
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
@@ -17,7 +16,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ValueBuilder extends Progress implements IndexBuilder {
+public final class ValueBuilder extends IndexBuilder {
   /** Index type (attributes/texts). */
   private final boolean text;
   /** Temporary value tree. */
@@ -29,19 +28,16 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
 
   /**
    * Constructor.
+   * @param d data reference
    * @param txt value type (text/attribute)
    */
-  public ValueBuilder(final boolean txt) {
+  public ValueBuilder(final Data d, final boolean txt) {
+    super(d);
     text = txt;
   }
 
-  /**
-   * Builds the index structure and returns an index instance.
-   * @param data data reference
-   * @return index instance
-   * @throws IOException IO Exception
-   */
-  public Values build(final Data data) throws IOException {
+  @Override
+  public Values build() throws IOException {
     final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;

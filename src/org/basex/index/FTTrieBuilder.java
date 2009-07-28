@@ -25,20 +25,16 @@ public final class FTTrieBuilder extends FTBuilder {
 
   /**
    * Constructor.
+   * @param d data reference
    * @param pr database properties
    */
-  public FTTrieBuilder(final Prop pr) {
-    super(pr);
+  public FTTrieBuilder(final Data d, final Prop pr) {
+    super(d, pr);
   }
 
-  /**
-   * Builds the index structure and returns an index instance.
-   * @param data data reference
-   * @return index instance
-   * @throws IOException IO Exception
-   */
-  public FTIndex build(final Data data) throws IOException {
-    index(data);
+  @Override
+  public FTIndex build() throws IOException {
+    index();
     return new FTTrie(data);
   }
 
@@ -48,7 +44,7 @@ public final class FTTrieBuilder extends FTBuilder {
   }
 
   @Override
-  void write(final Data data) throws IOException {
+  void write() throws IOException {
     final String db = data.meta.name;
     final Prop pr = data.meta.prop;
     final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));

@@ -81,7 +81,7 @@ public abstract class Data {
 
   /**
    * Closes the current database.
-   * @throws IOException in case the database could not be closed
+   * @throws IOException I/O exception
    */
   public final void close() throws IOException {
     if(fs != null) fs.close();
@@ -90,7 +90,7 @@ public abstract class Data {
 
   /**
    * Internal method to close the database.
-   * @throws IOException in case the database could not be closed
+   * @throws IOException I/O exception
    */
   protected abstract void cls() throws IOException;
 
@@ -102,7 +102,7 @@ public abstract class Data {
   /**
    * Closes the specified index.
    * @param index index to be closed
-   * @throws IOException in case the index could not be closed
+   * @throws IOException I/O exception
    */
   public abstract void closeIndex(Type index) throws IOException;
 
