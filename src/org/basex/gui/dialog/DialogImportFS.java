@@ -229,14 +229,15 @@ public final class DialogImportFS extends Dialog {
     boolean cBac = true; // backing store is existent directory?
     boolean cMou = true; // mount point is existent directory?
 
-    final GUIProp prop = gui.prop;
+    final Prop prop = gui.context.prop;
+    final GUIProp gprop = gui.prop;
     final String nm = dbname.getText().trim();
     cNam = nm.length() != 0;
-    if(cNam) prop.set(GUIProp.FSDBNAME, nm);
+    if(cNam) gprop.set(GUIProp.FSDBNAME, nm);
     ok = cNam;
 
     cAll = all.isSelected();
-    if(cAll) prop.set(GUIProp.FSIMPORTPATH, path.getText());
+    if(cAll) gprop.set(GUIProp.FSIMPORTPATH, path.getText());
 
     if(!cAll && cNam) {
       final String p = path.getText().trim();
