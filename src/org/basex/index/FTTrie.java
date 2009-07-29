@@ -673,7 +673,7 @@ public final class FTTrie extends FTIndex {
           if(hasNextNodes(cne)) {
             for(int t = cne[0] + 1; t < cne.length - 1; t += 2) {
               ld = FTIndexIterator.union(fuzzy(cne[t], null, -1,
-                  new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c, f), ld);
+                  new byte[] { (byte) cne[t + 1] }, d, p + 1, r, c, f), ld);
             }
           }
           return ld;

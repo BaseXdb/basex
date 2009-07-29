@@ -9,7 +9,7 @@ import org.basex.gui.layout.BaseXPanel;
 import org.basex.util.Performance;
 
 /**
- * This is a simple input box for BaseX views.
+ * This class allows simple text input for the table headers.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

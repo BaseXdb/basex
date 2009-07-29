@@ -34,7 +34,6 @@ public final class Info extends AInfo {
     tb.add(INFOGENERAL + NL);
     format(tb, INFODBPATH, prop.get(Prop.DBPATH), l);
     format(tb, INFOMEM, Performance.getMem(), l);
-    //format(tb, INFOMM, BaseX.flag(prop.is(MAINMEM)), l);
     format(tb, INFOINFO, BaseX.flag(prop.is(Prop.INFO)) +
         (prop.is(Prop.ALLINFO) ? " (" + INFOALL + ")" : ""), l);
 

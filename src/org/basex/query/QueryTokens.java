@@ -341,7 +341,7 @@ public interface QueryTokens {
   byte[] XSURI = token("http://www.w3.org/2001/XMLSchema");
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
-  /** BaseX URI. */
+  /** Database URI. */
   //  Locally defined to avoid dependencies to other files
   byte[] BXURI = token("http://www.basex.org");
 
@@ -360,7 +360,7 @@ public interface QueryTokens {
   byte[] IDREF = token("idref");
   /** FN token. */
   byte[] FN = token("fn");
-  /** BaseX token. */
+  /** Database token. */
   //  Locally defined to avoid dependencies to other files
   byte[] BASEX = token("basex");
   /** XS token. */

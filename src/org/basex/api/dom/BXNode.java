@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.UserDataHandler;
 
 /**
- * DOM - Node Implementation.
+ * DOM - Node implementation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -1,5 +1,7 @@
 package org.basex.test.w3c;
 
+import static org.basex.Text.*;
+
 import java.io.File;
 import org.basex.BaseX;
 import org.basex.core.Context;
@@ -75,7 +77,7 @@ public final class XMLTS {
 
     final Nodes root = new Nodes(0, data);
     BaseX.outln("\nXML Conformance Tests\n");
-    BaseX.outln("file = (expected result) -> BaseX result");
+    BaseX.outln("file = (expected result) -> " + NAME + " result");
 
     for(final int t : nodes("//*:TEST", root).nodes) {
       final Nodes srcRoot = new Nodes(t, data);

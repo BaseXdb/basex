@@ -32,7 +32,6 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Ping;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
@@ -202,8 +201,6 @@ public final class CommandParser extends InputParser {
           hc = consume(Cmd.class, cmd).toString();
         }
         return new Help(hc);
-      case PING:
-        return new Ping();
       case PROMPT:
         return new Prompt();
       case GETRESULT:

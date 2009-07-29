@@ -17,7 +17,7 @@ public interface Text {
 
   // FREQUENTLY USED CHARACTERS ===============================================
 
-  /** New Line. */
+  /** New line. */
   String NL = org.basex.core.Prop.NL;
   /** Colon. */
   String COL = ":";
@@ -52,74 +52,74 @@ public interface Text {
   String MAIL = "info@" + NAMESPACE + ".org";
   /** Code version. */
   String VERSION = "5.6 beta 7";
-  /** Company Info. */
+  /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
-  /** Version Information. */
+  /** Version information. */
   String VERSINFO = BaseX.info(lang("version"), VERSION);
 
-  /** BaseX title and version. */
+  /** Title and version. */
   String TITLE = NAME + S + VERSION;
-  /** BaseX Text. */
+  /** Title, version and company. */
   String CONSOLEINFO = TITLE + "; " + COMPANY;
 
   // CONSOLE INFO =============================================================
 
-  /** Console Text. */
+  /** Console text. */
   String CONSOLE = TITLE + " [%]" + NL + lang("help_intro") + NL;
 
-  /** Good-Bye Information. */
+  /** Goodbye information. */
   String[] CLIENTBYE = {
       lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4")
   };
 
-  /** Local (Standalone) Mode. */
+  /** Local (standalone) mode. */
   String LOCALMODE = lang("cs_local");
-  /** Client Mode. */
+  /** Client mode. */
   String CLIENTMODE = lang("cs_client");
   /** Continued prompt. */
   String INPUTCONT = DOTS + S;
 
-  /** Start Information. */
+  /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: BaseXClient [options] [query]" + NL +
+    "Usage: " + NAME + "Client [options] [query]" + NL +
     "  -d         debug mode" + NL +
     "  -o [file]  specify output file" + NL +
     "  -p<port>   specify server port" + NL +
-    "  -q<cmd>    send BaseX commands" + NL +
+    "  -q<cmd>    send database commands" + NL +
     "  -s<name>   specify server name" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -x         print result as xml" + NL +
     "  -z         skip query output";
 
-  /** Start Information. */
+  /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: BaseX [options] [query]" + NL +
+    "Usage: " + NAME + " [options] [query]" + NL +
     "  [query]    specify query file" + NL +
     "  -d         debug mode" + NL +
     "  -o [file]  specify output file" + NL +
-    "  -q<cmd>    send BaseX commands" + NL +
+    "  -q<cmd>    send database commands" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -x         print result as xml" + NL +
     "  -z         skip query output";
 
   // SERVER ===================================================================
 
-  /** Server Start. */
+  /** Server start. */
   String SERVERSTART = NL + TITLE + " Server " + lang("srv_start");
-  /** Server Stop. */
+  /** Server stop. */
   String SERVERSTOPPED = "Server " + lang("srv_stop");
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
-  /** Error shown in the Client Console when timeout is reached. */
+  /** Error shown in the client console when timeout is reached. */
   String SERVERTIME = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */
   String SERVERPORT = lang("srv_port") + COLS;
 
-  /** Start Information. */
+  /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: java BaseXServer [options]" + NL +
+    "Usage: java " + NAME + "Server [options]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
     " -h       show this help" + NL +
@@ -128,14 +128,14 @@ public interface Text {
 
   // WEB SERVER ===============================================================
 
-  /** Server Start. */
+  /** Web server start. */
   String WSERVERSTART = NL + TITLE + " WebServer " + lang("srv_start");
-  /** Server Stop. */
+  /** Web server stop. */
   String WSERVERSTOPPED = "WebServer " + lang("srv_stop");
 
-  /** Start Information. */
+  /** Start information. */
   String WSERVERINFO = CONSOLEINFO + NL +
-    "Usage: java BaseXWebServer [options]" + NL +
+    "Usage: java " + NAME + "WebServer [options]" + NL +
     " stop     stop server" + NL +
     " -c       cache XQuery requests" + NL +
     " -d       debug mode" + NL +
@@ -150,7 +150,7 @@ public interface Text {
    * initialization of the {@link Lang} class.
    */
 
-  /** Help String. */
+  /** Missing help. */
   String NOHELP = lang("ch_nohelp");
 
   /** Database separator. */
@@ -232,11 +232,11 @@ public interface Text {
   String XQUERYMV1 = lang("ch_xquerymv1");
   /** Command help. */
   String XQUERYMV2 = lang("ch_xquerymv2");
-  /** Command Help. */
+  /** Command help. */
   String XQUERY0 = lang("ch_xquery0");
-  /** Command Help. */
+  /** Command help. */
   String XQUERY1 = lang("ch_xquery1");
-  /** Command Help. */
+  /** Command help. */
   String XQUERY2 = lang("ch_xquery2");
   /** Command help. */
   String RUN0 = lang("ch_run0");
@@ -244,48 +244,48 @@ public interface Text {
   String RUN1 = lang("ch_run1");
   /** Command help. */
   String RUN2 = lang("ch_run2");
-  /** Command Help. */
+  /** Command help. */
   String FIND0 = lang("ch_find0");
-  /** Command Help. */
+  /** Command help. */
   String FIND1 = lang("ch_find1");
-  /** Command Help. */
+  /** Command help. */
   String FIND2 = lang("ch_find2");
-  /** Command Help. */
+  /** Command help. */
   String CS0 = lang("ch_cs0");
-  /** Command Help. */
+  /** Command help. */
   String CS1 = lang("ch_cs1");
-  /** Command Help. */
+  /** Command help. */
   String CS2 = lang("ch_cs2");
-  /** Command Help. */
+  /** Command help. */
   String BASH0 = "";
-  /** Command Help. */
+  /** Command help. */
   String BASH1 = lang("ch_bash1");
-  /** Command Help. */
+  /** Command help. */
   String BASH2 = lang("ch_bash2");
 
-  /** Command Help. */
+  /** Command help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
 
-  /** Command Help. */
+  /** Command help. */
   String COPY0 = lang("ch_copy0");
-  /** Command Help. */
+  /** Command help. */
   String COPY1 = lang("ch_copy1");
-  /** Command Help. */
+  /** Command help. */
   String COPY2 = lang("ch_copy2");
-  /** Command Help. */
+  /** Command help. */
   String DELETE0 = lang("ch_delete0");
-  /** Command Help. */
+  /** Command help. */
   String DELETE1 = lang("ch_delete1");
-  /** Command Help. */
+  /** Command help. */
   String DELETE2 = lang("ch_delete2");
 
-  /** Command Help. */
+  /** Command help. */
   String INSERT0 = "[" + CmdUpdate.FRAGMENT + "|" + CmdUpdate.ELEMENT + "|" +
     CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.TEXT + "|" + CmdUpdate.COMMENT + "|" +
     CmdUpdate.PI + "] [...]";
-  /** Command Help. */
+  /** Command help. */
   String INSERT1 = lang("ch_insert1");
-  /** Command Help. */
+  /** Command help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
     LI + CmdUpdate.ELEMENT   + S + lang("ch_insert21") + NL +
     LI + CmdUpdate.TEXT      + S + lang("ch_insert22") + NL +
@@ -293,12 +293,12 @@ public interface Text {
     LI + CmdUpdate.COMMENT   + S + lang("ch_insert24") + NL +
     LI + CmdUpdate.PI        + S + lang("ch_insert25") + NL +
     LI + CmdUpdate.FRAGMENT  + S + lang("ch_insert26");
-  /** Command Help. */
+  /** Command help. */
   String UPDATE0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.ATTRIBUTE + "|" +
     CmdUpdate.TEXT + "|" + CmdUpdate.COMMENT + "|" + CmdUpdate.PI + "] [...]";
-  /** Command Help. */
+  /** Command help. */
   String UPDATE1 = lang("ch_update1");
-  /** Command Help. */
+  /** Command help. */
   String UPDATE2 = lang("ch_update2") + NL + NL +
     LI + CmdUpdate.ELEMENT   + S + lang("ch_update21") + NL +
     LI + CmdUpdate.TEXT      + S + lang("ch_update22") + NL +
@@ -306,14 +306,14 @@ public interface Text {
     LI + CmdUpdate.COMMENT   + S + lang("ch_update24") + NL +
     LI + CmdUpdate.PI        + S + lang("ch_update25");
 
-  /** Command Help. */
+  /** Command help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
 
-  /** Command Help. */
+  /** Command help. */
   String SET0 = lang("ch_set0");
-  /** Command Help. */
+  /** Command help. */
   String SET1 = lang("ch_set1");
-  /** Command Help. */
+  /** Command help. */
   String SET2 = lang("ch_set2") + NL +
     LI + CmdSet.INFO      + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + lang("ch_set22") + NL +
@@ -326,23 +326,23 @@ public interface Text {
     LI + CmdSet.ATTRINDEX + lang("ch_set29") + NL +
     LI + CmdSet.FTINDEX   + lang("ch_set31");
 
-  /** Command Help. */
+  /** Command help. */
   String HELP0 = "[command]?";
-  /** Command Help. */
+  /** Command help. */
   String HELP1 = lang("ch_help1") + S + NAME + lang("ch_help11");
-  /** Command Help. */
+  /** Command help. */
   String HELP2 = lang("ch_help2");
-  /** Command Help. */
+  /** Command help. */
   String EXIT0 = "";
-  /** Command Help. */
+  /** Command help. */
   String EXIT1 = lang("ch_exit1") + S + NAME + DOT;
-  /** Command Help. */
+  /** Command help. */
   String EXIT2 = EXIT1;
-  /** Command Help. */
+  /** Command help. */
   String QUIT0 = "";
-  /** Command Help. */
+  /** Command help. */
   String QUIT1 = EXIT1;
-  /** Command Help. */
+  /** Command help. */
   String QUIT2 = EXIT2;
 
   // STARTER WINDOW ===========================================================
@@ -356,42 +356,39 @@ public interface Text {
 
   /** Process time. */
   String PROCTIME = lang("proc_time") + ": %";
-  /** No Document Warning. */
+  /** No document warning. */
   String PROCSYNTAX = lang("proc_syntax") + ": %";
-  /** Command Execution Error. */
+  /** Command execution error. */
   String PROCERR = lang("proc_err") + COL + NL + "%";
-  /** No Database Error. */
+  /** No database error. */
   String PROCNODB = lang("proc_nodb");
-  /** No Filesystem Error. */
+  /** No filesystem error. */
   String PROCNOFS = lang("proc_nofs");
-  /** Main Memory Error. */
+  /** Main memory error. */
   String PROCMM = lang("proc_mm");
-  /** Out of Memory Error. */
+  /** Out of memory error. */
   String PROCOUTMEM = lang("proc_outmem");
 
-  /** Unknown Command error. */
+  /** Unknown command error. */
   String CMDNO = lang("cmd_no");
-  /** Unknown Command error. */
+  /** Unknown command error. */
   String CMDUNKNOWN = lang("cmd_unknown");
-  /** Unknown Command error. */
+  /** Unknown command error. */
   String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short") + DOT;
-  /** Unknown Command error. */
+  /** Unknown command error. */
   String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
-  /** Database Closed. */
+  /** Database closed. */
   String CMDHELP = lang("help_long");
-
-  /** Database Closed. */
-  String PINGINFO = lang("cmd_ping") + NL;
 
   // CREATE COMMAND ===========================================================
 
-  /** Create Database information. */
+  /** Create database information. */
   String PROGCREATE = lang("pc_create");
-  /** Create Database information. */
+  /** Create database information. */
   String PROGINDEX = lang("pc_index");
-  /** Database Update. */
+  /** Database update. */
   String DBUPDATE = lang("pc_update");
-  /** Index Update. */
+  /** Index update. */
   String INDUPDATE = lang("pc_indupdate");
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
@@ -401,16 +398,16 @@ public interface Text {
   String LIMITTAGS = lang("pc_tags");
   /** Builder error. */
   String LIMITATTS = lang("pc_atts");
-  /** Create Database information. */
+  /** Create database information. */
   String NODESPARSED = S + lang("pc_parse");
-  /** Scanner Position. */
+  /** Scanner position. */
   String SCANPOS = lang("pc_pos");
 
-  /** Create Database information. */
+  /** Create database information. */
   String INDEXTXT = lang("pc_indextxt") + DOTS;
-  /** Create Database information. */
+  /** Create database information. */
   String INDEXATT = lang("pc_indexatt") + DOTS;
-  /** Create Database information. */
+  /** Create database information. */
   String INDEXFTX = lang("pc_indexftx") + DOTS;
 
   /** Database created. */
@@ -437,7 +434,7 @@ public interface Text {
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */
   String DBCLOSEERR = lang("db_closeerr");
-  /** Database Dropped. */
+  /** Database dropped. */
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
@@ -450,9 +447,9 @@ public interface Text {
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
 
-  /** Database Optimized. */
+  /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
-  /** Database Optimization. */
+  /** Database optimization. */
   String DBOPTERR1 = "Could not write statistics...";
 
   /** Index created. */
@@ -481,53 +478,53 @@ public interface Text {
 
   // XPATH COMMAND ============================================================
 
-  /** Query Info: Query. */
+  /** Query info: query. */
   String QUERYQU = lang("qu_query") + COL + S;
-  /** Query Info: Parsing. */
+  /** Query info: parsing. */
   String QUERYPARS = lang("qu_pars") + COL;
-  /** Query Info: Optimizing. */
+  /** Query info: optimizing. */
   String QUERYCOMP = lang("qu_comp") + COL;
-  /** Query Info: Evaluating. */
+  /** Query info: evaluating. */
   String QUERYEVAL = lang("qu_eval") + COL;
-  /** Query Info: Querying. */
+  /** Query info: querying. */
   String QUERYTIME = lang("qu_time") + COL;
-  /** Query Info: Result . */
+  /** Query info: result . */
   String QUERYRESULT = lang("qu_result") + COLS;
-  /** Query Info: Plan. */
+  /** Query info: plan. */
   String QUERYPLAN = lang("qu_plan") + COLS;
-  /** Query Info: Compiler. */
+  /** Query info: compiler. */
   String QUERYSEP = LI;
-  /** Query Info: XML Plan. */
+  /** Query info: XML plan. */
   String PLANXML = "plan.xml";
-  /** Query Info: DOT Plan. */
+  /** Query info: DOT plan. */
   String PLANDOT = "plan.dot";
 
-  /** Query Info: Query. */
+  /** Query info: query. */
   String QUERYSTRING = lang("qu_tabquery") + COLS;
-  /** Query Info: Compiling. */
+  /** Query info: compiling. */
   String QUERYPARSE = lang("qu_tabpars") + COLS;
-  /** Query Info: Compiling. */
+  /** Query info: compiling. */
   String QUERYCOMPILE = lang("qu_tabcomp") + COLS;
-  /** Query Info: Evaluating. */
+  /** Query info: evaluating. */
   String QUERYEVALUATE = lang("qu_tabeval") + COLS;
-  /** Query Info: Finishing. */
+  /** Query info: finishing. */
   String QUERYFINISH = lang("qu_tabfinish") + COLS;
-  /** Query Info: Time for printing. */
+  /** Query info: time for printing. */
   String QUERYPRINT = lang("qu_tabprint") + COLS;
-  /** Query Info: Total Time. */
+  /** Query info: total time. */
   String QUERYTOTAL = lang("qu_tabtotal") + COLS;
-  /** Query Hits. */
+  /** Query hits. */
   String QUERYHITS = lang("qu_tabhits") + COLS;
-  /** Query Info: Printed Data. */
+  /** Query info: printed data. */
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
-  /** Query Info: Memory. */
+  /** Query info: memory. */
   String QUERYMEM = lang("qu_tabmem") + ": %";
-  /** Query Hits. */
+  /** Query hits. */
   String HITS = lang("qu_hits");
 
-  /** Query Hits. */
+  /** Query hits. */
   String VALHIT = "Item";
-  /** Query Hits. */
+  /** Query hits. */
   String VALHITS = "Items";
 
   // UPDATE COMMANDS ==========================================================
@@ -560,7 +557,7 @@ public interface Text {
   String ATTDUPL = lang("uc_attdupl");
   /** Invalid position. */
   String POSINVALID = lang("uc_posinvalid");
-  /** Update PI info. */
+  /** Update processing instruction info. */
   String NAMEINVALID = lang("uc_invalid");
   /** Update text info. */
   String TXTINVALID = lang("uc_txtinvalid");
@@ -571,7 +568,7 @@ public interface Text {
 
   /** Process information. */
   String INFOWAIT = lang("wait");
-  /** Title of Information Dialog. */
+  /** Title of information dialog. */
   String INFOTITLE = lang("info_head");
   /** Index information. */
   String INFOINDEX = lang("info_index");
@@ -608,53 +605,53 @@ public interface Text {
 
   /** Info on database path. */
   String INFODBPATH = lang("info_dbpath");
-  /** No Document opened. */
+  /** No document opened. */
   String INFONODB = lang("info_nodb");
   /** Info on database. */
   String INFODBLIST = lang("info_dblist");
   /** Info on database. */
   String INFODBERR = lang("info_dberror");
 
-  /** Info on Query Verbosity. */
+  /** Info on query verbosity. */
   String INFOINFO = lang("info_info");
-  /** Info on Query Verbosity. */
+  /** Info on query verbosity. */
   String INFOALL = lang("info_all");
-  /** Info on Debug Mode. */
+  /** Info on debug mode. */
   String INFODEBUG = lang("info_debug");
-  /** Info on Whitespace Chopping. */
+  /** Info on whitespace chopping. */
   String INFOCHOP = lang("info_chop");
-  /** Info on Entity Parsing. */
+  /** Info on entity parsing. */
   String INFOENTITY = lang("info_entities");
   /** Info on result serialization. */
   String INFOSERIALIZE = lang("info_serialize");
   /** Info on well-formed XML serialization. */
   String INFOXMLOUTPUT = lang("info_xmloutput");
-  /** Info on Main Memory mode. */
+  /** Info on main memory mode. */
   String INFOMAINMEM = lang("info_mainmem");
-  /** Info on Tags. */
+  /** Info on tags. */
   String INFOTAGS = lang("info_tags");
-  /** Info on Attributes. */
+  /** Info on attributes. */
   String INFOATTS = lang("info_atts");
-  /** Info on Namespaces. */
+  /** Info on namespaces. */
   String INFONS = lang("info_ns");
-  /** Info on Text Indexing. */
+  /** Info on text indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
-  /** Info on Attribute Indexing. */
+  /** Info on attribute indexing. */
   String INFOATTRINDEX = lang("info_atvindex");
-  /** Info on Full-text Indexing. */
+  /** Info on full-text indexing. */
   String INFOFTINDEX = lang("info_ftindex");
-  /** Info on Fuzzy Indexing. */
+  /** Info on fuzzy indexing. */
   String INFOFZINDEX = lang("info_fzindex");
-  /** Info on Index. */
+  /** Info on index. */
   String INFOOUTOFDATED = lang("info_outofdated");
 
-  /** Info on Document Creation. */
+  /** Info on database. */
   String INFODB = lang("info_db");
-  /** Info on Document Creation. */
+  /** Info on document creation. */
   String INFOCREATE = lang("info_create");
-  /** Database Info. */
+  /** Database info. */
   String INFOGENERAL = lang("info_general");
-  /** Database Info. */
+  /** Database info. */
   String RESULTCHOP = " (" + lang("info_resultchop") + ")";
   /** Option flag. */
   String INFOON = lang("info_on");
@@ -693,192 +690,192 @@ public interface Text {
 
   // GUI COMMANDS =============================================================
 
-  /** Command Info. */
+  /** Command info. */
   String GUIABOUT = BaseX.info(lang("c_about") + DOTS, NAME);
-  /** Command Info. */
+  /** Command info. */
   String GUIABOUTTT = lang("c_abouttt");
-  /** Command Info. */
+  /** Command info. */
   String GUICLOSE = lang("c_close");
-  /** Command Info. */
+  /** Command info. */
   String GUICLOSETT = lang("c_closett");
-  /** Command Info. */
+  /** Command info. */
   String GUICOLOR = lang("c_color") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUICOLORTT = lang("c_colortt");
-  /** Command Info. */
+  /** Command info. */
   String GUICUT = lang("c_cut");
-  /** Command Info. */
+  /** Command info. */
   String GUICOPY = lang("c_copy");
-  /** Command Info. */
+  /** Command info. */
   String GUIALL = lang("c_all");
-  /** Command Info. */
+  /** Command info. */
   String GUICPPATH = lang("c_cppath");
-  /** Command Info. */
+  /** Command info. */
   String GUICOPYTT = lang("c_copytt");
-  /** Command Info. */
+  /** Command info. */
   String GUICPPATHTT = lang("c_cppathtt");
-  /** Command Info. */
+  /** Command info. */
   String GUICREATE = lang("c_create") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUICREATETT = lang("c_creatett");
-  /** Command Info. */
+  /** Command info. */
   String GUIDELETE = lang("c_delete") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIDEL = lang("c_delete");
-  /** Command Info. */
+  /** Command info. */
   String GUIDELETETT = lang("c_deletett");
-  /** Command Info. */
+  /** Command info. */
   String GUIDROP = lang("c_drop") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIDROPTT = lang("c_droptt");
-  /** Command Info. */
+  /** Command info. */
   String GUIEDIT = lang("c_edit") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIEDITTT = lang("c_edittt");
-  /** Command Info. */
+  /** Command info. */
   String GUIEXIT = lang("c_exit");
-  /** Command Info. */
+  /** Command info. */
   String GUIEXITTT = lang("c_exittt");
-  /** Command Info. */
+  /** Command info. */
   String GUIEXPORT = lang("c_export") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIEXPORTTT = lang("c_exporttt");
-  /** Command Info. */
+  /** Command info. */
   String GUIFILTER = lang("c_filter");
-  /** Command Info. */
+  /** Command info. */
   String GUIFILTERTT = lang("c_filtertt");
-  /** Command Info. */
+  /** Command info. */
   String GUIFONTS = lang("c_fonts");
-  /** Command Info. */
+  /** Command info. */
   String GUIFONTSTT = lang("c_fontstt");
-  /** Command Info. */
+  /** Command info. */
   String GUIFULL = lang("c_full");
-  /** Command Info. */
+  /** Command info. */
   String GUIFULLTT = lang("c_fulltt");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOBACK = lang("c_goback");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOBACKTT = lang("c_gobacktt");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOFORWARD = lang("c_goforward");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOFORWARDTT = lang("c_goforwardtt");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOUP = lang("c_goup");
-  /** Command Info. */
+  /** Command info. */
   String GUIGOUPTT = lang("c_gouptt");
-  /** Command Info. */
+  /** Command info. */
   String GUIIMPORTFS = lang("c_importfs") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIIMPORTFSTT = lang("c_importfstt");
-  /** Command Info. */
+  /** Command info. */
   String GUIINFO = lang("c_info");
-  /** Command Info. */
+  /** Command info. */
   String GUIINFOTT = lang("c_infott");
-  /** Command Info. */
+  /** Command info. */
   String GUIINSERT = lang("c_insert") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");
-  /** Command Info. */
+  /** Command info. */
   String GUIMAPLAYOUT = lang("c_maplayout");
-  /** Command Info. */
+  /** Command info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
-  /** Command Info. */
+  /** Command info. */
   String GUIOPEN = lang("c_open") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIOPENTT = lang("c_opentt");
-  /** Command Info. */
+  /** Command info. */
   String GUIPASTE = lang("c_paste");
-  /** Command Info. */
+  /** Command info. */
   String GUIPASTETT = lang("c_pastett");
-  /** Command Info. */
+  /** Command info. */
   String GUIPREFS = lang("c_prefs") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIPREFSTT = lang("c_prefstt");
-  /** Command Info. */
+  /** Command info. */
   String GUIREDO = lang("c_redo");
-  /** Command Info. */
+  /** Command info. */
   String GUIROOT = lang("c_root");
-  /** Command Info. */
+  /** Command info. */
   String GUIROOTTT = lang("c_roottt");
-  /** Command Info. */
+  /** Command info. */
   String GUIRTEXEC = lang("c_rtexec");
-  /** Command Info. */
+  /** Command info. */
   String GUIRTEXECTT = lang("c_rtexectt");
-  /** Command Info. */
+  /** Command info. */
   String GUIRTFILTER = lang("c_rtfilter");
-  /** Command Info. */
+  /** Command info. */
   String GUIRTFILTERTT = lang("c_rtfiltertt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWBUTTONS = lang("c_showbuttons");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWBUTTONSTT = lang("c_showbuttonstt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWEXPLORE = lang("c_showexplore");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWEXPLORETT = lang("c_showexplorett");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWFOLDER = lang("c_showfolder");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWFOLDERTT = lang("c_showfoldertt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWHELP = lang("c_showhelp");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWHELPTT = lang("c_showhelptt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWINFO = lang("c_showinfo");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWINFOTT = lang("c_showinfott");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWINPUT = lang("c_showinput");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWINPUTTT = lang("c_showinputtt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWMAP = lang("c_showmap");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWMAPTT = lang("c_showmaptt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWMENU = lang("c_showmenu");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWMENUTT = lang("c_showmenutt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWSTATUS = lang("c_showstatus");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWSTATUSTT = lang("c_showstatustt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWTABLE = lang("c_showtable");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWPLOT = lang("c_showplot");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWTABLETT = lang("c_showtablett");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWPLOTTT = lang("c_showplottt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWTEXT = lang("c_showtext");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWTEXTTT = lang("c_showtexttt");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWXQUERY = lang("c_showxquery");
-  /** Command Info. */
+  /** Command info. */
   String GUISHOWXQUERYTT = lang("c_showxquerytt");
-  /** Command Info. */
+  /** Command info. */
   String GUIUNDO = lang("c_undo");
-  /** Command Info. */
+  /** Command info. */
   String GUIXQOPEN = lang("c_xqopen") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
-  /** Command Info. */
+  /** Command info. */
   String GUIXQSAVE = lang("c_xqsave") + DOTS;
-  /** Command Info. */
+  /** Command info. */
   String GUIXQSAVETT = lang("c_xqsavett");
 
   // BUTTONS ==================================================================
 
-  /** New Line String. */
+  /** Search mode. */
   String BUTTONSEARCH = lang("b_search");
-  /** Input field. */
+  /** Command mode. */
   String BUTTONCMD = lang("b_cmd");
-  /** Input field. */
+  /** XQuery mode. */
   String BUTTONXQUERY = lang("b_xquery");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
@@ -904,15 +901,15 @@ public interface Text {
 
   /** Text find information. */
   String RESULTFIND = lang("text_find") + COLS;
-  /** Help String. */
+  /** Help string. */
   String NOTABLE = lang("no_table") + DOT;
-  /** Help String. */
+  /** Help string. */
   String NOSPACE = lang("no_space");
   /** Binary file. */
   byte[] MAPBINARY = token(lang("map_binary"));
-  /** Query Info title. */
+  /** Query info title. */
   String INFOTIT = lang("info_title");
-  /** No Query info. */
+  /** No query info. */
   String INFONO = lang("info_no");
   /** Query title. */
   String EXPLORETIT = lang("explore_title");
@@ -928,7 +925,7 @@ public interface Text {
 
   // DIALOG WINDOWS ===========================================================
 
-  /** Open Dialog - No database. */
+  /** Open dialog - No database. */
   String DIALOGINFO = lang("d_info");
   /** Dialog title for choosing a directory. */
   String DIALOGFC = lang("d_fctitle");
@@ -939,19 +936,19 @@ public interface Text {
   String CREATEFILT = lang("dc_filter");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
-  /** XML File Description. */
+  /** XML file description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
-  /** ZIP File Description. */
+  /** ZIP file description. */
   String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
-  /** GZ File Description. */
+  /** GZ file description. */
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
-  /** XQ File Description. */
+  /** XQ file description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog title for creating a database. */
   String CREATEDOC = lang("dc_doc") + COL;
   /** Dialog title for creating a database. */
   String CREATECOLL = lang("dc_coll") + COL;
-  /** Dialog Title for Database Options. */
+  /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
   String CREATECHOP = lang("dc_chop");
@@ -961,16 +958,16 @@ public interface Text {
   String CREATEDTD = lang("dc_dtd");
   /** SAX parsing information. */
   String CREATEINTPARSE = lang("dc_intparse");
-  /** Main-Memory Mode. */
+  /** Main-memory mode. */
   String CREATEMAINMEM = lang("dc_mainmem");
 
-  /** Word Index information. */
+  /** Word index information. */
   String CREATEFZ = lang("dc_fzindex");
-  /** Word Index information. */
+  /** Word index information. */
   String CREATESTEM = lang("dc_ftstem");
-  /** Word Index information. */
+  /** Word index information. */
   String CREATECS = lang("dc_ftcs");
-  /** Word Index information. */
+  /** Word index information. */
   String CREATEDC = lang("dc_ftdc");
 
   /** Whitespaces information. */
@@ -981,22 +978,22 @@ public interface Text {
   String ENTITIESINFO = lang("dc_entitiesinfo");
   /** Entities information. */
   String DTDINFO = lang("dc_dtdinfo");
-  /** Main-Memory Mode. */
+  /** Main-memory mode. */
   String MMEMINFO = lang("dc_mminfo");
 
-  /** Value Index information. */
+  /** Value index information. */
   String TXTINDEXINFO = lang("dc_txtinfo");
-  /** Value Index information. */
+  /** Value index information. */
   String ATTINDEXINFO = lang("dc_attinfo");
-  /** Full-text Index information. */
+  /** Full-text index information. */
   String FTINDEXINFO = lang("dc_ftxinfo");
-  /** Full-text Index information. */
+  /** Full-text index information. */
   String FZINDEXINFO = lang("dc_fzinfo");
-  /** Full-text Index information. */
+  /** Full-text index information. */
   String FTSTEMINFO = lang("dc_ftsteminfo");
-  /** Full-text Index information. */
+  /** Full-text index information. */
   String FTCSINFO = lang("dc_ftcsinfo");
-  /** Full-text Index information. */
+  /** Full-text index information. */
   String FTDCINFO = lang("dc_ftdcinfo");
 
   /** General info. */
@@ -1017,49 +1014,49 @@ public interface Text {
   /** Dialog title for deleting nodes. */
   String NODBQUESTION = INFONODB + DOT + NL + lang("do_nodbquestion") + NL + S;
 
-  /** File Dialog title. */
+  /** File dialog title. */
   String XQOPENTITLE = lang("dq_open");
-  /** File Dialog title. */
+  /** File dialog title. */
   String XQSAVETITLE = lang("dq_save");
-  /** File Dialog error. */
+  /** File dialog error. */
   String XQOPERROR = lang("dq_notopened");
-  /** File Dialog error. */
+  /** File dialog error. */
   String XQSAVERROR = lang("dq_notsaved");
-  /** File Dialog replace information. */
+  /** File dialog replace information. */
   String FILEREPLACE = lang("dq_replace");
 
   /** Dialog title for exporting XML. */
   String EXPORTTITLE = lang("d_export");
 
-  /** Progress text for FS import. */
+  /** Progress text for filesystem import. */
   String IMPORTPROG = "Parse filesystem...";
-  /** Dialog Title for Import Options. */
+  /** Dialog title for import options. */
   String IMPORTFSTITLE = lang("dfs_title");
-  /** Import Options. */
+  /** Import options. */
   String IMPORTALL = lang("dfs_all");
-  /** Import Options. */
+  /** Import options. */
   String IMPORTALLINFO = lang("dfs_allinfo") + COL;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFSTEXT1 = lang("dfs_text1") + COL;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFSTEXT2 = lang("dfs_text2") + COL;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFSTYPES = lang("dfs_types") + DOTS;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFSMAXINFO = lang("dfs_maxinfo") + DOT;
-  /** Import Options. */
+  /** Import options. */
   String IMPORTCONT = lang("dfs_cont");
-  /** Import Options. */
+  /** Import options. */
   String IMPORTMETA = lang("dfs_meta") + " (MP3, JPG, TIF, PNG, GIF, ...)";
-  /** Import Options. */
+  /** Import options. */
   String IMPORTFTINDEX = lang("dfs_ftindex");
-  /** Import Options. */
+  /** Import options. */
   String[] IMPORTFSMAX = {
       "Max. 1KB", "Max. 10KB", "Max. 100KB", "Max. 1MB", "Max. 10MB"
   };
-  /** Import Options. */
+  /** Import options. */
   int[] IMPORTFSMAXSIZE = { 1024, 10240, 102400, 1048576, 10485760 };
 
   /** Dialog title for renaming a database. */
@@ -1078,17 +1075,17 @@ public interface Text {
   /** Dialog title for dropping a database. */
   String DROPCONF = lang("dd_question") + NL + S;
 
-  /** Dialog Title for Import Options. */
+  /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");
-  /** Database Path. */
+  /** Database path. */
   String DATABASEPATH = lang("dp_dbpath");
   /** Interactions. */
   String PREFINTER = lang("dp_inter");
-  /** Look and Feel. */
+  /** Look and feel. */
   String PREFLF = lang("dp_lf");
   /** Focus. */
   String PREFFOCUS = lang("dp_focus");
-  /** Simple File Dialog. */
+  /** Simple file dialog. */
   String SIMPLEFILE = lang("dp_simplefd");
   /** Name display flag. */
   String PREFNAME = lang("dp_names");
@@ -1098,18 +1095,18 @@ public interface Text {
   /** Dialog title for deleting nodes. */
   String DELETECONF = lang("dx_question");
 
-  /** Dialog Title for inserting new data. */
+  /** Dialog title for inserting new data. */
   String INSERTTITLE = lang("dn_title");
-  /** Insert Name. */
+  /** Insert name. */
   String INSERTNAME = lang("dn_name") + COL;
-  /** Insert Value. */
+  /** Insert value. */
   String INSERTVALUE = lang("dn_value") + COL;
 
-  /** Dialog Title for updating document data. */
+  /** Dialog title for updating document data. */
   String EDITTITLE = lang("de_title");
-  /** Dialog Title for updating text. */
+  /** Dialog title for updating text. */
   String EDITTEXT = lang("de_text");
-  /** Dialog Title for updating text. */
+  /** Dialog title for updating text. */
   String[] EDITKIND = { lang("de_kind1"), lang("de_kind2"), lang("de_kind3"),
       lang("de_kind4"), lang("de_kind5"), lang("de_kind6")
   };
@@ -1137,7 +1134,7 @@ public interface Text {
 
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
-  /** Show Attributes.  */
+  /** Show attributes.  */
   String MAPATT = lang("dm_atts");
   /** Predefined number of layouts. */
   String[] MAPOFFSET = {
@@ -1175,15 +1172,15 @@ public interface Text {
 
   /** About text. */
   String ABOUTTITLE = BaseX.info(lang("da_title"), NAME);
-  /** Copyright Info. */
+  /** Copyright info. */
   String COPYRIGHT = "©2005-09 " + COMPANY;
-  /** License Info. */
+  /** License info. */
   String LICENSE = lang("da_license");
-  /** Developer Info. */
+  /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Grün";
-  /** Contributors Info. */
+  /** Contributors info. */
   String CONTRIBUTE1 = lang("da_cont1") + ": Sebastian Gath, Lukas Kircher,";
-  /** Developer Names. */
+  /** Developer names. */
   String CONTRIBUTE2 = "Andreas Weiler, Alexander Holupirek " +
     lang("da_cont2");
   /** Translation. */
@@ -1191,83 +1188,83 @@ public interface Text {
 
   // HELP TEXTS ===============================================================
 
-  /** Help String. */
+  /** Help string. */
   byte[] HELPQUERYRT = token(lang("h_queryrt"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPTOXQUERY = token(lang("h_toxquery"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPTOXPATH = token(lang("h_toxpath"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFILTER = token(lang("h_filter"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPGO = token(lang("h_go"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPHIST = token(lang("h_hist"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPSTOP = token(lang("h_stop"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPCANCEL = token(lang("h_cancel"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMODE = token(lang("h_mode"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPOK = token(lang("h_ok"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPOPT = token(lang("h_opt"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPRENAMEDB = token(lang("h_renamedb"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPOPENDB = token(lang("h_opendb"));
   /** Help string. */
   byte[] HELPOPENINFO = token(lang("h_openinfo"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFALIAS = token(lang("h_falias"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPBROWSE = token(lang("h_browse"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSPATH = token(lang("h_fspath"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPDBPATH = token(lang("h_dbpath"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPLANG = token(lang("h_lang"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPNAME = token(lang("h_names"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSNAME = token(lang("h_fsname"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSALL = token(lang("h_fsall"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSBACKING = token(lang("h_fsbacking"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSMOUNT = token(lang("h_fsmount"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMETA = token(lang("h_meta"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPCONT = token(lang("h_cont"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFSMAX = token(lang("h_fsmax"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMAPATTS = token(lang("h_mapatts"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMAPOFF = token(lang("h_mapoff"));
   /** HelpString. */
   byte[] HELPMAPSIZE = token(lang("h_mapsize"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPDROP = token(lang("h_drop"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPDROPDB = token(lang("h_dropdb"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPLF = token(lang("h_lf"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFOCUS = token(lang("h_focus"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPSIMPLEFILE = token(lang("h_simplefd"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPOPEN = token(lang("h_open"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFONT = token(lang("h_font"));
   /** Help string. */
   byte[] HELPMMEM = token(lang("h_mmem"));
@@ -1281,51 +1278,51 @@ public interface Text {
   byte[] HELPSEARCHFS = token(lang("h_searchfs"));
   /** Help Dialog. */
   byte[] HELPXPATH = token(lang("h_xpath"));
-  /** Help String. */
+  /** Help string. */
   String HELPMODEFILT = lang("h_modefilt");
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMAP = token(lang("h_map"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOT = token(lang("h_plot"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTAXISX = token(lang("h_plotaxisx"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTAXISY = token(lang("h_plotaxisy"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTXLOG = token(lang("h_plotxlog"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTYLOG = token(lang("h_plotylog"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTDOTS = token(lang("h_plotdots"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPPLOTITEM = token(lang("h_plotitem"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPFOLDER = token(lang("h_folder"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPTABLE = token(lang("h_table"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPTEXT = token(lang("h_text"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPINFO = token(lang("h_info"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPSEARCHCAT = token(lang("h_searchcat"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPCAT = token(lang("h_cat"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPDS = token(lang("h_ds"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPCATINPUT = token(lang("h_catinput"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMOVER = token(lang("h_mover"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPTABLEHEAD = token(lang("h_tablehead"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPMEM = token(lang("h_mem"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPGUISTATUS = token(lang("h_guistatus"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPEXPLORE = token(lang("h_explore"));
-  /** Help String. */
+  /** Help string. */
   byte[] HELPXQUERY = token(lang("h_xquery"));
 
   /** Dummy string to check if all language strings have been assigned. */

@@ -283,7 +283,6 @@ proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- increase
 cmd_no=Expecting command.
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
-cmd_ping=Connection successful.
 
 # Help Commands
 help_short=try 'help'

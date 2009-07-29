@@ -68,7 +68,7 @@ public final class MP3Extractor extends AbstractExtractor {
   private static final byte[][] LAYERS = new byte[][] {
     token("Layer 1"), token("Layer 2"), token("Layer 3"), EMPTY
   };
-  /** Available Bit Rates. */
+  /** Available bit rates. */
   private static final int[][][] BITRATES = { {
     { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 },
     { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384 },
@@ -78,25 +78,25 @@ public final class MP3Extractor extends AbstractExtractor {
     { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 },
     { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 16 },
   } };
-  /** MP3 Sample Rates. */
+  /** MP3 sample rates. */
   private static final int[][] SAMPLES = {
     { 11025, 12000, 8000, }, { 0, 0, 0 },
     { 22050, 24000, 16000 }, { 44100, 48000, 32000 }
   };
-  /** MP3 Sample Rates. */
+  /** MP3 sample rates. */
   private static final int[][] FSIZE = { { 32, 17, }, { 17, 9 } };
 
-  /** MP3 Modes. */
+  /** MP3 modes. */
   private static final byte[][] MODES = { token("Stereo"),
     token("Joint Stereo"), token("Dual Channel"), token("Mono") };
-  /** MP3 Emphases. */
+  /** MP3 emphases. */
   private static final byte[][] EMPH = { token("None"),
     token("5015MS"), token("Illegal"), token("CCITT") };
-  /** MP3 Samples per Frame. */
+  /** MP3 samples per frame. */
   private static final int[][] SPF = new int[][] {
     { 384, 1152, 1152 }, { 384, 1152, 576 }
   };
-  /** MP3 Emphases. */
+  /** MP3 emphases. */
   private static final byte[][] ENCODE = { token("CBR"), token("VBR") };
   /** Reference to the mp3 file. */
   private BufferedInputStream in;
@@ -276,7 +276,7 @@ public final class MP3Extractor extends AbstractExtractor {
         getTechInfo(builder, 0x80);
         in.close();
 
-        // parse ID3V1 Tags..
+        // parse ID3V1 tags..
         final RandomAccessFile raf = new RandomAccessFile(f, "r");
         raf.seek(fileLen - 0x80);
         raf.read(id3v1);

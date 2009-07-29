@@ -11,8 +11,7 @@ import java.util.zip.ZipInputStream;
 import org.xml.sax.InputSource;
 
 /**
- * BaseX file representation, pointing to a local or remote file or
- * byte array contents.
+ * File reference, wrapped into an IO representation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

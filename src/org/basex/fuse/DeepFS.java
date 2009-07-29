@@ -88,7 +88,7 @@ public final class DeepFS extends DeepFuse implements DataText {
   public native int nativeUnlink(final String pathname);
 
   /**
-   * Tell DeepFS that BaseX will shutdown.
+   * Tell DeepFS that the database will shutdown.
    */
   public native void nativeShutDown();
 

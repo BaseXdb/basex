@@ -12,7 +12,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
 /**
- * DOM - Attribute Implementation.
+ * DOM - Attribute implementation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -32,7 +32,7 @@ import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
 /**
- * Imports/shreds/parses a file hierarchy into a BaseX database.
+ * Imports/shreds/parses a file hierarchy into a database.
  *
  * The overall process of importing a file hierarchy can be described as
  * follows:

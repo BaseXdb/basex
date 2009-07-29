@@ -227,7 +227,7 @@ public class BaseXServerNew {
   class SessionListener implements Runnable {
     /** Thread. */
     Thread thread = null;
-    /** BaseXServerNew. */
+    /** Server reference. */
     BaseXServerNew bx;
 
     /**

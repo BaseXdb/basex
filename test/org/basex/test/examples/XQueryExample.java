@@ -62,7 +62,7 @@ public final class XQueryExample {
     // Closes the query processor
     processor.close();
 
-    out.println("\n=== Third version: Use the BaseX command");
+    out.println("\n=== Third version: Use the database command");
 
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);

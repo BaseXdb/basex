@@ -299,7 +299,7 @@ public class BaseX {
             i = args[a].length();
             ok = true;
           } else if(c == 'q') {
-            // send BaseX commands
+            // send database commands
             console = false;
             String input = "";
             if(i + 1 < args[a].length()) input = args[a].substring(i + 1);

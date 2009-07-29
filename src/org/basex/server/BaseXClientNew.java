@@ -22,7 +22,7 @@ public final class BaseXClientNew extends BaseX {
   final Socket socket;
 
   /**
-   * Main method of the <code>BaseXClient</code>, launching a local
+   * Main method of the database client, launching a local
    * client instance that sends all commands to a server instance.
    * Use <code>-h</code> to get a list of all available command-line
    * arguments.

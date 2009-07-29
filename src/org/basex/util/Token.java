@@ -4,7 +4,7 @@ import org.basex.BaseX;
 
 /**
  * This class provides convenience operations for handling so-called
- * 'Tokens'. Tokens in BaseX are nothing else than UTF8 encoded strings,
+ * 'Tokens'. Tokens in this project are nothing else than UTF8 encoded strings,
  * stored in a byte array.
  *
  * Note that, to guarantee a consistent string representation, all string

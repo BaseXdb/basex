@@ -54,7 +54,7 @@ public final class Prop extends AProp {
   public static IO xquery;
 
   /** Property information. */
-  static final String PROPHEADER = "# BaseX Property File." + NL +
+  static final String PROPHEADER = "# Property File." + NL +
       "# This here will be overwritten every time, but" + NL +
       "# you can set your own options at the end of the file." + NL;
   /** Property information. */

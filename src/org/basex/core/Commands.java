@@ -21,7 +21,7 @@ public interface Commands {
     // UPDATE COMMANDS
     DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS
-    DUMMYGENERAL(false), SET(true), HELP(true), PING(false), PROMPT(false),
+    DUMMYGENERAL(false), SET(true), HELP(true), PROMPT(false),
     EXIT(true), QUIT(false),
     // SERVER COMMANDS
     GETRESULT(false), GETINFO(false), STOP(false);

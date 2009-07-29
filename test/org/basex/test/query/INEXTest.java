@@ -52,7 +52,7 @@ public final class INEXTest {
   /** Kind of query. */
   private String[] query = new String[] {"automatic", "manual"};
 
-  /** Method used to sum pathes. */
+  /** Method used to sum up paths. */
   private final String xqm =
     "declare namespace basex = \"http://www.basex.com\"; " +
     "declare function basex:sum-path ( $n as node()? )  as xs:string { " +
@@ -107,7 +107,7 @@ public final class INEXTest {
   
   
   /**
-   * Perform INEXTest. 
+   * Performs the INEXTest. 
    * @param sub PrintOutput
    * @param xml XMLSerializer
    * @param db String database name
@@ -257,7 +257,7 @@ public final class INEXTest {
    * @param str Sting query to be replaced
    * @return replaced query String
    */
-    private static String replaceElements(final String str) {
+  private static String replaceElements(final String str) {
     byte[] b = str.getBytes();
     final byte[] or = new byte[]{' ', 'o', 'r', ' '};
     final byte[] co = new byte[]{' ', '|', ' '};

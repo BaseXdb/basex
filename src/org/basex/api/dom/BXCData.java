@@ -4,7 +4,7 @@ import org.basex.query.item.Nod;
 import org.w3c.dom.CDATASection;
 
 /**
- * DOM - CData Implementation.
+ * DOM - CData implementation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

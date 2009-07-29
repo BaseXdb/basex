@@ -14,17 +14,17 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class EXIFIndex {
-  /** Data Format. */
+  /** Data format. */
   static final int STRING = 2;
-  /** Data Format. */
+  /** Data format. */
   static final int SHORT = 3;
-  /** Data Format. */
+  /** Data format. */
   static final int LONG = 4;
-  /** Data Format. */
+  /** Data format. */
   static final int RATIONAL = 5;
-  /** Data Format. */
+  /** Data format. */
   static final int SIGNEDRATIONAL = 10;
-  /** Data Format. */
+  /** Data format. */
   static final int UNDEFINED = 7;
   /** EXIF information. */
   HashMap<Integer, EXIFInfo> info = new HashMap<Integer, EXIFInfo>();
@@ -188,7 +188,7 @@ public final class EXIFIndex {
    * EXIF Information structure.
    */
   abstract static class EXIFInfo {
-    /** Tag Name. */
+    /** Tag name. */
     byte[] tag;
     /** Format. */
     int format;
@@ -407,13 +407,13 @@ public final class EXIFIndex {
     /** Format. */
     private byte[][] cat;
 
-    /** RGB Component. */
+    /** RGB component. */
     private static final byte[] RGBCOMP = { 4, 5, 6, 0 };
-    /** RGB String. */
+    /** RGB string. */
     private static final byte[] RGB = bytes("RGB");
-    /** YCBCR Component. */
+    /** YCBCR component. */
     private static final byte[] YCBCRCOMP = { 1, 2, 3, 0 };
-    /** YCbCr String. */
+    /** YCbCr string. */
     private static final byte[] YCBCR = bytes("YCbCr");
     /** Component array. */
     private static final byte[][] COMPCONF =

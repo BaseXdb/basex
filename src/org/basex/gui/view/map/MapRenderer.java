@@ -172,24 +172,24 @@ final class MapRenderer {
 
     boolean l = false;
     while(r.thumbal < 2) {
-      ff = round((fftmax + fftmin) / 2);
+      ff = round(fftmax, fftmin);
       r.thumbf = ff * fs;
-      ffh = round((ffhtmax + ffhtmin) / 2);
+      ffh = round(ffhtmax, ffhtmin);
       r.thumbfh = (byte) Math.max(1, ffh * fs);
-      flh = round((flhtmax + flhtmin) / 2);
+      flh = round(flhtmax, flhtmin);
       r.thumblh = (byte) Math.max(1, (flh + ffh) * fs);
       r.thumbsw = r.thumbf;
 
       switch(r.thumbal) {
         case 0:
-          h = drawThumbnailsToken(g, r, data, false, 0, 0, fs);
+          h = drawThumbnailsToken(g, r, data, 0, 0, fs, false);
           break;
         case 1: case 2:
           h = drawThumbnailsSentence(g, r, data, r.thumbal == 1, false);
           break;
       }
 
-      if(h >= r.h || ge(ff, ffmax) || ge(ffh, ffhmax) || ge(flh, flhmax)) {
+      if(h >= r.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
           // use last setup to draw
           r.thumbf = bff * fs;
@@ -198,7 +198,7 @@ final class MapRenderer {
           r.thumbsw = r.thumbf;
           switch(r.thumbal) {
             case 0:
-              drawThumbnailsToken(g, r, data, true, 0, 0, fs);
+              drawThumbnailsToken(g, r, data, 0, 0, fs, true);
               return;
             case 1: case 2:
               drawThumbnailsSentence(g, r, data, r.thumbal == 1, true);
@@ -234,7 +234,7 @@ final class MapRenderer {
       }
     }
 
-    final double sum = data[3].length; //[0];
+    final double sum = data[3].length;
     final int nl = (int) ((r.h - 2.0) / lhmi);
     final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
     r.thumbf = fnew;
@@ -251,33 +251,26 @@ final class MapRenderer {
   }
 
   /**
-   * Less.
+   * Checks if the first is smaller than the second value, ignoring a
+   * small difference.
    * @param a double 1
    * @param b double 2
    * @return true if a < b
    */
   private static boolean le(final double a, final double b) {
-    return a < b || a / b > 0.95 && a / b < 1.05;
+    return a < b || a / b < 1.05;
   }
 
   /**
-   * Greater.
-   * @param a double 1
-   * @param b double 2
-   * @return true if a > b
-   */
-  private static boolean ge(final double a, final double b) {
-    return a >= b || a / b > 0.95 && a / b < 1.05;
-  }
-
-  /**
-   * Rounds a value.
-   * @param a double to round
+   * Returns the rounded average of the specified values.
+   * @param a first double
+   * @param b second double
    * @return rounded double
    */
-  private static double round(final double a) {
-    final int i = (int) (a * 100000);
-    final double d = a * 100000;
+  private static double round(final double a, final double b) {
+    final double v = (a + b) / 2;
+    final double d = v * 100000;
+    final int i = (int) d;
     final double r = d - i >= 0.5 ? i + 1 : i;
     return r / 100000;
   }
@@ -408,13 +401,13 @@ final class MapRenderer {
    * @param data full-text to be drawn
    * @param x x-value of the cursor
    * @param y y-value of the cursor
-   * @param draw boolean for drawing (used for calculating the height)
    * @param fs font size
+   * @param draw boolean for drawing (used for calculating the height)
    * @return heights
    */
   private static int drawThumbnailsToken(final Graphics g, final MapRect r,
-      final int[][] data, final boolean draw, final int x, final int y,
-      final int fs) {
+      final int[][] data, final int x, final int y, final int fs,
+      final boolean draw) {
 
     final double xx = r.x;
     final double ww = r.w;
@@ -578,9 +571,8 @@ final class MapRenderer {
     double ll = 0; // line length
     double error = 0;
     ul = -1;
-    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
-    int pp = 0;
-    TokenList tl = new TokenList();
+    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0, pp = 0;
+    final TokenList tl = new TokenList();
     ttcol = new IntList();
     boolean ir;
     for(int i = 0; i < data[0].length; i++) {
@@ -675,7 +667,7 @@ final class MapRenderer {
           i--;
         }
         if(i > 0) {
-          tl.add(new byte[]{'.', '.'});
+          tl.add(new byte[] { '.', '.' });
           ttcol.add(-1);
         }
 
@@ -684,7 +676,7 @@ final class MapRenderer {
         // invert tokens
         final byte[][] toks = tl.finish();
         final int[] tc = ttcol.finish();
-        tl = new TokenList();
+        tl.reset();
         ttcol = new IntList();
         for(int j = toks.length - 1; j > -1; j--) {
           tl.add(toks[j]);
@@ -735,7 +727,7 @@ final class MapRenderer {
           i++;
         }
         if(i < data[0].length) {
-          tl.add(new byte[]{'.', '.'});
+          tl.add(new byte[] { '.', '.' });
           ttcol.add(-1);
         }
         return tl;
@@ -789,7 +781,7 @@ final class MapRenderer {
       final IntList len = new IntList();
       for(int i = 0; i < tl.size(); i++) {
         l = 0;
-        byte[] tok = tl.get(i);
+        final byte[] tok = tl.get(i);
         for(int n = 0, ns = tok.length; n < ns; n += cl(tok[n])) {
           l += BaseXLayout.width(g, cw, cp(tok, n));
         }

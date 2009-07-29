@@ -182,7 +182,7 @@ public abstract class W3CTS {
         single = arg;
         maxout *= 10;
       } else {
-        BaseX.outln("\nBaseX vs. XQuery Test Suite\n" +
+        BaseX.outln("\n" + NAME + " vs. XQuery Test Suite\n" +
             " [pat] perform only tests with the specified pattern\n" +
             " -h show this help\n" +
             " -p change path\n" +

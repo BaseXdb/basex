@@ -19,7 +19,7 @@ import org.xml.sax.InputSource;
 public abstract class IO {
   /** Return IO dummy instance. */
   public static final IO DUMMY = new IOContent(Token.EMPTY);
-  /** BaseX Suffix. */
+  /** Database suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
   public static final String XQSUFFIX = ".xq";

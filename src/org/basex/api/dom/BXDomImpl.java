@@ -6,7 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 
 /**
- * DOM - Implementation.
+ * DOM - implementation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
