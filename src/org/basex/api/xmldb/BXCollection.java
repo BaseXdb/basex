@@ -11,7 +11,6 @@ import org.xmldb.api.modules.XMLResource;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
-import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
@@ -132,11 +131,10 @@ public final class BXCollection implements Collection, BXXMLDBText {
       final String uid = id == null || id.length() == 0 ? createId() : id;
       return new BXXMLResource(null, 0, uid, this);
     }
-    // reject binary resources
-    if(type.equals(BinaryResource.RESOURCE_TYPE)) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_BINARY);
-    }
-    throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE, ERR_TYPE + type);
+    // reject binary and other resources
+    throw type.equals(BinaryResource.RESOURCE_TYPE) ?
+      new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_BINARY) :
+      new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE, ERR_TYPE + type);
   }
 
   public void removeResource(final Resource res) throws XMLDBException {
@@ -174,13 +172,13 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // create parser, dependent on input type
     final Object cont = xml.content;
-    Parser p = null;
-    if(cont instanceof Document) p =
-      new DOCWrapper((Document) cont, id, ctx.prop);
-    else p = new DirParser(new IOContent((byte[]) cont, id), ctx.prop);
 
     // insert document
     try {
+      final Parser p = cont instanceof Document ?
+        new DOCWrapper((Document) cont, id, ctx.prop) :
+        Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop);
+      
       final Data data = ctx.data();
       data.insert(data.meta.size, -1, new MemBuilder(p).build(id));
       data.flush();
