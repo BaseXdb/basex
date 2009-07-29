@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Result;
@@ -20,6 +23,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Array;
+import org.basex.util.StringList;
 import org.basex.util.TokenList;
 
 import static org.basex.util.Token.*;
@@ -61,19 +65,59 @@ public final class INEXTest {
 
   /**
    * Constructor.
-   * @param db database instance
+   * @param d database instance
    * @param exe boolean for execution of the queries
    * @throws Exception exception
    */
-  private INEXTest(final String db, final boolean exe) throws Exception {
-    new Open(db).execute(context);
+  private INEXTest(final String d, final boolean exe) throws Exception {
+    BufferedWriter out = null; 
+    PrintOutput sub = null;
+    XMLSerializer xml = null;
+    
+    if (d != null) {
+      out = new BufferedWriter(
+          new FileWriter(new File("INEX/log/" + d + ".log")));
+      sub = new PrintOutput("INEX/sub/" + d + ".xml");
+      xml = new XMLSerializer(sub, false, true);
+      xml.openElement(token("efficiency-submission"));
+      test(sub, xml, d, exe);
+    } else {
+      final StringList dbs = List.list(context);
+      final Iterator<String> i = dbs.iterator();
+      while(i.hasNext()) {
+        final String db = i.next();
+        if (db.startsWith("pages")) { 
+          out = new BufferedWriter(
+              new FileWriter(new File("INEX/log/" + db + ".log")));
+          sub = new PrintOutput("INEX/sub/" + db + ".xml");
+          xml = new XMLSerializer(sub, false, true);
+          xml.openElement(token("efficiency-submission"));
+          test(sub, xml, db, exe);
+        }          
+      }
+    }
+    
+    xml.closeElement();
+    xml.close();
+    sub.close();
+    out.close();
+  }
 
+  
+  
+  
+  /**
+   * Perform INEXTest. 
+   * @param sub PrintOutput
+   * @param xml XMLSerializer
+   * @param db String database name
+   * @param exe boolean flag for execution
+   * @throws Exception FileNotFoundException
+   */
+  private void test(final PrintOutput sub, final XMLSerializer xml, 
+      final String db, final boolean exe) throws Exception {
+    new Open(db).execute(context);  
     // open query file
-    final BufferedWriter out =
-      new BufferedWriter(new FileWriter(new File("INEX/INEX1.log")));
-    final PrintOutput sub = new PrintOutput("INEX/sub.xml");
-    final XMLSerializer xml = new XMLSerializer(sub, false, true);
-
     final File file = new File("INEX/co.que");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
@@ -110,6 +154,7 @@ public final class INEXTest {
     final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
     final BufferedReader br = new BufferedReader(isr);
     String line = null;
+    boolean iu = true;
     while((line = br.readLine()) != null) {
       // extract topic id
       int s0 = line.indexOf('"');
@@ -124,9 +169,8 @@ public final class INEXTest {
       String q = line.substring(s0);
 
 //      q = q.replaceAll("\\. ", ".//text() ");
-      final String qo = q;
       q = replaceElements(q);
-
+      final byte[] qo = q.getBytes();
       if (exe) {
         q = xqm + "for $i score $s in " + q
           + " order by $s return (basex:sum-path($i), $s)";
@@ -138,15 +182,17 @@ public final class INEXTest {
 
         if(!proc.execute(context)) {
           System.out.println("- " + proc.info());
-          System.out.println("Query: " + q);
+          System.out.println("Query: " + new String(qo));
         } else {
           // extract and print processing time
           final String info = proc.info();
           proc.output(new NullOutput());
-          if (info.indexOf("Applying full-text index") < 0) {
-            System.out.println("No index usage: " + qo);
+          if (info.indexOf("Applying full-text index") < 0 
+              && info.indexOf("Removing path with no index results") < 0) { 
+            System.out.println("No index usage: " + q);
             System.out.println(q);
             System.out.println("****");
+            iu = false;
           }
           final int i = info.indexOf("Evaluating: ");
           final int j = info.indexOf(" ms", i);
@@ -160,7 +206,7 @@ public final class INEXTest {
             );
             xml.openElement(token("result"));
             xml.openElement(token("file"));
-            xml.text(token(file.toString()));
+            xml.text(token(db));
             xml.closeElement();
 
             final Result val = proc.result();
@@ -192,15 +238,17 @@ public final class INEXTest {
 
       if(++curr >= STOPAFTER) break;
     }
+    if (iu) System.out.println("All queries have used the index!");
+    
     br.close();
 
     if(s) {
       xml.closeElement();
     }
 
-    xml.close();
+/*    xml.close();
     sub.close();
-    out.close();
+    out.close();*/
   }
 
   /**
@@ -212,7 +260,7 @@ public final class INEXTest {
     private static String replaceElements(final String str) {
     byte[] b = str.getBytes();
     final byte[] or = new byte[]{' ', 'o', 'r', ' '};
-    final byte[] co = new byte[]{' ', ',', ' '};
+    final byte[] co = new byte[]{' ', '|', ' '};
     final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
     int i = 0;
     int sp = -1, sb = -1, sbb = -1, os = -1, ebb = -1;
@@ -225,8 +273,9 @@ public final class INEXTest {
           break;
         case '(':
           sb = i;
+          if (b[i + 1] == ')' || b[i + 1] == ' ' || b[i + 1] == '.') break;
           i++;
-          if (b[i] == ')' || b[i] == ' ') break;
+//          if (b[i] == ')' || b[i] == ' ' || b[i] == '.') break;
           boolean f = false;
           while(i < b.length && b[i] != ')' && !f) {
             f = b[i] == '"' || b[i] == '\'';
@@ -286,7 +335,7 @@ public final class INEXTest {
               bn = Array.add(bn, tok[k], 0, tok[k].length);
               bn = Array.add(bn, b, sbb, b.length);
               if (k < tok.length - 1)
-                bn = Array.add(bn, or, 0, or.length);
+                bn = Array.add(bn, co, 0, co.length);
             }
             i = sb;
             b = bn;
@@ -311,10 +360,11 @@ public final class INEXTest {
             }
             bn = Array.add(bn, b, ebb, b.length);
             b = bn;
-            ebb = -1; // new
+            ebb = -1;
           }
           break;
         case '[':
+          ebb = -1; 
           sbb = i;
           break;
         case ']':
@@ -367,8 +417,11 @@ public final class INEXTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new INEXTest("pages999", true);
-  /*  System.out.println("1.: " + replaceElements(
+   if (args.length == 0)
+      new INEXTest(null, true);
+    else 
+      new INEXTest(args[0], true);
+ /*   System.out.println("1.: " + replaceElements(
         "//sec[. ftcontains \"b\" ] or //sec[. ftcontains \"c\" ]"));
     System.out.println("2.: " + replaceElements(
         "//sec[.//ab ftcontains \"b\" ]"));
@@ -385,14 +438,16 @@ public final class INEXTest {
     System.out.println("8.: " + replaceElements(
       "article[. ftcontains (\"Nobel\" ftand \"prize\")]"));
     System.out.println("9.: " + replaceElements(
-    "article[.//(a|b) ftcontains \"Nobel\" and
-    .//st ftcontains (\"references\" ]"));
+    "article[.//(a|b) ftcontains \"Nobel\" and" +  
+    ".//st ftcontains \"references\" ]"));
     System.out.println("10.: " + replaceElements(
     "//article[.//(sec|p) ftcontains (\"mean\" ftand \"average\" " +
     "ftand \"precision\") and ( .//st ftcontains (\"references\") " +
     "or .//st ftcontains (\"see\" ftand \"also\") ) and .//image " +
     "ftcontains (\"precision\" ftand \"recall\")]"));
-
-  /* */
+    System.out.println("11.: " + replaceElements(
+    "//*[. ftcontains (\"alchemy\") and (. ftcontains (\"Asia\") " +
+    "or . ftcontains (\"Japan\" ftand \"China\" ftand \"India\"))]"));
+   /* */
   }
 }
