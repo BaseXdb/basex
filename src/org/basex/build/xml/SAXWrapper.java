@@ -1,8 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.Text.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
@@ -31,7 +29,7 @@ public final class SAXWrapper extends Parser {
   /** Parser reference. */
   private SAX2Data sax;
   /** File length. */
-  long length;
+  private long length;
   /** File counter. */
   long counter;
 
@@ -90,8 +88,8 @@ public final class SAXWrapper extends Parser {
   private InputSource wrap(final InputSource is) throws IOException {
     if(is == null) return null;
     final String id = is.getSystemId();
-    if(is.getByteStream() instanceof ByteArrayInputStream ||
-        id == null || id.length() == 0) return is;
+    if(!Prop.gui || is.getByteStream() != null || id == null ||
+        id.length() == 0) return is;
 
     length = IO.get(id).length();
     final FileInputStream fis = new FileInputStream(io.path()) {
