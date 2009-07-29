@@ -309,7 +309,7 @@ pc_dbnf=Please enter a database name.
 pc_mountnf=Please enter an existent directory as mount point.
 pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" could not be parsed.
-pc_pos="%" (Line %, Col %)
+pc_pos="%" (Line %)
 
 # Database commands
 db_no=Database '%' was not found.

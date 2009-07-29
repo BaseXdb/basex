@@ -17,7 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class SAX2Data extends DefaultHandler implements LexicalHandler {
+public final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Temporary attribute array. */
   final Atts atts = new Atts();
   /** Builder reference. */
@@ -39,7 +39,7 @@ public final class SAX2Data extends DefaultHandler implements LexicalHandler {
    * @param build builder reference
    * @param xml document name
    */
-  public SAX2Data(final Builder build, final String xml) {
+  public SAXHandler(final Builder build, final String xml) {
     builder = build;
     name = xml;
   }

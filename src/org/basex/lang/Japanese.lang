@@ -310,7 +310,7 @@ pc_dbnf=データベース名を入力してください。
 pc_mountnf=Please enter an existent directory as mount point.
 pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" をパースできませんでした。
-pc_pos=% (%行、%列)
+pc_pos=% (%行、)
 
 # Database commands
 db_no=データベース '%' が見付かりませんでした。

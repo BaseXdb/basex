@@ -1,5 +1,6 @@
 package org.basex.build.xml;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.Builder;
@@ -71,7 +72,7 @@ public final class DirParser extends Parser {
 
   @Override
   public String head() {
-    return parser != null ? parser.head() : "";
+    return parser != null ? parser.head() : PROGCREATE;
   }
 
   @Override

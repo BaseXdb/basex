@@ -310,7 +310,7 @@ pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
 pc_mountnf=Bitte ein gültiges Verzeichnis als 'mount point' angeben.
 pc_backingnf=Bitte ein gültiges Verzeichnis als Hilfsspeicher angeben.
 pc_err="%" konnte nicht eingelesen werden.
-pc_pos="%" (Zeile %, Spalte %)
+pc_pos="%" (Zeile %)
 
 # Database commands
 db_no=Datenbank '%' wurde nicht gefunden.

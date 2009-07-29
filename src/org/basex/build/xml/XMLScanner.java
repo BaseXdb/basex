@@ -1036,8 +1036,7 @@ public final class XMLScanner {
    * @return info string
    */
   public String det() {
-    final int c = Math.max(0, input.col);
-    return BaseX.info(SCANPOS, input.file.name(), input.line, c);
+    return BaseX.info(SCANPOS, input.file.name(), input.line);
   }
 
   /**

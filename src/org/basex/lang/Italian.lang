@@ -314,7 +314,7 @@ pc_dbnf=Inserisci un nome per il Database.
 pc_mountnf=Please enter an existent directory as mount point.
 pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" non può essere analizzato.
-pc_pos="%" (Linea %, Colonna %)
+pc_pos="%" (Linea %)
 
 # Database commands
 db_no=Database '%' non trovato.

@@ -309,7 +309,7 @@ pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
 pc_mountnf=Xin nhập một thu mục có sẵn làm điểm khung (mount point).
 pc_backingnf=Xin nhập một thu mục có sẵn làm nơi dự phòng.
 pc_err="%" không thể phân tích.
-pc_pos="%" (Dòng %, Cột %)
+pc_pos="%" (Dòng %)
 
 # Database commands
 db_no=Cơ sở dữ liệu '%' không tìm thấy.
