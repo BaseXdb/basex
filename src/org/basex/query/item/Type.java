@@ -646,8 +646,8 @@ public enum Type {
         try {
           // [CG] API/should be use instance properties
           final Prop prop = new Prop();
-          final DOCWrapper p = new DOCWrapper((Document) o, "tmp", prop);
-          final Data data = new MemBuilder(p).build("tmp");
+          final DOCWrapper p = new DOCWrapper((Document) o, "", prop);
+          final Data data = new MemBuilder(p).build();
           return new DBNode(data, 0);
         } catch(final IOException ex) {
           throw new QueryException(UNDOC, ex.getMessage());

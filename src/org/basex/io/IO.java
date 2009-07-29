@@ -61,7 +61,7 @@ public abstract class IO {
    * @return IO reference
    */
   public static IO get(final String s) {
-    if(s == null) return new IOFile("tmp");
+    if(s == null) return new IOFile("");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
     if(s.startsWith("http://")) return new IOUrl(s);
     return new IOFile(s);
@@ -167,13 +167,12 @@ public abstract class IO {
 
   /**
    * Chops the path and the XML suffix of the specified filename.
-   * Returns "tmp" if name is empty.
    * @return chopped filename
    */
   public final String dbname() {
     final String n = name();
     final int i = n.lastIndexOf(".");
-    return i != -1 ? n.substring(0, i) : n.length() == 0 ? "tmp" : n;
+    return i != -1 ? n.substring(0, i) : n;
   }
 
   /**

@@ -15,7 +15,7 @@ public final class IOContent extends IO {
    * @param c contents
    */
   public IOContent(final byte[] c) {
-    this(c, "tmp");
+    this(c, "");
   }
 
   /**

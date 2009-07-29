@@ -1,6 +1,8 @@
 package org.basex.build.xml;
 
 import static org.basex.Text.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
@@ -11,7 +13,6 @@ import org.basex.build.Parser;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.IOFile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -88,9 +89,11 @@ public final class SAXWrapper extends Parser {
    */
   private InputSource wrap(final InputSource is) throws IOException {
     if(is == null) return null;
-    final IO file = IO.get(is.getSystemId());
-    if(!(file instanceof IOFile)) return null;
-    length = file.length();
+    final String id = is.getSystemId();
+    if(is.getByteStream() instanceof ByteArrayInputStream ||
+        id == null || id.length() == 0) return is;
+
+    length = IO.get(id).length();
     final FileInputStream fis = new FileInputStream(io.path()) {
       @Override
       public int read(final byte[] b, final int off, final int len)

@@ -76,6 +76,7 @@ public final class Optimize extends ACreate {
     }
     data.meta.height = h;
     data.meta.uptodate = true;
+    data.flush();
 
     try {
       data.meta.txtindex = true;

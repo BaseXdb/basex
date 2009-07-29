@@ -43,10 +43,13 @@ public abstract class Parser {
    */
   public static Parser xmlParser(final IO io, final Prop prop)
       throws IOException {
+    
+    // use internal parser
+    if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop);
+    // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
-    return prop.is(Prop.INTPARSE) ? new XMLParser(io, prop) :
-      new SAXWrapper(s, prop);
+    return new SAXWrapper(s, prop);
   }
 
   /**

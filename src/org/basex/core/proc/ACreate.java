@@ -110,6 +110,7 @@ abstract class ACreate extends Process {
           new FTFuzzyBuilder(d, pr) : new FTTrieBuilder(d, pr); break;
       default: break;
     }
+    d.closeIndex(i);
     progress(builder);
     d.setIndex(i, builder.build());
   }
