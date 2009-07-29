@@ -1,6 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.Text.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -10,6 +11,7 @@ import org.basex.build.Parser;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -27,6 +29,10 @@ public final class SAXWrapper extends Parser {
   private final SAXSource source;
   /** Parser reference. */
   private SAX2Data sax;
+  /** File length. */
+  long length;
+  /** File counter. */
+  long counter;
 
   /**
    * Constructor.
@@ -40,6 +46,8 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public void parse(final Builder build) throws IOException {
+    
+    final InputSource is = wrap(source.getInputSource());
     try {
       XMLReader r = source.getXMLReader();
       if(r == null) {
@@ -55,10 +63,8 @@ public final class SAXWrapper extends Parser {
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
       r.setErrorHandler(sax);
 
-      final InputSource is = source.getInputSource();
       if(is != null) r.parse(is);
       else r.parse(source.getSystemId());
-
     } catch(final SAXParseException ex) {
       final String msg = BaseX.info(SCANPOS, ex.getSystemId(),
           ex.getLineNumber(), ex.getColumnNumber()) + ": " + ex.getMessage();
@@ -73,6 +79,31 @@ public final class SAXWrapper extends Parser {
       throw ioe;
     }
   }
+  
+  /**
+   * Wraps the input stream to track the number of read bytes.
+   * @param is input stream
+   * @return resulting stream
+   * @throws IOException I/O exception
+   */
+  private InputSource wrap(final InputSource is) throws IOException {
+    if(is == null) return null;
+    final IO file = IO.get(is.getSystemId());
+    if(!(file instanceof IOFile)) return null;
+    length = file.length();
+    final FileInputStream fis = new FileInputStream(io.path()) {
+      @Override
+      public int read(final byte[] b, final int off, final int len)
+          throws IOException {
+        final int i = super.read(b, off, len);
+        counter += i;
+        return i;
+      }
+    };
+    final InputSource input = new InputSource(fis);
+    source.setInputSource(input);
+    return input;
+  }
 
   @Override
   public String head() {
@@ -86,6 +117,9 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public double prog() {
+    if(length != 0) {
+      return (double) counter / length;
+    }
     return sax == null ? 0 : sax.nodes / 1000000d % 1;
   }
 }

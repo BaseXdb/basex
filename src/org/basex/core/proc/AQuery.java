@@ -50,6 +50,7 @@ abstract class AQuery extends Process {
    */
   protected final boolean query(final String query) {
     final int runs = prop.num(Prop.RUNS);
+    String err = null;
     try {
       for(int i = 0; i < runs; i++) {
         qp = new QueryProcessor(query, context);
@@ -71,13 +72,22 @@ abstract class AQuery extends Process {
       return true;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
-      return error(ex.getMessage());
+      err = ex.getMessage();
     } catch(final ProgressException ex) {
-      return error(Prop.server ? SERVERTIME : "");
+      err = Prop.server ? SERVERTIME : "";
     } catch(final Exception ex) {
       ex.printStackTrace();
-      return error(BaseX.bug());
+      err = BaseX.bug();
     }
+    
+    if(err != null) {
+      try {
+        qp.close();
+      } catch(final IOException ex) {
+        /* ignored */
+      }
+    }
+    return err == null;
   }
 
   @Override

@@ -299,7 +299,7 @@ public abstract class IO {
    * @param url url to be converted
    * @return file path
    */
-  static final String file(final String url) {
+  public static final String file(final String url) {
     final String fn = url.replaceAll(PREFILE, "");
     return fn.matches("/.:.*") ? fn.substring(1) : fn;
   }
