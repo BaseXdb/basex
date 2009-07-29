@@ -19,7 +19,7 @@ import org.basex.util.Token;
 final class BXQConnection extends BXQDataFactory implements XQConnection {
   /** Database meta data. */
   private final BXQMetaData meta = new BXQMetaData(this);
-  /** Boolean Value if autoCommit is enabled. */
+  /** Boolean value if auto commit is enabled. */
   private boolean autoCommit = true;
 
   public void commit() throws XQException {

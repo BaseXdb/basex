@@ -295,7 +295,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     valid(res, Result.class);
     if(it != null && !next) throw new BXQException(TWICE);
 
-    // evaluate different Result types...
+    // evaluate different result types...
     if(res instanceof StreamResult) {
       // StreamResult.. directly write result as string
       writeSequence(((StreamResult) res).getWriter(), null);

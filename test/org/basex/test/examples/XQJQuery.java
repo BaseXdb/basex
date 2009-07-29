@@ -13,7 +13,7 @@ import javax.xml.xquery.XQResultSequence;
  * @author BaseX Team
  */
 public final class XQJQuery {
-  /** Database Driver. */
+  /** Database driver. */
   private static final String DRIVER = "org.basex.api.xqj.BXQDataSource";
   /** Sample query. */
   private static final String QUERY = "doc('input.xml')//li";
@@ -24,23 +24,23 @@ public final class XQJQuery {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    // Gets the XQConnection for the specified Driver.
+    // Build a connection to the specified driver.
     final XQConnection conn = ((XQDataSource) Class.forName(DRIVER)
         .newInstance()).getConnection();
 
-    // Prepares the Expression with the Document and the Query.
+    // Prepare the expression with the document and the query.
     final XQPreparedExpression expr = conn.prepareExpression(QUERY);
 
-    // Executes the XQuery query.
+    // Execute the query.
     final XQResultSequence result = expr.executeQuery();
 
-    // Gets all results of the execution.
+    // Get all results of the execution.
     while(result.next()) {
-      // Prints the results to the console.
+      // Print the results to the console.
       System.out.println(result.getItemAsString(null));
     }
 
-    // Closes the expression.
+    // Close the expression.
     expr.close();
   }
 }

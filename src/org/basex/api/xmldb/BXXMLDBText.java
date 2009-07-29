@@ -16,34 +16,34 @@ interface BXXMLDBText {
   String XMLDB = "xmldb:";
   /** XMLDB URI. */
   String XMLDBURI = XMLDB + DBURI;
-  /** Localhost Name. */
+  /** Localhost name. */
   String LOCALHOST = "localhost:1984/";
-  /** Conformance Level of the implementation. */
+  /** Conformance level of the implementation. */
   String CONFORMANCE_LEVEL = "0";
 
-  /** Error Message. */
+  /** Error message. */
   String ERR_URI = "Invalid URI: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_PROP = "Property could not be set: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_BINARY = "Binary resources not supported.";
-  /** Error Message. */
+  /** Error message. */
   String ERR_TYPE = "Resource type is unknown: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_EMPTY = "Resource has no contents.";
-  /** Error Message. */
+  /** Error message. */
   String ERR_ID = "Resource has no ID.";
-  /** Error Message. */
+  /** Error message. */
   String ERR_UNKNOWN = "Unknown Resource: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_CONT = "Invalid content; string expected.";
-  /** Error Message. */
+  /** Error message. */
   String ERR_NSURI = "Namespace URI is empty: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_RES = "Resource not found: ";
-  /** Error Message. */
+  /** Error message. */
   String ERR_ITER = "Resource pointer out of range.";
-  /** Error Message. */
+  /** Error message. */
   String ERR_DOC = "Document ID cannot be retrieved from query result.";
 }
 

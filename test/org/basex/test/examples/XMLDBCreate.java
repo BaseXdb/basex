@@ -11,7 +11,7 @@ import org.xmldb.api.*;
  * @author BaseX Team
  */
 public final class XMLDBCreate {
-  /** Database Driver. */
+  /** Database driver. */
   public static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the collection. */
   public static final String COLL = "XMLDBCollection";
@@ -25,7 +25,7 @@ public final class XMLDBCreate {
     try {
       Class<?> c = Class.forName(DRIVER);
       Database db = (Database) c.newInstance();
-      // Register the Database.
+      // Register the database.
       DatabaseManager.registerDatabase(db);
 
       // Create a new collection

@@ -20,7 +20,7 @@ final class BXQItemType implements XQItemType {
   static final BXQItemType DEFAULT = new BXQItemType(
       Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
 
-  /** Base Types. */
+  /** Existing base types. */
   private static final Type[] BASE = {
       null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
       Type.YMD, Type.URI, Type.B6B, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
@@ -33,11 +33,11 @@ final class BXQItemType implements XQItemType {
   };
   /** Name. */
   private final QName name;
-  /** Base Type. */
+  /** Base type. */
   private final int base;
   /** Occurrence. */
   private final int occ;
-  /** Data Type. */
+  /** Data type. */
   private final Type type;
 
   /**

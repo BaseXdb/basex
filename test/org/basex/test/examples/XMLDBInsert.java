@@ -12,7 +12,7 @@ import org.xmldb.api.*;
  * @author BaseX Team
  */
 public final class XMLDBInsert {
-  /** Database Driver. */
+  /** Database driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the referenced database. */
   private static final String DBNAME = "xmldb:basex://localhost:1984/input";
@@ -28,21 +28,21 @@ public final class XMLDBInsert {
       Class<?> c = Class.forName(DRIVER);
 
       Database db = (Database) c.newInstance();
-      // Registers the Database.
+      // Register the database.
       DatabaseManager.registerDatabase(db);
-      // Receives the Collection.
+      // Receive the collection.
       col = DatabaseManager.getCollection(DBNAME);
 
-      // ID for the new Document.
+      // ID for the new document.
       String id = "SecondDoc";
-      // Content of the new Document.
+      // Content of the new document.
       String doc = "<xml>This is the second document.</xml>";
-      // Creates a new XMLResource with the ID.
+      // Create a new XML resource with the specified ID.
       XMLResource res = (XMLResource) col.createResource(id,
           XMLResource.RESOURCE_TYPE);
-      // Sets the content of the XMLResource as the Document.
+      // Set the content of the XML resource as the document.
       res.setContent(doc);
-      // Stores the Resource into the Database.
+      // Store the resource into the database.
       col.storeResource(res);
 
     } catch(XMLDBException ex) {

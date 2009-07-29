@@ -12,7 +12,7 @@ import org.xmldb.api.*;
  * @author BaseX Team
  */
 public final class XMLDBQuery {
-  /** Database Driver. */
+  /** Database driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the referenced database. */
   private static final String DBNAME = "xmldb:basex://localhost:1984/input";
@@ -30,19 +30,19 @@ public final class XMLDBQuery {
       Class<?> c = Class.forName(DRIVER);
 
       Database db = (Database) c.newInstance();
-      // Registers the Database.
+      // Register the database.
       DatabaseManager.registerDatabase(db);
-      // Receives the Database.
+      // Receive the database.
       coll = DatabaseManager.getCollection(DBNAME);
-      // Receives the XPathQueryService.
+      // Receive the XPath query service.
       XPathQueryService service = (XPathQueryService)
         coll.getService("XPathQueryService", "1.0");
-      // Executes the query and receives all results.
+      // Execute the query and receives all results.
       ResourceSet set = service.query(QUERY);
-      // Iterator for ResultSets.
+      // Create and loop through a result iterator.
       ResourceIterator iter = set.getIterator();
       while(iter.hasMoreResources()) {
-        // Receives the next results.
+        // Receive the next results.
         Resource res = iter.nextResource();
         // Writing the result to the console.
         System.out.println((String) res.getContent());

@@ -8,7 +8,7 @@ import org.xmldb.api.modules.CollectionManagementService;
 
 /**
  * Implementation of the CollectionManagementService Interface for the
- * XMLDB:API. Note that a BaseX database has one collection at a time,
+ * XMLDB:API. Note that a database has one collection at a time,
  * so creating a new collection creates a new database as well, and the
  * specified collection reference is reset every time a database is created.
  *

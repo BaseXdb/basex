@@ -146,7 +146,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   public void setContentAsDOM(final Node cont) throws XMLDBException {
-    // allow only Document instances...
+    // allow only document instances...
     if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     if(cont instanceof Document) content = cont;
     else throw new XMLDBException(ErrorCodes.WRONG_CONTENT_TYPE);
@@ -172,7 +172,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   public ContentHandler setContentAsSAX() throws XMLDBException {
     try {
-      // ..might be replaced by a custom SAX Content Handler in future.
+      // ..might be replaced by a custom SAX content handler in future.
       return new BXSAXContentHandler(this);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

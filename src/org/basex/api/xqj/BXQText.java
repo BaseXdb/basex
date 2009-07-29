@@ -10,70 +10,70 @@ interface BXQText {
   /** Java XQuery API version. */
   String VERSION = "1.0";
 
-  /** Error Message. */
+  /** Error message. */
   String CLOSED = " has been closed.";
-  /** Error Message. */
+  /** Error message. */
   String NULL = "% argument mustn't be null.";
-  /** Error Message. */
+  /** Error message. */
   String WRONG = "Wrong data type; % expected, % found.";
-  /** Error Message. */
+  /** Error message. */
   String ATOM = "Atomic value expected.";
-  /** Error Message. */
+  /** Error message. */
   String CONV = "No mapping known for '%'.";
-  /** Error Message. */
+  /** Error message. */
   String SQL = "SQL sources not supported.";
-  /** Error Message. */
+  /** Error message. */
   String PROPS = "No property support.";
-  /** Error Message. */
+  /** Error message. */
   String NODE = "Current item is not a node.";
-  /** Error Message. */
+  /** Error message. */
   String ATTR = "Cannot serialize top-level attributes.";
-  /** Error Message. */
+  /** Error message. */
   String NUM = "Number '%' is no integer.";
-  /** Error Message. */
+  /** Error message. */
   String TYPE = "Item has wrong type.";
-  /** Error Message. */
+  /** Error message. */
   String ATT = "Node must not be UNTYPED or ANYTYPE.";
-  /** Error Message. */
+  /** Error message. */
   String ELM = "Node must not be ELEMENT.";
-  /** Error Message. */
+  /** Error message. */
   String PI = "Node must be a processing instruction.";
-    /** Error Message. */
+    /** Error message. */
   String NOBASE = "Item has no base type.";
-  /** Error Message. */
+  /** Error message. */
   String TWICE = "Current item has already been requested.";
-  /** Error Message. */
+  /** Error message. */
   String FORWARD = "Sequence is forwards-only";
-  /** Error Message. */
+  /** Error message. */
   String CURSOR = "Cursor does not point to an item.";
-  /** Error Message. */
+  /** Error message. */
   String OCC = "Occurrence indicator and item type do not match.";
-  /** Error Message. */
+  /** Error message. */
   String OCCINV = "Invalid occurrence indicator.";
-  /** Error Message. */
+  /** Error message. */
   String PRE = "Unknown namespace prefix '%'.";
-  /** Error Message. */
+  /** Error message. */
   String ARG = "Wrong argument for %.";
-  /** Error Message. */
+  /** Error message. */
   String ARGC = "Construction Mode";
-  /** Error Message. */
+  /** Error message. */
   String ARGO = "Ordering Mode";
-  /** Error Message. */
+  /** Error message. */
   String ARGS = "Boundary Space";
-  /** Error Message. */
+  /** Error message. */
   String ARGN = "Namespace Mode";
-  /** Error Message. */
+  /** Error message. */
   String ARGB = "Binding Mode";
-  /** Error Message. */
+  /** Error message. */
   String ARGH = "Holdability";
-  /** Error Message. */
+  /** Error message. */
   String ARGR = "Scrollability";
-  /** Error Message. */
+  /** Error message. */
   String ARGL = "Language Type";
-  /** Error Message. */
+  /** Error message. */
   String TIME = "Timeout must be positive.";
-  /** Error Message. */
+  /** Error message. */
   String TIMEOUT = "Query exceeded timeout.";
-  /** Error Message. */
+  /** Error message. */
   String VAR = "Unknown variable %.";
 }

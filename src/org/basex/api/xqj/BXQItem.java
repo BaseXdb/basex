@@ -176,7 +176,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     opened();
     valid(result, Result.class);
 
-    // evaluate different Result types...
+    // evaluate different result types...
     if(result instanceof StreamResult) {
       // StreamResult.. directly write result as string
       writeItem(((StreamResult) result).getWriter(), null);

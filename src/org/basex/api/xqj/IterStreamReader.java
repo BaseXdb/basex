@@ -56,7 +56,7 @@ final class IterStreamReader implements XMLStreamReader {
    */
   IterStreamReader(final Iter res) {
     result = res;
-    // included for wrapping StreamReader into an XMLEventReader
+    // included for wrapping the stream reader into an XML event reader
     PROPS.put(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
   }
 
