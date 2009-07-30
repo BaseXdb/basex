@@ -12,7 +12,7 @@ import org.basex.data.Result;
 import org.basex.util.Performance;
 
 /**
- * XPath Test class.
+ * XQuery Test class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -49,7 +49,6 @@ public final class QueryTest {
     final Prop prop = CONTEXT.prop;
     prop.set(Prop.TEXTINDEX, true);
     prop.set(Prop.ATTRINDEX, true);
-    prop.set(Prop.MAINMEM, true);
     prop.set(Prop.CHOP, true);
     boolean ok = true;
 
@@ -71,7 +70,7 @@ public final class QueryTest {
       prop.set(Prop.FTINDEX, true);
       prop.set(Prop.FTFUZZY, false);
       prop.set(Prop.FTST, false);
-      prop.set(Prop.FTDC, false);
+      prop.set(Prop.FTDC, true);
       prop.set(Prop.FTCS, false);
       ok &= test(prop);
     }

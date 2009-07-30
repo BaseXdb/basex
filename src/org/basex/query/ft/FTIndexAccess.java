@@ -40,8 +40,8 @@ public final class FTIndexAccess extends Simple {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        // add entry to visualization
         final FTItem it = ir.next();
+        // add entry to visualization
         if(ctx.ftpos != null && it != null) ctx.ftpos.add(it.pre, it.all);
         return it;
       }

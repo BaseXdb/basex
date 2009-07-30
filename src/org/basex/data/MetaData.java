@@ -86,8 +86,8 @@ public final class MetaData {
     ftxindex = prop.is(Prop.FTINDEX);
     ftfz = prop.is(Prop.FTFUZZY);
     ftst = prop.is(Prop.FTST);
+    ftdc = prop.is(Prop.FTDC);
     ftcs = prop.is(Prop.FTCS);
-    ftdc = prop.is(Prop.FTCS);
   }
 
   /**

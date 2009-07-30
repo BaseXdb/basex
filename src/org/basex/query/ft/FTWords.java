@@ -238,6 +238,7 @@ public final class FTWords extends FTExpr {
     data = ic.data;
     final MetaData md = data.meta;
     final FTOpt fto = ic.ctx.ftopt;
+    
     if(txt == null || occ != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
