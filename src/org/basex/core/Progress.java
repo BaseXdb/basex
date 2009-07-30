@@ -29,7 +29,7 @@ public abstract class Progress {
    * Can be overwritten to give more detailed information.
    * @return header information
    */
-  protected String tit() {
+  public String tit() {
     return INFOWAIT;
   }
 

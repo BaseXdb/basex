@@ -332,7 +332,7 @@ public final class FSParser extends Parser {
   }
 
   @Override
-  public String head() {
+  public String tit() {
     return Text.IMPORTPROG;
   }
 

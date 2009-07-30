@@ -87,6 +87,7 @@ abstract class AQuery extends Process {
         /* ignored */
       }
     }
+    info.add(err);
     return err == null;
   }
 

@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
+import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -21,7 +22,7 @@ import org.basex.util.TokenMap;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public final class XMLScanner {
+public final class XMLScanner extends Progress {
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
   /** Verbose mode. */
@@ -1031,19 +1032,13 @@ public final class XMLScanner {
     throw new BuildException(det() + ": " + e, a);
   }
 
-  /**
-   * Returns detail info on the scanning process.
-   * @return info string
-   */
+  @Override
   public String det() {
     return BaseX.info(SCANPOS, input.file.name(), input.line);
   }
 
-  /**
-   * Returns per cent info on the scanning process.
-   * @return per cent
-   */
-  public double percent() {
+  @Override
+  public double prog() {
     return (double) input.pos() / input.length();
   }
 }

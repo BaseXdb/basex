@@ -522,7 +522,7 @@ public final class NewFSParser extends Parser {
   }
 
   @Override
-  public String head() {
+  public String tit() {
     return Text.IMPORTPROG;
   }
 

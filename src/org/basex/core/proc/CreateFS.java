@@ -13,23 +13,13 @@ import org.basex.core.Commands.CmdCreate;
  * @author Christian Gruen
  */
 public final class CreateFS extends ACreate {
-
-  /** File hierarchy to be imported. */
-  private final String fsimportpath;
-  /** Database name for imported file hierarchy. */
-  private final String name;
-  /** DeepFS mount point. */
-  private final String mount;
-  /** DeepFS backing store. */
-  private final String store;
-
   /**
    * Constructor.
    * @param path filesystem path
    * @param db name of database
    */
   public CreateFS(final String path, final String db) {
-    this(path, db, "no_fuse", "no_fuse");
+    this(path, db, "", "");
   }
 
   /**
@@ -42,10 +32,6 @@ public final class CreateFS extends ACreate {
   public CreateFS(final String path, final String db, final String mp,
       final String bp) {
     super(STANDARD, path, db, mp, bp);
-    fsimportpath = path;
-    name = db;
-    mount = mp;
-    store = bp;
   }
 
   @Override
@@ -53,8 +39,8 @@ public final class CreateFS extends ACreate {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
     return prop.is(Prop.NEWFSPARSER) ?
-      build(new NewFSParser(fsimportpath, mount, store, prop), name) :
-      build(new FSParser(fsimportpath, mount, store, prop), name);
+      build(new NewFSParser(args[0], args[2], args[3], prop), args[1]) :
+      build(new FSParser(args[0], args[2], args[3], prop), args[1]);
   }
 
   @Override

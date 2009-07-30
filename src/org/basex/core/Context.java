@@ -70,7 +70,7 @@ public final class Context {
    * Sets the specified data instance as current database.
    * @param d data reference
    */
-  public synchronized void openDB(final Data d) {
+  public void openDB(final Data d) {
     data = d;
     copied = null;
     marked = new Nodes(d);
@@ -80,7 +80,7 @@ public final class Context {
   /**
    * Removes the current database context.
    */
-  public synchronized void closeDB() {
+  public void closeDB() {
     data = null;
     current = null;
     marked = null;

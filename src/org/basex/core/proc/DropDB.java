@@ -55,7 +55,7 @@ public final class DropDB extends Process {
    * @param pr database properties
    * @return success of operation
    */
-  public static synchronized boolean delete(final String db,
+  static synchronized boolean delete(final String db,
       final String pat, final Prop pr) {
 
     final File path = pr.dbpath(db);

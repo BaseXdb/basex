@@ -51,12 +51,12 @@ public final class Open extends Process {
   public static Data open(final Context ctx, final String db)
       throws IOException {
 
-    // check if document exists
-    if(!ctx.prop.dbpath(db).exists())
-      throw new FileNotFoundException(BaseX.info(DBNOTFOUND, db));
-
     Data data = ctx.pin(db);
     if(data == null) {
+      // check if document exists
+      if(!ctx.prop.dbpath(db).exists())
+        throw new FileNotFoundException(BaseX.info(DBNOTFOUND, db));
+
       data = new DiskData(db, ctx.prop);
       ctx.addToPool(data);
     }

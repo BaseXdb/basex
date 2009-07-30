@@ -162,7 +162,7 @@ public final class XMLParser extends Parser {
   }
 
   @Override
-  public String head() {
+  public String tit() {
     return PROGCREATE;
   }
 
@@ -173,6 +173,6 @@ public final class XMLParser extends Parser {
 
   @Override
   public double prog() {
-    return scanner.percent();
+    return scanner.prog();
   }
 }

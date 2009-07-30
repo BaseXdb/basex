@@ -297,8 +297,7 @@ public abstract class Process extends Progress {
    */
   public final String args() {
     final StringBuilder sb = new StringBuilder();
-    for(final String a : args)
-      if(a != null) sb.append(" " + a);
+    for(final String a : args) if(a != null) sb.append(" " + a);
     return sb.toString();
   }
 

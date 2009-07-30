@@ -4,6 +4,7 @@ import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
+import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Atts;
@@ -14,7 +15,7 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Parser {
+public abstract class Parser extends Progress {
   /** Temporary attribute array. */
   protected final Atts atts = new Atts();
   /** Document flag; if true, a document node is added. */
@@ -71,28 +72,4 @@ public abstract class Parser {
    * @throws IOException I/O exception
    */
   public abstract void parse(Builder build) throws IOException;
-
-  /**
-   * Returns a compact description of the current progress.
-   * @return progress information
-   */
-  public String head() {
-    return "";
-  }
-
-  /**
-   * Returns detailed progress information.
-   * @return position info
-   */
-  public String det() {
-    return "";
-  }
-
-  /**
-   * Returns a value from 0 to 1, representing the current progress.
-   * @return progress information
-   */
-  public double prog() {
-    return 0;
-  }
 }

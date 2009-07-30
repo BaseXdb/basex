@@ -90,7 +90,7 @@ public final class DOCWrapper extends Parser {
   }
 
   @Override
-  public String head() {
+  public String tit() {
     return PROGCREATE;
   }
 

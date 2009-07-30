@@ -325,7 +325,7 @@ public abstract class Builder extends Progress {
 
   @Override
   public final String tit() {
-    return parser.head();
+    return parser.tit();
   }
 
   @Override

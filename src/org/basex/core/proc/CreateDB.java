@@ -68,7 +68,7 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates and returns a database instance for the specified XML document.
+   * Creates and returns a database instance from the specified parser.
    * @param ctx database context
    * @param p xml parser
    * @param db name of the database to be created; if db is <code>null</code>,
@@ -117,7 +117,8 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates and returns a main memory database from the specified XML document.
+   * Creates and returns a main memory database from the specified
+   * input reference.
    * @param io file reference
    * @param pr database properties
    * @return database instance

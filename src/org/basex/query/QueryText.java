@@ -32,6 +32,8 @@ public interface QueryText {
   Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
   /** BASX0002: Evaluation exception. */
   Object[] WHICHIDX = { BASX, 2, "Unknown index: '%'." };
+  /** BASX0003: Evaluation exception. */
+  Object[] NOFILE = { BASX, 3, "Text node could not be created (%)." };
 
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };

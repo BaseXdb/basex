@@ -3,8 +3,14 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
+import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
+import org.basex.io.IO;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -40,6 +46,7 @@ final class FNBaseX extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
       case FILENAME:   return filename(ctx);
+      case READ:       return text(ctx);
       case RANDOM:     return random();
       default:         return super.atomic(ctx);
     }
@@ -56,6 +63,26 @@ final class FNBaseX extends Fun {
     qt.parse(string(checkStr(expr[0], ctx)));
     qt.compile();
     return qt.iter();
+  }
+
+  /**
+   * Performs the eval function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item text(final QueryContext ctx) throws QueryException {
+    final byte[] name = checkStr(expr[0], ctx);
+    final IO io = IO.get(string(name));
+    if(!Prop.web && io.exists()) {
+      try {
+        return Str.get(io.content());
+      } catch(final IOException ex) {
+        BaseX.debug(ex);
+      }
+    }
+    Err.or(NOFILE, name);
+    return null;
   }
 
   /**

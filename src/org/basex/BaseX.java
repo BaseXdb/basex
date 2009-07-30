@@ -139,7 +139,7 @@ public class BaseX {
         out.close();
       }
 
-      if(v) {
+      if(v || !ok) {
         final CachedOutput out = new CachedOutput();
         launcher.info(out);
         final String inf = out.toString();

@@ -281,12 +281,12 @@ public final class MAB2Parser extends Parser {
    * Adds an entry.
    * @param in input stream
    * @param pos file offset to start from
-   * @param sub number of subordinate titles
+   * @param sb number of subordinate titles
    * @param last last title
    * @return last title
    * @throws IOException I/O exception
    */
-  private byte[] addEntry(final DataAccess in, final long pos, final int sub,
+  private byte[] addEntry(final DataAccess in, final long pos, final int sb,
       final byte[] last) throws IOException {
 
     mvID = null;
@@ -382,7 +382,7 @@ public final class MAB2Parser extends Parser {
         atts.reset();
         atts.add(MV_ID, mvID);
         atts.add(BIB_ID, bibID);
-        if(sub != 0 && !flat) atts.add(MAX, token(sub));
+        if(sb != 0 && !flat) atts.add(MAX, token(sb));
 
         // merge super and sub titles
         if(last != null) {
@@ -417,7 +417,7 @@ public final class MAB2Parser extends Parser {
         addTag(GENRE, genres.get(mvID));
         addTag(STATUS, status.get(bibID));
         addTag(LENDINGS, lendings.get(bibID));
-        if(sub == 0 || flat) builder.endElem(MEDIUM);
+        if(sb == 0 || flat) builder.endElem(MEDIUM);
         return title;
       }
     }

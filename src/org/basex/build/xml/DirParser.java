@@ -71,8 +71,8 @@ public final class DirParser extends Parser {
   }
 
   @Override
-  public String head() {
-    return parser != null ? parser.head() : PROGCREATE;
+  public String tit() {
+    return parser != null ? parser.tit() : PROGCREATE;
   }
 
   @Override
