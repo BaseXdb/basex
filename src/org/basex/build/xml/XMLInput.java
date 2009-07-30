@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class XMLInput {
+public final class XMLInput {
   /** Input stream reference. */
   BufferInput[] in = new BufferInput[1];
 
@@ -37,7 +37,7 @@ final class XMLInput {
    * @param f file reference
    * @throws IOException I/O exception
    */
-  XMLInput(final IO f) throws IOException {
+  public XMLInput(final IO f) throws IOException {
     in[0] = f.buffer();
     in[0].encoding();
     file = f;
@@ -56,7 +56,7 @@ final class XMLInput {
    * Jumps the specified number of characters back.
    * @param p number of characters
    */
-  void prev(final int p) {
+  public void prev(final int p) {
     pp -= p;
     pos();
   }
@@ -66,7 +66,7 @@ final class XMLInput {
    * @return next character
    * @throws IOException I/O exception
    */
-  int next() throws IOException {
+  public int next() throws IOException {
     if(pp != 0) return last[lp + pp++ & 0x0F];
 
     int ch = in[ip].readChar();
@@ -89,7 +89,7 @@ final class XMLInput {
    * @param s add spaces
    * @return true if everything went alright
    */
-  boolean add(final byte[] val, final boolean s) {
+  public boolean add(final byte[] val, final boolean s) {
     if(s) a(new CachedInput(Token.SPACE));
     a(new CachedInput(val));
     if(s) a(new CachedInput(Token.SPACE));
@@ -114,7 +114,7 @@ final class XMLInput {
    * Finishes file input.
    * @throws IOException I/O exception
    */
-  void finish() throws IOException {
+  public void finish() throws IOException {
     in[0].close();
   }
 
@@ -122,7 +122,7 @@ final class XMLInput {
    * Returns the current file position.
    * @return file position
    */
-  int pos() {
+  public int pos() {
     return Math.max(0, in[0].size() + pp);
   }
 
@@ -130,7 +130,7 @@ final class XMLInput {
    * Returns the file length.
    * @return file position
    */
-  long length() {
+  public long length() {
     return in[0].length();
   }
 }

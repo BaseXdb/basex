@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.BaseX;
+import org.basex.build.xml.XMLInput;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
@@ -22,6 +23,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.util.TokenBuilder;
 
 /**
  * Project specific functions.
@@ -76,7 +78,13 @@ final class FNBaseX extends Fun {
     final IO io = IO.get(string(name));
     if(!Prop.web && io.exists()) {
       try {
-        return Str.get(io.content());
+        final XMLInput in = new XMLInput(io);
+        final int len = (int) in.length();
+        final TokenBuilder tb = new TokenBuilder(len);
+        while(in.pos() < len) tb.addUTF(in.next());
+        in.finish();
+        return Str.get(tb.finish());
+        //return Str.get(io.content());
       } catch(final IOException ex) {
         BaseX.debug(ex);
       }
