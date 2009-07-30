@@ -92,7 +92,7 @@ final class XMLStreamWrapper extends Parser {
   }
 
   @Override
-  public String head() {
+  public String tit() {
     return PROGCREATE;
   }
 
