@@ -46,7 +46,7 @@ public final class GIFParser extends AbstractParser {
       throws IOException {
     try {
       f.buffer(10);
-    } catch(EOFException e) {
+    } catch(final EOFException e) {
       return;
     }
     if(!check(f)) return;

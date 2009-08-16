@@ -194,7 +194,7 @@ public final class SpotlightExtractor {
     /** Date and time when the content of this item was modified. */
     ContentModificationDate {
       @Override
-      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
         obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
       }
     },
@@ -204,12 +204,12 @@ public final class SpotlightExtractor {
      */
     ContentType {
       @Override
-      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
         try {
           String key = ((String) o).toUpperCase();
           key = key.replace('.', '_').replace('-', '_');
           obj.mimeTypeEvent(SpotlightContentType.valueOf(key));
-        } catch(IllegalArgumentException ex) {
+        } catch(final IllegalArgumentException ex) {
           BaseX.debug("SpotlightExtractor: unsupported ContentType found (%)",
               (String) o);
         }
@@ -373,11 +373,11 @@ public final class SpotlightExtractor {
     /** Media types present in the content. */
     MediaTypes {
       @Override
-      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
         try {
-          String key = ((String) o).toUpperCase();
+          final String key = ((String) o).toUpperCase();
           obj.metaTypeEvent(SpotlightMediaType.valueOf(key));
-        } catch(IllegalArgumentException ex) {
+        } catch(final IllegalArgumentException ex) {
           BaseX.debug("SpotlightExtractor: unsupported MediaType found (%)",
               (String) o);
         }
@@ -670,7 +670,7 @@ public final class SpotlightExtractor {
    * @throws IOException if any error occurs while writing to the parser.
    */
   void mimeTypeEvent(final SpotlightContentType ct) throws IOException {
-    MimeType m = ct.get();
+    final MimeType m = ct.get();
     if(m == null) return;
     meta.setMimeType(m);
     parser.metaEvent(meta);
