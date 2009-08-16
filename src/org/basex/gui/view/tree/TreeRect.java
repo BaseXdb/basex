@@ -1,6 +1,5 @@
 package org.basex.gui.view.tree;
 
-
 /**
  * This is class is used to handle rectangles containing more than one node.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
