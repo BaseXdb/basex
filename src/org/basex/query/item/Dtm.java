@@ -33,7 +33,7 @@ public final class Dtm extends Date {
   /**
    * Constructor.
    * @param dt date
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dtm(final byte[] dt) throws QueryException {
     super(Type.DTM, dt, XDTM);
@@ -46,7 +46,7 @@ public final class Dtm extends Date {
   /**
    * Constructor.
    * @param tm time in milliseconds
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   Dtm(final Dec tm) throws QueryException {
     this(Token.token(DATE.format(new java.util.Date(tm.itr()))));
@@ -57,7 +57,7 @@ public final class Dtm extends Date {
    * @param d date
    * @param a duration
    * @param p plus/minus flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dtm(final Date d, final Dur a, final boolean p) throws QueryException {
     this(d);

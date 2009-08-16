@@ -14,7 +14,7 @@ import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
- * Let Clause.
+ * Let clause.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -30,8 +30,7 @@ public final class Let extends ForLet {
    * @param s score flag
    */
   public Let(final Expr e, final Var v, final boolean s) {
-    expr = e;
-    var = v;
+    super(e, v);
     score = s;
   }
 

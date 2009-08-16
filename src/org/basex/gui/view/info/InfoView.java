@@ -110,7 +110,7 @@ public final class InfoView extends View {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWINFO);
   }
 
@@ -140,7 +140,8 @@ public final class InfoView extends View {
       } else if(line.startsWith(QUERYSTRING)) {
         query = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYPLAN)) {
-        while(split[++i].length() != 0) pln.add(split[i]);
+        while(++i < split.length && !Character.isLetter(split[i].charAt(0)))
+          pln.add(split[i]);
         --i;
       } else if(line.startsWith(QUERYCOMP)) {
         while(!split[++i].contains(QUERYRESULT)) cmp.add(split[i]);

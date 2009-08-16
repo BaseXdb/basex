@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestTags extends DataUpdateTest {
+public final class UpdateTestTags extends UpdateTest {
   /**
    * Tests insert as last child.
    */
@@ -207,7 +207,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
       while(currPos < pos) {
         final int k = data.kind(root);
         if(data.parent(root, k) != par) break;
-        root = root + data.size(root, k);
+        root += data.size(root, k);
         currPos++;
       }
     }

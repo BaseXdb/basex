@@ -24,7 +24,7 @@ public final class QNm extends Item {
   private int ns;
 
   /**
-   * Empty Constructor.
+   * Empty constructor.
    */
   public QNm() {
     super(Type.QNM);

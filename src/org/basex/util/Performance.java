@@ -134,7 +134,7 @@ public final class Performance {
    * Throws and catches an error to display the current stack.
    */
   public static void stack() {
-    try { throw new Error(); } catch(final Error e) { e.printStackTrace(); }
+    try { throw new Error(); } catch(final Error ex) { ex.printStackTrace(); }
   }
 
   @Override

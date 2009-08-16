@@ -80,7 +80,7 @@ public final class MixedPath extends Path {
    * Evaluates the location path.
    * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected Item eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...

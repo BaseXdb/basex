@@ -80,11 +80,13 @@ public final class GUI extends JFrame {
   public final GUIInput input;
   /** Filter button. */
   public final BaseXButton filter;
-  /** Help dialog. */
-  public DialogHelp help;
   /** Search view. */
   public final XQueryView query;
 
+  /** Fullscreen flag. */
+  public boolean fullscreen;
+  /** Help dialog. */
+  public DialogHelp help;
   /** Text view. */
   final TextView text;
   /** Info view. */
@@ -124,7 +126,7 @@ public final class GUI extends JFrame {
   public int focused = -1;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param ctx context reference
    * @param gprops gui properties
    */
@@ -297,6 +299,7 @@ public final class GUI extends JFrame {
 
   @Override
   public void dispose() {
+    query.confirm();
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     prop.set(GUIProp.MAXSTATE, max);
     if(!max) {
@@ -371,6 +374,7 @@ public final class GUI extends JFrame {
     final Namespaces ns = context.data().ns;
     final int def = ns.get(Token.EMPTY, 0);
     String in = qu;
+    if(in.trim().length() == 0) in = ".";
     if(def != 0) in = "declare default element namespace \"" +
       Token.string(ns.key(def)) + "\"; " + in;
     execute(new XQuery(in), main);
@@ -444,8 +448,7 @@ public final class GUI extends JFrame {
 
       // command info
       final String inf = pr.info();
-
-      if(!ok && inf.length() == 0) {
+      if(!ok && inf.equals(PROGERR)) {
         proc = null;
         return false;
       }
@@ -457,7 +460,7 @@ public final class GUI extends JFrame {
       // treat text view different to other views
       if(ok && pr.printing()) {
         // display text view if result will not highlight any nodes
-        if(!text.isValid() && nodes == null) GUICommands.SHOWTEXT.execute(this);
+        if(!text.visible() && nodes == null) GUICommands.SHOWTEXT.execute(this);
 
         // retrieve text result
         if(prop.is(GUIProp.SHOWTEXT)) {
@@ -483,8 +486,8 @@ public final class GUI extends JFrame {
       if(!ok) {
         // show error info
         if(!feedback) {
-          // display text view if text output is
-          if(!text.isValid()) GUICommands.SHOWTEXT.execute(this);
+          // display text view if text output is not shown
+          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
           text.setText(Token.token(inf));
         }
         cursor(CURSORARROW, true);
@@ -661,7 +664,8 @@ public final class GUI extends JFrame {
    * Turns fullscreen mode on/off.
    */
   public void fullscreen() {
-    fullscreen(!prop.is(GUIProp.FULLSCREEN));
+    fullscreen ^= true;
+    fullscreen(fullscreen);
   }
 
   /**
@@ -703,7 +707,7 @@ public final class GUI extends JFrame {
     prop.set(GUIProp.SHOWBUTTONS, !full);
     prop.set(GUIProp.SHOWINPUT, !full);
     prop.set(GUIProp.SHOWSTATUS, !full);
-    prop.set(GUIProp.FULLSCREEN, !full);
+    fullscreen = full;
 
     GraphicsEnvironment.getLocalGraphicsEnvironment().
       getDefaultScreenDevice().setFullScreenWindow(fullscr);

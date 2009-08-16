@@ -48,7 +48,7 @@ public final class Functions extends ExprInfo {
    * @param name name of the function
    * @param args optional arguments
    * @return function instance
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Expr get(final QNm name, final Expr[] args) throws QueryException {
     // find function
@@ -63,8 +63,8 @@ public final class Functions extends ExprInfo {
       return new Cast(args[0], seq);
     }
 
-    // check Java functions - not supported in server mode
-    if(!Prop.server && startsWith(uri, JAVAPRE)) {
+    // check Java functions - not supported in web server mode
+    if(!Prop.web && startsWith(uri, JAVAPRE)) {
       final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);
@@ -128,7 +128,7 @@ public final class Functions extends ExprInfo {
    * Adds a local function.
    * @param fun function instance
    * @return function id
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public int add(final Func fun) throws QueryException {
     final QNm name = fun.var.name;
@@ -165,7 +165,7 @@ public final class Functions extends ExprInfo {
   /**
    * Compiles the functions.
    * @param ctx query context
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void comp(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < size; i++) func[i].comp(ctx);
@@ -173,7 +173,7 @@ public final class Functions extends ExprInfo {
 
   /**
    * Checks if all functions have been correctly initialized.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void check() throws QueryException {
     for(int i = 0; i < size; i++) {
@@ -184,7 +184,7 @@ public final class Functions extends ExprInfo {
   /**
    * Finds similar function names and throws an error message.
    * @param name function name
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void funError(final QNm name) throws QueryException {
     // find function

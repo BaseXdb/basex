@@ -1,49 +1,58 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.util.IntList;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
- * Evaluates the 'copy' command.
+ * Evaluates the 'copy' command and copies nodes in the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Copy extends AUpdate {
   /**
-   * Constructor.
-   * @param a arguments
+   * Default constructor.
+   * @param source source query
+   * @param target target query
+   * @param position target position
    */
-  public Copy(final String... a) {
-    super(null, a);
+  public Copy(final String source, final String target, final int position) {
+    super(false, source, target);
+    pos = position;
+  }
+
+  /**
+   * Constructor, using 0 as target position.
+   * @param source source query
+   * @param target target query
+   */
+  public Copy(final String source, final String target) {
+    this(source, target, 0);
+  }
+
+  /**
+   * Constructor, used by the GUI.
+   */
+  public Copy() {
+    super(true);
   }
 
   @Override
   protected boolean exec() {
-    final boolean gui = args.length == 0;
+    if(!checkDB()) return false;
+
     final Data data = context.data();
-    if(data.ns.size() != 0) return error(UPDATENS);
-
-    final int pos = gui ? 0 : Token.toInt(args[0]);
-    if(pos < 0) return error(POSINVALID, args[0]);
-
-    Nodes src;
-    Nodes trg;
-    if(gui) {
-      src = context.copied();
-      trg = context.marked();
-      context.copy(null);
-    } else {
-      // perform query and check if all result nodes reference tags
-      src = query(args[1], null);
-      trg = query(args[2], COPYTAGS);
-      if(src == null || trg == null) return false;
-    }
-
+    Nodes src = gui ? context.copied() : query(args[0], null);
+    Nodes trg = gui ? context.marked() : query(args[1], COPYTAGS);
+    if(src == null || trg == null) return false;
+    if(gui) context.copy(null);
+    
     final int size = src.size();
     final Data[] srcDocs = new Data[src.size()];
     for(int c = 0; c < size; c++) srcDocs[c] = copy(src.data, src.nodes[c]);
@@ -51,23 +60,49 @@ public final class Copy extends AUpdate {
     final IntList marked = gui ? new IntList() : null;
     int copied = 0;
 
+    // check for duplicate source attributes
+    final TokenList tl = new TokenList();
+    for(int c = 0; c < size; c++) {
+      if(srcDocs[c].meta.size == 1 && srcDocs[c].kind(0) == Data.ATTR) {
+        final byte[] name = srcDocs[c].attName(0);
+        if(tl.contains(name)) return error(ATTDUPL, srcDocs[c].attName(0));
+        tl.add(name);
+      }
+    }
+
     for(int n = trg.size() - 1; n >= 0; n--) {
       final int par = trg.nodes[n];
+      // source nodes can only be appended to elements
       if(data.kind(par) != Data.ELEM) return error(COPYTAGS);
-
+      // check for duplicate target attributes
       for(int c = 0; c < size; c++) {
-        final int pre = pre(par, pos, data);
+        if(srcDocs[c].meta.size == 1 && srcDocs[c].kind(0) == Data.ATTR) {
+          final int att = srcDocs[c].attNameID(0);
+          final int last = par + data.attSize(par, Data.ELEM);
+          for(int p = par + 1; p < last; p++) {
+            if(att == data.attNameID(p)) return error(ATTDUPL, data.attName(p));
+          }
+        }
+      }
+    }
+
+    for(int n = trg.size() - 1; n >= 0; n--) {
+      final int par = trg.nodes[n];
+      for(int c = 0; c < size; c++) {
+        int pre = pre(par, pos, data);
 
         // merge text nodes if necessary
         // [CG] Updates/MergeText: might not cover all cases yet
-
         final int s = srcDocs[c].meta.size - 1;
-        final int up = s != 0 ? -1 :
+        final int txt = s != 0 ? -1 :
           Insert.checkText(data, pre, par, srcDocs[c].kind(s));
-        if(up != -1) {
-          data.update(up, Token.concat(data.text(up), srcDocs[c].text(s)));
-          if(gui && !marked.contains(up)) marked.add(up);
+        if(txt != -1) {
+          data.update(txt, Token.concat(data.text(txt), srcDocs[c].text(s)));
+          if(gui && !marked.contains(txt)) marked.add(txt);
         } else {
+          if(s == 0 && srcDocs[c].kind(0) == Data.ATTR) {
+            pre = par + data.attSize(par, data.kind(par));
+          }
           data.insert(pre, par, srcDocs[c]);
           if(gui) marked.add(pre);
         }
@@ -128,6 +163,7 @@ public final class Copy extends AUpdate {
 
   @Override
   public String toString() {
-    return name() + " " + args[0] + " " + args[1] + ", " + args[2];
+    return Cmd.COPY + " " + args[0] + " " + INTO + " " +
+      args[1] + (pos == 0 ? "" : " " + AT + " " + pos);
   }
 }

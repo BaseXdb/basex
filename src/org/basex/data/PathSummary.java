@@ -1,8 +1,10 @@
 package org.basex.data;
 
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.basex.core.Prop;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -20,10 +22,10 @@ public final class PathSummary {
   /** Parent stack. */
   private PathNode[] stack;
   /** Root node. */
-  private PathNode root;
+  public PathNode root;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    */
   public PathSummary() {
     init();
@@ -56,23 +58,11 @@ public final class PathSummary {
    * @param k node kind
    */
   public void add(final int n, final int l, final byte k) {
-    add(n, l, k, 0);
-  }
-
-  /**
-   * Opens an element.
-   * @param n name reference
-   * @param l current level
-   * @param k node kind
-   * @param tl length of text in bytes (0 for non-text nodes)
-   */
-  public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
       root = new PathNode(n, k, null);
       stack[0] = root;
     } else {
-      stack[l] = stack[l - 1].get(n, k, tl);
-      root.tl += tl;
+      stack[l] = stack[l - 1].get(n, k);
     }
   }
 
@@ -208,5 +198,28 @@ public final class PathSummary {
     }
     if(!o) out.sort(false);
     return out;
+  }
+
+  /**
+   * Returns information on the path summary.
+   * @param data data reference
+   * @return info
+   */
+  public byte[] info(final Data data) {
+    byte[] info = root.info(data, 0);
+    if(!data.meta.prop.is(Prop.INDEXALL)) info = chop(info, 1 << 13);
+    return info;
+  }
+
+  /**
+   * Serializes the path node.
+   * @param data data reference
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  public void plan(final Data data, final Serializer ser) throws IOException {
+    ser.openElement(PATH);
+    root.plan(data, ser);
+    ser.closeElement();
   }
 }

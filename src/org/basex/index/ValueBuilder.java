@@ -17,14 +17,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ValueBuilder extends IndexBuilder {
-  /** Index type (attributes/texts). */
-  private final boolean text;
   /** Temporary value tree. */
   private final ValueTree index = new ValueTree();
-  /** Current parsing value. */
-  private int id;
-  /** Maximum parsing value. */
-  private int total;
+  /** Index type (attributes/texts). */
+  private final boolean text;
 
   /**
    * Constructor.
@@ -44,7 +40,6 @@ public final class ValueBuilder extends IndexBuilder {
     final int max = (int) (data.meta.prop.dbfile(db, f).length() >>> 7);
     while(cap < max && cap < 1 << 24) cap <<= 1;
 
-    total = data.meta.size;
     final int type = text ? Data.TEXT : Data.ATTR;
     for(id = 0; id < total; id++) {
       if(data.kind(id) != type) continue;
@@ -53,8 +48,8 @@ public final class ValueBuilder extends IndexBuilder {
       // skip too long and pure whitespace tokens
       if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, id);
     }
-    index.init();
 
+    index.init();
     final int hs = index.size;
     final Prop pr = data.meta.prop;
     final DataOutput outl = new DataOutput(pr.dbfile(db, f + 'l'));
@@ -85,17 +80,7 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   @Override
-  public String tit() {
-    return PROGINDEX;
-  }
-
-  @Override
   public String det() {
     return text ? INDEXTXT : INDEXATT;
-  }
-
-  @Override
-  public double prog() {
-    return (double) id / total;
   }
 }

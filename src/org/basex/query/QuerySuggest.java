@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class QuerySuggest extends QueryParser {
+public final class QuerySuggest extends QueryParser {
   /** Data reference. */
   private final Data data;
   /** All current path nodes. */
@@ -61,7 +61,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   protected void checkInit() {
-    if(stack != null && !stack.empty()) return;
+    if(stack != null && !stack.empty() || !data.meta.pathindex) return;
     all = data.path.root();
     curr = all;
     stack = new Stack<ArrayList<PathNode>>();
@@ -69,11 +69,8 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   protected void checkAxis(final Axis axis) {
-    if(axis == Axis.CHILD || axis == Axis.DESC) {
-      all = data.path.desc(curr, axis == Axis.DESC);
-    } else {
-      all = new ArrayList<PathNode>();
-    }
+    all = axis != Axis.CHILD && axis != Axis.DESC || !data.meta.pathindex ?
+      new ArrayList<PathNode>() : data.path.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;
   }
@@ -109,6 +106,7 @@ public class QuerySuggest extends QueryParser {
 
   @Override
   protected void checkPred(final boolean open) {
+    if(stack == null) return;
     if(open) {
       checkTest(true);
       final ArrayList<PathNode> tmp = new ArrayList<PathNode>();

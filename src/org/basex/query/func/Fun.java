@@ -37,7 +37,7 @@ public abstract class Fun extends Arr {
    * Compiles the function.
    * @param ctx query context
    * @return evaluated item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public Expr c(final QueryContext ctx) throws QueryException {
@@ -54,7 +54,7 @@ public abstract class Fun extends Arr {
    * @param i item to be checked
    * @param t type to be checked
    * @return specified item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final Item check(final Item i, final Type t) throws QueryException {
     if(i == null) Err.empty(this);
@@ -68,7 +68,7 @@ public abstract class Fun extends Arr {
    * @param e expression to be checked
    * @param ctx query context
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
@@ -80,7 +80,7 @@ public abstract class Fun extends Arr {
    * Returns a token representation or an exception.
    * @param it item to be checked
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final byte[] checkStr(final Item it) throws QueryException {
     if(it == null) return Token.EMPTY;
@@ -93,7 +93,7 @@ public abstract class Fun extends Arr {
    * Returns a token representation or an exception.
    * @param it item to be checked
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final Nod checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(info(), Type.NOD, it);
@@ -104,7 +104,7 @@ public abstract class Fun extends Arr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {

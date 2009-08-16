@@ -71,7 +71,7 @@ public final class DiskData extends Data {
   private int lock;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param db name of database
    * @param pr database properties
    * @throws IOException IO Exception
@@ -88,7 +88,7 @@ public final class DiskData extends Data {
         if(k.length() == 0) break;
         if(k.equals(DBTAGS))      tags = new Names(in);
         else if(k.equals(DBATTS)) atts = new Names(in);
-        else if(k.equals(DBPATH))  path = new PathSummary(in);
+        else if(k.equals(DBPATH)) path = new PathSummary(in);
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
       }
 
@@ -129,11 +129,8 @@ public final class DiskData extends Data {
     write();
   }
 
-  /**
-   * Initializes the table.
-   * @throws IOException IO Exception
-   */
-  private void init() throws IOException {
+  @Override
+  public void init() throws IOException {
     // table main memory mode..
     final String db = meta.name;
     table = meta.prop.is(Prop.TABLEMEM) ?
@@ -141,7 +138,7 @@ public final class DiskData extends Data {
       new TableDiskAccess(db, DATATBL, meta.prop);
     texts = new DataAccess(db, DATATXT, meta.prop);
     values = new DataAccess(db, DATAATV, meta.prop);
-    initNames();
+    super.init();
   }
 
   /**
@@ -436,6 +433,8 @@ public final class DiskData extends Data {
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
+    // ignore deletions of single root node
+    if(pre == 0 && s == 1) return;
 
     // reduce size of ancestors
     int par = pre;

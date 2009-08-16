@@ -49,7 +49,7 @@ final class FNNum extends Fun {
    * Returns the absolute item.
    * @param it input item
    * @return absolute item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item abs(final Item it) throws QueryException {
     final double d = it.dbl();
@@ -68,7 +68,7 @@ final class FNNum extends Fun {
    * Returns a rounded item.
    * @param it input item
    * @return absolute item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item rnd(final Item it) throws QueryException {
     final double d = it.dbl();
@@ -87,7 +87,7 @@ final class FNNum extends Fun {
    * @param n input double value
    * @param ctx query context
    * @return rounded item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item rnd(final Item it, final double n, final QueryContext ctx)
       throws QueryException {

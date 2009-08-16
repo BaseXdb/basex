@@ -327,7 +327,7 @@ public class BaseXText extends BaseXPanel {
     final boolean ctrl = (Toolkit.getDefaultToolkit().
         getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
-    if(ctrl && c == KeyEvent.VK_F) {
+    if(ctrl && c == 'F') {
       if(find != null) find.requestFocusInWindow();
       return;
     }
@@ -360,16 +360,14 @@ public class BaseXText extends BaseXPanel {
         return;
       }
 
-      if(undo != null) {
-        if(c == 'X') {
-          cut();
-        } else if(c == 'V') {
-          paste();
-        } else if(c == 'Z') {
-          undo();
-        } else if(c == 'Y') {
-          redo();
-        }
+      if(c == 'X') {
+        cut();
+      } else if(c == 'V') {
+        paste();
+      } else if(c == 'Z') {
+        undo();
+      } else if(c == 'Y') {
+        redo();
       }
     }
 
@@ -533,11 +531,7 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    final int c = e.getKeyCode();
-    if(e.isControlDown() && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y) ||
-        undo == null) return;
-
-    undo.store(text.finish(), text.cursor());
+    if(undo != null) undo.store(text.finish(), text.cursor());
   }
 
   // EDITOR COMMANDS ==========================================================
@@ -546,6 +540,7 @@ public class BaseXText extends BaseXPanel {
    * Undoes the text.
    */
   protected void undo() {
+    if(undo == null) return;
     text = new BaseXTextTokens(undo.prev());
     rend.setText(text);
     text.pos(undo.cursor());
@@ -555,6 +550,7 @@ public class BaseXText extends BaseXPanel {
    * Redoes the text.
    */
   protected void redo() {
+    if(undo == null) return;
     text = new BaseXTextTokens(undo.next());
     rend.setText(text);
     text.pos(undo.cursor());

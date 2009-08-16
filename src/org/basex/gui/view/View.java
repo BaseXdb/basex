@@ -69,7 +69,7 @@ public abstract class View extends BaseXPanel {
    * Returns if this view is currently visible.
    * @return result of check.
    */
-  protected abstract boolean visible();
+  public abstract boolean visible();
 
   @Override
   public void mouseEntered(final MouseEvent e) {

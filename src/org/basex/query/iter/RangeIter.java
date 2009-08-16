@@ -4,7 +4,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 
 /**
- * Range Iterator.
+ * Range iterator.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

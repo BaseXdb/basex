@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.util.Token;
+import org.basex.core.proc.IntStop;
+import org.basex.core.proc.Set;
+import org.basex.util.Args;
 
 /**
  * This is the starter class for the database server. It handles incoming
@@ -23,28 +25,32 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public class BaseXServerNew {
+public final class BaseXServerNew {
   /** Database Context. */
   public final Context context = new Context();
+  /** Current client connections. */
+  final ArrayList<Session> sessions = new ArrayList<Session>();
+
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
   boolean verbose;
   /** Last Id from a client. */
-  int lastid = 0;
-  /** Current client connections. */
-  final ArrayList<Session> sessions = new ArrayList<Session>();
+  int lastid;
   /** ServerSocket. */
-  ServerSocket serverSocket;
-  /** InputListener. */
-  InputListener inputListener;
+  ServerSocket socket;
+
   /** SessionListenre. */
-  SessionListener sessionListener;
+  private SessionListener session;
+  /** InputListener. */
+  private InputListener input;
+  /** Flag for interactive mode. */
+  private boolean interactive;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
    * listed with the <code>-h</code> argument.
-   * @param args command line arguments
+   * @param args command-line arguments
    */
   public static void main(final String[] args) {
     new BaseXServerNew(args);
@@ -57,8 +63,6 @@ public class BaseXServerNew {
    * @param args arguments
    */
   public BaseXServerNew(final String... args) {
-    Prop.server = true;
-
     if(!parseArguments(args)) return;
 
     // guarantee correct shutdown...
@@ -72,21 +76,16 @@ public class BaseXServerNew {
     });
 
     try {
-      serverSocket = new ServerSocket(context.prop.num(Prop.PORT));
+      socket = new ServerSocket(context.prop.num(Prop.PORT));
       BaseX.outln(SERVERSTART);
-      inputListener = new InputListener();
-      inputListener.start();
-      sessionListener = new SessionListener(this);
-      sessionListener.start();
-    } catch(final Exception ex) {
-      BaseX.debug(ex);
-      if(ex instanceof BindException) {
-        BaseX.errln(SERVERBIND);
-      } else if(ex instanceof IOException) {
-        BaseX.errln(SERVERERR);
-      } else {
-        BaseX.errln(ex.getMessage());
+      if(interactive) {
+        input = new InputListener();
+        input.start();
       }
+      session = new SessionListener(this);
+      session.start();
+    } catch(final Exception ex) {
+      error(ex, true);
     }
   }
 
@@ -96,15 +95,29 @@ public class BaseXServerNew {
    */
   public void stop() throws IOException {
     running = false;
-    inputListener.thread.interrupt();
-    inputListener = null;
-    for (int i = 0; i < sessions.size(); i++) sessions.get(i).close();
+    if(interactive) {
+      input.thread.interrupt();
+      input = null;
+    }
+    for(final Session s : sessions) s.close();
 
     try {
-      // dummy Socket for breaking the accept block
-      new Socket("localhost", context.prop.num(Prop.PORT));
-    } catch(IOException ex) {
-      ex.printStackTrace();
+      // dummy socket for breaking the accept block
+      new Socket(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT));
+    } catch(final IOException ex) {
+      error(ex, false);
+    }
+  }
+
+  /**
+   * Quits the server.
+   */
+  public void quit() {
+    try {
+      new ClientLauncherNew(context).execute(new IntStop());
+      BaseX.outln(SERVERSTOPPED);
+    } catch(final IOException ex) {
+      error(ex, true);
     }
   }
 
@@ -113,56 +126,61 @@ public class BaseXServerNew {
    */
   public void close() {
     try {
-      serverSocket.close();
-    } catch(IOException ex) {
-      ex.printStackTrace();
+      socket.close();
+    } catch(final IOException ex) {
+      error(ex, false);
     }
   }
 
   /**
-   * Parses the command line arguments.
-   * @param args the command line arguments
+   * Parses the command-line arguments.
+   * @param args command-line arguments
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args);
     boolean ok = true;
-
-    // loop through all arguments
-    for(int a = 0; a < args.length; a++) {
-      ok = false;
-      if(args[a].startsWith("-")) {
-        for(int i = 1; i < args[a].length(); i++) {
-          final char c = args[a].charAt(i);
-          if(c == 'p') {
-            // parse server port
-            if(++i == args[a].length()) {
-              a++;
-              i = 0;
-            }
-            if(a == args.length) break;
-            final int p = Token.toInt(args[a].substring(i));
-            if(p <= 0) {
-              BaseX.errln(SERVERPORT + args[a].substring(i));
-              break;
-            }
-            context.prop.set(Prop.PORT, p);
-            i = args[a].length();
-            ok = true;
-          } else if(c == 'd') {
-            Prop.debug = true;
-            ok = true;
-          } else if(c == 'v') {
-            verbose = true;
-            ok = true;
-          } else {
-            break;
-          }
+    while(arg.more() && ok) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'd') {
+          // activate debug mode
+          ok = set(Prop.DEBUG, true);
+        } else if(c == 'i') {
+          // activate interactive mode
+          interactive = true;
+        } else if(c == 'p') {
+          // parse server port
+          ok = set(Prop.PORT, arg.string());
+        } else if(c == 's') {
+          // parse server name
+          ok = set(Prop.HOST, arg.string());
+        } else if(c == 'v') {
+          // show process info
+          verbose = true;
+        } else {
+          ok = false;
+        }
+      } else {
+        ok = false;
+        if(arg.string().equals("stop")) {
+          quit();
+          return false;
         }
       }
-      if(!ok) break;
     }
-    if(!ok) BaseX.errln(SERVERINFO);
+    if(!ok) BaseX.outln(SERVERINFO);
     return ok;
+  }
+
+  /**
+   * Sets the specified option.
+   * @param opt option to be set
+   * @param arg argument
+   * @return success flag
+   */
+  private boolean set(final Object[] opt, final Object arg) {
+    return new Set(opt, arg).execute(context);
   }
 
   /**
@@ -171,12 +189,11 @@ public class BaseXServerNew {
    * @author Andreas Weiler
    */
   class InputListener implements Runnable {
-
     /** Thread. */
     Thread thread = null;
 
     /**
-     * Starts the Thread.
+     * Starts the thread.
      */
     public void start() {
       thread = new Thread(this);
@@ -198,12 +215,12 @@ public class BaseXServerNew {
             BaseX.outln("Number of Clients: " + size);
             BaseX.outln("List of Clients:");
             for(int i = 0; i < size; i++) {
-              final Session session = sessions.get(i);
+              final Session s = sessions.get(i);
               String dbname = "No Database opened.";
-              if(session.context.data() != null) {
-                dbname = session.context.data().meta.name;
+              if(s.context.data() != null) {
+                dbname = s.context.data().meta.name;
               }
-              BaseX.outln("Client " + session.clientId + ": " + dbname);
+              BaseX.outln("Client " + s.clientId + ": " + dbname);
             }
           } else if(com.equals("help")) {
             BaseX.outln("-list     Lists all Clients connected to the Server"
@@ -249,18 +266,36 @@ public class BaseXServerNew {
     public void run() {
       while(running) {
         try {
-          final Socket s = serverSocket.accept();
+          final Socket s = socket.accept();
           if(!running) {
             close();
           } else {
-            final Session session = new Session(s, ++lastid, verbose, bx);
-            session.start();
-            sessions.add(session);
+            sessions.add(new Session(s, ++lastid, verbose, bx));
           }
         } catch(final IOException ex) {
-          ex.printStackTrace();
+          error(ex, false);
         }
       }
+    }
+  }
+
+  /**
+   * Prints a server error message.
+   * @param ex exception reference
+   * @param quiet quiet flag
+   */
+  public static void error(final Exception ex, final boolean quiet) {
+    if(quiet) {
+      BaseX.debug(ex);
+      if(ex instanceof BindException) {
+        BaseX.errln(SERVERBIND);
+      } else if(ex instanceof IOException) {
+        BaseX.errln(SERVERERR);
+      } else {
+        BaseX.errln(ex.getMessage());
+      }
+    } else {
+      ex.printStackTrace();
     }
   }
 }

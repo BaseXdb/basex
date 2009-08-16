@@ -15,7 +15,7 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXRadio extends JRadioButton {
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param label button title
    * @param hlp help text
    * @param sel initial selection state

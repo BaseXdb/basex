@@ -33,7 +33,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
   private int ww;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    * @param msg waiting message.
    * @param pb showing a progress bar

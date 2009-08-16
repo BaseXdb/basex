@@ -33,10 +33,6 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.ft.StemDir;
-import org.basex.query.ft.StopWords;
-import org.basex.query.ft.ThesQuery;
-import org.basex.query.ft.Thesaurus;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.FNSeq;
 import org.basex.query.func.Fun;
@@ -49,13 +45,14 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
+import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
- * XQuery Test Suite Wrapper.
+ * XQuery Test Suite wrapper.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -72,6 +69,13 @@ public abstract class W3CTS {
   /** Replacement pattern. */
   private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
 
+  /** Database context. */
+  protected final Context context = new Context();
+  /** Path to the XQuery Test Suite. */
+  protected String path = "";
+  /** Data reference. */
+  protected Data data;
+
   /** History Path. */
   private final String pathhis;
   /** Log File. */
@@ -80,11 +84,6 @@ public abstract class W3CTS {
   private final String input;
   /** Test Suite Identifier. */
   private final String testid;
-  /** Path to the XQuery Test Suite. */
-  private String path = "";
-
-  /** Database context. */
-  final Context context = new Context();
 
   /** Query Path. */
   private String queries;
@@ -116,16 +115,6 @@ public abstract class W3CTS {
   /** Cached collections. */
   private final HashMap<String, byte[][]> colls =
     new HashMap<String, byte[][]>();
-  /** Cached stop word files. */
-  private final HashMap<String, String> stop = new HashMap<String, String>();
-  /** Cached stop word files. */
-  private final HashMap<String, String> stop2 = new HashMap<String, String>();
-  /** Cached stemming dictionaries. */
-  private final HashMap<String, String> stem = new HashMap<String, String>();
-  /** Cached thesaurus. */
-  private final HashMap<String, String> thes = new HashMap<String, String>();
-  /** Cached thesaurus. */
-  private final HashMap<String, String> thes2 = new HashMap<String, String>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -147,9 +136,6 @@ public abstract class W3CTS {
   /** OK2 counter. */
   private int ok2;
 
-  /** Data reference. */
-  private Data data;
-
   /**
    * Constructor.
    * @param nm name of test
@@ -167,29 +153,37 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   void init(final String[] args) throws Exception {
-    // modifying internal query arguments...
-    for(final String arg : args) {
-      if(arg.equals("-r")) {
-        reporting = true;
-        currTime = true;
-      } else if(arg.startsWith("-p")) {
-        path = arg.substring(2);
-      } else if(arg.equals("-t")) {
-        currTime = true;
-      } else if(arg.equals("-v")) {
-        verbose = true;
-      } else if(!arg.startsWith("-")) {
-        single = arg;
-        maxout *= 10;
+    final Args arg = new Args(args);
+    boolean o = true;
+    while(arg.more() && o) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'r') {
+          reporting = true;
+          currTime = true;
+        } else if(c == 'p') {
+          path = arg.string();
+        } else if(c == 't') {
+          currTime = true;
+        } else if(c == 'v') {
+          verbose = true;
+        } else {
+          o = false;
+        }
       } else {
-        BaseX.outln("\n" + NAME + " vs. XQuery Test Suite\n" +
-            " [pat] perform only tests with the specified pattern\n" +
-            " -h show this help\n" +
-            " -p change path\n" +
-            " -r create report\n" +
-            " -v verbose output");
-        return;
+        single = arg.string();
+        maxout *= 10;
       }
+    }
+
+    if(!o) {
+      BaseX.outln(NL + BaseX.name(this) + " Test Suite" + NL +
+          " [pat] perform only tests with the specified pattern" + NL +
+          " -h show this help" + NL +
+          " -p change path" + NL +
+          " -r create report" + NL +
+          " -v verbose output");
+      return;
     }
 
     queries = path + "Queries/XQuery/";
@@ -204,15 +198,16 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     context.prop.set(Prop.XQFORMAT, false);
     context.prop.set(Prop.MAINMEM, false);
+    context.prop.set(Prop.CHOP, false);
 
     new CreateDB(path + input).execute(context);
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
-    BaseX.outln("\n" + TITLE + " vs. XQuery Test Suite " +
+    BaseX.outln(NL + BaseX.name(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
-    BaseX.outln("\nCaching Sources...");
+    BaseX.outln(NL + "Caching Sources...");
     for(final int s : nodes("//*:source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
@@ -238,25 +233,7 @@ public abstract class W3CTS {
       }
       colls.put(cname, dl.finish());
     }
-
-    BaseX.outln("Caching Full-text Structures...");
-    for(final int s : nodes("//*:stopwords", root).nodes) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stop.put(text("@uri", srcRoot), val);
-      stop2.put(text("@ID", srcRoot), val);
-    }
-    for(final int s : nodes("//*:stemming-dictionary", root).nodes) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stem.put(text("@ID", srcRoot), val);
-    }
-    for(final int s : nodes("//*:thesaurus", root).nodes) {
-      final Nodes srcRoot = new Nodes(s, data);
-      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      thes.put(text("@uri", srcRoot), val);
-      thes2.put(text("@ID", srcRoot), val);
-    }
+    init(root);
 
     if(reporting) {
       BaseX.outln("Delete old results...");
@@ -275,7 +252,7 @@ public abstract class W3CTS {
     final String time = perf.getTimer();
     final int total = ok + ok2 + err + err2;
 
-    BaseX.outln("Writing log file...\n");
+    BaseX.outln("Writing log file..." + NL);
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(pathlog), UTF8));
     bw.write("TEST RESULTS ==================================================");
@@ -357,13 +334,11 @@ public abstract class W3CTS {
     if(cont.size() != 0) {
       final Data d = Open.check(context, sources + string(
           data.atom(cont.nodes[0])) + ".xml");
-      curr = new Nodes(d.doc(), d);
+      curr = new Nodes(d.doc(), d, true);
     }
 
     final QueryProcessor xq = new QueryProcessor(in, curr, context);
     final QueryContext qctx = xq.ctx;
-    qctx.stop = stop;
-    qctx.thes = thes;
 
     try {
       files.add(file(nodes("*:input-file", root),
@@ -375,29 +350,7 @@ public abstract class W3CTS {
       var(nodes("*:input-query/@name", root),
           nodes("*:input-query/@variable", root), pth, qctx);
 
-      for(final String s : aux("stopwords", root)) {
-        final String fn = stop2.get(s);
-        if(fn != null) {
-          if(qctx.ftopt.sw == null) qctx.ftopt.sw = new StopWords();
-          qctx.ftopt.sw.read(IO.get(fn), false);
-        }
-      }
-
-      for(final String s : aux("stemming-dictionary", root)) {
-        final String fn = stem.get(s);
-        if(fn != null) {
-          if(qctx.ftopt.sd == null) qctx.ftopt.sd = new StemDir();
-          qctx.ftopt.sd.read(IO.get(fn));
-        }
-      }
-
-      for(final String s : aux("thesaurus", root)) {
-        final String fn = thes2.get(s);
-        if(fn != null) {
-          if(qctx.ftopt.th == null) qctx.ftopt.th = new ThesQuery();
-          qctx.ftopt.th.add(new Thesaurus(IO.get(fn), context));
-        }
-      }
+      parse(qctx, root);
 
       for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
@@ -738,7 +691,7 @@ public abstract class W3CTS {
    * @return attribute value
    * @throws Exception exception
    */
-  private String text(final String qu, final Nodes root) throws Exception {
+  protected String text(final String qu, final Nodes root) throws Exception {
     final Nodes n = nodes(qu, root);
     final TokenBuilder sb = new TokenBuilder();
     for(int i = 0; i < n.size(); i++) {
@@ -755,7 +708,7 @@ public abstract class W3CTS {
    * @return attribute value
    * @throws Exception exception
    */
-  private String[] aux(final String role, final Nodes root) throws Exception {
+  protected String[] aux(final String role, final Nodes root) throws Exception {
     return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
 
@@ -766,7 +719,7 @@ public abstract class W3CTS {
    * @return attribute value
    * @throws Exception exception
    */
-  private Nodes nodes(final String qu, final Nodes root) throws Exception {
+  protected Nodes nodes(final String qu, final Nodes root) throws Exception {
     return new QueryProcessor(qu, root, context).queryNodes();
   }
 
@@ -774,7 +727,7 @@ public abstract class W3CTS {
    * Recursively deletes a directory.
    * @param pth deletion path
    */
-  private void delete(final File[] pth) {
+  void delete(final File[] pth) {
     for(final File f : pth) {
       if(f.isDirectory()) delete(f.listFiles());
       f.delete();
@@ -804,7 +757,23 @@ public abstract class W3CTS {
    * @return content
    * @throws IOException I/O exception
    */
-  String read(final IO f) throws IOException {
+  private String read(final IO f) throws IOException {
     return string(f.content()).replaceAll("\r\n?", "\n");
   }
+
+  /**
+   * Initializes the test.
+   * @param root root nodes reference
+   * @throws Exception exception
+   */
+  abstract void init(final Nodes root) throws Exception;
+
+  /**
+   * Performs test specific parsings.
+   * @param qctx query context
+   * @param root root nodes reference
+   * @throws Exception exception
+   */
+  abstract void parse(final QueryContext qctx, final Nodes root)
+    throws Exception;
 }

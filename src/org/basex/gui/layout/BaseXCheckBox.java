@@ -16,7 +16,7 @@ import org.basex.util.Token;
  */
 public final class BaseXCheckBox extends JCheckBox {
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param hlp help text
    * @param label button title
    * @param sel initial selection state
@@ -28,7 +28,7 @@ public final class BaseXCheckBox extends JCheckBox {
   }
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param label button title
    * @param hlp help text
    * @param sel initial selection state

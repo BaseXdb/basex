@@ -44,8 +44,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected MemData finish() {
-    data.initNames();
+  protected MemData finish() throws IOException {
+    data.init();
     return data;
   }
 

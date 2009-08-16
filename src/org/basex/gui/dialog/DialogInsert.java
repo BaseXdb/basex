@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
+import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
@@ -46,7 +47,7 @@ public final class DialogInsert extends Dialog {
   BaseXRadio[] radio;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogInsert(final GUI main) {
@@ -102,15 +103,16 @@ public final class DialogInsert extends Dialog {
   void change(final Object src) {
     int n = 0;
     for(int r = 0; r < radio.length; r++) if(src == radio[r]) n = r;
-    BaseXLayout.setHeight(input2, n == 3 || n == 4 ? 30 : 200);
+    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 200);
 
     back.removeAll();
-    back.setLayout(new TableLayout(n == 3 || n == 5 ? 4 : 2, 1, 0, 8));
-    if(n != 2 && n != 4) {
+    back.setLayout(new TableLayout(
+        n == Data.ATTR || n == Data.PI ? 4 : 2, 1, 0, 8));
+    if(n != Data.TEXT && n != Data.COMM) {
       back.add(label1);
       back.add(input1);
     }
-    if(n != 1) {
+    if(n != Data.ELEM) {
       back.add(label2);
       back.add(input2);
     }
@@ -124,22 +126,21 @@ public final class DialogInsert extends Dialog {
     final String in1 = input1.getText();
     final String in2 = Token.string(input2.getText());
 
-    for(int i = 1; i < KINDS.length; i++) if(radio[i].isSelected()) kind = i;
+    for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
 
     result = new StringList();
     switch(kind) {
-      case 0: case 3: case 5:
+      case Data.ATTR: case Data.PI:
         result.add(in1);
         result.add(in2);
         break;
-      case 1:
+      case Data.ELEM:
         result.add(in1);
         break;
-      case 2: case 4:
+      case Data.TEXT: case Data.COMM:
         result.add(in2);
         break;
     }
-    result.add(null);
     lkind = kind;
   }
 }

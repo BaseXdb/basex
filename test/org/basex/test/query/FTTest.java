@@ -5,7 +5,7 @@ import org.basex.core.AProp;
 import org.basex.core.Prop;
 
 /**
- * Full-text Test Queries.
+ * Full-text test queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

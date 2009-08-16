@@ -241,7 +241,7 @@ public enum Calc {
    * @param a first item
    * @param b second item
    * @return result type
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public abstract Item ev(final Item a, final Item b) throws QueryException;
 
@@ -262,7 +262,7 @@ public enum Calc {
    * Returns a type error.
    * @param t expected type
    * @param it item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void errType(final Type t, final Item it)
       throws QueryException {
@@ -272,7 +272,7 @@ public enum Calc {
   /**
    * Returns a numeric type error.
    * @param it item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void errNum(final Item it) throws QueryException {
     Err.num(info(), it);
@@ -282,7 +282,7 @@ public enum Calc {
    * Returns a duration type error.
    * @param it item
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final Dur checkDur(final Item it) throws QueryException {
     if(!it.d()) Err.or(XPDUR, info(), it.type);
@@ -293,7 +293,7 @@ public enum Calc {
    * Checks if the specified items are numeric or untyped.
    * @param a first item
    * @param b second item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void checkNum(final Item a, final Item b)
       throws QueryException {
@@ -304,7 +304,7 @@ public enum Calc {
   /**
    * Checks if the specified value is outside the integer range.
    * @param d value to be checked
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected void checkRange(final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(RANGE, d);

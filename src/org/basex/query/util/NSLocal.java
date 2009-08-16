@@ -9,7 +9,7 @@ import org.basex.query.item.Uri;
 import org.basex.util.Atts;
 
 /**
- * Local Namespaces.
+ * Local namespaces.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -23,7 +23,7 @@ public final class NSLocal {
   /**
    * Adds the specified namespace.
    * @param name namespace
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public void add(final QNm name) throws QueryException {
     final byte[] ln = name.ln();
@@ -59,7 +59,7 @@ public final class NSLocal {
    * Finds the uri for the specified prefix in the local and global namespaces.
    * @param pre prefix of the namespace
    * @return uri
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public byte[] uri(final byte[] pre) throws QueryException {
     byte[] uri = find(pre);

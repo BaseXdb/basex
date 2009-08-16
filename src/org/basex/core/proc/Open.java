@@ -11,14 +11,14 @@ import org.basex.data.DiskData;
 import org.basex.io.IO;
 
 /**
- * Opens an existing database.
+ * Evaluates the 'open' command and opens a database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Open extends Process {
   /**
-   * Constructor.
+   * Default constructor.
    * @param name name of database
    */
   public Open(final String name) {
@@ -28,12 +28,17 @@ public final class Open extends Process {
   @Override
   protected boolean exec() {
     exec(new Close());
-    try {
-      final Data data = open(context, args[0]);
-      context.openDB(data);
 
-      if(data.meta.oldindex) info(INDUPDATE);
-      return info(DBOPENED, perf.getTimer());
+    final String db = args[0];
+    Data data = context.data();
+
+    try {
+      if(data == null || !data.meta.name.equals(db)) {
+        data = open(context, db);
+        context.openDB(data);
+        if(data.meta.oldindex) info(INDUPDATE);
+      }
+      return info(DBOPENED, db, perf.getTimer());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();

@@ -31,7 +31,7 @@ public final class PlotData {
   byte[] item = EMPTY;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param ctx context reference
    */
   public PlotData(final Context ctx) {

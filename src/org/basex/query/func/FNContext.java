@@ -38,10 +38,10 @@ final class FNContext extends Fun {
   }
 
   /**
-   * Returns the current Date.
+   * Returns the current date.
    * @param ctx query context
    * @return current date
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item currDate(final QueryContext ctx) throws QueryException {
     if(ctx.date != null) return ctx.date;
@@ -57,7 +57,7 @@ final class FNContext extends Fun {
    * Returns the current DateTime.
    * @param ctx query context
    * @return current date
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item currDTM(final QueryContext ctx) throws QueryException {
     if(ctx.dtm != null) return ctx.dtm;
@@ -74,7 +74,7 @@ final class FNContext extends Fun {
    * Returns the current DateTime.
    * @param ctx query context
    * @return current date
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item currTIM(final QueryContext ctx) throws QueryException {
     if(ctx.time != null) return ctx.time;

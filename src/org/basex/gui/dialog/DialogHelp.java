@@ -22,7 +22,7 @@ public final class DialogHelp extends Dialog {
   private final BaseXText area;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogHelp(final GUI main) {

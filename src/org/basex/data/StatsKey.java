@@ -38,7 +38,7 @@ public final class StatsKey {
   public boolean leaf;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    */
   public StatsKey() {
     cats = new Set();

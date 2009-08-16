@@ -115,22 +115,22 @@ public class Step extends Preds {
 
       // evaluates predicates
       for(final Expr p : pred) {
-        ctx.size = nb.size;
+        ctx.size = nb.size();
         ctx.pos = 1;
         int c = 0;
-        for(int s = 0; s < nb.size; s++) {
-          ctx.item = nb.item[s];
+        for(int s = 0; s < nb.size(); s++) {
+          ctx.item = nb.get(s);
           final Item i = p.test(ctx);
           if(i != null) {
             // assign score value
-            nb.item[s].score(i.score());
-            nb.item[c++] = nb.item[s];
+            nb.get(s).score(i.score());
+            nb.item[c++] = nb.get(s);
           }
           ctx.pos++;
         }
         nb.size = c;
       }
-      for(int n = 0; n < nb.size; n++) ni.add(nb.item[n]);
+      for(int n = 0; n < nb.size(); n++) ni.add(nb.get(n));
       nb = new NodIter();
     }
     return ni;

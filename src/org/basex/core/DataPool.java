@@ -7,7 +7,7 @@ import org.basex.data.MemData;
 import org.basex.util.Array;
 
 /**
- * Class for all referenced data.
+ * This class organizes all currently opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
@@ -15,7 +15,7 @@ import org.basex.util.Array;
 public final class DataPool {
   /** Data references. */
   private Data[] data = new Data[1];
-  /** Number of opened database for each reference. */
+  /** Number of current database users. */
   private int[] pins = new int[1];
   /** Number of data references. */
   private int size = 0;
@@ -64,9 +64,7 @@ public final class DataPool {
    * @return result of check
    */
   boolean pinned(final String db) {
-    for(int i = 0; i < size; i++) {
-      if(data[i].meta.name.equals(db)) return true;
-    }
+    for(int i = 0; i < size; i++) if(data[i].meta.name.equals(db)) return true;
     return false;
   }
 
@@ -90,7 +88,7 @@ public final class DataPool {
   /**
    * Closes all data references.
    */
-  public void close() {
+  public synchronized void close() {
     try {
       for(int i = 0; i < size; i++) data[i].close();
     } catch(final IOException ex) {

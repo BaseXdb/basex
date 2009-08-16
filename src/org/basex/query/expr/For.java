@@ -16,7 +16,7 @@ import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
- * For Clause.
+ * For clause.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -35,8 +35,7 @@ public final class For extends ForLet {
    * @param s score variable
    */
   public For(final Expr e, final Var v, final Var p, final Var s) {
-    expr = e;
-    var = v;
+    super(e, v);
     pos = p;
     score = s;
   }

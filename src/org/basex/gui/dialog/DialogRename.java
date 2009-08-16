@@ -15,7 +15,7 @@ import org.basex.io.IO;
 import org.basex.util.StringList;
 
 /**
- * Open Database Dialog.
+ * Open database dialog.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -33,7 +33,7 @@ public final class DialogRename extends Dialog {
   final StringList db;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    * @param dbname name of database
    */

@@ -14,9 +14,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Case extends Expr {
-  /** Expression list. */
-  private Expr expr;
+public final class Case extends Single {
   /** Variable. */
   private final Var var;
 
@@ -26,7 +24,7 @@ public final class Case extends Expr {
    * @param r return expression
    */
   public Case(final Var v, final Expr r) {
-    expr = r;
+    super(r);
     var = v;
   }
 
@@ -51,7 +49,7 @@ public final class Case extends Expr {
    * @param ctx query context
    * @param seq sequence to be checked
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   Iter iter(final QueryContext ctx, final Iter seq) throws QueryException {
     if(!var.type.instance(seq)) return null;

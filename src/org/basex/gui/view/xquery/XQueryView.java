@@ -1,7 +1,6 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +11,8 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -41,9 +42,9 @@ public final class XQueryView extends View {
   private static final ImageIcon ERRICON = BaseXLayout.icon("error");
 
   /** Header string. */
-  private final BaseXLabel header;
+  final BaseXLabel header;
   /** Scroll Pane. */
-  private final BaseXBack south;
+  final BaseXBack south;
   /** Text Area. */
   final XQueryText text;
   /** Info label. */
@@ -54,6 +55,8 @@ public final class XQueryView extends View {
   final BaseXButton stop;
   /** Filter button. */
   final BaseXButton filter;
+  /** Modified flag. */
+  boolean modified;
 
   /**
    * Default constructor.
@@ -83,6 +86,7 @@ public final class XQueryView extends View {
         final JPopupMenu popup = new JPopupMenu("History");
         final ActionListener al = new ActionListener() {
           public void actionPerformed(final ActionEvent ac) {
+            confirm();
             setQuery(IO.get(ac.getActionCommand()));
           }
         };
@@ -143,7 +147,7 @@ public final class XQueryView extends View {
     go.addKeyListener(this);
     go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        text.query(true);
+        text.query();
       }
     });
 
@@ -160,6 +164,7 @@ public final class XQueryView extends View {
     south.add(sp, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
 
+    Prop.xquery = IO.get("query.xq");
     refreshLayout();
   }
 
@@ -195,7 +200,7 @@ public final class XQueryView extends View {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWXQUERY);
   }
 
@@ -208,7 +213,7 @@ public final class XQueryView extends View {
     try {
       setQuery(file.content());
     } catch(final IOException ex) {
-      Dialog.error(gui, XQOPERROR);
+      Dialog.error(gui, NOTOPENED);
     }
   }
 
@@ -219,7 +224,8 @@ public final class XQueryView extends View {
   public void setQuery(final byte[] qu) {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
     text.setText(qu);
-    text.query(true);
+    text.query();
+    modified(false);
   }
 
   /**
@@ -227,6 +233,7 @@ public final class XQueryView extends View {
    * @return XQuery
    */
   public byte[] getQuery() {
+    modified(false);
     return text.getText();
   }
 
@@ -244,5 +251,22 @@ public final class XQueryView extends View {
 
     BaseXLayout.enable(stop, false);
     BaseXLayout.enable(info, !ok);
+  }
+  
+  /**
+   * Show a quit dialog for saving the opened XQuery.
+   */
+  public void confirm() {
+    if(modified && Dialog.confirm(gui, BaseX.info(XQUERYCONF,
+        Prop.xquery.name()))) GUICommands.XQSAVE.execute(gui);
+  }
+
+  /**
+   * Sets the query modification flag.
+   * @param mod modification flag
+   */
+  void modified(final boolean mod) {
+    if(modified != mod) header.setText(XQUERYTIT + (mod ? "*" : ""));
+    modified = mod;
   }
 }

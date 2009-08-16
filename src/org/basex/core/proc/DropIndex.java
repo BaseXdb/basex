@@ -5,35 +5,32 @@ import static org.basex.core.Commands.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.core.Process;
-import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Data.Type;
 import org.basex.io.IO;
 
 /**
- * Evaluates the 'drop index' command.
+ * Evaluates the 'drop index' command and deletes indexes in the currently
+ * opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class DropIndex extends Process {
-  /** Index type. */
-  final CmdIndex type;
-
+public final class DropIndex extends ACreate {
   /**
    * Constructor.
-   * @param t index type
+   * @param type index type, defined in {@link CmdIndex}
    */
-  public DropIndex(final CmdIndex t) {
-    super(DATAREF);
-    type = t;
+  public DropIndex(final Object type) {
+    super(DATAREF, type.toString());
   }
 
   @Override
   protected boolean exec() {
     final Data data = context.data();
-    switch(type) {
+
+    switch(getType(args[0])) {
       case TEXT:
         data.meta.txtindex = false;
         return drop(Type.TXT, DATATXT);
@@ -43,6 +40,13 @@ public final class DropIndex extends Process {
       case FULLTEXT:
         data.meta.ftxindex = false;
         return drop(Type.FTX, DATAFTX);
+      case SUMMARY:
+        if(data.meta.pathindex) {
+          data.meta.pathindex = false;
+          data.path.root = null;
+          data.flush();
+        }
+        return info(DBDROP, perf.getTimer());
       default:
         return false;
     }
@@ -57,6 +61,7 @@ public final class DropIndex extends Process {
   private boolean drop(final Type index, final String pat) {
     try {
       final Data data = context.data();
+      if(data instanceof MemData) return error(PROCMM);
       data.flush();
       data.closeIndex(index);
       return DropDB.delete(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
@@ -69,6 +74,6 @@ public final class DropIndex extends Process {
 
   @Override
   public String toString() {
-    return Cmd.DROP.name() + " " + CmdDrop.INDEX + " " + type;
+    return Cmd.DROP + " " + CmdDrop.INDEX + " " + args();
   }
 }

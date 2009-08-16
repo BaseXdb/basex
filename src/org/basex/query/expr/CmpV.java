@@ -102,7 +102,7 @@ public final class CmpV extends Arr {
      * @param a first item
      * @param b second item
      * @return result
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     public abstract boolean e(Item a, Item b) throws QueryException;
 

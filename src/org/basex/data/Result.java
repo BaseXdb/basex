@@ -25,15 +25,15 @@ public interface Result {
   /**
    * Serializes the complete result.
    * @param ser serializer
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   void serialize(Serializer ser) throws IOException;
 
   /**
    * Serializes the specified result.
    * @param ser serializer
-   * @param n number of result to serialize
-   * @throws IOException exception
+   * @param n results offset to serialize
+   * @throws IOException I/O exception
    */
   void serialize(Serializer ser, int n) throws IOException;
 }

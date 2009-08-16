@@ -23,7 +23,7 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
- * Open Database Dialog.
+ * Open database dialog.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -39,7 +39,7 @@ public final class DialogOpen extends Dialog {
   private BaseXBack buttons;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    * @param drop show drop dialog
    */

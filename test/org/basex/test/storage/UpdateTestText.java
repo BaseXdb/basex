@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestText extends DataUpdateTest {
+public final class UpdateTestText extends UpdateTest {
   /**
    * Tests insert as last child.
    * @throws Exception in case of problems.

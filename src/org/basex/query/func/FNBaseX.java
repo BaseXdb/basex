@@ -3,9 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.xml.XMLInput;
 import org.basex.core.Prop;

@@ -132,6 +132,14 @@ public final class BufferedFileChannel {
   }
 
   /**
+   * Returns the size of the buffer.
+   * @return the size of the buffer.
+   */
+  public int getBufferSize() {
+    return buf.capacity();
+  }
+
+  /**
    * Skips <code>n</code> bytes in the ByteBuffer.
    * @param n number of bytes to skip. May be negative.
    * @throws IOException if any error occurs while reading the file.
@@ -233,7 +241,7 @@ public final class BufferedFileChannel {
     final long offset = absolutePosition() - mark;
     if(offset == 0) return;
     assert offset > 0;
-    if(bPos < offset) {
+    if(bPos < offset || bPos == buf.limit()) {
       fc.position(mark);
       buf.position(buf.limit());
     } else {
@@ -329,8 +337,10 @@ public final class BufferedFileChannel {
    * @return The next four bytes at the channel's current position as integer.
    */
   public int getInt() {
-    return (buf.get() & 0xFF) << 24 | (buf.get() & 0xFF) << 16 |
-      (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
+    return (buf.get() & 0xFF) << 24
+        | (buf.get() & 0xFF) << 16
+        | (buf.get() & 0xFF) << 8
+        | buf.get() & 0xFF;
   }
 
   /**

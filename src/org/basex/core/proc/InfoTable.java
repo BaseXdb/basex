@@ -11,18 +11,19 @@ import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'info table' command.
+ * Evaluates the 'info table' command and returns the table representation
+ * of the currently opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class InfoTable extends AInfo {
   /**
-   * Constructor.
-   * @param a arguments
+   * Default constructor.
+   * @param arg optional arguments
    */
-  public InfoTable(final String... a) {
-    super(DATAREF | PRINTING, a);
+  public InfoTable(final String... arg) {
+    super(DATAREF | PRINTING, arg);
   }
 
   @Override
@@ -66,7 +67,7 @@ public final class InfoTable extends AInfo {
    * @param data data reference
    * @param s first node to be printed
    * @param e last node to be printed
-   * @throws IOException build or write error
+   * @throws IOException I/O exception
    */
   private static void table(final PrintOutput out, final Data data,
       final int s, final int e) throws IOException {
@@ -83,7 +84,7 @@ public final class InfoTable extends AInfo {
    * Writes the header for the 'table' command.
    * @param out output stream
    * @param data data reference
-   * @throws IOException build or write error
+   * @throws IOException I/O exception
    */
   private static void tableHeader(final PrintOutput out, final Data data)
       throws IOException {
@@ -103,7 +104,7 @@ public final class InfoTable extends AInfo {
    * @param out output stream
    * @param data data reference
    * @param p node to be printed
-   * @throws IOException build or write error
+   * @throws IOException I/O exception
    */
   private static void table(final PrintOutput out, final Data data,
       final int p) throws IOException {
@@ -135,7 +136,7 @@ public final class InfoTable extends AInfo {
    * @param out output stream
    * @param n number to be formatted
    * @param left size of the table entry
-   * @throws IOException build or write error
+   * @throws IOException I/O exception
    */
   private static void format(final PrintOutput out, final int n,
       final int left) throws IOException {
@@ -147,7 +148,7 @@ public final class InfoTable extends AInfo {
    * @param out output stream
    * @param t text to be formatted
    * @param s size of the table entry
-   * @throws IOException build or write error
+   * @throws IOException I/O exception
    */
   private static void format(final PrintOutput out, final byte[] t,
       final int s) throws IOException {
@@ -157,6 +158,9 @@ public final class InfoTable extends AInfo {
 
   @Override
   public String toString() {
-    return Cmd.INFO.name() + " " + CmdInfo.TABLE + args();
+    final StringBuilder sb = new StringBuilder(Cmd.INFO + " " + CmdInfo.TABLE);
+    if(args[0] != null) sb.append(' ' + args[0]);
+    if(args[1] != null) sb.append(' ' + args[1]);
+    return sb.toString();
   }
 }

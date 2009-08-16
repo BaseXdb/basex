@@ -13,7 +13,7 @@ import org.basex.query.util.Err;
 import org.basex.util.Array;
 
 /**
- * Union Expression.
+ * Union expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -47,6 +47,24 @@ public final class Union extends Arr {
     final Iter[] iter = new Iter[expr.length];
     for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
     return duplicates(ctx) ? eval(iter) : iter(iter);
+  }
+
+  /**
+   * Evaluates the iterators.
+   * @param iter iterators
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private NodeIter eval(final Iter[] iter) throws QueryException {
+    final NodIter ni = new NodIter(true);
+    for(final Iter ir : iter) {
+      Item it;
+      while((it = ir.next()) != null) {
+        if(!it.node()) Err.nodes(this);
+        ni.add((Nod) it);
+      }
+    }
+    return ni;
   }
 
   /**
@@ -88,24 +106,6 @@ public final class Union extends Arr {
         items[i] = (Nod) it;
       }
     };
-  }
-
-  /**
-   * Evaluates the iterators.
-   * @param iter iterators
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  private NodeIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter(true);
-    for(final Iter ir : iter) {
-      Item it;
-      while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this);
-        ni.add((Nod) it);
-      }
-    }
-    return ni;
   }
 
   @Override

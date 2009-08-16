@@ -50,7 +50,7 @@ public final class FNSeq extends Fun {
    * Looks for the index of an specified input item.
    * @param ctx query context
    * @return position(s) of item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = expr[1].atomic(ctx);
@@ -77,7 +77,7 @@ public final class FNSeq extends Fun {
    * Returns all distinct values of a sequence.
    * @param ctx query context
    * @return distinct iterator
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter distinct(final QueryContext ctx) throws QueryException {
     if(expr.length == 2) checkColl(expr[1], ctx);
@@ -102,7 +102,7 @@ public final class FNSeq extends Fun {
    * Inserts items before the specified position.
    * @param ctx query context
    * @return iterator
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter insbef(final QueryContext ctx) throws QueryException {
     return new Iter() {
@@ -129,7 +129,7 @@ public final class FNSeq extends Fun {
    * Removes an item at a specified position in a sequence.
    * @param ctx query context
    * @return iterator without Item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter remove(final QueryContext ctx) throws QueryException {
     return new Iter() {
@@ -149,7 +149,7 @@ public final class FNSeq extends Fun {
    * ending with end.
    * @param ctx query context
    * @return subsequence
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter subseq(final QueryContext ctx) throws QueryException {
     final long s = Math.round(checkDbl(expr[1], ctx));
@@ -184,7 +184,7 @@ public final class FNSeq extends Fun {
    * Reverses a sequence.
    * @param ctx query context
    * @return iterator
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
@@ -210,7 +210,7 @@ public final class FNSeq extends Fun {
    * Checks items for deep equality.
    * @param ctx query context
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
     if(expr.length == 3) checkColl(expr[2], ctx);
@@ -222,7 +222,7 @@ public final class FNSeq extends Fun {
    * @param iter1 first iterator
    * @param iter2 second iterator
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static boolean deep(final Iter iter1, final Iter iter2)
       throws QueryException {

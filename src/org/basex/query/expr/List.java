@@ -8,12 +8,12 @@ import org.basex.query.iter.SeqIter;
 import org.basex.util.TokenBuilder;
 
 /**
- * Expression List.
+ * Expression list.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class List extends Arr {
+public final class List extends Arr {
   /**
    * Constructor.
    * @param l expression list
@@ -28,7 +28,7 @@ public class List extends Arr {
     for(final Expr e : expr) if(!e.i() && !e.e()) return this;
 
     // return simple sequence if all values are items
-    final SeqIter seq = new SeqIter();
+    final SeqIter seq = new SeqIter(expr.length);
     for(final Expr e : expr) seq.add(ctx.iter(e));
     return seq.finish();
   }

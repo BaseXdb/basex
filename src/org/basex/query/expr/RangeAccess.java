@@ -59,6 +59,11 @@ public final class RangeAccess extends Simple {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof RangeAccess;
+  }
+
+  @Override
   public String color() {
     return "CC99FF";
   }

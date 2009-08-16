@@ -28,11 +28,11 @@ public final class DBExample {
     out.println("\n=== Create a database from a file:");
 
     // Sets an option: activates command info output
-    new Set("Info", "on").execute(context, out);
-    // Sets an option: chops whitespaces between text nodes (saves disk space)
-    new Set("Chop", "on").execute(context, out);
+    new Set("info", true).execute(context, out);
     // Creates a database from the specified file.
     new CreateDB("input.xml", "Example1").execute(context, out);
+    // Closes the database.
+    new Close().execute(context, out);
 
     out.println("\n=== Create a database from an input string:");
 
@@ -40,6 +40,8 @@ public final class DBExample {
     String xml = "<xml>This is a test</xml>";
     // Creates a database for the specified input.
     new CreateDB(xml, "Example2").execute(context, out);
+    // Closes the database.
+    new Close().execute(context, out);
 
     out.println("\n=== Open an existing database and show database info:");
 
@@ -47,6 +49,8 @@ public final class DBExample {
     new Open("Example1").execute(context, out);
     // Dumps information on the specified database context
     new InfoDB().execute(context, out);
+    // Closes the database.
+    new Close().execute(context, out);
 
     out.println("=== Drop databases:");
 

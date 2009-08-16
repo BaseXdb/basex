@@ -1,60 +1,62 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import org.basex.core.Process;
+import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 
 /**
- * Evaluates the 'delete' command.
+ * Evaluates the 'delete' command and deletes nodes in the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Delete extends Process {
+public final class Delete extends AUpdate {
   /**
-   * Constructor.
-   * @param a arguments
+   * Default constructor.
+   * @param target target query
    */
-  public Delete(final String... a) {
-    super(DATAREF | UPDATING, a);
+  public Delete(final String target) {
+    super(false, target);
+  }
+
+  /**
+   * Constructor, used by the GUI.
+   */
+  public Delete() {
+    super(true);
   }
 
   @Override
   protected boolean exec() {
-    final Data data = context.data();
-    if(data.ns.size() != 0) return error(UPDATENS);
+    if(!checkDB()) return false;
 
-    // gui mode: use currently marked nodes
-    final boolean gui = args.length == 0;
+    final Data data = context.data();
     Nodes nodes;
     if(gui) {
-      // ...from marked node set
+      // gui mode: use currently marked nodes as source
       nodes = context.marked();
       context.marked(new Nodes(data));
+      context.copy(null);
     } else {
-      // ...from query
       nodes = query(args[0], null);
+      if(nodes == null) return false;
     }
-    if(nodes == null) return false;
 
-    if(nodes.size() != 0) {
-      // delete all nodes backwards to preserve pre values of earlier nodes
-      final int size = nodes.size();
-      for(int i = size - 1; i >= 0; i--) {
-        final int pre = nodes.nodes[i];
-        if(data.fs != null) data.fs.delete(pre);
-        data.delete(pre);
-      }
-
-      // refresh current context
-      final Nodes curr = context.current();
-      if(gui && curr.size() > 1 || curr.nodes[0] == nodes.nodes[0]) {
-        context.current(new Nodes(0, data));
-      }
-      data.flush();
+    // delete all nodes backwards to preserve pre values of earlier nodes
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      final int pre = nodes.nodes[i];
+      if(data.fs != null) data.fs.delete(pre);
+      data.delete(pre);
     }
+
+    data.flush();
     context.update();
     return info(DELETEINFO, nodes.size(), perf.getTimer());
+  }
+
+  @Override
+  public String toString() {
+    return BaseX.name(this).toUpperCase() + " " + args[0];
   }
 }

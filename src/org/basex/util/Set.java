@@ -11,23 +11,13 @@ public class Set {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
   /** Hash keys. */
-  protected byte[][] keys;
+  protected byte[][] keys = new byte[CAP][];
   /** Pointers to the next token. */
-  protected int[] next;
+  protected int[] next = new int[CAP];
   /** Hash table buckets. */
-  protected int[] bucket;
+  protected int[] bucket = new int[CAP];
   /** Hash entries. Actual hash size is <code>size - 1</code>. */
-  protected int size;
-
-  /**
-   * Empty Constructor.
-   */
-  public Set() {
-    keys = new byte[CAP][];
-    next = new int[CAP];
-    bucket = new int[CAP];
-    size = 1;
-  }
+  protected int size = 1;
 
   /**
    * Indexes the specified key.

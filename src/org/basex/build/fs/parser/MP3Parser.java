@@ -5,16 +5,15 @@ import java.nio.BufferUnderflowException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DateField;
 import org.basex.build.fs.parser.Metadata.IntField;
-import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.MetaType;
+import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.StringField;
+import org.basex.util.Array;
 import org.basex.util.Token;
-
 import static org.basex.util.Token.*;
 
 /**
@@ -28,11 +27,11 @@ import static org.basex.util.Token.*;
  * <li>extended tag (before ID3v1 tag)</li>
  * </ul>
  * </p>
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
- *
+ * 
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>
  * @see <a href="http://www.id3.org/id3v2.4.0-frames">ID3v2.4.0 frames</a>
  */
@@ -347,14 +346,14 @@ public final class MP3Parser extends AbstractParser {
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.TITLE,
-        array));
+    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.TITLE, array,
+        true));
     bfc.get(array, 0, 30);
     if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.CREATOR,
-        array));
+        array, true));
     bfc.get(array, 0, 30);
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.ALBUM,
-        array));
+    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.ALBUM, array,
+        true));
     final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
     if(!ws(array)) {
@@ -374,7 +373,7 @@ public final class MP3Parser extends AbstractParser {
       }
     }
     if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-        array));
+        array, true));
     final int genreId = bfc.get() & 0xFF;
     if(genreId != 0) fsparser.metaEvent(meta.setString(StringField.GENRE,
         getGenre(genreId)));
@@ -466,7 +465,7 @@ public final class MP3Parser extends AbstractParser {
    * @param b the "code" of the genre.
    * @return the textual representation of the genre.
    */
-  static byte[] getGenre(final int b) {
+  public static byte[] getGenre(final int b) {
     return b < GENRES.length && b >= 0 ? GENRES[b] : EMPTY;
   }
 
@@ -552,9 +551,7 @@ public final class MP3Parser extends AbstractParser {
     if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
     else size--;
     if(encoding.length() == 0) { // no encoding specified
-      final byte[] array = new byte[size];
-      bfc.get(array);
-      return ParserUtil.checkAscii(array);
+      return bfc.get(new byte[size]);
     }
     final byte[] array = new byte[size - 1];
     return token(new String(bfc.get(array), encoding));
@@ -568,22 +565,22 @@ public final class MP3Parser extends AbstractParser {
   void fireGenreEvents(final int s) throws IOException {
     final byte[] value = readText(s);
     int id;
-    if(!ws(value)) {
-      if(value[0] == '(') { // ignore brackets around genre id
-        int limit = 1;
-        while(value[limit] >= '0' && value[limit] <= '9' && limit < s)
-          limit++;
-        id = toInt(value, 1, limit);
-      } else id = toInt(value);
-      if(id == Integer.MIN_VALUE) {
-        final byte[][] arrays = Token.split(value, ',');
-        for(final byte[] a : arrays) {
-          meta.setString(StringField.GENRE, a, true);
-          fsparser.metaEvent(meta);
-        }
-      } else {
-        meta.setString(StringField.GENRE, getGenre(id), false);
+    if(ws(value)) return;
+    if(value[0] == '(') { // ignore brackets around genre id
+      int limit = 1;
+      while(value[limit] >= '0' && value[limit] <= '9' && limit < s)
+        limit++;
+      id = toInt(value, 1, limit);
+    } else id = toInt(value);
+    if(id == Integer.MIN_VALUE) {
+      final byte[][] arrays = Token.split(value, ',');
+      for(final byte[] a : arrays) {
+        meta.setString(StringField.GENRE, a, true);
+        fsparser.metaEvent(meta);
       }
+    } else {
+      meta.setString(StringField.GENRE, getGenre(id), false);
+      fsparser.metaEvent(meta);
     }
   }
 
@@ -601,15 +598,16 @@ public final class MP3Parser extends AbstractParser {
     final int size = value.length;
     if(size == 0) return EMPTY;
     int i = 0;
-    while(i < size && (value[i] < '0' || value[i] > '9')) {
+    while(i < size && (value[i] < '1' || value[i] > '9')) {
       value[i++] = 0;
     }
-    if(i >= size) return EMPTY;
+    if(i == size) return EMPTY;
+    final int start = i; // first byte of the number
     while(i < size && value[i] >= '0' && value[i] <= '9')
       i++;
-    while(i < size)
-      value[i++] = 0;
-    return chopNumber(value);
+    final int len = i - start; // number of bytes of the number
+    if(len == 0) return EMPTY;
+    return Array.create(value, start, len);
   }
 
   /**
@@ -643,13 +641,12 @@ public final class MP3Parser extends AbstractParser {
    */
   String getPicName() throws IOException {
     // there may be more than one APIC frame with the same ID in the ID3 tag
-    // [BL] avoid duplicate file names
     bfc.buffer(1);
     final int typeId = bfc.get() & 0xFF;
     if(typeId >= 0 && typeId < PICTURE_TYPE.length) {
       return PICTURE_TYPE[typeId];
     }
-    return "Unknown";
+    return null;
   }
 
   /**
@@ -734,7 +731,8 @@ public final class MP3Parser extends AbstractParser {
         }
         int pos = 4;
         // ignore short content description
-        while(obj.bfc.get() != 0 && ++pos < size);
+        while(obj.bfc.get() != 0 && ++pos < size)
+          ;
         if(pos >= size) return;
         obj.meta.setString(StringField.DESCRIPTION, obj.readText(size - pos,
             encoding));
@@ -754,8 +752,8 @@ public final class MP3Parser extends AbstractParser {
     TLEN {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.fsparser.metaEvent(obj.meta.setDuration(ParserUtil.
-            convertDuration(obj.readText(size))));
+        obj.fsparser.metaEvent(obj.meta.setDuration(//
+        ParserUtil.convertDuration(obj.readText(size))));
       }
     },
     /** */
@@ -784,8 +782,9 @@ public final class MP3Parser extends AbstractParser {
               suffix);
         } catch(final IOException ex) {
           if(NewFSParser.VERBOSE) BaseX.debug(
-            "MP3Parser: Failed to parse APIC frame (%).",
-            ex.getMessage() == null ? obj.bfc.getFileName() : ex.getMessage());
+              "MP3Parser: Failed to parse APIC frame (%).",
+              ex.getMessage() == null ? obj.bfc.getFileName() : //
+                  ex.getMessage());
         }
       }
     };

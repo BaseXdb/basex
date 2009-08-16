@@ -11,7 +11,7 @@ import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
 
 /**
- * Except Expression.
+ * Except expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -100,8 +100,8 @@ public final class Except extends Arr {
       while((it = ir.next()) != null) {
         if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
-        for(int s = 0; s < ni.size; s++) {
-          if(ni.item[s].is(node)) ni.delete(s--);
+        for(int s = 0; s < ni.size(); s++) {
+          if(ni.get(s).is(node)) ni.delete(s--);
         }
       }
     }

@@ -113,7 +113,7 @@ public final class MapView extends View implements Runnable {
   private int tinyh;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param man view manager
    */
   public MapView(final ViewNotifier man) {
@@ -260,7 +260,7 @@ public final class MapView extends View implements Runnable {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWMAP);
   }
 
@@ -392,7 +392,7 @@ public final class MapView extends View implements Runnable {
     /*
      * Screenshots: try { File file = new File("screenshot.png");
      * ImageIO.write(mainMap, "png", file); } catch(IOException ex) {
-     * e.printStackTrace(); }
+     * ex.printStackTrace(); }
      */
   }
 
@@ -868,19 +868,19 @@ public final class MapView extends View implements Runnable {
 
     int pre = current.nodes[0];
     final GUIProp prop = gui.prop;
-    if(key == KeyEvent.VK_R) {
+    if(key == 'R') {
       final Random rnd = new Random();
       do {
         pre = rnd.nextInt(size);
       } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
       gui.notify.jump(new Nodes(pre, data));
-    } else if(key == KeyEvent.VK_N) {
+    } else if(key == 'N') {
       // jump to next node
       do {
         pre = (pre + 1) % size;
       } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
       gui.notify.jump(new Nodes(pre, data));
-    } else if(key == KeyEvent.VK_P) {
+    } else if(key == 'P') {
       // jump to previous node
       do {
         pre = (pre == 0 ? size : pre) - 1;
@@ -892,7 +892,7 @@ public final class MapView extends View implements Runnable {
       tinyh = 0;
       repaint();
       // [JH] to be included only in test versions
-    } else if(gui.prop.is(GUIProp.MAPINTERACTION) && key == KeyEvent.VK_1) {
+    } else if(gui.prop.is(GUIProp.MAPINTERACTION) && key == '1') {
       try {
         final File file1 = new File("baseXTM.png");
         ImageIO.write(mainMap, "png", file1);

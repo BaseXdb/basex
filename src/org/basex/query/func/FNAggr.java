@@ -67,7 +67,7 @@ public final class FNAggr extends Fun {
    * @param it first item
    * @param avg calculating the average
    * @return summed up item.
-   * @throws QueryException thrown if the items can't be compared
+   * @throws QueryException query exception
    */
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
@@ -94,7 +94,7 @@ public final class FNAggr extends Fun {
    * @param cmp comparator
    * @param ctx query context
    * @return resulting item
-   * @throws QueryException thrown if the items can't be compared
+   * @throws QueryException query exception
    */
   private Item minmax(final Iter iter1, final CmpV.Comp cmp,
       final QueryContext ctx) throws QueryException {
@@ -126,7 +126,7 @@ public final class FNAggr extends Fun {
    * @param a input item
    * @param b result item
    * @return result
-   * @throws QueryException thrown if the items can't be compared
+   * @throws QueryException query exception
    */
   private Type type(final Item a, final Item b) throws QueryException {
     if(b.u()) {
@@ -149,7 +149,7 @@ public final class FNAggr extends Fun {
    * @param r first item
    * @param cmp comparator
    * @return resulting item
-   * @throws QueryException thrown if the items can't be compared
+   * @throws QueryException query exception
    */
   private Item evalStr(final Iter iter, final Item r, final CmpV.Comp cmp)
       throws QueryException {

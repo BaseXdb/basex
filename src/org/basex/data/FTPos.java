@@ -1,5 +1,6 @@
 package org.basex.data;
 
+import org.basex.BaseX;
 import org.basex.util.Array;
 
 /**
@@ -62,7 +63,7 @@ public final class FTPos {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    final StringBuilder sb = new StringBuilder(BaseX.name(this));
     sb.append("[" + pre + ": ");
     for(int i = 0; i < pos.length; i++) {
       sb.append((i != 0 ? "," : "") + pos[i] + "/" + poi[i]);

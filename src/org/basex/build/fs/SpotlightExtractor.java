@@ -1,125 +1,412 @@
-/**
- *
- */
 package org.basex.build.fs;
 
-import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import org.basex.BaseX;
-import org.basex.build.fs.parser.Metadata;
-import org.basex.build.fs.parser.ParserUtil;
-import org.basex.build.fs.parser.Metadata.DateField;
-import org.basex.build.fs.parser.Metadata.StringField;
-import org.basex.util.Array;
-import org.basex.util.Token;
-
-import java.util.List;
+import java.util.Date;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.basex.BaseX;
+import org.basex.build.fs.parser.MP3Parser;
+import org.basex.build.fs.parser.Metadata;
+import org.basex.build.fs.parser.ParserUtil;
+import org.basex.build.fs.parser.Metadata.DateField;
+import org.basex.build.fs.parser.Metadata.IntField;
+import org.basex.build.fs.parser.Metadata.StringField;
+import org.basex.util.LibraryLoader;
+import org.basex.util.Token;
+
 /**
  * Extracts metadata from Apple's Spotlight.
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-@SuppressWarnings("all")
-public class SpotlightExtractor {
-  // [BL] access spotlight API via JNI
+public final class SpotlightExtractor {
 
-  private final ProcessBuilder pb;
-  private static final String MDLS = "/usr/bin/mdls";
-  private static final String RAW_FLAG = "-raw";
-  private static final String NAME_FLAG = "-name";
-  private static final byte[] NULL_ITEM = { '(', 'n', 'u', 'l', 'l', ')'};
-
-  private final List<String> commands;
-  private final int pathPos;
-  private byte[] data;
-  final NewFSParser parser;
-  final Metadata meta;
-
-  /** The format of the date values. */
-  private static final SimpleDateFormat SDF = new SimpleDateFormat(
-      "yyyy-MM-dd HH:mm:ss Z");
+  static {
+    LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
+  }
 
   /**
    * Registered metadata items and corresponding actions for metadata events.
    */
   enum Item {
+    /** Date and time of the last change made to a metadata attribute. */
     AttributeChangeDate {
       @Override
-      void parse(final SpotlightExtractor obj, final byte[] d)
+      void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
-        obj.dateEvent(DateField.DATE_ATTRIBUTE_MODIFIED, d);
+        obj.dateEvent(DateField.DATE_ATTRIBUTE_MODIFIED, o);
       }
     },
+    /**
+     * Title for the collection containing this item. This is analogous to a
+     * record label or photo album.
+     */
+    Album {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.ALBUM, o);
+      }
+    },
+    /** Track number of a song or composition when it is part of an album. */
+    AudioTrackNumber {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.TRACK, o);
+      }
+    },
+    /** The author of the contents of the file. */
     Authors {
       @Override
-      void parse(final SpotlightExtractor obj, final byte[] d)
+      void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
-        obj.meta.setString(StringField.CREATOR, d);
-        obj.parser.metaEvent(obj.meta);
+        obj.stringEvent(StringField.CREATOR, o);
       }
     },
+    /**
+     * Identifies city of origin according to guidelines established by the
+     * provider. For example, "New York", "Cupertino", or "Toronto".
+     */
     City {
       @Override
-      void parse(final SpotlightExtractor obj, final byte[] d)
+      void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
-        obj.meta.setString(StringField.SPATIAL, d);
-        obj.parser.metaEvent(obj.meta);
+        obj.stringEvent(StringField.SPATIAL, o);
       }
     },
+    /**
+     * A comment related to the file. This comment is not displayed by the
+     * Finder.
+     */
+    Comment {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.DESCRIPTION, o);
+      }
+    },
+    /** Composer of the song in the audio file. */
+    Composer {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      }
+    },
+    // /** The date and time that the content was created. */
+    // ContentCreationDate {
+    // @Override
+    // public void parse(final SpotlightExtractor obj, final Object o)
+    // throws IOException {
+    // obj.dateEvent(DateField.DATE_CREATED, o);
+    // }
+    // },
+    // /** Date and time when the content of this item was modified. */
+    // ContentModificationDate {
+    // @Override
+    // public void parse(SpotlightExtractor obj, Object o) throws IOException {
+    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+    // }
+    // },
+    /**
+     * Entity responsible for making contributions to the content of the
+     * resource. Examples of a contributor include a person, an organization or
+     * a service.
+     */
+    Contributors {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      }
+    },
+    /**
+     * The full, publishable name of the country or primary location where the
+     * intellectual property of the item was created, according to guidelines of
+     * the provider.
+     */
+    Country {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.SPATIAL, o);
+      }
+    },
+    /** Description of the kind of item this file represents. */
+    Description {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.DESCRIPTION, o);
+      }
+    },
+    /**
+     * The duration, in seconds, of the content of the item. A value of 10.5
+     * represents media that is 10 and 1/2 seconds long.
+     */
+    DurationSeconds {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.durationEvent(o);
+      }
+    },
+    /** Mac OS X Finder comments for this item. */
+    FinderComment {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.DESCRIPTION, o);
+      }
+    },
+    /** Date the file contents last changed. */
     FSContentChangeDate {
       @Override
-      void parse(final SpotlightExtractor obj, final byte[] d)
+      void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
-        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, d);
+        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
       }
     },
+    /** Date that the contents of the file were created. */
+    FSCreationDate {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.dateEvent(DateField.DATE_CREATED, o);
+      }
+    },
+    /** Group ID of the owner of the file. */
     FSOwnerGroupID {
       @Override
-      void parse(final SpotlightExtractor obj, final byte[] d)
-          throws IOException { /* */}
+      void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.FS_OWNER_GROUP_ID, o);
+      }
+    },
+    /** User ID of the owner of the file. */
+    FSOwnerUserID {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.FS_OWNER_USER_ID, o);
+      }
+    },
+    /** Size, in bytes, of the file on disk. */
+    FSSize {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.FS_SIZE, o);
+      }
+    },
+    /**
+     * Publishable entry providing a synopsis of the contents of the item. For
+     * example, "Apple Introduces the iPod Photo".
+     */
+    Headline {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.TITLE, o);
+      }
+    },
+    /**
+     * Formal identifier used to reference the resource within a given context.
+     * For example, the Message-ID of a mail message.
+     */
+    Identifier {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.IDENTIFIER, o);
+      }
+    },
+    /**
+     * Keywords associated with this file. For example, "Birthday", "Important",
+     * etc.
+     */
+    Keywords {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.KEYWORD, o);
+      }
+    },
+    /**
+     * Indicates the languages used by the item. The recommended best practice
+     * for the values of this attribute are defined by RFC 3066.
+     */
+    Languages {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.LANGUAGE, o);
+      }
+    },
+    /**
+     * Date and time that the file was last used. This value is updated
+     * automatically by LaunchServices everytime a file is opened by double
+     * clicking, or by asking LaunchServices to open a file.
+     */
+    LastUsedDate {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.dateEvent(DateField.DATE_LAST_USED, o);
+      }
+    },
+    /** Lyricist of the song in the audio file. */
+    Lyricist {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      }
+    },
+    /**
+     * Musical genre of the song or composition contained in the audio file. For
+     * example: "Jazz", "Pop", "Rock", "Classical".
+     */
+    MusicalGenre {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        final StringField field = StringField.GENRE;
+        String g = (String) o;
+        try {
+          if(g.charAt(0) == '(') g = g.substring(1, g.length() - 2);
+          final int genreId = Integer.parseInt(g);
+          obj.stringEvent(field, new String(MP3Parser.getGenre(genreId)));
+        } catch(final NumberFormatException ex) {
+          if(g.contains(",")) {
+            final StringTokenizer tok = new StringTokenizer(g, ", ");
+            while(tok.hasMoreTokens())
+              obj.stringEvent(field, tok.nextToken());
+          } else {
+            obj.stringEvent(field, g);
+          }
+        }
+      }
+    },
+    /** Number of pages in the document. */
+    NumberOfPages {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.NUMBER_OF_PAGES, o);
+      }
+    },
+    /**
+     * Height, in pixels, of the contents. For example, the image height or the
+     * video frame height.
+     */
+    PixelHeight {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.PIXEL_HEIGHT, o);
+      }
+    },
+    /**
+     * Width, in pixels, of the contents. For example, the image width or the
+     * video frame width.
+     */
+    PixelWidth {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.intEvent(IntField.PIXEL_WIDTH, o);
+      }
+    },
+    /**
+     * Publishers of the item. For example, a person, an organization, or a
+     * service.
+     */
+    Publisher {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.PUBLISHER, o);
+      }
+    },
+    /** Recipients of this item. */
+    Recipients {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.RECEIVER, o);
+      }
+    },
+    /**
+     * Recording date of the song or composition. This is in contrast to
+     * kMDItemContentCreationDate which, could indicate the creation date of an
+     * edited or "mastered" version of the original art.
+     */
+    RecordingDate {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.dateEvent(DateField.DATE_CREATED, o);
+      }
+    },
+    // /**
+    // * Contains a text representation of the content of the document.
+    // */
+    // TextContent {
+    // @Override
+    // public void parse(final SpotlightExtractor obj, final Object o)
+    // throws IOException {
+    // assert o instanceof String;
+    // obj.parser.textContent(-1, -1, (String) o, false);
+    // }
+    // },
+    /**
+     * Title of the item. For example, this could be the title of a document,
+     * the name of an song, or the subject of an email message.
+     */
+    Title {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.stringEvent(StringField.TITLE, o);
+      }
     };
 
     /**
      * Parses the data and fires parser events.
      * @param obj the {@link SpotlightExtractor} object to fire events from.
-     * @param d the data to parse.
+     * @param o the data to parse.
      * @throws IOException if any error occurs while writing to the parser.
      */
-    abstract void parse(final SpotlightExtractor obj, final byte[] d)
+    abstract void parse(final SpotlightExtractor obj, final Object o)
         throws IOException;
 
     @Override
     public String toString() {
       return "kMDItem" + name();
     }
+
+    /**
+     * Returns the enum constant for the string. Use this method instead of
+     * {@link #valueOf(String)}!
+     * @param n the name of the constant
+     * @return the enum instance.
+     */
+    public static Item getValue(final String n) {
+      return valueOf(n.substring(7));
+    }
   }
 
-  /**
-   * Converts the date to the correct xml format and fires an event.
-   * @param field the {@link DateField}
-   * @param date the date to convert.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void dateEvent(final DateField field, final byte[] date) throws IOException {
-    XMLGregorianCalendar gcal = null;
-    try {
-      gcal = ParserUtil.convertDate(SDF.parse(string(date)));
-    } catch(ParseException e) {
-      if(NewFSParser.VERBOSE) BaseX.debug("Failed to convert date (%)",
-          string(date));
-    }
-    if(gcal == null) return;
-    meta.setDate(field, gcal);
-    parser.metaEvent(meta);
-  }
+  /** The parser instance. */
+  final NewFSParser parser;
+  /** Metadata object. */
+  final Metadata meta;
 
   /**
    * Initializes the spotlight extractor.
@@ -128,17 +415,6 @@ public class SpotlightExtractor {
   public SpotlightExtractor(final NewFSParser fsParser) {
     parser = fsParser;
     meta = new Metadata();
-    commands = new ArrayList<String>();
-    commands.add(MDLS);
-    /* -name and -raw don't work properly (items are in wrong order) :-( */
-    // for(Item i : Item.values()) {
-    // commands.add(NAME_FLAG);
-    // commands.add(i.toString());
-    // }
-    // commands.add(RAW_FLAG);
-    pathPos = commands.size();
-    commands.add(""); // dummy command for file path
-    pb = new ProcessBuilder(commands);
   }
 
   /**
@@ -147,63 +423,128 @@ public class SpotlightExtractor {
    * @throws IOException if any error occurs...
    */
   public void parse(final File file) throws IOException {
-    data = new byte[8192];
-    commands.set(pathPos, file.getAbsolutePath());
-    Process p = pb.start();
-
-    InputStream in = p.getInputStream();
-    int bytesRead = 0;
-    int status;
-    while(true) {
-      status = in.read(data, bytesRead, data.length - bytesRead);
-      if(status == -1) break;
-      bytesRead += status;
-      if(bytesRead == data.length) {
-        data = Array.resize(data, data.length, bytesRead << 1);
-      }
-    }
-    byte[][] tokens = Token.split(data, 10); // 10 -> LF char => line by line
-    int numLines = tokens.length;
-    for(int i = 0; i < numLines; i++) {
-      byte[] line = tokens[i];
-      if(ws(line)) continue;
-      int len = line.length;
-      if(!startsWith(line, new byte[] { 'k', 'M', 'D', 'I', 't', 'e', 'm'})) {
-        continue;
-      }
-      int pos = indexOf(line, ' ');
-      if(pos == -1) {
-        BaseX.debug("Failed to parse spotlight items (%)", file);
-        return;
-      }
-      String itemName = string(substring(line, 7, pos));
-      Item item;
+    final Map<String, Object> metadata = getMetadata(file.getAbsolutePath());
+    if(metadata == null) return;
+    for(final Entry<String, Object> e : metadata.entrySet()) {
       try {
-        item = Item.valueOf(itemName);
-      } catch(IllegalArgumentException e) { // not registered
-        continue;
-      }
-      for(; pos < len; pos++)
-        if(line[pos] == '=') break;
-      pos += 2;
-      if(pos >= len) {
-        BaseX.debug("Failed to parse spotlight items (%)", file);
-        return;
-      }
-      if(line[pos] == '(') {
-        while(tokens[++i][0] != ')') {
-          line = trim(tokens[i]);
-          if(line[0] == '"') line = substring(line, 1, line.length - 1);
-          item.parse(this, line);
+        final Item item = Item.getValue(e.getKey());
+        final Object val = e.getValue();
+        if(val instanceof Object[]) {
+          for(final Object o : (Object[]) val) {
+            item.parse(this, o);
+          }
+        } else {
+          item.parse(this, val);
         }
-      } else {
-        int end = line.length;
-        if(line[pos] == '"') {
-          pos++;
-          end--;
-        }
-        item.parse(this, substring(line, pos, end));
+      } catch(final IllegalArgumentException ex) {
+        // item is not in enum ...do nothing
       }
     }
   }
+
+  /**
+   * Converts the object to the correct xml format and fires an event.
+   * @param field the {@link DateField}.
+   * @param o the object containing the date to convert.
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void dateEvent(final DateField field, final Object o) throws IOException {
+    assert o instanceof Date;
+    XMLGregorianCalendar gcal = null;
+    gcal = ParserUtil.convertDate((Date) o);
+    if(gcal == null) return;
+    meta.setDate(field, gcal);
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Converts the object to a Byte/Short/Integer/Long/Float or Double and fires
+   * an event.
+   * @param field the {@link IntField}.
+   * @param o the object to convert.
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void intEvent(final IntField field, final Object o) throws IOException {
+    long value;
+    // most objects will be Integer, Long or Double
+    if(o instanceof Integer) value = (Integer) o;
+    else if(o instanceof Long) value = (Long) o;
+    else if(o instanceof Double) value = ((Double) o).longValue();
+    else if(o instanceof Short) value = (Short) o;
+    else if(o instanceof Byte) value = (Byte) o;
+    else if(o instanceof Float) value = ((Float) o).longValue();
+    else if(o instanceof String) {
+      final byte[] a = ((String) o).getBytes();
+      int i = 0;
+      final int len = a.length;
+      while(i < len && a[i] >= '0' && a[i] <= '9')
+        i++;
+      value = Token.toLong(a, 0, i);
+      if(value == Long.MIN_VALUE) {
+        BaseX.debug("SpotlightExtractor: invalid value for int field: %",
+            (String) o);
+        return;
+      }
+    } else {
+      BaseX.debug("SpotlightExtractor: unsupported data type: %",
+          o.getClass().getName());
+      return;
+    }
+    if(value > Integer.MAX_VALUE) meta.setLong(field, value);
+    else if(value > Short.MAX_VALUE) meta.setInt(field, (int) value);
+    else meta.setShort(field, (short) value);
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Converts the object to a String and fires an event.
+   * @param field the {@link StringField}.
+   * @param o the object to convert.
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void stringEvent(final StringField field, final Object o) throws IOException {
+    assert o instanceof String;
+    meta.setString(field, (String) o, true);
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Converts an object that contains a seconds value to a XML duration object
+   * and fires an event.
+   * @param o the object to convert.
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void durationEvent(final Object o) throws IOException {
+    double value;
+    // most objects will be Double
+    if(o instanceof Double) value = (Double) o;
+    else if(o instanceof Integer) value = (Integer) o;
+    else if(o instanceof Long) value = (Long) o;
+    else if(o instanceof Short) value = (Short) o;
+    else if(o instanceof Byte) value = (Byte) o;
+    else if(o instanceof Float) value = (Float) o;
+    else if(o instanceof String) {
+      try {
+        value = Double.parseDouble((String) o);
+      } catch(final NumberFormatException e) {
+        BaseX.debug("SpotlightExtractor: invalid value for int field: %",
+            (String) o);
+        return;
+      }
+    } else {
+      BaseX.debug("SpotlightExtractor: unsupported data type: %",
+          o.getClass().getName());
+      return;
+    }
+    meta.setDuration(ParserUtil.convertMsDuration((int) (value * 1000)));
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Native method for retrieving all available metadata for a file.
+   * @param filename the path to the file.
+   * @return map containing the queried metadata attributes or <code>null</code>
+   *         if any error occurs.
+   */
+  private native Map<String, Object> getMetadata(final String filename);
 }

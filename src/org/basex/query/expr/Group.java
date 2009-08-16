@@ -17,14 +17,14 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Michael Seiferle
  */
-public class Group extends Expr {
+public final class Group extends Expr {
   /** Sequence to be grouped. */
   SeqIter sq;
   /** Group by specification. */
   Grp[] grp;
 
   /**
-   * Post grouped Tuples.
+   * Post grouped tuples.
    */
   HashMap<Integer, int[]> groups = null;
 
@@ -57,7 +57,7 @@ public class Group extends Expr {
   }
 
   /**
-   * Groups the Items.
+   * Groups the items.
    */
   protected void group() {
     if(groups == null) groups = new HashMap<Integer, int[]>();
@@ -118,7 +118,7 @@ public class Group extends Expr {
   /**
    * Adds the items to be grouped.
    * @param ctx query context
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public void add(final QueryContext ctx) throws QueryException {
     for(final Grp g : grp) g.add(ctx);

@@ -44,7 +44,7 @@ public final class YMd extends Dur {
    * @param it duration item
    * @param f factor
    * @param m multiplication/division flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public YMd(final Dur it, final double f, final boolean m)
       throws QueryException {
@@ -58,7 +58,7 @@ public final class YMd extends Dur {
   /**
    * Constructor.
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   YMd(final byte[] v) throws QueryException {
     super(Type.YMD);

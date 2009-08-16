@@ -6,7 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.util.Token;
 
 /**
- * Text Node Fragment.
+ * Text node fragment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

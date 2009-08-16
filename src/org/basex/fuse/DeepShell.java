@@ -59,7 +59,7 @@ public final class DeepShell {
   }
 
   /**
-   * Command line arguments if any.
+   * Command line-arguments if any.
    * @param args user arguments
    */
   private void exec(final String[] args) {
@@ -183,7 +183,7 @@ public final class DeepShell {
 
   /**
    * Leave shell.
-   * @param args argument vector (not used currently)
+   * @param args argument vector (currently not used)
    */
   @Command(shortcut = 'q', help = "quit shell (unmounts fuse and closes db)")
   public void quit(@SuppressWarnings("unused") final String[] args) {

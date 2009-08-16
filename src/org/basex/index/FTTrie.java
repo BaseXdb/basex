@@ -57,9 +57,9 @@ public final class FTTrie extends FTIndex {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(TRIE + NL);
-    tb.add("- %: %\n", CREATESTEM, BaseX.flag(data.meta.ftst));
-    tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
-    tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
+    tb.add("- %: %" + NL, CREATESTEM, BaseX.flag(data.meta.ftst));
+    tb.add("- %: %" + NL, CREATECS, BaseX.flag(data.meta.ftcs));
+    tb.add("- %: %" + NL, CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data.meta.prop);
@@ -249,7 +249,7 @@ public final class FTTrie extends FTIndex {
   private FTIndexIterator idata;
 
   /** counts number of chars skip per astericsWildCardTraversing. */
-  private int countSkippedChars;
+  private int skippedChars;
 
   /**
    * Looking up node with value, which match ending.
@@ -293,25 +293,25 @@ public final class FTTrie extends FTIndex {
     }
 
     // compare chars current node and ending
-      // skip all unlike chars, if any suitable was found
-      while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
+    // skip all unlike chars, if any suitable was found
+    while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
 
-      // skip all chars, equal to first char
-      while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) i++;
+    // skip all chars, equal to first char
+    while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) i++;
 
-      countSkippedChars = countSkippedChars + i - pointerNode - 1;
+    skippedChars += i - pointerNode - 1;
 
-      while(i < ne[0] + 1 && j < ending.length && ne[i] == ending[j]) {
-        i++;
-        j++;
-        last = true;
-      }
+    while(i < ne[0] + 1 && j < ending.length && ne[i] == ending[j]) {
+      i++;
+      j++;
+      last = true;
+    }
 
     // not processed all chars from node, but all chars from
     // ending were processed or root
     if(node == 0 || j == ending.length && i < ne[0] + 1) {
       if(!hasNextNodes(ne)) {
-        countSkippedChars = 0;
+        skippedChars = 0;
         return;
       }
 
@@ -320,14 +320,14 @@ public final class FTTrie extends FTIndex {
       for(int t = ne[0] + 1; t < ne.length - 1; t += 2) {
         wc(ne[t], ending, false, 1, 0, f);
       }
-      countSkippedChars = 0;
+      skippedChars = 0;
       return;
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       idata = FTIndexIterator.union(
           iter(tdid, ne[ne.length - 1], inD, f), idata);
 
-      countSkippedChars = 0;
+      skippedChars = 0;
 
       // node has successors and is leaf node
       if(hasNextNodes(ne)) {
@@ -345,7 +345,7 @@ public final class FTTrie extends FTIndex {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
       if(!hasNextNodes(ne)) {
-        countSkippedChars = 0;
+        skippedChars = 0;
         return;
       }
 
@@ -357,7 +357,7 @@ public final class FTTrie extends FTIndex {
 
       // move pointer and go on
       if(!hasNextNodes(ne)) {
-        countSkippedChars = 0;
+        skippedChars = 0;
         return;
       }
 

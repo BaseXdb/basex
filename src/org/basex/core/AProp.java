@@ -74,7 +74,7 @@ public abstract class AProp {
 
         final Object entry = props.get(key);
         if(val == null) {
-          BaseX.errln("%: \"%\" not found.", filename, key);
+          BaseX.errln("%: \"%\" not found.", filename, val);
         } else if(entry instanceof String) {
           props.put(key, val);
         } else if(entry instanceof Integer) {
@@ -212,15 +212,6 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final String key, final Object val) {
-    props.put(key, val);
-  }
-
-  /**
-   * Sets the specified value for the specified key.
-   * @param key key to be found
-   * @param val value to be written
-   */
   public void set(final Object[] key, final String val) {
     set(key, val, String.class);
   }
@@ -262,6 +253,16 @@ public abstract class AProp {
   }
 
   /**
+   * Sets the specified value for the specified key.
+   * @param key key to be found
+   * @param val value to be written
+   */
+  public void set(final String key, final Object val) {
+    props.put(key, val);
+    finish();
+  }
+
+  /**
    * Inverts a boolean property.
    * @param key key
    * @return new value
@@ -296,5 +297,11 @@ public abstract class AProp {
   private void set(final Object[] key, final Object val, final Class<?> c) {
     get(key, c);
     props.put(key[0].toString(), val);
+    finish();
   }
+
+  /**
+   * Sets static properties.
+   */
+  protected void finish() { }
 }

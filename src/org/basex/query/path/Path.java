@@ -44,8 +44,9 @@ public abstract class Path extends Expr {
   protected boolean uses(final Expr[] step, final Use use,
       final QueryContext ctx) {
 
-    //if(use == Use.POS) return false;
-    if(use == Use.CTX && root == null) return true;
+    if(use == Use.CTX || use == Use.ELM)
+      return root == null || root.uses(use, ctx);
+
     for(final Expr s : step) if(s.uses(use, ctx)) return true;
     return root != null && root.uses(use, ctx);
   }
@@ -79,7 +80,7 @@ public abstract class Path extends Expr {
    * Prints the query plan.
    * @param ser serializer
    * @param step step array
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   void plan(final Serializer ser, final Expr[] step) throws IOException {
     ser.openElement(this);

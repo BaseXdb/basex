@@ -32,7 +32,7 @@ public final class DataOutput extends OutputStream {
    * Convenience constructor.
    * A default buffer size will be used.
    * @param db name of the database
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public DataOutput(final File db) throws IOException {
     this(db, IO.BLOCKSIZE);
@@ -43,7 +43,7 @@ public final class DataOutput extends OutputStream {
    * The specified buffer size is used.
    * @param db name of the database
    * @param bufs size of the buffer to use
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public DataOutput(final File db, final int bufs)
       throws IOException {
@@ -59,7 +59,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes a boolean value to the output stream.
    * @param b boolean value
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void writeBool(final boolean b) throws IOException {
     write(b ? 1 : 0);
@@ -68,7 +68,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes a string to the output stream.
    * @param s string
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void writeString(final String s) throws IOException {
     writeBytes(Token.token(s));
@@ -78,7 +78,7 @@ public final class DataOutput extends OutputStream {
    * Writes the specified array to the output stream.
    * @param text array to be written
    * @return number of written bytes
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public int writeBytes(final byte[] text) throws IOException {
     final int s = writeNum(text.length);
@@ -90,7 +90,7 @@ public final class DataOutput extends OutputStream {
    * Writes the specified array to the output stream.
    * @param num array to be written
    * @return number of written bytes
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public int writeDouble(final double num) throws IOException {
     return writeBytes(Token.token(num));
@@ -100,7 +100,7 @@ public final class DataOutput extends OutputStream {
    * Writes the specified array to the output stream; null references
    * are replaced with an empty array.
    * @param array array to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void writeBytesArray(final byte[][] array) throws IOException {
     writeNum(array.length);
@@ -110,7 +110,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes the specified array to the output stream.
    * @param array array to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void writeNums(final int[] array) throws IOException {
     writeNum(array.length);
@@ -122,7 +122,7 @@ public final class DataOutput extends OutputStream {
    * By compressing, the size of the database files is reduced.
    * @param v value to be written
    * @return number of written values
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public int writeNum(final int v) throws IOException {
     if(v < 0 || v > 0x3FFFFFFF) {
@@ -144,7 +144,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes an integer value to the specified output stream.
    * @param v value to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void writeInt(final int v) throws IOException {
     write(v >>> 24);
@@ -156,7 +156,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes an integer value to the specified output stream.
    * @param v value to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void write1(final int v) throws IOException {
     write(v);
@@ -165,7 +165,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes an integer value to the specified output stream.
    * @param v value to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void write2(final int v) throws IOException {
     write(v >>> 8);
@@ -175,7 +175,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes an integer value to the specified output stream.
    * @param v value to be written
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public void write5(final long v) throws IOException {
     write((byte) (v >>> 32));

@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestAttributes extends DataUpdateTest {
+public final class UpdateTestAttributes extends UpdateTest {
   /**
    * Tests the update of an existing attribute.
    */

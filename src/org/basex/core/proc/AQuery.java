@@ -25,7 +25,7 @@ import org.basex.util.Performance;
 abstract class AQuery extends Process {
   /** Performance measurements. */
   protected final Performance per = new Performance();
-  /** Performance measurements. */
+  /** Query processor. */
   protected QueryProcessor qp;
   /** Parsing time. */
   protected long pars;
@@ -35,7 +35,7 @@ abstract class AQuery extends Process {
   protected long eval = 0;
 
   /**
-   * Constructor.
+   * Protected constructor.
    * @param p command properties
    * @param a arguments
    */
@@ -74,21 +74,13 @@ abstract class AQuery extends Process {
       BaseX.debug(ex);
       err = ex.getMessage();
     } catch(final ProgressException ex) {
-      err = Prop.server ? SERVERTIME : "";
+      err = PROGERR;
     } catch(final Exception ex) {
       ex.printStackTrace();
       err = BaseX.bug();
     }
-    
-    if(err != null) {
-      try {
-        qp.close();
-      } catch(final IOException ex) {
-        /* ignored */
-      }
-    }
-    info.add(err);
-    return err == null;
+    try { qp.close(); } catch(final IOException ex) { /* ignored */ }
+    return error(err);
   }
 
   @Override
@@ -160,6 +152,7 @@ abstract class AQuery extends Process {
       qu.plan(new XMLSerializer(out, false, true));
       info(QUERYPLAN);
       info.add(out.toString());
+      info.add(NL);
     }
     // reset timer
     per.getTime();

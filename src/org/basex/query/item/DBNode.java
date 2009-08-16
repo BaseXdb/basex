@@ -46,7 +46,17 @@ public class DBNode extends Nod {
    * @param p pre value
    */
   public DBNode(final Data d, final int p) {
-    this(d, p, null, TYPES[d.kind(p)]);
+    this(d, p, d.kind(p));
+  }
+
+  /**
+   * Constructor.
+   * @param d data reference
+   * @param p pre value
+   * @param k node kind
+   */
+  public DBNode(final Data d, final int p, final int k) {
+    this(d, p, null, TYPES[k]);
   }
 
   /**
@@ -158,7 +168,7 @@ public class DBNode extends Nod {
     // par.finish() ?..
     final DBNode node = new DBNode(data, pre, par, type);
     node.root = root;
-    node.score(score());
+    node.score = score;
     return node;
   }
 

@@ -54,7 +54,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    * Returns the name of the view property.
    * @return property
    */
-  public String prop() {
+  private String prop() {
     return "SHOW" + (view.gui.context.data() != null ? "" : "START") +
       view.getName().toUpperCase();
   }

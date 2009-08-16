@@ -40,11 +40,11 @@ public abstract class Parser extends Progress {
    * @param io io reference
    * @param prop database properties
    * @return xml parser
-   * @throws IOException io exception
+   * @throws IOException I/O exception
    */
   public static Parser xmlParser(final IO io, final Prop prop)
       throws IOException {
-    
+
     // use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop);
     // use default parser

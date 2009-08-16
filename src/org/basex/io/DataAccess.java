@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import org.basex.core.Prop;
 import org.basex.util.Num;
 
@@ -48,7 +47,7 @@ public final class DataAccess {
 
   /**
    * Flushes the buffered data.
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
@@ -56,7 +55,7 @@ public final class DataAccess {
 
   /**
    * Closes the data access.
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public synchronized void close() throws IOException {
     flush();

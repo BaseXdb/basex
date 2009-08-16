@@ -5,7 +5,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
 
 /**
- * Defines shared things of TreeMap Layout Algorithms.
+ * Defines shared things of TreeMap layout algorithms.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser

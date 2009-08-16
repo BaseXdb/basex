@@ -25,7 +25,7 @@ public final class Namespaces extends Set {
   private NSNode tmp;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    */
   public Namespaces() {
     root = new NSNode();
@@ -76,7 +76,7 @@ public final class Namespaces extends Set {
   }
 
   /**
-   * Returns the namespace for the specified qname.
+   * Returns the namespace offset for the specified qname.
    * @param n tag/attribute name
    * @return namespace
    */

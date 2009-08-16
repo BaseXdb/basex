@@ -32,7 +32,7 @@ final class IndexStats {
    * @param prop database properties
    */
   IndexStats(final Prop prop) {
-    nr = prop.num(Prop.INDEXOCC);
+    nr = prop.is(Prop.INDEXALL) ? 1 << 10 : 10;
     occMin = new int[nr];
     occMax = new int[nr];
     txtMin = new byte[nr][];

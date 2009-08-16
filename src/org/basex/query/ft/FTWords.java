@@ -131,7 +131,7 @@ public final class FTWords extends FTExpr {
    * Evaluates the full-text match.
    * @param ctx query context
    * @return length value, used for scoring
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private int contains(final QueryContext ctx) throws QueryException {
     // speed up default case
@@ -216,7 +216,7 @@ public final class FTWords extends FTExpr {
    * Returns a token representation or an exception.
    * @param iter iterator to be checked
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private byte[] nextStr(final Iter iter) throws QueryException {
     final Item it = iter.next();
@@ -235,10 +235,9 @@ public final class FTWords extends FTExpr {
      * - case sensitivity, diacritics and stemming flags comply with index
      * - no stop words are specified
      */
-    data = ic.data;
-    final MetaData md = data.meta;
+    final MetaData md = ic.data.meta;
     final FTOpt fto = ic.ctx.ftopt;
-    
+
     if(txt == null || occ != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
@@ -258,14 +257,17 @@ public final class FTWords extends FTExpr {
     ic.is = 0;
     while(ft.more()) {
       if(ft.get().length > Token.MAXLEN) return false;
-      final double s = data.nrIDs(ft);
-      if(s == 0) {
-        ic.is = 0;
-        break;
-      }
-      ic.is += s;
+      final int s = ic.data.nrIDs(ft);
+      if(ic.is > s || ic.is == 0) ic.is = s;
+      if(s == 0) break;
     }
     return true;
+  }
+
+  @Override
+  public FTExpr indexEquivalent(final IndexContext ic) {
+    data = ic.data;
+    return this;
   }
 
   @Override

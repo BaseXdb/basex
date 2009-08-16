@@ -1,10 +1,11 @@
 package org.basex.query;
 
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 
 /**
- * Expression Information.
+ * Expression information.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -34,14 +35,14 @@ public abstract class ExprInfo {
    * @return class name
    */
   public String name() {
-    return getClass().getSimpleName();
+    return BaseX.name(this);
   }
 
   /**
    * Recursively sends the abstract syntax of this expression to the
    * specified serializer.
    * @param ser serializer
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void plan(Serializer ser) throws IOException;
 

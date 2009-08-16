@@ -141,7 +141,7 @@ final class FNDate extends Fun {
    * @param t target type
    * @param ctx query context
    * @return date
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
@@ -153,7 +153,7 @@ final class FNDate extends Fun {
    * a duration is returned.
    * @param it item to be checked
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
     if(it.u()) return new Dur(it.str());
@@ -167,7 +167,7 @@ final class FNDate extends Fun {
    * @param zon timezone
    * @param d zone was defined
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
@@ -182,7 +182,7 @@ final class FNDate extends Fun {
    * @param zon timezone
    * @param d zone was defined
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
@@ -197,7 +197,7 @@ final class FNDate extends Fun {
    * @param zon timezone
    * @param d zone was defined
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
@@ -211,7 +211,7 @@ final class FNDate extends Fun {
    * @param date item to be checked
    * @param tm time zone
    * @return duration
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
@@ -240,7 +240,7 @@ final class FNDate extends Fun {
    * @param zon timezone
    * @param d zone was specified
    * @return adjusted date
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Date adjust(final Date date, final Item zon, final boolean d)
       throws QueryException {

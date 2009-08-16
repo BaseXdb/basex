@@ -9,14 +9,15 @@ import org.basex.data.Data.Type;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'info index' command.
+ * Evaluates the 'info index' command and returns information on the indexes
+ * of the currently opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class InfoIndex extends AInfo {
   /**
-   * Constructor.
+   * Default constructor.
    */
   public InfoIndex() {
     super(DATAREF | PRINTING);
@@ -45,10 +46,14 @@ public final class InfoIndex extends AInfo {
       out.println(INFOFTINDEX);
       out.println(data.info(Type.FTX));
     }
+    if(data.meta.pathindex) {
+      out.println(INFOPATHINDEX);
+      out.println(data.path.info(data));
+    }
   }
 
   @Override
   public String toString() {
-    return Cmd.INFO.name() + " " + CmdInfo.INDEX;
+    return Cmd.INFO + " " + CmdInfo.INDEX;
   }
 }

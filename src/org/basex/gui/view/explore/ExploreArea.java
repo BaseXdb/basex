@@ -93,19 +93,27 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   void init() {
     panel.removeAll();
+    panel.revalidate();
+    panel.repaint();
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(panel.getComponentCount() != 0) return;
-
     final Data data = gui.context.data();
-    if(!gui.prop.is(GUIProp.SHOWEXPLORE) || data == null) return;
+    if(!main.visible() || data == null) return;
+
+    final boolean pi = data.meta.pathindex;
+    if(panel.getComponentCount() != 0) {
+      if(!pi) init();
+      return;
+    }
+    if(!pi) return;
+
+    all.help(data.fs != null ? HELPSEARCHFS : HELPSEARCHXML);
     addKeys(gui.context.data());
     panel.revalidate();
     panel.repaint();
-    all.help(data.fs != null ? HELPSEARCHFS : HELPSEARCHXML);
   }
 
   /**

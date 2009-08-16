@@ -21,11 +21,11 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public abstract class DataUpdateTest {
+public abstract class UpdateTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
-  private static final String DBNAME = DataUpdateTest.class.getSimpleName();
+  private static final String DBNAME = UpdateTest.class.getSimpleName();
 
   /** JUnit tag. */
   protected static final byte[] JUNIT = token("junit");
@@ -42,7 +42,6 @@ public abstract class DataUpdateTest {
     final Prop prop = CONTEXT.prop;
     prop.set(Prop.TEXTINDEX, false);
     prop.set(Prop.ATTRINDEX, false);
-    prop.set(Prop.CHOP, true);
   }
 
   /**

@@ -14,7 +14,7 @@ import org.basex.core.proc.XQueryMV;
 import org.basex.io.NullOutput;
 
 /**
- * MedioVis Performance Test.
+ * MedioVis performance test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -131,7 +131,7 @@ public final class MVTest {
 
   /**
    * Main test method.
-   * @param args command line arguments (ignored)
+   * @param args command-line arguments (ignored)
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {

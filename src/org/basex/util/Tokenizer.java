@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data.Type;
 import org.basex.index.IndexToken;
@@ -13,7 +14,7 @@ import org.basex.query.ft.StemDir;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Tokenizer implements IndexToken {
+public final class Tokenizer implements IndexToken {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORD,
@@ -252,7 +253,7 @@ public class Tokenizer implements IndexToken {
    * @param u unit
    * @return new position
    */
-  public final int pos(final int w, final FTUnit u) {
+  public int pos(final int w, final FTUnit u) {
     if(u == FTUnit.WORD) return w;
 
     // if necessary, calculate sentences and paragraphs
@@ -368,6 +369,6 @@ public class Tokenizer implements IndexToken {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + string(text) + "]";
+    return BaseX.name(this) + '[' + string(text) + ']';
   }
 }

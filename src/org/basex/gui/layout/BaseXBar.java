@@ -63,7 +63,7 @@ public final class BaseXBar extends BaseXPanel {
   private final boolean visible;
 
   /**
-   * Default Constructor. By default, the scrollbar is switched off
+   * Default constructor. By default, the scrollbar is switched off
    * if the component is completely displayed.
    * @param cmp reference to the scrolled component
    */

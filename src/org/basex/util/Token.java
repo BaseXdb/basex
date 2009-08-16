@@ -19,6 +19,8 @@ public final class Token {
   /** Maximum number of categories in statistics. */
   public static final int MAXCATS = 50;
 
+  /** Empty token. */
+  public static final byte[] EMPTY = {};
   /** XML Token. */
   public static final byte[] XML = token("xml");
   /** XMLNS Token. */
@@ -29,16 +31,12 @@ public final class Token {
   public static final byte[] TRUE = token("true");
   /** False token. */
   public static final byte[] FALSE = token("false");
-  /** Infinity. */
+  /** Not available number. */
   public static final byte[] NAN = token("NaN");
-  /** Infinity. */
+  /** Positive infinity. */
   public static final byte[] INF = token("INF");
-  /** Infinity. */
+  /** Negative infinity. */
   public static final byte[] NINF = token("-INF");
-  /** Dots. */
-  public static final byte[] NULL = token("null");
-  /** Empty token. */
-  public static final byte[] EMPTY = {};
   /** Space token. */
   public static final byte[] SPACE = { ' ' };
   /** Zero token. */
@@ -102,7 +100,7 @@ public final class Token {
    * @param text token
    * @param s start position
    * @param l length
-   * @return result of check
+   * @return string
    */
   public static String utf8(final byte[] text, final int s, final int l) {
     try {
@@ -761,8 +759,8 @@ public final class Token {
 
   /**
    * Removes leading and trailing whitespaces from the specified token.
-   * @param t token to be checked
-   * @return chopped array
+   * @param t token to be trimmed
+   * @return trimmed token
    */
   public static byte[] trim(final byte[] t) {
     int s = -1;
@@ -771,6 +769,21 @@ public final class Token {
     while(--e > s) if(t[e] > ' ' || t[e] < 0) break;
     if(++e == t.length && s == 0) return t;
     return s == e ? EMPTY : Array.create(t, s, e - s);
+  }
+
+  /**
+   * Chops a token to the specified length and adds dots.
+   * @param t token to be chopped
+   * @param l maximum length
+   * @return chopped token
+   */
+  public static byte[] chop(final byte[] t, final int l) {
+    if(t.length <= l) return t;
+    final byte[] tt = Array.finish(t, l);
+    tt[l - 3] = '.';
+    tt[l - 2] = '.';
+    tt[l - 1] = '.';
+    return tt;
   }
 
   /**

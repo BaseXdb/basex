@@ -203,8 +203,8 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final Object str, final Object... ext) {
-    final byte[] t = str == null ? NULL : str instanceof byte[] ?
-        (byte[]) str : token(str.toString());
+    final byte[] t = str instanceof byte[] ? (byte[]) str :
+      token(str == null ? "null" : str.toString());
 
     for(int i = 0, e = 0; i < t.length; i++) {
       if(t[i] != '%' || e == ext.length) {
@@ -215,7 +215,7 @@ public final class TokenBuilder {
         if(d) i++;
         final int n = d ? c - '1' : e++;
         final Object o = n < ext.length ? ext[n] : null;
-        add(o instanceof byte[] ? (byte[]) o : o == null ? NULL : o.toString());
+        add(o instanceof byte[] ? (byte[]) o : o == null ? null : o.toString());
       }
     }
     return this;

@@ -4,7 +4,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.NodeIter;
 
 /**
- * XPath Axes.
+ * XPath axes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

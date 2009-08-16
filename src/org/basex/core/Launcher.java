@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import java.io.IOException;
-
 import org.basex.io.PrintOutput;
 
 /**
@@ -10,27 +9,28 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Launcher extends ALauncher {
+public final class Launcher extends ALauncher {
   /** Database Context. */
-  protected Context context;
+  protected final Context context;
+  /** Process reference. */
+  protected Process proc;
 
   /**
    * Constructor.
-   * @param pr process instance
    * @param ctx context
    */
-  public Launcher(final Process pr, final Context ctx) {
-    super(pr);
+  public Launcher(final Context ctx) {
     context = ctx;
   }
 
   @Override
-  public boolean execute() {
-    return proc.execute(context);
+  public boolean execute(final Process pr) {
+    proc = pr;
+    return pr.execute(context);
   }
 
   @Override
-  public void out(final PrintOutput out) throws IOException {
+  public void output(final PrintOutput out) throws IOException {
     proc.output(out);
   }
 

@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
@@ -107,6 +108,6 @@ final class NSNode {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[pre:" + pre + "]";
+    return BaseX.name(this) + "[pre:" + pre + "]";
   }
 }

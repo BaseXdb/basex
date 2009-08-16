@@ -18,7 +18,7 @@ public abstract class Simple extends Expr {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return false;
+    return u == Use.ELM;
   }
 
   @Override

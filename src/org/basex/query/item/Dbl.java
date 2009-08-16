@@ -43,7 +43,7 @@ public final class Dbl extends Item {
    * Returns an instance of this class.
    * @param v value
    * @return instance
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static Dbl get(final byte[] v) throws QueryException {
     return get(parse(v));
@@ -105,7 +105,7 @@ public final class Dbl extends Item {
    * Converts the given token into a double value.
    * @param val value to be converted
    * @return double value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   static double parse(final byte[] val) throws QueryException {
     try {

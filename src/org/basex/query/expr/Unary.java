@@ -15,7 +15,7 @@ import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
- * Unary Expression.
+ * Unary expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -71,7 +71,7 @@ public final class Order extends Expr {
   /**
    * Adds the items to be sorted.
    * @param ctx query context
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public void add(final QueryContext ctx) throws QueryException {
     for(final Ord o : ord) o.add(ctx);
@@ -95,7 +95,7 @@ public final class Order extends Expr {
    * @param o order array
    * @param s start position
    * @param e end position
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected void sort(final int[] o, final int s, final int e)
       throws QueryException {
@@ -157,7 +157,7 @@ public final class Order extends Expr {
    * @param a first position
    * @param it second item
    * @return result
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private int d(final int[] o, final int a, final Item[] it)
       throws QueryException {
@@ -181,7 +181,7 @@ public final class Order extends Expr {
    * @param a first position
    * @param b second position
    * @return result
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private int d(final int[] o, final int a, final int b)
       throws QueryException {
@@ -204,7 +204,7 @@ public final class Order extends Expr {
    * @param b second offset
    * @param c thirst offset
    * @return median
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private int m(final int[] o, final int a, final int b, final int c)
       throws QueryException {

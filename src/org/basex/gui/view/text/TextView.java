@@ -101,7 +101,7 @@ public final class TextView extends View {
   }
 
   /**
-   * Refreshes the doc display.
+   * Refreshes the text view.
    * @param nodes nodes to display
    */
   private void refreshText(final Nodes nodes) {
@@ -132,7 +132,7 @@ public final class TextView extends View {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWTEXT);
   }
 

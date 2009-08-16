@@ -28,7 +28,6 @@ import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Update;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
-import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
@@ -110,6 +109,8 @@ public enum GUICommands implements GUICommand {
   XQOPEN(true, GUIXQOPEN, "% R", GUIXQOPENTT) {
     @Override
     public void execute(final GUI gui) {
+      gui.query.confirm();
+      
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           gui.prop.get(GUIProp.XQPATH), gui);
@@ -137,7 +138,7 @@ public enum GUICommands implements GUICommand {
           file.write(gui.query.getQuery());
           gui.query.setQuery(file);
         } catch(final IOException ex) {
-          Dialog.error(gui, XQSAVERROR);
+          Dialog.error(gui, NOTSAVED);
         }
       }
     }
@@ -162,7 +163,7 @@ public enum GUICommands implements GUICommand {
   EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = save(gui);
+      final IO file = save(gui, gui.context.data().doc().length == 1);
       if(file != null) gui.execute(new Export(file.path()));
     }
   },
@@ -171,12 +172,12 @@ public enum GUICommands implements GUICommand {
   SAVE(true, GUIEXPORT, "", GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = save(gui);
+      final IO file = save(gui, true);
       if(file != null) {
         try {
           file.write(gui.text.getText());
         } catch(final IOException ex) {
-          Dialog.error(gui, XQSAVERROR);
+          Dialog.error(gui, NOTSAVED);
         }
       }
     }
@@ -260,7 +261,9 @@ public enum GUICommands implements GUICommand {
   DELETE(true, GUIDELETE, "", GUIDELETETT) {
     @Override
     public void execute(final GUI gui) {
-      if(Dialog.confirm(gui, DELETECONF)) gui.execute(new Delete());
+      if(Dialog.confirm(gui, DELETECONF)) {
+        gui.execute(new Delete());
+      }
     }
 
     @Override
@@ -278,7 +281,7 @@ public enum GUICommands implements GUICommand {
       final DialogInsert insert = new DialogInsert(gui);
       if(insert.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[insert.kind];
-      gui.execute(new Insert(type.toString(), insert.result.finish()));
+      gui.execute(new Insert(type, null, insert.result.finish()));
     }
 
     @Override
@@ -299,7 +302,7 @@ public enum GUICommands implements GUICommand {
       final DialogEdit edit = new DialogEdit(gui, nodes.nodes[0]);
       if(edit.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[edit.kind];
-      gui.execute(new Update(type.toString(), edit.result.finish()));
+      gui.execute(new Update(type, null, edit.result.finish()));
     }
 
     @Override
@@ -323,6 +326,7 @@ public enum GUICommands implements GUICommand {
         marked = new Nodes(pre, context.data());
       }
       gui.notify.context(marked, false, null);
+      gui.input.requestFocusInWindow();
     }
 
     @Override
@@ -564,7 +568,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.FULLSCREEN));
+      select(button, gui.fullscreen);
     }
 
     @Override
@@ -692,21 +696,23 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);
       if(info.ok()) {
-        final MetaData meta = gui.context.data().meta;
-        final boolean[] indexes = info.indexes();
+        final Data d = gui.context.data();
+        final boolean[] ind = info.indexes();
         if(info.opt) {
-          meta.txtindex = indexes[0];
-          meta.atvindex = indexes[1];
-          meta.ftxindex = indexes[2];
+          d.meta.txtindex = ind[0];
+          d.meta.atvindex = ind[1];
+          d.meta.ftxindex = ind[2];
           progress(gui, INFOOPT, new Process[] { new Optimize() });
         } else {
           Process[] proc = new Process[0];
-          if(indexes[0] != meta.txtindex)
-            proc = Array.add(proc, cmd(indexes[0], CmdIndex.TEXT));
-          if(indexes[1] != meta.atvindex)
-            proc = Array.add(proc, cmd(indexes[1], CmdIndex.ATTRIBUTE));
-          if(indexes[2] != meta.ftxindex)
-            proc = Array.add(proc, cmd(indexes[2], CmdIndex.FULLTEXT));
+          if(ind[0] != d.meta.pathindex)
+            proc = Array.add(proc, cmd(ind[0], CmdIndex.SUMMARY));
+          if(ind[1] != d.meta.txtindex)
+            proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
+          if(ind[2] != d.meta.atvindex)
+            proc = Array.add(proc, cmd(ind[2], CmdIndex.ATTRIBUTE));
+          if(ind[3] != d.meta.ftxindex)
+            proc = Array.add(proc, cmd(ind[3], CmdIndex.FULLTEXT));
 
           if(proc.length != 0) progress(gui, INFOBUILD, proc);
         }
@@ -867,7 +873,8 @@ public enum GUICommands implements GUICommand {
             gui.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
             if(op) Dialog.info(gui, INFOOPTIM);
           } else {
-            Dialog.error(gui, p.info());
+            final String info = p.info();
+            Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
           }
           // initialize views
           if(!ci && !di) gui.notify.init();
@@ -879,21 +886,22 @@ public enum GUICommands implements GUICommand {
   /**
    * Displays a file save dialog and returns the file name or a null reference.
    * @param gui gui reference
+   * @param single file vs directory dialog
    * @return io reference
    */
-  static IO save(final GUI gui) {
+  public static IO save(final GUI gui, final boolean single) {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
         gui.prop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
-    final boolean single = gui.context.data().doc().length == 1;
+    //final boolean single = gui.context.data().doc().length == 1;
     final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
       BaseXFileChooser.Mode.DSAVE);
     if(file == null) return null;
 
-    gui.prop.set(GUIProp.CREATEPATH, file.path());
     if(single) file.suffix(IO.XMLSUFFIX);
+    gui.prop.set(GUIProp.CREATEPATH, file.path());
     return file;
   }
 

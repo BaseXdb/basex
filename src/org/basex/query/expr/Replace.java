@@ -8,7 +8,7 @@ import static org.basex.query.QueryTokens.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class Replace extends Arr {
+public final class Replace extends Arr {
   /** 'Value of' flag. */
   private final boolean value;
 

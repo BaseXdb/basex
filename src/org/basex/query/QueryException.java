@@ -14,7 +14,7 @@ import org.basex.util.StringList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class QueryException extends Exception {
+public final class QueryException extends Exception {
   /** Error items. */
   public Iter iter = Iter.EMPTY;
 
@@ -54,7 +54,7 @@ public class QueryException extends Exception {
    * Returns the error code.
    * @return position
    */
-  public final String code() {
+  public String code() {
     return code;
   }
 
@@ -62,7 +62,7 @@ public class QueryException extends Exception {
    * Returns the error column.
    * @return error column
    */
-  public final int col() {
+  public int col() {
     return col;
   }
 
@@ -70,7 +70,7 @@ public class QueryException extends Exception {
    * Returns the error line.
    * @return error line
    */
-  public final int line() {
+  public int line() {
     return line;
   }
 
@@ -78,7 +78,7 @@ public class QueryException extends Exception {
    * Possible completions.
    * @return error line
    */
-  public final StringList complete() {
+  public StringList complete() {
     return complete == null ? new StringList() : complete;
   }
 
@@ -86,7 +86,7 @@ public class QueryException extends Exception {
    * Sets the error position.
    * @param parser parser
    */
-  public final void pos(final InputParser parser) {
+  public void pos(final InputParser parser) {
     if(line != 0 || parser == null) return;
     file = parser.file;
     line = 1;
@@ -102,7 +102,7 @@ public class QueryException extends Exception {
    * @param qp query parser
    * @param comp completions
    */
-  public final void complete(final InputParser qp, final StringList comp) {
+  public void complete(final InputParser qp, final StringList comp) {
     complete = comp;
     pos(qp);
   }
@@ -111,7 +111,7 @@ public class QueryException extends Exception {
    * Returns the simple error message.
    * @return string
    */
-  public final String simple() {
+  public String simple() {
     return super.getMessage();
   }
 
@@ -119,14 +119,14 @@ public class QueryException extends Exception {
    * Returns an extended error message.
    * @return string
    */
-  public final String extended() {
+  public String extended() {
     final StringBuilder sb = new StringBuilder();
     if(code != null) sb.append("[" + code + "] ");
     return sb + simple();
   }
 
   @Override
-  public final String getMessage() {
+  public String getMessage() {
     final StringBuilder sb = new StringBuilder();
     if(line != 0) {
       sb.append(STOPPED);

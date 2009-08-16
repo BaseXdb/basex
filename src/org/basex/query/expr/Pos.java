@@ -13,7 +13,7 @@ import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
- * Pos Expression.
+ * Pos expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -53,7 +53,7 @@ public final class Pos extends Simple {
    * @param cmp comparator
    * @param arg argument
    * @return resulting expression
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   static Expr get(final Expr expr, final Comp cmp, final Expr arg)
       throws QueryException {
@@ -112,7 +112,7 @@ public final class Pos extends Simple {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.POS;
+    return u == Use.POS || u == Use.ELM;
   }
 
   @Override

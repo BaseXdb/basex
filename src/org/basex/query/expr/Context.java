@@ -11,7 +11,7 @@ import org.basex.query.path.KindTest;
 import org.basex.query.path.Step;
 
 /**
- * Context Item.
+ * Context item.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -32,7 +32,7 @@ public final class Context extends Simple {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.CTX;
+    return u == Use.CTX || u == Use.ELM;
   }
 
   @Override

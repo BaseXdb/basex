@@ -166,26 +166,29 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @return chopped filename
+   * Chops the path and the XML suffix of the specified filename
+   * and returns the database name. If no name can be extracted, "database"
+   * will be used as default name.
+   * @return database name
    */
   public final String dbname() {
     final String n = name();
     final int i = n.lastIndexOf(".");
-    return i != -1 ? n.substring(0, i) : n;
+    final String nm = i != -1 ? n.substring(0, i) : n;
+    return nm.length() == 0 ? "database" : nm;
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @return chopped filename
+   * Chops the path of the specified filename.
+   * @return file name
    */
   public final String name() {
     return path.substring(path.lastIndexOf('/') + 1);
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @return chopped filename
+   * Returns the path.
+   * @return path
    */
   public final String path() {
     return path;
@@ -246,7 +249,7 @@ public abstract class IO {
    * Caches the contents of the specified input stream.
    * @param i input stream
    * @return cached contents
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected final byte[] cache(final InputStream i) throws IOException {
     final TokenBuilder tb = new TokenBuilder();

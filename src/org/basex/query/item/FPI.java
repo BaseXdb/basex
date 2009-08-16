@@ -6,7 +6,7 @@ import org.basex.BaseX;
 import org.basex.data.Serializer;
 
 /**
- * PI Node Fragment.
+ * PI node fragment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -7,14 +7,14 @@ import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
- * Evaluates the 'run' command.
+ * Evaluates the 'run' command and processes a query file as XQuery.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Run extends AQuery {
   /**
-   * Constructor.
+   * Default constructor.
    * @param file query file
    */
   public Run(final String file) {

@@ -25,7 +25,7 @@ import org.junit.Before;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  */
-public class DeepBaseTest {
+public final class DeepBaseTest {
   /** Name of test database. */
   private static final String DBNAME = DeepBaseTest.class.getSimpleName();
   /** File name for test output. */
@@ -37,11 +37,9 @@ public class DeepBaseTest {
 
   /**
    * Creates the database.
-   * @throws Exception exception
    */
   @Before
-  @SuppressWarnings("unused")
-  public void setUp() throws Exception {
+  public void setUp() {
     dbfs = new DeepFS(ctx, DBNAME);
   }
 

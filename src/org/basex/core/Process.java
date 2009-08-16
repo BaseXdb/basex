@@ -29,6 +29,8 @@ public abstract class Process extends Progress {
   protected static final int UPDATING = 2;
   /** Commands flag: data reference needed. */
   protected static final int DATAREF = 4;
+  /** Flags for controlling process evaluation. */
+  private final int flags;
 
   /** Command arguments. */
   public String[] args;
@@ -40,27 +42,25 @@ public abstract class Process extends Progress {
   /** Container for query information. */
   protected TokenBuilder info = new TokenBuilder();
   /** Performance measurements. */
-  protected Performance perf = new Performance();
+  protected Performance perf;
   /** Temporary query result. */
   protected Result result;
-  /** Command properties. */
-  private final int props;
 
   /**
    * Constructor.
-   * @param p properties
+   * @param f command flags
    * @param a arguments
    */
-  public Process(final int p, final String... a) {
-    props = p;
+  public Process(final int f, final String... a) {
+    flags = f;
     args = a;
   }
 
   /**
    * Executes the process and serializes the results. If an error happens, an
    * exception is thrown.
-   * @param ctx query context
-   * @param out output stream
+   * @param ctx database context
+   * @param out output stream reference
    * @throws Exception execution exception
    */
   public void execute(final Context ctx, final PrintOutput out)
@@ -73,44 +73,45 @@ public abstract class Process extends Progress {
 
   /**
    * Executes the process and returns a success flag.
-   * @param ctx query context
+   * @param ctx database context
    * @return success flag
    */
   public final boolean execute(final Context ctx) {
+    perf = new Performance();
     context = ctx;
     prop = ctx.prop;
 
     final Data data = context.data();
     // data reference needed?
-    if(data() && data == null) return error(PROCNODB);
-
-    if(data != null) {
-      // wait until update commands have been completed..
-      while(data.getLock() == 2) Performance.sleep(50);
+    if(data()) {
+      if(data == null) return error(PROCNODB);
       // check update commands..
-      if(updating()) {
-        if(prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM))
-          return error(PROCMM);
-        while(data.getLock() != 0) Performance.sleep(50);
-      }
+      if(updating() && (prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM)))
+        return error(PROCMM);
     }
 
-    try {
-      if(data != null) data.setLock(updating() ? 2 : 1);
-      final boolean ok = exec();
-      if(data != null && !printing()) data.setLock(0);
-      return ok;
-    } catch(final Throwable ex) {
-      if(data != null) data.setLock(0);
+    if(data != null) {
+      // wait until update and read operations have been completed..
+      while(data.getLock() == 2 || (updating() && data.getLock() != 0))
+        Performance.sleep(50);
+    }
 
-      // not expected...
+    boolean ok = false;
+    if(data != null) data.setLock(updating() ? 2 : 1);
+    try {
+      ok = exec();
+    } catch(final Throwable ex) {
+      // catch unexpected errors...
       ex.printStackTrace();
       if(ex instanceof OutOfMemoryError) {
         Performance.gc(2);
-        return error(PROCOUTMEM);
+        error(PROCOUTMEM);
+      } else {
+        error(PROCERR, this, ex.toString());
       }
-      return error(PROCERR, this, ex.toString());
     }
+    if(data != null) data.setLock(0);
+    return ok;
   }
 
   /**
@@ -144,7 +145,7 @@ public abstract class Process extends Progress {
   /**
    * Returns a query result.
    * @param out output stream
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   protected void out(final PrintOutput out) throws IOException {
@@ -156,7 +157,7 @@ public abstract class Process extends Progress {
    * @throws IOException I/O exception
    */
   public final void info(final PrintOutput out) throws IOException {
-    out.print(info.toString());
+    out.print(info());
   }
 
   /**
@@ -168,7 +169,6 @@ public abstract class Process extends Progress {
   public final boolean error(final String msg, final Object... ext) {
     info.reset();
     info.add(msg == null ? "" : msg, ext);
-    info.add(NL);
     return false;
   }
 
@@ -205,8 +205,8 @@ public abstract class Process extends Progress {
   /**
    * Performs the specified XQuery.
    * @param q query to be performed
-   * @param err if this string is specified, it is thrown if the results don't
-   *          yield element nodes
+   * @param err this string is thrown as exception if the results are no
+   *    element nodes
    * @return result set
    */
   protected final Nodes query(final String q, final String err) {
@@ -237,33 +237,24 @@ public abstract class Process extends Progress {
    * Returns if the current command yields some output.
    * @return result of check
    */
-  public final boolean printing() {
-    return check(PRINTING);
+  public boolean printing() {
+    return (flags & PRINTING) != 0;
   }
 
   /**
    * Returns if the current command needs a data reference for processing.
    * @return result of check
    */
-  public final boolean data() {
-    return check(DATAREF);
+  public boolean data() {
+    return (flags & DATAREF) != 0;
   }
 
   /**
    * Returns if the current command generates updates in the data structure.
    * @return result of check
    */
-  public final boolean updating() {
-    return check(UPDATING);
-  }
-
-  /**
-   * Checks the specified command property.
-   * @param pr property to be checked
-   * @return result of check
-   */
-  private boolean check(final int pr) {
-    return (props & pr) != 0;
+  public boolean updating() {
+    return (flags & UPDATING) != 0;
   }
 
   /**
@@ -297,20 +288,34 @@ public abstract class Process extends Progress {
    */
   public final String args() {
     final StringBuilder sb = new StringBuilder();
-    for(final String a : args) if(a != null) sb.append(" " + a);
+    for(final String a : args) if(a != null) sb.append(quote(a));
     return sb.toString();
   }
 
   /**
-   * Returns the class name.
-   * @return class name
+   * Returns a string representation of the object. In the client/server
+   * architecture, the command string is sent to and reparsed by the server.
+   * @return string representation
    */
-  public final String name() {
-    return getClass().getSimpleName().toUpperCase();
-  }
-
   @Override
   public String toString() {
-    return name() + args();
+    return BaseX.name(this).toUpperCase() + args();
+  }
+
+  /**
+   * Returns the specified string in quotes, if spaces are found.
+   * @param s string to be quoted
+   * @return quoted string
+   */
+  protected String quote(final String s) {
+    final StringBuilder sb = new StringBuilder();
+    if(s.length() != 0) {
+      sb.append(' ');
+      final boolean spc = s.indexOf(' ') != -1;
+      if(spc) sb.append('"');
+      sb.append(s);
+      if(spc) sb.append('"');
+    }
+    return sb.toString();
   }
 }

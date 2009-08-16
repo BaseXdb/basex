@@ -13,9 +13,11 @@ import org.basex.core.Prop;
 import org.basex.core.Process;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
-import org.basex.core.proc.GetInfo;
-import org.basex.core.proc.GetResult;
+import org.basex.core.proc.IntInfo;
+import org.basex.core.proc.IntOutput;
+import org.basex.core.proc.IntStop;
 import org.basex.io.BufferedOutput;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -27,55 +29,42 @@ import org.basex.util.Performance;
  * @author Andreas Weiler
  */
 final class Session implements Runnable {
+  /** Server reference. */
+  final BaseXServerNew bxs;
   /** Database context. */
-  final Context context = new Context();
+  final Context context;
   /** Socket. */
   final Socket socket;
   /** Client id. */
   final int clientId;
   /** Verbose mode. */
   final boolean info;
+
   /** Core. */
   Process core;
   /** Timeout thread. */
   Thread timeout;
-  /** Session thread. */
-  Thread session = null;
 
-  /** Flag for session. */
-  boolean running = true;
-  /** Output stream. */
-  DataOutputStream dos;
   /** Input stream. */
   DataInputStream dis;
   /** Print output. */
   PrintOutput out;
-  /** Server reference. */
-  BaseXServerNew bxs;
 
   /**
    * Session.
    * @param s socket
    * @param c client id
-   * @param i verbose Mode
+   * @param i info mode
    * @param b server reference
    */
   Session(final Socket s, final int c, final boolean i,
       final BaseXServerNew b) {
+    context = new Context(b.context);
     clientId = c;
     socket = s;
     info = i;
     bxs = b;
-  }
-
-  /**
-   * Starts the thread.
-   */
-  void start() {
-    if(session == null) {
-      session = new Thread(this);
-      session.start();
-    }
+    new Thread(this).start();
   }
 
   /**
@@ -83,7 +72,6 @@ final class Session implements Runnable {
    * @throws IOException I/O exception
    */
   private void handle() throws IOException {
-    if(info) BaseX.outln("Login from Client %.", clientId);
     final Performance perf = new Performance();
     final InetAddress addr = socket.getInetAddress();
     final String ha = addr.getHostAddress();
@@ -91,56 +79,61 @@ final class Session implements Runnable {
 
     // get command and arguments
     dis = new DataInputStream(socket.getInputStream());
-    dos = new DataOutputStream(socket.getOutputStream());
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
     final int port = socket.getPort();
 
-    while(running) {
-      final String in = getMessage().trim();
-      if(in.equals("end")) {
+    if(info) BaseX.outln("[%:%] Login: client '%'.", ha, port, clientId);
+
+    while(true) {
+      final String in = getMessage();
+      if(in == null) {
         stop(false);
         break;
       }
       if(info) BaseX.outln("[%:%] %", ha, port, in);
-      Process pr = null;
+
+      // parse input and create process instance
+      Process proc = null;
       try {
-        pr = new CommandParser(in, context).parse()[0];
+        proc = new CommandParser(in, context, true).parse()[0];
       } catch(final QueryException ex) {
-        pr = new Process(0) { };
-        pr.error(ex.extended());
-        core = pr;
-        send(-sp);
-        return;
+        // invalid command was sent by a client; create empty process
+        // with error feedback
+        proc = new Process(0) {};
+        proc.error(ex.extended());
+        core = proc;
+        send(false);
+        continue;
       }
-      if(pr instanceof Exit) {
-        send(0);
-        // interrupt running processes
+
+      if(proc instanceof IntStop || proc instanceof Exit) {
+        send(true);
         stop(true);
+        if(proc instanceof IntStop) bxs.stop();
         break;
-      }
-      final Process proc = pr;
-      if(proc instanceof GetResult || proc instanceof GetInfo) {
-        final Process c = core;
-        if(c == null) {
+      } else if(proc instanceof IntOutput || proc instanceof IntInfo) {
+        if(core == null) {
           out.print(BaseX.info(SERVERTIME));
-        } else if(proc instanceof GetResult) {
-          // the client requests result of the last process
-          c.output(out);
-          out.write(0);
-        } else if(proc instanceof GetInfo) {
-          // the client requests information about the last process
-          c.info(out);
-          out.write(0);
+        } else {
+          if(proc instanceof IntOutput) {
+            core.output(out);
+            out.write(new byte[IO.BLOCKSIZE]);
+          } else {
+            new DataOutputStream(out).writeUTF(core.info());
+          }
+          out.flush();
         }
-        out.flush();
       } else {
         core = proc;
         timeout(proc);
-        send(proc.execute(context) ? sp : -sp);
+        send(proc.execute(context));
+        if(proc.info().equals(PROGERR)) proc.error(SERVERTIME);
         timeout.interrupt();
       }
       if(info) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
     }
+
+    if(info) BaseX.outln("[%:%] Logout: client '%'.", ha, port, clientId);
   }
 
   /**
@@ -162,30 +155,31 @@ final class Session implements Runnable {
    * Returns the message from the client.
    * @return message
    */
-  synchronized String getMessage() {
+  String getMessage() {
     try {
       return dis.readUTF();
     } catch(final IOException ex) {
-      ex.printStackTrace();
-      return "end";
+      BaseX.debug(ex);
+      // for stopping all client threads cause of server stop
+      return null;
     }
   }
 
   /**
-   * Returns an answer to the client.
-   * @param id session id to be returned
+   * Sends the success flag to the client.
+   * @param ok success flag
    * @throws IOException I/O exception
    */
-  synchronized void send(final int id) throws IOException {
-    dos.writeInt(id);
-    dos.flush();
+  void send(final boolean ok) throws IOException {
+    out.write(ok ? 0 : 1);
+    out.flush();
   }
 
   /**
    * Stops the session.
    * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  void close() throws IOException {
     dis.close();
   }
 
@@ -193,25 +187,26 @@ final class Session implements Runnable {
    * Closes the session.
    * @param s boolean
    */
-  public void stop(final boolean s) {
-    running = false;
+  private void stop(final boolean s) {
     if(s) bxs.sessions.remove(this);
     new Close().execute(context);
-    if(info) BaseX.outln("Client % has logged out.", clientId);
-    timeout = null;
-    session = null;
+
+    if(timeout != null) timeout.interrupt();
     try {
       socket.close();
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      BaseXServerNew.error(ex, false);
     }
   }
 
+  /**
+   * Starts the session.
+   */
   public void run() {
     try {
       handle();
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      BaseXServerNew.error(ex, false);
     }
   }
 }

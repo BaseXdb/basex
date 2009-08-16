@@ -69,27 +69,27 @@ public abstract class Builder extends Progress {
   /**
    * Initializes the database construction.
    * @param db name of database
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void init(String db) throws IOException;
 
   /**
    * Finishes the build process and returns a database reference.
    * @return data database instance
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   protected abstract Data finish() throws IOException;
 
   /**
    * Closes open references.
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void close() throws IOException;
 
   /**
    * Adds a document node to the database.
    * @param tok the token to be added (tag name or content)
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void addDoc(byte[] tok) throws IOException;
 
@@ -102,7 +102,7 @@ public abstract class Builder extends Progress {
    * @param dis distance (relative parent reference)
    * @param as number of attributes
    * @param n element has namespaces
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void addElem(int tok, int tns, int dis, int as, boolean n)
     throws IOException;
@@ -113,7 +113,7 @@ public abstract class Builder extends Progress {
    * @param s namespace
    * @param v attribute value
    * @param d distance (relative parent reference)
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void addAttr(int n, int s, byte[] v, int d)
     throws IOException;
@@ -123,7 +123,7 @@ public abstract class Builder extends Progress {
    * @param tok the token to be added (tag name or content)
    * @param dis distance (relative parent reference)
    * @param kind the node kind
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void addText(byte[] tok, int dis, byte kind)
     throws IOException;
@@ -132,7 +132,7 @@ public abstract class Builder extends Progress {
    * Stores a size value to the specified table position.
    * @param pre pre reference
    * @param val value to be stored
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void setSize(int pre, int val) throws IOException;
 
@@ -140,7 +140,7 @@ public abstract class Builder extends Progress {
    * Stores an attribute value to the specified table position.
    * @param pre pre reference
    * @param val value to be stored
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public abstract void setAttValue(int pre, byte[] val) throws IOException;
 
@@ -149,17 +149,17 @@ public abstract class Builder extends Progress {
   /**
    * Builds the database by running the specified parser.
    * @return data database instance
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final Data build() throws IOException {
     return build("");
   }
-    
+
   /**
    * Builds the database by running the specified parser.
    * @param db name of database
    * @return data database instance
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final Data build(final String db) throws IOException {
     init(db);
@@ -182,17 +182,17 @@ public abstract class Builder extends Progress {
   /**
    * Opens a document node.
    * @param doc document name
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void startDoc(final byte[] doc) throws IOException {
     parStack[level++] = meta.size;
-    path.add(0, level, Data.DOC);
+    if(meta.pathindex) path.add(0, level, Data.DOC);
     addDoc(utf8(doc, Prop.ENCODING));
   }
 
   /**
    * Closes a document node.
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void endDoc() throws IOException {
     final int pre = parStack[--level];
@@ -217,7 +217,7 @@ public abstract class Builder extends Progress {
    * @param tag tag name
    * @param att attributes
    * @return preValue of the created node
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final int startElem(final byte[] tag, final Atts att)
       throws IOException {
@@ -231,7 +231,7 @@ public abstract class Builder extends Progress {
    * Stores an empty element.
    * @param tag tag name
    * @param att attributes
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void emptyElem(final byte[] tag, final Atts att)
       throws IOException {
@@ -243,7 +243,7 @@ public abstract class Builder extends Progress {
   /**
    * Closes an element.
    * @param tag tag name
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void endElem(final byte[] tag) throws IOException {
     if(stopped) {
@@ -265,7 +265,7 @@ public abstract class Builder extends Progress {
    * Stores a text node.
    * @param t text value
    * @param w whitespace flag
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void text(final TokenBuilder t, final boolean w)
       throws IOException {
@@ -286,7 +286,7 @@ public abstract class Builder extends Progress {
   /**
    * Stores a comment.
    * @param com comment text
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void comment(final TokenBuilder com) throws IOException {
     addText(com, Data.COMM);
@@ -295,7 +295,7 @@ public abstract class Builder extends Progress {
   /**
    * Stores a processing instruction.
    * @param pi processing instruction name and value
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void pi(final TokenBuilder pi) throws IOException {
     addText(pi, Data.PI);
@@ -314,7 +314,7 @@ public abstract class Builder extends Progress {
    * @param tag the tag to be processed
    * @param att attributes
    * @param txt text node
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   public final void nodeAndText(final byte[] tag, final Atts att,
       final byte[] txt) throws IOException {
@@ -345,7 +345,7 @@ public abstract class Builder extends Progress {
    * @param name tag name
    * @param att attributes
    * @return pre value of the created node
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   private int addElem(final byte[] name, final Atts att) throws IOException {
 
@@ -355,7 +355,7 @@ public abstract class Builder extends Progress {
     // get tag reference
     final int tid = tags.index(tag, null, true);
 
-    path.add(tid, level, Data.ELEM);
+    if(meta.pathindex) path.add(tid, level, Data.ELEM);
 
     // remember tag id and parent reference
     tagStack[level] = tid;
@@ -382,7 +382,7 @@ public abstract class Builder extends Progress {
       final byte[] av = att.val[a];
       final int an = atts.index(att.key[a], av, true);
       final int ans = ns.get(att.key[a]);
-      path.add(an, level + 1, Data.ATTR);
+      if(meta.pathindex) path.add(an, level + 1, Data.ATTR);
       addAttr(an, ans, av, a + 1);
     }
 
@@ -391,7 +391,6 @@ public abstract class Builder extends Progress {
         // set leaf node information in index
         tags.stat(tagStack[level - 1]).leaf = false;
       } else if(inDoc) {
-        // [AH] && !Prop.fuse.. still necessary?
         // don't allow more than one root node
         error(MOREROOTS, parser.det(), tag);
       }
@@ -399,7 +398,7 @@ public abstract class Builder extends Progress {
     if(meta.size != 1) inDoc = true;
 
     if(Prop.debug) {
-      if(++c % 500000 == 0) BaseX.err(" " + c + "\n");
+      if(++c % 500000 == 0) BaseX.err(" " + c + NL);
       else if(c % 50000 == 0) BaseX.err("!");
       else if(c % 10000 == 0) BaseX.err(".");
     }
@@ -421,7 +420,7 @@ public abstract class Builder extends Progress {
    * Adds a simple text, comment or processing instruction to the database.
    * @param txt the value to be added
    * @param kind the node type
-   * @throws IOException in case of parsing or writing problems
+   * @throws IOException I/O exception
    */
   private void addText(final TokenBuilder txt, final byte kind)
       throws IOException {
@@ -430,7 +429,7 @@ public abstract class Builder extends Progress {
 
     // text node processing for statistics
     if(kind == Data.TEXT) tags.index(tagStack[level - 1], t);
-    path.add(0, level, kind, t.length);
+    if(meta.pathindex) path.add(0, level, kind);
     addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], kind);
   }
 }

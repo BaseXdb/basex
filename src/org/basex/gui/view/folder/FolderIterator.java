@@ -37,7 +37,7 @@ final class FolderIterator {
   private int ll;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param v view reference
    */
   FolderIterator(final FolderView v) {

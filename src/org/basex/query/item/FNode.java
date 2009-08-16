@@ -7,7 +7,7 @@ import org.basex.query.iter.NodeMore;
 import org.basex.util.Array;
 
 /**
- * Node Type.
+ * Node type.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -77,12 +77,12 @@ public abstract class FNode extends Nod {
 
       @Override
       public boolean more() {
-        return iter != null && c != iter.size;
+        return iter != null && c != iter.size();
       }
 
       @Override
       public Nod next() {
-        return more() ? iter.item[c++] : null;
+        return more() ? iter.get(c++) : null;
       }
     };
   }

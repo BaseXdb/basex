@@ -100,14 +100,14 @@ public final class FTOr extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    int sum = 0;
+    int is = 0;
     for(int i = 0; i < expr.length; i++) {
       // no index access if negative operators is found
       if(!expr[i].indexAccessible(ic) || ic.not) return false;
-      sum += ic.is;
       ic.not = false;
+      is += ic.is;
     }
-    ic.is = sum;
+    ic.is = is;
     return true;
   }
 

@@ -1,7 +1,7 @@
 package org.basex.index;
 
+import static org.basex.Text.*;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
@@ -17,6 +17,10 @@ import org.basex.data.Data;
 public abstract class IndexBuilder extends Progress {
   /** Data reference. */
   protected final Data data;
+  /** Total parsing value. */
+  protected final int total;
+  /** Current parsing value. */
+  protected int id;
 
   /**
    * Builds the index structure and returns an index instance.
@@ -31,6 +35,7 @@ public abstract class IndexBuilder extends Progress {
    */
   public IndexBuilder(final Data d) {
     data = d;
+    total = data.meta.size;
   }
 
   @Override
@@ -43,5 +48,15 @@ public abstract class IndexBuilder extends Progress {
       }
       throw new ProgressException();
     }
+  }
+
+  @Override
+  public final String tit() {
+    return PROGINDEX;
+  }
+
+  @Override
+  public double prog() {
+    return (double) id / total;
   }
 }

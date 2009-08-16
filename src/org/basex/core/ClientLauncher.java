@@ -27,36 +27,35 @@ public final class ClientLauncher extends ALauncher {
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
-   * @param pr process
-   * @param prop database properties
+   * @param ctx database context
    */
-  public ClientLauncher(final Process pr, final Prop prop) {
-    super(pr);
-    host = prop.get(Prop.HOST);
-    port = prop.num(Prop.PORT);
+  public ClientLauncher(final Context ctx) {
+    host = ctx.prop.get(Prop.HOST);
+    port = ctx.prop.num(Prop.PORT);
   }
 
   @Override
-  public boolean execute() throws IOException {
-    send(proc.toString());
+  public boolean execute(final Process pr) throws IOException {
+    send(pr.toString());
     last = new DataInputStream(socket.getInputStream()).readInt();
+    socket.close();
     return last > 0;
   }
 
   @Override
-  public void out(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETRESULT.name() + " " + last);
+  public void output(final PrintOutput o) throws IOException {
+    send(Commands.Cmd.INTOUTPUT + " " + last);
     receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETINFO.name() + " " + last);
+    send(Commands.Cmd.INTINFO + " " + last);
     receive(o);
   }
 
   /**
-   * Sends the specified command and argument over the network.
+   * Sends the specified string over the network.
    * @param command command to be sent
    * @throws IOException I/O exception
    */
@@ -74,6 +73,9 @@ public final class ClientLauncher extends ALauncher {
     final InputStream in = socket.getInputStream();
     final byte[] bb = new byte[IO.BLOCKSIZE];
     int l = 0;
-    while((l = in.read(bb)) != -1) for(int i = 0; i < l; i++) o.write(bb[i]);
+    while((l = in.read(bb)) != -1) {
+      for(int i = 0; i < l; i++) o.write(bb[i]);
+    }
+    socket.close();
   }
 }

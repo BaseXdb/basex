@@ -134,11 +134,11 @@ public final class TokenList implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(getClass().getSimpleName() + "[");
+    final TokenBuilder tb = new TokenBuilder(BaseX.name(this) + '[');
     for(int i = 0; i < size; i++) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);
     }
-    return tb.add("]").toString();
+    return tb.add(']').toString();
   }
 }

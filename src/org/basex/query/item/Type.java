@@ -32,7 +32,7 @@ import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
 /**
- * XQuery Data Types.
+ * XQuery data types.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -713,7 +713,7 @@ public enum Type {
    * @param it item to be converted
    * @param ctx query context
    * @return new item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public Item e(final Item it, final QueryContext ctx) throws QueryException {
@@ -725,7 +725,7 @@ public enum Type {
    * The Java object is supposed to have a correct mapping type.
    * @param o Java object
    * @return new item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public Item e(final Object o) throws QueryException {
@@ -758,7 +758,7 @@ public enum Type {
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item
    * @return item argument
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected Item checkNum(final Item it) throws QueryException {
     return it.type == URI || !it.s() && !it.n() && !it.u() &&
@@ -771,7 +771,7 @@ public enum Type {
    * @param min minimum value
    * @param max maximum value
    * @return integer value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   protected long check(final Object o, final long min, final long max)
       throws QueryException {
@@ -807,7 +807,7 @@ public enum Type {
   /**
    * Checks the validity of the specified name.
    * @param it value to be checked
-   * @throws QueryException if name is invalid
+   * @throws QueryException query exception
    * @return name
    */
   protected byte[] checkName(final Item it) throws QueryException {
@@ -820,7 +820,7 @@ public enum Type {
    * Throws a casting exception.
    * @param it item to be included in the error message
    * @return dummy item
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Item error(final Item it) throws QueryException {
     Err.cast(this, it);

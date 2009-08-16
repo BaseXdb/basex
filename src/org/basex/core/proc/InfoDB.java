@@ -14,7 +14,8 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * Evaluates the 'info database' command.
+ * Evaluates the 'info database' command and returns information on the
+ * currently opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -25,7 +26,7 @@ public final class InfoDB extends AInfo {
     new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   public InfoDB() {
     super(DATAREF | PRINTING);
@@ -61,7 +62,6 @@ public final class InfoDB extends AInfo {
     tb.add(header, INFODB);
     format(tb, INFODBNAME, meta.name, l);
     format(tb, INFODBSIZE, Performance.format(len), l);
-    format(tb, INFOENCODING, meta.encoding, l);
     format(tb, INFONODES, Integer.toString(meta.size), l);
     format(tb, INFOHEIGHT, Integer.toString(meta.height), l);
 
@@ -70,6 +70,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFODOC, meta.file.path(), l);
     format(tb, INFOTIME, DATE.format(new Date(meta.time)), l);
     format(tb, INFODOCSIZE, Performance.format(meta.filesize), l);
+    format(tb, INFOENCODING, meta.encoding, l);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs), l);
     format(tb, INFOCHOP, BaseX.flag(meta.chop), 0);
     format(tb, INFOENTITY, BaseX.flag(meta.entity), 0);
@@ -80,6 +81,7 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
+        format(tb, INFOPATHINDEX, BaseX.flag(meta.pathindex), 0);
         format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), 0);
         format(tb, INFOATTRINDEX, BaseX.flag(meta.atvindex), 0);
         format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) + (meta.ftxindex &&
@@ -91,6 +93,6 @@ public final class InfoDB extends AInfo {
 
   @Override
   public String toString() {
-    return Cmd.INFO.name() + " " + CmdInfo.DB;
+    return Cmd.INFO + " " + CmdInfo.DB;
   }
 }

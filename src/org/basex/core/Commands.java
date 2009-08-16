@@ -2,6 +2,8 @@ package org.basex.core;
 
 import static org.basex.Text.*;
 
+import java.util.regex.Pattern;
+
 /**
  * This class defines the available command-line commands.
  *
@@ -10,31 +12,79 @@ import static org.basex.Text.*;
  */
 @SuppressWarnings("all")
 public interface Commands {
+  /** Command flag: command which will not be shown in the help. */
+  int HID = 1;
+  /** Command flag: command which cannot be run by the user. */
+  int INT = 2;
+  /** Command flag: dummy command for formatting the help output. */
+  int HLP = 4;
+  /** Command flag: command which can only be executed by the server. */
+  int SRV = 8;
+
   /** Command definitions. */
   enum Cmd {
-    // DATABASE COMMANDS
-    DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true),
-    CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
-    // QUERY COMMANDS
-    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false), RUN(true),
-    FIND(true), CS(true),
-    // UPDATE COMMANDS
-    DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
-    // GENERAL COMMANDS
-    DUMMYGENERAL(false), SET(true), HELP(true), PROMPT(false),
-    EXIT(true), QUIT(false),
-    // SERVER COMMANDS
-    GETRESULT(false), GETINFO(false), STOP(false);
+    // Database commands
+    HELPDATABASE(HLP), C(HID), CREATE(), O(HID), OPEN(), I(HID), INFO(),
+    CLOSE(), LIST(), DROP(), EXPORT(), OPTIMIZE(),
+    // Query commands
+    HELPQUERY(HLP), X(HID), XQUERY(), XQUERYMV(HID), RUN(), FIND(), CS(),
+    // Update commands
+    HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
+    // General commands
+    HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
+    // Internal commands
+    INTPROMPT(INT), INTOUTPUT(INT), INTINFO(INT), INTSTOP(INT);
+    /* Server commands
+    SHOW(SRV), GRANT(SRV), KILL(INT), ... */
 
-    /** Flag for official (public) commands. */
-    final boolean official;
+    /** Flags for controlling command parsing. */
+    private final int flags;
 
     /**
-     * Constructor, initializing the constants.
-     * @param o official command flag
+     * Default constructor.
      */
-    private Cmd(final boolean o) {
-      official = o;
+    private Cmd() {
+      this(0);
+    }
+
+    /**
+     * Constructor with additional flags.
+     * @param f command flags
+     */
+    private Cmd(final int f) {
+      flags = f;
+    }
+
+    /**
+     * Returns if this is a command which will not be shown in the help.
+     * @return result of check
+     */
+    boolean hidden() {
+      return (flags & HID) != 0;
+    }
+
+    /**
+     * Returns if this is an internal command which cannot be run by the user.
+     * @return result of check
+     */
+    boolean internal() {
+      return (flags & INT) != 0;
+    }
+
+    /**
+     * Returns if this is a dummy command for formatting the help.
+     * @return result of check
+     */
+    boolean dummy() {
+      return (flags & HLP) != 0;
+    }
+
+    /**
+     * Returns if this is a command which can only be executed by the server.
+     * @return result of check
+     */
+    boolean server() {
+      return (flags & SRV) != 0;
     }
 
     /**
@@ -46,10 +96,11 @@ public interface Commands {
       final StringBuilder sb = new StringBuilder();
 
       final Object args = help(0);
-      if(name().startsWith("DUMMY")) {
+      if(dummy()) {
         sb.append(NL + args + NL + NL);
-      } else if(args != null && (official || detail)) {
-        sb.append(name().toLowerCase() + " " + args + NL + "  " + help(1) + NL);
+      } else if(args != null && !dummy() && !internal() &&
+          (!hidden() || detail)) {
+        sb.append(this + " " + args + NL + "  " + help(1) + NL);
         if(detail) sb.append(NL + help(2) + NL);
       } else {
         if(detail) sb.append(NOHELP + NL);
@@ -57,6 +108,50 @@ public interface Commands {
       return sb.toString();
     }
 
+    /*
+     * Returns a help string as html.
+     * @return string
+    public final String html() {
+      final StringBuilder sb = new StringBuilder();
+      final Object args = help(0);
+      if(dummy()) {
+        sb.append("<br/>" + NL + "<h2>" + args + "</h2>" + NL);
+      } else {
+        if(args != null && !dummy() && !internal()) {
+          String name = name().toLowerCase();
+          sb.append("<a name=\"" + name + "\"></a>");
+          sb.append("<h3>" + name.substring(0, 1).toUpperCase() +
+              name.substring(1) + "</h3>" + NL);
+          sb.append("<p>" + NL);
+          sb.append("<code>" + name() + " " + args + "</code><br/><br/>" + NL);
+          final String help2 = help(2);
+          
+          final String help1 = Pattern.compile("\n\r?\n.*", Pattern.DOTALL).
+            matcher(help2).replaceAll("");
+          sb.append(help1.replaceAll("(\\[.*?\\]\\??)", "<code>$1</code>"));
+          sb.append(NL + "</p>" + NL);
+          
+          boolean first = true;
+          for(String s : help2.split(NL)) {
+            if(s.length() == 0) continue;
+            if(s.startsWith("- ")) {
+              sb.append((first ? "<ul>" : "</li>") + NL);
+              sb.append(s.replaceAll(
+                  "- (.*?):(.*)", "<li><code>$1</code>: $2<br/>") + NL);
+              first = false;
+            } else if(!first) {
+              sb.append(s.replaceAll("(\\[.*?\\]\\??)", "<code>$1</code>"));
+              sb.append(NL);
+            }
+          }
+          if(!first) sb.append("</li>" + NL + "</ul>" + NL);
+          sb.append(NL);
+        }
+      }
+      return sb.toString();
+    }
+     */
+    
     /**
      * Returns the specified help text for the current command.
      * @param n help offset
@@ -71,24 +166,20 @@ public interface Commands {
     }
   }
 
-  /** Create Command definitions. */
-  enum CmdCreate { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
-
-  /** Index Types definition. */
-  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
-
+  /** Create command definitions. */
+  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX }
   /** Info command definitions. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
-
   /** Drop command definitions. */
   enum CmdDrop { DATABASE, DB, INDEX }
-
-  /** Insert command definitions. */
-  enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
-
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,
     ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX
   }
+
+  /** Index types. */
+  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, SUMMARY }
+  /** Node types for updates. Order equals the data kind definitions. */
+  enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
 }

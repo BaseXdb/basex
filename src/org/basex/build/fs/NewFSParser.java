@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.basex.BaseX;
 import org.basex.Text;
@@ -23,17 +22,18 @@ import org.basex.build.fs.parser.BufferedFileChannel;
 import org.basex.build.fs.parser.Loader;
 import org.basex.build.fs.parser.Metadata;
 import org.basex.build.fs.parser.ParserUtil;
+import org.basex.build.fs.parser.TXTParser;
 import org.basex.build.fs.parser.Metadata.IntField;
+import org.basex.build.fs.parser.Metadata.StringField;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
-import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.
- *
+ * 
  * The overall process of importing a file hierarchy can be described as
  * follows:
  * <ol>
@@ -42,7 +42,7 @@ import org.basex.util.TokenBuilder;
  * <li>This class {@link NewFSParser} instantiates the parsers to extract
  * metadata and content from files.
  * </ol>
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek, alex@holupirek.de
  * @author Bastian Lemke
@@ -80,7 +80,7 @@ public final class NewFSParser extends Parser {
 
     @Override
     public String toString() {
-      StringBuilder str = new StringBuilder("xmlns");
+      final StringBuilder str = new StringBuilder("xmlns");
       if(prefix.length > 0) {
         str.append(':');
         str.append(string(prefix));
@@ -133,6 +133,9 @@ public final class NewFSParser extends Parser {
   static final Map<String, Class<? extends AbstractParser>>
   /**/REGISTRY = new HashMap<String, Class<? extends AbstractParser>>();
 
+  /** Fallback parser for file suffixes that are not registered. */
+  static Class<? extends AbstractParser> fallbackParser = null;
+
   /**
    * Registers a parser implementation with the fs parser.
    * @param suffix the suffix to register the parser implementation for.
@@ -143,17 +146,30 @@ public final class NewFSParser extends Parser {
     REGISTRY.put(suffix, c);
   }
 
+  /**
+   * Registers a fallback parser implementation with the fs parser.
+   * @param c the parser implementation class.
+   */
+  public static void registerFallback(final Class<? extends AbstractParser> c) {
+    if(fallbackParser != null) {
+      BaseX.debug("Replacing fallback parser with " + c.getName());
+    }
+    fallbackParser = c;
+  }
+
   /** Spotlight extractor. */
   private SpotlightExtractor spotlight;
 
   static {
     try {
       final Class<?>[] classes = Loader.load(AbstractParser.class.getPackage(),
-          Pattern.compile("^\\w{1,5}Parser$"));
+          AbstractParser.class);
       for(final Class<?> c : classes) {
         final String name = c.getSimpleName();
         if(REGISTRY.containsValue(c)) {
-          BaseX.debug("Successfully loaded %", name);
+          BaseX.debug("Successfully loaded parser: %", name);
+        } else if(fallbackParser == c) {
+          BaseX.debug("Successfully loaded fallback parser: %", name);
         } else BaseX.debug("Loading % ... FAILED", name);
       }
     } catch(final IOException ex) {
@@ -178,8 +194,10 @@ public final class NewFSParser extends Parser {
   private final String backingroot;
   /** Path to FUSE mountpoint. */
   public final String mountpoint;
-  /** MetadataAdapter registry. */
+  /** Instantiated parsers. */
   private final Map<String, AbstractParser> parserInstances;
+  /** Instantiated fallback parser. */
+  private AbstractParser fallbackParserInstance = null;
   /** The buffer to use for parsing the file contents. */
   private final ByteBuffer buffer;
 
@@ -205,6 +223,19 @@ public final class NewFSParser extends Parser {
   Metadata meta = new Metadata();
 
   /**
+   * First byte of the current file or content element in the current file. Is
+   * always equals to 0 for file elements.
+   */
+  private long lastContentOffset = 0;
+  /**
+   * Size of the current file or content element in the current file. For file
+   * elements this value is equals to the file size.
+   */
+  private long lastContentSize;
+  /** Counts how many content elements have been opened. */
+  private int contentOpenedCounter = 0;
+
+  /**
    * Constructor.
    * @param path the traversal starts from
    * @param mp mount point for fuse
@@ -227,17 +258,19 @@ public final class NewFSParser extends Parser {
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
     if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
+      buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
       if(prop.is(Prop.SPOTLIGHT)) {
         spotlight = new SpotlightExtractor(this);
+        fallbackParserInstance = new TXTParser();
       } else {
         final int size = (int) Math.ceil(REGISTRY.size() / 0.75f);
         parserInstances = new HashMap<String, AbstractParser>(size);
-        buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
         return;
       }
+    } else {
+      buffer = null;
     }
     parserInstances = null;
-    buffer = null;
   }
 
   /**
@@ -265,18 +298,38 @@ public final class NewFSParser extends Parser {
       try {
         instance = clazz.newInstance();
         BaseX.debug("Successfully initialized parser for ." + suffix
-            + " files.");
+            + " files: " + clazz.getSimpleName());
       } catch(final InstantiationException ex) {
-        BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
-            ex.getMessage());
+        BaseX.debug("Failed to load parser for suffix " + suffix + " (% - %)",
+            clazz.getSimpleName(), ex.getMessage());
       } catch(final IllegalAccessException ex) {
-        BaseX.debug("Failed to load parser for suffix " + suffix + " (%)",
-            ex.getMessage());
+        BaseX.debug("Failed to load parser for suffix " + suffix + " (% - %)",
+            clazz.getSimpleName(), ex.getMessage());
       }
       // put in hash map ... even if null
       parserInstances.put(suffix, instance);
     }
     return instance;
+  }
+
+  /**
+   * Gets the fallback parser implementation.
+   * @return the fallback parser implementation or <code>null</code> if no
+   *         fallback parser is available.
+   */
+  private AbstractParser getFallbackParser() {
+    if(fallbackParser == null) return null;
+    if(fallbackParserInstance == null) {
+      try {
+        fallbackParserInstance = fallbackParser.newInstance();
+        BaseX.debug("Successfully initialized fallback parser.");
+      } catch(final InstantiationException ex) {
+        BaseX.debug("Failed to load fallback parser (%)", ex.getMessage());
+      } catch(final IllegalAccessException ex) {
+        BaseX.debug("Failed to load fallback parser (%)", ex.getMessage());
+      }
+    }
+    return fallbackParserInstance;
   }
 
   /**
@@ -290,8 +343,8 @@ public final class NewFSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    builder.meta.backingpath = mybackingpath;
-    builder.meta.mountpoint = mountpoint;
+    builder.meta.backing = mybackingpath;
+    builder.meta.mount = mountpoint;
 
     // -- create backing store (DeepFS depends on it).
     final boolean fuse = prop.is(Prop.FUSE);
@@ -389,7 +442,7 @@ public final class NewFSParser extends Parser {
       chIn.close();
       chOut.close();
     } catch(final IOException ex) {
-      ex.getMessage();
+      BaseX.debug(ex.getMessage());
     }
   }
 
@@ -448,19 +501,38 @@ public final class NewFSParser extends Parser {
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
         if(prop.is(Prop.SPOTLIGHT)) {
-          spotlight.parse(f);
+          if(prop.is(Prop.FSMETA)) spotlight.parse(f);
+          if(prop.is(Prop.FSCONT)) {
+            final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
+            try {
+              fallbackParserInstance.readContent(fc, this);
+            } catch(final IOException ex) {
+              BaseX.debug(
+                  "NewFSParser: Failed to parse file metadata (% - %).",
+                  fc.getFileName(), ex.getMessage());
+            } finally {
+              try {
+                fc.close();
+              } catch(final IOException e) { /* */}
+            }
+          }
         } else if(name.indexOf('.') != -1) { // internal parser
           final int dot = name.lastIndexOf('.');
           final String suffix = name.substring(dot + 1).toLowerCase();
           if(size > 0) {
-            final AbstractParser parser = getParser(suffix);
+            AbstractParser parser = getParser(suffix);
+            if(parser == null) parser = getFallbackParser();
             if(parser != null) {
               final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
               try {
+                lastContentOffset = 0;
+                lastContentSize = size;
+                contentOpenedCounter = 0;
                 parse0(parser, fc);
-              } catch(final IOException e) {
-                BaseX.debug("NewFSParser: Failed to parse file metadata (%).",
-                    fc.getFileName());
+              } catch(final IOException ex) {
+                BaseX.debug(
+                    "NewFSParser: Failed to parse file metadata (% - %).",
+                    fc.getFileName(), ex.getMessage());
               } finally {
                 try {
                   fc.close();
@@ -478,21 +550,36 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Parses a fragment of a file.
+   * <p>
+   * Parses a fragment of a file, e.g. a picture inside an ID3 frame.
+   * </p>
+   * <p>
+   * This method is intended to be called only from within a parser
+   * implementation. The parser implementation must create a subchannel of its
+   * {@link BufferedFileChannel} instance via
+   * {@link BufferedFileChannel#subChannel(int)}.
+   * </p>
    * @param bfc the {@link BufferedFileChannel} to read from.
-   * @param name the filename (without suffix!).
+   * @param title the title to set for the fragment. Set to <code>null</code> if
+   *          there is no title to set.
    * @param suffix the file suffix.
    * @throws IOException if any error occurs while reading from the file.
    */
   public void parseFileFragment(final BufferedFileChannel bfc,
-      final String name, final String suffix) throws IOException {
+      final String title, final String suffix) throws IOException {
     if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
       final AbstractParser parser = getParser(suffix);
       final long offset = bfc.absolutePosition();
       final long size = bfc.size();
-      fileStartEvent(name, suffix, offset);
+      startContent(offset, size);
+      if(title != null) {
+        meta.setString(StringField.TITLE, token(title));
+        metaEvent(meta);
+      }
       if(parser != null) {
         try {
+          lastContentOffset = offset;
+          lastContentSize = size;
           parse0(parser, bfc);
         } catch(final IOException ex) {
           BaseX.debug(
@@ -501,8 +588,30 @@ public final class NewFSParser extends Parser {
           bfc.finish();
         }
       }
-      fileEndEvent(size);
+      endContent();
     }
+  }
+
+  /**
+   * <p>
+   * Parses the file with the fallback parser.
+   * </p>
+   * <p>
+   * This method is intended to be called from a parser implementation that
+   * failed to parse a file.
+   * </p>
+   * @param bfc the {@link BufferedFileChannel} to read from.
+   * @param content parses the content if true or the metadata otherwise.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void parseWithFallbackParser(final BufferedFileChannel bfc,
+      final boolean content) throws IOException {
+    final AbstractParser parser = getFallbackParser();
+    if(parser == null) return;
+    bfc.reset();
+    if(content) parser.readContent(bfc, this);
+    else parser.readMeta(bfc, this);
+    bfc.finish();
   }
 
   /**
@@ -560,42 +669,134 @@ public final class NewFSParser extends Parser {
    * @param m the {@link Metadata} object containing all metadata information.
    * @throws IOException if any error occurs while generating the xml code.
    */
+  @SuppressWarnings("all")
+  // suppress dead code warning for ADD_ATTS
   public void metaEvent(final Metadata m) throws IOException {
-    final byte[] data = m.getValue();
+    final byte[] data = ParserUtil.checkUTF(m.getValue());
     if(ws(data)) return;
     builder.nodeAndText(m.getKey(), ADD_ATTS ? m.getAtts() : EMPTY_ATTS, data);
   }
 
   /**
-   * Generates the xml representation for a new file inside the current file
-   * node.
-   * @param name the name of the file.
-   * @param suffix the suffix of the file.
-   * @param offset the absolute position of the first byte of the file inside
-   *          the current file.
+   * Adds a text element. If the position of the text content is unknown, the
+   * offset should be set to -1.
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file.
+   * @param size the size of the content element.
+   * @param text the text to add.
+   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
+   *          set.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public void fileStartEvent(final String name, final String suffix,
-      final long offset) throws IOException {
-    atts.reset();
-    final byte[] n = name == null ? UNKNOWN : token(name);
-    final int suffLen = suffix == null ? 0 : suffix.length() + 1;
-    final TokenBuilder tb = new TokenBuilder(n.length + suffLen);
-    tb.add(n);
-    if(suffix != null) tb.add('.').add(suffix);
-    atts.add(NAME, tb.finish());
-    atts.add(OFFSET, token(offset));
-    builder.startElem(FILE, atts);
+  public void textContent(final long offset, final long size,
+      final String text, final boolean preserveSpace) throws IOException {
+    textContent(offset, size, token(text), preserveSpace);
   }
 
   /**
-   * Closes the last opened file element.
-   * @param size the size of the file in bytes.
+   * Adds a text element. If the position of the text content is unknown, the
+   * offset should be set to -1.
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file.
+   * @param size the size of the content element.
+   * @param text the text to add.
+   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
+   *          set.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public void fileEndEvent(final long size) throws IOException {
-    addFSAtts(curr, size);
-    builder.endElem(DataText.FILE);
+  public void textContent(final long offset, final long size,
+      final byte[] text, final boolean preserveSpace) throws IOException {
+    textContent(offset, size, new TokenBuilder(ParserUtil.checkUTF(text)),
+        preserveSpace);
+  }
+
+  /**
+   * <p>
+   * Adds a text element. If the position of the text content is unknown, the
+   * offset should be set to -1. <b><code>text</code> must contain only valid
+   * UTF-8 characters!</b> Otherwise the generated XML document may be not
+   * well-formed.
+   * </p>
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file.
+   * @param size the size of the content element.
+   * @param text the text to add.
+   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
+   *          set.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void textContent(final long offset, final long size,
+      final TokenBuilder text, final boolean preserveSpace) throws IOException {
+    startContent(offset, size);
+    atts.reset();
+    atts.add(Metadata.DATA_TYPE, Metadata.DATA_TYPE_STRING);
+    if(preserveSpace) atts.add(Metadata.XML_SPACE,
+        Metadata.XmlSpace.PRESERVE.get());
+    else text.chop();
+    if(text.size() == 0) return;
+    builder.startElem(TEXT_CONTENT, atts);
+    builder.text(text, false);
+    builder.endElem(TEXT_CONTENT);
+    endContent();
+  }
+
+  /**
+   * Generates the xml representation for a new content element inside the
+   * current file or content node node.
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file.
+   * @param size the size of the content element.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void startContent(final long offset, final long size)
+      throws IOException {
+    if(offset == lastContentOffset && size == lastContentSize) {
+      /*
+       * content range is exactly the same as the range of the parent element.
+       * So don't create a new element and insert everything in the actual
+       * element.
+       */
+      return;
+    }
+    contentOpenedCounter++;
+    atts.reset();
+    atts.add(OFFSET, token(offset));
+    atts.add(SIZE, token(size));
+    builder.startElem(CONTENT, atts);
+  }
+
+  /**
+   * Closes the last opened content element.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void endContent() throws IOException {
+    if(contentOpenedCounter > 0) {
+      builder.endElem(CONTENT);
+      contentOpenedCounter--;
+    }
+  }
+
+  /**
+   * Generates the xml representation for a new XML content element inside the
+   * current file or content node node.
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file.
+   * @param size the size of the content element.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void startXMLContent(final long offset, final long size)
+      throws IOException {
+    startContent(offset, size);
+    builder.startElem(XML_CONTENT, EMPTY_ATTS);
+  }
+
+  /**
+   * Closes the last opened XML content element.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  public void endXMLContent() throws IOException {
+    builder.endElem(XML_CONTENT);
+    endContent();
   }
 
   /**

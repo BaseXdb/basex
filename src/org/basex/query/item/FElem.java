@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
- * Element Node Fragment.
+ * Element node fragment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -78,8 +78,8 @@ public final class FElem extends FNode {
   @Override
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int n = 0; n < children.size; n++) {
-      final Nod c = children.item[n];
+    for(int n = 0; n < children.size(); n++) {
+      final Nod c = children.get(n);
       if(c.type == Type.ELM || c.type == Type.TXT) tb.add(c.str());
     }
     return tb.finish();
@@ -143,8 +143,8 @@ public final class FElem extends FNode {
     }
 
     // serialize attributes
-    for(int n = 0; n < atts.size; n++) {
-      final Nod nod = atts.item[n];
+    for(int n = 0; n < atts.size(); n++) {
+      final Nod nod = atts.get(n);
       final QNm atn = nod.qname();
       if(atn.ns()) {
         if(!NSGlobal.standard(atn.uri.str())) {
@@ -157,7 +157,7 @@ public final class FElem extends FNode {
     }
 
     // serialize children
-    for(int n = 0; n < children.size; n++) children.item[n].serialize(ser);
+    for(int n = 0; n < children.size(); n++) children.get(n).serialize(ser);
     ser.closeElement();
 
     // reset top level namespace
@@ -170,13 +170,13 @@ public final class FElem extends FNode {
     final NodIter at = new NodIter();
     final FElem node = new FElem(name, ch, at, base, ns, par);
 
-    for(int c = 0; c < children.size; c++) {
-      ch.add(children.item[c].copy());
-      ch.item[c].parent(node);
+    for(int c = 0; c < children.size(); c++) {
+      ch.add(children.get(c).copy());
+      ch.get(c).parent(node);
     }
-    for(int c = 0; c < atts.size; c++) {
-      at.add(atts.item[c].copy());
-      at.item[c].parent(node);
+    for(int c = 0; c < atts.size(); c++) {
+      at.add(atts.get(c).copy());
+      at.get(c).parent(node);
     }
     return node;
   }
@@ -185,7 +185,8 @@ public final class FElem extends FNode {
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
-    if(atts.size != 0 || ns.size != 0 || children.size != 0) sb.append("...");
+    if(atts.size() != 0 || ns.size != 0 || children.size() != 0)
+      sb.append("...");
     return sb.append("/>").toString();
   }
 

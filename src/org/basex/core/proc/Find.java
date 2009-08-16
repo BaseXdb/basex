@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Context;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.util.Array;
@@ -12,18 +13,18 @@ import org.basex.util.XMLToken;
 import static org.basex.util.Token.*;
 
 /**
- * Evaluates the 'find' command.
+ * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
   /**
-   * Constructor.
-   * @param q query
+   * Default constructor.
+   * @param query simplified query
    */
-  public Find(final String q) {
-    super(DATAREF | PRINTING, q);
+  public Find(final String query) {
+    super(DATAREF | PRINTING, query);
   }
 
   @Override
@@ -105,10 +106,10 @@ public final class Find extends AQuery {
     final boolean r = root || context.root();
 
     if(r) xquery.add("/");
-    xquery.add("descendant-or-self::*");
+    xquery.add("descendant-or-self::");
+    String name = "*";
 
     do {
-      boolean size = false;
       boolean exact = true;
       String pred = "";
 
@@ -116,10 +117,8 @@ public final class Find extends AQuery {
       char op = qu.charAt(0);
       if(op == '>') {
         pred = DataText.S_SIZE;
-        size = true;
       } else if(op == '<') {
         pred = DataText.S_SIZE;
-        size = true;
       } else if(op == '.') {
         pred = DataText.S_SUFFIX;
         op = '=';
@@ -136,8 +135,9 @@ public final class Find extends AQuery {
       final int i = qu.indexOf(' ');
       String t = qu.substring(0, i);
 
-      if(size) {
+      if(pred == DataText.S_SIZE) {
         t = Long.toString(calcNum(token(t)));
+        if(name.length() != 0) name = "file";
       } else {
         // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");
@@ -148,9 +148,10 @@ public final class Find extends AQuery {
         t = "\"" + t + "\"";
       }
       // add predicate
-      xquery.add("[@" + pred + (exact ? op : " ftcontains ") + t + "]");
+      xquery.add(name + "[@" + pred + (exact ? op : " ftcontains ") + t + "]");
 
       qu = qu.substring(i + 1);
+      name = "";
     } while(qu.indexOf(' ') > -1);
 
     boolean f = true;
@@ -268,5 +269,10 @@ public final class Find extends AQuery {
     }
     if(tb.length() != 0) split[s++] = tb.toString();
     return Array.finish(split, s);
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.FIND + " " + args[0];
   }
 }

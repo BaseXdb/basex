@@ -56,7 +56,7 @@ public final class DOTSerializer extends Serializer {
   /**
    * Constructor, defining colors for the dot output.
    * @param o output stream
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public DOTSerializer(final PrintOutput o) throws IOException {
     for(int i = 0; i < IO.MAXHEIGHT; i++) children[i] = new IntList();
@@ -151,7 +151,7 @@ public final class DOTSerializer extends Serializer {
    * Prints a single node.
    * @param t text
    * @param col color
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   private void print(final byte[] t, final String col) throws IOException {
     final byte[] text = t.length > 60 ? concat(

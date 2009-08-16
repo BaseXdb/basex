@@ -32,13 +32,13 @@ public abstract class Serializer {
 
   /**
    * Starts a result.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void openResult() throws IOException;
 
   /**
    * Closes a result.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void closeResult() throws IOException;
 
@@ -46,7 +46,7 @@ public abstract class Serializer {
    * Serializes an attribute.
    * @param n name
    * @param v value
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void attribute(final byte[] n, final byte[] v)
     throws IOException;
@@ -54,7 +54,7 @@ public abstract class Serializer {
   /**
    * Serializes a text.
    * @param b text bytes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void text(final byte[] b) throws IOException;
 
@@ -62,14 +62,14 @@ public abstract class Serializer {
    * Serializes a text.
    * @param b text bytes
    * @param ftp full-text positions
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void text(final byte[] b, final FTPos ftp) throws IOException;
 
   /**
    * Serializes a comment.
    * @param b comment
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void comment(final byte[] b) throws IOException;
 
@@ -77,14 +77,14 @@ public abstract class Serializer {
    * Serializes a processing instruction.
    * @param n name
    * @param v value
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void pi(final byte[] n, final byte[] v) throws IOException;
 
   /**
    * Serializes an item.
    * @param b text bytes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public abstract void item(final byte[] b) throws IOException;
 
@@ -93,32 +93,32 @@ public abstract class Serializer {
   /**
    * Starts an element.
    * @param t tag
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected abstract void start(final byte[] t) throws IOException;
 
   /**
    * Finishes an empty element.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected abstract void empty() throws IOException;
 
   /**
    * Finishes an element.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected abstract void finish() throws IOException;
 
   /**
    * Closes an element.
    * @param t tag
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected abstract void close(final byte[] t) throws IOException;
 
   /**
    * Closes the serializer.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected abstract void cls() throws IOException;
 
@@ -128,7 +128,7 @@ public abstract class Serializer {
    * Opens an element.
    * @param expr expression info
    * @param a attributes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void openElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
@@ -139,7 +139,7 @@ public abstract class Serializer {
    * Opens an element.
    * @param t tag
    * @param a attributes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void openElement(final byte[] t, final byte[]... a)
       throws IOException {
@@ -156,7 +156,7 @@ public abstract class Serializer {
    * Serializes a namespace.
    * @param n name
    * @param v value
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void namespace(final byte[] n, final byte[] v)
       throws IOException {
@@ -168,7 +168,7 @@ public abstract class Serializer {
    * Opens and closes an empty element.
    * @param t tag
    * @param a attributes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void emptyElement(final byte[] t, final byte[]... a)
       throws IOException {
@@ -181,7 +181,7 @@ public abstract class Serializer {
    * Opens and closes an empty element.
    * @param expr expression info
    * @param a attributes
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void emptyElement(final Expr expr, final byte[]... a)
       throws IOException {
@@ -190,7 +190,7 @@ public abstract class Serializer {
 
   /**
    * Closes an element.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final void closeElement() throws IOException {
     if(tags.size() == 0) throw new IOException("All elements closed.");
@@ -207,7 +207,7 @@ public abstract class Serializer {
 
   /**
    * Closes the serializer.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public void close() throws IOException {
     cls();
@@ -236,7 +236,7 @@ public abstract class Serializer {
    * @param data data reference
    * @param pre pre value to start from
    * @return last pre value
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final int node(final Data data, final int pre) throws IOException {
     return node(data, pre, null);
@@ -248,7 +248,7 @@ public abstract class Serializer {
    * @param pre pre value to start from
    * @param ft full-text data
    * @return last pre value
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public final int node(final Data data, final int pre, final FTPosData ft)
       throws IOException {
@@ -351,7 +351,7 @@ public abstract class Serializer {
    * Returns the name of the specified expression.
    * @param expr expression
    * @return name
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   protected byte[] name(final ExprInfo expr) throws IOException {
@@ -360,7 +360,7 @@ public abstract class Serializer {
 
   /**
    * Finishes a new element node.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected final void finishElement() throws IOException {
     if(!inTag) return;

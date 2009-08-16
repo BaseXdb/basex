@@ -59,7 +59,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param nm name of the database
    * @param f prefix for all files (no ending)
    * @param pr database properties
-   * @throws IOException in case files cannot be read
+   * @throws IOException I/O exception
    */
   public TableDiskAccess(final String nm, final String f, final Prop pr)
       throws IOException {
@@ -144,7 +144,7 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Checks whether the current block needs to be written and write it.
    * @param buf buffer to write
-   * @throws IOException in case of problems
+   * @throws IOException I/O exception
    */
   private synchronized void writeBlock(final Buffer buf) throws IOException {
     file.seek(buf.pos * IO.BLOCKSIZE);

@@ -21,12 +21,12 @@ import static org.basex.data.DataText.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class TableBlockAccessTest {
+public final class BlockAccessTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/JUnit.xml";
   /** Test database name. */
   private static final String DBNAME =
-    TableBlockAccessTest.class.getSimpleName();
+    BlockAccessTest.class.getSimpleName();
   /** Test file we do updates with. */
   private static final Prop PROP = new Prop();
   /** BlockStorage. */
@@ -49,7 +49,6 @@ public final class TableBlockAccessTest {
   public static void setUpBeforeClass() {
     PROP.set(Prop.TEXTINDEX, false);
     PROP.set(Prop.ATTRINDEX, false);
-    PROP.set(Prop.CHOP, true);
   }
 
   /**

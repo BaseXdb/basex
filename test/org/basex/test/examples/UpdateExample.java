@@ -25,19 +25,18 @@ public final class UpdateExample {
     // Creates a standard output stream
     PrintOutput out = new PrintOutput(System.out);
 
-    out.println("\n=== Create a new database:");
+    out.println("\n=== Create a database:");
 
     // Sets an option: activates command info output
-    new Set("Info", "on").execute(context, out);
+    new Set("info", true).execute(context, out);
     // Creates a new database instance; argument can be a file name or XML
     new CreateDB("<doc a='b'>first</doc>", "Example").execute(context, out);
 
     out.println("\n=== Insert a document:");
 
     // Inserts a document into the database; argument can be a file name or XML
-    // Position: 0 (ignored for documents)
     // Target: insert on root level
-    new Insert("fragment", "<doc>second</doc>", "0", "/").execute(context, out);
+    new Insert("fragment", "/", "<doc>second</doc>").execute(context, out);
 
     out.println("\n=== Delete nodes");
 
@@ -49,7 +48,7 @@ public final class UpdateExample {
     // Inserts an element fragment into the database
     // Position: 1 = as first child
     // Target: insert after all /doc elements...
-    new Insert("fragment", "<sub/>", "1", "/doc").execute(context, out);
+    new Insert("fragment", "/doc", 1, "<sub/>").execute(context, out);
 
     out.println("\n=== Optimize the database:");
 

@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -18,19 +19,19 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Root;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.Scoring;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.path.AxisPath;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
@@ -77,6 +78,11 @@ public final class QueryContext extends Progress {
   /** Current leaf flag. */
   public boolean leaf;
 
+  /** Used documents. */
+  public DBNode[] doc = new DBNode[1];
+  /** Number of documents. */
+  public int docs;
+
   /** Full-text position data (for visualization). */
   public FTPosData ftpos;
   /** Full-text token counter (for visualization). */
@@ -111,9 +117,6 @@ public final class QueryContext extends Progress {
   public boolean spaces = false;
   /** Empty Order mode. */
   public boolean orderGreatest = false;
-
-  /** Default encoding. */
-  public byte[] encoding = token(Prop.ENCODING);
   /** Preserve Namespaces. */
   public boolean nsPreserve = true;
   /** Inherit Namespaces. */
@@ -124,6 +127,8 @@ public final class QueryContext extends Progress {
   public boolean construct = false;
   /** Revalidation Mode. */
   public int revalidate;
+  /** Default encoding. */
+  byte[] encoding = token(Prop.ENCODING);
 
   /** String container for query background information. */
   final TokenBuilder info = new TokenBuilder();
@@ -148,14 +153,10 @@ public final class QueryContext extends Progress {
 
   /** Reference to the root expression. */
   private Expr root;
-  /** Used documents. */
-  private DBNode[] doc = new DBNode[1];
   /** Initial number of documents. */
   private int rootDocs;
-  /** Number of documents. */
-  private int docs;
   /** Info flag. */
-  final boolean inf;
+  private final boolean inf;
 
   /**
    * Constructor.
@@ -170,7 +171,7 @@ public final class QueryContext extends Progress {
   /**
    * Parses the specified query.
    * @param q input query
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void parse(final String q) throws QueryException {
     query = q;
@@ -180,7 +181,7 @@ public final class QueryContext extends Progress {
   /**
    * Parses the specified module.
    * @param q input query
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void module(final String q) throws QueryException {
     query = q;
@@ -200,10 +201,10 @@ public final class QueryContext extends Progress {
       if(nodes != null) {
         // create document nodes
         final Data data = nodes.data;
-        for(int d = 0; d < nodes.size(); d++) {
+        for(int d = 0, dl = nodes.size(); d < dl; d++) {
           final int p = nodes.nodes[d];
-          if(data.kind(p) == Data.DOC) {
-            addDoc(new DBNode(data, p));
+          if(nodes.doc || data.kind(p) == Data.DOC) {
+            addDoc(new DBNode(data, p, Data.DOC));
             rootDocs++;
           }
         }
@@ -215,21 +216,21 @@ public final class QueryContext extends Progress {
         }
 
         // create initial context items
-        final SeqIter si = new SeqIter();
-        if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
-          // add document nodes if query starts with root node (optimization)
-          for(int d = 0; d < docs; d++) si.add(doc[d]);
+        if(nodes.doc || !root.uses(Use.ELM, this)) {
+          // optimization: all items are documents, or all query expressions
+          // start with root node
+          item = Seq.get(doc, docs);
         } else {
           // otherwise, add all context items
-          for(int n = 0; n < nodes.size(); n++)
+          final SeqIter si = new SeqIter(nodes.size());
+          for(int n = 0; n < nodes.size(); n++) {
             si.add(new DBNode(data, nodes.nodes[n]));
+          }
+          item = si.finish();
         }
-        item = si.finish();
 
         // add collection instances
-        final NodIter ni = new NodIter();
-        for(int d = 0; d < docs; d++) ni.add(doc[d]);
-        addColl(ni, token(data.meta.name));
+        addColl(new NodIter(doc, docs), token(data.meta.name));
       }
 
       // evaluates the query and returns the result
@@ -237,11 +238,9 @@ public final class QueryContext extends Progress {
       fun.comp(this);
       vars.comp(this);
       root = root.comp(this);
-      if(inf) {
-        compInfo(QUERYRESULT + "%" + NL, root);
-      }
-    } catch(final StackOverflowError e) {
-      if(Prop.debug) e.printStackTrace();
+      if(inf) compInfo(QUERYRESULT + "%" + NL, root);
+    } catch(final StackOverflowError ex) {
+      if(Prop.debug) ex.printStackTrace();
       Err.or(XPSTACK);
     }
   }
@@ -299,8 +298,8 @@ public final class QueryContext extends Progress {
   public Iter iter() throws QueryException {
     try {
       return iter(root);
-    } catch(final StackOverflowError e) {
-      if(Prop.debug) e.printStackTrace();
+    } catch(final StackOverflowError ex) {
+      if(Prop.debug) ex.printStackTrace();
       Err.or(XPSTACK);
       return null;
     }
@@ -310,7 +309,7 @@ public final class QueryContext extends Progress {
    * Serializes the specified item.
    * @param ser serializer
    * @param i item to serialize
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser, final Item i) throws IOException {
     i.serialize(ser);
@@ -339,7 +338,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Closes the context.
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   void close() throws IOException {
     for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
@@ -381,16 +380,15 @@ public final class QueryContext extends Progress {
    * @param db database name or file path
    * @param coll collection flag
    * @return database instance
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public DBNode doc(final byte[] db, final boolean coll) throws QueryException {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the collections contain the document
     for(int c = 0; c < colls; c++) {
-      for(int n = 0; n < collect[c].size; n++) {
-        if(eq(db, collect[c].item[n].base()))
-          return (DBNode) collect[c].item[n];
+      for(int n = 0; n < collect[c].size(); n++) {
+        if(eq(db, collect[c].get(n).base())) return (DBNode) collect[c].get(n);
       }
     }
 
@@ -458,13 +456,13 @@ public final class QueryContext extends Progress {
    * Adds a collection instance or returns an existing one.
    * @param coll name of the collection to be returned.
    * @return collection
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Iter coll(final byte[] coll) throws QueryException {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(colls == 0) Err.or(COLLDEF);
-      return new SeqIter(collect[0].item, collect[0].size);
+      return new SeqIter(collect[0].item, collect[0].size());
     }
 
     // invalid collection reference
@@ -475,7 +473,7 @@ public final class QueryContext extends Progress {
     while(true) {
       if(++c == colls) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
-      return new SeqIter(collect[c].item, collect[c].size);
+      return new SeqIter(collect[c].item, collect[c].size());
     }
   }
 
@@ -515,6 +513,10 @@ public final class QueryContext extends Progress {
   public Data data() throws QueryException {
     if(item == null) return null;
     Data data = null;
+
+    if(item.size(this) == docs && item instanceof Seq &&
+        ((Seq) item).val == doc) return doc[0].data;
+
     final Iter iter = item.iter();
     Item it;
     while((it = iter.next()) != null) {
@@ -551,6 +553,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + file + "]";
+    return BaseX.name(this) + '[' + file + ']';
   }
 }

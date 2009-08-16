@@ -1,17 +1,14 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DateField;
@@ -19,7 +16,7 @@ import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -146,14 +143,50 @@ public final class ParserUtil {
   }
 
   /**
-   * Checks if the given byte array only contains valid ascii chars. All invalid
-   * chars are removed.
+   * Checks if the given byte array only contains valid UTF-8 characters. All
+   * invalid chars are replaced by spaces.
    * @param data the byte array to check.
-   * @return a byte array containing only valid ascii chars.
+   * @return a byte array containing only valid UTF-8 chars.
    */
-  static byte[] checkAscii(final byte[] data) {
-    for(int i = 0, max = data.length; i < max; i++) {
-      if(data[i] < 0) data[i] = ' ';
+  public static byte[] checkUTF(final byte[] data) {
+    final int size = data.length;
+    int b;
+    for(int i = 0; i < size; i++) { // loop all chars
+      b = data[i];
+      if(b >= 0 && b < ' ' && !ws(b)) data[i] = ' '; // control character
+      else if(b > 0x7F) { // not an ascii char ... perhaps UTF-8?
+        final int numBytes;
+        if(b >= 0xC2 && b <= 0xDF) { // two byte UTF-8 char
+          numBytes = 2;
+        } else if(b >= 0xE0 && b <= 0xEF) { // three byte UTF-8 char
+          numBytes = 3;
+        } else if(b >= 0xF0 && b <= 0xF4) { // four byte UTF-8 char
+          numBytes = 4;
+        } else {
+          data[i] = ' '; // not an UTF-8 character
+          continue;
+        }
+        if(size - i < numBytes) { // UTF-8 sequence is not complete
+          while(i < size)
+            data[i++] = ' ';
+        } else {
+          boolean valid = true;
+          for(int j = 1; j < numBytes; j++) {
+            final int b2 = data[i + j];
+            if(b2 < 0x80 || b2 > 0xBF) {
+              valid = false;
+              break;
+            }
+          }
+          // replace complete sequence if any of the chars is invalid
+          if(!valid) {
+            data[i] = ' ';
+            for(int j = 1; j < numBytes; j++) {
+              data[i + j] = ' ';
+            }
+          }
+        }
+      } // else valid ASCII char,
     }
     return data;
   }

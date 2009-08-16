@@ -1,5 +1,6 @@
 package org.basex.test.query;
 
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.AProp;
@@ -18,8 +19,6 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class QueryTest {
-  /** Database Context. */
-  private static final Context CONTEXT = new Context();
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
     new SimpleTest(), new XPathMarkFTTest(), new FTTest()
@@ -28,6 +27,9 @@ public final class QueryTest {
   private static final boolean VERBOSE = false;
   /** Test all flag. */
   private static final boolean ALL = true;
+  /** Database Context. */
+  private final Context context = new Context();
+
   /** Wrong results counter. */
   private int wrong;
   /** Query counter. */
@@ -35,7 +37,7 @@ public final class QueryTest {
 
   /**
    * Main method of the test class.
-   * @param args command line arguments (ignored)
+   * @param args command-line arguments (ignored)
    */
   public static void main(final String[] args) {
     new QueryTest();
@@ -46,10 +48,7 @@ public final class QueryTest {
    */
   private QueryTest() {
     final Performance p = new Performance();
-    final Prop prop = CONTEXT.prop;
-    prop.set(Prop.TEXTINDEX, true);
-    prop.set(Prop.ATTRINDEX, true);
-    prop.set(Prop.CHOP, true);
+    final Prop prop = context.prop;
     boolean ok = true;
 
     if(ALL) {
@@ -67,10 +66,10 @@ public final class QueryTest {
       }
     } else {
       // single test
-      prop.set(Prop.FTINDEX, true);
+      prop.set(Prop.FTINDEX, false);
       prop.set(Prop.FTFUZZY, false);
       prop.set(Prop.FTST, false);
-      prop.set(Prop.FTDC, true);
+      prop.set(Prop.FTDC, false);
       prop.set(Prop.FTCS, false);
       ok &= test(prop);
     }
@@ -98,9 +97,9 @@ public final class QueryTest {
    */
   private boolean test(final AbstractTest test, final String ext) {
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
-    final String name = test.getClass().getSimpleName();
+    final String name = BaseX.name(test);
     Process proc = new CreateDB(file, name);
-    boolean ok = proc.execute(CONTEXT);
+    boolean ok = proc.execute(context);
 
     if(ok) {
       for(final Object[] qu : test.queries) {
@@ -113,7 +112,7 @@ public final class QueryTest {
         proc = new XQuery(query);
         counter++;
 
-        if(proc.execute(CONTEXT)) {
+        if(proc.execute(context)) {
           final Result val = proc.result();
           final Result cmp = correct ? (Result) qu[1] : null;
           if(val instanceof Nodes && cmp instanceof Nodes) {
@@ -138,7 +137,7 @@ public final class QueryTest {
       wrong++;
     }
 
-    new DropDB(name).execute(CONTEXT);
+    new DropDB(name).execute(context);
     return ok;
   }
 

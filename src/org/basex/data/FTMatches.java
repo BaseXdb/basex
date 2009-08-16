@@ -124,7 +124,7 @@ public final class FTMatches implements Iterable<FTMatch> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName() + "[" + sTokenNum + "]");
+    sb.append(BaseX.name(this) + "[" + sTokenNum + "]");
     for(final FTMatch m : this) sb.append("\n  " + m);
     return sb.toString();
   }

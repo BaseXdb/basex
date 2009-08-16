@@ -43,7 +43,7 @@ public final class DialogEdit extends Dialog {
   private final int pre;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to main frame
    * @param p pre value
    */
@@ -133,6 +133,5 @@ public final class DialogEdit extends Dialog {
       if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
       result.add(in2);
     }
-    result.add(null);
   }
 }

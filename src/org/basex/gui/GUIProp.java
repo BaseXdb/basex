@@ -27,7 +27,7 @@ public final class GUIProp extends AProp {
   /** Font size. */
   public static final Object[] FONTSIZE = { "FONTSIZE", 12 };
   /** Anti-aliasing mode. */
-  public static final Object[] FONTALIAS = { "FONTALIAS", 0 };
+  public static final Object[] FONTALIAS = { "FONTALIAS", 1 };
 
   /** Red GUI color factor. */
   public static final Object[] COLORRED = { "COLORRED", 18 };
@@ -166,8 +166,6 @@ public final class GUIProp extends AProp {
 
   /** Flag for activated result view after starting. */
   public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
-  /** Fullscreen flag. */
-  public static final Object[] FULLSCREEN = { "FULLSCREEN", false };
 
   /** Flag for skipping time intensive treemap infos. */
   public static final Object[] PERFINFO = { "PERFINFO", true };

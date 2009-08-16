@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
@@ -11,21 +12,23 @@ import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
- * Evaluates the 'optimize' command.
+ * Evaluates the 'export' command and saves the currently opened database
+ * to disk.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Export extends Process {
   /** Document Declaration. */
-  static final String DOCDECL = "<?xml version=\"1.0\" encoding=\"%\"?>";
+  private static final String DOCDECL =
+    "<?xml version=\"1.0\" encoding=\"%\"?>";
 
   /**
-   * Constructor.
-   * @param p path
+   * Default constructor.
+   * @param path export path
    */
-  public Export(final String p) {
-    super(DATAREF, p);
+  public Export(final String path) {
+    super(DATAREF, path);
   }
 
   @Override
@@ -46,10 +49,15 @@ public final class Export extends Process {
         out.close();
 
       }
-      return info(DBEXPORTED, perf.getTimer());
+      return info(DBEXPORTED, data.meta.name, perf.getTimer());
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.EXPORT + args();
   }
 }

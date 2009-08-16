@@ -7,7 +7,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 
 /**
- * XQuery Node Tests.
+ * XQuery node tests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -41,7 +41,7 @@ public abstract class Test {
    * Optimizes and compiles the expression.
    * @param ctx query context
    * @return false if test always returns false
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public boolean comp(final QueryContext ctx) throws QueryException {
@@ -52,7 +52,7 @@ public abstract class Test {
    * Tests the specified node.
    * @param nod temporary node
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public abstract boolean eval(final Nod nod) throws QueryException;
 

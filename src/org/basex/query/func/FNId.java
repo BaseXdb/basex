@@ -44,7 +44,7 @@ final class FNId extends Fun {
    * @param it item ids to be found
    * @param node attribute
    * @return resulting node list
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Iter id(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = new NodIter(true);
@@ -57,7 +57,7 @@ final class FNId extends Fun {
    * @param it item ids to be found
    * @param node attribute
    * @return resulting node list
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Iter idref(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = new NodIter(true);
@@ -70,7 +70,7 @@ final class FNId extends Fun {
    * @param lang language to be found
    * @param node attribute
    * @return resulting node list
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Iter lang(final byte[] lang, final Nod node) throws QueryException {
     Nod n = node;
@@ -92,7 +92,7 @@ final class FNId extends Fun {
    * Extracts the ids from the specified item.
    * @param iter iterator
    * @return ids
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private byte[][] ids(final Iter iter) throws QueryException {
     final TokenList tl = new TokenList();
@@ -108,7 +108,7 @@ final class FNId extends Fun {
    * @param ids ids to be found
    * @param nb node builder
    * @param nod node
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void add(final byte[][] ids, final NodIter nb,
       final Nod nod) throws QueryException {
@@ -132,7 +132,7 @@ final class FNId extends Fun {
    * @param ids ids to be found
    * @param nb node builder
    * @param nod node
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void addRef(final byte[][] ids, final NodIter nb,
       final Nod nod) throws QueryException {

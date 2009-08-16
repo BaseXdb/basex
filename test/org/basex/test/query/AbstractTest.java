@@ -23,7 +23,6 @@ import org.basex.util.Token;
  */
 abstract class AbstractTest {
   /** Dummy data reference. */
-  // [CG] PROPS: check null reference
   private static final Data DATA = new MemData(1, new Names(), new Names(),
       new Namespaces(), new PathSummary(), new Prop());
   /** Document. */

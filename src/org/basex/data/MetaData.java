@@ -24,9 +24,9 @@ public final class MetaData {
   /** Database name. */
   public String name;
   /** DeepFS mount point. */
-  public String mountpoint = "";
+  public String mount = "";
   /** DeepFS backing path. */
-  public String backingpath = "";
+  public String backing = "";
 
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
@@ -50,6 +50,8 @@ public final class MetaData {
   public boolean atvindex;
   /** Flag for creating a full-text index. */
   public boolean ftxindex;
+  /** Flag for creating a path summary. */
+  public boolean pathindex = true;
 
   /** Flag for fuzzy indexing. */
   public boolean ftfz;
@@ -81,6 +83,7 @@ public final class MetaData {
     prop = pr;
     chop = prop.is(Prop.CHOP);
     entity = prop.is(Prop.ENTITY);
+    pathindex = prop.is(Prop.PATHINDEX);
     txtindex = prop.is(Prop.TEXTINDEX);
     atvindex = prop.is(Prop.ATTRINDEX);
     ftxindex = prop.is(Prop.FTINDEX);
@@ -124,7 +127,7 @@ public final class MetaData {
       long t = 0;
       while((k = in.readString()).length() != 0) {
         final String v = in.readString();
-        if(k.equals(DBSTORAGE)) str = v;
+        if(k.equals(DBSTR)) str = v;
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = Token.toLong(v);
       }
@@ -162,29 +165,30 @@ public final class MetaData {
       if(k.length() == 0) break;
       final String v = in.readString();
 
-      if(k.equals(DBSTORAGE))       storage     = v;
-      else if(k.equals(IDBSTORAGE)) istorage    = v;
-      else if(k.equals(DBSIZE))     size        = Token.toInt(v);
-      else if(k.equals(DBFNAME))    file        = IO.get(v);
-      else if(k.equals(DBFSIZE))    filesize    = Token.toLong(v);
-      else if(k.equals(DBNDOCS))    ndocs       = Token.toInt(v);
-      else if(k.equals(DBFTDC))     ftdc        = toBool(v);
-      else if(k.equals(DBENCODING)) encoding    = v;
-      else if(k.equals(DBHEIGHT))   height      = Token.toInt(v);
-      else if(k.equals(DBCHOPPED))  chop        = toBool(v);
-      else if(k.equals(DBENTITY))   entity      = toBool(v);
-      else if(k.equals(DBTXTINDEX)) txtindex    = toBool(v);
-      else if(k.equals(DBATVINDEX)) atvindex    = toBool(v);
-      else if(k.equals(DBFTXINDEX)) ftxindex    = toBool(v);
-      else if(k.equals(DBFZINDEX))  ftfz        = toBool(v);
-      else if(k.equals(DBFTSTEM))   ftst        = toBool(v);
-      else if(k.equals(DBFTCS))     ftcs        = toBool(v);
-      else if(k.equals(DBFTDC))     ftdc        = toBool(v);
-      else if(k.equals(DBTIME))     time        = Token.toLong(v);
-      else if(k.equals(DBUPTODATE)) uptodate    = toBool(v);
-      else if(k.equals(DBLASTID))   lastid      = Token.toInt(v);
-      else if(k.equals(MOUNT))      mountpoint  = v;
-      else if(k.equals(BACKING))    backingpath = v;
+      if(k.equals(DBSTR))         storage   = v;
+      else if(k.equals(IDBSTR))   istorage  = v;
+      else if(k.equals(DBSIZE))   size      = Token.toInt(v);
+      else if(k.equals(DBFNAME))  file      = IO.get(v);
+      else if(k.equals(DBFSIZE))  filesize  = Token.toLong(v);
+      else if(k.equals(DBNDOCS))  ndocs     = Token.toInt(v);
+      else if(k.equals(DBFTDC))   ftdc      = toBool(v);
+      else if(k.equals(DBENC))    encoding  = v;
+      else if(k.equals(DBHGHT))   height    = Token.toInt(v);
+      else if(k.equals(DBCHOP))   chop      = toBool(v);
+      else if(k.equals(DBENTITY)) entity    = toBool(v);
+      else if(k.equals(DBPTHIDX)) pathindex = toBool(v);
+      else if(k.equals(DBTXTIDX)) txtindex  = toBool(v);
+      else if(k.equals(DBATVIDX)) atvindex  = toBool(v);
+      else if(k.equals(DBFTXIDX)) ftxindex  = toBool(v);
+      else if(k.equals(DBFZIDX))  ftfz      = toBool(v);
+      else if(k.equals(DBFTST))   ftst      = toBool(v);
+      else if(k.equals(DBFTCS))   ftcs      = toBool(v);
+      else if(k.equals(DBFTDC))   ftdc      = toBool(v);
+      else if(k.equals(DBTIME))   time      = Token.toLong(v);
+      else if(k.equals(DBUTD))    uptodate  = toBool(v);
+      else if(k.equals(DBLID))    lastid    = Token.toInt(v);
+      else if(k.equals(DBMNT))    mount     = v;
+      else if(k.equals(DBBCK))    backing   = v;
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -209,28 +213,29 @@ public final class MetaData {
    * @throws IOException IO Exception
    */
   synchronized void write(final DataOutput out) throws IOException {
-    writeInfo(out, DBSTORAGE,  STORAGE);
-    writeInfo(out, IDBSTORAGE, ISTORAGE);
-    writeInfo(out, DBFNAME,    file.path());
-    writeInfo(out, DBFSIZE,    filesize);
-    writeInfo(out, DBNDOCS,    ndocs);
-    writeInfo(out, DBENCODING, encoding);
-    writeInfo(out, DBHEIGHT,   height);
-    writeInfo(out, DBSIZE,     size);
-    writeInfo(out, DBCHOPPED,  chop);
-    writeInfo(out, DBENTITY,   entity);
-    writeInfo(out, DBTXTINDEX, txtindex);
-    writeInfo(out, DBATVINDEX, atvindex);
-    writeInfo(out, DBFTXINDEX, ftxindex);
-    writeInfo(out, DBFZINDEX,  ftfz);
-    writeInfo(out, DBFTSTEM,   ftst);
-    writeInfo(out, DBFTCS,     ftcs);
-    writeInfo(out, DBFTDC,     ftdc);
-    writeInfo(out, DBTIME,     time);
-    writeInfo(out, DBUPTODATE, uptodate);
-    writeInfo(out, DBLASTID,   lastid);
-    writeInfo(out, MOUNT,      mountpoint);
-    writeInfo(out, BACKING,    backingpath);
+    writeInfo(out, DBSTR,    STORAGE);
+    writeInfo(out, IDBSTR,   ISTORAGE);
+    writeInfo(out, DBFNAME,  file.path());
+    writeInfo(out, DBFSIZE,  filesize);
+    writeInfo(out, DBNDOCS,  ndocs);
+    writeInfo(out, DBENC,    encoding);
+    writeInfo(out, DBHGHT,   height);
+    writeInfo(out, DBSIZE,   size);
+    writeInfo(out, DBCHOP,   chop);
+    writeInfo(out, DBENTITY, entity);
+    writeInfo(out, DBPTHIDX, pathindex);
+    writeInfo(out, DBTXTIDX, txtindex);
+    writeInfo(out, DBATVIDX, atvindex);
+    writeInfo(out, DBFTXIDX, ftxindex);
+    writeInfo(out, DBFZIDX,  ftfz);
+    writeInfo(out, DBFTST,   ftst);
+    writeInfo(out, DBFTCS,   ftcs);
+    writeInfo(out, DBFTDC,   ftdc);
+    writeInfo(out, DBTIME,   time);
+    writeInfo(out, DBUTD,    uptodate);
+    writeInfo(out, DBLID,    lastid);
+    writeInfo(out, DBMNT,    mount);
+    writeInfo(out, DBBCK,    backing);
     out.write(0);
   }
 
@@ -239,7 +244,7 @@ public final class MetaData {
    * @param out output stream
    * @param k key
    * @param pr property to write
-   * @throws IOException in case the info could not be written
+   * @throws IOException I/O exception
    */
   private void writeInfo(final DataOutput out, final String k,
       final boolean pr) throws IOException {
@@ -251,7 +256,7 @@ public final class MetaData {
    * @param out output stream
    * @param k key
    * @param v value
-   * @throws IOException in case the info could not be written
+   * @throws IOException I/O exception
    */
   private void writeInfo(final DataOutput out, final String k,
       final long v) throws IOException {
@@ -263,7 +268,7 @@ public final class MetaData {
    * @param out output stream
    * @param k key
    * @param v value
-   * @throws IOException in case the info could not be written
+   * @throws IOException I/O exception
    */
   private void writeInfo(final DataOutput out, final String k,
       final String v) throws IOException {

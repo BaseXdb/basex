@@ -8,19 +8,19 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
 
 /**
- * Creates a new database.
+ * Evaluates the 'create mab' command and creates a new database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CreateMAB extends ACreate {
   /**
-   * Constructor.
-   * @param p database path
-   * @param n database name
+   * Default constructor.
+   * @param input input MAB2 file
+   * @param name database name
    */
-  public CreateMAB(final String p, final String n) {
-    super(STANDARD, p, n);
+  public CreateMAB(final String input, final String name) {
+    super(STANDARD, input, name == null ? IO.get(input).dbname() : name);
   }
 
   @Override
@@ -31,16 +31,15 @@ public final class CreateMAB extends ACreate {
 
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
+    prop.set(Prop.PATHINDEX, true);
     prop.set(Prop.TEXTINDEX, true);
     prop.set(Prop.ATTRINDEX, true);
     prop.set(Prop.FTINDEX, true);
-    final String db = args.length > 1 ? args[1] : null;
-    return build(new MAB2Parser(file, prop),
-        db == null ? file.dbname() : db);
+    return build(new MAB2Parser(file, prop), args[1]);
   }
 
   @Override
   public String toString() {
-    return Cmd.CREATE.name() + " " + CmdCreate.MAB + args();
+    return Cmd.CREATE + " " + CmdCreate.MAB + args();
   }
 }

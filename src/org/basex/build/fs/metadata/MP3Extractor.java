@@ -111,7 +111,7 @@ public final class MP3Extractor extends AbstractExtractor {
   /**
    * Reads a single byte from buffered input stream (mp3 file).
    * @return int, the read byte.
-   * @exception IOException in case of premature EOF or IO Error.
+   * @exception IOException in case of premature EOF or IO error.
    */
   private int read() throws IOException {
     int i = 0;
@@ -388,7 +388,7 @@ public final class MP3Extractor extends AbstractExtractor {
   }
 
   /**
-   * Returns an ID3V1 Tag.
+   * Returns an ID3V1 tag.
    * @param input input byte array
    * @param offset offset to look at
    * @param max maximum length

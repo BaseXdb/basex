@@ -26,7 +26,7 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogAbout extends Dialog {
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogAbout(final GUI main) {

@@ -187,7 +187,7 @@ final class FNStr extends Fun {
    * Returns a substring.
    * @param ctx query context
    * @return iterator
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item substr(final QueryContext ctx) throws QueryException {
     // normalize positions
@@ -222,7 +222,7 @@ final class FNStr extends Fun {
    * Returns a translated string.
    * @param ctx query context
    * @return string
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
@@ -264,7 +264,7 @@ final class FNStr extends Fun {
    * Returns a string join.
    * @param ctx query context
    * @return iterator
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
     final Item is = expr[1].atomic(ctx);
@@ -288,7 +288,7 @@ final class FNStr extends Fun {
    * Returns normalized unicode.
    * @param ctx query context
    * @return string
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);

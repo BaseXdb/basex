@@ -50,7 +50,7 @@ explore_title=Khảo sát
 # Dialog Windows
 d_info=Thông tin
 d_fctitle=Chọn thư mục
-d_export=Xuất khẩu cơ sở dữ liệu
+d_export=Xuất khẩu
 
 dc_title=Nhập vào tệp hoặc thư mục
 dc_filter=Bộ lọc
@@ -75,6 +75,7 @@ dc_chopinfo=Lựa chọn này xóa hết khoảng trắng giữa tags và nội 
 dc_intparseinfo=Mở lựa chọn này để sử dụng bộ phân tích XML được xây dựng bên trong
 dc_entitiesinfo=Tắt lựa chọn này để bỏ qua những entities không được định nghĩa (&...;)
 dc_dtdinfo=Tắt lựa chọn này để bỏ qua DTDs
+dc_pathinfo=A path summary speeds up path resolutions
 dc_txtinfo=Text được index để tăng tốc câu hỏi XPath
 dc_attinfo=Thuộc tính được index để tăng tốc câu hỏi XPath
 dc_ftxinfo=Nội dung được index để tăng tốc câu hỏi XPath
@@ -121,15 +122,17 @@ dd_title=Xóa bỏ cơ sở dữ liệu
 dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?
+dq_question=Save changes to %?
 
 dp_title=Những ưu tiên
 dp_dbpath=Đường dẫn tới cơ sở dữ liệu ( cơ sở dữ liệu phải chuyển bằng tay)
 dp_inter=Giao diện & Tương tác
-dp_lf=Xài cách nhìn & cảm giác Java (cần khởi động lại)
+dp_lf=Xài cách nhìn & cảm giác Java
 dp_focus=Tiêu diểm chuột thời gian thực
 dp_simplefd=Xài bộ chọn tệp đơn giản
 dp_names=Thay tags với thuộc tính @name
-dp_lang=Ngôn ngữ (cần khởi động lại)
+dp_lang=Ngôn ngữ
+dp_restart=cần khởi động lại
 
 dn_title=Nhập dữ liệu mới
 dn_name=Tên
@@ -137,7 +140,7 @@ dn_value=Giá trị
 
 de_title=Soạn thảo dữ liệu
 de_text=Soạn thảo %
-de_kind1=Nút góc
+de_kind1=Văn bản
 de_kind2=Element
 de_kind3=Text
 de_kind4=Thuộc tính
@@ -167,7 +170,7 @@ dm_size=Kích cỡ được xác định bởi
 dm_size_children=số con cái
 dm_size_fssize=kích cỡ tệp
 dm_size_textsize=độ dài văn bản
-dm_size_both=không/con cái và kích cỡ tệp
+dm_size_both=không/con cái và độ dài văn bản
 
 dz_total=Tổng bộ nhớ
 dz_reserved=Bộ nhớ đặt trước
@@ -203,7 +206,7 @@ c_edit=Soạn thảo
 c_edittt=Soạn thảo nút XML.
 c_exit=Thoát
 c_exittt=Thoát khỏi chương trình.
-c_export=Xuất khẩu XML
+c_export=Xuất khẩu
 c_exporttt=Xuấtkhẩu cơ sở dữ liệu hiện thời ra văn bản XML.
 c_filter=Bộ lọc được chọn
 c_filtertt=Lọc những nút được chọn.
@@ -282,12 +285,11 @@ proc_outmem=Hết bộ nhớ.\nHướng dẫn sau đây có thể giúp bạn:\n
 cmd_no=Đợi lệnh.
 cmd_unknown=Lệnh không hiểu '%'
 cmd_similar=Ý bạn là '%'?
-cmd_ping=Kết nối thành công.
 
 # Help Commands
-help_short=thử 'giúp đỡ'
-help_intro=thử "giúp đỡ" để có nhiều thông tin hơn.
-help_long=thử 'giúp đỡ [...]' để có nhiều thông tin hơn cho một lệnh đặt biệt.
+help_short=thử "%"
+help_intro=thử "%" để có nhiều thông tin hơn.
+help_long=thử "% [...]" để có nhiều thông tin hơn cho một lệnh đặt biệt.
 
 # Create Command
 pc_create=Cơ sở dữ liệu đã được tạo
@@ -320,8 +322,8 @@ db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.
 db_notdropped=Cơ sở dữ liệu không xóa bỏ được.
 db_inuse=Cơ sở dữ liệu đang được sử dụng bời 1 hay nhiều người.
 db_notopened=Cơ sở dữ liệu không mở được.
-db_opened=Cơ sở dữ liệu được mở ở %.
-db_exported=Cơ sở dữ liệu được xuất khẩu ra ở %.
+db_opened=Cơ sở dữ liệu '%' được mở ở %.
+db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
 
 # Index commands
 in_created=Index được tạo ở %.
@@ -335,7 +337,6 @@ cs_client=Người dùng
 
 # Server Info
 srv_connect=Không liên lạc được với máy chủ.
-srv_port=Số cổng không hiệu lực
 srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
 srv_bind=Máy chủ đang chạy hay không được phép.
 srv_start=đã khời dộng.\nĐang chờ yêu cầu...
@@ -387,6 +388,9 @@ uc_invalid=Tên "%" không phù hợp.
 uc_txtinvalid=Nút văn bản (text) không thề để trống.
 uc_namespaces=Không thề thay đổi văn bản có namespace.
 
+# General Commands
+gc_seterr=Could not set property '%' to '%'.
+
 # Info Strings
 info_head=Thông tin cơ sở dữ liệu
 info_index=Indexes
@@ -394,15 +398,15 @@ info_build=Đang tạo Indexes
 info_opt=Đang tối ưu cơ sở dữ liệu
 info_optim=Tối ưu hoàn tất.
 info_stats=Tạo thống kê
-info_dbname=Tên cơ sở dữ liệu
+info_dbname=Tên
 info_ndocs=Những văn bản
 info_docsize=Kích cỡ nhập vào
-info_dbsize=Kích cỡ cơ sở dữ liệu
+info_dbsize=Kích cỡ
 info_doc=Đường dẫn nguồn
 info_time=Dấu thời gian
 info_mem=Bộ nhớ đã dùng
 info_nodes=Những nút bản
-info_height=Chiều cao của cây
+info_height=Chiều cao
 info_encoding=Đang mã hóa
 info_dbpath=Đường dẫn cơ sở dữ liệu
 info_nodb=Không có cơ sở dữ liệu nào được tìm thấy.
@@ -419,6 +423,7 @@ info_mainmem=Chế độ bộ nhờ chính
 info_tags=Tags
 info_atts=Thuộc tình
 info_ns=Namespaces
+info_pathindex=Path Summary
 info_txtindex=Mục lục (index) văn bản
 info_atvindex=Mục lục (index) văn bản thuộc tính
 info_ftindex=Mục lục (index) nội dung
@@ -435,99 +440,72 @@ info_entries=% mục
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.
-ch_dummydatabase0=Cậu lệnh cơ sở dữ liệu:
+ch_helpdatabase0=Cậu lệnh cơ sở dữ liệu:
 ch_create1=Tạo cơ sở dữ liệu hay index.
 ch_create2=Tạo cơ sở dữ liệu từ XML hay tệp, hay tạo index:
-ch_create3=  creates database [tên] cho tệp hay thư mục [đường dẫn]
-ch_file= [đường dẫn] [tên?]:
-ch_create4= [đường dẫn] [tên] ([mount point] [backing store] chỉ với hỗ trợ fuse):
-ch_create5=  creates filesystem database [tên] for [đường dẫn] (using [mount point] and [backing store])
-ch_create6=  creates the specified index
-ch_open0=[database]
-ch_open1=Mở [cơ sở dữ liệu].
-ch_open2=Mở_đặc_biệt [cơ sở dữ liệu].
+ch_create3=creates the database [%] for the file or directory [%]
+ch_create4=creates the specified index
+ch_create5=creates filesystem database [%] for [%]
+ch_create6=(using [%] and [%] if FUSE is activated)
+ch_open1=Mở cơ sở dữ liệu.
+ch_open2=Mở_đặc_biệt [%].
 ch_info1=Hiển thị thông tin trên cơ sở dữ liệu hiện tại.
 ch_info21=Hiển thị thông tin trên cơ sở dữ liệu được mở hiện tại:
-ch_info22=- không tham số: hiển thị thông tin bao quát
-ch_info23=: hiển thị thông tin cơ sở dữ liệu
-ch_info24=: hiển thị thông tin index
-ch_info25= [bắt_đầu kết_thúc]|[lệnh_hỏi]: hiển thị bản XML
+ch_info22=không tham số: hiển thị thông tin bao quát
+ch_info23=hiển thị thông tin cơ sở dữ liệu
+ch_info24=hiển thị thông tin index
+ch_info25=hiển thị bản XML
 ch_close1=Đóng cơ sở dữ liệu hiện tại.
 ch_close2=Đóng cơ sở dữ liệu hiện tại.
 ch_list1=Liệt kê tất cả cơ sở dữ liệu.
 ch_list2=Liệt kê tất cả cơ sở dữ liệu.
 ch_drop1=Xóa bỏ cơ sở dữ liệu hoặc index.
 ch_drop2=Tham số sau có thể được cụ thể hóa:
-ch_drop22=  drops cơ_sở_dữ_liệu [tên]
-ch_drop21= [tên]:
-ch_drop23=  drops index_đặc_biệt
+ch_drop21=drops cơ_sở_dữ_liệu [%]
+ch_drop22=drops index_đặc_biệt
 ch_optimize1=Tối ưu cơ sở dữ liệu.
 ch_optimize2=Tối ưu cấu trúc cơ sở dữ liệu hiện tại.
-ch_export0=[tệp]
 ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.
-ch_export2=Xuất khẩu thiết lập hiện tại ra XML [tệp].
-ch_dummyquery0=Lệnh hỏi:
-ch_xpath0=[lệnh_hỏi]
-ch_xpath1=Đánh giá lệnh hỏi XPath.
-ch_xpath2=Đánh giá lệnh hỏi XPath cụ thể [lệnh_hỏi] và in kết quả.
-ch_xquerymv0=[hits] [subhits] ["query"]
+ch_export2=Xuất khẩu thiết lập hiện tại ra XML [%].
+ch_helpquery0=Lệnh hỏi:
 ch_xquerymv1=Đánh giá lệnh hỏi MedioVis.
-ch_xquerymv2=Đánh giá lệnh hỏi cụ thể [lệnh_hỏi] và giới hạn số\n lượng kết quả tìm được [hits] và số lượng \n phần tử phụ thuộc [subhits].
-ch_xquery0=[lệnh_hỏi]
-ch_xquery1=Đánh giá lệnh hỏi XQuery [lệnh_hỏi].
-ch_xquery2=Đánh giá lệnh hỏi XQuery và in ra kết quả.
-ch_run0=[file]
-ch_run1=Evaluate XQuery from [file].
-ch_run2=Evaluates an XQuery from the specified file and prints the result.
-ch_find0=[lệnh_hỏi]
+ch_xquerymv2=Đánh giá lệnh hỏi cụ thể [%] và giới hạn số\n lượng kết quả tìm được [%] và số lượng \n phần tử phụ thuộc [%].
+ch_xquery1=Đánh giá lệnh hỏi XQuery.
+ch_xquery2=Đánh giá lệnh hỏi XQuery [%] và in ra kết quả.
+ch_run1=Evaluate file as XQuery.
+ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=Đánh giá lệnh hỏi từ khóa.
 ch_find2=Những từ bổ nghỉa sau được dùng:\n =  : tìm chính xác những nút văn bản"\n @= : tìm chính xác những thuộc tính\n @  : tìm những thuộc tính
-
-# Help Texts
-ch_cs0=[lệnh_hỏi]
-ch_cs1=Đánh giá lệnh hỏi XPath và gán kết quả theo tập hợp ngữ cảnh mới.
-ch_cs2=Đánh giá lệnh hỏi XPath cụ thể [lệnh_hỏi] và gán kết quả\ntheo tập hợp ngữ cảnh mới.
-ch_bash1=Bắt đầu bash.
-ch_bash2=Bắt đầu chế độ bash
-ch_dummyupdate0=Những câu lệnh cập nhật:
-ch_copy0=[pos] [source],[target]
+ch_cs1=Đánh giá lệnh hỏi XQuery và gán kết quả theo tập hợp ngữ cảnh mới.
+ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể [%] và gán kết quả\ntheo tập hợp ngữ cảnh mới.
+ch_helpupdate0=Những câu lệnh cập nhật:
 ch_copy1=Chép những nút XML.
-ch_copy2=Đánh giá [source] và chép kết quả tới [target]\n như là con [pos] (0=last child).
-ch_delete0=["target"]
+ch_copy2=Đánh giá [%] và chép kết quả tới [%]\n như là con [%] (0=last child).
 ch_delete1=Xóa những nút XML.
-ch_delete2=Xóa những nút thỏa lệnh hỏi [target].
+ch_delete2=Xóa những nút thỏa lệnh hỏi [%].
 ch_insert1=Chèn những nút XML.
-ch_insert2=Chèn một mảng (frag) hay nút là con [pos]\n (0=con út) cả lệnh hỏi [target]:
-ch_insert21=[name] [pos] [target]: Insert [name]
-ch_insert22=[text] [pos] [target]: Insert [text]
-ch_insert23=[name] [value] [target]: Insert [name] and [value]
-ch_insert24=[text] [pos] [target]: Insert [text]
-ch_insert25=[name] [value] [pos] [target]: Insert [name] and [value]
-ch_insert26=[frag] [pos] [target]: Insert [frag]
+ch_insert2=Chèn một mảng (frag) hay nút là con [%]\n (0=con út) cả lệnh hỏi [%]:
+ch_insert21=Insert [%]
+ch_insert22=Insert [%], [%]
 ch_update1=Cập nhật những nút XML.
-ch_update2=Cập nhật những nút thỏa lệnh hỏi [target]:
-ch_update21=[name] [target]: Update with [name]
-ch_update22=[text] [target]: Update with [text]
-ch_update23=[name] [value] [target]: Update with [name] and [value]
-ch_update24=[text] [target]: Update with [text]
-ch_update25=[name] [value] [target]: Update with [name] and [value]
-ch_dummygeneral0=Những câu lệnh chung:
-ch_set0=[option] [value?]
-ch_set1=Gán lựa chọn toàn cục (current values: try 'info').
-ch_set2=Có [option]s với [giá trị = on|off]:
-ch_set21= [all?]: Hiển thị (tất cả) thông tin quy trình
-ch_set22=: Hiển thị thông tin chỉnh lỗi
-ch_set23=: Ghi ra kết quả lệnh hỏi
-ch_set24=: Ghi ra kết quả lệnh hỏi kiểu XML
-ch_set25=: Chế độ bộ nhớ chính
-ch_set26=: Chặt hết khoảng trắng
-ch_set27=: Phân tích các XML thực thể
-ch_set28=: Index văn bản
-ch_set29=: Index giá trị thuộc tính
-ch_set31=: Index nội dung
-ch_help1=Nhờ giúp đỡ
-ch_help11= những câu lệnh.
-ch_help2=Nếu [lệnh] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.\nNếu 'tất cả' là cụ thể(specified), sẽ bao gồm những câu lệnh ẩn.
+ch_update2=Cập nhật những nút thỏa lệnh hỏi [%]:
+ch_update21=Update with [%]
+ch_update22=Update with [%] and [%]
+ch_helpgeneral0=Những câu lệnh chung:
+ch_set1=Gán lựa chọn toàn cục (current values: try '%').
+ch_set2=Có [%] với [%] = on/off:
+ch_set21=Hiển thị (tất cả) thông tin quy trình
+ch_set22=Hiển thị thông tin chỉnh lỗi
+ch_set23=Ghi ra kết quả lệnh hỏi
+ch_set24=Ghi ra kết quả lệnh hỏi kiểu XML
+ch_set25=Chế độ bộ nhớ chính
+ch_set26=Chặt hết khoảng trắng
+ch_set27=Phân tích các XML thực thể
+ch_set28=Index văn bản
+ch_set29=Index giá trị thuộc tính
+ch_set31=Index nội dung
+ch_help1=Nhờ giúp đỡ % những câu lệnh.
+ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.\nNếu 'tất cả' là cụ thể(specified), sẽ bao gồm những câu lệnh ẩn.
 ch_exit1=Thoát
 
 # Help Texts
@@ -539,7 +517,7 @@ h_hist=Hiển thị lich sử thông tin nhập.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
 h_cancel=Nhấn nút này để đóng hội thoại và trở về cửa sổ chính.
-h_mode=Nhấp lựa chọn (combo box) để chuyển giữa tìm kiếm, XPath chế độ câu lệnh.\nLựa chọn này chỉ hiệu lực nếu cơ sở dữ liệu đã được mở.
+h_mode=Nhấp lựa chọn (combo box) để chuyển giữa tìm kiếm, XQuery chế độ câu lệnh.\nLựa chọn này chỉ hiệu lực nếu cơ sở dữ liệu đã được mở.
 h_ok=Nhấn nút này để chạy qua trình.
 h_opt=Nhấn nút này để tối ưu cơ sở dữ liệu.
 h_renamedb=Nhấn nút này để đổi tên cơ sở dữ liệu đã chọn.
@@ -557,7 +535,7 @@ h_fsall=Nếu checkbox này được chọn, toàn bộ hệ thống tệp sẽ 
 h_fsbacking=Thư mục DeepFS để chứa thông tin BLOBs. (Thật ra lá một bản sao hệ thống tệp được nhập khẩu).
 h_fsmount=Điểm khung (mount point) DeepFS. Cơ sở dữ liệu được kéo ra như hệ thống tệp trong khhông gian người dùng.
 h_meta=Chọn hộp này, meta-data sẽ được trích từ nhiều loại tệp. Meta-data bao gồm vd. chiều của ảnh, ID3 tags của tệp MP3 hay nội dung tệp email.
-h_cont=Chọn hộp này, nội dung văn bản của tệp sẽ được bao gồm trong cơ sở dữ liệu. Nếu nội dung được bao gồm, chúng có thể tìm kiếm được qua XPath hay XQuery.
+h_cont=Chọn hộp này, nội dung văn bản của tệp sẽ được bao gồm trong cơ sở dữ liệu. Nếu nội dung được bao gồm, chúng có thể tìm kiếm được qua  XQuery.
 h_fsmax=Bạn có thể chọn giới hạn kích thước cho các tệp văn bản bao gồm ở đây.
 h_mapatts= Chọn hộp này, bản dồ cây (TreeMap) sẽ bao gồm thuộc tính.
 h_maplayout=Ở đây bạn có thể thay đổi thuật toán bố cục được sử dụng trong vẽ bản đồ.
@@ -573,9 +551,9 @@ h_font=Ở đây bạn có thể chọn phông chữ được dùng trong hiển
 h_mmem=Trong chế độ bộ nhớ chính, lệnh hỏi sẽ được chạy 50-80% nhanh hơn. Nhưng xài nhiều bộ nhớ hơn và cơ sở dữ liệu sẽ tắt cập nhật.
 h_colors=Di chuyển con trược để đổi màu giao diện.
 h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
-h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XPath
+h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
 h_searchfs=Gõ cái gì đó vào miền văn bản để tìm nó trong hệ thống tệp. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tệp hay thư mục\n= ...  Tìm thấy chính xác tên\n. ..     Tìm thấy đuôi tệp\n< ...  Tìm thấy tệp kích cỡ nhỏ hơn tệp trên\n> ...  Tìm thấy tệp kích cỡ lớn hơn tệp trên\n\nbạn có thể nhập câu lệnh BaseX bằng cách thêm vào trước dữ liệu nhập 1 dấu chấm than.
-h_xpath=Chế độ XPath cho phép dữ liệu nhập là những câu hỏi XPath đơn giản. XPath thường chạy nhanh hơn XQuery. Ngôn ngữ XPath dựa trên biểu diễn cây của văn bản XML, có thể xác định quanh cây và chọn những nút theo những tiêu chuẩn khác nhau.
+h_xpath=Chế độ XQuery cho phép dữ liệu nhập là những câu hỏi XQuery đơn giản.
 h_modefilt= Nếu bộ lọc thời gian thực được tắt, nhấn Ctrl+ENTER để lọc kết quả lệnh hỏi.
 h_map=Cách vẽ này được gọi là bản đồ cây (TreeMap). Tất cả nút của văn bản XML được vẽ thành một hình chữ nhật, lấp đầy diện tích. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_plot=Cách vẽ này được gọi mảnh phân tán (Scatterplot). Tất cả nút XML được hiển thị trên một mảnh. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
@@ -588,7 +566,7 @@ h_plotitem=Với hộp chọn này bạn có thể chọn phần tử để hi�
 h_folder=Cách vẽ này hiển thị tất cả nut XML trong thư mục hiển thị. Nút có thể mở ra hay đóng khi nhấp lên mũi tên. Mặc dù chúng sẽ nổi lên khi được nhấp đơn hay zoom vào khi nhấp đôi. Đây là cách hiệu quả để soi văn bản XML. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_table=Cách vẽ này hiển thị tất cả nut XML trong một bản(table). Nếu bạn nhấp lên văn bản, Tất cả nút có cùng văn bản(text) sẽ nổi lên. Nhấp đôi lên văn bản, kết quả lệnh hỏi sẽ được lọc. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_text=Thanh này hiển thị kết quả lệnh hỏi hay văn bản dữ liệu xuất ra khác.\n\nPhím tắt: Nhấn '-' và '+' để đổi kích cỡ phông của tất cả thanh. Gõ vào khung xòe ra để chạy một tìm kiếm tiếp. Nó là cách đơn giản để tìm một điểm văn bản cụ thể.
-h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi XPath hay XQuery, bao gồm vài tiểu sử đơn giản.
+h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi  XQuery, bao gồm vài tiểu sử đơn giản.
 h_explore=Chế độ tìm kiếm đơn giản cho phép hỏi đơn giản trong văn bản XML.
 h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery 1.0. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=Trong hộp chọn này, tất cả tags và tên thuộc tính  của văn bản XML hiện hành sẽ được liệt kê. Nếu một mục được chọn, kết quả sẽ được đánh dấu trên hình vẽ. Nếu mục được chọn chứa giá trị văn bản (textual value), sẽ có thêm một widget xòe ra, cho phép những lệnh hỏi tiếp theo.

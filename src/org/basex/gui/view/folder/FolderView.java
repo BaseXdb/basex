@@ -2,7 +2,6 @@ package org.basex.gui.view.folder;
 
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -67,7 +66,7 @@ public final class FolderView extends View {
   private int boxMargin;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param man view manager
    */
   public FolderView(final ViewNotifier man) {
@@ -161,7 +160,7 @@ public final class FolderView extends View {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWFOLDER);
   }
 

@@ -54,14 +54,12 @@ public final class Jav extends Item {
   }
 
   @Override
-  @SuppressWarnings("unused")
-  public boolean eq(final Item it) throws QueryException {
+  public boolean eq(final Item it) {
     return Token.eq(str(), it.str());
   }
 
   @Override
-  @SuppressWarnings("unused")
-  public int diff(final Item it) throws QueryException {
+  public int diff(final Item it) {
     return Token.diff(str(), it.str());
   }
 

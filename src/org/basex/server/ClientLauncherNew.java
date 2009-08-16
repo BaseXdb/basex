@@ -2,15 +2,16 @@ package org.basex.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
-
 import org.basex.core.ALauncher;
-import org.basex.core.Commands;
+import org.basex.core.proc.IntInfo;
+import org.basex.core.proc.IntOutput;
+import org.basex.core.Context;
 import org.basex.core.Process;
+import org.basex.core.Prop;
+import org.basex.io.BufferInput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
@@ -22,70 +23,50 @@ import org.basex.io.PrintOutput;
  * @author Christian Gruen
  */
 public final class ClientLauncherNew extends ALauncher {
-  /** Temporary socket instance. */
-  private Socket socket;
-  /** Last socket reference. */
-  private int last;
+  /** Output stream. */
+  private final DataOutputStream out;
+  /** Input stream. */
+  private final InputStream in;
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
-   * @param pr process
-   * @param s socket reference
+   * @param ctx database context
+   * @throws IOException I/O exception
    */
-  public ClientLauncherNew(final Process pr, final Socket s) {
-    super(pr);
-    socket = s;
+  public ClientLauncherNew(final Context ctx) throws IOException {
+    final Socket socket = new Socket(
+        ctx.prop.get(Prop.HOST), ctx.prop.num(Prop.PORT));
+    in = socket.getInputStream();
+    out = new DataOutputStream(socket.getOutputStream());
   }
 
   @Override
-  public boolean execute() {
-    try {
-      send(proc.toString());
-      last = new DataInputStream(socket.getInputStream()).readInt();
-    } catch(final IOException ex) {
-      if(ex instanceof SocketException || ex instanceof EOFException) {
-        return false;
-      }
-      ex.printStackTrace();
-    }
-    return last > 0;
+  public boolean execute(final Process pr) throws IOException {
+    send(pr);
+    return in.read() == 0;
   }
 
   @Override
-  public void out(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETRESULT.name() + " " + last);
-    receive(o);
+  public void output(final PrintOutput o) throws IOException {
+    send(new IntOutput(""));
+    final BufferInput bi = new BufferInput(in);
+    int l;
+    while((l = bi.read()) != 0) o.write(l);
+    for(int i = 0; i < IO.BLOCKSIZE - 1; i++) bi.read();
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.Cmd.GETINFO.name() + " " + last);
-    receive(o);
+    send(new IntInfo(""));
+    o.print(new DataInputStream(in).readUTF());
   }
 
   /**
-   * Sends the specified command and argument over the network.
-   * @param command command to be sent
+   * Sends the specified process.
+   * @param pr process to send
    * @throws IOException I/O exception
    */
-  private void send(final String command) throws IOException {
-    final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-    out.writeUTF(command);
-    out.flush();
-  }
-
-  /**
-   * Receives an input stream over the network.
-   * @param o output stream
-   * @throws IOException I/O exception
-   */
-  private void receive(final PrintOutput o) throws IOException {
-    final InputStream in = socket.getInputStream();
-    final byte[] bb = new byte[IO.BLOCKSIZE];
-    int l = 0;
-    while((l = in.read(bb)) != -1) {
-      for(int i = 0; i < l - 1; i++) o.write(bb[i]);
-      if(l < IO.BLOCKSIZE) break;
-    }
+  private void send(final Process pr) throws IOException {
+    out.writeUTF(pr.toString());
   }
 }

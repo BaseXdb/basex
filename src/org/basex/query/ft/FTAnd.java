@@ -124,16 +124,17 @@ public final class FTAnd extends FTExpr {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     neg = new boolean[expr.length];
 
-    int sum = 0;
+    int is = 0;
     int n = 0;
     for(int i = 0; i < expr.length; i++) {
       if(!expr[i].indexAccessible(ic)) return false;
       neg[i] = ic.not;
       if(ic.not) n++;
       ic.not = false;
-      sum += ic.is;
+      if(is == 0 || ic.is < is) is = ic.is;
+      if(ic.is == 0) break;
     }
-    ic.is = sum;
+    ic.is = is;
 
     // no index access if first or all operators are negative
     return !neg[0] && n < expr.length;

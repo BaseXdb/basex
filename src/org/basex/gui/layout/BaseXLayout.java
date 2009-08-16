@@ -54,9 +54,10 @@ public final class BaseXLayout {
    */
   public static void help(final Component cont, final byte[] help) {
     final GUI gui = gui(cont);
+    if(gui == null) return;
     final GUIProp gprop = gui.prop;
     if(gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
-    if(gprop.is(GUIProp.FULLSCREEN)) return;
+    if(gui.fullscreen) return;
     if(help != null && gprop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
   }
 
@@ -67,7 +68,7 @@ public final class BaseXLayout {
    */
   static GUI gui(final Component cont) {
     final Container c = cont.getParent();
-    return c instanceof GUI ? (GUI) c : gui(c);
+    return c == null || c instanceof GUI ? (GUI) c : gui(c);
   }
 
   /**
@@ -157,8 +158,7 @@ public final class BaseXLayout {
         }
 
         if(e.isControlDown()) {
-          final GUIProp prop = gui(comp).prop;
-          final int fs = prop.num(GUIProp.FONTSIZE);
+          final int fs = gui.prop.num(GUIProp.FONTSIZE);
           int nfs = fs;
           if(code == '+' || code == '-' || code == '=') {
             nfs = Math.max(1, fs + (code == '-' ? -1 : 1));
@@ -166,8 +166,8 @@ public final class BaseXLayout {
             nfs = 12;
           }
           if(fs != nfs) {
-            prop.set(GUIProp.FONTSIZE, nfs);
-            GUIConstants.initFonts(prop);
+            gui.prop.set(GUIProp.FONTSIZE, nfs);
+            GUIConstants.initFonts(gui.prop);
             gui.notify.layout();
           }
         }
@@ -297,17 +297,32 @@ public final class BaseXLayout {
   }
 
   /**
-   * Enables/Disables anti-aliasing.
+   * Sets the specified anti-aliasing rendering.
    * @param g graphics reference
    * @param pr database properties
    */
   public static void antiAlias(final Graphics g, final GUIProp pr) {
+    Object rh = RenderingHints.VALUE_ANTIALIAS_ON;
     try {
-      ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-          RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
-          GUIConstants.FONTALIAS[pr.num(GUIProp.FONTALIAS)]).get(null));
+      rh = RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
+          GUIConstants.FONTALIAS[pr.num(GUIProp.FONTALIAS)]).get(null);
     } catch(final Exception ex) {
-      BaseX.errln(ex);
+      BaseX.debug(ex);
+    }
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, rh);
+  }
+
+  /**
+   * Checks if the Java version supports all anti-aliasing variants.
+   * @return result of check
+   */
+  public static boolean fullAlias() {
+    try {
+      // check if Java 1.6 rendering is available; if not, use default rendering
+      RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
+      return true;
+    } catch(final Exception ex) {
+      return false;
     }
   }
 

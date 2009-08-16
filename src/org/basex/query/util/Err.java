@@ -21,7 +21,7 @@ public final class Err {
    * Throws an exception.
    * @param err error message
    * @param x extended info
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void or(final Object[] err, final Object... x)
       throws QueryException {
@@ -33,7 +33,7 @@ public final class Err {
    * @param inf expression info
    * @param t expected type
    * @param it item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void type(final String inf, final Type t, final Item it)
       throws QueryException {
@@ -45,7 +45,7 @@ public final class Err {
    * @param i input
    * @param t expected type
    * @param ex example format
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void date(final byte[] i, final Type t, final String ex)
       throws QueryException {
@@ -56,7 +56,7 @@ public final class Err {
    * Throws an invalid value exception.
    * @param t expected type
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void value(final Type t, final Object v) throws QueryException {
     or(INVALUE, t, v);
@@ -66,7 +66,7 @@ public final class Err {
    * Throws a date range exception.
    * @param t expected type
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void range(final Type t, final byte[] v) throws QueryException {
     or(DATERANGE, t, v);
@@ -75,7 +75,7 @@ public final class Err {
   /**
    * Throws a empty sequence exception.
    * @param e calling expression
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void empty(final Expr e) throws QueryException {
     or(XPEMPTY, e.info());
@@ -85,7 +85,7 @@ public final class Err {
    * Throws a comparison exception.
    * @param it1 first item
    * @param it2 second item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void cmp(final Item it1, final Item it2) throws QueryException {
     if(it1 == it2) or(TYPECMP, it1.type);
@@ -96,7 +96,7 @@ public final class Err {
    * Throws a numeric type exception.
    * @param inf expression info
    * @param it item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void num(final String inf, final Item it)
       throws QueryException {
@@ -106,7 +106,7 @@ public final class Err {
   /**
    * Throws a node exception.
    * @param ex expression
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void nodes(final Expr ex) throws QueryException {
     or(EVALNODES, ex);
@@ -116,7 +116,7 @@ public final class Err {
    * Throws a numeric type exception.
    * @param t expression cast type
    * @param it item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static void cast(final Type t, final Item it) throws QueryException {
     or(XPINVCAST, it.type, t, chop(it));

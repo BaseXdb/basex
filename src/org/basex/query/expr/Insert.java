@@ -6,7 +6,7 @@ package org.basex.query.expr;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class Insert extends Arr {
+public final class Insert extends Arr {
   /** First flag. */
   final boolean first;
   /** Last flag. */

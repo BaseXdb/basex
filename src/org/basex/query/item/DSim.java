@@ -50,7 +50,7 @@ public final class DSim extends Date {
    * Constructor.
    * @param d date
    * @param t data type
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   DSim(final byte[] d, final Type t) throws QueryException {
     super(t, d, EXAMPLES[type(t)]);

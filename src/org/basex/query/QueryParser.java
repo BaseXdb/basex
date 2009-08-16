@@ -159,7 +159,7 @@ public class QueryParser extends InputParser {
    * @param f optional input file
    * @param u module uri
    * @return resulting expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public Expr parse(final String q, final IO f, final Uri u)
       throws QueryException {
@@ -178,7 +178,7 @@ public class QueryParser extends InputParser {
    * @param u module uri
    * @param end if true, input must be completely evaluated
    * @return resulting expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public Expr parse(final Uri u, final boolean end) throws QueryException {
     try {
@@ -207,7 +207,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [  2] Parses a VersionDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void versionDecl() throws QueryException {
     final int p = qp;
@@ -234,7 +234,7 @@ public class QueryParser extends InputParser {
    * [  7] Parses a Setter.
    * [ 30] Parses a QueryBody ( = Expr).
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr mainModule() throws QueryException {
     prolog1();
@@ -249,7 +249,7 @@ public class QueryParser extends InputParser {
   /**
    * [  4] Parses a ModuleDecl.
    * @param u module uri
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void moduleDecl(final Uri u) throws QueryException {
     check(MODULE);
@@ -271,7 +271,7 @@ public class QueryParser extends InputParser {
   /**
    * [  6] Parses a Prolog.
    * [  7] Parses a Setter.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void prolog1() throws QueryException {
     while(true) {
@@ -322,7 +322,7 @@ public class QueryParser extends InputParser {
   /**
    * [  6] Parses a Prolog.
    * [  7] Parses a Setter.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void prolog2() throws QueryException {
     while(true) {
@@ -346,7 +346,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 10] Parses a namespaceDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
     final QNm name = new QNm(ncName(XPNAME));
@@ -358,7 +358,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [UP141] Parses a RevalidationDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void revalidationDecl() throws QueryException {
     if(declReval) error(DUPLREVAL);
@@ -369,7 +369,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 11] Parses a BoundarySpaceDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void boundarySpaceDecl() throws QueryException {
     if(declSpaces) error(DUPLBOUND);
@@ -382,7 +382,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 12] Parses a DefaultNamespaceDecl.
    * @return true if declaration was found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean defaultNamespaceDecl() throws QueryException {
     final boolean elem = consumeWS(ELEMENT);
@@ -403,7 +403,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 13] Parses an OptionDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void optionDecl() throws QueryException {
     // ignore option declarations
@@ -414,7 +414,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 14] Parses an OrderingModeDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void orderingModeDecl() throws QueryException {
     if(declOrder) error(DUPLORD);
@@ -427,7 +427,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 15] Parses an emptyOrderDecl.
    * @return true if declaration was found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean emptyOrderDecl() throws QueryException {
     if(!consumeWS2(EMPTYORDER)) return false;
@@ -444,7 +444,7 @@ public class QueryParser extends InputParser {
    * [ 16] Parses a copyNamespacesDecl.
    * [ 17] Parses an PreserveMode.
    * [ 18] Parses an InheritMode.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void copyNamespacesDecl() throws QueryException {
     if(declPres) error(DUPLCOPYNS);
@@ -461,7 +461,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 19] Parses a DefaultCollationDecl.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean defaultCollationDecl() throws QueryException {
     if(!consumeWS2(COLLATION)) return false;
@@ -473,7 +473,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 20] Parses a BaseURIDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void baseURIDecl() throws QueryException {
     if(declBase) error(DUPLBASE);
@@ -484,7 +484,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 21] Parses a SchemaImport.
    * [ 22] Parses a SchemaPrefix.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void schemaImport() throws QueryException {
     if(consumeWS(NSPACE)) {
@@ -502,7 +502,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 23] Parses a ModuleImport.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void moduleImport() throws QueryException {
     QNm name = null;
@@ -546,7 +546,7 @@ public class QueryParser extends InputParser {
    * Parses the specified module.
    * @param f file name
    * @param u module uri
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void module(final String f, final Uri u) throws QueryException {
     if(ctx.modLoaded.contains(f)) return;
@@ -570,7 +570,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 24] Parses a VarDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void varDecl() throws QueryException {
     final QNm name = varName();
@@ -602,7 +602,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 25] Parses a ConstructionDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void constructionDecl() throws QueryException {
     if(declConstr) error(DUPLCONS);
@@ -614,7 +614,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 26] Parses a FunctionDecl.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void functionDecl() throws QueryException {
     final QNm name = new QNm(qName(DECLFUNC));
@@ -654,7 +654,7 @@ public class QueryParser extends InputParser {
    * [ 29] Parses an EnclosedExpr.
    * @param err error message
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr enclosed(final Object[] err) throws QueryException {
     check(BRACE1);
@@ -666,7 +666,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 31] Parses an Expr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Expr expr() throws QueryException {
     final Expr e = single();
@@ -684,7 +684,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 32] Parses an ExprSingle.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr single() throws QueryException {
     alter = null;
@@ -709,7 +709,7 @@ public class QueryParser extends InputParser {
    * [ 39] Parses an OrderSpecList.
    * [ 57]* Parses GroupByClause (*Xquery 1.1 draft)
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
     final int s = ctx.vars.size();
@@ -762,7 +762,7 @@ public class QueryParser extends InputParser {
    * [ 36] Parses a LetClause.
    * [FT37] Parses an FTScoreVar.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private ForLet[] forLet() throws QueryException {
     ForLet[] fl = null;
@@ -813,7 +813,7 @@ public class QueryParser extends InputParser {
    * [ 41] Parses an OrderModifier.
    * @param order order array
    * @return new order array
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Ord[] orderSpec(final Ord[] order) throws QueryException {
     final Expr e = check(single(), ORDERBY);
@@ -836,8 +836,8 @@ public class QueryParser extends InputParser {
   /**
    * [59]* GroupingSpec (*Xquery 1.1 Draft).
    * @param group grouping specification
-   * @return new Grp array
-   * @throws QueryException in case something went wrong
+   * @return new group array
+   * @throws QueryException query exception
    */
   private Grp[] groupSpec(final Grp[] group) throws QueryException {
     final Var v = new Var(varName());
@@ -853,7 +853,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 42] Parses a QuantifiedExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
     final boolean some = consumeWS(SOME, DOLLAR, NOSOME);
@@ -879,7 +879,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 42] Parses a TypeswitchExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
     if(!consumeWS(TYPESWITCH, PAR1, TYPEPAR)) return null;
@@ -922,7 +922,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 45] Parses an IfExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
     if(!consumeWS(IF, PAR1, IFPAR)) return null;
@@ -939,7 +939,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 46] Parses an OrExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr or() throws QueryException {
     final Expr e = and();
@@ -953,7 +953,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 47] Parses an AndExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr and() throws QueryException {
     final Expr e = comparison();
@@ -967,7 +967,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 48] Parses an ComparisonExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr comparison() throws QueryException {
     final Expr e = ftContains();
@@ -986,7 +986,7 @@ public class QueryParser extends InputParser {
   /**
    * [FT51] Parses a FTContainsExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
     final Expr e = range();
@@ -1007,7 +1007,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 49] Parses a RangeExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr range() throws QueryException {
     final Expr e = additive();
@@ -1018,7 +1018,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 50] Parses an AdditiveExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr additive() throws QueryException {
     Expr e = multiplicative();
@@ -1035,7 +1035,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 51] Parses a MultiplicativeExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
     Expr e = union();
@@ -1054,7 +1054,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 52] Parses a UnionExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr union() throws QueryException {
     final Expr e = intersect();
@@ -1069,7 +1069,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 52] Parses an IntersectExceptExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
     final Expr e = instanceoff();
@@ -1090,7 +1090,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 54] Parses an InstanceofExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr instanceoff() throws QueryException {
     final Expr e = treat();
@@ -1102,7 +1102,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 55] Parses a TreatExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
     final Expr e = castable();
@@ -1114,7 +1114,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 56] Parses a CastableExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr castable() throws QueryException {
     final Expr e = cast();
@@ -1126,7 +1126,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 57] Parses a CastExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
     final Expr e = unary();
@@ -1138,7 +1138,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 58] Parses a UnaryExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
     boolean minus = false;
@@ -1161,7 +1161,7 @@ public class QueryParser extends InputParser {
    * [ 59] Parses a ValueExpr.
    * [ 65] Parses an ExtensionExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr value() throws QueryException {
     final boolean lax = consumeWS(VALIDATE, LAX, NOVALIDATE);
@@ -1173,7 +1173,7 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 63] Parses a ValidateExpr.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void validate() throws QueryException {
     if(!consumeWS2(LAX)) consumeWS2(STRICT);
@@ -1186,7 +1186,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 66] Parses a Pragma.
    * @return true if pragma was found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean pragma() throws QueryException {
     if(!consumeWS2(PRAGMA)) return false;
@@ -1214,7 +1214,7 @@ public class QueryParser extends InputParser {
    * [ 68] Parses a PathExpr.
    * [ 69] Parses a RelativePathExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public Expr path() throws QueryException {
     checkInit();
@@ -1306,7 +1306,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 70] Parses a StepExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Expr step() throws QueryException {
     final Expr e = filter();
@@ -1316,7 +1316,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 71] Parses an AxisStep.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   Step axis() throws QueryException {
     Axis ax = null;
@@ -1369,7 +1369,7 @@ public class QueryParser extends InputParser {
    * [123] Parses a KindTest.
    * @param att attribute flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Test test(final boolean att) throws QueryException {
     final int p = qp;
@@ -1423,7 +1423,7 @@ public class QueryParser extends InputParser {
    * [ 82] Parses a PredicateList.
    * [ 83] Parses a Predicate.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr filter() throws QueryException {
     final Expr e = primary();
@@ -1441,7 +1441,7 @@ public class QueryParser extends InputParser {
    * [ 87] Parses a VarRef.
    * [ 90] Parses a ContextItem.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
     skipWS();
@@ -1485,7 +1485,7 @@ public class QueryParser extends InputParser {
    * [ 86] Parses a NumericLiteral.
    * [141] Parses an IntegerLiteral.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr numericLiteral() throws QueryException {
     tok.reset();
@@ -1503,7 +1503,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 88] Parses a VarName.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private QNm varName() throws QueryException {
     check(DOLLAR);
@@ -1516,7 +1516,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 89] Parses a ParenthesizedExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr parenthesized() throws QueryException {
     check(PAR1);
@@ -1528,7 +1528,7 @@ public class QueryParser extends InputParser {
   /**
    * [ 93] Parses a FunctionCall.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr functionCall() throws QueryException {
     final int p = qp;
@@ -1566,7 +1566,7 @@ public class QueryParser extends InputParser {
    * [ 94] Parses a Constructor.
    * [ 95] Parses a DirectConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr constructor() throws QueryException {
     check('<');
@@ -1578,7 +1578,7 @@ public class QueryParser extends InputParser {
    * [ 96] Parses a DirElemConstructor.
    * [ 97-100] Parses attributes.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr dirElemConstructor() throws QueryException {
     if(skipWS()) error(NOTAGNAME);
@@ -1682,7 +1682,7 @@ public class QueryParser extends InputParser {
    * @param ns namespace array
    * @param k namespace
    * @param v uri
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void addNS(final Atts ns, final byte[] k, final byte[] v)
       throws QueryException {
@@ -1697,7 +1697,7 @@ public class QueryParser extends InputParser {
    * [101] Parses a DirElemContent.
    * @param tag opening tag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr dirElemContent(final QNm tag) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
@@ -1744,7 +1744,7 @@ public class QueryParser extends InputParser {
   /**
    * [103] Parses a DirCommentConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr dirCommentConstructor() throws QueryException {
     check('-');
@@ -1764,7 +1764,7 @@ public class QueryParser extends InputParser {
   /**
    * [105-106] Parses a DirPIConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr dirPIConstructor() throws QueryException {
     if(consumeWSS()) error(PIXML, EMPTY);
@@ -1788,7 +1788,7 @@ public class QueryParser extends InputParser {
   /**
    * [107] Parses a CDataSection.
    * @return CData
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private byte[] cDataSection() throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
@@ -1809,7 +1809,7 @@ public class QueryParser extends InputParser {
   /**
    * [109] Parses a ComputedConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr computedConstructor() throws QueryException {
     final int p = qp;
@@ -1825,7 +1825,7 @@ public class QueryParser extends InputParser {
   /**
    * [110] Parses a CompDocConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compDocConstructor() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
@@ -1838,7 +1838,7 @@ public class QueryParser extends InputParser {
    * [111] Parses a CompElemConstructor.
    * [112] Parses a ContextExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compElemConstructor() throws QueryException {
     skipWS();
@@ -1862,7 +1862,7 @@ public class QueryParser extends InputParser {
   /**
    * [113] Parses a CompAttrConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compAttrConstructor() throws QueryException {
     skipWS();
@@ -1885,7 +1885,7 @@ public class QueryParser extends InputParser {
   /**
    * [114] Parses a CompTextConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compTextConstructor() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
@@ -1897,7 +1897,7 @@ public class QueryParser extends InputParser {
   /**
    * [115] Parses a CompCommentConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compCommentConstructor() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
@@ -1909,7 +1909,7 @@ public class QueryParser extends InputParser {
   /**
    * [116] Parses a CompPIConstructor.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr compPIConstructor() throws QueryException {
     skipWS();
@@ -1932,7 +1932,7 @@ public class QueryParser extends InputParser {
   /**
    * [117] Parses a SimpleType.
    * @return sequence type
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private SeqType simpleType() throws QueryException {
     final QNm type = new QNm(qName(TYPEINVALID));
@@ -1955,7 +1955,7 @@ public class QueryParser extends InputParser {
    * [120] Parses an OccurrenceIndicator.
    * [123] Parses a KindTest.
    * @return sequence type
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private SeqType sequenceType() throws QueryException {
     final QNm type = new QNm(qName(TYPEINVALID));
@@ -2008,7 +2008,7 @@ public class QueryParser extends InputParser {
   /**
    * [142] Parses a DecimalLiteral.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr decimalLiteral() throws QueryException {
     if(letter(curr())) return checkDbl();
@@ -2020,7 +2020,7 @@ public class QueryParser extends InputParser {
    * [143] Parses a DoubleLiteral.
    * Checks if a number is followed by a whitespace.
    * @return expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr checkDbl() throws QueryException {
     if(!consume('e') && !consume('E')) error(NUMBERWS);
@@ -2039,7 +2039,7 @@ public class QueryParser extends InputParser {
   /**
    * [144] Parses a StringLiteral.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private byte[] stringLiteral() throws QueryException {
     skipWS();
@@ -2061,7 +2061,7 @@ public class QueryParser extends InputParser {
   /**
    * [11-169] Parses a TryClause.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
     if(!consumeWS2(TRY)) return null;
@@ -2080,7 +2080,7 @@ public class QueryParser extends InputParser {
           check("*");
           codes = Array.add(codes, (QNm) null);
         }
-      } while(consume(PIPE));
+      } while(consumeWS(PIPE));
 
       Var[] var = {};
       final int s = ctx.vars.size();
@@ -2097,7 +2097,7 @@ public class QueryParser extends InputParser {
       final Expr ex = enclosed(NOENCLEXPR);
       ctx.vars.reset(s);
       ct = Array.add(ct, new Catch(ex, codes, var));
-    } while(consume(CATCH));
+    } while(consumeWS(CATCH));
 
     return new Try(tr, ct);
   }
@@ -2126,7 +2126,7 @@ public class QueryParser extends InputParser {
    * [FT164] Parses an FTContent.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftSelection(final boolean prg) throws QueryException {
     FTExpr expr = ftOr(prg);
@@ -2168,7 +2168,7 @@ public class QueryParser extends InputParser {
    * [FT145] Parses FTOr.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftOr(final boolean prg) throws QueryException {
     final FTExpr e = ftAnd(prg);
@@ -2183,7 +2183,7 @@ public class QueryParser extends InputParser {
    * [FT146] Parses FTAnd.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftAnd(final boolean prg) throws QueryException {
     final FTExpr e = ftMildNot(prg);
@@ -2198,7 +2198,7 @@ public class QueryParser extends InputParser {
    * [FT147] Parses FTMildNot.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftMildNot(final boolean prg) throws QueryException {
     final FTExpr e = ftUnaryNot(prg);
@@ -2216,7 +2216,7 @@ public class QueryParser extends InputParser {
    * [FT148] Parses FTUnaryNot.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftUnaryNot(final boolean prg) throws QueryException {
     final boolean not = consumeWS(FTNOT);
@@ -2228,7 +2228,7 @@ public class QueryParser extends InputParser {
    * [FT149] Parses FTPrimaryWithOptions.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftPrimaryWithOptions(final boolean prg) throws QueryException {
     FTExpr expr = ftPrimary(prg);
@@ -2248,7 +2248,7 @@ public class QueryParser extends InputParser {
    * [FT155] Parses FTTimes.
    * @param prg pragma flag
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
     if(pragma()) {
@@ -2293,7 +2293,7 @@ public class QueryParser extends InputParser {
   /**
    * [FT156] Parses an FTRange.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr[] ftRange() throws QueryException {
     final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
@@ -2321,7 +2321,7 @@ public class QueryParser extends InputParser {
   /**
    * [FT156] Parses an FTUnit.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private FTUnit ftUnit() throws QueryException {
     if(consumeWS(WORDS)) return FTUnit.WORD;
@@ -2335,7 +2335,7 @@ public class QueryParser extends InputParser {
    * [FT154] Parses an FTMatchOption.
    * @param opt options instance
    * @return false if no options were found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean ftMatchOption(final FTOpt opt) throws QueryException {
     if(consumeWS(LOWERCASE)) {
@@ -2431,7 +2431,7 @@ public class QueryParser extends InputParser {
   /**
    * [FT171] Parses an FTThesaurusID.
    * @param thes link to thesaurus
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void ftThesaurusID(final ThesQuery thes) throws QueryException {
     check(AT);
@@ -2463,7 +2463,7 @@ public class QueryParser extends InputParser {
    * [UP143] Parses an InsertExpression.
    * [UP142] Parses an InsertTargetChoiceExpr.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
     final int p = qp;
@@ -2498,7 +2498,7 @@ public class QueryParser extends InputParser {
   /**
    * [UP144] Parses a DeleteExpression.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr deletee() throws QueryException {
     final int p = qp;
@@ -2515,7 +2515,7 @@ public class QueryParser extends InputParser {
   /**
    * [UP146] Parses a RenameExpression.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
     final int p = qp;
@@ -2534,7 +2534,7 @@ public class QueryParser extends InputParser {
   /**
    * [UP145] Parses a ReplaceExpression.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
     final int p = qp;
@@ -2555,7 +2555,7 @@ public class QueryParser extends InputParser {
   /**
    * [UP150] Parses a TransformExpression.
    * @return query expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Expr transform() throws QueryException {
     if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
@@ -2580,7 +2580,7 @@ public class QueryParser extends InputParser {
    * Parses an NCName.
    * @param err optional error message
    * @return string
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private byte[] ncName(final Object[] err) throws QueryException {
     skipWS();
@@ -2594,7 +2594,7 @@ public class QueryParser extends InputParser {
    * Parses a QName.
    * @param err optional error message
    * @return string
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private byte[] qName(final Object[] err) throws QueryException {
     skipWS();
@@ -2629,7 +2629,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses and converts entities.
    * @param tb token builder
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   void entity(final TokenBuilder tb) throws QueryException {
     final String ent = ent(tb);
@@ -2641,7 +2641,7 @@ public class QueryParser extends InputParser {
    * @param expr expression
    * @param err error message
    * @return expression
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Expr check(final Expr expr, final Object[] err)
       throws QueryException {
@@ -2653,7 +2653,7 @@ public class QueryParser extends InputParser {
    * Checks for the specified character and throws an exception if
    * something else is found.
    * @param ch character to be found.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void check(final int ch) throws QueryException {
     if(!consume(ch)) error(WRONGCHAR, (char) ch, found());
@@ -2663,7 +2663,7 @@ public class QueryParser extends InputParser {
    * Checks for the specified string and throws an exception if
    * something else is found.
    * @param s string to be found.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected void check(final String s) throws QueryException {
     if(!consumeWS2(s)) error(WRONGCHAR, s, found());
@@ -2674,7 +2674,7 @@ public class QueryParser extends InputParser {
    * exhausted, throws an exception.
    * @param ch character to be found.
    * @return result of check
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean not(final int ch) throws QueryException {
     final char c = curr();
@@ -2698,7 +2698,7 @@ public class QueryParser extends InputParser {
    * Consumes the specified token and surrounding whitespaces.
    * @param t token to consume
    * @return true if token was found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean consumeWS(final String t) throws QueryException {
     final int p = qp;
@@ -2718,7 +2718,7 @@ public class QueryParser extends InputParser {
    * @param s2 second string
    * @param expr alternative error message
    * @return result of check
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected boolean consumeWS(final String s1, final String s2,
       final Object[] expr) throws QueryException {
@@ -2736,7 +2736,7 @@ public class QueryParser extends InputParser {
    * Peeks forward and consumes the string if it equals the specified one.
    * @param str string to consume
    * @return true if string was found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected boolean consumeWS2(final String str) throws QueryException {
     skipWS();
@@ -2746,7 +2746,7 @@ public class QueryParser extends InputParser {
   /**
    * Consumes all whitespace characters from the remaining query.
    * @return true if whitespaces were found
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private boolean skipWS() throws QueryException {
     final int p = qp;
@@ -2764,7 +2764,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes a comment.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private void comment() throws QueryException {
     qp++;
@@ -2794,7 +2794,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Throws the alternative error message.
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   void error() throws QueryException {
     qp = ap;
@@ -2807,7 +2807,7 @@ public class QueryParser extends InputParser {
    * Throws the specified error.
    * @param err error to be thrown
    * @param arg error arguments
-   * @throws QueryException parse exception
+   * @throws QueryException query exception
    */
   void error(final Object[] err, final Object... arg) throws QueryException {
     Err.or(err, arg);
@@ -2818,7 +2818,7 @@ public class QueryParser extends InputParser {
    * @param ar input array
    * @param e new expression
    * @return new array
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   protected Expr[] add(final Expr[] ar, final Expr e) throws QueryException {
     if(e == null) error(INCOMPLETE);

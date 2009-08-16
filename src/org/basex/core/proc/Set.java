@@ -8,26 +8,28 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 
 /**
- * Evaluates the 'set' command.
+ * Evaluates the 'set' command and modifies database properties.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Set extends Process {
   /**
-   * Constructor.
-   * @param option option
-   * @param val optional value
+   * Default constructor.
+   * @param key property
+   * @param value value to set (optional, depending on the property)
    */
-  public Set(final Object option, final String... val) {
-    super(STANDARD, (option instanceof Object[] ?
-        ((Object[]) option)[0] : option).toString(),
-        val.length == 0 ? null : val[0]);
+  public Set(final Object key, final Object value) {
+    super(STANDARD, (key instanceof Object[] ?
+        ((Object[]) key)[0] : key).toString(),
+        value == null ? null : value.toString());
   }
 
   @Override
   protected boolean exec() {
     final String key = args[0].toUpperCase();
+    String val = args[1];
+
     CmdSet s = null;
     try {
       s = Enum.valueOf(CmdSet.class, key);
@@ -35,21 +37,19 @@ public final class Set extends Process {
 
     try {
       final Object type = prop.object(key);
-      String val = args[1];
 
       if(type instanceof Boolean) {
-        final boolean all = ALL.equals(val);
         final boolean b = val == null ? !((Boolean) type).booleanValue() :
           val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
         prop.set(key, b);
+
+        final boolean all = ALL.equalsIgnoreCase(val);
         val = BaseX.flag(b);
         if(s == CmdSet.INFO) {
+          prop.set(Prop.ALLINFO, all);
           if(all) {
-            prop.set(Prop.ALLINFO, true);
             prop.set(Prop.INFO, true);
             val = INFOON + " (" + INFOALL + ")";
-          } else {
-            prop.set(Prop.ALLINFO, false);
           }
         }
       } else if(type instanceof Integer) {
@@ -63,7 +63,7 @@ public final class Set extends Process {
         Text.class.getField("INFO" + s).get(null).toString()) + ": " + val);
     } catch(final Exception ex) {
       BaseX.debug(ex);
-      return error("Could not assign \"%\"", key);
+      return error(SETERR, key, val);
     }
   }
 }

@@ -48,7 +48,6 @@ public final class BaseXWin {
     // read properties
     final Context ctx = new Context();
     final GUIProp gprop = new GUIProp();
-    ctx.prop.set(Prop.CHOP, true);
     Prop.gui = true;
 
     // show waiting panel and wait some time to allow repainting
@@ -138,8 +137,8 @@ public final class BaseXWin {
   }
 
   /**
-   * Main Method.
-   * @param args command line arguments.
+   * Main method.
+   * @param args command-line arguments.
    * An initial XML document or database file can be specified as argument.
    */
   public static void main(final String[] args) {

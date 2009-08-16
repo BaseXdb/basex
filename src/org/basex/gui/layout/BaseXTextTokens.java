@@ -14,7 +14,7 @@ public final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
   /** Text array to be written. */
-  byte[] text = EMPTY;
+  public byte[] text = EMPTY;
 
   /** Text length. */
   private int size;
@@ -366,7 +366,7 @@ public final class BaseXTextTokens {
    * Returns the text size.
    * @return text size
    */
-  int size() {
+  public int size() {
     return size;
   }
 }

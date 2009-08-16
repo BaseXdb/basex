@@ -33,29 +33,29 @@ public final class QueryProcessor extends Progress {
   private boolean compiled;
 
   /**
-   * Default Constructor.
-   * @param qu query
-   * @param c database context
+   * Default constructor.
+   * @param qu query to process
+   * @param cx database context
    */
-  public QueryProcessor(final String qu, final Context c) {
-    this(qu, c.current(), c);
+  public QueryProcessor(final String qu, final Context cx) {
+    this(qu, cx.current(), cx);
   }
 
   /**
-   * XQuery Constructor.
+   * Constructor with an initial context set.
    * @param qu query
-   * @param n initial nodes
-   * @param c database context
+   * @param nodes initial context set
+   * @param cx database context
    */
-  public QueryProcessor(final String qu, final Nodes n, final Context c) {
+  public QueryProcessor(final String qu, final Nodes nodes, final Context cx) {
     query = qu;
-    ctx = new QueryContext(c);
-    ctx.nodes = n;
+    ctx = new QueryContext(cx);
+    ctx.nodes = nodes;
     progress(ctx);
   }
 
   /**
-   * Parses the specified query.
+   * Parses the query.
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
@@ -85,7 +85,7 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Returns the result as an item.
-   * @return result iterator
+   * @return resulting item
    * @throws QueryException query exception
    */
   public Item eval() throws QueryException {
@@ -93,7 +93,7 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Parses the specified query and returns the result.
+   * Evaluates the specified query and returns the result.
    * @return result of query
    * @throws QueryException query exception
    */
@@ -103,8 +103,8 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Parses the specified query and returns the result nodes.
-   * @return result of query
+   * Evaluates the specified query and returns the result nodes.
+   * @return result nodes
    * @throws QueryException query exception
    */
   public Nodes queryNodes() throws QueryException {
@@ -133,7 +133,7 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Closes the processor.
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public void close() throws IOException {
     ctx.close();

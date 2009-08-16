@@ -18,7 +18,7 @@ final class ChildIterator {
   int pre;
 
   /***
-   * Default Constructor.
+   * Default constructor.
    * @param d data reference
    * @param p value of directory node
    */

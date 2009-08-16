@@ -69,8 +69,8 @@ public final class Lang {
           if(i == -1 || line.startsWith("#")) continue;
           final String key = line.substring(0, i);
           String val = line.substring(i + 1);
-          if(val.contains("\\n")) val = val.replaceAll("\\\\n", "\n");
-          if(Prop.langkeys) val = val + " {" + key + "}";
+          if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+          if(Prop.langkeys) val = "[" + key + ": " + val + "]";
           if(texts.get(key) == null) {
             texts.put(key, val);
           } else if(chk) {
@@ -138,8 +138,7 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        final File dir = new File(url.getFile());
-        for(final File f : dir.listFiles()) {
+        for(final File f : new File(url.getFile()).listFiles()) {
           langs.add(f.getName().replaceAll("." + SUFFIX, ""));
           creds.add(credits(new IOFile(f).content()));
         }

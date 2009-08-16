@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Var extends Expr implements Cloneable {
+public final class Var extends Expr implements Cloneable {
   /** Return type. */
   public Return ret = Return.SEQ;
   /** Global flag. */
@@ -76,7 +76,7 @@ public class Var extends Expr implements Cloneable {
    * @param e expression to be set
    * @param ctx query context
    * @return self reference
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
@@ -88,7 +88,7 @@ public class Var extends Expr implements Cloneable {
    * @param it item to be set
    * @param ctx query context
    * @return self reference
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Var bind(final Item it, final QueryContext ctx) throws QueryException {
     expr = it;
@@ -164,6 +164,12 @@ public class Var extends Expr implements Cloneable {
     } catch(final CloneNotSupportedException ex) {
       return null;
     }
+  }
+
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.VAR;
   }
 
   @Override

@@ -210,7 +210,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans an XML tag.
    * @param ch current character
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void scanTAG(final int ch) throws IOException {
     int c = ch;
@@ -254,7 +254,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans a quoted token.
    * @param ch current character
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void scanATTVALUE(final int ch) throws IOException {
     final int c = ch;
@@ -271,7 +271,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans an attribute value. [10]
    * @param ch current character
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void attValue(final int ch) throws IOException {
     boolean wrong = false;
@@ -295,7 +295,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans XML text.
    * @param ch current character
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void content(final int ch) throws IOException {
     type = Type.TEXT;
@@ -337,7 +337,7 @@ public final class XMLScanner extends Progress {
   /**
    * Checks input for CDATA section... &lt;![DATA[...]]&gt;.
    * @return true for CDATA
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private boolean isCDATA() throws IOException {
     if(!consume('!')) return false;
@@ -351,7 +351,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans CDATA.
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void cDATA() throws IOException {
     int ch;
@@ -367,7 +367,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans a comment.
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void comment() throws IOException {
     do {
@@ -384,7 +384,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans a processing instruction.
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void pi() throws IOException {
     final byte[] tok = name(true);
@@ -406,7 +406,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans whitespaces.
    * @return true for whitespaces
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private boolean s() throws IOException {
     final int ch = consume();
@@ -417,7 +417,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Checks input for whitespaces; if none are found, throws an error.
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
     if(!s()) error(NOWS, (char) consume());
@@ -426,7 +426,7 @@ public final class XMLScanner extends Progress {
   /**
    * Checks input for the specified character.
    * @param ch character to be found
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void check(final char ch) throws IOException {
     final int c = consume();
@@ -436,7 +436,7 @@ public final class XMLScanner extends Progress {
   /**
    * Checks input for the specified token.
    * @param tok token to be found
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void check(final byte[] tok) throws IOException {
     if(!consume(tok)) error(WRONGCHAR, tok, (char) consume());
@@ -446,7 +446,7 @@ public final class XMLScanner extends Progress {
    * Scans whitespaces.
    * @param ch current character
    * @return true for whitespaces
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private boolean s(final int ch) throws IOException {
     int c = ch;
@@ -461,7 +461,7 @@ public final class XMLScanner extends Progress {
   /**
    * Consumes a quote.
    * @return found quote
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private int qu() throws IOException {
     final int qu = consume();
@@ -473,7 +473,7 @@ public final class XMLScanner extends Progress {
    * Scans a reference. [67]
    * @param f dissolve entities
    * @return entity
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private byte[] ref(final boolean f) throws IOException {
     // scans numeric entities
@@ -529,7 +529,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans a PEReference. [69]
    * @return entity
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private byte[] peRef() throws IOException {
     // scans predefined entities
@@ -545,7 +545,7 @@ public final class XMLScanner extends Progress {
   /**
    * Adds some characters to the entity.
    * @param ent token builder
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void completeRef(final TokenBuilder ent) throws IOException {
     int ch = consume();
@@ -558,7 +558,7 @@ public final class XMLScanner extends Progress {
   /**
    * Reads next character or throws an exception if all bytes have been read.
    * @return next character
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private int nextChar() throws IOException {
     final int ch = consume();
@@ -648,7 +648,7 @@ public final class XMLScanner extends Progress {
   /**
    * Consumes an Nmtoken. [7]
    * @return name
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private byte[] nmtoken() throws IOException {
     final TokenBuilder name = new TokenBuilder();
@@ -745,7 +745,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans an public ID literal. [12]
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void pubidLit() throws IOException {
     final int qu = qu();
@@ -909,7 +909,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans a mixed value and children. [47-50]
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void cp() throws IOException {
     s();
@@ -929,7 +929,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Scans occurrences.
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void occ() throws IOException {
     if(!consume('+') && !consume('?')) consume('*');
@@ -970,7 +970,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans a document version.
    * @return true if version was found
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private boolean version() throws IOException {
     if(!consume(VERS)) return false;
@@ -984,7 +984,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans a document encoding.
    * @return encoding
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private String encoding() throws IOException {
     if(!consume(ENCOD)) return null;
@@ -1009,7 +1009,7 @@ public final class XMLScanner extends Progress {
   /**
    * Scans a standalone flag.
    * @return flag
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private byte[] sddecl() throws IOException {
     if(!consume(STANDALONE)) return null;
@@ -1026,7 +1026,7 @@ public final class XMLScanner extends Progress {
    * Throws an error.
    * @param e error message
    * @param a error arguments
-   * @throws IOException Build Exception
+   * @throws IOException I/O exception
    */
   private void error(final String e, final Object... a) throws IOException {
     throw new BuildException(det() + ": " + e, a);

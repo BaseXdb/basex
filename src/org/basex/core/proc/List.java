@@ -15,14 +15,14 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Evaluates the 'list' command. Shows all available databases.
+ * Evaluates the 'list' command and shows all available databases.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class List extends Process {
   /**
-   * Constructor.
+   * Default constructor.
    */
   public List() {
     super(PRINTING);
@@ -37,8 +37,8 @@ public final class List extends Process {
       o.println(INFONODB);
     } else {
       final TokenBuilder t = new TokenBuilder();
-      o.print(Token.token("Database"), ml);
-      o.println("XML Document");
+      o.print(Token.token(INFODBNAME), ml);
+      o.println(INFODOC);
       o.println("--------------------------------------------");
       for(final String name : list) {
         o.print(Token.token(name), ml);
@@ -55,7 +55,7 @@ public final class List extends Process {
         }
       }
       o.print(t.finish());
-      o.print(NL + list.length + INFODBLIST + NL);
+      o.print(NL + list.length + S + INFODBLIST + NL);
     }
   }
 

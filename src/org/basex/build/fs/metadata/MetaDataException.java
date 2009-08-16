@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 
 /**
- * MetaData Exception.
+ * MetaData exception.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek

@@ -13,7 +13,7 @@ import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 
 /**
- * FLWOR Clause.
+ * FLWOR clause.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -125,7 +125,7 @@ public class FLWOR extends Expr {
    * @param seq result sequence
    * @param it iterator
    * @param p variable position
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void iter(final QueryContext ctx, final SeqIter seq,
       final Iter[] it, final int p) throws QueryException {

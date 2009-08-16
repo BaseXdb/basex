@@ -16,10 +16,6 @@ import org.basex.util.Tokenizer;
 abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
   final Tokenizer wp;
-  /** Total parsing value. */
-  int total;
-  /** Current parsing value. */
-  int id;
 
   /**
    * Constructor.
@@ -36,16 +32,14 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException IO exception
    */
   final void index() throws IOException {
-    total = data.meta.size;
     for(id = 0; id < total; id++) {
-      if(data.kind(id) == Data.TEXT) {
-        checkStop();
-        wp.init(data.text(id));
-        while(wp.more()) {
-          final byte[] tok = wp.get();
-          // skip too long tokens
-          if(tok.length <= Token.MAXLEN) index(tok);
-        }
+      if(data.kind(id) != Data.TEXT) continue;
+      checkStop();
+      wp.init(data.text(id));
+      while(wp.more()) {
+        final byte[] tok = wp.get();
+        // skip too long tokens
+        if(tok.length <= Token.MAXLEN) index(tok);
       }
     }
     write();
@@ -64,17 +58,7 @@ abstract class FTBuilder extends IndexBuilder {
   abstract void write() throws IOException;
 
   @Override
-  public final String tit() {
-    return PROGINDEX;
-  }
-
-  @Override
   public final String det() {
     return INDEXFTX;
-  }
-
-  @Override
-  public final double prog() {
-    return (double) id / total;
   }
 }

@@ -11,7 +11,7 @@ import javax.swing.JTabbedPane;
  */
 public final class BaseXTabs extends JTabbedPane {
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param win parent window
    */
   public BaseXTabs(final Window win) {

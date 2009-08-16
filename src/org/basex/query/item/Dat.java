@@ -25,7 +25,7 @@ public final class Dat extends Date {
    * @param d date
    * @param a duration
    * @param p plus/minus flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dat(final Date d, final Dur a, final boolean p) throws QueryException {
     this(d);
@@ -35,7 +35,7 @@ public final class Dat extends Date {
   /**
    * Constructor.
    * @param d date
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dat(final byte[] d) throws QueryException {
     super(Type.DAT, d, XDATE);

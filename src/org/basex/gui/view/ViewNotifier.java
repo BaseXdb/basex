@@ -110,11 +110,13 @@ public final class ViewNotifier {
   }
 
   /**
-   * Notifies all views of a selection change. The mode flag
-   * determines what happens:
+   * Notifies all views of a selection change.
+   * The mode flag determines what happens:
+   * <ul>
    * <li>0: set currently focused node as marked node</li>
    * <li>1: add currently focused node</li>
    * <li>2: toggle currently focused node</li>
+   * </ul>
    * @param mode mark mode
    * @param vw the calling view
    */

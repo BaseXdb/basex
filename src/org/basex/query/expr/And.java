@@ -89,9 +89,29 @@ public final class And extends Arr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    for(final Expr e : expr) {
-      if(!e.indexAccessible(ic) || ic.seq) return false;
-      if(ic.is == 0) break;
+    int is = 0;
+    boolean empty = false;
+    final double[] ics = new double[expr.length];
+    for(int e = 0; e < expr.length; e++) {
+      if(!expr[e].indexAccessible(ic) || ic.seq) return false;
+      ics[e] = ic.is;
+      // evaluate empty result first
+      if(ic.is == 0) {
+        final Expr tmp = expr[e];
+        expr[e] = expr[0];
+        expr[0] = tmp;
+        empty = true;
+      }
+      is += ic.is;
+    }
+    if(empty) {
+      ic.is = 0;
+    } else {
+      // reorder arguments to speedup intersection
+      final int[] ord = Array.createOrder(ics, false);
+      final Expr[] ex = new Expr[ics.length];
+      for(int e = 0; e < expr.length; e++) ex[e] = expr[ord[e]];
+      expr = ex;
     }
     return true;
   }

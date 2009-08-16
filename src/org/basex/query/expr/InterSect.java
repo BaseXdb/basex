@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
@@ -47,6 +48,46 @@ public final class InterSect extends Arr {
   }
 
   /**
+   * Evaluates the iterators.
+   * @param iter iterators
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private NodIter eval(final Iter[] iter) throws QueryException {
+    NodIter ni = new NodIter(true);
+
+    Item it;
+    while((it = iter[0].next()) != null) {
+      if(!it.node()) Err.nodes(this);
+      ni.add((Nod) it);
+    }
+    final boolean db = ni.dbnodes();
+
+    for(int e = 1; e != expr.length && ni.size() != 0; e++) {
+      final NodIter res = new NodIter(true);
+      final Iter ir = iter[e];
+      while((it = ir.next()) != null) {
+        if(!it.node()) Err.nodes(this);
+        final Nod node = (Nod) it;
+
+        if(db && node instanceof DBNode) {
+          // optimization: use binary search
+          if(ni.contains((DBNode) node)) res.add(node);
+        } else {
+          for(int n = 0; n < ni.size(); n++) {
+            if(ni.get(n).is(node)) {
+              res.add(node);
+              break;
+            }
+          }
+        }
+      }
+      ni = res;
+    }
+    return ni;
+  }
+
+  /**
    * Creates a intersect iterator.
    * @param iter iterators
    * @return resulting iterator
@@ -79,39 +120,6 @@ public final class InterSect extends Arr {
         return true;
       }
     };
-  }
-
-  /**
-   * Evaluates the iterators.
-   * @param iter iterators
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  private NodIter eval(final Iter[] iter) throws QueryException {
-    NodIter seq = new NodIter(true);
-
-    Item it;
-    while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.nodes(this);
-      seq.add((Nod) it);
-    }
-
-    for(int e = 1; e != expr.length; e++) {
-      final NodIter res = new NodIter(true);
-      final Iter ir = iter[e];
-      while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this);
-        final Nod node = (Nod) it;
-        for(int s = 0; s < seq.size(); s++) {
-          if(seq.item[s].is(node)) {
-            res.add(node);
-            break;
-          }
-        }
-      }
-      seq = res;
-    }
-    return seq;
   }
 
   @Override

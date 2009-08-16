@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 
 /**
- * Sequence Iterator.
+ * Sequence iterator.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -28,7 +28,15 @@ public final class SeqIter extends Iter implements Result {
    * Constructor.
    */
   public SeqIter() {
-    item = new Item[1];
+    this(1);
+  }
+
+  /**
+   * Constructor.
+   * @param c initial capacity
+   */
+  public SeqIter(final int c) {
+    item = new Item[c];
   }
 
   /**
@@ -51,16 +59,6 @@ public final class SeqIter extends Iter implements Result {
 
   /**
    * Constructor.
-   * @param iter iterator
-   * @throws QueryException evaluation exception
-   */
-  private SeqIter(final Iter iter) throws QueryException {
-    this();
-    add(iter);
-  }
-
-  /**
-   * Constructor.
    * @param it item array
    * @param s size
    */
@@ -70,19 +68,23 @@ public final class SeqIter extends Iter implements Result {
   }
 
   /**
-   * Constructor.
+   * Returns the argument, if it is a sequence iterator.
+   * Otherwise, returns a new sequence iterator with the iterator contents.
    * @param iter iterator
    * @return iterator
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public static SeqIter get(final Iter iter) throws QueryException {
-    return iter instanceof SeqIter ? (SeqIter) iter : new SeqIter(iter);
+    if(iter instanceof SeqIter) return (SeqIter) iter;
+    final SeqIter si = new SeqIter(Math.max(1, iter.size()));
+    si.add(iter);
+    return si;
   }
 
   /**
    * Adds the contents of an iterator.
    * @param iter entry to be added
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public void add(final Iter iter) throws QueryException {
     Item i;

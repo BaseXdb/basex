@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestDeletes extends DataUpdateTest {
+public final class UpdateTestDeletes extends UpdateTest {
   /**
    * Tests deletion of a simple node.
    */

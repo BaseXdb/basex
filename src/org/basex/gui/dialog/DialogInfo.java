@@ -3,6 +3,9 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -10,27 +13,32 @@ import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Data.Type;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
 import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
+import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Info Database Dialog.
+ * Info database dialog.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
-  private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
+  private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
   /** Full-text indexing. */
   private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
   /** Full-text labels. */
@@ -43,7 +51,7 @@ public final class DialogInfo extends Dialog {
   public boolean opt;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogInfo(final GUI main) {
@@ -81,44 +89,82 @@ public final class DialogInfo extends Dialog {
     tab2.add(addIndex(false, data));
 
     // third tab
-    final BaseXBack tab3 = new BaseXBack();
-    tab3.setLayout(new GridLayout(2, 1));
-    tab3.setBorder(8, 8, 0, 8);
+    BaseXBack tab3 = null;
+    final boolean pi = data.meta.pathindex;
+    indexes[0] = new BaseXCheckBox(INFOPATHINDEX, null, pi, 0, this);
+
+    tab3 = new BaseXBack();
+    tab3.setLayout(new GridLayout(1, 1));
+    tab3.setBorder(8, 8, 8, 8);
+
+    final BaseXBack north = new BaseXBack();
+    north.setLayout(new BorderLayout());
+    north.add(indexes[0], BorderLayout.WEST);
+    final BaseXButton export = new BaseXButton(GUIEXPORT, null, this);
+    export.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        final IO file = GUICommands.save(gui, true);
+        if(file != null) {
+          PrintOutput out = null;
+          try {
+            out = new PrintOutput(file.path());
+            final XMLSerializer xml = new XMLSerializer(out, false, true);
+            data.path.plan(data, xml);
+          } catch(final IOException ex) {
+            Dialog.error(gui, NOTSAVED);
+          } finally {
+            if(out != null) try { out.close(); } catch(final Exception x) { }
+          }
+        }
+      }
+    });
+    if(pi) north.add(export, BorderLayout.EAST);
 
     BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
-
-    indexes[0] = new BaseXCheckBox(INFOTEXTINDEX,
-        Token.token(TXTINDEXINFO), meta.txtindex, 0, this);
-    p.add(indexes[0], BorderLayout.NORTH);
-
-    p.add(text(meta.txtindex ? data.info(Type.TXT) :
-      Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
-    tab3.add(p);
-
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-
-    indexes[1] = new BaseXCheckBox(INFOATTRINDEX,
-        Token.token(ATTINDEXINFO), meta.atvindex, 0, this);
-    p.add(indexes[1], BorderLayout.NORTH);
-
-    p.add(text(meta.atvindex ? data.info(Type.ATV) :
-      Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
+    p.add(north, BorderLayout.NORTH);
+    if(pi) p.add(text(data.path.info(data)), BorderLayout.CENTER);
     tab3.add(p);
 
     // fourth tab
     final BaseXBack tab4 = new BaseXBack();
-    tab4.setLayout(new GridLayout(1, 1));
-    tab4.setBorder(8, 8, 8, 8);
+    tab4.setLayout(new GridLayout(2, 1));
+    tab4.setBorder(8, 8, 0, 8);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+
+    indexes[1] = new BaseXCheckBox(INFOTEXTINDEX,
+        Token.token(TXTINDEXINFO), meta.txtindex, 0, this);
+    p.add(indexes[1], BorderLayout.NORTH);
+
+    p.add(text(meta.txtindex ? data.info(Type.TXT) :
+      Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
+    tab4.add(p);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+
+    indexes[2] = new BaseXCheckBox(INFOATTRINDEX,
+        Token.token(ATTINDEXINFO), meta.atvindex, 0, this);
+    p.add(indexes[2], BorderLayout.NORTH);
+
+    p.add(text(meta.atvindex ? data.info(Type.ATV) :
+      Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
+    tab4.add(p);
+
+    // fifth tab
+    final BaseXBack tab5 = new BaseXBack();
+    tab5.setLayout(new GridLayout(1, 1));
+    tab5.setBorder(8, 8, 8, 8);
 
     ftedit = !meta.ftxindex;
-    indexes[2] = new BaseXCheckBox(INFOFTINDEX,
+    indexes[3] = new BaseXCheckBox(INFOFTINDEX,
         Token.token(FTINDEXINFO), meta.ftxindex, 0, this);
 
     p = new BaseXBack();
     p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());
-    p.add(indexes[2], BorderLayout.NORTH);
+    p.add(indexes[3], BorderLayout.NORTH);
 
     if(ftedit) {
       p.add(new BaseXLabel(FTINDEXINFO, ftedit, false));
@@ -134,13 +180,14 @@ public final class DialogInfo extends Dialog {
     } else {
       p.add(text(data.info(Type.FTX)), BorderLayout.CENTER);
     }
-    tab4.add(p);
+    tab5.add(p);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, tab1);
     tabs.addTab(NAMESINFO, tab2);
-    tabs.addTab(INDEXINFO, tab3);
-    tabs.addTab(FTINFO, tab4);
+    tabs.addTab(INFOPATHINDEX, tab3);
+    tabs.addTab(INDEXINFO, tab4);
+    tabs.addTab(FTINFO, tab5);
 
     set(tabs, BorderLayout.CENTER);
 
@@ -202,23 +249,25 @@ public final class DialogInfo extends Dialog {
       close();
     }
     if(ftedit) {
-      final boolean ftx = indexes[2].isSelected();
+      final boolean ftx = indexes[3].isSelected();
       for(int f = 0; f < ft.length; f++) {
         ft[f].setEnabled(ftx);
         fl[f].setEnabled(ftx);
       }
     }
-    enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
+    final Data data = gui.context.data();
+    enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }
 
   @Override
   public void close() {
     super.close();
-    if(!ftedit) return;
-    final Prop prop = gui.context.prop;
-    prop.set(Prop.FTFUZZY, ft[0].isSelected());
-    prop.set(Prop.FTST, ft[1].isSelected());
-    prop.set(Prop.FTDC, ft[2].isSelected());
-    prop.set(Prop.FTCS, ft[3].isSelected());
+    if(ftedit) {
+      final Prop prop = gui.context.prop;
+      prop.set(Prop.FTFUZZY, ft[0].isSelected());
+      prop.set(Prop.FTST, ft[1].isSelected());
+      prop.set(Prop.FTDC, ft[2].isSelected());
+      prop.set(Prop.FTCS, ft[3].isSelected());
+    }
   }
 }

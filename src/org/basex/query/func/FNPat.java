@@ -49,7 +49,7 @@ final class FNPat extends Fun {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item match(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -63,7 +63,7 @@ final class FNPat extends Fun {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -96,7 +96,7 @@ final class FNPat extends Fun {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   private Iter token(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -122,7 +122,7 @@ final class FNPat extends Fun {
    * @param mod modifier item
    * @param ctx query context
    * @return modified pattern
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private Pattern pattern(final Expr pattern, final Expr mod,
       final QueryContext ctx) throws QueryException {

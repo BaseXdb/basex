@@ -86,7 +86,7 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified token is a valid Name.
+   * Checks if the specified token is a valid name.
    * @param v value to be checked
    * @return result of check
    */

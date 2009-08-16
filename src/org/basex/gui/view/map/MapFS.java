@@ -124,7 +124,7 @@ final class MapFS extends MapPainter {
             elem = true;
           } else if(k == Data.TEXT) {
             tb.add(data.text(p));
-            tb.add("\n");
+            tb.add('\n');
             elem = false;
           }
           p += data.attSize(p, k);

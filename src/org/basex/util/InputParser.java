@@ -136,7 +136,7 @@ public class InputParser {
    * @param str string to consume
    * @return true if string was found
    */
-  public boolean consume(final String str) {
+  protected boolean consume(final String str) {
     int p = qp;
     final int l = str.length();
     if(p + l > ql) return false;

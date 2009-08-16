@@ -59,7 +59,7 @@ public class Dur extends Item {
   /**
    * Constructor.
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dur(final byte[] v) throws QueryException {
     this(v, Type.DUR);
@@ -69,7 +69,7 @@ public class Dur extends Item {
    * Constructor.
    * @param v value
    * @param t data type
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Dur(final byte[] v, final Type t) throws QueryException {
     this(t);

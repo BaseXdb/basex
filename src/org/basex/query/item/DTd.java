@@ -54,7 +54,7 @@ public final class DTd extends Dur {
    * @param it duration item
    * @param f factor
    * @param m multiplication flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public DTd(final Dur it, final double f, final boolean m)
       throws QueryException {
@@ -83,7 +83,7 @@ public final class DTd extends Dur {
   /**
    * Constructor.
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   DTd(final byte[] v) throws QueryException {
     super(Type.DTD);

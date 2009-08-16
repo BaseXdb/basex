@@ -1,7 +1,6 @@
 package org.basex.gui.view.table;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -67,7 +66,7 @@ public final class TableView extends View implements Runnable {
     tdata.rows = null;
 
     final Data data = gui.context.data();
-    if(!visible() || data == null) return;
+    if(!visible() || data == null || !data.meta.pathindex) return;
     tdata.init(data);
     refreshContext(true, false);
   }
@@ -124,7 +123,7 @@ public final class TableView extends View implements Runnable {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWTABLE);
   }
 

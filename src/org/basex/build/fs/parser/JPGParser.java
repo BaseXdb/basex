@@ -1,16 +1,12 @@
 package org.basex.build.fs.parser;
 
-import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.DateField;
@@ -21,7 +17,7 @@ import org.basex.build.fs.parser.Metadata.StringField;
 
 /**
  * Parser for JPG files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
@@ -116,8 +112,8 @@ public final class JPGParser extends AbstractParser {
       void parse(final JPGParser obj, final long ifdOff, final ByteBuffer buf)
           throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          obj.meta.setString(StringField.DESCRIPTION, obj.readAscii(buf,
-              ifdOff));
+          obj.meta.setString(StringField.DESCRIPTION,
+              obj.readAscii(buf, ifdOff));
           obj.fsparser.metaEvent(obj.meta);
         } else error(obj, "Image description (0x010E)");
       }
@@ -249,7 +245,7 @@ public final class JPGParser extends AbstractParser {
       bfc.buffer(size);
       bfc.get(data);
     }
-    return trim(data);
+    return data;
   }
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
@@ -310,7 +306,7 @@ public final class JPGParser extends AbstractParser {
   @Override
   public void readContent(final BufferedFileChannel f,
       final NewFSParser parser) {
-    // no textual representation for jpg content ...
+  // no textual representation for jpg content ...
   }
 
   /** The {@link NewFSParser} instance to fire events. */
@@ -439,16 +435,18 @@ public final class JPGParser extends AbstractParser {
     int height = 0;
     switch(bfc.get()) { // extension code
       case 0x10: // Thumbnail coded using JPEG
-        fsparser.fileStartEvent("Thumbnail", "jpg", bfc.absolutePosition());
+        fsparser.startContent(bfc.absolutePosition(), s);
         fsparser.metaEvent(new Metadata(MetaType.IMAGE));
         fsparser.metaEvent(new Metadata(MimeType.JPG.get()));
+        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         break;
       case 0x11: // Thumbnail coded using 1 byte/pixel
         width = bfc.get();
         height = bfc.get();
         s -= 2;
-        fsparser.fileStartEvent("Thumbnail", null, bfc.absolutePosition());
+        fsparser.startContent(bfc.absolutePosition(), s);
         fsparser.metaEvent(new Metadata(MetaType.IMAGE));
+        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 1 byte/pixel."));
         break;
@@ -456,8 +454,9 @@ public final class JPGParser extends AbstractParser {
         width = bfc.get();
         height = bfc.get();
         s -= 2;
-        fsparser.fileStartEvent("Thumbnail", null, bfc.absolutePosition());
+        fsparser.startContent(bfc.absolutePosition(), s);
         fsparser.metaEvent(new Metadata(MetaType.IMAGE));
+        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 3 bytes/pixel."));
         break;
@@ -467,7 +466,7 @@ public final class JPGParser extends AbstractParser {
     }
     fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
     fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
-    fsparser.fileEndEvent(s);
+    fsparser.endContent();
     bfc.skip(s);
   }
 
@@ -477,10 +476,8 @@ public final class JPGParser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   private void readComment(final int size) throws IOException {
-    final byte[] array = new byte[size];
-    bfc.get(array);
     fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-        ParserUtil.checkAscii(array)));
+        bfc.get(new byte[size])));
   }
 
   /**
@@ -547,12 +544,11 @@ public final class JPGParser extends AbstractParser {
   private void readField(final long ifdOffset, final ByteBuffer data) {
     final int tagNr = data.getShort() & 0xFFFF;
     try {
-      // System.out.println("h" + Integer.toHexString(tagNr));
       final IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
       tag.parse(this, ifdOffset, data);
     } catch(final IOException ex) {
       BaseX.debug("%: %", bfc.getFileName(), ex.getMessage());
-    } catch(final IllegalArgumentException e) { /* */}
+    } catch(final IllegalArgumentException ex) { /* */}
   }
 
   /**

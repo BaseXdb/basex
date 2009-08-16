@@ -50,7 +50,7 @@ public final class FNIndex extends Set {
    * @param uri function uri
    * @param args optional arguments
    * @return function instance
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Fun get(final byte[] name, final byte[] uri, final Expr[] args)
       throws QueryException {
@@ -81,7 +81,7 @@ public final class FNIndex extends Set {
   /**
    * Finds similar function names for throwing an error message.
    * @param name function name
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public void error(final byte[] name) throws QueryException {
     // check similar predefined function

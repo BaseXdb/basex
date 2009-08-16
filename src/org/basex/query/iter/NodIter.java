@@ -1,5 +1,6 @@
 package org.basex.query.iter;
 
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
@@ -38,6 +39,26 @@ public final class NodIter extends NodeIter {
   public NodIter(final boolean d) {
     item = new Nod[1];
     dupl = d;
+  }
+
+  /**
+   * Constructor.
+   * @param it item array
+   * @param s size
+   */
+  public NodIter(final Nod[] it, final int s) {
+    this(false);
+    item = it;
+    size = s;
+  }
+
+  /**
+   * Returns the specified node.
+   * @param i node offset
+   * @return node
+   */
+  public Nod get(final int i) {
+    return item[i];
   }
 
   /**
@@ -94,6 +115,46 @@ public final class NodIter extends NodeIter {
     if(dupl) sort(sort);
     return Seq.get(item, size);
   }
+
+
+  /**
+   * Checks if binary search can be applied to this iterator, i.e.
+   * if all nodes are {@link DBNode} references and refer to the same database.
+   * @return result of check
+   */
+  public boolean dbnodes() {
+    if(dupl) sort(sort);
+
+    if(size == 0 || !(item[0] instanceof DBNode)) return false;
+    final DBNode n = (DBNode) item[0];
+    for(int s = 1; s < size; s++) {
+      if(!(item[s] instanceof DBNode) || n.data != ((DBNode) item[s]).data)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the iterator contains a database node with the specified
+   * pre value. All nodes are assumed to be {@link DBNode} references and
+   * sorted.
+   * @param node node to be found
+   * @return result of check
+   */
+  public boolean contains(final DBNode node) {
+    // binary search
+    int l = 0, h = size - 1;
+    while(l <= h) {
+      final int m = l + h >>> 1;
+      final DBNode n = (DBNode) item[m];
+      final int c = n.pre - node.pre;
+      if(c == 0) return n.data == node.data;
+      if(c < 0) l = m + 1;
+      else h = m - 1;
+    }
+    return false;
+  }
+
 
   /**
    * Sorts the nodes.

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,6 +18,7 @@ import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.AProp;
 import org.basex.core.Prop;
+import org.basex.core.proc.Set;
 import org.basex.data.XMLSerializer;
 import org.basex.io.BufferedOutput;
 import org.basex.io.IO;
@@ -28,6 +28,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.util.Var;
+import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -55,10 +56,10 @@ public final class BaseXWebServer {
     "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'" +
         " 'http://www.w3.org/TR/html4/loose.dtd'>";
   /** Document header. */
-  static final String HEADER = DOCTYPE +
-    "\n<html>\n<head><title>BaseX WebServer</title>\n" +
+  static final String HEADER = DOCTYPE + NL +
+    "<html>" + NL + "<head><title>BaseX WebServer</title>" + NL +
     "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'n" +
-    "</head>\n<body style='font-family:sans-serif;'>";
+    "</head>" + NL + "<body style='font-family:sans-serif;'>";
   /** Document footer. */
   static final String FOOTER = "</body></html>";
 
@@ -77,7 +78,7 @@ public final class BaseXWebServer {
 
   /**
    * Main method.
-   * @param args command line arguments
+   * @param args command-line arguments
    */
   public static void main(final String[] args) {
     new BaseXWebServer(args);
@@ -88,7 +89,6 @@ public final class BaseXWebServer {
    * @param args arguments
    */
   private BaseXWebServer(final String[] args) {
-    Prop.server = true;
     Prop.web = true;
 
     try {
@@ -101,14 +101,7 @@ public final class BaseXWebServer {
       BaseX.outln(WSERVERSTOPPED);
       context.close();
     } catch(final Exception ex) {
-      BaseX.debug(ex);
-      if(ex instanceof BindException) {
-        BaseX.errln(SERVERBIND);
-      } else if(ex instanceof IOException) {
-        BaseX.errln(SERVERERR);
-      } else {
-        BaseX.errln(ex.getMessage());
-      }
+      BaseXServer.error(ex, true);
     }
   }
 
@@ -164,14 +157,12 @@ public final class BaseXWebServer {
                   s.getPort(), req.file, p.getTimer());
             }
           } catch(final Exception ex) {
-            if(ex instanceof IOException) BaseX.errln(SERVERERR);
-            else ex.printStackTrace();
+            BaseXServer.error(ex, false);
           }
         }
       }.start();
     } catch(final Exception ex) {
-      if(ex instanceof IOException) BaseX.errln(SERVERERR);
-      else ex.printStackTrace();
+      BaseXServer.error(ex, false);
     }
   }
 
@@ -239,9 +230,9 @@ public final class BaseXWebServer {
     out.println("HTTP/1.1 " + code);
     if(head.length() != 0) out.println(head);
     out.println("Server: BaseXWebServer");
-    out.println("Content-Type: text/html; charset=utf-8\n");
+    out.println("Content-Type: text/html; charset=utf-8" + NL);
     out.println(HEADER);
-    out.println("<h3>BaseX WebServer</h3>\n" + msg);
+    out.println("<h3>BaseX WebServer</h3>" + NL + msg);
     out.println(FOOTER);
     out.close();
   }
@@ -260,7 +251,7 @@ public final class BaseXWebServer {
     final PrintOutput out = new PrintOutput(new BufferedOutput(os));
     out.println("HTTP/1.1 200 OK");
     out.println("Server: BaseXWebServer");
-    out.println("Content-Type: text/html; charset=utf-8\n");
+    out.println("Content-Type: text/html; charset=utf-8" + NL);
     out.println(DOCTYPE);
 
     try {
@@ -389,65 +380,63 @@ public final class BaseXWebServer {
   }
 
   /**
-   * Parses the command line arguments.
-   * @param args the command line arguments
+   * Parses the command-line arguments.
+   * @param args the command-line arguments
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args);
     boolean ok = true;
-
-    // loop through all arguments
-    for(int a = 0; a < args.length; a++) {
-      ok = false;
-      if(args[a].startsWith("-")) {
-        for(int i = 1; i < args[a].length(); i++) {
-          final char c = args[a].charAt(i);
-          if(c == 'p') {
-            // parse server port
-            if(++i == args[a].length()) {
-              a++;
-              i = 0;
-            }
-            if(a == args.length) break;
-            final int p = Token.toInt(args[a].substring(i));
-            if(p <= 0) {
-              BaseX.errln(SERVERPORT + args[a].substring(i));
-              break;
-            }
-            context.prop.set(Prop.WEBPORT, p);
-            i = args[a].length();
-            ok = true;
-          } else if(c == 'c') {
-            cache = true;
-            ok = true;
-          } else if(c == 'd') {
-            Prop.debug = true;
-            ok = true;
-          } else if(c == 'v') {
-            verbose = true;
-            ok = true;
-          } else {
-            break;
-          }
+    while(arg.more() && ok) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'p') {
+          // parse server port
+          ok = set(Prop.WEBPORT, arg.string());
+        } else if(c == 'c') {
+          cache = true;
+        } else if(c == 'd') {
+          ok = set(Prop.DEBUG, true);
+        } else if(c == 'v') {
+          verbose = true;
+        } else {
+          ok = false;
         }
-      } else if(args[a].equals("stop")) {
-        try {
-          // send the stop command
-          final Socket s = new Socket("localhost",
-              context.prop.num(Prop.WEBPORT));
-          s.getOutputStream().write(Token.token("STOP\n\n"));
-          s.close();
-        } catch(final Exception ex) {
-          if(ex instanceof IOException) BaseX.errln(SERVERERR);
-          else BaseX.errln(ex.getMessage());
-          BaseX.debug(ex);
+      } else {
+        ok = false;
+        if(arg.string().equals("stop")) {
+          quit();
+          return false;
         }
-        return false;
       }
-      if(!ok) break;
     }
-    if(!ok) BaseX.errln(WSERVERINFO);
+    if(!ok) BaseX.outln(WSERVERINFO);
     return ok;
+  }
+
+  /**
+   * Quits the server.
+   */
+  public void quit() {
+    try {
+      // send the stop command
+      final Socket s = new Socket(context.prop.get(Prop.HOST),
+          context.prop.num(Prop.WEBPORT));
+      s.getOutputStream().write(Token.token("STOP" + NL + NL));
+      s.close();
+    } catch(final Exception ex) {
+      BaseXServer.error(ex, false);
+    }
+  }
+
+  /**
+   * Sets the specified option.
+   * @param opt option to be set
+   * @param arg argument
+   * @return success flag
+   */
+  private boolean set(final Object[] opt, final Object arg) {
+    return new Set(opt, arg).execute(context);
   }
 
   /** This class provides information on a client request. */

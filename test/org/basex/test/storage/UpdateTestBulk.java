@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestBulk extends DataUpdateTest {
+public final class UpdateTestBulk extends UpdateTest {
   /** InsertData. */
   private Data insertData;
   /** Test file we do updates with. */

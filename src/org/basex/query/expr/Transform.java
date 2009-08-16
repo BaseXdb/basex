@@ -3,12 +3,12 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 
 /**
- * Transform Expression.
+ * Transform expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class Transform extends Arr {
+public final class Transform extends Arr {
   /** Transform expressions. */
   private final ForLet[] fl;
 

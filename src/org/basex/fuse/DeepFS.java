@@ -120,8 +120,8 @@ public final class DeepFS extends DeepFuse implements DataText {
   public DeepFS(final Data d) {
     data = d;
 
-    final String mountpoint = d.meta.mountpoint;
-    final String backingpath = d.meta.backingpath;
+    final String mountpoint = d.meta.mount;
+    final String backingpath = d.meta.backing;
     initNames();
 
     if(data.meta.prop.is(Prop.FUSE)) {
@@ -200,7 +200,7 @@ public final class DeepFS extends DeepFuse implements DataText {
         BaseX.err(i + " .. ");
       }
       BaseX.debug("GO.");
-      final String cmd = "umount -f " + data.meta.mountpoint;
+      final String cmd = "umount -f " + data.meta.mount;
       BaseX.errln(method + "Trying to unmount deepfs: " + cmd);
       final Runtime r = Runtime.getRuntime();
       final java.lang.Process p = r.exec(cmd);
@@ -210,10 +210,8 @@ public final class DeepFS extends DeepFuse implements DataText {
         ex.printStackTrace();
       }
       final int rc = p.exitValue();
-      String msg = method + "Unmount " + data.meta.mountpoint;
-      if(rc == 0) msg = msg + " ... OK.";
-      else msg = msg + " ... FAILED(" + rc + ") (Please unmount manually)";
-      BaseX.debug(msg);
+      BaseX.debug(method + "Unmount " + data.meta.mount + (rc == 0 ?
+          " ... OK." : " ... FAILED(" + rc + ") (Please unmount manually)"));
     }
   }
 
@@ -501,7 +499,7 @@ public final class DeepFS extends DeepFuse implements DataText {
     try {
       prop.set(Prop.FSCONT, true);
       prop.set(Prop.FSMETA, true);
-      final String bpath = data.meta.backingpath + path;
+      final String bpath = data.meta.backing + path;
       final Parser p = prop.is(Prop.NEWFSPARSER) ? new NewFSParser(
           bpath, context.prop) : new FSParser(bpath, context.prop);
       final MemBuilder mb = new MemBuilder(p);

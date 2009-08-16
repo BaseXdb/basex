@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.util.IntList;
 

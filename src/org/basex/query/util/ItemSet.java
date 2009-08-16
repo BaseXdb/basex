@@ -29,7 +29,7 @@ public final class ItemSet {
    * Indexes the specified item.
    * @param i item
    * @return true if value is new
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public boolean index(final Item i) throws QueryException {
     if(size == next.length) rehash();

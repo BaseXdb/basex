@@ -25,6 +25,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 
 /**
  * Dialog window for specifying the options for importing a file system.
@@ -54,13 +55,24 @@ public final class DialogImportFS extends Dialog {
   /** Mountpoint path. */
   private final BaseXTextField mountpoint;
 
+  /** Path summary flag. */
+  private final BaseXCheckBox pathindex;
+  /** Text index flag. */
+  private final BaseXCheckBox txtindex;
+  /** Attribute value index flag. */
+  private final BaseXCheckBox atvindex;
+  /** Fulltext index flag. */
+  private final BaseXCheckBox ftxindex;
+  /** Full-text indexing. */
+  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
+
   /** Directory path. */
   final BaseXTextField path;
   /** Database name. */
   final BaseXTextField dbname;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogImportFS(final GUI main) {
@@ -203,9 +215,51 @@ public final class DialogImportFS extends Dialog {
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
     p2.add(p);
 
+ // create checkboxes
+    final BaseXBack p3 = new BaseXBack();
+    p3.setLayout(new TableLayout(6, 1, 0, 0));
+    p3.setBorder(8, 8, 8, 8);
+
+    pathindex = new BaseXCheckBox(INFOPATHINDEX, Token.token(PATHINDEXINFO),
+        prop.is(Prop.PATHINDEX), 0, this);
+    p3.add(pathindex);
+    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
+
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
+        prop.is(Prop.TEXTINDEX), 0, this);
+    p3.add(txtindex);
+    p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
+
+    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
+        prop.is(Prop.ATTRINDEX), 0, this);
+    p3.add(atvindex);
+    p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
+
+    // create checkboxes
+    final BaseXBack p4 = new BaseXBack();
+    p4.setLayout(new TableLayout(10, 1, 0, 0));
+    p4.setBorder(8, 8, 8, 8);
+
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
+        prop.is(Prop.FTINDEX), 0, this);
+    p4.add(ftxindex);
+    p4.add(new BaseXLabel(FTINDEXINFO, true, false));
+
+    final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
+    final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO };
+    final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
+        prop.is(Prop.FTCS), prop.is(Prop.FTDC)
+    };
+    for(int f = 0; f < ft.length; f++) {
+      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], this);
+      p4.add(ft[f]);
+    }
+
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(METAINFO, p2);
+    tabs.addTab(INDEXINFO, p3);
+    tabs.addTab(FTINFO, p4);
     set(tabs, BorderLayout.CENTER);
 
     // create buttons
@@ -219,6 +273,9 @@ public final class DialogImportFS extends Dialog {
 
   @Override
   public void action(final String cmd) {
+    final boolean ftx = ftxindex.isSelected();
+    for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
+
     final boolean sel = !all.isSelected();
     BaseXLayout.enable(path, sel);
     BaseXLayout.enable(button, sel);
@@ -287,6 +344,15 @@ public final class DialogImportFS extends Dialog {
     prop.set(Prop.FSCONT, cont.isSelected());
     prop.set(Prop.FSMETA, meta.isSelected());
     prop.set(Prop.FSTEXTMAX, IMPORTFSMAXSIZE[maxsize.getSelectedIndex()]);
+    prop.set(Prop.PATHINDEX, pathindex.isSelected());
+    prop.set(Prop.TEXTINDEX, txtindex.isSelected());
+    prop.set(Prop.ATTRINDEX, atvindex.isSelected());
+    prop.set(Prop.FTINDEX, ftxindex.isSelected());
+    prop.set(Prop.FTFUZZY, ft[0].isSelected());
+    prop.set(Prop.FTST, ft[1].isSelected());
+    prop.set(Prop.FTCS, ft[2].isSelected());
+    prop.set(Prop.FTDC, ft[3].isSelected());
+
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSIMPORTPATH, path.getText());
@@ -295,6 +361,8 @@ public final class DialogImportFS extends Dialog {
       gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
       gprop.set(GUIProp.FSBACKING, backing.getText().trim());
     }
+    gprop.set(GUIProp.CREATEPATH, path.getText());
+
     super.close();
   }
 }

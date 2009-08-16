@@ -3,7 +3,7 @@ package org.basex.test.query;
 import org.basex.core.AProp;
 
 /**
- * XPathMark Simple Tests.
+ * XPathMark simple tests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

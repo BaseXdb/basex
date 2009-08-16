@@ -1,7 +1,6 @@
 package org.basex.test.w3c;
 
 import static org.basex.Text.*;
-
 import java.io.File;
 import org.basex.BaseX;
 import org.basex.core.Context;
@@ -15,7 +14,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.util.TokenBuilder;
 
 /**
- * XML Conformance Test Suite Wrapper.
+ * XML Conformance Test Suite wrapper.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -41,7 +40,7 @@ public final class XMLTS {
 
   /**
    * Main method of the test class.
-   * @param args command line arguments (ignored)
+   * @param args command-line arguments (ignored)
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {

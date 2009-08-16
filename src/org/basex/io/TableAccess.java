@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public abstract class TableAccess {
   /**
-   * Reads a byte from the specified position and returns it as integer.
+   * Reads a byte value and returns it as an integer value.
    * @param p pre value
    * @param o offset
    * @return integer value
@@ -19,7 +19,7 @@ public abstract class TableAccess {
   public abstract int read1(int p, int o);
 
   /**
-   * Reads a short value from the specified position and returns it as integer.
+   * Reads a short value and returns it as an integer value.
    * @param p pre value
    * @param o offset
    * @return integer value
@@ -27,7 +27,7 @@ public abstract class TableAccess {
   public abstract int read2(int p, int o);
 
   /**
-   * Reads an integer value from the specified position.
+   * Reads an integer value.
    * @param p pre value
    * @param o offset
    * @return integer value
@@ -35,7 +35,7 @@ public abstract class TableAccess {
   public abstract int read4(int p, int o);
 
   /**
-   * Reads an integer value from the specified position.
+   * Reads a 5-byte value and returns it as a long value.
    * @param p pre value
    * @param o offset
    * @return integer value
@@ -43,7 +43,7 @@ public abstract class TableAccess {
   public abstract long read5(int p, int o);
 
   /**
-   * Writes a byte to the specified position.
+   * Writes a byte value to the specified position.
    * @param p pre value
    * @param o offset
    * @param v value to be written
@@ -51,7 +51,7 @@ public abstract class TableAccess {
   public abstract void write1(int p, int o, int v);
 
   /**
-   * Writes 2 bytes to the specified position.
+   * Writes a short value to the specified position.
    * @param p pre value
    * @param o offset
    * @param v value to be written
@@ -75,14 +75,14 @@ public abstract class TableAccess {
   public abstract void write5(int p, int o, long v);
 
   /**
-   * Deletes a range of entries.
+   * Deletes the specified number of entries from the database.
    * @param pre pre value of the first node to delete
    * @param nr number of entries to be deleted
    */
   public abstract void delete(int pre, int nr);
 
   /**
-   * Inserts entries.
+   * Inserts the specified entries into the database.
    * @param pre pre value of node to insert after
    * @param entries array of bytes containing the entries to insert
    */
@@ -90,13 +90,13 @@ public abstract class TableAccess {
 
   /**
    * Flushes the table contents.
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public abstract void flush() throws IOException;
 
   /**
    * Closes the table access.
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
   public abstract void close() throws IOException;
 }

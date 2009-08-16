@@ -91,7 +91,12 @@ public final class Or extends Arr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    for(final Expr e : expr) if(!e.indexAccessible(ic) || ic.seq) return false;
+    int is = 0;
+    for(final Expr e : expr) {
+      if(!e.indexAccessible(ic) || ic.seq) return false;
+      is += ic.is;
+    }
+    ic.is = is;
     return true;
   }
 

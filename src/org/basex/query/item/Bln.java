@@ -99,7 +99,7 @@ public final class Bln extends Item {
    * Checks if the specified value is a correct boolean string.
    * @param str string to be checked
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   static boolean check(final byte[] str) throws QueryException {
     final byte[] s = Token.trim(str);

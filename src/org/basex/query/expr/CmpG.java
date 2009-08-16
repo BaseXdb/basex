@@ -222,7 +222,7 @@ public final class CmpG extends Arr {
    * @param a first item to be compared
    * @param b second item to be compared
    * @return result of check
-   * @throws QueryException thrown if the items can't be compared
+   * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) &&
@@ -248,14 +248,14 @@ public final class CmpG extends Arr {
     // loop through all strings
     final Iter ir = expr[1].iter(ic.ctx);
     Item it;
+    ic.is = 0;
     while((it = ir.next()) != null) {
       // allow arbitrary expressions here? it.returned(ctx) == Return.STR...
       final boolean str = it instanceof Str;
       if(!str || it.str().length > Token.MAXLEN) return false;
 
       final Type type = text ? Type.TXT : Type.ATV;
-      ic.is = Math.max(ic.is, !str ? ic.data.meta.size / 10 :
-          ic.data.nrIDs(new ValuesToken(type, it.str())));
+      ic.is += ic.data.nrIDs(new ValuesToken(type, it.str()));
       iacc = Array.add(iacc, new IndexAccess(it, type, ic));
     }
     return true;

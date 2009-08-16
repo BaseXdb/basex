@@ -24,6 +24,8 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends Parser {
+  /** SAX Handler reference. */
+  private SAXHandler sax;
   /** Optional XML reader. */
   private final SAXSource source;
   /** File length. */
@@ -45,7 +47,6 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public void parse(final Builder build) throws IOException {
-    
     final InputSource is = wrap(source.getInputSource());
     try {
       XMLReader r = source.getXMLReader();
@@ -55,7 +56,7 @@ public final class SAXWrapper extends Parser {
         f.setValidating(false);
         r = f.newSAXParser().getXMLReader();
       }
-      final SAXHandler sax = new SAXHandler(build, io.name());
+      sax = new SAXHandler(build, io.name());
       sax.doc = doc;
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
@@ -78,7 +79,7 @@ public final class SAXWrapper extends Parser {
       throw ioe;
     }
   }
-  
+
   /**
    * Wraps the input stream to track the number of read bytes.
    * @param is input stream
@@ -114,11 +115,12 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(SCANPOS, io.name(), line);
+    return length == 0 ? super.det() : BaseX.info(SCANPOS, io.name(), line);
   }
 
   @Override
   public double prog() {
-    return (double) counter / length;
+    return length == 0 ? sax == null ? 0 : sax.nodes / 1000000d % 1 :
+      (double) counter / length;
   }
 }

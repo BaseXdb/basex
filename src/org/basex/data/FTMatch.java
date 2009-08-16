@@ -92,8 +92,7 @@ public final class FTMatch implements Iterable<FTStringMatch> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName());
+    final StringBuilder sb = new StringBuilder(BaseX.name(this));
     for(final FTStringMatch s : this) sb.append(" " + s);
     return sb.toString();
   }

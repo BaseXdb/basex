@@ -127,7 +127,7 @@ public final class Dec extends Item {
    * Converts the given double into a decimal value.
    * @param val value to be converted
    * @return double value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   static BigDecimal parse(final double val) throws QueryException {
     if(val != val || val == 1 / 0d || val == -1 / 0d) Err.value(Type.DEC, val);
@@ -138,7 +138,7 @@ public final class Dec extends Item {
    * Converts the given token into a decimal value.
    * @param val value to be converted
    * @return double value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   static BigDecimal parse(final byte[] val) throws QueryException {
     if(contains(val, 'e') || contains(val, 'E')) Err.or(FUNCAST, Type.DEC, val);

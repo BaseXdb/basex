@@ -18,6 +18,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
+  /** Doc flag (all nodes refer to documents). */
+  public boolean doc;
   /** Root Node. */
   public Data data;
   /** Full-text position data (for visualization). */
@@ -62,6 +64,17 @@ public final class Nodes implements Result {
    */
   public Nodes(final int[] n, final Data d) {
     this(n, d, Prop.gui ? new FTPosData() : null);
+  }
+
+  /**
+   * Node Set constructor.
+   * @param n node set
+   * @param d data reference
+   * @param r doc flag (all nodes refer to documents)
+   */
+  public Nodes(final int[] n, final Data d, final boolean r) {
+    this(n, d, Prop.gui ? new FTPosData() : null);
+    doc = r;
   }
 
   /**
@@ -208,8 +221,7 @@ public final class Nodes implements Result {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(getClass().getSimpleName());
-    tb.add('[');
+    final TokenBuilder tb = new TokenBuilder(BaseX.name(this) + '[');
     for(int i = 0; i < size; i++) {
       if(i > 0) tb.add(',');
       tb.add(nodes[i]);

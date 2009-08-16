@@ -18,7 +18,7 @@ public class BaseXBack extends JPanel {
   private Fill mode;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    */
   public BaseXBack() {
     this(Fill.PLAIN);

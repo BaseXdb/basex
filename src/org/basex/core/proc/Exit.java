@@ -3,7 +3,7 @@ package org.basex.core.proc;
 import org.basex.core.Process;
 
 /**
- * Represents the 'stop' command.
+ * Evaluates the 'exit' command and quits the console.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

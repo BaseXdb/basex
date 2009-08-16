@@ -3,13 +3,13 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
-import java.awt.RenderingHints;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.TableLayout;
 
@@ -32,7 +32,7 @@ public final class DialogFontChooser extends Dialog {
   private final BaseXCombo aalias;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogFontChooser(final GUI main) {
@@ -67,7 +67,7 @@ public final class DialogFontChooser extends Dialog {
     pp.setLayout(new TableLayout(1, 2, 5, 5));
     pp.add(new BaseXLabel(FAALIAS));
 
-    final String[] combo = fullAlias() ? GUIConstants.FONTALIAS :
+    final String[] combo = BaseXLayout.fullAlias() ? GUIConstants.FONTALIAS :
       new String[] { GUIConstants.FONTALIAS[0], GUIConstants.FONTALIAS[1] };
     aalias = new BaseXCombo(combo, HELPFALIAS, this);
     aalias.setSelectedIndex(gprop.num(GUIProp.FONTALIAS));
@@ -78,20 +78,6 @@ public final class DialogFontChooser extends Dialog {
 
     finish(gprop.nums(GUIProp.FONTSLOC));
     font.focus();
-  }
-
-  /**
-   * Checks if the Java version supports all anti-aliasing variants.
-   * @return result of check
-   */
-  private static boolean fullAlias() {
-    // check if Java 1.6 rendering is available; if not, use default rendering
-    try {
-      RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
-      return true;
-    } catch(final Exception ex) {
-      return false;
-    }
   }
 
   @Override

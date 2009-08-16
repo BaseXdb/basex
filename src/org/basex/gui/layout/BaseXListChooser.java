@@ -35,7 +35,7 @@ public final class BaseXListChooser extends BaseXBack {
   boolean num = true;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param choice the input values for the list.
    * @param help help text
    * @param d dialog reference

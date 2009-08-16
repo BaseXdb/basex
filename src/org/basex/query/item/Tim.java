@@ -26,7 +26,7 @@ public final class Tim extends Date {
    * @param d date
    * @param a duration to be added/subtracted
    * @param p plus/minus flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Tim(final Tim d, final DTd a, final boolean p) throws QueryException {
     this(d);
@@ -36,7 +36,7 @@ public final class Tim extends Date {
   /**
    * Constructor.
    * @param tim time
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Tim(final byte[] tim) throws QueryException {
     super(Type.TIM, tim, XTIME);

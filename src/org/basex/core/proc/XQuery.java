@@ -1,15 +1,17 @@
 package org.basex.core.proc;
 
+import org.basex.core.Commands.Cmd;
+
 /**
- * Evaluates the 'xquery' command.
+ * Evaluates the 'xquery' command and processes an XQuery request.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class XQuery extends AQuery {
   /**
-   * Constructor.
-   * @param query query
+   * Default constructor.
+   * @param query query to process
    */
   public XQuery(final String query) {
     super(PRINTING, query);
@@ -18,5 +20,10 @@ public final class XQuery extends AQuery {
   @Override
   protected boolean exec() {
     return query(args[0]);
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.XQUERY + " " + args[0];
   }
 }

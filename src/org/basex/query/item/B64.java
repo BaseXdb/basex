@@ -30,7 +30,7 @@ public final class B64 extends Item {
   /**
    * Constructor.
    * @param d data
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public B64(final byte[] d) throws QueryException {
     super(Type.B6B);
@@ -105,7 +105,7 @@ public final class B64 extends Item {
   /**
    * Byte to hex conversion.
    * @param s base64 array
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void b2h(final byte[] s) throws QueryException {
     if((s.length & 3) != 0) castErr(s);
@@ -146,7 +146,7 @@ public final class B64 extends Item {
    * Byte to hex conversion.
    * @param c character to be encoded
    * @return encoded value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private int b2h(final byte c) throws QueryException {
     if(c < 0 || c >= B2H.length) castErr((char) c);

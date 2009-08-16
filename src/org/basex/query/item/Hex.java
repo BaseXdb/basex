@@ -27,7 +27,7 @@ public final class Hex extends Item {
   /**
    * Constructor.
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Hex(final byte[] v) throws QueryException {
     super(Type.HEX);
@@ -54,7 +54,7 @@ public final class Hex extends Item {
   /**
    * Converts the specified hex array into a byte array.
    * @param h hex input
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void h2b(final byte[] h) throws QueryException {
     if((h.length & 1) != 0) castErr(h);
@@ -70,7 +70,7 @@ public final class Hex extends Item {
    * Converts a single character into a byte value.
    * @param b character
    * @return byte value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private int h2b(final byte b) throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';

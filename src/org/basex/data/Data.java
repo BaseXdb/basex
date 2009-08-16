@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.fuse.DeepFS;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -72,8 +73,10 @@ public abstract class Data {
 
   /**
    * Dissolves the references to often used tag names and attributes.
+   * @throws IOException I/O exception
    */
-  public final void initNames() {
+  @SuppressWarnings("unused")
+  public void init() throws IOException {
     if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
@@ -441,4 +444,8 @@ public abstract class Data {
    */
   public abstract void setLock(final int l);
 
+  @Override
+  public String toString() {
+    return BaseX.name(this) + "[" + meta.name + "]";
+  }
 }

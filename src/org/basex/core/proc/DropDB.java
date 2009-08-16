@@ -3,34 +3,29 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.File;
-import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.data.Data;
 
 /**
- * Evaluates the 'drop database' command.
+ * Evaluates the 'drop database' command and deletes a database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class DropDB extends Process {
+public final class DropDB extends ACreate {
   /**
-   * Constructor.
-   * @param n name of database
+   * Default constructor.
+   * @param name name of database
    */
-  public DropDB(final String n) {
-    super(STANDARD, n);
+  public DropDB(final String name) {
+    super(STANDARD, name);
   }
 
   @Override
   protected boolean exec() {
-    final String db = args[0];
-    final Data data = context.data();
-
-    // close database if still open
-    if(data != null && data.meta.name.equals(db)) exec(new Close());
+    exec(new Close());
 
     // check if database is still pinned
+    final String db = args[0];
     if(context.pinned(db)) return error(DBINUSE);
 
     // try to drop database
@@ -71,6 +66,6 @@ public final class DropDB extends Process {
 
   @Override
   public String toString() {
-    return Cmd.DROP.name() + " " + CmdDrop.DB + args();
+    return Cmd.DROP + " " + CmdDrop.DB + args();
   }
 }

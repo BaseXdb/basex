@@ -32,7 +32,7 @@ public final class XQueryExample {
     // Creates a standard output stream
     PrintOutput out = new PrintOutput(System.out);
 
-    out.println("=== First version: Creating a result instance");
+    out.println("=== First version: Processing a result instance");
 
     // Creates a query instance
     QueryProcessor processor = new QueryProcessor(QUERY, context);
@@ -62,7 +62,7 @@ public final class XQueryExample {
     // Closes the query processor
     processor.close();
 
-    out.println("\n=== Third version: Use the database command");
+    out.println("\n=== Third version: Using the database command");
 
     // Creates and executes a query
     new XQuery(QUERY).execute(context, out);

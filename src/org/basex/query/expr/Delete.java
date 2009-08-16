@@ -32,6 +32,11 @@ public final class Delete extends Expr {
   }
 
   @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return expr.uses(u, ctx);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(token(DELETE));
     ser.closeElement();

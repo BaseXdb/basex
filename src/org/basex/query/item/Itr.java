@@ -118,7 +118,7 @@ public class Itr extends Item {
    * Converts the given item into a long value.
    * @param val value to be converted
    * @return long value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   static long parse(final byte[] val) throws QueryException {
     try {

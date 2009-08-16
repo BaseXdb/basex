@@ -12,11 +12,11 @@ import org.basex.util.TokenBuilder;
  */
 abstract class AInfo extends Process {
   /**
-   * Constructor.
+   * Protected constructor.
    * @param p properties
    * @param a arguments
    */
-  public AInfo(final int p, final String... a) {
+  protected AInfo(final int p, final String... a) {
     super(p, a);
   }
 

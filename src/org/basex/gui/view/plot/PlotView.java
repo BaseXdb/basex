@@ -107,7 +107,7 @@ public final class PlotView extends View implements Runnable {
   private final ViewRect selectionBox;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param man view manager
    */
   public PlotView(final ViewNotifier man) {
@@ -296,9 +296,9 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();
-    if(data == null) return;
-
     super.paintComponent(g);
+    if(data == null || !data.meta.pathindex) return;
+
     BaseXLayout.antiAlias(g, gui.prop);
 
     if(plotData == null) {
@@ -655,9 +655,8 @@ public final class PlotView extends View implements Runnable {
         double f = axis.startvalue;
         while(d < 1.0d - .25d / nrCaptions) {
           c++;
-          drawCaptionAndGrid(g, drawX,
-              formatString(f, drawX), d);
-          f = f + step;
+          drawCaptionAndGrid(g, drawX, formatString(f, drawX), d);
+          f += step;
           d = axis.calcPosition(f);
         }
         // draw min/max labels if little space available
@@ -889,7 +888,7 @@ public final class PlotView extends View implements Runnable {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWPLOT);
   }
 

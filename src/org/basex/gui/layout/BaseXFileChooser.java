@@ -35,7 +35,7 @@ public final class BaseXFileChooser {
   private FileDialog fd;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param title dialog title
    * @param path initial path
    * @param main reference to main window

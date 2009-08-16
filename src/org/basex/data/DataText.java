@@ -3,8 +3,6 @@ package org.basex.data;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.fs.NewFSParser;
-
 /**
  * This class assembles texts which are used in the data classes.
  *
@@ -21,13 +19,13 @@ public interface DataText {
   String ISTORAGE = "5.6";
 
   /** Database version. */
-  String DBSTORAGE = "STORAGE";
+  String DBSTR = "STORAGE";
   /** Database version. */
-  String IDBSTORAGE = "ISTORAGE";
+  String IDBSTR = "ISTORAGE";
   /** Last modification time. */
   String DBTIME = "TIME";
   /** Tree height. */
-  String DBHEIGHT = "HEIGHT";
+  String DBHGHT = "HEIGHT";
   /** Number of XML nodes. */
   String DBSIZE = "SIZE";
   /** File name. */
@@ -37,33 +35,35 @@ public interface DataText {
   /** Number of XML documents. */
   String DBNDOCS = "NDOCS";
   /** Encoding. */
-  String DBENCODING = "ENCODING";
+  String DBENC = "ENCODING";
   /** Whitespace chopping. */
-  String DBCHOPPED = "CHOPPED";
+  String DBCHOP = "CHOPPED";
   /** Entity parsing. */
   String DBENTITY = "ENTITY";
+  /** Path indexing. */
+  String DBPTHIDX = "PTHINDEX";
   /** Text indexing. */
-  String DBTXTINDEX = "TXTINDEX";
+  String DBTXTIDX = "TXTINDEX";
   /** Attribute indexing. */
-  String DBATVINDEX = "ATVINDEX";
+  String DBATVIDX = "ATVINDEX";
   /** Full-text indexing. */
-  String DBFTXINDEX = "FTXINDEX";
+  String DBFTXIDX = "FTXINDEX";
   /** Full-text fuzzy indexing. */
-  String DBFZINDEX = "FZINDEX";
+  String DBFZIDX = "FZINDEX";
   /** Full-text stemming. */
-  String DBFTSTEM = "FTSTEM";
+  String DBFTST = "FTSTEM";
   /** Full-text case sensitivity. */
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
   /** Up-to-date flag. */
-  String DBUPTODATE = "UPTODATE";
+  String DBUTD = "UPTODATE";
   /** Last (highest) id. */
-  String DBLASTID = "LASTID";
+  String DBLID = "LASTID";
   /** FS Mount point. */
-  String MOUNT = "MOUNT";
+  String DBMNT = "MOUNT";
   /** FS Backing store. */
-  String BACKING = "BACKING";
+  String DBBCK = "BACKING";
   /** Tags. */
   String DBTAGS = "TAGS";
   /** Attributes. */
@@ -85,11 +85,19 @@ public interface DataText {
   String S_SUFFIX = "suffix";
 
   /** DeepFS token. */
-  byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");
+  // [BL] ..namespaces need to defined on top of DeepFS XML instance
+  // byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");
+  byte[] DEEPFS = token("deepfs");
   /** Directory tag. */
-  byte[] DIR = NewFSParser.NS.FS.tag("dir");
+  byte[] DIR = token("dir");
   /** File tag. */
-  byte[] FILE = NewFSParser.NS.FS.tag("file");
+  byte[] FILE = token("file");
+  /** Content tag. */
+  byte[] CONTENT = token("content");
+  /** Text content tag. */
+  byte[] TEXT_CONTENT = token("text");
+  /** XML content tag. */
+  byte[] XML_CONTENT = token("xml");
   /** Unknown tag (place holder). */
   byte[] UNKNOWN = token("unknown");
 
@@ -101,16 +109,14 @@ public interface DataText {
   byte[] MTIME = token(S_MTIME);
   /** Suffix attribute. */
   byte[] SUFFIX = token(S_SUFFIX);
-  /** Content attribute. */
-  byte[] CONTENT = token("content");
   /** Offset attribute. */
   byte[] OFFSET = token("offset");
   /** File mode attribute. */
   byte[] MODE = token("mode");
   /** Mount point attribute. */
-  byte[] MOUNTPOINT = token("mountpoint");
+  byte[] MOUNTPOINT = token(MOUNT);
   /** Backing store attribute. */
-  byte[] BACKINGSTORE = token("backingstore");
+  byte[] BACKINGSTORE = token(BACKING);
   /** Negative mount point attribute. */
   byte[] NOTMOUNTED = token("(not mounted)");
   /** Negative backing store attribute. */
@@ -133,10 +139,19 @@ public interface DataText {
   /** CarriageReturn Entity. */
   byte[] E_CR = token("&#xD;");
 
-  /** Opening results tag. */
+  /** Results tag. */
   byte[] RESULTS = token("results");
-  /** Opening result tag. */
+  /** Result tag. */
   byte[] RESULT = token("result");
+  /** Path tag. */
+  byte[] PATH = token("path");
+  /** Node tag. */
+  byte[] NODE = token("node");
+  /** Kind attribute. */
+  byte[] KIND = token("kind");
+  /** Count attribute. */
+  byte[] COUNT = token("count");
+
   /** Comment output. */
   byte[] COM1 = token("<!--");
   /** Comment output. */
@@ -157,11 +172,13 @@ public interface DataText {
   byte[] ATT1 = token("=\"");
   /** Attribute output. */
   byte[] ATT2 = token("\"");
-  /** Text step. */
+  /** Document. */
+  byte[] DOC = token("doc()");
+  /** Text. */
   byte[] TEXT = token("text()");
-  /** Text step. */
+  /** Comment. */
   byte[] COMM = token("comment()");
-  /** Text step. */
+  /** Processing instruction. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
   byte[] ATT = { '@'};

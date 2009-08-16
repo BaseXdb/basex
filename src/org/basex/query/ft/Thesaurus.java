@@ -126,7 +126,7 @@ public final class Thesaurus {
   /**
    * Builds the thesaurus.
    * @param in input nodes
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private void build(final Nodes in) throws QueryException {
     final Nodes sub = nodes("*:synonym", in);
@@ -165,7 +165,7 @@ public final class Thesaurus {
    * @param query query string
    * @param in input nodes
    * @return resulting nodes
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Nodes nodes(final String query, final Nodes in)
       throws QueryException {
@@ -177,7 +177,7 @@ public final class Thesaurus {
    * @param query query string
    * @param in input nodes
    * @return resulting text
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private byte[] text(final String query, final Nodes in)
       throws QueryException {

@@ -4,43 +4,41 @@ import static org.basex.util.Token.token;
 import static org.basex.util.Token.string;
 import static org.basex.util.Token.trim;
 import static org.basex.build.fs.NewFSParser.NS;
-
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.util.Atts;
 import org.basex.util.Token;
 
 /**
  * Metadata key-value pairs.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-public class Metadata {
+public final class Metadata {
 
   // ----- Constants -----------------------------------------------------------
   /** xml:lang attribute. */
-  private static final byte[] XML_LANG = token("xml:lang");
+  public static final byte[] XML_LANG = token("xml:lang");
   /** xml:space attribute. */
-  private static final byte[] XML_SPACE = token("xml:space");
+  public static final byte[] XML_SPACE = token("xml:space");
   /** xml:base attribute. */
-  private static final byte[] XML_BASE = token("xml:base");
+  public static final byte[] XML_BASE = token("xml:base");
   /** xml:id attribute. */
-  private static final byte[] XML_ID = token("xml:id");
+  public static final byte[] XML_ID = token("xml:id");
 
   /** XML data type attribute name. */
-  private static final byte[] DATA_TYPE = NS.XSI.tag("type");
+  public static final byte[] DATA_TYPE = NS.XSI.tag("type");
   /** String data type. */
-  static final byte[] DATA_TYPE_STRING = NS.XS.tag("string");
+  public static final byte[] DATA_TYPE_STRING = NS.XS.tag("string");
   /** Short data type. */
-  static final byte[] DATA_TYPE_SHORT = NS.XS.tag("short");
+  public static final byte[] DATA_TYPE_SHORT = NS.XS.tag("short");
   /** Integer data type. */
-  static final byte[] DATA_TYPE_INTEGER = NS.XS.tag("integer");
+  public static final byte[] DATA_TYPE_INTEGER = NS.XS.tag("integer");
   /** Long data type. */
-  static final byte[] DATA_TYPE_LONG = NS.XS.tag("long");
+  public static final byte[] DATA_TYPE_LONG = NS.XS.tag("long");
   /** Duration metadata xml data type. */
-  static final byte[] DATA_TYPE_DURATION = NS.XS.tag("duration");
+  public static final byte[] DATA_TYPE_DURATION = NS.XS.tag("duration");
 
   /** Metadata type element. */
   public static final byte[] TYPE = NS.DCTERMS.tag("type");
@@ -85,6 +83,8 @@ public class Metadata {
   public enum MimeType {
     /** Unknown media. */
     UNKNOWN("unkown", ""),
+    /** Plaintext. */
+    TXT("text/plain", "txt"),
     /** XML. */
     XML("application/xml", "xml"),
     /** KML. */
@@ -198,6 +198,8 @@ public class Metadata {
     CREATOR(NS.DCTERMS, "creator"),
     /** Description. */
     DESCRIPTION(NS.DCTERMS, "description"),
+    /** Text encoding. */
+    ENCODING(NS.FSMETA, "encoding"),
     /** Sender. */
     SENDER(NS.FSMETA, "sender"),
     /** Genre. */

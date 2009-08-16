@@ -2,7 +2,6 @@ package org.basex.build.fs.parser;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.Metadata.MetaType;
 
@@ -18,8 +17,16 @@ public abstract class AbstractParser {
   /** The MIME type of the file. */
   private final Metadata format;
 
+//  /**
+//   * Constructor for initializing a parser with unknown file type and format.
+//   */
+//  protected AbstractParser() {
+//    type = null;
+//    format = null;
+//  }
+
   /**
-   * Constructor for initializing a parser.
+   * Constructor for initializing a regular parser.
    * @param t the type of the file.
    * @param m the MIME type of the file.
    */
@@ -29,7 +36,7 @@ public abstract class AbstractParser {
   }
 
   /**
-   * Constructor for initializing a parser.
+   * Constructor for initializing a regular parser.
    * @param t the type of the file.
    * @param m the MIME type of the file (as byte array).
    */
@@ -66,8 +73,8 @@ public abstract class AbstractParser {
    */
   public void readMeta(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
-    parser.metaEvent(type);
-    parser.metaEvent(format);
+    if(type != null) parser.metaEvent(type);
+    if(format != null) parser.metaEvent(format);
     meta(bfc, parser);
   }
 
@@ -98,7 +105,6 @@ public abstract class AbstractParser {
   public void readMetaAndContent(final BufferedFileChannel bfc,
       final NewFSParser parser) throws IOException {
     readMeta(bfc, parser);
-    bfc.finish();
     bfc.reset();
     readContent(bfc, parser);
   }

@@ -71,7 +71,7 @@ public final class Variables extends ExprInfo {
   /**
    * Compiles the variables.
    * @param ctx query context
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   public void comp(final QueryContext ctx) throws QueryException {
     global.comp(ctx);

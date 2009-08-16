@@ -4,18 +4,18 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 
 /**
- * This class stores the reference to the currently opened database.
- * Moreover, it provides references to the currently used, marked and
- * copied node sets.
+ * This class offers as central database context.
+ * It references the currently opened database. Moreover, it provides
+ * references to the currently used, marked and copied node sets.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Context {
-  /** Database pool. */
-  private static final DataPool POOL = new DataPool();
-  /** Sets the main properties. */
+  /** Database properties. */
   public final Prop prop;
+  /** Database pool. */
+  private final DataPool pool;
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -29,22 +29,33 @@ public final class Context {
    * Constructor.
    */
   public Context() {
-    this(new Prop());
+    this(null);
   }
 
   /**
-   * Constructor, defining an initial property file.
-   * @param p property file
+   * Constructor.
+   * @param ctx parent context
    */
-  public Context(final Prop p) {
-    prop = p;
+  public Context(final Context ctx) {
+    this(new Prop(), ctx);
+  }
+
+  /**
+   * Constructor, defining an initial property file and an
+   * optional parent context.
+   * @param pr property file
+   * @param ctx parent context
+   */
+  private Context(final Prop pr, final Context ctx) {
+    prop = pr;
+    pool = ctx == null ? new DataPool() : ctx.pool;
   }
 
   /**
    * Closes the database instance.
    */
   public void close() {
-    POOL.close();
+    pool.close();
     prop.write();
   }
 
@@ -91,7 +102,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc(), data);
+    current = new Nodes(data.doc(), data, true);
   }
 
   /**
@@ -108,6 +119,14 @@ public final class Context {
    */
   public void current(final Nodes curr) {
     current = curr;
+  }
+
+  /**
+   * Sets the data reference.
+   * @param d data reference
+   */
+  public void data(final Data d) {
+    data = d;
   }
 
   /**
@@ -148,7 +167,7 @@ public final class Context {
    * @return data reference
    */
   public Data pin(final String name) {
-    return POOL.pin(name);
+    return pool.pin(name);
   }
 
   /**
@@ -157,7 +176,7 @@ public final class Context {
    * @return true if reference was removed from the pool
    */
   public boolean unpin(final Data d) {
-    return POOL.unpin(d);
+    return pool.unpin(d);
   }
 
   /**
@@ -165,7 +184,7 @@ public final class Context {
    * @param d data reference
    */
   public void addToPool(final Data d) {
-    POOL.add(d);
+    pool.add(d);
   }
 
   /**
@@ -174,6 +193,6 @@ public final class Context {
    * @return int use-status
    */
   public boolean pinned(final String db) {
-    return POOL.pinned(db);
+    return pool.pinned(db);
   }
 }

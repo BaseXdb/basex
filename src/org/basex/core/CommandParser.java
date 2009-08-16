@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+import org.basex.Text;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
@@ -21,18 +22,19 @@ import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.GetInfo;
-import org.basex.core.proc.GetResult;
+import org.basex.core.proc.IntInfo;
+import org.basex.core.proc.IntOutput;
 import org.basex.core.proc.Help;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.InfoIndex;
 import org.basex.core.proc.InfoTable;
 import org.basex.core.proc.Insert;
+import org.basex.core.proc.IntStop;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Prompt;
+import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
@@ -55,7 +57,9 @@ import org.basex.util.StringList;
  */
 public final class CommandParser extends InputParser {
   /** Context. */
-  public final Context ctx;
+  private final Context ctx;
+  /** Flag for including the parsing of internal commands. */
+  private final boolean internal;
 
   /**
    * Constructor, parsing the input queries.
@@ -63,7 +67,18 @@ public final class CommandParser extends InputParser {
    * @param c context
    */
   public CommandParser(final String in, final Context c) {
+    this(in, c, false);
+  }
+
+  /**
+   * Constructor, parsing internal commands.
+   * @param in query input
+   * @param c context
+   * @param i flag for including the parsing of internal commands
+   */
+  public CommandParser(final String in, final Context c, final boolean i) {
     ctx = c;
+    internal = i;
     init(in);
   }
 
@@ -78,8 +93,7 @@ public final class CommandParser extends InputParser {
 
     while(true) {
       final Cmd cmd = consume(Cmd.class, null);
-      final Process proc = parse(cmd);
-      list = Array.add(list, proc);
+      list = Array.add(list, parse(cmd));
       consumeWS();
       if(!more()) return list;
       if(!consume(';')) help(null, cmd);
@@ -94,25 +108,25 @@ public final class CommandParser extends InputParser {
    */
   private Process parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
-      case CREATE:
+      // user commands
+
+      case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {
-          case DATABASE: case DB: case XML:
-            final String fn = path(cmd);
-            final String db = name(null);
-            return new CreateDB(fn, db == null ? fn : db);
-          case MAB: case MAB2:
-            return new CreateMAB(path(cmd), name(null));
-          case FS:
-            return ctx.prop.is(Prop.FUSE) ?
-              new CreateFS(path(cmd), name(cmd), path(cmd), path(cmd)) :
-              new CreateFS(path(cmd), name(cmd));
+          case DATABASE: case DB:
+            return new CreateDB(string(cmd), name(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
+          case FS:
+            return ctx.prop.is(Prop.FUSE) ?
+              new CreateFS(string(cmd), name(cmd), string(cmd), string(cmd)) :
+              new CreateFS(string(cmd), name(cmd));
+          case MAB:
+            return new CreateMAB(string(cmd), name(null));
         }
         break;
-      case OPEN:
+      case OPEN: case O:
         return new Open(name(cmd));
-      case INFO:
+      case INFO: case I:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
             return new Info();
@@ -142,55 +156,59 @@ public final class CommandParser extends InputParser {
       case OPTIMIZE:
         return new Optimize();
       case EXPORT:
-        return new Export(path(cmd));
-      case XQUERY:
+        return new Export(string(cmd));
+      case XQUERY: case X:
         return new XQuery(xquery(cmd));
       case XQUERYMV:
         return new XQueryMV(number(cmd), number(cmd), xquery(cmd));
       case RUN:
-        return new Run(path(cmd));
+        return new Run(string(cmd));
       case FIND:
         return new Find(string(cmd));
       case CS:
-        return new Cs(xquery(null));
+        return new Cs(xquery(cmd));
       case COPY:
-        final String num = number(cmd);
-        final String xp1 = xquery(cmd);
-        consume(',');
-        final String xp2 = xquery(cmd);
-        return new Copy(num, xp1, xp2);
+        return new Copy(xquery(cmd), target(INTO, cmd), pos(cmd));
       case DELETE:
         return new Delete(xquery(cmd));
       case INSERT:
         final CmdUpdate ins = consume(CmdUpdate.class, cmd);
-        final String in = ins.toString();
         switch(ins) {
-          case FRAGMENT:
-            return new Insert(in, xquery(cmd), number(cmd), xquery(cmd));
-          case ELEMENT: case TEXT: case COMMENT:
-            return new Insert(in, name(cmd), number(cmd), xquery(cmd));
+          case ELEMENT:
+            String val = name(cmd);
+            return new Insert(ins, target(INTO, cmd), pos(cmd), val);
+          case TEXT: case COMMENT: case FRAGMENT:
+            val = string(cmd);
+            return new Insert(ins, target(INTO, cmd), pos(cmd), val);
           case PI:
-            return new Insert(in, name(cmd), name(cmd), number(cmd),
-                xquery(cmd));
+            val = name(cmd);
+            String val2 = string(cmd);
+            return new Insert(ins, target(INTO, cmd), pos(cmd), val, val2);
           case ATTRIBUTE:
-            return new Insert(in, name(cmd), name(cmd), xquery(cmd));
+            val = name(cmd);
+            val2 = string(cmd);
+            return new Insert(ins, target(INTO, cmd), val, val2);
         }
         break;
       case UPDATE:
         final CmdUpdate upd = consume(CmdUpdate.class, cmd);
-        final String up = upd.toString();
         switch(upd) {
-          case ELEMENT: case TEXT: case COMMENT:
-            return new Update(up, name(cmd), xquery(cmd));
-          case PI:
-          case ATTRIBUTE:
-            return new Update(up, name(cmd), name(cmd), xquery(cmd));
+          case ELEMENT:
+            String val = name(cmd);
+            return new Update(upd, target(AT, cmd), val);
+          case TEXT: case COMMENT:
+            val = string(cmd);
+            return new Update(upd, target(AT, cmd), val);
+          case PI: case ATTRIBUTE:
+            val = name(cmd);
+            String val2 = string(cmd);
+            return new Update(upd, target(AT, cmd), val, val2);
           default:
         }
         break;
       case SET:
-        final String opt = name(cmd).toUpperCase();
-        String val = string(null, false);
+        final String opt = name(cmd);
+        String val = string(null);
         final Object type = ctx.prop.object(opt.toUpperCase());
         if(type == null) help(null, cmd);
         return new Set(opt, val);
@@ -201,70 +219,47 @@ public final class CommandParser extends InputParser {
           hc = consume(Cmd.class, cmd).toString();
         }
         return new Help(hc);
-      case PROMPT:
-        return new Prompt();
-      case GETRESULT:
-        return new GetResult(number(null));
-      case GETINFO:
-        return new GetInfo(number(null));
-      case EXIT:
-      case QUIT:
+      case EXIT: case QUIT: case Q:
         return new Exit();
+
+      // internal commands
+      case INTPROMPT:
+        return new IntPrompt();
+      case INTOUTPUT:
+        return new IntOutput(number(null));
+      case INTINFO:
+        return new IntInfo(number(null));
+      case INTSTOP:
+        return new IntStop();
+
       default:
     }
     return null;
   }
 
   /**
-   * Parses and returns a string delimited by a space.
-   * @param cmd referring command; if specified, the result mustn't be empty
-   * @param spc accept spaces as delimiters
+   * Parses and returns a string. Quotes can be used to include spaces.
+   * @param cmd referring command; if specified, the result must not be empty
    * @return path
    * @throws QueryException query exception
    */
-  private String string(final Cmd cmd, final boolean spc)
-      throws QueryException {
+  private String string(final Cmd cmd) throws QueryException {
     final StringBuilder tb = new StringBuilder();
     consumeWS();
-    char q = 0;
+    boolean q = false;
     while(more()) {
-      char ch = curr();
-      if(q != 0 && ch == '\\') {
-        consume();
-        if(more()) ch = curr();
-      } else {
-        if((spc && ch <= ' ' || ch == ';') && q == 0) break;
-        if(quote(ch)) q = q == 0 ? ch : q == ch ? 0 : q;
-      }
-      tb.append(ch);
+      char c = curr();
+      if((c <= ' ' || c == ';') && !q) break;
+      if(c == '"') q ^= true;
+      else tb.append(c);
       consume();
     }
     return finish(cmd, tb);
   }
 
   /**
-   * Parses and returns a string delimited by a space.
-   * @param cmd referring command; if specified, the result mustn't be empty
-   * @return path
-   * @throws QueryException query exception
-   */
-  private String string(final Cmd cmd) throws QueryException {
-    return string(cmd, false);
-  }
-
-  /**
-   * Parses and returns a file path.
-   * @param cmd referring command; if specified, the result mustn't be empty
-   * @return path
-   * @throws QueryException query exception
-   */
-  private String path(final Cmd cmd) throws QueryException {
-    return string(cmd, true);
-  }
-
-  /**
-   * Parses and returns an xquery expression (prototype).
-   * @param cmd referring command; if specified, the result mustn't be empty
+   * Parses and returns an xquery expression.
+   * @param cmd referring command; if specified, the result must not be empty
    * @return path
    * @throws QueryException query exception
    */
@@ -283,21 +278,47 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parses and returns a name.
-   * @param cmd referring command; if specified, the result mustn't be empty.
+   * Parses and returns a name. A name can include letters, digits, dashes
+   * and periods.
+   * @param cmd referring command; if specified, the result must not be empty.
    * @return name
    * @throws QueryException query exception
    */
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(curr('.') || curr('-') || letterOrDigit(curr())) sb.append(consume());
+    while(letterOrDigit(curr()) || curr('.') || curr('-')) sb.append(consume());
     return finish(cmd, sb);
   }
 
   /**
+   * Parses and returns an XQuery target, prefixed by the specified string.
+   * @param pre prefix
+   * @param cmd referring command; if specified, the result must not be empty.
+   * @return target
+   * @throws QueryException query exception
+   */
+  private String target(final String pre, final Cmd cmd) throws QueryException {
+    consumeWS();
+    if(!consume(pre) && !consume(pre.toLowerCase())) help(null, cmd);
+    return xquery(cmd);
+  }
+
+  /**
+   * Parses and returns a number, prefixed by the keyword {@link Text#AT}.
+   * @param cmd referring command; if specified, the result must not be empty.
+   * @return position
+   * @throws QueryException query exception
+   */
+  private int pos(final Cmd cmd) throws QueryException {
+    consumeWS();
+    return consume(AT) || consume(AT.toLowerCase()) ?
+        Integer.parseInt(number(cmd)) : 0;
+  }
+
+  /**
    * Parses and returns a name.
-   * @param cmd referring command; if specified, the result mustn't be empty.
+   * @param cmd referring command; if specified, the result must not be empty.
    * @param s input string
    * @return name
    * @throws QueryException query exception
@@ -311,7 +332,7 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses and returns a number.
-   * @param cmd referring command; if specified, the result mustn't be empty.
+   * @param cmd referring command; if specified, the result must not be empty.
    * @return name
    * @throws QueryException query exception
    */
@@ -320,9 +341,7 @@ public final class CommandParser extends InputParser {
     final StringBuilder tb = new StringBuilder();
     if(curr() == '-') tb.append(consume());
     while(digit(curr())) tb.append(consume());
-    if(tb.length() != 0) return tb.toString();
-    if(cmd != null) help(null, cmd);
-    return null;
+    return finish(cmd, tb);
   }
 
   /**
@@ -338,26 +357,33 @@ public final class CommandParser extends InputParser {
 
     final String token = name(null);
     try {
+      // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
-      if(!t.startsWith("DUMMY")) return Enum.valueOf(cmp, t);
+      final E cmd = Enum.valueOf(cmp, t);
+      if(!(cmd instanceof Cmd)) return cmd;
+      final Cmd c = (Cmd) cmd;
+      if(!c.dummy() && (internal || !c.internal())) return cmd;
     } catch(final IllegalArgumentException ex) { }
 
     final StringList alt = list(cmp, token);
     if(token == null) {
+      // no command found
       if(par == null) error(alt, CMDNO);
+      // show available command extensions
       help(alt, par);
     }
 
     // find similar commands
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
-    for(final Enum<?> e : cmp.getEnumConstants()) {
-      if(e instanceof Cmd && !((Cmd) e).official) continue;
-      final byte[] sm = lc(token(e.name()));
+    for(final String s : list(cmp, null)) {
+      final byte[] sm = lc(token(s));
       if(ls.similar(name, sm, 0)) error(alt, CMDSIMILAR, name, sm);
     }
 
+    // unknown command
     if(par == null) error(alt, CMDWHICH, token);
+    // show available command extensions
     help(alt, par);
     return null;
   }
@@ -384,7 +410,10 @@ public final class CommandParser extends InputParser {
     final StringList list = new StringList();
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      if(e instanceof Cmd && !((Cmd) e).official) continue;
+      if(e instanceof Cmd) {
+        final Cmd c = (Cmd) e;
+        if(c.dummy() || c.hidden() || c.internal()) continue;
+      }
       if(e.name().startsWith(t)) list.add(e.name().toLowerCase());
     }
     list.sort(true);

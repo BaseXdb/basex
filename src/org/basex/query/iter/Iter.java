@@ -28,7 +28,7 @@ public abstract class Iter implements Iterable<Item> {
   /**
    * Returns the next item or null if no other items are found.
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public abstract Item next() throws QueryException;
 
@@ -75,7 +75,7 @@ public abstract class Iter implements Iterable<Item> {
    * Returns a sequence from all iterator values.
    * Should be called before {@link #next}.
    * @return sequence
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Item finish() throws QueryException {
     Item i = next();

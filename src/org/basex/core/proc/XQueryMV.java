@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.mediovis.MAB2;
 import org.basex.core.Prop;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -18,7 +19,8 @@ import org.basex.util.Set;
 import org.basex.util.Token;
 
 /**
- * Evaluates the 'xquerymv' command.
+ * Evaluates the 'xquerymv' command and processes an XQuery request
+ * for MedioVis queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -27,42 +29,41 @@ public final class XQueryMV extends AQuery {
   /** Index reference. */
   private IDSet ids;
   /** Maximum hits. */
-  private int hits;
-  /** Maximum subhits. */
-  private int sub;
+  private int maxh;
+  /** Maximum sub hits. */
+  private int maxs;
   /** Maximum hits. */
   private int maxhits;
 
   /**
-   * Constructor.
-   * @param h number of hits
-   * @param s number of sub hits
-   * @param q query
+   * Default constructor.
+   * @param hits maximum number of hits
+   * @param subhits maximum number of sub hits
+   * @param query query to process
    */
-  public XQueryMV(final String h, final String s, final String q) {
-    super(DATAREF | PRINTING, h, s, q);
+  public XQueryMV(final String hits, final String subhits, final String query) {
+    super(DATAREF | PRINTING, hits, subhits, query);
   }
 
   @Override
   protected boolean exec() {
     // cache verbose flag
-    hits = Token.toInt(args[0]);
-    sub = Token.toInt(args[1]);
-    final String query = args[2] + "[position() <= " + hits * sub + "]";
+    maxh = Token.toInt(args[0]);
+    maxs = Token.toInt(args[1]);
+    final String query = "(" + args[2] + ")[position() <= " + maxh * maxs + "]";
     long fini = 0;
 
-    QueryProcessor qu = null;
     final int runs = prop.num(Prop.RUNS);
     try {
       for(int i = 0; i < runs; i++) {
-        qu = new QueryProcessor(query, context);
-        progress(qu);
+        qp = new QueryProcessor(query, context);
+        progress(qp);
 
-        qu.parse();
+        qp.parse();
         pars += per.getTime();
-        qu.compile();
+        qp.compile();
         comp += per.getTime();
-        result = qu.queryNodes();
+        result = qp.queryNodes();
         eval += per.getTime();
 
         final Nodes ns = (Nodes) result;
@@ -92,7 +93,7 @@ public final class XQueryMV extends AQuery {
           } else {
             ids.index(id, pre);
           }
-          if(ids.size() == hits) break;
+          if(ids.size() == maxh) break;
         }
         maxhits = ids.size();
         fini += per.getTime();
@@ -117,7 +118,7 @@ public final class XQueryMV extends AQuery {
   /**
    * Returns an MedioVis XML document.
    * @param out output reference
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   private void show(final PrintOutput out) throws IOException {
     final XMLSerializer xml = new XMLSerializer(out, false, true);
@@ -135,7 +136,6 @@ public final class XQueryMV extends AQuery {
     xml.openElement(MAB2.ROOT);
     xml.attribute(MAB2.HITS, Token.token(maxhits));
     xml.attribute(MAB2.MAX, Token.token(size));
-    //xml.attribute(MAB2.APPROX, Token.token(approx));
 
     // loop through titles
     for(int i = 0; i < maxhits; i++) {
@@ -157,11 +157,11 @@ public final class XQueryMV extends AQuery {
       }
 
       // print subordinate titles of query results first
-      final int maxsubs = Math.min(medium.size(), sub + 1);
+      final int maxsubs = Math.min(medium.size(), maxs + 1);
       for(int s = 1; s < maxsubs; s++) xml.node(data, medium.get(s));
 
       // print remaining subordinate titles
-      final int leftsubs = Math.min(sub, max) - maxsubs + 1;
+      final int leftsubs = Math.min(maxs, max) - maxsubs + 1;
       int m = 1;
       for(int s = 0; s < leftsubs;) {
         if(m < maxsubs && medium.get(m) == pp) {
@@ -177,7 +177,7 @@ public final class XQueryMV extends AQuery {
     }
 
     // close root tag
-    if(maxhits != 0) xml.closeElement();
+    xml.closeElement();
     xml.close();
   }
 
@@ -245,5 +245,10 @@ public final class XQueryMV extends AQuery {
       super.rehash();
       values = Array.extend(values);
     }
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.XQUERYMV + " " + args[0] + " " + args[1] + " " + args[2];
   }
 }

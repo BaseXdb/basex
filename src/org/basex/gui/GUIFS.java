@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
-
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Token;
 
@@ -45,7 +44,7 @@ public final class GUIFS {
   private static int size;
 
   /**
-   * Recognized File Types.
+   * Recognized file types.
    * All file types are organized in sub arrays. The first entry in
    * an sub array refers to the internal file type. The second one is the
    * file suffix which is equal to the .png file name on disk. If the file

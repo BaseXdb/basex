@@ -58,7 +58,7 @@ public abstract class Date extends Item {
    * @param typ data type
    * @param d date reference
    * @param e expected format
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected Date(final Type typ, final byte[] d, final String e)
       throws QueryException {
@@ -110,7 +110,7 @@ public abstract class Date extends Item {
    * @param mt matcher
    * @param p matching position
    * @param val value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void zone(final Matcher mt, final int p, final byte[] val)
     throws QueryException {
@@ -125,7 +125,7 @@ public abstract class Date extends Item {
    * Add/subtract the specified duration.
    * @param a duration
    * @param p plus/minus flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void calc(final Dur a, final boolean p)
       throws QueryException {

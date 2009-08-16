@@ -6,7 +6,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 
 /**
- * XQuery Kind Test.
+ * XQuery kind test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

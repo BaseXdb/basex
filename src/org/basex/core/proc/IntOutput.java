@@ -3,17 +3,17 @@ package org.basex.core.proc;
 import org.basex.core.Process;
 
 /**
- * Represents the 'get result' command.
+ * Internal command, returning process output.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class GetResult extends Process {
+public final class IntOutput extends Process {
   /**
-   * Constructor.
+   * Default constructor.
    * @param n optional process number
    */
-  public GetResult(final String n) {
+  public IntOutput(final String n) {
     super(STANDARD, n);
   }
 }

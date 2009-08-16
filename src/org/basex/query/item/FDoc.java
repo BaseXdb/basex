@@ -8,7 +8,7 @@ import org.basex.query.iter.NodIter;
 import org.basex.util.TokenBuilder;
 
 /**
- * Document Node Fragment.
+ * Document node fragment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -31,8 +31,8 @@ public final class FDoc extends FNode {
   @Override
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < children.size; c++) {
-      final Nod n = children.item[c];
+    for(int c = 0; c < children.size(); c++) {
+      final Nod n = children.get(c);
       if(n.type != Type.COM && n.type != Type.PI) tb.add(n.str());
     }
     return tb.finish();
@@ -40,7 +40,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < children.size; c++) children.item[c].serialize(ser);
+    for(int c = 0; c < children.size(); c++) children.get(c).serialize(ser);
   }
 
   @Override

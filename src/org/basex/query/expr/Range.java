@@ -11,7 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
 
 /**
- * Range Expression.
+ * Range expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -62,7 +62,7 @@ public final class Range extends Arr {
    * the range could not be evaluated.
    * @param ctx query context
    * @return value array
-   * @throws QueryException Exception
+   * @throws QueryException query exception
    */
   long[] range(final QueryContext ctx) throws QueryException {
     return expr[0].i() && expr[1].i() ? rng(ctx) : null;
@@ -73,7 +73,7 @@ public final class Range extends Arr {
    * the range could not be evaluated.
    * @param ctx query context
    * @return value array
-   * @throws QueryException Exception
+   * @throws QueryException query exception
    */
   private long[] rng(final QueryContext ctx) throws QueryException {
     final Item a = expr[0].atomic(ctx);

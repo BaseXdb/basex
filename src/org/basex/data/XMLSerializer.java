@@ -27,8 +27,8 @@ public final class XMLSerializer extends Serializer {
 
   /**
    * Constructor.
-   * @param o output stream
-   * @throws IOException exception
+   * @param o output stream reference
+   * @throws IOException I/O exception
    */
   public XMLSerializer(final PrintOutput o) throws IOException {
     this(o, false, false);
@@ -36,10 +36,10 @@ public final class XMLSerializer extends Serializer {
 
   /**
    * Constructor.
-   * @param o output stream
-   * @param x xml output
-   * @param p pretty printing
-   * @throws IOException exception
+   * @param o output stream reference
+   * @param x serialize result as well-formed xml
+   * @param p pretty print the result
+   * @throws IOException I/O exception
    */
   public XMLSerializer(final PrintOutput o, final boolean x, final boolean p)
       throws IOException {
@@ -157,7 +157,7 @@ public final class XMLSerializer extends Serializer {
   /**
    * Prints a single character.
    * @param b character to be printed
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   private void ch(final byte b) throws IOException {
     switch(b) {
@@ -204,7 +204,7 @@ public final class XMLSerializer extends Serializer {
   /**
    * Prints the text declaration to the output stream.
    * @param close close flag
-   * @throws IOException in case of problems with the PrintOutput
+   * @throws IOException I/O exception
    */
   private void indent(final boolean close) throws IOException {
     out.println();

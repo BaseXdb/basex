@@ -106,7 +106,7 @@ public class FTContains extends Expr {
     final FTExpr ie = ftexpr.indexEquivalent(ic);
 
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsIndex(expr, ie, ic.not);
+    if(ic.seq) return new FTContainsIndex(expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
     return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ic), ic.step);

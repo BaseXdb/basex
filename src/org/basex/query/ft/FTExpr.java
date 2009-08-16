@@ -40,7 +40,7 @@ public abstract class FTExpr extends Expr {
    * This method is called by the sequential full-text evaluation.
    * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @Override
   public abstract FTItem atomic(final QueryContext ctx) throws QueryException;
@@ -49,7 +49,7 @@ public abstract class FTExpr extends Expr {
    * This method is called by the index-based full-text evaluation.
    * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @Override
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;

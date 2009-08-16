@@ -139,8 +139,8 @@ public final class FSParser extends Parser {
     builder = build;
     builder.encoding(Prop.ENCODING);
 
-    builder.meta.backingpath = backingpath;
-    builder.meta.mountpoint = mountpoint;
+    builder.meta.backing = backingpath;
+    builder.meta.mount = mountpoint;
 
     // -- create backing store (DeepFS depends on it).
     final boolean fuse = prop.is(Prop.FUSE);
@@ -155,9 +155,9 @@ public final class FSParser extends Parser {
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
-      atts.reset();
       final byte[] mnt = fuse ? token(mountpoint) : NOTMOUNTED;
       final byte[] bck = fuse ? token(backingpath) : token(fsimportpath);
+      atts.reset();
       atts.add(MOUNTPOINT  , mnt);
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);

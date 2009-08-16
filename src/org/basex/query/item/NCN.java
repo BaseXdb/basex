@@ -15,7 +15,7 @@ public final class NCN extends Str {
   /**
    * Constructor.
    * @param v value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public NCN(final byte[] v) throws QueryException {
     super(Token.norm(v), Type.NCN);

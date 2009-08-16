@@ -18,7 +18,7 @@ import org.basex.util.Atts;
 import org.basex.util.Token;
 
 /**
- * Node Type.
+ * Node type.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -316,7 +316,7 @@ public abstract class Nod extends Item {
                 tmp.add(c.finish());
                 addDesc(c.child(), tmp);
               }
-              for(int t = tmp.size - 1; t >= 0; t--) ir.add(tmp.item[t]);
+              for(int t = tmp.size() - 1; t >= 0; t--) ir.add(tmp.get(t));
             }
             n = p;
             p = p.parent();
@@ -351,9 +351,9 @@ public abstract class Nod extends Item {
             if(n.is(Nod.this)) break;
             ir.add(n.finish());
           }
-          c = ir.size;
+          c = ir.size();
         }
-        return c > 0 ? ir.item[--c] : null;
+        return c > 0 ? ir.get(--c) : null;
       }
     };
   }

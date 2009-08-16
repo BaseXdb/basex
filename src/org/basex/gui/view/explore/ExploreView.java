@@ -1,7 +1,6 @@
 package org.basex.gui.view.explore;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,8 +29,7 @@ public final class ExploreView extends View {
   /** Header string. */
   private final BaseXLabel header;
   /** Current search panel. */
-  ExploreArea search;
-
+  final ExploreArea search;
   /** Execute button. */
   final BaseXButton go;
   /** Filter button. */
@@ -108,7 +106,7 @@ public final class ExploreView extends View {
   }
 
   @Override
-  protected boolean visible() {
+  public boolean visible() {
     return gui.prop.is(GUIProp.SHOWEXPLORE);
   }
 

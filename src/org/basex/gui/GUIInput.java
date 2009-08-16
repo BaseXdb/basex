@@ -36,7 +36,7 @@ public final class GUIInput extends BaseXTextField {
   String pre = "";
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main main window reference
    */
   public GUIInput(final GUI main) {

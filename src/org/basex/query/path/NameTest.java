@@ -11,7 +11,7 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 
 /**
- * XQuery Name Test.
+ * XQuery name test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -72,7 +72,7 @@ public final class NameTest extends Test {
 
       // check existence of namespaces in input document
       if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
-        // no namespaces - check only name
+        // no prefix - check only name
         if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
 
         // pre-evaluate unknown tag/attribute names

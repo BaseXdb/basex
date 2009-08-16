@@ -7,31 +7,31 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 
 /**
- * Creates a new filesystem mapping.
+ * Evaluates the 'create fs' command and creates a new filesystem mapping.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CreateFS extends ACreate {
   /**
-   * Constructor.
+   * Default constructor.
    * @param path filesystem path
-   * @param db name of database
+   * @param name name of database
    */
-  public CreateFS(final String path, final String db) {
-    this(path, db, "", "");
+  public CreateFS(final String path, final String name) {
+    this(path, name, "", "");
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying FUSE properties.
    * @param path filesystem path
-   * @param db name of database
+   * @param name name of database
    * @param mp fuse mount point
-   * @param bp path to BLOB backing store
+   * @param bs path to BLOB backing store
    */
-  public CreateFS(final String path, final String db, final String mp,
-      final String bp) {
-    super(STANDARD, path, db, mp, bp);
+  public CreateFS(final String path, final String name, final String mp,
+      final String bs) {
+    super(STANDARD, path, name, mp, bs);
   }
 
   @Override
@@ -45,6 +45,6 @@ public final class CreateFS extends ACreate {
 
   @Override
   public String toString() {
-    return Cmd.CREATE.name() + " " + CmdCreate.FS + args();
+    return Cmd.CREATE + " " + CmdCreate.FS + args();
   }
 }

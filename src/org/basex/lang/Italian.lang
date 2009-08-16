@@ -51,7 +51,7 @@ explore_title=Explore
 # Dialog Windows
 d_info=Informazione
 d_fctitle=Scegli una directory
-d_export=Salva Documento XML
+d_export=Salva
 
 dc_title=Inserisci un file o una directory
 dc_filter=Filtra
@@ -76,6 +76,7 @@ dc_chopinfo=Quest'opzione rimuove gli spazi vuoti tra i tag ed il contenuto
 dc_intparseinfo=Attiva quest'opzione per usare il parser XML integrato
 dc_entitiesinfo=Disattiva quest'opzione per saltare le entità indefinite (&...;)
 dc_dtdinfo=Disattiva quest'opzione per saltare i DTD
+dc_pathinfo=Un Path Summary velocizza path resolutions
 dc_txtinfo=I testi possono essere indicizzati per velocizzare le query XPath
 dc_attinfo=Gli attributi possono essere indicizzati per velocizzare le query XPath
 dc_ftxinfo=Un indice full-text velocizza le query XPath Full Text
@@ -123,16 +124,18 @@ dd_title=Cancella Database
 dd_question=Il Database '%' verrà cancellato.\nSei sicuro?
 
 dx_question=Cancellare. Sei sicuro?
+dq_question=Save changes to %?
 
 dp_title=Preferenze
 
 dp_dbpath=Database Path (Il Database dev'essere rimosso manualmente)
 dp_inter=GUI & Interazioni
-dp_lf=Usa il Layout di Java (Richiede un riavvio)
+dp_lf=Usa il Layout di Java
 dp_focus=Focus del mouse realtime
 dp_simplefd=Usa un file chooser semplificato
 dp_names=Sostituisci tag con gli attributi @name
-dp_lang=Lingua (Richiede un riavvio)
+dp_lang=Lingua
+dp_restart=Richiede un riavvio
 
 dn_title=Inserisci nuovi dati
 dn_name=Nome
@@ -140,7 +143,7 @@ dn_value=Valore
 
 de_title=Modifica dati
 de_text=Modifica %
-de_kind1=Nodo Root
+de_kind1=Documento
 de_kind2=Elemento
 de_kind3=Testo
 de_kind4=Attributo
@@ -167,11 +170,11 @@ dm_choice3=Titolo, no Bordo
 dm_choice4=Titolo, Bordo piccolo
 dm_choice5=Titolo, Bordo grande
 dm_offset=Offset
-dm_size=Dimensione determinata da
-dm_size_children=numero di figli
+dm_size=Ratio:
+dm_size_children=figli
 dm_size_fssize=dimensione file
 dm_size_textsize=lunghezza testo
-dm_size_both=no/figli e dimensione file
+dm_size_both=figli/lunghezza testo
 
 dz_total=Memoria totale
 dz_reserved=Memoria riservata
@@ -207,8 +210,8 @@ c_edit=Modifica
 c_edittt=Modifica i nodi XML.
 c_exit=Esci
 c_exittt=Esce dall'applicazione.
-c_export=Exporta XML
-c_exporttt=Esporta il database attuale su un documento XML.
+c_export=Esporta
+c_exporttt=Esporta il database attuale su XML documento/i.
 c_filter=Filtra selezione
 c_filtertt=Filtra i nodi selezionati.
 c_fonts=Carattere...
@@ -286,12 +289,11 @@ proc_outmem=Fuori dalla memoria principale.\nLe seguenti azioni potrebbero aiuta
 cmd_no=Attendo un comando.
 cmd_unknown=Comando sconosciuto: '%'
 cmd_similar=Intendevi '%'?
-cmd_ping=Connessione riuscita.
 
 # Help Commands
-help_short=Usa 'Aiuto'
-help_intro=Usa 'Aiuto' per avere maggiori informazioni.
-help_long=Usa 'Aiuto [...]' per avere maggiori informazioni su un comando specifico.
+help_short=Usa "%"
+help_intro=Usa "%" per avere maggiori informazioni.
+help_long=Usa "% [...]" per avere maggiori informazioni su un comando specifico.
 
 # Create Command
 pc_create=Database creato
@@ -325,8 +327,8 @@ db_dropped=Database '%' cancellato.
 db_notdropped=Impossibile cancellare il Database.
 db_inuse=Database is currently used by other clients.
 db_notopened=Impossibile aprire il Database.
-db_opened=Database aperto in %.
-db_exported=Database esportato in %.
+db_opened=Database '%' aperto in %.
+db_exported=Database '%' esportato in %.
 
 # Index commands
 in_created=Indici creati in %.
@@ -340,7 +342,6 @@ cs_client=Client
 
 # Server Info
 srv_connect=Impossibile comunicare col Server.
-srv_port=Numero porta non valido
 srv_timeout=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
 srv_start=avviato.\nAttendo richieste...
@@ -392,6 +393,9 @@ uc_invalid=Il nome "%" non è valido.
 uc_txtinvalid=I nodi testo non possono essere vuoti.
 uc_namespaces=Impossibile aggiornare documenti con namespace.
 
+# General Commands
+gc_seterr=Could not set property '%' to '%'.
+
 # Info Strings
 info_head=Informazioni sul Database
 info_index=Indici
@@ -399,19 +403,19 @@ info_build=Creazione indici
 info_opt=Ottimizzando Database
 info_optim=Ottimizzazione terminata.
 info_stats=Crea statistiche
-info_dbname=Nome del Database
+info_dbname=Nome
 info_ndocs=Documenti
-info_docsize=Fimensione Input
-info_dbsize=Dimensione Database
+info_docsize=Dimensione Input
+info_dbsize=Dimensione
 info_doc=Path Sorgente
 info_time=Data
 info_mem=Memoria principale usata
-info_nodes=Nodi Tabella
-info_height=Altezza albero
+info_nodes=Nodi
+info_height=Altezza
 info_encoding=Codifica
 info_dbpath=Path Database
 info_nodb=Nessun database trovato.
-info_dblist= Databases trovato.
+info_dblist=Databases trovato.
 info_dberror=non può essere aperto.
 info_info=Informazioni Processo
 info_all=verbose
@@ -424,6 +428,7 @@ info_mainmem=Modalità Main Memory
 info_tags=Tags
 info_atts=Attributi
 info_ns=Namespaces
+info_pathindex=Path Summary
 info_txtindex=Indicizza testo
 info_atvindex=Indicizza attributi
 info_ftindex=Indice full-text
@@ -440,111 +445,84 @@ info_entries=% registrazioni
 
 # Command Help
 ch_nohelp=Spiacente, nessun aiuto disponibile.
-ch_dummydatabase0=Comandi del Database:
+ch_helpdatabase0=Comandi del Database:
 ch_create1=Crea un Database o un Indice.
 ch_create2=Crea un Database da XML o Filesystem, oppure crea un Indice:
-ch_create3=  crea un Database [name] per il file o la directory XML [path]
-ch_file= [path] [name?]:
-ch_create4= [path] [name] ([mount point] [backing store] with fuse support only):
-ch_create5=  Crea un DeepFS Filesystem [name] per [path] (using [mount point] and [backing store])
-ch_create6=  crea l'indice specificato
-ch_open0=[database]
-ch_open1=Apri [database].
-ch_open2=apre il [database] specificato.
+ch_create3=crea un Database [%] per il file o la directory [%]
+ch_create4=crea l'indice specificato
+ch_create5=Crea un DeepFS Filesystem [%] per [%]
+ch_create6=(using [%] and [%] if FUSE is activated)
+ch_open1=Apri un Database.
+ch_open2=apre il Database [%] specificato.
 ch_info1=Mostra informazioni sul Database attuale.
 ch_info21=Mostra informazioni sul Database attualmente aperto:
-ch_info22=- nessun argomento: mostra informazioni globali
-ch_info23=: mostra informazioni sul Database
-ch_info24=: mostra informazioni sugli Indici
-ch_info25= [start end]|[query]: mostra tabella XML
+ch_info22=nessun argomento: mostra informazioni globali
+ch_info23=mostra informazioni sul Database
+ch_info24=mostra informazioni sugli Indici
+ch_info25=mostra tabella del Database
 ch_close1=Ciudi Database in uso.
 ch_close2=Chiude il Database in uso.
 ch_list1=Mostra Database disponibili.
 ch_list2=Mostra tutti i Database disponibili.
 ch_drop1=Cancella Database o Indice.
 ch_drop2=I seguenti argomenti possono essere specificati:
-ch_drop22=  calcella il Database [name]
-ch_drop21= [name]:
-ch_drop23=  cancella l'Idnice specificato
+ch_drop21=cancella il Database [%]
+ch_drop22=cancella l'Idnice specificato
 ch_optimize1=Ottimizza il Database.
 ch_optimize2=Ottimizza le strutture del Database in uso.
-ch_export0=[file]
 ch_export1=Esporta Database come XML.
-ch_export2=Esporta il context set attuale in un [file] XML.
-ch_dummyquery0=Comandi Query:
-ch_xpath0=[query]
-ch_xpath1=Esegui query XPath.
-ch_xpath2=Esegue la [query] XPath specificata e stampa il risultato.
-ch_xquerymv0=[hits] [subhits] ["query"]
+ch_export2=Esporta il Database in [%].
+ch_helpquery0=Comandi Query:
 ch_xquerymv1=Esegui query MedioVis.
-ch_xquerymv2=Esegue la [query] XPath specificata e limita il\n numero di risultati a [hits] ed il numero di\n elementi subordinati a [subhits].
-ch_xquery0=[query]
-ch_xquery1=Esegui [query] XQuery.
-ch_xquery2=Esegue una query XQuery e stampa il risultato.
-ch_run0=[file]
-ch_run1=Evaluate XQuery from [file].
-ch_run2=Evaluates an XQuery from the specified file and prints the result.
-ch_find0=[query]
+ch_xquerymv2=Esegue la [%] XQuery specificata e limita il\n numero di risultati a [%] ed il numero di\n elementi subordinati a [%].
+ch_xquery1=Esegui XQuery.
+ch_xquery2=Esegue il query [%] e stampa il risultato.
+ch_run1=Evaluate file as XQuery.
+ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=Esegui keyword query.
 ch_find2=I seguenti modificatori possono essere usati:\n =  : cerca nodi di testo con corrispondenza esatta"\n @= : cerca attributi con corrispondenza esatta\n @  : cerca attributi
-
-# Help Texts
-ch_cs0=[query]
-ch_cs1=Esegui query XPath ed imposta i risultati come un nuovo context set.
-ch_cs2=Esegue la specifica [query] XPath ed imposta i risultati\ncome un nuovo context set.
-ch_bash1=Avvia bash.
-ch_bash2=Avvia la modalità bash
-ch_dummyupdate0=Aggiorna comandi:
-ch_copy0=[pos] [source],[target]
+ch_cs1=Esegui query XQuery ed imposta i risultati come un nuovo context set.
+ch_cs2=Esegue la specifica [%] XQuery ed imposta i risultati\ncome un nuovo context set.
+ch_helpupdate0=Aggiorna comandi:
 ch_copy1=Copia nodi XML.
-ch_copy2=Esegue [source] e copia il risultato in [target]\n come figlio [pos] (0=ultimo figlio).
-ch_delete0=["target"]
+ch_copy2=Esegue [%] e copia il risultato in [%]\n come figlio [%] (0=ultimo figlio).
 ch_delete1=Cancella nodi XML.
-ch_delete2=Cancella i nodi che soddisfano la query [target] specificata.
+ch_delete2=Cancella i nodi che soddisfano la query [%] specificata.
 ch_insert1=Inserisci nodi XML.
-ch_insert2=Inserisce un frammento o un nodo specifico\n come figlio [pos] (0=ultimo figlio) della query [target] data:
-ch_insert21=[name] [pos] [target]: Inserisci [name]
-ch_insert22=[text] [pos] [target]: Inserisci [text]
-ch_insert23=[name] [value] [target]: Inserisci [name] and [value]
-ch_insert24=[text] [pos] [target]: Inserisci [text]
-ch_insert25=[name] [value] [pos] [target]: Inserisci [name] e [value]
-ch_insert26=[frag] [pos] [target]: Inserisci [frag]
+ch_insert2=Inserisce un frammento o un nodo specifico\n come figlio [%] (0=ultimo figlio) della query [%] data:
+ch_insert21=Inserisci [%]
+ch_insert22=Inserisci [%] e [%]
 ch_update1=Aggiorna nodi XML.
-ch_update2=Aggiorna i nodi che soddisfano la query [target] specificata:
-ch_update21=[name] [target]: Update with [name]
-ch_update22=[text] [target]: Update with [text]
-ch_update23=[name] [value] [target]: Update with [name] and [value]
-ch_update24=[text] [target]: Update with [text]
-ch_update25=[name] [value] [target]: Update with [name] and [value]
-ch_dummygeneral0=Comandi generali:
-ch_set0=[option] [value?]
-ch_set1=Imposta opzioni globali (valori attuali: usa 'Aiuto').
-ch_set2=[option]s disponibili con [value = on|off]:
-ch_set21= [all?]: Mostra (tutte) le process info
-ch_set22=: Visualizzazione delle informazioni di debug
-ch_set23=: Serializzazione dei risultati della query
-ch_set24=: Serializzazione dei risultati come XML
-ch_set25=: Modalità Main Memory
-ch_set26=: Rimozione degli spazi vuoti XML
-ch_set27=: Parsing delle entità XML
-ch_set28=: Indicizzando testo
-ch_set29=: Indicizzando valori attributi
-ch_set31=: Indicizzando full-text
-ch_help1=Ottieni aiuto su
-ch_help11= comandi.
-ch_help2=Se è specificato [command], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.\nSe è specificato 'all', anche i comandi nascosti sono inclusi.
+ch_update2=Aggiorna i nodi che soddisfano la query [%] specificata:
+ch_update21=Update with [%]
+ch_update22=Update with [%] and [%]
+ch_helpgeneral0=Comandi generali:
+ch_set1=Imposta opzioni globali (valori attuali: usa '%').
+ch_set2=Opzioni [%] disponibili con valore [%] = on/off:
+ch_set21=Mostra (tutte) le process info
+ch_set22=Visualizzazione delle informazioni di debug
+ch_set23=Serializzazione dei risultati della query
+ch_set24=Serializzazione dei risultati come XML
+ch_set25=Modalità Main Memory
+ch_set26=Rimozione degli spazi vuoti XML
+ch_set27=Parsing delle entità XML
+ch_set28=Indicizzando testo
+ch_set29=Indicizzando valori attributi
+ch_set31=Indicizzando full-text
+ch_help1=Ottieni aiuto su % comandi.
+ch_help2=Se è specificato [%], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.\nSe è specificato 'all', anche i comandi nascosti sono inclusi.
 ch_exit1=Esci
 
 # Help Texts
 h_filter=Filtra i risultati delle query.
 h_queryrt=Se questa checkbox è attiva, le query sono eseguite automaticamente dopo la pressione di qualsiasi tasto.
-h_toxquery=La query XPath attuale viene copiata nel pannello di ricerca XQuery.
-h_toxpath=Modificando le impostazioni di ricerca, le query XPath sono compilate ed eseguite internamente. Puoi mostrare e cambiare la query attuale premendo questo bottone.
+h_toxquery=La query attuale viene copiata nel pannello di ricerca XQuery.
+h_toxpath=Modificando le impostazioni di ricerca, le query sono compilate ed eseguite internamente. Puoi mostrare e cambiare la query attuale premendo questo bottone.
 h_hist=Mostra la cronologia degli input.
 h_go=Esegue la query.
 h_stop=Ferma il processo in corso.
 h_cancel=Schiaccia questo bottone per chiudere la finestra di dialogo e tronare alla schermata principale.
-h_mode=Clicca sulla combo box per scegliere tra la modalità di ricerca, XPath e comando.\nQuesta combo box è attiva solo se un database è aperto.
+h_mode=Clicca sulla combo box per scegliere tra la modalità di ricerca, XQuery e comando.\nQuesta combo box è attiva solo se un database è aperto.
 h_ok=Schiaccia questo bottone per iniziare il processo.
 h_opt=Schiaccia questo bottone per ottimizzare il database.
 h_renamedb=Schiaccia questo bottone per rinominare il database selezionato.
@@ -562,7 +540,7 @@ h_fsall=Se si seleziona questa checkbox, l'intero filesystem verrà passato al p
 h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
 h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
 h_meta=Se si seleziona questa checkbox, i meta-data verranno estratti da numerosi tipi di file. i meta-data inclidono ad esempio la dimensione delle immagini, i tag ID3 dei file MP3 o i contenuti dei file mail.
-h_cont=Selezionando questa checkbox i contenuti testuali del file vengono inclusi. Se i contenuti vengono inclusi, possono essere cercati usando XPath o XQuery.
+h_cont=Selezionando questa checkbox i contenuti testuali del file vengono inclusi. Se i contenuti vengono inclusi, possono essere cercati usando XQuery.
 h_fsmax=Qui è possibile definire una dimensione limite per i file di testo inclusi.
 h_mapatts= Se questa checkbox è attivata, gli attributi vengono mostrati dentro la TreeMap.
 h_maplayout=Qui puoi modificare l'algoritmo di layout usato nella visualizzazione Map. I cambi si vedono immediatamente se il database è aperto.
@@ -578,9 +556,9 @@ h_font=Qui puoi selezionare il carattere da usare nelle visualizzazioni.
 h_mmem=In modalità Main-Memory, le query verranno eseguite il 50-80% più velocemente. Per contro, il consumo di memoria aumenta, e gli aggiornamenti sul database sono disabilitati.
 h_colors=Muovi gli slider per cambiare i colori dell'interfaccia visuale.
 h_cmd=Qui puoi inserire i comandi BaseX. Usa 'aiuto' per avere una panoramica di tutti i comandi disponibili.\n\nPuoi recuperare input precedenti con i tasti SU e GIU'.
-h_searchxml=Digita qualcosa nel campo di testo per cercarlo nel tuo documento XML. La seguente sintassi è supportata:\n...      Trova tag e testi\n=...   Trova nodi testo esatti\n@ ...  Trova attributi e loro valori\n@=   Trova valori di attributi esatti\n/...     Esegui input come XPath
+h_searchxml=Digita qualcosa nel campo di testo per cercarlo nel tuo documento XML. La seguente sintassi è supportata:\n...      Trova tag e testi\n=...   Trova nodi testo esatti\n@ ...  Trova attributi e loro valori\n@=   Trova valori di attributi esatti\n/...     Esegui input come XQuery
 h_searchfs=Digita qualcosa nel campo di testo per cercarlo nel tuo filesystem. La seguente sintassi è supportata:\n...      Trova file o directory\n= ...  Trova nomi esatti\n. ..     Trova estensioni di file\n< ...  Trova file più piccoli della dimensione specificata\n> ...  Trova file più grandi della dimensione specificata\n\nPuoi inserire comandi BaseX facendoli precedere dal segno di punto esclamativo.
-h_xpath=La modalità XPath permette l'inserimento di semplici richieste XPath. XPath è spesso processato più velocemente di XQuery. Il linguaggio XPath è basato su una rappresentazione ad albero del documento XML, e fornisce la possibilità di navigare lungo l'albero, selezionando i nodi secondo diversi criteri.
+h_xpath=La modalità XQuery permette l'inserimento di semplici richieste XQuery.
 h_modefilt=Se il filtraggio real-time è disattivato, schiaccia Ctrl+ENTER per filtrare i risultati delle query.
 h_map=Questa visualizzazione è chiamata TreeMap. Tutti i nodi del documento XML sono rappresentati come rettangoli, e riempiono l'intera area. I nodi possono essere evidenziati con click singolo e filtrati con doppio click. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
 h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
@@ -593,7 +571,7 @@ h_plotitem=With this combo box you can select the item to display.
 h_folder=Questa visualizzazione mostra tutti i nodi XML in visualizzazione folder. I nodi possono essere espansi o chiusi schiacciando le frecce. Altrimenti possono essere evidenziati con click singolo ed ingrandidi con click doppio. Consente di navigare in maniera efficiente il documento. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
 h_table=Questa visualizzazione mostra tutti i nodi XML in una tabella. Cliccando su un testo, tutti i nodi con lo stesso testo vengono evidenziati. Con doppio click su un testo, i risultati della query vengono filtrati. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
 h_text=Questo pannello mostra i risultati delle query ed altro output testuale.\n\nTasti rapidi: Usa '-' e '+' per cambiare la dimensione del carattere di tutti i pannelli. Digita qualunque testo dentro il pop-up di ricerca per lanciare una ricerca incrementale. E' un buon modo per trovare punti specifici di testo.
-h_info=Questo pannello mostra informazioni sulla compilazione ed esevuzione di una richiesta XPath o XQuery.
+h_info=Questo pannello mostra informazioni sulla compilazione ed esevuzione di una richiesta XQuery.
 h_explore=La modalità di ricerca semplice consente query semplici sul documento XML.
 h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=In questa combo box sono elencati tutti i tag e gli attributi del documento XML in uso. Se si seleziona un elemento, i risultati della query sono evidenziati nella visualizzazione. Se l'elemento contiene valori testuali, viene visualizzata una finestra pop-up addizionale, che consente una maggiore definizione della query.

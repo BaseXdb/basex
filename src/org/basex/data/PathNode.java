@@ -4,9 +4,12 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.basex.Text;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class represents a node of the path summary.
@@ -19,38 +22,24 @@ public final class PathNode {
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
-  /** Tag counter. */
+  /** Counter. */
   public int count;
   /** Parent. */
   public PathNode par;
   /** Children. */
   public PathNode[] ch;
-  /** Average text length. */
-  public double tl;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param t tag
    * @param k node kind
    * @param p parent node
    */
   PathNode(final int t, final byte k, final PathNode p) {
-    this(t, k, 0, p);
-  }
-
-  /**
-   * Default Constructor.
-   * @param t tag
-   * @param k node kind
-   * @param l text length
-   * @param p parent node
-   */
-  PathNode(final int t, final byte k, final int l, final PathNode p) {
     ch = new PathNode[0];
     count = 1;
     name = (short) t;
     kind = k;
-    tl = l;
     par = p;
   }
 
@@ -65,7 +54,7 @@ public final class PathNode {
     kind = in.readByte();
     count = in.readNum();
     ch = new PathNode[in.readNum()];
-    tl = in.readDouble();
+    in.readDouble();
     par = p;
     for(int i = 0; i < ch.length; i++) ch[i] = new PathNode(in, this);
   }
@@ -74,18 +63,16 @@ public final class PathNode {
    * Returns a node reference for the specified tag.
    * @param t tag
    * @param k node kind
-   * @param l text length
    * @return node reference
    */
-  PathNode get(final int t, final byte k, final int l) {
+  PathNode get(final int t, final byte k) {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == t) {
         c.count++;
-        c.tl += l;
         return c;
       }
     }
-    final PathNode n = new PathNode(t, k, l, this);
+    final PathNode n = new PathNode(t, k, this);
     ch = Array.add(ch, n);
     return n;
   }
@@ -100,7 +87,7 @@ public final class PathNode {
     out.write1(kind);
     out.writeNum(count);
     out.writeNum(ch.length);
-    out.writeDouble(tl);
+    out.writeDouble(0);
     for(final PathNode c : ch) c.finish(out);
   }
 
@@ -143,9 +130,44 @@ public final class PathNode {
     return c;
   }
 
-  @Override
-  public String toString() {
-    return "Node[Kind: " + kind + ", Name: " + name +
-           ", Children: " + ch.length + ", TextLength: " + tl + "]";
+  /**
+   * Prints a path summary node.
+   * @param data data reference
+   * @param l level
+   * @return string representation
+   */
+  byte[] info(final Data data, final int l) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(l != 0) tb.add(Text.NL);
+    for(int i = 0; i < l << 1; i++) tb.add(' ');
+    switch(kind) {
+      case Data.DOC:  tb.add(DOC); break;
+      case Data.ELEM: tb.add(data.tags.key(name)); break;
+      case Data.TEXT: tb.add(TEXT); break;
+      case Data.ATTR: tb.add(ATT); tb.add(data.atts.key(name)); break;
+      case Data.COMM: tb.add(COMM); break;
+      case Data.PI:   tb.add(PI); break;
+    }
+    tb.add(" " + count + "x");
+    for(final PathNode p : ch) tb.add(p.info(data, l + 1));
+    return tb.finish();
+  }
+
+  /**
+   * Serializes the path node.
+   * @param data data reference
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  public void plan(final Data data, final Serializer ser) throws IOException {
+    ser.openElement(NODE, KIND, Token.token(TABLEKINDS[kind]));
+    if(kind == Data.ELEM) {
+      ser.attribute(NAME, data.tags.key(name));
+    } else if(kind == Data.ATTR) {
+      ser.attribute(NAME, Token.concat(ATT, data.atts.key(name)));
+    }
+    ser.text(Token.token(count));
+    for(final PathNode p : ch) p.plan(data, ser);
+    ser.closeElement();
   }
 }

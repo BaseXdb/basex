@@ -1,22 +1,23 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
+import org.basex.build.NativeBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
+import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
-import org.basex.index.FTTrieBuilder;
 import org.basex.index.FTFuzzyBuilder;
+import org.basex.index.FTTrieBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
 
@@ -28,11 +29,11 @@ import org.basex.index.ValueBuilder;
  */
 abstract class ACreate extends Process {
   /**
-   * Constructor.
+   * Protected constructor.
    * @param p command properties
    * @param a arguments
    */
-  public ACreate(final int p, final String... a) {
+  protected ACreate(final int p, final String... a) {
     super(p, a);
   }
 
@@ -44,19 +45,20 @@ abstract class ACreate extends Process {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
+    exec(new Close());
+
     String err = null;
     Builder builder = null;
     try {
-      exec(new Close());
-
       final boolean mem = db == null || prop.is(Prop.MAINMEM);
       if(!mem && context.pinned(db)) return error(DBINUSE);
 
-      builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
+      builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
+          new NativeBuilder(p) : new DiskBuilder(p);
       progress(builder);
       final Data data = builder.build(db == null ? "" : db);
       builder = null;
-      if(!(data instanceof MemData)) index(data);
+      if(!prop.is(Prop.MAINMEM)) index(data);
       context.openDB(data);
       context.addToPool(data);
       return info(DBCREATED, db, perf.getTimer());
@@ -64,13 +66,13 @@ abstract class ACreate extends Process {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
-      err = Prop.server ? SERVERTIME : CANCELCREATE;
+      err = PROGERR;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();
       err = BaseX.info(msg != null ? msg : args[0]);
     } catch(final Exception ex) {
-      BaseX.errln(ex);
+      BaseX.debug(ex);
       err = BaseX.info(CREATEERR, args[0]);
     }
     try {
@@ -79,7 +81,6 @@ abstract class ACreate extends Process {
       BaseX.debug(ex);
     }
     DropDB.drop(db, prop);
-
     return error(err);
   }
 
@@ -89,6 +90,7 @@ abstract class ACreate extends Process {
    * @throws IOException I/O exception
    */
   protected void index(final Data data) throws IOException {
+    if(data instanceof MemData) return;
     if(data.meta.txtindex) buildIndex(Type.TXT, data);
     if(data.meta.atvindex) buildIndex(Type.ATV, data);
     if(data.meta.ftxindex) buildIndex(Type.FTX, data);
@@ -113,5 +115,27 @@ abstract class ACreate extends Process {
     d.closeIndex(i);
     progress(builder);
     d.setIndex(i, builder.build());
+  }
+
+  /**
+   * Returns the index type or creates an error message and returns null.
+   * @param type index string
+   * @return index type.
+   */
+  protected CmdIndex getType(final String type) {
+    try {
+      return CmdIndex.valueOf(type.toUpperCase());
+    } catch(final Exception ex) {
+      error(CMDWHICH, type);
+      return null;
+    }
+  }
+
+  /**
+   * Closes the current database.
+   */
+  protected void close() {
+    final Data data = context.data();
+    if(data != null) exec(new Close());
   }
 }

@@ -22,28 +22,28 @@ import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
 
 /**
- * Creates a new database.
+ * Evaluates the 'create db' command and creates a new database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
   /**
-   * Constructor. The file name, excluding the suffix, is used as database name.
-   * @param input file name or XML string
+   * Default constructor.
+   * @param input input XML file or XML string
+   * @param name name of database
+   * (special characters are stripped before the name is applied)
    */
-  public CreateDB(final String input) {
-    this(input, input);
+  public CreateDB(final String input, final String name) {
+    super(STANDARD, input, IO.get(name == null ? input : name).dbname());
   }
 
   /**
-   * Constructor.
-   * @param input file name or XML string
-   * @param name name of database; if set to null,
-   *         a main memory instance is created
+   * Constructor. The file name, excluding the suffix, is used as database name.
+   * @param input input file or XML string
    */
-  public CreateDB(final String input, final String name) {
-    super(STANDARD, input, name == null ? null : IO.get(name).dbname());
+  public CreateDB(final String input) {
+    this(input, null);
   }
 
   @Override
@@ -59,7 +59,7 @@ public final class CreateDB extends ACreate {
    * @param io file reference
    * @param name name of the database to be created
    * @return database instance
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public static Data xml(final Context ctx, final IO io, final String name)
       throws IOException {
@@ -74,7 +74,7 @@ public final class CreateDB extends ACreate {
    * @param db name of the database to be created; if db is <code>null</code>,
    * a main memory instance is created
    * @return database instance
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public static Data xml(final Context ctx, final Parser p, final String db)
       throws IOException {
@@ -107,10 +107,10 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates and returns a main memory database from the specified parser.
+   * Creates and returns a main memory database for the specified parser.
    * @param p xml parser
    * @return database instance
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public static Data xml(final Parser p) throws IOException {
     return new MemBuilder(p).build();
@@ -122,7 +122,7 @@ public final class CreateDB extends ACreate {
    * @param io file reference
    * @param pr database properties
    * @return database instance
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public static Data xml(final IO io, final Prop pr) throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
@@ -134,7 +134,7 @@ public final class CreateDB extends ACreate {
    * @param s sax source
    * @param pr database properties
    * @return database instance
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public static Data xml(final SAXSource s, final Prop pr) throws IOException {
     return xml(new SAXWrapper(s, pr));
@@ -142,6 +142,6 @@ public final class CreateDB extends ACreate {
 
   @Override
   public String toString() {
-    return Cmd.CREATE.name() + " " + CmdCreate.DB + args();
+    return Cmd.CREATE + " " + CmdCreate.DB + args();
   }
 }

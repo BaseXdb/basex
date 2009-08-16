@@ -23,7 +23,7 @@ import org.basex.util.Token;
  */
 public abstract class Item extends Expr {
   /** Score value. */
-  protected double score;
+  public double score;
   /** Data type. */
   public Type type;
 
@@ -156,7 +156,7 @@ public abstract class Item extends Expr {
   /**
    * Returns a boolean representation of the item.
    * @return boolean value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public boolean bool() throws QueryException {
     Err.or(CONDTYPE, type, this);
@@ -166,7 +166,7 @@ public abstract class Item extends Expr {
   /**
    * Returns a decimal representation of the item.
    * @return decimal value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public BigDecimal dec() throws QueryException {
@@ -177,7 +177,7 @@ public abstract class Item extends Expr {
   /**
    * Returns an integer (long) representation of the item.
    * @return long value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public long itr() throws QueryException {
@@ -188,7 +188,7 @@ public abstract class Item extends Expr {
   /**
    * Returns a float representation of the item.
    * @return float value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public float flt() throws QueryException {
@@ -199,7 +199,7 @@ public abstract class Item extends Expr {
   /**
    * Returns a double representation of the item.
    * @return double value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public double dbl() throws QueryException {
@@ -211,7 +211,7 @@ public abstract class Item extends Expr {
    * Checks the items for equality.
    * @param it item to be compared.
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public abstract boolean eq(Item it) throws QueryException;
 
@@ -219,7 +219,7 @@ public abstract class Item extends Expr {
    * Returns the difference between the current and the specified item.
    * @param it item to be compared.
    * @return difference
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public int diff(final Item it) throws QueryException {
     Err.cmp(it, this);
@@ -245,7 +245,7 @@ public abstract class Item extends Expr {
   /**
    * Throws a cast error.
    * @param val cast value
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final void castErr(final Object val) throws QueryException {
     Err.or(FUNCAST, type, Err.chop(val));
@@ -254,7 +254,7 @@ public abstract class Item extends Expr {
   /**
    * Serializes the item.
    * @param ser serializer
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
     ser.item(str());

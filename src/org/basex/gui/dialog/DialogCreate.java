@@ -48,11 +48,13 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox entities;
   /** DTD mode. */
   private final BaseXCheckBox dtd;
-  /** Indexing mode. */
+  /** Path summary flag. */
+  private final BaseXCheckBox pathindex;
+  /** Text index flag. */
   private final BaseXCheckBox txtindex;
-  /** Indexing mode. */
+  /** Attribute value index flag. */
   private final BaseXCheckBox atvindex;
-  /** Word Indexing mode. */
+  /** Fulltext index flag. */
   private final BaseXCheckBox ftxindex;
   /** Full-text indexing. */
   private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
@@ -62,7 +64,7 @@ public final class DialogCreate extends Dialog {
   private final StringList db;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogCreate(final GUI main) {
@@ -148,8 +150,13 @@ public final class DialogCreate extends Dialog {
 
     // create checkboxes
     final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new TableLayout(10, 1, 0, 0));
+    p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
+
+    pathindex = new BaseXCheckBox(INFOPATHINDEX, Token.token(PATHINDEXINFO),
+        prop.is(Prop.PATHINDEX), 0, this);
+    p3.add(pathindex);
+    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
     txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
         prop.is(Prop.TEXTINDEX), 0, this);
@@ -276,6 +283,7 @@ public final class DialogCreate extends Dialog {
     prop.set(Prop.CREATEFILTER, filter.getText());
     prop.set(Prop.ENTITY, entities.isSelected());
     prop.set(Prop.DTD, dtd.isSelected());
+    prop.set(Prop.PATHINDEX, pathindex.isSelected());
     prop.set(Prop.TEXTINDEX, txtindex.isSelected());
     prop.set(Prop.ATTRINDEX, atvindex.isSelected());
     prop.set(Prop.FTINDEX, ftxindex.isSelected());

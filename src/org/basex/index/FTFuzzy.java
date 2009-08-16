@@ -85,9 +85,9 @@ public final class FTFuzzy extends FTIndex {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(FUZZY + NL);
-    tb.add("- %: %\n", CREATESTEM, BaseX.flag(data.meta.ftst));
-    tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
-    tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
+    tb.add("- %: %" + NL, CREATESTEM, BaseX.flag(data.meta.ftst));
+    tb.add("- %: %" + NL, CREATECS, BaseX.flag(data.meta.ftcs));
+    tb.add("- %: %" + NL, CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 

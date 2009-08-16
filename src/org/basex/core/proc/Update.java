@@ -2,38 +2,41 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 
 /**
- * Updates an element in the database.
+ * Evaluates the 'update' command and update nodes in the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Update extends AUpdate {
   /**
-   * Constructor.
-   * @param t update type
-   * @param a arguments
+   * Default constructor.
+   * @param type node type defined in {@link CmdUpdate}
+   * @param target target query
+   * @param vals value(s) to update; two values are expected for
+   * attributes and processing instructions
    */
-  public Update(final String t, final String... a) {
-    super(t, a);
+  public Update(final Object type, final String target, final String... vals) {
+    super(target == null, init(type.toString(), target, vals));
   }
 
   @Override
   protected boolean exec() {
-    final boolean gui = args[args.length - 1] == null;
-    final Data data = context.data();
-    if(data.ns.size() != 0) return error(UPDATENS);
+    if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query
     final CmdUpdate type = getType();
-    final Nodes nodes = gui ? context.marked() : query(args[type ==
-      CmdUpdate.PI || type == CmdUpdate.ATTRIBUTE ? 2 : 1], null);
+    if(type == null) return false;
+
+    final Nodes nodes = gui ? context.marked() : query(args[1], null);
     if(nodes == null) return false;
 
+    final Data data = context.data();
     boolean ok = false;
     switch(type) {
       case ATTRIBUTE: ok = attr(data, nodes); break;
@@ -53,27 +56,32 @@ public final class Update extends AUpdate {
    * @return success flag
    */
   private boolean attr(final Data data, final Nodes nodes) {
-    final byte[] n = token(args[0]);
-    final byte[] v = token(args[1]);
-    if(!check(n)) return error(ATTINVALID, n);
+    final byte[] name = token(args[2]);
+    final byte[] value = token(args[3]);
+    if(!check(name)) return error(ATTINVALID, name);
 
     // check if errors can occur
-    for(int i = nodes.size() - 1; i >= 0; i--) {
-      final int pre = nodes.nodes[i];
-      if(data.kind(pre) != Data.ATTR)
-        return error(UPDATENODE, CmdUpdate.values()[Data.ATTR]);
+    int lp = 0;
+    for(int n = nodes.size() - 1; n >= 0; n--) {
+      final int pre = nodes.nodes[n];
+      if(data.kind(pre) != Data.ATTR) {
+        final String type = CmdUpdate.values()[Data.ATTR].name().toLowerCase();
+        return error(UPDATENODE, type);
+      }
       // check existence of attribute
       int p = data.parent(pre, Data.ATTR);
-      final int last = p + data.attSize(p, Data.ELEM);
-      final int att = data.attNameID(n);
-      while(++p < last) {
-        if(p != pre && att == data.attNameID(p)) return error(ATTDUPL, n);
+      if(p == lp) return error(ATTDUPL, name);
+      lp = p;
+      final int as = p + data.attSize(p, Data.ELEM);
+      final int att = data.attNameID(name);
+      while(++p < as) {
+        if(p != pre && att == data.attNameID(p)) return error(ATTDUPL, name);
       }
     }
 
     // perform updates
-    for(int i = nodes.size() - 1; i >= 0; i--) {
-      data.update(nodes.nodes[i], n, v);
+    for(int n = nodes.size() - 1; n >= 0; n--) {
+      data.update(nodes.nodes[n], name, value);
     }
     return true;
   }
@@ -85,7 +93,7 @@ public final class Update extends AUpdate {
    * @return success flag
    */
   private boolean node(final Data data, final Nodes nodes) {
-    byte[] v = token(args[0]);
+    byte[] v = token(args[2]);
     final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
 
@@ -94,7 +102,7 @@ public final class Update extends AUpdate {
     } else if(kind == Data.ELEM || pi) {
       if(!check(v)) return error(NAMEINVALID, v);
       if(pi) {
-        final byte[] vv = token(args[1]);
+        final byte[] vv = token(args[3]);
         v = v.length == 0 ? vv : concat(v, SPACE, vv);
       }
     }
@@ -102,7 +110,8 @@ public final class Update extends AUpdate {
     // check if nodes to be updated have the same type
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
-      if(k != kind) return error(UPDATENODE, CmdUpdate.values()[kind]);
+      if(k != kind) return error(UPDATENODE,
+          CmdUpdate.values()[kind].name().toLowerCase());
     }
 
     // perform updates
@@ -112,6 +121,9 @@ public final class Update extends AUpdate {
 
   @Override
   public String toString() {
-    return name() + " " + getType() + args();
+    final StringBuilder sb = new StringBuilder(Cmd.UPDATE + " " + getType());
+    sb.append(quote(args[2]));
+    if(args.length == 4) sb.append(quote(args[3]));
+    return sb.append(' ' + AT + ' ' + args[1]).toString();
   }
 }

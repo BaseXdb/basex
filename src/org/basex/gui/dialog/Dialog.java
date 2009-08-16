@@ -35,7 +35,7 @@ public abstract class Dialog extends JDialog {
   private int[] loc;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to main window
    * @param title dialog title
    */
@@ -44,7 +44,7 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    * @param title dialog title
    * @param modal modal flag
@@ -208,7 +208,7 @@ public abstract class Dialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static boolean confirm(final Component comp, final String text) {
-    return JOptionPane.showConfirmDialog(comp, text, DIALOGINFO,
+    return JOptionPane.showConfirmDialog(comp, text, NAME,
         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
   }
 

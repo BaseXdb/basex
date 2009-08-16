@@ -4,7 +4,7 @@ import org.basex.data.FTPos;
 import org.basex.gui.view.ViewRect;
 
 /**
- * View Rectangle.
+ * View rectangle.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

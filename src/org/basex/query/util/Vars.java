@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import java.io.IOException;
+import org.basex.Text;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
@@ -41,7 +42,7 @@ public final class Vars extends ExprInfo {
   /**
    * Compiles the variables.
    * @param ctx query context
-   * @throws QueryException xquery exception
+   * @throws QueryException query exception
    */
   void comp(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < size; i++) vars[i].comp(ctx);
@@ -64,7 +65,7 @@ public final class Vars extends ExprInfo {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < size; i++)
-      sb.append((i == 0 ? "" : "\n") + i + ": " + vars[i]);
+      sb.append((i == 0 ? "" : Text.NL) + i + ": " + vars[i]);
     return sb.toString();
   }
 }

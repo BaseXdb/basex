@@ -51,7 +51,7 @@ public final class DialogPrefs extends Dialog {
   private final BaseXBack buttons;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param main reference to the main window
    */
   public DialogPrefs(final GUI main) {

@@ -51,7 +51,7 @@ explore_title=Explore
 # Dialog Windows
 d_info=情報
 d_fctitle=ディレクトリの選択
-d_export=XML文書の保存
+d_export=保存
 
 dc_filter=フィルター
 dc_title=XML文書の保存
@@ -76,6 +76,7 @@ dc_chopinfo=このオプションはタグとコンテンツの間にある全�
 dc_intparseinfo=このオプションをオフにすると、Java標準のXMLパーサーが使用されます。
 dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します (&...;)。
 dc_dtdinfo=このオプションをオフにすると、DTDをスキップします。
+dc_pathinfo=A path summary speeds up path resolutions
 dc_txtinfo=XPathクエリーを高速化するためにテキストノードにインデックスが作成されます。
 dc_attinfo=XPathクエリーを高速化するために属性値にインデックスが作成されます。
 dc_ftxinfo=XPath全文検索を高速化するために全文インデックスが作成されます。
@@ -122,15 +123,17 @@ dd_title=データベースの削除
 dd_question=データベース '%' を削除します。\nよろしいですか。
 
 dx_question=ノードの削除か。
+dq_question=Save changes to %?
 
 dp_title=設定
 dp_dbpath=データベースパス (データベースを手動で移動する必要があります。)
 dp_inter=ユーザーインターフェース
-dp_lf=Use Javaのルック＆フィール(再起動が必要です)
+dp_lf=Use Javaのルック＆フィール
 dp_focus=リアルタイムマウスフォーカス
 dp_simplefd=簡易版ファイル選択画面を使用
 dp_names=タグを@name属性で置き換え
-dp_lang=言語(再起動が必要です)
+dp_lang=言語
+dp_restart=再起動が必要です
 
 dn_title=新規データの作成
 dn_name=名前
@@ -164,11 +167,11 @@ dm_choice3=タイトル有り、枠線無し
 dm_choice4=タイトル有り、枠線最細
 dm_choice5=タイトル有り、枠線細
 dm_offset=Offsets
-dm_size=Size determined by
+dm_size=Ratio:
 dm_size_children=number of children
 dm_size_fssize=file size
 dm_size_textsize=text length
-dm_size_both=children and file size
+dm_size_both=children/text length
 
 dz_total=メモリ合計
 dz_reserved=予約メモリ量
@@ -204,7 +207,7 @@ c_edit=編集
 c_edittt=XMLノードの編集
 c_exit=終了
 c_exittt=アプリケーションを終了します。
-c_export=XMLの出力
+c_export=の出力
 c_exporttt=現在のデータベースをXML文書として出力します。
 c_filter=選択中のノードのフィルター
 c_filtertt=選択されたノードをフィルターします（？）。
@@ -283,12 +286,11 @@ proc_outmem=メモリー不足。\n以下のヒントが役に立つかもしれ
 cmd_no=Expecting command.
 cmd_unknown=不明なコマンドです '%'
 cmd_similar='%' の間違いではないですか。
-cmd_ping=接続に成功しました。
 
 # Help Commands
-help_short=try 'help'
-help_intro="help" と入力すると全般的な情報が得られます。
-help_long='help [...]' と入力すると、コマンドについての情報が得られます。
+help_short=try "%"
+help_intro="%" と入力すると全般的な情報が得られます。
+help_long="% [...]" と入力すると、コマンドについての情報が得られます。
 
 # Create Command
 pc_create=データベースが作成されました。
@@ -321,8 +323,8 @@ db_dropped=データベース '%' が削除されました。
 db_notdropped=データベースを削除できませんでした。
 db_inuse=Database is currently used by other clients.
 db_notopened=データベースを開けませんでした。
-db_opened=データベース % を開きました。
-db_exported=データベースを % に出力しました。
+db_opened=データベース "%" が % を開きました。
+db_exported=データベース "%" が % に出力しました。
 
 # Index commands
 in_created=% にインデックスが作成されました。
@@ -336,7 +338,6 @@ cs_client=クライアント
 
 # Server Info
 srv_connect=サーバーと通信できません。
-srv_port=ポート番号が不正です。
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
 srv_start=開始しました。\nリクエストを待っています。
@@ -388,6 +389,9 @@ uc_invalid=不正な名 "%"
 uc_txtinvalid=テキストノードを空に出来ません。
 uc_namespaces=名前空間付きの文書を更新できません。
 
+# General Commands
+gc_seterr=Could not set property '%' to '%'.
+
 # Info Strings
 info_head=データベース情報
 info_index=インデックス
@@ -420,6 +424,7 @@ info_mainmem=メインメモリモード
 info_tags=タグインデックス
 info_atts=属性名インデックス
 info_ns=名前空間
+info_pathindex=Path Summary
 info_txtindex=テキストインデックス
 info_atvindex=属性インデックス
 info_ftindex=全文インデックス
@@ -436,97 +441,72 @@ info_entries=% entries
 
 # Command Help
 ch_nohelp=ヘルプがありません。
-ch_dummydatabase0=データベースコマンド:
+ch_helpdatabase0=データベースコマンド:
 ch_create1=データベース又はインデックスの作成
 ch_create2=XMLあるいはファイルシステムからデータベースの作成、又はインデックスの作成:
-ch_create3=XML文書 [path] からデータベースを作成します。
-ch_file= [path] [name?]:
-ch_create4= [path] [name] ([mount point] [backing store] with fuse support only):
-ch_create5= ディレクトリ [path] からデータベース [name] を作成します。(using [mount point] and [backing store])
-ch_create6= 指定されたインデックスを作成します。
-ch_open0=[database]
-ch_open1=[database] を開く
-ch_open2=指定されたデータベース [database] を開きます。
+ch_create3=XML文書 [%2] からデータベースを作成します。
+ch_create4=指定されたインデックスを作成します。
+ch_create5=ディレクトリ [%2] からデータベース [%1] を作成します。
+ch_create6=using [%] and [%] if FUSE is activated)
+ch_open1=データベースを開く
+ch_open2=指定されたデータベース [%] を開きます。
 ch_info1=現在のデータベースに関する情報を表示します。
 ch_info21=現在開いているデータベースに関する情報を表示します。
-ch_info22=- 引数無し: 一般事項の表示
-ch_info23=: データベース情報を表示します。
-ch_info24=: インデックス情報を表示します。
-ch_info25= [start end]|[query]: XMLテーブルの表示
+ch_info22=引数無し: 一般事項の表示
+ch_info23=データベース情報を表示します。
+ch_info24=インデックス情報を表示します。
+ch_info25=XMLテーブルの表示
 ch_close1=現在のデータベースを閉じる
 ch_close2=現在のデータベースを閉じて、メインメモリをリセットします。
 ch_list1=利用可能なデータベースの一覧
 ch_list2=利用可能なデータベースの一覧を表示します。
 ch_drop1=データベース又はインデックスの削除
 ch_drop2=以下の引数が指定可能です。
-ch_drop22=データベース [name] を削除します。
-ch_drop21= [name]:
-ch_drop23=指定されたインデックスを削除します。
+ch_drop21=データベース [%] を削除します。
+ch_drop22=指定されたインデックスを削除します。
 ch_optimize1=データベースの最適化
 ch_optimize2=現在のデータベース構造を最適化します。
-ch_export0=[file]
 ch_export1=データベースをXMLで出力
-ch_export2=現在のコンテクストをXML文書として [file] に出力します。
-ch_dummyquery0=クエリーコマンド:
-ch_xpath0=[query]
-ch_xpath1=XPathクエリーの評価
-ch_xpath2=指定されたXPath [query] を評価し、結果を表示します。
-ch_xquerymv0=[hits] [subhits] ["query"]
+ch_export2=現在のコンテクストをXML文書として [%] に出力します。
+ch_helpquery0=クエリーコマンド:
 ch_xquerymv1=MedioVisクエリーの評価
-ch_xquerymv2=指定されたXPath [query] を評価し、結果を [hits] 件まで、\n 下位の要素を [subhits] 件までに制限して表示します。
-ch_xquery0=[query]
-ch_xquery1=XQuery [query] の評価
+ch_xquerymv2=指定されたXQuery [%] を評価し、結果を [%] 件まで、\n 下位の要素を [%] 件までに制限して表示します。
+ch_xquery1=XQuery の評価
 ch_xquery2=XQueryを評価し、結果を表示します
-ch_run0=[file]
-ch_run1=Evaluate XQuery from [file].
-ch_run2=Evaluates an XQuery from the specified file and prints the result.
-ch_find0=[query]
+ch_run1=Evaluate file as XQuery.
+ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。
-ch_cs0=[query]
-ch_cs1=XPathクエリーを評価、結果を新しいコンテキストセットに（？）
-ch_cs2=指定されたXPath [query] を評価し、結果を新しい\nコンテキストセットにします。
-ch_bash1=bashの開始
-ch_bash2=bashモードを開始します。
-ch_dummyupdate0=更新コマンド:
-ch_copy0=[pos] [source],[target]
+ch_cs1=XQueryクエリーを評価、結果を新しいコンテキストセットに（？）
+ch_cs2=指定されたXQuery [%] を評価し、結果を新しい\nコンテキストセットにします。
+ch_helpupdate0=更新コマンド:
 ch_copy1=XMLノードのコピー
-ch_copy2=[source] を評価し、結果を [target] の [pos] 番目の\n子ノードとしてコピーします。 (0=末尾).
-ch_delete0=["target"]
+ch_copy2=[%] を評価し、結果を [%] の [%] 番目の\n子ノードとしてコピーします。 (0=末尾).
 ch_delete1=XMLノードの削除
-ch_delete2=指定された [target] クエリーを満たすノードを削除します。
+ch_delete2=指定された [%] クエリーを満たすノードを削除します。
 ch_insert1=XMLノードの挿入
-ch_insert2=ノード（または断片）を[target] の [pos] 番目の\n子ノード(0=最後の子ノード)として挿入:
-ch_insert21=[name] [pos] [target]: [name] の挿入
-ch_insert22=[text] [pos] [target]: [text] の挿入
-ch_insert23=[name] [value] [target]: [name] と [value] の挿入
-ch_insert24=[text] [pos] [target]: [text] の挿入
-ch_insert25=[name] [value] [pos] [target]: [name] と [value] の挿入
-ch_insert26=[frag] [pos] [target]: [frag] の挿入
+ch_insert2=ノード（または断片）を[%2] の [%1] 番目の\n子ノード(0=最後の子ノード)として挿入:
+ch_insert21=[%] の挿入
+ch_insert22=[%] と [%] の挿入
 ch_update1=XMLノードの更新
-ch_update2=指定された [target] クエリーを満たすノードを更新します。:
-ch_update21=[name] [target]: ターゲットを [name] に更新
-ch_update22=[text] [target]: ターゲットを [text] に更新
-ch_update23=[name] [value] [target]: ターゲットを  [name] と [value] に更新
-ch_update24=[text] [target]: ターゲットを [text] に更新
-ch_update25=[name] [value] [target]: ターゲットを [name] と [value] に更新
-ch_dummygeneral0=全般的なコマンド:
-ch_set0=[option] [value]?
-ch_set1=グローバルオプションをセットします(現在の値を見るには 'info' と入力します)。
-ch_set2=Available [option]s with [value = on|off]:
-ch_set21= [all?]: (全ての)プロセス情報の表示
-ch_set22=: デバッグ情報の表示
-ch_set23=: クエリー結果のシリアル化
-ch_set24=: 結果をXMLとしてシリアル化
-ch_set25=: メインメモリモード
-ch_set26=: XML中の空白の切り捨て
-ch_set27=: XML実体のパース
-ch_set28=: テキストのインデックス作成
-ch_set29=: 属性値のインデックス作成
-ch_set31=: Full-text indexing
-ch_help1=ヘルプをオンにする
-ch_help11= コマンド
-ch_help2=[command] が指定された場合、指定されたコマンドに関する情報が\n 表示されます。指定しなかった場合は全てのコマンドが表示されます。\n'all' が指定された場合、隠しコマンドも共に表示されます。
+ch_update2=指定された [%] クエリーを満たすノードを更新します。:
+ch_update21=ターゲットを [%] に更新
+ch_update22=ターゲットを  [%] と [%] に更新
+ch_helpgeneral0=全般的なコマンド:
+ch_set1=グローバルオプションをセットします(現在の値を見るには '%' と入力します)。
+ch_set2=Available options [%] with [%] = on/off:
+ch_set21=(全ての)プロセス情報の表示
+ch_set22=デバッグ情報の表示
+ch_set23=クエリー結果のシリアル化
+ch_set24=結果をXMLとしてシリアル化
+ch_set25=メインメモリモード
+ch_set26=XML中の空白の切り捨て
+ch_set27=XML実体のパース
+ch_set28=テキストのインデックス作成
+ch_set29=属性値のインデックス作成
+ch_set31=Full-text indexing
+ch_help1=ヘルプをオンにする % コマンド
+ch_help2=[%] が指定された場合、指定されたコマンドに関する情報が\n 表示されます。指定しなかった場合は全てのコマンドが表示されます。\n'all' が指定された場合、隠しコマンドも共に表示されます。
 ch_exit1=終了
 
 # Help Texts
@@ -556,7 +536,7 @@ h_fsall=このチェックボックスを選択すると、ファイルシステ
 h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
 h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
 h_meta=このチェックボックスを選択すると、多くのファイルからメタデータも抽出されます。例えば、画像の解像度、MP3ファイルのID3タグ、Eメールファイルのコンテンツなどです。
-h_cont=このチェックボックスを選択すると、ファイル内のテキスト情報をデータベースに含めることが出来ます。テキスト情報を含めた場合、それらはXPath や XQueryによって検索することが出来ます。
+h_cont=このチェックボックスを選択すると、ファイル内のテキスト情報をデータベースに含めることが出来ます。テキスト情報を含めた場合、それらはXQueryによって検索することが出来ます。
 h_fsmax=インポートされるテキストファイルのサイズの上限を設定します。
 h_mapatts=このチェックボックスを選択すると、属性はツリーマップの中に表示されます。
 h_maplayout=ここではツリーマップビューのレイアウトアルゴリズムを変更します。データベースを開いている場合、変更は即座に反映されます。
@@ -572,9 +552,9 @@ h_font=ここでは各ビューで使用されるフォントを選択できま�
 h_mmem=メモリモードでは、クエリーは50-80% 高速に実行されます。その代わり、メモリ使用量が増大しデータベースに対する更新は利用できません。
 h_colors=スライダーを動かしてユーザーインターフェースの色を変更して下さい。
 h_cmd=ここにBaseXのコマンドを入力できます。'help' と入力すると全てのコマンドが表示されます。\n\n以前の入力したコマンドを呼び出すには↑↓ボタンを使います。
-h_searchxml=テキストフィールドに何か入力してXML文書を検索します。以下の文法が使えます。\n...      タグとテキストを検索します。\n=...   入力と完全に一致するテキストノードを検索します。\n@ ...  属性と属性値を検索します。\n@=   入力と完全に一致する属性値を検索します。\n/...     入力をXPathとして評価します。
+h_searchxml=テキストフィールドに何か入力してXML文書を検索します。以下の文法が使えます。\n...      タグとテキストを検索します。\n=...   入力と完全に一致するテキストノードを検索します。\n@ ...  属性と属性値を検索します。\n@=   入力と完全に一致する属性値を検索します。\n/...     入力をXQueryとして評価します。
 h_searchfs=テキストフィールドに何か入力してファイルシステムを検索します。以下の文法が使えます。\n...      ファイルやディレクトリを検索します。\n= ...    入力された値と完全に一致するファイルを検索します。\n. ..     拡張子を検索します。\n< ...    入力された値よりサイズの小さいファイルを検索します。\n> ...    入力された値よりサイズの大きいファイルを検索します。\n\n!に続けてBaseXコマンドを入力する事が出来ます。
-h_xpath=XPathモードでは簡単なXPathを入力できます。XPathは通常XQueryよりも高速に処理されます。XPath言語はXML文書を木構造で表現したものを元にその木構造を移動したり、豊富な検索条件によりノードを選択する事が出来ます。
+h_xpath=XQueryモードでは簡単なXQueryを入力できます。
 h_modefilt=リアルタイムフィルタリングが無効な場合、Ctrl+ENTERを押すことにより検索結果を表示できます。
 h_map=この視覚化の方法はツリーマップ（TreeMap）と呼ばれ、XML文書の全てのノードは四角で表現され、領域全体を埋めつくします。ノードをクリックするとハイライト表示され、ダブルクリックするとそのノード以下が表示されます。各要素でライトクリックするとポップアップメニューが表示されます。
 h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
@@ -587,7 +567,7 @@ h_plotitem=With this combo box you can select the item to display.
 h_folder=全てのXMLノードを通常の木構造で表示します。ノードの横の矢印をクリックすることにより開閉できます。また、ノードをクリックするとハイライト表示、ダブルクリックするとそのノードにズームインします。XML文書の探索には効率的な方法です。また各要素でライトクリックするとポップアップメニューが表示されます。
 h_table=XMLノードを表形式で表示します。テキストをクリックすると、そのテキストを持つ全てのノードがハイライト表示されます。テキストをダブルクリックすると、そのノード以下が表示されます。また各要素でライトクリックするとポップアップメニューが表示されます。
 h_text=このパネルはクエリーの結果やその他出力を表示します。\n\nキーボードショートカット:'-' と '+' で全てのパネルのフォントサイズを変更できます。任意のテキストを入力することによりインクリメンタルサーチでテキストを簡単に検索する事が出来ます。
-h_info=このパネルではXPathやXQueryのコンパイル・評価についての情報を簡単なプロファイル情報と共に表示します。
+h_info=このパネルではXQueryのコンパイル・評価についての情報を簡単なプロファイル情報と共に表示します。
 h_explore=単純検索モードは簡単にXML文書内を検索できます。
 h_xquery=このテキストエリアには任意のXQuery 1.0クエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_searchcat=このコンボボックスには、現在のXML文書の全てのタグと属性名が表示されます。リストから項目を選択すると他のビューで検索結果がマークされます。選択した項目がテキスト値を含んでいる場合、追加の入力画面が表示され、そこでさらに検索結果の絞り込みを行えます。

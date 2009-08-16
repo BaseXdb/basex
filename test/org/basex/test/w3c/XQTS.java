@@ -1,7 +1,10 @@
 package org.basex.test.w3c;
 
+import org.basex.data.Nodes;
+import org.basex.query.QueryContext;
+
 /**
- * XQuery Test Suite Wrapper.
+ * XQuery Test Suite wrapper.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -9,7 +12,7 @@ package org.basex.test.w3c;
 public final class XQTS extends W3CTS {
   /**
    * Main method of the test class.
-   * @param args command line arguments (ignored)
+   * @param args command-line arguments (ignored)
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
@@ -22,4 +25,10 @@ public final class XQTS extends W3CTS {
   public XQTS() {
     super("XQTS");
   }
+
+  @Override
+  void init(final Nodes root) { }
+
+  @Override
+  void parse(final QueryContext qctx, final Nodes root) { }
 }

@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import org.basex.BaseX;
 import org.basex.util.Array;
 import org.basex.util.Set;
 import org.basex.util.Token;
@@ -46,8 +47,11 @@ public final class MemValues extends Index {
 
   @Override
   public byte[] info() {
-    return Token.token(getClass().getSimpleName());
+    return Token.token(BaseX.name(this));
   }
+
+  @Override
+  public void close() { }
 
   /** MemValue Index. */
   static final class MemValueIndex extends Set {

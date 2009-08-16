@@ -32,8 +32,7 @@ public abstract class Index {
 
   /**
    * Closes the index.
-   * @throws IOException in case of write errors
+   * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  public void close() throws IOException { }
+  public abstract void close() throws IOException;
 }

@@ -8,18 +8,17 @@ import org.basex.core.Process;
 import org.basex.data.Data;
 
 /**
- * Evaluates the 'close' command. Removes the current database from
- * memory and releases memory resources.
+ * Evaluates the 'close' command and closes the current database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Close extends Process {
   /**
-   * Constructor.
+   * Default constructor.
    */
   public Close() {
-    super(0);
+    super(STANDARD);
   }
 
   @Override
@@ -27,10 +26,9 @@ public final class Close extends Process {
     try {
       final Data data = context.data();
       if(data == null) return true;
-      final String name = data.meta.name;
       close(context, data);
       context.closeDB();
-      return info(DBCLOSED, name);
+      return info(DBCLOSED, data.meta.name);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(DBCLOSEERR);

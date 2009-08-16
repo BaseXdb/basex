@@ -1,16 +1,14 @@
 package org.basex.test.cs;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.Socket;
-import org.basex.BaseX;
+import org.basex.core.ALauncher;
+import org.basex.core.Context;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
-import org.basex.io.PrintOutput;
+import org.basex.io.NullOutput;
 import org.basex.server.BaseXServerNew;
 import org.basex.server.ClientLauncherNew;
 
@@ -21,87 +19,77 @@ import org.basex.server.ClientLauncherNew;
  * @author Andreas Weiler
  */
 public final class LockingTest {
-  /** Socket from Client1.*/
-  Socket socket1;
-  /** Socket from Client2. */
-  Socket socket2;
+  /** Database Context. */
+  private Context context = new Context();
   /** Read Query. */
   String read;
-  /** Server Thread. */
-  Thread st;
-  /** BaseXServer. */
-  BaseXServerNew bxs;
 
   /**
    * Main method, launching the test.
-   * @param args command line arguments
+   * @param args command-line arguments
+   * @throws Exception exception
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws Exception {
     new LockingTest();
   }
 
   /**
    * Private constructor.
+   * @throws Exception exception
    */
-  private LockingTest() {
+  private LockingTest() throws Exception {
     startTheServer();
-    try {
-      final int port = bxs.context.prop.num(Prop.PORT);
-      final String host = bxs.context.prop.get(Prop.HOST);
-      socket1 = new Socket(host, port);
-      socket2 = new Socket(host, port);
-    } catch(final IOException ex) {
-      ex.printStackTrace();
+
+    read = "for $country in //country for $city in //city where"
+        + " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
+    int cnr = 2;
+    for(int i = 0; i < cnr; i++) {
+      startAClient(new ClientLauncherNew(context), i);
     }
-    read = "for $country in //country for $city in //city where" +
-    " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
-    startTests();
   }
 
   /**
    * Starts the server.
    */
   private void startTheServer() {
-    st = new Thread() {
+    new Thread() {
       @Override
       public void run() {
-        bxs = new BaseXServerNew("-v");
+        new BaseXServerNew("-v");
       }
-    };
-    st.start();
+    }.start();
   }
 
   /**
-   * Starts the tests.
+   * Starts a client.
+   * @param client client reference
+   * @param c int
    */
-  private void startTests() {
-    exe(socket1, new Open("factbook"));
-    exe(socket2, new Open("factbook"));
-    exe(socket1, new XQuery(read));
-    exe(socket2, new XQuery(read));
-    exe(socket1, new Insert("element", "aa", "0", "//members"));
-    exe(socket2, new Delete("//aa"));
-    exe(socket1, new XQuery(read));
-    BaseX.out("\nEnd of Tests\n");
+  private void startAClient(final ALauncher client, final int c) {
+    new Thread() {
+      int check = c;
+      @Override
+      public void run() {
+        exe(client, new Open("factbook"));
+        exe(client, new XQuery(read));
+        if(check % 2 == 0) {
+          exe(client, new Insert("element", "//members", "aa"));
+        } else {
+          exe(client, new Delete("//aa"));
+        }
+      }
+    }.start();
   }
 
   /**
-   * Executes the process with the specified socket.
-   * @param s Socket
-   * @param p process
+   * Executes the ClientLauncher.
+   * @param client client reference
+   * @param pr process to be executed
    */
-  private void exe(final Socket s, final Process p) {
-    final ClientLauncherNew proc = new ClientLauncherNew(p, s);
+  void exe(final ALauncher client, final Process pr) {
     try {
-      final boolean ok = proc.execute();
-      if(ok && p.printing()) {
-        final PrintOutput out = new PrintOutput(System.out);
-        proc.out(out);
-        out.close();
-      }
-    } catch(final FileNotFoundException ex) {
-      ex.printStackTrace();
-    } catch(final IOException ex) {
+      if(client.execute(pr)) client.output(new NullOutput());
+    } catch(IOException ex) {
       ex.printStackTrace();
     }
   }

@@ -5,6 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
@@ -22,6 +23,8 @@ public final class FTIndexAccess extends Simple {
   final FTExpr ftexpr;
   /** Index context. */
   final IndexContext ictx;
+  /** Scoring flag. */
+  final boolean scoring;
 
   /**
    * Constructor.
@@ -31,6 +34,7 @@ public final class FTIndexAccess extends Simple {
   public FTIndexAccess(final FTExpr ex, final IndexContext ic) {
     ftexpr = ex;
     ictx = ic;
+    scoring = !ic.ctx.ftfast;
   }
 
   @Override
@@ -41,8 +45,14 @@ public final class FTIndexAccess extends Simple {
       @Override
       public Item next() throws QueryException {
         final FTItem it = ir.next();
-        // add entry to visualization
-        if(ctx.ftpos != null && it != null) ctx.ftpos.add(it.pre, it.all);
+        if(it != null) {
+          // add entry to visualization
+          if(ctx.ftpos != null) ctx.ftpos.add(it.pre, it.all);
+          // assign scoring, if necessary and not done yet
+          if(scoring) it.score();
+          // remove matches reference to save memory
+          it.all = null;
+        }
         return it;
       }
     };
@@ -58,6 +68,11 @@ public final class FTIndexAccess extends Simple {
   @Override
   public boolean duplicates(final QueryContext ctx) {
     return ictx.dupl;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof FTIndexAccess;
   }
 
   @Override

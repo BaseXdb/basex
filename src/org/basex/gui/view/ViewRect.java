@@ -1,7 +1,9 @@
 package org.basex.gui.view;
 
+import org.basex.BaseX;
+
 /**
- * View Rectangle.
+ * View rectangle.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -52,7 +54,7 @@ public class ViewRect {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[x=" + x + ",y=" + y + ",h=" + h +
+    return BaseX.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
       ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }
 }

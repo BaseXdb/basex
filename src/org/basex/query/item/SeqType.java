@@ -39,7 +39,7 @@ public final class SeqType {
    * Checks the instance of the specified iterator.
    * @param iter iteration to be checked
    * @return result of check
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public boolean instance(final Iter iter) throws QueryException {
     Item it = iter.next();
@@ -114,7 +114,7 @@ public final class SeqType {
    * Checks the sequence extension.
    * @param it item
    * @return same item
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Item check(final Item it) throws QueryException {
     if(ext != null) {

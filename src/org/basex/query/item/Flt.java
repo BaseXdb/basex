@@ -90,7 +90,7 @@ public final class Flt extends Item {
    * Converts the given token into a double value.
    * @param val value to be converted
    * @return double value
-   * @throws QueryException possible converting exception
+   * @throws QueryException query exception
    */
   static float parse(final byte[] val) throws QueryException {
     try {

@@ -46,7 +46,7 @@ public final class Catch extends Single {
    * @param ctx query context
    * @param ex thrown exception
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Iter iter(final QueryContext ctx, final QueryException ex)
       throws QueryException {

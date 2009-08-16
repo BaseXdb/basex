@@ -1,7 +1,7 @@
 package org.basex.gui.view.map;
 
 /**
- * StripLayout Algorithm.
+ * StripLayout algorithm.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Joerg Hauser

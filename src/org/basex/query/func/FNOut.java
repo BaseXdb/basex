@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -51,7 +50,7 @@ final class FNOut extends Fun {
         final Iter si = SeqIter.get(expr[0].iter(ctx));
         msg = Token.string(checkStr(expr[1], ctx)) + " " + si;
         ctx.evalInfo(msg);
-        BaseX.outln(msg);
+        //BaseX.outln(msg);
         return si;
       default:
         return super.iter(ctx);

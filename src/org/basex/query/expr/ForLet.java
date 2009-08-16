@@ -9,17 +9,30 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class ForLet extends Expr {
-  /** Variable inputs. */
-  protected Expr expr;
+public abstract class ForLet extends Single {
   /** Variable. */
   protected Var var;
+
+  /**
+   * Constructor.
+   * @param e variable input
+   * @param v variable
+   */
+  public ForLet(final Expr e, final Var v) {
+    super(e);
+    var = v;
+  }
 
   /**
    * Checks if clause has no scoring and position.
    * @return result of check
    */
   abstract boolean standard();
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.VAR || super.uses(u, ctx);
+  }
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {

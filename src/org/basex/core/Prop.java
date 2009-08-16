@@ -1,7 +1,7 @@
 package org.basex.core;
 
 import java.io.File;
-import org.basex.BaseX;
+import org.basex.Text;
 import org.basex.io.IO;
 
 /**
@@ -16,7 +16,7 @@ public final class Prop extends AProp {
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
-  /** New line string. */
+  /** File separator string. */
   public static final String SEP = System.getProperty("file.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
@@ -34,25 +34,6 @@ public final class Prop extends AProp {
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
 
-  // STATIC PROPERTIES ========================================================
-
-  /** Language (changed after restart). */
-  public static String language;
-  /** Flag for showing language keys. */
-  public static boolean langkeys;
-
-  /** Server mode (shouldn't be overwritten by property file). */
-  public static boolean server = false;
-  /** GUI mode (shouldn't be overwritten by property file). */
-  public static boolean gui = false;
-  /** Web Server mode (shouldn't be overwritten by property file). */
-  public static boolean web = false;
-
-  /** Debug mode. */
-  public static boolean debug = false;
-  /** Last XQuery file. */
-  public static IO xquery;
-
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL +
       "# This here will be overwritten every time, but" + NL +
@@ -60,12 +41,29 @@ public final class Prop extends AProp {
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
+  // STATIC PROPERTIES ========================================================
+
+  /** GUI mode. */
+  public static boolean gui;
+  /** Web Server mode. */
+  public static boolean web;
+
+  /** Language (applied after restart). */
+  public static String language;
+  /** Flag for showing language keys. */
+  public static boolean langkeys;
+  /** Debug mode. */
+  public static boolean debug;
+
+  /** Last XQuery file. */
+  public static IO xquery;
+
   // The following properties will be saved to disk:
 
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
-  public static final Object[] DBPATH = { "DBPATH", HOME + "BaseXData" };
+  public static final Object[] DBPATH = { "DBPATH", HOME + Text.NAME + "Data" };
   /** Web Server path. */
   public static final Object[] WEBPATH = { "WEBPATH", WORK + "web" };
   /** Path to dotty. */
@@ -90,6 +88,9 @@ public final class Prop extends AProp {
 
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
+  /** Web server mode. */
+  public static final Object[] WEB = { "WEB", false };
+
   /** Short query info. */
   public static final Object[] INFO = { "INFO", false };
   /** Detailed query info. */
@@ -117,23 +118,26 @@ public final class Prop extends AProp {
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
   /** Flag for whitespace chopping. */
-  public static final Object[] CHOP = { "CHOP", false };
-  /** Flag for creating a full-text index. */
-  public static final Object[] FTINDEX = { "FTINDEX", false };
+  public static final Object[] CHOP = { "CHOP", true };
+  /** Flag for creating a path summary. */
+  public static final Object[] PATHINDEX = { "PATHINDEX", true };
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
   /** Flag for creating an attribute value index. */
   public static final Object[] ATTRINDEX = { "ATTRINDEX", true };
+  /** Flag for creating a full-text index. */
+  public static final Object[] FTINDEX = { "FTINDEX", false };
+
   /** Flag for loading database table into main memory. */
   public static final Object[] TABLEMEM = { "TABLEMEM", false };
   /** Flag for creating a main memory database. */
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
-  /** Number of index occurrences to print in the index info. */
-  public static final Object[] INDEXOCC = { "INDEXOCC", 10 };
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
+  /** Show all index info. */
+  public static final Object[] INDEXALL = { "INDEXALL", false };
 
   /** Flag for creating a fuzzy index. */
   public static final Object[] FTFUZZY = { "FTFUZZY", true };
@@ -159,10 +163,14 @@ public final class Prop extends AProp {
   /** Server timeout in seconds. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 3600 };
 
+  // DEEPFS OPTIONS ===========================================================
+
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
   /** Fuse support. */
   public static final Object[] FUSE = { "FUSE", false };
+  /** Flag for creating a native (joint) database. */
+  public static final Object[] NATIVEDATA = { "NATIVEDATA", false };
   /**
    * Spotlight integration. If true, on mac platforms spotlight index is used
    * instead of the internal parser implementations.
@@ -179,20 +187,7 @@ public final class Prop extends AProp {
    */
   public Prop() {
     super("");
-
-    // set static properties
-    language = get(LANGUAGE);
-    langkeys = is(LANGKEYS);
-
-    /** Load DeepFS dynamic library and set FUSE support flag. */
-    try {
-      if(is(FUSE)) {
-        System.load(HOME + "workspace/deepfs/build/src/libdeepfs.dylib");
-        BaseX.debug("DeepFS FUSE support enabled ... OK");
-      }
-    } catch(final UnsatisfiedLinkError ex) {
-      set(FUSE, false);
-    }
+    finish();
   }
 
   /**
@@ -213,5 +208,13 @@ public final class Prop extends AProp {
    */
   public File dbpath(final String db) {
     return new File(get(DBPATH) + '/' + db);
+  }
+
+  @Override
+  protected void finish() {
+    Prop.language = get(Prop.LANGUAGE);
+    Prop.langkeys = is(Prop.LANGKEYS);
+    Prop.debug = is(Prop.DEBUG);
+    Prop.web = is(Prop.WEB);
   }
 }

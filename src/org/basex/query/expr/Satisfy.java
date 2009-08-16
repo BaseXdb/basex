@@ -11,7 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
 /**
- * Some/Every Satisfier Clause.
+ * Some/Every satisfier clause.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -64,7 +64,7 @@ public final class Satisfy extends Expr {
    * @param it iterator
    * @param p variable position
    * @return satisfied flag
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private boolean iter(final QueryContext ctx, final Iter[] it,
       final int p) throws QueryException {

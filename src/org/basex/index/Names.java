@@ -22,7 +22,7 @@ public final class Names extends Set {
   private StatsKey[] stat;
 
   /**
-   * Empty Constructor.
+   * Default constructor.
    */
   public Names() {
     stat = new StatsKey[CAP];
@@ -78,7 +78,7 @@ public final class Names extends Set {
   /**
    * Writes the names to the specified output stream.
    * @param out output stream
-   * @throws IOException in case the file could not be written
+   * @throws IOException I/O exception
    */
   public synchronized void write(final DataOutput out) throws IOException {
     out.writeBytesArray(keys);

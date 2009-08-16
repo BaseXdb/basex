@@ -1,7 +1,6 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.Text.*;
-
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +40,6 @@ final class XQueryText extends BaseXText {
    */
   XQueryText(final XQueryView v) {
     super(HELPXQUERY, true, v.gui);
-
     view = v;
     setSyntax(new XQuerySyntax());
   }
@@ -63,15 +61,18 @@ final class XQueryText extends BaseXText {
    */
   void parse() {
     final byte[] qu = getText();
-    final boolean mod = isModule(qu);
-    if(gui.prop.is(GUIProp.EXECRT) && !mod) {
-      query(false);
+    final boolean module = isModule(qu);
+    boolean mod = !Token.eq(qu, last);
+    view.modified(view.modified || mod);
+
+    if(gui.prop.is(GUIProp.EXECRT) && !module && mod) {
+      query(qu, true);
     } else {
       try {
         last = qu;
-        final String xq = Token.string(qu);
+        final String xq = qu.length == 0 ? "." : Token.string(qu);
         final QueryContext ctx = new QueryContext(gui.context);
-        if(isModule(qu)) ctx.module(xq);
+        if(module) ctx.module(xq);
         else ctx.parse(xq);
         view.info("", true);
       } catch(final QueryException ex) {
@@ -81,17 +82,23 @@ final class XQueryText extends BaseXText {
   }
 
   /**
-   * Performs a query.
-   * @param force force query
+   * Performs the current query.
    */
-  void query(final boolean force) {
-    final byte[] qu = getText();
-    if(force || !Token.eq(qu, last)) {
-      last = qu;
-      if(isModule(qu)) return;
+  void query() {
+    query(getText(), true);
+  }
+
+  /**
+   * Performs the specified query.
+   * @param query to be processed
+   * @param force perform query, even if it has not changed.
+   */
+  void query(final byte[] query, final boolean force) {
+    if(force) {
+      last = query;
+      if(isModule(query)) return;
       BaseXLayout.enable(view.stop, true);
-      final String xq = Token.string(qu);
-      gui.execute(new XQuery(xq.trim().length() == 0 ? "." : xq));
+      gui.execute(new XQuery(query.length == 0 ? "." : Token.string(query)));
     } else {
       showError();
     }

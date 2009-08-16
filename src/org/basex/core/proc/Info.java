@@ -9,14 +9,14 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * Evaluates the 'info' command.
+ * Evaluates the 'info' command and returns general database information.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Info extends AInfo {
   /**
-   * Constructor.
+   * Default constructor.
    */
   public Info() {
     super(PRINTING);
@@ -42,6 +42,7 @@ public final class Info extends AInfo {
     format(tb, INFOENTITY, BaseX.flag(prop.is(Prop.ENTITY)), 0);
 
     tb.add(NL + INFOINDEX + NL);
+    format(tb, INFOPATHINDEX, BaseX.flag(prop.is(Prop.PATHINDEX)), 0);
     format(tb, INFOTEXTINDEX, BaseX.flag(prop.is(Prop.TEXTINDEX)), 0);
     format(tb, INFOATTRINDEX, BaseX.flag(prop.is(Prop.ATTRINDEX)), 0);
     format(tb, INFOFTINDEX, BaseX.flag(prop.is(Prop.FTINDEX)) +

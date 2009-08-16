@@ -1,8 +1,11 @@
 package org.basex.core.proc;
 
+import static org.basex.Text.*;
 import org.basex.core.Process;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
+import org.basex.data.MemData;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -12,17 +15,32 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 abstract class AUpdate extends Process {
-  /** Insert type. */
-  private final String type;
+  /** GUI flag. */
+  protected final boolean gui;
+  /** Target position. */
+  protected int pos;
 
   /**
-   * Constructor.
-   * @param t update type
+   * Protected constructor.
+   * @param g gui gui flag
    * @param a arguments
    */
-  protected AUpdate(final String t, final String... a) {
+  protected AUpdate(final boolean g, final String... a) {
     super(DATAREF | UPDATING, a);
-    type = t;
+    gui = g;
+  }
+
+  /**
+   * Returns the update type.
+   * @return update type.
+   */
+  protected CmdUpdate getType() {
+    try {
+      return CmdUpdate.valueOf(args[0].toUpperCase());
+    } catch(final Exception ex) {
+      error(CMDWHICH, args[0]);
+      return null;
+    }
   }
 
   /**
@@ -61,10 +79,28 @@ abstract class AUpdate extends Process {
   }
 
   /**
-   * Returns the update type.
-   * @return update type.
+   * Returns a string array composed by the three arguments.
+   * @param a first argument
+   * @param b second argument
+   * @param c second argument
+   * @return string array
    */
-  protected CmdUpdate getType() {
-    return CmdUpdate.valueOf(type.toUpperCase());
+  protected static String[] init(final String a, final String b,
+      final String... c) {
+    final StringList list = new StringList();
+    list.add(a);
+    list.add(b);
+    for(final String d : c) list.add(d);
+    return list.finish();
+  }
+
+  /**
+   * Performs some update checks.
+   * @return success flag
+   */
+  protected boolean checkDB() {
+    final Data data = context.data();
+    return data.ns.size() != 0 ? error(UPDATENS) : data instanceof MemData ?
+        error(PROCMM) : pos < 0 ? error(POSINVALID) : true;
   }
 }

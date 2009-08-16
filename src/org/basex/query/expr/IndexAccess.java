@@ -63,6 +63,11 @@ public final class IndexAccess extends Single {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof IndexAccess;
+  }
+
+  @Override
   public String color() {
     return "CC99FF";
   }

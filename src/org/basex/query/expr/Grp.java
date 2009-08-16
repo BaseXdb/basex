@@ -13,12 +13,12 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 
 /**
- * Single Group Expression.
+ * Single group expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Michael Seiferle
  */
-public class Grp extends Expr {
+public final class Grp extends Expr {
   /** Sequence. */
   private SeqIter seq;
   /** Grouping expression. */

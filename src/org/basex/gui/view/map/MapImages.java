@@ -42,7 +42,7 @@ final class MapImages {
   Thread thread;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param panel reference to the treemap
    */
   MapImages(final MapView panel) {

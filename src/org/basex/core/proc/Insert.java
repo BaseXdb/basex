@@ -10,6 +10,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
+import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -18,38 +19,60 @@ import org.basex.io.IOContent;
 import org.basex.util.Token;
 
 /**
- * Inserts an element into the database.
+ * Evaluates the 'insert' command and inserts nodes into the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public final class Insert extends AUpdate {
   /**
-   * Constructor.
-   * @param t insertion type
-   * @param a arguments
+   * Default constructor.
+   * @param type node type, defined in {@link CmdUpdate}
+   * @param position target position
+   * @param target target query
+   * @param vals value(s) to update; two values are expected for
+   * attributes and processing instructions
    */
-  public Insert(final String t, final String... a) {
-    super(t, a);
+  public Insert(final Object type, final String target, final int position,
+      final String... vals) {
+    super(target == null, init(type.toString(), target, vals));
+    pos = position;
+  }
+
+  /**
+   * Constructor, using 0 as target position.
+   * @param type node type, defined in {@link CmdUpdate}.
+   * @param target target query
+   * @param vals value(s) to update; two values are expected for
+   * attributes and processing instructions
+   */
+  public Insert(final Object type, final String target, final String... vals) {
+    this(type.toString(), target, 0, vals);
   }
 
   @Override
   protected boolean exec() {
-    final boolean gui = args[args.length - 1] == null;
-    final Data data = context.data();
-    if(data.ns.size() != 0) return error(UPDATENS);
+    if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query
     final CmdUpdate type = getType();
-    final Nodes nodes = gui ? context.marked() :
-      query(args[type == CmdUpdate.PI ? 3 : 2], null);
-    if(nodes == null) return false;
+    if(type == null) return false;
+
+    final Data data = context.data();
+    Nodes nodes;
+    if(gui) {
+      nodes = context.marked();
+      context.copy(null);
+    } else {
+      nodes = query(args[1], null);
+      if(nodes == null) return false;
+    }
 
     boolean ok = false;
     switch(type) {
       case ATTRIBUTE: ok = attr(data, nodes); break;
-      case FRAGMENT:  ok = frag(data, nodes, gui); break;
-      default:        ok = node(data, nodes, gui); break;
+      case FRAGMENT:  ok = frag(data, nodes); break;
+      default:        ok = node(data, nodes); break;
     }
     if(!ok) return false;
 
@@ -65,11 +88,11 @@ public final class Insert extends AUpdate {
    * @return success flag
    */
   private boolean attr(final Data data, final Nodes nodes) {
-    final byte[] n = Token.token(args[0]);
-    final byte[] v = Token.token(args[1]);
-    final int att = data.attNameID(n);
+    final byte[] name = Token.token(args[2]);
+    final byte[] val = Token.token(args[3]);
+    final int att = data.attNameID(name);
 
-    if(!check(n)) return error(ATTINVALID, n);
+    if(!check(name)) return error(ATTINVALID, name);
 
     // check if all nodes are elements
     for(int i = nodes.size() - 1; i >= 0; i--) {
@@ -80,14 +103,14 @@ public final class Insert extends AUpdate {
       // check uniqueness of attribute names
       final int last = par + data.attSize(par, kind);
       for(int p = par + 1; p < last; p++) {
-        if(att == data.attNameID(p)) return error(ATTDUPL, n);
+        if(att == data.attNameID(p)) return error(ATTDUPL, name);
       }
     }
 
     // perform updates
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
-      data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
+      data.insert(par + data.attSize(par, data.kind(par)), par, name, val);
     }
     return true;
   }
@@ -96,16 +119,12 @@ public final class Insert extends AUpdate {
    * Inserts fragments.
    * @param data data reference
    * @param nodes node reference
-   * @param gui gui flag
    * @return success flag
    */
-  private boolean frag(final Data data, final Nodes nodes, final boolean gui) {
-    final int pos = gui ? 0 : Token.toInt(args[1]);
-    if(pos < 0) return error(POSINVALID, args[1]);
-
+  private boolean frag(final Data data, final Nodes nodes) {
     Data tmp;
     try {
-      final IO io = IO.get(args[0]);
+      final IO io = IO.get(args[2]);
       final Parser parser = prop.is(Prop.INTPARSE) ||
         io instanceof IOContent ? new XMLParser(io, prop) :
         new SAXWrapper(new SAXSource(io.inputSource()), prop);
@@ -130,23 +149,21 @@ public final class Insert extends AUpdate {
    * Inserts nodes.
    * @param data data reference
    * @param nodes node reference
-   * @param gui gui flag
    * @return success flag
    */
-  private boolean node(final Data data, final Nodes nodes, final boolean gui) {
-    byte[] v = token(args[0]);
+  private boolean node(final Data data, final Nodes nodes) {
+    byte[] val = token(args[2]);
     final int kind = getType().ordinal();
     final boolean pi = kind == Data.PI;
     if(kind == Data.ELEM || pi) {
-      if(!check(v)) return error(NAMEINVALID, v);
+      if(!check(val)) return error(NAMEINVALID, val);
       if(pi) {
-        final byte[] vv = token(args[1]);
-        v = v.length == 0 ? vv : concat(v, SPACE, vv);
+        final byte[] vv = token(args[3]);
+        val = val.length == 0 ? vv : concat(val, SPACE, vv);
       }
     }
 
     // check correctness of query
-    final int pos = gui ? 0 : toInt(args[pi ? 2 : 1]);
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);
@@ -160,11 +177,11 @@ public final class Insert extends AUpdate {
       final int pre = pre(par, pos, data);
 
       // merge text nodes if necessary
-      final int up = checkText(data, pre, par, kind);
-      if(up != -1) {
-        data.update(up, concat(data.text(up), v));
+      final int txt = checkText(data, pre, par, kind);
+      if(txt != -1) {
+        data.update(txt, concat(data.text(txt), val));
       } else {
-        data.insert(pre, par, v, kind);
+        data.insert(pre, par, val, kind);
       }
     }
     return true;
@@ -191,6 +208,12 @@ public final class Insert extends AUpdate {
 
   @Override
   public String toString() {
-    return name() + " " + getType() + args();
+    final CmdUpdate type = getType();
+    final StringBuilder sb = new StringBuilder(Cmd.INSERT + " " + type);
+    sb.append(quote(args[2]));
+    if(args.length == 4) sb.append(quote(args[3]));
+    sb.append(" " + INTO + " " + args[1]);
+    if(pos != 0) sb.append(" " + AT + " " + pos);
+    return sb.toString();
   }
 }

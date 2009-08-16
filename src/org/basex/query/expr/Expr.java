@@ -14,18 +14,19 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 
 /**
- * Abstract Expression.
+ * Abstract expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
   /** Usage flags. */
-  protected enum Use {
-    /** Context.  */ CTX,
-    /** Fragment. */ FRG,
-    /** Position. */ POS,
-    /** Variable. */ VAR,
+  public enum Use {
+    /** Context.   */ CTX,
+    /** Fragment.  */ FRG,
+    /** Position.  */ POS,
+    /** Variable.  */ VAR,
+    /** Root Flag. */ ELM,
   }
   /** Undefined value. */
   protected static final int UNDEF = Integer.MIN_VALUE;
@@ -34,7 +35,7 @@ public abstract class Expr extends ExprInfo {
    * Optimizes and compiles the expression.
    * @param ctx query context
    * @return optimized Expression
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public abstract Expr comp(final QueryContext ctx) throws QueryException;
 
@@ -43,7 +44,7 @@ public abstract class Expr extends ExprInfo {
    * If this method is not overwritten, {@link #atomic} must be implemented.
    * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item it = atomic(ctx);
@@ -92,7 +93,7 @@ public abstract class Expr extends ExprInfo {
    * Performs a predicate test and returns the item if test was successful.
    * @param ctx query context
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Item test(final QueryContext ctx) throws QueryException {
     final Item it = ebv(ctx);
@@ -119,7 +120,7 @@ public abstract class Expr extends ExprInfo {
    * Returns the sequence size or 1.
    * @param ctx query context
    * @return result of check
-   * @throws QueryException Exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public long size(final QueryContext ctx) throws QueryException {
@@ -134,10 +135,7 @@ public abstract class Expr extends ExprInfo {
    * @param ctx query context
    * @return result of check
    */
-  @SuppressWarnings("unused")
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return true;
-  }
+  public abstract boolean uses(final Use u, final QueryContext ctx);
 
   /**
    * Checks if the specified variable is removable.
@@ -186,7 +184,7 @@ public abstract class Expr extends ExprInfo {
    * Checks if an index can be used for query evaluation.
    * @param ic index context
    * @return true if an index can be used
-   * @throws QueryException Exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
@@ -199,7 +197,7 @@ public abstract class Expr extends ExprInfo {
    * expression.
    * @param ic index context
    * @return Equivalent index-expression or null
-   * @throws QueryException Exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
@@ -223,7 +221,7 @@ public abstract class Expr extends ExprInfo {
    * @param e expression to be checked
    * @param ctx query context
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
@@ -240,7 +238,7 @@ public abstract class Expr extends ExprInfo {
    * @param e expression to be checked
    * @param ctx query context
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public final long checkItr(final Expr e, final QueryContext ctx)
       throws QueryException {
@@ -255,7 +253,7 @@ public abstract class Expr extends ExprInfo {
    * Returns a token representation or an exception.
    * @param it item to be checked
    * @return item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   protected final long checkItr(final Item it) throws QueryException {
     if(!it.u() && !it.type.instance(Type.ITR)) Err.type(info(), Type.ITR, it);
@@ -266,7 +264,7 @@ public abstract class Expr extends ExprInfo {
    * Throws an exception if the context item is not set.
    * @param ctx query context
    * @return item if everything is ok
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public final Item checkCtx(final QueryContext ctx) throws QueryException {
     final Item it = ctx.item;

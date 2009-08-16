@@ -169,7 +169,7 @@ public class AxisPath extends Path {
    * Compiles the location path.
    * @param ctx query context
    * @return optimized Expression
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Expr c(final QueryContext ctx) throws QueryException {
     // step optimizations will always return step instances
@@ -196,11 +196,14 @@ public class AxisPath extends Path {
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Use.VAR, ctx);
 
-    // check if context is set to a document node
+    // check if context is set to document nodes
     final Data data = ctx.data();
     if(data != null) {
       boolean doc = true;
-      for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
+      if(ctx.item.size(ctx) != ctx.docs || !(ctx.item instanceof Seq) ||
+          ((Seq) ctx.item).val != ctx.doc) {
+        for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
+      }
 
       if(doc) {
         // check if no position is used
@@ -273,7 +276,8 @@ public class AxisPath extends Path {
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // convert single descendant step to child steps
-    if(!data.meta.uptodate || data.ns.size() != 0) return null;
+    if(!data.meta.pathindex || !data.meta.uptodate || data.ns.size() != 0)
+      return null;
 
     ArrayList<PathNode> in = data.path.root();
     for(int s = 0; s <= l; s++) {
@@ -311,98 +315,101 @@ public class AxisPath extends Path {
     // skip position predicates and horizontal axes
     for(final Step s : step) if(!s.axis.down) return this;
 
-    // check if path can be converted to an index access
-    for(int i = 0; i < step.length; i++) {
-      // find cheapest index access
-      final Step stp = step[i];
-      IndexContext ictx = null;
-      int ip = 0;
+    // cache index access costs
+    IndexContext ics = null;
+    int ips = 0;
+    int ms = 0;
 
+    // check if path can be converted to an index access
+    for(int s = 0; s < step.length; s++) {
+      // find cheapest index access
+      final Step stp = step[s];
       // check if resulting index path will be duplicate free
-      final boolean d = stp.pred.length == 0 || pathNodes(data, i) == null;
+      final boolean d = pathNodes(data, s) == null;
 
       // choose cheapest index access
       for(int p = 0; p < stp.pred.length; p++) {
-        final IndexContext ic = new IndexContext(ctx, data, stp, d);
-        if(stp.pred[p].indexAccessible(ic) &&
-            (ictx == null || ictx.is > ic.is)) {
-          ictx = ic;
-          ip = p;
-        }
-      }
-
-      // no index access possible; skip remaining tests
-      if(ictx == null) continue;
-
-      // no results...
-      if(ictx.is == 0) {
-        if(ictx.not) {
-          // not operator... accept all results
-          stp.pred[ip] = Bln.TRUE;
-          continue;
-        }
-        ctx.compInfo(OPTNOINDEX, this);
-        return Seq.EMPTY;
-      }
-
-      // replace expressions for index access
-      final Expr ie = stp.pred[ip].indexEquivalent(ictx);
-
-      if(ictx.seq) {
-        // do not invert path
-        stp.pred[ip] = ie;
-      } else {
-        Step[] inv = {};
-
-        // collect remaining predicates
-        final Expr[] newPreds = new Expr[stp.pred.length - 1];
-        int c = 0;
-        for(int p = 0; p != stp.pred.length; p++) {
-          if(p != ip) newPreds[c++] = stp.pred[p];
-        }
-
-        // invert path before index step
-        for(int j = i; j >= 0; j--) {
-          final Axis a = step[j].axis.invert();
-          if(a == null) break;
-
-          if(j == 0) {
-            if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a,
-                new KindTest(Type.DOC)));
-          } else {
-            final Step prev = step[j - 1];
-            if(prev.pred.length != 0) break;
-            inv = Array.add(inv, Step.get(a, prev.test));
+        IndexContext ic = new IndexContext(ctx, data, stp, d);
+        if(!stp.pred[p].indexAccessible(ic)) continue;
+        if(ic.is == 0) {
+          if(ic.not) {
+            // not operator... accept all results
+            stp.pred[p] = Bln.TRUE;
+            continue;
           }
+          // no results...
+          ctx.compInfo(OPTNOINDEX, this);
+          return Seq.EMPTY;
         }
-        final boolean add = inv.length != 0 || newPreds.length != 0;
-
-        // create resulting expression
-        AxisPath result = null;
-        if(ie instanceof AxisPath) {
-          result = (AxisPath) ie;
-        } else if(add || i + 1 < step.length) {
-          result = add ? new AxisPath(ie, Step.get(Axis.SELF, Test.NODE)) :
-            new AxisPath(ie);
-        } else {
-          return ie;
+        if(ics == null || ics.is > ic.is) {
+          ics = ic;
+          ips = p;
+          ms = s;
+          break;
         }
-
-        // add remaining predicates to last step
-        final int sl = result.step.length - 1;
-        for(final Expr np : newPreds) {
-          result.step[sl] = result.step[sl].addPred(np);
-        }
-        // add inverted path as predicate to last step
-        if(inv.length != 0) {
-          result.step[sl] = result.step[sl].addPred(AxisPath.get(null, inv));
-        }
-        // add remaining steps
-        for(int j = i + 1; j < step.length; j++) {
-          result.step = Array.add(result.step, step[j]);
-        }
-        return result.comp(ctx);
       }
+    }
+
+    // no index access possible...
+    if(ics == null) return this;
+
+    // replace expressions for index access
+    final Step stp = step[ms];
+    final Expr ie = stp.pred[ips].indexEquivalent(ics);
+
+    if(ics.seq) {
+      // do not invert path
+      stp.pred[ips] = ie;
+    } else {
+      Step[] inv = {};
+
+      // collect remaining predicates
+      final Expr[] newPreds = new Expr[stp.pred.length - 1];
+      int c = 0;
+      for(int p = 0; p != stp.pred.length; p++) {
+        if(p != ips) newPreds[c++] = stp.pred[p];
+      }
+
+      // invert path before index step
+      for(int j = ms; j >= 0; j--) {
+        final Axis a = step[j].axis.invert();
+        if(a == null) break;
+
+        if(j == 0) {
+          if(a != Axis.ANC && a != Axis.ANCORSELF)
+            inv = Array.add(inv, Step.get(a, new KindTest(Type.DOC)));
+        } else {
+          final Step prev = step[j - 1];
+          inv = Array.add(inv, Step.get(a, prev.test, prev.pred));
+        }
+      }
+      final boolean add = inv.length != 0 || newPreds.length != 0;
+
+      // create resulting expression
+      AxisPath result = null;
+      if(ie instanceof AxisPath) {
+        result = (AxisPath) ie;
+      } else if(add || ms + 1 < step.length) {
+        result = add ? new AxisPath(ie, Step.get(Axis.SELF, Test.NODE)) :
+          new AxisPath(ie);
+      } else {
+        return ie;
+      }
+
+      // add remaining predicates to last step
+      final int sl = result.step.length - 1;
+      for(final Expr np : newPreds) {
+        result.step[sl] = result.step[sl].addPred(np);
+      }
+      // add inverted path as predicate to last step
+      if(inv.length != 0) {
+        result.step[sl] = result.step[sl].addPred(AxisPath.get(null, inv));
+      }
+      // add remaining steps
+      for(int s = ms + 1; s < step.length; s++) {
+        result.step = Array.add(result.step, step[s]);
+      }
+      return result.comp(ctx);
     }
     return this;
   }
@@ -464,7 +471,9 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
-    if(data != null && data.meta.uptodate && data.ns.size() == 0) {
+    if(data != null && !data.meta.pathindex && data.meta.uptodate &&
+        data.ns.size() == 0) {
+
       ArrayList<PathNode> nodes = data.path.root();
       for(final Step s : step) {
         res = -1;
@@ -500,7 +509,7 @@ public class AxisPath extends Path {
 
   /**
    * Checks if any of the location steps will never yield results.
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void checkEmpty() throws QueryException {
     final int ll = step.length;
@@ -537,7 +546,7 @@ public class AxisPath extends Path {
   /**
    * Throws a static warning.
    * @param s step
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   private void warning(final Step s) throws QueryException {
     Err.or(COMPSELF, s);
@@ -618,7 +627,10 @@ public class AxisPath extends Path {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof AxisPath)) return false;
     final AxisPath ap = (AxisPath) cmp;
-    if(step.length != ap.step.length) return false;
+    if((root == null || ap.root == null) && root != ap.root ||
+        step.length != ap.step.length ||
+        root != null && !root.sameAs(ap.root)) return false;
+
     for(int s = 0; s < step.length; s++) {
       if(!step[s].sameAs(ap.step[s])) return false;
     }

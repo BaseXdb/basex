@@ -9,16 +9,16 @@ import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 
 /**
- * Evaluates the 'prompt' command.
+ * Internal command, returning a console prompt.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Prompt extends Process {
+public final class IntPrompt extends Process {
   /**
-   * Constructor.
+   * Default constructor.
    */
-  public Prompt() {
+  public IntPrompt() {
     super(PRINTING);
   }
 
