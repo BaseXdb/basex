@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+
 /**
  * This is class is used to handle rectangles containing more than one node.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
@@ -10,8 +11,11 @@ final class TreeRect {
   public int x;
   /** Width. */
   public int w;
-  /** Rectangle pre value. */
-  public int pre;
+  /**
+   * Rectangle pre value. In case of multiple pre values used to buffer selected
+   * pre.
+   */
+  public int pre = -1;
   /**
    * array containing all pre values inside the rectangle.
    */

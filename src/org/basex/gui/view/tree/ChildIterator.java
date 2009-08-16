@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+
 import org.basex.data.Data;
 
 /**
