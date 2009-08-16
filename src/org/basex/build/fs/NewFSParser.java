@@ -122,10 +122,33 @@ public final class NewFSParser extends Parser {
      * @return the converted element as byte array;
      */
     public byte[] tag(final String element) {
-      if(prefix.length == 0) return token(element);
-      return concat(prefix, new byte[] { ':'}, token(element));
+      return tag(token(element));
+    }
+
+    /**
+     * Converts the xml element into a byte array containing the correct
+     * namespace prefix.
+     * @param element the xml element to convert.
+     * @return the converted element as byte array;
+     */
+    public byte[] tag(final byte[] element) {
+      if(prefix.length == 0) return element;
+      return concat(prefix, new byte[] { ':'}, element);
     }
   }
+  
+  /** DeepFS tag in fs namespace. */
+   byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
+  /** Directory tag in fs namespace. */
+  byte[] DIR_NS = NewFSParser.NS.FS.tag(DIR);
+  /** File tag in fs namespace. */
+  byte[] FILE_NS = NewFSParser.NS.FS.tag(FILE);
+  /** Content tag in fs namespace. */
+  byte[] CONTENT_NS = NewFSParser.NS.FS.tag(CONTENT);
+  /** Text content tag in fs namespace. */
+  byte[] TEXT_CONTENT_NS = NewFSParser.NS.FS.tag(TEXT_CONTENT);
+  /** XML content tag in fs namespace. */
+  byte[] XML_CONTENT_NS = NewFSParser.NS.FS.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 
@@ -375,7 +398,7 @@ public final class NewFSParser extends Parser {
         NS.XSI.start(builder);
       }
 
-      builder.startElem(DEEPFS, atts);
+      builder.startElem(DEEPFS_NS, atts);
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
           fsimportpath).getCanonicalFile()}) {
@@ -385,7 +408,7 @@ public final class NewFSParser extends Parser {
         parse(f);
         addFSAtts(f, sizeStack[0]);
       }
-      builder.endElem(DEEPFS);
+      builder.endElem(DEEPFS_NS);
     }
     builder.endDoc();
   }
@@ -468,7 +491,7 @@ public final class NewFSParser extends Parser {
   private void dir(final File f) throws IOException {
     atts.reset();
     atts.add(NAME, token(f.getName()));
-    builder.startElem(DIR, atts);
+    builder.startElem(DIR_NS, atts);
     sizeStack[++lvl] = 0;
     parse(f);
 
@@ -478,7 +501,7 @@ public final class NewFSParser extends Parser {
     final long size = sizeStack[lvl];
     addFSAtts(f, size);
 
-    builder.endElem(DIR);
+    builder.endElem(DIR_NS);
 
     // add file size to parent folder
     sizeStack[--lvl] += size;
@@ -497,7 +520,7 @@ public final class NewFSParser extends Parser {
       atts.reset();
       final String name = f.getName();
       atts.add(NAME, token(name));
-      builder.startElem(FILE, atts);
+      builder.startElem(FILE_NS, atts);
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
         if(prop.is(Prop.SPOTLIGHT)) {
@@ -543,7 +566,7 @@ public final class NewFSParser extends Parser {
           addFSAtts(f, size); // only for internal parser
         } // end internal parser
       }
-      builder.endElem(FILE);
+      builder.endElem(FILE_NS);
     }
     // add file size to parent folder
     sizeStack[lvl] += size;
@@ -734,9 +757,9 @@ public final class NewFSParser extends Parser {
         Metadata.XmlSpace.PRESERVE.get());
     else text.chop();
     if(text.size() == 0) return;
-    builder.startElem(TEXT_CONTENT, atts);
+    builder.startElem(TEXT_CONTENT_NS, atts);
     builder.text(text, false);
-    builder.endElem(TEXT_CONTENT);
+    builder.endElem(TEXT_CONTENT_NS);
     endContent();
   }
 
@@ -762,7 +785,7 @@ public final class NewFSParser extends Parser {
     atts.reset();
     atts.add(OFFSET, token(offset));
     atts.add(SIZE, token(size));
-    builder.startElem(CONTENT, atts);
+    builder.startElem(CONTENT_NS, atts);
   }
 
   /**
@@ -771,7 +794,7 @@ public final class NewFSParser extends Parser {
    */
   public void endContent() throws IOException {
     if(contentOpenedCounter > 0) {
-      builder.endElem(CONTENT);
+      builder.endElem(CONTENT_NS);
       contentOpenedCounter--;
     }
   }
@@ -787,7 +810,7 @@ public final class NewFSParser extends Parser {
   public void startXMLContent(final long offset, final long size)
       throws IOException {
     startContent(offset, size);
-    builder.startElem(XML_CONTENT, EMPTY_ATTS);
+    builder.startElem(XML_CONTENT_NS, EMPTY_ATTS);
   }
 
   /**
@@ -795,7 +818,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any error occurs while reading from the file.
    */
   public void endXMLContent() throws IOException {
-    builder.endElem(XML_CONTENT);
+    builder.endElem(XML_CONTENT_NS);
     endContent();
   }
 

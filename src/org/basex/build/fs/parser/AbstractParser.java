@@ -17,22 +17,14 @@ public abstract class AbstractParser {
   /** The MIME type of the file. */
   private final Metadata format;
 
-//  /**
-//   * Constructor for initializing a parser with unknown file type and format.
-//   */
-//  protected AbstractParser() {
-//    type = null;
-//    format = null;
-//  }
-
   /**
    * Constructor for initializing a regular parser.
    * @param t the type of the file.
    * @param m the MIME type of the file.
    */
   protected AbstractParser(final MetaType t, final String m) {
-    type = new Metadata(t);
-    format = new Metadata(m);
+    type = new Metadata().setMetaType(t);
+    format = new Metadata().setMimeType(m);
   }
 
   /**
@@ -41,8 +33,8 @@ public abstract class AbstractParser {
    * @param m the MIME type of the file (as byte array).
    */
   protected AbstractParser(final MetaType t, final byte[] m) {
-    type = new Metadata(t);
-    format = new Metadata(m);
+    type = new Metadata().setMetaType(t);
+    format = new Metadata().setMimeType(m);
   }
 
   // ---------------------------------------------------------------------------

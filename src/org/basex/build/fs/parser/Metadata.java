@@ -85,6 +85,10 @@ public final class Metadata {
     UNKNOWN("unkown", ""),
     /** Plaintext. */
     TXT("text/plain", "txt"),
+    /** HTML. */
+    HTML("text/html", "html"),
+    /** CSS. */
+    CSS("text/css", "css"),
     /** XML. */
     XML("application/xml", "xml"),
     /** KML. */
@@ -95,6 +99,8 @@ public final class Metadata {
     PNG("image/png", "png"),
     /** JPG. */
     JPG("image/jpeg", "jpg"),
+    /** GIF. */
+    GIF("image/gif", "gif"),
     /** BMP. */
     BMP("image/bmp", "bmp");
 
@@ -149,14 +155,14 @@ public final class Metadata {
     IMAGE,
     /** Message resource (e.g. email). */
     MESSAGE,
-    /** Movie resource (e.g. MPEG file). */
-    MOVIE,
     /** Presentation resource (e.g. PPT file). */
     PRESENTATION,
     /** Text resource (e.g. plain text file). */
     TEXT,
     /** Unknown resource type. */
     UNKNOWN,
+    /** Video resource (e.g. MPEG file). */
+    VIDEO,
     /** XML(-based) resource. */
     XML;
 
@@ -414,30 +420,6 @@ public final class Metadata {
   /** Standard constructor. */
   public Metadata() {
     value = Token.EMPTY;
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "type".
-   * @param t the type to set.
-   */
-  Metadata(final MetaType t) {
-    this(TYPE, t.get(), DATA_TYPE_STRING);
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "format".
-   * @param mimeType the MIME type to set.
-   */
-  Metadata(final String mimeType) {
-    this(token(mimeType));
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "format".
-   * @param mimeType the MIME type to set (as byte array).
-   */
-  Metadata(final byte[] mimeType) {
-    this(FORMAT, mimeType, DATA_TYPE_STRING);
   }
 
   /**
@@ -732,5 +714,68 @@ public final class Metadata {
       dt = DATA_TYPE_DURATION;
     }
     return recycle(k, v, dt);
+  }
+
+  /**
+   * Re-initializes the metadata object as type item.
+   * @param t the meta type to set.
+   * @return the metadata item
+   */
+  public Metadata setMetaType(final MetaType t) {
+    return recycle(TYPE, t.get(), DATA_TYPE_STRING);
+  }
+
+  /**
+   * Re-initializes the metadata object as format item.
+   * @param mimeType the MIME type to set
+   * @return the metadata item
+   */
+  public Metadata setMimeType(final String mimeType) {
+    return setMimeType(token(mimeType));
+  }
+
+  /**
+   * Re-initializes the metadata object as format item.
+   * @param mimeType the MIME type to set
+   * @return the metadata item
+   */
+  public Metadata setMimeType(final byte[] mimeType) {
+    return recycle(FORMAT, mimeType, DATA_TYPE_STRING);
+  }
+
+  /**
+   * Re-initializes the metadata object as format item.
+   * @param mimeType the MIME type to set
+   * @return the metadata item
+   */
+  public Metadata setMimeType(final MimeType mimeType) {
+    return setMimeType(mimeType.get());
+  }
+
+  /**
+   * Initializes the metadata object as special XML element "type".
+   * @param t the type to set.
+   */
+  @Deprecated
+  public Metadata(final MetaType t) {
+    this(TYPE, t.get(), DATA_TYPE_STRING);
+  }
+
+  /**
+   * Initializes the metadata object as special XML element "format".
+   * @param mimeType the MIME type to set.
+   */
+  @Deprecated
+  public Metadata(final String mimeType) {
+    this(token(mimeType));
+  }
+
+  /**
+   * Initializes the metadata object as special XML element "format".
+   * @param mimeType the MIME type to set (as byte array).
+   */
+  @Deprecated
+  Metadata(final byte[] mimeType) {
+    this(FORMAT, mimeType, DATA_TYPE_STRING);
   }
 }

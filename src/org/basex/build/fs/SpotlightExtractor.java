@@ -15,6 +15,8 @@ import org.basex.build.fs.parser.Metadata;
 import org.basex.build.fs.parser.ParserUtil;
 import org.basex.build.fs.parser.Metadata.DateField;
 import org.basex.build.fs.parser.Metadata.IntField;
+import org.basex.build.fs.parser.Metadata.MetaType;
+import org.basex.build.fs.parser.Metadata.MimeType;
 import org.basex.build.fs.parser.Metadata.StringField;
 import org.basex.util.LibraryLoader;
 import org.basex.util.Token;
@@ -28,6 +30,88 @@ public final class SpotlightExtractor {
 
   static {
     LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
+  }
+
+  /**
+   * Mapping of spotlight media types to DeepFS meta types.
+   * @author Bastian Lemke
+   */
+  enum SpotlightMediaType {
+    /** Sound. */
+    SOUND(MetaType.AUDIO),
+    /** Video. */
+    VIDEO(MetaType.VIDEO);
+
+    /** The {@link MetaType}. */
+    private final MetaType metaType;
+
+    /**
+     * Initializes the media type instance.
+     * @param t the corresponding meta type.
+     */
+    private SpotlightMediaType(final MetaType t) {
+      metaType = t;
+    }
+
+    /**
+     * Returns the meta type for this spotlight media type.
+     * @return the {@link MetaType}
+     */
+    MetaType get() {
+      return metaType;
+    }
+  }
+
+  /**
+   * Mapping of spotlight content types to DeepFS MIME types.
+   * @author Bastian Lemke
+   */
+  enum SpotlightContentType {
+    /** MP3 file. */
+    PUBLIC_MP3(MimeType.MP3),
+    /** JPEG file. */
+    PUBLIC_JPEG(MimeType.JPG),
+    /** PNG file. */
+    PUBLIC_PNG(MimeType.PNG),
+    /** GIF file. */
+    COM_COMPUSERVE_GIF(MimeType.GIF),
+    /** HTML file. */
+    PUBLIC_HTML(MimeType.HTML),
+    /** Plain text file. */
+    PUBLIC_PLAIN_TEXT(MimeType.TXT),
+    /** CSS file. */
+    COM_APPLE_DASHCODE_CSS(MimeType.CSS),
+    /** Image. */
+    PUBLIC_IMAGE(null),
+    /** Audio. */
+    PUBLIC_AUDIO(null),
+    /** Audiovisual content. */
+    PUBLIC_AUDIOVISUAL_CONTENT(null),
+    /** Data. */
+    PUBLIC_DATA(null),
+    /** Item. */
+    PUBLIC_ITEM(null),
+    /** Content. */
+    PUBLIC_CONTENT(null);
+
+    /** The {@link MimeType}. */
+    private final MimeType mimeType;
+
+    /**
+     * Initializes the content type instance.
+     * @param m the corresponding MIME type
+     */
+    private SpotlightContentType(final MimeType m) {
+      mimeType = m;
+    }
+
+    /**
+     * Returns the meta type for this spotlight media type.
+     * @return the {@link MetaType}
+     */
+    MimeType get() {
+      return mimeType;
+    }
   }
 
   /**
@@ -99,21 +183,38 @@ public final class SpotlightExtractor {
         obj.stringEvent(StringField.CONTRIBUTOR, o);
       }
     },
-    // /** The date and time that the content was created. */
-    // ContentCreationDate {
-    // @Override
-    // public void parse(final SpotlightExtractor obj, final Object o)
-    // throws IOException {
-    // obj.dateEvent(DateField.DATE_CREATED, o);
-    // }
-    // },
-    // /** Date and time when the content of this item was modified. */
-    // ContentModificationDate {
-    // @Override
-    // public void parse(SpotlightExtractor obj, Object o) throws IOException {
-    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
-    // }
-    // },
+    /** The date and time that the content was created. */
+    ContentCreationDate {
+      @Override
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
+        obj.dateEvent(DateField.DATE_CREATED, o);
+      }
+    },
+    /** Date and time when the content of this item was modified. */
+    ContentModificationDate {
+      @Override
+      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+      }
+    },
+    /**
+     * Uniform Type Identifier of the file. For example, a jpeg image file will
+     * have a value of public.jpeg.
+     */
+    ContentType {
+      @Override
+      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+        try {
+          String key = ((String) o).toUpperCase();
+          key = key.replace('.', '_').replace('-', '_');
+          obj.mimeTypeEvent(SpotlightContentType.valueOf(key));
+        } catch(IllegalArgumentException ex) {
+          BaseX.debug("SpotlightExtractor: unsupported ContentType found (%)",
+              (String) o);
+        }
+      }
+    },
     /**
      * Entity responsible for making contributions to the content of the
      * resource. Examples of a contributor include a person, an organization or
@@ -165,22 +266,22 @@ public final class SpotlightExtractor {
         obj.stringEvent(StringField.DESCRIPTION, o);
       }
     },
-    /** Date the file contents last changed. */
-    FSContentChangeDate {
-      @Override
-      void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
-      }
-    },
-    /** Date that the contents of the file were created. */
-    FSCreationDate {
-      @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_CREATED, o);
-      }
-    },
+    // /** Date the file contents last changed. */
+    // FSContentChangeDate {
+    // @Override
+    // void parse(final SpotlightExtractor obj, final Object o)
+    // throws IOException {
+    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+    // }
+    // },
+    // /** Date that the contents of the file were created. */
+    // FSCreationDate {
+    // @Override
+    // public void parse(final SpotlightExtractor obj, final Object o)
+    // throws IOException {
+    // obj.dateEvent(DateField.DATE_CREATED, o);
+    // }
+    // },
     /** Group ID of the owner of the file. */
     FSOwnerGroupID {
       @Override
@@ -267,6 +368,19 @@ public final class SpotlightExtractor {
       public void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
         obj.stringEvent(StringField.CONTRIBUTOR, o);
+      }
+    },
+    /** Media types present in the content. */
+    MediaTypes {
+      @Override
+      public void parse(SpotlightExtractor obj, Object o) throws IOException {
+        try {
+          String key = ((String) o).toUpperCase();
+          obj.metaTypeEvent(SpotlightMediaType.valueOf(key));
+        } catch(IllegalArgumentException ex) {
+          BaseX.debug("SpotlightExtractor: unsupported MediaType found (%)",
+              (String) o);
+        }
       }
     },
     /**
@@ -537,6 +651,28 @@ public final class SpotlightExtractor {
       return;
     }
     meta.setDuration(ParserUtil.convertMsDuration((int) (value * 1000)));
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Sets the meta type for the current item.
+   * @param mt the meta type
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void metaTypeEvent(final SpotlightMediaType mt) throws IOException {
+    meta.setMetaType(mt.get());
+    parser.metaEvent(meta);
+  }
+
+  /**
+   * Sets the MIME type for the current item.
+   * @param ct the spotlight content type
+   * @throws IOException if any error occurs while writing to the parser.
+   */
+  void mimeTypeEvent(final SpotlightContentType ct) throws IOException {
+    MimeType m = ct.get();
+    if(m == null) return;
+    meta.setMimeType(m);
     parser.metaEvent(meta);
   }
 
