@@ -75,6 +75,7 @@ public final class FTOr extends FTExpr {
         for(int i = 0; i < it.length; i++) {
           if(it[i] != null && p != i && item.pre == it[i].pre) {
             item.all = or(item.all, it[i].all);
+            item.score(ctx.score.ftOr(item, it[i], ctx.ftoknum, expr.length));
             it[i] = ir[i].next();
           }
         }

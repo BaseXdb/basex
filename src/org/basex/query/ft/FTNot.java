@@ -44,7 +44,10 @@ public final class FTNot extends FTExpr {
 
       @Override
       public FTItem next() throws QueryException {
-        return not(ir.next());
+        FTItem it = not(ir.next());
+        if (it == null) return it;
+        it.score(ctx.score.ftNot(it.score()));
+        return it;
       }
     };
   }

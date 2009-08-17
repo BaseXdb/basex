@@ -94,6 +94,7 @@ public final class FTAnd extends FTExpr {
           // [CG] FT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
           item.all = and(item.all, it[i].all);
+          item.score(ctx.score.ftAnd(item, it[i]));
           it[i] = ir[i].next();
         }
         it[0] = ir[0].next();
