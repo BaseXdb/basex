@@ -1,4 +1,4 @@
-#Wed Jul 22 22:55:21 CEST 2009
+#Sun Aug 16 13:45:58 CEST 2009
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
 org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.5
@@ -11,6 +11,8 @@ org.eclipse.jdt.core.compiler.doc.comment.support=enabled
 org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
 org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
 org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
+org.eclipse.jdt.core.compiler.problem.comparingIdentical=ignore
+org.eclipse.jdt.core.compiler.problem.deadCode=warning
 org.eclipse.jdt.core.compiler.problem.deprecation=warning
 org.eclipse.jdt.core.compiler.problem.deprecationInDeprecatedCode=enabled
 org.eclipse.jdt.core.compiler.problem.deprecationWhenOverridingDeprecatedMethod=enabled
@@ -35,6 +37,7 @@ org.eclipse.jdt.core.compiler.problem.invalidJavadocTagsVisibility=private
 org.eclipse.jdt.core.compiler.problem.localVariableHiding=warning
 org.eclipse.jdt.core.compiler.problem.methodWithConstructorName=warning
 org.eclipse.jdt.core.compiler.problem.missingDeprecatedAnnotation=warning
+org.eclipse.jdt.core.compiler.problem.missingHashCodeMethod=warning
 org.eclipse.jdt.core.compiler.problem.missingJavadocComments=warning
 org.eclipse.jdt.core.compiler.problem.missingJavadocCommentsOverriding=disabled
 org.eclipse.jdt.core.compiler.problem.missingJavadocCommentsVisibility=private
@@ -44,6 +47,7 @@ org.eclipse.jdt.core.compiler.problem.missingJavadocTagsOverriding=enabled
 org.eclipse.jdt.core.compiler.problem.missingJavadocTagsVisibility=private
 org.eclipse.jdt.core.compiler.problem.missingOverrideAnnotation=warning
 org.eclipse.jdt.core.compiler.problem.missingSerialVersion=ignore
+org.eclipse.jdt.core.compiler.problem.missingSynchronizedOnInheritedMethod=warning
 org.eclipse.jdt.core.compiler.problem.noEffectAssignment=warning
 org.eclipse.jdt.core.compiler.problem.noImplicitStringConversion=warning
 org.eclipse.jdt.core.compiler.problem.nonExternalizedStringLiteral=ignore

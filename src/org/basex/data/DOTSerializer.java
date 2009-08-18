@@ -17,8 +17,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class DOTSerializer extends Serializer {
-  /** Compact flag. */
-  private static final boolean COMPACT = false;
   /** Node entry. */
   private static final String NODE = "node% [label=\"%\" color=\"#%\"];";
   /** Link entry. */
@@ -81,7 +79,7 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.add(!COMPACT || tb.size() == 0 ? "\\n" : ", ");
+    tb.add("\\n");
     tb.add(n);
     tb.add(":");
     tb.add(v);

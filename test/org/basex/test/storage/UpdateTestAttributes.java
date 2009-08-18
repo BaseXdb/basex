@@ -52,7 +52,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     data.insert(9, 6, token("foo"), token("junit"));
     assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
-    assertEquals((int) Data.ATTR, data.kind(9));
+    assertEquals(Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));
     assertEquals(6, data.parent(8, Data.ATTR));
     assertEquals(6, data.parent(10, Data.ELEM));
@@ -63,7 +63,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
-    assertEquals((int) Data.ATTR, data.kind(9));
+    assertEquals(Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));
     assertEquals(6, data.parent(8, Data.ATTR));
     assertEquals(6, data.parent(10, Data.ELEM));
