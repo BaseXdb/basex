@@ -328,10 +328,8 @@ public class AxisPath extends Path {
       final boolean d = pathNodes(data, s) == null;
 
       // choose cheapest index access
-      System.out.println("=> " + stp.pred.length);
       for(int p = 0; p < stp.pred.length; p++) {
         IndexContext ic = new IndexContext(ctx, data, stp, d);
-        System.out.println("-> " + stp.pred[p] + ": " + ic.is);
         if(!stp.pred[p].indexAccessible(ic)) continue;
         if(ic.is == 0) {
           if(ic.not) {
