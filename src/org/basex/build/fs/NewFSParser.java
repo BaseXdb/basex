@@ -136,9 +136,9 @@ public final class NewFSParser extends Parser {
       return concat(prefix, new byte[] { ':'}, element);
     }
   }
-  
+
   /** DeepFS tag in fs namespace. */
-   byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
+  byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
   /** Directory tag in fs namespace. */
   byte[] DIR_NS = NewFSParser.NS.FS.tag(DIR);
   /** File tag in fs namespace. */
@@ -431,6 +431,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final File d) throws IOException {
+    if(d.isHidden()) return;
     final File[] files = d.listFiles();
     if(files == null) return;
 
@@ -523,6 +524,7 @@ public final class NewFSParser extends Parser {
       builder.startElem(FILE_NS, atts);
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
+        addFSAtts(f, size);
         if(prop.is(Prop.SPOTLIGHT)) {
           if(prop.is(Prop.FSMETA)) spotlight.parse(f);
           if(prop.is(Prop.FSCONT)) {
@@ -560,12 +562,11 @@ public final class NewFSParser extends Parser {
                 try {
                   fc.close();
                 } catch(final IOException e1) { /* */}
-              }
+              } // end try
             }
-          }
-          addFSAtts(f, size); // only for internal parser
+          } // end if size > 0
         } // end internal parser
-      }
+      } // end if FSMETA/FSCONT
       builder.endElem(FILE_NS);
     }
     // add file size to parent folder

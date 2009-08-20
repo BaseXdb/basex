@@ -191,13 +191,13 @@ public final class SpotlightExtractor {
         obj.dateEvent(DateField.DATE_CREATED, o);
       }
     },
-    /** Date and time when the content of this item was modified. */
-    ContentModificationDate {
-      @Override
-      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
-        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
-      }
-    },
+//    /** Date and time when the content of this item was modified. */
+//    ContentModificationDate {
+//      @Override
+//      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
+//        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+//      }
+//    },
     /**
      * Uniform Type Identifier of the file. For example, a jpeg image file will
      * have a value of public.jpeg.
@@ -298,14 +298,14 @@ public final class SpotlightExtractor {
         obj.intEvent(IntField.FS_OWNER_USER_ID, o);
       }
     },
-    /** Size, in bytes, of the file on disk. */
-    FSSize {
-      @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.FS_SIZE, o);
-      }
-    },
+    // /** Size, in bytes, of the file on disk. */
+    // FSSize {
+    // @Override
+    // public void parse(final SpotlightExtractor obj, final Object o)
+    // throws IOException {
+    // obj.intEvent(IntField.FS_SIZE, o);
+    // }
+    // },
     /**
      * Publishable entry providing a synopsis of the contents of the item. For
      * example, "Apple Introduces the iPod Photo".
