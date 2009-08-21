@@ -195,8 +195,8 @@ public class DBNode extends Nod {
     final int tid = data.tags.id(node.nname());
     StatsKey sk = data.tags.stat(tid);
     if (sk != null && sk.counter > 2) {
-      node.score(node.score * 1.00 - 
-          (double) sk.counter / (double) data.tags.tn);
+      node.score(node.score * (1.00 - 
+          (double) sk.counter / (double) data.tags.tn));
     }
     return node;
   }

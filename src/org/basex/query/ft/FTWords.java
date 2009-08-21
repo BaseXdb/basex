@@ -37,7 +37,10 @@ public final class FTWords extends FTExpr {
   byte[] txt;
   /** Fast evaluation. */
   boolean fast;
+  /** Expression list. */
+  Expr query;
 
+  
   /** All matches. */
   FTMatches all = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
@@ -47,8 +50,6 @@ public final class FTWords extends FTExpr {
   private Expr[] occ;
   /** Search mode. */
   private FTMode mode;
-  /** Expression list. */
-  private Expr query;
   /** Token number. */
   private byte tokNum;
   /** Standard evaluation. */
@@ -122,7 +123,13 @@ public final class FTWords extends FTExpr {
           }
           iat.setTokenNum(++ctx.ftoknum);
         }
-        return iat.more() ? new FTItem(iat.matches(), data, iat.next()) : null;
+        int tl = -1;
+        if (query instanceof Str) {
+          final Str s = (Str) query;
+          tl = s.str().length;
+        }
+        return iat.more() ? new FTItem(iat.matches(), 
+            data, iat.next(), tl) : null;
       }
     };
   }
