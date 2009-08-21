@@ -3,8 +3,11 @@ package org.basex.query.item;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Stack;
+
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.StatsKey;
 import org.basex.io.IO;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
@@ -186,6 +189,15 @@ public class DBNode extends Nod {
     if(p == (root != null ? 0 : -1)) return root;
     final DBNode node = copy();
     node.set(p, data.kind(p));
+    final double f =  (double) distToRoot(node.pre) / (double) data.meta.height;
+    node.score(node.score * Math.max(1 - f, f));
+    
+    final int tid = data.tags.id(node.nname());
+    StatsKey sk = data.tags.stat(tid);
+    if (sk != null && sk.counter > 2) {
+      node.score(node.score * 1.00 - 
+          (double) sk.counter / (double) data.tags.tn);
+    }
     return node;
   }
 
@@ -238,6 +250,9 @@ public class DBNode extends Nod {
   @Override
   public NodeIter desc() {
     return new NodeIter() {
+      final Stack<Integer> pres = new Stack<Integer>();
+      final Stack<Integer> level = new Stack<Integer>();
+      int l = -1;
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
@@ -249,6 +264,28 @@ public class DBNode extends Nod {
         k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
+        if (data.size(node.pre, k) > 1) {
+          if (l == -1) {
+            final int pp = data.parent(node.pre, k);
+            if(pres.size() == 0) {
+              pres.push(pp);
+              level.push(0);
+              l = 1;
+            } 
+              
+            while(pres.peek() != pp) {
+              pres.pop();
+              level.pop();
+            }
+            l = level.peek() + 1;            
+          }
+          pres.push(node.pre);
+          node.score(node.score / Math.abs(l));
+          level.push(l++);
+        } else {
+          node.score(node.score / Math.abs(l));
+          l = -1;
+        }
         return node;
       }
     };
@@ -267,6 +304,20 @@ public class DBNode extends Nod {
         final int k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
+        return node;
+      }
+    };
+  }
+  
+  @Override
+  public NodeIter anc() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Nod node = copy();
+
+      @Override
+      public Nod next() {
+        node = node.parent();
         return node;
       }
     };
@@ -295,5 +346,20 @@ public class DBNode extends Nod {
       default:
         return type + "{" + Err.chop(str()) + "}";
     }
+  }
+  
+  /**
+   * Determine distance to root node.
+   * @param p pre value of current node
+   * @return dist distance to root node
+   */
+  private int distToRoot(final int p) {
+    int d = 0;
+    int parent = data.parent(p, data.kind(p));
+    while(parent > 0) {
+      d++;
+      parent = data.parent(parent, data.kind(parent));
+    }
+    return d;
   }
 }

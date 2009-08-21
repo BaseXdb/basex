@@ -165,7 +165,7 @@ public abstract class Nod extends Item {
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public final NodeIter anc() {
+  public NodeIter anc() {
     return new NodeIter() {
       /** Temporary node. */
       private Nod node = Nod.this;

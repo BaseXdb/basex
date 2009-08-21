@@ -86,6 +86,7 @@ public class FTContains extends Expr {
     }
 
     ctx.fttoken = tmp;
+    s = Math.max(ctx.item.score - s / ctx.item.score, s - ctx.item.score / s);
     return Bln.get(s);
   }
 

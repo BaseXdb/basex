@@ -20,6 +20,8 @@ import org.basex.util.TokenBuilder;
 public final class Names extends Set {
   /** Statistic information. */
   private StatsKey[] stat;
+  /** total number of entries. */
+  public int tn = 0;
 
   /**
    * Default constructor.
@@ -39,7 +41,10 @@ public final class Names extends Set {
     bucket = in.readNums();
     size = in.readNum();
     stat = new StatsKey[next.length];
-    for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
+    for(int s = 1; s < size; s++) {
+      stat[s] = new StatsKey(in);
+      tn += stat[s].counter;
+    }
   }
 
   /**
