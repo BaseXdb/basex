@@ -44,11 +44,7 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
     final FTItem item = expr[0].atomic(ctx);
-    for(int e = 1; e < expr.length; e++) {
-      final FTItem it = expr[e].atomic(ctx);
-      item.all = and(item.all, it.all);
-      item.score(ctx.score.and(it.score(), item.score()));
-    }
+    for(int e = 1; e < expr.length; e++) and(ctx, item, expr[e].atomic(ctx));
     return item;
   }
 
@@ -93,8 +89,7 @@ public final class FTAnd extends FTExpr {
         for(int i = 1; i < it.length; i++) {
           // [CG] FT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
-          item.all = and(item.all, it[i].all);
-          item.score(ctx.score.ftAnd(item, it[i]));
+          and(ctx, item, it[i]);
           it[i] = ir[i].next();
         }
         it[0] = ir[0].next();
@@ -105,20 +100,21 @@ public final class FTAnd extends FTExpr {
 
   /**
    * Merges two matches.
-   * @param m1 first match list
-   * @param m2 second match list
-   * @return resulting match
+   * @param ctx query context
+   * @param i1 first item
+   * @param i2 second item
    */
-  static FTMatches and(final FTMatches m1, final FTMatches m2) {
+  void and(final QueryContext ctx, final FTItem i1, final FTItem i2) {
     final FTMatches all = new FTMatches(
-        m1.sTokenNum > m2.sTokenNum ? m1.sTokenNum : m2.sTokenNum);
+        (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 
-    for(final FTMatch s1 : m1) {
-      for(final FTMatch s2 : m2) {
+    for(final FTMatch s1 : i1.all) {
+      for(final FTMatch s2 : i2.all) {
         all.add(new FTMatch().add(s1).add(s2));
       }
     }
-    return all;
+    i1.score(ctx.score.ftAnd(i1, i2));
+    i1.all = all;
   }
 
   @Override

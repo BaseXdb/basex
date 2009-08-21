@@ -86,7 +86,13 @@ public class FTContains extends Expr {
     }
 
     ctx.fttoken = tmp;
-    s = Math.max(ctx.item.score - s / ctx.item.score, s - ctx.item.score / s);
+    /* [SG] null/NaN tests added; still, many FTTests are broken (e.g. if both
+     *   s and is are 1). If these bugs don't occur in the INEX context, we
+     *   could use a Prop.INEX flag here to save time.
+    final double is = ctx.item.score;
+    if(s != 0 && s == s && is != 0 && is == is) {
+      s = Math.max(ctx.item.score - s / ctx.item.score, s - ctx.item.score / s);
+    }*/
     return Bln.get(s);
   }
 

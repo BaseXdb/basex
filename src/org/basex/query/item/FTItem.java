@@ -42,13 +42,11 @@ public final class FTItem extends DBNode {
 
   @Override
   public double score() {
-    if (score == -1) {
-      final double ntl = super.data.textLen(super.pre); 
-      score = ((tl + 1) * all.match.length - 1) / ntl;
+    if(score == -1) {
+      score = ((tl + 1) * all.match.length - 1) / data.textLen(pre);
     }
-
     // default score for index results
-//    if(score == -1) score = all.matches() ? 1 : 0;
+    // if(score == -1) score = all.matches() ? 1 : 0;
     return score;
   }
 

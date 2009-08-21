@@ -34,7 +34,7 @@ public final class FTNot extends FTExpr {
 
   @Override
   public FTItem atomic(final QueryContext ctx) throws QueryException {
-    return not(expr[0].atomic(ctx));
+    return not(ctx, expr[0].atomic(ctx));
   }
 
   @Override
@@ -44,21 +44,22 @@ public final class FTNot extends FTExpr {
 
       @Override
       public FTItem next() throws QueryException {
-        FTItem it = not(ir.next());
-        if (it == null) return it;
-        it.score(ctx.score.ftNot(it.score()));
-        return it;
+        return not(ctx, ir.next());
       }
     };
   }
 
   /**
    * Negates a hit.
+   * @param ctx query context
    * @param item item
    * @return specified item
    */
-  FTItem not(final FTItem item) {
-    if(item != null) item.all = not(item.all);
+  FTItem not(final QueryContext ctx, final FTItem item) {
+    if(item != null) {
+      item.all = not(item.all);
+      item.score(ctx.score.ftNot(item.score()));
+    }
     return item;
   }
 

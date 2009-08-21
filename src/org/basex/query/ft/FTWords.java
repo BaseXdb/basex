@@ -123,13 +123,8 @@ public final class FTWords extends FTExpr {
           }
           iat.setTokenNum(++ctx.ftoknum);
         }
-        int tl = -1;
-        if (query instanceof Str) {
-          final Str s = (Str) query;
-          tl = s.str().length;
-        }
         return iat.more() ? new FTItem(iat.matches(), 
-            data, iat.next(), tl) : null;
+            data, iat.next(), txt.length) : null;
       }
     };
   }
