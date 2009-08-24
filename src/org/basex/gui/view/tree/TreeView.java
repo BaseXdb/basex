@@ -38,19 +38,22 @@ public final class TreeView extends View {
 
   // Constants
   /** Color for nodes. **/
-  int colorNode = 0xEDEFF7;
+  private final int colorNode = 0xEDEFF7;
   /** Color for rectangles. **/
-  int colorRect = 0xC9CFE7;
+  private final int colorRect = 0xC9CFE7;
   /** Color distance per level. **/
-  int colorDiff = 0x121008;
+  private final int colorDiff = 0x121008;
   /** Color marked nodes. **/
-  Color markColor = new Color(0x035FC7);
+  private final Color markColor = new Color(0x035FC7);
   /** Color text-nodes. **/
-  Color textColor = new Color(0x000F87);
+  private final Color textColor = new Color(0x000F87);
   /** Color highlighted nodes. **/
-  Color highlightColor = new Color(0x5D6FB7);
+  private final Color highlightColor = new Color(0x5D6FB7);
   /** Minimum space in rectangles needed for tags. **/
-  int minSpace = 35;
+  private final int minSpace = 35;
+  /** Minimum space between the levels. **/
+  final int minimumLevelDistance = 5;
+  
 
   // Options
   /** Draw only element nodes. */
@@ -88,8 +91,8 @@ public final class TreeView extends View {
   // private boolean refreshedMark = false;
   /** Height of the rectangles. */
   private int nodeHeight = -1;
-  /** Distance between the nodes. */
-  private int nodeDistance = 22;
+  /** Distance between the levels. */
+  private int levelDistance = -1;
 
   // /** image of the current marked nodes. */
   // private BufferedImage markedImage = null;
@@ -163,6 +166,7 @@ public final class TreeView extends View {
     // initializes sizes
     fontHeight = g.getFontMetrics().getHeight();
     if(nodeHeight == -1) nodeHeight = fontHeight;
+    setLevelDistance();
 
     if(windowSizeChanged()) {
 
@@ -270,13 +274,13 @@ public final class TreeView extends View {
    * @param level the current level
    * @param nodeList the node list
    */
-  private void drawNodes(final Graphics g, final int level,
+  private void drawNodes(final Graphics g, final int level, 
       final int[] nodeList) {
 
     // calculate sreenwidth, if more than one root split screen in parts
     final int numberOfRoots = gui.context.current().nodes.length;
-    final double screenWidth = numberOfRoots > 1 ? 
-        (getSize().width - 1 / (double) numberOfRoots)
+    final double screenWidth = numberOfRoots > 1 ? (getSize().width - 1 / 
+        (double) numberOfRoots)
         : getSize().width - 1;
 
     // calculate the important coordinate values of a rectangle
@@ -372,13 +376,13 @@ public final class TreeView extends View {
       rects.add(rect);
 
       // draw rectangle
-      g.setColor(new Color(colorRect -
-          ((level < 11 ? level : 11) * colorDiff)));
+      g.setColor(new Color(colorRect - ((level < 11 ? level : 11) 
+          * colorDiff)));
       g.drawRect((int) xx + 2, y, (int) w - 2, h);
 
       // fill rectangle with color
-      g.setColor(new Color(colorNode -
-          ((level < 11 ? level : 11) * colorDiff)));
+      g.setColor(new Color(colorNode - ((level < 11 ? level : 11) 
+          * colorDiff)));
       g.fillRect((int) xx + 1, y, (int) w - 1, h);
 
       // draw text into rectangle if enough space
@@ -457,7 +461,7 @@ public final class TreeView extends View {
    * Highlights nodes.
    * @param g the graphics reference.
    * @param c the color.
-   * @param r the rect to highlight.
+   * @param r the rectangle to highlight.
    * @param level the level.
    * @param showParent show parent.
    * @param showChildren show children.
@@ -680,19 +684,30 @@ public final class TreeView extends View {
    * @param level the level.
    * @return the y-axis value.
    */
-  public int getYperLevel(final int level) {
-    return level * nodeHeight + level * nodeDistance;
+  private int getYperLevel(final int level) {
+    return level * nodeHeight + level * levelDistance;
   }
 
   /**
-   * determines the level of a y-axis value.
+   * Determines the level of a y-axis value.
    * @param y the y-axis value.
    * @return the level if inside a node rectangle, -1 else.
    */
-  public int getLevelperY(final int y) {
-    double f = y / ((float) nodeDistance + nodeHeight);
-    double b = nodeHeight / (float) (nodeDistance + nodeHeight);
+  private int getLevelperY(final int y) {
+    final double f = y / ((float) levelDistance + nodeHeight);
+    final double b = nodeHeight / (float) (levelDistance + nodeHeight);
     return f <= ((int) f + b) ? (int) f : -1;
+  }
+
+  /**
+   * Determines the optimal distance between the levels.
+   */
+  private void setLevelDistance() {
+    final int levels = gui.context.data().meta.height + 1;
+    final int height = getSize().height - 1;
+    final int heightLeft = height - levels * nodeHeight;
+    final int lD = (int) (heightLeft / (double) levels);
+    levelDistance = lD < minimumLevelDistance ? minimumLevelDistance : lD;
   }
 
   /**
