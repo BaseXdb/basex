@@ -135,7 +135,7 @@ public final class GUI extends JFrame {
     prop = gprops;
     setTitle(Text.TITLE);
     setIconImage(BaseXLayout.image("icon"));
-
+    
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
     final int[] ps = prop.nums(GUIProp.GUILOC);
@@ -254,19 +254,19 @@ public final class GUI extends JFrame {
     text = new TextView(notify);
     info = new InfoView(notify, HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
+    final ViewPanel querypanel = new ViewPanel(query, XQUERYVIEW);
+    final ViewPanel infopanel = new ViewPanel(info, INFOVIEW);
 
     // create panels for closed and opened database mode
     final ViewPanel[][] panels = {
-      { textpanel },
+      { querypanel, infopanel, textpanel },
       { new ViewPanel(new FolderView(notify), FOLDERVIEW),
         new ViewPanel(new PlotView(notify), PLOTVIEW),
         new ViewPanel(new TableView(notify), TABLEVIEW),
         new ViewPanel(new MapView(notify), MAPVIEW),
         new ViewPanel(new TreeView(notify), TREEVIEW),
         new ViewPanel(new ExploreView(notify), EXPLOREVIEW),
-        new ViewPanel(query, XQUERYVIEW),
-        new ViewPanel(info, INFOVIEW),
-        textpanel
+        querypanel, infopanel, textpanel
       }
     };
     views = new ViewContainer(this, panels);
@@ -347,10 +347,7 @@ public final class GUI extends JFrame {
             if(!exec(p, p instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
-          if(!prop.is(GUIProp.SHOWSTARTTEXT) && !db ||
-             !prop.is(GUIProp.SHOWTEXT) && db) {
-            GUICommands.SHOWTEXT.execute(this);
-          }
+          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
           text.setText(new TokenBuilder(ex.getMessage()).finish());
         }
       }
@@ -463,7 +460,7 @@ public final class GUI extends JFrame {
         if(!text.visible() && nodes == null) GUICommands.SHOWTEXT.execute(this);
 
         // retrieve text result
-        if(prop.is(GUIProp.SHOWTEXT)) {
+        if(text.visible()) {
           final CachedOutput out = new CachedOutput(
               context.prop.num(Prop.MAXTEXT));
           pr.output(out);

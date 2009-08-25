@@ -84,7 +84,8 @@ public final class GUIConstants {
     INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
-  public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " -";
+  public static final String LAYOUTCLOSE = "H V " + XQUERYVIEW + " " +
+    INFOVIEW + " - " + TEXTVIEW + " -";
 
   // TOOLBAR ==================================================================
 

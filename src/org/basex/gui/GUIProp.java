@@ -164,8 +164,12 @@ public final class GUIProp extends AProp {
   /** Flag for activated tree view. */
   public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
-  /** Flag for activated result view after starting. */
+  /** Flag for activated text view after starting. */
   public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
+  /** Flag for activated xquery view after starting. */
+  public static final Object[] SHOWSTARTXQUERY = { "SHOWSTARTXQUERY", false };
+  /** Flag for activated info view after starting. */
+  public static final Object[] SHOWSTARTINFO = { "SHOWSTARTINFO", false };
 
   /** Flag for skipping time intensive treemap infos. */
   public static final Object[] PERFINFO = { "PERFINFO", true };

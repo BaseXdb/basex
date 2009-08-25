@@ -111,7 +111,8 @@ public final class InfoView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWINFO);
+    return gui.prop.is(gui.context.data() != null ?
+        GUIProp.SHOWINFO : GUIProp.SHOWSTARTINFO);
   }
 
   /**

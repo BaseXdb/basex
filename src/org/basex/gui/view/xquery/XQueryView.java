@@ -201,7 +201,8 @@ public final class XQueryView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWXQUERY);
+    return gui.prop.is(gui.context.data() != null ?
+        GUIProp.SHOWXQUERY : GUIProp.SHOWSTARTXQUERY);
   }
 
   /**

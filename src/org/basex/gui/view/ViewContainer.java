@@ -96,7 +96,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final String lo1 = gui.prop.get(db ?
         GUIProp.LAYOUTOPENED : GUIProp.LAYOUTCLOSED);
     final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
-    if(!buildLayout(lo1)) buildLayout(lo2);
+    if(!buildLayout(lo1) && !buildLayout(lo2)) {
+      BaseX.errln("Could not build layout \"%\"", lo2);
+    }
   }
 
   /**

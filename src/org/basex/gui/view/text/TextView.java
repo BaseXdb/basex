@@ -133,7 +133,8 @@ public final class TextView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWTEXT);
+    return gui.prop.is(gui.context.data() != null ?
+        GUIProp.SHOWTEXT : GUIProp.SHOWSTARTTEXT);
   }
 
   /**

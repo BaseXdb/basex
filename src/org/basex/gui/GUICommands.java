@@ -337,17 +337,19 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows the XQuery view. */
-  SHOWXQUERY(true, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
+  SHOWXQUERY(false, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(GUIProp.SHOWXQUERY);
+      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTXQUERY);
+      else gui.prop.invert(GUIProp.SHOWXQUERY);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWXQUERY));
+      select(button, gui.prop.is(gui.context.data() != null ? 
+          GUIProp.SHOWXQUERY : GUIProp.SHOWSTARTXQUERY));
     }
 
     @Override
@@ -355,17 +357,19 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows info. */
-  SHOWINFO(true, GUISHOWINFO, "% I", GUISHOWINFOTT) {
+  SHOWINFO(false, GUISHOWINFO, "% I", GUISHOWINFOTT) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(GUIProp.SHOWINFO);
+      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTINFO);
+      else gui.prop.invert(GUIProp.SHOWINFO);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWINFO));
+      select(button, gui.prop.is(gui.context.data() != null ?
+          GUIProp.SHOWINFO : GUIProp.SHOWSTARTINFO));
     }
 
     @Override
@@ -460,8 +464,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, gui.context.data() != null ?
-          gui.prop.is(GUIProp.SHOWTEXT) : gui.prop.is(GUIProp.SHOWSTARTTEXT));
+      select(button, gui.prop.is(gui.context.data() != null ?
+          GUIProp.SHOWTEXT : GUIProp.SHOWSTARTTEXT));
     }
 
     @Override
