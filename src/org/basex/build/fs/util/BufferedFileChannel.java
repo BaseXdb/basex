@@ -229,7 +229,7 @@ public final class BufferedFileChannel {
    * @throws IOException if any i/o error occurs.
    */
   public boolean isSubChannel() throws IOException {
-    return mark != 0 || fc.size() > rem + buf.remaining();
+    return mark != 0 || fc.size() > fc.position() + rem;
   }
 
   /**
