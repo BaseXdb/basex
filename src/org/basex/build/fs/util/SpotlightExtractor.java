@@ -1,4 +1,4 @@
-package org.basex.build.fs;
+package org.basex.build.fs.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,14 +10,13 @@ import java.util.Map.Entry;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.basex.BaseX;
+import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.MP3Parser;
-import org.basex.build.fs.parser.Metadata;
-import org.basex.build.fs.parser.ParserUtil;
-import org.basex.build.fs.parser.Metadata.DateField;
-import org.basex.build.fs.parser.Metadata.IntField;
-import org.basex.build.fs.parser.Metadata.MetaType;
-import org.basex.build.fs.parser.Metadata.MimeType;
-import org.basex.build.fs.parser.Metadata.StringField;
+import org.basex.build.fs.util.Metadata.DateField;
+import org.basex.build.fs.util.Metadata.IntField;
+import org.basex.build.fs.util.Metadata.MetaType;
+import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.util.LibraryLoader;
 import org.basex.util.Token;
 

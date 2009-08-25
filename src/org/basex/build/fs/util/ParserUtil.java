@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.basex.build.fs.util;
 
 import static org.basex.util.Token.*;
 import java.io.File;
@@ -11,7 +11,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.parser.Metadata.DateField;
+import org.basex.build.fs.util.Metadata.DateField;
 import org.basex.util.Token;
 
 /**

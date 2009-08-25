@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.basex.build.fs.util;
 
 import static org.basex.util.Token.token;
 import static org.basex.util.Token.string;
@@ -103,6 +103,8 @@ public final class Metadata {
     GIF("image/gif", "gif"),
     /** BMP. */
     BMP("image/bmp", "bmp"),
+    /** TIFF. */
+    TIFF("image/tiff", "tif"),
     /** M$ Word. */
     DOC("application/msword", "doc"),
     /** PDF. */

@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.basex.build.fs.util;
 
 import java.io.File;
 import java.io.IOException;

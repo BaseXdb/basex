@@ -3,7 +3,9 @@ package org.basex.build.fs.parser;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.parser.Metadata.MetaType;
+import org.basex.build.fs.util.BufferedFileChannel;
+import org.basex.build.fs.util.Metadata;
+import org.basex.build.fs.util.Metadata.MetaType;
 
 /**
  * Abstract class for metadata extractors / file parsers.

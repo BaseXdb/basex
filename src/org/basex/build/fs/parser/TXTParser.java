@@ -3,8 +3,9 @@ package org.basex.build.fs.parser;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.parser.Metadata.MetaType;
-import org.basex.build.fs.parser.Metadata.MimeType;
+import org.basex.build.fs.util.BufferedFileChannel;
+import org.basex.build.fs.util.Metadata.MetaType;
+import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 

@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.basex.build.fs.util;
 
 import java.io.EOFException;
 import java.io.File;
@@ -321,7 +321,8 @@ public final class BufferedFileChannel {
    * @return The next two bytes at the channel's current position as integer.
    */
   public int getShort() {
-    return (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
+    return buf.getShort() & 0xFFFF;
+    // return (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**
@@ -337,10 +338,9 @@ public final class BufferedFileChannel {
    * @return The next four bytes at the channel's current position as integer.
    */
   public int getInt() {
-    return (buf.get() & 0xFF) << 24
-        | (buf.get() & 0xFF) << 16
-        | (buf.get() & 0xFF) << 8
-        | buf.get() & 0xFF;
+    return buf.getInt() & 0xFFFFFFFF;
+    // return (buf.get() & 0xFF) << 24 | (buf.get() & 0xFF) << 16
+    // | (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**
@@ -374,6 +374,10 @@ public final class BufferedFileChannel {
    * @see #finish()
    */
   public void close() throws IOException {
+    if(isSubChannel()) {
+      throw new IOException("Can't close SubChannel, only the "
+          + "main BufferedFileChannel can be closed.");
+    }
     fc.close();
   }
 
@@ -408,12 +412,21 @@ public final class BufferedFileChannel {
   }
 
   /**
-   * Modifies this channel's byte order.
+   * Modifies this channel's byte order. The byte order is only relevant for the
+   * {@link #getShort()} and {@link #getInt()} methods.
    * @param order The new byte order, either {@link ByteOrder#BIG_ENDIAN
    *          BIG_ENDIAN} or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
-   *
+   * 
    */
   public void setByteOrder(final ByteOrder order) {
     buf.order(order);
+  }
+
+  /**
+   * Returns this FileChannel's byte order.
+   * @return the {@link ByteOrder}.
+   */
+  public ByteOrder getByteOrder() {
+    return buf.order();
   }
 }
