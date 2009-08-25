@@ -7,7 +7,7 @@ import org.basex.data.NativeData;
 
 /**
  * This class creates a memory based database instance and passes the events
- * to a native application code.
+ * to a native application.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

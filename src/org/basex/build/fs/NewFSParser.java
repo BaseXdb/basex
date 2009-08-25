@@ -34,17 +34,20 @@ import org.basex.util.TokenBuilder;
 /**
  * Imports/shreds/parses a file hierarchy into a database.
  * 
- * The overall process of importing a file hierarchy can be described as
- * follows:
- * <ol>
- * <li>The import is invoked by the {@link CreateFS} command. To import on the
- * command line type: <tt>$ create fs [path] [dbname]</tt></li>
+ * In more detail importing a file hierarchy means to map a file hierarchy
+ * into an XML representation according to an XML document valid against the
+ * DeepFSML specification.
+ * 
+ * <ul>
+ * <li>The import is invoked by the {@link CreateFS} command.</li>
+ * <li>To import on the command line type: <tt>$ create fs [path] [dbname]</tt></li>
+ * <li>To import using the GUI: File -&gt; Import Filesystem...</li>
  * <li>This class {@link NewFSParser} instantiates the parsers to extract
  * metadata and content from files.
- * </ol>
+ * </ul>
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Alexander Holupirek, alex@holupirek.de
+ * @author Alexander Holupirek
  * @author Bastian Lemke
  */
 public final class NewFSParser extends Parser {
