@@ -75,12 +75,18 @@ public final class SpotlightExtractor {
     PUBLIC_PNG(MimeType.PNG),
     /** GIF file. */
     COM_COMPUSERVE_GIF(MimeType.GIF),
+    /** BMP file. */
+    COM_MICROSOFT_BMP(MimeType.BMP),
     /** HTML file. */
     PUBLIC_HTML(MimeType.HTML),
     /** Plain text file. */
     PUBLIC_PLAIN_TEXT(MimeType.TXT),
     /** CSS file. */
     COM_APPLE_DASHCODE_CSS(MimeType.CSS),
+    /** Word file. */
+    COM_MICROSOFT_WORD_DOC(MimeType.DOC),
+    /** PDF file. */
+    COM_ADOBE_PDF(MimeType.PDF),
     /** Image. */
     PUBLIC_IMAGE(null),
     /** Audio. */

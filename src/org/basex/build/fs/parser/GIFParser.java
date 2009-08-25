@@ -30,7 +30,7 @@ public final class GIFParser extends AbstractParser {
 
   /** Standard constructor. */
   public GIFParser() {
-    super(MetaType.IMAGE, MimeType.GIF.get());
+    super(MetaType.PICTURE, MimeType.GIF.get());
   }
 
   @Override

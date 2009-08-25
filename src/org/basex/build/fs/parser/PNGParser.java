@@ -21,7 +21,7 @@ public final class PNGParser extends AbstractParser {
 
   /** Standard constructor. */
   public PNGParser() {
-    super(MetaType.IMAGE, MimeType.PNG.get());
+    super(MetaType.PICTURE, MimeType.PNG.get());
   }
 
   /** PNG header. */

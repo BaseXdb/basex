@@ -206,7 +206,7 @@ public final class NewFSParser extends Parser {
   /** If true, verbose debug messages are created (e.g. for corrupt files). */
   public static final boolean VERBOSE = true;
   /** If true, the <code>type=""</code> attributes are added to the XML doc. */
-  private static final boolean ADD_ATTS = true;
+  private static final boolean ADD_ATTS = false;
 
   /** Empty attribute array. */
   private static final Atts EMPTY_ATTS = new Atts();
@@ -406,6 +406,7 @@ public final class NewFSParser extends Parser {
       for(final File f : root ? File.listRoots() : new File[] { new File(
           fsimportpath).getCanonicalFile()}) {
 
+        if(f.isHidden()) continue;
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
         parse(f);
@@ -434,13 +435,12 @@ public final class NewFSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final File d) throws IOException {
-    if(d.isHidden()) return;
     final File[] files = d.listFiles();
     if(files == null) return;
 
     final boolean fuse = prop.is(Prop.FUSE);
     for(final File f : files) {
-      if(!valid(f)) continue;
+      if(!valid(f) || f.isHidden()) continue;
 
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
@@ -752,16 +752,20 @@ public final class NewFSParser extends Parser {
    *          set.
    * @throws IOException if any error occurs while reading from the file.
    */
+  @SuppressWarnings("all")
+  // suppress dead code warning for ADD_ATTS
   public void textContent(final long offset, final long size,
       final TokenBuilder text, final boolean preserveSpace) throws IOException {
     startContent(offset, size);
-    atts.reset();
-    atts.add(Metadata.DATA_TYPE, Metadata.DATA_TYPE_STRING);
-    if(preserveSpace) atts.add(Metadata.XML_SPACE,
-        Metadata.XmlSpace.PRESERVE.get());
-    else text.chop();
+    if(ADD_ATTS) {
+      atts.reset();
+      atts.add(Metadata.DATA_TYPE, Metadata.DATA_TYPE_STRING);
+      if(preserveSpace) atts.add(Metadata.XML_SPACE,
+          Metadata.XmlSpace.PRESERVE.get());
+    }
+    if(!preserveSpace) text.chop();
     if(text.size() == 0) return;
-    builder.startElem(TEXT_CONTENT_NS, atts);
+    builder.startElem(TEXT_CONTENT_NS, ADD_ATTS ? atts : EMPTY_ATTS);
     builder.text(text, false);
     builder.endElem(TEXT_CONTENT_NS);
     endContent();

@@ -102,7 +102,11 @@ public final class Metadata {
     /** GIF. */
     GIF("image/gif", "gif"),
     /** BMP. */
-    BMP("image/bmp", "bmp");
+    BMP("image/bmp", "bmp"),
+    /** M$ Word. */
+    DOC("application/msword", "doc"),
+    /** PDF. */
+    PDF("application/pdf", "pdf");
 
     /** The element name as byte array. */
     private final byte[] elem;
@@ -137,28 +141,30 @@ public final class Metadata {
   }
 
   /**
-   * Available metadata types.
+   * Available metadata types. Every file has at least one MetaType.
+   * Files may have more than one MetaType (e.g. a SVG file has MetaType "xml"
+   * and "image").
    * @author Bastian Lemke
    */
   public enum MetaType {
-    /** Application resource. */
-    APPLICATION,
     /** Archive resource (e.g. ZIP file). */
     ARCHIVE,
     /** Audio resource (e.g. MP3 file). */
     AUDIO,
+    /** Binary resource. */
+    BINARY,
     /** Contact resource (e.g. VCF file). */
     CONTACT,
     /** Document resource (e.g. DOC file). */
     DOCUMENT,
-    /** Image resource (e.g. JPG file). */
-    IMAGE,
+    /** Picture resource (e.g. JPG file). */
+    PICTURE,
     /** Message resource (e.g. email). */
     MESSAGE,
     /** Presentation resource (e.g. PPT file). */
     PRESENTATION,
     /** Text resource (e.g. plain text file). */
-    TEXT,
+    PLAINTEXT,
     /** Unknown resource type. */
     UNKNOWN,
     /** Video resource (e.g. MPEG file). */
@@ -404,18 +410,6 @@ public final class Metadata {
   private byte[] xmlBase = null;
   /** xml:id attribute value. */
   private byte[] xmlId = null;
-
-  /**
-   * Constructor for a new metadata item.
-   * @param k the key of the metadata key-value pair.
-   * @param v the value of the metadata key-value pair.
-   * @param dt the xml data type of the metadata item.
-   */
-  private Metadata(final byte[] k, final byte[] v, final byte[] dt) {
-    key = k;
-    value = v;
-    dataType = dt;
-  }
 
   /** Standard constructor. */
   public Metadata() {
@@ -750,32 +744,5 @@ public final class Metadata {
    */
   public Metadata setMimeType(final MimeType mimeType) {
     return setMimeType(mimeType.get());
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "type".
-   * @param t the type to set.
-   */
-  @Deprecated
-  public Metadata(final MetaType t) {
-    this(TYPE, t.get(), DATA_TYPE_STRING);
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "format".
-   * @param mimeType the MIME type to set.
-   */
-  @Deprecated
-  public Metadata(final String mimeType) {
-    this(token(mimeType));
-  }
-
-  /**
-   * Initializes the metadata object as special XML element "format".
-   * @param mimeType the MIME type to set (as byte array).
-   */
-  @Deprecated
-  Metadata(final byte[] mimeType) {
-    this(FORMAT, mimeType, DATA_TYPE_STRING);
   }
 }

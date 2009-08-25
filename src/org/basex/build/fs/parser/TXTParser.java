@@ -23,7 +23,7 @@ public final class TXTParser extends AbstractParser {
 
   /** Standard constructor. */
   public TXTParser() {
-    super(MetaType.TEXT, MimeType.TXT.get());
+    super(MetaType.PLAINTEXT, MimeType.TXT.get());
   }
 
   /** {@inheritDoc} */

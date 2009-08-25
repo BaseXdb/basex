@@ -272,7 +272,7 @@ public final class JPGParser extends AbstractParser {
 
   /** Standard constructor. */
   public JPGParser() {
-    super(MetaType.IMAGE, MimeType.JPG.get());
+    super(MetaType.PICTURE, MimeType.JPG.get());
   }
 
   /**
@@ -436,7 +436,7 @@ public final class JPGParser extends AbstractParser {
     switch(bfc.get()) { // extension code
       case 0x10: // Thumbnail coded using JPEG
         fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.IMAGE));
+        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
         fsparser.metaEvent(meta.setMimeType(MimeType.JPG.get()));
         fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         break;
@@ -445,7 +445,7 @@ public final class JPGParser extends AbstractParser {
         height = bfc.get();
         s -= 2;
         fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.IMAGE));
+        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
         fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 1 byte/pixel."));
@@ -455,7 +455,7 @@ public final class JPGParser extends AbstractParser {
         height = bfc.get();
         s -= 2;
         fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.IMAGE));
+        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
         fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
             "Thumbnail coded using 3 bytes/pixel."));
