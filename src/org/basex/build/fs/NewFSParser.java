@@ -286,7 +286,7 @@ public final class NewFSParser extends Parser {
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
     // SPOTLIGHT must not be true if the library is not available
-    if(prop.is(Prop.SPOTLIGHT)) {
+    if(Prop.MAC && prop.is(Prop.SPOTLIGHT)) {
       try {
         // initialize SpotlightExtractor class and try to load the library
         Class.forName(SpotlightExtractor.class.getCanonicalName(), true,
