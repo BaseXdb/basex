@@ -32,36 +32,6 @@ public final class SpotlightExtractor {
   }
 
   /**
-   * Mapping of spotlight media types to DeepFS meta types.
-   * @author Bastian Lemke
-   */
-  enum SpotlightMediaType {
-    /** Sound. */
-    SOUND(MetaType.AUDIO),
-    /** Video. */
-    VIDEO(MetaType.VIDEO);
-
-    /** The {@link MetaType}. */
-    private final MetaType metaType;
-
-    /**
-     * Initializes the media type instance.
-     * @param t the corresponding meta type.
-     */
-    private SpotlightMediaType(final MetaType t) {
-      metaType = t;
-    }
-
-    /**
-     * Returns the meta type for this spotlight media type.
-     * @return the {@link MetaType}
-     */
-    MetaType get() {
-      return metaType;
-    }
-  }
-
-  /**
    * Mapping of spotlight content types to DeepFS MIME types.
    * @author Bastian Lemke
    */
@@ -76,6 +46,8 @@ public final class SpotlightExtractor {
     COM_COMPUSERVE_GIF(MimeType.GIF),
     /** BMP file. */
     COM_MICROSOFT_BMP(MimeType.BMP),
+    /** TIFF file. */
+    PUBLIC_TIFF(MimeType.TIFF),
     /** HTML file. */
     PUBLIC_HTML(MimeType.HTML),
     /** Plain text file. */
@@ -87,35 +59,61 @@ public final class SpotlightExtractor {
     /** PDF file. */
     COM_ADOBE_PDF(MimeType.PDF),
     /** Image. */
-    PUBLIC_IMAGE(null),
+    PUBLIC_IMAGE(MetaType.PICTURE),
     /** Audio. */
-    PUBLIC_AUDIO(null),
+    PUBLIC_AUDIO(MetaType.AUDIO),
     /** Audiovisual content. */
-    PUBLIC_AUDIOVISUAL_CONTENT(null),
+    PUBLIC_AUDIOVISUAL_CONTENT(MetaType.VIDEO),
     /** Data. */
-    PUBLIC_DATA(null),
+    PUBLIC_DATA(),
     /** Item. */
-    PUBLIC_ITEM(null),
+    PUBLIC_ITEM(),
     /** Content. */
-    PUBLIC_CONTENT(null);
+    PUBLIC_CONTENT();
 
+    /** The {@link MetaType}. */
+    private final MetaType metaType;
     /** The {@link MimeType}. */
     private final MimeType mimeType;
 
+    /** Constructor for items that should be ignored. */
+    private SpotlightContentType() {
+      mimeType = null;
+      metaType = null;
+    }
+
     /**
-     * Initializes the content type instance.
+     * Initializes the content type instance with a {@link MimeType}.
      * @param m the corresponding MIME type
      */
     private SpotlightContentType(final MimeType m) {
       mimeType = m;
+      metaType = null;
+    }
+
+    /**
+     * Initializes the content type instance with a {@link MetaType}.
+     * @param m the corresponding {@link MetaType}.
+     */
+    private SpotlightContentType(final MetaType m) {
+      metaType = m;
+      mimeType = null;
     }
 
     /**
      * Returns the meta type for this spotlight media type.
-     * @return the {@link MetaType}
+     * @return the {@link MimeType}.
      */
-    MimeType get() {
+    MimeType getFormat() {
       return mimeType;
+    }
+
+    /**
+     * Returns the meta type for this spotlight content type.
+     * @return the {@link MetaType}.
+     */
+    MetaType getType() {
+      return metaType;
     }
   }
 
@@ -196,24 +194,26 @@ public final class SpotlightExtractor {
         obj.dateEvent(DateField.DATE_CREATED, o);
       }
     },
-//    /** Date and time when the content of this item was modified. */
-//    ContentModificationDate {
-//      @Override
-//      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
-//        obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
-//      }
-//    },
+    // /** Date and time when the content of this item was modified. */
+    // ContentModificationDate {
+    // @Override
+    // public void parse(final SpotlightExtractor obj, final Object o) throws
+    // IOException {
+    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+    // }
+    // },
     /**
      * Uniform Type Identifier of the file. For example, a jpeg image file will
      * have a value of public.jpeg.
      */
-    ContentType {
+    ContentTypeTree {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
+      public void parse(final SpotlightExtractor obj, final Object o)
+          throws IOException {
         try {
           String key = ((String) o).toUpperCase();
           key = key.replace('.', '_').replace('-', '_');
-          obj.mimeTypeEvent(SpotlightContentType.valueOf(key));
+          obj.contentTypeEvent(SpotlightContentType.valueOf(key));
         } catch(final IllegalArgumentException ex) {
           BaseX.debug("SpotlightExtractor: unsupported ContentType found (%)",
               (String) o);
@@ -373,19 +373,6 @@ public final class SpotlightExtractor {
       public void parse(final SpotlightExtractor obj, final Object o)
           throws IOException {
         obj.stringEvent(StringField.CONTRIBUTOR, o);
-      }
-    },
-    /** Media types present in the content. */
-    MediaTypes {
-      @Override
-      public void parse(final SpotlightExtractor obj, final Object o) throws IOException {
-        try {
-          final String key = ((String) o).toUpperCase();
-          obj.metaTypeEvent(SpotlightMediaType.valueOf(key));
-        } catch(final IllegalArgumentException ex) {
-          BaseX.debug("SpotlightExtractor: unsupported MediaType found (%)",
-              (String) o);
-        }
       }
     },
     /**
@@ -660,25 +647,17 @@ public final class SpotlightExtractor {
   }
 
   /**
-   * Sets the meta type for the current item.
-   * @param mt the meta type
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void metaTypeEvent(final SpotlightMediaType mt) throws IOException {
-    meta.setMetaType(mt.get());
-    parser.metaEvent(meta);
-  }
-
-  /**
    * Sets the MIME type for the current item.
    * @param ct the spotlight content type
    * @throws IOException if any error occurs while writing to the parser.
    */
-  void mimeTypeEvent(final SpotlightContentType ct) throws IOException {
-    final MimeType m = ct.get();
-    if(m == null) return;
-    meta.setMimeType(m);
-    parser.metaEvent(meta);
+  void contentTypeEvent(final SpotlightContentType ct) throws IOException {
+    final MetaType me = ct.getType();
+    if(me != null) parser.metaEvent(meta.setMetaType(me));
+    else {
+      final MimeType mi = ct.getFormat();
+      if(mi != null) parser.metaEvent(meta.setMimeType(mi));
+    }
   }
 
   /**

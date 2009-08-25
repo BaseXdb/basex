@@ -175,7 +175,7 @@ public final class Prop extends AProp {
    * Spotlight integration. If true, on mac platforms spotlight index is used
    * instead of the internal parser implementations.
    */
-  public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false};
+  public static final Object[] SPOTLIGHT = { "SPOTLIGHT", true};
 
   // WEBSERVER OPTIONS ========================================================
 

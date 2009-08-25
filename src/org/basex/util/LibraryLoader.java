@@ -4,7 +4,7 @@ import org.basex.BaseX;
 
 /**
  * Utility class to load shared libraries.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  */
@@ -28,8 +28,14 @@ public final class LibraryLoader {
       System.loadLibrary(libName);
       BaseX.debug("Loading library ... OK (" + libName + ").");
 
-      if(libName.equals(SPOTEXLIBNAME)) { spotexLoaded = true; return; }
-      if(libName.equals(JSDBFSLIBNAME)) { jsdbfsLoaded = true; return; }
+      if(libName.equals(SPOTEXLIBNAME)) {
+        spotexLoaded = true;
+        return;
+      }
+      if(libName.equals(JSDBFSLIBNAME)) {
+        jsdbfsLoaded = true;
+        return;
+      }
 
     } catch(UnsatisfiedLinkError e) {
       BaseX.errln("Loading library failed (" + libName + ")." + e);
@@ -47,6 +53,17 @@ public final class LibraryLoader {
     if(libName.equals(JSDBFSLIBNAME) && jsdbfsLoaded) return;
 
     loadLibrary(libName);
+  }
+
+  /**
+   * Checks if a library is loaded.
+   * @param libName name of the library.
+   * @return true if the library is loaded, false otherwise.
+   */
+  public static boolean isLoaded(final String libName) {
+    if(libName.equals(SPOTEXLIBNAME)) return spotexLoaded;
+    else if(libName.equals(JSDBFSLIBNAME)) return jsdbfsLoaded;
+    else return false;
   }
 
   /** Default constructor disabled. */

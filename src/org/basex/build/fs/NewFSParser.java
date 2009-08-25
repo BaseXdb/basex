@@ -30,14 +30,15 @@ import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.IO;
 import org.basex.util.Atts;
+import org.basex.util.LibraryLoader;
 import org.basex.util.TokenBuilder;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.
  * 
- * In more detail importing a file hierarchy means to map a file hierarchy
- * into an XML representation according to an XML document valid against the
- * DeepFSML specification.
+ * In more detail importing a file hierarchy means to map a file hierarchy into
+ * an XML representation according to an XML document valid against the DeepFSML
+ * specification.
  * 
  * <ul>
  * <li>The import is invoked by the {@link CreateFS} command.</li>
@@ -283,6 +284,17 @@ public final class NewFSParser extends Parser {
     backingroot = bs;
     mountpoint = mp;
     mybackingpath = backingroot + Prop.SEP + fsdbname;
+
+    // SPOTLIGHT must not be true if the library is not available
+    if(prop.is(Prop.SPOTLIGHT)) {
+      try {
+        // initialize SpotlightExtractor class and try to load the library
+        Class.forName(SpotlightExtractor.class.getCanonicalName(), true,
+            ClassLoader.getSystemClassLoader());
+      } catch(ClassNotFoundException e) { /* */}
+      if(!LibraryLoader.isLoaded(LibraryLoader.SPOTEXLIBNAME)) prop.set(
+          Prop.SPOTLIGHT, false);
+    }
 
     if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
       buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
