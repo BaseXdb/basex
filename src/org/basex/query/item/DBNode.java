@@ -190,7 +190,7 @@ public class DBNode extends Nod {
     final DBNode node = copy();
     node.set(p, data.kind(p));
     final double f =  (double) distToRoot(node.pre) / (double) data.meta.height;
-    node.score(node.score * Math.max(1 - f, f));
+     node.score(node.score * Math.max(1 - f, f));
     
     final int tid = data.tags.id(node.nname());
     StatsKey sk = data.tags.stat(tid);
@@ -283,7 +283,7 @@ public class DBNode extends Nod {
           node.score(node.score / Math.abs(l));
           level.push(l++);
         } else {
-          node.score(node.score / Math.abs(l));
+           node.score(node.score / Math.abs(l));
           l = -1;
         }
         return node;

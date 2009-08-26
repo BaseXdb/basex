@@ -43,7 +43,8 @@ public final class FTItem extends DBNode {
   @Override
   public double score() {
     if(score == -1) {
-      score = ((tl + 1) * all.match.length - 1) / data.textLen(pre);
+      score = (double) ((tl + 1) * all.match.length - 1) / 
+        (double) data.textLen(pre);
     }
     // default score for index results
     // if(score == -1) score = all.matches() ? 1 : 0;

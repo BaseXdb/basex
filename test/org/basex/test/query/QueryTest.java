@@ -66,8 +66,8 @@ public final class QueryTest {
       }
     } else {
       // single test
-      prop.set(Prop.FTINDEX, false);
-      prop.set(Prop.FTFUZZY, false);
+      prop.set(Prop.FTINDEX, true);
+      prop.set(Prop.FTFUZZY, true);
       prop.set(Prop.FTST, false);
       prop.set(Prop.FTDC, false);
       prop.set(Prop.FTCS, false);

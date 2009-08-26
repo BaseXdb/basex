@@ -90,7 +90,7 @@ public final class SeqIter extends Iter implements Result {
     Item i;
     while((i = iter.next()) != null) add(i);
   }
-
+  
   /**
    * Adds a single item.
    * @param it item to be added

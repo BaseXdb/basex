@@ -75,19 +75,16 @@ public final class Scoring {
   public double ftAnd(final FTItem item1, final FTItem item2) {
     final double score = Math.min(item1.score(), item2.score());
     int sum = 0;
-    int l;
     int count = 0;
+    
     for(int i = 0; i < item1.all.size; i++) {
-      l = -1;
-      for(final FTStringMatch sm : item1.all.match[i]) {
-        if(l == -1) {
-          l = sm.s;
-          continue;
+      for(final FTStringMatch sm1 : item1.all.match[i]) {
+        for(int j = 0; j < item2.all.size; j++) {
+          for(final FTStringMatch sm2 : item2.all.match[j]) {
+            sum += Math.abs(sm1.e - sm2.s);
+            count++;
+          }
         }
-        count++;
-        final int start = sm.s;
-        sum += start - l;
-        l = start;
       }
     }
     final double avg = (double) sum / (double) count;

@@ -22,12 +22,15 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
+import org.basex.index.Names;
 import org.basex.io.CachedOutput;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
@@ -47,7 +50,7 @@ public final class InexDBTestNew {
   /** Queries. */
   private static final String QUERIES = "rewrittenSub.que";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "pages";
+  private static final String DBPREFIX = "inex";
 
   /** Database context. */
   private static Context ctx = new Context();
@@ -57,6 +60,8 @@ public final class InexDBTestNew {
   private static StringList queries;
   /** Databases. */
   private static StringList databases;
+  /** Number of articles. */
+  private int[] numArt;
 
   /** Maximum number of databases. */
   private static int maxdb = Integer.MAX_VALUE;
@@ -99,7 +104,8 @@ public final class InexDBTestNew {
     " return concat(name($a),'[',basex:index-of($ssn,$a),']'), '/')};" +
     "declare function basex:index-of (" +
     " $n as node()* , $ntf as node() )  as xs:integer* { " +
-     "  for $s in (1 to count($n)) return $s[$n[$s] is $ntf]};";
+     "  for $s in (1 to count($n)) " +
+     "  return $s[$n[$s] is $ntf]};";
   /** Shows process info. */
   private boolean info;
 
@@ -128,7 +134,7 @@ public final class InexDBTestNew {
     br.close();
 
     if (subfile) {
-      // alcoate space for query times
+      // alocate space for query times
       qtimes = new double[queries.size()];
       results = new SeqIter[queries.size()];
       tid = tidl.finish();
@@ -146,6 +152,18 @@ public final class InexDBTestNew {
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
         queries.size(), databases.size(), runs, total ? "total" : "evaluation");
 
+    // get number of articles for each db
+    numArt = new int[databases.size()];
+    int last = 0;
+    for(int d = 0; d < databases.size(); d++) {
+      // open database and loop through all queries
+      launcher.execute(new Open(databases.get(d)));
+      final Names names = ctx.data().tags;
+      numArt[d] = last;
+      last += names.stat(names.id("article".getBytes())).counter; 
+      launcher.execute(new Close());
+    }
+    
     // run test
     final Performance p = new Performance();
     if(server) test();
@@ -212,7 +230,7 @@ public final class InexDBTestNew {
     // query and cache result
     final String que = subfile ? xqm + "for $i score $s in " 
         + queries.get(qu) + 
-        " order by $s return (basex:sum-path($i), $s)" 
+        " order by $s descending return (basex:sum-path($i), $s)" 
         : queries.get(qu);
         final Process proc = new XQuery(que);
     if(launcher.execute(proc)) {
@@ -229,8 +247,23 @@ public final class InexDBTestNew {
       final Result val = proc.result();
       if(val instanceof SeqIter) {
         final SeqIter itr = (SeqIter) val;
+        // update node path
+        for (int i = 0; i < itr.size(); i++) {
+           if(itr.item[i] instanceof Str) {
+             String str = new String(((Str) itr.item[i]).str());
+             if(str.startsWith("article")) {
+               final int s0 = str.indexOf('[');
+               final int s1 = str.indexOf(']');
+               final int c = Integer.parseInt(str.substring(s0 + 1, s1)) +  
+                 numArt[db];
+               final Str tmp = new Str(("article[" + c + 
+                   str.substring(s1)).getBytes(), false);
+               itr.item[i] = tmp;  
+             }
+           }
+        }
         if (results[qu] == null) results[qu] = itr; 
-        else results[qu].add(itr);
+        else results[qu] = addSorted(results[qu], itr);        
       }
     }     
     
@@ -242,6 +275,47 @@ public final class InexDBTestNew {
     }
   }
 
+  /**
+   * Adds the contents of an iterator in descending order of the score values.
+   * @param it1 entry to be added
+   * @param it2 entry to be added
+   * @return SeqIter with all values
+   * @throws QueryException query exception
+   */
+  public SeqIter addSorted(final Iter it1, final Iter it2) 
+  throws QueryException {
+    final SeqIter tmp = new SeqIter();
+    Item i1 = it1.next(), i2 = it2.next();
+    while(i1 != null && i2 != null) {
+      if (i1.score < i2.score) {
+        tmp.add(i2);
+        tmp.add(it2.next());
+        i2 = it2.next();
+      } else if (i1.score > i2.score) {
+        tmp.add(i1);
+        tmp.add(it1.next());
+        i1 = it1.next();
+      } else {
+        tmp.add(i2);
+        tmp.add(it2.next());
+        tmp.add(i1);
+        tmp.add(it1.next());
+        i1 = it1.next();
+        i2 = it2.next();
+      }
+    }
+    while((i1 = it1.next()) != null) {
+      tmp.add(i1);
+      tmp.add(it1.next());
+    }
+    while((i2 = it2.next()) != null) {
+      tmp.add(i2);
+      tmp.add(it2.next());
+    }
+    return tmp;
+  }
+
+  
   /**
    * Parses the command line arguments.
    * @param args the command line arguments
