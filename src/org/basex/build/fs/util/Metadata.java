@@ -108,7 +108,9 @@ public final class Metadata {
     /** M$ Word. */
     DOC("application/msword", "doc"),
     /** PDF. */
-    PDF("application/pdf", "pdf");
+    PDF("application/pdf", "pdf"),
+    /** Email. */
+    EML("message/rfc822", "eml");
 
     /** The element name as byte array. */
     private final byte[] elem;

@@ -437,9 +437,11 @@ public final class NewFSParser extends Parser {
    * @throws IOException I/O exception.
    */
   private void addFSAtts(final File f, final long size) throws IOException {
-    meta.setLong(IntField.FS_SIZE, size);
-    metaEvent(meta);
-    ParserUtil.fireDateEvents(this, meta, f);
+    if(prop.is(Prop.FSMETA)) {
+      meta.setLong(IntField.FS_SIZE, size);
+      metaEvent(meta);
+      ParserUtil.fireDateEvents(this, meta, f);
+    }
   }
 
   /**

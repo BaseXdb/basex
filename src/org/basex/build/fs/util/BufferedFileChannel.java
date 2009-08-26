@@ -8,7 +8,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+
 import org.basex.io.IO;
+import org.basex.util.TokenBuilder;
 
 /**
  * <p>
@@ -428,5 +430,33 @@ public final class BufferedFileChannel {
    */
   public ByteOrder getByteOrder() {
     return buf.order();
+  }
+
+  /**
+   * Read a line of text. A line is considered to be terminated by any one of a
+   * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
+   * immediately by a linefeed.
+   * @return A String containing the contents of the line, not including any
+   *         line-termination characters, or null if the end of the stream has
+   *         been reached
+   * @throws IOException if an I/O error occurs.
+   */
+  public String readLine() throws IOException {
+    TokenBuilder tb = new TokenBuilder(100);
+    out: while(true) {
+      for(int i = 0, max = buf.remaining(); i < max; i++) {
+        final int b = get();
+        if(b == '\n') {
+          break out;
+        } else if(b == '\r') {
+          if(get() != '\n') skip(-1);
+        } else tb.add((byte) b);
+      }
+      long r = remaining();
+      if(r == 0) return null;
+      int bs = getBufferSize();
+      buffer(r < bs ? (int) r : bs);
+    }
+    return tb.toString();
   }
 }

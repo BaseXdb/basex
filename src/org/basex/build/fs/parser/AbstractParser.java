@@ -67,6 +67,7 @@ public abstract class AbstractParser {
    */
   public void readMeta(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
+    // [BL] find more consistent way to set type and format
     if(type != null) parser.metaEvent(type);
     if(format != null) parser.metaEvent(format);
     meta(bfc, parser);
