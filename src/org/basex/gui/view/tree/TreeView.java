@@ -106,8 +106,6 @@ public final class TreeView extends View {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-    focusedRect = null;
-    markedImage = null;
     wwidth = -1;
     wheight = -1;
     repaint();
@@ -121,7 +119,6 @@ public final class TreeView extends View {
 
   @Override
   protected void refreshInit() {
-    markedImage = null;
     wwidth = -1;
     wheight = -1;
     repaint();
@@ -165,6 +162,13 @@ public final class TreeView extends View {
     setLevelDistance();
 
     if(windowSizeChanged()) {
+
+      if(markedImage != null) {
+        markedImage = null;
+        refreshedMark = true;
+      }
+      
+      focusedRect = null;
 
       treeImage = createImage();
       final Graphics tIg = treeImage.getGraphics();
@@ -373,13 +377,13 @@ public final class TreeView extends View {
       rects.add(rect);
 
       // draw rectangle
-      g.setColor(new Color(colorRect - ((level < 11 ? level : 11) 
-          * colorDiff)));
+      g.setColor(new Color(colorRect - 
+          ((level < 11 ? level : 11) * colorDiff)));
       g.drawRect((int) xx + 2, y, (int) w - 2, h);
 
       // fill rectangle with color
-      g.setColor(new Color(colorNode - ((level < 11 ? level : 11) 
-          * colorDiff)));
+      g.setColor(new Color(colorNode - 
+          ((level < 11 ? level : 11) * colorDiff)));
       g.fillRect((int) xx + 1, y, (int) w - 1, h);
 
       // draw text into rectangle if enough space
