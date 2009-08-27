@@ -19,6 +19,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
+import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -92,8 +93,12 @@ public final class TreeView extends View {
   private int nodeHeight = -1;
   /** Distance between the levels. */
   private int levelDistance = -1;
-  /** image of the current marked nodes. */
+  /** Image of the current marked nodes. */
   private BufferedImage markedImage = null;
+  /** If something is selected. */
+  private boolean selection = false;
+  /** The selection rectangle. */
+  private ViewRect selectRect = null;
 
   /**
    * Default Constructor.
@@ -167,7 +172,7 @@ public final class TreeView extends View {
         markedImage = null;
         refreshedMark = true;
       }
-      
+
       focusedRect = null;
 
       treeImage = createImage();
@@ -201,10 +206,86 @@ public final class TreeView extends View {
           showParentNode, showChildNodes);
     }
 
+    if(selection) markSelektedNodes(g);
+
   }
 
   /**
-   * controls the node temperature drawing.
+   * Draws the dragged selection and marks the nodes inside.
+   * @param g the graphics reference
+   */
+  private void markSelektedNodes(final Graphics g) {
+    final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
+    final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
+    final int w = Math.abs(selectRect.w);
+    final int h = Math.abs(selectRect.h);
+
+    // draw selection
+    g.setColor(Color.RED);
+    g.drawRect(x, y, w, h);
+
+    final int f = y;
+    final int t = y + h;
+    final int size = rectsPerLevel.size();
+    final IntList list = new IntList();
+
+    for(int i = 0; i < size; i++) {
+      int yL = getYperLevel(i);
+
+      if((yL >= f || yL + nodeHeight >= f) && 
+          (yL <= t || yL + nodeHeight <= t)) {
+        
+        final ArrayList<TreeRect> rList = rectsPerLevel.get(i);
+
+        if(rList.get(0).multiPres != null) {
+          final TreeRect mRect = rList.get(0);
+          final int l = mRect.multiPres.length;
+          int sPrePos = (int) (l * (x / (double) mRect.w));
+          int ePrePos = (int) (l * ((x + w) / (double) mRect.w));
+
+          if(sPrePos < 0) sPrePos = 0;
+          if(ePrePos >= l) ePrePos = l - 1;
+
+          for(int j = sPrePos; j < ePrePos; j++) {
+            list.add(mRect.multiPres[j]);
+          }
+
+          gui.notify.mark(new Nodes(list.finish(), gui.context.data()), this);
+          markNodes();
+          repaint();
+
+        } else {
+
+          boolean b = false;
+
+          for(int j = 0; j < rList.size(); j++) {
+            TreeRect tR = rList.get(j);
+
+            if(!b && tR.contains(x)) b = true;
+
+            if(b && tR.contains(x + w)) {
+              list.add(tR.pre);
+              break;
+            }
+
+            if(b) {
+              list.add(tR.pre);
+            }
+
+          }
+
+          gui.notify.mark(new Nodes(list.finish(), gui.context.data()), this);
+          markNodes();
+          repaint();
+        }
+
+      }
+
+    }
+  }
+
+  /**
+   * Controls the node temperature drawing.
    * @param root the root node
    * @param g the graphics reference
    */
@@ -329,11 +410,11 @@ public final class TreeView extends View {
 
     // draw rectangle
     g.setColor(new Color(colorRect - ((level < 11 ? level : 11) * colorDiff)));
-    g.drawRect(2, y, (int) w - 2, h);
+    g.drawRect(2, y, (int) w - 1, h);
 
     // fill rectangle with color
     g.setColor(new Color(colorNode - ((level < 11 ? level : 11) * colorDiff)));
-    g.fillRect(1, y, (int) w - 1, h);
+    g.fillRect(1, y, (int) w, h);
 
   }
 
@@ -434,8 +515,8 @@ public final class TreeView extends View {
 
           if(index > -1) {
 
-            int x = (int) (currRect.w * index
-                / (double) currRect.multiPres.length - 1);
+            int x = (int) (currRect.w * index / 
+                (double) currRect.multiPres.length);
 
             mIg.setColor(Color.RED);
             mIg.drawLine(x, y, x, y + nodeHeight);
@@ -456,7 +537,7 @@ public final class TreeView extends View {
 
           if(rect != null) {
             mIg.setColor(Color.RED);
-            mIg.fillRect(rect.x + 1, y, rect.w - 1, nodeHeight);
+            mIg.fillRect(rect.x + 1, y, rect.w, nodeHeight);
             drawTextIntoRectangle(mIg, pre, rect.x + (int) (rect.w / 2f),
                 rect.w, y);
             marked[j] = -1;
@@ -644,12 +725,10 @@ public final class TreeView extends View {
             return true;
           }
         }
-
       }
-
     } else {
 
-      int level = getLevelperY(mousePosY);
+      int level = getLevelPerY(mousePosY);
 
       if(level == -1 || level >= rectsPerLevel.size()) return false;
 
@@ -698,7 +777,7 @@ public final class TreeView extends View {
    * @param y the y-axis value.
    * @return the level if inside a node rectangle, -1 else.
    */
-  private int getLevelperY(final int y) {
+  private int getLevelPerY(final int y) {
     final double f = y / ((float) levelDistance + nodeHeight);
     final double b = nodeHeight / (float) (levelDistance + nodeHeight);
     return f <= ((int) f + b) ? (int) f : -1;
@@ -863,5 +942,35 @@ public final class TreeView extends View {
     if(e.getWheelRotation() > 0) gui.notify.context(new Nodes(gui.focused,
         gui.context.data()), false, null);
     else gui.notify.hist(false);
+  }
+
+  @Override
+  public void mouseDragged(final MouseEvent e) {
+    if(gui.updating || e.isShiftDown()) return;
+
+    if(!selection) {
+      selection = true;
+      selectRect = new ViewRect();
+      selectRect.x = e.getX();
+      selectRect.y = e.getY();
+      selectRect.h = 1;
+      selectRect.w = 1;
+
+    } else {
+      int x = e.getX();
+      int y = e.getY();
+
+      selectRect.w = x - selectRect.x;
+      selectRect.h = y - selectRect.y;
+
+    }
+    repaint();
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    if(gui.updating || gui.painting) return;
+    selection = false;
+    repaint();
   }
 }
