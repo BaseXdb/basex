@@ -469,8 +469,7 @@ public final class GUI extends JFrame {
       }
 
       boolean feedback = main;
-      if(!main && data != null && prop.is(GUIProp.SHOWXQUERY) &&
-          pr instanceof XQuery) {
+      if(!main && query.visible() && pr instanceof XQuery) {
         feedback = true;
         query.info(inf, ok);
       }

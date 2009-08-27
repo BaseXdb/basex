@@ -106,7 +106,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens an XQuery file. */
-  XQOPEN(true, GUIXQOPEN, "% R", GUIXQOPENTT) {
+  XQOPEN(false, GUIXQOPEN, "% R", GUIXQOPENTT) {
     @Override
     public void execute(final GUI gui) {
       gui.query.confirm();
@@ -122,7 +122,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Saves the current XQuery. */
-  XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
+  XQSAVE(false, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
