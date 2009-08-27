@@ -32,7 +32,7 @@ public final class GIFParser extends AbstractParser {
 
   /** Standard constructor. */
   public GIFParser() {
-    super(MetaType.PICTURE, MimeType.GIF.get());
+    super(MetaType.PICTURE, MimeType.GIF);
   }
 
   @Override
@@ -44,7 +44,7 @@ public final class GIFParser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel f, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     try {
       f.buffer(10);
@@ -62,8 +62,14 @@ public final class GIFParser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
   // no content to read...
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    meta(bfc, parser);
+    return true;
   }
 }

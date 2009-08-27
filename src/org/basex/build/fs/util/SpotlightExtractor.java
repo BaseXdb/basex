@@ -469,7 +469,8 @@ public final class SpotlightExtractor {
     // public void parse(final SpotlightExtractor obj, final Object o)
     // throws IOException {
     // assert o instanceof String;
-    // obj.parser.textContent(-1, -1, (String) o, false);
+    // String s = (String) o;
+    // obj.parser.textContent(-1, s.length(), s, false);
     // }
     // },
     /**

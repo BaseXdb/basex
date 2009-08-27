@@ -12,7 +12,7 @@ import static org.basex.util.Token.*;
 
 /**
  * Parser for PNG files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -24,7 +24,7 @@ public final class PNGParser extends AbstractParser {
 
   /** Standard constructor. */
   public PNGParser() {
-    super(MetaType.PICTURE, MimeType.PNG.get());
+    super(MetaType.PICTURE, MimeType.PNG);
   }
 
   /** PNG header. */
@@ -40,17 +40,23 @@ public final class PNGParser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
   // no textual representation for png content ...
   }
 
   @Override
-  public void meta(final BufferedFileChannel bfc, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
     if(!check(bfc)) return;
     final Metadata meta = new Metadata();
     parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, bfc.getInt()));
     parser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, bfc.getInt()));
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    meta(bfc, parser);
+    return true;
   }
 }

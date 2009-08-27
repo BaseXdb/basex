@@ -53,7 +53,7 @@ public final class JPGParser extends AbstractParser {
 
   /** Standard constructor. */
   public JPGParser() {
-    super(MetaType.PICTURE, MimeType.JPG.get());
+    super(MetaType.PICTURE, MimeType.JPG);
     meta = new Metadata();
     exifParser = new ExifParser();
   }
@@ -68,7 +68,7 @@ public final class JPGParser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel f, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     try {
       f.buffer(6);
@@ -104,11 +104,18 @@ public final class JPGParser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel f, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel f, final NewFSParser parser) {
   // no textual representation for jpg content ...
   }
 
   // ---------------------------------------------------------------------------
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel f, NewFSParser parser)
+      throws IOException {
+    meta(f, parser);
+    return true;
+  }
 
   /**
    * Reads two bytes from the {@link BufferedFileChannel} and returns the value
@@ -211,7 +218,7 @@ public final class JPGParser extends AbstractParser {
       case 0x10: // Thumbnail coded using JPEG
         fsparser.startContent(bfc.absolutePosition(), s);
         fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-        fsparser.metaEvent(meta.setMimeType(MimeType.JPG.get()));
+        fsparser.metaEvent(meta.setMimeType(MimeType.JPG));
         fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
         break;
       case 0x11: // Thumbnail coded using 1 byte/pixel

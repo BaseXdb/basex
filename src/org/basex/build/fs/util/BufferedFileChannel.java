@@ -436,12 +436,14 @@ public final class BufferedFileChannel {
    * Read a line of text. A line is considered to be terminated by any one of a
    * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
    * immediately by a linefeed.
-   * @return A String containing the contents of the line, not including any
-   *         line-termination characters, or null if the end of the stream has
-   *         been reached
+   * @param inputEncoding the input encoding.
+   * @return A (UTF-8-)String containing the contents of the line, not including
+   *         any line-termination characters, or null if the end of the stream
+   *         has been reached
    * @throws IOException if an I/O error occurs.
    */
-  public String readLine() throws IOException {
+  public String readLine(final String inputEncoding) throws IOException {
+    final boolean utf = inputEncoding.equalsIgnoreCase("UTF-8");
     TokenBuilder tb = new TokenBuilder(100);
     out: while(true) {
       for(int i = 0, max = buf.remaining(); i < max; i++) {
@@ -450,7 +452,10 @@ public final class BufferedFileChannel {
           break out;
         } else if(b == '\r') {
           if(get() != '\n') skip(-1);
-        } else tb.add((byte) b);
+        } else {
+          if(utf) tb.add((byte) b);
+          else tb.addUTF(b);
+        }
       }
       long r = remaining();
       if(r == 0) return null;

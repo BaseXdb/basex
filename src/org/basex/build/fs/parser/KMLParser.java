@@ -9,7 +9,7 @@ import org.basex.core.Prop;
 
 /**
  * Parser for KML files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -21,7 +21,7 @@ public final class KMLParser extends AbstractParser {
 
   /** Standard constructor. */
   public KMLParser() {
-    super(MetaType.XML, MimeType.KML.get());
+    super(MetaType.XML, MimeType.KML);
   }
 
   @Override
@@ -31,7 +31,7 @@ public final class KMLParser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel f, final NewFSParser parser)
+  protected void content(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     final long size = f.size();
     // parsing of xml fragments inside file is not supported
@@ -45,7 +45,14 @@ public final class KMLParser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel bfc, final NewFSParser parser) {
+  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser) {
   // no metadata to read...
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    content(bfc, parser);
+    return true;
   }
 }

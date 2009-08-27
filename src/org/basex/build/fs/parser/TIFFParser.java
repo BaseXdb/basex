@@ -26,7 +26,7 @@ public final class TIFFParser extends AbstractParser {
 
   /** Standard constructor. */
   public TIFFParser() {
-    super(MetaType.PICTURE, MimeType.TIFF.get());
+    super(MetaType.PICTURE, MimeType.TIFF);
     exifParser = new ExifParser();
   }
 
@@ -36,14 +36,20 @@ public final class TIFFParser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel f, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     exifParser.parse(f, parser);
   }
 
   @Override
-  public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
   // no content to read...
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    meta(bfc, parser);
+    return true;
   }
 }

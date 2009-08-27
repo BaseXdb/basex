@@ -214,6 +214,8 @@ public final class NewFSParser extends Parser {
   private static final Atts EMPTY_ATTS = new Atts();
   /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
+  /** Stack for the size attribute ids of content elements. */
+  private final int[] contentSizeIdStack = new int[IO.MAXHEIGHT];
   /** Path to root of the backing store. */
   private final String fsimportpath;
   /** Name of the database and backingroot sub directory. */
@@ -720,10 +722,10 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Adds a text element. If the position of the text content is unknown, the
-   * offset should be set to -1.
+   * Adds a text element.
    * @param offset the absolute position of the first byte of the file fragment
-   *          represented by this content element inside the current file.
+   *          represented by this content element inside the current file. A
+   *          negative value stands for an unknown offset.
    * @param size the size of the content element.
    * @param text the text to add.
    * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -736,10 +738,10 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Adds a text element. If the position of the text content is unknown, the
-   * offset should be set to -1.
+   * Adds a text element.
    * @param offset the absolute position of the first byte of the file fragment
-   *          represented by this content element inside the current file.
+   *          represented by this content element inside the current file. A
+   *          negative value stands for an unknown offset.
    * @param size the size of the content element.
    * @param text the text to add.
    * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -754,13 +756,13 @@ public final class NewFSParser extends Parser {
 
   /**
    * <p>
-   * Adds a text element. If the position of the text content is unknown, the
-   * offset should be set to -1. <b><code>text</code> must contain only valid
-   * UTF-8 characters!</b> Otherwise the generated XML document may be not
+   * Adds a text element. <b><code>text</code> must contain only valid UTF-8
+   * characters!</b> Otherwise the generated XML document may be not
    * well-formed.
    * </p>
    * @param offset the absolute position of the first byte of the file fragment
-   *          represented by this content element inside the current file.
+   *          represented by this content element inside the current file. A
+   *          negative value stands for an unknown offset.
    * @param size the size of the content element.
    * @param text the text to add.
    * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -771,31 +773,68 @@ public final class NewFSParser extends Parser {
   // suppress dead code warning for ADD_ATTS
   public void textContent(final long offset, final long size,
       final TokenBuilder text, final boolean preserveSpace) throws IOException {
-    startContent(offset, size);
+    // startContent(offset, size);
+    atts.reset();
+    atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
+    atts.add(SIZE, token(size));
     if(ADD_ATTS) {
-      atts.reset();
       atts.add(Metadata.DATA_TYPE, Metadata.DATA_TYPE_STRING);
       if(preserveSpace) atts.add(Metadata.XML_SPACE,
           Metadata.XmlSpace.PRESERVE.get());
     }
     if(!preserveSpace) text.chop();
     if(text.size() == 0) return;
-    builder.startElem(TEXT_CONTENT_NS, ADD_ATTS ? atts : EMPTY_ATTS);
+    builder.startElem(TEXT_CONTENT_NS, atts);
     builder.text(text, false);
     builder.endElem(TEXT_CONTENT_NS);
-    endContent();
+    // endContent();
   }
 
   /**
+   * <p>
+   * Generates the XML representation for a new content element inside the
+   * current file or content node node with a preliminary size value. The size
+   * value may be set with {@link #setContentSize(long) setContentSize(size)}.
+   * If it's not set, the size is supposed to be unknown.
+   * </p>
+   * @param offset the absolute position of the first byte of the file fragment
+   *          represented by this content element inside the current file. A
+   *          negative value stands for an unknown offset.
+   * @throws IOException if any I/O error occurs.
+   */
+  public void startContent(final long offset) throws IOException {
+    atts.reset();
+    atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
+    atts.add(SIZE, UNKNOWN);
+    contentSizeIdStack[contentOpenedCounter++] = builder.startElem(CONTENT_NS,
+        atts) + 2;
+    return;
+  }
+
+  /**
+   * Sets the size value for the last opened content element.
+   * @param size the size value to set.
+   * @throws IOException if any I/O error occurs.
+   */
+  public void setContentSize(final long size) throws IOException {
+    builder.setAttValue(contentSizeIdStack[contentOpenedCounter - 1],
+        token(size));
+  }
+
+  /**
+   * <p>
    * Generates the xml representation for a new content element inside the
    * current file or content node node.
+   * </p>
    * @param offset the absolute position of the first byte of the file fragment
-   *          represented by this content element inside the current file.
+   *          represented by this content element inside the current file. A
+   *          negative value stands for an unknown offset.
    * @param size the size of the content element.
-   * @throws IOException if any error occurs while reading from the file.
+   * @throws IOException if any I/O error occurs.
    */
   public void startContent(final long offset, final long size)
       throws IOException {
+    if(size < 1) throw new IllegalArgumentException("content size must be > 0");
     if(offset == lastContentOffset && size == lastContentSize) {
       /*
        * content range is exactly the same as the range of the parent element.
@@ -804,11 +843,8 @@ public final class NewFSParser extends Parser {
        */
       return;
     }
-    contentOpenedCounter++;
-    atts.reset();
-    atts.add(OFFSET, token(offset));
-    atts.add(SIZE, token(size));
-    builder.startElem(CONTENT_NS, atts);
+    startContent(offset);
+    setContentSize(size);
   }
 
   /**
@@ -832,8 +868,11 @@ public final class NewFSParser extends Parser {
    */
   public void startXMLContent(final long offset, final long size)
       throws IOException {
-    startContent(offset, size);
-    builder.startElem(XML_CONTENT_NS, EMPTY_ATTS);
+    // startContent(offset, size);
+    atts.reset();
+    atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
+    atts.add(SIZE, token(size));
+    builder.startElem(XML_CONTENT_NS, atts);
   }
 
   /**
@@ -842,7 +881,7 @@ public final class NewFSParser extends Parser {
    */
   public void endXMLContent() throws IOException {
     builder.endElem(XML_CONTENT_NS);
-    endContent();
+    // endContent();
   }
 
   /**

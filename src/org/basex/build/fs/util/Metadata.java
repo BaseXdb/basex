@@ -6,6 +6,8 @@ import static org.basex.util.Token.trim;
 import static org.basex.build.fs.NewFSParser.NS;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.basex.BaseX;
 import org.basex.util.Atts;
 import org.basex.util.Token;
 
@@ -82,40 +84,70 @@ public final class Metadata {
    */
   public enum MimeType {
     /** Unknown media. */
-    UNKNOWN("unkown", ""),
+    UNKNOWN("unkown", "", MetaType.UNKNOWN),
     /** Plaintext. */
-    TXT("text/plain", "txt"),
+    TXT("text/plain", "txt", MetaType.TEXT),
     /** HTML. */
-    HTML("text/html", "html"),
+    HTML("text/html", "html", MetaType.TEXT),
     /** CSS. */
-    CSS("text/css", "css"),
+    CSS("text/css", "css", MetaType.TEXT),
+    /** Rich text format. */
+    RTF("text/rtf", "rtf", MetaType.TEXT, MetaType.DOCUMENT),
     /** XML. */
-    XML("application/xml", "xml"),
+    XML("application/xml", "xml", MetaType.XML),
+    /** XML. */
+    XML2("text/xml", "xml", MetaType.XML),
     /** KML. */
-    KML("application/vnd.google-earth.kml+xml", "kml"),
+    KML("application/vnd.google-earth.kml+xml", "kml", MetaType.XML,
+        MetaType.MAP),
     /** MP3. */
-    MP3("audio/mp3", "mp3"),
+    MP3("audio/mp3", "mp3", MetaType.AUDIO),
+    /** Object file. */
+    O("application/octet-stream", "o"),
     /** PNG. */
-    PNG("image/png", "png"),
+    PNG("image/png", "png", MetaType.PICTURE),
+    /** ICS. */
+    ICS("application/ics", "ics", MetaType.CALENDAR),
+    /** Java archive. */
+    JAR("application/java-archive", "jar", MetaType.ARCHIVE),
     /** JPG. */
-    JPG("image/jpeg", "jpg"),
+    JPG("image/jpeg", "jpg", MetaType.PICTURE),
     /** GIF. */
-    GIF("image/gif", "gif"),
+    GIF("image/gif", "gif", MetaType.PICTURE),
     /** BMP. */
-    BMP("image/bmp", "bmp"),
+    BMP("image/bmp", "bmp", MetaType.PICTURE),
     /** TIFF. */
-    TIFF("image/tiff", "tif"),
+    TIFF("image/tiff", "tif", MetaType.PICTURE),
     /** M$ Word. */
-    DOC("application/msword", "doc"),
+    DOC("application/msword", "doc", MetaType.DOCUMENT),
     /** PDF. */
-    PDF("application/pdf", "pdf"),
+    PDF("application/pdf", "pdf", MetaType.DOCUMENT),
     /** Email. */
-    EML("message/rfc822", "eml");
+    EML("message/rfc822", "eml", MetaType.MESSAGE),
+    /** XLS. */
+    XLS("application/vnd.ms-excel", "xls", MetaType.DOCUMENT),
+    /** ODS. */
+    ODS("application/vnd.oasis.opendocument.spreadsheet", "ods",
+        MetaType.DOCUMENT),
+    /** pkcs7-signature. */
+    PKCS7("application/pkcs7-signature", ""),
+    /** x-pkcs7-signature. */
+    XPKCS7("application/x-pkcs7-signature", ""),
+    /** Vcard. */
+    VCARD("text/x-vcard", "vcf", MetaType.CONTACT),
+    /** ? */
+    FORCE_DOWNLOAD("application/force-download", ""),
+    /** Zip. */
+    ZIP("application/zip", "zip", MetaType.ARCHIVE),
+    /** text/directory */
+    DIRECTORY("text/directory", "");
 
     /** The element name as byte array. */
     private final byte[] elem;
     /** The default file suffix. */
     private final byte[] suff;
+    /** The associated meta types. */
+    private MetaType[] types;
 
     /**
      * Returns the xml element name as byte array.
@@ -134,20 +166,47 @@ public final class Metadata {
     }
 
     /**
+     * Returns the associated meta types.
+     * @return the associated meta types.
+     */
+    public MetaType[] getMetaTypes() {
+      return types;
+    }
+
+    /**
+     * Tries to find the MimeType item for the given MIME type string.
+     * @param name the MIME type string to find.
+     * @return the {@link MimeType} item or <code>null</code> if the item was
+     *         not found.
+     */
+    public static MimeType getItem(final String name) {
+      // [BL] more efficient MimeType retrieval.
+      byte[] token = token(name);
+      for(MimeType mt : MimeType.values()) {
+        if(Token.eq(mt.elem, token)) return mt;
+      }
+      BaseX.debug("MIME type not found: " + name);
+      return null;
+    }
+
+    /**
      * Constructor for initializing an element.
      * @param element the xml element string.
      * @param defaultSuffix the default file suffix for the MIME type.
+     * @param mt the associated meta types.
      */
-    MimeType(final String element, final String defaultSuffix) {
+    MimeType(final String element, final String defaultSuffix,
+        final MetaType... mt) {
       elem = token(element);
       suff = token(defaultSuffix);
+      types = mt;
     }
   }
 
   /**
-   * Available metadata types. Every file has at least one MetaType.
-   * Files may have more than one MetaType (e.g. a SVG file has MetaType "xml"
-   * and "image").
+   * Available metadata types. Every file has at least one MetaType. Files may
+   * have more than one MetaType (e.g. a SVG file has MetaType "xml" and
+   * "image").
    * @author Bastian Lemke
    */
   public enum MetaType {
@@ -157,18 +216,22 @@ public final class Metadata {
     AUDIO,
     /** Binary resource. */
     BINARY,
+    /** Calendar resource (e.g. ICS file). */
+    CALENDAR,
     /** Contact resource (e.g. VCF file). */
     CONTACT,
-    /** Document resource (e.g. DOC file). */
+    /** Document resource (e.g. DOC or PDF file). */
     DOCUMENT,
     /** Picture resource (e.g. JPG file). */
     PICTURE,
+    /** Map resource (e.g. KML or GPX file). */
+    MAP,
     /** Message resource (e.g. email). */
     MESSAGE,
     /** Presentation resource (e.g. PPT file). */
     PRESENTATION,
-    /** Text resource (e.g. plain text file). */
-    PLAINTEXT,
+    /** Text(-based) resource (e.g. plain text file). */
+    TEXT,
     /** Unknown resource type. */
     UNKNOWN,
     /** Video resource (e.g. MPEG file). */
@@ -728,25 +791,7 @@ public final class Metadata {
    * @param mimeType the MIME type to set
    * @return the metadata item
    */
-  public Metadata setMimeType(final String mimeType) {
-    return setMimeType(token(mimeType));
-  }
-
-  /**
-   * Re-initializes the metadata object as format item.
-   * @param mimeType the MIME type to set
-   * @return the metadata item
-   */
-  public Metadata setMimeType(final byte[] mimeType) {
-    return recycle(FORMAT, mimeType, DATA_TYPE_STRING);
-  }
-
-  /**
-   * Re-initializes the metadata object as format item.
-   * @param mimeType the MIME type to set
-   * @return the metadata item
-   */
   public Metadata setMimeType(final MimeType mimeType) {
-    return setMimeType(mimeType.get());
+    return recycle(FORMAT, mimeType.get(), DATA_TYPE_STRING);
   }
 }

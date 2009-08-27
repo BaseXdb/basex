@@ -30,7 +30,7 @@ public final class BMPParser extends AbstractParser {
 
   /** Standard constructor. */
   public BMPParser() {
-    super(MetaType.PICTURE, MimeType.BMP.get());
+    super(MetaType.PICTURE, MimeType.BMP);
   }
 
   @Override
@@ -41,7 +41,7 @@ public final class BMPParser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel f, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f)) return;
     f.skip(16);
@@ -60,8 +60,14 @@ public final class BMPParser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
   // no content to read...
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    meta(bfc, parser);
+    return true;
   }
 }

@@ -287,7 +287,7 @@ public final class MP3Parser extends AbstractParser {
 
   /** Standard constructor. */
   public MP3Parser() {
-    super(MetaType.AUDIO, MimeType.MP3.get());
+    super(MetaType.AUDIO, MimeType.MP3);
   }
 
   // ---------------------------------------------------------------------------
@@ -306,7 +306,7 @@ public final class MP3Parser extends AbstractParser {
   }
 
   @Override
-  public void meta(final BufferedFileChannel f, final NewFSParser parser)
+  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     fsparser = parser;
     bfc = f;
@@ -315,9 +315,16 @@ public final class MP3Parser extends AbstractParser {
   }
 
   @Override
-  public void readContent(final BufferedFileChannel f, //
+  protected void content(final BufferedFileChannel f, //
       final NewFSParser parser) {
   // no textual representation for mp3 content ...
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel f, NewFSParser parser)
+      throws IOException {
+    meta(f, parser);
+    return true;
   }
 
   // ---------------------------------------------------------------------------

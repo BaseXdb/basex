@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Text parser that tries to extract textual content from files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -24,7 +24,7 @@ public final class TXTParser extends AbstractParser {
 
   /** Standard constructor. */
   public TXTParser() {
-    super(MetaType.PLAINTEXT, MimeType.TXT.get());
+    super(MetaType.TEXT, MimeType.TXT);
   }
 
   /** {@inheritDoc} */
@@ -41,8 +41,9 @@ public final class TXTParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  public void readContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
+  protected void content(final BufferedFileChannel bfc, final NewFSParser parser)
+      throws IOException {
+    if(bfc.getFileName().endsWith(".emlxpart")) return; // ignore *.emlx files
     final int len = (int) Math.min(bfc.size(), parser.prop.num(Prop.FSTEXTMAX));
     final TokenBuilder content = new TokenBuilder(len);
     final int bufSize = bfc.getBufferSize();
@@ -92,5 +93,12 @@ public final class TXTParser extends AbstractParser {
     }
     content.chop();
     parser.textContent(0, len, content, true);
+  }
+
+  @Override
+  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+      throws IOException {
+    content(bfc, parser);
+    return true;
   }
 }
