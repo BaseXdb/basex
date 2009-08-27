@@ -537,7 +537,7 @@ public final class TreeView extends View {
 
           if(rect != null) {
             mIg.setColor(Color.RED);
-            mIg.fillRect(rect.x + 1, y, rect.w, nodeHeight);
+            mIg.fillRect(rect.x + 1, y, rect.w - 1, nodeHeight);
             drawTextIntoRectangle(mIg, pre, rect.x + (int) (rect.w / 2f),
                 rect.w, y);
             marked[j] = -1;
