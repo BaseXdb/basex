@@ -210,17 +210,24 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Adds a character array at the current position.
-   * @param ch char array
+   * Adds a string at the current position.
+   * @param str string
    */
-  void add(final char[] ch) {
+  void add(final String str) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
-    for(final char c : ch) tb.addUTF(c);
+    int cc = 0;
+    for(int c = 0, cl = str.length(); c < cl; c++) {
+      final int ch = str.charAt(c);
+      if(ch != '\r') {
+        tb.addUTF(ch);
+        cc++;
+      }
+    }
     tb.add(text, ps, size);
     text = tb.finish();
     size = tb.size();
-    for(int c = 0; c < ch.length; c++) next();
+    for(int c = 0; c < cc; c++) next();
   }
 
   /**

@@ -521,7 +521,7 @@ public class BaseXText extends BaseXPanel {
     } else {
       if(ctrl) return;
       if(text.start() != -1) text.delete();
-      text.add(new char[] { ch });
+      text.add(String.valueOf(ch));
     }
     e.consume();
     text.setCaret();
@@ -590,7 +590,7 @@ public class BaseXText extends BaseXPanel {
     if(txt == null) return;
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();
-    text.add(txt.toCharArray());
+    text.add(txt);
     if(undo != null) undo.store(text.finish(), text.cursor());
     text.setCaret();
   }
