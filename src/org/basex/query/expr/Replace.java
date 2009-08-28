@@ -2,6 +2,10 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.iter.Iter;
+
 /**
  * Replace expression.
  *
@@ -15,12 +19,18 @@ public final class Replace extends Arr {
   /**
    * Constructor.
    * @param t target expression
-   * @param e replace expression
+   * @param e source expression
    * @param v replace value of
    */
   public Replace(final Expr t, final Expr e, final boolean v) {
     super(t, e);
     value = v;
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    for(final Expr e : expr) e.iter(ctx);
+    return Iter.EMPTY;
   }
 
   @Override

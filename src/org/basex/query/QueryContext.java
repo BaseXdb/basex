@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.HashMap;
 import org.basex.BaseX;
@@ -32,6 +33,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.up.PendingUpdates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
@@ -157,6 +159,8 @@ public final class QueryContext extends Progress {
   private int rootDocs;
   /** Info flag. */
   private final boolean inf;
+  /** XQueryUP pending updates. */
+  public PendingUpdates updates;
 
   /**
    * Constructor.
@@ -166,6 +170,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
+    updates = new PendingUpdates();
   }
 
   /**
@@ -297,14 +302,16 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      return iter(root);
+      Item i = iter(root).finish();
+      updates.applyUpdates(this);
+      return i.iter();
     } catch(final StackOverflowError ex) {
       if(Prop.debug) ex.printStackTrace();
       Err.or(XPSTACK);
       return null;
     }
   }
-
+  
   /**
    * Serializes the specified item.
    * @param ser serializer
