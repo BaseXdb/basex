@@ -716,6 +716,7 @@ public final class NewFSParser extends Parser {
   @SuppressWarnings("all")
   // suppress dead code warning for ADD_ATTS
   public void metaEvent(final Metadata m) throws IOException {
+    if(!prop.is(Prop.FSMETA)) return;
     final byte[] data = ParserUtil.checkUTF(m.getValue());
     if(ws(data)) return;
     builder.nodeAndText(m.getKey(), ADD_ATTS ? m.getAtts() : EMPTY_ATTS, data);
@@ -773,6 +774,7 @@ public final class NewFSParser extends Parser {
   // suppress dead code warning for ADD_ATTS
   public void textContent(final long offset, final long size,
       final TokenBuilder text, final boolean preserveSpace) throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     // startContent(offset, size);
     atts.reset();
     atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
@@ -803,6 +805,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any I/O error occurs.
    */
   public void startContent(final long offset) throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     atts.reset();
     atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
     atts.add(SIZE, UNKNOWN);
@@ -817,6 +820,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any I/O error occurs.
    */
   public void setContentSize(final long size) throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     builder.setAttValue(contentSizeIdStack[contentOpenedCounter - 1],
         token(size));
   }
@@ -834,6 +838,7 @@ public final class NewFSParser extends Parser {
    */
   public void startContent(final long offset, final long size)
       throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     if(size < 1) throw new IllegalArgumentException("content size must be > 0");
     if(offset == lastContentOffset && size == lastContentSize) {
       /*
@@ -852,6 +857,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any error occurs while reading from the file.
    */
   public void endContent() throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     if(contentOpenedCounter > 0) {
       builder.endElem(CONTENT_NS);
       contentOpenedCounter--;
@@ -868,6 +874,7 @@ public final class NewFSParser extends Parser {
    */
   public void startXMLContent(final long offset, final long size)
       throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     // startContent(offset, size);
     atts.reset();
     atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
@@ -880,6 +887,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any error occurs while reading from the file.
    */
   public void endXMLContent() throws IOException {
+    if(!prop.is(Prop.FSCONT)) return;
     builder.endElem(XML_CONTENT_NS);
     // endContent();
   }
