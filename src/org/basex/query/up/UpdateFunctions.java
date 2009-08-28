@@ -25,4 +25,20 @@ public class UpdateFunctions {
       data.delete(pre);
     }
   }
+  
+  /**
+   * Renames the specified node.
+   * @param id node identity
+   * @param name new name
+   * @param data data reference
+   */
+  public static void rename(final int id, final byte[] name, final Data data) {
+    final int p = data.pre(id);
+    final int k = data.kind(p);
+    if(k == Data.ELEM) data.update(data.pre(id), name);
+    if(k == Data.ATTR) {
+      final byte[] v = data.attValue(p);
+      data.update(p, name, v);
+    }
+  }
 }

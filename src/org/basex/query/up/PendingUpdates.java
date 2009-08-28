@@ -23,13 +23,16 @@ import org.basex.util.IntList;
  */
 public class PendingUpdates {
   /** Holds delete primitives. */
-  ArrayList<UpdatePrimitive> deletes; 
+  ArrayList<UpdatePrimitive> deletes;
+  /** Holds rename primitives. */
+  ArrayList<UpdatePrimitive> renames;
   
   /**
    * Constructor.
    */
   public PendingUpdates() {
     deletes = new ArrayList<UpdatePrimitive>();
+    renames = new ArrayList<UpdatePrimitive>();
   }
   
   /**
@@ -38,6 +41,7 @@ public class PendingUpdates {
    */
   public void addPrimitive(final UpdatePrimitive p) {
     if(p instanceof DeletePrimitive) deletes.add(p);
+    if(p instanceof RenamePrimitive) renames.add(p);
   }
   
   /**
@@ -47,8 +51,10 @@ public class PendingUpdates {
    */
   private void checkConstraints() throws QueryException {
     final Set<Integer> err = new HashSet<Integer>();
+    for(final UpdatePrimitive p : renames)
+      if(!err.add(p.id)) Err.or(INCOMPLETE, p);
+    err.clear();
     for(final UpdatePrimitive p : deletes)
-      // remove later, just for testing
       if(!err.add(p.id)) Err.or(INCOMPLETE, p);
   }
   
@@ -61,6 +67,10 @@ public class PendingUpdates {
   public void applyUpdates(final QueryContext ctx) throws QueryException {
     checkConstraints();
     final Data data = ctx.data();
+    for(final UpdatePrimitive p : renames) {
+      final RenamePrimitive rp = (RenamePrimitive) p;
+      rename(rp.id, rp.newName, data);
+    }
     // apply deletes
     final IntList il = new IntList();
     for(final UpdatePrimitive p : deletes) il.add(p.pre);
