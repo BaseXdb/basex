@@ -67,7 +67,7 @@ public final class GIFParser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
     meta(bfc, parser);
     return true;

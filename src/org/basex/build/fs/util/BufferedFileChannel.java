@@ -10,6 +10,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
 import org.basex.io.IO;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -443,8 +444,8 @@ public final class BufferedFileChannel {
    * @throws IOException if an I/O error occurs.
    */
   public String readLine(final String inputEncoding) throws IOException {
-    final boolean utf = inputEncoding.equalsIgnoreCase("UTF-8");
-    TokenBuilder tb = new TokenBuilder(100);
+    final boolean utf = inputEncoding.equalsIgnoreCase(Token.UTF8);
+    final TokenBuilder tb = new TokenBuilder(100);
     out: while(true) {
       for(int i = 0, max = buf.remaining(); i < max; i++) {
         final int b = get();
@@ -457,9 +458,9 @@ public final class BufferedFileChannel {
           else tb.addUTF(b);
         }
       }
-      long r = remaining();
+      final long r = remaining();
       if(r == 0) return null;
-      int bs = getBufferSize();
+      final int bs = getBufferSize();
       buffer(r < bs ? (int) r : bs);
     }
     return tb.toString();

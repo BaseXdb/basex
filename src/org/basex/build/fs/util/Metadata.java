@@ -181,8 +181,8 @@ public final class Metadata {
      */
     public static MimeType getItem(final String name) {
       // [BL] more efficient MimeType retrieval.
-      byte[] token = token(name);
-      for(MimeType mt : MimeType.values()) {
+      final byte[] token = token(name);
+      for(final MimeType mt : MimeType.values()) {
         if(Token.eq(mt.elem, token)) return mt;
       }
       BaseX.debug("MIME type not found: " + name);

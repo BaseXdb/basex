@@ -111,7 +111,7 @@ public final class JPGParser extends AbstractParser {
   // ---------------------------------------------------------------------------
 
   @Override
-  protected boolean metaAndContent(BufferedFileChannel f, NewFSParser parser)
+  protected boolean metaAndContent(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     meta(f, parser);
     return true;

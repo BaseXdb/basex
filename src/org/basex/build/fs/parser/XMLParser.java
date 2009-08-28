@@ -50,7 +50,7 @@ public final class XMLParser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(BufferedFileChannel bfc, NewFSParser parser)
+  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
     content(bfc, parser);
     return true;

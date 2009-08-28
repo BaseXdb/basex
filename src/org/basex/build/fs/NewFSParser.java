@@ -293,7 +293,7 @@ public final class NewFSParser extends Parser {
         // initialize SpotlightExtractor class and try to load the library
         Class.forName(SpotlightExtractor.class.getCanonicalName(), true,
             ClassLoader.getSystemClassLoader());
-      } catch(ClassNotFoundException e) { /* */}
+      } catch(final ClassNotFoundException e) { /* */}
       if(!LibraryLoader.isLoaded(LibraryLoader.SPOTEXLIBNAME)) prop.set(
           Prop.SPOTLIGHT, false);
     }
