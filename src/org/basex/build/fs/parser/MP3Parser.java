@@ -321,8 +321,8 @@ public final class MP3Parser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel f,
+      final NewFSParser parser) throws IOException {
     meta(f, parser);
     return true;
   }
@@ -488,8 +488,15 @@ public final class MP3Parser extends AbstractParser {
    * @return the integer.
    */
   private int readSynchsafeInt() {
-    return (bfc.get() & 0xFF) << 21 | (bfc.get() & 0xFF) << 14
-        | (bfc.get() & 0xFF) << 7 | bfc.get() & 0xFF;
+    int b1 = bfc.get();
+    int b2 = bfc.get();
+    int b3 = bfc.get();
+    int b4 = bfc.get();
+    if(b1 > 127 || b2 > 127 || b3 > 127 || b4 > 127) {
+      // integer is not synchsafe
+      return b1 << 24 | b2 << 16 | b3 << 8 | b4;
+    }
+    return b1 << 21 | b2 << 14 | b3 << 7 | b4;
   }
 
   /**

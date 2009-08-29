@@ -55,20 +55,21 @@ public final class GIFParser extends AbstractParser {
 
     // extract image dimensions
     final Metadata meta = new Metadata();
-    meta.setInt(IntField.PIXEL_WIDTH, f.get() + f.get() << 8);
+    meta.setInt(IntField.PIXEL_WIDTH, f.get() + (f.get() << 8));
     parser.metaEvent(meta);
-    meta.setInt(IntField.PIXEL_HEIGHT, f.get() + f.get() << 8);
+    meta.setInt(IntField.PIXEL_HEIGHT, f.get() + (f.get() << 8));
     parser.metaEvent(meta);
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, //
+      final NewFSParser parser) {
   // no content to read...
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     meta(bfc, parser);
     return true;
   }

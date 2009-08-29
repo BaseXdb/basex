@@ -91,18 +91,18 @@ public final class BufferedFileChannel {
    * @param file the file to read from.
    * @param fileChannel the underlying {@link FileChannel} instance.
    * @param buffer the {@link ByteBuffer} to use.
-   * @param remaining the maximum number of bytes to read from the FileChannel
-   *          (excluding the already buffered bytes).
+   * @param bytesToRead the maximum number of bytes to read from the FileChannel
+   *          (including the already buffered bytes).
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
    */
   private BufferedFileChannel(final File file, final FileChannel fileChannel,
-      final ByteBuffer buffer, final long remaining) throws IOException {
+      final ByteBuffer buffer, final long bytesToRead) throws IOException {
     f = file;
     fc = fileChannel;
     buf = buffer;
     mark = absolutePosition();
-    rem = remaining;
+    rem = bytesToRead - buf.remaining();
   }
 
   /**
@@ -127,11 +127,11 @@ public final class BufferedFileChannel {
    */
   public BufferedFileChannel subChannel(final int bytesToRead)
       throws IOException {
-    final long remaining = bytesToRead - buf.remaining();
-    if(remaining > rem) throw new IllegalArgumentException(
+    if(remaining() < bytesToRead) throw new EOFException(
         "Requested number of bytes to read is too large.");
-    rem -= remaining;
-    return new BufferedFileChannel(f, fc, buf, remaining);
+    rem -= bytesToRead;
+    rem += buf.remaining();
+    return new BufferedFileChannel(f, fc, buf, bytesToRead);
   }
 
   /**
@@ -171,10 +171,7 @@ public final class BufferedFileChannel {
         fc.position(fc.position() + skip);
         buf.position(bufLim);
         rem -= skip + buffered;
-      } else {
-        buf.position(buf.position() + (int) n);
-        rem -= n;
-      }
+      } else buf.position(buf.position() + (int) n);
     }
   }
 
@@ -325,7 +322,6 @@ public final class BufferedFileChannel {
    */
   public int getShort() {
     return buf.getShort() & 0xFFFF;
-    // return (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**
@@ -342,8 +338,6 @@ public final class BufferedFileChannel {
    */
   public int getInt() {
     return buf.getInt() & 0xFFFFFFFF;
-    // return (buf.get() & 0xFF) << 24 | (buf.get() & 0xFF) << 16
-    // | (buf.get() & 0xFF) << 8 | buf.get() & 0xFF;
   }
 
   /**
@@ -360,7 +354,7 @@ public final class BufferedFileChannel {
    * @see #close()
    */
   public void finish() throws IOException {
-    final long len = buf.remaining() + rem;
+    final long len = remaining();
     skip(len);
   }
 

@@ -875,7 +875,6 @@ public final class NewFSParser extends Parser {
   public void startXMLContent(final long offset, final long size)
       throws IOException {
     if(!prop.is(Prop.FSCONT)) return;
-    // startContent(offset, size);
     atts.reset();
     atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
     atts.add(SIZE, token(size));
@@ -889,7 +888,6 @@ public final class NewFSParser extends Parser {
   public void endXMLContent() throws IOException {
     if(!prop.is(Prop.FSCONT)) return;
     builder.endElem(XML_CONTENT_NS);
-    // endContent();
   }
 
   /**

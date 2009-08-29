@@ -111,8 +111,8 @@ public final class JPGParser extends AbstractParser {
   // ---------------------------------------------------------------------------
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel f,
+      final NewFSParser parser) throws IOException {
     meta(f, parser);
     return true;
   }
@@ -177,8 +177,11 @@ public final class JPGParser extends AbstractParser {
     bfc.buffer(len);
     if(!checkNextBytes(HEADER_EXIF)) bfc.skip(size - len);
     final BufferedFileChannel sub = bfc.subChannel(size - len);
-    exifParser.parse(sub, fsparser);
-    sub.finish();
+    try {
+      exifParser.parse(sub, fsparser);
+    } finally {
+      sub.finish();
+    }
   }
 
   /**
