@@ -109,7 +109,8 @@ public final class FSParser extends Parser {
     meta.add(TYPEJPG, new JPGExtractor());
     meta.add(TYPEJPEG, new JPGExtractor());
     meta.add(TYPEBMP, new BMPExtractor());
-    meta.add(TYPEGIF, new TIFExtractor());
+    meta.add(TYPETIF, new TIFExtractor());
+    meta.add(TYPETIFF, new TIFExtractor());
     meta.add(TYPEMP3, new MP3Extractor());
     meta.add(TYPEEML, new EMLExtractor());
     meta.add(TYPEMBS, new EMLExtractor());

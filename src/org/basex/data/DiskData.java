@@ -434,7 +434,7 @@ public final class DiskData extends Data {
     int k = kind(pre);
     int s = size(pre, k);
     // ignore deletions of single root node
-    if(pre == 0 && s == 1) return;
+    if(pre == 0 && s == meta.size) return;
 
     // reduce size of ancestors
     int par = pre;

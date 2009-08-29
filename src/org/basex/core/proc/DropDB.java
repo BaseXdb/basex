@@ -22,7 +22,7 @@ public final class DropDB extends ACreate {
 
   @Override
   protected boolean exec() {
-    exec(new Close());
+    new Close().execute(context);
 
     // check if database is still pinned
     final String db = args[0];

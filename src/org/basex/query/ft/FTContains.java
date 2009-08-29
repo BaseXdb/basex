@@ -86,10 +86,10 @@ public class FTContains extends Expr {
     }
 
     ctx.fttoken = tmp;
-    final double is = ctx.item.score;
+    /*final double is = ctx.item.score;
     if(s != is && s != 0 && s == s && is != 0 && is == is) {
       s = Math.max(ctx.item.score - s / ctx.item.score, s - ctx.item.score / s);
-    }
+    }*/
     return Bln.get(s);
   }
 

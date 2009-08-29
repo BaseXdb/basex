@@ -71,7 +71,9 @@ public final class List extends Process {
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return db;
 
-    for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());
+    for(final IO f : dir.children()) {
+      if(f.isDir() && !f.name().endsWith(".tmp")) db.add(f.name());
+    }
     db.sort(false);
     return db;
   }

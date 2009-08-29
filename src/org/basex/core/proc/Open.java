@@ -27,7 +27,7 @@ public final class Open extends Process {
 
   @Override
   protected boolean exec() {
-    exec(new Close());
+    new Close().execute(context);
 
     final String db = args[0];
     Data data = context.data();

@@ -45,22 +45,26 @@ abstract class ACreate extends Process {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    exec(new Close());
+    new Close().execute(context);
+
+    final boolean mem = db == null || prop.is(Prop.MAINMEM);
+    if(!mem && context.pinned(db)) return error(DBINUSE);
+
+    final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
+        new NativeBuilder(p) : new DiskBuilder(p);
+    progress(builder);
 
     String err = null;
-    Builder builder = null;
     try {
-      final boolean mem = db == null || prop.is(Prop.MAINMEM);
-      if(!mem && context.pinned(db)) return error(DBINUSE);
-
-      builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
-          new NativeBuilder(p) : new DiskBuilder(p);
-      progress(builder);
-      final Data data = builder.build(db == null ? "" : db);
-      builder = null;
-      if(!prop.is(Prop.MAINMEM)) index(data);
-      context.openDB(data);
-      context.addToPool(data);
+      final Data data = builder.build(db == null ? "" : db + ".tmp");
+      if(mem) {
+        context.openDB(data);
+      } else {
+        index(data);
+        data.close();
+        move(db, p.prop);
+        new Open(db).execute(context);
+      }
       return info(DBCREATED, db, perf.getTimer());
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
@@ -76,12 +80,22 @@ abstract class ACreate extends Process {
       err = BaseX.info(CREATEERR, args[0]);
     }
     try {
-      if(builder != null) builder.close();
+      builder.close();
     } catch(final IOException ex) {
       BaseX.debug(ex);
     }
     DropDB.drop(db, prop);
     return error(err);
+  }
+
+  /**
+   * Moves a temporary database to the final destination.
+   * @param db name of database
+   * @param pr database properties
+   */
+  protected static void move(final String db, final Prop pr) {
+    DropDB.drop(db, pr);
+    pr.dbpath(db + ".tmp").renameTo(pr.dbpath(db));
   }
 
   /**
@@ -129,13 +143,5 @@ abstract class ACreate extends Process {
       error(CMDWHICH, type);
       return null;
     }
-  }
-
-  /**
-   * Closes the current database.
-   */
-  protected void close() {
-    final Data data = context.data();
-    if(data != null) exec(new Close());
   }
 }

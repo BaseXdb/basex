@@ -262,13 +262,13 @@ public abstract class Process extends Progress {
    * current process.
    * @param proc process to be executed
    * @return success of operation
-   */
   protected final boolean exec(final Process proc) {
     progress(proc);
     final boolean ok = proc.execute(context);
-    info = proc.info;
+    //info.add(proc.info);
     return ok;
   }
+   */
 
   /**
    * Returns the length of the longest string.

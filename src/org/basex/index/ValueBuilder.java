@@ -34,10 +34,11 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public Values build() throws IOException {
+    final Prop pr = data.meta.prop;
     final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
-    final int max = (int) (data.meta.prop.dbfile(db, f).length() >>> 7);
+    final int max = (int) (pr.dbfile(db, f).length() >>> 7);
     while(cap < max && cap < 1 << 24) cap <<= 1;
 
     final int type = text ? Data.TEXT : Data.ATTR;
@@ -51,7 +52,6 @@ public final class ValueBuilder extends IndexBuilder {
 
     index.init();
     final int hs = index.size;
-    final Prop pr = data.meta.prop;
     final DataOutput outl = new DataOutput(pr.dbfile(db, f + 'l'));
     outl.writeNum(hs);
     final DataOutput outr = new DataOutput(pr.dbfile(db, f + 'r'));

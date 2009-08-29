@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import org.basex.BaseX;
 import org.basex.io.IO;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -47,6 +48,7 @@ public abstract class AProp {
     final File file = new File(filename);
     if(!file.exists()) return;
 
+    TokenBuilder err = new TokenBuilder();
     try {
       final BufferedReader br = new BufferedReader(new FileReader(file));
       String line = null;
@@ -56,7 +58,7 @@ public abstract class AProp {
         if(line.length() == 0 || line.charAt(0) == '#') continue;
         final int d = line.indexOf('=');
         if(d < 0) {
-          BaseX.errln("%: \"%\" ignored.", filename, line);
+          err.add("%: \"%\" ignored. " + NL, filename, line);
           continue;
         }
 
@@ -73,8 +75,8 @@ public abstract class AProp {
         }
 
         final Object entry = props.get(key);
-        if(val == null) {
-          BaseX.errln("%: \"%\" not found.", filename, val);
+        if(entry == null) {
+          System.err.println(filename + ": \"" + key + "\" not found.");
         } else if(entry instanceof String) {
           props.put(key, val);
         } else if(entry instanceof Integer) {
@@ -93,9 +95,10 @@ public abstract class AProp {
       }
       br.close();
     } catch(final Exception ex) {
-      BaseX.errln("% could not be parsed.", filename);
+      err.add("% could not be parsed." + NL, filename);
       BaseX.debug(ex);
     }
+    if(err.size() != 0) BaseX.err(err.toString());
   }
 
   /**

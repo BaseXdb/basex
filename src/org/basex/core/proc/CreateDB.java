@@ -79,12 +79,13 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Context ctx, final Parser p, final String db)
       throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) new MemBuilder(p).build(db);
+    final Prop pr = p.prop;
+    if(pr.is(Prop.MAINMEM)) new MemBuilder(p).build(db);
 
     final Builder builder = new DiskBuilder(p);
-    final Prop pr = p.prop;
+    final String tmp = db + ".tmp"; 
     try {
-      final Data data = builder.build(db);
+      final Data data = builder.build(tmp);
       if(data.meta.txtindex) data.setIndex(Type.TXT,
         new ValueBuilder(data, true).build());
       if(data.meta.atvindex) data.setIndex(Type.ATV,
@@ -92,18 +93,18 @@ public final class CreateDB extends ACreate {
       if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
         new FTFuzzyBuilder(data, pr).build() :
         new FTTrieBuilder(data, pr).build());
-
-      ctx.addToPool(data);
-      return data;
+      data.close();
     } catch(final IOException ex) {
       try {
         builder.close();
       } catch(final IOException exx) {
         BaseX.debug(exx);
       }
-      DropDB.drop(db, ctx.prop);
+      DropDB.drop(tmp, pr);
       throw ex;
     }
+    move(db, pr);
+    return Open.open(ctx, db);
   }
 
   /**

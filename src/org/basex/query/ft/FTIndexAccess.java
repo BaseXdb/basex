@@ -51,7 +51,6 @@ public final class FTIndexAccess extends Simple {
           // assign scoring, if necessary and not done yet
           if(scoring) it.score();
           // remove matches reference to save memory
-          System.out.println(it.all);
           it.all = null;
         }
         return it;

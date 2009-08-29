@@ -67,6 +67,9 @@ public class PendingUpdates {
   public void applyUpdates(final QueryContext ctx) throws QueryException {
     checkConstraints();
     final Data data = ctx.data();
+    // [LK] temporarily added to suppress error for queries without database
+    if(data == null) return;
+
     for(final UpdatePrimitive p : renames) {
       final RenamePrimitive rp = (RenamePrimitive) p;
       rename(rp.id, rp.newName, data);

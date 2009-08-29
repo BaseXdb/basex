@@ -26,6 +26,10 @@ public interface FSText {
   byte[] TYPEPNG = token("png");
   /** BMP type. */
   byte[] TYPEBMP = token("bmp");
+  /** TIF type. */
+  byte[] TYPETIF = token("tif");
+  /** TIFF type. */
+  byte[] TYPETIFF = token("tiff");
   /** JPEG suffix. */
   byte[] TYPEJPEG = token("jpeg");
   /** EML suffix. */
