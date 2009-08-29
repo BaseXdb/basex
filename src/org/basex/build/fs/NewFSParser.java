@@ -288,14 +288,17 @@ public final class NewFSParser extends Parser {
     mybackingpath = backingroot + Prop.SEP + fsdbname;
 
     // SPOTLIGHT must not be true if the library is not available
-    if(Prop.MAC && prop.is(Prop.SPOTLIGHT)) {
-      try {
-        // initialize SpotlightExtractor class and try to load the library
-        Class.forName(SpotlightExtractor.class.getCanonicalName(), true,
-            ClassLoader.getSystemClassLoader());
-      } catch(final ClassNotFoundException e) { /* */}
-      if(!LibraryLoader.isLoaded(LibraryLoader.SPOTEXLIBNAME)) prop.set(
-          Prop.SPOTLIGHT, false);
+    if(prop.is(Prop.SPOTLIGHT)) {
+      if(!Prop.MAC) prop.set(Prop.SPOTLIGHT, false);
+      if(!LibraryLoader.isLoaded(LibraryLoader.SPOTEXLIBNAME)) {
+        try {
+          // initialize SpotlightExtractor class and try to load the library
+          Class.forName(SpotlightExtractor.class.getCanonicalName(), true,
+              ClassLoader.getSystemClassLoader());
+        } catch(final ClassNotFoundException e) { /* */}
+        if(!LibraryLoader.isLoaded(LibraryLoader.SPOTEXLIBNAME)) prop.set(
+            Prop.SPOTLIGHT, false);
+      }
     }
 
     if(prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) {
