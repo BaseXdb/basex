@@ -359,7 +359,8 @@ public class EMLParser extends AbstractParser {
 
     if(multipart) fsparser.startContent(bodyStartPos);
     // if we have a multipart message, extract text only if it is plaintext.
-    if(multipart ? readSectionHeader() : mContentType.startsWith("text")) {
+    if(multipart ? readSectionHeader() : mContentType == null
+        || mContentType.startsWith("text")) {
       final long pos2 = bfc.absolutePosition();
       final TokenBuilder tb = new TokenBuilder();
       boolean first = true;

@@ -452,7 +452,8 @@ public final class BufferedFileChannel {
         if(b == '\n') {
           break out;
         } else if(b == '\r') {
-          if(get() != '\n') skip(-1);
+          if(remaining() > 0 && buffer(1) && get() != '\n') skip(-1);
+          break out;
         } else {
           if(utf) tb.add((byte) b);
           else tb.addUTF(b);
