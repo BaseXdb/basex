@@ -48,7 +48,7 @@ public final class Dtm extends Date {
    * @param tm time in milliseconds
    * @throws QueryException query exception
    */
-  Dtm(final Dec tm) throws QueryException {
+  Dtm(final Itr tm) throws QueryException {
     this(Token.token(DATE.format(new java.util.Date(tm.itr()))));
   }
 

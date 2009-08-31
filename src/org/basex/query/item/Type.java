@@ -426,7 +426,7 @@ public enum Type {
   DTM("dateTime", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.type == LNG ? new Dtm((Dec) it) : it.type == DAT ?
+      return it.type == LNG ? new Dtm((Itr) it) : it.type == DAT ?
           new Dtm((Date) it) : checkStr(it) ? new Dtm(it.str()) : error(it);
     }
     @Override
