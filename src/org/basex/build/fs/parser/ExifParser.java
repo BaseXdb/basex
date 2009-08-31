@@ -43,7 +43,7 @@ public class ExifParser {
    * @author Bastian Lemke
    */
   private enum IFD_TAG {
-    /*
+        /*
      * HOWTO add more fields: . . . . . . . . . . . . . . . . . . . . . . . . ..
      * 1. Read Exif spec: http://www.Exif.org/Exif2-2.PDF and search for the . .
      * .. metadata that should be extracted. . . . . . . . . . . . . . . . . . .
@@ -51,138 +51,131 @@ public class ExifParser {
      * 3. add an item to this enum - the item name has to be the char 'h' . . ..
      * .. followed by the lowercase hex value of the TAG ID. . . . . . . . . . .
      * 4. implement the abstract parse() method, fill metadata container . . . .
-     * .. obj.meta with the metadata and fire metadata events . . . . . . . . ..
-     * .. (obj.fsparser.metaEvent(obj.meta))
+     * .. o.meta with the metadata and fire metadata events . . . . . . . . ..
+     * .. (o.fsparser.metaEvent(o.meta))
      */
     /** Image width. */
     h100 {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.PIXEL_WIDTH,
+            o.meta.setShort(IntField.PIXEL_WIDTH,
                 (short) (buf.getShort() & 0xFFFF));
             buf.getShort(); // empty two bytes
           } else if(type == IFD_TYPE_LONG) {
-            obj.meta.setInt(IntField.PIXEL_WIDTH, buf.getInt() & 0xFFFFFFFF);
-          } else error(obj, "Image width (0x0100)");
-          obj.fsparser.metaEvent(obj.meta);
-        } else error(obj, "Image width (0x0100)");
+            o.meta.setInt(IntField.PIXEL_WIDTH, buf.getInt() & 0xFFFFFFFF);
+          } else error(o, "Image width (0x0100)");
+          o.fsparser.metaEvent(o.meta);
+        } else error(o, "Image width (0x0100)");
       }
     },
-    /** Image length. */
+        /** Image length. */
     h101 {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            obj.meta.setShort(IntField.PIXEL_HEIGHT,
+            o.meta.setShort(IntField.PIXEL_HEIGHT,
                 (short) (buf.getShort() & 0xFFFF));
           } else if(type == IFD_TYPE_LONG) {
-            obj.meta.setInt(IntField.PIXEL_HEIGHT, buf.getInt() & 0xFFFFFFFF);
-          } else error(obj, "Image length (0x0101)");
-          obj.fsparser.metaEvent(obj.meta);
-        } else error(obj, "Image length (0x0101)");
+            o.meta.setInt(IntField.PIXEL_HEIGHT, buf.getInt() & 0xFFFFFFFF);
+          } else error(o, "Image length (0x0101)");
+          o.fsparser.metaEvent(o.meta);
+        } else error(o, "Image length (0x0101)");
       }
     },
-    /** Image description. */
+        /** Image description. */
     h10e {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          obj.meta.setString(StringField.DESCRIPTION,
-              obj.readAscii(buf, ifdOff));
-          obj.fsparser.metaEvent(obj.meta);
-        } else error(obj, "Image description (0x010E)");
+          o.meta.setString(StringField.DESCRIPTION, o.readAscii(buf));
+          o.fsparser.metaEvent(o.meta);
+        } else error(o, "Image description (0x010E)");
       }
     },
-    /** DateTime of image creation. */
+        /** DateTime of image creation. */
     h132 {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII && buf.getInt() == 20) {
-          obj.bfc.position(ifdOff + buf.getInt());
-          obj.bfc.buffer(20);
+          o.bfc.position(buf.getInt());
+          o.bfc.buffer(20);
           final byte[] data = new byte[20];
-          obj.bfc.get(data);
-          obj.dateEvent(DateField.DATE_CREATED, data);
-        } else error(obj, "DateTime (0x0132)");
+          o.bfc.get(data);
+          o.dateEvent(DateField.DATE_CREATED, data);
+        } else error(o, "DateTime (0x0132)");
       }
     },
-    /** Creator. */
+        /** Creator. */
     h13b {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          obj.meta.setString(StringField.CREATOR, //
-              obj.readAscii(buf, ifdOff));
-          obj.fsparser.metaEvent(obj.meta);
-        } else error(obj, "Creator (0x013B)");
+          o.meta.setString(StringField.CREATOR, //
+              o.readAscii(buf));
+          o.fsparser.metaEvent(o.meta);
+        } else error(o, "Creator (0x013B)");
       }
     },
-    // /** Exif Image Width. */
+        // /** Exif Image Width. */
     // ha002 {
     // @Override
-    // void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
+    // void parse(final ExifParser o, final ByteBuffer buf)
     // throws IOException {
     // final int type = buf.getShort();
     // if(buf.getInt() == 1) {
     // if(type == IFD_TYPE_LONG) {
-    // obj.meta.setLong(IntField.PIXEL_WIDTH,
+    // o.meta.setLong(IntField.PIXEL_WIDTH,
     // (long) buf.getInt() & 0xFFFFFFFF);
     // } else if(type == IFD_TYPE_SHORT) {
-    // obj.meta.setShort(IntField.PIXEL_WIDTH,
+    // o.meta.setShort(IntField.PIXEL_WIDTH,
     // (short) (buf.getShort() & 0xFFFF));
-    // } else error(obj, "Exif Image Width (0xA002)");
-    // } else error(obj, "Exif Image Width (0xA002)");
-    // obj.fsparser.metaEvent(obj.meta);
+    // } else error(o, "Exif Image Width (0xA002)");
+    // } else error(o, "Exif Image Width (0xA002)");
+    // o.fsparser.metaEvent(o.meta);
     // }
     // },
     // /** Exif Image Height. */
     // ha003 {
     // @Override
-    // void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
+    // void parse(final ExifParser o, final ByteBuffer buf)
     // throws IOException {
     // final int type = buf.getShort();
     // if(buf.getInt() == 1) {
     // if(type == IFD_TYPE_LONG) {
-    // obj.meta.setLong(IntField.PIXEL_HEIGHT,
+    // o.meta.setLong(IntField.PIXEL_HEIGHT,
     // (long) buf.getInt() & 0xFFFFFFFF);
     // } else if(type == IFD_TYPE_SHORT) {
-    // obj.meta.setShort(IntField.PIXEL_HEIGHT,
+    // o.meta.setShort(IntField.PIXEL_HEIGHT,
     // (short) (buf.getShort() & 0xFFFF));
-    // } else error(obj, "Exif Image Height (0xA003)");
-    // } else error(obj, "Exif Image Height (0xA003)");
-    // obj.fsparser.metaEvent(obj.meta);
+    // } else error(o, "Exif Image Height (0xA003)");
+    // } else error(o, "Exif Image Height (0xA003)");
+    // o.fsparser.metaEvent(o.meta);
     // }
     // },
     // /** GPS IFD. */
     // h8825 {
     // @Override
-    // void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
+    // void parse(final ExifParser o, final ByteBuffer buf)
     // throws IOException {
     // if(buf.getShort() == IFD_TYPE_LONG && buf.getInt() == 1) {
-    // obj.bfc.position(ifdOff + buf.getInt());
-    // obj.readIFD();
-    // } else error(obj, "GPS (0x8825)");
+    // o.bfc.position(buf.getInt());
+    // o.readIFD();
+    // } else error(o, "GPS (0x8825)");
     // }
     // },
     /** EXIF IFD. */
     h8769 {
       @Override
-      void parse(final ExifParser obj, final long ifdOff, final ByteBuffer buf)
-          throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_LONG && buf.getInt() == 1) {
-          obj.bfc.position(ifdOff + buf.getInt());
-          obj.readIFD();
-        } else error(obj, "Exif (0x8769)");
+          o.bfc.position(buf.getInt());
+          o.readIFD();
+        } else error(o, "Exif (0x8769)");
       }
     };
 
@@ -191,22 +184,21 @@ public class ExifParser {
      * Tag specific parse method.
      * </p>
      * @param exifParser {@link ExifParser} instance to send parser events from.
-     * @param ifdOff offset of the IFD the current tag belongs to.
      * @param buf the {@link ByteBuffer} to read from.
      * @throws IOException if any error occurs while reading additional data
      *           from the file channel.
      */
-    abstract void parse(final ExifParser exifParser, final long ifdOff,
-        final ByteBuffer buf) throws IOException;
+    abstract void parse(final ExifParser exifParser, final ByteBuffer buf)
+        throws IOException;
 
     /**
      * Log error.
-     * @param obj the current {@link ExifParser} instance.
+     * @param o the current {@link ExifParser} instance.
      * @param fieldName the name of the current IFD field.
      */
-    void error(final ExifParser obj, final String fieldName) {
+    void error(final ExifParser o, final String fieldName) {
       if(NewFSParser.VERBOSE) BaseX.debug("ExifParser: Invalid " + fieldName
-          + " field (%)", obj.bfc.getFileName());
+          + " field (%)", o.bfc.getFileName());
     }
   }
 
@@ -306,13 +298,12 @@ public class ExifParser {
    */
   void readIFD() throws IOException {
     bfc.buffer(2);
-    final long p = bfc.position() - 8;
     final int numFields = bfc.getShort();
     // one field contains 12 bytes
     final byte[] buf = new byte[numFields * 12];
     bfc.get(buf);
     for(int i = 0; i < numFields; i++) {
-      readField(p, ByteBuffer.wrap(buf, i * 12, 12).order(bfc.getByteOrder()));
+      readField(ByteBuffer.wrap(buf, i * 12, 12).order(bfc.getByteOrder()));
     }
   }
 
@@ -321,18 +312,17 @@ public class ExifParser {
   /**
    * Reads variable size ascii data from a IFD field.
    * @param buf the {@link ByteBuffer} to read from.
-   * @param ifdOff the offset of the current IFD.
    * @return the ascii data.
    * @throws IOException if any error occurs while reading from the file
    *           channel.
    */
-  byte[] readAscii(final ByteBuffer buf, final long ifdOff) throws IOException {
+  byte[] readAscii(final ByteBuffer buf) throws IOException {
     final int size = buf.getInt();
     final byte[] data = new byte[size];
     if(size <= 4) { // data is inlined
       buf.get(data);
     } else {
-      bfc.position(ifdOff + buf.getInt());
+      bfc.position(buf.getInt());
       bfc.buffer(size);
       bfc.get(data);
     }
@@ -376,16 +366,15 @@ public class ExifParser {
 
   /**
    * Reads a single tag field from the IFD array.
-   * @param ifdOffset position of the first IFD byte.
    * @param data the {@link ByteBuffer} containing the field data.
    */
-  private void readField(final long ifdOffset, final ByteBuffer data) {
+  private void readField(final ByteBuffer data) {
     final int tagNr = data.getShort() & 0xFFFF;
     try {
       final IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
-      tag.parse(this, ifdOffset, data);
+      tag.parse(this, data);
     } catch(final IOException ex) {
-      BaseX.debug("%: %", bfc.getFileName(), ex.getMessage());
+      BaseX.debug("%", ex);
     } catch(final IllegalArgumentException ex) { /* */}
   }
 }

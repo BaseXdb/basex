@@ -104,7 +104,7 @@ public final class JPGParser extends AbstractParser {
   }
 
   @Override
-  protected void content(final BufferedFileChannel f, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel f, final NewFSParser p) {
   // no textual representation for jpg content ...
   }
 

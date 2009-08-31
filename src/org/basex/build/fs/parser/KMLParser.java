@@ -50,8 +50,8 @@ public final class KMLParser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     content(bfc, parser);
     return true;
   }

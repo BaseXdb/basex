@@ -42,13 +42,14 @@ public final class TIFFParser extends AbstractParser {
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, //
+      final NewFSParser parser) {
   // no content to read...
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     meta(bfc, parser);
     return true;
   }

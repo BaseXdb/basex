@@ -555,7 +555,7 @@ public class EMLParser extends AbstractParser {
         final int n1 = hex2num(text[i]);
         final int n2 = hex2num(text[++i]);
         if(n1 < 0 || n2 < 0) continue;
-        addByte(tmp, (n1 << 4 | n2), utf);
+        addByte(tmp, n1 << 4 | n2, utf);
       } else addByte(tmp, c, utf);
     }
     return tmp.finish();

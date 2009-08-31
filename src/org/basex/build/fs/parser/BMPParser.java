@@ -22,7 +22,7 @@ import org.basex.build.fs.util.Metadata.MimeType;
 public final class BMPParser extends AbstractParser {
 
   /** BMP header info. */
-  byte[] HEADERBMP = token("BM");
+  private static final byte[] HEADERBMP = token("BM");
 
   static {
     NewFSParser.register("bmp", BMPParser.class);
@@ -60,13 +60,14 @@ public final class BMPParser extends AbstractParser {
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, //
+      final NewFSParser parser) {
   // no content to read...
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     meta(bfc, parser);
     return true;
   }

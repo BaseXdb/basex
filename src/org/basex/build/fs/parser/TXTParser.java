@@ -41,8 +41,8 @@ public final class TXTParser extends AbstractParser {
 
   /** {@inheritDoc} */
   @Override
-  protected void content(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected void content(final BufferedFileChannel bfc, //
+      final NewFSParser parser) throws IOException {
     if(bfc.getFileName().endsWith(".emlxpart")) return; // ignore *.emlx files
     final int len = (int) Math.min(bfc.size(), parser.prop.num(Prop.FSTEXTMAX));
     final TokenBuilder content = new TokenBuilder(len);
@@ -96,8 +96,8 @@ public final class TXTParser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     content(bfc, parser);
     return true;
   }

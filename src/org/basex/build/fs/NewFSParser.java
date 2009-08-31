@@ -42,7 +42,8 @@ import org.basex.util.TokenBuilder;
  * 
  * <ul>
  * <li>The import is invoked by the {@link CreateFS} command.</li>
- * <li>To import on the command line type: <tt>$ create fs [path] [dbname]</tt></li>
+ * <li>To import on the command line type: <tt>$ create fs [path] [dbname]</tt>
+ * </li>
  * <li>To import using the GUI: File -&gt; Import Filesystem...</li>
  * <li>This class {@link NewFSParser} instantiates the parsers to extract
  * metadata and content from files.
@@ -57,15 +58,15 @@ public final class NewFSParser extends Parser {
   // ----- Namespaces ----------------------------------------------------------
   /** All namespaces used in {@link NewFSParser}. */
   public enum NS {
-    /** XML schema namespace. */
+        /** XML schema namespace. */
     XS("xs", "http://www.w3.org/2001/XMLSchema"),
-    /** XML schema instance namespace. */
+        /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-    /** DeepFS filesystem namespace. */
+        /** DeepFS filesystem namespace. */
     FS("fs", "http://www.deepfs.org/fs/1.0/"),
-    /** DeepFS metadata namespace. */
+        /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
-    /** Dublin Core metadata terms namespace. */
+        /** Dublin Core metadata terms namespace. */
     DCTERMS("dcterms", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
@@ -143,17 +144,19 @@ public final class NewFSParser extends Parser {
   }
 
   /** DeepFS tag in fs namespace. */
-  byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
+  private static final byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
   /** Directory tag in fs namespace. */
-  byte[] DIR_NS = NewFSParser.NS.FS.tag(DIR);
+  private static final byte[] DIR_NS = NewFSParser.NS.FS.tag(DIR);
   /** File tag in fs namespace. */
-  byte[] FILE_NS = NewFSParser.NS.FS.tag(FILE);
+  private static final byte[] FILE_NS = NewFSParser.NS.FS.tag(FILE);
   /** Content tag in fs namespace. */
-  byte[] CONTENT_NS = NewFSParser.NS.FS.tag(CONTENT);
+  private static final byte[] CONTENT_NS = NewFSParser.NS.FS.tag(CONTENT);
   /** Text content tag in fs namespace. */
-  byte[] TEXT_CONTENT_NS = NewFSParser.NS.FS.tag(TEXT_CONTENT);
+  private static final byte[] TEXT_CONTENT_NS =
+      NewFSParser.NS.FS.tag(TEXT_CONTENT);
   /** XML content tag in fs namespace. */
-  byte[] XML_CONTENT_NS = NewFSParser.NS.FS.tag(XML_CONTENT);
+  private static final byte[] XML_CONTENT_NS =
+      NewFSParser.NS.FS.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 

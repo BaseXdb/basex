@@ -22,9 +22,9 @@ import org.basex.build.fs.util.Metadata.MimeType;
 public final class GIFParser extends AbstractParser {
 
   /** GIF87a header info. */
-  byte[] HEADERGIF87 = token("GIF87a");
+  private static final byte[] HEADERGIF87 = token("GIF87a");
   /** GIF89a header info. */
-  byte[] HEADERGIF89 = token("GIF89a");
+  private static final byte[] HEADERGIF89 = token("GIF89a");
 
   static {
     NewFSParser.register("gif", GIFParser.class);

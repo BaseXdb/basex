@@ -40,7 +40,8 @@ public final class PNGParser extends AbstractParser {
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, final NewFSParser parser) {
+  protected void content(final BufferedFileChannel bfc, //
+      final NewFSParser parser) {
   // no textual representation for png content ...
   }
 
@@ -54,8 +55,8 @@ public final class PNGParser extends AbstractParser {
   }
 
   @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected boolean metaAndContent(final BufferedFileChannel bfc,
+      final NewFSParser parser) throws IOException {
     meta(bfc, parser);
     return true;
   }
