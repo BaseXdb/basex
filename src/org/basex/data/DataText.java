@@ -87,11 +87,11 @@ public interface DataText {
   /** DeepFS token. */
   // [BL] ..namespaces need to defined on top of DeepFS XML instance
   // byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");
-  byte[] DEEPFS = token("deepfs");
+  byte[] DEEPFS = token("fs:deepfs");
   /** Directory tag. */
-  byte[] DIR = token("dir");
+  byte[] DIR = token("fs:dir");
   /** File tag. */
-  byte[] FILE = token("file");
+  byte[] FILE = token("fs:file");
   /** Content tag. */
   byte[] CONTENT = token("content");
   /** Text content tag. */

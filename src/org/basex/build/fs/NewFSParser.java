@@ -63,7 +63,10 @@ public final class NewFSParser extends Parser {
         /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
         /** DeepFS filesystem namespace. */
-    FS("fs", "http://www.deepfs.org/fs/1.0/"),
+    //FS("fs", "http://www.deepfs.org/fs/1.0/"),
+    //[BL] temporary hack to enable fsviews.  pls, remove FS in code below, where
+    // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
+    FS("", "http://www.deepfs.org/fs/1.0/"),
         /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
         /** Dublin Core metadata terms namespace. */
