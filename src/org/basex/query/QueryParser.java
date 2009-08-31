@@ -2410,6 +2410,7 @@ public class QueryParser extends InputParser {
           if(!union && !except) break;
         }
       } else if(consumeWS(DEFAULT)) {
+        if(!with) error(FTSTOP);
         check(STOP);
         check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {

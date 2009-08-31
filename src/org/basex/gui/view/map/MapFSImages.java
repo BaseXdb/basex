@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class MapImages {
+final class MapFSImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
   /** Reference to the treemap panel. */
@@ -45,7 +45,7 @@ final class MapImages {
    * Default constructor.
    * @param panel reference to the treemap
    */
-  MapImages(final MapView panel) {
+  MapFSImages(final MapView panel) {
     view = panel;
   }
 

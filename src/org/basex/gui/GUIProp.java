@@ -171,8 +171,6 @@ public final class GUIProp extends AProp {
   /** Flag for activated info view after starting. */
   public static final Object[] SHOWSTARTINFO = { "SHOWSTARTINFO", false };
 
-  /** Flag for skipping time intensive treemap infos. */
-  public static final Object[] PERFINFO = { "PERFINFO", true };
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };
   /** Choice of interacting with TreeeMap. */

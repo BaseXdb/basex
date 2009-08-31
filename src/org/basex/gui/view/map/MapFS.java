@@ -32,7 +32,7 @@ final class MapFS extends MapPainter {
   /** Image offset. */
   private static final int PICOFFSET = 2;
   /** Image cache. */
-  private static MapImages images;
+  private static MapFSImages images;
   /** Data FS reference. */
   private static DeepFS fs;
   /** Flag for error message. */
@@ -47,7 +47,7 @@ final class MapFS extends MapPainter {
   MapFS(final MapView m, final DeepFS f, final GUIProp pr) {
     super(m, pr);
     fs = f;
-    if(images == null) images = new MapImages(m);
+    if(images == null) images = new MapFSImages(m);
   }
 
   @Override

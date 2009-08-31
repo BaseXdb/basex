@@ -941,7 +941,7 @@ public final class Token {
    */
   public static int lc(final int ch) {
     return ch >= 'A' && ch <= 'Z' ? ch | 0x20 :
-      ch > 0x7F ? Character.toUpperCase(ch) : ch;
+      ch > 0x7F ? Character.toLowerCase(ch) : ch;
   }
 
   /**
