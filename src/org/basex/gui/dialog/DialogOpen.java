@@ -8,6 +8,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
+import org.basex.core.Context;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;
@@ -117,30 +119,36 @@ public final class DialogOpen extends Dialog {
 
   @Override
   public void action(final String cmd) {
+    final Context ctx = gui.context;
+
     if(BUTTONRENAME.equals(cmd)) {
       new DialogRename(gui, choice.getValue());
-      choice.setData(List.list(gui.context).finish());
+      choice.setData(List.list(ctx).finish());
     } else if(BUTTONOPEN.equals(cmd)) {
       close();
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
       if(db.length() == 0) return;
       if(Dialog.confirm(this, BaseX.info(DROPCONF, db))) {
-        DropDB.drop(db, gui.context.prop);
-        choice.setData(List.list(gui.context).finish());
+        if(ctx.data() != null && ctx.data().meta.name.equals(db)) {
+          new Close().execute(gui.context);
+          gui.notify.init();
+        }
+        DropDB.drop(db, ctx.prop);
+        choice.setData(List.list(ctx).finish());
         choice.requestFocusInWindow();
       }
     } else {
       final String db = choice.getValue().trim();
-      ok = db.length() != 0 && gui.context.prop.dbpath(db).exists();
+      ok = db.length() != 0 && ctx.prop.dbpath(db).exists();
       if(ok) doc.setText(db);
       enableOK(buttons, BUTTONDROP, ok);
 
       if(ok) {
         DataInput in = null;
         try {
-          in = new DataInput(gui.context.prop.dbfile(db, DATAINFO));
-          final MetaData meta = new MetaData(db, in, gui.context.prop);
+          in = new DataInput(ctx.prop.dbfile(db, DATAINFO));
+          final MetaData meta = new MetaData(db, in, ctx.prop);
           detail.setText(InfoDB.db(meta, true, true).finish());
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
