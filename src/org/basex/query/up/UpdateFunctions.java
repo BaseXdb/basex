@@ -35,8 +35,8 @@ public class UpdateFunctions {
   public static void rename(final int id, final byte[] name, final Data data) {
     final int p = data.pre(id);
     final int k = data.kind(p);
-    if(k == Data.ELEM) data.update(data.pre(id), name);
-    if(k == Data.ATTR) {
+    if(k == Data.ELEM || k == Data.PI) data.update(data.pre(id), name);
+    else if(k == Data.ATTR) {
       final byte[] v = data.attValue(p);
       data.update(p, name, v);
     }
