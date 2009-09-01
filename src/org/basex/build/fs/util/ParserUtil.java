@@ -22,6 +22,27 @@ import org.basex.util.Token;
  */
 public final class ParserUtil {
 
+  /** 1 Kibibyte. */
+  private static final int KIB = 1024;
+  /** 1 Mebibyte. */
+  private static final int MIB = 1048576;
+  /** 1 Gibibyte. */
+  private static final int GIB = 1073741824;
+  /** 1 Tibibyte. */
+  private static final long TIB = 1099511627776L;
+  /** 1 Pebibyte. */
+  private static final long PIB = 1125899906842624L;
+  /** Kibibyte abbreviation. */
+  private static final byte[] KIB_STR = token(" KiB");
+  /** Mebibyte abbreviation. */
+  private static final byte[] MIB_STR = token(" MiB");
+  /** Gibibyte abbreviation. */
+  private static final byte[] GIB_STR = token(" GiB");
+  /** Tibibyte abbreviation. */
+  private static final byte[] TIB_STR = token(" TiB");
+  /** Pebibyte abbreviation. */
+  private static final byte[] PIB_STR = token(" PiB");
+
   /** Factory to create date and duration values. */
   private static DatatypeFactory factory = null;
 
@@ -189,5 +210,26 @@ public final class ParserUtil {
       } // else valid ASCII char,
     }
     return data;
+  }
+
+  /**
+   * Converts a size value (number of bytes) into a human readable string (e.g.
+   * 100 MiB).
+   * @param size the number of bytes to convert to a human readable string
+   * @return the size as byte array
+   */
+  public static byte[] humanReadableSize(final long size) {
+    final float d = 100.0f;
+    assert size >= 0;
+    if(size < KIB) return concat(token(size), KIB_STR);
+    else if(size < MIB) {
+      return concat(token(Math.round((size * d) / KIB) / d), MIB_STR);
+    } else if(size < GIB) {
+      return concat(token(Math.round((size * d) / MIB) / d), GIB_STR);
+    } else if(size < TIB) {
+      return concat(token(Math.round((size * d) / GIB) / d), TIB_STR);
+    } else if(size < PIB) {
+      return concat(token(Math.round((size * d) / TIB) / d), PIB_STR);
+    } else return token(size);
   }
 }

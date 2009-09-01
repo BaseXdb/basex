@@ -63,8 +63,9 @@ public final class NewFSParser extends Parser {
         /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
         /** DeepFS filesystem namespace. */
-    //FS("fs", "http://www.deepfs.org/fs/1.0/"),
-    //[BL] temporary hack to enable fsviews.  pls, remove FS in code below, where
+    // FS("fs", "http://www.deepfs.org/fs/1.0/"),
+    // [BL] temporary hack to enable fsviews. pls, remove FS in code below,
+    // where
     // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
     FS("", "http://www.deepfs.org/fs/1.0/"),
         /** DeepFS metadata namespace. */
@@ -414,6 +415,7 @@ public final class NewFSParser extends Parser {
       final byte[] bck = fuse ? token(mybackingpath) : token(fsimportpath);
       atts.add(MOUNTPOINT, mnt);
       atts.add(BACKINGSTORE, bck);
+      atts.add(SIZE, EMPTY);
 
       // define namespaces
       NS.FS.start(builder);
@@ -425,7 +427,7 @@ public final class NewFSParser extends Parser {
         NS.XSI.start(builder);
       }
 
-      builder.startElem(DEEPFS_NS, atts);
+      int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
           fsimportpath).getCanonicalFile()}) {
@@ -434,7 +436,8 @@ public final class NewFSParser extends Parser {
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
         parse(f);
-        addFSAtts(f, sizeStack[0]);
+        addFSElems(f, sizeStack[0]);
+        addFSAtts(sizeAttId, f, sizeStack[0]);
       }
       builder.endElem(DEEPFS_NS);
     }
@@ -442,14 +445,27 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Adds the size node to the current node.
+   * Adds the size value to the current node.
+   * @param id the ID of the size attribute.
    * @param f the current file.
    * @param size the size to set.
    * @throws IOException I/O exception.
    */
-  private void addFSAtts(final File f, final long size) throws IOException {
+  @SuppressWarnings("unused")
+  private void addFSAtts(final int id, final File f, final long size)
+      throws IOException {
+    builder.setAttValue(id, token(size));
+  }
+
+  /**
+   * Adds the size and datetime values to the current node.
+   * @param f the current file.
+   * @param size the size to set.
+   * @throws IOException I/O exception.
+   */
+  private void addFSElems(final File f, final long size) throws IOException {
     if(prop.is(Prop.FSMETA)) {
-      meta.setLong(IntField.FS_SIZE, size);
+      meta.setLong(IntField.FS_SIZE, ParserUtil.humanReadableSize(size));
       metaEvent(meta);
       ParserUtil.fireDateEvents(this, meta, f);
     }
@@ -521,7 +537,8 @@ public final class NewFSParser extends Parser {
   private void dir(final File f) throws IOException {
     atts.reset();
     atts.add(NAME, token(f.getName()));
-    builder.startElem(DIR_NS, atts);
+    atts.add(SIZE, EMPTY);
+    int sizeAttId = builder.startElem(DIR_NS, atts) + 2;
     sizeStack[++lvl] = 0;
     parse(f);
 
@@ -529,7 +546,8 @@ public final class NewFSParser extends Parser {
     // take into account that stored pre value is the one of the
     // element node, not the attributes one!
     final long size = sizeStack[lvl];
-    addFSAtts(f, size);
+    addFSElems(f, size);
+    addFSAtts(sizeAttId, f, size);
 
     builder.endElem(DIR_NS);
 
@@ -550,10 +568,12 @@ public final class NewFSParser extends Parser {
       atts.reset();
       final String name = f.getName();
       atts.add(NAME, token(name));
-      builder.startElem(FILE_NS, atts);
+      atts.add(SIZE, EMPTY);
+      int sizeAttId = builder.startElem(FILE_NS, atts) + 2;
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
-        addFSAtts(f, size);
+        addFSElems(f, size);
+        addFSAtts(sizeAttId, f, size);
         if(prop.is(Prop.SPOTLIGHT)) {
           if(prop.is(Prop.FSMETA)) spotlight.parse(f);
           if(prop.is(Prop.FSCONT)) {
