@@ -64,7 +64,7 @@ public final class Delete extends Expr {
   }
 
   @Override
-  public boolean uses(Use u, QueryContext ctx) {
+  public boolean uses(final Use u, final QueryContext ctx) {
     return false;
   }
 }

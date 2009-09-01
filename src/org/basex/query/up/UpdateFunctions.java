@@ -9,7 +9,12 @@ import org.basex.data.Nodes;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class UpdateFunctions {
+public final class UpdateFunctions {
+  
+  /**
+   * Constructor.
+   */
+  private UpdateFunctions() { }
   
   /**
    * Delete nodes from database. Nodes are deleted backwards to preserve pre

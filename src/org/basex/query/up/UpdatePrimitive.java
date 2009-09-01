@@ -13,7 +13,7 @@ public abstract class UpdatePrimitive {
   int pre;
   
   /**
-   * Constructor
+   * Constructor.
    * @param nodeID node identity
    * @param nodePre node pre value
    */
