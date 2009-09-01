@@ -319,7 +319,7 @@ public abstract class Serializer {
           } while(k == Data.ELEM && l == 0 && tags.size() == 1);
 
           // check namespace of current element
-          final byte[] key = pre(name);
+          final byte[] key = pref(name);
           byte[] val = data.ns.key(data.tagNS(p));
           if(val == null) val = EMPTY;
           if(key.length != 0) {

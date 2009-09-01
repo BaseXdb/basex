@@ -101,30 +101,6 @@ public final class NewFSParser extends Parser {
       return str.toString();
     }
 
-    // /**
-    // * Returns the namespace's unique URI.
-    // * @return the URI.
-    // */
-    // public byte[] uri() {
-    // return uri;
-    // }
-    //
-    // /**
-    // * Returns the namespace's prefix.
-    // * @return the prefix.
-    // */
-    // public byte[] prefix() {
-    // return prefix;
-    // }
-
-    /**
-     * Calls {@link Builder#startNS(byte[], byte[])}.
-     * @param b the builder instance.
-     */
-    public void start(final Builder b) {
-      b.startNS(prefix, uri);
-    }
-
     /**
      * Converts the xml element into a byte array containing the correct
      * namespace prefix.
@@ -418,13 +394,13 @@ public final class NewFSParser extends Parser {
       atts.add(SIZE, EMPTY);
 
       // define namespaces
-      NS.FS.start(builder);
+      builder.startNS(FSPREF, FSURL);
       if(prop.is(Prop.FSMETA)) {
-        NS.FSMETA.start(builder);
-        NS.DCTERMS.start(builder);
+        builder.startNS(FSMETAPREF, FSMETAURL);
+        builder.startNS(FSDCPREF, FSDCURL);
       }
       if(ADD_ATTS) {
-        NS.XSI.start(builder);
+        builder.startNS(FSXSIPREF, FSXSIURL);
       }
 
       int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;

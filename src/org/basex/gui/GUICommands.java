@@ -581,8 +581,8 @@ public enum GUICommands implements GUICommand {
 
   /* OPTION MENU */
 
-  /** Realtime filtering on/off. */
-  RTEXEC(true, GUIRTEXEC, null, GUIRTEXECTT) {
+  /** Realtime execution on/off. */
+  RTEXEC(false, GUIRTEXEC, null, GUIRTEXECTT) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.EXECRT);
@@ -601,7 +601,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Realtime filtering on/off. */
-  RTFILTER(true, GUIRTFILTER, null, GUIRTFILTERTT) {
+  RTFILTER(false, GUIRTFILTER, null, GUIRTFILTERTT) {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.prop.invert(GUIProp.FILTERRT);

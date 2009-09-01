@@ -84,6 +84,23 @@ public interface DataText {
   /** Time of last modification. */
   String S_SUFFIX = "suffix";
 
+  /** DeepFS prefix. */
+  byte[] FSPREF = token("fs");
+  /** DeepFS url. */
+  byte[] FSURL = token("http://www.deepfs.org/fs/1.0/");
+  /** DeepFS prefix. */
+  byte[] FSMETAPREF = token("fsmeta");
+  /** DeepFS url. */
+  byte[] FSMETAURL = token("http://www.deepfs.org/fsmeta/1.0/");
+  /** DeepFS prefix. */
+  byte[] FSDCPREF = token("dcterms");
+  /** DeepFS url. */
+  byte[] FSDCURL = token("http://purl.org/dc/terms/");
+  /** DeepFS prefix. */
+  byte[] FSXSIPREF = token("xsi");
+  /** DeepFS url. */
+  byte[] FSXSIURL = token("http://www.w3.org/2001/XMLSchema-instance");
+
   /** DeepFS token. */
   // [BL] ..namespaces need to defined on top of DeepFS XML instance
   // byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");

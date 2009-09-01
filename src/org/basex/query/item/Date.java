@@ -223,6 +223,7 @@ public abstract class Date extends Item {
    * @return days
    */
   private static long days(final int y, final int m, final int d) {
+    // [CG] XQuery/days: too slow
     long n = 0;
     for(int i = 0; i < Math.abs(y); i++) n += 365 + (leap(i) ? 1 : 0);
     for(int i = 0; i < m; i++) n += dpm(y, i);

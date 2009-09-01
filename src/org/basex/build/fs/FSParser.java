@@ -163,6 +163,10 @@ public final class FSParser extends Parser {
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
 
+      builder.startNS(FSPREF, FSURL);
+      if(prop.is(Prop.FSMETA)) {
+        builder.startNS(FSMETAPREF, FSMETAURL);
+      }
       builder.startElem(DEEPFS, atts);
 
       for(final File f : root ? File.listRoots() :

@@ -81,8 +81,8 @@ public final class Namespaces extends Set {
    * @return namespace
    */
   public int get(final byte[] n) {
-    final byte[] pre = pre(n);
-    return pre.length == 0 ? 0 : ns(pre, root);
+    final byte[] pref = pref(n);
+    return pref.length == 0 ? 0 : ns(pref, root);
   }
 
   /**
@@ -115,7 +115,7 @@ public final class Namespaces extends Set {
    * @return namespace reference or 0 if no namespace was found
    */
   public int get(final byte[] n, final int p) {
-    return ns(pre(n), root.find(p));
+    return ns(pref(n), root.find(p));
   }
 
   /**

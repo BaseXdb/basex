@@ -15,9 +15,10 @@ import org.basex.core.Prop;
  */
 public final class XMLParser extends AbstractParser {
 
+  /*
   static {
     NewFSParser.register("xml", XMLParser.class);
-  }
+  }*/
 
   /** Standard constructor. */
   public XMLParser() {

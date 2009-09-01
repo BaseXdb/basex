@@ -2,7 +2,6 @@ package org.basex.test.query;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,11 +21,9 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.index.Names;
 import org.basex.io.CachedOutput;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
-import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -550,13 +547,13 @@ public final class InexDBTestNew {
   /**
    * Create and print submission file.
    * @throws Exception Exception
-   */
   private static void createSubFile() throws Exception {
     openSubFile();
     for (int j = 0; j < queries.size(); j++) 
       createQueryEntry(j, results[j]);
     closeSubFile();
   }
+   */
   
   /**
    * Replaces dedicated nodes by an or expression.

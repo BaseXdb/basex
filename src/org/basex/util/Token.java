@@ -949,7 +949,7 @@ public final class Token {
    * @param name name
    * @return prefix or empty token if no prefix exists
    */
-  public static byte[] pre(final byte[] name) {
+  public static byte[] pref(final byte[] name) {
     final int i = indexOf(name, ':');
     return i == -1 ? EMPTY : substring(name, 0, i);
   }

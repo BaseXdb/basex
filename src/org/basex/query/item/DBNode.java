@@ -127,7 +127,7 @@ public class DBNode extends Nod {
       name.uri = Uri.EMPTY;
     } else {
       final int n = ns ? data.ns.get(nm, pre) : data.tagNS(pre);
-      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pre(nm)));
+      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pref(nm)));
     }
     return name;
   }
