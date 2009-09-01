@@ -87,6 +87,7 @@ public final class Scoring {
         }
       }
     }
+    if (count == 0) return 0;
     final double avg = (double) sum / (double) count;
     return score / Math.sqrt(avg);
   }

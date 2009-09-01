@@ -30,7 +30,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
@@ -61,7 +60,8 @@ public final class InexDBTestNew {
   /** Databases. */
   private static StringList databases;
   /** Number of articles. */
-  private int[] numArt;
+  private int[] numArt = new int[]{0, 271212, 543767, 816058, 
+      1088475, 1360368, 1631900, 1905498, 2177546, 2450376};
 
   /** Maximum number of databases. */
   private static int maxdb = Integer.MAX_VALUE;
@@ -153,24 +153,25 @@ public final class InexDBTestNew {
         queries.size(), databases.size(), runs, total ? "total" : "evaluation");
 
     // get number of articles for each db
-    numArt = new int[databases.size()];
+    /*numArt = new int[databases.size()];
     int last = 0;
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
       launcher.execute(new Open(databases.get(d)));
       final Names names = ctx.data().tags;
       numArt[d] = last;
+      System.out.println(last);
       last += names.stat(names.id("article".getBytes())).counter; 
       launcher.execute(new Close());
     }
-    
+    */
     // run test
     final Performance p = new Performance();
     if(server) test();
-    else testLocal();
+    else testLocalNew();
     System.out.println("Total Time: " + p.getTimer());
     
-    if(subfile) createSubFile();
+//    if(subfile) createSubFile();
   }
 
   /**
@@ -190,7 +191,6 @@ public final class InexDBTestNew {
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
-      launcher.execute(new Open(databases.get(d)));
       for(int q = 0; q < queries.size(); q++) query(d, q);
       launcher.execute(new Close());
     }
@@ -201,7 +201,7 @@ public final class InexDBTestNew {
    * This version runs only locally.
    * @throws Exception exception
    */
-  private void testLocal() throws Exception {
+ /* private void testLocal() throws Exception {
     // cache all context nodes
     final Nodes[] roots = new Nodes[databases.size()];
     for(int d = 0; d < databases.size(); d++) {
@@ -218,8 +218,39 @@ public final class InexDBTestNew {
         query(d, q);
       }
     }
+    if (subfile) createSubFile();
+  }
+  */
+
+  /**
+   * First test, caching all databases before running the queries.
+   * This version runs only locally.
+   * @throws Exception exception
+   */
+  private void testLocalNew() throws Exception {
+    // cache all context nodes
+    final Nodes[] roots = new Nodes[databases.size()];
+    for(int d = 0; d < databases.size(); d++) {
+      final Data data = Open.open(ctx, databases.get(d));
+      roots[d] = new Nodes(data.doc(), data);
+    }
+
+    if (subfile) openSubFile();
+    // loop through all databases
+    for(int q = 0; q < queries.size(); q++) {
+      SeqIter s = null;
+      // loop through all queries
+      for(int d = 0; d < databases.size(); d++) {
+        // set cached context nodes and run query
+        ctx.current(roots[d]);
+        s = s == null ? queryNew(d, q) : addSorted(s, queryNew(d, q));
+      }
+      if (subfile) createQueryEntry(q, s);
+    }
+    if (subfile) closeSubFile();
   }
 
+  
   /**
    * Performs a single query.
    * @param db database offset
@@ -229,10 +260,11 @@ public final class InexDBTestNew {
   private void query(final int db, final int qu) throws Exception {
     // query and cache result
     final String que = subfile ? xqm + "for $i score $s in " 
-        + queries.get(qu) + 
-        " order by $s descending return (basex:sum-path($i), $s)" 
+        + queries.get(qu) 
+        + " order by $s descending return (basex:sum-path($i), $s)"
+//        + " return $i"
         : queries.get(qu);
-        final Process proc = new XQuery(que);
+    final Process proc = new XQuery(que);
     if(launcher.execute(proc)) {
       launcher.output(new NullOutput());
     }
@@ -263,7 +295,8 @@ public final class InexDBTestNew {
            }
         }
         if (results[qu] == null) results[qu] = itr; 
-        else results[qu] = addSorted(results[qu], itr);        
+        else results[qu].add(itr);
+//        else results[qu] = addSorted(results[qu], itr);        
       }
     }     
     
@@ -276,14 +309,74 @@ public final class InexDBTestNew {
   }
 
   /**
+   * Performs a single query.
+   * @param db database offset
+   * @param qu query offset
+   * @return iter for the results
+   * @throws Exception exception
+   */
+  private SeqIter queryNew(final int db, final int qu) throws Exception {
+    // query and cache result
+    final String que = subfile ? xqm + "for $i score $s in " 
+        + queries.get(qu) 
+        + " order by $s descending return (basex:sum-path($i), $s)"
+//        + " return $i"
+        : queries.get(qu);
+    final Process proc = new XQuery(que);
+    if(launcher.execute(proc)) {
+      launcher.output(new NullOutput());
+    }
+    final CachedOutput out = new CachedOutput();
+    launcher.info(out);
+    SeqIter itr = null;
+    
+    final String time = Pattern.compile(".*" +
+        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
+        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+    if (subfile) {
+      qtimes[qu] += Double.parseDouble(time);
+      final Result val = proc.result();
+      if(val instanceof SeqIter) {
+        itr = (SeqIter) val;
+        // update node path
+        for (int i = 0; i < itr.size(); i++) {
+           if(itr.item[i] instanceof Str) {
+             String str = new String(((Str) itr.item[i]).str());
+             if(str.startsWith("article")) {
+               final int s0 = str.indexOf('[');
+               final int s1 = str.indexOf(']');
+               final int c = Integer.parseInt(str.substring(s0 + 1, s1)) +  
+                 numArt[db];
+               final Str tmp = new Str(("article[" + c + 
+                   str.substring(s1)).getBytes(), false);
+               itr.item[i] = tmp;  
+             }
+           }
+        }
+      }
+    }     
+    
+    // output result
+    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+    if(info) {
+      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+    }
+    return itr;
+  }
+
+  
+  /**
    * Adds the contents of an iterator in descending order of the score values.
    * @param it1 entry to be added
    * @param it2 entry to be added
    * @return SeqIter with all values
-   * @throws QueryException query exception
    */
-  public SeqIter addSorted(final Iter it1, final Iter it2) 
-  throws QueryException {
+  public SeqIter addSorted(final SeqIter it1, final SeqIter it2) {
+    if (it1 == null && it2 != null) return it2;
+    if (it2 == null && it1 != null) return it1;
+    if (it1 == null && it2 == null) return new SeqIter();
+    
     final SeqIter tmp = new SeqIter();
     Item i1 = it1.next(), i2 = it2.next();
     while(i1 != null && i2 != null) {
@@ -416,41 +509,52 @@ public final class InexDBTestNew {
   }
 
   /**
+   * Create subfile entry for a query result. 
+   * 
+   * @param q query
+   * @param res result of the query
+   * @throws IOException IOException
+   */
+  private static void createQueryEntry(final int q, final SeqIter res) 
+  throws IOException {
+    xml.openElement(token("topic"),
+        token("topic-id"), token(tid[q]),
+        token("total_time_ms"), token(qtimes[q])
+    );
+    xml.openElement(token("result"));
+    xml.openElement(token("file"));
+    // [SG] which file???
+    xml.text(token("wikpedia"));
+    xml.closeElement();
+
+    Item a;
+    int r = 1;
+    while(res != null && (a = res.next()) != null) {
+      if(a instanceof Str) {
+        xml.openElement(token("path"));
+        xml.text(a.str());
+        xml.closeElement();
+        xml.openElement(token("rank"));
+        xml.text(token(r++));
+        xml.closeElement();
+      } else if(a instanceof Dbl) {
+        xml.openElement(token("rsv"));
+        xml.text(a.str());
+        xml.closeElement();
+      }
+    }
+    xml.closeElement();
+    xml.closeElement();    
+  }
+  
+  /**
    * Create and print submission file.
    * @throws Exception Exception
    */
   private static void createSubFile() throws Exception {
     openSubFile();
-    for (int j = 0; j < queries.size(); j++) {
-      xml.openElement(token("topic"),
-          token("topic-id"), token(tid[j]),
-          token("total_time_ms"), token(qtimes[j])
-      );
-      xml.openElement(token("result"));
-      xml.openElement(token("file"));
-      // [SG] which file???
-      xml.text(token("wikpedia"));
-      xml.closeElement();
-  
-      Item a;
-      int r = 1;
-      while(results[j] != null && (a = results[j].next()) != null) {
-        if(a instanceof Str) {
-          xml.openElement(token("path"));
-          xml.text(a.str());
-          xml.closeElement();
-          xml.openElement(token("rank"));
-          xml.text(token(r++));
-          xml.closeElement();
-        } else if(a instanceof Dbl) {
-          xml.openElement(token("rsv"));
-          xml.text(a.str());
-          xml.closeElement();
-        }
-      }
-      xml.closeElement();
-      xml.closeElement();
-    }
+    for (int j = 0; j < queries.size(); j++) 
+      createQueryEntry(j, results[j]);
     closeSubFile();
   }
   
