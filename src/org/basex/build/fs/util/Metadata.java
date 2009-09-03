@@ -126,6 +126,8 @@ public final class Metadata {
     EML("message/rfc822", "eml", MetaType.MESSAGE),
     /** XLS. */
     XLS("application/vnd.ms-excel", "xls", MetaType.DOCUMENT),
+    /** PPS. */
+    PPS("application/vnd.ms-powerpoint", "pps", MetaType.PRESENTATION),
     /** ODS. */
     ODS("application/vnd.oasis.opendocument.spreadsheet", "ods",
         MetaType.DOCUMENT),
@@ -133,6 +135,8 @@ public final class Metadata {
     PKCS7("application/pkcs7-signature", ""),
     /** x-pkcs7-signature. */
     XPKCS7("application/x-pkcs7-signature", ""),
+    /** pgp signature. */
+    PGP("application/pgp-signature", ""),
     /** Vcard. */
     VCARD("text/x-vcard", "vcf", MetaType.CONTACT),
     /** ? */
