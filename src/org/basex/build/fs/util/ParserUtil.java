@@ -32,6 +32,8 @@ public final class ParserUtil {
   private static final long TIB = 1099511627776L;
   /** 1 Pebibyte. */
   private static final long PIB = 1125899906842624L;
+  /** Byte abbreviation. */
+  private static final byte[] B_STR = token(" B");
   /** Kibibyte abbreviation. */
   private static final byte[] KIB_STR = token(" KiB");
   /** Mebibyte abbreviation. */
@@ -221,15 +223,17 @@ public final class ParserUtil {
   public static byte[] humanReadableSize(final long size) {
     final float d = 100.0f;
     assert size >= 0;
-    if(size < KIB) return concat(token(size), KIB_STR);
+    if(size < KIB) return concat(token(size), B_STR);
     else if(size < MIB) {
-      return concat(token(Math.round((size * d) / KIB) / d), MIB_STR);
+      return concat(token(Math.round((size * d) / KIB) / d), KIB_STR);
     } else if(size < GIB) {
-      return concat(token(Math.round((size * d) / MIB) / d), GIB_STR);
+      return concat(token(Math.round((size * d) / MIB) / d), MIB_STR);
     } else if(size < TIB) {
-      return concat(token(Math.round((size * d) / GIB) / d), TIB_STR);
+      return concat(token(Math.round((size * d) / GIB) / d), GIB_STR);
     } else if(size < PIB) {
-      return concat(token(Math.round((size * d) / TIB) / d), PIB_STR);
-    } else return token(size);
+      return concat(token(Math.round((size * d) / TIB) / d), TIB_STR);
+    } else {
+      return concat(token(Math.round((size * d) / PIB) / d), PIB_STR);
+    }
   }
 }

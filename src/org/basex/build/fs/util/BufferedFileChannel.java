@@ -394,7 +394,10 @@ public final class BufferedFileChannel {
     if(buffered < n) {
       if(n > buf.capacity()) return false;
       buf.compact();
-      rem -= fc.read(buf); // rem may be negative
+      final int readBytes = fc.read(buf);
+      if(readBytes + buffered < n || readBytes == -1) throw new EOFException(
+          f.getAbsolutePath());
+      rem -= readBytes; // rem may be negative
       buf.flip();
     }
     return true;

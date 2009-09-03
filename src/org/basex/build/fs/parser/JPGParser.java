@@ -60,7 +60,11 @@ public final class JPGParser extends AbstractParser {
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
-    f.buffer(4);
+    try {
+      f.buffer(6);
+    } catch(final EOFException e) {
+      return false;
+    }
     int b;
     // 0xFFD8FFE0 or 0xFFD8FFE1
     return f.getShort() == 0xFFD8
@@ -70,11 +74,6 @@ public final class JPGParser extends AbstractParser {
   @Override
   protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
-    try {
-      f.buffer(6);
-    } catch(final EOFException e) {
-      return;
-    }
     if(!check(f)) return;
     bfc = f;
     fsparser = parser;
@@ -180,7 +179,11 @@ public final class JPGParser extends AbstractParser {
     try {
       exifParser.parse(sub, fsparser);
     } finally {
-      sub.finish();
+      try {
+        sub.finish();
+      } catch(Exception ex) {
+        BaseX.debug(ex);
+      }
     }
   }
 
