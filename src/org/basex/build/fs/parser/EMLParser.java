@@ -554,7 +554,6 @@ public class EMLParser extends AbstractParser {
         if(text[++i] == 0xA) continue; // ignore line feed
         final int n1 = hex2num(text[i]);
         final int n2 = hex2num(text[++i]);
-        if(n1 < 0 || n2 < 0) continue;
         addByte(tmp, n1 << 4 | n2, utf);
       } else addByte(tmp, c, utf);
     }
@@ -569,9 +568,9 @@ public class EMLParser extends AbstractParser {
   private static int hex2num(final byte b) {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'A' && b <= 'F') return b - 0x37;
+    if(b >= 'a' && b <= 'f') return b - 0x57;
     // won't happen in correctly encoded mails
-    BaseX.debug("EMLExtractor.hex2num: " + (char) b);
-    return -1;
+    return b;
   }
 
   /**
@@ -585,43 +584,56 @@ public class EMLParser extends AbstractParser {
 
     final byte[] data = Token.delete(text, 0xA); // delete line feeds
     final int size = data.length;
-    assert size % 4 == 0;
+    if(size % 4 != 0) BaseX.debug("EMLParser: Invalid base64 encoding (%)",
+        Token.string(data));
     byte b1, b2, b3, b4;
     int i, max;
+    boolean valid = true;
     try {
       for(i = 0, max = size - 4; i < max;) {
         b1 = base64Val(data[i++]);
         b2 = base64Val(data[i++]);
         b3 = base64Val(data[i++]);
         b4 = base64Val(data[i++]);
+        if(b1 == -1 || b2 == -1 || b3 == -1 || b4 == -1) {
+          valid = false;
+          addByte(tmp, ' ', true);
+          continue;
+        }
         addByte(tmp, b1 << 2 | b2 >> 4, utf);
         addByte(tmp, b2 << 4 & 0xF0 | b3 >> 2, utf);
         addByte(tmp, b3 << 6 & 0xC0 | b4, utf);
       }
       b1 = base64Val(data[i++]);
-      assert b1 != -2; // there may be at most 3 empty bytes
-      b2 = base64Val(data[i++]);
-      if(b2 == -2) {
-        final int b = b1 << 2;
-        if(b != 0) addByte(tmp, b, utf);
-      } else {
-        addByte(tmp, b1 << 2 | b2 >> 4, utf);
-        b3 = base64Val(data[i++]);
-        if(b3 == -2) {
-          final int b = b2 << 4 & 0xF0;
+      if(b1 < 0) valid = false;
+      else {
+        b2 = base64Val(data[i++]);
+        if(b2 == -2) {
+          final int b = b1 << 2;
           if(b != 0) addByte(tmp, b, utf);
-        } else {
-          addByte(tmp, b2 << 4 & 0xF0 | b3 >> 2, utf);
-          b4 = base64Val(data[i++]);
-          if(b4 == -2) {
-            final byte b = (byte) (b3 << 6 & 0xC0);
+        } else if(b2 == -1) valid = false;
+        else {
+          addByte(tmp, b1 << 2 | b2 >> 4, utf);
+          b3 = base64Val(data[i++]);
+          if(b3 == -2) {
+            final int b = b2 << 4 & 0xF0;
             if(b != 0) addByte(tmp, b, utf);
-          } else addByte(tmp, b3 << 6 & 0xC0 | b4, utf);
+          } else if(b3 == -1) valid = false;
+          else {
+            addByte(tmp, b2 << 4 & 0xF0 | b3 >> 2, utf);
+            b4 = base64Val(data[i++]);
+            if(b4 == -2) {
+              final byte b = (byte) (b3 << 6 & 0xC0);
+              if(b != 0) addByte(tmp, b, utf);
+            } else if(b4 == -1) valid = false;
+            else addByte(tmp, b3 << 6 & 0xC0 | b4, utf);
+          }
         }
       }
     } catch(final Exception ex) {
       BaseX.debug("EMLParser: invalid base64 encoding");
     }
+    if(!valid) BaseX.debug("EMLParser: invalid base64 encoding");
     return tmp.finish();
   }
 
@@ -632,7 +644,6 @@ public class EMLParser extends AbstractParser {
    */
   private static byte base64Val(final byte b) {
     final byte val = BASE64MAPPING[b - 0x2B];
-    assert val != -1;
     return val;
   }
 }

@@ -59,19 +59,19 @@ public final class NewFSParser extends Parser {
   // ----- Namespaces ----------------------------------------------------------
   /** All namespaces used in {@link NewFSParser}. */
   public enum NS {
-        /** XML schema namespace. */
+    /** XML schema namespace. */
     XS("xs", "http://www.w3.org/2001/XMLSchema"),
-        /** XML schema instance namespace. */
+    /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-        /** DeepFS filesystem namespace. */
+    /** DeepFS filesystem namespace. */
     // FS("fs", "http://www.deepfs.org/fs/1.0/"),
     // [BL] temporary hack to enable fsviews. pls, remove FS in code below,
     // where
     // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
     FS("", "http://www.deepfs.org/fs/1.0/"),
-        /** DeepFS metadata namespace. */
+    /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
-        /** Dublin Core metadata terms namespace. */
+    /** Dublin Core metadata terms namespace. */
     DCTERMS("dcterms", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
@@ -490,7 +490,7 @@ public final class NewFSParser extends Parser {
     final String name = d.getName();
     atts.add(NAME, token(!name.equals("") ? name : d.getAbsolutePath()));
     atts.add(SIZE, ZERO);
-    int sizeAttId = builder.startElem(DIR_NS, atts) + 2;
+    final int sizeAttId = builder.startElem(DIR_NS, atts) + 2;
     sizeStack[++lvl] = 0;
 
     final boolean fuse = prop.is(Prop.FUSE);
@@ -534,7 +534,7 @@ public final class NewFSParser extends Parser {
       final String name = f.getName();
       atts.add(NAME, token(name));
       atts.add(SIZE, ZERO);
-      int sizeAttId = builder.startElem(FILE_NS, atts) + 2;
+      final int sizeAttId = builder.startElem(FILE_NS, atts) + 2;
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
         addFSElems(f, size);
@@ -551,7 +551,7 @@ public final class NewFSParser extends Parser {
                   fc.close();
                 } catch(final IOException e) { /* */}
               }
-            } catch(IOException ex) {
+            } catch(final IOException ex) {
               BaseX.debug("Failed to parse file: %", ex);
             }
           }
@@ -575,8 +575,9 @@ public final class NewFSParser extends Parser {
                     fc.close();
                   } catch(final IOException e1) { /* */}
                 }
-              } catch(IOException ex) {
-                BaseX.debug("Failed to parse file: %", ex);
+              } catch(final Exception ex) {
+                BaseX.debug("Failed to parse file (%): %", f.getAbsolutePath(),
+                    ex);
               }
             }
           } // end if size > 0
@@ -620,10 +621,10 @@ public final class NewFSParser extends Parser {
           lastContentOffset = offset;
           lastContentSize = size;
           parse0(parser, bfc);
-        } catch(final IOException ex) {
+        } catch(final Exception ex) {
           BaseX.debug(
-              "Failed to parse file fragment (file: %, offset: %, length: %)",
-              bfc.getFileName(), offset, size);
+              "Failed to parse file fragment (file: %, offset: %, length: %): "
+                  + "%", bfc.getFileName(), offset, size, ex);
           bfc.finish();
         }
       }

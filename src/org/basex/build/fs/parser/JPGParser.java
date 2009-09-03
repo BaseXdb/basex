@@ -153,8 +153,8 @@ public final class JPGParser extends AbstractParser {
    *           channel.
    */
   private void readDimensions() throws IOException {
+    bfc.buffer(9);
     if(bfc.get() == 8) {
-      bfc.buffer(8);
       final int height = bfc.getShort();
       final int width = bfc.getShort();
       fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
