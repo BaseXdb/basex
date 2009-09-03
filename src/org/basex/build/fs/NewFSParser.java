@@ -222,7 +222,7 @@ public final class NewFSParser extends Parser {
   /** Reference to the database builder. */
   private Builder builder;
   /** The currently processed file. */
-  private File curr;
+  public File curr;
   /** Level counter. */
   private int lvl = 0;
   /**

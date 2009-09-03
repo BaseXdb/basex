@@ -601,7 +601,7 @@ public final class TreeView extends View {
           g.drawLine((int) (mPreRect.w * pRatio), getYperLevel(l),
               (int) (mPreRect.w * pRatio), getYperLevel(l) + nodeHeight);
 
-          highlightNode(g, Color.RED, mPreRect, l, false, false);
+          highlightNode(g, Color.RED, mPreRect, l, true, false);
 
         } else {
 
@@ -610,7 +610,7 @@ public final class TreeView extends View {
           if(parRect != null) {
             g.drawLine((2 * parRect.x + parRect.w) / 2, getYperLevel(l)
                 + nodeHeight + 1, (2 * r.x + r.w) / 2, y - 1);
-            highlightNode(g, Color.RED, parRect, l, false, false);
+            highlightNode(g, Color.RED, parRect, l, true, false);
           }
         }
       }

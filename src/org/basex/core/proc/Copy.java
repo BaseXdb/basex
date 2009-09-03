@@ -129,7 +129,7 @@ public final class Copy extends AUpdate {
    * @param pre pre value
    * @return database instance
    */
-  public static Data copy(final Data data, final int pre) {
+  public static MemData copy(final Data data, final int pre) {
     // size of the data instance
     final int size = data.size(pre, data.kind(pre));
     // create temporary data instance, adopting the indexes of the source data
