@@ -44,7 +44,7 @@ import org.basex.util.StringList;
  */
 public final class InexDBTestNew {
   /** Queries. */
-  private static final String QUERIES = "rewrittenSub.que";
+  private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
   private static final String DBPREFIX = "inex";
 
