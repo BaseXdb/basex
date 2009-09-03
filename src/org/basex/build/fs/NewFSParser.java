@@ -29,6 +29,7 @@ import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Atts;
 import org.basex.util.LibraryLoader;
 import org.basex.util.TokenBuilder;
@@ -42,8 +43,8 @@ import org.basex.util.TokenBuilder;
  * 
  * <ul>
  * <li>The import is invoked by the {@link CreateFS} command.</li>
- * <li>To import on the command line type: <tt>$ create fs [path] [dbname]</tt>
- * </li>
+ * <li>To import on the command line type:
+ * <tt>$ create fs [path] [dbname] ([mountpoint] [backingstore])</tt></li>
  * <li>To import using the GUI: File -&gt; Import Filesystem...</li>
  * <li>This class {@link NewFSParser} instantiates the parsers to extract
  * metadata and content from files.
@@ -223,7 +224,7 @@ public final class NewFSParser extends Parser {
   /** The currently processed file. */
   private File curr;
   /** Level counter. */
-  private int lvl;
+  private int lvl = 0;
   /**
    * Length of absolute pathname of the root directory the import starts from,
    * i.e. the prefix to be chopped from path and substituted by backingroot.
@@ -264,7 +265,7 @@ public final class NewFSParser extends Parser {
     prop.set(Prop.DTD, false);
     root = path.equals("/");
 
-    fsimportpath = io.path();
+    fsimportpath = root ? "" : io.path();
     fsdbname = io.name();
     backingroot = bs;
     mountpoint = mp;
@@ -391,7 +392,7 @@ public final class NewFSParser extends Parser {
       final byte[] bck = fuse ? token(mybackingpath) : token(fsimportpath);
       atts.add(MOUNTPOINT, mnt);
       atts.add(BACKINGSTORE, bck);
-      atts.add(SIZE, EMPTY);
+      atts.add(SIZE, ZERO);
 
       // define namespaces
       builder.startNS(FSPREF, FSURL);
@@ -403,17 +404,15 @@ public final class NewFSParser extends Parser {
         builder.startNS(FSXSIPREF, FSXSIURL);
       }
 
-      int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;
+      builder.startElem(DEEPFS_NS, atts);
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
           fsimportpath).getCanonicalFile()}) {
 
-        if(f.isHidden()) continue;
+        if(f.isHidden() && !f.getAbsolutePath().equals("C:\\")) continue;
         importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
-        parse(f);
-        addFSElems(f, sizeStack[0]);
-        addFSAtts(sizeAttId, f, sizeStack[0]);
+        dir(f);
       }
       builder.endElem(DEEPFS_NS);
     }
@@ -444,33 +443,6 @@ public final class NewFSParser extends Parser {
       meta.setLong(IntField.FS_SIZE, ParserUtil.humanReadableSize(size));
       metaEvent(meta);
       ParserUtil.fireDateEvents(this, meta, f);
-    }
-  }
-
-  /**
-   * Visits files in a directory or steps further down.
-   * @param d the directory to be visited.
-   * @throws IOException I/O exception
-   */
-  private void parse(final File d) throws IOException {
-    final File[] files = d.listFiles();
-    if(files == null) return;
-
-    final boolean fuse = prop.is(Prop.FUSE);
-    for(final File f : files) {
-      if(!valid(f) || f.isHidden()) continue;
-
-      if(f.isDirectory()) {
-        // -- 'copy' directory to backing store
-        if(fuse) new File(mybackingpath
-            + f.getAbsolutePath().substring(importRootLength)).mkdir();
-        dir(f);
-      } else {
-        // -- copy file to backing store
-        if(fuse) copy(f.getAbsoluteFile(), new File(mybackingpath
-            + f.getAbsolutePath().substring(importRootLength)));
-        file(f);
-      }
     }
   }
 
@@ -507,23 +479,40 @@ public final class NewFSParser extends Parser {
 
   /**
    * Invoked when a directory is visited.
-   * @param f file name
+   * @param d directory name
    * @throws IOException I/O exception
    */
-  private void dir(final File f) throws IOException {
+  private void dir(final File d) throws IOException {
+    final File[] files = d.listFiles();
+    if(files == null) return;
+
     atts.reset();
-    atts.add(NAME, token(f.getName()));
-    atts.add(SIZE, EMPTY);
+    final String name = d.getName();
+    atts.add(NAME, token(!name.equals("") ? name : d.getAbsolutePath()));
+    atts.add(SIZE, ZERO);
     int sizeAttId = builder.startElem(DIR_NS, atts) + 2;
     sizeStack[++lvl] = 0;
-    parse(f);
 
-    // calling builder actualization
-    // take into account that stored pre value is the one of the
-    // element node, not the attributes one!
+    final boolean fuse = prop.is(Prop.FUSE);
+    for(final File f : files) {
+      if(!valid(f) || f.isHidden()) continue;
+
+      if(f.isDirectory()) {
+        // -- 'copy' directory to backing store
+        if(fuse) new File(mybackingpath
+            + f.getAbsolutePath().substring(importRootLength)).mkdir();
+        dir(f);
+      } else {
+        // -- copy file to backing store
+        if(fuse) copy(f.getAbsoluteFile(), new File(mybackingpath
+            + f.getAbsolutePath().substring(importRootLength)));
+        file(f);
+      }
+    }
+
     final long size = sizeStack[lvl];
-    addFSElems(f, size);
-    addFSAtts(sizeAttId, f, size);
+    addFSElems(d, size);
+    addFSAtts(sizeAttId, d, size);
 
     builder.endElem(DIR_NS);
 
@@ -544,7 +533,7 @@ public final class NewFSParser extends Parser {
       atts.reset();
       final String name = f.getName();
       atts.add(NAME, token(name));
-      atts.add(SIZE, EMPTY);
+      atts.add(SIZE, ZERO);
       int sizeAttId = builder.startElem(FILE_NS, atts) + 2;
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
@@ -553,17 +542,17 @@ public final class NewFSParser extends Parser {
         if(prop.is(Prop.SPOTLIGHT)) {
           if(prop.is(Prop.FSMETA)) spotlight.parse(f);
           if(prop.is(Prop.FSCONT)) {
-            final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
             try {
-              fallbackParserInstance.readContent(fc, this);
-            } catch(final IOException ex) {
-              BaseX.debug(
-                  "NewFSParser: Failed to parse file metadata (% - %).",
-                  fc.getFileName(), ex.getMessage());
-            } finally {
+              final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
               try {
-                fc.close();
-              } catch(final IOException e) { /* */}
+                fallbackParserInstance.readContent(fc, this);
+              } finally {
+                try {
+                  fc.close();
+                } catch(final IOException e) { /* */}
+              }
+            } catch(IOException ex) {
+              BaseX.debug("Failed to parse file: %", ex);
             }
           }
         } else if(name.indexOf('.') != -1) { // internal parser
@@ -573,21 +562,22 @@ public final class NewFSParser extends Parser {
             AbstractParser parser = getParser(suffix);
             if(parser == null) parser = getFallbackParser();
             if(parser != null) {
-              final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
               try {
-                lastContentOffset = 0;
-                lastContentSize = size;
-                contentOpenedCounter = 0;
-                parse0(parser, fc);
-              } catch(final IOException ex) {
-                BaseX.debug(
-                    "NewFSParser: Failed to parse file metadata (% - %).",
-                    fc.getFileName(), ex.getMessage());
-              } finally {
+                final BufferedFileChannel fc = new BufferedFileChannel(f,
+                    buffer);
                 try {
-                  fc.close();
-                } catch(final IOException e1) { /* */}
-              } // end try
+                  lastContentOffset = 0;
+                  lastContentSize = size;
+                  contentOpenedCounter = 0;
+                  parse0(parser, fc);
+                } finally {
+                  try {
+                    fc.close();
+                  } catch(final IOException e1) { /* */}
+                }
+              } catch(IOException ex) {
+                BaseX.debug("Failed to parse file: %", ex);
+              }
             }
           } // end if size > 0
         } // end internal parser
@@ -900,7 +890,7 @@ public final class NewFSParser extends Parser {
    * @throws IOException if any error occurs while generating the xml code.
    */
   public void parseXML() throws IOException {
-    final IO i = IO.get(curr.getPath());
+    final IO i = new IOFile(curr);
     final Parser parser = Parser.xmlParser(i, prop);
     parser.doc = false;
     parser.parse(builder);
