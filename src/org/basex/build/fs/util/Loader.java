@@ -15,7 +15,7 @@ import org.basex.BaseX;
 /**
  * Some utility methods for loading class files from folders, packages or jar
  * files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -68,7 +68,12 @@ public final class Loader extends ClassLoader {
       final String pkgName = pkg.getName();
       final URL pkgUrl = getURL(pkgName);
       if(pkgUrl == null) return new Class<?>[0];
-      final File packageDir = new File(pkgUrl.getFile());
+      File packageDir;
+      try {
+        packageDir = new File(pkgUrl.toURI());
+      } catch(IllegalArgumentException ex) {
+        packageDir = new File(pkgUrl.getFile());
+      }
       if(packageDir.exists()) { // package located on disk (as directory)
         for(final File f : packageDir.listFiles()) {
           String fileName = f.getName();
@@ -110,7 +115,7 @@ public final class Loader extends ClassLoader {
       throw ex;
     } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
-      BaseX.errln("Failed to load class (%)", t.getMessage());
+      BaseX.errln("Failed to load class: %", t);
     }
     // return only the correctly initialized classes
     final int counter = initializeClasses(foundClasses);
