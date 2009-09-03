@@ -166,6 +166,7 @@ public abstract class Builder extends Progress {
 
     // add document node and parse document
     parser.parse(this);
+    if(level != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[level]));
 
     meta.lastid = meta.size;
     if(meta.size == 0) {

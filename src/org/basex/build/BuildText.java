@@ -19,6 +19,8 @@ public interface BuildText {
   String MOREROOTS = "%: More than one root node: '<%>'";
   /** Parser Error. */
   String PARSEINVALID = "%: % expected, % found.";
+  /** Parser Error. */
+  String DOCOPEN = "%: Closing tag </%> expected.";
 
   /** Scanner error. */
   String DOCEMPTY = "Document is empty.";
