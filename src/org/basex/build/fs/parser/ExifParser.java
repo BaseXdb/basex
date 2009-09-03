@@ -101,7 +101,7 @@ public class ExifParser {
     h132 {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
-        if(buf.getShort() == IFD_TYPE_ASCII && buf.getInt() == 20) {
+        if(buf.getShort() == IFD_TYPE_ASCII && buf.getInt() >= 20) {
           o.bfc.position(buf.getInt());
           o.bfc.buffer(20);
           final byte[] data = new byte[20];
