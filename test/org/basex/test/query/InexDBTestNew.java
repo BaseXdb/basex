@@ -46,7 +46,7 @@ public final class InexDBTestNew {
   /** Queries. */
   private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "inex";
+  private static final String DBPREFIX = "index";
 
   /** Database context. */
   private static Context ctx = new Context();
@@ -105,6 +105,7 @@ public final class InexDBTestNew {
      "  return $s[$n[$s] is $ntf]};";
   /** Shows process info. */
   private boolean info;
+  private final StringList log = new StringList(); 
 
   
   /**
@@ -144,10 +145,14 @@ public final class InexDBTestNew {
       if(s.startsWith(DBPREFIX) && databases.size() < maxdb) databases.add(s);
     }
 
+//    log.add(BaseX.name(InexDBTest.class) + " [" +
+//        (server ? CLIENTMODE : LOCALMODE) + "]");
     BaseX.outln(BaseX.name(InexDBTest.class) + " [" +
         (server ? CLIENTMODE : LOCALMODE) + "]");
+//    log.add("=> " + queries.size() + " queries on " + databases.size() + 
+//        " databases, " + runs + " runs: " + (total ? "total" : "evaluation") + " time in ms\n");
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
-        queries.size(), databases.size(), runs, total ? "total" : "evaluation");
+        queries.size(), databases.size(), runs, (total ? "total" : "evaluation"));
 
     // get number of articles for each db
     /*numArt = new int[databases.size()];
@@ -166,9 +171,18 @@ public final class InexDBTestNew {
     final Performance p = new Performance();
     if(server) test();
     else testLocalNew();
+
+//    log.add("Total Time: " + p.getTimer());
+//    final String[] s = log.finish();
+//    for (String si : s) System.out.println(si);
     System.out.println("Total Time: " + p.getTimer());
     
-//    if(subfile) createSubFile();
+    if(subfile) {
+      openSubFile();
+      for (int i = 0; i < results.length; i++) 
+        createQueryEntry(i, results[i], 1500);
+      closeSubFile();      
+    }
   }
 
   /**
@@ -198,7 +212,7 @@ public final class InexDBTestNew {
    * This version runs only locally.
    * @throws Exception exception
    */
- /* private void testLocal() throws Exception {
+  private void testLocal() throws Exception {
     // cache all context nodes
     final Nodes[] roots = new Nodes[databases.size()];
     for(int d = 0; d < databases.size(); d++) {
@@ -215,9 +229,9 @@ public final class InexDBTestNew {
         query(d, q);
       }
     }
-    if (subfile) createSubFile();
+//    if (subfile) createSubFile();
   }
-  */
+  
 
   /**
    * First test, caching all databases before running the queries.
@@ -240,10 +254,12 @@ public final class InexDBTestNew {
       for(int d = 0; d < databases.size(); d++) {
         // set cached context nodes and run query
         ctx.current(roots[d]);
+        queryNew(d, q);
         s = s == null ? queryNew(d, q) : addSorted(s, queryNew(d, q));
       }
-      if (subfile) createQueryEntry(q, s);
+      if (subfile) createQueryEntry(q, s, 1500);
     }
+    
     if (subfile) closeSubFile();
   }
 
@@ -292,14 +308,17 @@ public final class InexDBTestNew {
            }
         }
         if (results[qu] == null) results[qu] = itr; 
-        else results[qu].add(itr);
-//        else results[qu] = addSorted(results[qu], itr);        
+//        else results[qu].add(itr);
+        else results[qu] = addSorted(results[qu], itr);        
       }
     }     
     
     // output result
+//    log.add("Query " + (qu + 1) +" on " + databases.get(db) + ":" + time);
     BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
     if(info) {
+//      log.add("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+//          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
       BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
     }
@@ -354,10 +373,13 @@ public final class InexDBTestNew {
     }     
     
     // output result
-    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+    log.add("Query " + (qu + 1) +" on " + databases.get(db) + ":" + time + NL);
+//    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
     if(info) {
-      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+      log.add("- " + Pattern.compile(".*Result: (.*?)\\n.*",
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+//      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+//          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
     }
     return itr;
   }
@@ -510,24 +532,26 @@ public final class InexDBTestNew {
    * 
    * @param q query
    * @param res result of the query
+   * @param k max number of results 
    * @throws IOException IOException
    */
-  private static void createQueryEntry(final int q, final SeqIter res) 
+  private static void createQueryEntry(final int q, final SeqIter res, 
+      final int k) 
   throws IOException {
     xml.openElement(token("topic"),
         token("topic-id"), token(tid[q]),
         token("total_time_ms"), token(qtimes[q])
     );
-    xml.openElement(token("result"));
-    xml.openElement(token("file"));
-    // [SG] which file???
-    xml.text(token("wikpedia"));
-    xml.closeElement();
 
     Item a;
     int r = 1;
     while(res != null && (a = res.next()) != null) {
+      if (r == k) break;
       if(a instanceof Str) {
+        xml.openElement(token("result"));
+        xml.openElement(token("file"));
+        xml.text(token("pages"));
+        xml.closeElement();
         xml.openElement(token("path"));
         xml.text(a.str());
         xml.closeElement();
@@ -538,11 +562,28 @@ public final class InexDBTestNew {
         xml.openElement(token("rsv"));
         xml.text(a.str());
         xml.closeElement();
+        xml.closeElement();
       }
     }
-    xml.closeElement();
+//    xml.closeElement();
     xml.closeElement();    
   }
+  
+
+  private static void print(final int q, final SeqIter res) 
+  throws IOException {
+    Item a;
+    int r = 1;
+    while(res != null && (a = res.next()) != null) {
+      if(a instanceof Str) {
+        System.out.println(a.str());
+        System.out.println(new String(token(r++)));
+      } else if(a instanceof Dbl) {
+        System.out.println(new String(a.str()));
+      }
+    }
+  }
+
   
   /**
    * Create and print submission file.
@@ -550,6 +591,7 @@ public final class InexDBTestNew {
   private static void createSubFile() throws Exception {
     openSubFile();
     for (int j = 0; j < queries.size(); j++) 
+//      print(j, results[j]);
       createQueryEntry(j, results[j]);
     closeSubFile();
   }
