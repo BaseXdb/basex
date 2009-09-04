@@ -24,7 +24,6 @@ import org.basex.build.fs.util.Loader;
 import org.basex.build.fs.util.Metadata;
 import org.basex.build.fs.util.ParserUtil;
 import org.basex.build.fs.util.SpotlightExtractor;
-import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
@@ -59,19 +58,19 @@ public final class NewFSParser extends Parser {
   // ----- Namespaces ----------------------------------------------------------
   /** All namespaces used in {@link NewFSParser}. */
   public enum NS {
-    /** XML schema namespace. */
+        /** XML schema namespace. */
     XS("xs", "http://www.w3.org/2001/XMLSchema"),
-    /** XML schema instance namespace. */
+        /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-    /** DeepFS filesystem namespace. */
+        /** DeepFS filesystem namespace. */
     // FS("fs", "http://www.deepfs.org/fs/1.0/"),
     // [BL] temporary hack to enable fsviews. pls, remove FS in code below,
     // where
     // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
     FS("", "http://www.deepfs.org/fs/1.0/"),
-    /** DeepFS metadata namespace. */
+        /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
-    /** Dublin Core metadata terms namespace. */
+        /** Dublin Core metadata terms namespace. */
     DCTERMS("dcterms", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
@@ -420,30 +419,31 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Adds the size value to the current node.
-   * @param id the ID of the size attribute.
+   * Prepares the attributes for the current file node.
    * @param f the current file.
-   * @param size the size to set.
+   * @return the attributes.
    * @throws IOException I/O exception.
    */
   @SuppressWarnings("unused")
-  private void addFSAtts(final int id, final File f, final long size)
+  private Atts fsAtts(final File f)
       throws IOException {
-    builder.setAttValue(id, token(size));
+    atts.reset();
+    final String name = f.getName();
+    atts.add(NAME, token(!name.equals("") ? name : f.getAbsolutePath()));
+    atts.add(SIZE, token(f.length()));
+    atts.add(MTIME, token(f.lastModified()));
+    return atts;
   }
 
   /**
-   * Adds the size and datetime values to the current node.
-   * @param f the current file.
+   * Adds the size value to the current node.
+   * @param id the ID of the size attribute.
    * @param size the size to set.
    * @throws IOException I/O exception.
    */
-  private void addFSElems(final File f, final long size) throws IOException {
-    if(prop.is(Prop.FSMETA)) {
-      meta.setLong(IntField.FS_SIZE, ParserUtil.humanReadableSize(size));
-      metaEvent(meta);
-      ParserUtil.fireDateEvents(this, meta, f);
-    }
+  private void setSize(final int id, final long size)
+      throws IOException {
+    builder.setAttValue(id, token(size));
   }
 
   /**
@@ -486,11 +486,7 @@ public final class NewFSParser extends Parser {
     final File[] files = d.listFiles();
     if(files == null) return;
 
-    atts.reset();
-    final String name = d.getName();
-    atts.add(NAME, token(!name.equals("") ? name : d.getAbsolutePath()));
-    atts.add(SIZE, ZERO);
-    final int sizeAttId = builder.startElem(DIR_NS, atts) + 2;
+    final int sizeAttId = builder.startElem(DIR_NS, fsAtts(d)) + 2;
     sizeStack[++lvl] = 0;
 
     final boolean fuse = prop.is(Prop.FUSE);
@@ -511,9 +507,7 @@ public final class NewFSParser extends Parser {
     }
 
     final long size = sizeStack[lvl];
-    addFSElems(d, size);
-    addFSAtts(sizeAttId, d, size);
-
+    setSize(sizeAttId, size);
     builder.endElem(DIR_NS);
 
     // add file size to parent folder
@@ -530,15 +524,10 @@ public final class NewFSParser extends Parser {
     final long size = f.length();
 
     if(!singlemode) {
-      atts.reset();
       final String name = f.getName();
-      atts.add(NAME, token(name));
-      atts.add(SIZE, ZERO);
-      final int sizeAttId = builder.startElem(FILE_NS, atts) + 2;
+      builder.startElem(FILE_NS, fsAtts(f));
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
-        addFSElems(f, size);
-        addFSAtts(sizeAttId, f, size);
         if(prop.is(Prop.SPOTLIGHT)) {
           if(prop.is(Prop.FSMETA)) spotlight.parse(f);
           if(prop.is(Prop.FSCONT)) {
@@ -624,7 +613,7 @@ public final class NewFSParser extends Parser {
         } catch(final Exception ex) {
           BaseX.debug(
               "Failed to parse file fragment (file: %, offset: %, length: %): "
-                  + "%", bfc.getFileName(), offset, size, ex);
+              + "%", bfc.getFileName(), offset, size, ex);
           bfc.finish();
         }
       }
