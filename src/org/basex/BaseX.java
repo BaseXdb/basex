@@ -277,7 +277,7 @@ public class BaseX {
           output = arg.string();
         } else if(c == 'p' && !standalone) {
           // parse server port
-          context.prop.set(Prop.PORT, arg.string());
+          context.prop.set(Prop.PORT, Integer.parseInt(arg.string()));
         } else if(c == 'q') {
           // send database commands
           commands = arg.rest();

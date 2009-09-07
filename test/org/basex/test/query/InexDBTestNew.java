@@ -105,6 +105,7 @@ public final class InexDBTestNew {
      "  return $s[$n[$s] is $ntf]};";
   /** Shows process info. */
   private boolean info;
+  /** Logging information. */
   private final StringList log = new StringList(); 
 
   
@@ -202,6 +203,7 @@ public final class InexDBTestNew {
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
+      launcher.execute(new Open(databases.get(d)));
       for(int q = 0; q < queries.size(); q++) query(d, q);
       launcher.execute(new Close());
     }
@@ -211,7 +213,6 @@ public final class InexDBTestNew {
    * First test, caching all databases before running the queries.
    * This version runs only locally.
    * @throws Exception exception
-   */
   private void testLocal() throws Exception {
     // cache all context nodes
     final Nodes[] roots = new Nodes[databases.size()];
@@ -231,6 +232,7 @@ public final class InexDBTestNew {
     }
 //    if (subfile) createSubFile();
   }
+   */
   
 
   /**
@@ -283,10 +285,11 @@ public final class InexDBTestNew {
     }
     final CachedOutput out = new CachedOutput();
     launcher.info(out);
-    
+
     final String time = Pattern.compile(".*" +
         (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
         Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+    
     if (subfile) {
       qtimes[qu] += Double.parseDouble(time);
       final Result val = proc.result();
@@ -569,9 +572,10 @@ public final class InexDBTestNew {
     xml.closeElement();    
   }
   
-
+  /**
   private static void print(final int q, final SeqIter res) 
-  throws IOException {
+    throws IOException {
+
     Item a;
     int r = 1;
     while(res != null && (a = res.next()) != null) {
@@ -583,6 +587,7 @@ public final class InexDBTestNew {
       }
     }
   }
+   */
 
   
   /**
