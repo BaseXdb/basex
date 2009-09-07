@@ -872,6 +872,7 @@ public final class PlotView extends View implements Runnable {
     MARGIN[3] = sz + 3;
     plotChanged = true;
     markingChanged = true;
+    if(plotData == null) return;
     repaint();
   }
 

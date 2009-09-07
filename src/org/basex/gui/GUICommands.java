@@ -601,7 +601,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Realtime filtering on/off. */
-  RTFILTER(false, GUIRTFILTER, null, GUIRTFILTERTT) {
+  RTFILTER(true, GUIRTFILTER, null, GUIRTFILTERTT) {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.prop.invert(GUIProp.FILTERRT);
@@ -610,7 +610,6 @@ public enum GUICommands implements GUICommand {
 
       final Context context = gui.context;
       final boolean root = context.root();
-
       if(!rt) {
         if(!root) {
           gui.notify.context(new Nodes(0, context.data()), true, null);

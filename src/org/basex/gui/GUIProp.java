@@ -76,6 +76,13 @@ public final class GUIProp extends AProp {
   /** Flag for activated xquery view. */
   public static final Object[] SHOWXQUERY = { "SHOWXQUERY", true };
 
+  /** Flag for activated text view after starting. */
+  public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
+  /** Flag for activated xquery view after starting. */
+  public static final Object[] SHOWSTARTXQUERY = { "SHOWSTARTXQUERY", false };
+  /** Flag for activated info view after starting. */
+  public static final Object[] SHOWSTARTINFO = { "SHOWSTARTINFO", false };
+
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };
   /** Flag for dissolving name attributes. */
@@ -163,13 +170,6 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWHELP = { "SHOWHELP", false };
   /** Flag for activated tree view. */
   public static final Object[] SHOWTREE = { "SHOWTREE", false };
-
-  /** Flag for activated text view after starting. */
-  public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
-  /** Flag for activated xquery view after starting. */
-  public static final Object[] SHOWSTARTXQUERY = { "SHOWSTARTXQUERY", false };
-  /** Flag for activated info view after starting. */
-  public static final Object[] SHOWSTARTINFO = { "SHOWSTARTINFO", false };
 
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };

@@ -288,6 +288,8 @@ public interface QueryText {
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
   /** XPST0003: Parsing exception. */
   Object[] FTSTOP = { XPST, 3, "Stop words expected." };
+  /** XPST0003: Parsing exception. */
+  Object[] FTMATCH = { XPST, 3, "Unknown match option." };
 
   /** XPST0005: Parsing exception. */
   Object[] COMPSELF = { XPST, 5, "Warning: '%' won't yield any results." };

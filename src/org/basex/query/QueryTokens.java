@@ -173,6 +173,8 @@ public interface QueryTokens {
   /** Parser token. */
   String NODES = "nodes";
   /** Parser token. */
+  String NO = "no";
+  /** Parser token. */
   String NOT = "not";
   /** Parser token. */
   String OCCURS = "occurs";
@@ -260,6 +262,8 @@ public interface QueryTokens {
   String UNORDERED = "unordered";
   /** Parser token. */
   String UPPERCASE = "uppercase";
+  /** Parser token. */
+  String USING = "using";
   /** Parser token. */
   String VALIDATE = "validate";
   /** Parser token. */

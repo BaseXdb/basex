@@ -2338,6 +2338,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean ftMatchOption(final FTOpt opt) throws QueryException {
+    if(!consumeWS(USING)) return false;
+
     if(consumeWS(LOWERCASE)) {
       if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
         error(FTDUP, CASE);
@@ -2364,17 +2366,15 @@ public class QueryParser extends InputParser {
     } else if(consumeWS(OPTION)) {
       optionDecl();
     } else {
-      final int p = qp;
-      final boolean with = consumeWS(WITH);
-      if(!with && !consumeWS(WITHOUT)) return false;
+      final boolean using = !consumeWS(NO);
 
       if(consumeWS2(STEMMING)) {
         if(opt.isSet(FTOpt.ST)) error(FTDUP, STEMMING);
-        opt.set(FTOpt.ST, with);
+        opt.set(FTOpt.ST, using);
       } else if(consumeWS2(THESAURUS)) {
         if(opt.th != null) error(FTDUP, THESAURUS);
         opt.th = new ThesQuery();
-        if(with) {
+        if(using) {
           final boolean par = consumeWS2(PAR1);
           if(!consumeWS2(DEFAULT)) ftThesaurusID(opt.th);
           while(par && consumeWS2(COMMA)) ftThesaurusID(opt.th);
@@ -2387,7 +2387,7 @@ public class QueryParser extends InputParser {
         opt.sw = new StopWords();
         boolean union = false;
         boolean except = false;
-        while(with) {
+        while(using) {
           if(consumeWS2(PAR1)) {
             do {
               final byte[] sl = stringLiteral();
@@ -2410,19 +2410,19 @@ public class QueryParser extends InputParser {
           if(!union && !except) break;
         }
       } else if(consumeWS(DEFAULT)) {
-        if(!with) error(FTSTOP);
+        if(!using) error(FTSTOP);
         check(STOP);
         check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {
         if(opt.isSet(FTOpt.WC)) error(FTDUP, WILDCARDS);
         if(opt.is(FTOpt.FZ)) error(FTFZWC);
-        opt.set(FTOpt.WC, with);
+        opt.set(FTOpt.WC, using);
       } else if(consumeWS2(FUZZY)) {
         if(opt.isSet(FTOpt.FZ)) error(FTDUP, FUZZY);
         if(opt.is(FTOpt.WC)) error(FTFZWC);
-        opt.set(FTOpt.FZ, with);
+        opt.set(FTOpt.FZ, using);
       } else {
-        qp = p;
+        error(FTMATCH);
         return false;
       }
     }

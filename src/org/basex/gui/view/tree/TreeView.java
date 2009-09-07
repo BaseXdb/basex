@@ -131,7 +131,7 @@ public final class TreeView extends View {
 
   @Override
   protected void refreshLayout() {
-    repaint();
+    if(gui.context.data() != null) repaint();
   }
 
   @Override

@@ -227,7 +227,7 @@ public final class ViewNotifier {
    */
   public void layout() {
     if(gui.help != null) gui.help.refresh();
-    if(gui.context.data() != null) for(final View v : view) v.refreshLayout();
+    for(final View v : view) v.refreshLayout();
   }
 
   /**
