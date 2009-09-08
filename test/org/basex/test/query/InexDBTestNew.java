@@ -3,8 +3,12 @@ package org.basex.test.query;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.ALauncher;
@@ -30,9 +34,12 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
+import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 
 /**
@@ -46,7 +53,7 @@ public final class InexDBTestNew {
   /** Queries. */
   private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "index";
+  private static final String DBPREFIX = "inex";
 
   /** Database context. */
   private static Context ctx = new Context();
@@ -72,6 +79,8 @@ public final class InexDBTestNew {
   private static boolean total;
   /** Create submission file. */
   private static boolean subfile;
+  /** Do not sum path in the submission file. */
+  private static boolean dbpath; 
   /** PrintOutput for the submission file. */
   private static PrintOutput sub = null;
   /** XMLSerializer for the submission file. */
@@ -105,10 +114,7 @@ public final class InexDBTestNew {
      "  return $s[$n[$s] is $ntf]};";
   /** Shows process info. */
   private boolean info;
-  /** Logging information. */
-  private final StringList log = new StringList(); 
-
-  
+    
   /**
    * Default constructor.
    * @param args command-line arguments
@@ -146,12 +152,8 @@ public final class InexDBTestNew {
       if(s.startsWith(DBPREFIX) && databases.size() < maxdb) databases.add(s);
     }
 
-//    log.add(BaseX.name(InexDBTest.class) + " [" +
-//        (server ? CLIENTMODE : LOCALMODE) + "]");
     BaseX.outln(BaseX.name(InexDBTest.class) + " [" +
         (server ? CLIENTMODE : LOCALMODE) + "]");
-//    log.add("=> " + queries.size() + " queries on " + databases.size() + 
-//        " databases, " + runs + " runs: " + (total ? "total" : "evaluation") + " time in ms\n");
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
         queries.size(), databases.size(), runs, (total ? "total" : "evaluation"));
 
@@ -173,15 +175,14 @@ public final class InexDBTestNew {
     if(server) test();
     else testLocalNew();
 
-//    log.add("Total Time: " + p.getTimer());
-//    final String[] s = log.finish();
-//    for (String si : s) System.out.println(si);
     System.out.println("Total Time: " + p.getTimer());
     
     if(subfile) {
       openSubFile();
-      for (int i = 0; i < results.length; i++) 
-        createQueryEntry(i, results[i], 1500);
+      for (int i = 0; i < results.length; i++) { 
+        if (server) createQueryEntryServer(i, results[i], 1500);
+        else createQueryEntry(i, results[i], 1500);
+        }
       closeSubFile();      
     }
   }
@@ -200,11 +201,16 @@ public final class InexDBTestNew {
    * @throws Exception exception
    */
   private void test() throws Exception {
+    launcher.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
       launcher.execute(new Open(databases.get(d)));
-      for(int q = 0; q < queries.size(); q++) query(d, q);
+      for(int q = 0; q < queries.size(); q++) {
+        final SeqIter s = queryServer(d, q);
+        if (results[q] != null) results[q] = addSortedServer(results[q], s);
+        else results[q] = s;
+      }
       launcher.execute(new Close());
     }
   }
@@ -213,7 +219,8 @@ public final class InexDBTestNew {
    * First test, caching all databases before running the queries.
    * This version runs only locally.
    * @throws Exception exception
-  private void testLocal() throws Exception {
+   */
+   private void testLocalNew() throws Exception {
     // cache all context nodes
     final Nodes[] roots = new Nodes[databases.size()];
     for(int d = 0; d < databases.size(); d++) {
@@ -221,34 +228,6 @@ public final class InexDBTestNew {
       roots[d] = new Nodes(data.doc(), data);
     }
 
-    // loop through all databases
-    for(int q = 0; q < queries.size(); q++) {
-      // loop through all queries
-      for(int d = 0; d < databases.size(); d++) {
-        // set cached context nodes and run query
-        ctx.current(roots[d]);
-        query(d, q);
-      }
-    }
-//    if (subfile) createSubFile();
-  }
-   */
-  
-
-  /**
-   * First test, caching all databases before running the queries.
-   * This version runs only locally.
-   * @throws Exception exception
-   */
-  private void testLocalNew() throws Exception {
-    // cache all context nodes
-    final Nodes[] roots = new Nodes[databases.size()];
-    for(int d = 0; d < databases.size(); d++) {
-      final Data data = Open.open(ctx, databases.get(d));
-      roots[d] = new Nodes(data.doc(), data);
-    }
-
-    if (subfile) openSubFile();
     // loop through all databases
     for(int q = 0; q < queries.size(); q++) {
       SeqIter s = null;
@@ -256,74 +235,19 @@ public final class InexDBTestNew {
       for(int d = 0; d < databases.size(); d++) {
         // set cached context nodes and run query
         ctx.current(roots[d]);
-        queryNew(d, q);
-        s = s == null ? queryNew(d, q) : addSorted(s, queryNew(d, q));
+        int oldSize = 0;
+        if (s != null) {
+          BaseX.outln("old:" + s.size());
+          oldSize = s.size();
+        } else BaseX.outln("old: 0");
+        final SeqIter ni = queryNew(d, q);
+        BaseX.outln("add:" + ni.size());
+        s = s == null ? ni : addSorted(s, ni);
+        if (s != null) 
+          BaseX.outln("new:" + s.size() + " " + 
+              (s.size() == oldSize + ni.size()));
       }
-      if (subfile) createQueryEntry(q, s, 1500);
-    }
-    
-    if (subfile) closeSubFile();
-  }
-
-  
-  /**
-   * Performs a single query.
-   * @param db database offset
-   * @param qu query offset
-   * @throws Exception exception
-   */
-  private void query(final int db, final int qu) throws Exception {
-    // query and cache result
-    final String que = subfile ? xqm + "for $i score $s in " 
-        + queries.get(qu) 
-        + " order by $s descending return (basex:sum-path($i), $s)"
-//        + " return $i"
-        : queries.get(qu);
-    final Process proc = new XQuery(que);
-    if(launcher.execute(proc)) {
-      launcher.output(new NullOutput());
-    }
-    final CachedOutput out = new CachedOutput();
-    launcher.info(out);
-
-    final String time = Pattern.compile(".*" +
-        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
-        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
-    
-    if (subfile) {
-      qtimes[qu] += Double.parseDouble(time);
-      final Result val = proc.result();
-      if(val instanceof SeqIter) {
-        final SeqIter itr = (SeqIter) val;
-        // update node path
-        for (int i = 0; i < itr.size(); i++) {
-           if(itr.item[i] instanceof Str) {
-             String str = new String(((Str) itr.item[i]).str());
-             if(str.startsWith("article")) {
-               final int s0 = str.indexOf('[');
-               final int s1 = str.indexOf(']');
-               final int c = Integer.parseInt(str.substring(s0 + 1, s1)) +  
-                 numArt[db];
-               final Str tmp = new Str(("article[" + c + 
-                   str.substring(s1)).getBytes(), false);
-               itr.item[i] = tmp;  
-             }
-           }
-        }
-        if (results[qu] == null) results[qu] = itr; 
-//        else results[qu].add(itr);
-        else results[qu] = addSorted(results[qu], itr);        
-      }
-    }     
-    
-    // output result
-//    log.add("Query " + (qu + 1) +" on " + databases.get(db) + ":" + time);
-    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
-    if(info) {
-//      log.add("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-//          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
-      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+      if (subfile) results[q] = s; 
     }
   }
 
@@ -354,8 +278,11 @@ public final class InexDBTestNew {
         Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
     if (subfile) {
       qtimes[qu] += Double.parseDouble(time);
+      if(server) {
+        
+      }
       final Result val = proc.result();
-      if(val instanceof SeqIter) {
+      if(val != null && val instanceof SeqIter) {
         itr = (SeqIter) val;
         // update node path
         for (int i = 0; i < itr.size(); i++) {
@@ -366,8 +293,13 @@ public final class InexDBTestNew {
                final int s1 = str.indexOf(']');
                final int c = Integer.parseInt(str.substring(s0 + 1, s1)) +  
                  numArt[db];
-               final Str tmp = new Str(("article[" + c + 
-                   str.substring(s1)).getBytes(), false);
+               Str tmp;
+               if (dbpath) {
+                 tmp = new Str((databases.get(db) + ":" + "article[" + 
+                     (c - numArt[db]) + str.substring(s1)).getBytes(), false);
+               } else 
+                 tmp = new Str(("article[" + c + str.substring(s1)).getBytes(), 
+                     false);  
                itr.item[i] = tmp;  
              }
            }
@@ -375,19 +307,82 @@ public final class InexDBTestNew {
       }
     }     
     
-    // output result
-    log.add("Query " + (qu + 1) +" on " + databases.get(db) + ":" + time + NL);
-//    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+    // output result    
+    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
     if(info) {
-      log.add("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
-//      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-//          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
     }
     return itr;
   }
 
   
+  /**
+   * Performs a single query within server mode.
+   * @param db database offset
+   * @param qu query offset
+   * @return iter for the results
+   * @throws Exception exception
+   */
+  private SeqIter queryServer(final int db, final int qu) throws Exception {
+    // query and cache result
+    final String que = subfile ? xqm + "for $i score $s in " 
+        + queries.get(qu) 
+        + " order by $s descending return (basex:sum-path($i), $s)"
+        : queries.get(qu);
+    final Process proc = new XQuery(que);
+    final CachedOutput res = new CachedOutput();
+    if(launcher.execute(proc)) {
+      launcher.output(res);
+    }
+    final CachedOutput out = new CachedOutput();
+    launcher.info(out);
+    SeqIter sq = new SeqIter();
+    
+    final String time = Pattern.compile(".*" +
+        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
+        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+    if (subfile) {
+      qtimes[qu] += Double.parseDouble(time);
+      StringTokenizer st = new StringTokenizer(res.toString(), " ");
+      String lp = new String();
+      while (st.hasMoreTokens()) {
+        final String p = st.nextToken();
+        if (!st.hasMoreTokens()) break;
+        final String s = st.nextToken();
+        if (!lp.equals(p)) {
+          Str str;  
+          // update path
+            if (p.startsWith("article")) {
+              final int s0 = p.indexOf('[');
+              final int s1 = p.indexOf(']');
+              final int n = Integer.parseInt(p.substring(s0 + 1, s1)) +  
+                numArt[db];
+              String a;
+              if (dbpath) 
+                a = databases.get(db) + ":" + "article[" + (n - numArt[db])  
+                  + p.substring(s1);
+              else a = "article[" + n + p.substring(s1);
+              str = new Str(a.getBytes(), false);
+            } else {
+              // [SG] wrong Path is set here
+              str = new Str(p.getBytes(), false);              
+            }
+            str.score(Double.parseDouble(s));
+            lp = p;
+            sq.add(str);
+        } 
+      }
+    }     
+    
+    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+    if(info) {
+      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+    }
+    return sq;
+  }
+
   /**
    * Adds the contents of an iterator in descending order of the score values.
    * @param it1 entry to be added
@@ -418,6 +413,7 @@ public final class InexDBTestNew {
         i1 = it1.next();
         i2 = it2.next();
       }
+      
     }
     while((i1 = it1.next()) != null) {
       tmp.add(i1);
@@ -427,6 +423,36 @@ public final class InexDBTestNew {
       tmp.add(i2);
       tmp.add(it2.next());
     }
+    return tmp;
+  }
+
+
+  /**
+   * Adds the contents of an iterator in descending order of the score values.
+   * @param it1 entry to be added
+   * @param it2 entry to be added
+   * @return SeqIter with all values
+   */
+  public SeqIter addSortedServer(final SeqIter it1, final SeqIter it2) {
+    final SeqIter tmp = new SeqIter();
+    Item i1 = it1.next(), i2 = it2.next();
+    while(i1 != null && i2 != null) {
+      if (i1.score < i2.score) {
+        tmp.add(i2);
+        i2 = it2.next();
+      } else if (i1.score > i2.score) {
+        tmp.add(i1);
+        i1 = it1.next();
+      } else {
+        tmp.add(i2);
+        tmp.add(i1);
+        i1 = it1.next();
+        i2 = it2.next();
+      }
+      
+    }
+    while((i1 = it1.next()) != null) tmp.add(i1);
+    while((i2 = it2.next()) != null) tmp.add(i2);
     return tmp;
   }
 
@@ -443,7 +469,10 @@ public final class InexDBTestNew {
       while(arg.more() && ok) {
         if(arg.dash()) {
           final char c = arg.next();
-          if(c == 'd') {
+          if(c == 'x') {
+            readQueries();
+            return false;
+          } else if(c == 'd') {
             maxdb = Integer.parseInt(arg.string());
           } else if(c == 'q') {
             maxqu = Integer.parseInt(arg.string());
@@ -457,6 +486,8 @@ public final class InexDBTestNew {
             subfile = true;
           } else if(c == 'v') {
             info = true;          
+          } else if(c == 'p') {
+            dbpath = true;          
           } else {
             ok = false;
           }
@@ -538,7 +569,7 @@ public final class InexDBTestNew {
    * @param k max number of results 
    * @throws IOException IOException
    */
-  private static void createQueryEntry(final int q, final SeqIter res, 
+  private static void createQueryEntryServer(final int q, final SeqIter res, 
       final int k) 
   throws IOException {
     xml.openElement(token("topic"),
@@ -548,9 +579,47 @@ public final class InexDBTestNew {
 
     Item a;
     int r = 1;
+    while(res != null && (a = res.next()) != null && r <= k) {
+      xml.openElement(token("result"));
+      xml.openElement(token("file"));
+      xml.text(token("pages"));
+      xml.closeElement();
+      xml.openElement(token("path"));
+      xml.text(a.str());
+      xml.closeElement();
+      xml.openElement(token("rank"));
+      xml.text(token(r++));
+      xml.closeElement();
+      xml.openElement(token("rsv"));
+      xml.text((Double.toString(a.score)).getBytes());
+      xml.closeElement();
+      xml.closeElement();      
+    }
+//    xml.closeElement();
+    xml.closeElement();    
+  }
+  
+  /**
+   * Create query entry in the submission file.
+   * @param q pointer on the query
+   * @param res result set
+   * @param k maximum number of results
+   * @throws IOException Exception
+   */
+  private static void createQueryEntry(final int q, final SeqIter res, 
+      final int k) throws IOException {
+    xml.openElement(token("topic"),
+        token("topic-id"), token(tid[q]),
+        token("total_time_ms"), token(qtimes[q])
+    );
+
+    Item a;
+    int r = 1;
     while(res != null && (a = res.next()) != null) {
       if (r == k) break;
-      if(a instanceof Str) {
+      final Item b = res.next();
+      if(a instanceof Str && b != null && 
+          b instanceof Dbl) {
         xml.openElement(token("result"));
         xml.openElement(token("file"));
         xml.text(token("pages"));
@@ -561,56 +630,59 @@ public final class InexDBTestNew {
         xml.openElement(token("rank"));
         xml.text(token(r++));
         xml.closeElement();
-      } else if(a instanceof Dbl) {
         xml.openElement(token("rsv"));
-        xml.text(a.str());
+        xml.text(b.str());
         xml.closeElement();
         xml.closeElement();
       }
     }
-//    xml.closeElement();
     xml.closeElement();    
   }
   
   /**
-  private static void print(final int q, final SeqIter res) 
-    throws IOException {
-
-    Item a;
-    int r = 1;
-    while(res != null && (a = res.next()) != null) {
-      if(a instanceof Str) {
-        System.out.println(a.str());
-        System.out.println(new String(token(r++)));
-      } else if(a instanceof Dbl) {
-        System.out.println(new String(a.str()));
-      }
+   * Read and backup all queries from file.
+   * @throws Exception FileNotFoundException
+   */
+  public void readQueries() throws Exception {
+    final File file = new File("co.que");
+    if(!file.exists()) {
+      System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
+      return;
     }
-  }
-   */
 
-  
-  /**
-   * Create and print submission file.
-   * @throws Exception Exception
-  private static void createSubFile() throws Exception {
-    openSubFile();
-    for (int j = 0; j < queries.size(); j++) 
-//      print(j, results[j]);
-      createQueryEntry(j, results[j]);
-    closeSubFile();
+    // scan all queries
+    final FileInputStream fis = new FileInputStream(file);
+    final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
+    final BufferedReader br = new BufferedReader(isr);
+    String line = null;
+    while((line = br.readLine()) != null) {
+      // extract topic id
+      int s0 = line.indexOf('"');
+      int s1 = line.indexOf('"', s0 + 1);
+      final int topicid = Integer.parseInt(line.substring(s0 + 1, s1));
+      // extract content id
+      s0 = line.indexOf('"', s1 + 1);
+      s1 = line.indexOf('"', s0 + 1);
+      final int contentid = Integer.parseInt(line.substring(s0 + 1, s1));
+      // extract query
+      s0 = line.indexOf('/', s1);
+      String q = line.substring(s0);
+
+      q = replaceElements(q);
+      System.out.println(topicid + ";" + contentid + ";" + q);
+    }
+    br.close();
   }
-   */
-  
+   
   /**
    * Replaces dedicated nodes by an or expression.
    * [(a|b) ftcontains "c"] => [a ftcontains "c" or [b ftcontains "c"]
    * @param str Sting query to be replaced
    * @return replaced query String
    */
-/*  private static String replaceElements(final String str) {
+  private static String replaceElements(final String str) {
     byte[] b = str.getBytes();
-    final byte[] or = new byte[]{' ', 'o', 'r', ' '};
+//    final byte[] or = new byte[]{' ', 'o', 'r', ' '};
     final byte[] co = new byte[]{' ', '|', ' '};
     final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
     int i = 0;
@@ -707,7 +779,8 @@ public final class InexDBTestNew {
               bn = Array.add(bn, tok[k], 0, tok[k].length);
               bn = Array.add(bn, b, i, ebb);
               if (k < tok.length - 1)
-                bn = Array.add(bn, or, 0, or.length);
+                bn = Array.add(bn, co, 0, co.length);
+//                bn = Array.add(bn, or, 0, or.length);
             }
             bn = Array.add(bn, b, ebb, b.length);
             b = bn;
@@ -761,5 +834,5 @@ public final class InexDBTestNew {
     }
     return new String(b);
   }
-*/
+
 }
