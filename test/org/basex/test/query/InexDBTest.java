@@ -19,6 +19,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.CachedOutput;
 import org.basex.io.NullOutput;
+import org.basex.io.PrintOutput;
 import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -33,9 +34,9 @@ import org.basex.util.StringList;
  */
 public final class InexDBTest {
   /** Queries. */
-  private static final String QUERIES = "rewritten.que";
+  private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "inex";
+  private static final String DBPREFIX = "pages";
 
   /** Database context. */
   private Context ctx = new Context();
@@ -58,7 +59,9 @@ public final class InexDBTest {
   private boolean total;
   /** Shows process info. */
   private boolean info;
-
+  /** Container for qtimes and results. */
+  private PrintOutput res;
+  
   /**
    * Main test method.
    * @param args command-line arguments
@@ -80,7 +83,8 @@ public final class InexDBTest {
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     queries = new StringList();
     String l;
-    while((l = br.readLine()) != null && queries.size() < maxqu) queries.add(l);
+    while((l = br.readLine()) != null && queries.size() < maxqu) 
+      queries.add(l.substring(l.indexOf('/')));
     br.close();
 
     // cache database names
@@ -94,11 +98,15 @@ public final class InexDBTest {
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
         queries.size(), databases.size(), runs, total ? "total" : "evaluation");
 
+    res = new PrintOutput("times");
+    
     // run test
     final Performance p = new Performance();
     if(server) test();
     else testLocal();
     System.out.println("Total Time: " + p.getTimer());
+    res.flush();
+    res.close();
   }
 
   /**
@@ -106,11 +114,12 @@ public final class InexDBTest {
    * @throws Exception exception
    */
   private void test() throws Exception {
+    launcher.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
       launcher.execute(new Open(databases.get(d)));
-      for(int q = 0; q < queries.size(); q++) query(d, q);
+      for(int q = 0; q < queries.size(); q++) queryResults(d, q);
       launcher.execute(new Close());
     }
   }
@@ -162,7 +171,40 @@ public final class InexDBTest {
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
     }
   }
+  
+  /**
+   * Performs a single query.
+   * @param db database offset
+   * @param qu query offset
+   * @throws Exception exception
+   */
+  private void queryResults(final int db, final int qu) throws Exception {
+    byte[] r = null;
+    if(launcher.execute(new XQuery(queries.get(qu)))) {
+      final CachedOutput o = new CachedOutput();
+      launcher.output(o);
+       r = o.finish();
+    }
+    final CachedOutput out = new CachedOutput();
+    launcher.info(out);
+    final String time = Pattern.compile(".*" +
+        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
+        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
 
+    // output result
+    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+    if(info) {
+      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+    }
+    
+    if (r != null) {
+      res.println(time);      
+    }
+
+  }
+
+  
   /**
    * Parses the command-line arguments.
    * @param args the command-line arguments
