@@ -163,7 +163,7 @@ public final class FSParser extends Parser {
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
 
-      builder.startNS(FSPREF, FSURL);
+      builder.startNS(FS, FSURL);
       if(prop.is(Prop.FSMETA)) {
         builder.startNS(FSMETAPREF, FSMETAURL);
       }

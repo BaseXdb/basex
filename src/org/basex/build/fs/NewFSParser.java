@@ -67,7 +67,7 @@ public final class NewFSParser extends Parser {
     // [BL] temporary hack to enable fsviews. pls, remove FS in code below,
     // where
     // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
-    FS("", "http://www.deepfs.org/fs/1.0/"),
+    DEEPFSURL("", "http://www.deepfs.org/fs/1.0/"),
         /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
         /** Dublin Core metadata terms namespace. */
@@ -124,19 +124,19 @@ public final class NewFSParser extends Parser {
   }
 
   /** DeepFS tag in fs namespace. */
-  private static final byte[] DEEPFS_NS = NewFSParser.NS.FS.tag(DEEPFS);
+  private static final byte[] DEEPFS_NS = NewFSParser.NS.DEEPFSURL.tag(DEEPFS);
   /** Directory tag in fs namespace. */
-  private static final byte[] DIR_NS = NewFSParser.NS.FS.tag(DIR);
+  private static final byte[] DIR_NS = NewFSParser.NS.DEEPFSURL.tag(DIR);
   /** File tag in fs namespace. */
-  private static final byte[] FILE_NS = NewFSParser.NS.FS.tag(FILE);
+  private static final byte[] FILE_NS = NewFSParser.NS.DEEPFSURL.tag(FILE);
   /** Content tag in fs namespace. */
-  private static final byte[] CONTENT_NS = NewFSParser.NS.FS.tag(CONTENT);
+  private static final byte[] CONTENT_NS = NewFSParser.NS.DEEPFSURL.tag(CONTENT);
   /** Text content tag in fs namespace. */
   private static final byte[] TEXT_CONTENT_NS =
-      NewFSParser.NS.FS.tag(TEXT_CONTENT);
+      NewFSParser.NS.DEEPFSURL.tag(TEXT_CONTENT);
   /** XML content tag in fs namespace. */
   private static final byte[] XML_CONTENT_NS =
-      NewFSParser.NS.FS.tag(XML_CONTENT);
+      NewFSParser.NS.DEEPFSURL.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 
@@ -394,7 +394,7 @@ public final class NewFSParser extends Parser {
       atts.add(SIZE, ZERO);
 
       // define namespaces
-      builder.startNS(FSPREF, FSURL);
+      builder.startNS(FS, FSURL);
       if(prop.is(Prop.FSMETA)) {
         builder.startNS(FSMETAPREF, FSMETAURL);
         builder.startNS(FSDCPREF, FSDCURL);

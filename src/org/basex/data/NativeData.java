@@ -23,6 +23,12 @@ public final class NativeData extends MemData {
    * @param cap initial capacity of pre/dist/size table.
    */
   private native void jniInit(final int cap);
+  
+  /** Pass strings to native environment. 
+   * @param a string to be passed
+   * @param b string to be passed
+   */
+  private native void passString(final String a, final String b);
 
   /**
    * Constructor.
@@ -37,5 +43,6 @@ public final class NativeData extends MemData {
       final Namespaces n, final PathSummary s, final Prop pr) {
     super(cap, tag, att, n, s, pr);
     jniInit(cap);
+    passString("abäßcd", "ab€£ﬁ#cd");
   }
 }

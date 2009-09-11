@@ -74,20 +74,43 @@ public interface DataText {
   String DBNS = "NS";
 
   // DEEPFS STRINGS ===========================================================
-
+  /** DeepFS tag. */
+  String S_DEEPFS = "deepfs";
+  /** Directory tag. */
+  String S_DIR = "fs:dir";
+  /** File tag. */
+  String S_FILE = "fs:file";
   /** Time of last modification. */
   String S_NAME = "name";
   /** Time of last modification. */
   String S_SIZE = "size";
   /** Time of last modification. */
   String S_MTIME = "mtime";
+  /** Time of last access token. */
+  String S_ATIME = "atime";
+  /** Time of creation token. */
+  String S_CTIME = "ctime";
+  /** Number of links token. */
+  String S_NLINK = "nlink";
+  /** User ID token. */
+  String S_UID = "uid";
+  /** Group ID token. */
+  String S_GID = "gid";
   /** Time of last modification. */
   String S_SUFFIX = "suffix";
-
   /** DeepFS prefix. */
-  byte[] FSPREF = token("fs");
+  String S_FS = "fs";
+  /** DeepFS URL string. */
+  String S_FSURL = "http://www.deepfs.org/fs/1.0/";
+  /** XMLNS prefix. */
+  String S_XMLNS = "xmlns";
+  /** DeepFS namespace declaration. */
+  String S_DPFSNS = "declare namespace fs = \"" + S_FSURL + "\"; ";
+  
+  /** DeepFS prefix. */
+  byte[] FS = token(S_FS);
   /** DeepFS url. */
-  byte[] FSURL = token("http://www.deepfs.org/fs/1.0/");
+  byte[] FSURL = token(S_FSURL);
   /** DeepFS prefix. */
   byte[] FSMETAPREF = token("fsmeta");
   /** DeepFS url. */
@@ -102,13 +125,11 @@ public interface DataText {
   byte[] FSXSIURL = token("http://www.w3.org/2001/XMLSchema-instance");
 
   /** DeepFS token. */
-  // [BL] ..namespaces need to defined on top of DeepFS XML instance
-  // byte[] DEEPFS = NewFSParser.NS.FS.tag("deepfs");
-  byte[] DEEPFS = token("fs:deepfs");
-  /** Directory tag. */
-  byte[] DIR = token("fs:dir");
-  /** File tag. */
-  byte[] FILE = token("fs:file");
+  byte[] DEEPFS = token(S_DEEPFS);
+  /** Directory token. */
+  byte[] DIR = token(S_DIR);
+  /** File token. */
+  byte[] FILE = token(S_FILE);
   /** Content tag. */
   byte[] CONTENT = token("content");
   /** Text content tag. */
@@ -118,12 +139,22 @@ public interface DataText {
   /** Unknown tag (place holder). */
   byte[] UNKNOWN = token("unknown");
 
-  /** Name attribute. */
+  /** Name attribute token. */
   byte[] NAME = token(S_NAME);
-  /** Size attribute. */
+  /** Size attribute token. */
   byte[] SIZE = token(S_SIZE);
-  /** Time of last modification. */
+  /** Time of last modification token. */
   byte[] MTIME = token(S_MTIME);
+  /** Time of last access token. */
+  byte[] ATIME = token(S_ATIME);
+  /** Time of creation token. */
+  byte[] CTIME = token(S_CTIME);
+  /** Number of links token. */
+  byte[] NLINK = token(S_NLINK);
+  /** User ID token. */
+  byte[] UID = token(S_UID);
+  /** Group ID token. */
+  byte[] GID = token(S_GID);
   /** Suffix attribute. */
   byte[] SUFFIX = token(S_SUFFIX);
   /** Offset attribute. */

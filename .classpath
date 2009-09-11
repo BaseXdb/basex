@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/package.html" kind="src" path="src"/>
+	<classpathentry excluding="**/package.html" kind="src" path="src">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="basex/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="**/package.html" kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/jfuse.jar" sourcepath="lib/jfuse.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,19 +1,26 @@
-package org.basex.fuse;
+package org.deepfs;
+
+import static org.catacombae.jfuse.types.system.StatConstant.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
+
 import org.basex.BaseX;
-import org.basex.core.Context;
+import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
+import org.catacombae.jfuse.types.system.Stat;
+import org.deepfs.fs.DeepFS;
+
 
 /**
  * Rudimentary shell to interact with a file hierarchy stored in XML.
@@ -34,20 +41,18 @@ public final class DeepShell {
     String help();
   }
 
-  /** Context. */
-  private final Context ctx = new Context();
   /** Filesystem reference. */
-  private final DeepFS fs = new DeepFS(ctx, "deepshell");
+  private final DeepFS fs;
 
   /** Shell prompt. */
   private static final String PS1 = "$ ";
 
   /** Constructor. */
   DeepShell() {
-    BaseX.errln("DeepShell");
-    //fs.init();
+    BaseX.debug("[DeepShell]");
+    fs = new DeepFS("deepshell");
     loop();
-    ctx.close();
+    fs.umount();
   }
 
   /** Rudimentary shell. */
@@ -76,7 +81,7 @@ public final class DeepShell {
         }
       }
       BaseX.out(
-          "%s: commmand not found. Type 'help' for available commands.\n",
+          "%: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -89,7 +94,7 @@ public final class DeepShell {
    * @return user input
    */
   private String input(final String prompt) {
-    System.out.println(prompt);
+    System.out.print(prompt);
     // get user input
     try {
       final InputStreamReader isr = new InputStreamReader(System.in);
@@ -127,7 +132,7 @@ public final class DeepShell {
       help(new String[] { "help", "mkdir"});
       return;
     }
-    final int err = fs.mkdir(args[1], DeepFuse.S_IFDIR | 0775);
+    final int err = fs.mkdir(args[1], S_IFDIR.getNativeValue() | 0775);
     if(err == -1) System.err.printf("mkdir failed. %d\n", err);
   }
 
@@ -162,6 +167,44 @@ public final class DeepShell {
   }
 
   /**
+   * Prints stat information of file to stdout.
+   * @param args argument vector
+   */
+  @Command(shortcut = 's',
+      args = "<file_name>", help = "display file status")
+  public void stat(final String[] args) {
+    if(args.length != 2) {
+      help(new String[] { "help", "stat"});
+      return;
+    }
+    final Stat stat = new Stat();
+    int rc = fs.stat(args[1], stat);
+    if(rc == -1) System.err.printf("stat failed.\n");
+    PrintStream ps = new PrintStream(System.out);
+    stat.printFields("deepshell: ", ps);
+    ps.flush();
+  }
+  
+  /**
+   * Prints stat information of file to stdout.
+   * @param args argument vector
+   */
+  @Command(shortcut = 'i',
+      args = "", help = "info table (BaseX command)")
+  public void info(final String[] args) {
+    if(args.length != 1) {
+      help(new String[] { "help", "info"});
+      return;
+    }
+    try {
+      new InfoTable(null, null).execute(fs.getContext(), new PrintOutput(System.out));
+      //output(new PrintOutput(System.out));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
    * Prints short help message for available commands.
    * @param args argument vector
    */
@@ -187,8 +230,7 @@ public final class DeepShell {
    */
   @Command(shortcut = 'q', help = "quit shell (unmounts fuse and closes db)")
   public void quit(@SuppressWarnings("unused") final String[] args) {
-    // unmount filesystem
-    fs.destroy();
+    fs.umount();
     BaseX.outln("cu");
     System.exit(0);
   }
@@ -197,13 +239,14 @@ public final class DeepShell {
    * Serialize FS instance.
    * @param args argument vector (currently not used)
    */
-  @Command(shortcut = 's', help = "print file hierarchy as XML")
+  @Command(shortcut = 'x', help = "print file hierarchy as XML")
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
-      final Nodes n = new QueryProcessor("/", ctx).queryNodes();
+      final Nodes n = new QueryProcessor("/", fs.getContext()).queryNodes();
       final PrintOutput out = new PrintOutput(System.out);
       final XMLSerializer xml = new XMLSerializer(out, false, true);
       n.serialize(xml);
+      out.flush();
       xml.close();
     } catch(final Exception ex) {
       ex.printStackTrace();

@@ -23,10 +23,14 @@ public final class Token {
   public static final byte[] EMPTY = {};
   /** XML Token. */
   public static final byte[] XML = token("xml");
+  /** XMLNS String. */
+  public static final String S_XMLNS = "xmlns";
   /** XMLNS Token. */
-  public static final byte[] XMLNS = token("xmlns");
+  public static final byte[] XMLNS = token(S_XMLNS);
+  /** XMLNS String with colon. */
+  public static final String S_XMLNSC = "xmlns:";
   /** XMLNS Token with colon. */
-  public static final byte[] XMLNSC = token("xmlns:");
+  public static final byte[] XMLNSC = token(S_XMLNSC);
   /** True token. */
   public static final byte[] TRUE = token("true");
   /** False token. */

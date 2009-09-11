@@ -13,7 +13,6 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fuse.DeepFS;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
@@ -21,6 +20,7 @@ import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.deepfs.fs.DeepFS;
 
 /**
  * Paint filesystem specific TreeMap rectangles.

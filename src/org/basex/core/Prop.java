@@ -87,7 +87,7 @@ public final class Prop extends AProp {
   public static final Object[] SKIP = { "SKIP", true };
 
   /** Debug mode. */
-  public static final Object[] DEBUG = { "DEBUG", false };
+  public static final Object[] DEBUG = { "DEBUG", true };
   /** Web server mode. */
   public static final Object[] WEB = { "WEB", false };
 

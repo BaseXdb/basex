@@ -3,13 +3,13 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.fuse.DeepFS;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.deepfs.fs.DeepFS;
 
 /**
  * This class provides access to the database. The storage
@@ -77,7 +77,8 @@ public abstract class Data {
    */
   @SuppressWarnings("unused")
   public void init() throws IOException {
-    if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
+    // [AH] check later  
+    //if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
   }
@@ -268,7 +269,7 @@ public abstract class Data {
 
   /**
    * Finds the specified attribute and returns its value.
-   * @param att attribute to be found
+   * @param att the attribute id of the attribute to be found
    * @param pre pre value
    * @return attribute value
    */
