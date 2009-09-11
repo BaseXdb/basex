@@ -381,6 +381,7 @@ public final class InexDBTestNew {
       StringTokenizer st = new StringTokenizer(res.toString(), " ");
       String lp = new String();
       while (st.hasMoreTokens()) {
+        qtimes[qu] += qt[db * 115 + qu];
         final String p = st.nextToken();
         if (!st.hasMoreTokens()) break;
         final String s = st.nextToken();
@@ -393,8 +394,7 @@ public final class InexDBTestNew {
           str.score(Double.parseDouble(s));
           sq.add(str);
           lp = tmp;
-        }
-      qtimes[qu] += qt[db * 115 + qu];
+        }      
       }
     }     
     
@@ -668,7 +668,7 @@ public final class InexDBTestNew {
           "total_time_ms=\"".length();
         final int e = l.lastIndexOf('"');
         final double ti = Double.parseDouble(l.substring(s, e));
-        if (ti > tmp[i]) o.write((l.substring(0, s) + 
+        if (ti > tmp[i] || ti == 0) o.write((l.substring(0, s) + 
             tmp[i] + l.substring(e) + NL).getBytes());
         else o.write((l + NL).getBytes());
       } else o.write((l + NL).getBytes());
