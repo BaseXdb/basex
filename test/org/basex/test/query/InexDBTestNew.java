@@ -557,8 +557,8 @@ public final class InexDBTestNew {
     sub = new PrintOutput("submission.xml");
     xml = new XMLSerializer(sub, false, true);
 //  <!DOCTYPE efficiency-submission SYSTEM 'efficiency-submission.dtd'>
-    xml.doctype("efficiency-submission".getBytes(), 
-        "'efficiency-submission.dtd'".getBytes(), null);
+  //  xml.doctype("efficiency-submission".getBytes(), 
+  //      "'efficiency-submission.dtd'".getBytes(), null);
 
 //    xml.openElement(token("efficiency-submission"));
     // print header in output file

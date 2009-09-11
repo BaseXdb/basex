@@ -166,7 +166,7 @@ public final class Prop extends AProp {
   // DEEPFS OPTIONS ===========================================================
 
   /** FSParser implementation. If true, the new implementation is used. */
-  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", true };
+  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
   /** Fuse support. */
   public static final Object[] FUSE = { "FUSE", false };
   /** Flag for creating a native (joint) database. */
