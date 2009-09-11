@@ -36,7 +36,7 @@ public final class InexDBTest {
   /** Queries. */
   private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "pages";
+  private static final String DBPREFIX = "inex";
 
   /** Database context. */
   private Context ctx = new Context();
@@ -183,7 +183,7 @@ public final class InexDBTest {
     if(launcher.execute(new XQuery(queries.get(qu)))) {
       final CachedOutput o = new CachedOutput();
       launcher.output(o);
-       r = o.finish();
+      r = o.finish();
     }
     final CachedOutput out = new CachedOutput();
     launcher.info(out);
@@ -198,12 +198,8 @@ public final class InexDBTest {
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
     }
     
-    if (r != null) {
-      res.println(time);      
-    }
-
+    if(r != null) res.println(time);
   }
-
   
   /**
    * Parses the command-line arguments.

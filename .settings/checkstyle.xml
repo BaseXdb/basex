@@ -49,7 +49,6 @@
         <module name="TypecastParenPad">
             <property name="tokens" value="RPAREN,TYPECAST"/>
         </module>
-        <module name="TabCharacter"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <property name="tokens" value="COLON,NOT_EQUAL,QUESTION,DIV,DIV_ASSIGN,BXOR,BXOR_ASSIGN,MINUS,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND,BAND,LAND,BAND_ASSIGN,MOD,MOD_ASSIGN,PLUS,PLUS_ASSIGN,LT,SL,SL_ASSIGN,LE,ASSIGN,MINUS_ASSIGN,EQUAL,GT,GE,SR,SR_ASSIGN,BSR,BSR_ASSIGN,BOR,BOR_ASSIGN,LOR,LITERAL_ASSERT,LITERAL_ASSERT,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_RETURN,SLIST,LITERAL_TRY"/>
@@ -124,7 +123,6 @@
             <property name="severity" value="ignore"/>
         </module>
     </module>
-    <module name="PackageHtml"/>
     <module name="Translation"/>
     <module name="StrictDuplicateCode">
         <property name="severity" value="ignore"/>
