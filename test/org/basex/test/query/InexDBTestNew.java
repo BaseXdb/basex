@@ -147,7 +147,7 @@ public final class InexDBTestNew {
       queries.add(l.substring(j + 1));
     }
     br.close();
-
+    
     if (subfile) {
       // alocate space for query times
       qtimes = new double[queries.size()];
@@ -167,6 +167,8 @@ public final class InexDBTestNew {
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
         queries.size(), databases.size(), runs, total ? "total" : "evaluation");
 
+//    sum();
+    
     // get number of articles for each db
     /*numArt = new int[databases.size()];
     int last = 0;
@@ -206,6 +208,24 @@ public final class InexDBTestNew {
     new InexDBTestNew(args);
   }
 
+  /**
+   * Second test, opening each databases before running the queries.
+   * @throws Exception exception
+   */
+  private void testSingleDB(final int d) throws Exception {
+    launcher.execute(new Set(Prop.SERIALIZE, true));
+    // loop through all databases
+    // open database and loop through all queries
+    launcher.execute(new Open(databases.get(d)));
+    for(int q = 0; q < queries.size(); q++) {
+      final SeqIter s = queryServer(d, q);
+      if (results[q] != null) results[q] = addSortedServer(results[q], s);
+      else results[q] = s;
+    }
+    launcher.execute(new Close());
+  }
+
+  
   /**
    * Second test, opening each databases before running the queries.
    * @throws Exception exception
@@ -493,6 +513,11 @@ public final class InexDBTestNew {
             info = true;          
           } else if(ca == 'p') {
             dbpath = true;          
+          } else if(ca == 'u') {
+            final String[] s = new String[args.length - 1];
+            System.arraycopy(args, 1, s, 0, s.length);
+            updateTimes(s);
+            return false;
           } else {
             ok = false;
           }
@@ -531,13 +556,16 @@ public final class InexDBTestNew {
   private static void openSubFile() throws Exception {
     sub = new PrintOutput("submission.xml");
     xml = new XMLSerializer(sub, false, true);
-    xml.openElement(token("efficiency-submission"));
-  
+//  <!DOCTYPE efficiency-submission SYSTEM 'efficiency-submission.dtd'>
+    xml.doctype("efficiency-submission".getBytes(), 
+        "'efficiency-submission.dtd'".getBytes(), null);
+
+//    xml.openElement(token("efficiency-submission"));
     // print header in output file
     xml.openElement(token("efficiency-submission"),
-        token("participant-id"), token("1111111"),
+        token("participant-id"), token("304"),
         token("run-id"), token("1111111"),
-        token("taks"), token(task[0]),
+        token("task"), token(task[0]),
         token("type"), token(type[0]),
         token("query"), token(query[0]),
         token("sequential"), token("yes")
@@ -550,22 +578,106 @@ public final class InexDBTestNew {
         token("description"), token("no"),
         token("narrative"), token("no")
     );
-    xml.emptyElement(token("general_description"));
-    xml.emptyElement(token("ranking_description"));
-    xml.emptyElement(token("indexing_description"));
-    xml.emptyElement(token("caching_description"));
+    
+    xml.openElement(token("general_description"));
+    xml.text(("By using a distributed adaption of our xml database system " + 
+        "(BaseX - www.basex.org) we are focused on efficient " +  
+        "evalutaion of xpath queries. The architecture of BaseX combined " + 
+        "with special evaluation strategies provides index usage for any " + 
+        "types of xpath full-text queries. " +
+        "Hence our performance measurements include the total " + 
+        "time both for accessing the indexes as well as " +
+        "traversing the specified location path.").getBytes());
+    xml.closeElement();
+    xml.openElement(token("ranking_description"));
+    xml.text(("We are using both a content based ranking as well as " + 
+        "a structural based ranking. At first a content based weight " + 
+        "is estimated and later refiened for each location step. " +
+        "The weights are based on meta information.").getBytes());
+    xml.closeElement();
+    xml.openElement(token("indexing_description"));
+    xml.text(("A customized and highly optimized full-text index " +  
+        "structure is used as backend. It enablese both fast standard " + 
+        "and fuzzy searching. There's no further stuctural information " +
+        "kept (like pathes) beside the token position and pointer on the " + 
+        "text node contaning the indexed token. Combined with the main " + 
+        "database table it's usage for fast query evaluation is complitly " +
+        "flexible.").getBytes());
+    xml.closeElement();
+    xml.openElement(token("caching_description"));
+    xml.text(("Because of the size of the wikipedia instance, the main " +
+        "memory of our database server could not keep it. Both the " + 
+        "distrubuted database as well as the full-text index structure " + 
+        "are diskbased and don't utilize any chaching machanisms.").getBytes());
+    xml.closeElement();
   }
   /**
    * Create and print submission file.
    * @throws Exception Exception
    */
   private static void closeSubFile() throws Exception {
-    xml.closeElement();
+//    xml.closeElement();
     xml.closeElement();
     xml.close();
     sub.close();
   }
 
+  
+  /**
+   * Update query times in submission.xml.
+   * @param args files with times
+   * @throws IOException IOException
+   */
+  private void updateTimes(final String[] args) throws IOException {
+    final BufferedReader[] bf = new BufferedReader[args.length];
+    for (int j = 0; j < bf.length; j++) 
+      bf[j] = new BufferedReader(new FileReader(args[j]));
+    
+    final int numdb = 10;
+    final int numq = 115;
+    final double[] qut = new double[numq * numdb];
+    String l;
+    int i = 0;
+    while ((l = bf[0].readLine()) != null) qut[i++] = Double.parseDouble(l);
+    bf[0].close();
+    
+    for (int j = 1; j < bf.length; j++) {
+      i = 0;
+      while ((l = bf[j].readLine()) != null) {  
+        qut[i] = Math.min(qut[i], Double.parseDouble(l));
+        i++;
+      }
+      bf[j].close();
+    }
+    
+    
+    final double[] tmp = new double[numq];
+    for (int j = 0; j < tmp.length; j++) {
+      for (int z = 0; z < numdb; z++) {
+        tmp[j] += qut[j + z * numq];
+      }
+    }
+    
+    final BufferedReader br = 
+      new BufferedReader(new FileReader("submission.xml"));
+    final PrintOutput o = new PrintOutput("submissionU.xml");
+    i = 0;
+    while ((l = br.readLine()) != null) {
+      if (l.contains("<topic topic-id=")) {
+        final int s = l.indexOf("total_time_ms=\"") + 
+          "total_time_ms=\"".length();
+        final int e = l.lastIndexOf('"');
+        final double ti = Double.parseDouble(l.substring(s, e));
+        if (ti > tmp[i]) o.write((l.substring(0, s) + 
+            tmp[i] + l.substring(e) + NL).getBytes());
+        else o.write((l + NL).getBytes());
+      } else o.write((l + NL).getBytes());
+    }
+    br.close();
+    o.flush();
+    o.close();
+    System.out.println("Updated");
+  }
   /**
    * Create subfile entry for a query result. 
    * 
@@ -886,4 +998,21 @@ public final class InexDBTestNew {
     return new String(b);
   }
 
+  /**
+   * Sum up processing times.
+   */
+  public void sum() {
+    int size = 10; //databases.size();
+    final double[] sum = new double[queries.size()];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < sum.length; j++) {
+        sum[j] = qt[i * sum.length + j];
+      }
+    }
+    for (int j = 0; j < sum.length; j++) {
+      System.out.println("query" + j + ":" + sum[j]);
+    }
+
+  }
+  
 }
