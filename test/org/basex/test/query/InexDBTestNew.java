@@ -551,8 +551,8 @@ public final class InexDBTestNew {
     sub = new PrintOutput("submission.xml");
     xml = new XMLSerializer(sub, false, true);
 //  <!DOCTYPE efficiency-submission SYSTEM 'efficiency-submission.dtd'>
-  //  xml.doctype("efficiency-submission".getBytes(),
-  //      "'efficiency-submission.dtd'".getBytes(), null);
+  //  xml.doctype(token("efficiency-submission"),
+  //      token("'efficiency-submission.dtd'"), null);
 
     // print header in output file
     xml.openElement(token("efficiency-submission"),
@@ -654,10 +654,13 @@ public final class InexDBTestNew {
           "total_time_ms=\"".length();
         final int e = l.lastIndexOf('"');
         final double ti = Double.parseDouble(l.substring(s, e));
-        if (ti > tmp[i] || ti == 0) o.write((l.substring(0, s) +
-            tmp[i] + l.substring(e) + NL).getBytes());
-        else o.write((l + NL).getBytes());
-      } else o.write((l + NL).getBytes());
+        if(ti > tmp[i] || ti == 0) {
+          o.print(l.substring(0, s) + tmp[i] + l.substring(e));
+        } else {
+          o.print(l);
+        }
+      } else o.print(l);
+      o.print(NL);
     }
     br.close();
     o.flush();
@@ -827,7 +830,7 @@ public final class InexDBTestNew {
    * @return replaced query String
    */
   private static String replaceElements(final String str) {
-    byte[] b = str.getBytes();
+    byte[] b = token(str);
 //    final byte[] or = new byte[]{' ', 'o', 'r', ' '};
     final byte[] co = new byte[]{' ', '|', ' '};
     final byte[] txt = new byte[]{'/', 't', 'e', 'x', 't', '(', ')'};
