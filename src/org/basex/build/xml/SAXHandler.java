@@ -1,5 +1,6 @@
 package org.basex.build.xml;
 
+import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -31,8 +32,12 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Document flag; if true, a document node is added. */
   boolean doc = true;
 
-  // needed for XMLEntityManager: increase entity limit
-  static { System.setProperty("entityExpansionLimit", "536870912"); }
+  static {
+    // needed for XMLEntityManager: increase entity limit
+    System.setProperty("entityExpansionLimit", "536870912");
+    // needed for frequently visited sites: modify user agent
+    System.setProperty("http.agent", NAME);
+  }
 
   /**
    * Constructor.
