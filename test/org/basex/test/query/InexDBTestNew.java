@@ -659,6 +659,7 @@ public final class InexDBTestNew {
         } else {
           o.print(l);
         }
+        i++;
       } else o.print(l);
       o.print(NL);
     }
