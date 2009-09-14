@@ -1,18 +1,12 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.query.up.UpdateFunctions.*;
-
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
-import org.basex.util.IntList;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Nod;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -22,17 +16,20 @@ import org.basex.util.IntList;
  * @author Lukas Kircher
  */
 public class PendingUpdates {
-  /** Holds delete primitives. */
-  ArrayList<UpdatePrimitive> deletes;
-  /** Holds rename primitives. */
-  ArrayList<UpdatePrimitive> renames;
+  /** Delete primitives. */
+  ArrayList<DeletePrimitive> deletes;
+  /** Rename primitives. */
+  ArrayList<RenamePrimitive> renames;
+  /** Replace primitives. */
+  ArrayList<ReplacePrimitive> replaces;
   
   /**
    * Constructor.
    */
   public PendingUpdates() {
-    deletes = new ArrayList<UpdatePrimitive>();
-    renames = new ArrayList<UpdatePrimitive>();
+    deletes = new ArrayList<DeletePrimitive>();
+    renames = new ArrayList<RenamePrimitive>();
+    replaces = new ArrayList<ReplacePrimitive>();
   }
   
   /**
@@ -40,43 +37,25 @@ public class PendingUpdates {
    * @param p primitive to add
    */
   public void addPrimitive(final UpdatePrimitive p) {
-    if(p instanceof DeletePrimitive) deletes.add(p);
-    if(p instanceof RenamePrimitive) renames.add(p);
-  }
-  
-  /**
-   * Checks all update operations for correctness. 
-   * XQueryUP specification 3.2.2
-   * @throws QueryException query exception
-   */
-  private void checkConstraints() throws QueryException {
-    final Set<Integer> err = new HashSet<Integer>();
-    for(final UpdatePrimitive p : renames)
-      if(!err.add(p.id)) Err.or(INCOMPLETE, p);
-    err.clear();
-    for(final UpdatePrimitive p : deletes)
-      if(!err.add(p.id)) Err.or(INCOMPLETE, p);
+    if(p instanceof DeletePrimitive) deletes.add((DeletePrimitive) p);
+    if(p instanceof RenamePrimitive) renames.add((RenamePrimitive) p);
+    if(p instanceof ReplacePrimitive) replaces.add((ReplacePrimitive) p);
   }
   
   /**
    * Applies all update primitives to the database if no constraints are hurt.
    * XQueryUP specification 3.2.2
-   * @param ctx query context
-   * @throws QueryException query exception
    */
-  public void applyUpdates(final QueryContext ctx) throws QueryException {
-    checkConstraints();
-    final Data data = ctx.data();
-    // [LK] temporarily added to suppress error for queries without database
-    if(data == null) return;
-
-    for(final UpdatePrimitive p : renames) {
-      final RenamePrimitive rp = (RenamePrimitive) p;
-      rename(rp.id, rp.newName, data);
+  public void applyUpdates()  {
+    // [LK] check constraints
+    
+    // [LK] apply updates
+    final Map<Data, DBNode> delData = new HashMap<Data, DBNode>();
+    ArrayList<Nod> delFrag = new ArrayList<Nod>();
+    for(final DeletePrimitive p : deletes) {
+      final Nod n = p.node;
+      if(n instanceof DBNode) delData.put(((DBNode) n).data, (DBNode) n);
+      else delFrag.add(n);
     }
-    // apply deletes
-    final IntList il = new IntList();
-    for(final UpdatePrimitive p : deletes) il.add(p.pre);
-    delete(new Nodes(il.finish(), data));
   }
 }

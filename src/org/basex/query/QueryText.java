@@ -25,8 +25,11 @@ public interface QueryText {
   /** XPTY Error type. */ String XPTY = "XPTY";
   /** XQDY Error type. */ String XQDY = "XQDY";
   /** XQST Error type. */ String XQST = "XQST";
-  /** XQUS Error type. */ String XUST = "XQUS";
   /** XQTY Error type. */ String XQTY = "XQTY";
+  /** XUDY Error type. */ String XUDY = "XUDY";
+  /** XQUS Error type. */ String XUST = "XQUS";
+  /** XUTY Error type. */ String XUTY = "XUTY";
+
 
   /** BASX0001: Evaluation exception. */
   Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
@@ -488,6 +491,16 @@ public interface QueryText {
   Object[] UPIMPL = { XUST, 0, "XQuery Update not implemented." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
+  
+//[LK] xquery update error msgs
+  /** XUDY0027: XQuery Update dynamic exception. */
+  Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
+  /** XUTY0008: XQuery Update dynamic exception. */
+  Object[] UPTRGMULT = { XUTY, 8, "Target result must be a single node." };
+  /** XUDY0009: XQuery Update dynamic exception. */
+  Object[] UPNOPAR = { XUDY, 9, "Target node has no parent." };
+  /** XUTY0010: XQuery Update dynamic exception. */
+  Object[] UPNOTYP = { XUTY, 10, "Unexpected type of replace nodes." };
 
   // OPTIMIZATIONS
 

@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import org.basex.query.item.Nod;
+
 /**
  * Abstract XQuery Update Primitive.
  *
@@ -7,18 +9,14 @@ package org.basex.query.up;
  * @author Lukas Kircher
  */
 public abstract class UpdatePrimitive {
-  /** Node identity. */
-  int id;
-  /** Pre value of database node. */
-  int pre;
+  /** Target node of update expression. */
+  Nod node;
   
   /**
    * Constructor.
-   * @param nodeID node identity
-   * @param nodePre node pre value
+   * @param n DBNode reference
    */
-  public UpdatePrimitive(final int nodeID, final int nodePre) {
-    id = nodeID;
-    pre = nodePre;
+  public UpdatePrimitive(final Nod n) {
+    node = n;
   }
 }

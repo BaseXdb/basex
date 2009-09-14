@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import org.basex.query.item.Nod;
+
 
 /**
  * Represents a rename primitive.
@@ -13,12 +15,11 @@ public class RenamePrimitive extends UpdatePrimitive {
   
   /**
    * Constructor.
-   * @param nodeID node identity
-   * @param nodePre node pre value
-   * @param n new name
+   * @param n target node
+   * @param name new name 
    */
-  public RenamePrimitive(final int nodeID, final int nodePre, final byte[] n) {
-    super(nodeID, nodePre);
-    newName = n;
+  public RenamePrimitive(final Nod n, final byte[] name) {
+    super(n);
+    newName = name;
   }
 }

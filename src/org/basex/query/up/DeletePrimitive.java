@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import org.basex.query.item.Nod;
+
 /**
  * Represents a delete primitive.
  *
@@ -10,10 +12,9 @@ public class DeletePrimitive extends UpdatePrimitive {
 
   /**
    * Constructor.
-   * @param nodeID node identity
-   * @param nodePre node pre value
+   * @param n expression target node
    */
-  public DeletePrimitive(final int nodeID, final int nodePre) {
-    super(nodeID, nodePre);
+  public DeletePrimitive(final Nod n) {
+    super(n);
   }
 }

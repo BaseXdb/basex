@@ -303,7 +303,7 @@ public final class QueryContext extends Progress {
   public Iter iter() throws QueryException {
     try {
       Item i = iter(root).finish();
-      updates.applyUpdates(this);
+//      updates.applyUpdates(this);
       return i.iter();
     } catch(final StackOverflowError ex) {
       if(Prop.debug) ex.printStackTrace();

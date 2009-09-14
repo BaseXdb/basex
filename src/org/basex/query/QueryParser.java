@@ -2509,7 +2509,7 @@ public class QueryParser extends InputParser {
       return null;
     }
     final Expr n = check(single(), INCOMPLETE);
-//    error(UPIMPL);
+    error(UPIMPL);
     return new Delete(n);
   }
 
@@ -2528,7 +2528,7 @@ public class QueryParser extends InputParser {
     final Expr trg = check(single(), INCOMPLETE);
     check(AS);
     final Expr n = check(single(), INCOMPLETE);
-//    error(UPIMPL);
+    error(UPIMPL);
     return new Rename(trg, n);
   }
 

@@ -8,11 +8,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.DeletePrimitive;
-import org.basex.util.IntList;
 
 /**
  * Delete expression.
@@ -41,14 +40,10 @@ public final class Delete extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter it = expr.iter(ctx);
-    final IntList pre = new IntList();
     Item i;
-    while((i = it.next()) != null) {
-      if(i instanceof DBNode) pre.add(((DBNode) i).pre);
-    }
-    final int[] t = pre.finish();
-    for(int p : t) ctx.updates.addPrimitive(
-        new DeletePrimitive(ctx.data().id(p), p));
+    while((i = it.next()) != null)
+      if(i instanceof Nod)
+        ctx.updates.addPrimitive(new DeletePrimitive((Nod) i)); 
     return Iter.EMPTY;
   }
 

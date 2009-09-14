@@ -1,10 +1,17 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.up.ReplacePrimitive;
+import org.basex.query.util.Err;
 
 /**
  * Replace expression.
@@ -29,7 +36,28 @@ public final class Replace extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    for(final Expr e : expr) e.iter(ctx);
+    if(value) return Iter.EMPTY;
+    final Iter t = expr[0].iter(ctx);
+    Item i = t.next();
+    // check target constraints
+    if(i == null) Err.or(UPSEQEMP, t);
+    if(t.next() != null) Err.or(UPTRGMULT, t);
+    if(!(i instanceof DBNode)) Err.or(UPTRGMULT, t);
+    final DBNode trgtN = (DBNode) i;
+    final Nod nod = trgtN.parent();
+    // [LK] parent node? DOC? ELEMENT? element counts as parent 
+    if(nod == null || Nod.kind(nod.type) == Data.DOC) Err.or(UPNOPAR, t);
+    // check replace constraints
+    final Iter r = expr[1].iter(ctx);
+    final int trgtKind = Nod.kind(trgtN.type);
+    i = r.next();
+    while(i != null) {
+      // [LK] compare node types, how to check for duplicates? w/o trgt
+      if(Nod.kind(i.type) != trgtKind); // [LK] print error
+      i = r.next();
+    }
+    i = r.finish();
+    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, i));
     return Iter.EMPTY;
   }
 
