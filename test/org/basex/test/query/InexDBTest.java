@@ -3,22 +3,17 @@ package org.basex.test.query;
 import static org.basex.Text.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.net.ConnectException;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.ALauncher;
 import org.basex.core.Context;
-import org.basex.core.Launcher;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.io.CachedOutput;
-import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
@@ -53,8 +48,6 @@ public final class InexDBTest {
   private int maxqu = Integer.MAX_VALUE;
   /** Number of runs. */
   private int runs = 1;
-  /** Uses client/server architecture. */
-  private boolean server;
   /** Measures total time. */
   private boolean total;
   /** Shows process info. */
@@ -93,8 +86,7 @@ public final class InexDBTest {
       if(s.startsWith(DBPREFIX) && databases.size() < maxdb) databases.add(s);
     }
 
-    BaseX.outln(BaseX.name(InexDBTest.class) + " [" +
-        (server ? CLIENTMODE : LOCALMODE) + "]");
+    BaseX.outln(BaseX.name(InexDBTest.class) + " [" + CLIENTMODE + "]");
     BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
         queries.size(), databases.size(), runs, total ? "total" : "evaluation");
 
@@ -102,10 +94,8 @@ public final class InexDBTest {
     
     // run test
     final Performance p = new Performance();
-    if(server) test();
-    else testLocal();
+    test();
     System.out.println("Total Time: " + p.getTimer());
-    res.flush();
     res.close();
   }
 
@@ -119,56 +109,10 @@ public final class InexDBTest {
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
       launcher.execute(new Open(databases.get(d)));
-      for(int q = 0; q < queries.size(); q++) queryResults(d, q);
-      launcher.execute(new Close());
-    }
-  }
-
-  /**
-   * First test, caching all databases before running the queries.
-   * This version runs only locally.
-   * @throws Exception exception
-   */
-  private void testLocal() throws Exception {
-    // cache all context nodes
-    final Nodes[] roots = new Nodes[databases.size()];
-    for(int d = 0; d < databases.size(); d++) {
-      final Data data = Open.open(ctx, databases.get(d));
-      roots[d] = new Nodes(data.doc(), data);
-    }
-
-    // loop through all databases
-    for(int q = 0; q < queries.size(); q++) {
-      // loop through all queries
-      for(int d = 0; d < databases.size(); d++) {
-        // set cached context nodes and run query
-        ctx.current(roots[d]);
-        query(d, q);
+      for(int q = 0; q < queries.size(); q++) {
+        for(int r = 0; r < runs; r++) query(d, q, r == runs - 1);
       }
-    }
-  }
-
-  /**
-   * Performs a single query.
-   * @param db database offset
-   * @param qu query offset
-   * @throws Exception exception
-   */
-  private void query(final int db, final int qu) throws Exception {
-    if(launcher.execute(new XQuery(queries.get(qu)))) {
-      launcher.output(new NullOutput());
-    }
-    final CachedOutput out = new CachedOutput();
-    launcher.info(out);
-    final String time = Pattern.compile(".*" +
-        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
-        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
-
-    // output result
-    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
-    if(info) {
-      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+      launcher.execute(new Close());
     }
   }
   
@@ -176,29 +120,30 @@ public final class InexDBTest {
    * Performs a single query.
    * @param db database offset
    * @param qu query offset
+   * @param s store flag
    * @throws Exception exception
    */
-  private void queryResults(final int db, final int qu) throws Exception {
-    byte[] r = null;
-    if(launcher.execute(new XQuery(queries.get(qu)))) {
-      final CachedOutput o = new CachedOutput();
-      launcher.output(o);
-      r = o.finish();
-    }
-    final CachedOutput out = new CachedOutput();
-    launcher.info(out);
-    final String time = Pattern.compile(".*" +
-        (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
-        Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+  private void query(final int db, final int qu, final boolean s)
+      throws Exception {
 
-    // output result
-    BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
-    if(info) {
-      BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+    if(launcher.execute(new XQuery(queries.get(qu)))) {
+      launcher.output(new CachedOutput());
+      if(!s) return;
+
+      final CachedOutput out = new CachedOutput();
+      launcher.info(out);
+      final String time = Pattern.compile(".*" +
+          (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
+          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+
+      // output result
+      BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+      if(info) {
+        BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+            Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
+      }
+      res.println(time);
     }
-    
-    if(r != null) res.println(time);
   }
   
   /**
@@ -219,8 +164,6 @@ public final class InexDBTest {
             maxqu = Integer.parseInt(arg.string());
           } else if(c == 'r') {
             runs = Integer.parseInt(arg.string());
-          } else if(c == 's') {
-            server = true;
           } else if(c == 't') {
             total = true;
           } else if(c == 'v') {
@@ -233,16 +176,14 @@ public final class InexDBTest {
         }
       }
 
-      launcher = server ? new ClientLauncherNew(ctx) : new Launcher(ctx);
+      launcher = new ClientLauncherNew(ctx);
       launcher.execute(new Set(Prop.SERIALIZE, total));
-      launcher.execute(new Set(Prop.RUNS, runs));
       launcher.execute(new Set(Prop.INFO, true));
       launcher.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {
       ok = false;
-      if(server && ex instanceof ConnectException) {
-        BaseX.outln("Please run BaseXServerNew for using server mode.");
-      }
+      BaseX.errln("Please run BaseXServerNew for using server mode.");
+      ex.printStackTrace();
     }
 
     if(!ok) {
@@ -250,7 +191,6 @@ public final class InexDBTest {
         "  -d<no>  maximum no/database" + NL +
         "  -q<no>  maximum no/queries" + NL +
         "  -r<no>  number of runs" + NL +
-        "  -s      use server architecture" + NL +
         "  -t      measure total time" + NL +
         "  -v      show process info");
     }
