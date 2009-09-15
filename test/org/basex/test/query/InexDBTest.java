@@ -34,7 +34,7 @@ public final class InexDBTest {
   private static final String DBPREFIX = "inex";
 
   /** Database context. */
-  private Context ctx = new Context();
+  private final Context ctx = new Context();
   /** Launcher. */
   private ALauncher launcher;
   /** Queries. */
@@ -48,8 +48,6 @@ public final class InexDBTest {
   private int maxqu = Integer.MAX_VALUE;
   /** Number of runs. */
   private int runs = 1;
-  /** Measures total time. */
-  private boolean total;
   /** Shows process info. */
   private boolean info;
   /** Container for qtimes and results. */
@@ -87,8 +85,8 @@ public final class InexDBTest {
     }
 
     BaseX.outln(BaseX.name(InexDBTest.class) + " [" + CLIENTMODE + "]");
-    BaseX.outln("=> % queries on % databases, % runs: % time in ms\n",
-        queries.size(), databases.size(), runs, total ? "total" : "evaluation");
+    BaseX.outln("=> % queries on % databases, % runs: time in ms\n",
+        queries.size(), databases.size(), runs);
 
     res = new PrintOutput("times");
     
@@ -132,8 +130,7 @@ public final class InexDBTest {
 
       final CachedOutput out = new CachedOutput();
       launcher.info(out);
-      final String time = Pattern.compile(".*" +
-          (total ? "Total Time" : "Evaluating") + ": (.*?) ms.*",
+      final String time = Pattern.compile(".*" + "Total Time: (.*?) ms.*",
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
 
       // output result
@@ -164,8 +161,6 @@ public final class InexDBTest {
             maxqu = Integer.parseInt(arg.string());
           } else if(c == 'r') {
             runs = Integer.parseInt(arg.string());
-          } else if(c == 't') {
-            total = true;
           } else if(c == 'v') {
             info = true;
           } else {
@@ -177,7 +172,6 @@ public final class InexDBTest {
       }
 
       launcher = new ClientLauncherNew(ctx);
-      launcher.execute(new Set(Prop.SERIALIZE, total));
       launcher.execute(new Set(Prop.INFO, true));
       launcher.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {

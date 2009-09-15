@@ -2383,36 +2383,37 @@ public class QueryParser extends InputParser {
       } else if(consumeWS(STOP)) {
         // add union/except
         check(WORDS);
-        if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);
-        opt.sw = new StopWords();
-        boolean union = false;
-        boolean except = false;
-        while(using) {
-          if(consumeWS2(PAR1)) {
-            do {
-              final byte[] sl = stringLiteral();
-              if(except) opt.sw.delete(sl);
-              else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
-            } while(consumeWS2(COMMA));
-            check(PAR2);
-          } else if(consumeWS2(AT)) {
-            String fn = string(stringLiteral());
-            if(ctx.stop != null) fn = ctx.stop.get(fn);
 
-            IO fl = IO.get(fn);
-            if(!fl.exists() && file != null) fl = file.merge(fl);
-            if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
-          } else if(!union && !except) {
-            error(FTSTOP);
+        if(consumeWS(DEFAULT)) {
+          if(!using) error(FTSTOP);
+        } else {
+          if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);
+          opt.sw = new StopWords();
+          boolean union = false;
+          boolean except = false;
+          while(using) {
+            if(consumeWS2(PAR1)) {
+              do {
+                final byte[] sl = stringLiteral();
+                if(except) opt.sw.delete(sl);
+                else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
+              } while(consumeWS2(COMMA));
+              check(PAR2);
+            } else if(consumeWS2(AT)) {
+              String fn = string(stringLiteral());
+              if(ctx.stop != null) fn = ctx.stop.get(fn);
+  
+              IO fl = IO.get(fn);
+              if(!fl.exists() && file != null) fl = file.merge(fl);
+              if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
+            } else if(!union && !except) {
+              error(FTSTOP);
+            }
+            union = consumeWS2(UNION);
+            except = !union && consumeWS2(EXCEPT);
+            if(!union && !except) break;
           }
-          union = consumeWS2(UNION);
-          except = !union && consumeWS2(EXCEPT);
-          if(!union && !except) break;
         }
-      } else if(consumeWS(DEFAULT)) {
-        if(!using) error(FTSTOP);
-        check(STOP);
-        check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {
         if(opt.isSet(FTOpt.WC)) error(FTDUP, WILDCARDS);
         if(opt.is(FTOpt.FZ)) error(FTFZWC);
