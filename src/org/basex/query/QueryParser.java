@@ -2510,7 +2510,7 @@ public class QueryParser extends InputParser {
       return null;
     }
     final Expr n = check(single(), INCOMPLETE);
-    error(UPIMPL);
+//    error(UPIMPL);
     return new Delete(n);
   }
 

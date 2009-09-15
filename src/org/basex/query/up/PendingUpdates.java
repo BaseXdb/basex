@@ -1,12 +1,12 @@
 package org.basex.query.up;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.FNode;
+
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -16,20 +16,17 @@ import org.basex.query.item.Nod;
  * @author Lukas Kircher
  */
 public class PendingUpdates {
-  /** Delete primitives. */
-  ArrayList<DeletePrimitive> deletes;
-  /** Rename primitives. */
-  ArrayList<RenamePrimitive> renames;
-  /** Replace primitives. */
-  ArrayList<ReplacePrimitive> replaces;
+  /** Update primitives which target nodes are DBNodes. */
+  Map<Data, Primitives> dbPrimitives;
+  /** Update primitives which target nodes are fragments. */
+  Primitives fragPrimitives;
   
   /**
    * Constructor.
    */
   public PendingUpdates() {
-    deletes = new ArrayList<DeletePrimitive>();
-    renames = new ArrayList<RenamePrimitive>();
-    replaces = new ArrayList<ReplacePrimitive>();
+    dbPrimitives = new HashMap<Data, Primitives>();
+    fragPrimitives = new Primitives();
   }
   
   /**
@@ -37,25 +34,26 @@ public class PendingUpdates {
    * @param p primitive to add
    */
   public void addPrimitive(final UpdatePrimitive p) {
-    if(p instanceof DeletePrimitive) deletes.add((DeletePrimitive) p);
-    if(p instanceof RenamePrimitive) renames.add((RenamePrimitive) p);
-    if(p instanceof ReplacePrimitive) replaces.add((ReplacePrimitive) p);
+    if(p.node instanceof FNode) fragPrimitives.addPrimitive(p);
+    else if(p.node instanceof DBNode) {
+      final Data d = ((DBNode) p.node).data;
+      Primitives dp = dbPrimitives.get(d);
+      if(dp == null) {
+        dp = new Primitives(); 
+        dbPrimitives.put(d, dp);
+      }
+      dp.addPrimitive(p);
+    }
   }
   
   /**
-   * Applies all update primitives to the database if no constraints are hurt.
+   * Checks constraints and applies all update primitives to the databases if
+   * no constraints are hurt.
    * XQueryUP specification 3.2.2
    */
-  public void applyUpdates()  {
-    // [LK] check constraints
-    
-    // [LK] apply updates
-    final Map<Data, DBNode> delData = new HashMap<Data, DBNode>();
-    ArrayList<Nod> delFrag = new ArrayList<Nod>();
-    for(final DeletePrimitive p : deletes) {
-      final Nod n = p.node;
-      if(n instanceof DBNode) delData.put(((DBNode) n).data, (DBNode) n);
-      else delFrag.add(n);
-    }
+  public void applyUpdates() {
+    final Primitives[] dp = new Primitives[dbPrimitives.size()];
+    dbPrimitives.values().toArray(dp);
+    for(Primitives p : dp) p.apply();
   }
 }

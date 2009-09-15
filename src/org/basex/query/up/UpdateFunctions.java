@@ -2,6 +2,7 @@ package org.basex.query.up;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FElem;
@@ -21,20 +22,20 @@ public final class UpdateFunctions {
    */
   private UpdateFunctions() { }
   
-//  /**
-//   * Delete nodes from database. Nodes are deleted backwards to preserve pre
-//   * values. All given nodes are part of the same Data instance.
-//   * @param nodes nodes to delete
-//   */
-//  public static void deleteDBNodes(final DBNode[] n) {
-//    final Data data = nodes.data;
-//    final int size = nodes.size();
-//    for(int i = size - 1; i >= 0; i--) {
-//      final int pre = nodes.nodes[i];
-//      if(data.fs != null) data.fs.delete(pre);
-//      data.delete(pre);
-//    }
-//  }
+  /**
+   * Delete nodes from database. Nodes are deleted backwards to preserve pre
+   * values. All given nodes are part of the same Data instance.
+   * @param nodes nodes to delete
+   */
+  public static void deleteDBNodes(final Nodes nodes) {
+    final Data data = nodes.data;
+    final int size = nodes.size();
+    for(int i = size - 1; i >= 0; i--) {
+      final int pre = nodes.nodes[i];
+      if(data.fs != null) data.fs.delete(pre);
+      data.delete(pre);
+    }
+  }
   
   /**
    * Renames the specified node.
