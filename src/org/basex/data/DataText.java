@@ -199,7 +199,8 @@ public interface DataText {
   byte[] KIND = token("kind");
   /** Count attribute. */
   byte[] COUNT = token("count");
-
+  /** Doctype output. */
+  byte[] DT = token("<!DOCTYPE");
   /** Comment output. */
   byte[] COM1 = token("<!--");
   /** Comment output. */
@@ -208,6 +209,7 @@ public interface DataText {
   byte[] PI1 = token("<?");
   /** PI output. */
   byte[] PI2 = token("?>");
+  
   /** Element output. */
   byte[] ELEM1 = { '<'};
   /** Element output. */

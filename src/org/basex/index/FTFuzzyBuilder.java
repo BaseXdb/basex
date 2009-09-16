@@ -2,10 +2,13 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
+import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -61,7 +64,11 @@ public final class FTFuzzyBuilder extends FTBuilder {
       isize++;
       tree[tl] = new FTHash();
     }
-    tree[tl].index(tok, id, wp.pos);
+    
+    if (wp instanceof ScoringTokenizer) {
+      BaseX.outln(new String(tok) + " " + ((ScoringTokenizer) wp).score(tok));
+      tree[tl].index(tok, id, ((ScoringTokenizer) wp).score(tok));
+    } else tree[tl].index(tok, id, wp.pos);
   }
 
   @Override

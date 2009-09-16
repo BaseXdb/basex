@@ -55,7 +55,7 @@ abstract class AQuery extends Process {
       for(int i = 0; i < runs; i++) {
         qp = new QueryProcessor(query, context);
         progress(qp);
-
+        
         qp.parse();
         pars += per.getTime();
         if(i == 0) plan(qp, false);

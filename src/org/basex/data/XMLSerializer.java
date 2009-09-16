@@ -202,6 +202,31 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
+   * Doctype declaration. 
+   * @param t document root element tag
+   * @param te external subset
+   * @param ti internal subset
+   * @throws IOException IOException
+   */
+  public void doctype(final byte[] t, final byte[] te, 
+      final byte[] ti) throws IOException {
+    out.print(DT);
+    out.print(' ');
+    out.print(t);
+    out.print(' ');
+    if (te != null) {
+      out.print("SYSTEM".getBytes());
+      out.print(' ');
+      out.print(te);
+      if (ti != null) out.print(' ');
+    }
+    
+    if (ti != null) out.print(ti);
+    out.print(ELEM2);
+    out.println();
+  }
+  
+  /**
    * Prints the text declaration to the output stream.
    * @param close close flag
    * @throws IOException I/O exception

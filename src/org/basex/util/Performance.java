@@ -9,12 +9,17 @@ package org.basex.util;
 public final class Performance {
   /** Performance Timer, based on nano seconds. */
   private long time;
+  // [SG] INEX budget
+  /** Query start time. */
+  public static long qst;
 
   /**
    * Constructor, initializing the performance timer.
    */
   public Performance() {
     initTimer();
+    // [SG] INEX budget
+    qst = time;
   }
 
   /**

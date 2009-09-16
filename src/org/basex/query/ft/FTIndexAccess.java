@@ -1,6 +1,8 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -11,6 +13,7 @@ import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
+import org.basex.util.Performance;
 
 /**
  * FTContains expression with index access.
@@ -53,7 +56,15 @@ public final class FTIndexAccess extends Simple {
           // remove matches reference to save memory
           it.all = null;
         }
-        return it;
+//        return it;
+        
+        //[SG] INEX budget time
+        final long t =  (Integer) Prop.IBT[1];
+        final long s = System.nanoTime();
+        if (t == -1 || (s - Performance.qst) / 10000 / 100d < t) {
+          return it;
+        }
+        return null;
       }
     };
   }

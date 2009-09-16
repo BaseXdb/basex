@@ -67,6 +67,8 @@ public final class InexDBTestNew {
   private static String[] query = new String[] {"automatic", "manual"};
   /** Collection for query times. */
   private static double[] qtimes;
+  /** Collection for query result sizes. */
+  private static final int[] qressizes = new int[10 * 115];
   /** Topic ids of the queries. */
   private static int[] tid;
   /** Results of the queries. */
@@ -96,7 +98,11 @@ public final class InexDBTestNew {
     if(!parseArguments(args)) return;
     String l;
     final BufferedReader brt = new BufferedReader(new FileReader("times"));
-    while((l = brt.readLine()) != null) qt[c++] = Double.parseDouble(l);
+    while((l = brt.readLine()) != null) {
+      final int index = l.indexOf(';');
+      qt[c] = Double.parseDouble(l.substring(0, index));
+      qressizes[c++] = Integer.parseInt(l.substring(index + 1));
+    }
     brt.close();
 
     // cache queries
@@ -173,6 +179,7 @@ public final class InexDBTestNew {
    * @throws Exception exception
    */
   private SeqIter query(final int db, final int qu) throws Exception {
+    if (qressizes[db * 115 + qu] == 0) return new SeqIter();
     // query and cache result
     final String que = XQM + "for $i score $s in " +
         queries.get(qu) + " order by $s descending " +
@@ -187,23 +194,28 @@ public final class InexDBTestNew {
     final CachedOutput out = new CachedOutput();
     launcher.info(out);
     final SeqIter sq = new SeqIter();
+    final int size = qressizes[db * 115 + qu];
 
-    final StringTokenizer st = new StringTokenizer(res.toString(), " ");
-    String lp = "";
-    while (st.hasMoreTokens()) {
-      qtimes[qu] += qt[db * 115 + qu];
-      final String p = st.nextToken();
-      if(!st.hasMoreTokens()) break;
-      final String s = st.nextToken();
-      if(!st.hasMoreTokens()) break;
-      String uri = st.nextToken();
-      uri = uri.substring(uri.lastIndexOf('/') + 1);
-      final String tmp = uri + ";" + p;
-      if(!lp.equals(tmp)) {
-        final Str str = Str.get(token(uri + ";" + p));
-        str.score(Double.parseDouble(s));
-        sq.add(str);
-        lp = tmp;
+    if (size > 0) {
+      StringTokenizer st = new StringTokenizer(res.toString(), " ");
+      String lp = "";
+      int z = 0;
+      while (st.hasMoreTokens() && z < size) {
+        qtimes[qu] += qt[db * 115 + qu];
+        final String p = st.nextToken();
+        if (!st.hasMoreTokens()) break;
+        final String s = st.nextToken();
+        if (!st.hasMoreTokens()) break;
+        String uri = st.nextToken();
+        uri = uri.substring(uri.lastIndexOf('/') + 1);
+        final String tmp = uri + ";" + p;
+        if (!lp.equals(tmp)) {
+          final Str str = Str.get(token(uri + ";" + p));
+          str.score(Double.parseDouble(s));
+          sq.add(str);
+          lp = tmp;
+        }
+        z++;
       }
     }
 

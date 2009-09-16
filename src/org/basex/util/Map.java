@@ -22,7 +22,19 @@ public class Map<E> extends Set {
     final int i = add(key);
     values[Math.abs(i)] = val;
   }
-
+  
+  
+  /**
+   * Update the old value of the entry.
+   * @param key key 
+   * @param val value
+   */
+  public void setValue(final byte[] key, final E val) {
+    final int i = id(key);
+    if (i == 0) return;
+    values[Math.abs(i)] = val;
+  }
+  
   /**
    * Returns the value for the specified key.
    * @param key key to be found

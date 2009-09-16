@@ -14,7 +14,7 @@ import org.basex.query.ft.StemDir;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Tokenizer implements IndexToken {
+public class Tokenizer implements IndexToken {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORD,
@@ -311,7 +311,7 @@ public final class Tokenizer implements IndexToken {
     for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
     return t;
   }
-
+  
   /**
    * Gets full-text info for the specified token; needed for visualizations.
    * int[0]: length of each token

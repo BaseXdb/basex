@@ -162,6 +162,10 @@ public final class Prop extends AProp {
 
   /** Server timeout in seconds. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 3600 };
+  
+  //[SG] INEX budget time
+  /** INEX budget for queries. */
+  public static final Object[] IBT = { "INDEXBUDGETTIME", -1 };
 
   // DEEPFS OPTIONS ===========================================================
 

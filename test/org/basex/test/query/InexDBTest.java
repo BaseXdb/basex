@@ -52,6 +52,11 @@ public final class InexDBTest {
   private boolean info;
   /** Container for qtimes and results. */
   private PrintOutput res;
+  /** Budget for a query in ms. */
+  private double  budget = -1;
+  /** Remaining query time - used for budget queries.  */
+  private double[] rqt;
+  
   
   /**
    * Main test method.
@@ -77,6 +82,7 @@ public final class InexDBTest {
     while((l = br.readLine()) != null && queries.size() < maxqu) 
       queries.add(l.substring(l.indexOf('/')));
     br.close();
+    rqt = new double[queries.size()];
 
     // cache database names
     databases = new StringList();
@@ -123,9 +129,21 @@ public final class InexDBTest {
    */
   private void query(final int db, final int qu, final boolean s)
       throws Exception {
-
+    if (budget > -1) {
+      final double timer = budget - rqt[qu];
+      if (timer <= 0) {
+        if (s) {  
+          res.println(0 + ";" + 0);
+          BaseX.outln("Query % on %: %", qu + 1, databases.get(db), 0);
+        }
+        return;
+      }
+      launcher.execute(new Set(Prop.IBT, timer));   
+    }
+    
+    final CachedOutput r = new CachedOutput();
     if(launcher.execute(new XQuery(queries.get(qu)))) {
-      launcher.output(new CachedOutput());
+      launcher.output(r);
       if(!s) return;
 
       final CachedOutput out = new CachedOutput();
@@ -139,7 +157,17 @@ public final class InexDBTest {
         BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
             Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
       }
-      res.println(time);
+      String in = out.toString();
+      in = in.substring(in.indexOf("Results") + 
+          "Results".length(), in.indexOf("Item")).trim();
+      rqt[qu] += Double.parseDouble(time);
+      res.println(time + ";" + 
+          Integer.parseInt(in.substring(in.indexOf(':') + 2)));
+    } else {
+      final CachedOutput out = new CachedOutput();
+      launcher.info(out);
+      BaseX.outln(out.toString());
+      res.println(-1 + ";" + -1);
     }
   }
   
@@ -163,6 +191,8 @@ public final class InexDBTest {
             runs = Integer.parseInt(arg.string());
           } else if(c == 'v') {
             info = true;
+          } else if(c == 'b') {
+            budget = Long.parseLong(arg.string());
           } else {
             ok = false;
           }
