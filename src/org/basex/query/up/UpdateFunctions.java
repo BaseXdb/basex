@@ -39,17 +39,16 @@ public final class UpdateFunctions {
   
   /**
    * Renames the specified node.
-   * @param id node identity
+   * @param pre pre value
    * @param name new name
    * @param data data reference
    */
-  public static void rename(final int id, final byte[] name, final Data data) {
-    final int p = data.pre(id);
-    final int k = data.kind(p);
-    if(k == Data.ELEM || k == Data.PI) data.update(data.pre(id), name);
+  public static void rename(final int pre, final byte[] name, final Data data) {
+    final int k = data.kind(pre);
+    if(k == Data.ELEM || k == Data.PI) data.update(pre, name);
     else if(k == Data.ATTR) {
-      final byte[] v = data.attValue(p);
-      data.update(p, name, v);
+      final byte[] v = data.attValue(pre);
+      data.update(pre, name, v);
     }
   }
   

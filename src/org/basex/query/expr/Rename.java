@@ -6,6 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.RenamePrimitive;
@@ -36,10 +37,9 @@ public final class Rename extends Arr {
     if(i == null) Err.or(INCOMPLETE, i);
     if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(INCOMPLETE, i);
     final Item nmItem = nI.next();
-    if(!(nmItem instanceof Str)) Err.or(IMPLCOL, nmItem);
-    final Nod n = (Nod) i;
-    ctx.updates.addPrimitive(
-        new RenamePrimitive(n, nmItem.str()));
+    if(!(nmItem instanceof Str || nmItem instanceof QNm)) 
+      Err.or(IMPLCOL, nmItem);
+    ctx.updates.addPrimitive(new RenamePrimitive((Nod) i, nmItem.str()));
     return Iter.EMPTY;
   }
   

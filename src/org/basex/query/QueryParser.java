@@ -2529,7 +2529,7 @@ public class QueryParser extends InputParser {
     final Expr trg = check(single(), INCOMPLETE);
     check(AS);
     final Expr n = check(single(), INCOMPLETE);
-    error(UPIMPL);
+//    error(UPIMPL);
     return new Rename(trg, n);
   }
 

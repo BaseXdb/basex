@@ -1,5 +1,8 @@
 package org.basex.query.up;
 
+import static org.basex.query.up.UpdateFunctions.*;
+
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +22,8 @@ import org.basex.util.IntList;
 public class Primitives {
   /** Update primitives. */
   List<DeletePrimitive> deletes;
+  /** Update primitives. */
+  List<RenamePrimitive> renames;
   /** Database reference. */
   Data data;
   
@@ -27,6 +32,7 @@ public class Primitives {
    */
   public Primitives() {
     deletes = new LinkedList<DeletePrimitive>();
+    renames = new LinkedList<RenamePrimitive>();
   }
 
   /**
@@ -35,6 +41,7 @@ public class Primitives {
    */
   public void addPrimitive(final UpdatePrimitive p) {
     if(p instanceof DeletePrimitive) deletes.add((DeletePrimitive) p);
+    if(p instanceof RenamePrimitive) renames.add((RenamePrimitive) p);
     if(p.node instanceof DBNode && data == null) data = ((DBNode) p.node).data;
   }
   
@@ -43,9 +50,14 @@ public class Primitives {
    */
   public void apply() {
     if(data != null) {
+      for(final RenamePrimitive p : renames) {
+        final DBNode n = (DBNode) p.node;
+        rename(n.pre, p.newName, n.data);
+      }
+      
       final IntList pres = new IntList();
       for(final DeletePrimitive p : deletes) pres.add(((DBNode) p.node).pre);
-      UpdateFunctions.deleteDBNodes(new Nodes(pres.finish(), data));
+      deleteDBNodes(new Nodes(pres.finish(), data));
     }
   }
 }
