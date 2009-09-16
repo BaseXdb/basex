@@ -65,6 +65,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       tree[tl] = new FTHash();
     }
     
+    // [SG] INEX Budget
     if (wp instanceof ScoringTokenizer) {
       BaseX.outln(new String(tok) + " " + ((ScoringTokenizer) wp).score(tok));
       tree[tl].index(tok, id, ((ScoringTokenizer) wp).score(tok));
