@@ -23,7 +23,7 @@ public class Primitives {
   Data data;
   
   /**
-   * Constructor
+   * Constructor.
    */
   public Primitives() {
     deletes = new LinkedList<DeletePrimitive>();
@@ -33,7 +33,7 @@ public class Primitives {
    * Adds a primitive to a primitive list depending on its type.
    * @param p update primitive
    */
-  public void addPrimitive(UpdatePrimitive p) {
+  public void addPrimitive(final UpdatePrimitive p) {
     if(p instanceof DeletePrimitive) deletes.add((DeletePrimitive) p);
     if(p.node instanceof DBNode && data == null) data = ((DBNode) p.node).data;
   }

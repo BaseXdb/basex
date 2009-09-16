@@ -68,7 +68,7 @@ public final class InexDBTestNew {
   /** Collection for query times. */
   private static double[] qtimes;
   /** Collection for query result sizes. */
-  private static final int[] qressizes = new int[10 * 115];
+  private static final int[] QRESSIZES = new int[10 * 115];
   /** Topic ids of the queries. */
   private static int[] tid;
   /** Results of the queries. */
@@ -101,7 +101,7 @@ public final class InexDBTestNew {
     while((l = brt.readLine()) != null) {
       final int index = l.indexOf(';');
       qt[c] = Double.parseDouble(l.substring(0, index));
-      qressizes[c++] = Integer.parseInt(l.substring(index + 1));
+      QRESSIZES[c++] = Integer.parseInt(l.substring(index + 1));
     }
     brt.close();
 
@@ -179,7 +179,7 @@ public final class InexDBTestNew {
    * @throws Exception exception
    */
   private SeqIter query(final int db, final int qu) throws Exception {
-    if (qressizes[db * 115 + qu] == 0) return new SeqIter();
+    if (QRESSIZES[db * 115 + qu] == 0) return new SeqIter();
     // query and cache result
     final String que = XQM + "for $i score $s in " +
         queries.get(qu) + " order by $s descending " +
@@ -194,7 +194,7 @@ public final class InexDBTestNew {
     final CachedOutput out = new CachedOutput();
     launcher.info(out);
     final SeqIter sq = new SeqIter();
-    final int size = qressizes[db * 115 + qu];
+    final int size = QRESSIZES[db * 115 + qu];
 
     if (size > 0) {
       StringTokenizer st = new StringTokenizer(res.toString(), " ");

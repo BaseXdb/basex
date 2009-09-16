@@ -59,7 +59,7 @@ public final class FTIndexAccess extends Simple {
 //        return it;
         
         //[SG] INEX budget time
-        final long t =  (Integer) Prop.IBT[1];
+        final long t = ctx.context.prop.num(Prop.IBT);
         final long s = System.nanoTime();
         if (t == -1 || (s - Performance.qst) / 10000 / 100d < t) {
           return it;

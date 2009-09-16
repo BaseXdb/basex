@@ -261,11 +261,6 @@ public abstract class AProp {
    * @param val value to be written
    */
   public void set(final String key, final Object val) {
-    // [SG] INEX budget time
-    if (key.equals(Prop.IBT[0])) {
-      Prop.IBT[1] = val;
-      return;
-    }
     props.put(key, val);
     finish();
   }

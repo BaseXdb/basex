@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
 import org.basex.util.Tokenizer;
 
