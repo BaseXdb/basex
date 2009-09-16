@@ -24,11 +24,16 @@ import org.catacombae.jfuse.types.system.StatConstant;
  */
 public final class FileTestMacros {
 
+  /** Private utility constructor. */
+  private FileTestMacros() {
+    throw new UnsupportedOperationException();
+  }
+  
   /** Test file mode whether it is a directory.
    * @param m file mode
    * @return true if directory mode
    */
-  public static boolean S_ISDIR(StatConstant m) {
+  public static boolean S_ISDIR(final StatConstant m) {
     return S_ISDIR(m.getNativeValue());
   }
   
@@ -36,7 +41,7 @@ public final class FileTestMacros {
    * @param m file mode
    * @return true if directory mode
    */
-  public static boolean S_ISDIR(int m) {
+  public static boolean S_ISDIR(final int m) {
     return (m & S_IFMT.getNativeValue()) == S_IFDIR.getNativeValue();
   }
   
@@ -44,7 +49,7 @@ public final class FileTestMacros {
    * @param m file mode
    * @return true if directory mode
    */
-  public static boolean S_ISREG(StatConstant m) {
+  public static boolean S_ISREG(final StatConstant m) {
     return S_ISREG(m.getNativeValue());
   }
   
@@ -52,7 +57,7 @@ public final class FileTestMacros {
    * @param m file mode
    * @return true if directory mode
    */
-  public static boolean S_ISREG(int m) {
+  public static boolean S_ISREG(final int m) {
     return (m & S_IFMT.getNativeValue()) == S_IFREG.getNativeValue();
   }
 }

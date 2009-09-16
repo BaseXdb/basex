@@ -1,6 +1,7 @@
 package org.deepfs;
 
 import static org.catacombae.jfuse.types.system.StatConstant.*;
+import static org.basex.util.Token.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -49,8 +50,14 @@ public final class DeepShell {
 
   /** Constructor. */
   DeepShell() {
-    BaseX.debug("[DeepShell]");
-    fs = new DeepFS("deepshell");
+    this("deepfs");
+  }
+  
+  /** Constructor. 
+   * @param fsdbname DeepFS filesystem/database instance
+   */
+  DeepShell(final String fsdbname) {
+    fs = new DeepFS(fsdbname);
     loop();
     fs.umount();
   }
@@ -189,6 +196,23 @@ public final class DeepShell {
    * Prints stat information of file to stdout.
    * @param args argument vector
    */
+  @Command(shortcut = 'l',
+      args = "<file_name>", help = "list directory")
+  public void list(final String[] args) {
+    if(args.length != 2) {
+      help(new String[] { "help", "list"});
+      return;
+    }
+    byte[][] dents = fs.readdir(args[1]);
+    if (dents == null) System.err.printf("listing failed.\n");
+    for (byte[] de : dents)
+      BaseX.out(">> " + string(de));
+  }
+  
+  /**
+   * Prints stat information of file to stdout.
+   * @param args argument vector
+   */
   @Command(shortcut = 'i',
       args = "", help = "info table (BaseX command)")
   public void info(final String[] args) {
@@ -197,8 +221,8 @@ public final class DeepShell {
       return;
     }
     try {
-      new InfoTable(null, null).execute(fs.getContext(), new PrintOutput(System.out));
-      //output(new PrintOutput(System.out));
+      new InfoTable(null, null).execute(fs.getContext(), new PrintOutput(
+          System.out));
     } catch (Exception e) {
       e.printStackTrace();
     }

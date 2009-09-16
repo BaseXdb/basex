@@ -67,7 +67,7 @@ public final class NewFSParser extends Parser {
     // [BL] temporary hack to enable fsviews. pls, remove FS in code below,
     // where
     // apt; we can plug namespaces directly into DataText.DEEPFS and friends.
-    DEEPFSURL("", "http://www.deepfs.org/fs/1.0/"),
+    DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
         /** DeepFS metadata namespace. */
     FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
         /** Dublin Core metadata terms namespace. */
@@ -124,19 +124,19 @@ public final class NewFSParser extends Parser {
   }
 
   /** DeepFS tag in fs namespace. */
-  private static final byte[] DEEPFS_NS = NewFSParser.NS.DEEPFSURL.tag(DEEPFS);
+  private static final byte[] DEEPFS_NS = NewFSParser.NS.DEEPURL.tag(DEEPFS);
   /** Directory tag in fs namespace. */
-  private static final byte[] DIR_NS = NewFSParser.NS.DEEPFSURL.tag(DIR);
+  private static final byte[] DIR_NS = NewFSParser.NS.DEEPURL.tag(DIR);
   /** File tag in fs namespace. */
-  private static final byte[] FILE_NS = NewFSParser.NS.DEEPFSURL.tag(FILE);
+  private static final byte[] FILE_NS = NewFSParser.NS.DEEPURL.tag(FILE);
   /** Content tag in fs namespace. */
-  private static final byte[] CONTENT_NS = NewFSParser.NS.DEEPFSURL.tag(CONTENT);
+  private static final byte[] CONTENT_NS = NewFSParser.NS.DEEPURL.tag(CONTENT);
   /** Text content tag in fs namespace. */
   private static final byte[] TEXT_CONTENT_NS =
-      NewFSParser.NS.DEEPFSURL.tag(TEXT_CONTENT);
+      NewFSParser.NS.DEEPURL.tag(TEXT_CONTENT);
   /** XML content tag in fs namespace. */
   private static final byte[] XML_CONTENT_NS =
-      NewFSParser.NS.DEEPFSURL.tag(XML_CONTENT);
+      NewFSParser.NS.DEEPURL.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 

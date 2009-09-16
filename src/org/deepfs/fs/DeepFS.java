@@ -6,12 +6,12 @@ import static org.deepfs.jfuse.FileTestMacros.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MemData;
@@ -80,7 +80,8 @@ public final class DeepFS implements DataText {
    */
   public DeepFS(final String name) {
     ctx = new Context();
-    new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS + 
+    if (!new Open(name).execute(ctx))
+      new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS + 
         "=\"" + S_FSURL + "\"/>", name).execute(ctx);
     data = ctx.data();
     initNames();
@@ -166,7 +167,6 @@ public final class DeepFS implements DataText {
    * @throws QueryException on failure
    */
   private Nodes xquery(final String query) throws QueryException {
-    BaseX.debug("[xquery] " + query);
     return new QueryProcessor(query, ctx).queryNodes();
   }
   
@@ -221,6 +221,22 @@ public final class DeepFS implements DataText {
     } catch(final QueryException ex) {
       ex.printStackTrace();
       return -1;
+    }
+  }
+
+
+  /** 
+   * Resolve child axis from path and return pre values of children.
+   * @param path to be resolved
+   * @return pre values of children found
+   */
+  private int[] path2preChildren(final String path) {
+    try {
+      Nodes n = xquery(pn2xp(path, true) + "/child::fs:*");
+      return n.nodes;
+    } catch(final QueryException ex) {
+      ex.printStackTrace();
+      return null;
     }
   }
 
@@ -478,6 +494,83 @@ public final class DeepFS implements DataText {
         && data.tagID(pre) == data.tags.id(DataText.DIR);
   }
 
+  /**
+   * Resolve filesystem pathname and fill stat information.
+   * For root access ('/') return default access.
+   * Note we store the pre value as inode.
+   * @param path to file
+   * @param sbuf buffer to be filled
+   * @return 0 or -1 for success or failure
+   */
+  public int stat(final String path, final Stat sbuf) {
+    final String method = "[stat] ";
+    if (path.equals("/")) {
+      sbuf.st_ino = 1;
+      sbuf.st_atimespec.setToMillis(rootStat.st_atimespec.toMillis());
+      sbuf.st_ctimespec.setToMillis(rootStat.st_ctimespec.toMillis());
+      sbuf.st_mtimespec.setToMillis(rootStat.st_mtimespec.toMillis());
+      sbuf.st_mode = rootStat.st_mode;
+      sbuf.st_size = rootStat.st_size;
+      sbuf.st_uid = rootStat.st_uid;
+      sbuf.st_gid = rootStat.st_gid;
+      sbuf.st_nlink = rootStat.st_gid;
+      BaseX.debug(method + path + " ino: " + 1);
+      return 0;
+    }
+    int pre = path2pre(path);
+    if (pre == -1) {
+      BaseX.debug(method + path + " (-1)");
+      return -1;
+    }
+    byte[] mtime = attr(pre, mtimeID);
+    byte[] ctime = attr(pre, ctimeID);
+    byte[] atime = attr(pre, atimeID);
+    byte[] mode  = attr(pre, modeID);
+    byte[] size  = attr(pre, sizeID);
+    byte[] uid   = attr(pre, uidID);
+    byte[] gid   = attr(pre, gidID);
+    byte[] nlink = attr(pre, nlinkID);
+//    BaseX.debug(
+//        "pre/inode: " + pre +
+//        "mtime: " + string(mtime) +
+//        "\nctime: " + string(ctime) +
+//        "\natime: " + string(atime) +
+//        "\nmode: " + string(mode) +
+//        "\nsize: " + string(size) +
+//        "\nuid: " + string(uid) +
+//        "\ngid: " + string(gid) +
+//        "\nnlink: " + string(nlink)
+//        );
+    sbuf.st_ino = pre;
+    sbuf.st_atimespec.setToMillis(Long.parseLong(string(atime)));
+    sbuf.st_ctimespec.setToMillis(Long.parseLong(string(ctime)));
+    sbuf.st_mtimespec.setToMillis(Long.parseLong(string(mtime)));
+    sbuf.st_mode = Long.parseLong(string(mode));
+    sbuf.st_size = Long.parseLong(string(size));
+    sbuf.st_uid =  Long.parseLong(string(uid));
+    sbuf.st_gid =  Long.parseLong(string(gid));
+    sbuf.st_nlink =  Long.parseLong(string(nlink));
+//    if (Prop.debug) sbuf.printFields("-", new PrintStream(System.err));
+    BaseX.debug(method + path + " ino: " + pre);
+    return 0;
+  }
+  
+  /**
+   * Read directory entries.
+   * 
+   * @param path directory to be listed.
+   * @return directory entries, null on failure
+   */
+  public byte[][] readdir(final String path) {
+    int[] cld = path2preChildren(path);
+    if (cld == null) return null;
+    int len = cld.length;
+    byte[][] dents = new byte[len][];
+    for (int i = 0; i < len; i++)
+      dents[i] = attr(cld[i], nameID);
+    return dents;
+  }
+
   /** Called when filesystem is unmounted. */
   public void umount() {
     ctx.closeDB();
@@ -491,57 +584,6 @@ public final class DeepFS implements DataText {
     return ctx;
   }
 
-  /**
-   * Resolve filesystem pathname and fill stat information.
-   * For root access ('/') return default access.
-   * @param path to file
-   * @param sbuf buffer to be filled
-   * @return 0 or -1 for success or failure
-   */
-  public int stat(final String path, Stat sbuf) {
-    if (path.equals("/")) {
-      sbuf.st_atimespec.setToMillis(rootStat.st_atimespec.toMillis());
-      sbuf.st_ctimespec.setToMillis(rootStat.st_ctimespec.toMillis());
-      sbuf.st_mtimespec.setToMillis(rootStat.st_mtimespec.toMillis());
-      sbuf.st_mode = rootStat.st_mode;
-      sbuf.st_size = rootStat.st_size;
-      sbuf.st_uid = rootStat.st_uid;
-      sbuf.st_gid = rootStat.st_gid;
-      sbuf.st_nlink = rootStat.st_gid;
-      return 0;
-    }
-    int pre = path2pre(path);
-    if (pre == -1) return -1;
-    byte[] mtime = attr(pre, mtimeID);
-    byte[] ctime = attr(pre, ctimeID);
-    byte[] atime = attr(pre, atimeID);
-    byte[] mode  = attr(pre, modeID);
-    byte[] size  = attr(pre, sizeID);
-    byte[] uid   = attr(pre, uidID);
-    byte[] gid   = attr(pre, gidID);
-    byte[] nlink = attr(pre, nlinkID);
-    BaseX.debug(
-        "mtime: " + string(mtime) +
-        "\nctime: " + string(ctime) +
-        "\natime: " + string(atime) +
-        "\nmode: " + string(mode) +
-        "\nsize: " + string(size) +
-        "\nuid: " + string(uid) +
-        "\ngid: " + string(gid) +
-        "\nnlink: " + string(nlink)
-        );
-    sbuf.st_atimespec.setToMillis(Long.parseLong(string(atime)));
-    sbuf.st_ctimespec.setToMillis(Long.parseLong(string(ctime)));
-    sbuf.st_mtimespec.setToMillis(Long.parseLong(string(mtime)));
-    sbuf.st_mode = Long.parseLong(string(mode));
-    sbuf.st_size = Long.parseLong(string(size));
-    sbuf.st_uid =  Long.parseLong(string(uid));
-    sbuf.st_gid =  Long.parseLong(string(gid));
-    sbuf.st_nlink =  Long.parseLong(string(nlink));
-    if (Prop.debug) sbuf.printFields("-", new PrintStream(System.err));
-    return 0;
-  }
-  
   /**
    * Remove directory.
    * 
@@ -683,7 +725,7 @@ public final class DeepFS implements DataText {
    */
   public int mkdir(final String path, final int mode) {
     // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR.
-    final String method = "[-basex_mkdir] ";
+    final String method = "[mkdir] ";
     final int n = createNode(path, S_IFDIR.getNativeValue() | mode);
     BaseX.debug(method + "path: " + path + " mode: "
         + Integer.toOctalString(mode) + " id : (" + n + ")");
@@ -728,19 +770,6 @@ public final class DeepFS implements DataText {
 //      return -1;
 //    }
 //  }
-//
-//  public String readdir(final String path, final int offset) {
-//    try {
-//      final String query = "string(" + pn2xp(path, true) + "/child::*[" + offset
-//          + "]/@name)";
-//      final QueryProcessor xq = new QueryProcessor(query, ctx);
-//      final SeqIter s = (SeqIter) xq.query();
-//      return s.size() != 1 ? null : string(s.next().str());
-//    } catch(final QueryException ex) {
-//      ex.printStackTrace();
-//      return null;
-//    }
-//  }
 //   
 //  public int release(final String path) {
 //    final boolean dirty = true;
@@ -782,4 +811,4 @@ public final class DeepFS implements DataText {
   public native void nativeShutDown();
 
   /* ------------------------------------------------------------------------ */
-}
+} 
