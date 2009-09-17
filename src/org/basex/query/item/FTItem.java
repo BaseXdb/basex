@@ -53,7 +53,8 @@ public final class FTItem extends DBNode {
 
   @Override
   public String toString() {
-    return data != null ? super.toString() + " (" + all.size + ")" :
-      name() + " (" + all.size + ")";
+    return super.toString() + (all != null ? " (" + all.size + ")" : "");
+    /*return data != null ? super.toString() + " (" + all.size + ")" :
+      name() + " (" + all.size + ")";*/
   }
 }

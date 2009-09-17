@@ -28,6 +28,9 @@ import org.basex.util.StringList;
  * @author Sebastian Gath
  */
 public final class InexDBTest {
+  /** Query prolog. */
+  static final String PROLOG = "declare ft-option using stemming; ";
+
   /** Queries. */
   private static final String QUERIES = "inex.queries";
   /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
@@ -129,7 +132,8 @@ public final class InexDBTest {
    */
   private void query(final int db, final int qu, final boolean s)
       throws Exception {
-    if (budget > -1) {
+
+    if(budget > -1) {
       final double timer = budget - rqt[qu];
       if (timer <= 0) {
         if (s) {  
@@ -142,7 +146,7 @@ public final class InexDBTest {
     }
     
     final CachedOutput r = new CachedOutput();
-    if(launcher.execute(new XQuery(queries.get(qu)))) {
+    if(launcher.execute(new XQuery(PROLOG + queries.get(qu)))) {
       launcher.output(r);
       if(!s) return;
 

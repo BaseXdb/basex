@@ -174,7 +174,7 @@ public final class CElem extends CFrag {
 
           // add namespaces from ancestors
           final Atts atts = node.ns();
-          if(atts != null) {
+          if(atts != null && atts.size != 0) {
             node = node.parent();
             while(node != null && node.type == Type.ELM) {
               final Atts ns = node.ns();

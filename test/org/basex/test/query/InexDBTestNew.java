@@ -77,6 +77,7 @@ public final class InexDBTestNew {
   /** Method used to sum up paths. */
   private static final String XQM =
     "declare namespace basex = \"http://www.basex.com\"; " +
+    InexDBTest.PROLOG +
     "declare function basex:sum-path ( $n as node()? )  as xs:string { " +
     " string-join( for $a in $n/ancestor-or-self::* " +
     " let $ssn := $a/../*[name() = name($a)] " +
