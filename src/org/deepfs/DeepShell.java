@@ -204,8 +204,8 @@ public final class DeepShell {
       return;
     }
     byte[][] dents = fs.readdir(args[1]);
-    if (dents == null) System.err.printf("listing failed.\n");
-    for (byte[] de : dents)
+    if(dents == null) System.err.printf("listing failed.\n");
+    for(byte[] de : dents)
       BaseX.out(">> " + string(de));
   }
   

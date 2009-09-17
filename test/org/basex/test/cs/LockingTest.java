@@ -9,8 +9,8 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.NullOutput;
-import org.basex.server.BaseXServerNew;
-import org.basex.server.ClientLauncherNew;
+import org.basex.BaseXServer;
+import org.basex.core.ClientLauncher;
 
 /**
  * This class tests the four locking cases.
@@ -44,7 +44,7 @@ public final class LockingTest {
         + " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
     int cnr = 2;
     for(int i = 0; i < cnr; i++) {
-      startAClient(new ClientLauncherNew(context), i);
+      startAClient(new ClientLauncher(context), i);
     }
   }
 
@@ -55,7 +55,7 @@ public final class LockingTest {
     new Thread() {
       @Override
       public void run() {
-        new BaseXServerNew("-v");
+        new BaseXServer("-v");
       }
     }.start();
   }

@@ -36,8 +36,7 @@ public final class ScoringTokenizer extends Tokenizer{
    */
   public int score(final byte[] key) {
     int c = token.get(key);
-    if (c == 0) return 0;
-    return c * 1000 /  max; 
+    return c == 0 ? 0 : c * 1000 /  max;
   }
   
   /**
@@ -47,10 +46,10 @@ public final class ScoringTokenizer extends Tokenizer{
     while(super.more()) {
       final byte[] b = super.get();
       Integer c = token.get(b); 
-      if (c != null) {
+      if(c != null) {
         System.out.println(new String(b) + " " + (c + 1));
-        token.setValue(b, ++c);
-        if (c > max) max = c;
+        token.set(b, ++c);
+        if(c > max) max = c;
       } else token.add(b, 1);            
     }
   }

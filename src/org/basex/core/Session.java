@@ -1,16 +1,12 @@
-package org.basex.server;
+package org.basex.core;
 
 import static org.basex.Text.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import org.basex.BaseX;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.Process;
+import org.basex.BaseXServer;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntInfo;
@@ -28,20 +24,18 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-final class Session implements Runnable {
+public final class Session implements Runnable {
   /** Server reference. */
-  final BaseXServerNew bxs;
+  final BaseXServer bxs;
   /** Database context. */
-  final Context context;
+  public final Context context;
   /** Socket. */
   final Socket socket;
-  /** Client id. */
-  final int clientId;
   /** Verbose mode. */
   final boolean info;
 
   /** Core. */
-  Process core;
+  public Process core;
   /** Timeout thread. */
   Thread timeout;
 
@@ -53,14 +47,11 @@ final class Session implements Runnable {
   /**
    * Session.
    * @param s socket
-   * @param c client id
    * @param i info mode
    * @param b server reference
    */
-  Session(final Socket s, final int c, final boolean i,
-      final BaseXServerNew b) {
+  public Session(final Socket s, final boolean i, final BaseXServer b) {
     context = new Context(b.context);
-    clientId = c;
     socket = s;
     info = i;
     bxs = b;
@@ -73,16 +64,12 @@ final class Session implements Runnable {
    */
   private void handle() throws IOException {
     final Performance perf = new Performance();
-    final InetAddress addr = socket.getInetAddress();
-    final String ha = addr.getHostAddress();
-    final int sp = socket.getPort();
 
     // get command and arguments
     dis = new DataInputStream(socket.getInputStream());
     out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
-    final int port = socket.getPort();
 
-    if(info) BaseX.outln("[%:%] Login: client '%'.", ha, port, clientId);
+    if(info) BaseX.outln(this + " Login.");
 
     while(true) {
       final String in = getMessage();
@@ -90,7 +77,7 @@ final class Session implements Runnable {
         stop(false);
         break;
       }
-      if(info) BaseX.outln("[%:%] %", ha, port, in);
+      if(info) BaseX.outln(this + " " + in);
 
       // parse input and create process instance
       Process proc = null;
@@ -130,10 +117,10 @@ final class Session implements Runnable {
         if(proc.info().equals(PROGERR)) proc.error(SERVERTIME);
         timeout.interrupt();
       }
-      if(info) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
+      if(info) BaseX.outln(this + " " + perf);
     }
 
-    if(info) BaseX.outln("[%:%] Logout: client '%'.", ha, port, clientId);
+    if(info) BaseX.outln(this + " Logout.");
   }
 
   /**
@@ -179,7 +166,7 @@ final class Session implements Runnable {
    * Stops the session.
    * @throws IOException I/O exception
    */
-  void close() throws IOException {
+  public void close() throws IOException {
     dis.close();
   }
 
@@ -195,7 +182,7 @@ final class Session implements Runnable {
     try {
       socket.close();
     } catch(final IOException ex) {
-      BaseXServerNew.error(ex, false);
+      BaseXServer.error(ex, false);
     }
   }
 
@@ -206,7 +193,14 @@ final class Session implements Runnable {
     try {
       handle();
     } catch(final IOException ex) {
-      BaseXServerNew.error(ex, false);
+      BaseXServer.error(ex, false);
     }
+  }
+
+  @Override
+  public String toString() {
+    final String host = socket.getInetAddress().getHostAddress();
+    final int port = socket.getPort();
+    return BaseX.info("[%:%]", host, port);
   }
 }

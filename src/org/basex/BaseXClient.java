@@ -1,5 +1,8 @@
 package org.basex;
 
+import java.io.IOException;
+
+import org.basex.core.ALauncher;
 import org.basex.core.ClientLauncher;
 
 /**
@@ -8,7 +11,7 @@ import org.basex.core.ClientLauncher;
  * Add the '-h' option to get a list on all available command-line arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public final class BaseXClient extends BaseX {
   /**
@@ -26,10 +29,17 @@ public final class BaseXClient extends BaseX {
    */
   public BaseXClient() {
     super(false);
+    try {
+      launcher = new ClientLauncher(context);
+    } catch(final Exception ex) {
+      BaseXServer.error(ex, true);
+      standalone = true;
+    }
   }
 
   @Override
-  protected ClientLauncher launcher() {
-    return new ClientLauncher(context);
+  protected ALauncher launcher() throws IOException {
+    if(launcher == null) launcher = new ClientLauncher(context);
+    return launcher;
   }
 }

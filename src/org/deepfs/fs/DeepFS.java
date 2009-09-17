@@ -80,7 +80,7 @@ public final class DeepFS implements DataText {
    */
   public DeepFS(final String name) {
     ctx = new Context();
-    if (!new Open(name).execute(ctx))
+    if(!new Open(name).execute(ctx))
       new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS + 
         "=\"" + S_FSURL + "\"/>", name).execute(ctx);
     data = ctx.data();
@@ -504,7 +504,7 @@ public final class DeepFS implements DataText {
    */
   public int stat(final String path, final Stat sbuf) {
     final String method = "[stat] ";
-    if (path.equals("/")) {
+    if(path.equals("/")) {
       sbuf.st_ino = 1;
       sbuf.st_atimespec.setToMillis(rootStat.st_atimespec.toMillis());
       sbuf.st_ctimespec.setToMillis(rootStat.st_ctimespec.toMillis());
@@ -518,7 +518,7 @@ public final class DeepFS implements DataText {
       return 0;
     }
     int pre = path2pre(path);
-    if (pre == -1) {
+    if(pre == -1) {
       BaseX.debug(method + path + " (-1)");
       return -1;
     }
@@ -550,7 +550,7 @@ public final class DeepFS implements DataText {
     sbuf.st_uid =  Long.parseLong(string(uid));
     sbuf.st_gid =  Long.parseLong(string(gid));
     sbuf.st_nlink =  Long.parseLong(string(nlink));
-//    if (Prop.debug) sbuf.printFields("-", new PrintStream(System.err));
+//    if(Prop.debug) sbuf.printFields("-", new PrintStream(System.err));
     BaseX.debug(method + path + " ino: " + pre);
     return 0;
   }
@@ -563,10 +563,10 @@ public final class DeepFS implements DataText {
    */
   public byte[][] readdir(final String path) {
     int[] cld = path2preChildren(path);
-    if (cld == null) return null;
+    if(cld == null) return null;
     int len = cld.length;
     byte[][] dents = new byte[len][];
-    for (int i = 0; i < len; i++)
+    for(int i = 0; i < len; i++)
       dents[i] = attr(cld[i], nameID);
     return dents;
   }

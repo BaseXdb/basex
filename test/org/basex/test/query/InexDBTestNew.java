@@ -1,5 +1,6 @@
 package org.basex.test.query;
 
+
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import org.basex.BaseX;
 import org.basex.core.ALauncher;
+import org.basex.core.ClientLauncher;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
@@ -25,7 +27,6 @@ import org.basex.io.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
-import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -281,11 +282,11 @@ public final class InexDBTestNew {
           ok = false;
         }
       }
-      launcher = new ClientLauncherNew(ctx);
+      launcher = new ClientLauncher(ctx);
       launcher.execute(new Set(Prop.INFO, true));
     } catch(final Exception ex) {
       ok = false;
-      BaseX.errln("Please run BaseXServerNew for using server mode.");
+      BaseX.errln("Please run BaseXServer for using server mode.");
       ex.printStackTrace();
     }
 

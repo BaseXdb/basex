@@ -19,7 +19,6 @@ import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.server.BaseXServerNew;
 import org.basex.util.Args;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -38,7 +37,7 @@ public class BaseX {
   /** Database Context. */
   protected final Context context = new Context();
   /** Launcher. */
-  protected Launcher launcher;
+  protected ALauncher launcher;
   /** Standalone or Client/Server mode. */
   protected boolean standalone;
 
@@ -224,7 +223,7 @@ public class BaseX {
     try {
       launcher().execute(new Exit());
     } catch(final Exception ex) {
-      BaseXServerNew.error(ex, true);
+      BaseXServer.error(ex, true);
     }
     if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
   }

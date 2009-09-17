@@ -14,6 +14,8 @@ import org.junit.BeforeClass;
  * @author Christian Gruen
  */
 public final class CmdServerTest extends CmdTest {
+  /** Socket reference. */
+  private static ALauncher launcher;
   /** Server reference. */
   static BaseXServer server;
 
@@ -24,16 +26,22 @@ public final class CmdServerTest extends CmdTest {
       @Override
       public void run() { server = new BaseXServer(); }
     }.start();
+
+    try {
+      launcher = new ClientLauncher(CONTEXT);
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
+    }
   }
 
   /** Stops the server. */
   @AfterClass
   public static void quit() {
-    new BaseXServer("stop");
+    server.quit();
   }
 
   @Override
   protected ALauncher launcher() {
-    return new ClientLauncher(CONTEXT);
+    return launcher;
   }
 }

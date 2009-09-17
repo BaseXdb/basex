@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.ALauncher;
+import org.basex.core.ClientLauncher;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
@@ -15,7 +16,6 @@ import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
-import org.basex.server.ClientLauncherNew;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
@@ -201,12 +201,12 @@ public final class InexDBTest {
         }
       }
 
-      launcher = new ClientLauncherNew(ctx);
+      launcher = new ClientLauncher(ctx);
       launcher.execute(new Set(Prop.INFO, true));
       launcher.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {
       ok = false;
-      BaseX.errln("Please run BaseXServerNew for using server mode.");
+      BaseX.errln("Please run BaseXServer for using server mode.");
       ex.printStackTrace();
     }
 
