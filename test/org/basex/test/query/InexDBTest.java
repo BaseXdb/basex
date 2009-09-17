@@ -215,7 +215,6 @@ public final class InexDBTest {
         "  -d<no>  maximum no/database" + NL +
         "  -q<no>  maximum no/queries" + NL +
         "  -r<no>  number of runs" + NL +
-        "  -t      measure total time" + NL +
         "  -v      show process info");
     }
     return ok;

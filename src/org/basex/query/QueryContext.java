@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.HashMap;
 import org.basex.BaseX;
@@ -204,21 +203,20 @@ public final class QueryContext extends Progress {
     try {
       // cache the initial context nodes
       if(nodes != null) {
-        // create document nodes
         final Data data = nodes.data;
+        if(nodes.doc) doc = new DBNode[nodes.size()];
+
+        // create document nodes
         for(int d = 0, dl = nodes.size(); d < dl; d++) {
           final int p = nodes.nodes[d];
           if(nodes.doc || data.kind(p) == Data.DOC) {
             addDoc(new DBNode(data, p, Data.DOC));
-            rootDocs++;
           }
         }
-        if(rootDocs == 0) {
-          for(final int p : data.doc()) {
-            addDoc(new DBNode(data, p));
-            rootDocs++;
-          }
+        if(docs == 0) {
+          for(final int p : data.doc()) addDoc(new DBNode(data, p));
         }
+        rootDocs = docs;
 
         // create initial context items
         if(nodes.doc || !root.uses(Use.ELM, this)) {
@@ -237,6 +235,7 @@ public final class QueryContext extends Progress {
         // add collection instances
         addColl(new NodIter(doc, docs), token(data.meta.name));
       }
+      if(doc == null) doc = new DBNode[1];
 
       // evaluates the query and returns the result
       if(inf) compInfo(QUERYCOMP);

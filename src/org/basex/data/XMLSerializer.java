@@ -213,15 +213,16 @@ public final class XMLSerializer extends Serializer {
     out.print(DT);
     out.print(' ');
     out.print(t);
-    out.print(' ');
-    if (te != null) {
-      out.print("SYSTEM".getBytes());
+    if(te != null) {
+      out.print(' ');
+      out.print(SYS);
       out.print(' ');
       out.print(te);
-      if (ti != null) out.print(' ');
     }
-    
-    if (ti != null) out.print(ti);
+    if(ti != null) {
+      out.print(' ');
+      out.print(ti);
+    }
     out.print(ELEM2);
     out.println();
   }

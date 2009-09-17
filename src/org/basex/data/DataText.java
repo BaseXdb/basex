@@ -201,6 +201,8 @@ public interface DataText {
   byte[] COUNT = token("count");
   /** Doctype output. */
   byte[] DT = token("<!DOCTYPE");
+  /** Doctype system keyword. */
+  byte[] SYS = token("SYSTEM");
   /** Comment output. */
   byte[] COM1 = token("<!--");
   /** Comment output. */

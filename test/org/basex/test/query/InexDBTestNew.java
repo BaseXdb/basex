@@ -292,8 +292,7 @@ public final class InexDBTestNew {
     if(!ok) {
       BaseX.outln("Usage: " + BaseX.name(this) + " [options]" + NL +
       "  -u[...] update submission times" + NL +
-      "  -v      show process info" + NL +
-      "  -c      convert queries");
+      "  -x      convert queries");
     }
     return ok;
   }
@@ -304,9 +303,10 @@ public final class InexDBTestNew {
    */
   private static void openSubFile() throws Exception {
     sub = new PrintOutput("submission.xml");
-    sub.println("<!DOCTYPE efficiency-submission SYSTEM " +
-    "'efficiency-submission.dtd'>");
+
     xml = new XMLSerializer(sub, false, true);
+    xml.doctype(token("efficiency-submission"),
+        token("efficiency-submission.dtd"), null);
 
     // print header in output file
     xml.openElement(token("efficiency-submission"),
@@ -319,7 +319,7 @@ public final class InexDBTestNew {
         token("no_cpu"), token("2"),
         token("ram"), token("32 GB"),
         token("index_size_bytes"), token("7869335184"),
-        token("indexing_time_sec"), token("3028")
+        token("indexing_time_sec"), token("2874")
     );
     xml.emptyElement(token("topic-fields"),
         token("co_title"), token("no"),
