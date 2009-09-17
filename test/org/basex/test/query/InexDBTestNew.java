@@ -318,7 +318,8 @@ public final class InexDBTestNew {
         token("sequential"), token("yes"),
         token("no_cpu"), token("2"),
         token("ram"), token("32 GB"),
-        token("index_size_bytes"), token("7.5 GB")
+        token("index_size_bytes"), token("7869335184"),
+        token("indexing_time_sec"), token("3028")
     );
     xml.emptyElement(token("topic-fields"),
         token("co_title"), token("no"),

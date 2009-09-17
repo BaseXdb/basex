@@ -115,6 +115,9 @@ public class Tokenizer implements IndexToken {
     cs = fto.is(FTOpt.CS);
     wc = fto.is(FTOpt.WC);
     fz = fto.is(FTOpt.FZ);
+    st = fto.is(FTOpt.ST);
+    st = fto.is(FTOpt.ST);
+    dc = fto.is(FTOpt.DC);
     sd = fto.sd;
     fast = f;
   }

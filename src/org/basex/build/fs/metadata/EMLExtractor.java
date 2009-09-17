@@ -85,15 +85,15 @@ public final class EMLExtractor extends AbstractExtractor {
       mMultiPart = mContentType != null && mContentType.contains("multipart");
 
       // find beginning of first part
-      if(mMultiPart) while(!mCurrLine.contains(mBoundary))
-        readLine();
+      if(mMultiPart) while(!mCurrLine.contains(mBoundary) && readLine());
     }
 
     // parse all mail parts (can be just one)
-    while(getBodyData(build));
-
-    // need to reset if email is mbox format
-    mMultiPart = false;
+    if(mCurrLine != null) {
+      while(getBodyData(build));
+      // need to reset if email is mbox format
+      mMultiPart = false;
+    }
 
     build.endElem(EMAIL);
 

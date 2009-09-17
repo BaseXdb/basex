@@ -148,7 +148,7 @@ public final class InexDBTest {
 
       final CachedOutput out = new CachedOutput();
       launcher.info(out);
-      final String time = Pattern.compile(".*" + "Total Time: (.*?) ms.*",
+      final String time = Pattern.compile(".*Total Time: (.*?) ms.*",
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
 
       // output result

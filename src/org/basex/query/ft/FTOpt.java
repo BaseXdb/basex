@@ -271,19 +271,20 @@ public final class FTOpt extends ExprInfo {
   public String toString() {
     final StringBuilder s = new StringBuilder();
     if(is(ST) || sd != null)
-      s.append(" " + QueryTokens.WITH + " " + QueryTokens.STEMMING);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.STEMMING);
     if(is(WC))
-      s.append(" " + QueryTokens.WITH + " " + QueryTokens.WILDCARDS);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.WILDCARDS);
     if(is(FZ))
-      s.append(" " + QueryTokens.WITH + " " + QueryTokens.FUZZY);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.FUZZY);
     if(is(DC))
-      s.append(" " + QueryTokens.DIACRITICS + " " + QueryTokens.SENSITIVE);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.DIACRITICS + " " +
+          QueryTokens.SENSITIVE);
     if(th != null)
-      s.append(" " + QueryTokens.WITH + " " + QueryTokens.THESAURUS);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.THESAURUS);
     if(is(UC))
-      s.append(" " + QueryTokens.UPPERCASE);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.UPPERCASE);
     if(is(LC))
-      s.append(" " + QueryTokens.LOWERCASE);
+      s.append(" " + QueryTokens.USING + " " + QueryTokens.LOWERCASE);
     return s.toString();
   }
 }

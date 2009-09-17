@@ -84,7 +84,7 @@ abstract class ACreate extends Process {
     } catch(final IOException ex) {
       BaseX.debug(ex);
     }
-    DropDB.drop(db, prop);
+    if(db != null) DropDB.drop(db + ".tmp", prop);
     return error(err);
   }
 
