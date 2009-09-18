@@ -92,7 +92,7 @@ for ($i; $i<$anzahl; $i++) {
 }
 echo "<br/>";
 echo "<INPUT TYPE=\"Submit\" VALUE=\"Vote\" NAME=\"submitvote\"></FORM>";
-echo "<br/><H1>Results</H1>";
+echo "<br/><H1>Results:</H1>";
 $i=0;
 for ($i; $i<$anzahl; $i++) {
     echo $option[$i].": ".$votes[$i]." votes";
