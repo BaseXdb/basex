@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.fs.FSText;
+import org.basex.core.Main;
 import org.basex.util.Array;
 
 /**
@@ -167,13 +167,13 @@ public final class MP3Extractor extends AbstractExtractor {
 
       // no readable version found..
       if(tt == null) {
-        BaseX.debug(ID3UNKNOWN, tag, file.getName());
+        Main.debug(ID3UNKNOWN, tag, file.getName());
       } else if(enc == 0 || enc == 3) {
         // UTF16 not supported (0: ISO8859, 1: LE, 2: BW, 3: UTF8)
         final byte[] cont = chop(fsize - 1, tt.length == 3);
 
         if(cont == null) {
-          BaseX.debug(ID3NULL, tag, file.getName());
+          Main.debug(ID3NULL, tag, file.getName());
         } else if(cont.length != 0) {
           frames.add(tt[1]);
           frames.add(cont);
@@ -299,10 +299,10 @@ public final class MP3Extractor extends AbstractExtractor {
           builder.endElem(ID3);
         }
       } else {
-        BaseX.debug(ID3INVALID, file.getName());
+        Main.debug(ID3INVALID, file.getName());
       }
     } catch(final MetaDataException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
 
     if(found) builder.endElem(AUDIO);

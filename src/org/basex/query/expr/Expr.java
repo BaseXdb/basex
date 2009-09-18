@@ -1,7 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.query.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -201,7 +202,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 

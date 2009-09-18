@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.MP3Parser;
 import org.basex.build.fs.util.Metadata.DateField;
@@ -17,6 +16,7 @@ import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 import org.basex.util.LibraryLoader;
 import org.basex.util.Token;
 
@@ -215,7 +215,7 @@ public final class SpotlightExtractor {
           key = key.replace('.', '_').replace('-', '_');
           obj.contentTypeEvent(SpotlightContentType.valueOf(key));
         } catch(final IllegalArgumentException ex) {
-          BaseX.debug("SpotlightExtractor: unsupported ContentType found (%)",
+          Main.debug("SpotlightExtractor: unsupported ContentType found (%)",
               (String) o);
         }
       }
@@ -588,12 +588,12 @@ public final class SpotlightExtractor {
         i++;
       value = Token.toLong(a, 0, i);
       if(value == Long.MIN_VALUE) {
-        BaseX.debug("SpotlightExtractor: invalid value for int field: %",
+        Main.debug("SpotlightExtractor: invalid value for int field: %",
             (String) o);
         return;
       }
     } else {
-      BaseX.debug("SpotlightExtractor: unsupported data type: %",
+      Main.debug("SpotlightExtractor: unsupported data type: %",
           o.getClass().getName());
       return;
     }
@@ -634,12 +634,12 @@ public final class SpotlightExtractor {
       try {
         value = Double.parseDouble((String) o);
       } catch(final NumberFormatException e) {
-        BaseX.debug("SpotlightExtractor: invalid value for int field: %",
+        Main.debug("SpotlightExtractor: invalid value for int field: %",
             (String) o);
         return;
       }
     } else {
-      BaseX.debug("SpotlightExtractor: unsupported data type: %",
+      Main.debug("SpotlightExtractor: unsupported data type: %",
           o.getClass().getName());
       return;
     }

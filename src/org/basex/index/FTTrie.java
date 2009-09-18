@@ -1,10 +1,11 @@
 package org.basex.index;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
@@ -57,9 +58,9 @@ public final class FTTrie extends FTIndex {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(TRIE + NL);
-    tb.add("- %: %" + NL, CREATESTEM, BaseX.flag(data.meta.ftst));
-    tb.add("- %: %" + NL, CREATECS, BaseX.flag(data.meta.ftcs));
-    tb.add("- %: %" + NL, CREATEDC, BaseX.flag(data.meta.ftdc));
+    tb.add("- %: %" + NL, CREATESTEM, Main.flag(data.meta.ftst));
+    tb.add("- %: %" + NL, CREATECS, Main.flag(data.meta.ftcs));
+    tb.add("- %: %" + NL, CREATEDC, Main.flag(data.meta.ftdc));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data.meta.prop);

@@ -15,7 +15,6 @@ m_view=Ansicht
 m_options=Optionen
 m_help=Hilfe
 m_db=Datenbank
-m_xquery=XQuery
 m_main=Hauptfenster
 m_views=Ansichten
 m_inter=Interaktion
@@ -223,8 +222,8 @@ c_goup=Hoch
 c_gouptt=Wechselt eine Ebene nach oben.
 c_importfs=Importiere Filesystem
 c_importfstt=Erstellt eine Datenbank aus der Filesystem-Struktur.
-c_info=Datenbank-Information
-c_infott=Zeigt Informationen über die aktuelle Datenbank an.
+c_props=Eigenschaften
+c_propstt=Zeigt Informationen über die aktuelle Datenbank an.
 c_insert=Neu
 c_inserttt=Erzeugt einen neuen XML-Knoten.
 c_maplayout=Map-Layout...
@@ -269,9 +268,9 @@ c_showtexttt=Zeigt die Textansicht an.
 c_showxquery=Anfrage-Editor
 c_showxquerytt=Zeigt den Anfrage-Editor an.
 c_undo=Rückgängig
-c_xqopen=Öffnen
+c_xqopen=XQuery öffnen
 c_xqopentt=Öffnet eine XQuery-Datei
-c_xqsave=Speichern
+c_xqsave=XQuery speichern
 c_xqsavett=Speichert die XQuery-Datei
 
 # Commands & Processes
@@ -340,7 +339,7 @@ cs_client=Client
 srv_connect=Server ist nicht erreichbar.
 srv_timeout=Der Prozess hat das Timeout überschritten.
 srv_bind=Server läuft, oder Zugriff wurde untersagt.
-srv_start=wurde gestartet.\nWartet auf Anfragen...
+srv_start=Wartet auf Anfragen...
 srv_stop=wurde gestoppt.
 
 # Bye
@@ -389,11 +388,14 @@ uc_invalid=Name "%" ist ungültig.
 uc_txtinvalid=Textknoten können nicht leer sein.
 uc_namespaces=Dokumente mit Namespaces können nicht verändert werden.
 
+# Server Commands
+sv_databases=% opened database(s)
+sv_sessions=% session(s)
+
 # General Commands
 gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.
 
 # Info Strings
-info_head=Datenbank-Information
 info_index=Indizes
 info_build=Erstelle Indizes
 info_opt=Optimiere Datenbank
@@ -430,7 +432,7 @@ info_atvindex=Attribut-Index
 info_ftindex=Volltext-Index
 info_fzindex=unscharf
 info_outofdated=veraltet
-info_db=Datenbank-Information
+info_db=Datenbank-Eigenschaften
 info_create=Datenbankerstellung
 info_general=Allgemeines
 info_resultchop=gekürzt
@@ -486,12 +488,19 @@ ch_delete1=Löschen von XML-Knoten.
 ch_delete2=Löscht die Knoten, die der angegebenen\n[%]-Anfrage entsprechen.
 ch_insert1=Einfügen von XML-Knoten.
 ch_insert2=Fügt ein Fragment oder einen angegebenen Knoten als\nKind [%] (0 = letztes Kind) der angegebenen\n[%]-Anfrage ein:
-ch_insert21=Fügt [%] ein
-ch_insert22=Fügt [%] und [%] ein
+ch_insert21=fügt [%] ein
+ch_insert22=fügt [%] und [%] ein
 ch_update1=Aktualisieren von XML-Knoten.
 ch_update2=Aktualisiert Knoten, die der angegebenen [%]-Anfrage entsprechen:
-ch_update21=Aktualisiert mit [%]
-ch_update22=Aktualisiert mit [%] und [%]
+ch_update21=aktualisiert mit [%]
+ch_update22=aktualisiert mit [%] und [%]
+ch_helpserver0=Server-Befehle:
+ch_kill1=Beenden der Datenbank-Sessions.
+ch_kill2=Beendet alle Datenbank-Sessions.
+ch_show1=Anzeige von Server-Information.
+ch_show21=Zeigt Server-Information an:
+ch_show22=zeigt aktuell geöffnete Datenbanken.
+ch_show23=zeigt aktuelle Datenbank-Sessions.
 ch_helpgeneral0=Allgemeine Befehle:
 ch_set1=Setzen von allgemeinen Optionen (aktuelle Werte via '%').
 ch_set2=Verfügbare Optionen [%] mit [%] = on/off:

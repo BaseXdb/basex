@@ -1,6 +1,7 @@
 package org.basex.build;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.data.MemData;
 import org.basex.data.MetaData;

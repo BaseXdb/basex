@@ -10,7 +10,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * Some utility methods for loading class files from folders, packages or jar
@@ -115,7 +116,7 @@ public final class Loader extends ClassLoader {
       throw ex;
     } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
-      BaseX.errln("Failed to load class: %", t);
+      Main.errln("Failed to load class: %", t);
     }
     // return only the correctly initialized classes
     final int counter = initializeClasses(foundClasses);
@@ -189,7 +190,7 @@ public final class Loader extends ClassLoader {
       throw ex;
     } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error.
-      BaseX.errln("Failed to load class (%)", t.getMessage());
+      Main.errln("Failed to load class (%)", t.getMessage());
     }
     return loadedClasses.toArray(new Class<?>[loadedClasses.size()]);
   }
@@ -389,7 +390,7 @@ public final class Loader extends ClassLoader {
         Class.forName(c.getName(), true, ClassLoader.getSystemClassLoader());
         counter++;
       } catch(final Throwable t) { // catch everything and break after an error.
-        BaseX.errln("Failed to load class (%)", t.getMessage());
+        Main.errln("Failed to load class (%)", t.getMessage());
         break;
       }
     }

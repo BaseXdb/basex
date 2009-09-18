@@ -2,7 +2,8 @@ package org.basex.io;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 
 /**
@@ -99,32 +100,32 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write1(final int p, final int o, final int v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public void write2(final int p, final int o, final int v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public void write4(final int p, final int o, final int v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public void write5(final int p, final int o, final long v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public void delete(final int pre, final int size) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public void insert(final int pre, final byte[] entries) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override

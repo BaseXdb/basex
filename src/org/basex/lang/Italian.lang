@@ -15,7 +15,6 @@ m_view=Visualizza
 m_options=Opzioni
 m_help=Aiuto
 m_db=Database
-m_xquery=XQuery
 m_main=Finestra principale
 m_views=Visualizzazioni
 m_inter=Interazione
@@ -226,8 +225,8 @@ c_goup=Livello superiore
 c_gouptt=Sale di un livello.
 c_importfs=Importa Filesystem
 c_importfstt=Crea un database a partire dalla struttura del Filesystem.
-c_info=Info Database
-c_infott=Mostra le informazioni sul Database attualmente in uso.
+c_props=Informazioni
+c_propstt=Mostra le informazioni sul Database attualmente in uso.
 c_insert=Nuovo
 c_inserttt=Crea un nuovo nodo XML.
 c_maplayout=Map Layout...
@@ -272,9 +271,9 @@ c_showtexttt=Mostra la visualizazzione testo.
 c_showxquery=Pannello Query
 c_showxquerytt=Mostra il pannello delle query.
 c_undo=Annulla
-c_xqopen=Apri
+c_xqopen=Apri XQuery
 c_xqopentt=Apre un file XQuery
-c_xqsave=Salva
+c_xqsave=Salva XQuery
 c_xqsavett=Salva la file XQuery
 
 # Commands & Processes
@@ -344,7 +343,7 @@ cs_client=Client
 srv_connect=Impossibile comunicare col Server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
-srv_start=avviato.\nAttendo richieste...
+srv_start=Attendo richieste...
 srv_stop=fermato.
 
 # Bye
@@ -393,11 +392,14 @@ uc_invalid=Il nome "%" non è valido.
 uc_txtinvalid=I nodi testo non possono essere vuoti.
 uc_namespaces=Impossibile aggiornare documenti con namespace.
 
+# Server Commands
+sv_databases=% opened database(s)
+sv_sessions=% session(s)
+
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
-info_head=Informazioni sul Database
 info_index=Indici
 info_build=Creazione indici
 info_opt=Ottimizzando Database
@@ -496,6 +498,13 @@ ch_update1=Aggiorna nodi XML.
 ch_update2=Aggiorna i nodi che soddisfano la query [%] specificata:
 ch_update21=Update with [%]
 ch_update22=Update with [%] and [%]
+ch_helpserver0=Comandi server:
+ch_kill1=Kill databases sessions.
+ch_kill2=Kills all current database sessions.
+ch_show1=Show server information.
+ch_show21=Shows server information:
+ch_show22=shows currently opened databases.
+ch_show23=shows current database sessions.
 ch_helpgeneral0=Comandi generali:
 ch_set1=Imposta opzioni globali (valori attuali: usa '%').
 ch_set2=Opzioni [%] disponibili con valore [%] = on/off:

@@ -4,7 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.math.BigDecimal;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -133,7 +134,7 @@ public abstract class Item extends Expr {
    * @return string representation
    */
   public byte[] str() {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -170,7 +171,7 @@ public abstract class Item extends Expr {
    */
   @SuppressWarnings("unused")
   public BigDecimal dec() throws QueryException {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -181,7 +182,7 @@ public abstract class Item extends Expr {
    */
   @SuppressWarnings("unused")
   public long itr() throws QueryException {
-    BaseX.notexpected();
+    Main.notexpected();
     return 0;
   }
 
@@ -192,7 +193,7 @@ public abstract class Item extends Expr {
    */
   @SuppressWarnings("unused")
   public float flt() throws QueryException {
-    BaseX.notexpected();
+    Main.notexpected();
     return 0;
   }
 
@@ -203,7 +204,7 @@ public abstract class Item extends Expr {
    */
   @SuppressWarnings("unused")
   public double dbl() throws QueryException {
-    BaseX.notexpected();
+    Main.notexpected();
     return 0;
   }
 

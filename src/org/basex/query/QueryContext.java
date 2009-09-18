@@ -1,13 +1,13 @@
 package org.basex.query;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
@@ -559,6 +559,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return BaseX.name(this) + '[' + file + ']';
+    return Main.name(this) + '[' + file + ']';
   }
 }

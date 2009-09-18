@@ -1,6 +1,6 @@
 package org.basex.util;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 
 /**
  * Utility class to load shared libraries.
@@ -26,7 +26,7 @@ public final class LibraryLoader {
   private static void loadLibrary(final String libName) {
     try {
       System.loadLibrary(libName);
-      BaseX.debug("Loading library ... OK (" + libName + ").");
+      Main.debug("Loading library ... OK (" + libName + ").");
 
       if(libName.equals(SPOTEXLIBNAME)) {
         spotexLoaded = true;
@@ -38,8 +38,8 @@ public final class LibraryLoader {
       }
 
     } catch(UnsatisfiedLinkError e) {
-      BaseX.errln("Loading library failed (" + libName + ")." + e);
-      BaseX.errln("-Djava.library.path is : '"
+      Main.errln("Loading library failed (" + libName + ")." + e);
+      Main.errln("-Djava.library.path is : '"
           + System.getProperty("java.library.path") + "'");
     }
   }

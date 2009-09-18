@@ -5,7 +5,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.util.Token;
 
@@ -138,7 +139,7 @@ final class MapFSImages {
             if((loaderC & 5) == 0 && !view.gui.painting) paint();
           } catch(final Exception ex) {
             // catch and ignore any kind of exception
-            BaseX.debug(ex);
+            Main.debug(ex);
           }
         }
         paint();

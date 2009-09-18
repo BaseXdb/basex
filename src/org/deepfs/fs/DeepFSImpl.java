@@ -2,7 +2,7 @@ package org.deepfs.fs;
 
 import java.nio.ByteBuffer;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.catacombae.jfuse.FUSE;
 import org.catacombae.jfuse.FUSEFileSystemAdapter;
 import org.catacombae.jfuse.types.fuse26.FUSEFileInfo;
@@ -50,14 +50,14 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   public int mknod(final ByteBuffer path, final short fileMode,
       final long deviceNumber) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    BaseX.debug("mknod: " + pathString);
+    Main.debug("mknod: " + pathString);
     return 0;
   }
 
   @Override
   public int mkdir(final ByteBuffer path, final short createMode) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    BaseX.debug("mkdir: " + pathString);
+    Main.debug("mkdir: " + pathString);
     int rc = dbfs.mkdir(pathString, createMode);
     if(rc == -1) return -ENETRESET;
     return 0;
@@ -66,7 +66,7 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   @Override
   public int getattr(final ByteBuffer path, final Stat stbuf) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    BaseX.debug("getattr: " + pathString);
+    Main.debug("getattr: " + pathString);
     if(pathString == null) return -ENOENT;
     int rc = dbfs.stat(pathString, stbuf);
     if(rc == -1) return -ENOENT;
@@ -121,7 +121,7 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
 
   @Override
   public void destroy(final Object o) {
-    BaseX.debug("destroy");
+    Main.debug("destroy");
     dbfs.umount();
   }
   

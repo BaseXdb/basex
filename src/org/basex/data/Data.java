@@ -2,7 +2,8 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -447,6 +448,6 @@ public abstract class Data {
 
   @Override
   public String toString() {
-    return BaseX.name(this) + "[" + meta.name + "]";
+    return Main.name(this) + "[" + meta.name + "]";
   }
 }

@@ -1,14 +1,15 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.NativeBuilder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -67,22 +68,22 @@ abstract class ACreate extends Process {
       }
       return info(DBCREATED, db, perf.getTimer());
     } catch(final FileNotFoundException ex) {
-      BaseX.debug(ex);
-      err = BaseX.info(FILEWHICH, p.io);
+      Main.debug(ex);
+      err = Main.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
       err = PROGERR;
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       final String msg = ex.getMessage();
-      err = BaseX.info(msg != null ? msg : args[0]);
+      err = Main.info(msg != null ? msg : args[0]);
     } catch(final Exception ex) {
-      BaseX.debug(ex);
-      err = BaseX.info(CREATEERR, args[0]);
+      Main.debug(ex);
+      err = Main.info(CREATEERR, args[0]);
     }
     try {
       builder.close();
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     if(db != null) DropDB.drop(db + ".tmp", prop);
     return error(err);

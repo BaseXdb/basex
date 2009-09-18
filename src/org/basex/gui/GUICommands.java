@@ -1,14 +1,15 @@
 package org.basex.gui;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import javax.swing.AbstractButton;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
@@ -89,6 +90,55 @@ public enum GUICommands implements GUICommand {
     }
   },
 
+  /** Shows database info. */
+  INFO(true, GUIINFO, "% D", GUIINFOTT) {
+    @Override
+    public void execute(final GUI gui) {
+      final DialogInfo info = new DialogInfo(gui);
+      if(info.ok()) {
+        final Data d = gui.context.data();
+        final boolean[] ind = info.indexes();
+        if(info.opt) {
+          d.meta.txtindex = ind[0];
+          d.meta.atvindex = ind[1];
+          d.meta.ftxindex = ind[2];
+          progress(gui, INFOOPT, new Process[] { new Optimize() });
+        } else {
+          Process[] proc = new Process[0];
+          if(ind[0] != d.meta.pathindex)
+            proc = Array.add(proc, cmd(ind[0], CmdIndex.SUMMARY));
+          if(ind[1] != d.meta.txtindex)
+            proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
+          if(ind[2] != d.meta.atvindex)
+            proc = Array.add(proc, cmd(ind[2], CmdIndex.ATTRIBUTE));
+          if(ind[3] != d.meta.ftxindex)
+            proc = Array.add(proc, cmd(ind[3], CmdIndex.FULLTEXT));
+
+          if(proc.length != 0) progress(gui, INFOBUILD, proc);
+        }
+      }
+    }
+
+    /**
+     * Returns a process for creating/dropping the specified index.
+     * @param create create flag
+     * @param index name of index
+     * @return process reference
+     */
+    private Process cmd(final boolean create, final CmdIndex index) {
+      return create ? new CreateIndex(index) : new DropIndex(index);
+    }
+  },
+
+  /** Exports a document. */
+  EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
+    @Override
+    public void execute(final GUI gui) {
+      final IO file = save(gui, gui.context.data().doc().length == 1);
+      if(file != null) gui.execute(new Export(file.path()));
+    }
+  },
+
   /** Opens a dialog to drop databases. */
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
@@ -156,15 +206,6 @@ public enum GUICommands implements GUICommand {
       final String m = gprop.get(GUIProp.FSMOUNT);
       final String b = gprop.get(GUIProp.FSBACKING);
       progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
-    }
-  },
-
-  /** Exports a document. */
-  EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
-    @Override
-    public void execute(final GUI gui) {
-      final IO file = save(gui, gui.context.data().doc().length == 1);
-      if(file != null) gui.execute(new Export(file.path()));
     }
   },
 
@@ -693,46 +734,6 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
-  /** Shows database info. */
-  INFO(true, GUIINFO, "% D", GUIINFOTT) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogInfo info = new DialogInfo(gui);
-      if(info.ok()) {
-        final Data d = gui.context.data();
-        final boolean[] ind = info.indexes();
-        if(info.opt) {
-          d.meta.txtindex = ind[0];
-          d.meta.atvindex = ind[1];
-          d.meta.ftxindex = ind[2];
-          progress(gui, INFOOPT, new Process[] { new Optimize() });
-        } else {
-          Process[] proc = new Process[0];
-          if(ind[0] != d.meta.pathindex)
-            proc = Array.add(proc, cmd(ind[0], CmdIndex.SUMMARY));
-          if(ind[1] != d.meta.txtindex)
-            proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
-          if(ind[2] != d.meta.atvindex)
-            proc = Array.add(proc, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftxindex)
-            proc = Array.add(proc, cmd(ind[3], CmdIndex.FULLTEXT));
-
-          if(proc.length != 0) progress(gui, INFOBUILD, proc);
-        }
-      }
-    }
-
-    /**
-     * Returns a process for creating/dropping the specified index.
-     * @param create create flag
-     * @param index name of index
-     * @return process reference
-     */
-    private Process cmd(final boolean create, final CmdIndex index) {
-      return create ? new CreateIndex(index) : new DropIndex(index);
-    }
-  },
-
   /** Shows the "about" information. */
   ABOUT(false, GUIABOUT, null, GUIABOUTTT) {
     @Override
@@ -873,7 +874,7 @@ public enum GUICommands implements GUICommand {
 
           // return user information
           if(ok) {
-            gui.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
+            gui.status.setText(Main.info(PROCTIME, perf.getTimer()));
             if(op) Dialog.info(gui, INFOOPTIM);
           } else {
             final String info = p.info();

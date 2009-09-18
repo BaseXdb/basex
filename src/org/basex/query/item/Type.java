@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
-import org.basex.BaseX;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
@@ -16,6 +15,7 @@ import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DOCWrapper;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
@@ -729,7 +729,7 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Object o) throws QueryException {
-    BaseX.notexpected(o);
+    Main.notexpected(o);
     return null;
   }
 

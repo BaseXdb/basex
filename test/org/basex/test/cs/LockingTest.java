@@ -1,6 +1,7 @@
 package org.basex.test.cs;
 
 import java.io.IOException;
+import org.basex.BaseXServer;
 import org.basex.core.ALauncher;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -9,8 +10,7 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.NullOutput;
-import org.basex.BaseXServer;
-import org.basex.core.ClientLauncher;
+import org.basex.server.ClientLauncher;
 
 /**
  * This class tests the four locking cases.

@@ -59,7 +59,7 @@ public final class Lang {
       final String path = SUFFIX + "/" + lang + "." + SUFFIX;
       final URL url = BaseX.class.getResource(path);
       if(url == null) {
-        BaseX.errln("%." + SUFFIX + " not found.", lang);
+        Main.errln("%." + SUFFIX + " not found.", lang);
       } else {
         final BufferedReader br = new BufferedReader(new InputStreamReader(
             (InputStream) url.getContent(), Token.UTF8));
@@ -74,14 +74,14 @@ public final class Lang {
           if(texts.get(key) == null) {
             texts.put(key, val);
           } else if(chk) {
-            BaseX.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
+            Main.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
           }
           if(chk) check.put(key, true);
         }
         br.close();
       }
     } catch(final IOException ex) {
-      BaseX.errln(ex);
+      Main.errln(ex);
     }
   }
 
@@ -94,7 +94,7 @@ public final class Lang {
     if(key == null) {
       if(CHECK && check.size() != 0) {
         final Iterator<String> it = check.keySet().iterator();
-        while(it.hasNext()) BaseX.errln("%." + SUFFIX + ": '%' not used",
+        while(it.hasNext()) Main.errln("%." + SUFFIX + ": '%' not used",
             Prop.language, it.next());
       }
       return null;
@@ -102,7 +102,7 @@ public final class Lang {
 
     final String val = texts.get(key);
     if(val == null) {
-      if(texts.size() != 0) BaseX.errln("%." + SUFFIX + ": '%' missing",
+      if(texts.size() != 0) Main.errln("%." + SUFFIX + ": '%' missing",
           Prop.language, key);
       return "?????";
     }
@@ -144,7 +144,7 @@ public final class Lang {
         }
       }
     } catch(final IOException ex) {
-      BaseX.errln(ex);
+      Main.errln(ex);
     }
     return new String[][] { langs.finish(), creds.finish() };
   }

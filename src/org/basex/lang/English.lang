@@ -15,7 +15,6 @@ m_view=View
 m_options=Options
 m_help=Help
 m_db=Database
-m_xquery=XQuery
 m_main=Main Window
 m_views=Views
 m_inter=Interaction
@@ -223,8 +222,8 @@ c_goup=Go Up
 c_gouptt=Move one level up.
 c_importfs=Import Filesystem
 c_importfstt=Creates a database from the filesystem structure.
-c_info=Database Info
-c_infott=Show information on the currently opened database.
+c_props=Properties
+c_propstt=Show information on the currently opened database.
 c_insert=New
 c_inserttt=Creates a new XML node.
 c_maplayout=Map Layout...
@@ -269,9 +268,9 @@ c_showtexttt=Show the text view.
 c_showxquery=Query Editor
 c_showxquerytt=Show the Query editor.
 c_undo=Undo
-c_xqopen=Open
+c_xqopen=Open XQuery
 c_xqopentt=Opens an XQuery file
-c_xqsave=Save
+c_xqsave=Save XQuery
 c_xqsavett=Saves the XQuery file
 
 # Commands & Processes
@@ -340,7 +339,7 @@ cs_client=Client
 srv_connect=Can't communicate with the server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
-srv_start=started.\nWaiting for requests...
+srv_start=Waiting for requests...
 srv_stop=stopped.
 
 # Bye
@@ -389,11 +388,14 @@ uc_invalid=Name "%" is invalid.
 uc_txtinvalid=Text nodes cannot be empty.
 uc_namespaces=Cannot update documents with namespaces.
 
+# Server Commands
+sv_databases=% opened database(s)
+sv_sessions=% session(s)
+
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
-info_head=Database Information
 info_index=Indexes
 info_build=Building Indexes
 info_opt=Optimizing Database
@@ -430,7 +432,7 @@ info_atvindex=Attribute Index
 info_ftindex=Full-Text Index
 info_fzindex=fuzzy
 info_outofdated=out-of-dated
-info_db=Database Information
+info_db=Database Properties
 info_create=Database Creation
 info_general=General Information
 info_resultchop=chopped
@@ -486,12 +488,19 @@ ch_delete1=Delete XML nodes.
 ch_delete2=Deletes nodes satisfying the specified [%] query.
 ch_insert1=Insert XML nodes.
 ch_insert2=Inserts a fragment or specific node as\n child [%] (0=last child) of the given [%] query:
-ch_insert21=Insert [%]
-ch_insert22=Insert [%] and [%]
+ch_insert21=insert [%]
+ch_insert22=insert [%] and [%]
 ch_update1=Update XML nodes.
 ch_update2=Updates nodes satisfying the specified [%] query:
-ch_update21=Update with [%]
-ch_update22=Update with [%] and [%]
+ch_update21=update with [%]
+ch_update22=update with [%] and [%]
+ch_helpserver0=Server Commands:
+ch_kill1=Kill databases sessions.
+ch_kill2=Kills all current database sessions.
+ch_show1=Show server information.
+ch_show21=Shows server information:
+ch_show22=shows currently opened databases.
+ch_show23=shows current database sessions.
 ch_helpgeneral0=General Commands:
 ch_set1=Set global options (current values: try '%').
 ch_set2=Available options [%] with value [%] = on/off:

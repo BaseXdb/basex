@@ -2,7 +2,8 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
 import org.basex.util.TokenBuilder;
@@ -60,6 +61,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return BaseX.info("%(%)", name(), base);
+    return Main.info("%(%)", name(), base);
   }
 }

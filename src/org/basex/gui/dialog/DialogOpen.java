@@ -1,14 +1,14 @@
 package org.basex.gui.dialog;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
@@ -129,7 +129,7 @@ public final class DialogOpen extends Dialog {
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
       if(db.length() == 0) return;
-      if(Dialog.confirm(this, BaseX.info(DROPCONF, db))) {
+      if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
         if(ctx.data() != null && ctx.data().meta.name.equals(db)) {
           new Close().execute(gui.context);
           gui.notify.init();

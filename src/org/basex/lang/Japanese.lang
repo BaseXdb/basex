@@ -15,7 +15,6 @@ m_view=ビュー
 m_options=オプション
 m_help=ヘルプ
 m_db=データベース
-m_xquery=XQuery
 m_main=メインウィンドウ
 m_views=Views
 m_inter=Interaction
@@ -223,8 +222,8 @@ c_goup=上へ
 c_gouptt=1階層上に行きます。
 c_importfs=ファイルシステムからインポート
 c_importfstt=ファイルシステムの構造からデータベースを作成します。
-c_info=データベース情報
-c_infott=現在選択されているデータベースについての情報を表示します。
+c_props=情報
+c_propstt=現在選択されているデータベースについての情報を表示します。
 c_insert=新規
 c_inserttt=新しいXMLノードを作成します。
 c_maplayout=マップレイアウト
@@ -269,9 +268,9 @@ c_showtexttt=テキストビューを表示します。
 c_showxquery=クエリーパネル
 c_showxquerytt=クエリーパネルを表示します。
 c_undo=アンドゥ
-c_xqopen=開く
+c_xqopen=XQuery 開く
 c_xqopentt=XQueryファイルを開きます。
-c_xqsave=保存
+c_xqsave=XQuery 保存
 c_xqsavett=現在のXQueryを保存します。
 
 # Commands & Processes
@@ -340,7 +339,7 @@ cs_client=クライアント
 srv_connect=サーバーと通信できません。
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
-srv_start=開始しました。\nリクエストを待っています。
+srv_start=リクエストを待っています。
 srv_stop=停止しました。
 
 # Bye
@@ -389,11 +388,14 @@ uc_invalid=不正な名 "%"
 uc_txtinvalid=テキストノードを空に出来ません。
 uc_namespaces=名前空間付きの文書を更新できません。
 
+# Server Commands
+sv_databases=% opened database(s)
+sv_sessions=% session(s)
+
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
-info_head=データベース情報
 info_index=インデックス
 info_build=インデックスを構築中
 info_opt=データベースを最適化中
@@ -492,6 +494,13 @@ ch_update1=XMLノードの更新
 ch_update2=指定された [%] クエリーを満たすノードを更新します。:
 ch_update21=ターゲットを [%] に更新
 ch_update22=ターゲットを  [%] と [%] に更新
+ch_helpserver0=Server Commands:
+ch_kill1=Kill databases sessions.
+ch_kill2=Kills all current database sessions.
+ch_show1=Show server information.
+ch_show21=Shows server information:
+ch_show22=shows currently opened databases.
+ch_show23=shows current database sessions.
 ch_helpgeneral0=全般的なコマンド:
 ch_set1=グローバルオプションをセットします(現在の値を見るには '%' と入力します)。
 ch_set2=Available options [%] with [%] = on/off:

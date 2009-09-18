@@ -1,8 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.util.Token;
 
@@ -28,7 +30,7 @@ public final class Run extends AQuery {
     try {
       return query(Token.string(io.content()));
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       final String msg = ex.getMessage();
       return error(msg != null ? msg : args[0]);
     }

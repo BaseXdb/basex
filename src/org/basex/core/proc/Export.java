@@ -1,8 +1,9 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
@@ -44,14 +45,14 @@ public final class Export extends Process {
           file = file.merge(IO.get(Token.string(data.text(pre))));
         }
         final PrintOutput out = new PrintOutput(file.path());
-        out.println(BaseX.info(DOCDECL, Token.UTF8));
+        out.println(Main.info(DOCDECL, Token.UTF8));
         new XMLSerializer(out, false, data.meta.chop).node(data, pre);
         out.close();
 
       }
       return info(DBEXPORTED, data.meta.name, perf.getTimer());
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(ex.getMessage());
     }
   }

@@ -1,7 +1,8 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.Process;
 import org.basex.io.PrintOutput;
@@ -25,10 +26,10 @@ public final class Help extends Process {
   protected void out(final PrintOutput out) throws IOException {
     try {
       final Cmd cmd = Cmd.valueOf(args[0]);
-      out.print(cmd.help(true));
+      out.print(cmd.help(true, context.server));
     } catch(final Exception ex) {
       out.println(CMDHELP);
-      for(final Cmd c : Cmd.values()) out.print(c.help(false));
+      for(final Cmd c : Cmd.values()) out.print(c.help(false, context.server));
     }
   }
 }

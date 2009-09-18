@@ -1,6 +1,6 @@
 package org.basex.core.proc;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.data.Nodes;
 
 /**
@@ -32,6 +32,6 @@ public final class Cs extends AQuery {
 
   @Override
   public String toString() {
-    return BaseX.name(this).toUpperCase() + ' ' + args[0];
+    return Main.name(this).toUpperCase() + ' ' + args[0];
   }
 }

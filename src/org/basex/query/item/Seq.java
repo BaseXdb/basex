@@ -3,7 +3,8 @@ package org.basex.query.item;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -107,7 +108,7 @@ public class Seq extends Item {
 
   @Override
   public int diff(final Item it) {
-    BaseX.notexpected();
+    Main.notexpected();
     return 0;
   }
 

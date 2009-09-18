@@ -1,7 +1,8 @@
 package org.basex.test.w3c;
 
 import java.util.HashMap;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
@@ -48,7 +49,7 @@ public final class XQFTTS extends W3CTS {
 
   @Override
   void init(final Nodes root) throws Exception {
-    BaseX.outln("Caching Full-text Structures...");
+    Main.outln("Caching Full-text Structures...");
     for(final int s : nodes("//*:stopwords", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');

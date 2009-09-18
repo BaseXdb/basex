@@ -1,7 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.BuildException;

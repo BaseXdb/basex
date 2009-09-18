@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
@@ -77,7 +77,7 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   public TypeInfo getSchemaTypeInfo() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 

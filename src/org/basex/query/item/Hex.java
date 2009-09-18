@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -104,6 +104,6 @@ public final class Hex extends Item {
 
   @Override
   public String toString() {
-    return BaseX.info("\"%\"", b2h());
+    return Main.info("\"%\"", b2h());
   }
 }

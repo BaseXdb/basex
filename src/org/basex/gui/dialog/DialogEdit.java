@@ -1,11 +1,11 @@
 package org.basex.gui.dialog;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
@@ -59,7 +59,7 @@ public final class DialogEdit extends Dialog {
     final Data data = context.data();
     kind = data.kind(pre);
 
-    final String title = BaseX.info(EDITTEXT, EDITKIND[kind]);
+    final String title = Main.info(EDITTEXT, EDITKIND[kind]);
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 

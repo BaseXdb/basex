@@ -1,10 +1,12 @@
 package org.basex.core;
 
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.Array;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class organizes all currently opened database.
@@ -12,7 +14,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class DataPool {
+final class DataPool {
   /** Data references. */
   private Data[] data = new Data[1];
   /** Number of current database users. */
@@ -25,7 +27,7 @@ public final class DataPool {
    * @param db name of the database
    * @return data reference
    */
-  public Data pin(final String db) {
+  Data pin(final String db) {
     for(int i = 0; i < size; i++) {
       if(data[i].meta.name.equals(db)) {
         pins[i]++;
@@ -40,7 +42,7 @@ public final class DataPool {
    * @param d data reference
    * @return true if reference was removed from the pool
    */
-  public boolean unpin(final Data d) {
+  boolean unpin(final Data d) {
     // ignore main memory database instances
     if(d instanceof MemData) return false;
 
@@ -72,7 +74,7 @@ public final class DataPool {
    * Adds a data reference to the pool.
    * @param d data reference
    */
-  public void add(final Data d) {
+  void add(final Data d) {
     // ignore main memory database instances
     if(d instanceof MemData) return;
 
@@ -86,13 +88,27 @@ public final class DataPool {
   }
 
   /**
+   * Returns information on the opened database instances.
+   * @return data reference
+   */
+  String info() {
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(SRVDATABASES, size);
+    tb.add(size != 0 ? COL + NL : DOT);
+    for(int i = 0; i < size; i++) {
+      tb.add(LI + data[i].meta.name + " (" + pins[i] + "x)");
+    }
+    return tb.toString();
+  }
+
+  /**
    * Closes all data references.
    */
-  public synchronized void close() {
+  synchronized void close() {
     try {
       for(int i = 0; i < size; i++) data[i].close();
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     size = 0;
   }

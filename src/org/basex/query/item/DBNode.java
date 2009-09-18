@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
+import org.basex.query.ft.Scoring;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.Err;
@@ -19,7 +20,7 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public class DBNode extends Nod {
-  /** Scoring step. */
+  /** Scoring step; a better place for this might be {@link Scoring}. */
   private static final double SCORESTEP = 0.8;
   /** Node Types. */
   private static final Type[] TYPES = {
@@ -183,23 +184,11 @@ public class DBNode extends Nod {
   public Nod parent() {
     if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
+    if(p == -1) return null;
 
     // check if parent constructor exists; if not, include document root node
-    if(p == (root != null ? 0 : -1)) return root;
     final DBNode node = copy();
     node.set(p, data.kind(p));
-    //double f = (double) distToRoot(node.pre) / (double) data.meta.height;
-    //node.score(node.score * Math.max(1 - f, f));
-    node.score(node.score * SCORESTEP);
-    
-    //System.out.println(this + ": " + data.tags.id(node.nname()));
-    /*
-    final int tid = data.tags.id(node.nname());
-    StatsKey sk = data.tags.stat(tid);
-    if (sk != null && sk.counter > 2) {
-      node.score(node.score * (1.00 - 
-          (double) sk.counter / (double) data.tags.tn));
-    }*/
     return node;
   }
 
@@ -207,6 +196,20 @@ public class DBNode extends Nod {
   public void parent(final Nod p) {
     root = p;
     par = p;
+  }
+  
+  @Override
+  public NodeIter anc() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Nod node = copy();
+
+      @Override
+      public Nod next() {
+        node = node.parent();
+        return node;
+      }
+    };
   }
 
   @Override
@@ -266,12 +269,19 @@ public class DBNode extends Nod {
       final double sc = node.score;
 
       @Override
-      public Nod next() {
+      public DBNode next() {
         if(p == s) return null;
         k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
-        /*
+        node.score(sc * SCORESTEP);
+        return node;
+
+        /* [SG] I temporarily added a comment and replace this by a very
+         *   trivial scoring method (although I agree that this method
+         *   shouldn't be too expensive; but we should check first if it
+         *   yields helpful results..).
+
         if(data.size(node.pre, k) > 1) {
           if (l == -1) {
             final int pp = data.parent(node.pre, k);
@@ -288,14 +298,12 @@ public class DBNode extends Nod {
             l = level.peek() + 1;            
           }
           pres.push(node.pre);
-          node.score(node.score / Math.abs(l));
+          node.score(sc / Math.abs(l));
           level.push(l++);
         } else {
-          node.score(node.score / Math.abs(l));
+          node.score(sc / Math.abs(l));
           l = -1;
         }*/
-        node.score(sc * SCORESTEP);
-        return node;
       }
     };
   }
@@ -317,16 +325,36 @@ public class DBNode extends Nod {
       }
     };
   }
-  
+
   @Override
-  public NodeIter anc() {
+  public NodeIter par() {
     return new NodeIter() {
-      /** Temporary node. */
-      private Nod node = copy();
+      /** First call. */
+      private boolean more;
 
       @Override
       public Nod next() {
-        node = node.parent();
+        if(more) return null;
+        more = true;
+
+        final Nod node = parent();
+        if(node != null) {
+          node.score(node.score * SCORESTEP);
+
+          /* [SG] I moved this code down and temporarily added a comment
+           * due to performance issues (should be revised as soon as another
+           * cheap scoring variant is found)
+  
+          double f = (double) distToRoot(node.pre) / (double) data.meta.height;
+          node.score(node.score * Math.max(1 - f, f));
+          
+          final int tid = data.tags.id(node.nname());
+          StatsKey sk = data.tags.stat(tid);
+          if (sk != null && sk.counter > 2) {
+            node.score(node.score * (1.00 - 
+                (double) sk.counter / (double) data.tags.tn));
+          }*/
+        }
         return node;
       }
     };

@@ -5,6 +5,7 @@ import org.basex.core.*;
 import org.basex.core.Process;
 import org.basex.core.proc.*;
 import org.basex.io.*;
+import org.basex.server.ClientLauncher;
 import org.basex.util.Performance;
 
 /**
@@ -19,6 +20,8 @@ public final class ServerExample {
   static Context context;
   /** Output stream reference. */
   static PrintOutput out;
+  /** Process launcher. */
+  static ClientLauncher launcher;
 
   /** Private constructor. */
   private ServerExample() { }
@@ -42,6 +45,8 @@ public final class ServerExample {
 
     // Create a new database context, referencing the database.
     context = new Context();
+    // Create command launcher
+    launcher = new ClientLauncher(context);
     // Create a standard output stream.
     out = new PrintOutput(System.out);
 
@@ -76,13 +81,12 @@ public final class ServerExample {
   }
 
   /**
-   * Processes the specified command on the server.
+   * Processes the specified command on the server and returns the output
+   * or command info.
    * @param proc process to be executed
    * @throws Exception exception
    */
   private static void launch(final Process proc) throws Exception {
-    // Create a process launcher.
-    ClientLauncher launcher = new ClientLauncher(context);
     // Execute the process.
     if(launcher.execute(proc)) {
       // Serialize the output if execution was successful.

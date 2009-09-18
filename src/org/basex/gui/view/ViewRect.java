@@ -1,6 +1,6 @@
 package org.basex.gui.view;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 
 /**
  * View rectangle.
@@ -54,7 +54,7 @@ public class ViewRect {
 
   @Override
   public String toString() {
-    return BaseX.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
+    return Main.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
       ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }
 }

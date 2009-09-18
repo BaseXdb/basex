@@ -1,7 +1,8 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data.Type;
 import org.basex.index.IndexToken;
@@ -372,6 +373,6 @@ public class Tokenizer implements IndexToken {
 
   @Override
   public String toString() {
-    return BaseX.name(this) + '[' + string(text) + ']';
+    return Main.name(this) + '[' + string(text) + ']';
   }
 }

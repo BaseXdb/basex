@@ -1,6 +1,7 @@
 package org.basex.gui.view.xquery;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +12,8 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
@@ -258,7 +260,7 @@ public final class XQueryView extends View {
    * Show a quit dialog for saving the opened XQuery.
    */
   public void confirm() {
-    if(modified && Dialog.confirm(gui, BaseX.info(XQUERYCONF,
+    if(modified && Dialog.confirm(gui, Main.info(XQUERYCONF,
         Prop.xquery.name()))) GUICommands.XQSAVE.execute(gui);
   }
 

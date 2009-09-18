@@ -1,6 +1,6 @@
 package org.basex.gui;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.FontMetrics;

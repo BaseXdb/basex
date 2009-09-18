@@ -1,9 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.data.Data;
 
@@ -30,7 +31,7 @@ public final class Close extends Process {
       context.closeDB();
       return info(DBCLOSED, data.meta.name);
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(DBCLOSEERR);
     }
   }

@@ -2,6 +2,8 @@ package org.basex.core;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.server.Session;
+import org.basex.server.Sessions;
 
 /**
  * This class offers as central database context.
@@ -12,10 +14,14 @@ import org.basex.data.Nodes;
  * @author Christian Gruen
  */
 public final class Context {
+  /** Current client connections. */
+  public final Sessions sessions;
   /** Database properties. */
   public final Prop prop;
   /** Database pool. */
   private final DataPool pool;
+  /** Server flag. */
+  public boolean server;
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -49,6 +55,7 @@ public final class Context {
   private Context(final Prop pr, final Context ctx) {
     prop = pr;
     pool = ctx == null ? new DataPool() : ctx.pool;
+    sessions = ctx == null ? new Sessions() : ctx.sessions;
   }
 
   /**
@@ -194,5 +201,29 @@ public final class Context {
    */
   public boolean pinned(final String db) {
     return pool.pinned(db);
+  }
+
+  /**
+   * Returns information on the opened database instances.
+   * @return data reference
+   */
+  public String info() {
+    return pool.info();
+  }
+
+  /**
+   * Adds the specified session.
+   * @param s session to be added
+   */
+  public void add(final Session s) {
+    sessions.add(s);
+  }
+
+  /**
+   * Removes the specified session.
+   * @param s session to be removed
+   */
+  public void delete(final Session s) {
+    sessions.delete(s);
   }
 }

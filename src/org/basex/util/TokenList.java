@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import org.basex.BaseX;
+import org.basex.core.Main;
 
 /**
  * This is a simple container for tokens (byte arrays).
@@ -128,13 +128,13 @@ public final class TokenList implements Iterable<byte[]> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public byte[] next() { return list[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(BaseX.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Main.name(this) + '[');
     for(int i = 0; i < size; i++) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);

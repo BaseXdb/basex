@@ -1,7 +1,8 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -35,6 +36,6 @@ public final class IntPrompt extends Process {
       }
       if(nodes.size() != 1) curr.add("[...]");
     }
-    out.print(BaseX.info(fs ? "%[basex] $ " : "%> ", curr));
+    out.print(Main.info(fs ? "%[basex] $ " : "%> ", curr));
   }
 }

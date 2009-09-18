@@ -2,7 +2,8 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.util.Token;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -98,27 +99,27 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   /* Implements XMLReader method. */
   public void setDTDHandler(final DTDHandler h) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   /* Implements XMLReader method. */
   public void setEntityResolver(final EntityResolver resolver) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   /* Implements XMLReader method. */
   public void setErrorHandler(final ErrorHandler h) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   /* Implements XMLReader method. */
   public void setFeature(final String name, final boolean value) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   /* Implements XMLReader method. */
   public void setProperty(final String name, final Object value) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   /** Caches a tag name. */

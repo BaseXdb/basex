@@ -1,7 +1,7 @@
 package org.basex.gui.view;
 
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import static org.basex.Text.*;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -14,7 +14,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.StringTokenizer;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -97,7 +97,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
         GUIProp.LAYOUTOPENED : GUIProp.LAYOUTCLOSED);
     final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
     if(!buildLayout(lo1) && !buildLayout(lo2)) {
-      BaseX.errln("Could not build layout \"%\"", lo2);
+      Main.errln("Could not build layout \"%\"", lo2);
     }
   }
 
@@ -261,7 +261,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    BaseX.debug("ViewContainer.getView: Unknown view \"%\"", name);
+    Main.debug("ViewContainer.getView: Unknown view \"%\"", name);
     return null;
   }
 
@@ -429,9 +429,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
         }
       }
       if(nv == views.length) return true;
-      BaseX.errln("Missing Views: " + cnstr);
+      Main.errln("Missing Views: " + cnstr);
     } catch(final Exception ex) {
-      BaseX.errln("Could not build layout: " + cnstr);
+      Main.errln("Could not build layout: " + cnstr);
     }
     return false;
   }

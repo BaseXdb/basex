@@ -1,10 +1,11 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -40,7 +41,7 @@ public final class Open extends Process {
       }
       return info(DBOPENED, db, perf.getTimer());
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       final String msg = ex.getMessage();
       return error(msg.length() != 0 ? msg : DBOPENERR);
     }
@@ -60,7 +61,7 @@ public final class Open extends Process {
     if(data == null) {
       // check if document exists
       if(!ctx.prop.dbpath(db).exists())
-        throw new FileNotFoundException(BaseX.info(DBNOTFOUND, db));
+        throw new FileNotFoundException(Main.info(DBNOTFOUND, db));
 
       data = new DiskData(db, ctx.prop);
       ctx.addToPool(data);

@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
-import org.basex.BaseX;
 import org.basex.build.Builder;
+import org.basex.core.Main;
 import org.basex.util.Token;
 import static org.basex.build.fs.FSText.*;
 
@@ -37,7 +37,7 @@ public final class JPGExtractor extends EXIFExtractor {
       try {
         if(b == 0xE1) skip = scanEXIF(in, skip, f.getName());
       } catch(final IOException ex) {
-        BaseX.debug(f + ": " + ex.getMessage());
+        Main.debug(f + ": " + ex.getMessage());
         exif.clear();
       }
       skip(in, skip);

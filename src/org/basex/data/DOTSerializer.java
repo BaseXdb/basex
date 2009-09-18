@@ -3,7 +3,8 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
@@ -105,7 +106,7 @@ public final class DOTSerializer extends Serializer {
     final int c = nodes.get(level);
     final IntList il = children[level];
     for(int i = 0, is = il.size(); i < is; i++) {
-      out.println(BaseX.info(LINK, c, il.get(i)));
+      out.println(Main.info(LINK, c, il.get(i)));
     }
     color = null;
     il.reset();
@@ -154,7 +155,7 @@ public final class DOTSerializer extends Serializer {
   private void print(final byte[] t, final String col) throws IOException {
     final byte[] text = t.length > 60 ? concat(
         substring(t, 0, 60), token("...")) : t;
-    out.println(BaseX.info(NODE, count, text, col));
+    out.println(Main.info(NODE, count, text, col));
     nodes.set(count, level);
     if(level > 0) children[level - 1].add(count);
     count++;

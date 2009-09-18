@@ -3,9 +3,9 @@ package org.basex.build.fs.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import org.basex.BaseX;
 import org.basex.build.fs.FSText;
 import org.basex.build.fs.metadata.EXIFIndex.EXIFInfo;
+import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import static org.basex.build.fs.FSText.*;
@@ -107,7 +107,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
 
       final EXIFInfo inf = index.get(tagnr);
       if(inf == null) {
-        BaseX.debug(FSText.EXIFIGNORED, Integer.toHexString(tagnr), file);
+        Main.debug(FSText.EXIFIGNORED, Integer.toHexString(tagnr), file);
         continue;
       }
 
@@ -116,11 +116,11 @@ abstract class EXIFExtractor extends AbstractExtractor {
 
       if(format != inf.format) {
         if(inf.format == EXIFIndex.UNDEFINED) {
-          BaseX.debug(FSText.EXIFFORMAT1, Integer.toHexString(tagnr),
+          Main.debug(FSText.EXIFFORMAT1, Integer.toHexString(tagnr),
             inf.tag, inf.format, format, file);
           continue;
         }
-        BaseX.debug(FSText.EXIFFORMAT2, Integer.toHexString(tagnr),
+        Main.debug(FSText.EXIFFORMAT2, Integer.toHexString(tagnr),
           inf.tag, inf.format, format, file);
       }
 
@@ -154,7 +154,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
       } else if(format == EXIFIndex.UNDEFINED) {
         v = inf.val(Array.create(buffer, e + 8, 4));
       } else {
-        throw new MetaDataException(BaseX.info(FSText.EXIFUNKNOWN,
+        throw new MetaDataException(Main.info(FSText.EXIFUNKNOWN,
             Integer.toHexString(tagnr), format));
       }
       if(v.length > 0) {

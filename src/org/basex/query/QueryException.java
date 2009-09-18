@@ -1,7 +1,8 @@
 package org.basex.query;
 
 import static org.basex.query.QueryTokens.*;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.iter.Iter;
@@ -35,7 +36,7 @@ public final class QueryException extends Exception {
    * @param e message extension
    */
   public QueryException(final Object s, final Object... e) {
-    super(BaseX.info(s, e));
+    super(Main.info(s, e));
   }
 
   /**
@@ -130,9 +131,9 @@ public final class QueryException extends Exception {
     final StringBuilder sb = new StringBuilder();
     if(line != 0) {
       sb.append(STOPPED);
-      sb.append(BaseX.info(LINEINFO, line));
-      if(col != 0) sb.append(BaseX.info(COLINFO, col));
-      if(file != null) sb.append(BaseX.info(FILEINFO, file));
+      sb.append(Main.info(LINEINFO, line));
+      if(col != 0) sb.append(Main.info(COLINFO, col));
+      if(file != null) sb.append(Main.info(FILEINFO, file));
       sb.append(": \n");
     }
     return sb.append(extended()).toString();

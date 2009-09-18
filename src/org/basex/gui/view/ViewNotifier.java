@@ -1,8 +1,8 @@
 package org.basex.gui.view;
 
 import java.awt.Window;
-import org.basex.Text;
 import org.basex.core.Context;
+import org.basex.core.Text;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;

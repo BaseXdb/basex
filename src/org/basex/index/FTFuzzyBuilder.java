@@ -3,7 +3,7 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
@@ -67,7 +67,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     
     // [SG] INEX Budget
     if (wp instanceof ScoringTokenizer) {
-      BaseX.outln(new String(tok) + " " + ((ScoringTokenizer) wp).score(tok));
+      Main.outln(new String(tok) + " " + ((ScoringTokenizer) wp).score(tok));
       tree[tl].index(tok, id, ((ScoringTokenizer) wp).score(tok));
     } else tree[tl].index(tok, id, wp.pos);
   }

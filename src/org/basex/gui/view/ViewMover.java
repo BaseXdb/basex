@@ -1,6 +1,7 @@
 package org.basex.gui.view;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

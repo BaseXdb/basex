@@ -7,7 +7,7 @@ import static org.basex.build.fs.NewFSParser.NS;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.util.Atts;
 import org.basex.util.Token;
 
@@ -288,7 +288,7 @@ public final class Metadata {
       for(final MimeType mt : MimeType.values()) {
         if(Token.eq(mt.elem, token)) return mt;
       }
-      BaseX.debug("MIME type not found: " + name);
+      Main.debug("MIME type not found: " + name);
       return null;
     }
 

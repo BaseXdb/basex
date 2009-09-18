@@ -1,10 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
@@ -13,6 +13,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
@@ -98,7 +99,7 @@ public final class CreateDB extends ACreate {
       try {
         builder.close();
       } catch(final IOException exx) {
-        BaseX.debug(exx);
+        Main.debug(exx);
       }
       DropDB.drop(tmp, pr);
       throw ex;

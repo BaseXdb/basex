@@ -1,10 +1,5 @@
 package org.basex;
 
-import java.io.IOException;
-
-import org.basex.core.ALauncher;
-import org.basex.core.ClientLauncher;
-
 /**
  * This is the starter class for the client console mode.
  * It sends all commands to the server instance.
@@ -20,26 +15,15 @@ public final class BaseXClient extends BaseX {
    * Use <code>-h</code> to get a list command-line arguments.
    * @param args command-line arguments
    */
-  public static void main(final String[] args) {
-    new BaseXClient().run(args);
+  public static void main(final String... args) {
+    new BaseXClient(args);
   }
 
   /**
    * Constructor.
+   * @param args command line arguments
    */
-  public BaseXClient() {
-    super(false);
-    try {
-      launcher = new ClientLauncher(context);
-    } catch(final Exception ex) {
-      BaseXServer.error(ex, true);
-      standalone = true;
-    }
-  }
-
-  @Override
-  protected ALauncher launcher() throws IOException {
-    if(launcher == null) launcher = new ClientLauncher(context);
-    return launcher;
+  public BaseXClient(final String... args) {
+    super(false, args);
   }
 }

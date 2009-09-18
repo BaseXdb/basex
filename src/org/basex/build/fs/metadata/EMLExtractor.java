@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
 import org.basex.build.Builder;
+import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -234,7 +234,7 @@ public final class EMLExtractor extends AbstractExtractor {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'A' && b <= 'F') return b - 0x37;
     // won't happen in correctly encoded mails
-    BaseX.debug("EMLExtractor.hex2num: " + (char) b);
+    Main.debug("EMLExtractor.hex2num: " + (char) b);
     return -1;
   }
 
@@ -394,7 +394,7 @@ public final class EMLExtractor extends AbstractExtractor {
       final long min = cal.getTimeInMillis() / 60000;
       build.emptyElem(EMLDATE, atts.set(EMLTIME, token(min)));
     } catch(final Exception ex) {
-      BaseX.debug("EMLExtractor.getDate: " + mCurrLine);
+      Main.debug("EMLExtractor.getDate: " + mCurrLine);
     }
   }
 

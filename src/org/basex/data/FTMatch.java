@@ -3,7 +3,7 @@ package org.basex.data;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.util.Array;
 
 /**
@@ -86,13 +86,13 @@ public final class FTMatch implements Iterable<FTStringMatch> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public FTStringMatch next() { return match[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(BaseX.name(this));
+    final StringBuilder sb = new StringBuilder(Main.name(this));
     for(final FTStringMatch s : this) sb.append(" " + s);
     return sb.toString();
   }

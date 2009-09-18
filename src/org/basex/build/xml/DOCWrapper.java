@@ -1,12 +1,12 @@
 package org.basex.build.xml;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Stack;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Token;
@@ -96,7 +96,7 @@ public final class DOCWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, filename, nodes);
+    return Main.info(NODESPARSED, filename, nodes);
   }
 
   @Override

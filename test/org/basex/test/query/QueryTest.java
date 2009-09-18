@@ -1,7 +1,7 @@
 package org.basex.test.query;
 
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.AProp;
 import org.basex.core.Prop;
@@ -97,7 +97,7 @@ public final class QueryTest {
    */
   private boolean test(final AbstractTest test, final String ext) {
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
-    final String name = BaseX.name(test);
+    final String name = Main.name(test);
     Process proc = new CreateDB(file, name);
     boolean ok = proc.execute(context);
 

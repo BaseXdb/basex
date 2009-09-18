@@ -1,8 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -88,7 +90,7 @@ public final class Optimize extends ACreate {
       data.meta.ftxindex = prop.is(Prop.FTINDEX);
       index(data);
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
 
     data.flush();

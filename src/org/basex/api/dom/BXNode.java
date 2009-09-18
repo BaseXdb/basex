@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
@@ -95,7 +95,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.child().next());
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
       return null;
     }
   }
@@ -107,7 +107,7 @@ public abstract class BXNode implements Node {
       Nod t = null;
       while((t = it.next()) != null) n = t;
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
     }
     return finish(n);
   }
@@ -120,7 +120,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.follSibl().next());
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
       return null;
     }
   }
@@ -129,7 +129,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.precSibl().next());
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
       return null;
     }
   }
@@ -197,22 +197,22 @@ public abstract class BXNode implements Node {
   }
 
   public final boolean isDefaultNamespace(final String namespaceURI) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
   public final boolean isEqualNode(final Node arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
   public final String lookupNamespaceURI(final String prefix) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public final String lookupPrefix(final String namespaceURI) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -269,7 +269,7 @@ public abstract class BXNode implements Node {
           nb.add(n.copy());
       }
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
     }
     return new BXNList(nb);
   }
@@ -285,7 +285,7 @@ public abstract class BXNode implements Node {
       Nod n = null;
       while((n = it.next()) != null) nb.add(n.copy());
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
     }
     return nb;
   }

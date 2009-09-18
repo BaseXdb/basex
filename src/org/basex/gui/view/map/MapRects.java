@@ -2,7 +2,8 @@ package org.basex.gui.view.map;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.util.Array;
 
 /**
@@ -117,7 +118,7 @@ final class MapRects implements Iterable<MapRect> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public MapRect next() { return list[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 

@@ -4,7 +4,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.xml.sax.SAXException;
 
 /**
@@ -26,46 +27,46 @@ public final class BXDocBuilderFactory extends DocumentBuilderFactory {
 
   @Override
   public void setAttribute(final String name, final Object value) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public Object getAttribute(final String name) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   @Override
   public Schema getSchema() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   @Override
   public void setSchema(final Schema grammar) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public boolean isXIncludeAware() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
   @Override
   public void setXIncludeAware(final boolean state) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public boolean getFeature(final String name) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
   @Override
   public void setFeature(final String name, final boolean value) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   // doesn't overwrite its ancestor method..

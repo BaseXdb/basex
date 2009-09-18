@@ -4,10 +4,10 @@ import static org.basex.build.mediovis.MAB2.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.DataAccess;
 import org.basex.io.IO;
@@ -169,14 +169,14 @@ public final class MAB2Parser extends Parser {
       else entry.pos(pos);
 
       if(Prop.debug) {
-        if(++i % 50000 == 0) BaseX.err(" " + i + "\n");
-        else if(i % 5000 == 0) BaseX.err("!");
-        else if(i % 1000 == 0) BaseX.err(".");
+        if(++i % 50000 == 0) Main.err(" " + i + "\n");
+        else if(i % 5000 == 0) Main.err("!");
+        else if(i % 1000 == 0) Main.err(".");
       }
     }
 
     if(Prop.debug) {
-      BaseX.err("\nParse Offsets (%): %/%\n", ids.size(), p.getTimer(),
+      Main.err("\nParse Offsets (%): %/%\n", ids.size(), p.getTimer(),
           Performance.getMem());
     }
 
@@ -194,7 +194,7 @@ public final class MAB2Parser extends Parser {
     }
 
     if(Prop.debug) {
-      BaseX.err("\nCreate Titles: %/%\n", p.getTimer(), Performance.getMem());
+      Main.err("\nCreate Titles: %/%\n", p.getTimer(), Performance.getMem());
     }
 
     builder.endElem(LIBRARY);
@@ -580,7 +580,7 @@ public final class MAB2Parser extends Parser {
         hash.add(key, val);
       }
     } catch(final IOException ex) {
-      BaseX.debug(new File(fn).getAbsolutePath() + " not found.");
+      Main.debug(new File(fn).getAbsolutePath() + " not found.");
     }
   }
 

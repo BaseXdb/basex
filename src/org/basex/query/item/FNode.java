@@ -51,7 +51,7 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public Nod parent() {
+  public final Nod parent() {
     return par;
   }
 
@@ -125,6 +125,19 @@ public abstract class FNode extends Nod {
           }
         }
         return node;
+      }
+    };
+  }
+
+  @Override
+  public NodeIter par() {
+    return new NodeIter() {
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Nod next() {
+        return (more ^= true) ? par : null;
       }
     };
   }

@@ -5,7 +5,6 @@ import java.nio.BufferUnderflowException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -15,6 +14,7 @@ import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import static org.basex.util.Token.*;
@@ -372,7 +372,7 @@ public final class MP3Parser extends AbstractParser {
         fsparser.metaEvent(meta.setDate(DateField.DATE,
             ParserUtil.convertDate(d)));
       } catch(final ParseException ex) {
-        if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
+        if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
       }
     }
     bfc.get(array, 0, 30);
@@ -531,7 +531,7 @@ public final class MP3Parser extends AbstractParser {
       case ENC_UTF_8:
         return "UTF-8";
       case ENC_UTF_16_NO_BOM:
-        BaseX.debug(
+        Main.debug(
             "MP3Parser: Unsupported text encoding (UTF-16 without BOM) found "
                 + "(%).", bfc.getFileName());
         return null;
@@ -723,7 +723,7 @@ public final class MP3Parser extends AbstractParser {
               ParserUtil.convertDate(d));
           obj.fsparser.metaEvent(obj.meta);
         } catch(final ParseException ex) {
-          if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
+          if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
         }
       }
     },
@@ -786,7 +786,7 @@ public final class MP3Parser extends AbstractParser {
           if(obj.fsparser.isParseable(obj.bfc, "png")) suffix = "png";
           else if(obj.fsparser.isParseable(obj.bfc, "jpg")) suffix = "jpg";
           else {
-            BaseX.debug(
+            Main.debug(
                 "MP3Parser: Illegal or unsupported picture MIME type (%).",
                 obj.bfc.getFileName());
             obj.bfc.skip(s - (obj.bfc.position() - position)); // skip frame
@@ -798,7 +798,7 @@ public final class MP3Parser extends AbstractParser {
           obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
               suffix);
         } catch(final IOException ex) {
-          if(NewFSParser.VERBOSE) BaseX.debug(
+          if(NewFSParser.VERBOSE) Main.debug(
               "MP3Parser: Failed to parse APIC frame (%).",
               ex.getMessage() == null ? obj.bfc.getFileName() : //
                   ex.getMessage());

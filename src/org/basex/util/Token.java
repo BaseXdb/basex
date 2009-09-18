@@ -1,6 +1,6 @@
 package org.basex.util;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 
 /**
  * This class provides convenience operations for handling so-called
@@ -171,8 +171,8 @@ public final class Token {
     try {
       return new String(s, enc).getBytes(UTF8);
     } catch(final Exception ex) {
-      BaseX.debug(ex);
-      BaseX.errln(ex);
+      Main.debug(ex);
+      Main.errln(ex);
       return EMPTY;
     }
   }

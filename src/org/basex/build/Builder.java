@@ -1,10 +1,11 @@
 package org.basex.build;
 
-import static org.basex.Text.*;
 import static org.basex.build.BuildText.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -399,9 +400,9 @@ public abstract class Builder extends Progress {
     if(meta.size != 1) inDoc = true;
 
     if(Prop.debug) {
-      if(++c % 500000 == 0) BaseX.err(" " + c + NL);
-      else if(c % 50000 == 0) BaseX.err("!");
-      else if(c % 10000 == 0) BaseX.err(".");
+      if(++c % 500000 == 0) Main.err(" " + c + NL);
+      else if(c % 50000 == 0) Main.err("!");
+      else if(c % 10000 == 0) Main.err(".");
     }
 
     return pre;

@@ -3,7 +3,8 @@ package org.basex.build.fs.metadata;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
 import java.util.HashMap;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
@@ -359,7 +360,7 @@ public final class EXIFIndex {
         return concat(bytes("F "), num(v));
       }
 
-      BaseX.debug(EXIFRATIONAL);
+      Main.debug(EXIFRATIONAL);
       return EMPTY;
     }
 
@@ -472,7 +473,7 @@ public final class EXIFIndex {
         return tok;
       }
 
-      BaseX.debug(EXIFUNDEFINED);
+      Main.debug(EXIFUNDEFINED);
       return EMPTY;
     }
   }

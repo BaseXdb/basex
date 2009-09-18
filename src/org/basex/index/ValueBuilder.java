@@ -1,7 +1,7 @@
 package org.basex.index;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;

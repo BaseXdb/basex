@@ -1,7 +1,8 @@
 package org.basex.query.item;
 
 import java.math.BigDecimal;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 
@@ -109,6 +110,6 @@ public class Str extends Item {
 
   @Override
   public String toString() {
-    return BaseX.info("\"%\"", val);
+    return Main.info("\"%\"", val);
   }
 }

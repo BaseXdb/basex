@@ -1,8 +1,9 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -71,13 +72,13 @@ abstract class AQuery extends Process {
       execInfo();
       return true;
     } catch(final QueryException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       err = ex.getMessage();
     } catch(final ProgressException ex) {
       err = PROGERR;
     } catch(final Exception ex) {
       ex.printStackTrace();
-      err = BaseX.bug();
+      err = Main.bug();
     }
     try { qp.close(); } catch(final IOException ex) { /* ignored */ }
     return error(err);

@@ -1,11 +1,13 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.MetaData;
@@ -72,8 +74,8 @@ public final class InfoDB extends AInfo {
     format(tb, INFODOCSIZE, Performance.format(meta.filesize), l);
     format(tb, INFOENCODING, meta.encoding, l);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs), l);
-    format(tb, INFOCHOP, BaseX.flag(meta.chop), 0);
-    format(tb, INFOENTITY, BaseX.flag(meta.entity), 0);
+    format(tb, INFOCHOP, Main.flag(meta.chop), 0);
+    format(tb, INFOENTITY, Main.flag(meta.entity), 0);
 
     if(index) {
       tb.add(NL);
@@ -81,10 +83,10 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
-        format(tb, INFOPATHINDEX, BaseX.flag(meta.pathindex), 0);
-        format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), 0);
-        format(tb, INFOATTRINDEX, BaseX.flag(meta.atvindex), 0);
-        format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) + (meta.ftxindex &&
+        format(tb, INFOPATHINDEX, Main.flag(meta.pathindex), 0);
+        format(tb, INFOTEXTINDEX, Main.flag(meta.txtindex), 0);
+        format(tb, INFOATTRINDEX, Main.flag(meta.atvindex), 0);
+        format(tb, INFOFTINDEX, Main.flag(meta.ftxindex) + (meta.ftxindex &&
             meta.ftfz ? " (" + INFOFZINDEX + ")" : ""), 0);
       }
     }

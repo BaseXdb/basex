@@ -2,7 +2,8 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 
 /**
@@ -62,6 +63,6 @@ public final class FPI extends FNode {
 
   @Override
   public String toString() {
-    return BaseX.info("<?% %?>", name.str(), val);
+    return Main.info("<?% %?>", name.str(), val);
   }
 }

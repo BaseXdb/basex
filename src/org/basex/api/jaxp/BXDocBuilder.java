@@ -5,12 +5,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.BaseX;
 import org.basex.api.dom.BXDoc;
 import org.basex.api.dom.BXDomImpl;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.w3c.dom.DOMImplementation;
@@ -64,7 +64,7 @@ public final class BXDocBuilder extends DocumentBuilder {
 
   @Override
   public Document newDocument() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 

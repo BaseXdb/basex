@@ -1,7 +1,8 @@
 package org.basex.query.item;
 
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 
 /**
@@ -42,6 +43,6 @@ public final class FComm extends FNode {
 
   @Override
   public String toString() {
-    return BaseX.info("<!--%-->", val);
+    return Main.info("<!--%-->", val);
   }
 }

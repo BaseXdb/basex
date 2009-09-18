@@ -1,6 +1,6 @@
 package org.basex.data;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;

@@ -1,13 +1,13 @@
 package org.basex.core;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import org.basex.Text;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdShow;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -31,10 +31,12 @@ import org.basex.core.proc.InfoIndex;
 import org.basex.core.proc.InfoTable;
 import org.basex.core.proc.Insert;
 import org.basex.core.proc.IntStop;
+import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.IntPrompt;
+import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
@@ -58,8 +60,10 @@ import org.basex.util.StringList;
 public final class CommandParser extends InputParser {
   /** Context. */
   private final Context ctx;
-  /** Flag for including the parsing of internal commands. */
+  /** Flag for including internal commands. */
   private final boolean internal;
+  /** Flag for including server commands. */
+  private final boolean server;
 
   /**
    * Constructor, parsing the input queries.
@@ -77,8 +81,21 @@ public final class CommandParser extends InputParser {
    * @param i flag for including the parsing of internal commands
    */
   public CommandParser(final String in, final Context c, final boolean i) {
+    this(in, c, i, false);
+  }
+
+  /**
+   * Constructor, parsing internal commands.
+   * @param in query input
+   * @param c context
+   * @param i internal flag
+   * @param s server flag
+   */
+  public CommandParser(final String in, final Context c, final boolean i,
+      final boolean s) {
     ctx = c;
     internal = i;
+    server = s;
     init(in);
   }
 
@@ -232,6 +249,19 @@ public final class CommandParser extends InputParser {
       case INTSTOP:
         return new IntStop();
 
+      // server commands
+      case KILL:
+        return new Kill();
+      case SHOW:
+        final CmdShow show = consume(CmdShow.class, cmd);
+        switch(show) {
+          case DATABASES:
+          case SESSIONS:
+            return new Show(show);
+          default:
+        }
+        break;
+
       default:
     }
     return null;
@@ -352,7 +382,7 @@ public final class CommandParser extends InputParser {
    * @return index
    * @throws QueryException query exception
    */
-  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
+  protected <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
       throws QueryException {
 
     final String token = name(null);
@@ -362,29 +392,31 @@ public final class CommandParser extends InputParser {
       final E cmd = Enum.valueOf(cmp, t);
       if(!(cmd instanceof Cmd)) return cmd;
       final Cmd c = (Cmd) cmd;
-      if(!c.dummy() && (internal || !c.internal())) return cmd;
+      if(!c.help() && (internal || !c.internal()) &&
+          (server || !c.server())) return cmd;
     } catch(final IllegalArgumentException ex) { }
 
-    final StringList alt = list(cmp, token);
+    final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // no command found
-      if(par == null) error(alt, CMDNO);
+      if(par == null) error(list(alt), CMDNO);
       // show available command extensions
-      help(alt, par);
+      help(list(alt), par);
     }
 
     // find similar commands
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
-    for(final String s : list(cmp, null)) {
-      final byte[] sm = lc(token(s));
-      if(ls.similar(name, sm, 0)) error(alt, CMDSIMILAR, name, sm);
+    for(final Enum<?> s : list(cmp, null)) {
+      final byte[] sm = lc(token(s.name().toLowerCase()));
+      if(ls.similar(name, sm, 0) && (server || !((Cmd) s).server()))
+        error(list(alt), CMDSIMILAR, name, sm);
     }
 
     // unknown command
-    if(par == null) error(alt, CMDWHICH, token);
+    if(par == null) error(list(alt), CMDWHICH, token);
     // show available command extensions
-    help(alt, par);
+    help(list(alt), par);
     return null;
   }
 
@@ -394,8 +426,9 @@ public final class CommandParser extends InputParser {
    * @param cmd input completions
    * @throws QueryException query exception
    */
-  private void help(final StringList alt, final Cmd cmd) throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true));
+  protected void help(final StringList alt, final Cmd cmd)
+      throws QueryException {
+    error(alt, PROCSYNTAX, cmd.help(true, server));
   }
 
   /**
@@ -405,18 +438,21 @@ public final class CommandParser extends InputParser {
    * @param i user input
    * @return completions
    */
-  private <T extends Enum<T>> StringList list(final Class<T> en,
+  private <T extends Enum<T>> Enum<?>[] list(final Class<T> en,
       final String i) {
-    final StringList list = new StringList();
+
+    Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
       if(e instanceof Cmd) {
         final Cmd c = (Cmd) e;
-        if(c.dummy() || c.hidden() || c.internal()) continue;
+        if(c.help() || c.hidden() || c.internal()) continue;
       }
-      if(e.name().startsWith(t)) list.add(e.name().toLowerCase());
+      if(e.name().startsWith(t)) {
+        list = Array.add(list, e);
+        //list.add(e.name().toLowerCase());
+      }
     }
-    list.sort(true);
     return list;
   }
 
@@ -432,5 +468,16 @@ public final class CommandParser extends InputParser {
     final QueryException qe = new QueryException(m, e);
     qe.complete(this, comp);
     throw qe;
+  }
+
+  /**
+   * Converts the specified commands into a string list.
+   * @param comp input completions
+   * @return string list
+   */
+  public StringList list(final Enum<?>[] comp) {
+    StringList list = new StringList();
+    for(Enum<?> c : comp) list.add(c.name().toLowerCase());
+    return list;
   }
 }

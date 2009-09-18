@@ -1,11 +1,12 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-import org.basex.BaseX;
-import org.basex.Text;
+import static org.basex.core.Text.*;
+
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -44,7 +45,7 @@ public final class Set extends Process {
         prop.set(key, b);
 
         final boolean all = ALL.equalsIgnoreCase(val);
-        val = BaseX.flag(b);
+        val = Main.flag(b);
         if(s == CmdSet.INFO) {
           prop.set(Prop.ALLINFO, all);
           if(all) {
@@ -57,12 +58,12 @@ public final class Set extends Process {
       } else if(type instanceof String) {
         prop.set(key, val);
       } else {
-        BaseX.notexpected();
+        Main.notexpected();
       }
       return info((s == null ? key :
         Text.class.getField("INFO" + s).get(null).toString()) + ": " + val);
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(SETERR, key, val);
     }
   }

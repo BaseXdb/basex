@@ -1,10 +1,11 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
@@ -67,7 +68,7 @@ public final class DropIndex extends ACreate {
       return DropDB.delete(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
           info(DBDROP, perf.getTimer()) : error(DBDROPERR);
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(ex.getMessage());
     }
   }

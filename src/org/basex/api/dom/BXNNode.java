@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.iter.NodIter;
 import org.basex.util.Token;
 import org.w3c.dom.NamedNodeMap;
@@ -33,27 +33,27 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
   }
 
   public Node getNamedItemNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public Node setNamedItem(final Node arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public Node removeNamedItem(final String name) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public Node setNamedItemNS(final Node arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public Node removeNamedItemNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 }

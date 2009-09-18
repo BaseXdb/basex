@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 
 /**
  * This class is implemented by all kinds of processes.

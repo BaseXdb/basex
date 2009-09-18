@@ -7,7 +7,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.xml.sax.InputSource;
 
 /**
@@ -26,7 +27,7 @@ public final class BXPath implements XPath {
 
   public void setXPathVariableResolver(final XPathVariableResolver var) {
     variables = var;
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public XPathVariableResolver getXPathVariableResolver() {
@@ -35,7 +36,7 @@ public final class BXPath implements XPath {
 
   public void setXPathFunctionResolver(final XPathFunctionResolver fun) {
     functions = fun;
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public XPathFunctionResolver getXPathFunctionResolver() {
@@ -43,7 +44,7 @@ public final class BXPath implements XPath {
   }
 
   public void setNamespaceContext(final NamespaceContext ns) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public NamespaceContext getNamespaceContext() {

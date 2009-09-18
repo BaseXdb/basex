@@ -1,10 +1,10 @@
 package org.basex.test.query;
 
-import org.basex.Text;
 import org.basex.core.ALauncher;
 import org.basex.core.Context;
 import org.basex.core.Launcher;
 import org.basex.core.Process;
+import org.basex.core.Text;
 import org.basex.core.proc.*;
 import org.basex.core.Commands.*;
 import org.basex.data.Data;

@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import org.basex.build.mediovis.MAB2Parser;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;

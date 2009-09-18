@@ -459,16 +459,12 @@ public final class INEXTest {
     }
     bf.close();
   }
-  
 
-  
   /**
    * Create and print submission file.
    * @throws Exception Exception
    */
   private void createSubFile() throws Exception {
-    //BufferedWriter out = new BufferedWriter(
-    //    new FileWriter(new File("INEX/pages.log"))); 
     PrintOutput sub = new PrintOutput("INEX/submission.xml");
     XMLSerializer xml = new XMLSerializer(sub, false, true);
     xml.openElement(token("efficiency-submission"));

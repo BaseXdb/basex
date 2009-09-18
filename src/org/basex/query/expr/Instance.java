@@ -3,7 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -58,6 +59,6 @@ public final class Instance extends Single {
 
   @Override
   public String toString() {
-    return BaseX.info("% instance of %", expr, seq);
+    return Main.info("% instance of %", expr, seq);
   }
 }

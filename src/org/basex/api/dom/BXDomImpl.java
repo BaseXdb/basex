@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -25,13 +25,13 @@ public final class BXDomImpl implements DOMImplementation {
 
   public Document createDocument(final String nsURI, final String qn,
       final DocumentType doctype) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public DocumentType createDocumentType(final String qn, final String pid,
       final String sid) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 

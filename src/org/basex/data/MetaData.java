@@ -1,10 +1,10 @@
 package org.basex.data;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.BuildException;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -134,7 +134,7 @@ public final class MetaData {
       return f != null && f.eq(IO.get(path)) && f.date() == t &&
         STORAGE.equals(str);
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return false;
     } finally {
       try { if(in != null) in.close(); } catch(final IOException ex) { }

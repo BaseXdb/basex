@@ -1,11 +1,13 @@
 package org.basex.gui.layout;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
@@ -105,7 +107,7 @@ public final class BaseXFileChooser {
 
     final IO io = IO.get(fc.getSelectedFile().getPath());
     return mode != Mode.FSAVE || !io.exists() ||
-      Dialog.confirm(gui, BaseX.info(FILEREPLACE, io.name())) ? io : null;
+      Dialog.confirm(gui, Main.info(FILEREPLACE, io.name())) ? io : null;
   }
 
   /**

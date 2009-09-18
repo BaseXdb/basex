@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -214,7 +214,7 @@ public final class BaseXLayout {
   public static URL imageURL(final String name) {
     final String path = "img/" + name + ".png";
     final URL url = GUI.class.getResource(path);
-    if(url == null) BaseX.errln("Not found: " + path);
+    if(url == null) Main.errln("Not found: " + path);
     return url;
   }
 
@@ -307,7 +307,7 @@ public final class BaseXLayout {
       rh = RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
           GUIConstants.FONTALIAS[pr.num(GUIProp.FONTALIAS)]).get(null);
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, rh);
   }
@@ -400,7 +400,7 @@ public final class BaseXLayout {
         l = cl(s[k]);
       }
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     g.drawString(string(s, 0, j), x, y + fs);
     return fw;
@@ -421,7 +421,7 @@ public final class BaseXLayout {
       // ignore faulty character sets
       for(int k = 0; k < l; k += cl(s[k])) fw += width(g, cw, cp(s, k));
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     return fw;
   }

@@ -1,13 +1,14 @@
 package org.basex.gui;
 
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUICommands.*;
-import static org.basex.Text.*;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.UIManager;
-import org.basex.Text;
+
+import org.basex.core.Text;
 import org.basex.gui.view.ViewPanel;
 import org.basex.io.IO;
 
@@ -91,9 +92,9 @@ public final class GUIConstants {
 
   /** Toolbar entries, containing the button commands. */
   public static final GUICommand[] TOOLBAR = {
-    GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
+    GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
-      SHOWTABLE, SHOWPLOT, null, SHOWHELP, INFO
+      SHOWTABLE, SHOWPLOT, null, SHOWHELP
   };
 
   // MENUBARS =================================================================
@@ -105,9 +106,8 @@ public final class GUIConstants {
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   public static final Object[][] MENUITEMS = { {
-    MENUDB, CREATE, OPEN, EXPORT, DROP, CLOSE, null,
-    MENUXQ, XQOPEN, XQSAVE, null,
-    IMPORTFS, null, EXIT
+    MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, null,
+    XQOPEN, XQSAVE, null, IMPORTFS, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
     SHOWXQUERY, SHOWINFO, null, COPYPATH, FILTER
@@ -120,7 +120,7 @@ public final class GUIConstants {
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
     null, PREFS
   }, {
-    SHOWHELP, INFO, null, ABOUT
+    SHOWHELP, null, ABOUT
   }};
 
   /** Context menu entries. */

@@ -1,8 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -61,7 +63,7 @@ public final class CreateIndex extends ACreate {
       buildIndex(index, data);
       return info(DBINDEXED, perf.getTimer());
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(ex.getMessage());
     }
   }

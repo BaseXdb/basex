@@ -1,9 +1,10 @@
 package org.basex.test.w3c;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.File;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
@@ -58,7 +59,7 @@ public final class XMLTS {
       if(arg.equals("-v")) {
         verbose = true;
       } else {
-        BaseX.outln("\nXML Conformance Tests\n -v verbose output");
+        Main.outln("\nXML Conformance Tests\n -v verbose output");
         return;
       }
     }
@@ -75,8 +76,8 @@ public final class XMLTS {
     int wrong = 0;
 
     final Nodes root = new Nodes(0, data);
-    BaseX.outln("\nXML Conformance Tests\n");
-    BaseX.outln("file = (expected result) -> " + NAME + " result");
+    Main.outln("\nXML Conformance Tests\n");
+    Main.outln("file = (expected result) -> " + NAME + " result");
 
     for(final int t : nodes("//*:TEST", root).nodes) {
       final Nodes srcRoot = new Nodes(t, data);
@@ -89,17 +90,17 @@ public final class XMLTS {
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
-        BaseX.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
+        Main.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
             (success ? "correct" : "wrong") + (correct ? " (OK)" : " (WRONG)"));
         if(verbose) {
           String inf = proc.info();
-          if(inf.length() != 0) BaseX.outln("[BASEX ] " + inf);
+          if(inf.length() != 0) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
           new Close().execute(ctx);
           proc = new CreateDB(PATH + uri);
           proc.execute(ctx);
           inf = proc.info();
-          if(inf.length() != 0) BaseX.outln("[XERCES] " + inf);
+          if(inf.length() != 0) Main.outln("[XERCES] " + inf);
         }
       }
       if(correct) ok++;
@@ -108,9 +109,9 @@ public final class XMLTS {
       new Close().execute(ctx);
     }
 
-    BaseX.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
-    BaseX.outln("Successful: " + ok);
-    BaseX.outln("Wrong: " + wrong);
+    Main.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
+    Main.outln("Successful: " + ok);
+    Main.outln("Wrong: " + wrong);
   }
 
   /**

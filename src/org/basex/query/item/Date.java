@@ -6,7 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
@@ -39,7 +40,7 @@ public abstract class Date extends Item {
     try {
       df = DatatypeFactory.newInstance();
     } catch(final Exception ex) {
-      BaseX.notexpected();
+      Main.notexpected();
     }
   }
 

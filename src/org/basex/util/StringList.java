@@ -3,7 +3,8 @@ package org.basex.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * This is a simple container for string values.
@@ -79,7 +80,7 @@ public final class StringList implements Iterable<String> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public String next() { return list[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 }

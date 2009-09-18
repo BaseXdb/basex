@@ -1,8 +1,8 @@
 package org.basex.core;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -137,7 +137,7 @@ public abstract class Process extends Progress {
       throw ex;
     } catch(final Exception ex) {
       out.print(ex.toString());
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     if(data != null) data.setLock(0);
   }
@@ -227,7 +227,7 @@ public abstract class Process extends Progress {
       }
       return nodes;
     } catch(final QueryException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       error(ex.getMessage());
       return null;
     }
@@ -299,7 +299,7 @@ public abstract class Process extends Progress {
    */
   @Override
   public String toString() {
-    return BaseX.name(this).toUpperCase() + args();
+    return Main.name(this).toUpperCase() + args();
   }
 
   /**

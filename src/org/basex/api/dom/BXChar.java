@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.item.Nod;
 import org.basex.util.Token;
 import org.w3c.dom.CharacterData;
@@ -42,22 +42,22 @@ public abstract class BXChar extends BXNode implements CharacterData {
   }
 
   public final void appendData(final String arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public final void deleteData(final int off, final int count) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public final void insertData(final int off, final String arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public final void replaceData(final int off, final int c, final String arg) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public final void setData(final String dat) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 }

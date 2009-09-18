@@ -4,8 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.xml.XMLInput;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
@@ -84,7 +84,7 @@ final class FNBaseX extends Fun {
         return Str.get(tb.finish());
         //return Str.get(io.content());
       } catch(final IOException ex) {
-        BaseX.debug(ex);
+        Main.debug(ex);
       }
     }
     Err.or(NOFILE, name);

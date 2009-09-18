@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -87,7 +87,7 @@ public final class DeepShell {
           }
         }
       }
-      BaseX.out(
+      Main.out(
           "%: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
     } catch(final Exception ex) {
@@ -108,7 +108,7 @@ public final class DeepShell {
       return new BufferedReader(isr).readLine().trim();
     } catch(final Exception ex) {
       // also catches interruptions such as ctrl+c, etc.
-      BaseX.outln();
+      Main.outln();
       return null;
     }
   }
@@ -206,7 +206,7 @@ public final class DeepShell {
     byte[][] dents = fs.readdir(args[1]);
     if(dents == null) System.err.printf("listing failed.\n");
     for(byte[] de : dents)
-      BaseX.out(">> " + string(de));
+      Main.out(">> " + string(de));
   }
   
   /**
@@ -255,7 +255,7 @@ public final class DeepShell {
   @Command(shortcut = 'q', help = "quit shell (unmounts fuse and closes db)")
   public void quit(@SuppressWarnings("unused") final String[] args) {
     fs.umount();
-    BaseX.outln("cu");
+    Main.outln("cu");
     System.exit(0);
   }
 

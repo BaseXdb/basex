@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.io.IO;
 
 /**
@@ -150,7 +150,7 @@ public class InputParser {
    * @return completion
    */
   public byte[] found() {
-    return curr() == 0 ? EMPTY : BaseX.inf(FOUND, curr());
+    return curr() == 0 ? EMPTY : Main.inf(FOUND, curr());
   }
 
   /**
@@ -214,7 +214,7 @@ public class InputParser {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
-    return BaseX.info(INVENTITY, ent);
+    return Main.info(INVENTITY, ent);
   }
 
   /**

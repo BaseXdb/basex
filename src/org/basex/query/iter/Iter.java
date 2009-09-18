@@ -1,7 +1,8 @@
 package org.basex.query.iter;
 
 import java.util.Iterator;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -105,7 +106,7 @@ public abstract class Iter implements Iterable<Item> {
         }
       }
       public Item next() { return next; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 }

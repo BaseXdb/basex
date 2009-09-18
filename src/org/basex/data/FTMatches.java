@@ -1,7 +1,7 @@
 package org.basex.data;
 
 import java.util.Iterator;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.util.Array;
 
 /**
@@ -117,14 +117,14 @@ public final class FTMatches implements Iterable<FTMatch> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public FTMatch next() { return match[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(BaseX.name(this) + "[" + sTokenNum + "]");
+    sb.append(Main.name(this) + "[" + sTokenNum + "]");
     for(final FTMatch m : this) sb.append("\n  " + m);
     return sb.toString();
   }

@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodeIter;
@@ -47,7 +47,7 @@ public final class BXElem extends BXNode implements Element {
   }
 
   public String getAttributeNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -57,7 +57,7 @@ public final class BXElem extends BXNode implements Element {
   }
 
   public Attr getAttributeNodeNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -66,12 +66,12 @@ public final class BXElem extends BXNode implements Element {
   }
 
   public NodeList getElementsByTagNameNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public TypeInfo getSchemaTypeInfo() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -84,7 +84,7 @@ public final class BXElem extends BXNode implements Element {
   }
 
   public boolean hasAttributeNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
@@ -147,7 +147,7 @@ public final class BXElem extends BXNode implements Element {
         if(Token.eq(nm, n.nname())) return n;
       }
     } catch(final QueryException ex) {
-      BaseX.notexpected();
+      Main.notexpected();
     }
     return null;
   }

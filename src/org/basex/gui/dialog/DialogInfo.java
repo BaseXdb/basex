@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -55,7 +56,7 @@ public final class DialogInfo extends Dialog {
    * @param main reference to the main window
    */
   public DialogInfo(final GUI main) {
-    super(main, INFOTITLE);
+    super(main, INFODB);
 
     // first tab
     final BaseXBack tab1 = new BaseXBack();

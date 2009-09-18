@@ -1,7 +1,8 @@
 package org.basex.query.util;
 
 import java.io.IOException;
-import org.basex.Text;
+
+import org.basex.core.Text;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;

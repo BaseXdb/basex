@@ -1,6 +1,6 @@
 package org.basex.gui.view.plot;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;

@@ -1,7 +1,8 @@
 package org.basex.util;
 
 import java.util.Arrays;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * This is a simple container for native int values.
@@ -348,7 +349,7 @@ public class IntList {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder(BaseX.name(this) + '[');
+    final TokenBuilder sb = new TokenBuilder(Main.name(this) + '[');
     for(int i = 0; i < size; i++) sb.add((i == 0 ? "" : ",") + list[i]);
     return sb.add(']').toString();
   }

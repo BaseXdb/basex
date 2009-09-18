@@ -1,19 +1,20 @@
 package org.basex.test.query;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
 import org.basex.core.ALauncher;
-import org.basex.core.ClientLauncher;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
+import org.basex.server.ClientLauncher;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
@@ -31,10 +32,18 @@ public final class InexDBTest {
   /** Query prolog. */
   static final String PROLOG = "declare ft-option using stemming; ";
 
-  /** Queries. */
-  private static final String QUERIES = "inex.queries";
-  /** Database prefix (1000 instances: "pages", 10 instances: "inex"). */
-  private static final String DBPREFIX = "inex";
+  /** Submission file. */
+  static final String SUBMISSION = "submission.xml";
+  /** Updated submission file. */
+  static final String SUBMISSIONU = "submissionU.xml";
+  /** Topics file. */
+  static final String TOPICS = "topics.xml";
+  /** Query file. */
+  static final String QUERIES = "inex.queries";
+  /** Times output file. */
+  static final String TIMES = "times";
+  /** Database prefix. */
+  static final String DBPREFIX = "inex";
 
   /** Database context. */
   private final Context ctx = new Context();
@@ -46,13 +55,15 @@ public final class InexDBTest {
   private StringList databases;
 
   /** Maximum number of databases. */
-  private int maxdb = Integer.MAX_VALUE;
+  private int dbindex = -1;
   /** Maximum number of queries. */
-  private int maxqu = Integer.MAX_VALUE;
+  private int quindex = -1;
   /** Number of runs. */
   private int runs = 1;
   /** Shows process info. */
   private boolean info;
+  /** Shows process info. */
+  private boolean stem;
   /** Container for qtimes and results. */
   private PrintOutput res;
   /** Budget for a query in ms. */
@@ -76,34 +87,40 @@ public final class InexDBTest {
    * @throws Exception exception
    */
   private InexDBTest(final String[] args) throws Exception {
+    final Performance p = new Performance();
+    Main.outln(Main.name(InexDBTest.class));
+
     if(!parseArguments(args)) return;
 
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     queries = new StringList();
     String l;
-    while((l = br.readLine()) != null && queries.size() < maxqu) 
-      queries.add(l.substring(l.indexOf('/')));
+    int c = 0;
+    while((l = br.readLine()) != null) {
+      if(quindex == -1 || ++c == quindex) {
+        queries.add(l.substring(l.lastIndexOf(';') + 1));
+      }
+    }
     br.close();
     rqt = new double[queries.size()];
 
     // cache database names
     databases = new StringList();
     for(final String s : List.list(ctx)) {
-      if(s.startsWith(DBPREFIX) && databases.size() < maxdb) databases.add(s);
+      if(s.startsWith(DBPREFIX) && (dbindex == -1 ||
+         s.equals(DBPREFIX + dbindex))) databases.add(s);
     }
 
-    BaseX.outln(BaseX.name(InexDBTest.class) + " [" + CLIENTMODE + "]");
-    BaseX.outln("=> % queries on % databases, % runs: time in ms\n",
+    Main.outln("=> % queries on % databases, % runs: time in ms\n",
         queries.size(), databases.size(), runs);
 
-    res = new PrintOutput("times");
-    
     // run test
-    final Performance p = new Performance();
+    if(dbindex == -1 && quindex == -1) res = new PrintOutput(TIMES);
     test();
-    System.out.println("Total Time: " + p.getTimer());
-    res.close();
+    if(res != null) res.close();
+
+    Main.outln("Total Time: " + p);
   }
 
   /**
@@ -137,8 +154,8 @@ public final class InexDBTest {
       final double timer = budget - rqt[qu];
       if (timer <= 0) {
         if (s) {  
-          res.println(0 + ";" + 0);
-          BaseX.outln("Query % on %: %", qu + 1, databases.get(db), 0);
+          if(res != null) res.println(0 + ";" + 0);
+          Main.outln("Query % on %: %", qu + 1, databases.get(db), 0);
         }
         return;
       }
@@ -146,7 +163,7 @@ public final class InexDBTest {
     }
     
     final CachedOutput r = new CachedOutput();
-    if(launcher.execute(new XQuery(PROLOG + queries.get(qu)))) {
+    if(launcher.execute(new XQuery((stem ? PROLOG : "") + queries.get(qu)))) {
       launcher.output(r);
       if(!s) return;
 
@@ -156,22 +173,22 @@ public final class InexDBTest {
           Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
 
       // output result
-      BaseX.outln("Query % on %: %", qu + 1, databases.get(db), time);
+      Main.outln("Query % on %: %", qu + 1, databases.get(db), time);
       if(info) {
-        BaseX.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
+        Main.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
             Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
       }
       String in = out.toString();
       in = in.substring(in.indexOf("Results") + 
           "Results".length(), in.indexOf("Item")).trim();
       rqt[qu] += Double.parseDouble(time);
-      res.println(time + ";" + 
+      if(res != null) res.println(time + ";" + 
           Integer.parseInt(in.substring(in.indexOf(':') + 2)));
     } else {
       final CachedOutput out = new CachedOutput();
       launcher.info(out);
-      BaseX.outln(out.toString());
-      res.println(-1 + ";" + -1);
+      Main.outln(out.toString());
+      if(res != null) res.println(-1 + ";" + -1);
     }
   }
   
@@ -188,11 +205,13 @@ public final class InexDBTest {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'd') {
-            maxdb = Integer.parseInt(arg.string());
+            dbindex = Integer.parseInt(arg.string());
           } else if(c == 'q') {
-            maxqu = Integer.parseInt(arg.string());
+            quindex = Integer.parseInt(arg.string());
           } else if(c == 'r') {
             runs = Integer.parseInt(arg.string());
+          } else if(c == 's') {
+            stem = true;
           } else if(c == 'v') {
             info = true;
           } else if(c == 'b') {
@@ -210,15 +229,16 @@ public final class InexDBTest {
       launcher.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {
       ok = false;
-      BaseX.errln("Please run BaseXServer for using server mode.");
+      Main.errln("Please run BaseXServer for using server mode.");
       ex.printStackTrace();
     }
 
     if(!ok) {
-      BaseX.outln("Usage: " + BaseX.name(this) + " [options]" + NL +
-        "  -d<no>  maximum no/database" + NL +
-        "  -q<no>  maximum no/queries" + NL +
+      Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
+        "  -d<no>  use specified database (0-9)" + NL +
+        "  -q<no>  perform specified query (1-#queries)" + NL +
         "  -r<no>  number of runs" + NL +
+        "  -s      use stemming" + NL +
         "  -v      show process info");
     }
     return ok;

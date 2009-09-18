@@ -1,10 +1,14 @@
-package org.basex.core;
+package org.basex.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import org.basex.core.ALauncher;
+import org.basex.core.Context;
+import org.basex.core.Process;
+import org.basex.core.Prop;
 import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.IntOutput;
 import org.basex.io.BufferInput;

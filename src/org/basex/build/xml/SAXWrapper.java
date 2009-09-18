@@ -1,13 +1,14 @@
 package org.basex.build.xml;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -66,7 +67,7 @@ public final class SAXWrapper extends Parser {
       if(is != null) r.parse(is);
       else r.parse(source.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = BaseX.info(SCANPOS, ex.getSystemId(),
+      final String msg = Main.info(SCANPOS, ex.getSystemId(),
           ex.getLineNumber(), ex.getColumnNumber()) + ": " + ex.getMessage();
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
@@ -115,7 +116,7 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : BaseX.info(SCANPOS, io.name(), line);
+    return length == 0 ? super.det() : Main.info(SCANPOS, io.name(), line);
   }
 
   @Override

@@ -1,7 +1,8 @@
 package org.basex.build.fs.metadata;
 
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * MetaData exception.
@@ -24,6 +25,6 @@ public final class MetaDataException extends IOException {
    * @param e message extension
    */
   public MetaDataException(final String s, final Object... e) {
-    super(BaseX.info(s, e));
+    super(Main.info(s, e));
   }
 }

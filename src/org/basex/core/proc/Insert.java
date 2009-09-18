@@ -1,14 +1,14 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.BaseX;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdUpdate;
@@ -131,7 +131,7 @@ public final class Insert extends AUpdate {
 
       tmp = new MemBuilder(parser).build();
     } catch(final IOException ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(ex.getMessage());
     }
 

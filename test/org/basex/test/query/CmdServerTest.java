@@ -2,7 +2,7 @@ package org.basex.test.query;
 
 import org.basex.BaseXServer;
 import org.basex.core.ALauncher;
-import org.basex.core.ClientLauncher;
+import org.basex.server.ClientLauncher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -24,7 +24,9 @@ public final class CmdServerTest extends CmdTest {
   public static void start() {
     new Thread() {
       @Override
-      public void run() { server = new BaseXServer(); }
+      public void run() {
+        server = new BaseXServer();
+      }
     }.start();
 
     try {

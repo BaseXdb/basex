@@ -13,8 +13,6 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.basex.BaseX;
-import org.basex.Text;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
@@ -25,7 +23,9 @@ import org.basex.build.fs.util.Metadata;
 import org.basex.build.fs.util.ParserUtil;
 import org.basex.build.fs.util.SpotlightExtractor;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -163,7 +163,7 @@ public final class NewFSParser extends Parser {
    */
   public static void registerFallback(final Class<? extends AbstractParser> c) {
     if(fallbackParser != null) {
-      BaseX.debug("Replacing fallback parser with " + c.getName());
+      Main.debug("Replacing fallback parser with " + c.getName());
     }
     fallbackParser = c;
   }
@@ -178,13 +178,13 @@ public final class NewFSParser extends Parser {
       for(final Class<?> c : classes) {
         final String name = c.getSimpleName();
         if(REGISTRY.containsValue(c)) {
-          BaseX.debug("Successfully loaded parser: %", name);
+          Main.debug("Successfully loaded parser: %", name);
         } else if(fallbackParser == c) {
-          BaseX.debug("Successfully loaded fallback parser: %", name);
-        } else BaseX.debug("Loading % ... FAILED", name);
+          Main.debug("Successfully loaded fallback parser: %", name);
+        } else Main.debug("Loading % ... FAILED", name);
       }
     } catch(final IOException ex) {
-      BaseX.errln("Failed to load parsers (%)", ex.getMessage());
+      Main.errln("Failed to load parsers (%)", ex.getMessage());
     }
   }
 
@@ -324,13 +324,13 @@ public final class NewFSParser extends Parser {
       if(clazz == null) return null;
       try {
         instance = clazz.newInstance();
-        BaseX.debug("Successfully initialized parser for ." + suffix
+        Main.debug("Successfully initialized parser for ." + suffix
             + " files: " + clazz.getSimpleName());
       } catch(final InstantiationException ex) {
-        BaseX.debug("Failed to load parser for suffix " + suffix + " (% - %)",
+        Main.debug("Failed to load parser for suffix " + suffix + " (% - %)",
             clazz.getSimpleName(), ex.getMessage());
       } catch(final IllegalAccessException ex) {
-        BaseX.debug("Failed to load parser for suffix " + suffix + " (% - %)",
+        Main.debug("Failed to load parser for suffix " + suffix + " (% - %)",
             clazz.getSimpleName(), ex.getMessage());
       }
       // put in hash map ... even if null
@@ -349,11 +349,11 @@ public final class NewFSParser extends Parser {
     if(fallbackParserInstance == null) {
       try {
         fallbackParserInstance = fallbackParser.newInstance();
-        BaseX.debug("Successfully initialized fallback parser.");
+        Main.debug("Successfully initialized fallback parser.");
       } catch(final InstantiationException ex) {
-        BaseX.debug("Failed to load fallback parser (%)", ex.getMessage());
+        Main.debug("Failed to load fallback parser (%)", ex.getMessage());
       } catch(final IllegalAccessException ex) {
-        BaseX.debug("Failed to load fallback parser (%)", ex.getMessage());
+        Main.debug("Failed to load fallback parser (%)", ex.getMessage());
       }
     }
     return fallbackParserInstance;
@@ -459,7 +459,7 @@ public final class NewFSParser extends Parser {
       chIn.close();
       chOut.close();
     } catch(final IOException ex) {
-      BaseX.debug(ex.getMessage());
+      Main.debug(ex.getMessage());
     }
   }
 
@@ -472,7 +472,7 @@ public final class NewFSParser extends Parser {
     try {
       return f.getPath().equals(f.getCanonicalPath());
     } catch(final IOException ex) {
-      BaseX.debug(f + ": " + ex.getMessage());
+      Main.debug(f + ": " + ex.getMessage());
       return false;
     }
   }
@@ -541,7 +541,7 @@ public final class NewFSParser extends Parser {
                 } catch(final IOException e) { /* */}
               }
             } catch(final IOException ex) {
-              BaseX.debug("Failed to parse file: %", ex);
+              Main.debug("Failed to parse file: %", ex);
             }
           }
         } else if(name.indexOf('.') != -1) { // internal parser
@@ -565,7 +565,7 @@ public final class NewFSParser extends Parser {
                   } catch(final IOException e1) { /* */}
                 }
               } catch(final Exception ex) {
-                BaseX.debug("Failed to parse file (%): %", f.getAbsolutePath(),
+                Main.debug("Failed to parse file (%): %", f.getAbsolutePath(),
                     ex);
               }
             }
@@ -611,7 +611,7 @@ public final class NewFSParser extends Parser {
           lastContentSize = size;
           parse0(parser, bfc);
         } catch(final Exception ex) {
-          BaseX.debug(
+          Main.debug(
               "Failed to parse file fragment (file: %, offset: %, length: %): "
               + "%", bfc.getFileName(), offset, size, ex);
           bfc.finish();

@@ -1,7 +1,8 @@
 package org.basex.util;
 
 import java.util.Iterator;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * This is a simple container for native int array values.
@@ -70,7 +71,7 @@ public final class IntArrayList implements Iterable<int[]> {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
       public int[] next() { return list[c]; }
-      public void remove() { BaseX.notexpected(); }
+      public void remove() { Main.notexpected(); }
     };
   }
 }

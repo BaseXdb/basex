@@ -106,11 +106,7 @@ public class Step extends Preds {
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {
-        if(test.eval(nod)) {
-          nod = nod.finish();
-          nod.score(ctx.score.step(it.score()));
-          nb.add(nod);
-        }
+        if(test.eval(nod)) nb.add(nod.finish());
       }
 
       // evaluates predicates

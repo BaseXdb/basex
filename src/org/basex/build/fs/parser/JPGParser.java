@@ -3,7 +3,6 @@ package org.basex.build.fs.parser;
 import java.io.EOFException;
 import java.io.IOException;
 
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -11,6 +10,7 @@ import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 
 /**
  * Parser for JPG files.
@@ -160,7 +160,7 @@ public final class JPGParser extends AbstractParser {
       fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
       fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
     } else {
-      if(NewFSParser.VERBOSE) BaseX.debug(
+      if(NewFSParser.VERBOSE) Main.debug(
           "JPGParser: Wrong data precision field (%).", bfc.getFileName());
     }
   }
@@ -182,7 +182,7 @@ public final class JPGParser extends AbstractParser {
       try {
         sub.finish();
       } catch(Exception ex) {
-        BaseX.debug(ex);
+        Main.debug(ex);
       }
     }
   }
@@ -248,7 +248,7 @@ public final class JPGParser extends AbstractParser {
             "Thumbnail coded using 3 bytes/pixel."));
         break;
       default:
-        BaseX.debug("JPGParser: Illegal or unsupported JFIF header (%)",
+        Main.debug("JPGParser: Illegal or unsupported JFIF header (%)",
             bfc.getFileName());
     }
     fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));

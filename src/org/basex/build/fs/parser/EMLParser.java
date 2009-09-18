@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -20,6 +19,7 @@ import org.basex.build.fs.util.Metadata.DateField;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -59,7 +59,7 @@ public class EMLParser extends AbstractParser {
           obj.meta.setDate(DateField.DATE_CREATED, ParserUtil.convertDate(d));
           obj.fsparser.metaEvent(obj.meta);
         } catch(final ParseException ex) {
-          if(NewFSParser.VERBOSE) BaseX.debug("%: %", obj.bfc.getFileName(),
+          if(NewFSParser.VERBOSE) Main.debug("%: %", obj.bfc.getFileName(),
               ex.getMessage());
         }
         return true;
@@ -113,7 +113,7 @@ public class EMLParser extends AbstractParser {
             assert text[i] == '=';
             ++i;
           } else {
-            BaseX.debug("EMLParser: Found invalid chars in subject (%)",
+            Main.debug("EMLParser: Found invalid chars in subject (%)",
                 obj.bfc.getFileName());
             break; // stop reading
           }
@@ -584,7 +584,7 @@ public class EMLParser extends AbstractParser {
 
     final byte[] data = Token.delete(text, 0xA); // delete line feeds
     final int size = data.length;
-    if(size % 4 != 0) BaseX.debug("EMLParser: Invalid base64 encoding (%)",
+    if(size % 4 != 0) Main.debug("EMLParser: Invalid base64 encoding (%)",
         Token.string(data));
     byte b1, b2, b3, b4;
     int i, max;
@@ -631,9 +631,9 @@ public class EMLParser extends AbstractParser {
         }
       }
     } catch(final Exception ex) {
-      BaseX.debug("EMLParser: invalid base64 encoding");
+      Main.debug("EMLParser: invalid base64 encoding");
     }
-    if(!valid) BaseX.debug("EMLParser: invalid base64 encoding");
+    if(!valid) Main.debug("EMLParser: invalid base64 encoding");
     return tmp.finish();
   }
 

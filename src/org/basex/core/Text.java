@@ -1,4 +1,4 @@
-package org.basex;
+package org.basex.core;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
@@ -55,7 +55,7 @@ public interface Text {
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
-  String VERSINFO = BaseX.info(lang("version"), VERSION);
+  String VERSINFO = Main.info(lang("version"), VERSION);
 
   /** Title and version. */
   String TITLE = NAME + S + VERSION;
@@ -65,8 +65,9 @@ public interface Text {
   // CONSOLE INFO =============================================================
 
   /** Console text. */
-  String CONSOLE = TITLE + " [%]" + NL +
-    BaseX.info(lang("help_intro"), Cmd.HELP) + NL;
+  String CONSOLE = TITLE + " [%]" + NL + "%";
+  /** Console text. */
+  String CONSOLE2 = Main.info(lang("help_intro"), Cmd.HELP) + NL;
 
   /** Goodbye information. */
   String[] CLIENTBYE = {
@@ -77,6 +78,8 @@ public interface Text {
   String LOCALMODE = lang("cs_local");
   /** Client mode. */
   String CLIENTMODE = lang("cs_client");
+  /** Local (standalone) mode. */
+  String SERVERMODE = "Server";
   /** Continued prompt. */
   String INPUTCONT = DOTS + S;
 
@@ -106,9 +109,9 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server start. */
-  String SERVERSTART = NL + TITLE + " Server " + lang("srv_start");
+  String SERVERSTART = lang("srv_start") + NL;
   /** Server stop. */
-  String SERVERSTOPPED = "Server " + lang("srv_stop");
+  String SERVERSTOPPED = SERVERMODE + ' ' + lang("srv_stop");
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
   /** Error shown in the client console when timeout is reached. */
@@ -191,23 +194,23 @@ public interface Text {
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
-  String CREATE2 = lang("ch_create2") + NL + NL +
+  String CREATE2 = lang("ch_create2") + NL +
     LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "]?:" + NL +
-      "  " + BaseX.info(lang("ch_create3"), NAM, PATH) + NL +
+      "  " + Main.info(lang("ch_create3"), NAM, PATH) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
       "  " + lang("ch_create4") + NL +
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
       "] ([" + MOUNT + "] [" + BACKING + "]): " + NL +
-      "  " + BaseX.info(lang("ch_create5"), NAM, PATH) + NL +
-      "  " + BaseX.info(lang("ch_create6"), MOUNT, BACKING);
+      "  " + Main.info(lang("ch_create5"), NAM, PATH) + NL +
+      "  " + Main.info(lang("ch_create6"), MOUNT, BACKING);
 
   /** Command help. */
   String OPEN0 = "[" + NAM + "]";
   /** Command help. */
   String OPEN1 = lang("ch_open1");
   /** Command help. */
-  String OPEN2 = BaseX.info(lang("ch_open2"), NAM);
+  String OPEN2 = Main.info(lang("ch_open2"), NAM);
 
   /** Command help. */
   String INFO0 = "[" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" +
@@ -215,7 +218,7 @@ public interface Text {
   /** Command help. */
   String INFO1 = lang("ch_info1");
   /** Command help. */
-  String INFO2 = lang("ch_info21") + NL + NL +
+  String INFO2 = lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
     LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
@@ -240,9 +243,9 @@ public interface Text {
   /** Command help. */
   String DROP1 = lang("ch_drop1");
   /** Command help. */
-  String DROP2 = lang("ch_drop2") + NL + NL +
+  String DROP2 = lang("ch_drop2") + NL +
     LI + CmdDrop.DB + " [" + NAM + "]:" + NL +
-      "  " + BaseX.info(lang("ch_drop21"), NAM) + NL +
+      "  " + Main.info(lang("ch_drop21"), NAM) + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.SUMMARY + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22");
@@ -259,7 +262,7 @@ public interface Text {
   /** Command help. */
   String EXPORT1 = lang("ch_export1");
   /** Command help. */
-  String EXPORT2 = BaseX.info(lang("ch_export2"), PATH);
+  String EXPORT2 = Main.info(lang("ch_export2"), PATH);
 
   /** Command help. */
   String HELPQUERY0 = lang("ch_helpquery0");
@@ -269,21 +272,21 @@ public interface Text {
   /** Command help. */
   String XQUERYMV1 = lang("ch_xquerymv1");
   /** Command help. */
-  String XQUERYMV2 = BaseX.info(lang("ch_xquerymv2"), QUERY, "hits", "subhits");
+  String XQUERYMV2 = Main.info(lang("ch_xquerymv2"), QUERY, "hits", "subhits");
 
   /** Command help. */
   String XQUERY0 = "[" + QUERY + "]";
   /** Command help. */
   String XQUERY1 = lang("ch_xquery1");
   /** Command help. */
-  String XQUERY2 = BaseX.info(lang("ch_xquery2"), QUERY);
+  String XQUERY2 = Main.info(lang("ch_xquery2"), QUERY);
 
   /** Command help. */
   String RUN0 = "[" + PATH + "]";
   /** Command help. */
   String RUN1 = lang("ch_run1");
   /** Command help. */
-  String RUN2 = BaseX.info(lang("ch_run2"), PATH);
+  String RUN2 = Main.info(lang("ch_run2"), PATH);
 
   /** Command help. */
   String FIND0 = "[" + QUERY + "]";
@@ -308,14 +311,14 @@ public interface Text {
   /** Command help. */
   String COPY1 = lang("ch_copy1");
   /** Command help. */
-  String COPY2 = BaseX.info(lang("ch_copy2"), SOURCE, TARGET, POS);
+  String COPY2 = Main.info(lang("ch_copy2"), SOURCE, TARGET, POS);
 
   /** Command help. */
   String DELETE0 = "[" + TARGET + "]";
   /** Command help. */
   String DELETE1 = lang("ch_delete1");
   /** Command help. */
-  String DELETE2 = BaseX.info(lang("ch_delete2"), TARGET);
+  String DELETE2 = Main.info(lang("ch_delete2"), TARGET);
 
   /** Command help. */
   String INSERT0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
@@ -330,13 +333,13 @@ public interface Text {
   String INSERTTMP2 = LI + "% [%] [%] " + INTO + " [" + TARGET + "] " +
     AT + " [" + POS + "]: " + lang("ch_insert22");
   /** Command help. */
-  String INSERT2 = BaseX.info(lang("ch_insert2"), POS, TARGET) + NL + NL +
-    BaseX.info(INSERTTMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
-    BaseX.info(INSERTTMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
-    BaseX.info(INSERTTMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
-    BaseX.info(INSERTTMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
-    BaseX.info(INSERTTMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL) + NL +
-    BaseX.info(INSERTTMP1, CmdUpdate.FRAGMENT, FRAGMENT, FRAGMENT);
+  String INSERT2 = Main.info(lang("ch_insert2"), POS, TARGET) + NL +
+    Main.info(INSERTTMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
+    Main.info(INSERTTMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
+    Main.info(INSERTTMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
+    Main.info(INSERTTMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
+    Main.info(INSERTTMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL) + NL +
+    Main.info(INSERTTMP1, CmdUpdate.FRAGMENT, FRAGMENT, FRAGMENT);
 
   /** Command help. */
   String UPDATE0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
@@ -351,12 +354,31 @@ public interface Text {
   String UPDATETMP2 = LI + "% [%] [%] " + AT + " [" + TARGET + "]: " +
     lang("ch_update22");
   /** Command help. */
-  String UPDATE2 = BaseX.info(lang("ch_update2"), TARGET) + NL + NL +
-    BaseX.info(UPDATETMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
-    BaseX.info(UPDATETMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
-    BaseX.info(UPDATETMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
-    BaseX.info(UPDATETMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
-    BaseX.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL);
+  String UPDATE2 = Main.info(lang("ch_update2"), TARGET) + NL +
+    Main.info(UPDATETMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
+    Main.info(UPDATETMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
+    Main.info(UPDATETMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
+    Main.info(UPDATETMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
+    Main.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL);
+
+  /** Command help. */
+  String HELPSERVER0 = lang("ch_helpserver0");
+
+  /** Command help. */
+  String KILL0 = "";
+  /** Command help. */
+  String KILL1 = lang("ch_kill1");
+  /** Command help. */
+  String KILL2 = lang("ch_kill2");
+
+  /** Command help. */
+  String SHOW0 = "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "]";
+  /** Command help. */
+  String SHOW1 = lang("ch_show1");
+  /** Command help. */
+  String SHOW2 = lang("ch_show21") + NL +
+    LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
+    LI + CmdShow.SESSIONS + ": " + lang("ch_show23");
 
   /** Command help. */
   String HELPGENERAL0 = lang("ch_helpgeneral0");
@@ -364,9 +386,9 @@ public interface Text {
   /** Command help. */
   String SET0 = "[option] [value]?";
   /** Command help. */
-  String SET1 = BaseX.info(lang("ch_set1"), Cmd.INFO);
+  String SET1 = Main.info(lang("ch_set1"), Cmd.INFO);
   /** Command help. */
-  String SET2 = BaseX.info(lang("ch_set2"), "option", "value") + NL + NL +
+  String SET2 = Main.info(lang("ch_set2"), "option", "value") + NL +
     LI + CmdSet.INFO + " [all]?" + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
@@ -381,9 +403,9 @@ public interface Text {
   /** Command help. */
   String HELP0 = "[command]?";
   /** Command help. */
-  String HELP1 = BaseX.info(lang("ch_help1"), NAME);
+  String HELP1 = Main.info(lang("ch_help1"), NAME);
   /** Command help. */
-  String HELP2 = BaseX.info(lang("ch_help2"), "command");
+  String HELP2 = Main.info(lang("ch_help2"), "command");
   /** Command help. */
   String EXIT0 = "";
   /** Command help. */
@@ -396,7 +418,7 @@ public interface Text {
   String QUIT1 = EXIT1;
   /** Command help. */
   String QUIT2 = EXIT2;
-
+  
   // STARTER WINDOW ===========================================================
 
   /** Waiting info. */
@@ -429,11 +451,11 @@ public interface Text {
   String CMDUNKNOWN = lang("cmd_unknown");
   /** Unknown command error. */
   String CMDWHICH = CMDUNKNOWN + "; " +
-    BaseX.info(lang("help_short"), Cmd.HELP) + DOT;
+    Main.info(lang("help_short"), Cmd.HELP) + DOT;
   /** Unknown command error. */
   String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
   /** Database closed. */
-  String CMDHELP = BaseX.info(lang("help_long"), Cmd.HELP);
+  String CMDHELP = Main.info(lang("help_long"), Cmd.HELP);
 
   // CREATE COMMAND ===========================================================
 
@@ -619,6 +641,13 @@ public interface Text {
   /** Update namespaces error. */
   String UPDATENS = lang("uc_namespaces");
 
+  // SERVER COMMANDS ==========================================================
+
+  /** Database not found. */
+  String SRVDATABASES = lang("sv_databases");
+  /** Database not found. */
+  String SRVSESSIONS = lang("sv_sessions");
+
   // GENERAL COMMANDS =========================================================
 
   /** Insert query info. */
@@ -628,8 +657,6 @@ public interface Text {
 
   /** Process information. */
   String INFOWAIT = lang("wait") + DOTS;
-  /** Title of information dialog. */
-  String INFOTITLE = lang("info_head");
   /** Index information. */
   String INFOINDEX = lang("info_index");
   /** Index information. */
@@ -740,8 +767,6 @@ public interface Text {
   /** Menu label. */
   String MENUDB = lang("m_db") + COL;
   /** Menu label. */
-  String MENUXQ = lang("m_xquery") + COL;
-  /** Menu label. */
   String MENUMAIN = lang("m_main") + COL;
   /** Menu label. */
   String MENUVIEWS = lang("m_views") + COL;
@@ -753,7 +778,7 @@ public interface Text {
   // GUI COMMANDS =============================================================
 
   /** Command info. */
-  String GUIABOUT = BaseX.info(lang("c_about") + DOTS, NAME);
+  String GUIABOUT = Main.info(lang("c_about") + DOTS, NAME);
   /** Command info. */
   String GUIABOUTTT = lang("c_abouttt");
   /** Command info. */
@@ -831,9 +856,9 @@ public interface Text {
   /** Command info. */
   String GUIIMPORTFSTT = lang("c_importfstt");
   /** Command info. */
-  String GUIINFO = lang("c_info");
+  String GUIINFO = lang("c_props") + DOTS;
   /** Command info. */
-  String GUIINFOTT = lang("c_infott");
+  String GUIINFOTT = lang("c_propstt");
   /** Command info. */
   String GUIINSERT = lang("c_insert") + DOTS;
   /** Command info. */
@@ -1234,7 +1259,7 @@ public interface Text {
   String MEMHELP = lang("dz_help");
 
   /** About text. */
-  String ABOUTTITLE = BaseX.info(lang("da_title"), NAME);
+  String ABOUTTITLE = Main.info(lang("da_title"), NAME);
   /** Copyright info. */
   String COPYRIGHT = "©2005-09 " + COMPANY;
   /** License info. */

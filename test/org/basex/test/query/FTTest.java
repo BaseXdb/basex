@@ -1,7 +1,7 @@
 package org.basex.test.query;
 
-import org.basex.BaseX;
 import org.basex.core.AProp;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 
 /**
@@ -18,7 +18,7 @@ public final class FTTest extends AbstractTest {
    * @return string
    */
   private String set(final String key, final boolean val) {
-    return "set " + key + " " + BaseX.flag(val);
+    return "set " + key + " " + Main.flag(val);
   }
 
   /** Constructor. */

@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -22,7 +23,8 @@ import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.MatteBorder;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
@@ -617,7 +619,7 @@ public class BaseXText extends BaseXPanel {
       try {
         return (String) t.getTransferData(DataFlavor.stringFlavor);
       } catch(final Exception ex) {
-        BaseX.debug(ex);
+        Main.debug(ex);
       }
     }
     return null;

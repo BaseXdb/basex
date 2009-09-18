@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FComm;
 import org.basex.query.item.FDoc;
@@ -106,7 +106,7 @@ public final class BXDoc extends BXNode implements Document {
       final Node n = list.item(l);
       if(n.getNodeType() == Node.ELEMENT_NODE) return (Element) n;
     }
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -115,12 +115,12 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public DOMConfiguration getDomConfig() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
   public Element getElementById(final String elementId) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -130,7 +130,7 @@ public final class BXDoc extends BXNode implements Document {
 
   public NodeList getElementsByTagNameNS(final String namespaceURI,
       final String localName) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -143,7 +143,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public boolean getStrictErrorChecking() {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return false;
   }
 
@@ -160,7 +160,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public Node importNode(final Node importedNode, final boolean deep) {
-    BaseX.notimplemented();
+    Main.notimplemented();
     return null;
   }
 
@@ -179,14 +179,14 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public void setStrictErrorChecking(final boolean strictErrorChecking) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public void setXmlStandalone(final boolean xmlStandalone) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   public void setXmlVersion(final String xmlVersion) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 }

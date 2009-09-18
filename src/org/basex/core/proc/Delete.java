@@ -1,7 +1,8 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
-import org.basex.BaseX;
+import static org.basex.core.Text.*;
+
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 
@@ -57,6 +58,6 @@ public final class Delete extends AUpdate {
 
   @Override
   public String toString() {
-    return BaseX.name(this).toUpperCase() + " " + args[0];
+    return Main.name(this).toUpperCase() + " " + args[0];
   }
 }

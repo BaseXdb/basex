@@ -1,6 +1,7 @@
 package org.basex;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.CreateDB;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;

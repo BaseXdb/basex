@@ -3,7 +3,8 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -153,7 +154,7 @@ public abstract class IO {
    */
   @SuppressWarnings("unused")
   public IO merge(final IO f) {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -199,7 +200,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public String dir() {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -208,7 +209,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public IO[] children() {
-    BaseX.notexpected();
+    Main.notexpected();
     return null;
   }
 
@@ -219,7 +220,7 @@ public abstract class IO {
    */
   @SuppressWarnings("unused")
   public void write(final byte[] c) throws IOException {
-    BaseX.notexpected();
+    Main.notexpected();
   }
 
   /**
@@ -227,7 +228,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public boolean delete() {
-    BaseX.notexpected();
+    Main.notexpected();
     return false;
   }
 

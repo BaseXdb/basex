@@ -1,13 +1,13 @@
 package org.basex.build.xml;
 
-import static org.basex.Text.*;
 import static org.basex.build.BuildText.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
+import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -145,7 +145,7 @@ public final class XMLScanner extends Progress {
       while(typ.length() < 13) typ += " ";
       String out = sta + typ;
       if(token != null) out += "'" + token + "'";
-      BaseX.outln(out);
+      Main.outln(out);
     }
     return true;
   }
@@ -712,7 +712,7 @@ public final class XMLScanner extends Progress {
           cont = file.content();
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {
-          BaseX.debug(ex);
+          Main.debug(ex);
           error(FILEERR, name);
         }
 
@@ -1034,7 +1034,7 @@ public final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return BaseX.info(SCANPOS, input.file.name(), input.line);
+    return Main.info(SCANPOS, input.file.name(), input.line);
   }
 
   @Override

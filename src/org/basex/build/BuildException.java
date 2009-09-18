@@ -1,7 +1,8 @@
 package org.basex.build;
 
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 
 /**
  * This class indicates building exceptions.
@@ -24,6 +25,6 @@ public final class BuildException extends IOException {
    * @param e message extension
    */
   public BuildException(final String s, final Object... e) {
-    super(BaseX.info(s, e));
+    super(Main.info(s, e));
   }
 }

@@ -2,7 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
@@ -39,7 +40,7 @@ public final class FNIndex extends Set {
       final String dsc = def.desc;
       final byte[] key = token(dsc.substring(0, dsc.indexOf("(")));
       final int i = add(key);
-      if(i < 0) BaseX.notexpected("Function defined twice:" + def);
+      if(i < 0) Main.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }
@@ -72,7 +73,7 @@ public final class FNIndex extends Set {
       } catch(final QueryException ex) {
         throw ex;
       } catch(final Exception ex) {
-        BaseX.notexpected("Can't run " + string(name));
+        Main.notexpected("Can't run " + string(name));
       }
     }
     return null;

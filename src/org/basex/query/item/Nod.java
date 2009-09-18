@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import java.math.BigDecimal;
-import org.basex.BaseX;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
@@ -9,6 +8,7 @@ import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXNode;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.iter.NodIter;
@@ -280,17 +280,7 @@ public abstract class Nod extends Item {
    * Returns a parent axis iterator.
    * @return iterator
    */
-  public NodeIter par() {
-    return new NodeIter() {
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Nod next() {
-        return (more ^= true) ? parent() : null;
-      }
-    };
-  }
+  public abstract NodeIter par();
 
   /**
    * Returns a preceding axis iterator.
@@ -406,7 +396,7 @@ public abstract class Nod extends Item {
       case ATT: return Data.ATTR;
       case COM: return Data.COMM;
       case PI : return Data.PI;
-      default : BaseX.notexpected(); return -1;
+      default : Main.notexpected(); return -1;
     }
   }
 

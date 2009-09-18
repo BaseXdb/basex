@@ -10,7 +10,6 @@ import java.util.Date;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -18,6 +17,7 @@ import org.basex.build.fs.util.ParserUtil;
 import org.basex.build.fs.util.Metadata.DateField;
 import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.core.Main;
 
 /**
  * <p>
@@ -197,7 +197,7 @@ public class ExifParser {
      * @param fieldName the name of the current IFD field.
      */
     void error(final ExifParser o, final String fieldName) {
-      if(NewFSParser.VERBOSE) BaseX.debug("ExifParser: Invalid " + fieldName
+      if(NewFSParser.VERBOSE) Main.debug("ExifParser: Invalid " + fieldName
           + " field (%)", o.bfc.getFileName());
     }
   }
@@ -342,7 +342,7 @@ public class ExifParser {
       meta.setDate(field, gcal);
       fsparser.metaEvent(meta);
     } catch(final ParseException ex) {
-      if(NewFSParser.VERBOSE) BaseX.debug(ex.getMessage());
+      if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
     }
   }
 
@@ -374,7 +374,7 @@ public class ExifParser {
       final IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
       tag.parse(this, data);
     } catch(final IOException ex) {
-      BaseX.debug("%", ex);
+      Main.debug("%", ex);
     } catch(final IllegalArgumentException ex) { /* */}
   }
 }

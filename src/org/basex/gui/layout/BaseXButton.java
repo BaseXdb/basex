@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;

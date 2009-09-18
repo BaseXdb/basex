@@ -1,6 +1,6 @@
 package org.basex.test.w3c;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,8 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -177,7 +177,7 @@ public abstract class W3CTS {
     }
 
     if(!o) {
-      BaseX.outln(NL + BaseX.name(this) + " Test Suite" + NL +
+      Main.outln(NL + Main.name(this) + " Test Suite" + NL +
           " [pat] perform only tests with the specified pattern" + NL +
           " -h show this help" + NL +
           " -p change path" + NL +
@@ -204,24 +204,24 @@ public abstract class W3CTS {
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
-    BaseX.outln(NL + BaseX.name(this) + " Test Suite " +
+    Main.outln(NL + Main.name(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
-    BaseX.outln(NL + "Caching Sources...");
+    Main.outln(NL + "Caching Sources...");
     for(final int s : nodes("//*:source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       srcs.put(text("@ID", srcRoot), val);
     }
 
-    BaseX.outln("Caching Modules...");
+    Main.outln("Caching Modules...");
     for(final int s : nodes("//*:module", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       mods.put(text("@ID", srcRoot), val);
     }
 
-    BaseX.outln("Caching Collections...");
+    Main.outln("Caching Collections...");
     for(final int c : nodes("//*:collection", root).nodes) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
@@ -236,23 +236,23 @@ public abstract class W3CTS {
     init(root);
 
     if(reporting) {
-      BaseX.outln("Delete old results...");
+      Main.outln("Delete old results...");
       delete(new File[] { new File(results) });
     }
 
-    BaseX.out("Parsing Queries");
-    if(verbose) BaseX.outln();
+    Main.out("Parsing Queries");
+    if(verbose) Main.outln();
     final Nodes nodes = nodes("//*:test-case", root);
     for(int t = 0; t < nodes.size(); t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
-      if(!verbose && t % 1000 == 0) BaseX.out(".");
+      if(!verbose && t % 1000 == 0) Main.out(".");
     }
-    BaseX.outln();
+    Main.outln();
 
     final String time = perf.getTimer();
     final int total = ok + ok2 + err + err2;
 
-    BaseX.outln("Writing log file..." + NL);
+    Main.outln("Writing log file..." + NL);
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(pathlog), UTF8));
     bw.write("TEST RESULTS ==================================================");
@@ -286,11 +286,11 @@ public abstract class W3CTS {
       bw.close();
     }
 
-    BaseX.outln("Total #Queries: " + total);
-    BaseX.outln("Correct / Empty results: " + ok + " / " + ok2);
-    BaseX.out("Conformance (w/empty results): ");
-    BaseX.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
-    BaseX.outln("Total Time: " + time);
+    Main.outln("Total #Queries: " + total);
+    Main.outln("Correct / Empty results: " + ok + " / " + ok2);
+    Main.out("Conformance (w/empty results): ");
+    Main.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
+    Main.outln("Total Time: " + time);
 
     context.close();
   }
@@ -318,7 +318,7 @@ public abstract class W3CTS {
     if(inname == null) inname = outname;
 
     if(single != null && !outname.startsWith(single)) return true;
-    if(verbose) BaseX.outln("- " + outname);
+    if(verbose) Main.outln("- " + outname);
 
     final IO file = IO.get(queries + pth + inname + ".xq");
     final String in = read(file);

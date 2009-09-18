@@ -15,15 +15,6 @@ public final class Scoring {
   private static final double LOG = Math.E - 1;
 
   /**
-   * Returns a scoring after a location step traversal.
-   * @param s input value
-   * @return result
-   */
-  public double step(final double s) {
-    return s;
-  }
-
-  /**
    * Calculates a score value, based on the token length
    * and complete text length.
    * @param tl token length

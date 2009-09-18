@@ -4,7 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.basex.Text;
+
+import org.basex.core.Text;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;

@@ -1,6 +1,7 @@
 package org.basex.gui.view.explore;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -9,7 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.proc.Find;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -335,7 +337,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private String[] entries(final byte[][] key) {
     final StringList sl = new StringList();
-    sl.add(BaseX.info(INFOENTRIES, key.length));
+    sl.add(Main.info(INFOENTRIES, key.length));
     for(final byte[] k : key) sl.add(Token.string(k));
     sl.sort(true);
     return sl.finish();

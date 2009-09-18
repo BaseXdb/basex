@@ -1,6 +1,7 @@
-package org.basex;
+package org.basex.server;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.AProp;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Set;
 import org.basex.data.XMLSerializer;
@@ -39,7 +41,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class BaseXWebServer {
+public final class WebServer {
   /** Header key. */
   static final Pattern QUERY = Pattern.compile("(GET|POST) (.*) HTTP.*");
   /** Xquery suffix. */
@@ -81,14 +83,14 @@ public final class BaseXWebServer {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new BaseXWebServer(args);
+    new WebServer(args);
   }
 
   /**
    * Constructor.
    * @param args arguments
    */
-  private BaseXWebServer(final String[] args) {
+  private WebServer(final String[] args) {
     Prop.web = true;
 
     try {
@@ -96,12 +98,12 @@ public final class BaseXWebServer {
 
       final ServerSocket server = new ServerSocket(
           context.prop.num(Prop.WEBPORT));
-      BaseX.outln(WSERVERSTART);
+      Main.outln(WSERVERSTART);
       while(running) serve(server);
-      BaseX.outln(WSERVERSTOPPED);
+      Main.outln(WSERVERSTOPPED);
       context.close();
     } catch(final Exception ex) {
-      BaseXServer.error(ex, true);
+      Main.error(ex, true);
     }
   }
 
@@ -135,7 +137,7 @@ public final class BaseXWebServer {
 
             // no file specified - try alternatives
             if(req.code == 404) {
-              BaseX.debug("File not found: %", path);
+              Main.debug("File not found: %", path);
               send("404 File Not Found", "", "Not found: " + path, s);
             } else if(req.code == 302) {
               send("302 Found", "Location: " + path,
@@ -153,16 +155,16 @@ public final class BaseXWebServer {
 
             if(verbose) {
               final InetAddress addr = s.getInetAddress();
-              BaseX.outln("%:% => % [%]", addr.getHostAddress(),
+              Main.outln("%:% => % [%]", addr.getHostAddress(),
                   s.getPort(), req.file, p.getTimer());
             }
           } catch(final Exception ex) {
-            BaseXServer.error(ex, false);
+            Main.error(ex, false);
           }
         }
       }.start();
     } catch(final Exception ex) {
-      BaseXServer.error(ex, false);
+      Main.error(ex, false);
     }
   }
 
@@ -289,7 +291,7 @@ public final class BaseXWebServer {
       } else {
         out.println(ex.toString());
       }
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
     out.close();
   }
@@ -410,7 +412,7 @@ public final class BaseXWebServer {
         }
       }
     }
-    if(!ok) BaseX.outln(WSERVERINFO);
+    if(!ok) Main.outln(WSERVERINFO);
     return ok;
   }
 
@@ -425,7 +427,7 @@ public final class BaseXWebServer {
       s.getOutputStream().write(Token.token("STOP" + NL + NL));
       s.close();
     } catch(final Exception ex) {
-      BaseXServer.error(ex, false);
+      Main.error(ex, false);
     }
   }
 

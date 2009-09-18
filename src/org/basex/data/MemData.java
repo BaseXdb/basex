@@ -1,6 +1,6 @@
 package org.basex.data;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
@@ -55,7 +55,7 @@ public class MemData extends Data {
 
   @Override
   public final void setIndex(final Type type, final Index ind) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
@@ -266,34 +266,34 @@ public class MemData extends Data {
 
   @Override
   public final void delete(final int pre) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public final void update(final int pre, final byte[] name, final byte[] v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public final void insert(final int pre, final int par, final byte[] tag,
       final int kind) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public final void insert(final int pre, final int par, final byte[] name,
       final byte[] v) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public final void insert(final int pre, final int par, final Data d) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override
   public final void update(final int pre, final byte[] text) {
-    BaseX.notimplemented();
+    Main.notimplemented();
   }
 
   @Override

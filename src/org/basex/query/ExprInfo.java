@@ -1,7 +1,8 @@
 package org.basex.query;
 
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 
 /**
@@ -35,7 +36,7 @@ public abstract class ExprInfo {
    * @return class name
    */
   public String name() {
-    return BaseX.name(this);
+    return Main.name(this);
   }
 
   /**

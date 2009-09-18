@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import org.basex.BaseX;
 import org.basex.io.IO;
 import org.basex.util.TokenBuilder;
 
@@ -42,7 +41,7 @@ public abstract class AProp {
         props.put(arr[0].toString(), arr[1]);
       }
     } catch(final Exception ex) {
-      BaseX.notexpected(ex);
+      Main.notexpected(ex);
     }
 
     final File file = new File(filename);
@@ -96,9 +95,9 @@ public abstract class AProp {
       br.close();
     } catch(final Exception ex) {
       err.add("% could not be parsed." + NL, filename);
-      BaseX.debug(ex);
+      Main.debug(ex);
     }
-    if(err.size() != 0) BaseX.err(err.toString());
+    if(err.size() != 0) Main.err(err.toString());
   }
 
   /**
@@ -151,8 +150,8 @@ public abstract class AProp {
       bw.write(user.toString());
       bw.close();
     } catch(final Exception ex) {
-      BaseX.errln("% could not be written.", filename);
-      BaseX.debug(ex);
+      Main.errln("% could not be written.", filename);
+      Main.debug(ex);
     }
   }
 
@@ -284,9 +283,9 @@ public abstract class AProp {
    */
   private Object get(final Object[] key, final Class<?> c) {
     final Object entry = props.get(key[0].toString());
-    if(entry == null) BaseX.notexpected("Property " + key[0] + " not defined.");
+    if(entry == null) Main.notexpected("Property " + key[0] + " not defined.");
     final Class<?> cc = entry.getClass();
-    if(c != cc) BaseX.notexpected("Property '" + key[0] + "' is a " +
+    if(c != cc) Main.notexpected("Property '" + key[0] + "' is a " +
         cc.getSimpleName());
     return entry;
   }

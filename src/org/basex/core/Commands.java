@@ -1,7 +1,6 @@
 package org.basex.core;
 
-import static org.basex.Text.*;
-
+import static org.basex.core.Text.*;
 import java.util.regex.Pattern;
 
 /**
@@ -30,12 +29,12 @@ public interface Commands {
     HELPQUERY(HLP), X(HID), XQUERY(), XQUERYMV(HID), RUN(), FIND(), CS(),
     // Update commands
     HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
+    // Server commands
+    HELPSERVER(HLP | SRV), KILL(SRV), SHOW(SRV),
     // General commands
     HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands
     INTPROMPT(INT), INTOUTPUT(INT), INTINFO(INT), INTSTOP(INT);
-    /* Server commands
-    SHOW(SRV), GRANT(SRV), KILL(INT), ... */
 
     /** Flags for controlling command parsing. */
     private final int flags;
@@ -75,7 +74,7 @@ public interface Commands {
      * Returns if this is a dummy command for formatting the help.
      * @return result of check
      */
-    boolean dummy() {
+    boolean help() {
       return (flags & HLP) != 0;
     }
 
@@ -90,16 +89,17 @@ public interface Commands {
     /**
      * Returns a help string.
      * @param detail show details
+     * @param server show server commands
      * @return string
      */
-    public final String help(final boolean detail) {
+    public final String help(final boolean detail, final boolean server) {
       final StringBuilder sb = new StringBuilder();
 
       final Object args = help(0);
-      if(dummy()) {
-        sb.append(NL + args + NL + NL);
-      } else if(args != null && !dummy() && !internal() &&
-          (!hidden() || detail)) {
+      if(help()) {
+        if(!server() || server) sb.append(NL + args + NL + NL);
+      } else if(args != null && !help() && !internal() &&
+          (!hidden() || detail) && (!server() || server)) {
         sb.append(this + " " + args + NL + "  " + help(1) + NL);
         if(detail) sb.append(NL + help(2) + NL);
       } else {
@@ -159,7 +159,7 @@ public interface Commands {
      */
     private String help(final int n) {
       try {
-        return org.basex.Text.class.getField(name() + n).get(null).toString();
+        return Text.class.getField(name() + n).get(null).toString();
       } catch(final Exception ex) {
         return null;
       }
@@ -172,6 +172,8 @@ public interface Commands {
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
   /** Drop command definitions. */
   enum CmdDrop { DATABASE, DB, INDEX }
+  /** Show command definitions. */
+  enum CmdShow { DATABASES, SESSIONS }
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,

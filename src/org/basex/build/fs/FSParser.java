@@ -9,8 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.basex.BaseX;
-import org.basex.Text;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.metadata.AbstractExtractor;
@@ -23,7 +21,9 @@ import org.basex.build.fs.metadata.MetaDataException;
 import org.basex.build.fs.metadata.PNGExtractor;
 import org.basex.build.fs.metadata.TIFExtractor;
 import org.basex.build.fs.metadata.XMLExtractor;
+import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
@@ -237,7 +237,7 @@ public final class FSParser extends Parser {
     try {
       return f.getPath().equals(f.getCanonicalPath());
     } catch(final IOException ex) {
-      BaseX.debug(f + ": " + ex.getMessage());
+      Main.debug(f + ": " + ex.getMessage());
       return false;
     }
   }
@@ -283,7 +283,7 @@ public final class FSParser extends Parser {
           try {
             index.extract(builder, f);
           } catch(final MetaDataException ex) {
-            BaseX.debug(ex);
+            Main.debug(ex);
           }
         }
       }

@@ -1,6 +1,6 @@
 package org.basex.gui.view.map;
 
-import org.basex.BaseX;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
@@ -101,7 +101,7 @@ final class MapList extends IntList {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(BaseX.name(this) + '[');
+    final StringBuilder sb = new StringBuilder(Main.name(this) + '[');
     for(int i = 0; i < size; i++) {
       sb.append((i == 0 ? "" : ", ") + list[i]);
       if(weight != null) sb.append("/" + weight[i]);

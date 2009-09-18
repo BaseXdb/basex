@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.Box;
@@ -8,8 +9,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.Text;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;

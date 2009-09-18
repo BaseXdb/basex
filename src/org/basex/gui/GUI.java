@@ -1,6 +1,6 @@
 package org.basex.gui;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -19,12 +19,12 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.BaseX;
-import org.basex.Text;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
@@ -530,12 +530,12 @@ public final class GUI extends JFrame {
       setHits(result == null ? 0 : result.size());
 
       // show status info
-      status.setText(BaseX.info(PROCTIME, time));
+      status.setText(Main.info(PROCTIME, time));
 
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();
-      Dialog.error(this, BaseX.info(PROCERR, pr,
+      Dialog.error(this, Main.info(PROCERR, pr,
           ex.toString().length() != 0 ? ex.toString() : ex.getMessage()));
       updating = false;
     }

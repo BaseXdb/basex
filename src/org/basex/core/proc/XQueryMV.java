@@ -1,9 +1,10 @@
 package org.basex.core.proc;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.mediovis.MAB2;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
@@ -101,7 +102,7 @@ public final class XQueryMV extends AQuery {
       execInfo();
       return info(QUERYFINISH + Performance.getTimer(fini, runs));
     } catch(final Exception ex) {
-      BaseX.debug(ex);
+      Main.debug(ex);
       return error(ex.getMessage());
     }
   }

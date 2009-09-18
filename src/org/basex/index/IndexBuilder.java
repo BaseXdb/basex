@@ -1,8 +1,10 @@
 package org.basex.index;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.data.Data;
@@ -44,7 +46,7 @@ public abstract class IndexBuilder extends Progress {
       try {
         data.close();
       } catch(final Exception ex) {
-        BaseX.debug(ex);
+        Main.debug(ex);
       }
       throw new ProgressException();
     }

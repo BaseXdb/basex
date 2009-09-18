@@ -9,9 +9,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.BaseX;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.Metadata.DateField;
+import org.basex.core.Main;
 import org.basex.util.Token;
 
 /**
@@ -52,7 +52,7 @@ public final class ParserUtil {
     try {
       factory = DatatypeFactory.newInstance();
     } catch(final DatatypeConfigurationException ex) {
-      BaseX.debug(ex.getMessage());
+      Main.debug(ex.getMessage());
     }
   }
 
@@ -110,11 +110,11 @@ public final class ParserUtil {
       }
       b = minSec[++i];
     }
-    if(mins == Integer.MIN_VALUE || NewFSParser.VERBOSE) BaseX.debug(
+    if(mins == Integer.MIN_VALUE || NewFSParser.VERBOSE) Main.debug(
         "ParserUtil: Invalid min value in minSec duration (%)", string(minSec));
     // read seconds
     final int secs = toInt(minSec, ++i, max);
-    if(secs == Integer.MIN_VALUE || NewFSParser.VERBOSE) BaseX.debug(
+    if(secs == Integer.MIN_VALUE || NewFSParser.VERBOSE) Main.debug(
         "ParserUtil: Invalid sec value in minSec duration (%)", string(minSec));
     final int milliseconds = secs * 1000 + mins * 60000;
     return factory.newDuration(milliseconds);

@@ -1,10 +1,11 @@
 package org.basex.build.xml;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 
@@ -42,7 +43,7 @@ public final class DirParser extends Parser {
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
     parse(b, io);
-    if(Prop.debug) BaseX.err(NL);
+    if(Prop.debug) Main.err(NL);
   }
 
   /**
@@ -65,7 +66,7 @@ public final class DirParser extends Parser {
         parser = Parser.xmlParser(io, prop);
         parser.doc = doc;
         parser.parse(b);
-        if(Prop.debug && ++c % 100 == 0) BaseX.err(";");
+        if(Prop.debug && ++c % 100 == 0) Main.err(";");
       }
     }
   }
