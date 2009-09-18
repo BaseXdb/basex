@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.Process;

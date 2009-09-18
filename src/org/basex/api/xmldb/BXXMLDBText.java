@@ -1,6 +1,6 @@
 package org.basex.api.xmldb;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 
 /**
  * This class organizes textual information for the XMLDB API.

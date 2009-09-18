@@ -1,14 +1,14 @@
 package org.basex.api.xqj;
 
-import static org.basex.Text.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -98,7 +98,7 @@ final class XMLStreamWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, io.name(), nodes);
+    return Main.info(NODESPARSED, io.name(), nodes);
   }
 
   @Override

@@ -5,7 +5,8 @@ import java.nio.charset.Charset;
 import java.util.Set;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQMetaData;
-import org.basex.Text;
+
+import org.basex.core.Text;
 
 /**
  * Java XQuery API - Meta Data.

@@ -16,7 +16,8 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -307,7 +308,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       ser.setLexicalHandler(sax.getLexicalHandler());
       while(next()) serialize(item().it, qctx, ser);
     } else {
-      BaseX.notimplemented();
+      Main.notimplemented();
     }
   }
 

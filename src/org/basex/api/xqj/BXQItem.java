@@ -15,7 +15,8 @@ import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultItem;
-import org.basex.BaseX;
+
+import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -191,7 +192,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
         throw new BXQException(ex);
       }
     } else {
-      BaseX.notimplemented();
+      Main.notimplemented();
     }
   }
 

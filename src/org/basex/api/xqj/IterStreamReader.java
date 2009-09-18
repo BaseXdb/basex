@@ -8,8 +8,8 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import org.basex.BaseX;
 import org.basex.api.jaxp.BXNamespaceContext;
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
@@ -517,7 +517,7 @@ final class IterStreamReader implements XMLStreamReader {
           kind = END_ELEMENT;
         }
       } catch(final QueryException ex) {
-        BaseX.notexpected();
+        Main.notexpected();
       }
       return true;
     }
