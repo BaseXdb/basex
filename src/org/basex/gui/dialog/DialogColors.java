@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;

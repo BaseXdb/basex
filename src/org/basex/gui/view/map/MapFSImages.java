@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
-
 import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.util.Token;

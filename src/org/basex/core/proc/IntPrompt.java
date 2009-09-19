@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.data.Data;

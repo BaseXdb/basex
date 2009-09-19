@@ -1,8 +1,7 @@
 package org.basex.test.query;
 
 import org.basex.BaseXServer;
-import org.basex.core.ALauncher;
-import org.basex.server.ClientLauncher;
+import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -14,8 +13,6 @@ import org.junit.BeforeClass;
  * @author Christian Gruen
  */
 public final class CmdServerTest extends CmdTest {
-  /** Socket reference. */
-  private static ALauncher launcher;
   /** Server reference. */
   static BaseXServer server;
 
@@ -30,7 +27,7 @@ public final class CmdServerTest extends CmdTest {
     }.start();
 
     try {
-      launcher = new ClientLauncher(CONTEXT);
+      session = new ClientSession(CONTEXT);
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
@@ -38,12 +35,12 @@ public final class CmdServerTest extends CmdTest {
 
   /** Stops the server. */
   @AfterClass
-  public static void quit() {
-    server.quit();
-  }
-
-  @Override
-  protected ALauncher launcher() {
-    return launcher;
+  public static void stop() {
+    try {
+      session.close();
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
+    }
+    server.stop();
   }
 }

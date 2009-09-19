@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.build.mediovis.MAB2;
 import org.basex.core.Main;

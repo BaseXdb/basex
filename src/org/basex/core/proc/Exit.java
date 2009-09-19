@@ -11,6 +11,12 @@ import org.basex.core.Process;
 public final class Exit extends Process {
   /** Constructor. */
   public Exit() {
-    super(STANDARD);
+    super(PRINTING);
+  }
+
+  @Override
+  protected boolean exec() {
+    new Close().execute(context);
+    return true;
   }
 }

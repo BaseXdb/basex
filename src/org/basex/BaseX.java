@@ -2,10 +2,13 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import org.basex.core.Session;
+import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
+import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Token;
 
@@ -20,8 +23,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class BaseX extends Main {
-  /** Standalone or client mode. */
-  private boolean standalone;
   /** User query. */
   private String commands;
   /** XQuery file. */
@@ -41,18 +42,8 @@ public class BaseX extends Main {
    * @param args command line arguments
    */
   public BaseX(final String... args) {
-    this(true, args);
-  }
-
-  /**
-   * Constructor.
-   * @param sa standalone flag
-   * @param args command line arguments
-   */
-  public BaseX(final boolean sa, final String... args) {
-    super(sa, false, args);
+    super(args);
     if(!ok) return;
-    standalone = sa;
 
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -79,8 +70,11 @@ public class BaseX extends Main {
       process(commands);
     } else {
       // enter interactive mode
-      outln(CONSOLE, standalone ? LOCALMODE : CLIENTMODE, CONSOLE2);
-      user = console();
+      outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
+      if(console) {
+        if(!set(Prop.INFO, ON)) return;
+        user = console();
+      }
     }
     quit(user);
   }
@@ -103,6 +97,32 @@ public class BaseX extends Main {
     return null;
   }
 
+  /**
+   * Returns if this is the standalone version.
+   * @return standalone flag
+   */
+  private boolean sa() {
+    return !(this instanceof BaseXClient);
+  }
+  
+  @Override
+  protected Session session() {
+    if(session == null) {
+      if(sa()) {
+        session = new LocalSession(context);
+      } else {
+        try {
+          session = new ClientSession(context);
+        } catch(final Exception ex) {
+          // no server available; switches to standalone mode
+          Main.error(ex, true);
+          ok = false;
+        }
+      }
+    }
+    return session;
+  }
+  
   @Override
   protected final void parseArguments(final String[] args) {
     final Args arg = new Args(args);
@@ -110,10 +130,13 @@ public class BaseX extends Main {
     while(arg.more() && ok) {
       if(arg.dash()) {
         final char c = arg.next();
-        if(c == 'd') {
+        if(c == 'c') {
+          // send database commands
+          commands = arg.remaining();
+        } else if(c == 'd') {
           // activate debug mode
           context.prop.set(Prop.DEBUG, true);
-        } else if(c == 'D' && standalone) {
+        } else if(c == 'D' && sa()) {
           // hidden option: show dot query graph
           ok = set(Prop.DOTPLAN, true);
         } else if(c == 'm') {
@@ -122,21 +145,18 @@ public class BaseX extends Main {
         } else if(c == 'M') {
           // hidden option: activate main memory mode
           ok = set(Prop.MAINMEM, true);
+        } else if(c == 'n' && !sa()) {
+          // parse server name
+          context.prop.set(Prop.HOST, arg.string());
         } else if(c == 'o') {
           // specify file for result output
           output = arg.string();
-        } else if(c == 'p' && !standalone) {
+        } else if(c == 'p' && !sa()) {
           // parse server port
-          context.prop.set(Prop.PORT, Integer.parseInt(arg.string()));
-        } else if(c == 'q') {
-          // send database commands
-          commands = arg.rest();
+          context.prop.set(Prop.PORT, arg.num());
         } else if(c == 'r') {
           // hidden option: parse number of runs
           ok = set(Prop.RUNS, arg.string());
-        } else if(c == 's' && !standalone) {
-          // parse server name
-          context.prop.set(Prop.HOST, arg.string());
         } else if(c == 'v') {
           // show process info
           ok = set(Prop.INFO, true);
@@ -160,6 +180,6 @@ public class BaseX extends Main {
       }
     }
     console = file == null && commands == null;
-    if(!ok) outln(standalone ? LOCALINFO : CLIENTINFO);
+    if(!ok) outln(sa() ? LOCALINFO : CLIENTINFO);
   }
 }

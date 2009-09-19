@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.Token;

@@ -1,7 +1,6 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +11,6 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;

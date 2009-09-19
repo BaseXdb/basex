@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

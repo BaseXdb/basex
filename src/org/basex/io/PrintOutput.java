@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import static org.basex.core.Text.*;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

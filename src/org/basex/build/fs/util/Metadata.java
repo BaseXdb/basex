@@ -6,7 +6,6 @@ import static org.basex.util.Token.trim;
 import static org.basex.build.fs.NewFSParser.NS;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.core.Main;
 import org.basex.util.Atts;
 import org.basex.util.Token;

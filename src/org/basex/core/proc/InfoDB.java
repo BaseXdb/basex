@@ -1,12 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.basex.core.Main;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;

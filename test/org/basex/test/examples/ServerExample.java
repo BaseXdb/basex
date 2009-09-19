@@ -1,11 +1,8 @@
 package org.basex.test.examples;
 
 import org.basex.BaseXServer;
-import org.basex.core.*;
-import org.basex.core.Process;
-import org.basex.core.proc.*;
 import org.basex.io.*;
-import org.basex.server.ClientLauncher;
+import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 
 /**
@@ -16,12 +13,10 @@ import org.basex.util.Performance;
  * @author BaseX Team
  */
 public final class ServerExample {
-  /** Database context. */
-  static Context context;
+  /** Session. */
+  static ClientSession session;
   /** Output stream reference. */
   static PrintOutput out;
-  /** Process launcher. */
-  static ClientLauncher launcher;
 
   /** Private constructor. */
   private ServerExample() { }
@@ -43,38 +38,46 @@ public final class ServerExample {
     // Wait for the thread to be started.
     Performance.sleep(100);
 
-    // Create a new database context, referencing the database.
-    context = new Context();
-    // Create command launcher
-    launcher = new ClientLauncher(context);
+    // Create client session, specifying the server name and port
+    session = new ClientSession("localhost", 1984);
+
     // Create a standard output stream.
     out = new PrintOutput(System.out);
+
+    // Alternative: write results to disk
+    //out = new PrintOutput("result.txt");
 
     out.println("\n=== Create a database:");
 
     // Set an option: activate command info output.
-    launch(new Set("info", true));
+    launch("set info true");
     // Create a database from the specified file.
-    launch(new CreateDB("input.xml", "input"));
+    launch("create db \"input.xml\" input");
 
     out.println("\n=== Run a query:");
 
     // Create a database for the specified input.
-    launch(new XQuery("//li"));
+    launch("xquery //li");
 
     out.println("\n=== Show database information:");
 
     // Create a database for the specified input.
-    launch(new InfoDB());
+    launch("info db");
 
     out.println("\n=== Close and drop the database:");
 
     // Close the database.
-    launch(new Close());
+    launch("close");
     // Drop the database.
-    launch(new DropDB("input"));
+    launch("drop db input");
 
     out.println("\n=== Stop the server:");
+
+    // Close the session.
+    session.close();
+
+    // Close the output stream
+    out.close();
 
     // Stop server instance.
     new BaseXServer("stop");
@@ -83,16 +86,16 @@ public final class ServerExample {
   /**
    * Processes the specified command on the server and returns the output
    * or command info.
-   * @param proc process to be executed
+   * @param cmd command to be executed
    * @throws Exception exception
    */
-  private static void launch(final Process proc) throws Exception {
+  private static void launch(final String cmd) throws Exception {
     // Execute the process.
-    if(launcher.execute(proc)) {
+    if(session.execute(cmd)) {
       // Serialize the output if execution was successful.
-      launcher.output(out);
+      session.output(out);
     }
     // Show process information.
-    launcher.info(out);
+    session.info(out);
   }
 }

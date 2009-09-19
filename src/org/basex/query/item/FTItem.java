@@ -15,7 +15,6 @@ public final class FTItem extends DBNode {
   /** Length of the full-text token. */
   private int tl;
 
-
   /**
    * Constructor, called by the sequential variant.
    * @param a matches
@@ -43,11 +42,10 @@ public final class FTItem extends DBNode {
   @Override
   public double score() {
     if(score == -1) {
+      //score = all.matches() ? 1 : 0;
       score = (double) ((tl + 1) * all.match.length - 1) / 
         (double) data.textLen(pre);
     }
-    // default score for index results
-    // if(score == -1) score = all.matches() ? 1 : 0;
     return score;
   }
 

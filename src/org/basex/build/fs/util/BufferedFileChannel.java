@@ -8,7 +8,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-
 import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -337,6 +336,7 @@ public final class BufferedFileChannel {
    * @return The next four bytes at the channel's current position as integer.
    */
   public int getInt() {
+    // [BL] bit operation is redundant...
     return buf.getInt() & 0xFFFFFFFF;
   }
 

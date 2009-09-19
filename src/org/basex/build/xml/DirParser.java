@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;

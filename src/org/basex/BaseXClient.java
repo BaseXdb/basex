@@ -24,6 +24,6 @@ public final class BaseXClient extends BaseX {
    * @param args command line arguments
    */
   public BaseXClient(final String... args) {
-    super(false, args);
+    super(args);
   }
 }

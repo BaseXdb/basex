@@ -70,10 +70,18 @@ public final class Args {
   }
 
   /**
+   * Returns the next number.
+   * @return number as int value
+   */
+  public int num() {
+    return Integer.parseInt(string());
+  }
+
+  /**
    * Returns the remaining string.
    * @return remaining string
    */
-  public String rest() {
+  public String remaining() {
     while(args.charAt(c) == ' ') if(++c == args.length()) return "";
     final String s = args.substring(c);
     c = args.length();

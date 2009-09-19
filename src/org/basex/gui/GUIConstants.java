@@ -7,7 +7,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.UIManager;
-
 import org.basex.core.Text;
 import org.basex.gui.view.ViewPanel;
 import org.basex.io.IO;

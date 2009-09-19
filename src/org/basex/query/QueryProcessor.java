@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Progress;

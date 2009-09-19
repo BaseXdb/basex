@@ -10,7 +10,15 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class ALauncher {
+public abstract class Session {
+  /**
+   * Executes the specified comment.
+   * @param cmd command to be executed
+   * @throws IOException I/O exception
+   * @return success of operation
+   */
+  public abstract boolean execute(final String cmd) throws IOException;
+
   /**
    * Executes a process.
    * @param pr process to be executed
@@ -32,4 +40,10 @@ public abstract class ALauncher {
    * @throws IOException I/O exception
    */
   public abstract void info(final PrintOutput out) throws IOException;
+
+  /**
+   * Closes the session.
+   * @throws IOException I/O exception
+   */
+  public abstract void close() throws IOException;
 }

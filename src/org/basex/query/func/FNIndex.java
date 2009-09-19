@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;

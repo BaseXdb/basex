@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;

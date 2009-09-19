@@ -1,7 +1,6 @@
 package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;

@@ -1,7 +1,6 @@
 package org.basex.test.w3c;
 
 import java.util.HashMap;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;

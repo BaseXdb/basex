@@ -11,7 +11,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.core.Main;
 import org.basex.gui.layout.BaseXLabel;
 import static org.basex.gui.GUIConstants.*;

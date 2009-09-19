@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-
 import java.util.Iterator;
 import org.basex.core.Main;
 import org.basex.util.Array;
@@ -13,9 +12,9 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Sessions implements Iterable<Session> {
+public final class Sessions implements Iterable<ServerSession> {
   /** Entries. */
-  Session[] list = new Session[8];
+  ServerSession[] list = new ServerSession[8];
   /** Number of entries. */
   int size;
 
@@ -23,7 +22,7 @@ public final class Sessions implements Iterable<Session> {
    * Adds a session to the array.
    * @param s string to be added
    */
-  public void add(final Session s) {
+  public void add(final ServerSession s) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = s;
   }
@@ -41,7 +40,7 @@ public final class Sessions implements Iterable<Session> {
    * @param p position
    * @return entry
    */
-  public Session get(final int p) {
+  public ServerSession get(final int p) {
     return list[p];
   }
 
@@ -49,7 +48,7 @@ public final class Sessions implements Iterable<Session> {
    * Deletes the specified entry.
    * @param s entry to be deleted.
    */
-  public void delete(final Session s) {
+  public void delete(final ServerSession s) {
     for(int i = 0; i < size; i++) {
       if(list[i] == s) {
         Array.move(list, i + 1, -1, --size - i);
@@ -58,11 +57,11 @@ public final class Sessions implements Iterable<Session> {
     }
   }
 
-  public Iterator<Session> iterator() {
-    return new Iterator<Session>() {
+  public Iterator<ServerSession> iterator() {
+    return new Iterator<ServerSession>() {
       private int c = -1;
       public boolean hasNext() { return ++c < size; }
-      public Session next() { return list[c]; }
+      public ServerSession next() { return list[c]; }
       public void remove() { Main.notexpected(); }
     };
   }
@@ -74,8 +73,8 @@ public final class Sessions implements Iterable<Session> {
   public String info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVSESSIONS, size);
-    tb.add(size != 0 ? COL + NL : DOT);
-    for(final Session s : this) tb.add(LI + s.info() + NL);
+    tb.add(size != 0 ? COL : DOT);
+    for(final ServerSession s : this) tb.add(NL + LI + s.info());
     return tb.toString();
   }
 }

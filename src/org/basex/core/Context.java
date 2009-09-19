@@ -2,7 +2,7 @@ package org.basex.core;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.server.Session;
+import org.basex.server.ServerSession;
 import org.basex.server.Sessions;
 
 /**
@@ -215,7 +215,7 @@ public final class Context {
    * Adds the specified session.
    * @param s session to be added
    */
-  public void add(final Session s) {
+  public void add(final ServerSession s) {
     sessions.add(s);
   }
 
@@ -223,7 +223,7 @@ public final class Context {
    * Removes the specified session.
    * @param s session to be removed
    */
-  public void delete(final Session s) {
+  public void delete(final ServerSession s) {
     sessions.delete(s);
   }
 }

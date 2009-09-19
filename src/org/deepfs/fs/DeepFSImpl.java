@@ -1,7 +1,6 @@
 package org.deepfs.fs;
 
 import java.nio.ByteBuffer;
-
 import org.basex.core.Main;
 import org.catacombae.jfuse.FUSE;
 import org.catacombae.jfuse.FUSEFileSystemAdapter;
@@ -9,9 +8,7 @@ import org.catacombae.jfuse.types.fuse26.FUSEFileInfo;
 import org.catacombae.jfuse.types.fuse26.FUSEFillDir;
 import org.catacombae.jfuse.types.system.Stat;
 import org.catacombae.jfuse.util.FUSEUtil;
-
 import static org.basex.util.Token.*;
-
 
 /**
  * DeepFS: The XQuery Filesystem. Filesystem-side implementation of DeepFS.

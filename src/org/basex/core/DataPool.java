@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -94,9 +93,9 @@ final class DataPool {
   String info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVDATABASES, size);
-    tb.add(size != 0 ? COL + NL : DOT);
+    tb.add(size != 0 ? COL : DOT);
     for(int i = 0; i < size; i++) {
-      tb.add(LI + data[i].meta.name + " (" + pins[i] + "x)");
+      tb.add(NL + LI + data[i].meta.name + " (" + pins[i] + "x)");
     }
     return tb.toString();
   }

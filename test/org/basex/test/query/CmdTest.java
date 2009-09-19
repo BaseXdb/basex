@@ -1,8 +1,8 @@
 package org.basex.test.query;
 
-import org.basex.core.ALauncher;
+import org.basex.core.Session;
 import org.basex.core.Context;
-import org.basex.core.Launcher;
+import org.basex.core.LocalSession;
 import org.basex.core.Process;
 import org.basex.core.Text;
 import org.basex.core.proc.*;
@@ -13,6 +13,7 @@ import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
@@ -30,6 +31,14 @@ public class CmdTest {
   private static final String FILE = "input.xml";
   /** Test name. */
   private static final String NAME = "input";
+  /** Socket reference. */
+  static Session session;
+
+  /** Starts the server. */
+  @BeforeClass
+  public static void start() {
+    session = new LocalSession(CONTEXT);
+  }
 
   /** Removes test databases and closes the database context. */
   @AfterClass
@@ -384,21 +393,12 @@ public class CmdTest {
    */
   private String process(final Process pr) {
     try {
-      final ALauncher la = launcher();
-      final boolean ok = la.execute(pr);
+      final boolean ok = session.execute(pr);
       final CachedOutput co = new CachedOutput();
-      la.info(co);
+      session.info(co);
       return ok ? null : co.toString();
     } catch(final Exception ex) {
       return ex.toString();
     }
-  }
-
-  /**
-   * Returns a process launcher.
-   * @return launcher
-   */
-  protected ALauncher launcher() {
-    return new Launcher(CONTEXT);
   }
 }

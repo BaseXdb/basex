@@ -3,7 +3,6 @@ package org.basex.build.fs.metadata;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
 import java.util.HashMap;
-
 import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;

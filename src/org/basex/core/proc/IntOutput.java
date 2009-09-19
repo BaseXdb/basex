@@ -11,9 +11,8 @@ import org.basex.core.Process;
 public final class IntOutput extends Process {
   /**
    * Default constructor.
-   * @param n optional process number
    */
-  public IntOutput(final String n) {
-    super(STANDARD, n);
+  public IntOutput() {
+    super(STANDARD);
   }
 }

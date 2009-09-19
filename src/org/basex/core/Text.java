@@ -85,23 +85,24 @@ public interface Text {
 
   /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + "Client [options] [query]" + NL +
+    "Usage: " + NAME + CLIENTMODE + " [-np] [-cdovVxz] [query]" + NL +
+    "  [query]    specify query file" + NL +
+    "  -c<cmd>    send database commands" + NL +
     "  -d         debug mode" + NL +
-    "  -o [file]  specify output file" + NL +
+    "  -n<name>   specify server name" + NL +
+    "  -o<file>   specify output file" + NL +
     "  -p<port>   specify server port" + NL +
-    "  -q<cmd>    send database commands" + NL +
-    "  -s<name>   specify server address" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -x         print result as xml" + NL +
     "  -z         skip query output";
 
   /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [options] [query]" + NL +
+    "Usage: " + NAME + " [-cdovVxz] [query]" + NL +
     "  [query]    specify query file" + NL +
+    "  -c<cmd>    send database commands" + NL +
     "  -d         debug mode" + NL +
-    "  -o [file]  specify output file" + NL +
-    "  -q<cmd>    send database commands" + NL +
+    "  -o<file>   specify output file" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -x         print result as xml" + NL +
     "  -z         skip query output";
@@ -121,12 +122,11 @@ public interface Text {
 
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: java " + NAME + "Server [options]" + NL +
+    "Usage: java " + NAME + SERVERMODE + " [-dnpv] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
-    " -h       show this help" + NL +
+    " -n<name> specify server address" + NL +
     " -p<port> specify server port" + NL +
-    " -s<name> specify server address" + NL +
     " -v       verbose mode";
 
   // WEB SERVER ===============================================================

@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;

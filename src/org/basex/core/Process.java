@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Nodes;

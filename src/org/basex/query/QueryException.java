@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -20,15 +19,15 @@ public final class QueryException extends Exception {
   public Iter iter = Iter.EMPTY;
 
   /** File reference. */
-  protected IO file;
+  private IO file;
   /** Possible completions. */
-  protected StringList complete;
+  private StringList complete;
   /** Error code. */
-  protected String code;
+  private String code;
   /** Error line. */
-  protected int line;
+  private int line;
   /** Error column. */
-  protected int col;
+  private int col;
 
   /**
    * Constructor.

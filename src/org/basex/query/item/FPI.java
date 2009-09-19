@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 

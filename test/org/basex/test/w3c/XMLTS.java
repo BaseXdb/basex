@@ -1,7 +1,6 @@
 package org.basex.test.w3c;
 
 import static org.basex.core.Text.*;
-
 import java.io.File;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -64,13 +63,13 @@ public final class XMLTS {
       }
     }
 
-    final Context ctx = new Context();
+    context = new Context();
     context.prop.set(Prop.TEXTINDEX, false);
     context.prop.set(Prop.ATTRINDEX, false);
     //context.prop.set(MAINMEM, true);
 
-    new CreateDB(FILE).execute(ctx);
-    data = ctx.data();
+    new CreateDB(FILE).execute(context);
+    data = context.data();
 
     int ok = 0;
     int wrong = 0;
@@ -86,7 +85,7 @@ public final class XMLTS {
 
       context.prop.set(Prop.INTPARSE, true);
       Process proc = new CreateDB(PATH + uri);
-      final boolean success = proc.execute(ctx);
+      final boolean success = proc.execute(context);
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
@@ -96,9 +95,9 @@ public final class XMLTS {
           String inf = proc.info();
           if(inf.length() != 0) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
-          new Close().execute(ctx);
+          new Close().execute(context);
           proc = new CreateDB(PATH + uri);
-          proc.execute(ctx);
+          proc.execute(context);
           inf = proc.info();
           if(inf.length() != 0) Main.outln("[XERCES] " + inf);
         }
@@ -106,7 +105,7 @@ public final class XMLTS {
       if(correct) ok++;
       else wrong++;
 
-      new Close().execute(ctx);
+      new Close().execute(context);
     }
 
     Main.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");

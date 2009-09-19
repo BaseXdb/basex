@@ -11,9 +11,8 @@ import org.basex.core.Process;
 public final class IntInfo extends Process {
   /**
    * Default constructor.
-   * @param n optional process number
    */
-  public IntInfo(final String n) {
-    super(STANDARD, n);
+  public IntInfo() {
+    super(STANDARD);
   }
 }

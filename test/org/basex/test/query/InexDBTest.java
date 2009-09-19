@@ -1,11 +1,10 @@
 package org.basex.test.query;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.core.ALauncher;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -14,7 +13,7 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
-import org.basex.server.ClientLauncher;
+import org.basex.server.ClientSession;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
@@ -29,9 +28,6 @@ import org.basex.util.StringList;
  * @author Sebastian Gath
  */
 public final class InexDBTest {
-  /** Query prolog. */
-  static final String PROLOG = "declare ft-option using stemming; ";
-
   /** Submission file. */
   static final String SUBMISSION = "submission.xml";
   /** Updated submission file. */
@@ -47,8 +43,8 @@ public final class InexDBTest {
 
   /** Database context. */
   private final Context ctx = new Context();
-  /** Launcher. */
-  private ALauncher launcher;
+  /** Session. */
+  private ClientSession session;
   /** Queries. */
   private StringList queries;
   /** Databases. */
@@ -62,8 +58,6 @@ public final class InexDBTest {
   private int runs = 1;
   /** Shows process info. */
   private boolean info;
-  /** Shows process info. */
-  private boolean stem;
   /** Container for qtimes and results. */
   private PrintOutput res;
   /** Budget for a query in ms. */
@@ -128,15 +122,15 @@ public final class InexDBTest {
    * @throws Exception exception
    */
   private void test() throws Exception {
-    launcher.execute(new Set(Prop.SERIALIZE, true));
+    session.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
-      launcher.execute(new Open(databases.get(d)));
+      session.execute(new Open(databases.get(d)));
       for(int q = 0; q < queries.size(); q++) {
         for(int r = 0; r < runs; r++) query(d, q, r == runs - 1);
       }
-      launcher.execute(new Close());
+      session.execute(new Close());
     }
   }
   
@@ -159,37 +153,46 @@ public final class InexDBTest {
         }
         return;
       }
-      launcher.execute(new Set(Prop.IBT, timer));   
+      session.execute(new Set(Prop.IBT, timer));   
     }
     
     final CachedOutput r = new CachedOutput();
-    if(launcher.execute(new XQuery((stem ? PROLOG : "") + queries.get(qu)))) {
-      launcher.output(r);
+    if(session.execute(new XQuery(queries.get(qu)))) {
+      session.output(r);
       if(!s) return;
 
       final CachedOutput out = new CachedOutput();
-      launcher.info(out);
-      final String time = Pattern.compile(".*Total Time: (.*?) ms.*",
-          Pattern.DOTALL).matcher(out.toString()).replaceAll("$1");
+      session.info(out);
+
+      final String str = out.toString();
+      final String time = find(str, "Total Time: (.*) ms");
+      final String items = find(str, "([0-9]+) ms");
 
       // output result
-      Main.outln("Query % on %: %", qu + 1, databases.get(db), time);
-      if(info) {
-        Main.outln("- " + Pattern.compile(".*Result: (.*?)\\n.*",
-            Pattern.DOTALL).matcher(out.toString()).replaceAll("$1"));
-      }
-      String in = out.toString();
-      in = in.substring(in.indexOf("Results") + 
-          "Results".length(), in.indexOf("Item")).trim();
+      Main.outln("Query % on %: % (% items)",
+          qu + 1, databases.get(db), time, items);
+
+      if(info) Main.outln("- " + find(str, "Result: (.*)\\r?\\n"));
+
       rqt[qu] += Double.parseDouble(time);
-      if(res != null) res.println(time + ";" + 
-          Integer.parseInt(in.substring(in.indexOf(':') + 2)));
+      if(res != null) res.println(time + ";" + items);
     } else {
       final CachedOutput out = new CachedOutput();
-      launcher.info(out);
-      Main.outln(out.toString());
-      if(res != null) res.println(-1 + ";" + -1);
+      session.info(out);
+      Main.outln(out);
+      if(res != null) res.println("-1;-1");
     }
+  }
+
+  /**
+   * Finds a string in the specified pattern.
+   * @param str input string
+   * @param pat regular pattern
+   * @return resulting string
+   */
+  private String find(final String str, final String pat) {
+    final Matcher m = Pattern.compile(pat).matcher(str);
+    return m.find() ? m.group(1) : "";
   }
   
   /**
@@ -205,17 +208,15 @@ public final class InexDBTest {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'd') {
-            dbindex = Integer.parseInt(arg.string());
+            dbindex = arg.num();
           } else if(c == 'q') {
-            quindex = Integer.parseInt(arg.string());
+            quindex = arg.num();
           } else if(c == 'r') {
-            runs = Integer.parseInt(arg.string());
-          } else if(c == 's') {
-            stem = true;
+            runs = arg.num();
           } else if(c == 'v') {
             info = true;
           } else if(c == 'b') {
-            budget = Long.parseLong(arg.string());
+            budget = arg.num();
           } else {
             ok = false;
           }
@@ -224,9 +225,9 @@ public final class InexDBTest {
         }
       }
 
-      launcher = new ClientLauncher(ctx);
-      launcher.execute(new Set(Prop.INFO, true));
-      launcher.execute(new Set(Prop.ALLINFO, info));
+      session = new ClientSession(ctx);
+      session.execute(new Set(Prop.INFO, true));
+      session.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {
       ok = false;
       Main.errln("Please run BaseXServer for using server mode.");
@@ -238,7 +239,6 @@ public final class InexDBTest {
         "  -d<no>  use specified database (0-9)" + NL +
         "  -q<no>  perform specified query (1-#queries)" + NL +
         "  -r<no>  number of runs" + NL +
-        "  -s      use stemming" + NL +
         "  -v      show process info");
     }
     return ok;

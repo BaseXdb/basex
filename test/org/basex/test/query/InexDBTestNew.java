@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
-import org.basex.core.ALauncher;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
@@ -26,7 +25,7 @@ import org.basex.io.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
-import org.basex.server.ClientLauncher;
+import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -63,8 +62,8 @@ public final class InexDBTestNew {
 
   /** Database context. */
   private Context ctx = new Context();
-  /** Launcher. */
-  private ALauncher launcher;
+  /** Session. */
+  private ClientSession session;
   /** Queries. */
   private StringList queries;
   /** Databases. */
@@ -76,8 +75,6 @@ public final class InexDBTestNew {
   private PrintOutput sub = null;
   /** XMLSerializer for the submission file. */
   private XMLSerializer xml = null;
-  /** Shows process info. */
-  private boolean stem;
 
   /** Collection for query result sizes. */
   private int[] qressizes;
@@ -162,15 +159,15 @@ public final class InexDBTestNew {
    * @throws Exception exception
    */
   private void test() throws Exception {
-    launcher.execute(new Set(Prop.SERIALIZE, true));
+    session.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries
-      launcher.execute(new Open(databases.get(d)));
+      session.execute(new Open(databases.get(d)));
       for(int q = 0; q < queries.size(); q++) {
         results[q] = addSortedServer(results[q], query(d, q));
       }
-      launcher.execute(new Close());
+      session.execute(new Close());
     }
   }
 
@@ -188,14 +185,14 @@ public final class InexDBTestNew {
     if(size == 0) return new SeqIter();
 
     // query and cache result
-    final String que = XQM + (stem ? PROLOG : "") + "for $i score $s in " +
+    final String que = XQM + "for $i score $s in " +
         queries.get(qu) + " order by $s descending " +
         "return (basex:sum-path($i), $s, base-uri($i))";
 
     final Process proc = new XQuery(que);
     final CachedOutput res = new CachedOutput();
-    if(launcher.execute(proc)) launcher.output(res);
-    launcher.info(new CachedOutput());
+    if(session.execute(proc)) session.output(res);
+    session.info(new CachedOutput());
 
     final SeqIter sq = new SeqIter();
     final StringTokenizer st = new StringTokenizer(res.toString(), " ");
@@ -268,9 +265,7 @@ public final class InexDBTestNew {
       while(arg.more() && ok) {
         if(arg.dash()) {
           final char ca = arg.next();
-          if(c == 's') {
-            stem = true;
-          } else if(ca == 'u') {
+          if(ca == 'u') {
             final String[] s = new String[args.length - 1];
             System.arraycopy(args, 1, s, 0, s.length);
             updateTimes(s);
@@ -283,8 +278,8 @@ public final class InexDBTestNew {
           ok = false;
         }
       }
-      launcher = new ClientLauncher(ctx);
-      launcher.execute(new Set(Prop.INFO, true));
+      session = new ClientSession(ctx);
+      session.execute(new Set(Prop.INFO, true));
     } catch(final Exception ex) {
       ok = false;
       Main.errln("Please run BaseXServer for using server mode.");
@@ -293,7 +288,6 @@ public final class InexDBTestNew {
 
     if(!ok) {
       Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
-        "  -s      use stemming" + NL +
         "  -u[...] update submission times" + NL +
         "  -x      convert queries");
     }

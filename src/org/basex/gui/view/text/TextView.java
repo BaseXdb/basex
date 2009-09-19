@@ -1,11 +1,9 @@
 package org.basex.gui.view.text;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.Box;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;

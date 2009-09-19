@@ -2,11 +2,9 @@ package org.basex.query.up;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
-
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks

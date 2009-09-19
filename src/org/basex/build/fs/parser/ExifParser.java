@@ -7,9 +7,7 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -65,6 +63,7 @@ public class ExifParser {
                 (short) (buf.getShort() & 0xFFFF));
             buf.getShort(); // empty two bytes
           } else if(type == IFD_TYPE_LONG) {
+            // [BL] bit operation is redundant...
             o.meta.setInt(IntField.PIXEL_WIDTH, buf.getInt() & 0xFFFFFFFF);
           } else error(o, "Image width (0x0100)");
           o.fsparser.metaEvent(o.meta);
@@ -81,6 +80,7 @@ public class ExifParser {
             o.meta.setShort(IntField.PIXEL_HEIGHT,
                 (short) (buf.getShort() & 0xFFFF));
           } else if(type == IFD_TYPE_LONG) {
+            // [BL] bit operation is redundant...
             o.meta.setInt(IntField.PIXEL_HEIGHT, buf.getInt() & 0xFFFFFFFF);
           } else error(o, "Image length (0x0101)");
           o.fsparser.metaEvent(o.meta);

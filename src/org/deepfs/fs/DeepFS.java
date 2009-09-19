@@ -3,10 +3,8 @@ package org.deepfs.fs;
 import static org.basex.util.Token.*;
 import static org.catacombae.jfuse.types.system.StatConstant.*;
 import static org.deepfs.jfuse.FileTestMacros.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;

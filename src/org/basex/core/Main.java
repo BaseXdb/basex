@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.BindException;
 import java.util.Random;
+
+import org.basex.BaseXServer;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.server.ClientLauncher;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -32,32 +33,17 @@ public abstract class Main {
   /** Output file for queries. */
   protected String output;
 
-  /** Launcher. */
-  protected ALauncher launcher;
+  /** Session. */
+  protected Session session;
   /** Console mode. */
   protected boolean console;
 
   /**
    * Constructor.
-   * @param sa standalone flag
-   * @param sv server flag
    * @param args command line arguments
    */
-  public Main(final boolean sa, final boolean sv, final String... args) {
-    context.server = sv;
-
-    if(sa) {
-      launcher = new Launcher(context);
-    } else {
-      try {
-        launcher = new ClientLauncher(context);
-      } catch(final Exception ex) {
-        // no server available; switches to standalone mode
-        Main.error(ex, true);
-        ok = false;
-        return;
-      }
-    }
+  protected Main(final String... args) {
+    context.server = this instanceof BaseXServer;
     parseArguments(args);
   }
 
@@ -66,30 +52,34 @@ public abstract class Main {
    * @return user interruption
    */
   protected boolean console() {
-    if(console) set(Prop.INFO, ON);
+    if(console && !set(Prop.INFO, ON)) return true;
+
     while(console) {
       if(!process(new IntPrompt(), true)) break;
-      final String in = input();
-      if(in == null) break;
-      if(!process(in)) return true;
+      try {
+        final InputStreamReader isr = new InputStreamReader(System.in);
+        final String in = new BufferedReader(isr).readLine().trim();
+        if(!process(in)) return true;
+      } catch(final Exception ex) {
+        // also catches forced interruptions such as ctrl+c
+        break;
+      }
     }
     return false;
   }
 
   /**
-   * Returns the next user input.
-   * @return user input
+   * Quits the console mode.
+   * @param user quit by user
    */
-  private String input() {
-    try {
-      final InputStreamReader isr = new InputStreamReader(System.in);
-      return new BufferedReader(isr).readLine().trim();
-    } catch(final Exception ex) {
-      // also catches forced interruptions such as ctrl+c
-      return null;
+  public void quit(final boolean user) {
+    if(!user) {
+      process(new Exit(), true);
+    } else {
+      outln(CLIENTBYE[new Random().nextInt(4)]);
     }
   }
-
+  
   /**
    * Evaluates the input, which can be interactive input or the commands
    * specified after the <code>-q</code> command-line argument.
@@ -98,10 +88,9 @@ public abstract class Main {
    */
   protected boolean process(final String in) {
     try {
-      for(final Process p :
-        new CommandParser(in, context, false, context.server).parse()) {
-        if(p instanceof Exit) return false;
+      for(final Process p : new CommandParser(in, context).parse()) {
         if(!process(p, true)) break;
+        if(p instanceof Exit) return false;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());
@@ -117,18 +106,20 @@ public abstract class Main {
    */
   protected boolean process(final Process pr, final boolean v) {
     try {
-      final boolean success = launcher.execute(pr);
+      final Session ss = session();
+      if(ss == null) return false;
+      final boolean success = ss.execute(pr);
 
       if(success && pr.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
             new PrintOutput(System.out);
-        launcher.output(out);
+        ss.output(out);
         out.close();
       }
 
       if(v || !success) {
         final CachedOutput out = new CachedOutput();
-        launcher.info(out);
+        ss.info(out);
         final String inf = out.toString();
         if(inf.length() != 0) {
           if(!success) {
@@ -141,22 +132,9 @@ public abstract class Main {
       if(v && console && !(pr instanceof IntPrompt)) outln();
       return success;
     } catch(final IOException ex) {
-      error(ex, SERVERERR);
+      error(ex, true);
       return false;
     }
-  }
-
-  /**
-   * Quits the code.
-   * @param user states if application was actively quit by the user
-   */
-  protected void quit(final boolean user) {
-    try {
-      launcher.execute(new Exit());
-    } catch(final Exception ex) {
-      error(ex, true);
-    }
-    if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
   /**
@@ -178,6 +156,12 @@ public abstract class Main {
     errln((console ? "" : INFOERROR) + msg.trim());
     debug(ex);
   }
+
+  /**
+   * Returns the session.
+   * @return session
+   */
+  protected abstract Session session();
 
   /**
    * Parses the command-line arguments, specified by the user.
@@ -292,10 +276,10 @@ public abstract class Main {
   /**
    * Prints a server error message.
    * @param ex exception reference
-   * @param quiet quiet flag
+   * @param msg message flag
    */
-  public static void error(final Exception ex, final boolean quiet) {
-    if(quiet) {
+  public static void error(final Exception ex, final boolean msg) {
+    if(msg) {
       debug(ex);
       if(ex instanceof BindException) {
         errln(SERVERBIND);

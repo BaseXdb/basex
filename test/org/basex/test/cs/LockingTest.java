@@ -2,7 +2,7 @@ package org.basex.test.cs;
 
 import java.io.IOException;
 import org.basex.BaseXServer;
-import org.basex.core.ALauncher;
+import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.proc.Delete;
@@ -10,7 +10,7 @@ import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.NullOutput;
-import org.basex.server.ClientLauncher;
+import org.basex.server.ClientSession;
 
 /**
  * This class tests the four locking cases.
@@ -44,7 +44,7 @@ public final class LockingTest {
         + " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
     int cnr = 2;
     for(int i = 0; i < cnr; i++) {
-      startAClient(new ClientLauncher(context), i);
+      startAClient(new ClientSession(context), i);
     }
   }
 
@@ -65,7 +65,7 @@ public final class LockingTest {
    * @param client client reference
    * @param c int
    */
-  private void startAClient(final ALauncher client, final int c) {
+  private void startAClient(final Session client, final int c) {
     new Thread() {
       int check = c;
       @Override
@@ -82,13 +82,13 @@ public final class LockingTest {
   }
 
   /**
-   * Executes the ClientLauncher.
-   * @param client client reference
+   * Executes the specified process.
+   * @param ss client session
    * @param pr process to be executed
    */
-  void exe(final ALauncher client, final Process pr) {
+  void exe(final Session ss, final Process pr) {
     try {
-      if(client.execute(pr)) client.output(new NullOutput());
+      if(ss.execute(pr)) ss.output(new NullOutput());
     } catch(IOException ex) {
       ex.printStackTrace();
     }

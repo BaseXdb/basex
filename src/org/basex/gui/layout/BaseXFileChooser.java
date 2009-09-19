@@ -1,12 +1,10 @@
 package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
-
 import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-
 import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;

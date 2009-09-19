@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -25,33 +24,36 @@ import org.basex.query.QueryException;
 import org.basex.util.Performance;
 
 /**
- * Session for a client-server connection.
+ * Single session for a client-server connection.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class Session extends Thread {
+public final class ServerSession extends Thread {
   /** Database context. */
   private final Context context;
   /** Socket reference. */
   private final Socket socket;
   /** Server reference. */
   private final BaseXServer server;
-
   /** Core. */
-  public Process core;
+  private Process core;
   /** Timeout thread. */
-  Thread timeout;
+  private Thread timeout;
+  /** Info flag. */
+  private boolean info;
 
   /**
-   * Session.
+   * Constructor.
    * @param s socket
    * @param b server reference
+   * @param i info flag
    */
-  public Session(final Socket s, final BaseXServer b) {
+  public ServerSession(final Socket s, final BaseXServer b, final boolean i) {
     context = new Context(b.context);
     socket = s;
     server = b;
+    info = i;
     start();
   }
 
@@ -63,14 +65,14 @@ public final class Session extends Thread {
       final PrintOutput out = new PrintOutput(
           new BufferedOutput(socket.getOutputStream()));
 
-      if(server.verbose) Main.outln(this + " Login.");
+      if(info) Main.outln(this + " Login.");
 
       while(true) {
         String in = null;
         try {
           in = dis.readUTF();
         } catch(final IOException ex) {
-          // this exception is thrown if the server is stopped
+          // this exception is thrown for each session if the server is stopped
           exit();
           break;
         }
@@ -111,12 +113,10 @@ public final class Session extends Thread {
           core = proc;
           send(out, false);
         }
-        if(server.verbose) {
-          Main.outln(this + " " + in + ": " + perf.getTimer());
-        }
+        if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
       }
 
-      if(server.verbose) Main.outln(this + " Logout.");
+      if(info) Main.outln(this + " Logout.");
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
@@ -139,7 +139,7 @@ public final class Session extends Thread {
    * @param proc process reference
    */
   private void timeout(final Process proc) {
-    final int to = context.prop.num(Prop.TIMEOUT);
+    final long to = context.prop.num(Prop.TIMEOUT);
     timeout = new Thread() {
       @Override
       public void run() {
@@ -154,24 +154,24 @@ public final class Session extends Thread {
    * Exits the session.
    */
   public void exit() {
+    stopProcess();
     if(timeout != null) timeout.interrupt();
 
     context.delete(this);
     new Close().execute(context);
 
     try {
-      close();
+      socket.close();
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
   }
 
   /**
-   * Closes the session.
-   * @throws IOException I/O exception
+   * Stops the current process.
    */
-  public void close() throws IOException {
-    socket.close();
+  public void stopProcess() {
+    if(core != null) core.stop();
   }
 
   /**

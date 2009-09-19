@@ -7,7 +7,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
-
 import org.basex.core.Main;
 import org.xml.sax.InputSource;
 

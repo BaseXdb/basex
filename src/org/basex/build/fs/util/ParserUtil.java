@@ -195,7 +195,7 @@ public final class ParserUtil {
         } else {
           boolean valid = true;
           for(int j = 1; j < numBytes; j++) {
-            final int b2 = data[i + j];
+            final int b2 = data[i + j] & 0xFF;
             if(b2 < 0x80 || b2 > 0xBF) {
               valid = false;
               break;

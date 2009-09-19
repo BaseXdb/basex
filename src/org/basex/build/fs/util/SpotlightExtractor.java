@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.MP3Parser;
 import org.basex.build.fs.util.Metadata.DateField;

@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import java.util.Iterator;
-
 import org.basex.core.Main;
 
 /**

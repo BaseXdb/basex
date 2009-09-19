@@ -2,7 +2,6 @@ package org.deepfs;
 
 import static org.catacombae.jfuse.types.system.StatConstant.*;
 import static org.basex.util.Token.*;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -12,7 +11,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
-
 import org.basex.core.Main;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;

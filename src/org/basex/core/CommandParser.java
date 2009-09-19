@@ -62,8 +62,6 @@ public final class CommandParser extends InputParser {
   private final Context ctx;
   /** Flag for including internal commands. */
   private final boolean internal;
-  /** Flag for including server commands. */
-  private final boolean server;
 
   /**
    * Constructor, parsing the input queries.
@@ -78,24 +76,11 @@ public final class CommandParser extends InputParser {
    * Constructor, parsing internal commands.
    * @param in query input
    * @param c context
-   * @param i flag for including the parsing of internal commands
+   * @param i internal flag
    */
   public CommandParser(final String in, final Context c, final boolean i) {
-    this(in, c, i, false);
-  }
-
-  /**
-   * Constructor, parsing internal commands.
-   * @param in query input
-   * @param c context
-   * @param i internal flag
-   * @param s server flag
-   */
-  public CommandParser(final String in, final Context c, final boolean i,
-      final boolean s) {
     ctx = c;
     internal = i;
-    server = s;
     init(in);
   }
 
@@ -243,9 +228,9 @@ public final class CommandParser extends InputParser {
       case INTPROMPT:
         return new IntPrompt();
       case INTOUTPUT:
-        return new IntOutput(number(null));
+        return new IntOutput();
       case INTINFO:
-        return new IntInfo(number(null));
+        return new IntInfo();
       case INTSTOP:
         return new IntStop();
 
@@ -393,7 +378,7 @@ public final class CommandParser extends InputParser {
       if(!(cmd instanceof Cmd)) return cmd;
       final Cmd c = (Cmd) cmd;
       if(!c.help() && (internal || !c.internal()) &&
-          (server || !c.server())) return cmd;
+          (ctx.server || !c.server())) return cmd;
     } catch(final IllegalArgumentException ex) { }
 
     final Enum<?>[] alt = list(cmp, token);
@@ -409,7 +394,7 @@ public final class CommandParser extends InputParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
-      if(ls.similar(name, sm, 0) && (server || !((Cmd) s).server()))
+      if(ls.similar(name, sm, 0) && (ctx.server || !((Cmd) s).server()))
         error(list(alt), CMDSIMILAR, name, sm);
     }
 
@@ -428,7 +413,7 @@ public final class CommandParser extends InputParser {
    */
   protected void help(final StringList alt, final Cmd cmd)
       throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true, server));
+    error(alt, PROCSYNTAX, cmd.help(true, ctx.server));
   }
 
   /**

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
@@ -10,7 +7,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Metadata;
@@ -85,6 +81,7 @@ public class EMLParser extends AbstractParser {
           while(i < len && text[i] != '=')
             tmp.add(text[i++]);
           if(i + 4 >= len) {
+            // [BL] FindBugs warning: variable i is not used anymore..
             i = len;
             break;
           }

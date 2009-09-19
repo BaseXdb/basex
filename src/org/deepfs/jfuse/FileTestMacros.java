@@ -1,7 +1,6 @@
 package org.deepfs.jfuse;
 
 import static org.catacombae.jfuse.types.system.StatConstant.*;
-
 import org.catacombae.jfuse.types.system.StatConstant;
 
 /** (from stat.h)

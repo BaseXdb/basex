@@ -4,7 +4,6 @@ import static org.basex.build.BuildText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;

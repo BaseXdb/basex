@@ -1,7 +1,6 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

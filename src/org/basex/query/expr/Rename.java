@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -35,7 +34,7 @@ public final class Rename extends Arr {
     final Iter tgI = expr[0].iter(ctx);
     final Iter nI = expr[1].iter(ctx);
     Item i = tgI.next();
-    if(i == null) Err.or(INCOMPLETE, i);
+    if(i == null) Err.or(INCOMPLETE);
     if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(INCOMPLETE, i);
     final int kind = Nod.kind(((Nod) i).type);
     if(kind != Data.ATTR && kind != Data.ELEM && kind != Data.PI)

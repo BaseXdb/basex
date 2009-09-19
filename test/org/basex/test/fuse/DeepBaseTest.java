@@ -1,9 +1,7 @@
 package org.basex.test.fuse;
 
 import static org.junit.Assert.*;
-
 import java.io.File;
-
 import org.basex.core.proc.DropDB;
 import org.deepfs.fs.DeepFS;
 import org.junit.After;

@@ -7,7 +7,6 @@ import org.basex.build.fs.util.Metadata;
 import org.basex.build.fs.util.Metadata.IntField;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
-
 import static org.basex.util.Token.*;
 
 /**

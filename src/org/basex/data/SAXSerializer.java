@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.xml.sax.ContentHandler;

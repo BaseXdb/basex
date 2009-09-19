@@ -1,11 +1,8 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.UpdateFunctions.*;
-
-
 import java.util.LinkedList;
 import java.util.List;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.item.DBNode;

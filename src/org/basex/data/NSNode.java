@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;

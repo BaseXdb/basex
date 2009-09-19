@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.core.Main;
 import org.basex.query.ExprInfo;
 import org.basex.query.IndexContext;

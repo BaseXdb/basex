@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.basex.core.Main;
 import org.basex.util.Array;
 

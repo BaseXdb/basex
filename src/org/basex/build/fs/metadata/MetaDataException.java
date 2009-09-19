@@ -1,7 +1,6 @@
 package org.basex.build.fs.metadata;
 
 import java.io.IOException;
-
 import org.basex.core.Main;
 
 /**

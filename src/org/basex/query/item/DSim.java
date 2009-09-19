@@ -3,7 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
