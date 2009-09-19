@@ -15,8 +15,26 @@ import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
- * This wrapper sends client commands to the server instance over a socket.
- * It extends the {@link Session} class.
+ * This wrapper sends commands to the server instance over a socket
+ * connection. It extends the {@link Session} class.
+ * 
+ * The following steps show how to talk to the server instance with any
+ * other programming language:
+ * <ul> 
+ * <li> A socket is created by the constructor.</li>
+ * <li> The {@link #execute} method sends database commands to the server
+ * as UTF8 byte arrays. The byte array is preceded by two bytes (high/low byte)
+ * containing the string length. A single byte is received as result,
+ * determining if command execution was successful (0) or not (1).</li>
+ * <li> The {@link #output} method sends the {@link Cmd#INTOUTPUT} command
+ * to the server. As the length of the resulting byte array is unknown,
+ * it is concluded by {@link IO#BLOCKSIZE} zero bytes.</li>
+ * <li> The {@link #info} method sends the {@link Cmd#INTINFO} command and
+ * receives a UTF8 byte array as result, which has the format as the one sent
+ * by {@link #execute}.</li>
+ * <li> {@link #close} closes the session by sending the {@link Cmd#EXIT}
+ * command to the server.</li>
+ * </ul>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

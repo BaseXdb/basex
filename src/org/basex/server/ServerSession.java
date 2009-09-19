@@ -103,7 +103,7 @@ public final class ServerSession extends Thread {
             timeout(proc);
             send(out, proc.execute(context));
             if(proc.info().equals(PROGERR)) proc.error(SERVERTIME);
-            timeout.interrupt();
+            if(timeout != null) timeout.interrupt();
           }
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create empty process
@@ -140,6 +140,8 @@ public final class ServerSession extends Thread {
    */
   private void timeout(final Process proc) {
     final long to = context.prop.num(Prop.TIMEOUT);
+    if(to == 0) return;
+
     timeout = new Thread() {
       @Override
       public void run() {

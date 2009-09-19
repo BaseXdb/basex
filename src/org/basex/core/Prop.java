@@ -40,23 +40,6 @@ public final class Prop extends AProp {
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
-  // STATIC PROPERTIES ========================================================
-
-  /** GUI mode. */
-  public static boolean gui;
-  /** Web Server mode. */
-  public static boolean web;
-
-  /** Language (applied after restart). */
-  public static String language;
-  /** Flag for showing language keys. */
-  public static boolean langkeys;
-  /** Debug mode. */
-  public static boolean debug;
-
-  /** Last XQuery file. */
-  public static IO xquery;
-
   // The following properties will be saved to disk:
 
   // DATABASE & PROGRAM PATHS =================================================
@@ -159,8 +142,8 @@ public final class Prop extends AProp {
   /** Flag for creating flat MAB2 data. */
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
 
-  /** Server timeout in seconds. */
-  public static final Object[] TIMEOUT = { "TIMEOUT", 3600 };
+  /** Server timeout in seconds; deactivated if set to 0. */
+  public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
   
   //[SG] INEX budget time
   /** INEX budget for queries. */
@@ -184,6 +167,23 @@ public final class Prop extends AProp {
 
   /** PHP Path. */
   public static final Object[] PHPPATH = { "PHPPATH", "php" };
+
+  // STATIC PROPERTIES ========================================================
+
+  /** GUI mode. */
+  public static boolean gui;
+  /** Web Server mode. */
+  public static boolean web;
+  /** Debug mode. */
+  public static boolean debug;
+
+  /** Language (applied after restart). */
+  public static String language = LANGUAGE[1].toString();
+  /** Flag for showing language keys. */
+  public static boolean langkeys;
+
+  /** Last XQuery file. */
+  public static IO xquery;
 
   /**
    * Constructor.

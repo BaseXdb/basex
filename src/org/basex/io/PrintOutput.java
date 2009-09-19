@@ -1,9 +1,9 @@
 package org.basex.io;
 
-import static org.basex.core.Text.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import org.basex.core.Prop;
 import org.basex.util.Token;
 
 /**
@@ -104,7 +104,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final String str) throws IOException {
     print(str);
-    print(NL);
+    print(Prop.NL);
   }
 
   /**
@@ -112,7 +112,7 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public final void println() throws IOException {
-    print(NL);
+    print(Prop.NL);
   }
 
   /**
@@ -131,7 +131,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final byte[] token) throws IOException {
     print(token);
-    print(NL);
+    print(Prop.NL);
   }
 
   /**
