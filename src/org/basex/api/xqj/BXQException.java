@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import javax.xml.xquery.XQException;
-
 import org.basex.core.Main;
 
 /**

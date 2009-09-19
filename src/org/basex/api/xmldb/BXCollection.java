@@ -1,7 +1,6 @@
 package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Random;

@@ -13,7 +13,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
-
 import org.basex.core.Main;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
