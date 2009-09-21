@@ -1,6 +1,7 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,6 +25,8 @@ import org.basex.util.Args;
  * @author Christian Gruen
  */
 public final class BaseXServer extends Main {
+  /** Server socket. */
+  ServerSocket server;
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
@@ -46,68 +49,47 @@ public final class BaseXServer extends Main {
     super(args);
     if(!ok) return;
 
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        // interrupt running processes
-        for(final ServerSession s : context.sessions) s.stopProcess();
-        context.close();
-      }
-    });
+    try {
+      server = new ServerSocket(context.prop.num(Prop.PORT));
 
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          final ServerSocket ss = new ServerSocket(context.prop.num(Prop.PORT));
+      new Thread() {
+        @Override
+        public void run() {
           while(running) {
             try {
-              final Socket s = ss.accept();
-              if(running) {
-                context.add(new ServerSession(s, BaseXServer.this, info));
-              }
+              final Socket s = server.accept();
+              context.add(new ServerSession(s, BaseXServer.this, info));
             } catch(final IOException ex) {
-              error(ex, false);
+              // socket was closed..
+              break;
             }
           }
-        } catch(final Exception ex) {
-          error(ex, true);
         }
-      }
-    }.start();
+      }.start();
 
-    outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
-
-    if(!console) return;
-    quit(console());
-  }
-
-  @Override
-  public void quit(final boolean user) {
-    running = false;
-    console = false;
-    for(final ServerSession s : context.sessions) s.exit();
-    super.quit(user);
-
-    try {
-      // dummy session for breaking the accept block
-      new ClientSession(context);
-    } catch(final IOException ex) {
+      outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
+      if(console) quit(console());
+    } catch(final Exception ex) {
       error(ex, false);
     }
   }
 
-  /**
-   * Stops the server.
-   */
-  public void stop() {
+  @Override
+  public synchronized void quit(final boolean user) {
+    if(!running) return;
+    running = false;
+    super.quit(user);
+
     try {
-      new ClientSession(context).execute(new IntStop());
-      outln(SERVERSTOPPED);
+      // close input streams
+      if(console) System.in.close();
+      server.close();
     } catch(final IOException ex) {
-      error(ex, true);
+      error(ex, false);
     }
+
+    console = false;
+    context.close();
   }
 
   @Override
@@ -144,7 +126,12 @@ public final class BaseXServer extends Main {
       } else {
         ok = false;
         if(arg.string().equals("stop")) {
-          stop();
+          try {
+            new ClientSession(context).execute(new IntStop());
+            outln(SERVERSTOPPED);
+          } catch(final IOException ex) {
+            error(ex, true);
+          }
           return;
         }
       }

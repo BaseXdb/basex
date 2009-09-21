@@ -36,12 +36,12 @@ public final class ServerSession extends Thread {
   private final Socket socket;
   /** Server reference. */
   private final BaseXServer server;
+  /** Info flag. */
+  private final boolean info;
   /** Core. */
   private Process core;
   /** Timeout thread. */
   private Thread timeout;
-  /** Info flag. */
-  private boolean info;
 
   /**
    * Constructor.
@@ -83,27 +83,27 @@ public final class ServerSession extends Thread {
         try {
           proc = new CommandParser(in, context, true).parse()[0];
 
-          if(proc instanceof IntStop || proc instanceof Exit) {
-            send(out, true);
-            exit();
-            if(proc instanceof IntStop) server.quit(false);
-            break;
-          } else if(proc instanceof IntOutput || proc instanceof IntInfo) {
-            if(core == null) {
-              out.print(Main.info(SERVERTIME));
-            } else if(proc instanceof IntOutput) {
+          if(proc instanceof IntOutput || proc instanceof IntInfo) {
+            if(proc instanceof IntOutput) {
               core.output(out);
               out.write(new byte[IO.BLOCKSIZE]);
             } else {
-              new DataOutputStream(out).writeUTF(core.info());
+              String inf = core.info();
+              if(inf.equals(PROGERR)) inf = SERVERTIME;
+              new DataOutputStream(out).writeUTF(inf);
             }
             out.flush();
           } else {
             core = proc;
-            timeout(proc);
+            startTimer(proc);
             send(out, proc.execute(context));
-            if(proc.info().equals(PROGERR)) proc.error(SERVERTIME);
-            if(timeout != null) timeout.interrupt();
+            stopTimer();
+
+            if(proc instanceof IntStop || proc instanceof Exit) {
+              exit();
+              if(proc instanceof IntStop) server.quit(false);
+              break;
+            }
           }
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create empty process
@@ -135,10 +135,10 @@ public final class ServerSession extends Thread {
   }
 
   /**
-   * Times out a process.
+   * Starts a timeout thread for the specified process.
    * @param proc process reference
    */
-  private void timeout(final Process proc) {
+  private void startTimer(final Process proc) {
     final long to = context.prop.num(Prop.TIMEOUT);
     if(to == 0) return;
 
@@ -153,27 +153,27 @@ public final class ServerSession extends Thread {
   }
 
   /**
+   * Stops the current timeout thread.
+   */
+  private void stopTimer() {
+    if(timeout != null) timeout.interrupt();
+  }
+
+  /**
    * Exits the session.
    */
   public void exit() {
-    stopProcess();
-    if(timeout != null) timeout.interrupt();
+    if(core != null) core.stop();
+    stopTimer();
 
-    context.delete(this);
     new Close().execute(context);
+    context.delete(this);
 
     try {
       socket.close();
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
-  }
-
-  /**
-   * Stops the current process.
-   */
-  public void stopProcess() {
-    if(core != null) core.stop();
   }
 
   /**

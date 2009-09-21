@@ -62,20 +62,20 @@ public final class LockingTest {
 
   /**
    * Starts a client.
-   * @param client client reference
+   * @param session client reference
    * @param c int
    */
-  private void startAClient(final Session client, final int c) {
+  private void startAClient(final Session session, final int c) {
     new Thread() {
       int check = c;
       @Override
       public void run() {
-        exe(client, new Open("factbook"));
-        exe(client, new XQuery(read));
+        exe(session, new Open("factbook"));
+        exe(session, new XQuery(read));
         if(check % 2 == 0) {
-          exe(client, new Insert("element", "//members", "aa"));
+          exe(session, new Insert("element", "//members", "aa"));
         } else {
-          exe(client, new Delete("//aa"));
+          exe(session, new Delete("//aa"));
         }
       }
     }.start();

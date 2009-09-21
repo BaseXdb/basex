@@ -1,8 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import java.util.Iterator;
-import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
@@ -12,7 +10,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Sessions implements Iterable<ServerSession> {
+public final class Sessions {
   /** Entries. */
   ServerSession[] list = new ServerSession[8];
   /** Number of entries. */
@@ -57,15 +55,6 @@ public final class Sessions implements Iterable<ServerSession> {
     }
   }
 
-  public Iterator<ServerSession> iterator() {
-    return new Iterator<ServerSession>() {
-      private int c = -1;
-      public boolean hasNext() { return ++c < size; }
-      public ServerSession next() { return list[c]; }
-      public void remove() { Main.notexpected(); }
-    };
-  }
-
   /**
    * Returns information on the opened database instances.
    * @return data reference
@@ -74,7 +63,7 @@ public final class Sessions implements Iterable<ServerSession> {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVSESSIONS, size);
     tb.add(size != 0 ? COL : DOT);
-    for(final ServerSession s : this) tb.add(NL + LI + s.info());
+    for(int i = 0; i < size; i++) tb.add(NL + LI + list[i].info());
     return tb.toString();
   }
 }

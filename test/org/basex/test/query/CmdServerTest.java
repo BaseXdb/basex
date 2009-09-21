@@ -41,6 +41,8 @@ public final class CmdServerTest extends CmdTest {
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
-    server.stop();
+    
+    // Stop server instance.
+    new BaseXServer("stop");
   }
 }

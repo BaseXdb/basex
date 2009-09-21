@@ -43,17 +43,7 @@ public class BaseX extends Main {
    */
   public BaseX(final String... args) {
     super(args);
-    if(!ok) return;
-
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        // interrupt running processes
-        context.close();
-      }
-    });
-    run();
+    if(ok) run();
   }
 
   /**

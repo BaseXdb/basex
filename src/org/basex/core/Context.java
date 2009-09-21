@@ -16,10 +16,10 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Current client connections. */
   public final Sessions sessions;
-  /** Database properties. */
-  public final Prop prop;
   /** Database pool. */
   private final DataPool pool;
+  /** Database properties. */
+  public Prop prop;
   /** Server flag. */
   public boolean server;
   /** Central data reference. */
@@ -62,8 +62,10 @@ public final class Context {
    * Closes the database instance.
    */
   public void close() {
+    if(prop == null) return;
+    for(int i = 0; i < sessions.size();) sessions.get(i).exit();
     pool.close();
-    prop.write();
+    prop = null;
   }
 
   /**

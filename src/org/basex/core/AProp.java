@@ -103,7 +103,7 @@ public abstract class AProp {
   /**
    * Writes the properties to disk.
    */
-  public void write() {
+  public synchronized void write() {
     final File file = new File(filename);
 
     try {

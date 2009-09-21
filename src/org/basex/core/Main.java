@@ -45,6 +45,15 @@ public abstract class Main {
   protected Main(final String... args) {
     context.server = this instanceof BaseXServer;
     parseArguments(args);
+    if(!ok) return;
+
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        context.close();
+      }
+    });
   }
 
   /**
@@ -72,7 +81,7 @@ public abstract class Main {
    * Quits the console mode.
    * @param user quit by user
    */
-  public void quit(final boolean user) {
+  public synchronized void quit(final boolean user) {
     if(!user) {
       process(new Exit(), true);
     } else {
@@ -109,6 +118,7 @@ public abstract class Main {
       final Session ss = session();
       if(ss == null) return false;
       final boolean success = ss.execute(pr);
+      if(pr instanceof Exit) return true;
 
       if(success && pr.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
