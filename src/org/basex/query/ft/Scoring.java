@@ -68,21 +68,21 @@ public final class Scoring {
     int sum = 0;
     int count = 0;
 
-    for(int i = 0; i < item1.all.size; i++) {
-      for(final FTStringMatch sm1 : item1.all.match[i]) {
-        for(int j = 0; j < item2.all.size; j++) {
-          for(final FTStringMatch sm2 : item2.all.match[j]) {
-            sum += Math.abs(sm1.e - sm2.s);
+    for(final FTMatch m1 : item1.all) {
+      for(final FTStringMatch sm1 : m1) {
+        if(sm1.n) continue;
+        for(final FTMatch m2 : item2.all) {
+          for(final FTStringMatch sm2 : m2) {
+            if(sm2.n) continue;
+            sum += Math.abs(sm1.s - sm2.s);
             count++;
           }
         }
       }
     }
-    if (count == 0) return 0;
-    final double avg = (double) sum / (double) count;
-    return score / Math.sqrt(avg);
+    return count == 0 ? 0 : score / Math.sqrt((double) sum / count);
   }
-
+  
   /**
    * Determines a single scoring value out of two FTOr combined terms.
    * The maximum scoring value is chosen and weighted by the number

@@ -113,9 +113,8 @@ public final class FTAnd extends FTExpr {
         all.add(new FTMatch().add(s1).add(s2));
       }
     }
-    // [SG] temporarily changed to compare results
-    //i1.score(ctx.score.ftAnd(i1, i2));
-    i1.score(ctx.score.and(i1.score(), i2.score()));
+    i1.score(ctx.score.ftAnd(i1, i2));
+    //i1.score(ctx.score.and(i1.score(), i2.score()));
     i1.all = all;
   }
 
