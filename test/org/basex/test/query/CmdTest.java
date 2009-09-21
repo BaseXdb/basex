@@ -9,7 +9,6 @@ import org.basex.core.proc.*;
 import org.basex.core.Commands.*;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -393,10 +392,7 @@ public class CmdTest {
    */
   private String process(final Process pr) {
     try {
-      final boolean ok = session.execute(pr);
-      final CachedOutput co = new CachedOutput();
-      session.info(co);
-      return ok ? null : co.toString();
+      return session.execute(pr) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }

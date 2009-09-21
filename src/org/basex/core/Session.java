@@ -10,14 +10,14 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Session {
+public interface Session {
   /**
-   * Executes the specified comment.
+   * Executes the specified command.
    * @param cmd command to be executed
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public abstract boolean execute(final String cmd) throws IOException;
+  boolean execute(final String cmd) throws IOException;
 
   /**
    * Executes a process.
@@ -25,25 +25,25 @@ public abstract class Session {
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public abstract boolean execute(final Process pr) throws IOException;
+  boolean execute(final Process pr) throws IOException;
 
   /**
-   * Serializes the textual results of a command.
+   * Serializes the result to the specified output stream.
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public abstract void output(final PrintOutput out) throws IOException;
+  void output(final PrintOutput out) throws IOException;
 
   /**
    * Returns process info.
-   * @param out output stream
+   * @return process info
    * @throws IOException I/O exception
    */
-  public abstract void info(final PrintOutput out) throws IOException;
+  String info() throws IOException;
 
   /**
    * Closes the session.
    * @throws IOException I/O exception
    */
-  public abstract void close() throws IOException;
+  void close() throws IOException;
 }

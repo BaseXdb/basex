@@ -95,7 +95,7 @@ public final class ServerExample {
       // Serialize the output if execution was successful.
       session.output(out);
     }
-    // Show process information.
-    session.info(out);
+    // Show optional process information.
+    out.println(session.info());
   }
 }

@@ -10,7 +10,6 @@ import org.basex.BaseXServer;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
-import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
@@ -126,9 +125,7 @@ public abstract class Main {
       }
 
       if(v || !success) {
-        final CachedOutput out = new CachedOutput();
-        ss.info(out);
-        final String inf = out.toString();
+        final String inf = ss.info();
         if(inf.length() != 0) {
           if(!success) {
             error(null, inf);

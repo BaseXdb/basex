@@ -137,16 +137,16 @@ public final class InexDBTest {
    * Performs a single query.
    * @param db database offset
    * @param qu query offset
-   * @param s store flag
+   * @param store store flag
    * @throws Exception exception
    */
-  private void query(final int db, final int qu, final boolean s)
+  private void query(final int db, final int qu, final boolean store)
       throws Exception {
 
     if(budget > -1) {
       final double timer = budget - rqt[qu];
-      if (timer <= 0) {
-        if (s) {
+      if(timer <= 0) {
+        if(store) {
           if(res != null) res.println(0 + ";" + 0);
           Main.outln("Query % on %: %", qu + 1, databases.get(db), 0);
         }
@@ -155,17 +155,13 @@ public final class InexDBTest {
       session.execute(new Set(Prop.IBT, timer));
     }
 
-    final CachedOutput r = new CachedOutput();
     if(session.execute(new XQuery(queries.get(qu)))) {
-      session.output(r);
-      if(!s) return;
+      session.output(new CachedOutput());
+      if(!store) return;
 
-      final CachedOutput out = new CachedOutput();
-      session.info(out);
-
-      final String str = out.toString();
+      final String str = session.info();
       final String time = find(str, "Total Time: (.*) ms");
-      final String items = find(str, "([0-9]+) Items");
+      final String items = find(str, "Results   : ([0-9]+) Item");
 
       // output result
       Main.outln("Query % on %: % (% items)",
@@ -176,9 +172,7 @@ public final class InexDBTest {
       rqt[qu] += Double.parseDouble(time);
       if(res != null) res.println(time + ";" + items);
     } else {
-      final CachedOutput out = new CachedOutput();
-      session.info(out);
-      Main.outln(out);
+      Main.outln(session.info());
       if(res != null) res.println("-1;-1");
     }
   }

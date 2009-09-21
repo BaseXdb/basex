@@ -39,7 +39,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ClientSession extends Session {
+public final class ClientSession implements Session {
   /** Output stream. */
   private final DataOutputStream out;
   /** Input stream. */
@@ -66,18 +66,15 @@ public final class ClientSession extends Session {
     out = new DataOutputStream(socket.getOutputStream());
   }
 
-  @Override
   public boolean execute(final String cmd) throws IOException {
     out.writeUTF(cmd);
     return in.read() == 0;
   }
 
-  @Override
   public boolean execute(final Process pr) throws IOException {
     return execute(pr.toString());
   }
 
-  @Override
   public void output(final PrintOutput o) throws IOException {
     out.writeUTF(Cmd.INTOUTPUT.toString());
     final BufferInput bi = new BufferInput(in);
@@ -86,13 +83,11 @@ public final class ClientSession extends Session {
     for(int i = 0; i < IO.BLOCKSIZE - 1; i++) bi.read();
   }
 
-  @Override
-  public void info(final PrintOutput o) throws IOException {
+  public String info() throws IOException {
     out.writeUTF(Cmd.INTINFO.toString());
-    o.print(new DataInputStream(in).readUTF());
+    return new DataInputStream(in).readUTF();
   }
 
-  @Override
   public void close() throws IOException {
     execute(Cmd.EXIT.toString());
   }

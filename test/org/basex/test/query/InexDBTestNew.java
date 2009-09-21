@@ -192,7 +192,6 @@ public final class InexDBTestNew {
     final Process proc = new XQuery(que);
     final CachedOutput res = new CachedOutput();
     if(session.execute(proc)) session.output(res);
-    session.info(new CachedOutput());
 
     final SeqIter sq = new SeqIter();
     final StringTokenizer st = new StringTokenizer(res.toString(), " ");
