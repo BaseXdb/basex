@@ -181,6 +181,7 @@ public final class InexDBTestNew {
   private SeqIter query(final int db, final int qu) throws Exception {
     final int size = qressizes[db * nqueries + qu];
     final double qtime = qt[db * nqueries + qu];
+    qtimes[qu] += qtime;
 
     if(size == 0) return new SeqIter();
 
@@ -198,7 +199,6 @@ public final class InexDBTestNew {
     String lp = "";
     int z = 0;
     while(st.hasMoreTokens() && z < size) {
-      qtimes[qu] += qtime;
       final String p = st.nextToken();
       if(!st.hasMoreTokens()) break;
       final String s = st.nextToken();
@@ -273,23 +273,23 @@ public final class InexDBTestNew {
             convertTopics();
             return false;
           }
-
           ok = false;
         }
       }
-      session = new ClientSession(ctx);
-      session.execute(new Set(Prop.INFO, true));
+      if(ok) {
+        session = new ClientSession(ctx);
+        session.execute(new Set(Prop.INFO, true));
+      } else {
+        Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
+          "  -u[...] update submission times" + NL +
+          "  -x      convert queries");
+      }
     } catch(final Exception ex) {
       ok = false;
       Main.errln("Please run BaseXServer for using server mode.");
       ex.printStackTrace();
     }
 
-    if(!ok) {
-      Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
-        "  -u[...] update submission times" + NL +
-        "  -x      convert queries");
-    }
     return ok;
   }
 
@@ -501,7 +501,7 @@ public final class InexDBTestNew {
         final String q = line.substring(s0, line.lastIndexOf('<'));
         out.println(t + ";" + c + ";" + ty + ";" + q);
       }
-     }
+    }
     br.close();
   }
 

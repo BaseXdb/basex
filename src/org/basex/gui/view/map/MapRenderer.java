@@ -90,7 +90,7 @@ final class MapRenderer {
         }
         if(draw) {
           g.drawString(String.valueOf((char) ftt.pm),
-              xx + ll - (xx > ws ? ws : 0), yy);
+              xx + ll - Math.max(xx, ws), yy);
         }
       }
 
