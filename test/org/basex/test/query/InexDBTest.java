@@ -153,7 +153,7 @@ public final class InexDBTest {
         }
         return;
       }
-      session.execute(new Set(Prop.IBT, timer));   
+      session.execute(new Set(Prop.IBT, timer));
     }
     
     final CachedOutput r = new CachedOutput();

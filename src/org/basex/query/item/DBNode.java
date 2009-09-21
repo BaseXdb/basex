@@ -189,6 +189,22 @@ public class DBNode extends Nod {
     // check if parent constructor exists; if not, include document root node
     final DBNode node = copy();
     node.set(p, data.kind(p));
+
+    /* [SG] I moved this code down and temporarily added a comment
+     * due to performance issues (should be revised as soon as another
+     * cheap scoring variant is found)
+
+    double f = (double) distToRoot(node.pre) / (double) data.meta.height;
+    node.score(node.score * Math.max(1 - f, f));
+    
+    final int tid = data.tags.id(node.nname());
+    StatsKey sk = data.tags.stat(tid);
+    if (sk != null && sk.counter > 2) {
+      node.score(node.score * (1.00 - 
+          (double) sk.counter / (double) data.tags.tn));
+    }*/
+
+    node.score(node.score * SCORESTEP);
     return node;
   }
 
@@ -336,26 +352,7 @@ public class DBNode extends Nod {
       public Nod next() {
         if(more) return null;
         more = true;
-
-        final Nod node = parent();
-        if(node != null) {
-          node.score(node.score * SCORESTEP);
-
-          /* [SG] I moved this code down and temporarily added a comment
-           * due to performance issues (should be revised as soon as another
-           * cheap scoring variant is found)
-  
-          double f = (double) distToRoot(node.pre) / (double) data.meta.height;
-          node.score(node.score * Math.max(1 - f, f));
-          
-          final int tid = data.tags.id(node.nname());
-          StatsKey sk = data.tags.stat(tid);
-          if (sk != null && sk.counter > 2) {
-            node.score(node.score * (1.00 - 
-                (double) sk.counter / (double) data.tags.tn));
-          }*/
-        }
-        return node;
+        return parent();
       }
     };
   }
