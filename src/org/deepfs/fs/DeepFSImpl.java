@@ -12,11 +12,11 @@ import static org.basex.util.Token.*;
 
 /**
  * DeepFS: The XQuery Filesystem. Filesystem-side implementation of DeepFS.
- * 
+ *
  * Uses LGPL jFUSE bindings v0.1 provided by
  * Copyright (C) 2008-2009  Erik Larsson <erik82@kth.se>
  * and is based on example code taken from the project.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
@@ -105,15 +105,15 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
       final long offset, final FUSEFileInfo fi) {
     String pathString = FUSEUtil.decodeUTF8(path);
     if(pathString == null) return -ENOENT;
-    if(offset < 0 || offset > Integer.MAX_VALUE) return -EINVAL; 
-    
+    if(offset < 0 || offset > Integer.MAX_VALUE) return -EINVAL;
+
 //    int bytesLeftInFile = helloStr.length - (int) offset;
 //    if(bytesLeftInFile > 0) {
 //      int len = Math.min(bytesLeftInFile, buf.remaining());
 //      buf.put(helloStr, (int) offset, len);
 //      return len;
 //    }
-    
+
     return 0;
   }
 
@@ -122,10 +122,10 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
     Main.debug("destroy");
     dbfs.umount();
   }
-  
+
   /**
    * Main entry point.
-   * 
+   *
    * @param args mount point is expected as first argument.
    */
   public static void main(final String[] args) {

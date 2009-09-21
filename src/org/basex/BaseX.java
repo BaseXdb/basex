@@ -94,7 +94,7 @@ public class BaseX extends Main {
   private boolean sa() {
     return !(this instanceof BaseXClient);
   }
-  
+
   @Override
   protected Session session() {
     if(session == null) {
@@ -112,7 +112,7 @@ public class BaseX extends Main {
     }
     return session;
   }
-  
+
   @Override
   protected final void parseArguments(final String[] args) {
     final Args arg = new Args(args);

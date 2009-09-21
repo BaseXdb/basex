@@ -40,7 +40,6 @@ public final class FTWords extends FTExpr {
   /** Expression list. */
   Expr query;
 
-  
   /** All matches. */
   FTMatches all = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
@@ -124,7 +123,7 @@ public final class FTWords extends FTExpr {
           }
           iat.setTokenNum(++ctx.ftoknum);
         }
-        return iat.more() ? new FTItem(iat.matches(), 
+        return iat.more() ? new FTItem(iat.matches(),
             data, iat.next(), txt.length) : null;
       }
     };

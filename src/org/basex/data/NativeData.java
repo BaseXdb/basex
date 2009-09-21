@@ -23,8 +23,8 @@ public final class NativeData extends MemData {
    * @param cap initial capacity of pre/dist/size table.
    */
   private native void jniInit(final int cap);
-  
-  /** Pass strings to native environment. 
+
+  /** Pass strings to native environment.
    * @param a string to be passed
    * @param b string to be passed
    */

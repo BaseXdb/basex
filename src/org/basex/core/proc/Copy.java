@@ -52,7 +52,7 @@ public final class Copy extends AUpdate {
     Nodes trg = gui ? context.marked() : query(args[1], COPYTAGS);
     if(src == null || trg == null) return false;
     if(gui) context.copy(null);
-    
+
     final int size = src.size();
     final Data[] srcDocs = new Data[src.size()];
     for(int c = 0; c < size; c++) srcDocs[c] = copy(src.data, src.nodes[c]);

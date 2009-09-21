@@ -418,7 +418,7 @@ public interface Text {
   String QUIT1 = EXIT1;
   /** Command help. */
   String QUIT2 = EXIT2;
-  
+
   // STARTER WINDOW ===========================================================
 
   /** Waiting info. */

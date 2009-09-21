@@ -184,7 +184,7 @@ public final class ServerSession extends Thread {
     final Data data = context.data();
     return this + (data != null ? ": " + data.meta.name : "");
   }
-  
+
   @Override
   public String toString() {
     final String host = socket.getInetAddress().getHostAddress();

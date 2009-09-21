@@ -310,7 +310,7 @@ public final class QueryContext extends Progress {
       return null;
     }
   }
-  
+
   /**
    * Serializes the specified item.
    * @param ser serializer

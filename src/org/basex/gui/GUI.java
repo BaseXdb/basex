@@ -135,7 +135,7 @@ public final class GUI extends JFrame {
     prop = gprops;
     setTitle(Text.TITLE);
     setIconImage(BaseXLayout.image("icon"));
-    
+
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
     final int[] ps = prop.nums(GUIProp.GUILOC);

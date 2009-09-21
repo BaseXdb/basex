@@ -491,7 +491,7 @@ public interface QueryText {
   Object[] UPIMPL = { XUST, 0, "XQuery Update not implemented." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
-  
+
 //[LK] xquery update error msgs
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };

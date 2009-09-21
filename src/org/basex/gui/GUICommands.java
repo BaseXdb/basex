@@ -159,7 +159,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.query.confirm();
-      
+
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           gui.prop.get(GUIProp.XQPATH), gui);
@@ -373,7 +373,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       super.refresh(gui, button);
-      select(button, gui.prop.is(gui.context.data() != null ? 
+      select(button, gui.prop.is(gui.context.data() != null ?
           GUIProp.SHOWXQUERY : GUIProp.SHOWSTARTXQUERY));
     }
 

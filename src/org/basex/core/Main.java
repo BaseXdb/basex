@@ -1,13 +1,11 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.BindException;
 import java.util.Random;
-
 import org.basex.BaseXServer;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
@@ -88,7 +86,7 @@ public abstract class Main {
       outln(CLIENTBYE[new Random().nextInt(4)]);
     }
   }
-  
+
   /**
    * Evaluates the input, which can be interactive input or the commands
    * specified after the <code>-q</code> command-line argument.

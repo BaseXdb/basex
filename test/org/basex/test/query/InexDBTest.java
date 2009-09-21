@@ -64,8 +64,7 @@ public final class InexDBTest {
   private double  budget = -1;
   /** Remaining query time - used for budget queries.  */
   private double[] rqt;
-  
-  
+
   /**
    * Main test method.
    * @param args command-line arguments
@@ -133,7 +132,7 @@ public final class InexDBTest {
       session.execute(new Close());
     }
   }
-  
+
   /**
    * Performs a single query.
    * @param db database offset
@@ -147,7 +146,7 @@ public final class InexDBTest {
     if(budget > -1) {
       final double timer = budget - rqt[qu];
       if (timer <= 0) {
-        if (s) {  
+        if (s) {
           if(res != null) res.println(0 + ";" + 0);
           Main.outln("Query % on %: %", qu + 1, databases.get(db), 0);
         }
@@ -155,7 +154,7 @@ public final class InexDBTest {
       }
       session.execute(new Set(Prop.IBT, timer));
     }
-    
+
     final CachedOutput r = new CachedOutput();
     if(session.execute(new XQuery(queries.get(qu)))) {
       session.output(r);
@@ -166,7 +165,7 @@ public final class InexDBTest {
 
       final String str = out.toString();
       final String time = find(str, "Total Time: (.*) ms");
-      final String items = find(str, "([0-9]+) ms");
+      final String items = find(str, "([0-9]+) Items");
 
       // output result
       Main.outln("Query % on %: % (% items)",
@@ -194,7 +193,7 @@ public final class InexDBTest {
     final Matcher m = Pattern.compile(pat).matcher(str);
     return m.find() ? m.group(1) : "";
   }
-  
+
   /**
    * Parses the command-line arguments.
    * @param args the command-line arguments

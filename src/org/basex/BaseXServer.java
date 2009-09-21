@@ -1,7 +1,6 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -97,7 +96,7 @@ public final class BaseXServer extends Main {
     if(session == null) session = new LocalSession(context);
     return session;
   }
-  
+
   @Override
   protected void parseArguments(final String[] args) {
     final Args arg = new Args(args);

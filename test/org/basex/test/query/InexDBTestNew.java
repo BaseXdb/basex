@@ -125,7 +125,7 @@ public final class InexDBTestNew {
     results = new SeqIter[nqueries];
     qressizes = new int[10 * nqueries];
     qt = new double[10 * nqueries];
-    
+
     if(!parseArguments(args)) return;
 
     final BufferedReader brt = new BufferedReader(new FileReader(TIMES));

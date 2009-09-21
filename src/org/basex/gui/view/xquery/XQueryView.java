@@ -253,7 +253,7 @@ public final class XQueryView extends View {
     BaseXLayout.enable(stop, false);
     BaseXLayout.enable(info, !ok);
   }
-  
+
   /**
    * Show a quit dialog for saving the opened XQuery.
    */

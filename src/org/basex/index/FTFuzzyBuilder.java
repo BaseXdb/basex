@@ -63,7 +63,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       isize++;
       tree[tl] = new FTHash();
     }
-    
+
     // [SG] INEX Budget
     if (wp instanceof ScoringTokenizer) {
       Main.outln(new String(tok) + " " + ((ScoringTokenizer) wp).score(tok));

@@ -106,7 +106,7 @@ public interface DataText {
   String S_XMLNS = "xmlns";
   /** DeepFS namespace declaration. */
   String S_DPFSNS = "declare namespace fs = \"" + S_FSURL + "\"; ";
-  
+
   /** DeepFS prefix. */
   byte[] FS = token(S_FS);
   /** DeepFS url. */
@@ -211,7 +211,7 @@ public interface DataText {
   byte[] PI1 = token("<?");
   /** PI output. */
   byte[] PI2 = token("?>");
-  
+
   /** Element output. */
   byte[] ELEM1 = { '<'};
   /** Element output. */

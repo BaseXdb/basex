@@ -313,7 +313,7 @@ public class Tokenizer implements IndexToken {
     for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
     return t;
   }
-  
+
   /**
    * Gets full-text info for the specified token; needed for visualizations.
    * int[0]: length of each token

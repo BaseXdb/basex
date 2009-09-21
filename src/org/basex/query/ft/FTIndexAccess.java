@@ -54,7 +54,7 @@ public final class FTIndexAccess extends Simple {
           it.all = null;
         }
         return it;
-        
+
         /* [SG] INEX budget time
         // [SG] temporarily removed..
         final long t = ctx.context.prop.num(Prop.IBT);

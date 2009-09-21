@@ -36,10 +36,10 @@ public final class DeepFS implements DataText {
   private Context ctx;
   /** Data instance. */
   private Data data;
-  
+
   /** Stat information for root node. */
   private Stat rootStat;
-  
+
   /** Index References. */
   private int fileID;
   /** Index References. */
@@ -54,7 +54,7 @@ public final class DeepFS implements DataText {
   private int sizeID;
   /** Index References. */
   private int nameID;
-  
+
   /** Index References. */
   public int suffixID;
   /** Index References. */
@@ -71,7 +71,7 @@ public final class DeepFS implements DataText {
   public int gidID;
   /** Index References. */
   public int contentID;
-  
+
   /**
    * Constructor for {@link DeepShell} and java only test cases (no mount).
    * @param name name of initially empty database.
@@ -79,13 +79,13 @@ public final class DeepFS implements DataText {
   public DeepFS(final String name) {
     ctx = new Context();
     if(!new Open(name).execute(ctx))
-      new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS + 
+      new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS +
         "=\"" + S_FSURL + "\"/>", name).execute(ctx);
     data = ctx.data();
     initNames();
     initRootStat();
   }
-  
+
 ///**
 //* Constructor.
 //* @param d data reference
@@ -118,7 +118,7 @@ public final class DeepFS implements DataText {
 //   nativeMount(mountpoint, backingpath);
 // }
 //}
-  
+
   /**
    * Initialize often used tags and attributes.
    */
@@ -141,7 +141,7 @@ public final class DeepFS implements DataText {
     modeID         = data.atts.index(MODE,         null, false);
     suffixID       = data.atts.index(SUFFIX,       null, false);
   }
-  
+
   /**
    * Initialize default file attributes for root ('/') access.
    */
@@ -167,7 +167,7 @@ public final class DeepFS implements DataText {
   private Nodes xquery(final String query) throws QueryException {
     return new QueryProcessor(query, ctx).queryNodes();
   }
-  
+
   /**
    * Converts a pathname to a DeepFS XPath expression. FUSE always passes on
    * 'absolute, normalized' pathnames, i.e., starting with a slash, redundant
@@ -182,7 +182,7 @@ public final class DeepFS implements DataText {
     qb.append(S_DPFSNS);
     qb.append("/" + S_DEEPFS);
     if(path.equals("/")) return qb.toString();
-    
+
     for(int i = 0; i < path.length(); i++) {
       final char c = path.charAt(i);
       if(c == '/') {
@@ -195,18 +195,18 @@ public final class DeepFS implements DataText {
         eb.append(c);
       }
     }
-    if(eb.length() != 0) 
+    if(eb.length() != 0)
       if(dir) qb.append(S_DIR + "[@" + S_NAME + " = \"" + eb + "\"]");
     else qb.append("*[@" + S_NAME + " = \"" + eb + "\"]");
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    
+
     Main.debug("[pn2xp] " + qu);
-    
+
     return qu;
   }
-  
+
   /**
    * Resolves path and returns pre.
    * @param path to be resolved
@@ -223,7 +223,7 @@ public final class DeepFS implements DataText {
   }
 
 
-  /** 
+  /**
    * Resolve child axis from path and return pre values of children.
    * @param path to be resolved
    * @return pre values of children found
@@ -265,8 +265,7 @@ public final class DeepFS implements DataText {
     final int s = path.lastIndexOf('/');
     return s > 0 ? path.substring(0, s) : "/";
   }
-  
-  
+
   /**
    * Construct file node as MemData object, ready to be inserted into main
    * data instance.
@@ -369,7 +368,7 @@ public final class DeepFS implements DataText {
 //    final Prop prop = data.meta.prop;
 //    final MemData md = new MemData(64, data.tags, data.atts, data.ns,
 //        data.path, prop);
-//  
+//
 //    try {
 //      prop.set(Prop.FSCONT, true);
 //      prop.set(Prop.FSMETA, true);
@@ -480,7 +479,7 @@ public final class DeepFS implements DataText {
     return data.kind(pre) == Data.ELEM
         && data.tagID(pre) == data.tags.id(DataText.FILE);
   }
-  
+
   /**
    * Checks if the specified node is a directory.
    * @param pre pre value
@@ -552,10 +551,10 @@ public final class DeepFS implements DataText {
     Main.debug(method + path + " ino: " + pre);
     return 0;
   }
-  
+
   /**
    * Read directory entries.
-   * 
+   *
    * @param path directory to be listed.
    * @return directory entries, null on failure
    */
@@ -574,8 +573,8 @@ public final class DeepFS implements DataText {
     ctx.closeDB();
     ctx.close();
   }
-  
-  /** Getter for actual context. 
+
+  /** Getter for actual context.
    * @return context
    */
   public Context getContext() {
@@ -584,7 +583,7 @@ public final class DeepFS implements DataText {
 
   /**
    * Remove directory.
-   * 
+   *
    * @param path to directory to be removed
    * @return zero on success, -1 on failure
    */
@@ -594,8 +593,7 @@ public final class DeepFS implements DataText {
     refresh();
     return n;
   }
-  
-  
+
   /**
    * Closes the fuse instance.
    * @throws IOException I/O exception
@@ -745,7 +743,7 @@ public final class DeepFS implements DataText {
   }
 
   /** Unlink a file node.
-   * 
+   *
    * @param path to file to be deleted
    * @return success or failure
    */
@@ -768,7 +766,7 @@ public final class DeepFS implements DataText {
 //      return -1;
 //    }
 //  }
-//   
+//
 //  public int release(final String path) {
 //    final boolean dirty = true;
 //
@@ -781,7 +779,7 @@ public final class DeepFS implements DataText {
 //    }
 //    return 0;
 //  }
-  
+
   /*
    * ------------------------------------------------------------------------
    * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
@@ -809,4 +807,4 @@ public final class DeepFS implements DataText {
   public native void nativeShutDown();
 
   /* ------------------------------------------------------------------------ */
-} 
+}

@@ -2402,7 +2402,7 @@ public class QueryParser extends InputParser {
             } else if(consumeWS2(AT)) {
               String fn = string(stringLiteral());
               if(ctx.stop != null) fn = ctx.stop.get(fn);
-  
+
               IO fl = IO.get(fn);
               if(!fl.exists() && file != null) fl = file.merge(fl);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);

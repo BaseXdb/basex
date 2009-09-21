@@ -10,10 +10,10 @@ import org.basex.core.Prop;
  */
 public final class ScoringTokenizer extends Tokenizer{
   /** Token map. */
-  private Map<Integer> token = new Map<Integer>(); 
+  private Map<Integer> token = new Map<Integer>();
   /** Maximum score. */
   private int max = 0;
-  
+
   /**
    * Empty constructor.
    * @param pr (optional) database properties
@@ -38,20 +38,19 @@ public final class ScoringTokenizer extends Tokenizer{
     int c = token.get(key);
     return c == 0 ? 0 : c * 1000 /  max;
   }
-  
+
   /**
    * Initializes the scoring process.
    */
   private void initScoring() {
     while(super.more()) {
       final byte[] b = super.get();
-      Integer c = token.get(b); 
+      Integer c = token.get(b);
       if(c != null) {
         System.out.println(new String(b) + " " + (c + 1));
         token.set(b, ++c);
         if(c > max) max = c;
-      } else token.add(b, 1);            
+      } else token.add(b, 1);
     }
   }
-  
 }

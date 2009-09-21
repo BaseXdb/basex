@@ -125,12 +125,12 @@ public interface Commands {
           sb.append("<p>" + NL);
           sb.append("<code>" + name() + " " + args + "</code><br/><br/>" + NL);
           final String help2 = help(2);
-          
+
           final String help1 = Pattern.compile("\n\r?\n.*", Pattern.DOTALL).
             matcher(help2).replaceAll("");
           sb.append(help1.replaceAll("(\\[.*?\\]\\??)", "<code>$1</code>"));
           sb.append(NL + "</p>" + NL);
-          
+
           boolean first = true;
           for(String s : help2.split(NL)) {
             if(s.length() == 0) continue;
@@ -151,7 +151,7 @@ public interface Commands {
       return sb.toString();
     }
      */
-    
+
     /**
      * Returns the specified help text for the current command.
      * @param n help offset

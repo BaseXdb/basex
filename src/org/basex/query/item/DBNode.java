@@ -196,11 +196,11 @@ public class DBNode extends Nod {
 
     double f = (double) distToRoot(node.pre) / (double) data.meta.height;
     node.score(node.score * Math.max(1 - f, f));
-    
+
     final int tid = data.tags.id(node.nname());
     StatsKey sk = data.tags.stat(tid);
     if (sk != null && sk.counter > 2) {
-      node.score(node.score * (1.00 - 
+      node.score(node.score * (1.00 -
           (double) sk.counter / (double) data.tags.tn));
     }*/
 
@@ -213,7 +213,7 @@ public class DBNode extends Nod {
     root = p;
     par = p;
   }
-  
+
   @Override
   public NodeIter anc() {
     return new NodeIter() {
@@ -305,13 +305,13 @@ public class DBNode extends Nod {
               pres.push(pp);
               level.push(0);
               l = 1;
-            } 
-              
+            }
+
             while(pres.peek() != pp) {
               pres.pop();
               level.pop();
             }
-            l = level.peek() + 1;            
+            l = level.peek() + 1;
           }
           pres.push(node.pre);
           node.score(sc / Math.abs(l));
@@ -381,8 +381,8 @@ public class DBNode extends Nod {
         return type + "{" + Err.chop(str()) + "}";
     }
   }
-  
-  /**
+
+  /*
    * Determine distance to root node.
    * @param p pre value of current node
    * @return dist distance to root node

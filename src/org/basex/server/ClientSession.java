@@ -17,10 +17,10 @@ import org.basex.io.PrintOutput;
 /**
  * This wrapper sends commands to the server instance over a socket
  * connection. It extends the {@link Session} class.
- * 
+ *
  * The following steps show how to talk to the server instance with any
  * other programming language:
- * <ul> 
+ * <ul>
  * <li> A socket is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server
  * as UTF8 byte arrays. The byte array is preceded by two bytes (high/low byte)

@@ -77,7 +77,7 @@ public abstract class Data {
    */
   @SuppressWarnings("unused")
   public void init() throws IOException {
-    // [AH] check later  
+    // [AH] check later
     //if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);

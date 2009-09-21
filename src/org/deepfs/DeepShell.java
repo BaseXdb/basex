@@ -50,8 +50,8 @@ public final class DeepShell {
   DeepShell() {
     this("deepfs");
   }
-  
-  /** Constructor. 
+
+  /** Constructor.
    * @param fsdbname DeepFS filesystem/database instance
    */
   DeepShell(final String fsdbname) {
@@ -189,7 +189,7 @@ public final class DeepShell {
     stat.printFields("deepshell: ", ps);
     ps.flush();
   }
-  
+
   /**
    * Prints stat information of file to stdout.
    * @param args argument vector
@@ -206,7 +206,7 @@ public final class DeepShell {
     for(byte[] de : dents)
       Main.out(">> " + string(de));
   }
-  
+
   /**
    * Prints stat information of file to stdout.
    * @param args argument vector
@@ -225,7 +225,7 @@ public final class DeepShell {
       e.printStackTrace();
     }
   }
-  
+
   /**
    * Prints short help message for available commands.
    * @param args argument vector

@@ -144,7 +144,7 @@ public final class Prop extends AProp {
 
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
-  
+
   //[SG] INEX budget time
   /** INEX budget for queries. */
   public static final Object[] IBT = { "INDEXBUDGETTIME", -1 };

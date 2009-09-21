@@ -83,7 +83,7 @@ public final class CreateDB extends ACreate {
     if(pr.is(Prop.MAINMEM)) new MemBuilder(p).build(db);
 
     final Builder builder = new DiskBuilder(p);
-    final String tmp = db + ".tmp"; 
+    final String tmp = db + ".tmp";
     try {
       final Data data = builder.build(tmp);
       if(data.meta.txtindex) data.setIndex(Type.TXT,

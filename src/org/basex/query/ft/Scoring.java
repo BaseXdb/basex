@@ -67,7 +67,7 @@ public final class Scoring {
     final double score = Math.min(item1.score(), item2.score());
     int sum = 0;
     int count = 0;
-    
+
     for(int i = 0; i < item1.all.size; i++) {
       for(final FTStringMatch sm1 : item1.all.match[i]) {
         for(int j = 0; j < item2.all.size; j++) {
