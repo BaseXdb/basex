@@ -36,7 +36,7 @@ import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogFontChooser;
 import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.dialog.DialogImportFS;
+import org.basex.gui.dialog.DialogCreateFS;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogMapLayout;
@@ -190,21 +190,6 @@ public enum GUICommands implements GUICommand {
           Dialog.error(gui, NOTSAVED);
         }
       }
-    }
-  },
-
-  /** Opens a dialog to import the filesystem. */
-  IMPORTFS(false, GUIIMPORTFS, null, GUIIMPORTFSTT) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!new DialogImportFS(gui).ok()) return;
-      final GUIProp gprop = gui.prop;
-      final String p = gprop.is(GUIProp.FSALL) ? "/"
-          : gui.prop.get(GUIProp.FSIMPORTPATH).replace('\\', '/');
-      final String n = gprop.get(GUIProp.FSDBNAME);
-      final String m = gprop.get(GUIProp.FSMOUNT);
-      final String b = gprop.get(GUIProp.FSBACKING);
-      progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
     }
   },
 
@@ -707,7 +692,24 @@ public enum GUICommands implements GUICommand {
       new DialogPrefs(gui);
     }
   },
+  
+  /* DEEPFS MENU */
 
+  /** Opens a dialog to import given directory as DeepFS instance. */
+  CREATEFS(false, GUICREATEFS, null, GUICREATEFSTT) {
+    @Override
+    public void execute(final GUI gui) {
+      if(!new DialogCreateFS(gui).ok()) return;
+      final GUIProp gprop = gui.prop;
+      final String p = gprop.is(GUIProp.FSALL) ? "/"
+          : gui.prop.get(GUIProp.FSIMPORTPATH).replace('\\', '/');
+      final String n = gprop.get(GUIProp.FSDBNAME);
+      final String m = gprop.get(GUIProp.FSMOUNT);
+      final String b = gprop.get(GUIProp.FSBACKING);
+      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
+    }
+  },
+  
   /* HELP MENU */
 
   /** Shows the help window. */

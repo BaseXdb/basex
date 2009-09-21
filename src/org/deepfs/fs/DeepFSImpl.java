@@ -45,19 +45,20 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
 
   @Override
   public int mknod(final ByteBuffer path, final short fileMode,
-      final long deviceNumber) {
+      final long devNum) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    Main.debug("mknod: " + pathString);
-    return 0;
+    int rc = dbfs.create(pathString, fileMode);
+    Main.debug("mknod: " + pathString + " (" + rc + ") device: " + devNum);
+    return (rc == -1) ? -ENETRESET : 0;
   }
 
   @Override
   public int mkdir(final ByteBuffer path, final short createMode) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    Main.debug("mkdir: " + pathString);
-    int rc = dbfs.mkdir(pathString, createMode);
-    if(rc == -1) return -ENETRESET;
-    return 0;
+    int rc = 0;
+    rc = dbfs.mkdir(pathString, createMode);
+    Main.debug("mkdir: " + pathString + "(" + rc + ")");
+    return (rc == -1) ? -ENETRESET : 0;
   }
 
   @Override

@@ -101,12 +101,12 @@ public final class GUIConstants {
   /** Top menu entries. */
   public static final String[] MENUBAR = {
       Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
-      Text.MENUHELP };
+      Text.MENUDEEPFS, Text.MENUHELP };
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   public static final Object[][] MENUITEMS = { {
     MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, null,
-    XQOPEN, XQSAVE, null, IMPORTFS, null, EXIT
+    XQOPEN, XQSAVE, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
     SHOWXQUERY, SHOWINFO, null, COPYPATH, FILTER
@@ -118,6 +118,8 @@ public final class GUIConstants {
     MENUINTER, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
     null, PREFS
+  }, {
+    CREATEFS
   }, {
     SHOWHELP, null, ABOUT
   }};

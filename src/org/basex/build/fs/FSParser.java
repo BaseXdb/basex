@@ -338,7 +338,7 @@ public final class FSParser extends Parser {
 
   @Override
   public String tit() {
-    return Text.IMPORTPROG;
+    return Text.CREATEFSPROG;
   }
 
   @Override

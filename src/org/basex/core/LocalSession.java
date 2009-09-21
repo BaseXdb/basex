@@ -29,7 +29,8 @@ public final class LocalSession extends Session {
     try {
       return execute(new CommandParser(str, ctx).parse()[0]);
     } catch(final QueryException ex) {
-      throw new IOException(ex);
+      // [CG] strange, but there is no IOException(Throwable cause) on the Mac.
+      throw new IOException(ex.getMessage());
     }
   }
 

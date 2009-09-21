@@ -762,6 +762,8 @@ public interface Text {
   /** Menu entry. */
   String MENUOPTIONS = lang("m_options");
   /** Menu entry. */
+  String MENUDEEPFS = "DeepFS";
+  /** Menu entry. */
   String MENUHELP = lang("m_help");
 
   /** Menu label. */
@@ -852,9 +854,9 @@ public interface Text {
   /** Command info. */
   String GUIGOUPTT = lang("c_gouptt");
   /** Command info. */
-  String GUIIMPORTFS = lang("c_importfs") + DOTS;
+  String GUICREATEFS = lang("c_createfs") + DOTS;
   /** Command info. */
-  String GUIIMPORTFSTT = lang("c_importfstt");
+  String GUICREATEFSTT = lang("c_createfstt");
   /** Command info. */
   String GUIINFO = lang("c_props") + DOTS;
   /** Command info. */
@@ -1118,13 +1120,15 @@ public interface Text {
   String EXPORTTITLE = lang("d_export");
 
   /** Progress text for filesystem import. */
-  String IMPORTPROG = "Parse filesystem...";
+  String CREATEFSPROG = "Traversing filesystem...";
   /** Dialog title for import options. */
-  String IMPORTFSTITLE = lang("dfs_title");
+  String CREATEFSTITLE = lang("dfs_newtitle");
+  /** Dialog title for creating a filesystem database. */
+  String CREATEFSNAME = lang("dfs_name") + COLS;
   /** Import options. */
   String IMPORTALL = lang("dfs_all");
   /** Import options. */
-  String IMPORTALLINFO = lang("dfs_allinfo") + COL;
+  String IMPORTALLINFO = lang("dfs_allinfo") + DOT;
   /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
   /** Import options. */

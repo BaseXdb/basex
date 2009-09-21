@@ -33,7 +33,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class DialogImportFS extends Dialog {
+public final class DialogCreateFS extends Dialog {
   /** Available databases. */
   private final StringList db;
   /** Database info. */
@@ -75,8 +75,8 @@ public final class DialogImportFS extends Dialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogImportFS(final GUI main) {
-    super(main, IMPORTFSTITLE);
+  public DialogCreateFS(final GUI main) {
+    super(main, CREATEFSTITLE);
     db = List.list(main.context);
 
     // create panels
@@ -84,24 +84,16 @@ public final class DialogImportFS extends Dialog {
     p1.setLayout(new TableLayout(3, 1));
     p1.setBorder(8, 8, 8, 8);
 
-    p1.add(new BaseXLabel(IMPORTFSTEXT, false, true));
-
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(7, 2, 6, 0));
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
-    path = new BaseXTextField(gprop.get(GUIProp.FSIMPORTPATH),
-        HELPFSPATH, this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
-    BaseXLayout.setWidth(path, 240);
-    p.add(path);
 
+    BaseXLabel lab = new BaseXLabel(IMPORTFSTEXT, false, true);
+    lab.setBorder(new EmptyBorder(4, 4, 0, 0));
+    p.add(lab);
+   
     button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -114,19 +106,17 @@ public final class DialogImportFS extends Dialog {
       }
     });
     p.add(button);
-
-    p.add(new BaseXLabel(CREATENAME, false, true));
-    p.add(new BaseXLabel(""));
-
-    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), HELPFSNAME, this);
-    dbname.addKeyListener(new KeyAdapter() {
+    
+    path = new BaseXTextField(gprop.get(GUIProp.FSIMPORTPATH),
+        HELPFSPATH, this);
+    path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
         action(null);
       }
     });
-    BaseXLayout.setWidth(dbname, 240);
-    p.add(dbname);
+    BaseXLayout.setWidth(path, 240);
+    p.add(path);
 
     all = new BaseXCheckBox(IMPORTALL, HELPFSALL,
         gprop.is(GUIProp.FSALL), this);
@@ -138,6 +128,21 @@ public final class DialogImportFS extends Dialog {
       }
     });
     p.add(all);
+    
+    BaseXLabel lab1 = new BaseXLabel(CREATEFSNAME, false, true);
+    lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
+    p.add(lab1);
+    p.add(new BaseXLabel(""));
+    
+    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), HELPFSNAME, this);
+    dbname.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
+    });
+    BaseXLayout.setWidth(dbname, 240);
+    p.add(dbname);
 
     backing = new BaseXTextField(gprop.get(GUIProp.FSBACKING),
         HELPFSBACKING, this);

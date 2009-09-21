@@ -141,7 +141,7 @@ public final class GUIProp extends AProp {
   /** Path for importing the file system. */
   public static final Object[] FSIMPORTPATH = { "FSIMPORTPATH", Prop.WORK };
   /** Name of the filesystem database. */
-  public static final Object[] FSDBNAME = { "FSDBNAME", "Filesystem" };
+  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFSDB" };
   /** Name of the mountpoint. */
   public static final Object[] FSMOUNT = { "FSMOUNT", Prop.TMP + "deepfs" };
   /** Name of the backingroot. */
