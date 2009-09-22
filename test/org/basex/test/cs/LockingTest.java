@@ -60,7 +60,7 @@ public class LockingTest {
   public final void createAndDrop() {
     start = 0;
     ok(new CreateDB(FILE), session1);
-    stay();
+    plus();
     ok(new CreateDB(FILE), session1);
     stay();
     no(new CreateDB(FILE), session2);
@@ -77,13 +77,13 @@ public class LockingTest {
   public final void closeAndOpen() {
     start = 0;
     ok(new CreateDB(FILE), session2);
-    stay();
+    plus();
     ok(new Close(), session1);
     stay();
     ok(new Close(), session2);
-    stay();
+    neg();
     ok(new Open(NAME), session1);
-    stay();
+    plus();
     ok(new Open(NAME), session2);
     plus();
     ok(new Close(), session1);
@@ -108,25 +108,25 @@ public class LockingTest {
    * The number of references of the DB in the pool is raised by 1.
    */
   private void plus() {
-    boolean flag = ((start + 1) == CONTEXT.size(NAME));
+    boolean flag = ((start + 1) == server.context.size(NAME));
     assertTrue(flag);
-    start = CONTEXT.size(NAME);
+    start = server.context.size(NAME);
   }
   
   /**
    * The number of references of the DB in the pool is reduced by 1.
    */
   private void neg() {
-    boolean flag = ((start - 1) == CONTEXT.size(NAME));
+    boolean flag = ((start - 1) == server.context.size(NAME));
     assertTrue(flag);
-    start = CONTEXT.size(NAME);
+    start = server.context.size(NAME);
   }
   
   /**
    * The number of references of the DB in the pool remains constant.
    */
   private void stay() {
-    boolean flag = (start == CONTEXT.size(NAME));
+    boolean flag = (start == server.context.size(NAME));
     assertTrue(flag);
   }
   
