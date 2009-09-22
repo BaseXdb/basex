@@ -165,11 +165,12 @@ public final class DialogCreateFS extends Dialog {
     info.setBorder(20, 0, 10, 0);
     p1.add(info);
 
-    // create checkboxes
+    // Metadata panel
     final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(4, 1));
     p2.setBorder(8, 8, 8, 8);
 
+    // Include metadata checkbox
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
     p2.add(label);
     meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, prop.is(Prop.FSMETA),
@@ -204,7 +205,6 @@ public final class DialogCreateFS extends Dialog {
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
     p2.add(p);
 
- // create checkboxes
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
@@ -224,13 +224,12 @@ public final class DialogCreateFS extends Dialog {
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
-    // create checkboxes
     final BaseXBack p4 = new BaseXBack();
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
     ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        prop.is(Prop.FTINDEX), 0, this);
+        true, 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 

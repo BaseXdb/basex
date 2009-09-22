@@ -144,12 +144,12 @@ public final class Prop extends AProp {
 
   // DEEPFS OPTIONS ===========================================================
   
-  /** Flag for importing file contents. */
-  public static final Object[] FSCONT = { "FSCONT", false };
   /** Flag for importing file metadata. */
-  public static final Object[] FSMETA = { "FSMETA", false };
+  public static final Object[] FSMETA = { "FSMETA", true };
+  /** Flag for importing file contents. */
+  public static final Object[] FSCONT = { "FSCONT", true };
   /** Maximum size for textual imports. */
-  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
+  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 1048576 };
 
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
