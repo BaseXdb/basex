@@ -60,34 +60,37 @@ public class LockingTest {
   public final void createAndDrop() {
     start = 0;
     ok(new CreateDB(FILE), session1);
-    plus();
+    checkPin(1);
     ok(new CreateDB(FILE), session1);
-    stay();
+    checkPin(0);
     no(new CreateDB(FILE), session2);
-    stay();
+    checkPin(0);
     no(new CreateDB(FILE), session2);
-    stay();
+    checkPin(0);
     no(new DropDB(NAME), session2);
-    stay();
+    checkPin(0);
     ok(new DropDB(NAME), session1);
+    checkPin(-1);
   }
   
-  /** Close and Open Tests*/
+  /** Close and Open Tests. */
   @Test
   public final void closeAndOpen() {
     start = 0;
     ok(new CreateDB(FILE), session2);
-    plus();
+    checkPin(1);
     ok(new Close(), session1);
-    stay();
+    checkPin(0);
     ok(new Close(), session2);
-    neg();
+    checkPin(-1);
     ok(new Open(NAME), session1);
-    plus();
+    checkPin(1);
     ok(new Open(NAME), session2);
-    plus();
+    checkPin(1);
     ok(new Close(), session1);
-    neg();
+    checkPin(-1);
+    ok(new Close(), session2);
+    checkPin(-1);
   }
 
   /** Stops the server. */
@@ -104,30 +107,13 @@ public class LockingTest {
     new BaseXServer("stop");
   }
   
-  /**
-   * The number of references of the DB in the pool is raised by 1.
+  /** 
+   * Checks if the number of references of the database in the pool is correct.
+   * @param val value of the change
    */
-  private void plus() {
-    boolean flag = ((start + 1) == server.context.size(NAME));
-    assertTrue(flag);
+  private void checkPin(final int val) {
+    assertEquals(start + val, server.context.size(NAME));
     start = server.context.size(NAME);
-  }
-  
-  /**
-   * The number of references of the DB in the pool is reduced by 1.
-   */
-  private void neg() {
-    boolean flag = ((start - 1) == server.context.size(NAME));
-    assertTrue(flag);
-    start = server.context.size(NAME);
-  }
-  
-  /**
-   * The number of references of the DB in the pool remains constant.
-   */
-  private void stay() {
-    boolean flag = (start == server.context.size(NAME));
-    assertTrue(flag);
   }
   
   /**
