@@ -1,96 +1,173 @@
 package org.basex.test.cs;
 
-import java.io.IOException;
+import static org.junit.Assert.*;
+
 import org.basex.BaseXServer;
-import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.Process;
-import org.basex.core.proc.Delete;
-import org.basex.core.proc.Insert;
+import org.basex.core.Session;
+import org.basex.core.proc.Close;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
-import org.basex.core.proc.XQuery;
-import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * This class tests the four locking cases.
+ * This class tests transaction and locking cases.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class LockingTest {
-  /** Database Context. */
-  private Context context = new Context();
-  /** Read Query. */
-  String read;
+public class LockingTest {
+  /** Server reference. */
+  static BaseXServer server;
+  /** Database context. */
+  protected static final Context CONTEXT = new Context();
+  /** Test file. */
+  private static final String FILE = "input.xml";
+  /** Test name. */
+  private static final String NAME = "input";
+  /** Start value before each test. */
+  private int start;
+  /** Socket reference. */
+  static Session session1;
+  /** Socket reference. */
+  static Session session2;
 
-  /**
-   * Main method, launching the test.
-   * @param args command-line arguments
-   * @throws Exception exception
-   */
-  public static void main(final String[] args) throws Exception {
-    new LockingTest();
-  }
+  /** Starts the server. */
+  @BeforeClass
+  public static void start() {
+    new Thread() {
+      @Override
+      public void run() {
+        server = new BaseXServer();
+      }
+    }.start();
 
-  /**
-   * Private constructor.
-   * @throws Exception exception
-   */
-  private LockingTest() throws Exception {
-    startTheServer();
-
-    read = "for $country in //country for $city in //city where"
-        + " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
-    int cnr = 2;
-    for(int i = 0; i < cnr; i++) {
-      startAClient(new ClientSession(context), i);
+    try {
+      session1 = new ClientSession(CONTEXT);
+      session2 = new ClientSession(CONTEXT);
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
     }
   }
-
-  /**
-   * Starts the server.
-   */
-  private void startTheServer() {
-    new Thread() {
-      @Override
-      public void run() {
-        new BaseXServer("-v");
-      }
-    }.start();
+  
+  /** Create and Drop Tests. */
+  @Test
+  public final void createAndDrop() {
+    start = 0;
+    ok(new CreateDB(FILE), session1);
+    stay();
+    ok(new CreateDB(FILE), session1);
+    stay();
+    no(new CreateDB(FILE), session2);
+    stay();
+    no(new CreateDB(FILE), session2);
+    stay();
+    no(new DropDB(NAME), session2);
+    stay();
+    ok(new DropDB(NAME), session1);
+  }
+  
+  /** Close and Open Tests*/
+  @Test
+  public final void closeAndOpen() {
+    start = 0;
+    ok(new CreateDB(FILE), session2);
+    stay();
+    ok(new Close(), session1);
+    stay();
+    ok(new Close(), session2);
+    stay();
+    ok(new Open(NAME), session1);
+    stay();
+    ok(new Open(NAME), session2);
+    plus();
+    ok(new Close(), session1);
+    neg();
   }
 
-  /**
-   * Starts a client.
-   * @param session client reference
-   * @param c int
-   */
-  private void startAClient(final Session session, final int c) {
-    new Thread() {
-      int check = c;
-      @Override
-      public void run() {
-        exe(session, new Open("factbook"));
-        exe(session, new XQuery(read));
-        if(check % 2 == 0) {
-          exe(session, new Insert("element", "//members", "aa"));
-        } else {
-          exe(session, new Delete("//aa"));
-        }
-      }
-    }.start();
-  }
-
-  /**
-   * Executes the specified process.
-   * @param ss client session
-   * @param pr process to be executed
-   */
-  void exe(final Session ss, final Process pr) {
+  /** Stops the server. */
+  @AfterClass
+  public static void stop() {
     try {
-      if(ss.execute(pr)) ss.output(new NullOutput());
-    } catch(IOException ex) {
-      ex.printStackTrace();
+      session1.close();
+      session2.close();
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
+    }
+
+    // Stop server instance.
+    new BaseXServer("stop");
+  }
+  
+  /**
+   * The number of references of the DB in the pool is raised by 1.
+   */
+  private void plus() {
+    boolean flag = ((start + 1) == CONTEXT.size(NAME));
+    assertTrue(flag);
+    start = CONTEXT.size(NAME);
+  }
+  
+  /**
+   * The number of references of the DB in the pool is reduced by 1.
+   */
+  private void neg() {
+    boolean flag = ((start - 1) == CONTEXT.size(NAME));
+    assertTrue(flag);
+    start = CONTEXT.size(NAME);
+  }
+  
+  /**
+   * The number of references of the DB in the pool remains constant.
+   */
+  private void stay() {
+    boolean flag = (start == CONTEXT.size(NAME));
+    assertTrue(flag);
+  }
+  
+  /**
+   * Assumes that this command is successful.
+   * @param pr process reference
+   * @param s Session
+   */
+  private void ok(final Process pr, final Session s) {
+    final String msg = process(pr, s);
+    if(msg != null) fail(msg);
+  }
+
+  /**
+   * Assumes that this command fails.
+   * @param pr process reference
+   * @param s Session
+   */
+  private void no(final Process pr, final Session s) {
+    ok(process(pr, s) != null);
+  }
+  
+  /**
+   * Assumes that the specified flag is successful.
+   * @param flag flag
+   */
+  private static void ok(final boolean flag) {
+    assertTrue(flag);
+  }
+  
+  /**
+   * Runs the specified process.
+   * @param pr process reference
+   * @param session Session
+   * @return success flag
+   */
+  private String process(final Process pr, final Session session) {
+    try {
+      return session.execute(pr) ? null : session.info();
+    } catch(final Exception ex) {
+      return ex.toString();
     }
   }
 }
