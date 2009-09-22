@@ -114,7 +114,7 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes a process.
+   * Executes a process. This method is overwritten by many processes.
    * @return success of operation
    */
   protected boolean exec() {
@@ -126,37 +126,27 @@ public abstract class Process extends Progress {
    * @param out output stream
    * @throws IOException I/O exception
    */
-
   public final void output(final PrintOutput out) throws IOException {
     final Data data = context.data();
     try {
-      if(printing()) out(out);
+      out(out);
     } catch(final IOException ex) {
       if(data != null) data.setLock(0);
       throw ex;
-    } catch(final Exception ex) {
+    /*} catch(final Exception ex) {
       out.print(ex.toString());
-      Main.debug(ex);
+      Main.debug(ex);*/
     }
     if(data != null) data.setLock(0);
   }
 
   /**
-   * Returns a query result.
+   * Returns a query result. This method is overwritten by many processes.
    * @param out output stream
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   protected void out(final PrintOutput out) throws IOException {
-  }
-
-  /**
-   * Returns process info.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  public final void info(final PrintOutput out) throws IOException {
-    out.print(info());
   }
 
   /**
@@ -177,7 +167,7 @@ public abstract class Process extends Progress {
    * @param ext extended info
    * @return true
    */
-  public final boolean info(final String str, final Object... ext) {
+  protected final boolean info(final String str, final Object... ext) {
     if(prop.is(Prop.INFO)) {
       info.add(str, ext);
       info.add(NL);
@@ -257,19 +247,6 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes the specified process and adopts the process results to the
-   * current process.
-   * @param proc process to be executed
-   * @return success of operation
-  protected final boolean exec(final Process proc) {
-    progress(proc);
-    final boolean ok = proc.execute(context);
-    //info.add(proc.info);
-    return ok;
-  }
-   */
-
-  /**
    * Returns the length of the longest string.
    * @param str strings
    * @return maximum length
@@ -292,16 +269,6 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Returns a string representation of the object. In the client/server
-   * architecture, the command string is sent to and reparsed by the server.
-   * @return string representation
-   */
-  @Override
-  public String toString() {
-    return Main.name(this).toUpperCase() + args();
-  }
-
-  /**
    * Returns the specified string in quotes, if spaces are found.
    * @param s string to be quoted
    * @return quoted string
@@ -316,5 +283,15 @@ public abstract class Process extends Progress {
       if(spc) sb.append('"');
     }
     return sb.toString();
+  }
+
+  /**
+   * Returns a string representation of the object. In the client/server
+   * architecture, the command string is sent to and reparsed by the server.
+   * @return string representation
+   */
+  @Override
+  public String toString() {
+    return Main.name(this).toUpperCase() + args();
   }
 }

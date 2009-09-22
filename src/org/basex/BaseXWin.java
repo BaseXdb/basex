@@ -34,8 +34,14 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class BaseXWin {
-  /** GUI reference. */
-  public GUI gui;
+  /**
+   * Main method.
+   * @param args command-line arguments.
+   * An initial XML document or database file can be specified as argument.
+   */
+  public static void main(final String[] args) {
+    new BaseXWin(args);
+  }
 
   /**
    * Constructor.
@@ -61,7 +67,7 @@ public final class BaseXWin {
         // initialize look and feel
         init(gprop);
         // open main window
-        gui = new GUI(ctx, gprop);
+        final GUI gui = new GUI(ctx, gprop);
 
         // open specified document or database
         if(args.length != 0) {
@@ -79,7 +85,7 @@ public final class BaseXWin {
    * Initializes the GUI.
    * @param prop gui properties
    */
-  static void init(final GUIProp prop) {
+  void init(final GUIProp prop) {
     try {
       // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
@@ -135,14 +141,5 @@ public final class BaseXWin {
     wait.setLocation(s.width - p.width >> 1, s.height - p.height >> 1);
     wait.setVisible(true);
     return wait;
-  }
-
-  /**
-   * Main method.
-   * @param args command-line arguments.
-   * An initial XML document or database file can be specified as argument.
-   */
-  public static void main(final String[] args) {
-    new BaseXWin(args);
   }
 }

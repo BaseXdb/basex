@@ -122,12 +122,12 @@ public class DBNode extends Nod {
   public QNm qname(final QNm name) {
     final byte[] nm = nname();
     name.name(nm);
+    name.uri = Uri.EMPTY;
     final boolean ns = name.ns();
-    if(!ns && data.ns.size() == 0) {
-      name.uri = Uri.EMPTY;
-    } else {
+    if(ns || data.ns.size() != 0) {
       final int n = ns ? data.ns.get(nm, pre) : data.tagNS(pre);
-      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pref(nm)));
+      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : ns ?
+          NSGlobal.uri(pref(nm)) : EMPTY);
     }
     return name;
   }

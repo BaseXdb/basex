@@ -1,9 +1,7 @@
 package org.basex.test.cs;
 
 import static org.junit.Assert.*;
-
 import org.basex.BaseXServer;
-import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Session;
 import org.basex.core.proc.Close;
@@ -11,6 +9,7 @@ import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
 import org.basex.server.ClientSession;
+import org.basex.util.Performance;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,18 +23,15 @@ import org.junit.Test;
 public class LockingTest {
   /** Server reference. */
   static BaseXServer server;
-  /** Database context. */
-  protected static final Context CONTEXT = new Context();
+
   /** Test file. */
   private static final String FILE = "input.xml";
   /** Test name. */
   private static final String NAME = "input";
-  /** Start value before each test. */
-  private int start;
   /** Socket reference. */
-  static Session session1;
+  private static Session session1;
   /** Socket reference. */
-  static Session session2;
+  private static Session session2;
 
   /** Starts the server. */
   @BeforeClass
@@ -47,9 +43,12 @@ public class LockingTest {
       }
     }.start();
 
+    // wait for server to be started
+    Performance.sleep(100);
+
     try {
-      session1 = new ClientSession(CONTEXT);
-      session2 = new ClientSession(CONTEXT);
+      session1 = new ClientSession(server.context);
+      session2 = new ClientSession(server.context);
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
@@ -58,41 +57,44 @@ public class LockingTest {
   /** Create and Drop Tests. */
   @Test
   public final void createAndDrop() {
-    start = 0;
     ok(new CreateDB(FILE), session1);
-    checkPin(1);
+    pins(1, NAME);
     ok(new CreateDB(FILE), session1);
-    checkPin(0);
+    pins(1, NAME);
     no(new CreateDB(FILE), session2);
-    checkPin(0);
+    pins(1, NAME);
     no(new CreateDB(FILE), session2);
-    checkPin(0);
+    pins(1, NAME);
     no(new DropDB(NAME), session2);
-    checkPin(0);
+    pins(1, NAME);
     ok(new DropDB(NAME), session1);
-    checkPin(-1);
   }
   
   /** Close and Open Tests. */
   @Test
   public final void closeAndOpen() {
-    start = 0;
     ok(new CreateDB(FILE), session2);
-    checkPin(1);
+    pins(1, NAME);
     ok(new Close(), session1);
-    checkPin(0);
+    pins(1, NAME);
     ok(new Close(), session2);
-    checkPin(-1);
+    pins(0, NAME);
     ok(new Open(NAME), session1);
-    checkPin(1);
+    pins(1, NAME);
     ok(new Open(NAME), session2);
-    checkPin(1);
+    pins(2, NAME);
     ok(new Close(), session1);
-    checkPin(-1);
-    ok(new Close(), session2);
-    checkPin(-1);
+    pins(1, NAME);
   }
 
+  /* [AW] to add..
+   * - concurrent create commands
+   * - concurrent queries
+   * - concurrent updates
+   * - ..
+   */
+  
+  
   /** Stops the server. */
   @AfterClass
   public static void stop() {
@@ -107,13 +109,13 @@ public class LockingTest {
     new BaseXServer("stop");
   }
   
-  /** 
-   * Checks if the number of references of the database in the pool is correct.
-   * @param val value of the change
+  /**
+   * Checks the number of database pins for the specified database.
+   * @param pin expected number of pins
+   * @param name name of database
    */
-  private void checkPin(final int val) {
-    assertEquals(start + val, server.context.size(NAME));
-    start = server.context.size(NAME);
+  private void pins(final int pin, final String name) {
+    assertEquals(pin, server.context.size(name));
   }
   
   /**

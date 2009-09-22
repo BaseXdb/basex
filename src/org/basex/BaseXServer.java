@@ -14,8 +14,8 @@ import org.basex.server.ServerSession;
 import org.basex.util.Args;
 
 /**
- * This is the starter class for the client/server architecture.
- * It handles incoming requests and allows simultaneous database requests.
+ * This is the starter class for the database server.
+ * It handles concurrent requests from multiple users.
  * Add the '-h' option to get a list on all available command-line
  * arguments.
  *

@@ -28,7 +28,6 @@ public final class LocalSession implements Session {
     try {
       return execute(new CommandParser(str, ctx).parse()[0]);
     } catch(final QueryException ex) {
-      // [CG] strange, but there is no IOException(Throwable cause) on the Mac.
       throw new IOException(ex.getMessage());
     }
   }

@@ -3,7 +3,6 @@ package org.basex.query.util;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.util.Atts;
-import org.basex.util.Token;
 
 /**
  * Global namespaces.
@@ -49,7 +48,7 @@ public final class NSGlobal {
     for(int s = atts.size - 1; s >= 0; s--) {
       if(eq(atts.val[s], uri)) return atts.key[s];
     }
-    return Token.EMPTY;
+    return EMPTY;
   }
 
   /**

@@ -121,7 +121,6 @@ public final class InexDBTest {
    * @throws Exception exception
    */
   private void test() throws Exception {
-    session.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
     for(int d = 0; d < databases.size(); d++) {
       // open database and loop through all queries

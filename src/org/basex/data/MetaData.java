@@ -145,10 +145,10 @@ public final class MetaData {
   }
 
   /**
-   * Notifies the meta structures of an update.
-   * Deletes/resets the indexes.
+   * Notifies the meta structures of an update and invalidates the indexes.
    */
   void update() {
+    time = System.currentTimeMillis();
     txtindex = false;
     atvindex = false;
     ftxindex = false;

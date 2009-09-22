@@ -22,6 +22,13 @@ public final class XQuery extends AQuery {
     return query(args[0]);
   }
 
+  // [LK] this method could be overwritten to check if the process
+  //   performs updates
+  @Override
+  public boolean updating() {
+    return super.updating();
+  }
+
   @Override
   public String toString() {
     return Cmd.XQUERY + " " + args[0];

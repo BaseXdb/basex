@@ -85,7 +85,7 @@ public final class QNm extends Item {
    * Sets the name.
    * @param nm name
    */
-  public void name(final byte[] nm) {
+  void name(final byte[] nm) {
     val = nm;
     ns = indexOf(val, ':');
   }

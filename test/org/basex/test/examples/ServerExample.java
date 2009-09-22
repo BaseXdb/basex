@@ -96,6 +96,6 @@ public final class ServerExample {
       session.output(out);
     }
     // Show optional process information.
-    out.println(session.info());
+    out.print(session.info());
   }
 }

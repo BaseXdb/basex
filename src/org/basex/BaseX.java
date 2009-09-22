@@ -41,7 +41,7 @@ public class BaseX extends Main {
    * Constructor.
    * @param args command line arguments
    */
-  public BaseX(final String... args) {
+  protected BaseX(final String... args) {
     super(args);
     if(ok) run();
   }
