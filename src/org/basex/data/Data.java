@@ -64,7 +64,7 @@ public abstract class Data {
   /** Full-text index instance. */
   protected Index ftxindex;
 
-  /** File system indicator. */
+  /** File system reference. */
   public DeepFS fs;
   /** Index Reference for name tag. */
   public int nameID;
@@ -77,8 +77,7 @@ public abstract class Data {
    */
   @SuppressWarnings("unused")
   public void init() throws IOException {
-    // [AH] check later
-    //if(tags.id(DataText.DEEPFS) != 0) fs = new DeepFS(this);
+    if(meta.deepfs) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
   }

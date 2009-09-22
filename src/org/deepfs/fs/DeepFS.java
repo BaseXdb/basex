@@ -86,38 +86,39 @@ public final class DeepFS implements DataText {
     initRootStat();
   }
 
-///**
-//* Constructor.
-//* @param d data reference
-//*/
-//public DeepFS(final Data d) {
-// data = d;
-//
-// final String mountpoint = d.meta.mount;
-// final String backingpath = d.meta.backing;
-// initNames();
-//
-// if(data.meta.prop.is(Prop.FUSE)) {
-//   final File mp = new File(mountpoint);
-//   final File bp = new File(backingpath);
-//   /* --- prepare, (ie., potentially make) mountpoint & backing store --- */
-//   // - mountpoint
-//   if(!mp.exists()) {
-//     if(!mp.mkdirs()) {
-//       BaseX.debug(FSText.NOMOUNTPOINT + mp.toString());
-//       return;
-//     }
-//   }
-//   // - backing store
-//   if(!bp.exists()) {
-//     if(!bp.mkdirs()) {
-//       BaseX.debug(FSText.NOBACKINGPATH + bp.toString());
-//       return;
-//     }
-//   }
-//   nativeMount(mountpoint, backingpath);
-// }
-//}
+  /**
+   * Constructor.
+   * @param d data reference
+   */
+  public DeepFS(final Data d) {
+    data = d;
+    initNames();
+//    initRootStat();
+
+//    final String mountpoint = d.meta.mount;
+//    final String backingpath = d.meta.backing;
+
+//    if(data.meta.prop.is(Prop.FUSE)) {
+//      final File mp = new File(mountpoint);
+//      final File bp = new File(backingpath);
+//      /* --- prepare, (ie., potentially make) mountpoint & backing store */
+//      // - mountpoint
+//      if(!mp.exists()) {
+//        if(!mp.mkdirs()) {
+//          BaseX.debug(FSText.NOMOUNTPOINT + mp.toString());
+//          return;
+//        }
+//      }
+//      // - backing store
+//      if(!bp.exists()) {
+//        if(!bp.mkdirs()) {
+//          BaseX.debug(FSText.NOBACKINGPATH + bp.toString());
+//          return;
+//        }
+//      }
+//      nativeMount(mountpoint, backingpath);
+//    }
+  }
 
   /**
    * Initialize often used tags and attributes.
