@@ -70,9 +70,9 @@ public final class MetaData {
   public int lastid = -1;
 
   /** DeepFS mount point. */
-  public String mount;
+  public String  mount = "";
   /** DeepFS backing path. */
-  public String backing;
+  public String backing = "";
   /** Flag for DeepFS instance. */
   public boolean deepfs = false;
 
