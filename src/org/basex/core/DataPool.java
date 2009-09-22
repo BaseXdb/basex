@@ -35,6 +35,20 @@ final class DataPool {
     }
     return null;
   }
+  
+  /**
+   * Returns number of references for the specified database, or 0.
+   * @param db name of the database
+   * @return number of references
+   */
+  int size(final String db) {
+    for(int i = 0; i < size; i++) {
+      if(data[i].meta.name.equals(db)) {
+        return pins[i];
+      }
+    }
+    return 0;
+  }
 
   /**
    * Unpins a data reference.
