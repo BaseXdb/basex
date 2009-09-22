@@ -130,13 +130,6 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
 
-  /** Flag for importing file contents. */
-  public static final Object[] FSCONT = { "FSCONT", false };
-  /** Flag for importing file metadata. */
-  public static final Object[] FSMETA = { "FSMETA", false };
-  /** Maximum size for textual imports. */
-  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
-
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };
   /** Flag for creating flat MAB2 data. */
@@ -150,6 +143,13 @@ public final class Prop extends AProp {
   public static final Object[] IBT = { "INDEXBUDGETTIME", -1 };
 
   // DEEPFS OPTIONS ===========================================================
+  
+  /** Flag for importing file contents. */
+  public static final Object[] FSCONT = { "FSCONT", false };
+  /** Flag for importing file metadata. */
+  public static final Object[] FSMETA = { "FSMETA", false };
+  /** Maximum size for textual imports. */
+  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
 
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
@@ -157,6 +157,8 @@ public final class Prop extends AProp {
   public static final Object[] FUSE = { "FUSE", false };
   /** Flag for creating a native (joint) database. */
   public static final Object[] NATIVEDATA = { "NATIVEDATA", false };
+  /** Propagate changes in DeepFS back to original filesystem. */
+  public static final Object[] WTHROUGH = {"WTHROUGH", false };
   /**
    * Spotlight integration. If true, on mac platforms spotlight index is used
    * instead of the internal parser implementations.

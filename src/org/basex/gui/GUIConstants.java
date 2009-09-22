@@ -119,7 +119,7 @@ public final class GUIConstants {
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
     null, PREFS
   }, {
-    CREATEFS
+    CREATEFS, null, DQE,
   }, {
     SHOWHELP, null, ABOUT
   }};

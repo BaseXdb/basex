@@ -50,8 +50,6 @@ public final class DialogCreateFS extends Dialog {
   private final BaseXBack buttons;
   /** ComboBox. */
   private final BaseXCombo maxsize;
-  /** Backing path. */
-  private final BaseXTextField backing;
   /** Mountpoint path. */
   private final BaseXTextField mountpoint;
 
@@ -107,7 +105,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(button);
     
-    path = new BaseXTextField(gprop.get(GUIProp.FSIMPORTPATH),
+    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING),
         HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
@@ -144,16 +142,6 @@ public final class DialogCreateFS extends Dialog {
     BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
 
-    backing = new BaseXTextField(gprop.get(GUIProp.FSBACKING),
-        HELPFSBACKING, this);
-    backing.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
-    BaseXLayout.setWidth(backing, 240);
-
     mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT),
         HELPFSMOUNT, this);
     mountpoint.addKeyListener(new KeyAdapter() {
@@ -165,10 +153,6 @@ public final class DialogCreateFS extends Dialog {
     BaseXLayout.setWidth(mountpoint, 240);
 
     if(prop.is(Prop.FUSE)) {
-      p.add(new BaseXLabel("Backing store:", false, true));
-      p.add(new BaseXLabel(""));
-      p.add(backing);
-      p.add(new BaseXLabel(""));
       p.add(new BaseXLabel("DeepFS mount point:", false, true));
       p.add(new BaseXLabel(""));
       p.add(mountpoint);
@@ -288,7 +272,6 @@ public final class DialogCreateFS extends Dialog {
 
     boolean cAll; // import all is chosen?
     boolean cNam; // dbname given?
-    boolean cBac = true; // backing store is existent directory?
     boolean cMou = true; // mount point is existent directory?
 
     final Prop prop = gui.context.prop;
@@ -299,7 +282,7 @@ public final class DialogCreateFS extends Dialog {
     ok = cNam;
 
     cAll = all.isSelected();
-    if(cAll) gprop.set(GUIProp.FSIMPORTPATH, path.getText());
+    if(cAll) gprop.set(GUIProp.FSBACKING, path.getText());
 
     if(!cAll && cNam) {
       final String p = path.getText().trim();
@@ -309,8 +292,6 @@ public final class DialogCreateFS extends Dialog {
     ok &= cAll;
 
     if(prop.is(Prop.FUSE)) {
-      cBac = new File(backing.getText().trim()).isDirectory();
-      ok &= cBac;
       cMou = new File(mountpoint.getText().trim()).isDirectory();
       ok &= cMou;
     }
@@ -319,7 +300,6 @@ public final class DialogCreateFS extends Dialog {
 
     if(!ok) {
       if(!cMou) inf = MOUNTWHICH;
-      if(!cBac) inf = BACKINGWHICH;
       if(!cAll) inf = PATHWHICH;
       if(!cNam) inf = DBWHICH;
     }
@@ -360,12 +340,9 @@ public final class DialogCreateFS extends Dialog {
 
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FSALL, all.isSelected());
-    gprop.set(GUIProp.FSIMPORTPATH, path.getText());
+    gprop.set(GUIProp.FSBACKING, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());
-    if(prop.is(Prop.FUSE)) {
-      gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
-      gprop.set(GUIProp.FSBACKING, backing.getText().trim());
-    }
+    gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
     gprop.set(GUIProp.CREATEPATH, path.getText());
 
     super.close();

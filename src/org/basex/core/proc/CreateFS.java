@@ -19,19 +19,17 @@ public final class CreateFS extends ACreate {
    * @param name name of database
    */
   public CreateFS(final String path, final String name) {
-    this(path, name, "", "");
+    this(path, name, "no_mount");
   }
 
   /**
    * Constructor, specifying FUSE properties.
-   * @param path filesystem path
+   * @param path to import root directory
    * @param name name of database
    * @param mp fuse mount point
-   * @param bs path to BLOB backing store
    */
-  public CreateFS(final String path, final String name, final String mp,
-      final String bs) {
-    super(STANDARD, path, name, mp, bs);
+  public CreateFS(final String path, final String name, final String mp) {
+    super(STANDARD, path, name, mp);
   }
 
   @Override
@@ -39,8 +37,8 @@ public final class CreateFS extends ACreate {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
     return prop.is(Prop.NEWFSPARSER) ?
-      build(new NewFSParser(args[0], args[2], args[3], prop), args[1]) :
-      build(new FSParser(args[0], args[2], args[3], prop), args[1]);
+      build(new NewFSParser(args[0], args[2], prop), args[1]) :
+      build(new FSParser(args[0], args[2], prop), args[1]);
   }
 
   @Override

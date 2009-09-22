@@ -3,12 +3,10 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.metadata.AbstractExtractor;
@@ -58,27 +56,18 @@ public final class FSParser extends Parser {
   private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Path to root of the backing store. */
   private final String fsimportpath;
-  /** Name of the database and backingroot sub directory. */
-  private final String fsdbname;
-  /** Path to root of the backing store. */
-  private final String backingroot;
   /** Path to FUSE mountpoint. */
   public final String mountpoint;
   /** Meta data index. */
   private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
   /** Root flag to parse root node or all partitions (C:, D: ...). */
   private final boolean root;
-  /** Path to root of the backing store for this import. */
-  public final String backingpath;
   /** Reference to the database builder. */
   private Builder builder;
   /** The currently processed file. */
   private File curr;
   /** Level counter. */
   private int lvl;
-  /** Length of absolute pathname of the root directory the import starts from,
-   * i.e. the prefix to be chopped from path and substituted by backingroot. */
-  private int importRootLength;
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
 
@@ -86,12 +75,10 @@ public final class FSParser extends Parser {
    * Constructor.
    * @param path the traversal starts from
    * @param mp mount point for fuse
-   * @param bs path to root of backing store for BLOBs
    * @param pr database properties
    * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final String path, final String mp, final String bs,
-      final Prop pr) {
+  public FSParser(final String path, final String mp, final Prop pr) {
     super(IO.get(path), pr);
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
@@ -99,10 +86,7 @@ public final class FSParser extends Parser {
     root = path.equals("/");
 
     fsimportpath = io.path();
-    fsdbname = io.name();
-    backingroot = bs;
     mountpoint = mp;
-    backingpath = backingroot + Prop.SEP + fsdbname;
 
     meta.add(TYPEGIF, new GIFExtractor());
     meta.add(TYPEPNG, new PNGExtractor());
@@ -124,8 +108,7 @@ public final class FSParser extends Parser {
    * @param pr database properties
    */
   public FSParser(final String path, final Prop pr) {
-    // [AH] pass mountpoint and backing store args to single parser
-    this(path, "/mnt/deepfs", "/var/tmp/deepfs", pr);
+    this(path, "/mnt/deepfs", pr);
     singlemode = true;
   }
 
@@ -137,27 +120,19 @@ public final class FSParser extends Parser {
    */
   @Override
   public void parse(final Builder build) throws IOException {
+    final boolean fuse = prop.is(Prop.FUSE);
     builder = build;
     builder.encoding(Prop.ENCODING);
-
-    builder.meta.backing = backingpath;
     builder.meta.mount = mountpoint;
-
-    // -- create backing store (DeepFS depends on it).
-    final boolean fuse = prop.is(Prop.FUSE);
-    if(fuse && !singlemode) {
-      final File bs = new File(backingpath);
-      if(!bs.mkdirs() && bs.exists())
-          throw new IOException(BACKINGEXISTS + backingpath);
-    }
-
+    builder.meta.backing = fsimportpath;
+    builder.meta.deepfs = true;
     builder.startDoc(token(io.name()));
 
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
       final byte[] mnt = fuse ? token(mountpoint) : NOTMOUNTED;
-      final byte[] bck = fuse ? token(backingpath) : token(fsimportpath);
+      final byte[] bck = token(fsimportpath);
       atts.reset();
       atts.add(MOUNTPOINT  , mnt);
       atts.add(SIZE        , Token.EMPTY);
@@ -172,7 +147,6 @@ public final class FSParser extends Parser {
       for(final File f : root ? File.listRoots() :
         new File[] { new File(fsimportpath).getCanonicalFile() }) {
 
-        importRootLength = f.getAbsolutePath().length();
         sizeStack[0] = 0;
         parse(f);
         builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
@@ -185,48 +159,49 @@ public final class FSParser extends Parser {
   /**
    * Visits files in a directory or steps further down.
    * @param d the directory to be visited.
-   * @throws IOException I/O exception
+   * @throws IOException on failure
    */
   private void parse(final File d) throws IOException {
     final File[] files = d.listFiles();
     if(files == null) return;
 
-    final boolean fuse = prop.is(Prop.FUSE);
     for(final File f : files) {
       if(!valid(f)) continue;
 
+      // [AH] changed backing semantics.
+//      final boolean fuse = prop.is(Prop.FUSE);
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
-        if(fuse) new File(backingpath +
-            f.getAbsolutePath().substring(importRootLength)).mkdir();
+//        if(fuse) new File(backingpath +
+//            f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
         // -- copy file to backing store
-        if(fuse) copy(f.getAbsoluteFile(), new File(backingpath +
-            f.getAbsolutePath().substring(importRootLength)));
+//        if(fuse) copy(f.getAbsoluteFile(), new File(backingpath +
+//            f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
     }
   }
 
-  /**
-   * Copies a file to the backing store.
-   * @param src file source
-   * @param dst file destination in backing store
-   */
-  private void copy(final File src, final File dst) {
-    try {
-      final InputStream in = new FileInputStream(src);
-      final OutputStream out = new FileOutputStream(dst);
-      final byte[] buf = new byte[IO.BLOCKSIZE];
-      int len;
-      while((len = in.read(buf)) > 0) out.write(buf, 0, len);
-      in.close();
-      out.close();
-    } catch(final IOException ex) {
-      ex.getMessage();
-    }
-  }
+//  /**
+//   * Copies a file to the backing store.
+//   * @param src file source
+//   * @param dst file destination in backing store
+//   */
+//  private void copy(final File src, final File dst) {
+//    try {
+//      final InputStream in = new FileInputStream(src);
+//      final OutputStream out = new FileOutputStream(dst);
+//      final byte[] buf = new byte[IO.BLOCKSIZE];
+//      int len;
+//      while((len = in.read(buf)) > 0) out.write(buf, 0, len);
+//      in.close();
+//      out.close();
+//    } catch(final IOException ex) {
+//      ex.getMessage();
+//    }
+//  }
 
   /**
    * Determines if the specified file is valid and no symbolic link.

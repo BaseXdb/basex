@@ -31,6 +31,8 @@ public interface Text {
   String LI = "- ";
   /** Space. */
   String S = " ";
+  /** Question mark. */
+  String Q = "?";
   /** On flag. */
   String ON = "ON";
   /** Off flag. */
@@ -515,6 +517,8 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
+  /** No Database to be dropped. */
+  String DBNODBTODROP = lang("db_nodbtodrop");
   /** Database is in use by a other client. */
   String DBINUSE = lang("db_inuse");
   /** Database not opened. */
@@ -694,6 +698,8 @@ public interface Text {
   String INFODBPATH = lang("info_dbpath");
   /** No document opened. */
   String INFONODB = lang("info_nodb");
+  /** No DeepFS database is there to be opened. */
+  String INFONODEEPFS = lang("info_nodeepfs");
   /** Info on database. */
   String INFODBLIST = lang("info_dblist");
   /** Info on database. */
@@ -857,6 +863,10 @@ public interface Text {
   String GUICREATEFS = lang("c_createfs") + DOTS;
   /** Command info. */
   String GUICREATEFSTT = lang("c_createfstt");
+  /** Command info. */
+  String GUIDQE = lang("c_dqe") + DOTS;
+  /** Command info. */
+  String GUIDQETT = lang("c_dqett") + DOT;
   /** Command info. */
   String GUIINFO = lang("c_props") + DOTS;
   /** Command info. */
@@ -1102,9 +1112,13 @@ public interface Text {
 
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
-  /** Dialog title for deleting nodes. */
-  String NODBQUESTION = INFONODB + DOT + NL + lang("do_nodbquestion") + NL + S;
-
+  /** Dialog asking if a new database should be be created. */
+  String NODBQUESTION = INFONODB 
+    + DOT + NL + lang("do_nodbquestion") + NL + S;
+  /** Dialog asking if a new database should be be created. */
+  String NODEEPFSQUESTION = INFONODEEPFS 
+    + DOT + NL + lang("do_nodbquestion") + NL + S;
+  
   /** File dialog title. */
   String XQOPENTITLE = lang("dq_open");
   /** File dialog title. */
@@ -1129,6 +1143,14 @@ public interface Text {
   String IMPORTALL = lang("dfs_all");
   /** Import options. */
   String IMPORTALLINFO = lang("dfs_allinfo") + DOT;
+  /** Write from db to fs option. */
+  String WTHROUGH = lang("dfs_wrt");
+  /** Import options. */
+  String WTHROUGHTT = lang("dfs_wrttt") + DOT;  
+  /** Dialog question to activate write through. */
+  String WTHROUGHOK = lang("dfs_wrtok") + Q;
+  /** Dialog question to activate write through. */
+  String WTHROUGHTITLE = lang("dfs_wrttitle") + Q;
   /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
   /** Import options. */

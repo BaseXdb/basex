@@ -64,6 +64,9 @@ public interface DataText {
   String DBMNT = "MOUNT";
   /** FS Backing store. */
   String DBBCK = "BACKING";
+  /** DeepFS instance. */
+  String DBDEEPFS = "DEEPFS";
+  
   /** Tags. */
   String DBTAGS = "TAGS";
   /** Attributes. */

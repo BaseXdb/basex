@@ -139,16 +139,15 @@ public final class GUIProp extends AProp {
   public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
 
   /** Path for importing the file system. */
-  public static final Object[] FSIMPORTPATH = { "FSIMPORTPATH", Prop.WORK };
+  public static final Object[] FSBACKING = { "FSIMPORTPATH", Prop.WORK };
   /** Name of the filesystem database. */
   public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFSDB" };
   /** Name of the mountpoint. */
   public static final Object[] FSMOUNT = { "FSMOUNT", Prop.TMP + "deepfs" };
-  /** Name of the backingroot. */
-  public static final Object[] FSBACKING =
-    { "FSBACKING", Prop.TMP + "backingstore_deepfs" };
   /** Flag for importing complete file system hierarchy. */
   public static final Object[] FSALL = { "FSALL", false };
+  /** Flag write through in Desktop Query Engine. */
+  public static final Object[] FSWTHROUGH = { "FSWTHROUGH", false };
 
   /** Last command inputs. */
   public static final Object[] COMMANDS = { "COMMANDS", new String[0] };

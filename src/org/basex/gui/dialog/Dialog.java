@@ -20,7 +20,7 @@ import org.basex.gui.layout.TableLayout;
 
 /**
  * This class provides the architecture for consistent dialog windows.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -59,7 +59,9 @@ public abstract class Dialog extends JDialog {
     setResizable(false);
     addWindowListener(new WindowAdapter() {
       @Override
-      public void windowClosing(final WindowEvent e) { cancel(); }
+      public void windowClosing(final WindowEvent e) {
+        cancel();
+      }
     });
   }
 
@@ -97,12 +99,12 @@ public abstract class Dialog extends JDialog {
    * @param cmd the action command
    */
   @SuppressWarnings("unused")
-  public void action(final String cmd) { }
+  public void action(final String cmd) { /* */}
 
   /**
    * Called when GUI design has changed.
    */
-  public void refresh() { }
+  public void refresh() { /* */}
 
   /**
    * Cancels the dialog; can be overwritten.
@@ -113,8 +115,8 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Closes the dialog; can be overwritten and stores the dialog position
-   * if it has been specified before.
+   * Closes the dialog; can be overwritten and stores the dialog position if it
+   * has been specified before.
    */
   public void close() {
     ok = true;
@@ -146,9 +148,8 @@ public abstract class Dialog extends JDialog {
    * @return button list
    */
   protected static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, true,
-        new String[] { BUTTONOK, BUTTONCANCEL },
-        new byte[][] { HELPOK, HELPCANCEL });
+    return newButtons(dialog, true, new String[] { BUTTONOK, BUTTONCANCEL},
+        new byte[][] { HELPOK, HELPCANCEL});
   }
 
   /**
@@ -210,6 +211,20 @@ public abstract class Dialog extends JDialog {
   public static boolean confirm(final Component comp, final String text) {
     return JOptionPane.showConfirmDialog(comp, text, NAME,
         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+  }
+
+  /**
+   * Static yes/no dialog with warning symbol.
+   * @param comp parent reference
+   * @param text text
+   * @param title of warning dialog
+   * @return true if dialog was confirmed
+   */
+  public static boolean confirmWarning(final Component comp, final String text,
+      final String title) {
+    return JOptionPane.showConfirmDialog(comp, text, NAME + " - " + title,
+        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) 
+        == JOptionPane.YES_OPTION;
   }
 
   /**

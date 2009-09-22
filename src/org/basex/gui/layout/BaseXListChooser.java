@@ -137,7 +137,9 @@ public final class BaseXListChooser extends BaseXBack {
       }
       @Override
       public void mousePressed(final MouseEvent e) {
-        text.setText(list.getSelectedValue().toString());
+        Object i = list.getSelectedValue();
+        if (i == null) return;
+        text.setText(i.toString());
         focus();
         text.selectAll();
         d.action(null);

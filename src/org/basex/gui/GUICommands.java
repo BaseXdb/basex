@@ -1,24 +1,27 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+
 import javax.swing.AbstractButton;
+
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdUpdate;
-import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
+import org.basex.core.proc.Cs;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.Export;
@@ -33,14 +36,15 @@ import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
 import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
+import org.basex.gui.dialog.DialogCreateFS;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogFontChooser;
 import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.dialog.DialogCreateFS;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogMapLayout;
 import org.basex.gui.dialog.DialogOpen;
+import org.basex.gui.dialog.DialogOpenFS;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.layout.BaseXFileChooser;
@@ -142,7 +146,7 @@ public enum GUICommands implements GUICommand {
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, INFODB);
+      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, DBNODBTODROP);
     }
   },
 
@@ -702,14 +706,28 @@ public enum GUICommands implements GUICommand {
       if(!new DialogCreateFS(gui).ok()) return;
       final GUIProp gprop = gui.prop;
       final String p = gprop.is(GUIProp.FSALL) ? "/"
-          : gui.prop.get(GUIProp.FSIMPORTPATH).replace('\\', '/');
+          : gui.prop.get(GUIProp.FSBACKING).replace('\\', '/');
       final String n = gprop.get(GUIProp.FSDBNAME);
       final String m = gprop.get(GUIProp.FSMOUNT);
-      final String b = gprop.get(GUIProp.FSBACKING);
-      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n, m, b) });
+      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n, m) });
     }
   },
   
+  /** Opens a dialog to use DeepFS instance as Desktop Query Engine. */
+  DQE(false, GUIDQE, null, GUIDQETT) {
+    @Override
+    public void execute(final GUI gui) {
+      final DialogOpenFS dialog = new DialogOpenFS(gui, false);
+      if(dialog.ok()) {
+        if(new Close().execute(gui.context)) gui.notify.init();
+        gui.execute(new Open(dialog.db()));
+      } else if(dialog.nodb()) {
+        if(Dialog.confirmWarning(gui, NODEEPFSQUESTION, CREATEFSTITLE))
+          CREATEFS.execute(gui);
+      }
+    }
+  },
+ 
   /* HELP MENU */
 
   /** Shows the help window. */

@@ -120,7 +120,7 @@ public final class CommandParser extends InputParser {
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case FS:
             return ctx.prop.is(Prop.FUSE) ?
-              new CreateFS(string(cmd), name(cmd), string(cmd), string(cmd)) :
+              new CreateFS(string(cmd), name(cmd), string(cmd)) :
               new CreateFS(string(cmd), name(cmd));
           case MAB:
             return new CreateMAB(string(cmd), name(null));

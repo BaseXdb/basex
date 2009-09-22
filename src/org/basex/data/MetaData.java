@@ -23,11 +23,7 @@ public final class MetaData {
 
   /** Database name. */
   public String name;
-  /** DeepFS mount point. */
-  public String mount = "";
-  /** DeepFS backing path. */
-  public String backing = "";
-
+  
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
   /** Original filename of XML document. */
@@ -72,6 +68,13 @@ public final class MetaData {
   public int size;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
+
+  /** DeepFS mount point. */
+  public String mount;
+  /** DeepFS backing path. */
+  public String backing;
+  /** Flag for DeepFS instance. */
+  public boolean deepfs = false;
 
   /**
    * Constructor, specifying the database name.
@@ -189,6 +192,7 @@ public final class MetaData {
       else if(k.equals(DBLID))    lastid    = Token.toInt(v);
       else if(k.equals(DBMNT))    mount     = v;
       else if(k.equals(DBBCK))    backing   = v;
+      else if(k.equals(DBDEEPFS)) deepfs    = toBool(v);
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -234,8 +238,9 @@ public final class MetaData {
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
-    writeInfo(out, DBMNT,    mount);
     writeInfo(out, DBBCK,    backing);
+    writeInfo(out, DBMNT,    mount);
+    writeInfo(out, DBDEEPFS, deepfs);
     out.write(0);
   }
 

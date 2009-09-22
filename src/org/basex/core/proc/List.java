@@ -2,8 +2,11 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;
@@ -76,5 +79,36 @@ public final class List extends Process {
     }
     db.sort(false);
     return db;
+  }
+  
+  /**
+   * Returns a list of all DeepFS databases.
+   * @param ctx context reference
+   * @return available databases.
+   */
+  public static StringList listFS(final Context ctx) {
+    final StringList dbl = new StringList();
+
+    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
+    if(!dir.exists()) return dbl;
+
+    for(final IO f : dir.children()) {
+      DataInput in = null;
+      if(f.isDir() && !f.name().endsWith(".tmp")) {
+        final String dbname = f.name();
+        try {
+          in = new DataInput(ctx.prop.dbfile(dbname, DATAINFO));
+          final MetaData meta = new MetaData(dbname, in, ctx.prop);
+          if (meta.deepfs)
+            dbl.add(dbname);
+        } catch(final IOException ex) {
+          Main.debug(ex.getMessage()); 
+        } finally {
+          try { if(in != null) in.close(); } catch(final IOException ex) { }
+        }
+      }
+    }
+    dbl.sort(false);
+    return dbl;
   }
 }
