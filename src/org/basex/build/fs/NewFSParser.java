@@ -361,15 +361,22 @@ public final class NewFSParser extends Parser {
         builder.startNS(FSXSIPREF, FSXSIURL);
       }
 
-      builder.startElem(DEEPFS_NS, atts);
+      final int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
           fsimportpath).getCanonicalFile()}) {
 
         if(f.isHidden() && !f.getAbsolutePath().equals("C:\\")) continue;
         sizeStack[0] = 0;
-        dir(f);
+
+        for(final File file : f.listFiles()) {
+          if(!valid(file) || file.isHidden()) continue;
+          if(file.isDirectory()) dir(file);
+          else file(file);
+        }
+
       }
+      setSize(sizeAttId, sizeStack[0]);
       builder.endElem(DEEPFS_NS);
     }
     builder.endDoc();
@@ -403,22 +410,22 @@ public final class NewFSParser extends Parser {
     builder.setAttValue(id, token(size));
   }
 
-//  /**
-//   * Copies a file to the backing store.
-//   * @param src file source
-//   * @param dst file destination in backing store
-//   */
-//  private void copy(final File src, final File dst) {
-//    try {
-//      final FileChannel chIn = new FileInputStream(src).getChannel();
-//      final FileChannel chOut = new FileOutputStream(dst).getChannel();
-//      chIn.transferTo(0, chIn.size(), chOut);
-//      chIn.close();
-//      chOut.close();
-//    } catch(final IOException ex) {
-//      Main.debug(ex.getMessage());
-//    }
-//  }
+  // /**
+  // * Copies a file to the backing store.
+  // * @param src file source
+  // * @param dst file destination in backing store
+  // */
+  // private void copy(final File src, final File dst) {
+  // try {
+  // final FileChannel chIn = new FileInputStream(src).getChannel();
+  // final FileChannel chOut = new FileOutputStream(dst).getChannel();
+  // chIn.transferTo(0, chIn.size(), chOut);
+  // chIn.close();
+  // chOut.close();
+  // } catch(final IOException ex) {
+  // Main.debug(ex.getMessage());
+  // }
+  // }
 
   /**
    * Determines if the specified file is valid and no symbolic link.
@@ -450,16 +457,16 @@ public final class NewFSParser extends Parser {
       if(!valid(f) || f.isHidden()) continue;
 
       // [AH] changed backing semantics.
-//      final boolean fuse = prop.is(Prop.FUSE);
+      // final boolean fuse = prop.is(Prop.FUSE);
       if(f.isDirectory()) {
-//        // -- 'copy' directory to backing store
-//        if(fuse) new File(mybackingpath
-//            + f.getAbsolutePath().substring(importRootLength)).mkdir();
+        // // -- 'copy' directory to backing store
+        // if(fuse) new File(mybackingpath
+        // + f.getAbsolutePath().substring(importRootLength)).mkdir();
         dir(f);
       } else {
-//        // -- copy file to backing store
-//        if(fuse) copy(f.getAbsoluteFile(), new File(mybackingpath
-//            + f.getAbsolutePath().substring(importRootLength)));
+        // // -- copy file to backing store
+        // if(fuse) copy(f.getAbsoluteFile(), new File(mybackingpath
+        // + f.getAbsolutePath().substring(importRootLength)));
         file(f);
       }
     }
