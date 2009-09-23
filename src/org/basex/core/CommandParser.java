@@ -394,7 +394,8 @@ public final class CommandParser extends InputParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
-      if(ls.similar(name, sm, 0) && (ctx.server || !((Cmd) s).server()))
+      final boolean all = ctx.server || s instanceof Cmd && ((Cmd) s).server();
+      if(ls.similar(name, sm, 0) && all)
         error(list(alt), CMDSIMILAR, name, sm);
     }
 

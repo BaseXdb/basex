@@ -54,17 +54,19 @@ public final class FTItem extends DBNode {
   @Override
   public double score() {
     if(score == -1) {
-      if (ids) {
+      if(ids) {
         Iterator<FTStringMatch> i = all.match[0].iterator();
-        if (i.hasNext()) {
+        if(i.hasNext()) {
           score = i.next().e / 1000.0;
-        } else 
-          score = Math.max((double) all.size / (double) is, 
+        } else {
+          score = Math.max((double) all.size / (double) is,
               Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
+        }
+      } else {
+        // [SG] rewritten to get score values <= 1
+        score = Math.max((double) all.size / (double) is,
+            Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
       }
-      // [SG] rewritten to get score values <= 1
-      else score = Math.max((double) all.size / (double) is, 
-          Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
       //score = (double) ((tl + 1) * all.match.length - 1) /
       //  (double) data.textLen(pre);
       // [SG] default scoring
