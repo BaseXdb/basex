@@ -7,8 +7,10 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.PathSummary;
 import org.basex.index.Names;
+import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.iter.NodeIter;
 
 /**
  * XQuery Update update functions.
@@ -56,24 +58,71 @@ public final class UpdateFunctions {
   
   /**
    * Builds new MemData instance from iterator.
-   * @param node node
+   * @param n node
    * @return new MemData instance
+   * @throws QueryException query exception
    */
-  public static MemData buildDB(final Nod node) {
+  public static MemData buildDB(final Nod n) throws QueryException {
     final MemData m = new MemData(20, new Names(), new Names(), 
         new Namespaces(), new PathSummary(), new Prop());
-    int dis = 1;
-    if(node instanceof DBNode) {
-      DBNode n = (DBNode) node; 
-      final Data d = n.data;
-      final int k = Nod.kind(n.type); 
-      if(k == Data.ELEM) m.addElem(
-          m.tags.index(d.tag(n.pre), null, false), 
-          0, dis, n.attr().size() + 1, d.size(n.pre, k), false);
-
-    } else {
-//      FNode n = (FNode) node;
-    }
+    if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
+//    if(n instanceof FNode) addFragment((FNode) n, m, 1);
     return m;
+  }
+  
+//  /**
+//   * Adds node to MemData instance.
+//   * @param n node 
+//   * @param m data reference
+//   * @param dis distance
+//   * @return neighbour distance from parent
+//   */
+//  private static int addFragment(final FNode n, final MemData m, 
+//      final int dis) {
+//    // [LK] add framgents to MemData instance
+//    // add node
+//    // add attributes
+//    // recursively add childs    (for node n in child) addNode
+//    return 0;
+//  }
+  
+  /**
+   * Adds node to MemData instance.
+   * @param n node
+   * @param m data reference
+   * @param dis distance
+   * @return neighbour distance from parent
+   * @throws QueryException query exception
+   */
+  private static int addDBNode(final DBNode n, final MemData m, final int dis) 
+    throws QueryException {
+    int d = dis;
+    final Data data = n.data;
+    final int k = Nod.kind(n.type);
+    // add node
+    if(k == Data.ELEM) m.addElem(
+        m.tags.index(data.tag(n.pre), null, false), 
+        0, d, n.attr().size() + 1, data.size(n.pre, k) + 1, false);
+    d++;
+    // add attributes
+    final NodeIter nIt = n.attr();
+    DBNode at = (DBNode) nIt.next();
+    // local parent distance
+    int ld = 1;
+    while(at != null) {
+      m.addAtt(m.atts.index(data.attName(at.pre), null, false), 
+          0, data.attValue(at.pre), ld);
+      ld++;
+      d++;
+      at = (DBNode) nIt.next();
+    }
+    // add childs
+    final NodeIter cIt = n.child();
+    DBNode ch = (DBNode) cIt.next();
+    while(ch != null) {
+      ld = addDBNode(ch, m, ld);
+      ch = (DBNode) cIt.next();
+    }
+    return d;
   }
 }

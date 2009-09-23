@@ -1,6 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.UpdateFunctions.*;
+import static org.basex.query.QueryText.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.Nod;
+import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -78,18 +80,19 @@ public class Primitives {
         }
       } else {
         while(i != null) {
-          // [LK] correct? PI and COM child().size()==-1 ?? PI and COM no child!
-          if(i.child().size() == -1) {
+          final int k = Nod.kind(i.type);
+          // [LK] comments and processing instructions not supported
+          if(k == Data.COMM || k == Data.PI) Err.or(UPIMPL, i.type);
+          if(k == Data.TEXT) {
+            // [LK] merge text nodes
             DBNode dbn = null;
             if(i instanceof DBNode) dbn = (DBNode) i;
             data.insert(pre++, par, dbn == null ? i.nname() : 
-              dbn.data.tag(dbn.pre), Nod.kind(i.type));
-          } else {
-            final MemData mem = buildDB(i);
-            // [LK] remove next line - testing
-            if(mem == null) break;
-            data.insert(pre++, par, mem);
+            dbn.data.tag(dbn.pre), Nod.kind(i.type));
           }
+          // element nodes are added via a new MemData instance 
+          final MemData m = buildDB(i);
+          data.insert(pre++, par, m);
           i = (Nod) p.replaceNodes.next();
         }
       }
