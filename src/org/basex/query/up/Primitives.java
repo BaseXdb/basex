@@ -71,13 +71,14 @@ public class Primitives {
       Nod i = (Nod) p.replaceNodes.next();
       if(Nod.kind(i.type) == Data.ATTR) {
         while(i != null) {
+          // [LK] check for duplicate attributes
           final FAttr attr = (FAttr) i;
           data.insert(pre++, par, attr.qname().str(), attr.str());
           i = (Nod) p.replaceNodes.next();
         }
       } else {
         while(i != null) {
-          // [LK] correct? PI and COM child().size()==0 ?? test ...
+          // [LK] correct? PI and COM child().size()==-1 ?? PI and COM no child!
           if(i.child().size() == -1) {
             DBNode dbn = null;
             if(i instanceof DBNode) dbn = (DBNode) i;
