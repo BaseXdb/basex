@@ -101,6 +101,15 @@ abstract class AQuery extends Process {
     if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) o.println();
   }
 
+  // [LK] this method could be overwritten to check if the process
+  //   performs updates
+  @Override
+  public boolean updating() {
+    // final QueryParser p = new QueryParser(new QueryContext(context));
+    // ...
+    return super.updating();
+  }
+
   /**
    * Adds evaluation information to the information string.
    */
