@@ -100,6 +100,10 @@ public final class UpdateFunctions {
     final Data data = n.data;
     final int k = Nod.kind(n.type);
     // add node
+    if(k == Data.TEXT) {
+      m.addText(data.text(n.pre), d++, Data.TEXT);
+      return d;
+    }
     if(k == Data.ELEM) m.addElem(
         m.tags.index(data.tag(n.pre), null, false), 
         0, d, n.attr().size() + 1, data.size(n.pre, k) + 1, false);
