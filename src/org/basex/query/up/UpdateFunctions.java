@@ -1,13 +1,14 @@
 package org.basex.query.up;
 
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
-import org.basex.query.QueryException;
+import org.basex.data.PathSummary;
+import org.basex.index.Names;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FElem;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.Nod;
 
 /**
  * XQuery Update update functions.
@@ -48,31 +49,30 @@ public final class UpdateFunctions {
     if(k == Data.ELEM || k == Data.PI) data.update(pre, name);
     else if(k == Data.ATTR) {
       final byte[] v = data.attValue(pre);
+      // [LK] proc.Update
       data.update(pre, name, v);
     }
   }
   
   /**
    * Builds new MemData instance from iterator.
-   * @param n node
-   * @param item iterator
+   * @param node node
    * @return new MemData instance
-   * @throws QueryException query exception
    */
-  public static MemData buildDB(final DBNode n, final Item item) 
-      throws QueryException {
-    final Data d = n.data;
-    final MemData m = new MemData(20, d.tags, d.atts, d.ns, d.path, 
-        d.meta.prop);
-    final Iter it = item.iter();
-    Item i = it.next();
-    while(i != null) {
-      if(i instanceof FElem) {
-//        final FElem e = (FElem) i;
-//        final int ti = m.tags.add(e.str());
-//        m.addElem(ti, n, d, a, s, ne);
-      }
-      i = it.next();
+  public static MemData buildDB(final Nod node) {
+    final MemData m = new MemData(20, new Names(), new Names(), 
+        new Namespaces(), new PathSummary(), new Prop());
+    int dis = 1;
+    if(node instanceof DBNode) {
+      DBNode n = (DBNode) node; 
+      final Data d = n.data;
+      final int k = Nod.kind(n.type); 
+      if(k == Data.ELEM) m.addElem(
+          m.tags.index(d.tag(n.pre), null, false), 
+          0, dis, n.attr().size() + 1, d.size(n.pre, k), false);
+
+    } else {
+//      FNode n = (FNode) node;
     }
     return m;
   }

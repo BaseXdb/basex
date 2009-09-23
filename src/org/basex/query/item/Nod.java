@@ -95,6 +95,14 @@ public abstract class Nod extends Item {
   public QNm qname() {
     return null;
   }
+  
+  /**
+   * Returns the node id.
+   * @return id
+   */
+  public int id() {
+    return id;
+  }
 
   /**
    * Returns a temporary node name.

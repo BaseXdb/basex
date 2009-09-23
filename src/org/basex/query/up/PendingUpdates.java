@@ -3,6 +3,7 @@ package org.basex.query.up;
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.data.Data;
+import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 
@@ -48,8 +49,10 @@ public class PendingUpdates {
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
    * XQueryUP specification 3.2.2
+   * @throws QueryException query exception
    */
-  public void applyUpdates() {
+  public void applyUpdates() throws QueryException {
+    // Only primitives which target nodes are database nodes are processed.
     final Primitives[] dp = new Primitives[dbPrimitives.size()];
     dbPrimitives.values().toArray(dp);
     for(Primitives p : dp) p.apply();
