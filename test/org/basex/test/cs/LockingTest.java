@@ -32,6 +32,8 @@ public class LockingTest {
   private static Session session1;
   /** Socket reference. */
   private static Session session2;
+  /** Flag for threads. */
+  static boolean running = true;
 
   /** Starts the server. */
   @BeforeClass
@@ -44,7 +46,7 @@ public class LockingTest {
     }.start();
 
     // wait for server to be started
-    Performance.sleep(100);
+    Performance.sleep(200);
 
     try {
       session1 = new ClientSession(server.context);
@@ -68,6 +70,7 @@ public class LockingTest {
     no(new DropDB(NAME), session2);
     pins(1, NAME);
     ok(new DropDB(NAME), session1);
+    pins(0, NAME);
   }
   
   /** Close and Open Tests. */
@@ -85,6 +88,31 @@ public class LockingTest {
     pins(2, NAME);
     ok(new Close(), session1);
     pins(1, NAME);
+    ok(new Close(), session2);
+    pins(0, NAME);
+  }
+  
+  /**
+   * Tests concurrent create commands.
+   */
+  @Test
+  public final void conCreate() {
+    thread(new Open(NAME), session1);
+    //thread(new CreateDB("factbook.xml"), session2);
+  }
+  
+  /**
+   * Starts a thread.
+   * @param pr process reference
+   * @param ses session
+   */
+  private void thread(final Process pr, final Session ses) {
+    new Thread() {
+      @Override
+      public void run() {
+        ok(pr, ses);
+      }
+    }.start();
   }
 
   /* [AW] to add..
@@ -123,7 +151,7 @@ public class LockingTest {
    * @param pr process reference
    * @param s Session
    */
-  private void ok(final Process pr, final Session s) {
+  void ok(final Process pr, final Session s) {
     final String msg = process(pr, s);
     if(msg != null) fail(msg);
   }
