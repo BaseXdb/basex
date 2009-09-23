@@ -38,7 +38,15 @@ public abstract class FTIndexIterator extends IndexIterator {
   public void setTokenNum(final byte tn) {
     toknum = tn;
   }
-
+  
+  /**
+   * Get number of indexed results.
+   * @return number of indexed results
+   */
+  public int indexSize() {
+    return size;
+  }
+  
   /**
    * Merges two index array iterators.
    * @param i1 first index array iterator to merge

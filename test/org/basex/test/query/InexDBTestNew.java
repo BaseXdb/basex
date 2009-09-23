@@ -196,7 +196,6 @@ public final class InexDBTestNew {
 
     final SeqIter sq = new SeqIter();
     final StringTokenizer st = new StringTokenizer(res.toString(), " ");
-    String lp = "";
     int z = 0;
     while(st.hasMoreTokens() && z < size) {
       final String p = st.nextToken();
@@ -205,14 +204,11 @@ public final class InexDBTestNew {
       if(!st.hasMoreTokens()) break;
       String uri = st.nextToken();
       //while(uri.indexOf(".xml") == -1) uri = st.nextToken();
-      uri = uri.substring(uri.lastIndexOf('/') + 1);
+      uri = uri.substring(uri.lastIndexOf('/') + 1, uri.indexOf(".xml") + 4);
       final String tmp = uri + ";" + p;
-      if(!lp.equals(tmp)) {
-        final Str str = Str.get(token(uri + ";" + p));
-        str.score(Double.parseDouble(s));
-        sq.add(str);
-        lp = tmp;
-      }
+      final Str str = Str.get(token(tmp));
+      str.score(Double.parseDouble(s));
+      sq.add(str);
       z++;
     }
 
@@ -244,7 +240,6 @@ public final class InexDBTestNew {
         i1 = it1.next();
         i2 = it2.next();
       }
-
     }
     while((i1 = it1.next()) != null) tmp.add(i1);
     while((i2 = it2.next()) != null) tmp.add(i2);

@@ -1,7 +1,10 @@
 package org.basex.query.item;
 
+import java.util.Iterator;
+
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
+import org.basex.data.FTStringMatch;
 
 /**
  * XQuery item representing a full-text Node.
@@ -14,6 +17,10 @@ public final class FTItem extends DBNode {
   public FTMatches all;
   /** Length of the full-text token. */
   private int tl;
+  /** Total number of indexed results. */
+  private int is;
+  /** Flag for indexed score values. */
+  private boolean ids;
 
   /**
    * Constructor, called by the sequential variant.
@@ -30,20 +37,34 @@ public final class FTItem extends DBNode {
    * @param a full-text matches
    * @param d data reference
    * @param p pre value
+   * @param tis total size indexed results
    * @param tol token length
+   * @param indexedScore flag for usage of indexed score values
    */
-  public FTItem(final FTMatches a, final Data d, final int p, final int tol) {
+  public FTItem(final FTMatches a, final Data d, final int p, final int tol, 
+      final int tis, final boolean indexedScore) {
     super(d, p, null, Type.TXT);
     all = a;
     score = -1;
     tl = tol;
+    is = tis;
+    ids = indexedScore;
   }
 
   @Override
   public double score() {
     if(score == -1) {
+      if (ids) {
+        Iterator<FTStringMatch> i = all.match[0].iterator();
+        if (i.hasNext()) {
+          score = i.next().e / 1000.0;
+        } else 
+          score = Math.max((double) all.size / (double) is, 
+              Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
+      }
       // [SG] rewritten to get score values <= 1
-      score = Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1);
+      else score = Math.max((double) all.size / (double) is, 
+          Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
       //score = (double) ((tl + 1) * all.match.length - 1) /
       //  (double) data.textLen(pre);
       // [SG] default scoring

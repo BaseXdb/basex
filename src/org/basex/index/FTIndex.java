@@ -50,6 +50,7 @@ abstract class FTIndex extends Index {
           lpre = da.readNum(pos);
           pos = da.pos();
           f = false;
+          size = s;
         }
         pre = lpre;
 

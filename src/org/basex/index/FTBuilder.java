@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
 import org.basex.util.Tokenizer;
 
@@ -24,7 +25,10 @@ abstract class FTBuilder extends IndexBuilder {
    */
   protected FTBuilder(final Data d, final Prop pr) {
     super(d);
-    wp = new Tokenizer(pr);
+    if (pr.is(Prop.INDEXSCORES)) 
+      wp = new ScoringTokenizer(pr);
+    else 
+      wp = new Tokenizer(pr);
   }
 
   /**

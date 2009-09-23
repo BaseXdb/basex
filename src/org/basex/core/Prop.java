@@ -142,6 +142,10 @@ public final class Prop extends AProp {
   /** INEX budget for queries. */
   public static final Object[] IBT = { "INDEXBUDGETTIME", -1 };
 
+  /** Indexing scores in place of pos values. */
+  public static final Object[] INDEXSCORES = { "INDEXSCORES", false };
+
+  
   // DEEPFS OPTIONS ===========================================================
   
   /** Flag for importing file metadata. */

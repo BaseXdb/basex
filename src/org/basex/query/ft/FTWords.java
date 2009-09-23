@@ -1,6 +1,8 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -122,9 +124,10 @@ public final class FTWords extends FTExpr {
             iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
           }
           iat.setTokenNum(++ctx.ftoknum);
-        }
+        }        
         return iat.more() ? new FTItem(iat.matches(),
-            data, iat.next(), txt.length) : null;
+            data, iat.next(), txt.length, iat.indexSize(),
+            ctx.context.prop.is(Prop.INDEXSCORES)) : null;
       }
     };
   }
