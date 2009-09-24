@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.UpdateFunctions.*;
-import static org.basex.query.QueryText.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.Nod;
-import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -59,16 +57,21 @@ public class Primitives {
    * @throws QueryException query exception 
    */
   public void apply() throws QueryException {
+    // rename
     for(final RenamePrimitive p : renames) {
       final DBNode n = (DBNode) p.node;
       rename(n.pre, p.newName, n.data);
     }
     
+    // replace
     for(final ReplacePrimitive p : replaces) {
+      // [LK] trgt / rpl node must be different nodes
       if(!(p.node instanceof DBNode)) continue;
       final DBNode n = (DBNode) p.node;
       int pre = n.pre;
+      // [LK] check parent of replaced node
       final int par = data.parent(pre, data.kind(pre));
+      // [LK] move delete further down
       data.delete(pre);
       Nod i = (Nod) p.replaceNodes.next();
       if(Nod.kind(i.type) == Data.ATTR) {
@@ -81,23 +84,23 @@ public class Primitives {
       } else {
         while(i != null) {
           final int k = Nod.kind(i.type);
-          // [LK] comments and processing instructions not supported
-          if(k == Data.COMM || k == Data.PI) Err.or(UPIMPL, i.type);
-          if(k == Data.TEXT) {
+          if(k == Data.TEXT || k == Data.COMM || k == Data.PI) {
             // [LK] merge text nodes
             DBNode dbn = null;
             if(i instanceof DBNode) dbn = (DBNode) i;
             data.insert(pre++, par, dbn == null ? i.nname() : 
             dbn.data.tag(dbn.pre), Nod.kind(i.type));
+          } else {
+            // element nodes are added via a new MemData instance 
+            final MemData m = buildDB(i);
+            data.insert(pre++, par, m);
           }
-          // element nodes are added via a new MemData instance 
-          final MemData m = buildDB(i);
-          data.insert(pre++, par, m);
           i = (Nod) p.replaceNodes.next();
         }
       }
     }
     
+    // delete
     final IntList pres = new IntList();
     for(final DeletePrimitive p : deletes) pres.add(((DBNode) p.node).pre);
     deleteDBNodes(new Nodes(pres.finish(), data));

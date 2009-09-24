@@ -63,7 +63,7 @@ public final class UpdateFunctions {
    * @throws QueryException query exception
    */
   public static MemData buildDB(final Nod n) throws QueryException {
-    final MemData m = new MemData(20, new Names(), new Names(), 
+    final MemData m = new MemData(1, new Names(), new Names(), 
         new Namespaces(), new PathSummary(), new Prop());
     if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
 //    if(n instanceof FNode) addFragment((FNode) n, m, 1);
@@ -100,8 +100,8 @@ public final class UpdateFunctions {
     final Data data = n.data;
     final int k = Nod.kind(n.type);
     // add node
-    if(k == Data.TEXT) {
-      m.addText(data.text(n.pre), d++, Data.TEXT);
+    if(k == Data.TEXT || k == Data.PI || k == Data.COMM) {
+      m.addText(data.text(n.pre), d++, k);
       return d;
     }
     if(k == Data.ELEM) m.addElem(
