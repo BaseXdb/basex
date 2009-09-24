@@ -63,6 +63,7 @@ public final class UpdateFunctions {
    * @throws QueryException query exception
    */
   public static MemData buildDB(final Nod n) throws QueryException {
+    // [LK] use index refs
     final MemData m = new MemData(1, new Names(), new Names(), 
         new Namespaces(), new PathSummary(), new Prop());
     if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
@@ -106,7 +107,7 @@ public final class UpdateFunctions {
     }
     if(k == Data.ELEM) m.addElem(
         m.tags.index(data.tag(n.pre), null, false), 
-        0, d, n.attr().size() + 1, data.size(n.pre, k) + 1, false);
+        0, d, data.attSize(n.pre, k), data.size(n.pre, k), false);
     d++;
     // add attributes
     final NodeIter nIt = n.attr();
@@ -120,6 +121,12 @@ public final class UpdateFunctions {
       d++;
       at = (DBNode) nIt.next();
     }
+//    try {
+//      InfoTable.table(new PrintOutput(System.out), m, 0, Integer.MAX_VALUE);
+//    } catch(IOException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
     // add childs
     final NodeIter cIt = n.child();
     DBNode ch = (DBNode) cIt.next();

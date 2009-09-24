@@ -69,7 +69,7 @@ public final class InfoTable extends AInfo {
    * @param e last node to be printed
    * @throws IOException I/O exception
    */
-  private static void table(final PrintOutput out, final Data data,
+  public static void table(final PrintOutput out, final Data data,
       final int s, final int e) throws IOException {
 
     final boolean all = s == 0 && e == data.meta.size;
