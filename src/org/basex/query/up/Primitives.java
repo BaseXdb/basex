@@ -71,7 +71,7 @@ public class Primitives {
       int pre = n.pre;
       // [LK] check parent of replaced node
       final int par = data.parent(pre, data.kind(pre));
-      // [LK] move delete further down
+      // [LK] move delete?
       data.delete(pre);
       Nod i = (Nod) p.replaceNodes.next();
       if(Nod.kind(i.type) == Data.ATTR) {
