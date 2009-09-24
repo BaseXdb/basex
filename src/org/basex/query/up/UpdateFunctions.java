@@ -102,7 +102,7 @@ public final class UpdateFunctions {
         final int s = e.desc().size();
         m.addElem(
             m.tags.index(e.nname(), null, false), 
-            0, d++, as, s, false);
+            0, d++, as > -1 ? as : as + 2, s > -1 ? s : s + 2, false);
         break;
       case Data.TEXT:
         m.addText(((FTxt) n).str(), d++, k);
@@ -115,6 +115,8 @@ public final class UpdateFunctions {
         break;
     }
     if(k != Data.ELEM) return d;
+    
+    printTable(m);
 
     final FElem e = (FElem) n;
     // add attributes

@@ -11,6 +11,7 @@ import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
+import org.basex.query.item.FNode;
 import org.basex.query.item.Nod;
 import org.basex.util.IntList;
 
@@ -77,8 +78,15 @@ public class Primitives {
       if(Nod.kind(i.type) == Data.ATTR) {
         while(i != null) {
           // [LK] check for duplicate attributes
-          final FAttr attr = (FAttr) i;
-          data.insert(pre++, par, attr.qname().str(), attr.str());
+          if(i instanceof FNode) {
+            final FAttr attr = (FAttr) i;
+            data.insert(pre++, par, attr.qname().str(), attr.str());
+          } else if(i instanceof DBNode) {
+            final DBNode attr = (DBNode) i;
+            final Data d = attr.data;
+            data.insert(pre++, par, d.attName(attr.pre), 
+                d.attValue(attr.pre));
+          }
           i = (Nod) p.replaceNodes.next();
         }
       } else {
