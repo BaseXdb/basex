@@ -82,6 +82,21 @@ public final class UpdateFunctions {
   }
   
   /**
+   * Builds new MemData instance from iterator.
+   * @param n node
+   * @return new MemData instance
+   * @throws QueryException query exception
+   */
+  public static MemData buildDBFromSet(final Nod n) throws QueryException {
+    // [LK] use index refs
+    final MemData m = new MemData(1, new Names(), new Names(), 
+        new Namespaces(), new PathSummary(), new Prop());
+    if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
+    if(n instanceof FNode) addFragment((FNode) n, m, 1);
+    return m;
+  }
+  
+  /**
    * Adds node to MemData instance.
    * @param n node 
    * @param m data reference
@@ -159,8 +174,7 @@ public final class UpdateFunctions {
     }
     if(k == Data.ELEM) m.addElem(
         m.tags.index(data.tag(n.pre), null, false), 
-        0, d, data.attSize(n.pre, k), data.size(n.pre, k), false);
-    d++;
+        0, d++, data.attSize(n.pre, k), data.size(n.pre, k), false);
     // add attributes
     final NodeIter nIt = n.attr();
     DBNode at = (DBNode) nIt.next();
