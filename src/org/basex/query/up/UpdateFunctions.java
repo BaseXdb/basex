@@ -1,14 +1,24 @@
 package org.basex.query.up;
 
+import java.io.IOException;
+
 import org.basex.core.Prop;
+import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.PathSummary;
 import org.basex.index.Names;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.FAttr;
+import org.basex.query.item.FComm;
+import org.basex.query.item.FElem;
+import org.basex.query.item.FNode;
+import org.basex.query.item.FPI;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodeIter;
 
@@ -67,25 +77,67 @@ public final class UpdateFunctions {
     final MemData m = new MemData(1, new Names(), new Names(), 
         new Namespaces(), new PathSummary(), new Prop());
     if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
-//    if(n instanceof FNode) addFragment((FNode) n, m, 1);
+    if(n instanceof FNode) addFragment((FNode) n, m, 1);
     return m;
   }
   
-//  /**
-//   * Adds node to MemData instance.
-//   * @param n node 
-//   * @param m data reference
-//   * @param dis distance
-//   * @return neighbour distance from parent
-//   */
-//  private static int addFragment(final FNode n, final MemData m, 
-//      final int dis) {
-//    // [LK] add framgents to MemData instance
-//    // add node
-//    // add attributes
-//    // recursively add childs    (for node n in child) addNode
-//    return 0;
-//  }
+  /**
+   * Adds node to MemData instance.
+   * @param n node 
+   * @param m data reference
+   * @param dis distance
+   * @return neighbour distance from parent
+   * @throws QueryException query exception 
+   */
+  private static int addFragment(final FNode n, final MemData m, 
+      final int dis) throws QueryException {
+    int d = dis;
+    final int k = Nod.kind(n.type);
+    // add node
+    switch (k) {
+      case Data.ELEM:
+        final FElem e = (FElem) n;
+        // [LK] check sizes
+        final int as = e.attr().size();
+        final int s = e.desc().size();
+        m.addElem(
+            m.tags.index(e.nname(), null, false), 
+            0, d++, as, s, false);
+        break;
+      case Data.TEXT:
+        m.addText(((FTxt) n).str(), d++, k);
+        break;
+      case Data.COMM:
+        m.addText(((FComm) n).str(), d++, k);
+        break;
+      case Data.PI:
+        m.addText(((FPI) n).str(), d++, k);
+        break;
+    }
+    if(k != Data.ELEM) return d;
+
+    final FElem e = (FElem) n;
+    // add attributes
+    final NodeIter nIt = e.attr();
+    FAttr at = (FAttr) nIt.next();
+    // local parent distance
+    int ld = 1;
+    while(at != null) {
+      m.addAtt(m.atts.index(at.qname().str(), null, false), 
+          0, at.str(), ld);
+      ld++;
+      d++;
+      at = (FAttr) nIt.next();
+    }
+    // add childs
+    final NodeIter cIt = n.child();
+    FNode ch = (FNode) cIt.next();
+    while(ch != null) {
+      ld = addFragment(ch, m, ld);
+      ch = (FNode) cIt.next();
+    }
+    return d;
+  }
   
   /**
    * Adds node to MemData instance.
@@ -121,12 +173,6 @@ public final class UpdateFunctions {
       d++;
       at = (DBNode) nIt.next();
     }
-//    try {
-//      InfoTable.table(new PrintOutput(System.out), m, 0, Integer.MAX_VALUE);
-//    } catch(IOException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
     // add childs
     final NodeIter cIt = n.child();
     DBNode ch = (DBNode) cIt.next();
@@ -135,5 +181,17 @@ public final class UpdateFunctions {
       ch = (DBNode) cIt.next();
     }
     return d;
+  }
+  
+  /**
+   * Prints database table.
+   * @param d data reference
+   */
+  public static void printTable(Data d) {
+    try {
+      InfoTable.table(new PrintOutput(System.out), d, 0, Integer.MAX_VALUE);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
   }
 }
