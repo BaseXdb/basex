@@ -116,8 +116,6 @@ public final class UpdateFunctions {
     }
     if(k != Data.ELEM) return d;
     
-    printTable(m);
-
     final FElem e = (FElem) n;
     // add attributes
     final NodeIter nIt = e.attr();
