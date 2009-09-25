@@ -1,118 +1,38 @@
 package org.basex.test.cs;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
 import org.basex.BaseXServer;
-import org.basex.core.Process;
 import org.basex.core.Session;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
+import org.basex.core.Context;
+import org.basex.core.Process;
+import org.basex.core.proc.Delete;
+import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
+import org.basex.core.proc.XQuery;
+import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
- * This class tests transaction and locking cases.
+ * This class tests the four locking cases.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class LockingTest {
-  /** Server reference. */
-  static BaseXServer server;
+public final class LockingTest {
+  /** Database Context. */
+  private Context context = new Context();
+  /** Read Query. */
+  String read;
+  /** Tests are running. */
+  boolean running = true;
 
-  /** Test file. */
-  private static final String FILE = "input.xml";
-  /** Test name. */
-  private static final String NAME = "input";
-  /** Socket reference. */
-  private static Session session1;
-  /** Socket reference. */
-  private static Session session2;
-  /** Flag for threads. */
-  static boolean running = true;
-
-  /** Starts the server. */
-  @BeforeClass
-  public static void start() {
-    new Thread() {
-      @Override
-      public void run() {
-        server = new BaseXServer();
-      }
-    }.start();
-
-    // wait for server to be started
-    Performance.sleep(200);
-
-    try {
-      session1 = new ClientSession(server.context);
-      session2 = new ClientSession(server.context);
-    } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
-    }
-  }
-  
-  /** Create and Drop Tests. */
-  @Test
-  public final void createAndDrop() {
-    ok(new CreateDB(FILE), session1);
-    pins(1, NAME);
-    ok(new CreateDB(FILE), session1);
-    pins(1, NAME);
-    no(new CreateDB(FILE), session2);
-    pins(1, NAME);
-    no(new CreateDB(FILE), session2);
-    pins(1, NAME);
-    no(new DropDB(NAME), session2);
-    pins(1, NAME);
-    ok(new DropDB(NAME), session1);
-    pins(0, NAME);
-  }
-  
-  /** Close and Open Tests. */
-  @Test
-  public final void closeAndOpen() {
-    ok(new CreateDB(FILE), session2);
-    pins(1, NAME);
-    ok(new Close(), session1);
-    pins(1, NAME);
-    ok(new Close(), session2);
-    pins(0, NAME);
-    ok(new Open(NAME), session1);
-    pins(1, NAME);
-    ok(new Open(NAME), session2);
-    pins(2, NAME);
-    ok(new Close(), session1);
-    pins(1, NAME);
-    ok(new Close(), session2);
-    pins(0, NAME);
-  }
-  
   /**
-   * Tests concurrent create commands.
+   * Main method, launching the test.
+   * @param args command-line arguments
+   * @throws Exception exception
    */
-  @Test
-  public final void conCreate() {
-    thread(new Open(NAME), session1);
-    //thread(new CreateDB("factbook.xml"), session2);
-  }
-  
-  /**
-   * Starts a thread.
-   * @param pr process reference
-   * @param ses session
-   */
-  private void thread(final Process pr, final Session ses) {
-    new Thread() {
-      @Override
-      public void run() {
-        ok(pr, ses);
-      }
-    }.start();
+  public static void main(final String[] args) throws Exception {
+    new LockingTest();
   }
 
   /* [AW] to add..
@@ -122,68 +42,73 @@ public class LockingTest {
    * - ..
    */
   
+  /**
+   * Private constructor.
+   * @throws Exception exception
+   */
+  private LockingTest() throws Exception {
+    start();
+
+    read = "for $country in //country for $city in //city where"
+        + " $city/name = 'Berlin' and $country/name = 'Germany' return $city";
+    int cnr = 2;
+    for(int i = 0; i < cnr; i++) {
+      startAClient(new ClientSession(context), i);
+    }
+    while(running) { }
+    stop();
+  }
+
+  /**
+   * Starts the server.
+   */
+  private void start() {
+    new Thread() {
+      @Override
+      public void run() {
+        new BaseXServer("-v");
+      }
+    }.start();    
+  }
   
   /** Stops the server. */
-  @AfterClass
-  public static void stop() {
-    try {
-      session1.close();
-      session2.close();
-    } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
-    }
-
+  private void stop() {
     // Stop server instance.
     new BaseXServer("stop");
   }
-  
+
   /**
-   * Checks the number of database pins for the specified database.
-   * @param pin expected number of pins
-   * @param name name of database
+   * Starts a client.
+   * @param session client reference
+   * @param c int
    */
-  private void pins(final int pin, final String name) {
-    assertEquals(pin, server.context.size(name));
-  }
-  
-  /**
-   * Assumes that this command is successful.
-   * @param pr process reference
-   * @param s Session
-   */
-  void ok(final Process pr, final Session s) {
-    final String msg = process(pr, s);
-    if(msg != null) fail(msg);
+  private void startAClient(final Session session, final int c) {
+    new Thread() {
+      int check = c;
+      @Override
+      public void run() {
+        exe(session, new Open("factbook"));
+        exe(session, new XQuery(read));
+        if(check % 2 == 0) {
+          exe(session, new Insert("element", "//members", "aa"));
+        } else {
+          exe(session, new Delete("//aa"));
+          running = false;
+        }
+      }
+    }.start();
   }
 
   /**
-   * Assumes that this command fails.
-   * @param pr process reference
-   * @param s Session
+   * Executes the specified process.
+   * @param ss client session
+   * @param pr process to be executed
    */
-  private void no(final Process pr, final Session s) {
-    ok(process(pr, s) != null);
-  }
-  
-  /**
-   * Assumes that the specified flag is successful.
-   * @param flag flag
-   */
-  private static void ok(final boolean flag) {
-    assertTrue(flag);
-  }
-  
-  /**
-   * Runs the specified process.
-   * @param pr process reference
-   * @param session Session
-   * @return success flag
-   */
-  private String process(final Process pr, final Session session) {
+  void exe(final Session ss, final Process pr) {
     try {
-      return session.execute(pr) ? null : session.info();
-    } catch(final Exception ex) {
-      return ex.toString();
+      if(ss.execute(pr)) ss.output(new NullOutput());
+    } catch(IOException ex) {
+      ex.printStackTrace();
     }
   }
 }
