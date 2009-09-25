@@ -32,8 +32,6 @@ public class PoolTest {
   static Session session1;
   /** Socket reference. */
   static Session session2;
-  /** Flag for threads. */
-  static boolean running = true;
 
   /** Starts the server. */
   @BeforeClass
