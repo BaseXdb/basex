@@ -175,7 +175,7 @@ public final class ParserUtil {
     final int size = data.length;
     int b;
     for(int i = 0; i < size; i++) { // loop all chars
-      b = data[i];
+      b = data[i] & 0xFF;
       if(b >= 0 && b < ' ' && !ws(b)) data[i] = ' '; // control character
       else if(b > 0x7F) { // not an ascii char ... perhaps UTF-8?
         final int numBytes;
@@ -207,7 +207,7 @@ public final class ParserUtil {
             for(int j = 1; j < numBytes; j++) {
               data[i + j] = ' ';
             }
-          }
+          } else i += numBytes - 1;
         }
       } // else valid ASCII char,
     }
