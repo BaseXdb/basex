@@ -59,7 +59,8 @@ public final class ScoringTokenizer extends Tokenizer{
    */
   public void readFrequency() {
     try {
-      final BufferedReader br = new BufferedReader(new FileReader("words.freq"));
+      final BufferedReader br = new BufferedReader(
+          new FileReader("words.freq"));
       String l;
       freq = new IntMap();
       while((l = br.readLine()) != null) {

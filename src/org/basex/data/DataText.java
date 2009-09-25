@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 /**
@@ -165,9 +164,9 @@ public interface DataText {
   /** File mode attribute. */
   byte[] MODE = token("mode");
   /** Mount point attribute. */
-  byte[] MOUNTPOINT = token(MOUNT);
+  byte[] MOUNTPOINT = token("mountpoint");
   /** Backing store attribute. */
-  byte[] BACKINGSTORE = token(BACKING);
+  byte[] BACKINGSTORE = token("backingstore");
   /** Negative mount point attribute. */
   byte[] NOTMOUNTED = token("(not mounted)");
   /** Negative backing store attribute. */
@@ -255,7 +254,7 @@ public interface DataText {
   /** URI header. */
   String TABLEURI = "NAMESPACE";
   /** Fifth table Header. */
-  String TABLEKIND = "  KIND  CONTENT" + NL;
+  String TABLEKIND = "  KIND  CONTENT";
   /** Table Kinds. */
   String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
 

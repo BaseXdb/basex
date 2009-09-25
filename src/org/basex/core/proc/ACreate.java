@@ -62,7 +62,7 @@ abstract class ACreate extends Process {
       } else {
         index(data);
         data.close();
-        move(db, p.prop);
+        if(!move(db, p.prop)) throw new Exception();
         new Open(db).execute(context);
       }
       return info(DBCREATED, db, perf.getTimer());
@@ -92,10 +92,11 @@ abstract class ACreate extends Process {
    * Moves a temporary database to the final destination.
    * @param db name of database
    * @param pr database properties
+   * @return true if move was successful
    */
-  protected static void move(final String db, final Prop pr) {
+  protected static boolean move(final String db, final Prop pr) {
     DropDB.drop(db, pr);
-    pr.dbpath(db + ".tmp").renameTo(pr.dbpath(db));
+    return pr.dbpath(db + ".tmp").renameTo(pr.dbpath(db));
   }
 
   /**

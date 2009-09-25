@@ -201,7 +201,7 @@ public final class UpdateFunctions {
    * Prints database table.
    * @param d data reference
    */
-  public static void printTable(Data d) {
+  public static void printTable(final Data d) {
     try {
       InfoTable.table(new PrintOutput(System.out), d, 0, Integer.MAX_VALUE);
     } catch(IOException e) {

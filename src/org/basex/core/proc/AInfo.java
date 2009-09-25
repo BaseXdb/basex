@@ -1,7 +1,7 @@
 package org.basex.core.proc;
 
-import static org.basex.core.Text.*;
 import org.basex.core.Process;
+import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -31,6 +31,6 @@ abstract class AInfo extends Process {
       final String val, final int i) {
     tb.add(' ');
     tb.add(key, i);
-    tb.add(": " + val + NL);
+    tb.add(": " + val + Prop.NL);
   }
 }

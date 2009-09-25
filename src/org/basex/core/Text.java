@@ -53,7 +53,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMESPACE + ".org";
   /** Code version. */
-  String VERSION = "5.72";
+  String VERSION = "5.73";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -161,10 +161,6 @@ public interface Text {
   String SOURCE = "source";
   /** Command help. */
   String TARGET = "target";
-  /** Mount point attribute. */
-  String MOUNT = "mountpoint";
-  /** Backing store attribute. */
-  String BACKING = "backingstore";
   /** Command help. */
   String QUERY = "query";
   /** Command help. */
@@ -203,9 +199,9 @@ public interface Text {
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
       "  " + lang("ch_create4") + NL +
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
-      "] ([" + MOUNT + "] [" + BACKING + "]): " + NL +
+      "] ([mountpoint] [backingstore]): " + NL +
       "  " + Main.info(lang("ch_create5"), NAM, PATH) + NL +
-      "  " + Main.info(lang("ch_create6"), MOUNT, BACKING);
+      "  " + Main.info(lang("ch_create6"), "mountpoint", "backingstore");
 
   /** Command help. */
   String OPEN0 = "[" + NAM + "]";

@@ -114,6 +114,7 @@ abstract class AQuery extends Process {
    * Adds evaluation information to the information string.
    */
   protected final void execInfo() {
+    if(!prop.is(Prop.INFO)) return;
     final int runs = prop.num(Prop.RUNS);
     final String opt = qp.info(prop.is(Prop.ALLINFO));
     if(opt.length() != 0) info(opt);
@@ -128,6 +129,7 @@ abstract class AQuery extends Process {
    * @param hits information
    */
   protected final void outInfo(final PrintOutput out, final long hits) {
+    if(!prop.is(Prop.INFO)) return;
     final int runs = prop.num(Prop.RUNS);
     info(QUERYPRINT + per.getTimer(runs));
     info(QUERYTOTAL + perf.getTimer(runs));

@@ -95,7 +95,7 @@ public final class InfoTable extends AInfo {
     format(out, token(TABLESIZE), len + 2);
     format(out, token(TABLEATS), 4);
     format(out, token(TABLENS), 4);
-    out.print(TABLEKIND);
+    out.println(TABLEKIND);
   }
 
   /**

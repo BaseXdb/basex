@@ -67,7 +67,7 @@ public abstract class Process extends Progress {
 
     if(!execute(ctx)) throw new RuntimeException(info());
     output(out);
-    if(ctx.prop.is(Prop.INFO)) out.print(info());
+    out.print(info());
   }
 
   /**
@@ -170,7 +170,7 @@ public abstract class Process extends Progress {
   protected final boolean info(final String str, final Object... ext) {
     if(prop.is(Prop.INFO)) {
       info.add(str, ext);
-      info.add(NL);
+      info.add(Prop.NL);
     }
     return true;
   }
