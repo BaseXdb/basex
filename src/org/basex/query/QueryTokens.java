@@ -51,6 +51,8 @@ public interface QueryTokens {
   /** Parser token. */
   String CONSTRUCTION = "construction";
   /** Parser token. */
+  String CONTAINS = "contains";
+  /** Parser token. */
   String CONTENT = "content";
   /** Parser token. */
   String COPY = "copy";

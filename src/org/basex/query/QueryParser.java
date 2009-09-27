@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -990,7 +991,15 @@ public class QueryParser extends InputParser {
    */
   private Expr ftContains() throws QueryException {
     final Expr e = range();
-    if(!consumeWS(FTCONTAINS)) return e;
+    if(ctx.context.prop.is(Prop.FTCONTAINS)) {
+      if(!consumeWS(FTCONTAINS)) return e;
+    } else {
+      final int p = qp;
+      if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
+        qp = p;
+        return e;
+      }
+    }
 
     // [CG] XQuery/FTIgnoreOption
     final FTExpr select = ftSelection(false);
@@ -1823,6 +1832,17 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Consumes the specified expression or resets the query position.
+   * @param expr expression
+   * @param p query position
+   * @return expression or null
+   */
+  private Expr consume(final Expr expr, final int p) {
+    if(expr == null) qp = p;
+    return expr;
+  }
+
+  /**
    * [110] Parses a CompDocConstructor.
    * @return query expression
    * @throws QueryException query exception
@@ -1852,7 +1872,7 @@ public class QueryParser extends InputParser {
       check(BRACE2);
     }
 
-    check(BRACE1);
+    if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
     return new CElem(name, e == null ? new Expr[0] : new Expr[] { e },
@@ -2682,18 +2702,6 @@ public class QueryParser extends InputParser {
     final char c = curr();
     if(c == 0) error(WRONGEND, ch);
     return c != ch;
-  }
-
-  /**
-   * Consumes the specified expression or resets the query position.
-   * @param expr expression
-   * @param p query position
-   * @return expression or null
-   */
-  private Expr consume(final Expr expr, final int p) {
-    if(expr != null) return expr;
-    qp = p;
-    return expr;
   }
 
   /**
