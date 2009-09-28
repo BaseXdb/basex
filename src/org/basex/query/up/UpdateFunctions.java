@@ -20,7 +20,9 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
+import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
+import org.basex.util.Token;
 
 /**
  * XQuery Update update functions.
@@ -68,31 +70,65 @@ public final class UpdateFunctions {
   
   /**
    * Builds new MemData instance from iterator.
-   * @param n node
+   * @param root root node  
+   * @param ch sequence iterator
+   * @param d data reference for indices
    * @return new MemData instance
    * @throws QueryException query exception
    */
-  public static MemData buildDB(final Nod n) throws QueryException {
-    // [LK] use index refs
-    final MemData m = new MemData(1, new Names(), new Names(), 
+  public static MemData buildDB(final Nod root, final Iter ch, final Data d) 
+  throws QueryException {
+    MemData m = null;
+    // [LK] usage of index refs only possible if target node is a dbnode,
+    // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
+    if(d == null) m = new MemData(20, new Names(), new Names(), 
         new Namespaces(), new PathSummary(), new Prop());
-    if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
-    if(n instanceof FNode) addFragment((FNode) n, m, 1);
-    return m;
-  }
-  
-  /**
-   * Builds new MemData instance from iterator.
-   * @param n node
-   * @return new MemData instance
-   * @throws QueryException query exception
-   */
-  public static MemData buildDBFromSet(final Nod n) throws QueryException {
-    // [LK] use index refs
-    final MemData m = new MemData(1, new Names(), new Names(), 
-        new Namespaces(), new PathSummary(), new Prop());
-    if(n instanceof DBNode) addDBNode((DBNode) n, m, 1);
-    if(n instanceof FNode) addFragment((FNode) n, m, 1);
+    else m = new MemData(20, d.tags, d.atts, d.ns, d.path, d.meta.prop);
+    // add parent node
+    final Iter i = ch;
+    Nod n = (Nod) i.next();
+    // determine size of sequence
+    int ds = 1;
+    while(n != null) {
+      if(n instanceof DBNode) {
+        final DBNode dbn = (DBNode) n;
+        ds += dbn.data.size(dbn.pre, Nod.kind(dbn.type));
+      }
+      else if(n instanceof FNode) {
+        final FNode fn = (FNode) n;
+        ds += fn.descOrSelf().size();
+      }
+      n = (Nod) i.next();
+    }
+    // add doc root node
+    if(root == null) m.addDoc(Token.EMPTY, ds);
+    // [LK] alternative root
+    else return null;
+    
+    // add nodes as childs
+    int dis = 1;
+    i.reset();
+    n = (Nod) i.next();
+    while(n != null) {
+      if(n instanceof DBNode) {
+        final NodeIter desc = ((DBNode) n).descOrSelf();
+        DBNode dn = (DBNode) desc.next();
+        while(dn != null) {
+          addDBNode(dn, m, dis);
+          dn = (DBNode) desc.next();
+        }
+      }
+      else if(n instanceof FNode) {
+        final NodeIter desc = ((FNode) n).descOrSelf();
+        FNode fn = (FNode) desc.next();
+        while(fn != null) {
+          addFragment(fn, m, dis);
+          fn = (FNode) desc.next();
+        }
+      }
+      n = (Nod) i.next();
+    }
+    printTable(m);
     return m;
   }
   
@@ -101,12 +137,10 @@ public final class UpdateFunctions {
    * @param n node 
    * @param m data reference
    * @param dis distance
-   * @return neighbour distance from parent
    * @throws QueryException query exception 
    */
-  private static int addFragment(final FNode n, final MemData m, 
+  private static void addFragment(final FNode n, final MemData m, 
       final int dis) throws QueryException {
-    int d = dis;
     final int k = Nod.kind(n.type);
     // add node
     switch (k) {
@@ -117,41 +151,28 @@ public final class UpdateFunctions {
         final int s = e.desc().size();
         m.addElem(
             m.tags.index(e.nname(), null, false), 
-            0, d++, as > -1 ? as : as + 2, s > -1 ? s : s + 2, false);
+            0, dis, as == -1 ? 1 : as, s == -1 ? 1 : s, false);
         break;
       case Data.TEXT:
-        m.addText(((FTxt) n).str(), d++, k);
-        break;
-      case Data.COMM:
-        m.addText(((FComm) n).str(), d++, k);
-        break;
+        m.addText(((FTxt) n).str(), dis, k);
+        return;
       case Data.PI:
-        m.addText(((FPI) n).str(), d++, k);
-        break;
+        m.addText(((FPI) n).str(), dis, k);
+        return;
+      case Data.COMM:
+        m.addText(((FComm) n).str(), dis, k);
+        return;
     }
-    if(k != Data.ELEM) return d;
     
-    final FElem e = (FElem) n;
     // add attributes
-    final NodeIter nIt = e.attr();
+    final NodeIter nIt = n.attr();
     FAttr at = (FAttr) nIt.next();
     // local parent distance
-    int ld = 1;
     while(at != null) {
       m.addAtt(m.atts.index(at.qname().str(), null, false), 
-          0, at.str(), ld);
-      ld++;
-      d++;
+          0, at.str(), dis);
       at = (FAttr) nIt.next();
     }
-    // add childs
-    final NodeIter cIt = n.child();
-    FNode ch = (FNode) cIt.next();
-    while(ch != null) {
-      ld = addFragment(ch, m, ld);
-      ch = (FNode) cIt.next();
-    }
-    return d;
   }
   
   /**
@@ -159,42 +180,36 @@ public final class UpdateFunctions {
    * @param n node
    * @param m data reference
    * @param dis distance
-   * @return neighbour distance from parent
    * @throws QueryException query exception
    */
-  private static int addDBNode(final DBNode n, final MemData m, final int dis) 
+  private static void addDBNode(final DBNode n, final MemData m, final int dis) 
     throws QueryException {
-    int d = dis;
     final Data data = n.data;
     final int k = Nod.kind(n.type);
-    // add node
-    if(k == Data.TEXT || k == Data.PI || k == Data.COMM) {
-      m.addText(data.text(n.pre), d++, k);
-      return d;
+    // [LK] type DOC?
+    switch(k) {
+      case Data.ELEM:
+        m.addElem(m.tags.index(data.tag(n.pre), null, false), 
+            0, dis, data.attSize(n.pre, k), data.size(n.pre, k), false);
+        break;
+      case Data.TEXT:
+        m.addText(data.text(n.pre), dis, k);
+        return;
+      case Data.PI:
+        m.addText(data.text(n.pre), dis, k);
+        return;
+      case Data.COMM:
+        m.addText(data.text(n.pre), dis, k);
+        return;
     }
-    if(k == Data.ELEM) m.addElem(
-        m.tags.index(data.tag(n.pre), null, false), 
-        0, d++, data.attSize(n.pre, k), data.size(n.pre, k), false);
     // add attributes
-    final NodeIter nIt = n.attr();
-    DBNode at = (DBNode) nIt.next();
-    // local parent distance
-    int ld = 1;
+    final NodeIter atts = n.attr();
+    DBNode at = (DBNode) atts.next();
     while(at != null) {
-      m.addAtt(m.atts.index(data.attName(at.pre), null, false), 
-          0, data.attValue(at.pre), ld);
-      ld++;
-      d++;
-      at = (DBNode) nIt.next();
+      m.addAtt(m.atts.index(at.data.attName(at.pre), null, false), 
+          0, at.data.attValue(at.pre), dis);
+      at = (DBNode) atts.next();
     }
-    // add childs
-    final NodeIter cIt = n.child();
-    DBNode ch = (DBNode) cIt.next();
-    while(ch != null) {
-      ld = addDBNode(ch, m, ld);
-      ch = (DBNode) cIt.next();
-    }
-    return d;
   }
   
   /**

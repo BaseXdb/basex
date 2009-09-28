@@ -1,7 +1,7 @@
 package org.basex.query.up;
 
+import org.basex.data.MemData;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
 
 /**
  * Represents a replace primitive.
@@ -11,15 +11,15 @@ import org.basex.query.iter.Iter;
  */
 public class ReplacePrimitive extends UpdatePrimitive {
   /** Nodes replacing the target. */
-  Iter replaceNodes;
+  MemData r;
 
   /**
    * Constructor.
    * @param n target node
-   * @param r replace nodes
+   * @param replace replace nodes
    */
-  public ReplacePrimitive(final Nod n, final Iter r) {
+  public ReplacePrimitive(final Nod n, final MemData replace) {
     super(n);
-    replaceNodes = r;
+    r = replace;
   }
 }

@@ -2,10 +2,13 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
@@ -54,7 +57,14 @@ public final class Replace extends Arr {
       i = r.next();
     }
     r.reset();
-    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, r));
+    // [LK] create mem data instance here
+    // create mem data -> insert doc node r as root
+    // iter -> node,doc,... -> insert each node,etc. into r
+    // apply
+    if(value) Err.or(UPIMPL, value);
+    final MemData m = buildDB(null, r,  
+        trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
+    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, m));
     return Iter.EMPTY;
   }
 
