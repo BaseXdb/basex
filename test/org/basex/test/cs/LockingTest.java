@@ -59,23 +59,21 @@ public final class LockingTest {
     conCreate();
     System.out.println("--> Test 1 successfull, Test 2 started...");    
     done = false;
-    conQuery();
+    // read read test
+    runTest(true, true);
     System.out.println("--> Test 2 successfull, Test 3 started...");
     done = false;
-    conUpdate();
-    process(new XQuery("count(//aa)"), session1);
-    CachedOutput out = new CachedOutput();
-    try {
-      session1.output(out);
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
-    byte[] res = out.finish();
-    if(Token.string(res).equals("0")) {
-    System.out.println("--> Test 3 successfull, finished...");
-    } else {
-      err("test failed: conUpdate");
-    }
+    // write write test
+    runTest(false, false);
+    checkTest3();
+    done = false;
+    // write read test
+    runTest(false, true);
+    System.out.println("--> Test 3 successfull, Test 4 started...");
+    done = false;
+    // read write test
+    runTest(true, false);
+    System.out.println("--> Test 4 successfull, Test 5 started...");
     while(running) { Performance.sleep(200); }
     stop();
   }
@@ -132,7 +130,7 @@ public final class LockingTest {
           @Override
           public void run() {
             String result = process(new CreateDB(FILE), session2);
-            if(result == null) err("test failed: conCreate");
+            if(result == null) err("test failed conCreate");
             process(new Open(NAME), session2);
             done = true;
           }
@@ -143,46 +141,55 @@ public final class LockingTest {
   }
   
   /**
-   * Tests concurrent query commands.
+   * Runs the tests.
+   * @param test1 boolean
+   * @param test2 boolean
    */
-  private void conQuery() {
+  private void runTest(final boolean test1, final boolean test2) {
     new Thread() {
       @Override
       public void run() {
-        process(new XQuery(QUERY), session1);
+        if(test1) {
+          process(new XQuery(QUERY), session1);
+        } else {
+          process(new Insert(CmdUpdate.ELEMENT, "//members", "aa"), session1);
+        }
         new Thread() {
           @Override
           public void run() {
-            String result = process(new XQuery(QUERY), session2);
-            if(result != null) err("test failed conQuery: " + result);
+            String result = "";
+            if(test2) {
+              result = process(new XQuery(QUERY), session2);
+            } else {
+              result = process(new Delete("//aa"), session2);
+            }
+            if(result != null) err("test failed readRead: " + result);
             done = true;
           }
         }.start();
       }
     }.start();
     while(!done) { Performance.sleep(200); }
+    if(test1 && !test2) running = false;
   }
   
   /**
-   * Tests concurrent update commands.
+   * Checks test3 for correctness. 
    */
-  private void conUpdate() {
-    new Thread() {
-      @Override
-      public void run() {
-        process(new Insert(CmdUpdate.ELEMENT, "//members", "aa"), session1);
-        new Thread() {
-          @Override
-          public void run() {
-            String result = process(new Delete("//aa"), session2);
-            if(result != null) err("test failed conUpdate: " + result);
-            done = true;
-          }
-        }.start();
-      }
-    }.start();
-    while(!done) { Performance.sleep(200); }
-    running = false;
+  private void checkTest3() {
+    process(new XQuery("count(//aa)"), session1);
+    CachedOutput out = new CachedOutput();
+    try {
+      session1.output(out);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    byte[] res = out.finish();
+    if(Token.string(res).equals("0")) {
+    System.out.println("--> Test 3 successfull, finished...");
+    } else {
+      err("test failed: conUpdate");
+    }
   }
   
   /**
