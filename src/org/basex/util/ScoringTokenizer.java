@@ -46,8 +46,7 @@ public final class ScoringTokenizer extends Tokenizer{
     if (c > 0 && freq != null) {
       final int f = freq.get(key);
       if (f > 0) {
-        return (int) (Math.log(1313 / f) * c * 1000 / max);
-//        return (int) (Math.log(2666130 / f) * c * 1000 / max);
+        return (int) (Math.log(2666130 / f) * c * 1000 / max);
       }
     }
     

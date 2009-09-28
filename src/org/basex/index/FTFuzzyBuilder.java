@@ -68,7 +68,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       final int score = ((ScoringTokenizer) wp).score(tok);
       if (score > -1) {
         tree[tl].index(tok, id, score);
-      }
+      } else tree[tl].index(tok, id, wp.pos);
     } else tree[tl].index(tok, id, wp.pos);
   }
 
