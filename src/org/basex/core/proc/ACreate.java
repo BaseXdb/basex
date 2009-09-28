@@ -48,7 +48,10 @@ abstract class ACreate extends Process {
     new Close().execute(context);
 
     final boolean mem = db == null || prop.is(Prop.MAINMEM);
-    if(!mem && context.pinned(db)) return error(DBINUSE);
+    if(!mem) {
+      if(context.pinned(db) || p.prop.dbpath(db + ".tmp").exists())
+        return error(DBINUSE);
+    }
 
     final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
         new NativeBuilder(p) : new DiskBuilder(p);

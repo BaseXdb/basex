@@ -37,7 +37,6 @@ b_search=検索
 s_ok=OK
 
 # Visualizations
-text_find=検索
 no_table=No table available for this data
 no_space=Too less space
 map_binary=バイナリーファイル
@@ -59,8 +58,6 @@ dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書
 dc_gzdesc=GZip圧縮されたXML文書
 dc_xqdesc=XQueryファイル
-dc_doc=文書
-dc_coll=コレクション
 dc_advtitle=データベースオプション
 dc_chop=空白を取り除く
 dc_intparse=内部XMLパーサーを使用
@@ -70,7 +67,6 @@ dc_fzindex=曖昧検索を有効にする
 dc_ftstem=語幹抽出 (English)
 dc_ftdc=分音符号
 dc_ftcs=大文字・小文字の区別
-dc_mainmem=メインメモリモード
 dc_chopinfo=このオプションはタグとコンテンツの間にある全ての空白を削除します。
 dc_intparseinfo=このオプションをオフにすると、Java標準のXMLパーサーが使用されます。
 dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します (&...;)。
@@ -83,7 +79,6 @@ dc_fzinfo=このオプションは曖昧検索（類似検索）を高速化し�
 dc_ftsteminfo=全ての単語（token）は語幹抽出されてからインデックス化されます。
 dc_ftcsinfo=インデックス内で大文字と小文字を区別します。
 dc_ftdcinfo=インデックス化の際に分音符号（ウムラウト、アクサン等）が考慮されます。
-dc_mminfo=このモードではクエリーは高速化されますが、更新は行えません。
 dc_general=一般
 dc_parse=パース
 dc_names=名前
@@ -106,16 +101,14 @@ dfs_all=全てインポートする
 dfs_allinfo=ファイルシステム全体をインポートします
 dfs_wrt=Write through
 dfs_wrttt=Modifications to the DeepFS instance are propagated to the originally mapped file hierarchy
-dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem
-dfs_wrttitle=Propagate changes to filesystem
+dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem?
+dfs_wrttitle=Propagate changes to filesystem?
 dfs_text=インポートするディレクトリ
 dfs_text1=ファイル情報、メタデータ
 dfs_text2=ファイルの内容
-dfs_types=ファイルタイプ
 dfs_maxinfo=テキスト情報の取り込みを指定されたサイズに制限
 dfs_cont=ファイル内のテキスト情報を含める
 dfs_meta=メタデータを含める
-dfs_ftindex=ファイルの内容にインデックスを作成する
 
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。
@@ -285,7 +278,6 @@ proc_time=所要時間
 proc_syntax=文法
 proc_err='%'を実行できませんでした。
 proc_nodb=メモリー上にデータベースはありません。
-proc_nofs=Current database is no filesystem import.
 proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
 proc_outmem=メモリー不足。\n以下のヒントが役に立つかもしれません。\n- -Xmx<サイズ>を使うことで、Javaのヒープサイズを増やすことが出来ます。\n- BaseXの内部XMLパーサーに 'set intparse on' を設定してみて下さい。 \n- いくつかのインデックスを無効にすることによりメモリーを節約できます。
 
@@ -316,7 +308,6 @@ pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
 pc_dbnf=データベース名を入力してください。
 pc_mountnf=Please enter an existent directory as mount point.
-pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、)
 
@@ -327,16 +318,14 @@ db_closeerr=データベースを閉じる事が出来ませんでした。
 db_optimized=データベース % 最適化されました。（？）
 db_dropped=データベース '%' が削除されました。
 db_notdropped=データベースを削除できませんでした。
-db_nodbtodrop=No databases exist to be dropped.
 info_nodeepfs=No DeepFS database found
-db_inuse=Database is currently used by other clients.
+db_inuse=Database is currently accessed by other clients.
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
 
 # Index commands
 in_created=% にインデックスが作成されました。
-in_err=インデックスを作成できませんでした。
 in_dropped=% インデックスを削除しました。
 in_notdropped=インデックスを削除できませんでした。
 
@@ -359,7 +348,6 @@ bye4=じゃーね。
 
 # Query Commands
 qu_query=クエリー　　
-qu_pars=パース中
 qu_comp=コンパイル中 
 qu_eval=計算中
 qu_time=タイミング
@@ -382,14 +370,11 @@ qu_tabhits=結果　　　　
 # Update Commands
 uc_querynodeserr=クエリーはノードセットを返さなければいけません。
 uc_deleteinfo=%2 で %1 個のノードが削除されました。
-uc_deleteroot=ノードを削除できません。
 uc_copyroot=ルートノードの後には挿入できません。
-uc_copyinfo=%個のノードが%にコピーされました。
 uc_insertinfo=%個のノードが%に挿入されました。.
 uc_updateinfo=%個のノードが更新されました %.
 uc_updatenode=更新するノードは%でなければいけません。.
 uc_copytags=対象ノードはXML要素でなければいけません。
-uc_inserttext=テキストノードを別のテキストノードの前後に挿入することは出来ません。
 uc_attinvalid=「%」は有効な属性名ではありません。
 uc_attdupl=属性「%」は既に定義されています。
 uc_posinvalid=不正な位置 "%".
@@ -528,10 +513,6 @@ ch_help2=[%] が指定された場合、指定されたコマンドに関する�
 ch_exit1=終了
 
 # Help Texts
-h_filter=クエリー実行結果の表示
-h_queryrt=このチェックボックスがチェックされている場合、キー入力を行うたびにクエリーが自動的に実行されます。
-h_toxquery=現在のXPathクエリーがXQuer検索パネルにコピーされます。
-h_toxpath=検索用のGUIコンポーネントを操作する事により、内部的にXPathクエリーが作成、実行されます。このボタンを押して、XPathクエリーの表示、変更を行えます。
 h_hist=入力履歴の表示
 h_go=クエリーを実行します。
 h_stop=現在の操作を中止します。
@@ -551,7 +532,6 @@ h_lang=別の言語に切り替えます。選択した言語を有効にする�
 h_names=このオプションはタグが'name'という名前の属性を持っているかチェックします。'name'属性が存在する場合、タグの代わりに属性値が表示されます。現在のデータベースに'name'属性を持つタグが存在しない場合、このオプションは変更できません。
 h_fsname=新しいデータベースの名前をこのテキストフィールドに入力して下さい。
 h_fsall=このチェックボックスを選択すると、ファイルシステム全体が処理されます。
-h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
 h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
 h_meta=このチェックボックスを選択すると、多くのファイルからメタデータも抽出されます。例えば、画像の解像度、MP3ファイルのID3タグ、Eメールファイルのコンテンツなどです。
 h_cont=このチェックボックスを選択すると、ファイル内のテキスト情報をデータベースに含めることが出来ます。テキスト情報を含めた場合、それらはXQueryによって検索することが出来ます。
@@ -561,19 +541,16 @@ h_maplayout=ここではツリーマップビューのレイアウトアルゴ�
 h_mapoff=ここではツリーマップビューの四角形の整列方法を変更します。データベースを開いている場合、変更は即座に反映されます。
 h_mapsize=Here you can influence how the rectangle size is calculated.
 h_drop=このボタンを押して現在選択されているデータベースを削除します。
-h_dropdb=削除したいデータベースを選択して下さい。
 h_lf=このオプションでアプリケーションの見た目を変更できます。
 h_focus=このチェックボックスがチェックされている場合、入力可能なGUIコンポーネント上をマウスが通過すると、そこにフォーカスが移ります。
 h_simplefd=デフォルトのファイル選択画面で問題が発生する場合、簡易で高速なファイル選択画面に切り替えることが出来ます。
 h_open=開きたいデータベースを選択して下さい。
 h_font=ここでは各ビューで使用されるフォントを選択できます。
-h_mmem=メモリモードでは、クエリーは50-80% 高速に実行されます。その代わり、メモリ使用量が増大しデータベースに対する更新は利用できません。
 h_colors=スライダーを動かしてユーザーインターフェースの色を変更して下さい。
 h_cmd=ここにBaseXのコマンドを入力できます。'help' と入力すると全てのコマンドが表示されます。\n\n以前の入力したコマンドを呼び出すには↑↓ボタンを使います。
 h_searchxml=テキストフィールドに何か入力してXML文書を検索します。以下の文法が使えます。\n...      タグとテキストを検索します。\n=...   入力と完全に一致するテキストノードを検索します。\n@ ...  属性と属性値を検索します。\n@=   入力と完全に一致する属性値を検索します。\n/...     入力をXQueryとして評価します。
 h_searchfs=テキストフィールドに何か入力してファイルシステムを検索します。以下の文法が使えます。\n...      ファイルやディレクトリを検索します。\n= ...    入力された値と完全に一致するファイルを検索します。\n. ..     拡張子を検索します。\n< ...    入力された値よりサイズの小さいファイルを検索します。\n> ...    入力された値よりサイズの大きいファイルを検索します。\n\n!に続けてBaseXコマンドを入力する事が出来ます。
 h_xpath=XQueryモードでは簡単なXQueryを入力できます。
-h_modefilt=リアルタイムフィルタリングが無効な場合、Ctrl+ENTERを押すことにより検索結果を表示できます。
 h_map=この視覚化の方法はツリーマップ（TreeMap）と呼ばれ、XML文書の全てのノードは四角で表現され、領域全体を埋めつくします。ノードをクリックするとハイライト表示され、ダブルクリックするとそのノード以下が表示されます。各要素でライトクリックするとポップアップメニューが表示されます。
 h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.

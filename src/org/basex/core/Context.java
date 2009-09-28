@@ -62,10 +62,8 @@ public final class Context {
    * Closes the database instance.
    */
   public void close() {
-    if(prop == null) return;
     for(int i = 0; i < sessions.size();) sessions.get(i).exit();
     pool.close();
-    prop = null;
   }
 
   /**

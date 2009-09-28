@@ -216,8 +216,6 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] PIWRONG = { XPST, 3, "Invalid processing-instruction." };
   /** XPST0003: Parsing exception. */
-  Object[] NSWRONG = { XPST, 3, "Invalid namespace construction." };
-  /** XPST0003: Parsing exception. */
   Object[] NOENCLEXPR = { XPST, 3, "Expecting valid expression after \"{\"." };
   /** XPST0003: Parsing exception. */
   Object[] NODOCCONS = { XPST, 3, "Expecting document construction." };

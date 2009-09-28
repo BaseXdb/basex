@@ -37,7 +37,6 @@ b_search=Search
 s_ok=OK
 
 # Visualizations
-text_find=Find
 no_table=No table available for this data
 no_space=Too less space
 map_binary=Binary File
@@ -59,8 +58,6 @@ dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
 dc_xqdesc=XQuery files
-dc_doc=Document
-dc_coll=Collection
 dc_advtitle=Create Database
 dc_chop=Chop Whitespaces
 dc_intparse=Use internal XML parser
@@ -70,7 +67,6 @@ dc_fzindex=Support Fuzzy Searching
 dc_ftstem=(English) Stemming
 dc_ftdc=Diacritics
 dc_ftcs=Case Sensitivity
-dc_mainmem=Main-Memory Mode
 dc_chopinfo=This option removes whitespaces between tags and contents
 dc_intparseinfo=Switch this option on to use the built-in XML parser
 dc_entitiesinfo=Switch this option off to skip undefined entities (&...;)
@@ -83,7 +79,6 @@ dc_fzinfo=This option speeds up similarity searches
 dc_ftsteminfo=All tokens are stemmed before they are indexed
 dc_ftcsinfo=Case sensitive is considered in the index
 dc_ftdcinfo=Diacritics are considered in the index
-dc_mminfo=This mode speeds up querying, but updates are disabled
 dc_general=General
 dc_parse=Parsing
 dc_names=Names
@@ -106,16 +101,14 @@ dfs_all=Complete
 dfs_allinfo=Creates a complete (C:, D: etc. on Windows, '/' on UNIX) mapping of the filesystem
 dfs_wrt=Write through
 dfs_wrttt=Modifications to the DeepFS instance are propagated to the originally mapped file hierarchy
-dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem
-dfs_wrttitle=Propagate changes to filesystem
+dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem?
+dfs_wrttitle=Propagate changes to filesystem?
 dfs_text=Map Directory to DeepFS XML
 dfs_text1=File Information & Metadata
 dfs_text2=File Contents
-dfs_types=File types
 dfs_maxinfo=Limit text inclusion to given size
 dfs_cont=Include textual file contents
 dfs_meta=Include metadata
-dfs_ftindex=Index file contents
 
 dr_title=Rename Database
 dr_exists=Database exists already.
@@ -285,7 +278,6 @@ proc_time=Time Needed
 proc_syntax=Syntax
 proc_err=Could not execute '%'
 proc_nodb=No database opened.
-proc_nofs=Current database is no filesystem import.
 proc_mm=Command is not available in main memory mode.
 proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- increase Java's heap size with the flag -Xmx<size>\n- choose the internal XML parser in the GUI or via 'set intparse on'\n- deactivate the text and attribute indexes
 
@@ -316,7 +308,6 @@ pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
 pc_mountnf=Please enter an existent directory as mount point.
-pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" could not be parsed.
 pc_pos="%" (Line %)
 
@@ -327,15 +318,13 @@ db_closeerr=Database could not be closed.
 db_optimized=Database optimized in %.
 db_dropped=Database '%' was dropped.
 db_notdropped=Database could not be dropped.
-db_nodbtodrop=No databases exist to be dropped.
-db_inuse=Database is currently used by other clients.
+db_inuse=Database is currently accessed by other clients.
 db_notopened=Database could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
 
 # Index commands
 in_created=Index created in %.
-in_err=Index could not be created.
 in_dropped=Index dropped in %.
 in_notdropped=Index could not be dropped.
 
@@ -358,7 +347,6 @@ bye4=Enjoy life.
 
 # Query Commands
 qu_query=Query
-qu_pars=Parsing
 qu_comp=Compiling
 qu_eval=Evaluating
 qu_time=Timing
@@ -381,14 +369,11 @@ qu_tabhits=Results
 # Update Commands
 uc_querynodeserr=Query must yield a nodeset.
 uc_deleteinfo=% node(s) deleted in %.
-uc_deleteroot=Cannot delete document node.
 uc_copyroot=Cannot insert after root node.
-uc_copyinfo=% node(s) copied in %.
 uc_insertinfo=% node(s) inserted in %.
 uc_updateinfo=% node(s) updated in %.
 uc_updatenode=Node to be updated must be %.
 uc_copytags=Target nodes must be elements.
-uc_inserttext=Cannot insert text node after/before another text node.
 uc_attinvalid="%" is not a valid attribute name.
 uc_attdupl=Duplicate attribute "%" found.
 uc_posinvalid=Invalid position value "%".
@@ -528,10 +513,6 @@ ch_help2=If [%] is specified, information on the specific\ncommand is printed; o
 ch_exit1=Exit
 
 # Help Texts
-h_filter=Filter your query results.
-h_queryrt=If this checkbox is turned on, queries are automatically performed after each key-click.
-h_toxquery=The current XPath query is copied to the XQuery search panel.
-h_toxpath=By modifying the search widgets, internal XPath queries are built and executed. You can display and change the current query by pressing this button.
 h_hist=Show input history.
 h_go=Executes the query.
 h_stop=Stops the current process.
@@ -551,7 +532,6 @@ h_lang=Here you can switch to another language. Note that BaseX must be restarte
 h_names=This option checks if tags contain a 'name' attribute. If the attribute exists, the value of the attribute is shown instead of the tag. You can't change this option if the current database has no 'name' attributes.
 h_fsname=Enter the name of the new DeepFS database in this text field.
 h_fsall=If this checkbox is chosen, the whole file system will be parsed.
-h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
 h_fsmount=DeepFS mount point. The database is mounted as filesystem in user space.
 h_meta=By choosing this checkbox, meta-data will be extracted from numerous file types. Meta-data includes e.g. the dimensions of images, ID3 tags of MP3 files or contents of email files.
 h_cont=The textual contents of files can be included in the database by choosing this checkbox. If the contents are included, they can be searched via XQuery.
@@ -561,19 +541,16 @@ h_maplayout=Here you can modify the layout algorithm which is used in the Map vi
 h_mapoff=Here you can modify the offset sizes of the rectangles.
 h_mapsize=Here you can influence how the rectangle size is calculated.
 h_drop=Choose the button to drop the currently chosen database.
-h_dropdb=Choose the database you want to drop.
 h_lf=The look & feel of the application can be changed with this option.
 h_focus=If this checkbox is chosen, input components are focused as soon as the cursor is moved over them.
 h_simplefd=If you have troubles using the default file chooser, you can switch to a simple, but faster one.
 h_open=Choose the database you want to open.
 h_font=Here you can choose the fonts which are used in the views.
-h_mmem=In main-memory mode, queries will be executed 50-80% faster. As a drawback, main-memory consumption increases, and updates on the database are disabled.
 h_colors=Move the sliders to change the colors of the visual interface.
 h_cmd=Here you can enter BaseX commands. Try 'help' to get a survey on all available commands.\n\nYou can retrieve previous inputs with the cursor keys UP and DOWN.
 h_searchxml=Just type something in the text field to search in your XML document. The following syntax is supported:\n...      Find tags and texts\n=...   Find exact text nodes\n@ ...  Find attributes and attribute values\n@=   Find exact attribute values\n/...     Evaluate input as XQuery
 h_searchfs=Just type something in the text field to search in your filesystem. The following syntax is supported:\n...      Find any files or directories\n= ...  Find exact names\n. ..     Find file extensions\n< ...  Find files smaller than the specified size\n> ...  Find files larger than the specified size\n\nYou can enter BaseX commands by preceding your input with an exclamation mark.
 h_xpath=The XQuery mode allows the input of simple XQuery requests.
-h_modefilt=If real-time filtering is deactivated, press Ctrl+ENTER to filter the query results.
 h_map=This visualization is called TreeMap. All nodes of the XML document are represented as rectangles, filling the complete area. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a plot representation. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.

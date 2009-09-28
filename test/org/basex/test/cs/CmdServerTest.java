@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.cs;
 
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;

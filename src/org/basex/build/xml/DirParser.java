@@ -42,7 +42,7 @@ public final class DirParser extends Parser {
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
     parse(b, io);
-    if(Prop.debug) Main.err(NL);
+    if(Prop.debug) Main.err(Prop.NL);
   }
 
   /**

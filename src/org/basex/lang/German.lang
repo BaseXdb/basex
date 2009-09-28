@@ -37,7 +37,6 @@ b_search=Suche
 s_ok=OK
 
 # Visualizations
-text_find=Finde
 no_table=Tabelle für aktuelle Daten nicht verfügbar
 no_space=Zu wenig Platz
 map_binary=Binärdatei
@@ -59,8 +58,6 @@ dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente
 dc_xqdesc=XQuery-Anfragen
-dc_doc=Dokument
-dc_coll=Collection
 dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen
 dc_intparse=Internen XML-Parser benutzen
@@ -70,7 +67,6 @@ dc_fzindex=Unterstütze unscharfe Suche
 dc_ftstem=Stemming (englisch)
 dc_ftdc=Diakritische Zeichen
 dc_ftcs=Groß- und Kleinschreibung
-dc_mainmem=Hauptspeicher-Modus
 dc_chopinfo=Diese Option entfernt Leerzeichen zwischen Tags und Textknoten
 dc_intparseinfo=Wenn die Option aktiviert ist, wird der interne XML-Parser genutzt
 dc_entitiesinfo=Undefinierte Entities (&...;) können mit dieser Option ignoriert werden
@@ -83,7 +79,6 @@ dc_fzinfo=Diese Option beschleunigt Ähnlichkeitssuchen
 dc_ftsteminfo=Alle Begriffe werden vor der Indexierung normalisiert
 dc_ftdcinfo=Diakritische Zeichen werden im Index berücksichtigt
 dc_ftcsinfo=Groß- und Kleinschreibung wird im Index berücksichtigt
-dc_mminfo=Anfragen werden schneller ausgeführt, aber Updates sind deaktiviert
 dc_general=Allgemein
 dc_parse=Parsing
 dc_names=Namen
@@ -105,17 +100,15 @@ dfs_name=Name der Dateisystem Datenbank
 dfs_all=Komplett
 dfs_allinfo=Erstellt eine komplette Repräsentation des Dateisystems (C:, D: etc. unter Windows, '/' unter Unix)
 dfs_wrt=Write through
-dfs_wrttt=Änderungen an der DeepFS Instanz werden in's Orginalverzeichnis übertragen
-dfs_wrtok=Alle Änderungen die an der Datenbank "%" durchgeführt werden,\nwerden in's Verzeichnis "%" übertragen
-dfs_wrttitle=Änderungen in's Dateisystem übertragen
+dfs_wrttt=Änderungen an der DeepFS Instanz werden ins Orginalverzeichnis übertragen
+dfs_wrtok=Alle Änderungen die an der Datenbank "%" durchgeführt werden,\nwerden ins Verzeichnis "%" übertragen?
+dfs_wrttitle=Änderungen ins Dateisystem übertragen?
 dfs_text=DeepFS Wurzelverzeichnis
 dfs_text1=Datei-Information & Meta-Daten
 dfs_text2=Datei-Inhalte
-dfs_types=Dateitypen
 dfs_maxinfo=Begrenze den Import auf eine maximale Dateigröße
 dfs_cont=Importiere Datei-Inhalte
 dfs_meta=Importiere Meta-Daten
-dfs_ftindex=Indexiere Dateiinhalte
 
 dr_title=Datenbank umbenennen
 dr_exists=Datenbank existiert schon
@@ -285,7 +278,6 @@ proc_time=Benötigte Zeit
 proc_syntax=Syntax
 proc_err='%' konnte nicht ausgeführt werden
 proc_nodb=Keine Datenbank geöffnet.
-proc_nofs=Die aktuelle Datenbank ist kein Filesystem-Import.
 proc_mm=Der Befehl ist im Hauptspeicher-Modus nicht verfügbar.
 proc_outmem=Der Hauptspeicher ist voll.\nDie folgenden Hinweise helfen vielleicht weiter:\n- Erhöhen Sei den verfügbaren Speicher mit dem Java-Flag -Xmx<size>\n- Wählen Sie den internen XML-Parser über die GUI oder mit 'set intparse on' aus\n- deaktivieren Sie die Text- und Attribut-Indizes
 
@@ -316,7 +308,6 @@ pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
 pc_mountnf=Bitte ein gültiges Verzeichnis als 'mount point' angeben.
-pc_backingnf=Bitte ein gültiges Verzeichnis als Hilfsspeicher angeben.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %)
 
@@ -327,7 +318,6 @@ db_closeerr=Datenbank konnte nicht geschlossen werden.
 db_optimized=Datenbank optimiert in %.
 db_dropped=Datenbank '%' wurde gelöscht.
 db_notdropped=Datenbank konnte nicht gelöscht werden.
-db_nodbtodrop=Keine Datenbanken zum Löschen vorhanden.
 db_inuse=Datenbank wird gerade von anderen Clients benutzt.
 db_notopened=Datenbank konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet in %.
@@ -335,7 +325,6 @@ db_exported=Datenbank '%' exportiert in %.
 
 # Index commands
 in_created=Index wurde erzeugt in %.
-in_err=Index konnte nicht erzeugt werden.
 in_dropped=Index wurde gelöscht in %.
 in_notdropped=Index konnte nicht gelöscht werden.
 
@@ -358,7 +347,6 @@ bye4=Viel Spass.
 
 # Query Commands
 qu_query=Anfrage
-qu_pars=Parsing
 qu_comp=Kompilierung
 qu_eval=Ausführung
 qu_time=Zeit
@@ -381,14 +369,11 @@ qu_tabhits=Ergebnisse
 # Update Commands
 uc_querynodeserr=Anfrage muss ein Knotenset liefern.
 uc_deleteinfo=% Knoten gelöscht in %.
-uc_deleteroot=Dokumentknoten kann nicht gelöscht werden.
 uc_copyroot=Nach Wurzelknoten kann nicht eingefügt werden.
-uc_copyinfo=% Knoten kopiert nach %.
 uc_insertinfo=% Knoten eingefügt in %.
 uc_updateinfo=% Knoten aktualisiert in %.
 uc_updatenode=Knoten der aktualisiert wird muss ein % sein.
 uc_copytags=Zielknoten müssen Elemente sein.
-uc_inserttext=Kann keinen Textknoten vor/nach einem anderen Textknoten einfügen.
 uc_attinvalid="%" ist kein gültiger Attributname.
 uc_attdupl=Doppeltes Attribut "%" gefunden.
 uc_posinvalid=Ungültiger Positionswert "%".
@@ -528,10 +513,6 @@ ch_help2=Wenn [%] angegeben wurde, werden Informationen\nzum eingegebenen Befehl
 ch_exit1=Beende
 
 # Help Texts
-h_filter=Filtern der Suchtreffer.
-h_queryrt=Wenn diese Checkbox aktiviert ist, werden Anfragen automatisch nach jedem Tastendruck ausgeführt.
-h_toxquery=Kopiert die aktuelle Anfrage ins XQuery Suchfeld.
-h_toxpath=Durch die Veränderung der Suchkomponenten werden intern XPath-Anfragen erstellt und ausgeführt. Durch Druck auf diesen Button kann die aktuelle Anfrage dargestellt und verändert werden.
 h_hist=Auswahl der letzten Texteingaben.
 h_go=Führt die Anfrage aus.
 h_stop=Stoppt den aktuellen Prozess.
@@ -551,7 +532,6 @@ h_lang=Hier kann eine andere Sprache ausgewählt werden. Beachte das BaseX zur A
 h_names=Diese Option überprüft ob Tags in der XML-Datei 'name' Attribute enthalten. Wenn die Attribute bestehen wird der Wert des Attributs anstatt dem Tag angezeigt. Beachte man kann diese Option nicht ändern wenn die aktuelle Datenbank keine 'name' Attribute besitzt.
 h_fsname=Der Name der neuen DeepFS Datenbank.
 h_fsall=Wenn diese Checkbox ausgewählt wurde wird das komplette Dateisystem geparsed.
-h_fsbacking=DeepFS Verzeichnis zum Einlagern von BLOBs während des imports.  (Die importierten Dateien werden dort gespiegelt).
 h_fsmount=DeepFS mount point. Die erstellte Datenbank wird als filesystem in userspace gemountet.
 h_meta=Wenn diese Checkbox ausgewählt wurde, wird von vielen Dateitypen Meta-Daten extrahiert. Die Meta-Daten enthalten bspw. Größe eines Bildes, ID3 Tags von MP3 Dateien oder den Inhalt von Email-Dateien.
 h_cont=Die textuellen Inhalte von Dateien können durch diese Checkbox in die Datenbank eingebunden werden. Wenn die Inhalte eingebunden wurden, können sie mit XQUERY durchsucht werden.
@@ -561,19 +541,16 @@ h_maplayout=Hier kann der Layout Algorithmus, welcher für die Map Visualisierun
 h_mapoff=Hier können die Größe der Rechteckränder verändert werden.
 h_mapsize=Hier können Sie die Berechnung der Rechteckgrößen beeinflussen.
 h_drop=Button um die aktuell ausgewählte Datenbank zu entfernen.
-h_dropdb=Auswahl der Datenbank die entfernt werden soll.
 h_lf=Das Look & Feel der Anwendung kann mit dieser Option verändert werden.
 h_focus=Wenn diese Checkbox ausgewählt wurde, werden die Komponenten fokussiert sobald der Mauszeiger sich über ihnen bewegt.
 h_simplefd=Bei Problemen mit dem Standard Datei-Auswahlmenü, kann zu einer einfacheren aber schnelleren Variante gewechselt werden.
 h_open=Wähle die zu öffnende Datenbank aus.
 h_font=Hier können die Schriftarten, welche in den versch. Ansichten benutzt werden ausgewählt werden.
-h_mmem=Im Hauptspeicher-Modus werden Anfragen 50-80% schneller ausgeführt. Der Nachteil ist, dass der Hauptspeicherverbrauch ansteigt und Updates auf die Datenbank deaktiviert sind.
 h_colors=Bewege die Sliders um die Farben des visuellen Interfaces zu verändern.
 h_cmd=Hier können BaseX Befehle eingegeben werden. Versuche 'help' um eine Übersicht über alle Befehle zu bekommen.\n\nVorherige Eingaben können durch die Cursortasten Hoch und Runter angezeigt werden.
 h_searchxml=Hier kann ein beliebiger Suchbegriff für die Suche im XML Dokument eingegeben werden. Die folgende Syntax wird unterstützt:\n...      Finde Tags und Texte\n=...   Finde die exakten Textknoten\n@ ...  Finde Attribute und Attributwerte\n@=   Finde die exakten Attributwerte\n/...     Führe die Eingabe als XQuery aus
 h_searchfs=Hier kann ein beliebiger Suchbegriff für die Suche im Dateisystem eingegeben werden. Die folgende Syntax wird unterstützt:\n...      Finde irgendwelche Dateien oder Verzeichnisse\n= ...  Finde exakte Namen\n. ..     Finde Dateierweiterungen\n< ...  Finde Dateien, die kleiner als die angegebene Größe sind\n> ...  Finde Dateien, die größer als die angegebene Größe sind\n\nBaseX Befehle können mit einem vorausgehenden Ausrufezeichen eingegeben werden.
 h_xpath=Der XQuery-Modus erlaubt die Eingabe und Ausführung von XQuery-Anfragen.
-h_modefilt=Wenn die Echtzeit-Filterung deaktiviert ist, drücke Ctrl+ENTER um die Anfrageergebnisse zu filtern.
 h_map=Diese Visualisierung wird TreeMap genannt. Alle Knoten des XML Dokuments werden als Rechtecke, welche den kompletten Bereich ausfüllen repräsentiert. Knoten können durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gefiltert werden. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
 h_plot=Diese Visualisierung wird Scatterplot genannt. Knoten können durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gefiltert werden. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
 h_plotaxisx=Mit dieser Combobox kann die Belegung der x-Achse festgelegt werden.

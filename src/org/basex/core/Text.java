@@ -29,10 +29,6 @@ public interface Text {
   String DOTS = "...";
   /** List. */
   String LI = "- ";
-  /** Space. */
-  String S = " ";
-  /** Question mark. */
-  String Q = "?";
   /** On flag. */
   String ON = "ON";
   /** Off flag. */
@@ -60,7 +56,7 @@ public interface Text {
   String VERSINFO = Main.info(lang("version"), VERSION);
 
   /** Title and version. */
-  String TITLE = NAME + S + VERSION;
+  String TITLE = NAME + " " + VERSION;
   /** Title, version and company. */
   String CONSOLEINFO = TITLE + "; " + COMPANY;
 
@@ -82,8 +78,6 @@ public interface Text {
   String CLIENTMODE = lang("cs_client");
   /** Local (standalone) mode. */
   String SERVERMODE = "Server";
-  /** Continued prompt. */
-  String INPUTCONT = DOTS + S;
 
   /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
@@ -404,12 +398,14 @@ public interface Text {
   String HELP1 = Main.info(lang("ch_help1"), NAME);
   /** Command help. */
   String HELP2 = Main.info(lang("ch_help2"), "command");
+
   /** Command help. */
   String EXIT0 = "";
   /** Command help. */
-  String EXIT1 = lang("ch_exit1") + S + NAME + DOT;
+  String EXIT1 = lang("ch_exit1") + " " + NAME + DOT;
   /** Command help. */
   String EXIT2 = EXIT1;
+
   /** Command help. */
   String QUIT0 = "";
   /** Command help. */
@@ -420,7 +416,7 @@ public interface Text {
   // STARTER WINDOW ===========================================================
 
   /** Waiting info. */
-  String WAIT1 = lang("launch") + S + TITLE;
+  String WAIT1 = lang("launch") + " " + TITLE;
   /** Waiting info. */
   String WAIT2 = lang("wait") + DOTS;
 
@@ -434,8 +430,6 @@ public interface Text {
   String PROCERR = lang("proc_err") + COL + NL + "%";
   /** No database error. */
   String PROCNODB = lang("proc_nodb");
-  /** No filesystem error. */
-  String PROCNOFS = lang("proc_nofs");
   /** Main memory error. */
   String PROCMM = lang("proc_mm");
   /** Out of memory error. */
@@ -474,7 +468,7 @@ public interface Text {
   /** Builder error. */
   String LIMITATTS = lang("pc_atts");
   /** Create database information. */
-  String NODESPARSED = S + lang("pc_parse");
+  String NODESPARSED = " " + lang("pc_parse");
   /** Scanner position. */
   String SCANPOS = lang("pc_pos");
 
@@ -498,8 +492,6 @@ public interface Text {
   String DBWHICH = lang("pc_dbnf");
   /** Missing mount point. */
   String MOUNTWHICH = lang("pc_mountnf");
-  /** Missing backing store. */
-  String BACKINGWHICH = lang("pc_backingnf");
 
   // DATABASE COMMANDS ========================================================
 
@@ -513,8 +505,6 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
-  /** No Database to be dropped. */
-  String DBNODBTODROP = lang("db_nodbtodrop");
   /** Database is in use by a other client. */
   String DBINUSE = lang("db_inuse");
   /** Database not opened. */
@@ -531,8 +521,6 @@ public interface Text {
 
   /** Index created. */
   String DBINDEXED = lang("in_created");
-  /** Index error. */
-  String DBINDEXERR = lang("in_err");
   /** Index dropped. */
   String DBDROP = lang("in_dropped");
   /** Index not dropped. */
@@ -556,9 +544,7 @@ public interface Text {
   // XPATH COMMAND ============================================================
 
   /** Query info: query. */
-  String QUERYQU = lang("qu_query") + COL + S;
-  /** Query info: parsing. */
-  String QUERYPARS = lang("qu_pars") + COL;
+  String QUERYQU = lang("qu_query") + COL + " ";
   /** Query info: optimizing. */
   String QUERYCOMP = lang("qu_comp") + COL;
   /** Query info: evaluating. */
@@ -571,10 +557,6 @@ public interface Text {
   String QUERYPLAN = lang("qu_plan") + COLS;
   /** Query info: compiler. */
   String QUERYSEP = LI;
-  /** Query info: XML plan. */
-  String PLANXML = "plan.xml";
-  /** Query info: DOT plan. */
-  String PLANDOT = "plan.dot";
 
   /** Query info: query. */
   String QUERYSTRING = lang("qu_tabquery") + COLS;
@@ -611,13 +593,9 @@ public interface Text {
 
   /** Deletion info. */
   String DELETEINFO = lang("uc_deleteinfo");
-  /** Deletion error. */
-  String DELETEROOT = lang("uc_deleteroot");
   /** Insert query info. */
   String COPYROOT = lang("uc_copyroot");
 
-  /** Copy query info. */
-  String COPYINFO = lang("uc_copyinfo");
   /** Insert query info. */
   String INSERTINFO = lang("uc_insertinfo");
   /** Update query info. */
@@ -626,8 +604,6 @@ public interface Text {
   String UPDATENODE = lang("uc_updatenode");
   /** Insert query info. */
   String COPYTAGS = lang("uc_copytags");
-  /** Insert query info. */
-  String INSERTTEXT = lang("uc_inserttext");
   /** Update element info. */
   String ATTINVALID = lang("uc_attinvalid");
   /** Duplicate attribute info. */
@@ -694,8 +670,6 @@ public interface Text {
   String INFODBPATH = lang("info_dbpath");
   /** No document opened. */
   String INFONODB = lang("info_nodb");
-  /** No DeepFS database is there to be opened. */
-  String INFONODEEPFS = lang("info_nodeepfs");
   /** Info on database. */
   String INFODBLIST = lang("info_dblist");
   /** Info on database. */
@@ -994,8 +968,6 @@ public interface Text {
 
   // VISUALIZATIONS ===========================================================
 
-  /** Text find information. */
-  String RESULTFIND = lang("text_find") + COLS;
   /** Help string. */
   String NOTABLE = lang("no_table") + DOT;
   /** Help string. */
@@ -1039,10 +1011,6 @@ public interface Text {
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
   /** XQ file description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
-  /** Dialog title for creating a database. */
-  String CREATEDOC = lang("dc_doc") + COL;
-  /** Dialog title for creating a database. */
-  String CREATECOLL = lang("dc_coll") + COL;
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
@@ -1053,8 +1021,6 @@ public interface Text {
   String CREATEDTD = lang("dc_dtd");
   /** SAX parsing information. */
   String CREATEINTPARSE = lang("dc_intparse");
-  /** Main-memory mode. */
-  String CREATEMAINMEM = lang("dc_mainmem");
 
   /** Full-text index information. */
   String CREATEFZ = lang("dc_fzindex");
@@ -1073,8 +1039,6 @@ public interface Text {
   String ENTITIESINFO = lang("dc_entitiesinfo");
   /** Entities information. */
   String DTDINFO = lang("dc_dtdinfo");
-  /** Main-memory mode. */
-  String MMEMINFO = lang("dc_mminfo");
 
   /** Path summary information. */
   String PATHINDEXINFO = lang("dc_pathinfo");
@@ -1109,11 +1073,11 @@ public interface Text {
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
   /** Dialog asking if a new database should be be created. */
-  String NODBQUESTION = INFONODB 
-    + DOT + NL + lang("do_nodbquestion") + NL + S;
+  String NODBQUESTION = INFONODB
+    + DOT + NL + lang("do_nodbquestion") + NL + " ";
   /** Dialog asking if a new database should be be created. */
-  String NODEEPFSQUESTION = INFONODEEPFS 
-    + DOT + NL + lang("do_nodbquestion") + NL + S;
+  String NODEEPFSQUESTION = lang("info_nodeepfs") 
+    + DOT + NL + lang("do_nodbquestion") + NL + " ";
   
   /** File dialog title. */
   String XQOPENTITLE = lang("dq_open");
@@ -1144,9 +1108,9 @@ public interface Text {
   /** Import options. */
   String WTHROUGHTT = lang("dfs_wrttt") + DOT;  
   /** Dialog question to activate write through. */
-  String WTHROUGHOK = lang("dfs_wrtok") + Q;
+  String WTHROUGHOK = lang("dfs_wrtok");
   /** Dialog question to activate write through. */
-  String WTHROUGHTITLE = lang("dfs_wrttitle") + Q;
+  String WTHROUGHTITLE = lang("dfs_wrttitle");
   /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
   /** Import options. */
@@ -1154,15 +1118,11 @@ public interface Text {
   /** Import options. */
   String IMPORTFSTEXT2 = lang("dfs_text2") + COL;
   /** Import options. */
-  String IMPORTFSTYPES = lang("dfs_types") + DOTS;
-  /** Import options. */
   String IMPORTFSMAXINFO = lang("dfs_maxinfo") + DOT;
   /** Import options. */
   String IMPORTCONT = lang("dfs_cont");
   /** Import options. */
   String IMPORTMETA = lang("dfs_meta") + " (MP3, JPG, TIF, PNG, GIF, ...)";
-  /** Import options. */
-  String IMPORTFTINDEX = lang("dfs_ftindex");
   /** Import options. */
   String[] IMPORTFSMAX = {
       "Max. 1KB", "Max. 10KB", "Max. 100KB", "Max. 1MB", "Max. 10MB"
@@ -1184,7 +1144,7 @@ public interface Text {
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
-  String DROPCONF = lang("dd_question") + NL + S;
+  String DROPCONF = lang("dd_question") + NL + " ";
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");
@@ -1299,14 +1259,6 @@ public interface Text {
   // HELP TEXTS ===============================================================
 
   /** Help string. */
-  byte[] HELPQUERYRT = token(lang("h_queryrt"));
-  /** Help string. */
-  byte[] HELPTOXQUERY = token(lang("h_toxquery"));
-  /** Help string. */
-  byte[] HELPTOXPATH = token(lang("h_toxpath"));
-  /** Help string. */
-  byte[] HELPFILTER = token(lang("h_filter"));
-  /** Help string. */
   byte[] HELPGO = token(lang("h_go"));
   /** Help string. */
   byte[] HELPHIST = token(lang("h_hist"));
@@ -1345,8 +1297,6 @@ public interface Text {
   /** Help string. */
   byte[] HELPFSALL = token(lang("h_fsall"));
   /** Help string. */
-  byte[] HELPFSBACKING = token(lang("h_fsbacking"));
-  /** Help string. */
   byte[] HELPFSMOUNT = token(lang("h_fsmount"));
   /** Help string. */
   byte[] HELPMETA = token(lang("h_meta"));
@@ -1365,8 +1315,6 @@ public interface Text {
   /** Help string. */
   byte[] HELPDROP = token(lang("h_drop"));
   /** Help string. */
-  byte[] HELPDROPDB = token(lang("h_dropdb"));
-  /** Help string. */
   byte[] HELPLF = token(lang("h_lf"));
   /** Help string. */
   byte[] HELPFOCUS = token(lang("h_focus"));
@@ -1377,8 +1325,6 @@ public interface Text {
   /** Help string. */
   byte[] HELPFONT = token(lang("h_font"));
   /** Help string. */
-  byte[] HELPMMEM = token(lang("h_mmem"));
-  /** Help string. */
   byte[] HELPCOLORS = token(lang("h_colors"));
   /** Help Dialog. */
   byte[] HELPCMD = token(lang("h_cmd"));
@@ -1388,8 +1334,6 @@ public interface Text {
   byte[] HELPSEARCHFS = token(lang("h_searchfs"));
   /** Help Dialog. */
   byte[] HELPXPATH = token(lang("h_xpath"));
-  /** Help string. */
-  String HELPMODEFILT = lang("h_modefilt");
   /** Help string. */
   byte[] HELPMAP = token(lang("h_map"));
   /** Help string. */

@@ -58,7 +58,7 @@ public final class List extends Process {
         }
       }
       o.print(t.finish());
-      o.print(NL + list.length + S + INFODBLIST + NL);
+      o.print(NL + list.length + " " + INFODBLIST + NL);
     }
   }
 

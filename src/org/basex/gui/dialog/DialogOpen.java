@@ -112,7 +112,6 @@ public final class DialogOpen extends Dialog {
    * @return result of check
    */
   public boolean nodb() {
-    System.err.println(choice.getIndex());
     return choice.getIndex() == -1;
   }
 

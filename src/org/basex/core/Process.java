@@ -89,6 +89,7 @@ public abstract class Process extends Progress {
         return error(PROCMM);
     }
 
+    // [AW] comment this out to disable database locking
     if(data != null) {
       // wait until update and read operations have been completed..
       while(data.getLock() == 2 || (updating() && data.getLock() != 0))

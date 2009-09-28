@@ -168,6 +168,4 @@ public interface FSText {
   String NOMOUNTPOINT = "Mountpoint does not exist. Please create first.";
   /** Error message 'create fs ...' if backingpath does not exist. */
   String NOBACKINGPATH = "Backing store does not exist. Please create first.";
-  /** Error message 'create FS...' if backing storage exists. */
-  String BACKINGEXISTS = "Backing storage exists. Please delete first. ";
 }

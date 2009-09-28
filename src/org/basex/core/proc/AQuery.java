@@ -153,11 +153,12 @@ abstract class AQuery extends Process {
       final DOTSerializer ser = new DOTSerializer(out);
       qu.plan(ser);
       ser.close();
-      IO.get(PLANDOT).write(out.finish());
-      new ProcessBuilder(prop.get(Prop.DOTTY), PLANDOT).start().waitFor();
+      final String dot = "plan.dot";
+      IO.get(dot).write(out.finish());
+      new ProcessBuilder(prop.get(Prop.DOTTY), dot).start().waitFor();
       //f.delete();
     }
-    // dump query plan
+    // show XML plan
     if(prop.is(Prop.XMLPLAN)) {
       final CachedOutput out = new CachedOutput();
       qu.plan(new XMLSerializer(out, false, true));

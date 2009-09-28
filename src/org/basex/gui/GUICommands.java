@@ -146,7 +146,7 @@ public enum GUICommands implements GUICommand {
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, DBNODBTODROP);
+      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, INFONODB);
     }
   },
 

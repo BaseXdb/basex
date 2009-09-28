@@ -36,7 +36,6 @@ b_search=Tìm kiếm
 s_ok=OK
 
 # Visualizations
-text_find=Tìm thấy
 no_table=Không bản nào trống cho dữ liệu này
 no_space=Thiếu chỗ
 map_binary=Tệp nhị phân
@@ -58,8 +57,6 @@ dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip
 dc_gzdesc=Văn bản XML nén GZip
 dc_xqdesc=Những tệp XQuery
-dc_doc=Văn bản
-dc_coll=Tập hợp
 dc_advtitle=Tạo cơ sở dữ liệu
 dc_chop=Cắt hết khoảng trống
 dc_intparse=Sử dụng bộ phân tích XML nội bộ
@@ -69,7 +66,6 @@ dc_fzindex=Hỗ trợ tìm kiếm Fuzzy
 dc_ftstem=Nhét đầy
 dc_ftdc=Dấu phụ phân biệt
 dc_ftcs=Trường hợp nhạy cảm
-dc_mainmem=Chế độ bộ nhớ chính
 dc_chopinfo=Lựa chọn này xóa hết khoảng trắng giữa tags và nội dung
 dc_intparseinfo=Mở lựa chọn này để sử dụng bộ phân tích XML được xây dựng bên trong
 dc_entitiesinfo=Tắt lựa chọn này để bỏ qua những entities không được định nghĩa (&...;)
@@ -82,7 +78,6 @@ dc_fzinfo=Lựa chọn này sẽ tăng tốc những tìm kiếm giống nhau
 dc_ftsteminfo=Tất cả token được nhồi đầy trước khi được index
 dc_ftcsinfo=Trường hợp nhạy cảm được xem xét trong index
 dc_ftdcinfo=Dấu phụ phân biệt được xem xét trong index
-dc_mminfo=Chế độ này tăng tốc lệnh hỏi nhưng thay đổi nội dung không được
 dc_general=Chung
 dc_parse=Đang phân tích
 dc_names=Tên
@@ -105,16 +100,14 @@ dfs_all=Nhập tất cả
 dfs_allinfo=Nhập toàn bộ hệ thống tệp
 dfs_wrt=Write through
 dfs_wrttt=Modifications to the DeepFS instance are propagated to the originally mapped file hierarchy
-dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem
-dfs_wrttitle=Propagate changes to filesystem
+dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem?
+dfs_wrttitle=Propagate changes to filesystem?
 dfs_text=Thư mục để nhập vào
 dfs_text1=Thông tin tệp va metadata
 dfs_text2=Nội dung tệp
-dfs_types=Loại tệp
 dfs_maxinfo=Giới hạn văn bản cho kich cỡ được cho
 dfs_cont=Bao gồm nội dung tệp chứa text
 dfs_meta=Bao gồm metadata
-dfs_ftindex=Nội dung tệp chứa index
 
 dr_title=Đổi tên cơ sở dữ liệu
 dr_exists=Cơ sở dữ liệu đã có rồi.
@@ -284,7 +277,6 @@ proc_time=Thời gian cần
 proc_syntax=Cú pháp
 proc_err=Không thể chạy '%'
 proc_nodb=Không cơ sở dữ liệu được mở.
-proc_nofs=Cơ ở dữ liệu hiện thời không nhập hệ thống tệp.
 proc_mm=Lệnh không có trong chế độ bộ nhớ chính.
 proc_outmem=Hết bộ nhớ.\nHướng dẫn sau đây có thể giúp bạn:\n- tăng kích cỡ Java's heap với cờ -Xmx<size>\n- chọn bộ phân tích nội bộ trong giao diện hoặc qua 'thiết đặt intparse '\n- tắt văn bản và thuộc tính indexes
 
@@ -315,7 +307,6 @@ pc_filenf=Tệp và thư mục "%" không tìm thấy.
 pc_pathnf=Tệp hay thư mục không tìm thấy.
 pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
 pc_mountnf=Xin nhập một thu mục có sẵn làm điểm khung (mount point).
-pc_backingnf=Xin nhập một thu mục có sẵn làm nơi dự phòng.
 pc_err="%" không thể phân tích.
 pc_pos="%" (Dòng %)
 
@@ -326,15 +317,13 @@ db_closeerr=Cơ sở dữ liệu không đóng được.
 db_optimized=Cơ sở dữ liệu tối ưu trong %.
 db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.
 db_notdropped=Cơ sở dữ liệu không xóa bỏ được.
-db_nodbtodrop=No databases exist to be dropped.
-db_inuse=Cơ sở dữ liệu đang được sử dụng bời 1 hay nhiều người.
+db_inuse=Database is currently accessed by other clients.
 db_notopened=Cơ sở dữ liệu không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
 
 # Index commands
 in_created=Index được tạo ở %.
-in_err=Index không tạo được.
 in_dropped=Index được xóa ở %.
 in_notdropped=Index không xóa được.
 
@@ -357,7 +346,6 @@ bye4=Chúc hạnh phúc nha.
 
 # Query Commands
 qu_query=Hỏi
-qu_pars=Đang phân tích
 qu_comp=Đang dịch
 qu_eval=Đang đánh giá
 qu_time=Đang tính giờ
@@ -380,14 +368,11 @@ qu_tabhits=Kết quả
 # Update Commands
 uc_querynodeserr=Lệnh hỏi phải lấy một tập nút.
 uc_deleteinfo=% nút được xóa trong %.
-uc_deleteroot=Không xóa được nút văn bản.
 uc_copyroot=Không chèn được vào sau nút.
-uc_copyinfo=% nút được chép trong %.
 uc_insertinfo=% nút được chèn trong %.
 uc_updateinfo=% nút được đổi trong %.
 uc_updatenode=Nút bị đổi phải được %.
 uc_copytags=Nút mục tiêu phải là phần tử (elements).
-uc_inserttext=Không chèn nút văn bản (text) trước/sau một nút văn bản (text) khác.
 uc_attinvalid=Không có tên thuộc tính "%" .
 uc_attdupl=Thuộc tính "%" đã được định nghĩa.
 uc_posinvalid=Giá trị vị trí không phù hợp "%".
@@ -527,10 +512,6 @@ ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ đ
 ch_exit1=Thoát
 
 # Help Texts
-h_filter=Lọc kết quả lệnh hỏi.
-h_queryrt=Nếu checkbox này được bật lên, lệnh hỏi tự động chạy ở mỗi phím nhấn bất kỳ.
-h_toxquery=Lệnh hỏi XPath hiện thời được chép tới thanh tìm XQuery.
-h_toxpath=Thay đổi widgets tìm kiếm, lệnh hỏi XPath được xây dựng và chạy bên trong. Bạn có thể hiển thị và thay đổi lệnh hỏi hiện hành khi nhấn nút này.
 h_hist=Hiển thị lich sử thông tin nhập.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
@@ -550,7 +531,6 @@ h_lang=Ở đây bạn có thể chuyển sang ngôn ngữ khác. Chú ý rằng
 h_names=Lựa chọn này kiểm tra tags có chứa một thuộc tính 'tên'('name') không. Nếu có, hiển thị giá trị thuộc tính thay vì tag. Bạn không thế đổi lựa chọn này nếu cơ sở dữ liệu hiện hành không có thuộc tính 'tên'.
 h_fsname=Nhập tên sơ sở dữ liệu mới ở đây.
 h_fsall=Nếu checkbox này được chọn, toàn bộ hệ thống tệp sẽ được phân tích.
-h_fsbacking=Thư mục DeepFS để chứa thông tin BLOBs. (Thật ra lá một bản sao hệ thống tệp được nhập khẩu).
 h_fsmount=Điểm khung (mount point) DeepFS. Cơ sở dữ liệu được kéo ra như hệ thống tệp trong khhông gian người dùng.
 h_meta=Chọn hộp này, meta-data sẽ được trích từ nhiều loại tệp. Meta-data bao gồm vd. chiều của ảnh, ID3 tags của tệp MP3 hay nội dung tệp email.
 h_cont=Chọn hộp này, nội dung văn bản của tệp sẽ được bao gồm trong cơ sở dữ liệu. Nếu nội dung được bao gồm, chúng có thể tìm kiếm được qua  XQuery.
@@ -560,19 +540,16 @@ h_maplayout=Ở đây bạn có thể thay đổi thuật toán bố cục đư�
 h_mapoff=Ở đây bạn có thể thay đổi kích cỡ nhánh của hình chữ nhật.
 h_mapsize=Ở đây bạn có thể thay đổi cách kích cỡ hình chữ nhật được tính.
 h_drop=Chọn nút này để xóa bỏ cơ sở dữ liệu hiện hành.
-h_dropdb=Chọn cơ sở dữ liệu bạn muốn xóa bỏ.
 h_lf=Lựa chọn này thay đổi cách nhìn & cảm của chương trình.
 h_focus=Chọn hộp này, những thành phần nhập vào sẽ được nổi bật khi con trỏ chạy qua.
 h_simplefd=Nếu bạn có những phiền toái, hãy sử dụng đầu chọn tệp mặc định, bạn có thể chuyển qua cái đơn giản và nhanh.
 h_open=Chọn cơ sở dữ liệu bạn muốn mở.
 h_font=Ở đây bạn có thể chọn phông chữ được dùng trong hiển thị(views).
-h_mmem=Trong chế độ bộ nhớ chính, lệnh hỏi sẽ được chạy 50-80% nhanh hơn. Nhưng xài nhiều bộ nhớ hơn và cơ sở dữ liệu sẽ tắt cập nhật.
 h_colors=Di chuyển con trược để đổi màu giao diện.
 h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
 h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
 h_searchfs=Gõ cái gì đó vào miền văn bản để tìm nó trong hệ thống tệp. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tệp hay thư mục\n= ...  Tìm thấy chính xác tên\n. ..     Tìm thấy đuôi tệp\n< ...  Tìm thấy tệp kích cỡ nhỏ hơn tệp trên\n> ...  Tìm thấy tệp kích cỡ lớn hơn tệp trên\n\nbạn có thể nhập câu lệnh BaseX bằng cách thêm vào trước dữ liệu nhập 1 dấu chấm than.
 h_xpath=Chế độ XQuery cho phép dữ liệu nhập là những câu hỏi XQuery đơn giản.
-h_modefilt= Nếu bộ lọc thời gian thực được tắt, nhấn Ctrl+ENTER để lọc kết quả lệnh hỏi.
 h_map=Cách vẽ này được gọi là bản đồ cây (TreeMap). Tất cả nút của văn bản XML được vẽ thành một hình chữ nhật, lấp đầy diện tích. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_plot=Cách vẽ này được gọi mảnh phân tán (Scatterplot). Tất cả nút XML được hiển thị trên một mảnh. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_plotaxisx=Với hộp chọn này bạn có thể định nghĩa trục x.

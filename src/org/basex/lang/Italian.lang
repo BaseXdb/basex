@@ -37,7 +37,6 @@ b_search=Cerca
 s_ok=OK
 
 # Visualizations
-text_find=Trova
 no_table=Nessuna tabella disponibile per questi dati
 no_space=Spazio insufficiente
 map_binary=File binario
@@ -59,8 +58,6 @@ dc_xmldesc=Documenti XML
 dc_zipdesc=Documenti XML in formato Zip
 dc_gzdesc=Documenti XML in formato GZip
 dc_xqdesc=file XQuery
-dc_doc=Documento
-dc_coll=Collezione
 dc_advtitle=Crea Database
 dc_chop=Rimuovi spazi vuoti
 dc_intparse=Usa il parses XML interno
@@ -70,7 +67,6 @@ dc_fzindex=Supporto Fuzzy Searching
 dc_ftstem=Stemming (Inglese)
 dc_ftdc=Diacritici
 dc_ftcs=Case Sensitive
-dc_mainmem=Modalità Main-Memory
 dc_chopinfo=Quest'opzione rimuove gli spazi vuoti tra i tag ed il contenuto
 dc_intparseinfo=Attiva quest'opzione per usare il parser XML integrato
 dc_entitiesinfo=Disattiva quest'opzione per saltare le entità indefinite (&...;)
@@ -83,7 +79,6 @@ dc_fzinfo=Quest'opzione velocizza le ricerche per similitudine
 dc_ftsteminfo=Si applica lo stemming a tutti i token prima di indicizzarli
 dc_ftcsinfo=Le maiuscole/minuscole sono considerate nell'indice
 dc_ftdcinfo=I diacritici sono considerati nell indice
-dc_mminfo=Questa modalità velocizza le interrogazioni, ma gli update sono disabilitati
 dc_general=Generale
 dc_parse=Parsing
 dc_names=Nomi
@@ -106,16 +101,14 @@ dfs_all=Importa tutto
 dfs_allinfo=Importa filesystem completo
 dfs_wrt=Write through
 dfs_wrttt=Modifications to the DeepFS instance are propagated to the originally mapped file hierarchy
-dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem
-dfs_wrttitle=Propagate changes to filesystem
+dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem?
+dfs_wrttitle=Propagate changes to filesystem?
 dfs_text=Directory da importare
 dfs_text1=Informazione & metadata del file
 dfs_text2=Contenuti del file
-dfs_types=Tipi di file
 dfs_maxinfo=Limita l'inclusione di testo ad una dimensione data
 dfs_cont=Includi i contenuti testuali del file
 dfs_meta=Includi i metadata
-dfs_ftindex=Indicizza i contenuti del file
 
 dr_title=Rinomina Database
 dr_exists=Il Database esiste già.
@@ -288,7 +281,6 @@ proc_time=Tempo necessario
 proc_syntax=Sintassi
 proc_err=Impossibile eseguire '%'
 proc_nodb=Nessun database aperto.
-proc_nofs=Il database attuale non è un filesystem import.
 proc_mm=Questo comando non è disponibile in modalità Main-Memory.
 proc_outmem=Fuori dalla memoria principale.\nLe seguenti azioni potrebbero aiutarti:\n- aumenta la dimensione heap di Java con il flag -Xmx<size>\n- scegli il parser XML integrato nella GUI o attraverso 'set intparse on'\n- disattiva gli indici di testo ed attributi
 
@@ -320,7 +312,6 @@ pc_pathnf=File o directory non trovato.
 pc_dbnf=Inserisci un nome per il Database.
 # ADDED
 pc_mountnf=Please enter an existent directory as mount point.
-pc_backingnf=Please enter an existent directory as backing store.
 pc_err="%" non può essere analizzato.
 pc_pos="%" (Linea %)
 
@@ -331,15 +322,13 @@ db_closeerr=Impossibile chiudere il Database.
 db_optimized=Database ottimizzato in %.
 db_dropped=Database '%' cancellato.
 db_notdropped=Impossibile cancellare il Database.
-db_nodbtodrop=No databases exist to be dropped.
-db_inuse=Database is currently used by other clients.
+db_inuse=Database is currently accessed by other clients.
 db_notopened=Impossibile aprire il Database.
 db_opened=Database '%' aperto in %.
 db_exported=Database '%' esportato in %.
 
 # Index commands
 in_created=Indici creati in %.
-in_err=Impossibile creare gli indici.
 in_dropped=Indici cancellati in %.
 in_notdropped=Impossibile cancellare gli indici.
 
@@ -362,7 +351,6 @@ bye4=Alla prossima.
 
 # Query Commands
 qu_query=Query
-qu_pars=Parsing
 qu_comp=Compilando
 qu_eval=Eseguendo
 qu_time=Timing
@@ -385,14 +373,11 @@ qu_tabhits=Results
 # Update Commands
 uc_querynodeserr=La query deve contenere un nodeset.
 uc_deleteinfo=% nodo/i cancellato/i in %.
-uc_deleteroot=Impossibile cancellare il nodo document.
 uc_copyroot=Impossibile inserire dopo il nodo root.
-uc_copyinfo=% nodo/i copiato/i in %.
 uc_insertinfo=% nodo/i inserito/i in %.
 uc_updateinfo=% nodo/i aggiornato/i in %.
 uc_updatenode=Il nodo da aggiornare dev'essere %.
 uc_copytags=I nodi target devono essere elementi.
-uc_inserttext=Impossibile inserire un nodo testo dopo/prima di un altro nodo testo.
 uc_attinvalid="%" non è un nome di attributo valido.
 uc_attdupl=L'attributo "%" è già definito.
 uc_posinvalid=Valore di posizione non valido "%".
@@ -532,10 +517,6 @@ ch_help2=Se è specificato [%], l'informazione sullo specifico\n comando viene m
 ch_exit1=Esci
 
 # Help Texts
-h_filter=Filtra i risultati delle query.
-h_queryrt=Se questa checkbox è attiva, le query sono eseguite automaticamente dopo la pressione di qualsiasi tasto.
-h_toxquery=La query attuale viene copiata nel pannello di ricerca XQuery.
-h_toxpath=Modificando le impostazioni di ricerca, le query sono compilate ed eseguite internamente. Puoi mostrare e cambiare la query attuale premendo questo bottone.
 h_hist=Mostra la cronologia degli input.
 h_go=Esegue la query.
 h_stop=Ferma il processo in corso.
@@ -555,7 +536,6 @@ h_lang=Qui è possibile cambiare la lingua dell'applicazione. BaseX dev'essere r
 h_names=Quest'opzione controlla se un tag contiene un attributo 'name'. Se l'attributo esiste, il valore dell'attributo viene mostrato al posto del tag. Non è possibile cambiare quest'opzione se il database in uso no contiene attributi 'name'.
 h_fsname=Inserisci il nome del nuovo database in questo campo di testo.
 h_fsall=Se si seleziona questa checkbox, l'intero filesystem verrà passato al parser.
-h_fsbacking=DeepFS directory to store BLOBs into. (Is actually a copy of the imported file hierarchy).
 h_fsmount=DeepFS mount point. The database is mounted as filesystem in userspace.
 h_meta=Se si seleziona questa checkbox, i meta-data verranno estratti da numerosi tipi di file. i meta-data inclidono ad esempio la dimensione delle immagini, i tag ID3 dei file MP3 o i contenuti dei file mail.
 h_cont=Selezionando questa checkbox i contenuti testuali del file vengono inclusi. Se i contenuti vengono inclusi, possono essere cercati usando XQuery.
@@ -565,19 +545,16 @@ h_maplayout=Qui puoi modificare l'algoritmo di layout usato nella visualizzazion
 h_mapoff=Here you can modify the offset sizes of the rectangles.
 h_mapsize=Qui puoi definire le fondamenta del calcolo della dimensione dei rettangoli.
 h_drop=Usa questo bottone per eliminare il database selezionato.
-h_dropdb=Scegli un database da cancellare.
 h_lf=L'aspetto dell'applicazione può essere cambiato con quest'opzione.
 h_focus=Se questa checkbox è attivata, i componenti di input vengono evidenziati non appena il cursore si move su di essi.
 h_simplefd=Se hai problemi con la selezione file standard, puoi passare ad una versione semplice, ma più veloce.
 h_open=Scegli il database da aprire.
 h_font=Qui puoi selezionare il carattere da usare nelle visualizzazioni.
-h_mmem=In modalità Main-Memory, le query verranno eseguite il 50-80% più velocemente. Per contro, il consumo di memoria aumenta, e gli aggiornamenti sul database sono disabilitati.
 h_colors=Muovi gli slider per cambiare i colori dell'interfaccia visuale.
 h_cmd=Qui puoi inserire i comandi BaseX. Usa 'aiuto' per avere una panoramica di tutti i comandi disponibili.\n\nPuoi recuperare input precedenti con i tasti SU e GIU'.
 h_searchxml=Digita qualcosa nel campo di testo per cercarlo nel tuo documento XML. La seguente sintassi è supportata:\n...      Trova tag e testi\n=...   Trova nodi testo esatti\n@ ...  Trova attributi e loro valori\n@=   Trova valori di attributi esatti\n/...     Esegui input come XQuery
 h_searchfs=Digita qualcosa nel campo di testo per cercarlo nel tuo filesystem. La seguente sintassi è supportata:\n...      Trova file o directory\n= ...  Trova nomi esatti\n. ..     Trova estensioni di file\n< ...  Trova file più piccoli della dimensione specificata\n> ...  Trova file più grandi della dimensione specificata\n\nPuoi inserire comandi BaseX facendoli precedere dal segno di punto esclamativo.
 h_xpath=La modalità XQuery permette l'inserimento di semplici richieste XQuery.
-h_modefilt=Se il filtraggio real-time è disattivato, schiaccia Ctrl+ENTER per filtrare i risultati delle query.
 h_map=Questa visualizzazione è chiamata TreeMap. Tutti i nodi del documento XML sono rappresentati come rettangoli, e riempiono l'intera area. I nodi possono essere evidenziati con click singolo e filtrati con doppio click. Un menu pop-up verrà mostrato se si clicca col tasto destro su un elemento.
 h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a scatterplot. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_plotaxisx=With this combo box you can define the assignment to the x-axis.

@@ -81,7 +81,7 @@ public final class Open extends Process {
 
     final IO f = IO.get(path);
     final String db = f.dbname();
-    return ctx.prop.dbpath(db).exists() ?
-        open(ctx, db) : CreateDB.xml(ctx, f, db);
+    return ctx.prop.dbpath(db).exists() ? open(ctx, db) :
+      CreateDB.xml(ctx, f, db);
   }
 }

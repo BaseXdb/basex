@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.BuildException;
@@ -82,6 +83,9 @@ public final class CreateDB extends ACreate {
     final Prop pr = p.prop;
     if(pr.is(Prop.MAINMEM)) new MemBuilder(p).build(db);
 
+    if(ctx.pinned(db) || p.prop.dbpath(db + ".tmp").exists())
+      throw new IOException(DBINUSE);
+
     final Builder builder = new DiskBuilder(p);
     final String tmp = db + ".tmp";
     try {
@@ -94,6 +98,7 @@ public final class CreateDB extends ACreate {
         new FTFuzzyBuilder(data, pr).build() :
         new FTTrieBuilder(data, pr).build());
       data.close();
+      if(!move(db, pr)) throw new IOException();
     } catch(final IOException ex) {
       try {
         builder.close();
@@ -103,7 +108,6 @@ public final class CreateDB extends ACreate {
       DropDB.drop(tmp, pr);
       throw ex;
     }
-    move(db, pr);
     return Open.open(ctx, db);
   }
 
