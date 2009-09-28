@@ -21,15 +21,11 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Return;
-import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 import org.basex.util.XMLToken;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.ProcessingInstruction;
-import org.w3c.dom.Text;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
 
 /**
  * XQuery data types.
@@ -607,8 +603,8 @@ public enum Type {
   TXT("text", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXText) return ((BXText) o).getNod();
-      return new FTxt(token(((Text) o).getNodeValue()), null);
+      return o instanceof BXText ? ((BXText) o).getNod() :
+        new FTxt((Node) o, null);
     }
   },
 
@@ -616,11 +612,8 @@ public enum Type {
   PI("processing-instruction", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXPI) return ((BXPI) o).getNod();
-
-      final ProcessingInstruction pi = (ProcessingInstruction) o;
-      return new FPI(new QNm(token(pi.getNodeName())),
-          token(pi.getNodeValue()), null);
+      return o instanceof BXPI ? ((BXPI) o).getNod() :
+        new FPI((Node) o, null);
     }
   },
 
@@ -628,11 +621,8 @@ public enum Type {
   ELM("element", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXElem) return ((BXElem) o).getNod();
-
-      // [CG] API/add complete DOM object for elements
-      return new FElem(new QNm(token(((Element) o).getNodeName())),
-          EMPTY, null);
+      return o instanceof BXElem ? ((BXElem) o).getNod() :
+        new FElem((Node) o, null);
     }
   },
 
@@ -644,7 +634,7 @@ public enum Type {
 
       if(o instanceof Document) {
         try {
-          // [CG] API/should be use instance properties
+          // [CG] API/should use instance properties
           final Prop prop = new Prop();
           final DOCWrapper p = new DOCWrapper((Document) o, "", prop);
           final Data data = new MemBuilder(p).build();
@@ -653,9 +643,10 @@ public enum Type {
           throw new QueryException(UNDOC, ex.getMessage());
         }
       }
-
-      // [CG] API/add complete DOM object for document fragments
-      return new FDoc(new NodIter(), EMPTY);
+      // document fragment
+      final DocumentFragment df = (DocumentFragment) o;
+      final String bu = df.getBaseURI();
+      return new FDoc((Node) o, bu != null ? token(bu) : EMPTY);
     }
   },
 
@@ -666,11 +657,8 @@ public enum Type {
   ATT("attribute", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXAttr) return ((BXAttr) o).getNod();
-
-      final Attr at = (Attr) o;
-      return new FAttr(new QNm(token(at.getNodeName())),
-          token(at.getNodeValue()), null);
+      return o instanceof BXAttr ? ((BXAttr) o).getNod() :
+        new FAttr((Node) o, null);
     }
   },
 
@@ -678,9 +666,8 @@ public enum Type {
   COM("comment", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXComm) return ((BXComm) o).getNod();
-
-      return new FComm(token(((Comment) o).getNodeValue()), null);
+      return o instanceof BXComm ? ((BXComm) o).getNod() :
+        new FComm((Node) o, null);
     }
   },
 

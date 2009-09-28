@@ -93,8 +93,7 @@ public final class UpdateFunctions {
       if(n instanceof DBNode) {
         final DBNode dbn = (DBNode) n;
         ds += dbn.data.size(dbn.pre, Nod.kind(dbn.type));
-      }
-      else if(n instanceof FNode) {
+      } else if(n instanceof FNode) {
         final FNode fn = (FNode) n;
         ds += fn.descOrSelf().size();
       }
@@ -117,8 +116,7 @@ public final class UpdateFunctions {
           addDBNode(dn, m, dis);
           dn = (DBNode) desc.next();
         }
-      }
-      else if(n instanceof FNode) {
+      } else if(n instanceof FNode) {
         final NodeIter desc = ((FNode) n).descOrSelf();
         FNode fn = (FNode) desc.next();
         while(fn != null) {

@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
@@ -30,8 +29,6 @@ public abstract class IO {
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
 
-  /** File prefix. */
-  private static final String PREFILE = "file://";
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";
 
@@ -63,8 +60,9 @@ public abstract class IO {
   public static IO get(final String s) {
     if(s == null) return new IOFile("");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(s.startsWith("http://")) return new IOUrl(s);
-    return new IOFile(s);
+    if(!s.contains(":") || s.startsWith("file:") ||
+        s.length() > 2 && s.charAt(1) == ':') return new IOFile(s);
+    return new IOUrl(s);
   }
 
   /**
@@ -281,28 +279,9 @@ public abstract class IO {
 
   /**
    * Creates a URL from the specified path.
-   * @param path path to be converted
    * @return URL
    */
-  public static final String url(final String path) {
-    String pre = PREFILE;
-    if(!path.startsWith("/")) {
-      pre += "/";
-      if(path.length() < 2 || path.charAt(1) != ':') {
-        pre += "/" + Prop.WORK.replace('\\', '/');
-        if(!pre.endsWith("/")) pre += "/";
-      }
-    }
-    return pre + path.replace('\\', '/');
-  }
-
-  /**
-   * Creates a file path from the specified URL.
-   * @param url url to be converted
-   * @return file path
-   */
-  public static final String file(final String url) {
-    final String fn = url.replaceAll(PREFILE, "");
-    return fn.matches("/.:.*") ? fn.substring(1) : fn;
+  public String url() {
+    return path;
   }
 }

@@ -10,6 +10,9 @@ import org.basex.util.Atts;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Element node fragment.
@@ -53,6 +56,49 @@ public final class FElem extends FNode {
     base = b;
     ns = nsp;
     par = p;
+  }
+
+  /**
+   * Constructor for DOM nodes (partial).
+   * Provided by Erdal Karaca.
+   * @param node DOM node
+   * @param p parent reference
+   */
+  public FElem(final Node node, final Nod p) {
+    super(Type.ELM);
+    final int s = node.getChildNodes().getLength();
+    final Nod[] childArr = new Nod[s];
+    final Nod[] attArr = new Nod[s];
+
+    name = new QNm(Token.token(node.getNodeName()));
+    children = new NodIter(childArr, childArr.length);
+    atts = new NodIter(attArr, attArr.length);
+    base = EMPTY;
+    ns = new Atts();
+    par = p;
+
+    final NamedNodeMap attsMap = node.getAttributes();
+    for(int i = 0; i < attsMap.getLength(); i++) {
+      attArr[i] = new FAttr(attsMap.item(i), this);
+    }
+
+    final NodeList childNodeList = node.getChildNodes();
+    for(int i = 0; i < childNodeList.getLength(); i++) {
+      final Node child = childNodeList.item(i);
+
+      switch(child.getNodeType()) {
+        case Node.TEXT_NODE:
+          childArr[i] = new FTxt(child, this); break;
+        case Node.COMMENT_NODE:
+          childArr[i] = new FComm(child, this); break;
+        case Node.PROCESSING_INSTRUCTION_NODE:
+          childArr[i] = new FPI(child, this); break;
+        case Node.ELEMENT_NODE:
+          childArr[i] = new FElem(child, this); break;
+        default:
+          break;
+      }
+    }
   }
 
   @Override

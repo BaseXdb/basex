@@ -150,7 +150,7 @@ public class QueryParser extends InputParser {
    */
   public QueryParser(final QueryContext c) {
     ctx = c;
-    file = c.file;
+    file = c.file();
   }
 
   /**

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.basex.core.Prop;
 import org.xml.sax.InputSource;
 
 /**
@@ -17,6 +18,8 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** File prefix. */
+  private static final String PREFILE = "file:";
   /** Input stream reference. */
   private InputStream is;
   /** File reference. */
@@ -124,7 +127,7 @@ public final class IOFile extends IO {
 
   @Override
   public InputSource inputSource() {
-    return is == null ? new InputSource(url(path)) : new InputSource(is);
+    return is == null ? new InputSource(url()) : new InputSource(is);
   }
 
   @Override
@@ -170,5 +173,29 @@ public final class IOFile extends IO {
   public boolean delete() {
     if(isDir()) for(final IO ch : children()) if(!ch.delete()) return false;
     return file.delete();
+  }
+
+  @Override
+  public String url() {
+    String pre = PREFILE;
+    if(!path.startsWith("/")) {
+      pre += "/";
+      if(path.length() < 2 || path.charAt(1) != ':') {
+        pre += "/" + Prop.WORK.replace('\\', '/');
+        if(!pre.endsWith("/")) pre += "/";
+      }
+    }
+    return pre + path.replace('\\', '/');
+  }
+
+  /**
+   * Creates a file path from the specified URL.
+   * @param url url to be converted
+   * @return file path
+   */
+  private static String file(final String url) {
+    final String fn = url.startsWith(PREFILE) ?
+        url.substring(PREFILE.length()) : url;
+    return fn.matches("/.:.*") ? fn.substring(1) : fn;
   }
 }

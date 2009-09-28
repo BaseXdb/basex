@@ -45,7 +45,6 @@ final class FNBaseX extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FILENAME:   return filename(ctx);
       case READ:       return text(ctx);
       case RANDOM:     return random();
       default:         return super.atomic(ctx);
@@ -129,14 +128,5 @@ final class FNBaseX extends Fun {
 
     Err.or(WHICHIDX, type);
     return null;
-  }
-
-  /**
-   * Performs the contains lower case function.
-   * @param ctx query context
-   * @return iterator
-   */
-  private Item filename(final QueryContext ctx) {
-    return ctx.file == null ? Str.ZERO : Str.get(token(ctx.file.name()));
   }
 }

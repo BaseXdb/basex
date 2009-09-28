@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
+import org.basex.util.Token;
+import org.w3c.dom.Node;
 
 /**
  * Attribute node fragment.
@@ -28,6 +30,17 @@ public final class FAttr extends FNode {
     name = n;
     val = v;
     par = p;
+  }
+
+  /**
+   * Constructor for DOM nodes (partial).
+   * Provided by Erdal Karaca.
+   * @param node DOM node
+   * @param p parent reference
+   */
+  public FAttr(final Node node, final Nod p) {
+    this(new QNm(Token.token(node.getNodeName())),
+        Token.token(node.getNodeValue()), p);
   }
 
   @Override

@@ -148,7 +148,7 @@ public class DBNode extends Nod {
     if(type != Type.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.file.path());
     final IO file = IO.get(string(data.text(pre)));
-    return token(dir.merge(file).path());
+    return token(dir.merge(file).url());
   }
 
   @Override

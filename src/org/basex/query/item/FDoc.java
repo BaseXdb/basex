@@ -6,6 +6,8 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
 import org.basex.util.TokenBuilder;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Document node fragment.
@@ -26,6 +28,19 @@ public final class FDoc extends FNode {
     super(Type.DOC);
     children = ch;
     base = b;
+  }
+
+
+  /**
+   * Constructor for DOM nodes (partial).
+   * Provided by Erdal Karaca.
+   * @param node DOM node
+   * @param b base uri
+   */
+  public FDoc(final Node node, final byte[] b) {
+    this(new NodIter(), b);
+    final NodeList nl = node.getChildNodes();
+    if(nl.getLength() != 0) children.add(new FElem(nl.item(0), this));
   }
 
   @Override

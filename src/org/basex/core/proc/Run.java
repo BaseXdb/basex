@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Token;
 
@@ -25,6 +26,8 @@ public final class Run extends AQuery {
   protected boolean exec() {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
+    Prop.xquery = io;
+
     try {
       return query(Token.string(io.content()));
     } catch(final IOException ex) {

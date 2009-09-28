@@ -3,6 +3,8 @@ package org.basex.query.item;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
+import org.basex.util.Token;
+import org.w3c.dom.Node;
 
 /**
  * Comment node fragment.
@@ -23,6 +25,16 @@ public final class FComm extends FNode {
     super(Type.COM);
     val = t;
     par = p;
+  }
+
+  /**
+   * Constructor for DOM nodes (partial).
+   * Provided by Erdal Karaca.
+   * @param node DOM node
+   * @param parent parent reference
+   */
+  public FComm(final Node node, final Nod parent) {
+    this(Token.token(node.getNodeValue()), parent);
   }
 
   @Override

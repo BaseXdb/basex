@@ -58,8 +58,6 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> stop;
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
-  /** Reference to the query file. */
-  public IO file = Prop.xquery;
   /** Query string. */
   public String query;
 
@@ -108,7 +106,8 @@ public final class QueryContext extends Progress {
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Static Base URI. */
-  public Uri baseURI = Uri.EMPTY;
+  public Uri baseURI = Uri.uri(Prop.xquery != null ?
+      token(Prop.xquery.url()) : EMPTY);
   /** Default element namespace. */
   public byte[] nsElem = EMPTY;
   /** Default collation. */
@@ -179,7 +178,7 @@ public final class QueryContext extends Progress {
    */
   public void parse(final String q) throws QueryException {
     query = q;
-    root = new QueryParser(this).parse(q, file, null);
+    root = new QueryParser(this).parse(q, file(), null);
   }
 
   /**
@@ -189,7 +188,7 @@ public final class QueryContext extends Progress {
    */
   public void module(final String q) throws QueryException {
     query = q;
-    new QueryParser(this).parse(q, file, Uri.EMPTY);
+    new QueryParser(this).parse(q, file(), Uri.EMPTY);
   }
 
   /**
@@ -419,6 +418,7 @@ public final class QueryContext extends Progress {
         Err.or(INVDOC, name);
       }
     } else {
+      final IO file = file();
       data = check(name, file == null, coll);
       if(data == null) data = check(file.merge(io).path(), true, coll);
     }
@@ -535,6 +535,14 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns an IO representation of the base uri.
+   * @return IO reference
+   */
+  public IO file() {
+    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.str())) : null;
+  }
+  
+  /**
    * Returns query background information.
    * @return warning
    */
@@ -559,6 +567,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return Main.name(this) + '[' + file + ']';
+    return Main.name(this) + '[' + file() + ']';
   }
 }

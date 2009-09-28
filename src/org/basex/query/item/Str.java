@@ -66,7 +66,7 @@ public class Str extends Item {
   }
 
   @Override
-  public final byte[] str() {
+  public byte[] str() {
     return val;
   }
 

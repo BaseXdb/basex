@@ -256,22 +256,20 @@ public final class WebServer {
     out.println(DOCTYPE);
 
     try {
+      Prop.xquery = req.file;
       QueryProcessor xq = null;
+      String query = Token.string(req.file.content());
 
       // cache compiled query or create new one
       if(cache) {
         final String key = req.file + "/" + req.file.date();
         xq = map.get(key);
         if(xq == null) {
-          final String query = Token.string(req.file.content());
           xq = new QueryProcessor(query, context);
-          xq.ctx.file = req.file;
           map.put(key, xq);
         }
       } else {
-        final String query = Token.string(req.file.content());
         xq = new QueryProcessor(query, context);
-        xq.ctx.file = req.file;
       }
 
       // assign parameters to the xquery processor

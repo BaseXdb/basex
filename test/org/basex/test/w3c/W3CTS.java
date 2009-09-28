@@ -320,8 +320,8 @@ public abstract class W3CTS {
     if(single != null && !outname.startsWith(single)) return true;
     if(verbose) Main.outln("- " + outname);
 
-    final IO file = IO.get(queries + pth + inname + ".xq");
-    final String in = read(file);
+    Prop.xquery = IO.get(queries + pth + inname + ".xq");
+    final String in = read(Prop.xquery);
     String error = null;
     SeqIter iter = null;
     boolean doc = true;

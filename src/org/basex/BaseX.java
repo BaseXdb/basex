@@ -53,6 +53,7 @@ public class BaseX extends Main {
     boolean user = false;
     if(file != null) {
       // query file contents
+      Prop.xquery = IO.get(file);
       final String query = content();
       if(query != null) process(new XQuery(query), true);
     } else if(commands != null) {
