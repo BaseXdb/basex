@@ -212,7 +212,7 @@ public final class InexDBTestNew {
       z++;
     }
 
-    Main.outln("Query % on %: %", qu + 1, databases.get(db), qtime);
+    Main.outln("Query % on %: % with size: %", qu + 1, databases.get(db), qtime, size);
     return sq;
   }
 
@@ -223,9 +223,8 @@ public final class InexDBTestNew {
    * @return SeqIter with all values
    */
   private SeqIter addSortedServer(final SeqIter it1, final SeqIter it2) {
-    if(it1 == null && it2 != null) return it2;
-    if(it2 == null && it1 != null) return it1;
-
+    if(it1 == null || it1.size() == 0) return it2;
+    
     final SeqIter tmp = new SeqIter();
     Item i1 = it1.next(), i2 = it2.next();
     while(i1 != null && i2 != null) {
@@ -241,8 +240,15 @@ public final class InexDBTestNew {
         i2 = it2.next();
       }
     }
-    while((i1 = it1.next()) != null) tmp.add(i1);
-    while((i2 = it2.next()) != null) tmp.add(i2);
+    while(i1 != null) {
+      tmp.add(i1);
+      i1 = it1.next();
+    }
+    
+    while(i2 != null) {
+      tmp.add(i2);
+      i2 = it2.next();
+    }
     return tmp;
   }
 
