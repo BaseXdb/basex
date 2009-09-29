@@ -62,7 +62,7 @@ public final class Replace extends Arr {
     // iter -> node,doc,... -> insert each node,etc. into r
     // apply
     if(value) Err.or(UPIMPL, value);
-    final MemData m = buildDB(null, r, 
+    final MemData m = buildDB(r, 
         trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
     ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, m));
     return Iter.EMPTY;

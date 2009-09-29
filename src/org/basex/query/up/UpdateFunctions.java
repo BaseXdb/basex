@@ -22,7 +22,7 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * XQuery Update update functions.
@@ -70,13 +70,12 @@ public final class UpdateFunctions {
   
   /**
    * Builds new MemData instance from iterator.
-   * @param root root node  
    * @param ch sequence iterator
    * @param d data reference for indices
    * @return new MemData instance
    * @throws QueryException query exception
    */
-  public static MemData buildDB(final Nod root, final Iter ch, final Data d) 
+  public static MemData buildDB(final Iter ch, final Data d) 
   throws QueryException {
     MemData m = null;
     // [LK] usage of index refs only possible if target node is a dbnode,
@@ -99,10 +98,8 @@ public final class UpdateFunctions {
       }
       n = (Nod) i.next();
     }
-    // add doc root node
-    if(root == null) m.addDoc(Token.EMPTY, ds);
-    // [LK] alternative root
-    else return null;
+    // add root node for data instance
+    m.addDoc(EMPTY, ds);
     
     // add nodes as childs
     int pre = 1;
@@ -118,7 +115,7 @@ public final class UpdateFunctions {
       }
       n = (Nod) i.next();
     }
-//    printTable(m);
+    printTable(m);
     return m;
   }
   
@@ -173,6 +170,12 @@ public final class UpdateFunctions {
             0, pre - par, as == -1 ? 1 : as, s == -1 ? 1 : s, false);
         pre++;
         break;
+      case Data.ATTR:
+        // needed to build data instance from attribute sequence
+        final FAttr fat = (FAttr) n;
+        m.addAtt(m.atts.index(fat.qname().str(), null, false), 
+            0, fat.str(), pre - par);
+        return ++pre;
       case Data.TEXT:
         m.addText(((FTxt) n).str(), pre - par, k);
         return ++pre;
@@ -213,6 +216,7 @@ public final class UpdateFunctions {
    */
   private static int addDBNode(final DBNode n, final MemData m, 
       final int preVal, final int par) throws QueryException {
+    // [LK] copy nodes directly from table instead of using iterators
     final Data data = n.data;
     final int k = Nod.kind(n.type);
     int pre = preVal;
@@ -223,6 +227,11 @@ public final class UpdateFunctions {
             0, pre - par, data.attSize(n.pre, k), data.size(n.pre, k), false);
         pre++;
         break;
+      case Data.ATTR:
+        // needed to build data instance from attribute sequence
+        m.addAtt(m.atts.index(data.attName(n.pre), null, false), 
+            0, data.attValue(n.pre), pre - par);
+        return ++pre;
       case Data.TEXT:
         m.addText(data.text(n.pre), pre - par, k);
         return ++pre;
@@ -233,12 +242,12 @@ public final class UpdateFunctions {
         m.addText(data.text(n.pre), pre - par, k);
         return ++pre;
     }
-    // add attributes
+    // add attributes and child nodes if n is element
     final NodeIter atts = n.attr();
     DBNode at = (DBNode) atts.next();
     while(at != null) {
-      m.addAtt(m.atts.index(at.data.attName(at.pre), null, false), 
-          0, at.data.attValue(at.pre), pre - preVal);
+      m.addAtt(m.atts.index(data.attName(at.pre), null, false), 
+          0, data.attValue(at.pre), pre - preVal);
       pre++;
       at = (DBNode) atts.next();
     }
