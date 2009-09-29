@@ -584,19 +584,19 @@ public final class DiskData extends Data {
   @Override
   public void insertSeq(final int pre, final int par, final Data dt) {
     meta.update();
-
-    // first source node to be copied; if input is a document, skip first node
-    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
+    final int sa = 1;
     // number of nodes to be inserted
     int ss = dt.size(0, dt.kind(0));
 
     // copy database entries
-    for(int s = sa; s < sa + ss; s++) {
+    for(int s = sa; s < ss; s++) {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
       // recalculate distance for root nodes
-      // [CG] Updates/Insert: test collections
-      final int d = r < sa ? pre - par : s - r;
+//      final int p = pre + s - 1;
+//      final int d = r == 0 ? p - par : p - r;
+      // [LK] debug!
+      final int d = r > par ? s - r : s - par;
       final int p = pre + s - sa - 1;
 
       switch(k) {
@@ -621,10 +621,7 @@ public final class DiskData extends Data {
       }
     }
     // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss);
-
-    // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
+    if(par != 0) updateTable(pre, par, ss - 1);
   }
 
   /**
