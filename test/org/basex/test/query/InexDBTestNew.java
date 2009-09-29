@@ -212,7 +212,8 @@ public final class InexDBTestNew {
       z++;
     }
 
-    Main.outln("Query % on %: % with size: %", qu + 1, databases.get(db), qtime, size);
+    Main.outln("Query % on %: % with size: %", qu + 1,
+        databases.get(db), qtime, size);
     return sq;
   }
 

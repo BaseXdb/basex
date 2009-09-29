@@ -90,8 +90,6 @@ public final class Prop extends AProp {
 
   /** Format XQuery output. */
   public static final Object[] XQFORMAT = { "XQFORMAT", true };
-  /** FTContains compatibility. */
-  public static final Object[] FTCONTAINS = { "FTCONTAINS", true };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };

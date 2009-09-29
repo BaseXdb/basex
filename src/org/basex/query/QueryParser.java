@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -884,7 +883,6 @@ public class QueryParser extends InputParser {
    */
   private Expr typeswitch() throws QueryException {
     if(!consumeWS(TYPESWITCH, PAR1, TYPEPAR)) return null;
-
     check(PAR1);
     final Expr e = check(expr(), NOTYPESWITCH);
     check(PAR2);
@@ -991,9 +989,8 @@ public class QueryParser extends InputParser {
    */
   private Expr ftContains() throws QueryException {
     final Expr e = range();
-    if(ctx.context.prop.is(Prop.FTCONTAINS)) {
-      if(!consumeWS(FTCONTAINS)) return e;
-    } else {
+
+    if(!consumeWS(FTCONTAINS)) {
       final int p = qp;
       if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
         qp = p;
