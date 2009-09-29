@@ -580,6 +580,58 @@ public final class DiskData extends Data {
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
   }
+  
+  /**
+   * Inserts a data instance at the specified pre value.
+   * Note that the specified data instance must differ from this instance.
+   * @param pre value at which to insert new data
+   * @param par parent pre value of node
+   * @param dt data instance to copy from
+   */
+  public void insertSeq(final int pre, final int par, final Data dt) {
+    meta.update();
+
+    // first source node to be copied; if input is a document, skip first node
+    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
+    // number of nodes to be inserted
+    int ss = dt.size(0, dt.kind(0));
+
+    // copy database entries
+    for(int s = sa; s < sa + ss; s++) {
+      final int k = dt.kind(s);
+      final int r = dt.parent(s, k);
+      // recalculate distance for root nodes
+      // [CG] Updates/Insert: test collections
+      final int d = r < sa ? pre - par : s - r;
+      final int p = pre + s - sa - 1;
+
+      switch(k) {
+        case ELEM:
+          // add element
+          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
+          break;
+        case DOC:
+          // add document
+          insertDoc(p, dt.size(s, k), dt.text(s));
+          break;
+        case TEXT:
+        case COMM:
+        case PI:
+          // add text
+          insertText(p, d, dt.text(s), k);
+          break;
+        case ATTR:
+          // add attribute
+          insertAttr(p, d, dt.attName(s), dt.attValue(s));
+          break;
+      }
+    }
+    // update table if no document was inserted
+    if(par != 0) updateTable(pre, par, ss);
+
+    // delete old empty root node
+    if(size(0, DOC) == 1) delete(0);
+  }
 
   /**
    * Inserts an element node without updating the size and distance values

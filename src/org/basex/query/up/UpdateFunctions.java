@@ -95,7 +95,7 @@ public final class UpdateFunctions {
         ds += dbn.data.size(dbn.pre, Nod.kind(dbn.type));
       } else if(n instanceof FNode) {
         final FNode fn = (FNode) n;
-        ds += fn.descOrSelf().size();
+        ds += fragmentSize(fn, false);
       }
       n = (Nod) i.next();
     }
@@ -105,24 +105,16 @@ public final class UpdateFunctions {
     else return null;
     
     // add nodes as childs
-    int dis = 1;
+    int pre = 1;
     i.reset();
     n = (Nod) i.next();
     while(n != null) {
       if(n instanceof DBNode) {
-        final NodeIter desc = ((DBNode) n).descOrSelf();
-        DBNode dn = (DBNode) desc.next();
-        while(dn != null) {
-          addDBNode(dn, m, dis);
-          dn = (DBNode) desc.next();
-        }
+        DBNode dn = (DBNode) n;
+        pre = addDBNode(dn, m, pre, 0);
       } else if(n instanceof FNode) {
-        final NodeIter desc = ((FNode) n).descOrSelf();
-        FNode fn = (FNode) desc.next();
-        while(fn != null) {
-          addFragment(fn, m, dis);
-          fn = (FNode) desc.next();
-        }
+        final FNode fn = (FNode) n;
+        pre = addFragment(fn, m, pre, 0);
       }
       n = (Nod) i.next();
     }
@@ -131,83 +123,132 @@ public final class UpdateFunctions {
   }
   
   /**
-   * Adds node to MemData instance.
-   * @param n node 
-   * @param m data reference
-   * @param dis distance
+   * Determines the number of descendants of a fragment.
+   * @param n fragment node
+   * @param attr count attribute size of node
+   * @return number of descendants + 1 or attribute size + 1
    * @throws QueryException query exception 
    */
-  private static void addFragment(final FNode n, final MemData m, 
-      final int dis) throws QueryException {
+  public static int fragmentSize(final FNode n, final boolean attr) 
+   throws QueryException {
+    int s = 1;
+    final NodeIter at = n.attr();
+    Nod fat = at.next();
+    while(fat != null) {
+      s++;
+      fat = at.next();
+    }
+    if(attr) return s;
+    final NodeIter it = n.child();
+    Nod i = it.next();
+    while(i != null) {
+      s += fragmentSize((FNode) i, false);
+      i = it.next();
+    }
+    return s;
+  }
+  
+  /**
+   * Adds a fragment to a MemData instance.
+   * @param n node to be added
+   * @param m data reference
+   * @param preVal node position
+   * @param par node parent
+   * @return pre value of next node
+   * @throws QueryException query exception
+   */
+  private static int addFragment(final FNode n, final MemData m, 
+      final int preVal, final int par) throws QueryException {
     final int k = Nod.kind(n.type);
+    int pre = preVal;
     // add node
     switch (k) {
       case Data.ELEM:
         final FElem e = (FElem) n;
         // [LK] check sizes
-        final int as = e.attr().size();
-        final int s = e.desc().size();
+        final int as = fragmentSize(e, true);
+        final int s = fragmentSize(e, false);
         m.addElem(
             m.tags.index(e.nname(), null, false), 
-            0, dis, as == -1 ? 1 : as, s == -1 ? 1 : s, false);
+            0, pre - par, as == -1 ? 1 : as, s == -1 ? 1 : s, false);
+        pre++;
         break;
       case Data.TEXT:
-        m.addText(((FTxt) n).str(), dis, k);
-        return;
+        m.addText(((FTxt) n).str(), pre - par, k);
+        return ++pre;
       case Data.PI:
-        m.addText(((FPI) n).str(), dis, k);
-        return;
+        m.addText(((FPI) n).str(), pre - par, k);
+        return ++pre;
       case Data.COMM:
-        m.addText(((FComm) n).str(), dis, k);
-        return;
+        m.addText(((FComm) n).str(), pre - par, k);
+        return ++pre;
     }
     
     // add attributes
-    final NodeIter nIt = n.attr();
-    FAttr at = (FAttr) nIt.next();
-    // local parent distance
+    final NodeIter attIt = n.attr();
+    FAttr at = (FAttr) attIt.next();
     while(at != null) {
       m.addAtt(m.atts.index(at.qname().str(), null, false), 
-          0, at.str(), dis);
-      at = (FAttr) nIt.next();
+          0, at.str(), pre - preVal);
+      pre++;
+      at = (FAttr) attIt.next();
     }
+    final NodeIter chIt = n.child();
+    Nod fn = chIt.next();
+    while(fn != null) {
+      pre = addFragment((FNode) fn, m, pre, preVal);
+      fn = chIt.next();
+    }
+    return pre;
   }
   
   /**
-   * Adds node to MemData instance.
-   * @param n node
+   * Adds a database node to a MemData instance.
+   * @param n node to be added
    * @param m data reference
-   * @param dis distance
+   * @param preVal node position
+   * @param par node parent
+   * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static void addDBNode(final DBNode n, final MemData m, final int dis) 
-    throws QueryException {
+  private static int addDBNode(final DBNode n, final MemData m, 
+      final int preVal, final int par) throws QueryException {
     final Data data = n.data;
     final int k = Nod.kind(n.type);
+    int pre = preVal;
     // [LK] type DOC?
     switch(k) {
       case Data.ELEM:
         m.addElem(m.tags.index(data.tag(n.pre), null, false), 
-            0, dis, data.attSize(n.pre, k), data.size(n.pre, k), false);
+            0, pre - par, data.attSize(n.pre, k), data.size(n.pre, k), false);
+        pre++;
         break;
       case Data.TEXT:
-        m.addText(data.text(n.pre), dis, k);
-        return;
+        m.addText(data.text(n.pre), pre - par, k);
+        return ++pre;
       case Data.PI:
-        m.addText(data.text(n.pre), dis, k);
-        return;
+        m.addText(data.text(n.pre), pre - par, k);
+        return ++pre;
       case Data.COMM:
-        m.addText(data.text(n.pre), dis, k);
-        return;
+        m.addText(data.text(n.pre), pre - par, k);
+        return ++pre;
     }
     // add attributes
     final NodeIter atts = n.attr();
     DBNode at = (DBNode) atts.next();
     while(at != null) {
       m.addAtt(m.atts.index(at.data.attName(at.pre), null, false), 
-          0, at.data.attValue(at.pre), dis);
+          0, at.data.attValue(at.pre), pre - preVal);
+      pre++;
       at = (DBNode) atts.next();
     }
+    final NodeIter chIt = n.child();
+    Nod dn = chIt.next();
+    while(dn != null) {
+      pre = addDBNode((DBNode) dn, m, pre, preVal);
+      dn = chIt.next();
+    }
+    return pre;
   }
   
   /**
