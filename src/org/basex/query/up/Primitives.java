@@ -9,6 +9,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.Nod;
 import org.basex.util.IntList;
 
 /**
@@ -65,9 +66,13 @@ public class Primitives {
     for(final ReplacePrimitive p : replaces) {
       // [LK] trgt / rpl node must be different nodes
       // [LK] check parent of replaced node
-      // [LK] check for duplicate attributess
+      // [LK] check for duplicate attributes
       // [LK] merge text nodes
       if(!(p.node instanceof DBNode)) continue;
+      final DBNode n = (DBNode) p.node;
+      final int k = Nod.kind(n.type);
+      data.insert(n.pre + data.size(n.pre, k), data.parent(n.pre, k), p.r);
+      data.delete(n.pre);
     }
     
     // delete

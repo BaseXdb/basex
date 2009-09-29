@@ -429,6 +429,15 @@ public abstract class Data {
    * @param d data instance to copy from
    */
   public abstract void insert(int pre, int par, Data d);
+  
+  /**
+   * Inserts a data instance at the specified pre value.
+   * Note that the specified data instance must differ from this instance.
+   * @param pre value at which to insert new data
+   * @param par parent pre value of node
+   * @param dt data instance to copy from
+   */
+  public abstract void insertSeq(final int pre, final int par, final Data dt);
 
   /**
    * Returns the locking situation of the data.

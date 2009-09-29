@@ -290,6 +290,11 @@ public class MemData extends Data {
   public final void insert(final int pre, final int par, final Data d) {
     Main.notimplemented();
   }
+  
+  @Override
+  public final void insertSeq(final int pre, final int par, final Data d) {
+    Main.notimplemented();
+  }
 
   @Override
   public final void update(final int pre, final byte[] text) {
