@@ -45,7 +45,7 @@ public final class ScoringTokenizer extends Tokenizer{
 
   @Override
   public byte[] get() {
-    return (!phrase) ? super.get() : super.text;
+    return phrase ? super.text : super.get();
   }
   
   @Override
@@ -56,12 +56,11 @@ public final class ScoringTokenizer extends Tokenizer{
   }
 
   /**
-   * Set flag for phrase processing.
+   * Sets flag for phrase processing.
    */
   public void phrase() {
     phrase = true;
   }
-  
   
   /**
    * Returns the score for the specified key.
@@ -71,17 +70,17 @@ public final class ScoringTokenizer extends Tokenizer{
   public int score(final byte[] key) {
     final int c = token.get(key);
     token.set(key, -1);
-    if (c > 0 && freq != null) {
+    if(c > 0 && freq != null) {
       final int f = freq.get(key);
-      if (f > 0) {
-        return (int) (Math.log(2666130 / f) * c * 1000 / max);
+      if(f > 0) {
+        return Math.max(1, (int) (Math.log(2666130d / f) * c * 1000 / max));
       }
     }
-    return c == 0 ? 0 : c * 1000 /  max;
+    return c == 0 ? 0 : Math.max(1, c * 1000 / max);
   }
 
   /**
-   * Read frequency out of an external file.
+   * Reads the frequency out of an external file.
    */
   public void readFrequency() {
     try {

@@ -57,7 +57,7 @@ public final class FTItem extends DBNode {
       if(ids) {
         Iterator<FTStringMatch> i = all.match[0].iterator();
         if(i.hasNext()) {
-          score = i.next().e / 1000.0;
+          score = i.next().e / 1000d;
         } else {
           score = Math.max((double) all.size / (double) is,
               Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));

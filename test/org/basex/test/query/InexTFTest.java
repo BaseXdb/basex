@@ -155,12 +155,10 @@ public final class InexTFTest {
    * @param qu query offset
    * @throws Exception exception
    */
-  private void query(final int db, final int qu)
-      throws Exception {
-
+  private void query(final int db, final int qu) throws Exception {
     if(session.execute(new XQuery(
-        "distinct-values((for $i in //*[text() ftcontains \"" 
-        + words.get(qu) + "\"] return base-uri($i)))"))) {
+        "distinct-values((for $i in //*[text() ftcontains \""  +
+        words.get(qu) + "\"] return base-uri($i)))"))) {
       session.output(new CachedOutput());
 
       final String str = session.info();

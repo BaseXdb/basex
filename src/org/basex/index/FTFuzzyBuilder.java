@@ -64,12 +64,11 @@ public final class FTFuzzyBuilder extends FTBuilder {
     }
 
     // [SG] INEX score value indexing
-    if (wp instanceof ScoringTokenizer) {
-      final int score = ((ScoringTokenizer) wp).score(tok);
-      if (score > -1) {
-        tree[tl].index(tok, id, score);
-      } else tree[tl].index(tok, id, wp.pos);
-    } else tree[tl].index(tok, id, wp.pos);
+    if(wp instanceof ScoringTokenizer) {
+      tree[tl].index(tok, id, ((ScoringTokenizer) wp).score(tok));
+    } else {
+      tree[tl].index(tok, id, wp.pos);
+    }
   }
 
   @Override
