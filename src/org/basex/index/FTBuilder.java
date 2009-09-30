@@ -1,11 +1,11 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.util.ScoringTokenizer;
-import org.basex.util.Token;
 import org.basex.util.Tokenizer;
 
 /**
@@ -36,45 +36,47 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException IO exception
    */
   final void index() throws IOException {
-    final String[] s = {"wonder girls", "cloud computing", "evidence theory",
-    "dempster schafer", "rabindranath tagore", "danny boyle", 
-    "hard disk", "second world war", "stock exchange", "insider trading",
-    "game show", "hatha yoga", "world wide web", "french revolution", 
-    "global warming", "human activity", "virtual museums"};
-    int p;
-    int i, j;
+    final byte[][] st = { token("wonder girls"), token("cloud computing"),
+        token("evidence theory"), token("dempster schafer"),
+        token("rabindranath tagore"), token("danny boyle"),
+        token("hard disk"), token("second world war"), token("stock exchange"),
+        token("insider trading"), token("game show"), token("hatha yoga"),
+        token("world wide web"), token("french revolution"), 
+        token("global warming"), token("human activity"),
+        token("virtual museums")
+    };
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) continue;
       checkStop();
-      p = 0;
-      i = 0;
-      j = 0;
+      int p = 0, i = 0, j = 0;
       wp.init(data.text(id));
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens
-        if(tok.length <= Token.MAXLEN) index(tok);
+        if(tok.length <= MAXLEN) index(tok);
         
         // [SG] INEX index phrases
-        if (wp instanceof ScoringTokenizer) {
-          if (j == 0) {
-            for (i = 0; i < s.length; i++) { 
-              if(s[i].indexOf(new String(tok)) == 0) {
+        if(wp instanceof ScoringTokenizer) {
+          if(j == 0) {
+            for(i = 0; i < st.length; i++) { 
+              if(startsWith(st[i], tok)) {
                 p++;
                 j += tok.length + 1;
                 break;
               }
             }
           } else {
-            if (j > 0 && s[i].length() >= j + tok.length 
-                && s[i].substring(j, j + tok.length).equals(new String(tok))) {
-              if (j + tok.length == s[i].length()) {
-                index(s[i].getBytes());
+            if(st[i].length >= j + tok.length &&
+                eq(substring(st[i], j, j + tok.length), tok)) {
+              if(j + tok.length == st[i].length) {
+                index(st[i]);
                 j = 0;
               } else {
                 j += tok.length + 1;
               }
-            } else j = 0;
+            } else {
+              j = 0;
+            }
           }                        
         }          
       }
