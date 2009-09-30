@@ -22,6 +22,7 @@ import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
@@ -114,14 +115,23 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          // more than one token: deactivate fast processing
-          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
-              ctx.context.prop);
-          ft.fast &= ft.count() == 1;
-          ft.init();
-          while(ft.more()) {
-            final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
-            iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
+          if (ctx.context.prop.is(Prop.INDEXSCORES)) {
+            //[SG] INEX phrase processing 
+            final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt), ctx.ftopt, fast,
+                ctx.context.prop);
+            st.phrase();
+            st.more();
+            iat = (FTIndexIterator) data.ids(st);
+          } else {
+            // more than one token: deactivate fast processing
+            final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
+                ctx.context.prop);
+            ft.fast &= ft.count() == 1;
+            ft.init();
+            while(ft.more()) {
+              final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
+              iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
+            }
           }
           iat.setTokenNum(++ctx.ftoknum);
         }        
@@ -257,6 +267,15 @@ public final class FTWords extends FTExpr {
       }
     }
 
+    // [SG] INEX phrase processing
+    if (ic.ctx.context.prop.is(Prop.INDEXSCORES)) {      
+      final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt), fto, fast, ic.ctx.context.prop);
+      st.phrase();
+      st.more();
+      ic.is = ic.data.nrIDs(st);
+      return true;
+    }
+    
     // summarize number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
     ic.is = 0;

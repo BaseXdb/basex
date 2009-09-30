@@ -154,6 +154,7 @@ public final class InexDBTest {
       session.execute(new Set(Prop.IBT, timer));
     }
 
+    session.execute(new Set(Prop.SERIALIZE, false));
     if(session.execute(new XQuery(queries.get(qu)))) {
       session.output(new CachedOutput());
       if(!store) return;

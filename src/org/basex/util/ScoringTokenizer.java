@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.basex.core.Prop;
+import org.basex.query.ft.FTOpt;
 
 /**
  * Full-text tokenizer with scoring support.
@@ -18,7 +19,9 @@ public final class ScoringTokenizer extends Tokenizer{
   private int max = 1;
   /** Container for frequency. */
   private IntMap freq;
-
+  /** Flag for phrase processing. */
+  private boolean phrase = false;
+  
   /**
    * Empty constructor.
    * @param pr (optional) database properties
@@ -27,7 +30,24 @@ public final class ScoringTokenizer extends Tokenizer{
     super(Token.EMPTY, pr);
     readFrequency();
   }
+  
+  /**
+   * Constructor.
+   * @param txt text
+   * @param fto full-text options
+   * @param f fast evaluation
+   * @param pr database properties
+   */
+  public ScoringTokenizer(final byte[] txt, final FTOpt fto, final boolean f,
+      final Prop pr) {
+    super(txt, fto, f, pr);
+  }
 
+  @Override
+  public byte[] get() {
+    return (!phrase) ? super.get() : super.text;
+  }
+  
   @Override
   public void init(final byte[] txt) {
     super.init(txt);    
@@ -35,6 +55,14 @@ public final class ScoringTokenizer extends Tokenizer{
     init();    
   }
 
+  /**
+   * Set flag for phrase processing.
+   */
+  public void phrase() {
+    phrase = true;
+  }
+  
+  
   /**
    * Returns the score for the specified key.
    * @param key key

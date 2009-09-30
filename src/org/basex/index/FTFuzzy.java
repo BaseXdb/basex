@@ -10,6 +10,7 @@ import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
+import org.basex.util.ScoringTokenizer;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
@@ -102,8 +103,12 @@ public final class FTFuzzy extends FTIndex {
     // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
-
-    final byte[] tok = fto.get();
+    
+    byte[] tok;
+    if (ind instanceof ScoringTokenizer) {
+      tok = ((ScoringTokenizer) ind).get();
+    } else 
+    tok = fto.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
