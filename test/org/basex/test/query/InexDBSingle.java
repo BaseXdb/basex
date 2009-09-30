@@ -51,6 +51,9 @@ public final class InexDBSingle {
     final Performance p = new Performance();
     Main.outln(Main.name(InexDBSingle.class));
 
+    // use tf/idf scoring model
+    session.execute("set indexscores on");
+    
     if(!parseArguments(args)) return;
 
     // cache queries
