@@ -92,8 +92,8 @@ public final class FTOr extends FTExpr {
 
     for(final FTMatch m : i1.all) all.add(m);
     for(final FTMatch m : i2.all) all.add(m);
-    i1.score(ctx.score.ftOr(i1, i2, ctx.ftoknum, expr.length));
-    //i1.score(ctx.score.or(i1.score(), i2.score()));
+    //i1.score(ctx.score.ftOr(i1, i2, ctx.ftoknum, expr.length));
+    i1.score(ctx.score.or(i1.score(), i2.score()));
     i1.all = all;
   }
 

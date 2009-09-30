@@ -36,14 +36,19 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException IO exception
    */
   final void index() throws IOException {
-    final byte[][] st = { token("wonder girls"), token("cloud computing"),
-        token("evidence theory"), token("dempster schafer"),
-        token("rabindranath tagore"), token("danny boyle"),
-        token("hard disk"), token("second world war"), token("stock exchange"),
-        token("insider trading"), token("game show"), token("hatha yoga"),
+    final byte[][] st = {
+        token("natural disaster"), token("wonder girls"), 
+        token("plays of shakespeare"), token("cloud computing"), 
+        token("evidence theory"), token("dempster schafer"), 
+        token("opengl shading language"), token("rabindranath tagore"), 
+        token("finland industry manufacturer"), token("saab sisu car"), 
+        token("slumdog millionaire"), token("danny boyle"), 
+        token("tiananmen square"), token("hard disk"), 
+        token("stock exchange"), token("insider trading"), 
+        token("game show"), token("hatha yoga"), 
         token("world wide web"), token("french revolution"), 
-        token("global warming"), token("human activity"),
-        token("virtual museums")
+        token("global warming"), token("human activity"), 
+        token("paul is dead"), token("virtual museums"), 
     };
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) continue;

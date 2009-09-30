@@ -115,10 +115,12 @@ public final class FTAnd extends FTExpr {
         all.add(new FTMatch().add(s1).add(s2));
       }
     }
-    if (ctx.context.prop.is(Prop.INDEXSCORES))
-      i1.score(Math.min(i1.score, i2.score));
-    else i1.score(ctx.score.ftAnd(i1, i2));
-    //i1.score(ctx.score.and(i1.score(), i2.score()));
+    if(ctx.context.prop.is(Prop.INDEXSCORES)) {
+      i1.score(ctx.score.and(i1.score(), i2.score()));
+      //i1.score(Math.min(i1.score(), i2.score()));
+    } else {
+      i1.score(ctx.score.ftAnd(i1, i2));
+    }
     i1.all = all;
   }
 
