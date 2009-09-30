@@ -329,28 +329,44 @@ public final class InexDBTestNew {
     );
 
     xml.openElement(token("general_description"));
-    xml.text(token("The client/server architecture of BaseX 5.72 was used " +
-        "to perform the tests. The test machine has an Intel Xeon E5345 " +
-        "with 2 Quad-Core CPUs and 32 GB RAM."));
+    xml.text(token("BaseX is a native XML database and XPath/XQuery " +
+        "processor, including support for the latest XQuery Full Text " +
+    		"recommendation. The client/server architecture of BaseX 5.75 was " +
+        "used to perform the tests. The test machine has an Intel Xeon " +
+        "E5345 with 2 Quad-Core CPUs and 32 GB RAM."));
     xml.closeElement();
     xml.openElement(token("ranking_description"));
-    xml.text(token("We are using both content-based as well as " +
-        "structural-based ranking. At first, a content-based weight " +
-        "is estimated and later refined for each location step. " +
-        "The weights are derived from database meta information."));
+    xml.text(token("As we put our main focus on efficiency and generic " +
+        "evaluation of all types of XQuery requests and input documents, " +
+    		"our scoring model is based on a classical TF/IDF implementation. " +
+        "Additional scoring calculations are performed by XQFT (ftand, ftor, " +
+        "ftnot) and XQuery operators (union, location steps, ...). " +
+        "A higher ranking is given to those text nodes which are closer to " +
+        "the location steps of the input query than others. We decided " +
+        "to stick with conjunctive query evaluation (using 'ftand' instead " +
+        "of 'ftor' in the proposed topic queries), as a change to the " +
+        "disjunctive mode would have led to too many changes, which could " +
+        "not have been reasonably implemented in the remaining time frame. " +
+        "Next, we decided to not extend the proposed queries with stemming, " +
+        "stop words or thesaurus options. As a consequence, many queries " +
+        "might return less results than the TopX reference engine " +
+        "(and sometimes no results at all)."));
     xml.closeElement();
     xml.openElement(token("indexing_description"));
-    xml.text(token("The full-text indexes of BaseX support both an " +
-        "sped up evaluation of simple ftcontains operators as well " +
-        "as advanced features of the upcoming XQFT Recommendation. " +
-        "The indexes contain token positions and pointers on the text nodes. " +
+    xml.text(token("The full-text indexes of BaseX support both a " +
+        "quick and sped up evaluation of simple full text queries as well " +
+        "as the full evaluation of all recommended features of the upcoming " +
+        "XQFT Recommendation. " +
+        "Positions and pointers on the text nodes are stored in the indexes " +
+        "as well as simple scoring information." +
         "Structural information, such as location paths to the text nodes, " +
-        "are evaluated at runtime. As a consequence, our performance " +
-        "measurements include the total time both for accessing the indexes " +
-        "as well as traversing the inverted specified location paths."));
+        "are evaluated at runtime. To give a realistic picture, we have " +
+        "included both the total time for accessing indexes as well " +
+        "well as traversing the inverted specified location paths in our " +
+        "final performance results."));
     xml.closeElement();
     xml.openElement(token("caching_description"));
-    xml.text(token("Both database instances as well as the full-text " +
+    xml.text(token("Both the database instances as well as the full-text " +
         "indexes are completely disk-based and rely on the caching " +
         "mechanisms of the operating system."));
     xml.closeElement();

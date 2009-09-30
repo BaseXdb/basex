@@ -579,7 +579,7 @@ public final class SpotlightExtractor {
     else if(o instanceof Byte) value = (Byte) o;
     else if(o instanceof Float) value = ((Float) o).longValue();
     else if(o instanceof String) {
-      final byte[] a = ((String) o).getBytes();
+      final byte[] a = Token.token((String) o);
       int i = 0;
       final int len = a.length;
       while(i < len && a[i] >= '0' && a[i] <= '9')

@@ -2,7 +2,7 @@ package org.basex.util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
 
@@ -50,9 +50,9 @@ public final class ScoringTokenizer extends Tokenizer{
   
   @Override
   public void init(final byte[] txt) {
-    super.init(txt);    
+    super.init(txt);
     initScoring();
-    init();    
+    init();
   }
 
   /**
@@ -77,7 +77,6 @@ public final class ScoringTokenizer extends Tokenizer{
         return (int) (Math.log(2666130 / f) * c * 1000 / max);
       }
     }
-    
     return c == 0 ? 0 : c * 1000 /  max;
   }
 
@@ -92,16 +91,15 @@ public final class ScoringTokenizer extends Tokenizer{
       freq = new IntMap();
       while((l = br.readLine()) != null) {
         final int i = l.indexOf(';');
-        freq.add(l.substring(0, i).getBytes(), 
-            Integer.valueOf(l.substring(i + 1)));
+        freq.add(Token.token(l.substring(0, i)),
+            Token.toInt(l.substring(i + 1)));
       }
-                
       br.close();
-    } catch (Exception e) {
-      
+    } catch(final Exception ex) {
+      Main.errln(ex);
     }
   }
-  
+
   /**
    * Initializes the scoring process.
    */
@@ -113,7 +111,7 @@ public final class ScoringTokenizer extends Tokenizer{
       if(c != 0) {
         token.set(b, ++c);
         if(c > max) max = c;
-      } else { 
+      } else {
         token.add(b, 1);
       }
     }

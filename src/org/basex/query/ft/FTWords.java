@@ -117,8 +117,8 @@ public final class FTWords extends FTExpr {
         if(iat == null) {
           if (ctx.context.prop.is(Prop.INDEXSCORES)) {
             //[SG] INEX phrase processing 
-            final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt), ctx.ftopt, fast,
-                ctx.context.prop);
+            final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt),
+                ctx.ftopt, fast, ctx.context.prop);
             st.phrase();
             st.more();
             iat = (FTIndexIterator) data.ids(st);
@@ -269,7 +269,8 @@ public final class FTWords extends FTExpr {
 
     // [SG] INEX phrase processing
     if (ic.ctx.context.prop.is(Prop.INDEXSCORES)) {      
-      final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt), fto, fast, ic.ctx.context.prop);
+      final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt),
+          fto, fast, ic.ctx.context.prop);
       st.phrase();
       st.more();
       ic.is = ic.data.nrIDs(st);
