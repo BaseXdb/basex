@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class InexDBSingle {
+public final class InexSingle {
   /** Query file. */
   static final String QUERIES = "inex.queries";
   /** Database prefix. */
@@ -39,7 +39,7 @@ public final class InexDBSingle {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new InexDBSingle(args);
+    new InexSingle(args);
   }
 
   /**
@@ -47,9 +47,9 @@ public final class InexDBSingle {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  private InexDBSingle(final String[] args) throws Exception {
+  private InexSingle(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexDBSingle.class));
+    Main.outln(Main.name(InexSingle.class));
 
     // use tf/idf scoring model
     session.execute("set indexscores on");

@@ -3,10 +3,8 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.metadata.AbstractExtractor;

@@ -14,12 +14,12 @@ import org.basex.query.item.FNode;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class PendingUpdates {
+public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  Map<Data, Primitives> dbPrimitives;
+  private final Map<Data, Primitives> dbPrimitives;
   /** Update primitives which target nodes are fragments. */
-  Primitives fragPrimitives;
-  
+  private final Primitives fragPrimitives;
+
   /**
    * Constructor.
    */
@@ -27,7 +27,7 @@ public class PendingUpdates {
     dbPrimitives = new HashMap<Data, Primitives>();
     fragPrimitives = new Primitives();
   }
-  
+
   /**
    * Adds an update primitive to the corresponding primitive list.
    * @param p primitive to add
@@ -38,13 +38,13 @@ public class PendingUpdates {
       final Data d = ((DBNode) p.node).data;
       Primitives dp = dbPrimitives.get(d);
       if(dp == null) {
-        dp = new Primitives(); 
+        dp = new Primitives();
         dbPrimitives.put(d, dp);
       }
       dp.addPrimitive(p);
     }
   }
-  
+
   /**
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
@@ -55,6 +55,6 @@ public class PendingUpdates {
     // Only primitives which target nodes are database nodes are processed.
     final Primitives[] dp = new Primitives[dbPrimitives.size()];
     dbPrimitives.values().toArray(dp);
-    for(Primitives p : dp) p.apply();
+    for(final Primitives p : dp) p.apply();
   }
 }

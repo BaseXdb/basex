@@ -27,7 +27,7 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class InexDBTest {
+public final class InexTest {
   /** Submission file. */
   static final String SUBMISSION = "submission.xml";
   /** Updated submission file. */
@@ -71,7 +71,7 @@ public final class InexDBTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new InexDBTest(args);
+    new InexTest(args);
   }
 
   /**
@@ -79,9 +79,9 @@ public final class InexDBTest {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  private InexDBTest(final String[] args) throws Exception {
+  private InexTest(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexDBTest.class));
+    Main.outln(Main.name(InexTest.class));
 
     if(!parseArguments(args)) return;
 

@@ -1,7 +1,7 @@
 package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
-import static org.basex.test.inex.InexDBTest.*;
+import static org.basex.test.inex.InexTest.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +38,7 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class InexDBTestNew {
+public final class InexSubmit {
   /** Method used to sum up paths. */
   private static final String XQM =
     "declare namespace basex = \"http://www.basex.com\"; " +
@@ -95,7 +95,7 @@ public final class InexDBTestNew {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new InexDBTestNew(args);
+    new InexSubmit(args);
   }
 
   /**
@@ -103,9 +103,9 @@ public final class InexDBTestNew {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  private InexDBTestNew(final String[] args) throws Exception {
+  private InexSubmit(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexDBTestNew.class));
+    Main.outln(Main.name(InexSubmit.class));
 
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));

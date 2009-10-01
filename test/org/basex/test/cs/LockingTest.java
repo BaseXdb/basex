@@ -1,7 +1,6 @@
 package org.basex.test.cs;
 
 import java.io.IOException;
-
 import org.basex.BaseXServer;
 import org.basex.core.Session;
 import org.basex.core.Process;

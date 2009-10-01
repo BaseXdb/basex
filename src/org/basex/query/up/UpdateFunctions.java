@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
@@ -31,14 +30,13 @@ import static org.basex.util.Token.*;
  * @author Lukas Kircher
  */
 public final class UpdateFunctions {
-  
   /**
    * Constructor.
    */
   private UpdateFunctions() { }
-  
+
   /**
-   * Delete nodes from database. Nodes are deleted backwards to preserve pre
+   * Deletes nodes from database. Nodes are deleted backwards to preserve pre
    * values. All given nodes are part of the same Data instance.
    * @param nodes nodes to delete
    */
@@ -51,7 +49,7 @@ public final class UpdateFunctions {
       data.delete(pre);
     }
   }
-  
+
   /**
    * Renames the specified node.
    * @param pre pre value
@@ -67,20 +65,20 @@ public final class UpdateFunctions {
       data.update(pre, name, v);
     }
   }
-  
+
   /**
-   * Builds new MemData instance from iterator.
+   * Builds new {@link MemData} instance from iterator.
    * @param ch sequence iterator
    * @param d data reference for indices
-   * @return new MemData instance
+   * @return new data instance
    * @throws QueryException query exception
    */
-  public static MemData buildDB(final Iter ch, final Data d) 
+  public static MemData buildDB(final Iter ch, final Data d)
   throws QueryException {
     MemData m = null;
     // [LK] usage of index refs only possible if target node is a dbnode,
     // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
-    if(d == null) m = new MemData(20, new Names(), new Names(), 
+    if(d == null) m = new MemData(20, new Names(), new Names(),
         new Namespaces(), new PathSummary(), new Prop());
     else m = new MemData(20, d.tags, d.atts, d.ns, d.path, d.meta.prop);
     // add parent node
@@ -100,14 +98,14 @@ public final class UpdateFunctions {
     }
     // add root node for data instance
     m.addDoc(EMPTY, ds);
-    
-    // add nodes as childs
+
+    // add nodes as children
     int pre = 1;
     i.reset();
     n = (Nod) i.next();
     while(n != null) {
       if(n instanceof DBNode) {
-        DBNode dn = (DBNode) n;
+        final DBNode dn = (DBNode) n;
         pre = addDBNode(dn, m, pre, 0);
       } else if(n instanceof FNode) {
         final FNode fn = (FNode) n;
@@ -117,16 +115,16 @@ public final class UpdateFunctions {
     }
     return m;
   }
-  
+
   /**
    * Determines the number of descendants of a fragment.
    * @param n fragment node
    * @param attr count attribute size of node
    * @return number of descendants + 1 or attribute size + 1
-   * @throws QueryException query exception 
+   * @throws QueryException query exception
    */
-  public static int fragmentSize(final FNode n, final boolean attr) 
-   throws QueryException {
+  public static int fragmentSize(final FNode n, final boolean attr)
+  throws QueryException {
     int s = 1;
     final NodeIter at = n.attr();
     Nod fat = at.next();
@@ -143,9 +141,9 @@ public final class UpdateFunctions {
     }
     return s;
   }
-  
+
   /**
-   * Adds a fragment to a MemData instance.
+   * Adds a fragment to a {@link MemData} instance.
    * @param n node to be added
    * @param m data reference
    * @param preVal node position
@@ -153,7 +151,7 @@ public final class UpdateFunctions {
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addFragment(final FNode n, final MemData m, 
+  private static int addFragment(final FNode n, final MemData m,
       final int preVal, final int par) throws QueryException {
     final int k = Nod.kind(n.type);
     int pre = preVal;
@@ -165,14 +163,14 @@ public final class UpdateFunctions {
         final int as = fragmentSize(e, true);
         final int s = fragmentSize(e, false);
         m.addElem(
-            m.tags.index(e.nname(), null, false), 
+            m.tags.index(e.nname(), null, false),
             0, pre - par, as == -1 ? 1 : as, s == -1 ? 1 : s, false);
         pre++;
         break;
       case Data.ATTR:
         // needed to build data instance from attribute sequence
         final FAttr fat = (FAttr) n;
-        m.addAtt(m.atts.index(fat.qname().str(), null, false), 
+        m.addAtt(m.atts.index(fat.qname().str(), null, false),
             0, fat.str(), pre - par);
         return ++pre;
       case Data.TEXT:
@@ -185,12 +183,12 @@ public final class UpdateFunctions {
         m.addText(((FComm) n).str(), pre - par, k);
         return ++pre;
     }
-    
+
     // add attributes
     final NodeIter attIt = n.attr();
     FAttr at = (FAttr) attIt.next();
     while(at != null) {
-      m.addAtt(m.atts.index(at.qname().str(), null, false), 
+      m.addAtt(m.atts.index(at.qname().str(), null, false),
           0, at.str(), pre - preVal);
       pre++;
       at = (FAttr) attIt.next();
@@ -203,9 +201,9 @@ public final class UpdateFunctions {
     }
     return pre;
   }
-  
+
   /**
-   * Adds a database node to a MemData instance.
+   * Adds a database node to a {@link MemData} instance.
    * @param n node to be added
    * @param m data reference
    * @param preVal node position
@@ -213,7 +211,7 @@ public final class UpdateFunctions {
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addDBNode(final DBNode n, final MemData m, 
+  private static int addDBNode(final DBNode n, final MemData m,
       final int preVal, final int par) throws QueryException {
     // [LK] copy nodes directly from table instead of using iterators
     final Data data = n.data;
@@ -222,13 +220,13 @@ public final class UpdateFunctions {
     // [LK] type DOC?
     switch(k) {
       case Data.ELEM:
-        m.addElem(m.tags.index(data.tag(n.pre), null, false), 
+        m.addElem(m.tags.index(data.tag(n.pre), null, false),
             0, pre - par, data.attSize(n.pre, k), data.size(n.pre, k), false);
         pre++;
         break;
       case Data.ATTR:
         // needed to build data instance from attribute sequence
-        m.addAtt(m.atts.index(data.attName(n.pre), null, false), 
+        m.addAtt(m.atts.index(data.attName(n.pre), null, false),
             0, data.attValue(n.pre), pre - par);
         return ++pre;
       case Data.TEXT:
@@ -245,7 +243,7 @@ public final class UpdateFunctions {
     final NodeIter atts = n.attr();
     DBNode at = (DBNode) atts.next();
     while(at != null) {
-      m.addAtt(m.atts.index(data.attName(at.pre), null, false), 
+      m.addAtt(m.atts.index(data.attName(at.pre), null, false),
           0, data.attValue(at.pre), pre - preVal);
       pre++;
       at = (DBNode) atts.next();
@@ -258,7 +256,7 @@ public final class UpdateFunctions {
     }
     return pre;
   }
-  
+
   /**
    * Prints database table.
    * @param d data reference
@@ -266,7 +264,7 @@ public final class UpdateFunctions {
   public static void printTable(final Data d) {
     try {
       InfoTable.table(new PrintOutput(System.out), d, 0, Integer.MAX_VALUE);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
     }
   }

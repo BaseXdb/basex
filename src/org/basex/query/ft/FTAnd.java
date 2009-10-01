@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.core.Prop;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;

@@ -2,16 +2,13 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -60,9 +57,9 @@ public final class DialogOpenFS extends Dialog {
 
     // create database chooser
     final StringList db = List.listFS(main.context);
-    
+
     choice = new BaseXListChooser(db.finish(), HELPOPEN, this);
-    
+
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 420);
 
@@ -87,7 +84,7 @@ public final class DialogOpenFS extends Dialog {
     pp.setBorder(new EmptyBorder(0, 12, 0, 0));
     pp.setLayout(new BorderLayout());
     pp.add(info, BorderLayout.CENTER);
-    
+
     wth = new BaseXCheckBox(WTHROUGH, HELPFSALL, false, this);
     wth.setToolTipText(WTHROUGHTT);
     wth.setBorder(new EmptyBorder(4, 4, 0, 0));
@@ -117,7 +114,7 @@ public final class DialogOpenFS extends Dialog {
     set(pp, BorderLayout.EAST);
     action(null);
     if(db.size() == 0) return;
-    
+
     finish(null);
   }
 
@@ -142,7 +139,7 @@ public final class DialogOpenFS extends Dialog {
   public void action(final String cmd) {
     final Context ctx = gui.context;
     final GUIProp gprop = gui.prop;
-    
+
     if(BUTTONRENAME.equals(cmd)) {
       new DialogRename(gui, choice.getValue());
       choice.setData(List.list(ctx).finish());
@@ -159,7 +156,7 @@ public final class DialogOpenFS extends Dialog {
         DropDB.drop(db, ctx.prop);
         choice.setData(List.list(ctx).finish());
         choice.requestFocusInWindow();
-      } 
+      }
     } else {
       final String db = choice.getValue().trim();
       ok = db.length() != 0 && ctx.prop.dbpath(db).exists();

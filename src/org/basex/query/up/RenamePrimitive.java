@@ -9,14 +9,14 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class RenamePrimitive extends UpdatePrimitive {
+public final class RenamePrimitive extends UpdatePrimitive {
   /** New name. */
-  byte[] newName;
-  
+  final byte[] newName;
+
   /**
    * Constructor.
    * @param n target node
-   * @param name new name 
+   * @param name new name
    */
   public RenamePrimitive(final Nod n, final byte[] name) {
     super(n);

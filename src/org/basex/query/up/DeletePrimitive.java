@@ -8,8 +8,7 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class DeletePrimitive extends UpdatePrimitive {
-
+public final class DeletePrimitive extends UpdatePrimitive {
   /**
    * Constructor.
    * @param n expression target node

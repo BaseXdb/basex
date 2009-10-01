@@ -1,15 +1,12 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
-
 import javax.swing.AbstractButton;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;

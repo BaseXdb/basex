@@ -1,7 +1,6 @@
 package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.regex.Matcher;
@@ -28,7 +27,7 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class InexTFTest {
+public final class InexTFCalc {
   /** Words file. */
   static final String WORDS = "words";
   /** Query file. */
@@ -56,7 +55,7 @@ public final class InexTFTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new InexTFTest(args);
+    new InexTFCalc(args);
   }
 
   /**
@@ -64,9 +63,9 @@ public final class InexTFTest {
    * @param args arguments
    * @throws Exception exception
    */
-  private InexTFTest(final String[] args) throws Exception {
+  private InexTFCalc(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexTFTest.class));
+    Main.outln(Main.name(InexTFCalc.class));
     databases = new StringList();
     
     if(!parseArguments(args)) return;

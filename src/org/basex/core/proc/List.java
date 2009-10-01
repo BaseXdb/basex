@@ -2,9 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;

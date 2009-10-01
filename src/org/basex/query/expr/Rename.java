@@ -19,7 +19,6 @@ import org.basex.query.util.Err;
  * @author Lukas Kircher
  */
 public final class Rename extends Arr {
-
   /**
    * Constructor.
    * @param tg target expression

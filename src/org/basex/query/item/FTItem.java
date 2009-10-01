@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import java.util.Iterator;
-
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.FTStringMatch;

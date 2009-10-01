@@ -1,10 +1,8 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.UpdateFunctions.*;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
@@ -13,23 +11,23 @@ import org.basex.query.item.Nod;
 import org.basex.util.IntList;
 
 /**
- * Holds all update primitives for a specific data reference. The distinct 
- * primitives are hold seperately to support fast checking of update 
+ * Holds all update primitives for a specific data reference. The distinct
+ * primitives are hold separately to support fast checking of update
  * constraints.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class Primitives {
+public final class Primitives {
   /** Update primitives. */
-  List<DeletePrimitive> deletes;
+  private final List<DeletePrimitive> deletes;
   /** Update primitives. */
-  List<RenamePrimitive> renames;
+  private final List<RenamePrimitive> renames;
   /** Update primitives. */
-  List<ReplacePrimitive> replaces;
+  private final List<ReplacePrimitive> replaces;
   /** Database reference. */
-  Data data;
-  
+  private Data data;
+
   /**
    * Constructor.
    */
@@ -49,10 +47,10 @@ public class Primitives {
     else if(p instanceof ReplacePrimitive) replaces.add((ReplacePrimitive) p);
     if(p.node instanceof DBNode && data == null) data = ((DBNode) p.node).data;
   }
-  
+
   /**
    * Applies all updates to the data reference.
-   * @throws QueryException query exception 
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public void apply() throws QueryException {
@@ -61,7 +59,7 @@ public class Primitives {
       final DBNode n = (DBNode) p.node;
       rename(n.pre, p.newName, n.data);
     }
-    
+
     // replace
     for(final ReplacePrimitive p : replaces) {
       // [LK] trgt / rpl node must be different nodes
@@ -74,7 +72,7 @@ public class Primitives {
       data.insertSeq(n.pre + data.size(n.pre, k), data.parent(n.pre, k), p.r);
       data.delete(n.pre);
     }
-    
+
     // delete
     final IntList pres = new IntList();
     for(final DeletePrimitive p : deletes) pres.add(((DBNode) p.node).pre);

@@ -9,9 +9,9 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class ReplacePrimitive extends UpdatePrimitive {
+public final class ReplacePrimitive extends UpdatePrimitive {
   /** Nodes replacing the target. */
-  MemData r;
+  final MemData r;
 
   /**
    * Constructor.

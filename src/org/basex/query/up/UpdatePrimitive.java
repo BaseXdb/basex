@@ -8,15 +8,15 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public abstract class UpdatePrimitive {
+abstract class UpdatePrimitive {
   /** Target node of update expression. */
-  Nod node;
+  final Nod node;
   
   /**
    * Constructor.
    * @param n DBNode reference
    */
-  public UpdatePrimitive(final Nod n) {
+  protected UpdatePrimitive(final Nod n) {
     node = n;
   }
 }
