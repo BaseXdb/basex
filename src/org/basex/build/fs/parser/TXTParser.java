@@ -21,11 +21,11 @@ import org.basex.util.TokenBuilder;
 public final class TXTParser extends AbstractParser {
 
   /** Suffixes of all file formats, this parser is able to parse. */
-  private static final TreeSet<String> suffixes = new TreeSet<String>();
+  private static final TreeSet<String> SUFFIXES = new TreeSet<String>();
 
   static {
-    suffixes.add("txt");
-    for(String suf : suffixes)
+    SUFFIXES.add("txt");
+    for(String suf : SUFFIXES)
       NewFSParser.register(suf, TXTParser.class);
     NewFSParser.registerFallback(TXTParser.class);
   }
@@ -35,7 +35,7 @@ public final class TXTParser extends AbstractParser {
   public boolean check(final BufferedFileChannel bfc) {
     final String name = bfc.getFileName();
     final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
-    return suffixes.contains(suf);
+    return SUFFIXES.contains(suf);
     // [BL] search for invalid characters?
   }
 

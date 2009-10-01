@@ -200,7 +200,6 @@ public final class CmpG extends Arr {
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
-      System.out.println("! " + ir2.getClass());
       final SeqIter seq = new SeqIter();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {

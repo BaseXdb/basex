@@ -23,16 +23,16 @@ import org.basex.io.IOFile;
 public final class XMLParser extends AbstractParser {
 
   /** Suffixes of all file formats, this parser is able to parse. */
-  private static final TreeMap<String, MimeType> suffixes =
+  private static final TreeMap<String, MimeType> SUFFIXES =
       new TreeMap<String, MimeType>();
 
   static {
-    suffixes.put("xml", MimeType.XML);
-    suffixes.put("kml", MimeType.KML);
-    suffixes.put("rng", MimeType.XML);
-    suffixes.put("webloc", MimeType.XML);
-    suffixes.put("mailtoloc", MimeType.XML);
-    for(String suf : suffixes.keySet())
+    SUFFIXES.put("xml", MimeType.XML);
+    SUFFIXES.put("kml", MimeType.KML);
+    SUFFIXES.put("rng", MimeType.XML);
+    SUFFIXES.put("webloc", MimeType.XML);
+    SUFFIXES.put("mailtoloc", MimeType.XML);
+    for(final String suf : SUFFIXES.keySet())
       NewFSParser.register(suf, XMLParser.class);
   }
 
@@ -40,16 +40,16 @@ public final class XMLParser extends AbstractParser {
   public boolean check(final BufferedFileChannel f) {
     final String name = f.getFileName();
     final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
-    if(!suffixes.keySet().contains(suf)) return false;
+    if(!SUFFIXES.keySet().contains(suf)) return false;
     return true;
   }
 
   /**
    * Checks if the document is well-formed.
-   * @param f the {@link BufferedFileChannel} to read the xml document from.
-   * @param parser the parser to get properties from.
-   * @return true if the document is well-formed, false otherwise.
-   * @throws IOException if any error occurs.
+   * @param f the {@link BufferedFileChannel} to read the xml document from
+   * @param parser the parser to get properties from
+   * @return true if the document is well-formed, false otherwise
+   * @throws IOException if any error occurs
    */
   private boolean check(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
@@ -80,10 +80,10 @@ public final class XMLParser extends AbstractParser {
   }
 
   /**
-   * Parses the XML content (without well-formedness check)
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @param parser the parser to write the xml to.
-   * @throws IOException if any error occurs.
+   * Parses the XML content (without well-formedness check).
+   * @param f the {@link BufferedFileChannel} to read from
+   * @param parser the parser to write the xml to
+   * @throws IOException if any error occurs
    */
   private void parse(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
@@ -101,9 +101,9 @@ public final class XMLParser extends AbstractParser {
 
   /**
    * Sets {@link MetaType} and {@link MimeType}.
-   * @param bfc the {@link BufferedFileChannel} to read from.
-   * @param parser the {@link NewFSParser}.
-   * @throws IOException if any error occurs.
+   * @param bfc the {@link BufferedFileChannel} to read from
+   * @param parser the {@link NewFSParser}
+   * @throws IOException if any error occurs
    */
   private void setTypeAndFormat(final BufferedFileChannel bfc,
       final NewFSParser parser) throws IOException {
@@ -111,7 +111,7 @@ public final class XMLParser extends AbstractParser {
     parser.metaEvent(meta.setMetaType(MetaType.XML));
     final String name = bfc.getFileName();
     final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
-    final MimeType mime = suffixes.get(suf);
+    final MimeType mime = SUFFIXES.get(suf);
     if(mime == null) Main.notexpected();
     parser.metaEvent(meta.setMimeType(mime));
   }

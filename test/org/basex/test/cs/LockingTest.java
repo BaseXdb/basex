@@ -61,14 +61,14 @@ public final class LockingTest {
     conCreate();
     System.out.println(server.context.info());
     if(server.context.size("factbook") == 2) {
-      System.out.println("--> Test 1 successfull, Test 2 started...");
+      System.out.println("--> Test 1 successful, Test 2 started...");
     } else {
       err("test failed conCreate");
     }
 
     // read read test
     runTest(true, true);
-    System.out.println("--> Test 2 successfull, Test 3 started...");
+    System.out.println("--> Test 2 successful, Test 3 started...");
     done = false;
     
     // write write test
@@ -77,18 +77,18 @@ public final class LockingTest {
     if(!checkRes(session1).equals("0")) {
       err("test failed write write");
     } else {
-      System.out.println("--> Test 3 successfull, Test 4 started...");
+      System.out.println("--> Test 3 successful, Test 4 started...");
     }
     done = false;
     
     // write read test
     runTest(false, true);
-    System.out.println("--> Test 4 successfull, Test 5 started...");
+    System.out.println("--> Test 4 successful, Test 5 started...");
     done = false;
     
     // read write test
     runTest(true, false);
-    System.out.println("--> Test 5 successfull, last check...");
+    System.out.println("--> Test 5 successful, last check...");
     
     process(new XQuery("count(//aa)"), session1);
     if(!checkRes(session1).equals("0")) {
