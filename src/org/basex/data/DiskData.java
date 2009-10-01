@@ -627,7 +627,7 @@ public final class DiskData extends Data {
     System.out.println("after insert");
     UpdateFunctions.printTable(this);
     // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss);
+    if(par != 0) updateTable(pre, par, ss - 1);
     System.out.println("after table update");
     UpdateFunctions.printTable(this);
   }
