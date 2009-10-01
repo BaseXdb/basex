@@ -115,7 +115,6 @@ public final class UpdateFunctions {
       }
       n = (Nod) i.next();
     }
-    printTable(m);
     return m;
   }
   

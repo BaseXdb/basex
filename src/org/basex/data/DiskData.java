@@ -15,6 +15,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
+import org.basex.query.up.UpdateFunctions;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -550,6 +551,7 @@ public final class DiskData extends Data {
       final int r = dt.parent(s, k);
       // recalculate distance for root nodes
       // [CG] Updates/Insert: test collections
+      // [LK] pre - par correct? should it be p - par?
       final int d = r < sa ? pre - par : s - r;
       final int p = pre + s - sa - 1;
 
@@ -583,6 +585,10 @@ public final class DiskData extends Data {
   
   @Override
   public void insertSeq(final int pre, final int par, final Data dt) {
+    System.out.println("\n\ninsert ...");
+    UpdateFunctions.printTable(dt);
+    System.out.println("before insert");
+    UpdateFunctions.printTable(this);
     meta.update();
     final int sa = 1;
     // number of nodes to be inserted
@@ -592,12 +598,10 @@ public final class DiskData extends Data {
     for(int s = sa; s < ss; s++) {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
-      // recalculate distance for root nodes
-//      final int p = pre + s - 1;
-//      final int d = r == 0 ? p - par : p - r;
       // [LK] debug!
-      final int d = r > par ? s - r : s - par;
-      final int p = pre + s - sa - 1;
+//      final int p = pre + s - sa - 1;
+      int p = pre + s - 1;
+      int d = r > 0 ? s - r : p - par;
 
       switch(k) {
         case ELEM:
@@ -620,8 +624,12 @@ public final class DiskData extends Data {
           break;
       }
     }
+    System.out.println("after insert");
+    UpdateFunctions.printTable(this);
     // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss - 1);
+    if(par != 0) updateTable(pre, par, ss);
+    System.out.println("after table update");
+    UpdateFunctions.printTable(this);
   }
 
   /**

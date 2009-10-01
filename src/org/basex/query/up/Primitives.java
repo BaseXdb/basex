@@ -71,7 +71,7 @@ public class Primitives {
       if(!(p.node instanceof DBNode)) continue;
       final DBNode n = (DBNode) p.node;
       final int k = Nod.kind(n.type);
-      data.insert(n.pre + data.size(n.pre, k), data.parent(n.pre, k), p.r);
+      data.insertSeq(n.pre + data.size(n.pre, k), data.parent(n.pre, k), p.r);
       data.delete(n.pre);
     }
     
