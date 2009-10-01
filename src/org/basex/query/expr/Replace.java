@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.up.UpdateFunctions.*;
+
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
@@ -11,6 +12,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.up.ReplacePrimitive;
 import org.basex.query.util.Err;
 
@@ -48,13 +50,15 @@ public final class Replace extends Arr {
     final Nod par = trgtN.parent();
     if(par == null || Nod.kind(par.type) == Data.DOC) Err.or(UPNOPAR, t);
     // check replace constraints
-    final Iter r = expr[1].iter(ctx);
+    // [LK] reset doesn't work on lists SeqIter.get()
+    final Iter r = SeqIter.get(expr[1].iter(ctx));
     final boolean trgIsAttr = Nod.kind(trgtN.type) == Data.ATTR ? true : false;
     i = r.next();
     while(i != null) {
       if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(INCOMPLETE, t);
       i = r.next();
     }
+    // [LK] reset doesn't work on lists SeqIter.get()
     r.reset();
     // [LK] create mem data instance here
     // create mem data -> insert doc node r as root

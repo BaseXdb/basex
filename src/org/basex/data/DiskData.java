@@ -551,7 +551,6 @@ public final class DiskData extends Data {
       final int r = dt.parent(s, k);
       // recalculate distance for root nodes
       // [CG] Updates/Insert: test collections
-      // [LK] pre - par correct? should it be p - par?
       final int d = r < sa ? pre - par : s - r;
       final int p = pre + s - sa;
 
@@ -599,7 +598,6 @@ public final class DiskData extends Data {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
       // [LK] debug!
-//      final int p = pre + s - sa - 1;
       int p = pre + s - 1;
       int d = r > 0 ? s - r : p - par;
 
