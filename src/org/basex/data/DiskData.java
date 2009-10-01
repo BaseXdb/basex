@@ -515,11 +515,11 @@ public final class DiskData extends Data {
     meta.update();
 
     if(kind == ELEM) {
-      insertElem(pre - 1, pre - par, val, 1, 1);
+      insertElem(pre, pre - par, val, 1, 1);
     } else if(kind == DOC) {
-      insertDoc(pre - 1, 1, val);
+      insertDoc(pre, 1, val);
     } else {
-      insertText(pre - 1, pre - par, val, kind);
+      insertText(pre, pre - par, val, kind);
     }
     updateTable(pre, par, 1);
   }
@@ -531,7 +531,7 @@ public final class DiskData extends Data {
     meta.update();
 
     // insert attribute and increase attSize of parent element
-    insertAttr(pre - 1, pre - par, name, val);
+    insertAttr(pre, pre - par, name, val);
     attSize(par, ELEM, attSize(par, ELEM) + 1);
     updateTable(pre, par, 1);
   }
@@ -553,7 +553,7 @@ public final class DiskData extends Data {
       // [CG] Updates/Insert: test collections
       // [LK] pre - par correct? should it be p - par?
       final int d = r < sa ? pre - par : s - r;
-      final int p = pre + s - sa - 1;
+      final int p = pre + s - sa;
 
       switch(k) {
         case ELEM:

@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
 import java.io.BufferedReader;

@@ -247,7 +247,7 @@ public final class BlockAccessTest {
    */
   @Test
   public void testSimpleInsert() {
-    tba.insert(3, getTestEntries(1));
+    tba.insert(4, getTestEntries(1));
     assertEquals(size + 1, tba.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 1);
@@ -264,7 +264,7 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertMultiple() {
-    tba.insert(3, getTestEntries(3));
+    tba.insert(4, getTestEntries(3));
     assertEquals(size + 3, tba.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
@@ -282,7 +282,7 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertMany() {
-    tba.insert(3, getTestEntries(entries - 1));
+    tba.insert(4, getTestEntries(entries - 1));
     assertEquals(size + entries - 1, tba.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, entries - 1);
@@ -299,7 +299,7 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertAtBlockBoundary() {
-    tba.insert(nodes - 1, getTestEntries(nodes));
+    tba.insert(nodes, getTestEntries(nodes));
     assertEquals(size + nodes, tba.size());
     assertEquals(blocks + 1, tba.blocks());
     assertEntrysEqual(0, 0, nodes);

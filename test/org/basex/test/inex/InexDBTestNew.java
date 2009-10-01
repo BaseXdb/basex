@@ -1,7 +1,7 @@
-package org.basex.test.query;
+package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
-import static org.basex.test.query.InexDBTest.*;
+import static org.basex.test.inex.InexDBTest.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.File;

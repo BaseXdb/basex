@@ -323,14 +323,14 @@ public final class TableDiskAccess extends TableAccess {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
     count += nr;
-    cursor(pre);
+    cursor(pre - 1);
 
-    final int ins = pre - firstPre + 1;
+    final int ins = pre - firstPre;
 
     // all entries fit in current block
     if(nr < ENTRIES - nextPre + firstPre) {
       // shift following entries forward and insert next entries
-      copy(bf.buf, ins, bf.buf, ins + nr, nextPre - pre);
+      copy(bf.buf, ins, bf.buf, ins + nr, nextPre - pre + 1);
       copy(entries, 0, bf.buf, ins, nr);
 
       // update index entries
@@ -342,7 +342,7 @@ public final class TableDiskAccess extends TableAccess {
     // we need to reorganize entries
 
     // save entries to be added into new block after inserted blocks
-    final int move = nextPre - pre - 1;
+    final int move = nextPre - pre;
     final byte[] rest = new byte[move << IO.NODEPOWER];
 
     copy(bf.buf, ins, rest, 0, move);
@@ -350,7 +350,7 @@ public final class TableDiskAccess extends TableAccess {
     // make room in index for new blocks
     int newBlocks = (int) Math.ceil((double) nr / NEWENTRIES) + 1;
     // in case we insert at block boundary
-    if(pre == nextPre - 1) newBlocks--;
+    if(pre == nextPre) newBlocks--;
 
     // resize the index
     firstPres = Array.resize(firstPres, nrBlocks, nrBlocks + newBlocks);
@@ -366,7 +366,7 @@ public final class TableDiskAccess extends TableAccess {
       newBlock();
       copy(entries, pos, bf.buf, 0, Math.min(remain, NEWENTRIES));
 
-      firstPres[++index] = nr - remain + pre + 1;
+      firstPres[++index] = nr - remain + pre;
       blocks[index] = (int) bf.pos;
       indexSize++;
       remain -= NEWENTRIES;
@@ -378,7 +378,7 @@ public final class TableDiskAccess extends TableAccess {
       newBlock();
       copy(rest, 0, bf.buf, 0, move);
 
-      firstPres[++index] = pre + nr + 1;
+      firstPres[++index] = pre + nr;
       blocks[index] = (int) bf.pos;
       indexSize++;
     }
@@ -387,7 +387,7 @@ public final class TableDiskAccess extends TableAccess {
     for(int i = index + 1; i < indexSize; i++) firstPres[i] += nr;
 
     // update cached variables
-    firstPre = pre + 1;
+    firstPre = pre;
     if(rest.length > 0) firstPre += nr;
     nextPre = index + 1 >= indexSize ? count : firstPres[index + 1];
   }
