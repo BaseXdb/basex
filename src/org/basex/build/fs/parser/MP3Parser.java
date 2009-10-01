@@ -285,13 +285,6 @@ public final class MP3Parser extends AbstractParser {
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  /** Standard constructor. */
-  public MP3Parser() {
-    super(MetaType.AUDIO, MimeType.MP3);
-  }
-
-  // ---------------------------------------------------------------------------
-
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
   /** The {@link NewFSParser} instance to fire events. */
@@ -322,9 +315,17 @@ public final class MP3Parser extends AbstractParser {
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel f,
-      final NewFSParser parser) throws IOException {
-    meta(f, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
+  }
+
+  /**
+   * Sets {@link MetaType} and {@link MimeType}.
+   * @throws IOException if any error occurs.
+   */
+  private void setTypeAndFormat() throws IOException {
+    fsparser.metaEvent(meta.setMetaType(MetaType.AUDIO));
+    fsparser.metaEvent(meta.setMimeType(MimeType.MP3));
   }
 
   // ---------------------------------------------------------------------------
@@ -353,6 +354,7 @@ public final class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the ID3v1 tag.
    */
   private void readMetaID3v1() throws IOException {
+    setTypeAndFormat();
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
@@ -415,6 +417,7 @@ public final class MP3Parser extends AbstractParser {
    * @throws IOException if any error occurs while reading the ID3v2 tag.
    */
   private void readMetaID3v2() throws IOException {
+    setTypeAndFormat();
     int size = readID3v2Header();
     while(size >= MINIMAL_FRAME_SIZE) {
       final int res = readID3v2Frame();
@@ -533,7 +536,7 @@ public final class MP3Parser extends AbstractParser {
       case ENC_UTF_16_NO_BOM:
         Main.debug(
             "MP3Parser: Unsupported text encoding (UTF-16 without BOM) found "
-                + "(%).", bfc.getFileName());
+            + "(%).", bfc.getFileName());
         return null;
       case ENC_UTF_16_WITH_BOM:
         return "UTF-16";
@@ -689,7 +692,7 @@ public final class MP3Parser extends AbstractParser {
    * @author Bastian Lemke
    */
   private enum Frame {
-    /** */
+        /** */
     TIT2 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -697,7 +700,7 @@ public final class MP3Parser extends AbstractParser {
         obj.fsparser.metaEvent(obj.meta);
       }
     },
-    /** */
+        /** */
     TPE1 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -705,7 +708,7 @@ public final class MP3Parser extends AbstractParser {
         obj.fsparser.metaEvent(obj.meta);
       }
     },
-    /** */
+        /** */
     TALB {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -713,7 +716,7 @@ public final class MP3Parser extends AbstractParser {
         obj.fsparser.metaEvent(obj.meta);
       }
     },
-    /** */
+        /** */
     TYER {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -727,14 +730,14 @@ public final class MP3Parser extends AbstractParser {
         }
       }
     },
-    /** */
+        /** */
     TCON {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         obj.fireGenreEvents(size);
       }
     },
-    /** */
+        /** */
     COMM {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -757,7 +760,7 @@ public final class MP3Parser extends AbstractParser {
         obj.fsparser.metaEvent(obj.meta);
       }
     },
-    /** */
+        /** */
     TRCK {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -765,7 +768,7 @@ public final class MP3Parser extends AbstractParser {
         obj.fsparser.metaEvent(obj.meta);
       }
     },
-    /** */
+        /** */
     TLEN {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
@@ -773,7 +776,7 @@ public final class MP3Parser extends AbstractParser {
         ParserUtil.convertDuration(obj.readText(size))));
       }
     },
-    /** */
+        /** */
     APIC {
       @Override
       void parse(final MP3Parser obj, final int s) throws IOException {
@@ -801,7 +804,7 @@ public final class MP3Parser extends AbstractParser {
           if(NewFSParser.VERBOSE) Main.debug(
               "MP3Parser: Failed to parse APIC frame (%).",
               ex.getMessage() == null ? obj.bfc.getFileName() : //
-                  ex.getMessage());
+              ex.getMessage());
         }
       }
     };

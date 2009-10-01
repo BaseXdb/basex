@@ -21,11 +21,6 @@ public final class PNGParser extends AbstractParser {
     NewFSParser.register("png", PNGParser.class);
   }
 
-  /** Standard constructor. */
-  public PNGParser() {
-    super(MetaType.PICTURE, MimeType.PNG);
-  }
-
   /** PNG header. */
   private static final byte[] HEADER = { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D,
       0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52};
@@ -49,14 +44,15 @@ public final class PNGParser extends AbstractParser {
       throws IOException {
     if(!check(bfc)) return;
     final Metadata meta = new Metadata();
+    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
+    parser.metaEvent(meta.setMimeType(MimeType.PNG));
     parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, bfc.getInt()));
     parser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, bfc.getInt()));
   }
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
-    meta(bfc, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
   }
 }

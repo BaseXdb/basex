@@ -1,5 +1,6 @@
 package org.basex.build.fs.parser;
 
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public class EMLParser extends AbstractParser {
    * @author Bastian Lemke
    */
   private enum EML_Meta {
-    /** The sender of the mail. */
+        /** The sender of the mail. */
     FROM {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -46,7 +47,7 @@ public class EMLParser extends AbstractParser {
         return false;
       }
     },
-    /** Date when the mail was sended. */
+        /** Date when the mail was sended. */
     DATE {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -61,7 +62,7 @@ public class EMLParser extends AbstractParser {
         return true;
       }
     },
-    /** The mail subject. */
+        /** The mail subject. */
     SUBJECT {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -122,7 +123,7 @@ public class EMLParser extends AbstractParser {
         return false;
       }
     },
-    /** Receiver. */
+        /** Receiver. */
     TO {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -130,7 +131,7 @@ public class EMLParser extends AbstractParser {
         return false;
       }
     },
-    /** Carbon copy receiver. */
+        /** Carbon copy receiver. */
     CC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -138,7 +139,7 @@ public class EMLParser extends AbstractParser {
         return false;
       }
     },
-    /** Blind carbon copy receiver. */
+        /** Blind carbon copy receiver. */
     BCC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -146,7 +147,7 @@ public class EMLParser extends AbstractParser {
         return false;
       }
     },
-    /** The content type. */
+        /** The content type. */
     CONTENT_TYPE {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
@@ -154,7 +155,7 @@ public class EMLParser extends AbstractParser {
         return true;
       }
     },
-    /** The content transfer encoding. */
+        /** The content transfer encoding. */
     CONTENT_TRANSFER_ENCODING {
       @Override
       public boolean parse(final EMLParser obj) {
@@ -180,21 +181,21 @@ public class EMLParser extends AbstractParser {
    * @author Bastian Lemke
    */
   private enum Encoding {
-    /** plaintext. */
+        /** plaintext. */
     NONE {
       @Override
       public byte[] decode(final byte[] text, final boolean utf) {
         return text;
       }
     },
-    /** Q-Encoding. */
+        /** Q-Encoding. */
     Q_ENC {
       @Override
       public byte[] decode(final byte[] text, final boolean utf) {
         return decodeQ(text, utf);
       }
     },
-    /** base64 encoding. */
+        /** base64 encoding. */
     BASE64 {
       @Override
       public byte[] decode(final byte[] text, final boolean utf) {
@@ -255,11 +256,6 @@ public class EMLParser extends AbstractParser {
   /** Metadata item. */
   Metadata meta = new Metadata();
 
-  /** Standard constructor. */
-  public EMLParser() {
-    super(MetaType.MESSAGE, MimeType.EML);
-  }
-
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     bfc = f;
@@ -269,7 +265,21 @@ public class EMLParser extends AbstractParser {
   @Override
   protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
-    if(!check(f)) return;
+    meta0(f, parser);
+  }
+
+  /**
+   * Reads the metadata.
+   * @param f the {@link BufferedFileChannel} to read from.
+   * @param parser the parser to fire metaEvents.
+   * @return true if the file was successfully parsed, false otherwise.
+   * @throws IOException if any error occurs.
+   */
+  private boolean meta0(final BufferedFileChannel f, final NewFSParser parser)
+      throws IOException {
+    if(!check(f)) return false;
+    parser.metaEvent(meta.setMetaType(MetaType.MESSAGE));
+    parser.metaEvent(meta.setMimeType(MimeType.EML));
     fsparser = parser;
     mBoundary = "";
     do {
@@ -286,8 +296,9 @@ public class EMLParser extends AbstractParser {
         getBoundary();
         getCharset();
       }
-      if(readNext && !readLine()) return;
+      if(readNext && !readLine()) return true;
     } while(mCurrLine.length() != 0);
+    return true;
   }
 
   @Override
@@ -295,7 +306,6 @@ public class EMLParser extends AbstractParser {
       throws IOException {
     if(!check(f)) return;
     fsparser = parser;
-
     do {
       String type = "";
       final Matcher m = KEYPAT.matcher(mCurrLine);
@@ -319,7 +329,7 @@ public class EMLParser extends AbstractParser {
   @Override
   protected boolean metaAndContent(final BufferedFileChannel f,
       final NewFSParser parser) throws IOException {
-    meta(f, parser);
+    if(!meta0(f, parser)) return true;
     if(mCurrLine == null) return true;
     parseContent();
     return true;

@@ -28,11 +28,6 @@ public final class GIFParser extends AbstractParser {
     NewFSParser.register("gif", GIFParser.class);
   }
 
-  /** Standard constructor. */
-  public GIFParser() {
-    super(MetaType.PICTURE, MimeType.GIF);
-  }
-
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     final int len = HEADERGIF87.length;
@@ -51,8 +46,11 @@ public final class GIFParser extends AbstractParser {
     }
     if(!check(f)) return;
 
-    // extract image dimensions
     final Metadata meta = new Metadata();
+    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
+    parser.metaEvent(meta.setMimeType(MimeType.GIF));
+
+    // extract image dimensions
     meta.setInt(IntField.PIXEL_WIDTH, f.get() + (f.get() << 8));
     parser.metaEvent(meta);
     meta.setInt(IntField.PIXEL_HEIGHT, f.get() + (f.get() << 8));
@@ -67,8 +65,7 @@ public final class GIFParser extends AbstractParser {
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
-    meta(bfc, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
   }
 }

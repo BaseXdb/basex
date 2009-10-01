@@ -2,8 +2,11 @@ package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.TreeSet;
+
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
+import org.basex.build.fs.util.Metadata;
 import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.core.Prop;
@@ -17,27 +20,34 @@ import org.basex.util.TokenBuilder;
  */
 public final class TXTParser extends AbstractParser {
 
-  static {
-    NewFSParser.register("txt", TXTParser.class);
-    NewFSParser.registerFallback(TXTParser.class);
-  }
+  /** Suffixes of all file formats, this parser is able to parse. */
+  private static final TreeSet<String> suffixes = new TreeSet<String>();
 
-  /** Standard constructor. */
-  public TXTParser() {
-    super(MetaType.TEXT, MimeType.TXT);
+  static {
+    suffixes.add("txt");
+    for(String suf : suffixes)
+      NewFSParser.register(suf, TXTParser.class);
+    NewFSParser.registerFallback(TXTParser.class);
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel bfc) {
+    final String name = bfc.getFileName();
+    final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+    return suffixes.contains(suf);
     // [BL] search for invalid characters?
-    return true;
   }
 
   /** {@inheritDoc} */
   @Override
   protected void meta(final BufferedFileChannel bfc, //
-      final NewFSParser parser) { /* */}
+      final NewFSParser parser) throws IOException {
+    if(!check(bfc)) return;
+    final Metadata meta = new Metadata();
+    parser.metaEvent(meta.setMetaType(MetaType.TEXT));
+    parser.metaEvent(meta.setMimeType(MimeType.TXT));
+  }
 
   /** {@inheritDoc} */
   @Override
@@ -67,7 +77,7 @@ public final class TXTParser extends AbstractParser {
           } else if(b >= 0xF0 && b <= 0xF4) { // four byte UTF-8 char
             followingBytes = 3;
           } else {
-            return; // no UTF-8 char
+            return; // not an UTF-8 character
           }
           if(bytesToRead < followingBytes) {
             if(remaining + bytesToRead < followingBytes) {
@@ -97,8 +107,7 @@ public final class TXTParser extends AbstractParser {
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
-    content(bfc, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
   }
 }

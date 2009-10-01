@@ -26,11 +26,6 @@ public final class BMPParser extends AbstractParser {
     NewFSParser.register("bmp", BMPParser.class);
   }
 
-  /** Standard constructor. */
-  public BMPParser() {
-    super(MetaType.PICTURE, MimeType.BMP);
-  }
-
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     if(f.size() < 2) return false;
@@ -49,8 +44,11 @@ public final class BMPParser extends AbstractParser {
       return;
     }
 
-    // extract image dimensions
     final Metadata meta = new Metadata();
+    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
+    parser.metaEvent(meta.setMimeType(MimeType.BMP));
+    
+    // extract image dimensions
     final int w = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
     final int h = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
     parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, w));
@@ -65,8 +63,7 @@ public final class BMPParser extends AbstractParser {
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
-    meta(bfc, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
   }
 }

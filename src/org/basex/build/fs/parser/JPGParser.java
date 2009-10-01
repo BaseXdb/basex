@@ -42,20 +42,13 @@ public final class JPGParser extends AbstractParser {
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
   private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00};
   /** Metadata item. */
-  private final Metadata meta;
+  private final Metadata meta = new Metadata();
   /** Parser for Exif data. */
-  private final ExifParser exifParser;
+  private final ExifParser exifParser = new ExifParser();
   /** The {@link NewFSParser} instance to fire events. */
   private NewFSParser fsparser;
   /** The {@link BufferedFileChannel} to read from. */
   private BufferedFileChannel bfc;
-
-  /** Standard constructor. */
-  public JPGParser() {
-    super(MetaType.PICTURE, MimeType.JPG);
-    meta = new Metadata();
-    exifParser = new ExifParser();
-  }
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
@@ -74,6 +67,8 @@ public final class JPGParser extends AbstractParser {
   protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f)) return;
+    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
+    parser.metaEvent(meta.setMimeType(MimeType.JPG));
     bfc = f;
     fsparser = parser;
     bfc.skip(-2);
@@ -110,9 +105,8 @@ public final class JPGParser extends AbstractParser {
 
   @Override
   protected boolean metaAndContent(final BufferedFileChannel f,
-      final NewFSParser parser) throws IOException {
-    meta(f, parser);
-    return true;
+      final NewFSParser parser) {
+    return false;
   }
 
   /**
