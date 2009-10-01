@@ -1,5 +1,20 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.up.UpdateFunctions.*;
+
+import org.basex.data.Data;
+import org.basex.data.MemData;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
+import org.basex.query.up.InsertPrimitive;
+import org.basex.query.util.Err;
+
 
 /**
  * Insert expression.
@@ -9,30 +24,53 @@ package org.basex.query.expr;
  */
 public final class Insert extends Arr {
   /** First flag. */
-  final boolean first;
+  final boolean as;
   /** Last flag. */
   final boolean last;
   /** After flag. */
-  final boolean after;
+  final boolean into;
   /** Before flag. */
-  final boolean before;
+  final boolean after;
 
   /**
    * Constructor.
    * @param src source expression
-   * @param fi first flag
-   * @param la last flag
-   * @param af after flag
-   * @param be before flag
+   * @param a as
+   * @param la last
+   * @param in into
+   * @param af after
    * @param trg target expression
    */
-  public Insert(final Expr src, final boolean fi, final boolean la,
-      final boolean af, final boolean be, final Expr trg) {
+  public Insert(final Expr src, final boolean a, final boolean la,
+      final boolean in, final boolean af, final Expr trg) {
     super(src, trg);
-    first = fi;
+    as = a;
     last = la;
+    into = in;
     after = af;
-    before = be;
+  }
+  
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    if(!into) Err.or(UPIMPL, "only insert into");
+    final Iter src = expr[1].iter(ctx);
+    Item i = src.next();
+    if(i == null) Err.or(UPSEQEMP, src);
+    if(src.next() != null) Err.or(UPTRGMULT, src);
+    if(!(i instanceof Nod)) Err.or(UPTRGMULT, src);
+    final Nod trgtN = (Nod) i;
+    // [LK] check nodes for type
+    final Iter r = SeqIter.get(expr[0].iter(ctx));
+    i = r.next();
+    if(i instanceof Nod) {
+      final Nod n = (Nod) i;
+      if(Nod.kind(n.type) == Data.ATTR) Err.or(UPIMPL, "no attrs supported");
+    }
+    r.reset();
+    final MemData m = buildDB(r,
+        trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
+    ctx.updates.addPrimitive(new InsertPrimitive(trgtN, m));
+    return Iter.EMPTY;
   }
 
   @Override

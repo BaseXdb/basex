@@ -19,4 +19,10 @@ abstract class UpdatePrimitive {
   protected UpdatePrimitive(final Nod n) {
     node = n;
   }
+  
+  /**
+   * Applies the update operation represented by this primitive to the 
+   * database.s 
+   */
+  public abstract void apply();
 }

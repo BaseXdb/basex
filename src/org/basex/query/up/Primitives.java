@@ -1,14 +1,12 @@
 package org.basex.query.up;
 
-import static org.basex.query.up.UpdateFunctions.*;
-import java.util.LinkedList;
-import java.util.List;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
-import org.basex.util.IntList;
+import org.basex.query.item.FNode;
 
 /**
  * Holds all update primitives for a specific data reference. The distinct
@@ -19,22 +17,15 @@ import org.basex.util.IntList;
  * @author Lukas Kircher
  */
 public final class Primitives {
-  /** Update primitives. */
-  private final List<DeletePrimitive> deletes;
-  /** Update primitives. */
-  private final List<RenamePrimitive> renames;
-  /** Update primitives. */
-  private final List<ReplacePrimitive> replaces;
-  /** Database reference. */
-  private Data data;
+  /** Atomic update operations hashed after pre value. */
+  private Map<Integer, UpdatePrimitive> op;
 
   /**
    * Constructor.
    */
   public Primitives() {
-    deletes = new LinkedList<DeletePrimitive>();
-    renames = new LinkedList<RenamePrimitive>();
-    replaces = new LinkedList<ReplacePrimitive>();
+    // [LK] only a single update operation per db node possible at the moment
+    op = new HashMap<Integer, UpdatePrimitive>();
   }
 
   /**
@@ -42,10 +33,11 @@ public final class Primitives {
    * @param p update primitive
    */
   public void addPrimitive(final UpdatePrimitive p) {
-    if(p instanceof DeletePrimitive) deletes.add((DeletePrimitive) p);
-    else if(p instanceof RenamePrimitive) renames.add((RenamePrimitive) p);
-    else if(p instanceof ReplacePrimitive) replaces.add((ReplacePrimitive) p);
-    if(p.node instanceof DBNode && data == null) data = ((DBNode) p.node).data;
+    if(p.node instanceof DBNode)
+      op.put(((DBNode) p.node).pre, p);
+    // [LK] check fragment constraints?
+    if(p.node instanceof FNode)
+      op.put(((FNode) p.node).id(), p);
   }
 
   /**
@@ -54,28 +46,18 @@ public final class Primitives {
    */
   @SuppressWarnings("unused")
   public void apply() throws QueryException {
-    // rename
-    for(final RenamePrimitive p : renames) {
-      final DBNode n = (DBNode) p.node;
-      rename(n.pre, p.newName, n.data);
-    }
-
-    // replace
-    for(final ReplacePrimitive p : replaces) {
-      // [LK] trgt / rpl node must be different nodes
-      // [LK] check parent of replaced node
-      // [LK] check for duplicate attributes
-      // [LK] merge text nodes
-      if(!(p.node instanceof DBNode)) continue;
-      final DBNode n = (DBNode) p.node;
-      final int k = Nod.kind(n.type);
-      data.delete(n.pre);
-      data.insertSeq(n.pre + data.size(n.pre, k), data.parent(n.pre, k), p.r);
-    }
-
-    // delete
-    final IntList pres = new IntList();
-    for(final DeletePrimitive p : deletes) pres.add(((DBNode) p.node).pre);
-    deleteDBNodes(new Nodes(pres.finish(), data));
+    // [LK] sort operations after pre values of primitives, eliminate
+    // unnecessary ones and apply backwards
+    // [LK] trgt / rpl node must be different nodes
+    // [LK] check parent of replaced node
+    // [LK] check for duplicate attributes
+    // [LK] merge text nodes
+    final int l = op.size();
+    final Integer[] t = new Integer[l];
+    op.keySet().toArray(t);
+    final int[] p = new int[l];
+    for(int i = 0; i < l; i++) p[i] = t[i];
+    Arrays.sort(p);
+    for(int i = l - 1; i >= 0; i--) op.get(new Integer(p[i])).apply();
   }
 }

@@ -1,21 +1,22 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.index.FTFuzzy;
+import org.basex.index.FTTrie;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Values;
-import org.basex.index.FTTrie;
 import org.basex.io.DataAccess;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
-import org.basex.query.up.UpdateFunctions;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -584,14 +585,14 @@ public final class DiskData extends Data {
   
   @Override
   public void insertSeq(final int pre, final int par, final Data dt) {
-    System.out.println("\n\ninsert ...");
-    UpdateFunctions.printTable(dt);
-    System.out.println("before insert");
-    UpdateFunctions.printTable(this);
+//    System.out.println("\n\ninsert ...");
+//    UpdateFunctions.printTable(dt);
+//    System.out.println("before insert");
+//    UpdateFunctions.printTable(this);
     meta.update();
     final int sa = 1;
     // number of nodes to be inserted
-    int ss = dt.size(0, dt.kind(0));
+    final int ss = dt.size(0, dt.kind(0));
 
     // copy database entries
     for(int s = sa; s < ss; s++) {
@@ -622,12 +623,12 @@ public final class DiskData extends Data {
           break;
       }
     }
-    System.out.println("after insert");
-    UpdateFunctions.printTable(this);
+//    System.out.println("after insert");
+//    UpdateFunctions.printTable(this);
     // update table if no document was inserted
     if(par != 0) updateTable(pre, par, ss - 1);
-    System.out.println("after table update");
-    UpdateFunctions.printTable(this);
+//    System.out.println("after table update");
+//    UpdateFunctions.printTable(this);
   }
 
   /**

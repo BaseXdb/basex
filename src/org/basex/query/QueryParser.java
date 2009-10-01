@@ -2510,7 +2510,7 @@ public class QueryParser extends InputParser {
     if(consumeWS(BEFORE)) be = true;
     if(!(in ^ af ^ be)) error(INCOMPLETE);
     final Expr trg = check(single(), INCOMPLETE);
-    error(UPIMPL);
+//    error(UPIMPL);
     return new Insert(s, as, last, in, af, trg);
   }
 

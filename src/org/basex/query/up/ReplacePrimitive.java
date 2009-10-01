@@ -1,6 +1,8 @@
 package org.basex.query.up;
 
+import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
 /**
@@ -21,5 +23,15 @@ public final class ReplacePrimitive extends UpdatePrimitive {
   public ReplacePrimitive(final Nod n, final MemData replace) {
     super(n);
     r = replace;
+  }
+
+  @Override
+  public void apply() {
+    if(!(node instanceof DBNode)) return;
+    final DBNode n = (DBNode) node;
+    final Data data = n.data;
+    final int k = Nod.kind(n.type);
+    data.insertSeq(n.pre + data.size(n.pre, k), data.parent(n.pre, k), r);
+    data.delete(n.pre);
   }
 }

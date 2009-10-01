@@ -58,12 +58,7 @@ public final class Replace extends Arr {
       if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(INCOMPLETE, t);
       i = r.next();
     }
-    // [LK] reset doesn't work on lists SeqIter.get()
     r.reset();
-    // [LK] create mem data instance here
-    // create mem data -> insert doc node r as root
-    // iter -> node,doc,... -> insert each node,etc. into r
-    // apply
     if(value) Err.or(UPIMPL, value);
     final MemData m = buildDB(r, 
         trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
