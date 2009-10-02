@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 
 /**
@@ -51,8 +52,21 @@ abstract class UpdatePrimitive {
   public abstract Type type();
   
   /**
+   * Checks for constraints, etc.
+   * @throws QueryException query exception 
+   */
+  public abstract void check() throws QueryException;
+  
+  /**
    * Applies the update operation represented by this primitive to the 
    * database.s 
    */
   public abstract void apply();
+  
+  /**
+   * Merges if possible two update primitives of the same type if they are
+   * applied on the same target.
+   * @param p primitive to be merged with 
+   */
+  public abstract void merge(final UpdatePrimitive p);
 }

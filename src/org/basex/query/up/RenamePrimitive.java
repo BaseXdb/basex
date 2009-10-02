@@ -3,6 +3,7 @@ package org.basex.query.up;
 import static org.basex.query.up.UpdatePrimitive.Type.*;
 import static org.basex.query.up.UpdateFunctions.*;
 
+import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
@@ -37,5 +38,15 @@ public final class RenamePrimitive extends UpdatePrimitive {
   @Override
   public Type type() {
     return RENAME;
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void check() throws QueryException {
+  }
+
+  @Override
+  public void merge(UpdatePrimitive p) {
+    // [LK] throw query exception: multiple renames on same node
   }
 }

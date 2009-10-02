@@ -4,6 +4,7 @@ import static org.basex.query.up.UpdatePrimitive.Type.*;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Nodes;
+import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
@@ -32,5 +33,15 @@ public final class DeletePrimitive extends UpdatePrimitive {
   @Override
   public Type type() {
     return DELETE;
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void check() throws QueryException {
+  }
+
+  @Override
+  public void merge(UpdatePrimitive p) {
+    // [LK] throw query exception: multiple deletes on same node
   }
 }

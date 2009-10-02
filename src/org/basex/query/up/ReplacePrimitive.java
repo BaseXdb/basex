@@ -1,10 +1,12 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.UpdatePrimitive.Type.*;
+
 import org.basex.data.Data;
-import org.basex.data.MemData;
+import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.iter.Iter;
 
 /**
  * Represents a replace primitive.
@@ -12,9 +14,7 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class ReplacePrimitive extends UpdatePrimitive {
-  /** Nodes replacing the target. */
-  final MemData r;
+public final class ReplacePrimitive extends PrimitiveCopy {
   /** Replacing nodes are attributes. */
   final boolean a;
   /** Replace value of target node. */
@@ -27,12 +27,16 @@ public final class ReplacePrimitive extends UpdatePrimitive {
    * @param attr replacing nodes are attributes
    * @param value replace value of target
    */
-  public ReplacePrimitive(final Nod n, final MemData replace, 
+  public ReplacePrimitive(final Nod n, final Iter replace, 
       final boolean attr, final boolean value) {
-    super(n);
+    super(n, replace);
     a = attr;
     v = value;
-    r = replace;
+  }
+  
+  @Override
+  public void check() throws QueryException {
+    super.check();
   }
 
   @Override
@@ -43,8 +47,8 @@ public final class ReplacePrimitive extends UpdatePrimitive {
     final int k = Nod.kind(n.type);
     final int par = d.parent(n.pre, d.kind(n.pre));
     if(a)
-      UpdateFunctions.insertAttributes(n.pre, par, d, r);
-    else d.insertSeq(n.pre + d.size(n.pre, k), par , r);
+      UpdateFunctions.insertAttributes(n.pre, par, d, m);
+    else d.insertSeq(n.pre + d.size(n.pre, k), par , m);
     d.delete(n.pre);
   }
 

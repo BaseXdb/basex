@@ -44,14 +44,13 @@ public final class Primitives {
       l[p.type().ordinal()] = p;
       op.put(i, l);
     }
-    l[p.type().ordinal()] = p;
+    l[p.type().ordinal()].merge(p);
   }
 
   /**
    * Applies all updates to the data reference.
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
   public void apply() throws QueryException {
     // [LK] sort operations after pre values of primitives, eliminate
     // unnecessary ones and apply backwards
@@ -67,6 +66,7 @@ public final class Primitives {
     Arrays.sort(p);
     for(int i = l - 1; i >= 0; i--) {
       final UpdatePrimitive[] pl = op.get(p[i]);
+      for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.apply();
     }
   }
