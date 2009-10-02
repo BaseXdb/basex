@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.up.UpdatePrimitive.Type.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.item.DBNode;
@@ -39,5 +40,10 @@ public class InsertPrimitive extends UpdatePrimitive {
           n.pre, d, i);
     else
       d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, i);
+  }
+
+  @Override
+  public Type type() {
+    return a ? INSERTATTR : INSERTINTO;
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.up.UpdatePrimitive.Type.*;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Nodes;
@@ -26,5 +27,10 @@ public final class DeletePrimitive extends UpdatePrimitive {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     deleteDBNodes(new Nodes(new int[]{n.pre}, n.data));
+  }
+
+  @Override
+  public Type type() {
+    return DELETE;
   }
 }

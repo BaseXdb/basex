@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.up.UpdatePrimitive.Type.*;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.query.item.DBNode;
@@ -31,5 +32,10 @@ public final class RenamePrimitive extends UpdatePrimitive {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     rename(n.pre, newName, n.data);
+  }
+
+  @Override
+  public Type type() {
+    return RENAME;
   }
 }
