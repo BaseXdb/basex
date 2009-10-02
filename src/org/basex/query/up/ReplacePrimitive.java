@@ -34,12 +34,12 @@ public final class ReplacePrimitive extends UpdatePrimitive {
   public void apply() {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
-    final Data data = n.data;
+    final Data d = n.data;
     final int k = Nod.kind(n.type);
+    final int par = d.parent(n.pre, d.kind(n.pre));
     if(a)
-      UpdateFunctions.insertAttributes(n.pre, data, r);
-    else data.insertSeq(n.pre + data.size(n.pre, k), 
-        data.parent(n.pre, k), r);
-    data.delete(n.pre);
+      UpdateFunctions.insertAttributes(n.pre, par, d, r);
+    else d.insertSeq(n.pre + d.size(n.pre, k), par , r);
+    d.delete(n.pre);
   }
 }

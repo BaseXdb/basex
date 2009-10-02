@@ -43,7 +43,7 @@ public final class Insert extends Arr {
    */
   public Insert(final Expr src, final boolean a, final boolean la,
       final boolean in, final boolean af, final Expr trg) {
-    super(src, trg);
+    super(trg, src);
     as = a;
     last = la;
     into = in;
@@ -53,23 +53,26 @@ public final class Insert extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(!into) Err.or(UPIMPL, "only insert into");
-    final Iter src = expr[1].iter(ctx);
-    Item i = src.next();
-    if(i == null) Err.or(UPSEQEMP, src);
-    if(src.next() != null) Err.or(UPTRGMULT, src);
-    if(!(i instanceof Nod)) Err.or(UPTRGMULT, src);
+    final Iter ti = expr[0].iter(ctx);
+    Item i = ti.next();
+    if(i == null) Err.or(UPSEQEMP, ti);
+    if(ti.next() != null) Err.or(UPTRGMULT, ti);
+    if(!(i instanceof Nod)) Err.or(UPTRGMULT, ti);
     final Nod trgtN = (Nod) i;
     // [LK] check nodes for type
-    final Iter r = SeqIter.get(expr[0].iter(ctx));
+    final Iter r = SeqIter.get(expr[1].iter(ctx));
     i = r.next();
-    if(i instanceof Nod) {
-      final Nod n = (Nod) i;
-      if(Nod.kind(n.type) == Data.ATTR) Err.or(UPIMPL, "no attrs supported");
+    final boolean insAttr = Nod.kind(i.type) == Data.ATTR;
+    if(insAttr && Nod.kind(trgtN.type) != Data.ELEM) Err.or(INCOMPLETE, r);
+    i = r.next();
+    while(i != null) {
+      if((Nod.kind(i.type) == Data.ATTR) ^ insAttr) Err.or(INCOMPLETE, r);
+      i = r.next();
     }
     r.reset();
     final MemData m = buildDB(r,
         trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
-    ctx.updates.addPrimitive(new InsertPrimitive(trgtN, m));
+    ctx.updates.addPrimitive(new InsertPrimitive(trgtN, m, insAttr));
     return Iter.EMPTY;
   }
 

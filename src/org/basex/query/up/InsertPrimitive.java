@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -13,14 +14,18 @@ import org.basex.query.item.Nod;
 public class InsertPrimitive extends UpdatePrimitive {
   /** Insert nodes copy. */
   final MemData i;
+  /** Inserted nodes are attributes. */
+  final boolean a;
 
   /**
    * Constructor
    * @param n target 
    * @param insert insert nodes
+   * @param attr inserted nodes are attributes 
    */
-  public InsertPrimitive(Nod n, final MemData insert) {
+  public InsertPrimitive(Nod n, final MemData insert, final boolean attr) {
     super(n);
+    a = attr;
     i = insert;
   }
 
@@ -28,6 +33,11 @@ public class InsertPrimitive extends UpdatePrimitive {
   public void apply() {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
-    n.data.insertSeq(n.pre + n.data.attSize(n.pre, Nod.kind(n.type)), n.pre, i);
+    final Data d = n.data;
+    if(a)
+      UpdateFunctions.insertAttributes(n.pre + d.attSize(n.pre, d.kind(n.pre)), 
+          n.pre, d, i);
+    else
+      d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, i);
   }
 }
