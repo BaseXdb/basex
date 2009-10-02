@@ -23,7 +23,6 @@ public final class Primitives {
    * Constructor.
    */
   public Primitives() {
-    // [LK] only a single update operation per db node possible at the moment
     op = new HashMap<Integer, UpdatePrimitive[]>();
   }
 
