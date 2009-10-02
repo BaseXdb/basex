@@ -14,14 +14,19 @@ import org.basex.query.item.Nod;
 public final class ReplacePrimitive extends UpdatePrimitive {
   /** Nodes replacing the target. */
   final MemData r;
+  /** Replacing nodes are attributes. */
+  final boolean a;
 
   /**
    * Constructor.
    * @param n target node
    * @param replace replace nodes
+   * @param attr replacing nodes are attributes
    */
-  public ReplacePrimitive(final Nod n, final MemData replace) {
+  public ReplacePrimitive(final Nod n, final MemData replace, 
+      final boolean attr) {
     super(n);
+    a = attr;
     r = replace;
   }
 
@@ -31,7 +36,10 @@ public final class ReplacePrimitive extends UpdatePrimitive {
     final DBNode n = (DBNode) node;
     final Data data = n.data;
     final int k = Nod.kind(n.type);
-    data.insertSeq(n.pre + data.size(n.pre, k), data.parent(n.pre, k), r);
+    if(a)
+      UpdateFunctions.insertAttributes(n.pre, data, r);
+    else data.insertSeq(n.pre + data.size(n.pre, k), 
+        data.parent(n.pre, k), r);
     data.delete(n.pre);
   }
 }

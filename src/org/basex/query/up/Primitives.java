@@ -9,9 +9,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 
 /**
- * Holds all update primitives for a specific data reference. The distinct
- * primitives are hold separately to support fast checking of update
- * constraints.
+ * Holds all update primitives for a specific data reference.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher

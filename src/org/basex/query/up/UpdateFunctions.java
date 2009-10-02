@@ -49,6 +49,22 @@ public final class UpdateFunctions {
       data.delete(pre);
     }
   }
+  
+  /**
+   * Inserts a set of attributes a node.
+   * @param pre target pre value
+   * @param d target data reference
+   * @param m {@link MemData} instance holding attributes
+   */
+  public static void insertAttributes(final int pre, final Data d, 
+      final MemData m) {
+    final int ss = m.size(0, m.kind(0));
+    final int par = d.parent(pre, d.kind(pre));
+    for(int s = 1; s < ss; s++) {
+      final int p = pre + s - 1;
+      d.insert(p, par, m.attName(s), m.attValue(s));
+    }
+  }
 
   /**
    * Renames the specified node.
