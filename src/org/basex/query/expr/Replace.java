@@ -11,6 +11,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.ReplacePrimitive;
@@ -52,14 +54,21 @@ public final class Replace extends Arr {
     // check replace constraints
     // [LK] reset doesn't work on lists SeqIter.get()
     final Iter r = SeqIter.get(expr[1].iter(ctx));
-    final boolean trgIsAttr = Nod.kind(trgtN.type) == Data.ATTR ? true : false;
     i = r.next();
+    if(value) {
+      Err.or(UPIMPL, "foobanchu");
+      if(!(i instanceof Str || i instanceof QNm)) Err.or(IMPLCOL, i);
+      if(r.next() != null) Err.or(UPTRGMULT, i);
+      // [LK] implement after refactoring of update primitives
+      return Iter.EMPTY;
+    }
+    
+    final boolean trgIsAttr = Nod.kind(trgtN.type) == Data.ATTR ? true : false;
     while(i != null) {
       if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(INCOMPLETE, t);
       i = r.next();
     }
     r.reset();
-    if(value) Err.or(UPIMPL, value);
     final MemData m = buildDB(r, 
         trgtN instanceof DBNode ? ((DBNode) trgtN).data : null);
     ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, m, trgIsAttr, value));

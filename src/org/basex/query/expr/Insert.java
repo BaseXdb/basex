@@ -62,6 +62,7 @@ public final class Insert extends Arr {
     // [LK] check nodes for type
     final Iter r = SeqIter.get(expr[1].iter(ctx));
     i = r.next();
+    if(i == null) Err.or(UPSEQEMP, i);
     final boolean insAttr = Nod.kind(i.type) == Data.ATTR;
     if(insAttr && Nod.kind(trgtN.type) != Data.ELEM) Err.or(INCOMPLETE, r);
     i = r.next();

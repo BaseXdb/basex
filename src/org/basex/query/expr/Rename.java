@@ -39,6 +39,7 @@ public final class Rename extends Arr {
     if(kind != Data.ATTR && kind != Data.ELEM && kind != Data.PI)
       Err.or(INCOMPLETE, i);
     final Item nmItem = nI.next();
+    // [LK] QName correct?
     if(!(nmItem instanceof Str || nmItem instanceof QNm)) 
       Err.or(IMPLCOL, nmItem);
     ctx.updates.addPrimitive(new RenamePrimitive((Nod) i, nmItem.str()));
