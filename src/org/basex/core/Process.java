@@ -92,8 +92,8 @@ public abstract class Process extends Progress {
     // [AW] comment this out to disable database locking
     if(data != null) {
       // wait until update and read operations have been completed..
-      //while(data.getLock() == 2 || (updating() && data.getLock() != 0))
-      //  Performance.sleep(50);
+      while(data.getLock() == 2 || (updating() && data.getLock() != 0))
+        Performance.sleep(50);
     }
 
     boolean ok = false;
