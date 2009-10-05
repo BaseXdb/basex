@@ -109,7 +109,7 @@ public final class QueryTest {
         if(up && ((String) qu[0]).startsWith("x")) {
           proc = new CreateDB(file, name);
           ok = proc.execute(context);
-          UpdateFunctions.printTable(context.data());
+//          UpdateFunctions.printTable(context.data());
         }
         
         final boolean correct = qu.length == 3;
