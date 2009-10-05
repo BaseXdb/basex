@@ -177,7 +177,7 @@ public abstract class W3CTS {
     }
 
     if(!o) {
-      Main.outln(NL + Main.name(this) + " Test Suite" + NL +
+      Main.outln(NL + Main.name(this) + " Test Suite [pat]" + NL +
           " [pat] perform only tests with the specified pattern" + NL +
           " -h show this help" + NL +
           " -p change path" + NL +
