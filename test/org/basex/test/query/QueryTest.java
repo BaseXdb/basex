@@ -21,7 +21,7 @@ import org.basex.util.Performance;
 public final class QueryTest {
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest()
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
@@ -98,11 +98,18 @@ public final class QueryTest {
   private boolean test(final AbstractTest test, final String ext) {
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(test);
+    final boolean up = test instanceof XQUPTest;
     Process proc = new CreateDB(file, name);
     boolean ok = proc.execute(context);
 
     if(ok) {
       for(final Object[] qu : test.queries) {
+        // added to renew document after each update test
+        if(up && ((String) qu[0]).startsWith("x")) {
+          proc = new CreateDB(file, name);
+          ok = proc.execute(context);
+        }
+        
         final boolean correct = qu.length == 3;
         final String query = qu[correct ? 2 : 1].toString();
         final String cmd = qu[0] + ": " + query;
