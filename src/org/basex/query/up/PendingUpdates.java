@@ -9,7 +9,8 @@ import org.basex.query.item.FNode;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
- * constraints and finally executes them.
+ * constraints and finally executes them. Update primtives which target node
+ * is a fragment are only checked for constraints.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
@@ -25,20 +26,21 @@ public final class PendingUpdates {
    */
   public PendingUpdates() {
     dbPrimitives = new HashMap<Data, Primitives>();
-    fragPrimitives = new Primitives();
+    fragPrimitives = new Primitives(true);
   }
 
   /**
    * Adds an update primitive to the corresponding primitive list.
    * @param p primitive to add
+   * @throws QueryException query exception
    */
-  public void addPrimitive(final UpdatePrimitive p) {
+  public void addPrimitive(final UpdatePrimitive p) throws QueryException {
     if(p.node instanceof FNode) fragPrimitives.addPrimitive(p);
     else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
       Primitives dp = dbPrimitives.get(d);
       if(dp == null) {
-        dp = new Primitives();
+        dp = new Primitives(false);
         dbPrimitives.put(d, dp);
       }
       dp.addPrimitive(p);
@@ -52,7 +54,8 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void applyUpdates() throws QueryException {
-    // Only primitives which target nodes are database nodes are processed.
+    // only constraints are checked for fragment primitives
+    fragPrimitives.apply();
     final Primitives[] dp = new Primitives[dbPrimitives.size()];
     dbPrimitives.values().toArray(dp);
     for(final Primitives p : dp) p.apply();

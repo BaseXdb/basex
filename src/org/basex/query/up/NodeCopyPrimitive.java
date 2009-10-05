@@ -15,7 +15,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public abstract class PrimitiveCopy extends UpdatePrimitive {
+public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   /** Copy of nodes to be inserted. */
   LinkedList<Iter> c;
   /** {@link MemData} instance of node copies. Speeds up insert. */
@@ -26,7 +26,7 @@ public abstract class PrimitiveCopy extends UpdatePrimitive {
    * @param n target node
    * @param copy node copy
    */
-  protected PrimitiveCopy(final Nod n, final Iter copy) {
+  protected NodeCopyPrimitive(final Nod n, final Iter copy) {
     super(n);
     c = new LinkedList<Iter>();
     c.add(copy);
@@ -50,6 +50,6 @@ public abstract class PrimitiveCopy extends UpdatePrimitive {
   
   @Override
   public void merge(UpdatePrimitive p) {
-    c.add(((PrimitiveCopy) p).c.getFirst());
+    c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 }

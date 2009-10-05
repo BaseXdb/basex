@@ -14,7 +14,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertPrimitive extends PrimitiveCopy {
+public class InsertPrimitive extends NodeCopyPrimitive {
   /** Inserted nodes are attributes. */
   final boolean a;
 

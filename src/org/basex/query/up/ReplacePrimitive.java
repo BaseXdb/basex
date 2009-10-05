@@ -14,24 +14,20 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class ReplacePrimitive extends PrimitiveCopy {
+public final class ReplacePrimitive extends NodeCopyPrimitive {
   /** Replacing nodes are attributes. */
   final boolean a;
-  /** Replace value of target node. */
-  final boolean v;
 
   /**
    * Constructor.
    * @param n target node
    * @param replace replace nodes
    * @param attr replacing nodes are attributes
-   * @param value replace value of target
    */
   public ReplacePrimitive(final Nod n, final Iter replace, 
-      final boolean attr, final boolean value) {
+      final boolean attr) {
     super(n, replace);
     a = attr;
-    v = value;
   }
   
   @Override
@@ -54,6 +50,6 @@ public final class ReplacePrimitive extends PrimitiveCopy {
 
   @Override
   public Type type() {
-    return v ? a ? REPLACEVALUE : REPLACEELEMCONT : REPLACENODE;
+    return REPLACENODE;
   }
 }

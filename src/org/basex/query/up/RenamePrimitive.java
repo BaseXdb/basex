@@ -14,25 +14,22 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class RenamePrimitive extends UpdatePrimitive {
-  /** New name. */
-  final byte[] newName;
+public final class RenamePrimitive extends NewValuePrimitive {
 
   /**
    * Constructor.
    * @param n target node
-   * @param name new name
+   * @param newName new name
    */
-  public RenamePrimitive(final Nod n, final byte[] name) {
-    super(n);
-    newName = name;
+  public RenamePrimitive(final Nod n, final byte[] newName) {
+    super(n, newName);
   }
 
   @Override
   public void apply() {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
-    rename(n.pre, newName, n.data);
+    rename(n.pre, name, n.data);
   }
 
   @Override
@@ -43,10 +40,5 @@ public final class RenamePrimitive extends UpdatePrimitive {
   @SuppressWarnings("unused")
   @Override
   public void check() throws QueryException {
-  }
-
-  @Override
-  public void merge(UpdatePrimitive p) {
-    // [LK] throw query exception: multiple renames on same node
   }
 }

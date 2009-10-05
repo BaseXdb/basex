@@ -66,7 +66,7 @@ public final class Replace extends Arr {
       i = r.next();
     }
     r.reset();
-    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, r, trgIsAttr, value));
+    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, r, trgIsAttr));
     return Iter.EMPTY;
   }
 

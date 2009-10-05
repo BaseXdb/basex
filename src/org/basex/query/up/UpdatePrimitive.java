@@ -14,10 +14,7 @@ abstract class UpdatePrimitive {
   final Nod node;
   
   /**
-   * Update primitive type enumeration. The types build a hierarchy that 
-   * states, in case of multiple updates on a distinct node, which update 
-   * operation can be omitted. I.e. a rename and delete operation on the same 
-   * node results in a delete operation.
+   * Update primitive type enumeration.
    *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Lukas Kircher
@@ -59,7 +56,7 @@ abstract class UpdatePrimitive {
   
   /**
    * Applies the update operation represented by this primitive to the 
-   * database.s 
+   * database. 
    */
   public abstract void apply();
   
@@ -67,6 +64,7 @@ abstract class UpdatePrimitive {
    * Merges if possible two update primitives of the same type if they are
    * applied on the same target.
    * @param p primitive to be merged with 
+   * @throws QueryException query exception
    */
-  public abstract void merge(final UpdatePrimitive p);
+  public abstract void merge(final UpdatePrimitive p) throws QueryException;
 }

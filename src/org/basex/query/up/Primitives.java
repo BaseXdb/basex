@@ -18,19 +18,24 @@ import org.basex.query.up.UpdatePrimitive.Type;
 public final class Primitives {
   /** Atomic update operations hashed after pre value. */
   private Map<Integer, UpdatePrimitive[]> op;
+  /** Target nodes of update primitives are fragments. */
+  private final boolean f;
 
   /**
    * Constructor.
+   * @param fragment target nodes are fragments
    */
-  public Primitives() {
+  public Primitives(final boolean fragment) {
+    f = fragment;
     op = new HashMap<Integer, UpdatePrimitive[]>();
   }
 
   /**
    * Adds a primitive to a primitive list depending on its type.
    * @param p update primitive
+   * @throws QueryException query exception
    */
-  public void addPrimitive(final UpdatePrimitive p) {
+  public void addPrimitive(final UpdatePrimitive p) throws QueryException {
     Integer i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
     // possible to use node id 'cause nodes in map belong to the same
@@ -67,7 +72,9 @@ public final class Primitives {
     for(int i = l - 1; i >= 0; i--) {
       final UpdatePrimitive[] pl = op.get(p[i]);
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
-      for(final UpdatePrimitive pp : pl) if(pp != null) pp.apply();
+      if(f) return;
+      for(final UpdatePrimitive pp : pl) 
+        if(pp != null && pp.node instanceof DBNode) pp.apply();
     }
   }
 }
