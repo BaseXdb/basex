@@ -10,7 +10,6 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.query.up.UpdateFunctions;
 import org.basex.util.Performance;
 
 /**

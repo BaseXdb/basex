@@ -19,12 +19,12 @@ public class InsertPrimitive extends NodeCopyPrimitive {
   final boolean a;
 
   /**
-   * Constructor
+   * Constructor.
    * @param n target 
    * @param insert insert nodes
    * @param attr inserted nodes are attributes 
    */
-  public InsertPrimitive(Nod n, final Iter insert, final boolean attr) {
+  public InsertPrimitive(final Nod n, final Iter insert, final boolean attr) {
     super(n, insert);
     a = attr;
   }

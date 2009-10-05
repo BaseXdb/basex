@@ -34,7 +34,7 @@ public class XQUPTest extends AbstractTest{
     };
   }
   @Override
-  String details(AProp prop) { return ""; }
+  String details(final AProp prop) { return ""; }
  
   /*
   

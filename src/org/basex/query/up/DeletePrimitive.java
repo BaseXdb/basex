@@ -41,7 +41,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public void merge(UpdatePrimitive p) {
+  public void merge(final UpdatePrimitive p) {
     // [LK] throw query exception: multiple deletes on same node
   }
 }

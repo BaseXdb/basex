@@ -49,7 +49,7 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   }
   
   @Override
-  public void merge(UpdatePrimitive p) {
+  public void merge(final UpdatePrimitive p) {
     c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 }

@@ -15,7 +15,7 @@ public class ReplaceValuePrimitive extends NewValuePrimitive {
    * @param n target node
    * @param newName new name
    */
-  public ReplaceValuePrimitive(Nod n, byte[] newName) {
+  public ReplaceValuePrimitive(final Nod n, final byte[] newName) {
     super(n, newName);
   }
 
