@@ -485,12 +485,16 @@ public interface QueryText {
   Object[] NOATTALL = { XQTY, 24,
       "Attributes must directly follow element nodes." };
 
+  // [LK] CG: dummy error for various unspecified exceptions
+  /** XPST0003: Parsing exception. */
+  Object[] UPDATE = { XUST, 0, "Update error." };
+  
   /** XUST0000: Parsing exception. */
-  Object[] UPIMPL = { XUST, 0, "XQuery Update not implemented." };
+  Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
 
-//[LK] xquery update error msgs
+  //[LK] xquery update error msgs
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
   /** XUTY0008: XQuery Update dynamic exception. */

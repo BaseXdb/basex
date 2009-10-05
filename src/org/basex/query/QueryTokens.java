@@ -263,6 +263,8 @@ public interface QueryTokens {
   /** Parser token. */
   String UNORDERED = "unordered";
   /** Parser token. */
+  String UPDATING = "updating";
+  /** Parser token. */
   String UPPERCASE = "uppercase";
   /** Parser token. */
   String USING = "using";

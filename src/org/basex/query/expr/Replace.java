@@ -54,7 +54,7 @@ public final class Replace extends Arr {
     i = r.next();
     if(value) {
       Err.or(UPIMPL, "foobanchu");
-      if(!(i instanceof Str || i instanceof QNm)) Err.or(IMPLCOL, i);
+      if(!(i instanceof Str || i instanceof QNm)) Err.or(UPDATE, i);
       if(r.next() != null) Err.or(UPTRGMULT, i);
       // [LK] implement after refactoring of update primitives
       return Iter.EMPTY;
@@ -62,7 +62,7 @@ public final class Replace extends Arr {
     
     final boolean trgIsAttr = Nod.kind(trgtN.type) == Data.ATTR ? true : false;
     while(i != null) {
-      if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(INCOMPLETE, t);
+      if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(UPDATE, t);
       i = r.next();
     }
     r.reset();

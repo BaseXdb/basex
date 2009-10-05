@@ -61,10 +61,10 @@ public final class Insert extends Arr {
     i = r.next();
     if(i == null) Err.or(UPSEQEMP, i);
     final boolean insAttr = Nod.kind(i.type) == Data.ATTR;
-    if(insAttr && Nod.kind(trgtN.type) != Data.ELEM) Err.or(INCOMPLETE, r);
+    if(insAttr && Nod.kind(trgtN.type) != Data.ELEM) Err.or(UPDATE, r);
     i = r.next();
     while(i != null) {
-      if((Nod.kind(i.type) == Data.ATTR) ^ insAttr) Err.or(INCOMPLETE, r);
+      if((Nod.kind(i.type) == Data.ATTR) ^ insAttr) Err.or(UPDATE, r);
       i = r.next();
     }
     r.reset();

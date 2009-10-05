@@ -331,7 +331,12 @@ public class QueryParser extends InputParser {
 
       if(consumeWS(VARIABLE)) {
         varDecl();
+      } else if(consumeWS(UPDATING)) {
+        // [LK] CG: check if function performs an update
+        check(FUNCTION);
+        functionDecl();
       } else if(consumeWS(FUNCTION)) {
+        // [LK] CG: check if function performs no updates
         functionDecl();
       } else if(consumeWS(OPTION)) {
         optionDecl();
@@ -364,7 +369,7 @@ public class QueryParser extends InputParser {
     if(declReval) error(DUPLREVAL);
     ctx.revalidate = consumeWS2(STRICT) ? 0 : consumeWS2(LAX) ? 1 :
         consumeWS2(SKIP) ? 2 : -1;
-    error(UPIMPL);
+    declReval = true;
   }
 
   /**
@@ -2503,14 +2508,12 @@ public class QueryParser extends InputParser {
         check(LAST);
         last = true;
       }
-      check(INTO);
     }
     if(consumeWS(INTO)) in = true;
-    if(consumeWS(AFTER)) af = true;
-    if(consumeWS(BEFORE)) be = true;
+    else if(consumeWS(AFTER)) af = true;
+    else if(consumeWS(BEFORE)) be = true;
     if(!(in ^ af ^ be)) error(INCOMPLETE);
     final Expr trg = check(single(), INCOMPLETE);
-//    error(UPIMPL);
     return new Insert(s, as, last, in, af, trg);
   }
 
@@ -2527,7 +2530,6 @@ public class QueryParser extends InputParser {
       return null;
     }
     final Expr n = check(single(), INCOMPLETE);
-//    error(UPIMPL);
     return new Delete(n);
   }
 
@@ -2546,7 +2548,6 @@ public class QueryParser extends InputParser {
     final Expr trg = check(single(), INCOMPLETE);
     check(AS);
     final Expr n = check(single(), INCOMPLETE);
-//    error(UPIMPL);
     return new Rename(trg, n);
   }
 
@@ -2567,7 +2568,6 @@ public class QueryParser extends InputParser {
     final Expr t = check(single(), INCOMPLETE);
     check(WITH);
     final Expr e = check(single(), INCOMPLETE);
-//    error(UPIMPL);
     return new Replace(t, e, v);
   }
 

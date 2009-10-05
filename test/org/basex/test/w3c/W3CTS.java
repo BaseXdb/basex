@@ -454,7 +454,8 @@ public abstract class W3CTS {
         ok++;
       } else if(error == null) {
         boolean inspect = false;
-        int s = -1, rs = result.size();
+        int s = -1;
+        final int rs = result.size();
         while(++s < rs) {
           inspect |= s < cmpFiles.nodes.length &&
             eq(data.atom(cmpFiles.nodes[s]), INSPECT);
@@ -486,8 +487,7 @@ public abstract class W3CTS {
             if(test) break;
           }
         }
-
-        if(s == result.size() && !inspect) {
+        if(rs > 0 && s == rs && !inspect) {
           if(print) {
             if(outFiles.size() == 0) result.add(error(pth + outname, expError));
             logErr.append(logStr);

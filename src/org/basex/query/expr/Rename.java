@@ -33,15 +33,15 @@ public final class Rename extends Arr {
     final Iter tgI = expr[0].iter(ctx);
     final Iter nI = expr[1].iter(ctx);
     Item i = tgI.next();
-    if(i == null) Err.or(INCOMPLETE);
-    if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(INCOMPLETE, i);
+    if(i == null) Err.or(UPDATE);
+    if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(UPDATE, i);
     final int kind = Nod.kind(((Nod) i).type);
     if(kind != Data.ATTR && kind != Data.ELEM && kind != Data.PI)
-      Err.or(INCOMPLETE, i);
+      Err.or(UPDATE, i);
     final Item nmItem = nI.next();
     // [LK] QName correct?
     if(!(nmItem instanceof Str || nmItem instanceof QNm)) 
-      Err.or(IMPLCOL, nmItem);
+      Err.or(UPDATE, nmItem);
     ctx.updates.addPrimitive(new RenamePrimitive((Nod) i, nmItem.str()));
     return Iter.EMPTY;
   }
