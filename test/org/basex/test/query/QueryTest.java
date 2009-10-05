@@ -10,6 +10,7 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.query.up.UpdateFunctions;
 import org.basex.util.Performance;
 
 /**
@@ -108,6 +109,7 @@ public final class QueryTest {
         if(up && ((String) qu[0]).startsWith("x")) {
           proc = new CreateDB(file, name);
           ok = proc.execute(context);
+          UpdateFunctions.printTable(context.data());
         }
         
         final boolean correct = qu.length == 3;
