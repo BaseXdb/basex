@@ -44,6 +44,7 @@ import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogOpenFS;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
+import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
@@ -152,6 +153,15 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
+    }
+  },
+  
+  /** Server Dialog. */
+  SERVER(false, "Server...", "% serv", "SERVER") {
+    @Override
+    public void execute(final GUI gui) {
+   // open file chooser for XML creation
+      new DialogServer(gui);
     }
   },
 

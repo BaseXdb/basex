@@ -1,6 +1,7 @@
 package org.basex.test.cs;
 
 import java.io.IOException;
+
 import org.basex.BaseXServer;
 import org.basex.core.Session;
 import org.basex.core.Process;
@@ -33,14 +34,20 @@ public final class LockingTest {
   private static final String QUERY = "for $c in //country for $n in"
       + " //city where $c/@id = $n/@country and $n/name = 'Tirane'" +
       		" return $n/population/text()";
+  /** Test query 2. */
+  private static final String QUERYN = "for $c in doc('factbook')" +
+  		"//country for $n in doc('factbook')//city where $c/@id =" +
+  				" $n/@country and $n/name = 'Tirane' return $n/population/text()";
   /** Socket reference. */
   static Session session1;
   /** Socket reference. */
   static Session session2;
-  /** Tests are running. */
-  boolean running = true;
   /** Status of test. */
   boolean done = false;
+  /** Number of done eff tests. */
+  int tdone = 0;
+  /** Number of eff tests. */
+  int tests = 5;
 
   /**
    * Main method, launching the test.
@@ -94,13 +101,30 @@ public final class LockingTest {
     if(!checkRes(session1).equals("0")) {
       err("test failed write read / read write");
     } else {
-      System.out.println("--> All Tests done, bye bye...");
+      System.out.println("--> All Locking Tests done...," +
+      		" efficiency test started...");
     }
-
-    while(running) {
-      Performance.sleep(200);
+    for(int i = 0; i < tests; i++) {
+      startQueryT(createSession());
     }
+    while(tdone < tests) Performance.sleep(200);
     stop();
+  }
+  
+  /**
+   * Starts a xquery thread.
+   * @param s Session
+   */
+  private void startQueryT(final ClientSession s) {
+    new Thread() {
+      @Override
+      public void run() {
+        process(new XQuery(QUERYN), s);
+        if(!checkRes(s).equals("192000")) err("efficiency test failed");
+        closeSession(s);
+        tdone++;
+      }
+    }.start();
   }
 
   /** Starts the server. */
@@ -115,22 +139,39 @@ public final class LockingTest {
     // wait for server to be started
     Performance.sleep(1000);
 
+    session1 = createSession();
+    session2 = createSession();
+  }
+  
+  /**
+   * Creates a Clientsession.
+   * @return ClientSession 
+   */
+  ClientSession createSession() {
     try {
-      session1 = new ClientSession(server.context);
-      session2 = new ClientSession(server.context);
+      return new ClientSession(server.context);
     } catch(IOException e) {
       e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Closes a Clientsession.
+   * @param s Session
+   */
+  void closeSession(final Session s) {
+    try {
+      s.close();
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
     }
   }
 
   /** Stops the server. */
   private void stop() {
-    try {
-      session1.close();
-      session2.close();
-    } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
-    }
+    closeSession(session1);
+    closeSession(session2);
     // Stop server instance.
     new BaseXServer("stop");
   }
@@ -193,7 +234,6 @@ public final class LockingTest {
     while(!done) {
       Performance.sleep(200);
     }
-    if(test1 && !test2) running = false;
   }
 
   /**
