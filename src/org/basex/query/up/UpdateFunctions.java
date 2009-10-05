@@ -175,7 +175,6 @@ public final class UpdateFunctions {
     switch (k) {
       case Data.ELEM:
         final FElem e = (FElem) n;
-        // [LK] check sizes
         final int as = fragmentSize(e, true);
         final int s = fragmentSize(e, false);
         m.addElem(
