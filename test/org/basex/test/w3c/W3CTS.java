@@ -162,7 +162,7 @@ public abstract class W3CTS {
           reporting = true;
           currTime = true;
         } else if(c == 'p') {
-          path = arg.string();
+          path = arg.string() + "/";
         } else if(c == 't') {
           currTime = true;
         } else if(c == 'v') {
@@ -254,7 +254,7 @@ public abstract class W3CTS {
 
     Main.outln("Writing log file..." + NL);
     BufferedWriter bw = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(pathlog), UTF8));
+        new OutputStreamWriter(new FileOutputStream(path + pathlog), UTF8));
     bw.write("TEST RESULTS ==================================================");
     bw.write(NL + NL + "Total #Queries: " + total + NL);
     bw.write("Correct / Empty Results: " + ok + " / " + ok2 + NL);
