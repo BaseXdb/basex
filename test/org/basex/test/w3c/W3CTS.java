@@ -314,248 +314,251 @@ public abstract class W3CTS {
   private boolean parse(final Nodes root) throws Exception {
     final String pth = text("@FilePath", root);
     final String outname = text("@name", root);
-    String inname = text("*:query/@name", root);
-    if(inname == null) inname = outname;
-
     if(single != null && !outname.startsWith(single)) return true;
     if(verbose) Main.outln("- " + outname);
 
-    Prop.xquery = IO.get(queries + pth + inname + ".xq");
-    final String in = read(Prop.xquery);
-    String error = null;
-    SeqIter iter = null;
-    boolean doc = true;
+    final Nodes nodes = states(root);
+    for(int n = 0; n < nodes.size(); n++) {
+      final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
+      
+      final String inname = text("*:query/@name", state);
+      Prop.xquery = IO.get(queries + pth + inname + ".xq");
+      final String in = read(Prop.xquery);
+      String error = null;
+      SeqIter iter = null;
+      boolean doc = true;
 
-    final TokenBuilder files = new TokenBuilder();
-    final CachedOutput out = new CachedOutput();
+      final TokenBuilder files = new TokenBuilder();
+      final CachedOutput out = new CachedOutput();
 
-    final Nodes cont = nodes("*:contextItem", root);
-    Nodes curr = null;
-    if(cont.size() != 0) {
-      final Data d = Open.check(context, sources + string(
-          data.atom(cont.nodes[0])) + ".xml");
-      curr = new Nodes(d.doc(), d, true);
-    }
-
-    final QueryProcessor xq = new QueryProcessor(in, curr, context);
-    final QueryContext qctx = xq.ctx;
-
-    try {
-      files.add(file(nodes("*:input-file", root),
-          nodes("*:input-file/@variable", root), qctx));
-      files.add(file(nodes("*:input-URI", root),
-          nodes("*:input-URI/@variable", root), qctx));
-      files.add(file(nodes("*:defaultCollection", root), null, qctx));
-
-      var(nodes("*:input-query/@name", root),
-          nodes("*:input-query/@variable", root), pth, qctx);
-
-      parse(qctx, root);
-
-      for(final int p : nodes("*:module", root).nodes) {
-        final String ns = text("@namespace", new Nodes(p, data));
-        final String f = mods.get(string(data.atom(p))) + ".xq";
-        xq.module(ns, f);
+      final Nodes cont = nodes("*:contextItem", state);
+      Nodes curr = null;
+      if(cont.size() != 0) {
+        final Data d = Open.check(context, sources + string(
+            data.atom(cont.nodes[0])) + ".xml");
+        curr = new Nodes(d.doc(), d, true);
       }
 
-      // evaluate and serialize query
-      final XMLSerializer xml = new XMLSerializer(out, false,
-          context.prop.is(Prop.XQFORMAT));
-      iter = SeqIter.get(xq.iter());
-      Item it;
-      while((it = iter.next()) != null) {
-        doc &= it.type == Type.DOC;
-        it.serialize(xml);
-      }
-      xml.close();
+      final QueryProcessor xq = new QueryProcessor(in, curr, context);
+      final QueryContext qctx = xq.ctx;
 
-    } catch(final QueryException ex) {
-      error = ex.getMessage();
-      if(error.startsWith("Stopped at")) {
-        error = error.substring(error.indexOf('\n') + 1);
-      }
+      try {
+        files.add(file(nodes("*:input-file", state),
+            nodes("*:input-file/@variable", state), qctx));
+        files.add(file(nodes("*:input-URI", state),
+            nodes("*:input-URI/@variable", state), qctx));
+        files.add(file(nodes("*:defaultCollection", state), null, qctx));
 
-      if(error.startsWith("[")) {
-        final int i = error.indexOf("]");
-        error = error.substring(1).substring(0, i - 1) +
-          error.substring(i + 1);
-      }
-    } catch(final Exception ex) {
-      final ByteArrayOutputStream bw = new ByteArrayOutputStream();
-      ex.printStackTrace(new PrintStream(bw));
-      error = bw.toString();
-    } catch(final Error ex) {
-      final ByteArrayOutputStream bw = new ByteArrayOutputStream();
-      ex.printStackTrace(new PrintStream(bw));
-      error = bw.toString();
-    }
+        var(nodes("*:input-query/@name", state),
+            nodes("*:input-query/@variable", state), pth, qctx);
 
-    final Nodes outFiles = nodes("*:output-file/text()", root);
-    final Nodes cmpFiles = nodes("*:output-file/@compare", root);
-    boolean xml = false;
-    boolean frag = false;
+        parse(qctx, state);
 
-    final StringList result = new StringList();
-    for(int o = 0; o < outFiles.size(); o++) {
-      final String resFile = string(data.atom(outFiles.nodes[o]));
-      final IO exp = IO.get(expected + pth + resFile);
-      result.add(read(exp));
-      final byte[] type = data.atom(cmpFiles.nodes[o]);
-      xml |= eq(type, XML);
-      frag |= eq(type, FRAGMENT);
-    }
-    String expError = text("*:expected-error/text()", root);
-
-    final StringBuilder log = new StringBuilder(pth + inname + ".xq");
-    if(files.size() != 0) {
-      log.append(" [");
-      log.append(files);
-      log.append("]");
-    }
-    log.append(NL);
-
-    /** Remove comments. */
-    log.append(norm(in));
-    log.append(NL);
-    final String logStr = log.toString();
-    final boolean print = currTime || !logStr.contains("current-") &&
-        !logStr.contains("implicit-timezone");
-
-    if(reporting) {
-      logFile.append("    <test-case name=\"");
-      logFile.append(outname);
-      logFile.append("\" result='");
-    }
-
-    boolean correctError = false;
-    if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
-      expError = error(pth + outname, expError);
-      final String code = error.substring(0, Math.min(8, error.length()));
-      for(final String er : SLASH.split(expError)) {
-        if(code.equals(er)) {
-          correctError = true;
-          break;
+        for(final int p : nodes("*:module", root).nodes) {
+          final String ns = text("@namespace", new Nodes(p, data));
+          final String f = mods.get(string(data.atom(p))) + ".xq";
+          xq.module(ns, f);
         }
+
+        // evaluate and serialize query
+        final XMLSerializer xml = new XMLSerializer(out, false,
+            context.prop.is(Prop.XQFORMAT));
+        iter = SeqIter.get(xq.iter());
+        Item it;
+        while((it = iter.next()) != null) {
+          doc &= it.type == Type.DOC;
+          it.serialize(xml);
+        }
+        xml.close();
+
+      } catch(final QueryException ex) {
+        error = ex.getMessage();
+        if(error.startsWith("Stopped at")) {
+          error = error.substring(error.indexOf('\n') + 1);
+        }
+
+        if(error.startsWith("[")) {
+          final int i = error.indexOf("]");
+          error = error.substring(1).substring(0, i - 1) +
+            error.substring(i + 1);
+        }
+      } catch(final Exception ex) {
+        final ByteArrayOutputStream bw = new ByteArrayOutputStream();
+        ex.printStackTrace(new PrintStream(bw));
+        error = bw.toString();
+      } catch(final Error ex) {
+        final ByteArrayOutputStream bw = new ByteArrayOutputStream();
+        ex.printStackTrace(new PrintStream(bw));
+        error = bw.toString();
       }
-    }
 
-    if(correctError) {
-      if(print) {
-        logOK.append(logStr);
-        logOK.append("[Right] ");
-        logOK.append(norm(error));
-        logOK.append(NL);
-        logOK.append(NL);
-        addLog(pth, outname + ".log", error);
+      final Nodes outFiles = nodes("*:output-file/text()", state);
+      final Nodes cmpFiles = nodes("*:output-file/@compare", state);
+      boolean xml = false;
+      boolean frag = false;
+
+      final StringList result = new StringList();
+      for(int o = 0; o < outFiles.size(); o++) {
+        final String resFile = string(data.atom(outFiles.nodes[o]));
+        final IO exp = IO.get(expected + pth + resFile);
+        result.add(read(exp));
+        final byte[] type = data.atom(cmpFiles.nodes[o]);
+        xml |= eq(type, XML);
+        frag |= eq(type, FRAGMENT);
       }
-      if(reporting) logFile.append("pass");
-      ok++;
-    } else if(error == null) {
-      boolean inspect = false;
-      int s = -1, rs = result.size();
-      while(++s < rs) {
-        inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
-            INSPECT);
+      String expError = text("*:expected-error/text()", state);
 
-        if(result.get(s).equals(out.toString())) break;
+      final StringBuilder log = new StringBuilder(pth + inname + ".xq");
+      if(files.size() != 0) {
+        log.append(" [");
+        log.append(files);
+        log.append("]");
+      }
+      log.append(NL);
 
-        if(xml || frag) {
-          iter.reset();
+      /** Remove comments. */
+      log.append(norm(in));
+      log.append(NL);
+      final String logStr = log.toString();
+      final boolean print = currTime || !logStr.contains("current-") &&
+          !logStr.contains("implicit-timezone");
 
-          String rin = result.get(s);
-          if(!doc || frag) {
-            if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
-            rin = "<X>" + rin + "</X>";
+      if(reporting) {
+        logFile.append("    <test-case name=\"");
+        logFile.append(outname);
+        logFile.append("\" result='");
+      }
+
+      boolean correctError = false;
+      if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
+        expError = error(pth + outname, expError);
+        final String code = error.substring(0, Math.min(8, error.length()));
+        for(final String er : SLASH.split(expError)) {
+          if(code.equals(er)) {
+            correctError = true;
+            break;
           }
-
-          final Data rdata = CreateDB.xml(IO.get(rin), context.prop);
-          final SeqIter si = new SeqIter();
-          int pre = doc ? 0 : 2;
-          final int size = rdata.meta.size;
-          while(pre < size) {
-            final int k = rdata.kind(pre);
-            if(k != Data.TEXT || !ws(rdata.atom(pre))) {
-              si.add(new DBNode(rdata, pre));
-            }
-            pre += rdata.size(pre, k);
-          }
-          final boolean test = FNSeq.deep(iter, si);
-          rdata.close();
-          if(test) break;
         }
       }
 
-      if(s == result.size() && !inspect) {
-        if(print) {
-          if(outFiles.size() == 0) result.add(error(pth + outname, expError));
-          logErr.append(logStr);
-          logErr.append("[" + testid + " ] ");
-          logErr.append(norm(result.get(0)));
-          logErr.append(NL);
-          logErr.append("[Wrong] ");
-          logErr.append(norm(out.toString()));
-          logErr.append(NL);
-          logErr.append(NL);
-          addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
-        }
-        if(reporting) logFile.append("fail");
-        err++;
-      } else {
+      if(correctError) {
         if(print) {
           logOK.append(logStr);
           logOK.append("[Right] ");
-          logOK.append(norm(out.toString()));
+          logOK.append(norm(error));
           logOK.append(NL);
           logOK.append(NL);
-          addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
-        }
-        if(reporting) {
-          logFile.append("pass");
-          if(inspect) logFile.append("' todo='inspect");
-        }
-        ok++;
-      }
-    } else {
-      if(outFiles.size() == 0 || expError.length() != 0) {
-        if(print) {
-          logOK2.append(logStr);
-          logOK2.append("[" + testid + " ] ");
-          logOK2.append(norm(expError));
-          logOK2.append(NL);
-          logOK2.append("[Rght?] ");
-          logOK2.append(norm(error));
-          logOK2.append(NL);
-          logOK2.append(NL);
           addLog(pth, outname + ".log", error);
         }
         if(reporting) logFile.append("pass");
-        ok2++;
-      } else {
-        if(print) {
-          logErr2.append(logStr);
-          logErr2.append("[" + testid + " ] ");
-          logErr2.append(norm(result.get(0)));
-          logErr2.append(NL);
-          logErr2.append("[Wrong] ");
-          logErr2.append(norm(error));
-          logErr2.append(NL);
-          logErr2.append(NL);
-          addLog(pth, outname + ".log", error);
-        }
-        if(reporting) logFile.append("fail");
-        err2++;
-      }
-    }
-    if(reporting) {
-      logFile.append("'/>");
-      logFile.append(NL);
-    }
-    xq.close();
+        ok++;
+      } else if(error == null) {
+        boolean inspect = false;
+        int s = -1, rs = result.size();
+        while(++s < rs) {
+          inspect |= s < cmpFiles.nodes.length &&
+            eq(data.atom(cmpFiles.nodes[s]), INSPECT);
 
-    if(curr != null) Close.close(context, curr.data);
+          if(result.get(s).equals(out.toString())) break;
+
+          if(xml || frag) {
+            iter.reset();
+
+            String rin = result.get(s).trim();
+            if(!doc || frag) {
+              if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
+              rin = "<X>" + rin + "</X>";
+            }
+
+            final Data rdata = CreateDB.xml(IO.get(rin), context.prop);
+            final SeqIter si = new SeqIter();
+            int pre = doc ? 0 : 2;
+            final int size = rdata.meta.size;
+            while(pre < size) {
+              final int k = rdata.kind(pre);
+              if(k != Data.TEXT || !ws(rdata.atom(pre))) {
+                si.add(new DBNode(rdata, pre));
+              }
+              pre += rdata.size(pre, k);
+            }
+            final boolean test = FNSeq.deep(iter, si);
+            rdata.close();
+            if(test) break;
+          }
+        }
+
+        if(s == result.size() && !inspect) {
+          if(print) {
+            if(outFiles.size() == 0) result.add(error(pth + outname, expError));
+            logErr.append(logStr);
+            logErr.append("[" + testid + " ] ");
+            logErr.append(norm(result.get(0)));
+            logErr.append(NL);
+            logErr.append("[Wrong] ");
+            logErr.append(norm(out.toString()));
+            logErr.append(NL);
+            logErr.append(NL);
+            addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
+          }
+          if(reporting) logFile.append("fail");
+          err++;
+        } else {
+          if(print) {
+            logOK.append(logStr);
+            logOK.append("[Right] ");
+            logOK.append(norm(out.toString()));
+            logOK.append(NL);
+            logOK.append(NL);
+            addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
+          }
+          if(reporting) {
+            logFile.append("pass");
+            if(inspect) logFile.append("' todo='inspect");
+          }
+          ok++;
+        }
+      } else {
+        if(outFiles.size() == 0 || expError.length() != 0) {
+          if(print) {
+            logOK2.append(logStr);
+            logOK2.append("[" + testid + " ] ");
+            logOK2.append(norm(expError));
+            logOK2.append(NL);
+            logOK2.append("[Rght?] ");
+            logOK2.append(norm(error));
+            logOK2.append(NL);
+            logOK2.append(NL);
+            addLog(pth, outname + ".log", error);
+          }
+          if(reporting) logFile.append("pass");
+          ok2++;
+        } else {
+          if(print) {
+            logErr2.append(logStr);
+            logErr2.append("[" + testid + " ] ");
+            logErr2.append(norm(result.get(0)));
+            logErr2.append(NL);
+            logErr2.append("[Wrong] ");
+            logErr2.append(norm(error));
+            logErr2.append(NL);
+            logErr2.append(NL);
+            addLog(pth, outname + ".log", error);
+          }
+          if(reporting) logFile.append("fail");
+          err2++;
+        }
+      }
+      if(reporting) {
+        logFile.append("'/>");
+        logFile.append(NL);
+      }
+      xq.close();
+
+      if(curr != null) Close.close(context, curr.data);
+    }
     return single == null || !outname.equals(single);
   }
-
+  
   /**
    * Normalizes the specified string.
    * @param in input string
@@ -766,7 +769,8 @@ public abstract class W3CTS {
    * @param root root nodes reference
    * @throws Exception exception
    */
-  abstract void init(final Nodes root) throws Exception;
+  @SuppressWarnings("unused")
+  void init(final Nodes root) throws Exception { }
 
   /**
    * Performs test specific parsings.
@@ -774,6 +778,18 @@ public abstract class W3CTS {
    * @param root root nodes reference
    * @throws Exception exception
    */
-  abstract void parse(final QueryContext qctx, final Nodes root)
-    throws Exception;
+  @SuppressWarnings("unused")
+  void parse(final QueryContext qctx, final Nodes root)
+    throws Exception { }
+
+  /**
+   * Returns all query states.
+   * @param root root node
+   * @return states
+   * @throws Exception exception
+   */
+  @SuppressWarnings("unused")
+  Nodes states(final Nodes root) throws Exception {
+    return root;
+  }
 }

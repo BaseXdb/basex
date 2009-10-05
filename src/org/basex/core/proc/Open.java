@@ -8,6 +8,7 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 
 /**
@@ -81,7 +82,7 @@ public final class Open extends Process {
 
     final IO f = IO.get(path);
     final String db = f.dbname();
-    return ctx.prop.dbpath(db).exists() ? open(ctx, db) :
+    return MetaData.found(path, db, ctx.prop) ? open(ctx, db) :
       CreateDB.xml(ctx, f, db);
   }
 }
