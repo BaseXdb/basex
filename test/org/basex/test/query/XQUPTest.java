@@ -15,7 +15,9 @@ public class XQUPTest extends AbstractTest{
    */
   public XQUPTest() {
     doc = "<uptest>" +
-    		"<a name='aa'/>" +
+    		"<a name='aa'>" +
+    		"txt" +
+    		"</a>" +
     		"<b/>" +
     		"</uptest>";
     
@@ -23,14 +25,22 @@ public class XQUPTest extends AbstractTest{
     // name starts with 'x' (=>excecute) is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
+        
+        // delete
         { "xdel1", nodes(),
         "delete node /uptest/a" },
         { "del1", nodes(),
         "/uptest/a" },
+        
         { "xdel2", nodes(),
         "delete node /uptest/a/@name" },
         { "del2", nodes(),
         "/uptest/a/@name" },
+        
+        { "xdel3", nodes(),
+        "delete node /uptest/a/text()" },
+        { "del3", nodes(),
+        "/uptest/a/text()" },
     };
   }
   @Override
@@ -39,11 +49,12 @@ public class XQUPTest extends AbstractTest{
   /*
   
   PRE DIS SIZ ATS  NS  KIND  CONTENT
-  0   1   5   1   0  DOC   basex
-  1   1   4   1   0  ELEM  uptest
-  2   1   2   2   0  ELEM  a
+  0   1   6   1   0  DOC   basex
+  1   1   5   1   0  ELEM  uptest
+  2   1   3   2   0  ELEM  a
   3   1   1   1   0  ATTR  name="aa"
-  4   3   1   1   0  ELEM  b
+  4   2   1   1   0  TEXT  txt
+  5   4   1   1   0  ELEM  b
   
   */
 }

@@ -1,9 +1,9 @@
 package org.basex.test.query;
 
+import org.basex.core.AProp;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
-import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
@@ -21,7 +21,7 @@ import org.basex.util.Performance;
 public final class QueryTest {
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), /*new XQUPTest()*/
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
@@ -96,11 +96,12 @@ public final class QueryTest {
    * @return true if everything went alright
    */
   private boolean test(final AbstractTest test, final String ext) {
-    final String file = test.doc.replaceAll("\\\"", "\\\\\"");
+    String file = test.doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(test);
     final boolean up = test instanceof XQUPTest;
     Process proc = new CreateDB(file, name);
     boolean ok = proc.execute(context);
+//    UpdateFunctions.printTable(context.data());
 
     if(ok) {
       for(final Object[] qu : test.queries) {
@@ -108,7 +109,6 @@ public final class QueryTest {
         if(up && ((String) qu[0]).startsWith("x")) {
           proc = new CreateDB(file, name);
           ok = proc.execute(context);
-//          UpdateFunctions.printTable(context.data());
         }
         
         final boolean correct = qu.length == 3;
