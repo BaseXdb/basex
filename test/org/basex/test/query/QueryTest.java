@@ -21,12 +21,12 @@ import org.basex.util.Performance;
 public final class QueryTest {
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), /*new XQUPTest()*/
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = true;
+  private static final boolean ALL = false;
   /** Database Context. */
   private final Context context = new Context();
 
@@ -106,7 +106,7 @@ public final class QueryTest {
     if(ok) {
       for(final Object[] qu : test.queries) {
         // added to renew document after each update test
-        if(up && ((String) qu[0]).startsWith("x")) {
+        if(up && ((String) qu[0]).startsWith("xxx")) {
           proc = new CreateDB(file, name);
           ok = proc.execute(context);
         }
