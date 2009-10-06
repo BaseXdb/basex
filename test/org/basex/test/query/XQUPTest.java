@@ -42,24 +42,61 @@ public class XQUPTest extends AbstractTest{
           "</car>" +
         "</ugly>" +
       "</cars>" +
+      "<?dohere what='how'?>" +
       "</up>";
     
     // XQUP expressions return an empty iterator thus every test query q which 
-    // name starts with 'x' (=>excecute) is an update query.
+    // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
+//        { "xxxxxxxxxxxxx", nodes(),
+//        "//processing-instruction('dohere')" },
         
         // delete elem attr txt pi com
         { "xxxdel1", nodes(),
-        "delete nodes //car" },
-        { "del1", nodes(),
+        "delete nodes /up/cars/good/car[1]" },
+        { "del1", nodes(5,12,22),
         "//car" },
+        { "xxxdel2", nodes(),
+        "delete nodes //car" },
+        { "del2", nodes(),
+        "//car" },
+        { "xxxdel3", nodes(),
+        "delete node /up/cars/good/car[1]/@id" },
+        { "del3", nodes(),
+        "/up/cars/good/car[1]/@id" },
+        { "xxxdel4", nodes(),
+        "delete node //wheels/text()" },
+        { "del4", nodes(),
+        "//wheels/text()" },
+        { "xxxdel5", nodes(),
+        "delete node //comment()" },
+        { "del5", nodes(),
+        "//comment()" },
+        { "xxxdel6", nodes(),
+        "delete node //processing-instruction()" },
+        { "del6", nodes(),
+        "//processing-instruction()" },
         
         // rename elem attr pi
+        { "xxxren1", nodes(),
+        "rename node /up/cars as 'CARS'" },
+        { "ren1", nodes(2),
+        "/up/CARS" },
+        { "xxxren2", nodes(),
+        "rename node /up/cars/good/car[1]/@id as 'ID'" },
+        { "ren2", nodes(6),
+        "//car/@ID" },
+        { "xxxren3", nodes(),
+        "rename node //processing-instruction('dohere') as 'BADVICE'" },
+        { "ren3", nodes(28),
+        "//processing-instruction('BADVICE')" },
         
         // replace
         
         // insert
+        
+        // parser tests
     };
   }
   @Override
@@ -68,8 +105,8 @@ public class XQUPTest extends AbstractTest{
   /*
   
   PRE DIS SIZ ATS  NS  KIND  CONTENT
-  0   1  28   1   0  DOC   basex
-  1   1  27   1   0  ELEM  up
+  0   1  29   1   0  DOC   basex
+  1   1  28   1   0  ELEM  up
   2   1  26   2   0  ELEM  cars
   3   1   1   1   0  ATTR  cat="c"
   4   2   9   1   0  ELEM  good
@@ -95,7 +132,8 @@ public class XQUPTest extends AbstractTest{
  24  22   4   1   0  ELEM  ugly
  25   1   3   2   0  ELEM  car
  26   1   1   1   0  ATTR  id="4"
- 27   2   1   1   0  COMM   nice one
+ 27   2   1   1   0  COMM   nice one 
+ 28  27   1   1   0  PI    dohere what='how'
   
   */
 }

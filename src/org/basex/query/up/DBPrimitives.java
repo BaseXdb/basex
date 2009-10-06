@@ -48,8 +48,7 @@ public final class DBPrimitives {
       l = new UpdatePrimitive[Type.values().length];
       l[p.type().ordinal()] = p;
       op.put(i, l);
-    }
-    l[p.type().ordinal()].merge(p);
+    } else l[p.type().ordinal()].merge(p);
   }
 
   /**

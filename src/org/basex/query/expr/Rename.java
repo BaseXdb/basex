@@ -9,6 +9,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.up.RenamePrimitive;
 import org.basex.query.util.Err;
 
@@ -30,8 +31,8 @@ public final class Rename extends Arr {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter tgI = expr[0].iter(ctx);
-    final Iter nI = expr[1].iter(ctx);
+    final Iter tgI = SeqIter.get(expr[0].iter(ctx));
+    final Iter nI = SeqIter.get(expr[1].iter(ctx));
     Item i = tgI.next();
     if(i == null) Err.or(UPDATE);
     if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(UPDATE, i);
