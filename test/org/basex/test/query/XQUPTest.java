@@ -55,7 +55,7 @@ public class XQUPTest extends AbstractTest{
         // delete
         { "xxxdel1", nodes(),
         "delete nodes /up/cars/good/car[1]" },
-        { "del1", nodes(5,12,22),
+        { "del1", nodes(5, 12, 22),
         "//car" },
         { "xxxdel2", nodes(),
         "delete nodes //car" },

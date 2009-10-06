@@ -382,28 +382,32 @@ public final class QueryContext extends Progress {
 
   /**
    * Adds a database instance or returns an existing one.
-   * @param db database name or file path
+   * @param path database name or file path
    * @param coll collection flag
+   * @param db database flag
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] db, final boolean coll) throws QueryException {
-    if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
+  public DBNode doc(final byte[] path, final boolean coll,
+      final boolean db) throws QueryException {
+    if(contains(path, '<') || contains(path, '>')) Err.or(INVDOC, path);
 
     // check if the collections contain the document
     for(int c = 0; c < colls; c++) {
       for(int n = 0; n < collect[c].size(); n++) {
-        if(eq(db, collect[c].get(n).base())) return (DBNode) collect[c].get(n);
+        if(eq(path, collect[c].get(n).base())) {
+          return (DBNode) collect[c].get(n);
+        }
       }
     }
 
     // check if the database has already been opened
-    final String name = string(db);
+    final String nm = string(path);
     for(int d = 0; d < docs; d++)
-    if(doc[d].data.meta.name.equals(name)) return doc[d];
+    if(doc[d].data.meta.name.equals(nm)) return doc[d];
 
     // check if the document has already been opened
-    final IO io = IO.get(string(db));
+    final IO io = IO.get(string(path));
     for(int d = 0; d < docs; d++) {
       if(doc[d].data.meta.file.eq(io)) return doc[d];
     }
@@ -411,15 +415,15 @@ public final class QueryContext extends Progress {
     // get database instance
     Data data = null;
 
-    if(Prop.web) {
+    if(Prop.web || db) {
       try {
-        data = Open.open(context, name);
+        data = Open.open(context, nm);
       } catch(final IOException ex) {
-        Err.or(INVDOC, name);
+        Err.or(db ? NODB : INVDOC, nm);
       }
     } else {
       final IO file = file();
-      data = check(name, file == null, coll);
+      data = check(nm, file == null, coll);
       if(data == null) data = check(file.merge(io).path(), true, coll);
     }
 
@@ -433,7 +437,7 @@ public final class QueryContext extends Progress {
    * Adds a document to the document array.
    * @param node node to be added
    */
-  private void addDoc(final DBNode node) {
+  public void addDoc(final DBNode node) {
     if(docs == doc.length) doc = Array.extend(doc);
     doc[docs++] = node;
   }
@@ -477,7 +481,7 @@ public final class QueryContext extends Progress {
 
     int c = -1;
     while(true) {
-      if(++c == colls) addDocs(doc(coll, true));
+      if(++c == colls) addDocs(doc(coll, true, false));
       else if(!eq(collName[c], coll)) continue;
       return new SeqIter(collect[c].item, collect[c].size());
     }

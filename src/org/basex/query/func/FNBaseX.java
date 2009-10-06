@@ -13,6 +13,7 @@ import org.basex.io.IO;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
@@ -29,7 +30,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class FNBaseX extends Fun {
+public final class FNBaseX extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] arg = new Iter[expr.length];
@@ -45,10 +46,16 @@ final class FNBaseX extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case READ:       return text(ctx);
-      case RANDOM:     return random();
-      default:         return super.atomic(ctx);
+      case READ:   return text(ctx);
+      case RANDOM: return random();
+      case DB:     return db(ctx);
+      default:     return super.atomic(ctx);
     }
+  }
+
+  @Override
+  public Expr c(final QueryContext ctx) throws QueryException {
+    return func == FunDef.DB && expr[0].i() ? db(ctx) : this;
   }
 
   /**
@@ -81,13 +88,22 @@ final class FNBaseX extends Fun {
         while(in.pos() < len) tb.addUTF(in.next());
         in.finish();
         return Str.get(tb.finish());
-        //return Str.get(io.content());
       } catch(final IOException ex) {
         Main.debug(ex);
       }
     }
     Err.or(NOFILE, name);
     return null;
+  }
+
+  /**
+   * Performs the eval function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item db(final QueryContext ctx) throws QueryException {
+    return ctx.doc(checkStr(expr[0], ctx), false, true);
   }
 
   /**

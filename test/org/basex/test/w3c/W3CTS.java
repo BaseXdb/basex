@@ -31,11 +31,12 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.FNIndex;
+import org.basex.query.func.FNBaseX;
+import org.basex.query.func.FNGen;
 import org.basex.query.func.FNSeq;
 import org.basex.query.func.Fun;
+import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
@@ -243,15 +244,16 @@ public abstract class W3CTS {
     Main.out("Parsing Queries");
     if(verbose) Main.outln();
     final Nodes nodes = nodes("//*:test-case", root);
-    for(int t = 0; t < nodes.size(); t++) {
+    //final Nodes nodes = nodes(
+    //  "//*:test-group[starts-with(@name, 'Minimal')]//*:test-case", root);
+    final int total = nodes.size();
+    for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(!verbose && t % 1000 == 0) Main.out(".");
     }
     Main.outln();
 
     final String time = perf.getTimer();
-    final int total = ok + ok2 + err + err2;
-
     Main.outln("Writing log file..." + NL);
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(path + pathlog), UTF8));
@@ -261,7 +263,6 @@ public abstract class W3CTS {
     bw.write("Conformance (w/Empty Results): ");
     bw.write(pc(ok, total) + " / " + pc(ok + ok2, total) + NL);
     bw.write("Wrong Results / Errors: " + err + " / " + err2 + NL);
-    //bw.write("Total Time: " + time + NL + NL);
     bw.write("WRONG =========================================================");
     bw.write(NL + NL + logErr + NL);
     bw.write("WRONG (ERRORS) ================================================");
@@ -315,8 +316,15 @@ public abstract class W3CTS {
     final String pth = text("@FilePath", root);
     final String outname = text("@name", root);
     if(single != null && !outname.startsWith(single)) return true;
-    if(verbose) Main.outln("- " + outname);
 
+    if(verbose) Main.outln("- " + outname);
+    if(reporting) {
+      logFile.append("    <test-case name=\"");
+      logFile.append(outname);
+      logFile.append("\" result='");
+    }
+    if(outname.equals("id-insert-expr-079")) return true;
+    
     final Nodes nodes = states(root);
     for(int n = 0; n < nodes.size(); n++) {
       final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
@@ -334,8 +342,8 @@ public abstract class W3CTS {
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
       if(cont.size() != 0) {
-        final Data d = Open.check(context, sources + string(
-            data.atom(cont.nodes[0])) + ".xml");
+        final Data d = Open.check(context,
+            srcs.get(string(data.atom(cont.nodes[0]))));
         curr = new Nodes(d.doc(), d, true);
       }
 
@@ -344,10 +352,11 @@ public abstract class W3CTS {
 
       try {
         files.add(file(nodes("*:input-file", state),
-            nodes("*:input-file/@variable", state), qctx));
+            nodes("*:input-file/@variable", state), qctx, n == 0));
         files.add(file(nodes("*:input-URI", state),
-            nodes("*:input-URI/@variable", state), qctx));
-        files.add(file(nodes("*:defaultCollection", state), null, qctx));
+            nodes("*:input-URI/@variable", state), qctx, n == 0));
+        files.add(file(nodes("*:defaultCollection", state),
+            null, qctx, n == 0));
 
         var(nodes("*:input-query/@name", state),
             nodes("*:input-query/@variable", state), pth, qctx);
@@ -423,12 +432,6 @@ public abstract class W3CTS {
       final boolean print = currTime || !logStr.contains("current-") &&
           !logStr.contains("implicit-timezone");
 
-      if(reporting) {
-        logFile.append("    <test-case name=\"");
-        logFile.append(outname);
-        logFile.append("\" result='");
-      }
-
       boolean correctError = false;
       if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
         expError = error(pth + outname, expError);
@@ -487,7 +490,7 @@ public abstract class W3CTS {
             if(test) break;
           }
         }
-        if(rs > 0 && s == rs && !inspect) {
+        if((rs > 0 || expError.length() != 0) && s == rs && !inspect) {
           if(print) {
             if(outFiles.size() == 0) result.add(error(pth + outname, expError));
             logErr.append(logStr);
@@ -548,13 +551,13 @@ public abstract class W3CTS {
           err2++;
         }
       }
-      if(reporting) {
-        logFile.append("'/>");
-        logFile.append(NL);
-      }
-      xq.close();
-
       if(curr != null) Close.close(context, curr.data);
+      xq.close();
+    }
+
+    if(reporting) {
+      logFile.append("'/>");
+      logFile.append(NL);
     }
     return single == null || !outname.equals(single);
   }
@@ -597,35 +600,43 @@ public abstract class W3CTS {
    * @param nod variables
    * @param var documents
    * @param ctx query context
+   * @param first call
    * @return string with input files
    * @throws QueryException query exception
    */
   private byte[] file(final Nodes nod, final Nodes var,
-      final QueryContext ctx) throws QueryException {
+      final QueryContext ctx, final boolean first) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size(); c++) {
       final byte[] nm = data.atom(nod.nodes[c]);
-      final String src = srcs.get(string(nm));
+      String src = srcs.get(string(nm));
       if(tb.size() != 0) tb.add(", ");
       tb.add(nm);
 
+      Expr expr = null;
       if(src == null) {
         // assign collection
         final NodIter col = new NodIter();
-        for(final byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl, true));
-        ctx.addColl(col, nm);
-
-        if(var != null) {
-          final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
-          ctx.vars.addGlobal(v.bind(Uri.uri(nm), ctx));
+        for(final byte[] cl : colls.get(string(nm))) {
+          col.add(ctx.doc(cl, true, false));
         }
+        ctx.addColl(col, nm);
+        expr = Uri.uri(nm);
       } else {
         // assign document
-        final Fun fun = FNIndex.get().get(token("doc"), QueryTokens.FNURI,
-            new Expr[] { Str.get(src) });
+        FunDef def = FunDef.DOC;
+        if(!first) {
+          def = FunDef.DB;
+          src = IO.get(src).dbname();
+        }
+        final Fun fun = first ? new FNGen() : new FNBaseX();
+        fun.init(def, new Expr[] { Str.get(src) });
+        expr = fun;
+      }
+      if(var != null) {
         final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
-        ctx.vars.addGlobal(v.bind(fun, ctx));
+        ctx.vars.addGlobal(v.bind(expr, ctx));
       }
     }
     return tb.finish();

@@ -291,7 +291,9 @@ public enum FunDef {
   /** XProject specific function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN),
   /** XProject specific function - opens and returns file contents. */
-  READ(BXURI, FNBaseX.class, 1, 1, "read(string)", STR);
+  READ(BXURI, FNBaseX.class, 1, 1, "read(string)", STR),
+  /** Project specific function - evaluates the specified query. */
+  DB(BXURI, FNBaseX.class, 1, 1, "database(string)", NOD);
 
   /** Function classes. */
   Class<? extends Fun> func;

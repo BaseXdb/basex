@@ -25,6 +25,16 @@ public abstract class Fun extends Arr {
   /** Function description. */
   public FunDef func;
 
+  /**
+   * Initializes the function.
+   * @param f function description
+   * @param e expression array
+   */
+  public final void init(final FunDef f, final Expr[] e) {
+    func = f;
+    expr = e;
+  }
+
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);

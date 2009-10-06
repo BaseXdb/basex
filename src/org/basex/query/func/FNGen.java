@@ -17,7 +17,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class FNGen extends Fun {
+public final class FNGen extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -41,13 +41,13 @@ final class FNGen extends Fun {
       case DOC:
         Item it = iter.next();
         return it == null ? null : it.type == Type.DOC ? it :
-          ctx.doc(checkStr(it), false);
+          ctx.doc(checkStr(it), false, false);
       case DOCAVAIL:
         it = iter.next();
         if(it != null) {
           final byte[] file = checkStr(it);
           try {
-            ctx.doc(file, false);
+            ctx.doc(file, false, false);
             return Bln.TRUE;
           } catch(final QueryException ex) { }
         }
@@ -59,12 +59,10 @@ final class FNGen extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    // ..slows it down if the document will not be used,
-    // but allows more optimizations
     if(func == FunDef.DOC) {
       if(!expr[0].i()) return this;
       final Item it = (Item) expr[0];
-      return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false);
+      return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false, false);
     }
     return this;
   }
