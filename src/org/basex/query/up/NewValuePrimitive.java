@@ -16,8 +16,6 @@ import org.basex.query.util.Err;
 public abstract class NewValuePrimitive extends UpdatePrimitive {
   /** New name. */
   final byte[] name;
-  /** Multiple updates are applied on this target node. */
-  boolean mult;
 
   /**
    * Constructor.
@@ -27,7 +25,6 @@ public abstract class NewValuePrimitive extends UpdatePrimitive {
   public NewValuePrimitive(final Nod n, final byte[] newName) {
     super(n);
     name = newName;
-    mult = false;
   }
 
   @SuppressWarnings("unused")

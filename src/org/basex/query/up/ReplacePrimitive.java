@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.up.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
@@ -7,6 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
 
 /**
  * Represents a replace primitive.
@@ -51,5 +53,11 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
   @Override
   public Type type() {
     return REPLACENODE;
+  }
+  
+  @Override
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    if(mult) Err.or(UPTRGMULT, node);
+    mult = true;
   }
 }

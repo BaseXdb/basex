@@ -49,14 +49,12 @@ public final class Replace extends Arr {
     final Nod par = trgtN.parent();
     if(par == null || Nod.kind(par.type) == Data.DOC) Err.or(UPNOPAR, t);
     // check replace constraints
-    // [LK] reset doesn't work on lists SeqIter.get()
     final Iter r = SeqIter.get(expr[1].iter(ctx));
     i = r.next();
     if(value) {
       Err.or(UPIMPL, "foobanchu");
-      if(!(i instanceof Str || i instanceof QNm)) Err.or(UPDATE, i);
       if(r.next() != null) Err.or(UPTRGMULT, i);
-      // [LK] implement after refactoring of update primitives
+      if(!(i instanceof Str || i instanceof QNm)) Err.or(UPDATE, i);
       return Iter.EMPTY;
     }
     

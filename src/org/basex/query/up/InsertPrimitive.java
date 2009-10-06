@@ -50,4 +50,9 @@ public class InsertPrimitive extends NodeCopyPrimitive {
   public Type type() {
     return a ? INSERTATTR : INSERTINTO;
   }
+  
+  @Override
+  public void merge(final UpdatePrimitive p) {
+    c.add(((NodeCopyPrimitive) p).c.getFirst());
+  }
 }

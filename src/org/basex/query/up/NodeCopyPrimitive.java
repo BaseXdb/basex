@@ -47,9 +47,4 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
     m = buildDB(c.getFirst(), node instanceof DBNode ? ((DBNode) node).data :
       null);
   }
-  
-  @Override
-  public void merge(final UpdatePrimitive p) {
-    c.add(((NodeCopyPrimitive) p).c.getFirst());
-  }
 }

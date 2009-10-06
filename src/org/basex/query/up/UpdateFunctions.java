@@ -61,7 +61,7 @@ public final class UpdateFunctions {
       final Data d, final MemData m) {
     final int ss = m.size(0, m.kind(0));
     for(int s = 1; s < ss; s++) {
-      final int p = pre + s - 1;
+      final int p = pre + s;
       d.insert(p, par, m.attName(s), m.attValue(s));
     }
   }

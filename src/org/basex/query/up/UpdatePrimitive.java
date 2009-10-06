@@ -12,6 +12,8 @@ import org.basex.query.item.Nod;
 abstract class UpdatePrimitive {
   /** Target node of update expression. */
   final Nod node;
+  /** Multiple updates are applied on this target node. */
+  boolean mult;
   
   /**
    * Update primitive type enumeration.
@@ -40,6 +42,7 @@ abstract class UpdatePrimitive {
    */
   protected UpdatePrimitive(final Nod n) {
     node = n;
+    mult = false;
   }
   
   /**

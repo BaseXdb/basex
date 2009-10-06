@@ -50,9 +50,9 @@ public class XQUPTest extends AbstractTest{
     // The test query following q represents the actual test.
     queries = new Object[][] {
 //        { "xxxxxxxxxxxxx", nodes(),
-//        "//processing-instruction('dohere')" },
+//        "/up/cars/good/car[1]/@id" },
         
-        // delete elem attr txt pi com
+        // delete
         { "xxxdel1", nodes(),
         "delete nodes /up/cars/good/car[1]" },
         { "del1", nodes(5,12,22),
@@ -78,7 +78,7 @@ public class XQUPTest extends AbstractTest{
         { "del6", nodes(),
         "//processing-instruction()" },
         
-        // rename elem attr pi
+        // rename
         { "xxxren1", nodes(),
         "rename node /up/cars as 'CARS'" },
         { "ren1", nodes(2),
@@ -92,7 +92,26 @@ public class XQUPTest extends AbstractTest{
         { "ren3", nodes(28),
         "//processing-instruction('BADVICE')" },
         
-        // replace
+        //[LK] add fragment tests
+        // replace elem
+        { "xxxrep1", nodes(),
+        "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
+        { "rep1", nodes(7),
+        "/up/cars/good/car[1]/@color" },
+        // replace attribute
+        { "xxxrep2", nodes(),
+        "replace node /up/cars/good/car[1]/@id with " +
+        "/up/cars/good/car[2]/@color" },
+        { "rep2", nodes(6),
+        "/up/cars/good/car[1]/@color, /up/cars/good/car[1]/@id" },
+        // replace text
+        /*{ "xxxrep2", nodes(),
+        "replace node /up/cars/good/car/wheels/text() with 'snap'" },
+        { "rep2", nodes(6),
+        "/up/cars/good/car/wheels[text()='snap']" },*/
+        
+        // replace comment
+        // replace processing instruction
         
         // insert
         
