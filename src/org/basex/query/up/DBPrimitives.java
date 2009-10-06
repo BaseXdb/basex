@@ -15,7 +15,7 @@ import org.basex.query.up.UpdatePrimitive.Type;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class Primitives {
+public final class DBPrimitives {
   /** Atomic update operations hashed after pre value. */
   private Map<Integer, UpdatePrimitive[]> op;
   /** Target nodes of update primitives are fragments. */
@@ -25,7 +25,7 @@ public final class Primitives {
    * Constructor.
    * @param fragment target nodes are fragments
    */
-  public Primitives(final boolean fragment) {
+  public DBPrimitives(final boolean fragment) {
     f = fragment;
     op = new HashMap<Integer, UpdatePrimitive[]>();
   }

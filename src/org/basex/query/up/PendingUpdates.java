@@ -17,16 +17,16 @@ import org.basex.query.item.FNode;
  */
 public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  private final Map<Data, Primitives> dbPrimitives;
+  private final Map<Data, DBPrimitives> dbPrimitives;
   /** Update primitives which target nodes are fragments. */
-  private final Primitives fragPrimitives;
+  private final DBPrimitives fragPrimitives;
 
   /**
    * Constructor.
    */
   public PendingUpdates() {
-    dbPrimitives = new HashMap<Data, Primitives>();
-    fragPrimitives = new Primitives(true);
+    dbPrimitives = new HashMap<Data, DBPrimitives>();
+    fragPrimitives = new DBPrimitives(true);
   }
 
   /**
@@ -38,9 +38,9 @@ public final class PendingUpdates {
     if(p.node instanceof FNode) fragPrimitives.addPrimitive(p);
     else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
-      Primitives dp = dbPrimitives.get(d);
+      DBPrimitives dp = dbPrimitives.get(d);
       if(dp == null) {
-        dp = new Primitives(false);
+        dp = new DBPrimitives(false);
         dbPrimitives.put(d, dp);
       }
       dp.addPrimitive(p);
@@ -56,8 +56,8 @@ public final class PendingUpdates {
   public void applyUpdates() throws QueryException {
     // only constraints are checked for fragment primitives
     fragPrimitives.apply();
-    final Primitives[] dp = new Primitives[dbPrimitives.size()];
+    final DBPrimitives[] dp = new DBPrimitives[dbPrimitives.size()];
     dbPrimitives.values().toArray(dp);
-    for(final Primitives p : dp) p.apply();
+    for(final DBPrimitives p : dp) p.apply();
   }
 }
