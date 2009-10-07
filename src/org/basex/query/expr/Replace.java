@@ -16,7 +16,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.ReplacePrimitive;
+import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 

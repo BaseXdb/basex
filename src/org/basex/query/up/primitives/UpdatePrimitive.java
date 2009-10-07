@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.primitives;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
@@ -9,9 +9,9 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-abstract class UpdatePrimitive {
+public abstract class UpdatePrimitive {
   /** Target node of update expression. */
-  final Nod node;
+  public final Nod node;
   /** Multiple updates are applied on this target node. */
   boolean mult;
   

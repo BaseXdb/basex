@@ -1,12 +1,13 @@
-package org.basex.query.up;
+package org.basex.query.up.primitives;
 
-import static org.basex.query.up.UpdatePrimitive.Type.*;
+import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.up.UpdateFunctions;
 
 /**
  * Represents an insert primitive.
@@ -33,7 +34,7 @@ public class InsertPrimitive extends NodeCopyPrimitive {
   public void check() throws QueryException {
     super.check();
   }
-
+  
   @Override
   public void apply() {
     if(!(node instanceof DBNode)) return;

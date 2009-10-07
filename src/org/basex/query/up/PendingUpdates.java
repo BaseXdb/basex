@@ -6,6 +6,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
+import org.basex.query.up.primitives.UpdatePrimitive;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks

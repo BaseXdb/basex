@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.primitives;
 
 import org.basex.query.item.Nod;
 

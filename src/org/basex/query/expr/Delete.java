@@ -2,14 +2,16 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.up.DeletePrimitive;
+import org.basex.query.up.primitives.DeletePrimitive;
 
 /**
  * Delete expression.

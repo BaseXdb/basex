@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 

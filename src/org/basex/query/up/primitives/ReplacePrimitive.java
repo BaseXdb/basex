@@ -1,13 +1,14 @@
-package org.basex.query.up;
+package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.up.UpdatePrimitive.Type.*;
+import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.up.UpdateFunctions;
 import org.basex.query.util.Err;
 
 /**

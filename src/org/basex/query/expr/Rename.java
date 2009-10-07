@@ -10,7 +10,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.RenamePrimitive;
+import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.query.util.Err;
 
 /**

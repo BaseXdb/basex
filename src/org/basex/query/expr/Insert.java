@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.InsertPrimitive;
+import org.basex.query.up.primitives.InsertPrimitive;
 import org.basex.query.util.Err;
 
 

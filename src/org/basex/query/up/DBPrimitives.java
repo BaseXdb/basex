@@ -7,7 +7,8 @@ import java.util.Map;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
-import org.basex.query.up.UpdatePrimitive.Type;
+import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.UpdatePrimitive.Type;
 
 /**
  * Holds all update primitives for a specific data reference.
