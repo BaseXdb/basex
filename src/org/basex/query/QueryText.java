@@ -493,10 +493,16 @@ public interface QueryText {
   
   /** XUST0000: Parsing exception. */
   Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
+  /** XUST0000: Parsing exception. */
+  Object[] UPEXPSIMPLE = { XUST, 1, "Expecting simple expression." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
 
-  //[LK] xquery update error msgs
+  //[LK] xquery update error msgs, work on texts
+  /** XUDY0023: XQuery Update dynamic exception. */
+  Object[] UPCONFNSPAR = { XUDY, 23, "Namespaces conflicts." };
+  /** XUDY0024: XQuery Update dynamic exception. */
+  Object[] UPCONFNS = { XUDY, 24, "Namespaces conflicts." };
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
   /** XUTY0008: XQuery Update dynamic exception. */
@@ -504,7 +510,9 @@ public interface QueryText {
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target node has no parent." };
   /** XUTY0010: XQuery Update dynamic exception. */
-  Object[] UPNOTYP = { XUTY, 10, "Unexpected type of replace nodes." };
+  Object[] UPWRATTR = { XUTY, 10, "Replace nodes must be attribute nodes." };
+  /** XUTY0010: XQuery Update dynamic exception. */
+  Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
 
   // OPTIMIZATIONS
 

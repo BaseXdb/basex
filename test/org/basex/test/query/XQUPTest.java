@@ -105,10 +105,10 @@ public class XQUPTest extends AbstractTest{
         { "rep2", nodes(6),
         "/up/cars/good/car[1]/@color, /up/cars/good/car[1]/@id" },
         // replace text
-        /*{ "xxxrep2", nodes(),
+        { "xxxrep3", nodes(),
         "replace node /up/cars/good/car/wheels/text() with 'snap'" },
-        { "rep2", nodes(6),
-        "/up/cars/good/car/wheels[text()='snap']" },*/
+        { "rep3", nodes(11),
+        "/up/cars/good/car/wheels[text()='snap']" },
         
         // replace comment
         // replace processing instruction

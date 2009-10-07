@@ -2567,7 +2567,7 @@ public class QueryParser extends InputParser {
     }
     final Expr t = check(single(), INCOMPLETE);
     check(WITH);
-    final Expr e = check(single(), INCOMPLETE);
+    final Expr e = check(single(), UPEXPSIMPLE);
     return new Replace(t, e, v);
   }
 

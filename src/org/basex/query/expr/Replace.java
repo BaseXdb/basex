@@ -3,17 +3,22 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.FNode;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.ReplacePrimitive;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Replace expression.
@@ -38,34 +43,87 @@ public final class Replace extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(value) return Iter.EMPTY;
-    final Iter t = expr[0].iter(ctx);
+    final Iter t = SeqIter.get(expr[0].iter(ctx));
     Item i = t.next();
+    
     // check target constraints
-    if(i == null) Err.or(UPSEQEMP, t);
-    if(t.next() != null) Err.or(UPTRGMULT, t);
-    if(!(i instanceof Nod)) Err.or(UPTRGMULT, t);
-    final Nod trgtN = (Nod) i;
-    final Nod par = trgtN.parent();
-    if(par == null || Nod.kind(par.type) == Data.DOC) Err.or(UPNOPAR, t);
+    if(i == null) Err.or(UPSEQEMP, i);
+    if(t.size() > 1 || !(i instanceof Nod)) Err.or(UPTRGMULT, i);
+    final Nod n = (Nod) i;
+    final Nod p = n.parent();
+    final boolean a = Nod.kind(n.type) == Data.ATTR;
+    if(p == null) Err.or(UPNOPAR, i);
+    
     // check replace constraints
+    // non attribute non value
     final Iter r = SeqIter.get(expr[1].iter(ctx));
-    i = r.next();
-    if(value) {
-      Err.or(UPIMPL, "foobanchu");
-      if(r.next() != null) Err.or(UPTRGMULT, i);
-      if(!(i instanceof Str || i instanceof QNm)) Err.or(UPDATE, i);
+    if(!a && !value) {
+      final SeqIter seq = new SeqIter();
+      i = r.next();
+      while(i != null) {
+        if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
+        if(i instanceof Nod) {
+          final Nod tn = (Nod) i;
+          if(Nod.kind(tn.type) == Data.ATTR) Err.or(UPWRELM, i);
+          if(Nod.kind(tn.type) == Data.DOC) seq.add(tn.child());
+          else seq.add(tn);
+        }
+        i = r.next();
+      }
+      seq.reset();
+      // [LK] evtl merge text nodes in sequence iterator here?
+      ctx.updates.addPrimitive(new ReplacePrimitive(n, seq, false));
       return Iter.EMPTY;
     }
     
-    final boolean trgIsAttr = Nod.kind(trgtN.type) == Data.ATTR ? true : false;
-    while(i != null) {
-      if((Nod.kind(i.type) == Data.ATTR) ^ trgIsAttr) Err.or(UPDATE, t);
+    // replace attribute node
+    if(a && !value) {
       i = r.next();
+      final HashSet<String> set = new HashSet<String>();
+      // bpar states if ns constraints for parent of target are hurt. 
+      // Error results in XUDY0023.
+      boolean bpar = false;
+      // brep states if a ns constraint in the replace node set is hurt ...
+      // ... this results in XUDY0024.
+      boolean brep = false;
+      while(i != null) {
+        if(!(i instanceof Nod) || !(Nod.kind(i.type) == Data.ATTR))
+          Err.or(UPWRATTR, i);
+        // check namespace constraints in replace node set (dupl. attributes...)
+        brep = checkNS(set, (Nod) i);
+        i = r.next();
+      }
+      // check attributes of parent of target node for namespace constraints
+      final SeqIter tAttr = SeqIter.get(n.parent().attr());
+      i = tAttr.next();
+      while(i != null) {
+        bpar = checkNS(set, (Nod) i);
+        i = tAttr.next();
+      }
+      if(bpar) Err.or(UPCONFNSPAR, i);
+      if(brep) Err.or(UPCONFNS, i);
+      r.reset();
+      ctx.updates.addPrimitive(new ReplacePrimitive(n, r, true));
+      
+    // replace value / element content
+    } else {
+      Err.or(UPIMPL, "replace value not yet avlbl");
     }
-    r.reset();
-    ctx.updates.addPrimitive(new ReplacePrimitive(trgtN, r, trgIsAttr));
+    
     return Iter.EMPTY;
+  }
+  
+  /**
+   * Checks for duplicates/namespace conflicts in the given set. 
+   * @param s set
+   * @param n node ns to add
+   * @return true if duplicates exist
+   */
+  public static boolean checkNS(final Set<String> s, final Nod n) {
+    if(n instanceof FNode) 
+      return !s.add(Token.string(((FNode) n).nname()));
+    final DBNode dn = (DBNode) n;
+    return !s.add(Token.string(dn.data.attName(dn.pre)));
   }
 
   @Override
