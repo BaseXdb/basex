@@ -90,14 +90,14 @@ public final class Replace extends Arr {
         if(!(i instanceof Nod) || !(Nod.kind(i.type) == Data.ATTR))
           Err.or(UPWRATTR, i);
         // check namespace constraints in replace node set (dupl. attributes...)
-        brep = checkNS(set, (Nod) i);
+        brep = checkNS(set, (Nod) i) | brep;
         i = r.next();
       }
       // check attributes of parent of target node for namespace constraints
       final SeqIter tAttr = SeqIter.get(n.parent().attr());
       i = tAttr.next();
       while(i != null) {
-        bpar = checkNS(set, (Nod) i);
+        bpar = checkNS(set, (Nod) i) | bpar;
         i = tAttr.next();
       }
       if(bpar) Err.or(UPCONFNSPAR, i);

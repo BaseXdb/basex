@@ -105,6 +105,7 @@ public final class QueryTest {
 
     if(ok) {
       for(final Object[] qu : test.queries) {
+//        UpdateFunctions.printTable(context.data());
         // added to renew document after each update test
         if(up && ((String) qu[0]).startsWith("xxx")) {
           proc = new CreateDB(file, name);

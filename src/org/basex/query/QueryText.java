@@ -500,9 +500,9 @@ public interface QueryText {
 
   //[LK] xquery update error msgs, work on texts
   /** XUDY0023: XQuery Update dynamic exception. */
-  Object[] UPCONFNSPAR = { XUDY, 23, "Namespaces conflicts." };
+  Object[] UPCONFNSPAR = { XUDY, 23, "Namespace conflicts." };
   /** XUDY0024: XQuery Update dynamic exception. */
-  Object[] UPCONFNS = { XUDY, 24, "Namespaces conflicts." };
+  Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
   /** XUTY0008: XQuery Update dynamic exception. */
