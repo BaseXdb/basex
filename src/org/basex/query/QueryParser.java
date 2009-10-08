@@ -2496,25 +2496,28 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    final Expr s = check(single(), UPDATE);
-    boolean in = false;
-    boolean af = false;
-    boolean be = false;
-    boolean as = false;
+    // [LK] evaluate as element constructor?
+    final Expr s = check(single(), UPEXPSIMPLE);
+    boolean first = false;
     boolean last = false;
+    boolean into = false;
+    boolean before = false;
+    boolean after = false;
     if(consumeWS(AS)) {
-      as = true;
       if(!consumeWS(FIRST)) {
         check(LAST);
         last = true;
-      }
+      } else first = true;
+      check(INTO);
+      into = true;
     }
-    if(consumeWS(INTO)) in = true;
-    else if(consumeWS(AFTER)) af = true;
-    else if(consumeWS(BEFORE)) be = true;
-    if(!(in ^ af ^ be)) error(INCOMPLETE);
-    final Expr trg = check(single(), INCOMPLETE);
-    return new Insert(s, as, last, in, af, trg);
+    if(!into) into = consumeWS(INTO);
+    after = consumeWS(AFTER);
+    before = consume(BEFORE);
+    if(!(into ^ after ^ before)) Err.or(UPDATE, this);
+    
+    final Expr trg = check(single(), UPEXPSIMPLE);
+    return new Insert(s, first, last, before, after, trg);
   }
 
   /**
@@ -2529,7 +2532,7 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    final Expr n = check(single(), INCOMPLETE);
+    final Expr n = check(single(), UPEXPSIMPLE);
     return new Delete(n);
   }
 
@@ -2565,7 +2568,7 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    final Expr t = check(single(), INCOMPLETE);
+    final Expr t = check(single(), UPEXPSIMPLE);
     check(WITH);
     final Expr e = check(single(), UPEXPSIMPLE);
     return new Replace(t, e, v);
@@ -2582,14 +2585,14 @@ public class QueryParser extends InputParser {
     do {
       final Var v = new Var(varName());
       check(ASSIGN);
-      final Expr e = check(single(), INCOMPLETE);
+      final Expr e = check(single(), UPEXPSIMPLE);
       ctx.vars.add(v);
       fl = Array.add(fl, new For(e, v, null, null));
     } while(consumeWS(COMMA));
     check(MODIFY);
-    final Expr e1 = check(single(), INCOMPLETE);
+    final Expr e1 = check(single(), UPEXPSIMPLE);
     check(RETURN);
-    final Expr e2 = check(single(), INCOMPLETE);
+    final Expr e2 = check(single(), UPEXPSIMPLE);
 
     error(UPIMPL);
     return new Transform(fl, e1, e2);

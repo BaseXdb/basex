@@ -62,12 +62,13 @@ public final class Replace extends Arr {
       i = r.next();
       while(i != null) {
         if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
-        if(i instanceof Nod) {
+        else if(i instanceof Nod) {
           final Nod tn = (Nod) i;
           if(Nod.kind(tn.type) == Data.ATTR) Err.or(UPWRELM, i);
-          if(Nod.kind(tn.type) == Data.DOC) seq.add(tn.child());
+          if(Nod.kind(tn.type) == Data.DOC) 
+            seq.add(tn.child());
           else seq.add(tn);
-        }
+        } else Err.or(UPDATE, this);
         i = r.next();
       }
       seq.reset();

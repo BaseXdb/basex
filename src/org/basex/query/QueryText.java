@@ -493,7 +493,7 @@ public interface QueryText {
   
   /** XUST0000: Parsing exception. */
   Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
-  /** XUST0000: Parsing exception. */
+  /** XUST0001: Parsing exception. */
   Object[] UPEXPSIMPLE = { XUST, 1, "Expecting simple expression." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
@@ -507,6 +507,14 @@ public interface QueryText {
   Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
+  /** XUDY0029: XQuery Update dynamic exception. */
+  Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
+  /** XUTY0004: XQuery Update dynamic exception. */
+  Object[] UPNOATTRPER = { XUTY, 4, "Attribute following non attribute node." };
+  /** XUTY0005: XQuery Update dynamic exception. */
+  Object[] UPTRGTYP = { XUTY, 5, "Wrong type of target node." };
+  /** XUTY0006: XQuery Update dynamic exception. */
+  Object[] UPTRGTYP2 = { XUTY, 6, "Wrong type of target node." };
   /** XUTY0008: XQuery Update dynamic exception. */
   Object[] UPTRGMULT = { XUTY, 8, "Target result must be a single node." };
   /** XUTY0010: XQuery Update dynamic exception. */
