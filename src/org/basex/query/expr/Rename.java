@@ -1,17 +1,17 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Rename expression.
@@ -31,19 +31,28 @@ public final class Rename extends Arr {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter tgI = SeqIter.get(expr[0].iter(ctx));
-    final Iter nI = SeqIter.get(expr[1].iter(ctx));
-    Item i = tgI.next();
-    if(i == null) Err.or(UPDATE);
-    if(tgI.size() > 1 || !(i instanceof Nod)) Err.or(UPDATE, i);
-    final int kind = Nod.kind(((Nod) i).type);
-    if(kind != Data.ATTR && kind != Data.ELEM && kind != Data.PI)
-      Err.or(UPDATE, i);
-    final Item nmItem = nI.next();
-    // [LK] QName correct?
-    if(!(nmItem instanceof Str || nmItem instanceof QNm)) 
-      Err.or(UPDATE, nmItem);
-    ctx.updates.addPrimitive(new RenamePrimitive((Nod) i, nmItem.str()));
+    final Iter t = SeqIter.get(expr[0].iter(ctx));
+    Item i = t.next();
+    
+    // check target constraints
+    if(i == null) Err.or(UPSEQEMP, this);
+    if(t.size() != 1) Err.or(UPWRTRGTYP, this);
+    if(!(i instanceof Nod)) Err.or(UPWRTRGTYP, this);
+    final Nod n = (Nod) i;
+    final int k = Nod.kind(n.type);
+    if(!(k == Data.ELEM || k == Data.ATTR || k == Data.PI))
+        Err.or(UPWRTRGTYP, this); 
+
+    // check new name constraints
+    final Iter na = SeqIter.get(expr[1].iter(ctx));
+    i = na.next();
+    // [LK] temporary solution, use parts of node constructor in parser?
+    byte[] name = Token.token("");
+    if(i == null) Err.or(UPDATE, this);
+    if(i.type.num || i.type.str) name = i.str();
+    if(name.length == 0) Err.or(UPDATE, this);
+    ctx.updates.addPrimitive(new RenamePrimitive(n, name));
+    
     return Iter.EMPTY;
   }
   

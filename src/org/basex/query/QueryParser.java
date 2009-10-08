@@ -2545,9 +2545,9 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    final Expr trg = check(single(), INCOMPLETE);
+    final Expr trg = check(single(), UPEXPSIMPLE);
     check(AS);
-    final Expr n = check(single(), INCOMPLETE);
+    final Expr n = check(single(), UPEXPSIMPLE);
     return new Rename(trg, n);
   }
 
