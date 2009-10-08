@@ -38,9 +38,4 @@ public abstract class NewValuePrimitive extends UpdatePrimitive {
     if(mult) Err.or(UPTRGMULT, node);
     mult = true;
   }
-
-  @Override
-  public Type type() {
-    return null;
-  }
 }

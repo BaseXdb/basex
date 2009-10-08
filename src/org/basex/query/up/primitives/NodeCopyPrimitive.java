@@ -23,16 +23,21 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   LinkedList<Iter> c;
   /** {@link MemData} instance of node copies. Speeds up insert. */
   MemData m;
+  /** Nodes copied are attributes. */
+  final boolean a;
 
   /**
    * Constructor.
    * @param n target node
    * @param copy node copy
+   * @param attr copied nodes are attributes
    */
-  protected NodeCopyPrimitive(final Nod n, final Iter copy) {
+  protected NodeCopyPrimitive(final Nod n, final Iter copy, 
+      final boolean attr) {
     super(n);
     c = new LinkedList<Iter>();
     c.add(copy);
+    a = attr;
   }
   
   @Override
@@ -52,6 +57,6 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
     while(it.hasNext()) {
       seq.add(it.next());
     }
-    m = buildDB(seq,((DBNode) node).data);
+    m = buildDB(seq, ((DBNode) node).data);
   }
 }

@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.primitives.InsertPrimitive;
+import org.basex.query.up.primitives.InsertIntoPrimitive;
 import org.basex.query.util.Err;
 
 
@@ -68,7 +68,7 @@ public final class Insert extends Arr {
       i = r.next();
     }
     r.reset();
-    ctx.updates.addPrimitive(new InsertPrimitive(trgtN, r, insAttr));
+    ctx.updates.addPrimitive(new InsertIntoPrimitive(trgtN, r, insAttr));
     return Iter.EMPTY;
   }
 

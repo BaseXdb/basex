@@ -1,5 +1,7 @@
 package org.basex.query.up.primitives;
 
+import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
+
 import org.basex.query.item.Nod;
 
 /**
@@ -21,5 +23,10 @@ public class ReplaceValuePrimitive extends NewValuePrimitive {
 
   @Override
   public void apply() { 
+  }
+  
+  @Override
+  public Type type() {
+    return REPLACEVALUE;
   }
 }

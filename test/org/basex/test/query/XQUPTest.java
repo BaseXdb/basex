@@ -11,13 +11,13 @@ import org.basex.core.AProp;
 public class XQUPTest extends AbstractTest{
   /** Testing sequence containing different kinds of fragments for 
    * insert / replace expressions. */
-  static final String seq1 = "(<a/>, 5, 'fooboo')";
+  static final String SEQ1 = "(<a/>, 5, 'fooboo')";
   /** S.a. */
-  static final String seq2 = "(<a/>, 5, 'fooboo', attribute n{b})";
+  static final String SEQ2 = "(<a/>, 5, 'fooboo', attribute n{b})";
   /** S.a. */
-  static final String seq3 = "(attribute n{b}, attribute c{b})";
+  static final String SEQ3 = "(attribute n{b}, attribute c{b})";
   /** S.a. */
-  static final String seq4 = "(attribute n{b}, attribute n{b}," +
+  static final String SEQ4 = "(attribute n{b}, attribute n{b}," +
   "attribute c{b})";
   
   /**
@@ -120,24 +120,23 @@ public class XQUPTest extends AbstractTest{
         { "rep3", nodes(11),
         "/up/cars/good/car/wheels[text()='snap']" },
         { "xxxrep4", nodes(),
-        "replace node /up/cars/good/car/wheels/text() with " + seq1},
+        "replace node /up/cars/good/car/wheels/text() with " + SEQ1},
         { "rep4", nodes(11),
         "/up/cars/good/car/wheels[text()='fooboo']" },
         // replace attribute
         { "xxxrep5", nodes(),
-        "replace node /up/cars/good/car[@id='1']/@id with " + seq3},
-        { "rep5", nodes(6,7),
-        "/up/cars/good/car/@n, /up/cars/good/car/@c" },
+        "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
+        { "rep5", nodes(6,7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
         // replace comment
         { "xxxrep6", nodes(),
-        "replace node /up/cars/good/car/comment() with " + seq1},
-        { "rep6", nodes(8,9),
+        "replace node /up/cars/good/car/comment() with " + SEQ1},
+        { "rep6", nodes(8,9),  
         "/up/cars/good/car/text()" },
         // replace processing instruction
         { "xxxrep7", nodes(),
-        "replace node /up/cars/bad/car/processing-instruction() with " + seq1},
-        { "rep7", nodes(18,19,20),
-        "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
+        "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
+        { "rep7", nodes(18,19,20), 
+        "/up/cars/bad/car/a, /up/cars/bad/car/text()" }, 
     
         // insert
         // parser tests

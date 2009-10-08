@@ -101,7 +101,6 @@ public final class QueryTest {
     final boolean up = test instanceof XQUPTest;
     Process proc = new CreateDB(file, name);
     boolean ok = proc.execute(context);
-//    UpdateFunctions.printTable(context.data());
 
     if(ok) {
       for(final Object[] qu : test.queries) {

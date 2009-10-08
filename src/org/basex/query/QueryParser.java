@@ -2496,7 +2496,7 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    final Expr s = check(single(), INCOMPLETE);
+    final Expr s = check(single(), UPDATE);
     boolean in = false;
     boolean af = false;
     boolean be = false;

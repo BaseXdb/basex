@@ -18,8 +18,6 @@ import org.basex.query.util.Err;
  * @author Lukas Kircher
  */
 public final class ReplacePrimitive extends NodeCopyPrimitive {
-  /** Replacing nodes are attributes. */
-  final boolean a;
 
   /**
    * Constructor.
@@ -29,8 +27,7 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
    */
   public ReplacePrimitive(final Nod n, final Iter replace, 
       final boolean attr) {
-    super(n, replace);
-    a = attr;
+    super(n, replace, attr);
   }
   
   @Override

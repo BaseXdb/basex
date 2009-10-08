@@ -24,7 +24,6 @@ public abstract class UpdatePrimitive {
    */
   public enum Type { 
     /** Type Insert into. */ INSERTINTO,
-    /** Type Insert attribute. */ INSERTATTR,
     /** Type Replace value. */ REPLACEVALUE,
     /** Type Rename. */ RENAME,
     /** Type Insert before. */ INSERTBEFORE,
