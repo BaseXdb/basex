@@ -10,6 +10,12 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.up.primitives.InsertAfterPrimitive;
+import org.basex.query.up.primitives.InsertBeforePrimitive;
+import org.basex.query.up.primitives.InsertIntoFirstPrimitive;
+import org.basex.query.up.primitives.InsertIntoLastPrimitive;
+import org.basex.query.up.primitives.InsertIntoPrimitive;
+import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
 
 
@@ -55,12 +61,16 @@ public final class Insert extends Arr {
     Item i = s.next();
     // e needed to track order of attribute / non attribute nodes XUTY0004
     boolean e = false;
+    boolean a = false;
     while(i != null) {
       if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
       else if(i instanceof Nod) {
         final Nod tn = (Nod) i;
         final int k = Nod.kind(tn.type);
-        if(e && k == Data.ATTR) Err.or(UPNOATTRPER, this);
+        if(k == Data.ATTR) {
+          if(e) Err.or(UPNOATTRPER, this);
+          a = true;
+        }
         if(k != Data.ATTR) e = true;
         if(Nod.kind(tn.type) == Data.DOC) 
           seq.add(tn.child());
@@ -84,7 +94,15 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
-    Err.or(UPDATE, this);
+    UpdatePrimitive p = null;
+    if(into) p = first ? new InsertIntoFirstPrimitive(n, seq, a) : 
+      last ? new InsertIntoLastPrimitive(n, seq, a) : 
+        new InsertIntoPrimitive(n, seq, a);
+    
+    if(after) p = new InsertAfterPrimitive(n, seq, a);
+    if(before) p = new InsertBeforePrimitive(n, seq, a);
+    
+    ctx.updates.addPrimitive(p);
     return Iter.EMPTY;
   }
 

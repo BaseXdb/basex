@@ -59,8 +59,9 @@ public abstract class UpdatePrimitive {
   /**
    * Applies the update operation represented by this primitive to the 
    * database. 
+   * @throws QueryException query exception 
    */
-  public abstract void apply();
+  public abstract void apply() throws QueryException;
   
   /**
    * Merges if possible two update primitives of the same type if they are

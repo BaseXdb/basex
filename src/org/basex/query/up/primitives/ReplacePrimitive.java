@@ -1,13 +1,18 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
+import java.util.Iterator;
+
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.up.UpdateFunctions;
 import org.basex.query.util.Err;
 
@@ -30,13 +35,22 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
     super(n, replace, attr);
   }
   
+  @SuppressWarnings("unused")
   @Override
   public void check() throws QueryException {
-    super.check();
   }
 
   @Override
-  public void apply() {
+  public void apply() throws QueryException {
+    // create db containing insertion nodes
+    if(!(node instanceof DBNode)) return;
+    final SeqIter seq = new SeqIter();
+    final Iterator<Iter> it = c.iterator();
+    while(it.hasNext()) {
+      seq.add(it.next());
+    }
+    final MemData m = buildDB(seq, ((DBNode) node).data);
+    
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;
