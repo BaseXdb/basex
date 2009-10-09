@@ -61,6 +61,9 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     MemData m = null;
+    // source nodes may be empty, thus insert has no effect at all
+    if(seq.size() == 0 && aSeq.size() == 0) return;
+    
     // insert non-attribute nodes
     if(seq.size() > 0) {
       m = buildDB(seq, ((DBNode) node).data);

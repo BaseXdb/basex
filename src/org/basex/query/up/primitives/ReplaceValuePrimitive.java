@@ -2,6 +2,8 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
+import org.basex.data.Data;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
 /**
@@ -22,7 +24,14 @@ public class ReplaceValuePrimitive extends NewValuePrimitive {
   }
 
   @Override
-  public void apply() { 
+  public void apply() {
+    if(!(node instanceof DBNode)) return;
+    
+    final DBNode n = (DBNode) node;
+    final Data d = n.data;
+    final int k = d.kind(n.pre);
+    if(k == Data.ATTR) d.update(n.pre, d.attName(n.pre), name);
+    else d.update(n.pre, name);
   }
   
   @Override

@@ -17,6 +17,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.ReplacePrimitive;
+import org.basex.query.up.primitives.ReplaceValuePrimitive;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -33,11 +34,11 @@ public final class Replace extends Arr {
   /**
    * Constructor.
    * @param t target expression
-   * @param e source expression
+   * @param r source expression
    * @param v replace value of
    */
-  public Replace(final Expr t, final Expr e, final boolean v) {
-    super(t, e);
+  public Replace(final Expr t, final Expr r, final boolean v) {
+    super(t, r);
     value = v;
   }
 
@@ -108,7 +109,20 @@ public final class Replace extends Arr {
       
     // replace value / element content
     } else {
-      Err.or(UPIMPL, "replace value not yet avlbl");
+      final int k = Nod.kind(n.type);
+      
+      if(k == Data.ELEM) {
+        Err.or(UPIMPL, this);
+        
+        // [LK] if value is replaced source expression is evaluated like a
+        // text node constructor
+      } else {
+        i = r.next();
+        if(i == null) Err.or(UPDATE, this);
+        if (i.type.num || i.type.str) 
+          ctx.updates.addPrimitive(new ReplaceValuePrimitive(n, i.str()));
+        else Err.or(UPDATE, this);
+      }
     }
     
     return Iter.EMPTY;

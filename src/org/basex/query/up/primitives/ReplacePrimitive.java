@@ -49,11 +49,19 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
     while(it.hasNext()) {
       seq.add(it.next());
     }
-    final MemData m = buildDB(seq, ((DBNode) node).data);
-    
+
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;
+
+    // source nodes may be empty, thus the replace results in deleting the 
+    // target node
+    if(seq.size() == 0) {
+      d.delete(n.pre);
+      return;
+    }
+      
+    final MemData m = buildDB(seq, ((DBNode) node).data);
     final int k = Nod.kind(n.type);
     final int par = d.parent(n.pre, d.kind(n.pre));
     if(a)

@@ -2570,8 +2570,8 @@ public class QueryParser extends InputParser {
     }
     final Expr t = check(single(), UPEXPSIMPLE);
     check(WITH);
-    final Expr e = check(single(), UPEXPSIMPLE);
-    return new Replace(t, e, v);
+    final Expr r = check(single(), UPEXPSIMPLE);
+    return new Replace(t, r, v);
   }
 
   /**
