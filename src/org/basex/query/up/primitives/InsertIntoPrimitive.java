@@ -58,7 +58,7 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
           else seq.add(i);
           i = ni.next();
         }
-      } else seq.add(it.next());
+      }
     }
     
     final DBNode n = (DBNode) node;
