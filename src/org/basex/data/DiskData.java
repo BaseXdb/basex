@@ -585,10 +585,6 @@ public final class DiskData extends Data {
   
   @Override
   public void insertSeq(final int pre, final int par, final Data dt) {
-//    System.out.println("\n\ninsert ...");
-//    UpdateFunctions.printTable(dt);
-//    System.out.println("before insert");
-//    UpdateFunctions.printTable(this);
     meta.update();
     final int sa = 1;
     // number of nodes to be inserted
@@ -623,12 +619,8 @@ public final class DiskData extends Data {
           break;
       }
     }
-//    System.out.println("after insert");
-//    UpdateFunctions.printTable(this);
-    // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss - 1);
-//    System.out.println("after table update");
-//    UpdateFunctions.printTable(this);
+    // [LK] test insertion of document nodes
+    updateTable(pre, par, ss - 1);
   }
 
   /**

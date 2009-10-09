@@ -515,6 +515,8 @@ public interface QueryText {
   Object[] UPTRGTYP = { XUTY, 5, "Wrong type of target node." };
   /** XUTY0006: XQuery Update dynamic exception. */
   Object[] UPTRGTYP2 = { XUTY, 6, "Wrong type of target node." };
+  /** XUTY0006: XQuery Update dynamic exception. */
+  Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
   /** XUTY0008: XQuery Update dynamic exception. */
   Object[] UPTRGMULT = { XUTY, 8, "Target result must be a single node." };
   /** XUTY0010: XQuery Update dynamic exception. */

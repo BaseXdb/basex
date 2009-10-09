@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 
@@ -11,7 +12,9 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.DeletePrimitive;
+import org.basex.query.util.Err;
 
 /**
  * Delete expression.
@@ -39,11 +42,13 @@ public final class Delete extends Expr {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter it = expr.iter(ctx);
-    Item i;
-    while((i = it.next()) != null)
-      if(i instanceof Nod)
-        ctx.updates.addPrimitive(new DeletePrimitive((Nod) i)); 
+    final Iter t = SeqIter.get(expr.iter(ctx));
+    Item i = t.next();
+    while(i != null) {
+      if(!(i instanceof Nod)) Err.or(UPTRGDELEMPT, this);
+      ctx.updates.addPrimitive(new DeletePrimitive((Nod) i));
+      i = t.next();
+    }
     return Iter.EMPTY;
   }
 
