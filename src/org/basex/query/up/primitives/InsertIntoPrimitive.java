@@ -43,7 +43,6 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
     if(!(node instanceof DBNode)) return;
 
     // create db containing insertion nodes
-    if(!(node instanceof DBNode)) return;
     // attribute nodes are treated seperately
     final SeqIter aSeq = new SeqIter();
     final SeqIter seq = new SeqIter();
@@ -51,29 +50,29 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
     while(it.hasNext()) {
       final Iter ni = it.next();
       // sort nodes into attribute sequence and others
-      if(a) {
-        Item i = ni.next();
-        while(i != null) {
-          if(Nod.kind(i.type) == Data.ATTR) aSeq.add(i);
-          else seq.add(i);
-          i = ni.next();
-        }
+      Item i = ni.next();
+      while(i != null) {
+        if(Nod.kind(i.type) == Data.ATTR) aSeq.add(i);
+        else seq.add(i);
+        i = ni.next();
       }
     }
     
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     MemData m = null;
+    // insert non-attribute nodes
+    if(seq.size() > 0) {
+      m = buildDB(seq, ((DBNode) node).data);
+      d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, m);
+    }
+    
+    
     // insert attributes
     if(aSeq.size() > 0) {
       m = buildDB(aSeq, ((DBNode) node).data);
       UpdateFunctions.insertAttributes(n.pre + d.attSize(n.pre, d.kind(n.pre)), 
           n.pre, d, m);
-    }
-    // insert others
-    if(seq.size() > 0) {
-      m = buildDB(seq, ((DBNode) node).data);
-      d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, m);
     }
   }
 

@@ -161,7 +161,8 @@ public final class FTTest extends AbstractTest {
       { "FTDiacritics 1", nodes(17, 19),
         "//s [text() ftcontains 'diat']" },
       { "FTDiacritics 2", nodes(17, 19),
-        "//s [text() ftcontains 'diät joghurt' using diacritics insensitive]" },
+        "//s [text() ftcontains 'diät joghurt' using diacritics " +
+        "insensitive]" },
       { "FTDiacritics 3", nodes(17),
         "//s [text() ftcontains 'diät joghurt' using diacritics sensitive]" },
 

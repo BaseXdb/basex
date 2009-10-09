@@ -13,14 +13,14 @@ public class XQUPTest extends AbstractTest{
    * insert / replace expressions. */
   static final String SEQ1 = "(<a/>, 5, 'fooboo')";
   /** S.a. */
-  static final String SEQ2 = "(<a/>, 5, 'fooboo', attribute n{b})";
+  static final String SEQ2 = "(<a/>, 5, 'fooboo', attribute n{'b'})";
   /** S.a. */
-  static final String SEQ3 = "(attribute n{b}, attribute c{b})";
+  static final String SEQ3 = "(attribute n{'b'}, attribute c{'b'})";
   /** S.a. */
-  static final String SEQ4 = "(attribute n{b}, attribute n{b}," +
-  "attribute c{b})";
+  static final String SEQ4 = "(attribute n{'b'}, attribute n{'b'}," +
+  "attribute c{'b'})";
   /** S.a. */
-  static final String SEQ5 = "(attribute n{b}, <a/>, 5, 'fooboo')";
+  static final String SEQ5 = "(attribute n{'b'}, <a/>, 5, 'fooboo')";
   
   /**
    * Constructor.
@@ -61,8 +61,8 @@ public class XQUPTest extends AbstractTest{
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-//        { "xxxxxxxxxxxxx", nodes(),
-//        "/up/cars/good/car[1]/@id" },
+        { "xxxxxxxxxxxxx", nodes(5),
+        "/up/cars/good/car[@id='1']" },
         
         // delete
         { "xxxdel1", nodes(),
@@ -128,27 +128,33 @@ public class XQUPTest extends AbstractTest{
         // replace attribute
         { "xxxrep5", nodes(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
-        { "rep5", nodes(6,7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
+        { "rep5", nodes(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
         // replace comment
         { "xxxrep6", nodes(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", nodes(8,9),  
+        { "rep6", nodes(8, 9),  
         "/up/cars/good/car/text()" },
         // replace processing instruction
         { "xxxrep7", nodes(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", nodes(18,19,20), 
+        { "rep7", nodes(18, 19, 20), 
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" }, 
     
         // insert
         { "xxxins1", nodes(),
-        "insert node " + SEQ1 + "into /up/cars/good/car[@id=1]"},
-        { "ins1", nodes(18,19,20), 
-        "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
+        "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
+        { "ins1", nodes(7, 8, 9), 
+        "/up/cars/good/car/a, /up/cars/good/car/text()" },
         { "xxxins2", nodes(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nodes(18,19,20), 
-        "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
+        { "ins2", nodes(7, 8, 9, 10), 
+        "/up/cars/good/car/@n, /up/cars/good/car/a, " +
+        "/up/cars/good/car/text()" },
+//        { "xxxins3", nodes(),
+//        "insert node //car[@id=3] into /up/cars/good/car[@id=1]"},
+//        { "ins3", nodes(7), 
+//        "//car[@id]/car, //car[@id]/car/text()" },
+        
         // parser tests
     };
   }

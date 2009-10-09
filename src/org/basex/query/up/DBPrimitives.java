@@ -64,6 +64,7 @@ public final class DBPrimitives {
     // [LK] check for duplicate attributes
     // [LK] merge text nodes
     final int l = op.size();
+    if(op.size() == 0) return;
     final Integer[] t = new Integer[l];
     op.keySet().toArray(t);
     final int[] p = new int[l];

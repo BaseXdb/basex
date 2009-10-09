@@ -59,7 +59,7 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
     if(a)
       UpdateFunctions.insertAttributes(n.pre, par, d, m);
     else d.insertSeq(n.pre + d.size(n.pre, k), par , m);
-    d.delete(n.pre);
+    d.delete(n.pre + (a ? seq.size() : 0));
   }
 
   @Override

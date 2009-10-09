@@ -60,11 +60,13 @@ public final class UpdateFunctions {
   public static void insertAttributes(final int pre, final int par, 
       final Data d, final MemData m) {
     final int ss = m.size(0, m.kind(0));
+//    printTable(m);
     for(int s = 1; s < ss; s++) {
       // [LK] removed -1 in next line ... test!
-      final int p = pre + s;
+      final int p = pre + s - 1;
       d.insert(p, par, m.attName(s), m.attValue(s));
     }
+//    printTable(d);
   }
 
   /**
