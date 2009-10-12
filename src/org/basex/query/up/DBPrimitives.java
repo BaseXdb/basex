@@ -53,15 +53,13 @@ public final class DBPrimitives {
   }
 
   /**
-   * Applies all updates to the data reference.
+   * Checks constraints and applies all updates to the data bases.
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
     // [LK] sort operations after pre values of primitives, eliminate
     // unnecessary ones and apply backwards
     // [LK] trgt / rpl node must be different nodes
-    // [LK] check parent of replaced node
-    // [LK] check for duplicate attributes
     // [LK] merge text nodes
     final int l = op.size();
     if(op.size() == 0) return;

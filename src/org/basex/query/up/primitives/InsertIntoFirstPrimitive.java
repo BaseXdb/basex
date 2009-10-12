@@ -2,13 +2,9 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.Iterator;
-
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 
 /**
@@ -37,14 +33,7 @@ public class InsertIntoFirstPrimitive extends NodeCopyPrimitive {
 
   @Override
   public void apply() throws QueryException {
- // create db containing insertion nodes
-    if(!(node instanceof DBNode)) return;
-    final SeqIter seq = new SeqIter();
-    final Iterator<Iter> it = c.iterator();
-    while(it.hasNext()) {
-      seq.add(it.next());
-    }
-//    MemData m = buildDB(seq, ((DBNode) node).data);
+    Err.or(UPDATE, this);
   }
 
   @Override

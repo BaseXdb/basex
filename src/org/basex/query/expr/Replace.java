@@ -16,6 +16,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.up.primitives.ReplaceElemContentPrimitive;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValuePrimitive;
 import org.basex.query.util.Err;
@@ -109,22 +110,20 @@ public final class Replace extends Arr {
       
     // replace value / element content
     } else {
+      // [LK] if value is replaced source expression is evaluated like a
+      // text node constructor
+      i = r.next();
+      // [LK] check how to deal with empty sequences
+      if(i == null) Err.or(UPDATE, this);
       final int k = Nod.kind(n.type);
+      if(i.type.num || i.type.str)
+        ctx.updates.addPrimitive(k == Data.ELEM ? 
+            new ReplaceElemContentPrimitive(n, i.str()) : 
+              new ReplaceValuePrimitive(n, i.str()));
       
-      if(k == Data.ELEM) {
-        Err.or(UPIMPL, this);
-        
-        // [LK] if value is replaced source expression is evaluated like a
-        // text node constructor
-      } else {
-        i = r.next();
-        if(i == null) Err.or(UPDATE, this);
-        if (i.type.num || i.type.str) 
-          ctx.updates.addPrimitive(new ReplaceValuePrimitive(n, i.str()));
-        else Err.or(UPDATE, this);
-      }
+      else Err.or(UPDATE, this);
     }
-    
+      
     return Iter.EMPTY;
   }
   

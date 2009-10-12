@@ -63,6 +63,7 @@ public final class Insert extends Arr {
     boolean e = false;
     boolean a = false;
     while(i != null) {
+      // [CG] check txt constructor
       if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
       else if(i instanceof Nod) {
         final Nod tn = (Nod) i;

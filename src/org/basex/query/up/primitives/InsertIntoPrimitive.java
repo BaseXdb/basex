@@ -70,7 +70,6 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
       d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, m);
     }
     
-    
     // insert attributes
     if(aSeq.size() > 0) {
       m = buildDB(aSeq, ((DBNode) node).data);
