@@ -14,20 +14,15 @@ import org.basex.query.iter.Iter;
 public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   /** Copy of nodes to be inserted. */
   LinkedList<Iter> c;
-  /** Nodes copied contain attributes. */
-  final boolean a;
 
   /**
    * Constructor.
    * @param n target node
    * @param copy node copy
-   * @param attr copied nodes are attributes
    */
-  protected NodeCopyPrimitive(final Nod n, final Iter copy, 
-      final boolean attr) {
+  protected NodeCopyPrimitive(final Nod n, final Iter copy) {
     super(n);
     c = new LinkedList<Iter>();
     c.add(copy);
-    a = attr;
   }
 }

@@ -8,30 +8,30 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
- * Insert into as last primitive.
+ * Insert attribute primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertIntoLastPrimitive extends InsertPrimitive {
-  
+public class InsertAttribute extends InsertPrimitive {
+
   /**
    * Constructor.
    * @param n target node
-   * @param copy copy of nodes to be inserted
-   * @param l actual pre location where nodes are inserted
+   * @param copy insertion nods
+   * @param l actual insert location
    */
-  public InsertIntoLastPrimitive(final Nod n, final Iter copy, final int l) {
+  protected InsertAttribute(final Nod n, final Iter copy, final int l) {
     super(n, copy, l);
-  }
-  
-  @Override
-  public void check() throws QueryException {
-    Err.or(UPDATE, this);
   }
 
   @Override
   public void apply() throws QueryException {
+    Err.or(UPDATE, this);
+  }
+
+  @Override
+  public void check() throws QueryException {
     Err.or(UPDATE, this);
   }
 
@@ -42,6 +42,6 @@ public class InsertIntoLastPrimitive extends InsertPrimitive {
 
   @Override
   public Type type() {
-    return Type.INSERTINTOLA;
+    return null;
   }
 }

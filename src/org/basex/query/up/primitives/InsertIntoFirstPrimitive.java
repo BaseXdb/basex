@@ -13,17 +13,16 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertIntoFirstPrimitive extends NodeCopyPrimitive {
+public class InsertIntoFirstPrimitive extends InsertPrimitive {
   
   /**
    * Constructor.
    * @param n target node
    * @param copy copy of nodes to be inserted
-   * @param attr copied nodes are attributes
+   * @param l actual pre location where nodes are inserted
    */
-  public InsertIntoFirstPrimitive(final Nod n, final Iter copy, 
-      final boolean attr) {
-    super(n, copy, attr);
+  public InsertIntoFirstPrimitive(final Nod n, final Iter copy, final int l) {
+    super(n, copy, l);
   }
   
   @Override

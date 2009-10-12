@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
@@ -61,16 +62,14 @@ public final class Insert extends Arr {
     Item i = s.next();
     // e needed to track order of attribute / non attribute nodes XUTY0004
     boolean e = false;
-    boolean a = false;
     while(i != null) {
-      // [CG] check txt constructor
+      // [LK] check  use of txt node constructor
       if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
       else if(i instanceof Nod) {
         final Nod tn = (Nod) i;
         final int k = Nod.kind(tn.type);
         if(k == Data.ATTR) {
           if(e) Err.or(UPNOATTRPER, this);
-          a = true;
         }
         if(k != Data.ATTR) e = true;
         if(Nod.kind(tn.type) == Data.DOC) 
@@ -95,13 +94,18 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
+    int pl = -1;
+    if(n instanceof DBNode) {
+      final DBNode dn = (DBNode) n;
+      pl = dn.pre + dn.data.attSize(dn.pre, dn.data.kind(dn.pre));
+    }
     UpdatePrimitive p = null;
-    if(into) p = first ? new InsertIntoFirstPrimitive(n, seq, a) : 
-      last ? new InsertIntoLastPrimitive(n, seq, a) : 
-        new InsertIntoPrimitive(n, seq, a);
+    if(into) p = first ? new InsertIntoFirstPrimitive(n, seq, pl) : 
+      last ? new InsertIntoLastPrimitive(n, seq, pl) : 
+        new InsertIntoPrimitive(n, seq, pl);
     
-    if(after) p = new InsertAfterPrimitive(n, seq, a);
-    if(before) p = new InsertBeforePrimitive(n, seq, a);
+    if(after) p = new InsertAfterPrimitive(n, seq, pl);
+    if(before) p = new InsertBeforePrimitive(n, seq, pl);
     
     ctx.updates.addPrimitive(p);
     return Iter.EMPTY;
@@ -111,5 +115,4 @@ public final class Insert extends Arr {
   public String toString() {
     return null;
   }
-
 }

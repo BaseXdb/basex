@@ -20,17 +20,16 @@ import org.basex.query.up.UpdateFunctions;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertIntoPrimitive extends NodeCopyPrimitive {
+public class InsertIntoPrimitive extends InsertPrimitive {
 
   /**
    * Constructor.
    * @param n target node
    * @param copy copy of nodes to be inserted
-   * @param attr copied nodes are attributes
+   * @param l actual pre location where nodes are inserted
    */
-  public InsertIntoPrimitive(final Nod n, final Iter copy, 
-      final boolean attr) {
-    super(n, copy, attr);
+  public InsertIntoPrimitive(final Nod n, final Iter copy, final int l) {
+    super(n, copy, l);
   }
   
   @SuppressWarnings("unused")
@@ -67,7 +66,7 @@ public class InsertIntoPrimitive extends NodeCopyPrimitive {
     // insert non-attribute nodes
     if(seq.size() > 0) {
       m = buildDB(seq, ((DBNode) node).data);
-      d.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(n.type)), n.pre, m);
+      d.insertSeq(loc, n.pre, m);
     }
     
     // insert attributes
