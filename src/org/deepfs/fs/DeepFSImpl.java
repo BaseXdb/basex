@@ -1,6 +1,9 @@
 package org.deepfs.fs;
 
+import static org.basex.util.Token.*;
+
 import java.nio.ByteBuffer;
+
 import org.basex.core.Main;
 import org.catacombae.jfuse.FUSE;
 import org.catacombae.jfuse.FUSEFileSystemAdapter;
@@ -8,15 +11,14 @@ import org.catacombae.jfuse.types.fuse26.FUSEFileInfo;
 import org.catacombae.jfuse.types.fuse26.FUSEFillDir;
 import org.catacombae.jfuse.types.system.Stat;
 import org.catacombae.jfuse.util.FUSEUtil;
-import static org.basex.util.Token.*;
+import org.deepfs.jfuse.DeepStat;
 
 /**
  * DeepFS: The XQuery Filesystem. Filesystem-side implementation of DeepFS.
- *
- * Uses LGPL jFUSE bindings v0.1 provided by
- * Copyright (C) 2008-2009  Erik Larsson <erik82@kth.se>
- * and is based on example code taken from the project.
- *
+ * 
+ * Uses LGPL jFUSE bindings v0.1 provided by Copyright (C) 2008-2009 Erik
+ * Larsson <erik82@kth.se> and is based on example code taken from the project.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
@@ -30,17 +32,29 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   /** Connection to database storage. */
   private DeepFS dbfs;
 
-  /** Constructor. */
-  public DeepFSImpl() {
-    dbfs = new DeepFS("deepfs");
+  /**
+   * Constructor.
+   * @param mountpoint of DeepFUSE
+   * */
+  public DeepFSImpl(final String mountpoint) {
+    dbfs = new DeepFS("deepfs", mountpoint);
   }
 
   /**
-   * Constructor (currently we always create a fresh instance).
-   * @param db DeepFS database/filesystem instance to be created.
+   * Constructor.
+   * @param db DeepFS database/filesystem name
+   * @param mountpoint of DeepFUSE
    */
-  public DeepFSImpl(final String db) {
-    dbfs = new DeepFS(db);
+  public DeepFSImpl(final String db, final String mountpoint) {
+    dbfs = new DeepFS(db, mountpoint);
+  }
+
+  /**
+   * Constructor.
+   * @param db DeepFS data instance
+   */
+  public DeepFSImpl(final DeepFS db) {
+    dbfs = db;
   }
 
   @Override
@@ -61,13 +75,27 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
     return (rc == -1) ? -ENETRESET : 0;
   }
 
+  /**
+   * Get file attributes.
+   * @param path to file
+   * @param stbuf to be filled
+   * @return zero on success, errno otherwise
+   */
   @Override
   public int getattr(final ByteBuffer path, final Stat stbuf) {
     String pathString = FUSEUtil.decodeUTF8(path);
-    Main.debug("getattr: " + pathString);
-    if(pathString == null) return -ENOENT;
-    int rc = dbfs.stat(pathString, stbuf);
-    if(rc == -1) return -ENOENT;
+    if (pathString == null) return -ENOENT;
+    DeepStat dst = dbfs.stat(pathString);
+    if(dst == null) return -ENOENT;
+    stbuf.st_ino = dst.stino;
+    stbuf.st_atimespec.setToMillis(dst.statimespec);
+    stbuf.st_ctimespec.setToMillis(dst.stctimespec);
+    stbuf.st_mtimespec.setToMillis(dst.stmtimespec);
+    stbuf.st_mode = dst.stmode;
+    stbuf.st_size = dst.stsize;
+    stbuf.st_uid = dst.stuid;
+    stbuf.st_gid = dst.stgid;
+    stbuf.st_nlink = dst.stnlink;
     return 0;
   }
 
@@ -94,8 +122,8 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
     String pathString = FUSEUtil.decodeUTF8(path);
     if(pathString == null) return -ENOENT;
 
-//    if(!pathString.equals(helloPath)) return -ENOENT;
-//    if((fi.flags & 3) != O_RDONLY) return -EACCES;
+    // if(!pathString.equals(helloPath)) return -ENOENT;
+    // if((fi.flags & 3) != O_RDONLY) return -EACCES;
 
     return -ENOENT;
   }
@@ -107,12 +135,12 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
     if(pathString == null) return -ENOENT;
     if(offset < 0 || offset > Integer.MAX_VALUE) return -EINVAL;
 
-//    int bytesLeftInFile = helloStr.length - (int) offset;
-//    if(bytesLeftInFile > 0) {
-//      int len = Math.min(bytesLeftInFile, buf.remaining());
-//      buf.put(helloStr, (int) offset, len);
-//      return len;
-//    }
+    // int bytesLeftInFile = helloStr.length - (int) offset;
+    // if(bytesLeftInFile > 0) {
+    // int len = Math.min(bytesLeftInFile, buf.remaining());
+    // buf.put(helloStr, (int) offset, len);
+    // return len;
+    // }
 
     return 0;
   }
@@ -124,11 +152,27 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   }
 
   /**
+   * Mount existing instance as filesystem in userspace.
+   * @param mp mount point
+   * @param deepfs DeepFS database instance
+   */
+  public static void mount(final String mp, final DeepFS deepfs) {
+    FUSE.main(new String[] { mp}, new DeepFSImpl(deepfs));
+  }
+
+  /**
    * Main entry point.
-   *
-   * @param args mount point is expected as first argument.
+   * 
+   * @param args mount point is expected as first argument, database as second.
    */
   public static void main(final String[] args) {
-    FUSE.main(args, new DeepFSImpl());
+    if(args.length != 2) {
+      Main.err("DeepFSImpl expects mount point"
+          + " and DeepFS database name as arguments");
+      System.exit(-1);
+    }
+    final String mountp = args[0];
+    final String dbname = args[1];
+    FUSE.main(new String[] { mountp}, new DeepFSImpl(dbname, mountp));
   }
 }

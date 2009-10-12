@@ -59,6 +59,6 @@
  troubles while installing and running BaseX: basex@inf.uni-konstanz.de
  
  Have a nice day,
- BaseX team 2008
+ BaseX team 2009
  
  =================================== DBIS Group, University of Konstanz

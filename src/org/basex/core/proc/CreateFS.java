@@ -7,10 +7,12 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 
 /**
- * Evaluates the 'create fs' command and creates a new filesystem mapping.
+ * Evaluates the 'create fs' command and creates a new filesystem mapping
+ * from an existing file hierarchy.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
+ * @author Alexander Holupirek
  */
 public final class CreateFS extends ACreate {
   /**
@@ -19,17 +21,7 @@ public final class CreateFS extends ACreate {
    * @param name name of database
    */
   public CreateFS(final String path, final String name) {
-    this(path, name, "no_mount");
-  }
-
-  /**
-   * Constructor, specifying FUSE properties.
-   * @param path to import root directory
-   * @param name name of database
-   * @param mp fuse mount point
-   */
-  public CreateFS(final String path, final String name, final String mp) {
-    super(STANDARD, path, name, mp);
+    super(STANDARD, path, name);
   }
 
   @Override
@@ -37,8 +29,8 @@ public final class CreateFS extends ACreate {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
     return prop.is(Prop.NEWFSPARSER) ?
-      build(new NewFSParser(args[0], args[2], prop), args[1]) :
-      build(new FSParser(args[0], args[2], prop), args[1]);
+      build(new NewFSParser(args[0], prop), args[1]) :
+      build(new FSParser(args[0], prop), args[1]);
   }
 
   @Override

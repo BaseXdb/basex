@@ -1,12 +1,15 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+
 import javax.swing.AbstractButton;
+
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
@@ -23,6 +26,7 @@ import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Insert;
+import org.basex.core.proc.Mount;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Update;
@@ -40,6 +44,7 @@ import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogMapLayout;
+import org.basex.gui.dialog.DialogMountFS;
 import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogOpenFS;
 import org.basex.gui.dialog.DialogPrefs;
@@ -52,6 +57,7 @@ import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.deepfs.jfuse.JFUSEAdapter;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
@@ -715,8 +721,7 @@ public enum GUICommands implements GUICommand {
       final String p = gprop.is(GUIProp.FSALL) ? "/"
           : gui.prop.get(GUIProp.FSBACKING).replace('\\', '/');
       final String n = gprop.get(GUIProp.FSDBNAME);
-      final String m = gprop.get(GUIProp.FSMOUNT);
-      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n, m) });
+      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n) });
     }
   },
   
@@ -732,6 +737,27 @@ public enum GUICommands implements GUICommand {
         if(Dialog.confirmWarning(gui, NODEEPFSQUESTION, CREATEFSTITLE))
           CREATEFS.execute(gui);
       }
+    }
+  },
+  
+  /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace. */
+  MOUNTFS(false, GUIMOUNTFS, null, GUIMOUNTFSTT) {
+    @Override
+    public void execute(final GUI gui) {
+      final DialogMountFS dialog = new DialogMountFS(gui);
+      if(dialog.ok()) {
+        if(new Close().execute(gui.context)) gui.notify.init();
+        gui.execute(new Mount(dialog.db(), dialog.mp()));
+      } else if(dialog.nodb()) {
+        if(Dialog.confirmWarning(gui, NODEEPFSQUESTION, CREATEFSTITLE))
+          CREATEFS.execute(gui);
+      }
+    }
+    
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      // disable mount button, if native library is not available.
+      BaseXLayout.enable(button, JFUSEAdapter.loadJFUSELibrary());
     }
   },
  

@@ -1,7 +1,11 @@
 package org.basex.test.fuse;
 
+import static org.basex.data.DataText.*;
 import static org.junit.Assert.*;
+import static org.basex.util.Token.*;
+
 import java.io.File;
+
 import org.basex.core.proc.DropDB;
 import org.deepfs.fs.DeepFS;
 import org.junit.After;
@@ -27,7 +31,7 @@ public final class DeepBaseTest {
    */
   @Before
   public void setUp() {
-    dbfs = new DeepFS(DBNAME);
+    dbfs = new DeepFS(DBNAME, string(NOTMOUNTED));
   }
 
   /**

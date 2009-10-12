@@ -138,13 +138,13 @@ public final class GUIProp extends AProp {
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
 
-  /** Path for importing the file system. */
-  public static final Object[] FSBACKING = { "FSIMPORTPATH", Prop.WORK };
-  /** Name of the filesystem database. */
-  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFSDB" };
+  /** Path to mapped file hierarchy. */
+  public static final Object[] FSBACKING = { "FSBACKING", Prop.HOME };
+  /** Name of the DeepFS database. */
+  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFS_Database" };
   /** Name of the mountpoint. */
-  public static final Object[] FSMOUNT = { "FSMOUNT", Prop.TMP + "deepfs" };
-  /** Flag for importing complete file system hierarchy. */
+  public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
+  /** Flag indicating the mapping of the complete disk. */
   public static final Object[] FSALL = { "FSALL", false };
   /** Flag write through in Desktop Query Engine. */
   public static final Object[] FSWTHROUGH = { "FSWTHROUGH", false };

@@ -838,6 +838,10 @@ public interface Text {
   /** Command info. */
   String GUIDQETT = lang("c_dqett") + DOT;
   /** Command info. */
+  String GUIMOUNTFS = lang("c_mountfs") + DOTS;
+  /** Command info. */
+  String GUIMOUNTFSTT = lang("c_mountfstt") + DOT;
+  /** Command info. */
   String GUIINFO = lang("c_props") + DOTS;
   /** Command info. */
   String GUIINFOTT = lang("c_propstt");
@@ -954,6 +958,8 @@ public interface Text {
   String BUTTONRENAME = lang("b_rename");
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
+  /** Button text for mounting database. */
+  String BUTTONMOUNT = lang("b_mount");
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
   /** Button text for deleting files. */
@@ -1130,6 +1136,13 @@ public interface Text {
   /** Import options. */
   int[] IMPORTFSMAXSIZE = { 1024, 10240, 102400, 1048576, 10485760 };
 
+  /** Dialog title for opening a database as desktop query engine. */
+  String OPENDQETITLE = lang("dqe_title") + DOTS;
+  /** Dialog title for mounting a DeepFS database. */
+  String OPENMOUNTTITLE = lang("dmnt_title") + DOTS;
+  /** No valid path to mount point. */
+  String NOVALIDMOUNT = lang("dmnt_nomountpath") + DOT;
+  
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */

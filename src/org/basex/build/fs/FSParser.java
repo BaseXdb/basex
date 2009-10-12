@@ -3,8 +3,11 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+import static org.deepfs.jfuse.JFUSEAdapter.*;
+
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.metadata.AbstractExtractor;
@@ -53,9 +56,7 @@ public final class FSParser extends Parser {
   /** Pre value stack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Path to root of the backing store. */
-  private final String fsimportpath;
-  /** Path to FUSE mountpoint. */
-  public final String mountpoint;
+  private final String backingpath;
   /** Meta data index. */
   private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
   /** Root flag to parse root node or all partitions (C:, D: ...). */
@@ -72,19 +73,17 @@ public final class FSParser extends Parser {
   /**
    * Constructor.
    * @param path the traversal starts from
-   * @param mp mount point for fuse
    * @param pr database properties
    * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final String path, final String mp, final Prop pr) {
+  public FSParser(final String path, final Prop pr) {
     super(IO.get(path), pr);
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
     prop.set(Prop.DTD, false);
     root = path.equals("/");
 
-    fsimportpath = io.path();
-    mountpoint = mp;
+    backingpath = io.path();
 
     meta.add(TYPEGIF, new GIFExtractor());
     meta.add(TYPEPNG, new PNGExtractor());
@@ -101,16 +100,6 @@ public final class FSParser extends Parser {
   }
 
   /**
-   * Constructor to parse single file nodes.
-   * @param path String to file node to parse
-   * @param pr database properties
-   */
-  public FSParser(final String path, final Prop pr) {
-    this(path, "/mnt/deepfs", pr);
-    singlemode = true;
-  }
-
-  /**
    * Main entry point for the import of a file hierarchy.
    * Instantiates the engine and starts the traversal.
    * @param build instance passed by {@link CreateFS}.
@@ -118,32 +107,25 @@ public final class FSParser extends Parser {
    */
   @Override
   public void parse(final Builder build) throws IOException {
-    final boolean fuse = prop.is(Prop.FUSE);
     builder = build;
     builder.encoding(Prop.ENCODING);
-    builder.meta.mount = mountpoint;
-    builder.meta.backing = fsimportpath;
+    builder.meta.backing = backingpath;
     builder.meta.deepfs = true;
     builder.startDoc(token(io.name()));
 
     if(singlemode) {
       file(new File(io.path()).getCanonicalFile());
     } else {
-      final byte[] mnt = fuse ? token(mountpoint) : NOTMOUNTED;
-      final byte[] bck = token(fsimportpath);
+      final byte[] bck = token(backingpath);
       atts.reset();
-      atts.add(MOUNTPOINT  , mnt);
+      atts.add(MOUNTPOINT  , NOTMOUNTED);
       atts.add(SIZE        , Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
 
-      builder.startNS(FS, FSURL);
-      if(prop.is(Prop.FSMETA)) {
-        builder.startNS(FSMETAPREF, FSMETAURL);
-      }
       builder.startElem(DEEPFS, atts);
 
       for(final File f : root ? File.listRoots() :
-        new File[] { new File(fsimportpath).getCanonicalFile() }) {
+        new File[] { new File(backingpath).getCanonicalFile() }) {
 
         sizeStack[0] = 0;
         parse(f);
@@ -166,7 +148,7 @@ public final class FSParser extends Parser {
     for(final File f : files) {
       if(!valid(f)) continue;
 
-      // [AH] changed backing semantics.
+      // [BL] changed backing semantics.
 //      final boolean fuse = prop.is(Prop.FUSE);
       if(f.isDirectory()) {
         // -- 'copy' directory to backing store
@@ -221,7 +203,7 @@ public final class FSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void dir(final File f) throws IOException {
-    preStack[++lvl] = builder.startElem(DIR, atts(f, false));
+    preStack[++lvl] = builder.startElem(DIR, atts(f, true));
     sizeStack[lvl] = 0;
     parse(f);
     builder.endElem(DIR);
@@ -290,22 +272,30 @@ public final class FSParser extends Parser {
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name
-   * @param r root flag
+   * @param d directory flag
    * @return attributes as byte[][]
    */
-  private Atts atts(final File f, final boolean r) {
-    final String name = r ? f.getPath() : f.getName();
+  private Atts atts(final File f, final boolean d) {
+    final String name = f.getName();
     final int s = name.lastIndexOf('.');
-    // current time storage: minutes from 1.1.1970
-    // (values will be smaller than 1GB and will thus be inlined in the storage)
-    final long time = f.lastModified() / 60000;
+    final long time = f.lastModified();
     final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
 
     atts.reset();
     atts.add(NAME, token(name));
     atts.add(SUFFIX, suf);
+    atts.add(MTIME, token(time));
+    // [AH] combine that with create() in DeepFS class.
+    atts.add(CTIME, ZERO);
+    atts.add(ATIME, ZERO);
+    if (d)
+      atts.add(MODE, token(getSIFDIR() | 0755));
+    else
+      atts.add(MODE, token(getSIFREG() | 0644));
     atts.add(SIZE, token(f.length()));
-    if(time != 0) atts.add(MTIME, token(time));
+    atts.add(UID, ZERO);
+    atts.add(GID, ZERO);
+    atts.add(NLINK, ZERO);
     return atts;
   }
 

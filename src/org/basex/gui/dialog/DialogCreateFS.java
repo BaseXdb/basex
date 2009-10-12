@@ -1,14 +1,16 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
+
 import javax.swing.ImageIcon;
 import javax.swing.border.EmptyBorder;
+
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -50,8 +52,6 @@ public final class DialogCreateFS extends Dialog {
   private final BaseXBack buttons;
   /** ComboBox. */
   private final BaseXCombo maxsize;
-  /** Mountpoint path. */
-  private final BaseXTextField mountpoint;
 
   /** Path summary flag. */
   private final BaseXCheckBox pathindex;
@@ -141,24 +141,6 @@ public final class DialogCreateFS extends Dialog {
     });
     BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
-
-    mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT),
-        HELPFSMOUNT, this);
-    mountpoint.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
-    BaseXLayout.setWidth(mountpoint, 240);
-
-    if(prop.is(Prop.FUSE)) {
-      p.add(new BaseXLabel("DeepFS mount point:", false, true));
-      p.add(new BaseXLabel(""));
-      p.add(mountpoint);
-      p.add(new BaseXLabel(""));
-    }
-
     p1.add(p);
 
     info = new BaseXLabel(" ");
@@ -271,7 +253,6 @@ public final class DialogCreateFS extends Dialog {
 
     boolean cAll; // import all is chosen?
     boolean cNam; // dbname given?
-    boolean cMou = true; // mount point is existent directory?
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
@@ -290,15 +271,9 @@ public final class DialogCreateFS extends Dialog {
     }
     ok &= cAll;
 
-    if(prop.is(Prop.FUSE)) {
-      cMou = new File(mountpoint.getText().trim()).isDirectory();
-      ok &= cMou;
-    }
-
     String inf = " ";
 
     if(!ok) {
-      if(!cMou) inf = MOUNTWHICH;
       if(!cAll) inf = PATHWHICH;
       if(!cNam) inf = DBWHICH;
     }
@@ -341,7 +316,6 @@ public final class DialogCreateFS extends Dialog {
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSBACKING, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());
-    gprop.set(GUIProp.FSMOUNT, mountpoint.getText().trim());
     gprop.set(GUIProp.CREATEPATH, path.getText());
 
     super.close();

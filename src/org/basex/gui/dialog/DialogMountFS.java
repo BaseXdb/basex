@@ -2,59 +2,68 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
+
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
 import org.basex.core.Context;
-import org.basex.core.Main;
-import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXTextField;
+import org.basex.gui.layout.TableLayout;
 import org.basex.io.DataInput;
+import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
  * Open database dialog.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
- * @author Christian Gruen
  * @author Alexander Holupirek
  */
-public final class DialogOpenFS extends Dialog {
+public final class DialogMountFS extends Dialog {
   /** List of currently available databases. */
   private final BaseXListChooser choice;
   /** Information panel. */
   private final BaseXLabel doc;
   /** Information panel. */
   private final BaseXText detail;
+  /** Browse button. */
+  private final BaseXButton button;
+  /** Mountpoint warning. */
+  private final BaseXLabel warn;
   /** Buttons. */
   private BaseXBack buttons;
-  /** Write through flag. */
-  private final BaseXCheckBox wth;
 
+  /** Mountpoint path. */
+  final BaseXTextField mountpoint;
+  
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param drop show drop dialog
    */
-  public DialogOpenFS(final GUI main, final boolean drop) {
-    super(main, drop ? DROPTITLE : OPENDQETITLE);
+  public DialogMountFS(final GUI main) {
+    super(main, OPENMOUNTTITLE);
+    final GUIProp gprop = gui.prop;
 
     // create database chooser
     final StringList db = List.listFS(main.context);
@@ -66,51 +75,69 @@ public final class DialogOpenFS extends Dialog {
 
     final BaseXBack info = new BaseXBack();
     info.setLayout(new BorderLayout());
-    info.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(10, 10, 10, 10)));
+    info.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10,
+        10, 10, 10)));
 
     doc = new BaseXLabel(DIALOGINFO);
-    doc.setFont(getFont().deriveFont(18f));
-    doc.setBorder(0, 0, 5, 0);
+    doc.setFont(getFont().deriveFont(16f));
+    doc.setBorder(0, 0, 2, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(HELPOPENINFO, false, this);
-    detail.setFont(getFont());
+    detail.setFont(getFont().deriveFont(10f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
-
     BaseXLayout.setWidth(detail, 420);
     info.add(detail, BorderLayout.CENTER);
+
+    // -- mount panel
+    BaseXBack m = new BaseXBack();
+    m.setLayout(new TableLayout(3, 2, 0, 0));
+    m.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5,
+        5, 5)));
+    BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
+    lab.setBorder(new EmptyBorder(5, 5, 5, 0));
+    m.add(lab);
+    m.add(new BaseXLabel(""));
+    mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), HELPFSMOUNT,
+        this);
+    mountpoint.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
+    });
+    BaseXLayout.setWidth(mountpoint, 300);
+    m.add(mountpoint);
+    button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    button.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        final IO file = new BaseXFileChooser(DIALOGFC, mountpoint.getText(),
+            main).select(BaseXFileChooser.Mode.DOPEN);
+         if(file != null) {
+          mountpoint.setText(file.path());
+        }
+      }
+    });
+    m.add(button);
+    warn = new BaseXLabel(" ");
+    warn.setBorder(5, 5, 0, 0);
+    m.add(warn);
+    info.add(m, BorderLayout.SOUTH);
 
     final BaseXBack pp = new BaseXBack();
     pp.setBorder(new EmptyBorder(0, 12, 0, 0));
     pp.setLayout(new BorderLayout());
     pp.add(info, BorderLayout.CENTER);
 
-    wth = new BaseXCheckBox(WTHROUGH, HELPFSALL, false, this);
-    wth.setToolTipText(WTHROUGHTT);
-    wth.setBorder(new EmptyBorder(4, 4, 0, 0));
-    wth.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        action(null);
-      }
-    });
-
     // create buttons
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    if(drop) {
-      buttons = newButtons(this, true,
-          new String[] { BUTTONDROP, BUTTONCANCEL },
-          new byte[][] { HELPDROP, HELPCANCEL });
-    } else {
-      buttons = newButtons(this, true,
-          new String[] { BUTTONRENAME, BUTTONOPEN, BUTTONCANCEL },
-          new byte[][] { HELPRENAMEDB, HELPOPENDB, HELPCANCEL });
-    }
+    buttons = newButtons(this, true, new String[] { BUTTONMOUNT,
+        BUTTONCANCEL}, new byte[][] { HELPOPENDB, HELPCANCEL});
+
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
-    p.add(wth);
 
     set(pp, BorderLayout.EAST);
     action(null);
@@ -118,7 +145,7 @@ public final class DialogOpenFS extends Dialog {
 
     finish(null);
   }
-
+  
   /**
    * Returns the database name.
    * @return database name
@@ -127,7 +154,16 @@ public final class DialogOpenFS extends Dialog {
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
   }
-
+  
+  /**
+   * Returns the mount point.
+   * @return database name
+   */
+  public String mp() {
+    final String db = mountpoint.getText().trim();
+    return ok && db.length() > 0 ? db : null;
+  }
+  
   /**
    * Returns if no databases have been found.
    * @return result of check
@@ -139,54 +175,42 @@ public final class DialogOpenFS extends Dialog {
   @Override
   public void action(final String cmd) {
     final Context ctx = gui.context;
-    final GUIProp gprop = gui.prop;
-
-    if(BUTTONRENAME.equals(cmd)) {
-      new DialogRename(gui, choice.getValue());
-      choice.setData(List.list(ctx).finish());
-    } else if(BUTTONOPEN.equals(cmd)) {
+    final String db = choice.getValue().trim();
+    final String mp = mountpoint.getText().trim();
+    
+    if(BUTTONMOUNT.equals(cmd)) {
+//      DeepFSImpl.main(new String[] {mp, db});
       close();
-    } else if(BUTTONDROP.equals(cmd)) {
-      final String db = choice.getValue();
-      if(db.length() == 0) return;
-      if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
-        if(ctx.data() != null && ctx.data().meta.name.equals(db)) {
-          new Close().execute(gui.context);
-          gui.notify.init();
-        }
-        DropDB.drop(db, ctx.prop);
-        choice.setData(List.list(ctx).finish());
-        choice.requestFocusInWindow();
-      }
     } else {
-      final String db = choice.getValue().trim();
       ok = db.length() != 0 && ctx.prop.dbpath(db).exists();
-      enableOK(buttons, BUTTONDROP, ok);
-
+      warn.setText(" ");
+      warn.setIcon(null);
       if(ok) {
-        doc.setText(db);
+        doc.setText("Mount " + db + ":");
         DataInput in = null;
         try {
+          // fill detail panel with db info
           in = new DataInput(ctx.prop.dbfile(db, DATAINFO));
           final MetaData meta = new MetaData(db, in, ctx.prop);
           detail.setText(InfoDB.db(meta, true, true).finish());
-          if (WTHROUGH.equals(cmd) && wth.isSelected()) {
-            final boolean dec = Dialog.confirmWarning(
-                this, Main.info(WTHROUGHOK, meta.name, meta.backing)
-                , WTHROUGHTITLE);
-            ctx.prop.set(Prop.WTHROUGH, dec);
-            gprop.set(GUIProp.FSWTHROUGH, dec);
-            wth.setSelected(dec);
-          }
+          // check for valid mountpoint
+          final IO file = IO.get(mp);
+          boolean mpok = mp.length() != 0 && file.exists() && file.isDir();
+          if (!mpok) {
+            warn.setText(NOVALIDMOUNT);
+            warn.setIcon(BaseXLayout.icon("error"));
+          } 
+          ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try { if(in != null) in.close(); } catch(final IOException ex) { }
+          try {
+            if(in != null) in.close();
+          } catch(final IOException ex) { /* */}
         }
       }
-      enableOK(buttons, BUTTONOPEN, ok);
-      enableOK(buttons, BUTTONRENAME, ok);
+      enableOK(buttons, BUTTONMOUNT, ok);
     }
   }
 

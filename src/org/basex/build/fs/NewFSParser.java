@@ -184,9 +184,7 @@ public final class NewFSParser extends Parser {
   /** Stack for the size attribute ids of content elements. */
   private final int[] contentSizeIdStack = new int[IO.MAXHEIGHT];
   /** Path to root of the backing store. */
-  private final String fsimportpath;
-  /** Path to FUSE mountpoint. */
-  public final String mountpoint;
+  private final String backingpath;
   /** Instantiated parsers. */
   private final Map<String, AbstractParser> parserInstances;
   /** Instantiated fallback parser. */
@@ -224,18 +222,16 @@ public final class NewFSParser extends Parser {
   /**
    * Constructor.
    * @param path of import root (backing store)
-   * @param mp mount point for fuse
    * @param pr database properties
    */
-  public NewFSParser(final String path, final String mp, final Prop pr) {
+  public NewFSParser(final String path, final Prop pr) {
     super(IO.get(path), pr);
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
     prop.set(Prop.DTD, false);
     root = path.equals("/");
 
-    fsimportpath = root ? "" : io.path();
-    mountpoint = mp;
+    backingpath = root ? "" : io.path();
 
     // SPOTLIGHT must not be true if the library is not available
     if(prop.is(Prop.SPOTLIGHT)) {
@@ -265,16 +261,6 @@ public final class NewFSParser extends Parser {
       buffer = null;
     }
     parserInstances = null;
-  }
-
-  /**
-   * Constructor to parse single file nodes.
-   * @param path String to file node to parse
-   * @param pr database properties
-   */
-  public NewFSParser(final String path, final Prop pr) {
-    this(path, "/mnt/deepfs", pr);
-    singlemode = true;
   }
 
   /**
@@ -335,8 +321,7 @@ public final class NewFSParser extends Parser {
   public void parse(final Builder build) throws IOException {
     builder = build;
     builder.encoding(Prop.ENCODING);
-    builder.meta.mount = mountpoint;
-    builder.meta.backing = fsimportpath;
+    builder.meta.backing = backingpath;
     builder.meta.deepfs = true;
     builder.startDoc(token(io.name()));
 
@@ -344,25 +329,24 @@ public final class NewFSParser extends Parser {
       file(new File(io.path()).getCanonicalFile());
     } else {
       atts.reset();
-      final byte[] mnt = prop.is(Prop.FUSE) ? token(mountpoint) : NOTMOUNTED;
-      atts.add(MOUNTPOINT, mnt);
-      atts.add(BACKINGSTORE, token(fsimportpath));
+      atts.add(MOUNTPOINT, NOTMOUNTED);
+      atts.add(BACKINGSTORE, token(backingpath));
       atts.add(SIZE, ZERO);
 
-      // define namespaces
-      builder.startNS(FS, FSURL);
-      if(prop.is(Prop.FSMETA)) {
-        builder.startNS(FSMETAPREF, FSMETAURL);
-        builder.startNS(FSDCPREF, FSDCURL);
-      }
-      if(ADD_ATTS) {
-        builder.startNS(FSXSIPREF, FSXSIURL);
-      }
+      // [BL] currently turned off (update problematic). define namespaces
+//      builder.startNS(FS, FSURL);
+//      if(prop.is(Prop.FSMETA)) {
+//        builder.startNS(FSMETAPREF, FSMETAURL);
+//        builder.startNS(FSDCPREF, FSDCURL);
+//      }
+//      if(ADD_ATTS) {
+//        builder.startNS(FSXSIPREF, FSXSIURL);
+//      }
 
       final int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
-          fsimportpath).getCanonicalFile()}) {
+          backingpath).getCanonicalFile()}) {
 
         if(f.isHidden() && !f.getAbsolutePath().equals("C:\\")) continue;
         sizeStack[0] = 0;
@@ -454,7 +438,7 @@ public final class NewFSParser extends Parser {
     for(final File f : files) {
       if(!valid(f) || f.isHidden()) continue;
 
-      // [AH] changed backing semantics.
+      // [BL] changed backing semantics.
       // final boolean fuse = prop.is(Prop.FUSE);
       if(f.isDirectory()) {
         // // -- 'copy' directory to backing store

@@ -79,9 +79,9 @@ public interface DataText {
   /** DeepFS tag. */
   String S_DEEPFS = "deepfs";
   /** Directory tag. */
-  String S_DIR = "fs:dir";
+  String S_DIR = "dir";
   /** File tag. */
-  String S_FILE = "fs:file";
+  String S_FILE = "file";
   /** Time of last modification. */
   String S_NAME = "name";
   /** Time of last modification. */
@@ -103,20 +103,20 @@ public interface DataText {
   /** DeepFS prefix. */
   String S_FS = "fs";
   /** DeepFS URL string. */
-  String S_FSURL = "http://www.deepfs.org/fs/1.0/";
+  //String S_FSURL = "http://www.deepfs.org/fs/1.0/";
   /** XMLNS prefix. */
   String S_XMLNS = "xmlns";
   /** DeepFS namespace declaration. */
-  String S_DPFSNS = "declare namespace fs = \"" + S_FSURL + "\"; ";
+  //String S_DPFSNS = "declare namespace fs = \"" + S_FSURL + "\"; ";
 
   /** DeepFS prefix. */
   byte[] FS = token(S_FS);
   /** DeepFS url. */
-  byte[] FSURL = token(S_FSURL);
+//  byte[] FSURL = token(S_FSURL);
   /** DeepFS prefix. */
   byte[] FSMETAPREF = token("fsmeta");
   /** DeepFS url. */
-  byte[] FSMETAURL = token("http://www.deepfs.org/fsmeta/1.0/");
+//  byte[] FSMETAURL = token("http://www.deepfs.org/fsmeta/1.0/");
   /** DeepFS prefix. */
   byte[] FSDCPREF = token("dcterms");
   /** DeepFS url. */

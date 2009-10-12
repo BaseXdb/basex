@@ -1,10 +1,10 @@
 package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
-import static org.catacombae.jfuse.types.system.StatConstant.*;
-import static org.deepfs.jfuse.FileTestMacros.*;
-import java.io.File;
+import static org.deepfs.jfuse.JFUSEAdapter.*;
+
 import java.io.IOException;
+
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -18,11 +18,9 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.catacombae.jfuse.types.system.Stat;
-import org.catacombae.jfuse.util.FUSEUtil;
 import org.deepfs.DeepShell;
+import org.deepfs.jfuse.DeepStat;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
@@ -38,7 +36,7 @@ public final class DeepFS implements DataText {
   private Data data;
 
   /** Stat information for root node. */
-  private Stat rootStat;
+  private DeepStat rootStat;
 
   /** Index References. */
   private int fileID;
@@ -72,15 +70,21 @@ public final class DeepFS implements DataText {
   /** Index References. */
   public int contentID;
 
+  /** OS user id.*/
+  private long sUID; 
+  /** OS group id.*/
+  private long sGID; 
+  
   /**
    * Constructor for {@link DeepShell} and java only test cases (no mount).
-   * @param name name of initially empty database.
+   * @param dbname name of (initially empty) database.
+   * @param mountpoint of DeepFS database
    */
-  public DeepFS(final String name) {
+  public DeepFS(final String dbname, final String mountpoint) {
     ctx = new Context();
-    if(!new Open(name).execute(ctx))
-      new CreateDB("<" + string(DEEPFS) + " " + S_XMLNSC + S_FS +
-        "=\"" + S_FSURL + "\"/>", name).execute(ctx);
+    if(!new Open(dbname).execute(ctx))
+      new CreateDB("<" + string(DEEPFS) + " " + "mountpoint=\"" 
+          + mountpoint + "\"/>", dbname).execute(ctx);
     data = ctx.data();
     initNames();
     initRootStat();
@@ -93,31 +97,18 @@ public final class DeepFS implements DataText {
   public DeepFS(final Data d) {
     data = d;
     initNames();
-//    initRootStat();
-
-//    final String mountpoint = d.meta.mount;
-//    final String backingpath = d.meta.backing;
-
-//    if(data.meta.prop.is(Prop.FUSE)) {
-//      final File mp = new File(mountpoint);
-//      final File bp = new File(backingpath);
-//      /* --- prepare, (ie., potentially make) mountpoint & backing store */
-//      // - mountpoint
-//      if(!mp.exists()) {
-//        if(!mp.mkdirs()) {
-//          BaseX.debug(FSText.NOMOUNTPOINT + mp.toString());
-//          return;
-//        }
-//      }
-//      // - backing store
-//      if(!bp.exists()) {
-//        if(!bp.mkdirs()) {
-//          BaseX.debug(FSText.NOBACKINGPATH + bp.toString());
-//          return;
-//        }
-//      }
-//      nativeMount(mountpoint, backingpath);
-//    }
+    initRootStat();
+  }
+  
+  /**
+   * Constructor.
+   * @param c existing context
+   */
+  public DeepFS(final Context c) {
+    ctx = c;
+    data = ctx.data();
+    initNames();
+    initRootStat();
   }
 
   /**
@@ -147,16 +138,16 @@ public final class DeepFS implements DataText {
    * Initialize default file attributes for root ('/') access.
    */
   private void initRootStat() {
-    rootStat = new Stat();
-    rootStat.zero();
-    rootStat.st_atimespec.setToMillis(System.currentTimeMillis());
-    rootStat.st_ctimespec.setToMillis(System.currentTimeMillis());
-    rootStat.st_mtimespec.setToMillis(System.currentTimeMillis());
-    rootStat.st_mode = S_IFDIR.getNativeValue() | 0755;
-    rootStat.st_size = 0;
-    rootStat.st_uid =  FUSEUtil.getProcessUid();
-    rootStat.st_gid =  FUSEUtil.getProcessGid();
-    rootStat.st_nlink =  0;
+    rootStat = new DeepStat();
+    rootStat.statimespec = System.currentTimeMillis();
+    rootStat.stctimespec = System.currentTimeMillis();
+    rootStat.stmtimespec = System.currentTimeMillis();
+    rootStat.stmode = getSIFDIR() | 0755;
+    rootStat.stsize = 0;
+    rootStat.stuid =  sUID;
+    rootStat.stgid =  sGID;
+    rootStat.stnlink =  0;
+    rootStat.stino = 1;
   }
 
   /**
@@ -180,7 +171,7 @@ public final class DeepFS implements DataText {
   private String pn2xp(final String path, final boolean dir) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
-    qb.append(S_DPFSNS);
+    //qb.append(S_DPFSNS);
     qb.append("/" + S_DEEPFS);
     if(path.equals("/")) return qb.toString();
 
@@ -231,7 +222,7 @@ public final class DeepFS implements DataText {
    */
   private int[] path2preChildren(final String path) {
     try {
-      Nodes n = xquery(pn2xp(path, true) + "/child::fs:*");
+      Nodes n = xquery(pn2xp(path, true) + "/child::*");
       return n.nodes;
     } catch(final QueryException ex) {
       ex.printStackTrace();
@@ -279,21 +270,21 @@ public final class DeepFS implements DataText {
     int nodeSize = 10; // 1x elem, 9x attr
     final MemData m = new MemData(nodeSize, data.tags, data.atts, data.ns,
         data.path, data.meta.prop);
-    final int tagID = S_ISREG(mode) ? fileID : dirID;
+    final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
     m.addElem(tagID , 0, 1, nodeSize, nodeSize, false);
     m.addAtt(nameID , 0, token(fname), 1);
     m.addAtt(sizeID , 0, ZERO, 2);
     m.addAtt(modeID , 0, token(mode), 3);
-    m.addAtt(uidID  , 0, token(FUSEUtil.getProcessUid()), 4);
-    m.addAtt(gidID  , 0, token(FUSEUtil.getProcessGid()), 5);
+    m.addAtt(uidID  , 0, token(sUID), 4);
+    m.addAtt(gidID  , 0, token(sGID), 5);
     m.addAtt(atimeID, 0, time, 6);
     m.addAtt(mtimeID, 0, time, 7);
     m.addAtt(ctimeID, 0, time, 8);
     m.addAtt(nlinkID, 0, token("1"), 9);
     return m;
   }
-
+  
   /**
    * Returns mountpoint attribute value.
    * @param pre pre value
@@ -424,17 +415,17 @@ public final class DeepFS implements DataText {
     return insert(ppre, buildFileNode(path, mode));
   }
 
-  /**
-   * Deletes a non-empty directory.
-   * @param dir to be deleted.
-   * @return boolean true for success, false for failure.
-   */
-  private static boolean deleteDir(final File dir) {
-    if(dir.isDirectory()) {
-      for(final File ch : dir.listFiles()) if(!deleteDir(ch)) return false;
-    }
-    return dir.delete();
-  }
+//  /**
+//   * Deletes a non-empty directory.
+//   * @param dir to be deleted.
+//   * @return boolean true for success, false for failure.
+//   */
+//  private static boolean deleteDir(final File dir) {
+//    if(dir.isDirectory()) {
+//      for(final File ch : dir.listFiles()) if(!deleteDir(ch)) return false;
+//    }
+//    return dir.delete();
+//  }
 
   /**
    * Deletes a file node.
@@ -476,7 +467,6 @@ public final class DeepFS implements DataText {
    * @return result of comparison
    */
   public boolean isFile(final int pre) {
-    // [AH] this.fileID may be sufficient?
     return data.kind(pre) == Data.ELEM
         && data.tagID(pre) == data.tags.id(DataText.FILE);
   }
@@ -497,28 +487,18 @@ public final class DeepFS implements DataText {
    * For root access ('/') return default access.
    * Note we store the pre value as inode.
    * @param path to file
-   * @param sbuf buffer to be filled
-   * @return 0 or -1 for success or failure
+   * @return file attributes or null
    */
-  public int stat(final String path, final Stat sbuf) {
+  public DeepStat stat(final String path) {
     final String method = "[stat] ";
-    if(path.equals("/")) {
-      sbuf.st_ino = 1;
-      sbuf.st_atimespec.setToMillis(rootStat.st_atimespec.toMillis());
-      sbuf.st_ctimespec.setToMillis(rootStat.st_ctimespec.toMillis());
-      sbuf.st_mtimespec.setToMillis(rootStat.st_mtimespec.toMillis());
-      sbuf.st_mode = rootStat.st_mode;
-      sbuf.st_size = rootStat.st_size;
-      sbuf.st_uid = rootStat.st_uid;
-      sbuf.st_gid = rootStat.st_gid;
-      sbuf.st_nlink = rootStat.st_gid;
-      Main.debug(method + path + " ino: " + 1);
-      return 0;
-    }
+    DeepStat sbuf = new DeepStat();
+
+    if(path.equals("/")) return rootStat;
+    
     int pre = path2pre(path);
     if(pre == -1) {
       Main.debug(method + path + " (-1)");
-      return -1;
+      return null;
     }
     byte[] mtime = attr(pre, mtimeID);
     byte[] ctime = attr(pre, ctimeID);
@@ -528,29 +508,28 @@ public final class DeepFS implements DataText {
     byte[] uid   = attr(pre, uidID);
     byte[] gid   = attr(pre, gidID);
     byte[] nlink = attr(pre, nlinkID);
-//    BaseX.debug(
-//        "pre/inode: " + pre +
-//        "mtime: " + string(mtime) +
-//        "\nctime: " + string(ctime) +
-//        "\natime: " + string(atime) +
-//        "\nmode: " + string(mode) +
-//        "\nsize: " + string(size) +
-//        "\nuid: " + string(uid) +
-//        "\ngid: " + string(gid) +
-//        "\nnlink: " + string(nlink)
-//        );
-    sbuf.st_ino = pre;
-    sbuf.st_atimespec.setToMillis(Long.parseLong(string(atime)));
-    sbuf.st_ctimespec.setToMillis(Long.parseLong(string(ctime)));
-    sbuf.st_mtimespec.setToMillis(Long.parseLong(string(mtime)));
-    sbuf.st_mode = Long.parseLong(string(mode));
-    sbuf.st_size = Long.parseLong(string(size));
-    sbuf.st_uid =  Long.parseLong(string(uid));
-    sbuf.st_gid =  Long.parseLong(string(gid));
-    sbuf.st_nlink =  Long.parseLong(string(nlink));
-//    if(Prop.debug) sbuf.printFields("-", new PrintStream(System.err));
-    Main.debug(method + path + " ino: " + pre);
-    return 0;
+    Main.debug(
+        "pre/inode: " + pre +
+        "\natime: " + string(atime) +
+        "\nmtime: " + string(mtime) +
+        "\nctime: " + string(ctime) +
+        "\nmode: " + string(mode) +
+        "\nsize: " + string(size) +
+        "\nuid: " + string(uid) +
+        "\ngid: " + string(gid) +
+        "\nnlink: " + string(nlink)
+        );
+    sbuf.stino = pre;
+    sbuf.statimespec = Long.parseLong(string(atime));
+    sbuf.stctimespec = Long.parseLong(string(ctime));
+    sbuf.stmtimespec = Long.parseLong(string(mtime));
+    sbuf.stmode = Long.parseLong(string(mode));
+    sbuf.stsize = Long.parseLong(string(size));
+    sbuf.stuid = Long.parseLong(string(uid));
+    sbuf.stgid = Long.parseLong(string(gid));
+    sbuf.stnlink = Long.parseLong(string(nlink));
+    Main.debug(method + path + " ino: " + sbuf.stino);
+    return sbuf;
   }
 
   /**
@@ -705,13 +684,14 @@ public final class DeepFS implements DataText {
    * @param pre pre value
    */
   public void delete(final int pre) {
-    if(data.meta.prop.is(Prop.FUSE)) {
-      final String bpath = Token.string(path(pre, true));
-      final File f = new File(bpath);
-      if(f.isDirectory()) deleteDir(f);
-      else if(f.isFile()) f.delete();
-      nativeUnlink(Token.string(path(pre, false)));
-    }
+    if (pre == 0) /* avoid checkstyle warnings. */;
+//    if(data.meta.prop.is(Prop.FUSE)) {
+//      final String bpath = Token.string(path(pre, true));
+//      final File f = new File(bpath);
+//      if(f.isDirectory()) deleteDir(f);
+//      else if(f.isFile()) f.delete();
+//      nativeUnlink(Token.string(path(pre, false)));
+//    }
   }
 
   /**
@@ -723,7 +703,7 @@ public final class DeepFS implements DataText {
   public int mkdir(final String path, final int mode) {
     // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR.
     final String method = "[mkdir] ";
-    final int n = createNode(path, S_IFDIR.getNativeValue() | mode);
+    final int n = createNode(path, getSIFDIR() | mode);
     Main.debug(method + "path: " + path + " mode: "
         + Integer.toOctalString(mode) + " id : (" + n + ")");
     refresh();
@@ -738,7 +718,7 @@ public final class DeepFS implements DataText {
    */
   public int create(final String path, final int mode) {
     // if(!isFile(mode)) return -1; // Linux does not submit S_IFREG.
-    final int n = createNode(path, S_IFREG.getNativeValue() | mode);
+    final int n = createNode(path, getSIFREG() | mode);
     refresh();
     return n;
   }
@@ -781,31 +761,31 @@ public final class DeepFS implements DataText {
 //    return 0;
 //  }
 
-  /*
-   * ------------------------------------------------------------------------
-   * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
-   * ------------------------------------------------------------------------
-   */
-
-  /**
-   * Mount database as FUSE.
-   * @param mp path where to mount BaseX.
-   * @param bs path to backing storage root of this instance.
-   * @return 0 on success, errno in case of failure.
-   */
-  public native int nativeMount(final String mp, final String bs);
-
-  /**
-   * Unlink file in backing store.
-   * @param pathname to file to delete
-   * @return 0 on success, errno in case of failure.
-   */
-  public native int nativeUnlink(final String pathname);
-
-  /**
-   * Tell DeepFS that the database will shutdown.
-   */
-  public native void nativeShutDown();
+//  /*
+//   * ------------------------------------------------------------------------
+//   * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
+//   * ------------------------------------------------------------------------
+//   */
+//
+//  /**
+//   * Mount database as FUSE.
+//   * @param mp path where to mount BaseX.
+//   * @param bs path to backing storage root of this instance.
+//   * @return 0 on success, errno in case of failure.
+//   */
+//  public native int nativeMount(final String mp, final String bs);
+//
+//  /**
+//   * Unlink file in backing store.
+//   * @param pathname to file to delete
+//   * @return 0 on success, errno in case of failure.
+//   */
+//  public native int nativeUnlink(final String pathname);
+//
+//  /**
+//   * Tell DeepFS that the database will shutdown.
+//   */
+//  public native void nativeShutDown();
 
   /* ------------------------------------------------------------------------ */
 }

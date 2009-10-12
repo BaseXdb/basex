@@ -25,6 +25,7 @@ b_ok=  OK
 b_opt=Optimize...
 b_rename=Rename...
 b_open= Open 
+b_mount= Mount 
 b_cancel=Cancel
 b_drop=Drop
 b_cmd=Command
@@ -88,6 +89,11 @@ dc_ft=Full-Text
 
 do_title=Open Database
 do_nodbquestion=Do you want to create a new one?
+
+dqe_title=Open DeepFS instance
+
+dmnt_title=Mount DeepFS instance
+dmnt_nomountpath=No valid mount point
 
 dq_open=Open XQuery file
 dq_save=Save XQuery file
@@ -222,6 +228,8 @@ c_createfs=Create DeepFS mapping
 c_createfstt=Creates a DeepFS filesystem representation starting from a given directory. The resulting database may later be used to start BaseX as a Desktop Query Engine or to mount the database as filesystem in userspace.
 c_dqe=Desktop Query Engine
 c_dqett=Open DeepFS database and use it as Desktop Search/Query Engine
+c_mountfs=Mount DB as FUSE
+c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Properties
 c_propstt=Show information on the currently opened database.
 c_insert=New

@@ -163,9 +163,4 @@ public interface FSText {
   /** Email attributes. */
   byte[][] ATTRIBUTETOKENS = { token("CC"), token("User-Agent"),
       token("Organization") };
-
-  /** Error message 'create fs ...' if mountpoint does not exist. */
-  String NOMOUNTPOINT = "Mountpoint does not exist. Please create first.";
-  /** Error message 'create fs ...' if backingpath does not exist. */
-  String NOBACKINGPATH = "Backing store does not exist. Please create first.";
 }

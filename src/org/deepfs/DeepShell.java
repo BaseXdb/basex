@@ -1,7 +1,9 @@
 package org.deepfs;
 
-import static org.catacombae.jfuse.types.system.StatConstant.*;
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+import static org.deepfs.jfuse.JFUSEAdapter.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -11,14 +13,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
+
 import org.basex.core.Main;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
-import org.catacombae.jfuse.types.system.Stat;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.jfuse.DeepStat;
 
 
 /**
@@ -55,7 +58,7 @@ public final class DeepShell {
    * @param fsdbname DeepFS filesystem/database instance
    */
   DeepShell(final String fsdbname) {
-    fs = new DeepFS(fsdbname);
+    fs = new DeepFS(fsdbname, string(NOTMOUNTED));
     loop();
     fs.umount();
   }
@@ -137,7 +140,7 @@ public final class DeepShell {
       help(new String[] { "help", "mkdir"});
       return;
     }
-    final int err = fs.mkdir(args[1], S_IFDIR.getNativeValue() | 0775);
+    final int err = fs.mkdir(args[1], getSIFDIR() | 0775);
     if(err == -1) System.err.printf("mkdir failed. %d\n", err);
   }
 
@@ -182,11 +185,10 @@ public final class DeepShell {
       help(new String[] { "help", "stat"});
       return;
     }
-    final Stat stat = new Stat();
-    int rc = fs.stat(args[1], stat);
-    if(rc == -1) System.err.printf("stat failed.\n");
+    DeepStat dst = fs.stat(args[1]);
+    if(dst == null) System.err.printf("stat failed.\n");
     PrintStream ps = new PrintStream(System.out);
-    stat.printFields("deepshell: ", ps);
+    dst.printFields("deepshell: ", ps);
     ps.flush();
   }
 
