@@ -282,14 +282,15 @@ public class DialogServer extends Dialog {
    */
   @SuppressWarnings("unchecked")
   ArrayList<Object[]> getList() {
-    if(!new File(file).exists()) return null;
-    try {
-      ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-      return (ArrayList<Object[]>) in.readObject();
-    } catch(Exception e) {
-      e.printStackTrace();
+    if(new File(file).exists()) {
+      try {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+        return (ArrayList<Object[]>) in.readObject();
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
     }
-    return null;
+    return new ArrayList<Object[]>();
   }
 
   /**

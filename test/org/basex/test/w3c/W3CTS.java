@@ -126,7 +126,7 @@ public abstract class W3CTS {
   /** Error log. */
   private final StringBuilder logErr2 = new StringBuilder();
   /** File log. */
-  private final StringBuilder logFile = new StringBuilder();
+  private final StringBuilder logReport = new StringBuilder();
 
   /** Error counter. */
   private int err;
@@ -164,8 +164,6 @@ public abstract class W3CTS {
           currTime = true;
         } else if(c == 'p') {
           path = arg.string() + "/";
-        } else if(c == 't') {
-          currTime = true;
         } else if(c == 'v') {
           verbose = true;
         } else {
@@ -282,7 +280,7 @@ public abstract class W3CTS {
       bw = new BufferedWriter(new OutputStreamWriter(
           new FileOutputStream(report + NAME + ".xml"), UTF8));
       write(bw, report + NAME + "Pre.xml");
-      bw.write(logFile.toString());
+      bw.write(logReport.toString());
       write(bw, report + NAME + "Pos.xml");
       bw.close();
     }
@@ -318,13 +316,10 @@ public abstract class W3CTS {
     if(single != null && !outname.startsWith(single)) return true;
 
     if(verbose) Main.outln("- " + outname);
-    if(reporting) {
-      logFile.append("    <test-case name=\"");
-      logFile.append(outname);
-      logFile.append("\" result='");
-    }
-    if(outname.equals("id-insert-expr-079")) return true;
-    
+
+    boolean inspect = false;
+    boolean correct = true;
+
     final Nodes nodes = states(root);
     for(int n = 0; n < nodes.size(); n++) {
       final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
@@ -429,8 +424,8 @@ public abstract class W3CTS {
       log.append(norm(in));
       log.append(NL);
       final String logStr = log.toString();
-      final boolean print = currTime || !logStr.contains("current-") &&
-          !logStr.contains("implicit-timezone");
+      // skip queries with variable results
+      final boolean print = currTime || !logStr.contains("current-");
 
       boolean correctError = false;
       if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
@@ -453,10 +448,8 @@ public abstract class W3CTS {
           logOK.append(NL);
           addLog(pth, outname + ".log", error);
         }
-        if(reporting) logFile.append("pass");
         ok++;
       } else if(error == null) {
-        boolean inspect = false;
         int s = -1;
         final int rs = result.size();
         while(++s < rs) {
@@ -485,9 +478,9 @@ public abstract class W3CTS {
               }
               pre += rdata.size(pre, k);
             }
-            final boolean test = FNSeq.deep(iter, si);
+            final boolean eq = FNSeq.deep(iter, si);
             rdata.close();
-            if(test) break;
+            if(eq) break;
           }
         }
         if((rs > 0 || expError.length() != 0) && s == rs && !inspect) {
@@ -503,7 +496,7 @@ public abstract class W3CTS {
             logErr.append(NL);
             addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
           }
-          if(reporting) logFile.append("fail");
+          correct = false;
           err++;
         } else {
           if(print) {
@@ -513,10 +506,6 @@ public abstract class W3CTS {
             logOK.append(NL);
             logOK.append(NL);
             addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
-          }
-          if(reporting) {
-            logFile.append("pass");
-            if(inspect) logFile.append("' todo='inspect");
           }
           ok++;
         }
@@ -533,7 +522,6 @@ public abstract class W3CTS {
             logOK2.append(NL);
             addLog(pth, outname + ".log", error);
           }
-          if(reporting) logFile.append("pass");
           ok2++;
         } else {
           if(print) {
@@ -547,7 +535,7 @@ public abstract class W3CTS {
             logErr2.append(NL);
             addLog(pth, outname + ".log", error);
           }
-          if(reporting) logFile.append("fail");
+          correct = false;
           err2++;
         }
       }
@@ -556,8 +544,13 @@ public abstract class W3CTS {
     }
 
     if(reporting) {
-      logFile.append("'/>");
-      logFile.append(NL);
+      logReport.append("    <test-case name=\"");
+      logReport.append(outname);
+      logReport.append("\" result='");
+      logReport.append(correct ? "pass" : "fail");
+      if(inspect) logReport.append("' todo='inspect");
+      logReport.append("'/>");
+      logReport.append(NL);
     }
     return single == null || !outname.equals(single);
   }

@@ -39,6 +39,10 @@ public final class Mount extends Process {
 
     final DeepFS fs = new DeepFS(context);
 
+    /* [AH] request Prop.JFUSE, ...
+     * Class<?> cls = Class.forName("org.deepfs.DeepFS");
+     * cls.getMethod("mount", ...).invoke(null, ...);
+     */
     if(JFUSEAdapter.loadJFUSELibrary()) {
       new Thread() {
         @Override

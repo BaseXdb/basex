@@ -69,7 +69,7 @@ public final class Prop extends AProp {
   public static final Object[] SKIP = { "SKIP", true };
 
   /** Debug mode. */
-  public static final Object[] DEBUG = { "DEBUG", true };
+  public static final Object[] DEBUG = { "DEBUG", false };
   /** Web server mode. */
   public static final Object[] WEB = { "WEB", false };
 
@@ -226,5 +226,21 @@ public final class Prop extends AProp {
     Prop.langkeys = is(Prop.LANGKEYS);
     Prop.debug = is(Prop.DEBUG);
     Prop.web = is(Prop.WEB);
+
+    /* [AH] JFUSE property could be set here
+    Prop.... =
+    try {
+      Class<?> cls = Class.forName("org.deepfs.jfuse.JFUSEAdapter");
+      cls.getMethod("loadJFUSELibrary").invoke(null);
+      //JFUSEAdapter.loadJFUSELibrary()
+      enabled = true;
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
+    
+    // Alternative:
+    Class<?> cls = Class.forName("org.deepfs.DeepFS");
+    cls.getMethod("load").invoke(null);
+     */
   }
 }

@@ -288,6 +288,13 @@ public final class FSParser extends Parser {
     // [AH] combine that with create() in DeepFS class.
     atts.add(CTIME, ZERO);
     atts.add(ATIME, ZERO);
+    /* [AH] First alternative:
+     * if(jfuse != null) {
+     *   jfuse.getSIFDIR() / jfuse....invoke(...)
+     * }
+    /* [AH] Second alternative: FSParser could be overwritten and
+     * extended by JFUSE specific methods.
+     */
     if (d)
       atts.add(MODE, token(getSIFDIR() | 0755));
     else

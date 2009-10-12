@@ -38,6 +38,10 @@ public final class LockingTest {
   private static final String QUERYN = "for $c in doc('factbook')" +
   		"//country for $n in doc('factbook')//city where $c/@id =" +
   				" $n/@country and $n/name = 'Tirane' return $n/population/text()";
+  /** Test query 3.
+  private static final String QUERY3 = "for $c in doc('factbook')//node()" +
+      "where contains($c/text(), 'a') return $c";
+  */
   /** Socket reference. */
   static Session session1;
   /** Socket reference. */

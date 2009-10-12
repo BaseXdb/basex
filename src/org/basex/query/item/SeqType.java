@@ -91,9 +91,13 @@ public final class SeqType {
       if(type == Type.EMP || occ % 2 != 0) return Seq.EMPTY;
       Err.cast(type, item);
     }
+    if(type == Type.EMP) Err.cast(type, item);
 
     boolean ins = it.type.instance(type);
-    if(type == Type.EMP || !it.u() && !ins) Err.cast(type, it);
+    if(!it.u() && !ins &&
+      // implicit type promotions
+      (it.type != Type.DEC || type != Type.FLT && type != Type.DBL) &&
+      (it.type != Type.URI || type != Type.STR)) Err.cast(type, it);
 
     it = check(ins ? it : type.e(it, ctx));
     Item n = iter.next();
