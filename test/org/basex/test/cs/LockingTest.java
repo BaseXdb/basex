@@ -3,6 +3,7 @@ package org.basex.test.cs;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
+import org.basex.core.Main;
 import org.basex.core.Session;
 import org.basex.core.Process;
 import org.basex.core.Commands.CmdUpdate;
@@ -70,16 +71,16 @@ public final class LockingTest {
     process(new DropDB("factbook"), session1);
     // concurrent create test
     conCreate();
-    System.out.println(server.context.pool.info());
+    Main.outln(server.context.pool.info());
     if(server.context.size("factbook") == 2) {
-      System.out.println("--> Test 1 successful, Test 2 started...");
+      Main.outln("--> Test 1 successful, Test 2 started...");
     } else {
       err("test failed conCreate");
     }
 
     // read read test
     runTest(true, true);
-    System.out.println("--> Test 2 successful, Test 3 started...");
+    Main.outln("--> Test 2 successful, Test 3 started...");
     done = false;
     
     // write write test
@@ -88,24 +89,24 @@ public final class LockingTest {
     if(!checkRes(session1).equals("0")) {
       err("test failed write write");
     } else {
-      System.out.println("--> Test 3 successful, Test 4 started...");
+      Main.outln("--> Test 3 successful, Test 4 started...");
     }
     done = false;
     
     // write read test
     runTest(false, true);
-    System.out.println("--> Test 4 successful, Test 5 started...");
+    Main.outln("--> Test 4 successful, Test 5 started...");
     done = false;
     
     // read write test
     runTest(true, false);
-    System.out.println("--> Test 5 successful, last check...");
+    Main.outln("--> Test 5 successful, last check...");
     
     process(new XQuery("count(//aa)"), session1);
     if(!checkRes(session1).equals("0")) {
       err("test failed write read / read write");
     } else {
-      System.out.println("--> All Locking Tests done...," +
+      Main.outln("--> All Locking Tests done...," +
         " efficiency test started...");
     }
     for(int i = 0; i < tests; i++) {
@@ -197,7 +198,7 @@ public final class LockingTest {
         Performance.sleep(300);
         final String result = process(new CreateDB(FILE), session2);
         if(result == null) err("test failed conCreate");
-        else System.out.println("Message: " + result);
+        else Main.outln("Message: " + result);
       }
     }.start();
     // first (main) thread

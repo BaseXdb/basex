@@ -1,6 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
@@ -59,16 +60,16 @@ public final class SAXExample extends DefaultHandler {
   @Override
   public void startElement(final String uri, final String ln, final String qn,
       final Attributes at) {
-    System.out.print("Start Element: " + qn);
+    Main.outln("Start Element: " + qn);
   }
 
   @Override
   public void endElement(final String uri, final String ln, final String qn) {
-    System.out.print("End Element: " + qn);
+    Main.outln("End Element: " + qn);
   }
 
   @Override
   public void characters(final char[] ch, final int s, final int l) {
-    System.out.print("Characters: " + new String(ch, s, l));
+    Main.outln("Characters: " + new String(ch, s, l));
   }
 }

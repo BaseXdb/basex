@@ -51,19 +51,40 @@ public final class ClientSession implements Session {
    * @throws IOException I/O exception
    */
   public ClientSession(final Context context) throws IOException {
-    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT));
+    this(context, null, null);
   }
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
-   * @param name server name
-   * @param port server port
+   * @param context database context
+   * @param user user name
+   * @param pw password
    * @throws IOException I/O exception
    */
-  public ClientSession(final String name, final int port) throws IOException {
-    final Socket socket = new Socket(name, port);
+  public ClientSession(final Context context, final String user,
+      final String pw) throws IOException {
+    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT), user, pw);
+  }
+
+  /**
+   * Constructor, specifying the server host:port and the command to be sent.
+   * @param host server name
+   * @param port server port
+   * @param user user name
+   * @param pw password
+   * @throws IOException I/O exception
+   */
+  public ClientSession(final String host, final int port,
+      final String user, final String pw) throws IOException {
+    final Socket socket = new Socket(host, port);
     in = socket.getInputStream();
     out = new DataOutputStream(socket.getOutputStream());
+
+    // [CG] handle server login feedback
+    out.writeUTF(user != null ? user : "");
+    out.writeUTF(pw != null ? pw : "");
+    final String fb = new DataInputStream(in).readUTF();
+    if(fb.length() != 0) throw new RuntimeException(fb);
   }
 
   public boolean execute(final String cmd) throws IOException {

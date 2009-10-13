@@ -3,6 +3,7 @@ package org.basex.test.storage;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
@@ -105,7 +106,7 @@ public abstract class UpdateTest {
    */
   private void exec(final Process proc) {
     if(!proc.execute(CONTEXT)) {
-      System.out.println(proc.info());
+      Main.outln(proc.info());
       System.exit(1);
     }
   }

@@ -641,7 +641,6 @@ public final class TreeView extends View {
       // // final int mPreLength = cRect.multiPres.length - 1;
       // // int cx = (int) (cRect.w * drawFrom / (double) mPreLength);
       // // int cw = (int) (cRect.w * drawTo / (double) mPreLength);
-      // // System.out.println(drawFrom+ " " +cx);
       // // g.setColor(Color.GREEN);
       // // g.fillRect(cx, getYperLevel(l), Math.max(cw - cx, 1), nodeHeight);
       // // highlightNode(g, Color.GREEN, cRect, l, false, false);
@@ -829,7 +828,6 @@ public final class TreeView extends View {
         s = Token.string(data.text(pre));
         g.setColor(textColor);
     }
-    // System.out.println(data.);
     Token.string(data.text(pre));
     int textWidth = 0;
 

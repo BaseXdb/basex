@@ -49,7 +49,9 @@ public final class Users {
    */
   public boolean create(final String usern, final String pass) {
     // check if user exists already
-    if(users.contains(usern)) return false;
+    for(final User user : users) {
+      if(user.name.equals(usern)) return false;
+    }
 
     final User user = new User();
     user.name = usern;
@@ -69,14 +71,30 @@ public final class Users {
    * @return success of operation
    */
   public boolean drop(final String usern) {
-    int i = -1;
-    for(int j = 0; j < users.size(); j++) {
-      if((users.get(j).name).equals(usern)) i = j;
+    for(int i = 0; i < users.size(); i++) {
+      if((users.get(i).name).equals(usern)) {
+        users.remove(i);
+        write();
+        return true;
+      }
     }
-    if(i == -1) return false;
-    users.remove(i);
-    write();
-    return true;
+    return false;
+  }
+
+  /**
+   * Verifies the specified user/password combination.
+   * @param usern String
+   * @param pw password
+   * @return success of operation
+   */
+  public boolean check(final String usern, final String pw) {
+    for(final User user : users) {
+      if(user.name.equals(usern)) {
+        byte[] pass = crypt.encrypt(Token.token(pw));
+        return Token.eq(pass, user.pw);
+      }
+    }
+    return false;
   }
 
   /**
@@ -185,15 +203,5 @@ public final class Users {
     boolean create;
     /** Admin rights. */
     boolean admin;
-    
-    @Override
-    public boolean equals(final Object u) {
-      return u instanceof User && ((User) u).name.equals(name);
-    }
-
-    @Override
-    public int hashCode() {
-      return name.hashCode();
-    }
   }
 }

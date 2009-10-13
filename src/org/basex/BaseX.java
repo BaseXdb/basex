@@ -27,6 +27,8 @@ public class BaseX extends Main {
   private String commands;
   /** XQuery file. */
   private String file;
+  /** User name. */
+  private String user;
 
   /**
    * Main method, launching the standalone console mode.
@@ -50,7 +52,7 @@ public class BaseX extends Main {
    * Constructor.
    */
   protected final void run() {
-    boolean user = false;
+    boolean u = false;
     if(file != null) {
       // query file contents
       Prop.xquery = IO.get(file);
@@ -64,10 +66,10 @@ public class BaseX extends Main {
       outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
       if(console) {
         if(!set(Prop.INFO, ON)) return;
-        user = console();
+        u = console();
       }
     }
-    quit(user);
+    quit(u);
   }
 
   /**
@@ -102,8 +104,23 @@ public class BaseX extends Main {
       if(sa()) {
         session = new LocalSession(context);
       } else {
+        String pw = null;
+        // [CG] experimental user/password input
+        if(this instanceof BaseXClient) {
+          while(user == null || user.length() == 0) {
+            Main.out("Username: ");
+            user = input();
+            //user = System.console().readLine();
+          }
+          while(pw == null || pw.length() == 0) {
+            Main.out("Password: ");
+            pw = input();
+            // Java 1.6 needed to hide password
+            //pw = new String(System.console().readPassword());
+          }
+        }
         try {
-          session = new ClientSession(context);
+          session = new ClientSession(context, user, pw);
         } catch(final Exception ex) {
           // no server available; switches to standalone mode
           Main.error(ex, true);
@@ -148,6 +165,9 @@ public class BaseX extends Main {
         } else if(c == 'r') {
           // hidden option: parse number of runs
           ok = set(Prop.RUNS, arg.string());
+        } else if(c == 'u' && !sa()) {
+          // specify user name
+          user = arg.string();
         } else if(c == 'v') {
           // show process info
           ok = set(Prop.INFO, true);

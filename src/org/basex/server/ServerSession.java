@@ -65,7 +65,15 @@ public final class ServerSession extends Thread {
       final PrintOutput out = new PrintOutput(
           new BufferedOutput(socket.getOutputStream()));
 
-      if(info) Main.outln(this + " Login.");
+      // [CG] handle unknown users and wrong passwords
+      final String user = dis.readUTF();
+      final String pw = dis.readUTF();
+      final boolean ok = context.users.check(user, pw);
+      new DataOutputStream(out).writeUTF(ok ? "" : "Login failed.");
+      out.flush();
+
+      if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + user);
+      if(!ok) return;
 
       while(true) {
         String in = null;
@@ -116,7 +124,7 @@ public final class ServerSession extends Thread {
         if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
       }
 
-      if(info) Main.outln(this + " Logout.");
+      if(info) Main.outln(this + " Logout: " + user);
     } catch(final IOException ex) {
       Main.error(ex, false);
     }

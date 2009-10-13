@@ -16,6 +16,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.basex.BaseXServer;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
@@ -200,7 +201,7 @@ public final class DialogServer extends Dialog {
           String line = "";
           try {
             while((line = in.readLine()) != null) {
-              System.out.println(line);
+              Main.outln(line);
             }
           } catch(final IOException ex) {
             ex.printStackTrace();

@@ -74,8 +74,8 @@ public final class QueryTest {
       ok &= test(prop);
     }
 
-    System.out.println(ok ? "All tests correct." : wrong + " Wrong results...");
-    System.out.println(counter + " queries, " + p);
+    Main.outln(ok ? "All tests correct." : wrong + " Wrong results...");
+    Main.outln(counter + " queries, " + p);
   }
 
   /**
@@ -155,7 +155,7 @@ public final class QueryTest {
    * @param detail detailed info
    */
   private void err(final String info, final String detail) {
-    System.out.println("- " + info);
-    if(detail != null) System.out.println(detail);
+    Main.outln("- " + info);
+    if(detail != null) Main.outln(detail);
   };
 }

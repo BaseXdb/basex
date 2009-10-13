@@ -1,11 +1,10 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.BindException;
 import java.util.Random;
+import java.util.Scanner;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
@@ -60,16 +59,25 @@ public abstract class Main {
 
     while(console) {
       if(!process(new IntPrompt(), true)) break;
-      try {
-        final InputStreamReader isr = new InputStreamReader(System.in);
-        final String in = new BufferedReader(isr).readLine().trim();
-        if(!process(in)) return true;
-      } catch(final Exception ex) {
-        // also catches forced interruptions such as ctrl+c
-        break;
-      }
+      final String in = input();
+      if(in == null) break;
+      if(!process(in)) return true;
     }
     return false;
+  }
+
+  /**
+   * Returns user input.
+   * @return user input
+   */
+  protected final String input() {
+    //return System.console().readLine();
+    try {
+      return new Scanner(System.in).nextLine();
+    } catch(final Exception ex) {
+      // catches forced interruptions such as ctrl+c
+      return null;
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ import org.basex.util.Args;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class BaseXServer extends Main {
+public final class BaseXServer extends Main implements Runnable {
   /** Server socket. */
   ServerSocket server;
   /** Flag for server activity. */
@@ -50,29 +50,30 @@ public final class BaseXServer extends Main {
 
     try {
       server = new ServerSocket(context.prop.num(Prop.PORT));
-
-      new Thread() {
-        @Override
-        public void run() {
-          while(running) {
-            try {
-              final Socket s = server.accept();
-              context.add(new ServerSession(s, BaseXServer.this, info));
-            } catch(final IOException ex) {
-              // socket was closed..
-              break;
-            }
-          }
-        }
-      }.start();
+      new Thread(this).start();
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
     } catch(final Exception ex) {
-      error(ex, false);
+      error(ex, true);
     }
   }
 
+  /**
+   * Server thread.
+   */
+  public void run() {
+    while(running) {
+      try {
+        final Socket s = server.accept();
+        context.add(new ServerSession(s, this, info));
+      } catch(final IOException ex) {
+        // socket was closed..
+        break;
+      }
+    }
+  }
+  
   @Override
   public synchronized void quit(final boolean user) {
     if(!running) return;

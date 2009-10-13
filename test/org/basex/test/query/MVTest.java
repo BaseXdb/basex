@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Open;
@@ -45,7 +46,7 @@ public final class MVTest {
     //final File file = new File("etc/xml/mv.txt");
     final File file = new File("mv.txt");
     if(!file.exists()) {
-      System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
+      Main.outln("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
     context.prop.set(Prop.INFO, true);
@@ -103,8 +104,8 @@ public final class MVTest {
           Integer.toString(SUB), query.toString());
 
       if(!proc.execute(context)) {
-        System.out.println("- " + proc.info());
-        System.out.println("Query: " + query);
+        Main.outln("- " + proc.info());
+        Main.outln("Query: " + query);
       } else {
         // run serialization
         proc.output(new NullOutput());
@@ -120,7 +121,7 @@ public final class MVTest {
         j = info.indexOf(" Item", i);
         final String nodes = info.substring(i + "Results   : ".length(), j);
 
-        System.out.println(time + "\t" + nodes + "\t" + query);
+        Main.outln(time + "\t" + nodes + "\t" + query);
         out.write(nodes + "\t" + query);
         out.newLine();
       }

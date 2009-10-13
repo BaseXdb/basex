@@ -3,17 +3,14 @@ package org.deepfs;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.Scanner;
 import java.util.StringTokenizer;
-
 import org.basex.core.Main;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
@@ -22,7 +19,6 @@ import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.jfuse.DeepStat;
-
 
 /**
  * Rudimentary shell to interact with a file hierarchy stored in XML.
@@ -102,13 +98,12 @@ public final class DeepShell {
    * @return user input
    */
   private String input(final String prompt) {
-    System.out.print(prompt);
+    Main.out(prompt);
     // get user input
     try {
-      final InputStreamReader isr = new InputStreamReader(System.in);
-      return new BufferedReader(isr).readLine().trim();
+      return new Scanner(System.in).nextLine();
     } catch(final Exception ex) {
-      // also catches interruptions such as ctrl+c, etc.
+      // catches forced interruptions such as ctrl+c
       Main.outln();
       return null;
     }

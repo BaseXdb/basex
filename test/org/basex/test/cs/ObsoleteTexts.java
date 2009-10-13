@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.basex.core.Main;
+
 /**
  * Checks all project interfaces for potentially obsolete texts.
  *
@@ -41,12 +43,10 @@ public final class ObsoleteTexts {
     read(new File("src"), set);
     
     for(final Class<?> c : CLASSES) {
-      System.out.println(c.getSimpleName() + ".java");
+      Main.outln(c.getSimpleName() + ".java");
       for(final Field f : c.getDeclaredFields()) {
         final String name = f.getName();
-        if(!set.contains(name)) {
-          System.out.println("- " + name);
-        }
+        if(!set.contains(name)) Main.outln("- " + name);
       }
     }
   }
