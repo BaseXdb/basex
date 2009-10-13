@@ -35,7 +35,8 @@ public final class CreateDB extends ACreate {
    * (special characters are stripped before the name is applied)
    */
   public CreateDB(final String input, final String name) {
-    super(STANDARD, input, IO.get(name == null ? input : name).dbname());
+    super(STANDARD | CREATE, input,
+        IO.get(name == null ? input : name).dbname());
   }
 
   /**

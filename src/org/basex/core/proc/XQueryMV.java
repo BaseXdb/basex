@@ -42,7 +42,7 @@ public final class XQueryMV extends AQuery {
    * @param query query to process
    */
   public XQueryMV(final String hits, final String subhits, final String query) {
-    super(DATAREF | PRINTING, hits, subhits, query);
+    super(PRINTING, hits, subhits, query);
   }
 
   @Override

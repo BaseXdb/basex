@@ -53,13 +53,8 @@ public final class Users {
       if(user.name.equals(usern)) return false;
     }
 
-    final User user = new User();
-    user.name = usern;
-    user.pw = crypt.encrypt(Token.token(pass));
-    user.read = READ;
-    user.write = WRITE;
-    user.create = CREATE;
-    user.admin = ADMIN;
+    final User user = new User(usern, crypt.encrypt(Token.token(pass)),
+        READ, WRITE, CREATE, ADMIN);
     users.add(user);
     write();
     return true;
@@ -82,19 +77,19 @@ public final class Users {
   }
 
   /**
-   * Verifies the specified user/password combination.
+   * Returns a user if the name/password combination is correct.
    * @param usern String
    * @param pw password
    * @return success of operation
    */
-  public boolean check(final String usern, final String pw) {
+  public User get(final String usern, final String pw) {
     for(final User user : users) {
       if(user.name.equals(usern)) {
         byte[] pass = crypt.encrypt(Token.token(pw));
-        return Token.eq(pass, user.pw);
+        return Token.eq(pass, user.pw) ? user : null;
       }
     }
-    return false;
+    return null;
   }
 
   /**
@@ -106,13 +101,8 @@ public final class Users {
         final DataInput in = new DataInput(file);
         final int s = in.readNum();
         for(int u = 0; u < s; u++) {
-          final User user = new User();
-          user.name = in.readString();
-          user.pw = in.readBytes();
-          user.read = in.readBool();
-          user.write = in.readBool();
-          user.create = in.readBool();
-          user.admin = in.readBool();
+          final User user = new User(in.readString(), in.readBytes(),
+              in.readBool(), in.readBool(), in.readBool(), in.readBool());
           users.add(user);
         }
       } catch(final Exception ex) {
@@ -185,23 +175,5 @@ public final class Users {
    */
   public ArrayList<Object[]> getUsers() {
     return new ArrayList<Object[]>();
-  }
-
-  /**
-   * Contains a single user.
-   */
-  static class User {
-    /** User name. */
-    String name;
-    /** Password. */
-    byte[] pw;
-    /** Read permission. */
-    boolean read;
-    /** Write permission. */
-    boolean write;
-    /** Create permission. */
-    boolean create;
-    /** Admin rights. */
-    boolean admin;
   }
 }

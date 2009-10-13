@@ -17,7 +17,7 @@ public final class Show extends Process {
    * @param cmd show command
    */
   public Show(final Object cmd) {
-    super(PRINTING, cmd.toString());
+    super(PRINTING | ADMIN, cmd.toString());
   }
 
   @Override

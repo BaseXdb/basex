@@ -66,13 +66,14 @@ public final class ServerSession extends Thread {
           new BufferedOutput(socket.getOutputStream()));
 
       // [CG] handle unknown users and wrong passwords
-      final String user = dis.readUTF();
+      final String us = dis.readUTF();
       final String pw = dis.readUTF();
-      final boolean ok = context.users.check(user, pw);
+      context.user = context.users.get(us, pw);
+      final boolean ok = context.user != null;
       new DataOutputStream(out).writeUTF(ok ? "" : "Login failed.");
       out.flush();
 
-      if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + user);
+      if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + us);
       if(!ok) return;
 
       while(true) {
@@ -124,7 +125,7 @@ public final class ServerSession extends Thread {
         if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
       }
 
-      if(info) Main.outln(this + " Logout: " + user);
+      if(info) Main.outln(this + " Logout: " + context.user);
     } catch(final IOException ex) {
       Main.error(ex, false);
     }

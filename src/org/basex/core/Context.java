@@ -19,9 +19,12 @@ public final class Context {
   /** Users. */
   public final Users users;
   /** Database properties. */
-  public Prop prop;
+  public final Prop prop;
   /** Database pool. */
   public final DataPool pool;
+  /** Current user. */
+  public User user;
+
   /** Central data reference. */
   private Data data;
   /** Current context. */

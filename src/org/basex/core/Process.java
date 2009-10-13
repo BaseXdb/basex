@@ -29,6 +29,15 @@ public abstract class Process extends Progress {
   protected static final int UPDATING = 2;
   /** Commands flag: data reference needed. */
   protected static final int DATAREF = 4;
+  /** Commands flag: admin rights needed. */
+  protected static final int READ = 8;
+  /** Commands flag: admin rights needed. */
+  protected static final int WRITE = 16;
+  /** Commands flag: admin rights needed. */
+  protected static final int CREATE = 32;
+  /** Commands flag: admin rights needed. */
+  protected static final int ADMIN = 64;
+
   /** Flags for controlling process evaluation. */
   private final int flags;
 
@@ -80,6 +89,16 @@ public abstract class Process extends Progress {
     perf = new Performance();
     context = ctx;
     prop = ctx.prop;
+
+    // check user rights (experimental)
+    if(context.user != null) {
+      String perm = null;
+      if(admin() && !context.user.admin) perm = "admin";
+      else if(create() && !context.user.create) perm = "create";
+      else if(write() && !context.user.write) perm = "write";
+      else if(read() && !context.user.read) perm = "read";
+      if(perm != null) return error("User has no '" + perm + "' rights.");
+    }
 
     final Data data = context.data();
     // data reference needed?
@@ -246,6 +265,38 @@ public abstract class Process extends Progress {
    */
   public boolean updating() {
     return (flags & UPDATING) != 0;
+  }
+
+  /**
+   * Returns if the current command is an read command.
+   * @return result of check
+   */
+  public boolean read() {
+    return (flags & ADMIN) != 0;
+  }
+
+  /**
+   * Returns if the current command is a write command.
+   * @return result of check
+   */
+  public boolean write() {
+    return (flags & WRITE) != 0;
+  }
+
+  /**
+   * Returns if the current command is a create command.
+   * @return result of check
+   */
+  public boolean create() {
+    return (flags & CREATE) != 0;
+  }
+
+  /**
+   * Returns if the current command is an admin command.
+   * @return result of check
+   */
+  public boolean admin() {
+    return (flags & ADMIN) != 0;
   }
 
   /**
