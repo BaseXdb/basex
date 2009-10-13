@@ -69,7 +69,10 @@ public final class Users {
    * @return success of operation
    */
   public boolean drop(final String usern) {
-    final int i = users.indexOf(usern);
+    int i = -1;
+    for(int j = 0; j < users.size(); j++) {
+      if((users.get(j).name).equals(usern)) i = j;
+    }
     if(i == -1) return false;
     users.remove(i);
     write();
