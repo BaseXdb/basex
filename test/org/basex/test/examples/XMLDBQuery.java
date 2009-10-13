@@ -19,6 +19,9 @@ public final class XMLDBQuery {
   /** Sample query. */
   private static final String QUERY = "//li";
 
+  /** Private constructor. */
+  private XMLDBQuery() { }  
+
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

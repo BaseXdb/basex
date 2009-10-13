@@ -110,15 +110,15 @@ public class XMLResourceTest extends TestCase {
   public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
       int count = 0;
-      public void startElement(final String u, final String ln, final String qn, final Attributes a) {
+      public void startElement(final String u, final String ln, final String qn,
+          final Attributes a) {
         count++;
       }
       public void endDocument() {
         assertEquals("Wrong number of elements.", 2, count);
       }
     };
-    final XMLResource res = (XMLResource) coll.getResource(AllTests.DOC2);
-    res.getContentAsSAX(ch);
+    ((XMLResource) coll.getResource(AllTests.DOC2)).getContentAsSAX(ch);
   }
 
   @Test
@@ -147,16 +147,17 @@ public class XMLResourceTest extends TestCase {
   /**
    * Compares an XML resource with a file on disk.
    * @param file file name
-   * @param res resource
+   * @param r resource
    * @throws XMLDBException exception
    * @throws IOException I/O exception
    */
-  private void compare(final String file, final Resource res)
+  private void compare(final String file, final Resource r)
       throws XMLDBException, IOException {
 
     // compare serialized node with input file
-    final String cont = res.getContent().toString();
+    final String cont = r.getContent().toString();
     final byte[] buffer = AllTests.read(file);
-    assertEquals("File content differs.", new String(buffer).trim(), cont.trim());
+    assertEquals("File content differs.", new String(buffer).trim(),
+        cont.trim());
   }
 }

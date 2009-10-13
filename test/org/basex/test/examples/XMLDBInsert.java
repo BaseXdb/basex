@@ -17,6 +17,9 @@ public final class XMLDBInsert {
   /** Name of the referenced database. */
   private static final String DBNAME = "xmldb:basex://localhost:1984/input";
 
+  /** Private constructor. */
+  private XMLDBInsert() { }
+  
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

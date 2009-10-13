@@ -21,8 +21,11 @@ import org.basex.test.xqj.AllTests;
  * @author Christian Gruen
  */
 public final class RunTests {
+  /** Private constructor. */
+  private RunTests() { }
+
   /**
-   * Main method
+   * Main method.
    * @param args (ignored) command-line arguments
    * @throws Exception exceptions
    */

@@ -229,7 +229,7 @@ public class CollectionTest extends TestCase {
     reader.parse(new InputSource(AllTests.DOC3));
     coll.storeResource(xml2);
     // check number of documents
-    assertEquals("Wrong number of documents.", 4,coll.getResourceCount());
+    assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
 
     // update document with known id
     res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
@@ -358,15 +358,31 @@ public class CollectionTest extends TestCase {
     }
   }
 
-  /** Abstract class for defining arbitrary methods. */
-  static abstract class Code {
-    /** Method to be executed. */
+  /**
+   * Abstract class for defining arbitrary methods.
+   */
+  abstract static class Code {
+    /** 
+     * Method to be executed.
+     * @return result
+     * @throws XMLDBException exception
+     */
     abstract Object run() throws XMLDBException;
-    /** Returns the result of the method as integer. */
+
+    /**
+     * Returns the result of the method as integer.
+     * @return integer result
+     * @throws XMLDBException exception
+     */
     int num() throws XMLDBException {
       return ((Integer) run()).intValue();
     }
-    /** Returns the result of the method as string array. */
+
+    /**
+     * Returns the result of the method as string array.
+     * @return string array
+     * @throws XMLDBException exception
+     */
     String[] strings() throws XMLDBException {
       return (String[]) run();
     }

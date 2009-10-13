@@ -18,6 +18,9 @@ public final class XQJQuery {
   /** Sample query. */
   private static final String QUERY = "doc('input.xml')//li";
 
+  /** Private constructor. */
+  private XQJQuery() { }
+  
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -25,8 +28,8 @@ public final class XQJQuery {
    */
   public static void main(final String[] args) throws Exception {
     // Build a connection to the specified driver.
-    final XQConnection conn = ((XQDataSource) Class.forName(DRIVER)
-        .newInstance()).getConnection();
+    final XQConnection conn = ((XQDataSource) Class.forName(DRIVER).
+        newInstance()).getConnection();
 
     // Prepare the expression with the document and the query.
     final XQPreparedExpression expr = conn.prepareExpression(QUERY);

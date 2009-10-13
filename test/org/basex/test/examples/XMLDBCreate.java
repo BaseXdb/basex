@@ -16,6 +16,9 @@ public final class XMLDBCreate {
   /** Name of the collection. */
   public static final String COLL = "XMLDBCollection";
 
+  /** Private constructor. */
+  private XMLDBCreate() { }
+  
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

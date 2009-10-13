@@ -19,7 +19,7 @@ import junit.textui.TestRunner;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class AllTests {
+public final class AllTests {
   /** XMLDB driver. */
   static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Database/document path. */
@@ -43,8 +43,11 @@ public class AllTests {
   /** Collection. */
   static Collection coll;
 
+  /** Private constructor. */
+  private AllTests() { }
+
   /**
-   * Main method
+   * Main method.
    * @param args (ignored) command-line arguments
    * @throws Exception exceptions
    */

@@ -2,7 +2,6 @@ package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
@@ -27,7 +26,9 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
 
 /**
  * Java XQuery API - Data Factory.
@@ -200,9 +201,15 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
 
     final ByteArrayOutputStream ba = new ByteArrayOutputStream();
     try {
-      new XMLSerializer(ba, null).serialize(v);
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
+      final DOMImplementationRegistry registry =
+        DOMImplementationRegistry.newInstance();
+      final DOMImplementationLS impl =
+          (DOMImplementationLS) registry.getDOMImplementation("LS");
+      final LSOutput output = impl.createLSOutput();
+      output.setByteStream(ba);
+      impl.createLSSerializer().write(v, output);
+    } catch(Exception e) {
+      e.printStackTrace();
     }
     return new BXQItem(createDB(new IOContent(ba.toByteArray())), this);
   }
