@@ -13,40 +13,29 @@ import javax.crypto.spec.PBEParameterSpec;
  * @author Andreas Weiler
  */
 public final class Crypter {
-  /** De- and encryption key. */
-  private final String key = "BaseX";
   /** Bytes for de- and encryption. */
-  private final byte[] salt = { (byte) 0xc9, (byte) 0xc9, (byte) 0xc9,
+  private static final byte[] SALT = { (byte) 0xc9, (byte) 0xc9, (byte) 0xc9,
       (byte) 0xc9, (byte) 0xc9, (byte) 0xc9, (byte) 0xc9, (byte) 0xc9};
+  /** De- and encryption key. */
+  private static final String KEY = "BaseX";
   /** Encryption cipher. */
-  private Cipher encryptCipher;
+  private Cipher encrypt;
   /** Decryption cipher. */
-  private Cipher decryptCipher;
-  /** Encoder. */
-  private final sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
-  /** Decoder. */
-  private final sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
-
-  /** Standard constructor. */
-  public Crypter() {
-    init(key.toCharArray(), salt);
-  }
+  private Cipher decrypt;
 
   /**
-   * Initiates the decryption mechanism.
-   * @param pass char[]
-   * @param s byte[]
+   * Standard constructor.
    */
-  public void init(final char[] pass, final byte[] s) {
+  public Crypter() {
     try {
-      final PBEParameterSpec ps = new PBEParameterSpec(s, 20);
-      final SecretKeyFactory kf = SecretKeyFactory.
-      getInstance("PBEWithMD5AndDES");
-      final SecretKey k = kf.generateSecret(new PBEKeySpec(pass));
-      encryptCipher = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
-      encryptCipher.init(Cipher.ENCRYPT_MODE, k, ps);
-      decryptCipher = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
-      decryptCipher.init(Cipher.DECRYPT_MODE, k, ps);
+      final PBEParameterSpec ps = new PBEParameterSpec(SALT, 20);
+      final SecretKeyFactory kf =
+        SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+      final SecretKey k = kf.generateSecret(new PBEKeySpec(KEY.toCharArray()));
+      encrypt = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
+      encrypt.init(Cipher.ENCRYPT_MODE, k, ps);
+      decrypt = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
+      decrypt.init(Cipher.DECRYPT_MODE, k, ps);
     } catch(final Exception ex) {
       throw new SecurityException("Could not initialize CryptoLibrary: "
           + ex.getMessage());
@@ -58,9 +47,9 @@ public final class Crypter {
    * @param tok token to be encrypted
    * @return encrypted string.
    */
-  public synchronized String encrypt(final byte[] tok) {
+  public synchronized byte[] encrypt(final byte[] tok) {
     try {
-      return encoder.encode(encryptCipher.doFinal(tok));
+      return encrypt.doFinal(tok);
     } catch(final Exception ex) {
       throw new SecurityException("Could not encrypt: " + ex.getMessage());
     }
@@ -71,9 +60,9 @@ public final class Crypter {
    * @param str Description of the Parameter
    * @return decrypted token.
    */
-  public synchronized byte[] decrypt(final String str) {
+  public synchronized byte[] decrypt(final byte[] str) {
     try {
-      return decryptCipher.doFinal(decoder.decodeBuffer(str));
+      return decrypt.doFinal(str);
     } catch(final Exception ex) {
       throw new SecurityException("Could not decrypt: " + ex.getMessage());
     }

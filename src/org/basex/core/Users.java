@@ -87,7 +87,7 @@ public final class Users {
         for(int u = 0; u < s; u++) {
           final User user = new User();
           user.name = in.readString();
-          user.pw = in.readString();
+          user.pw = in.readBytes();
           user.read = in.readBool();
           user.write = in.readBool();
           user.create = in.readBool();
@@ -111,7 +111,7 @@ public final class Users {
       for(int u = 0; u < s; u++) {
         final User user = users.get(u);
         out.writeString(user.name);
-        out.writeString(user.pw);
+        out.writeBytes(user.pw);
         out.writeBool(user.read);
         out.writeBool(user.write);
         out.writeBool(user.create);
@@ -173,7 +173,7 @@ public final class Users {
     /** User name. */
     String name;
     /** Password. */
-    String pw;
+    byte[] pw;
     /** Read permission. */
     boolean read;
     /** Write permission. */
