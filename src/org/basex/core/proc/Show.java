@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import java.io.IOException;
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.core.Commands.CmdShow;
 import org.basex.io.PrintOutput;
 
@@ -17,7 +18,7 @@ public final class Show extends Process {
    * @param cmd show command
    */
   public Show(final Object cmd) {
-    super(PRINTING | ADMIN, cmd.toString());
+    super(PRINTING | User.ADMIN, cmd.toString());
   }
 
   @Override

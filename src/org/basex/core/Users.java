@@ -16,14 +16,8 @@ import org.basex.util.TokenBuilder;
  * @author Andreas Weiler
  */
 public final class Users {
-  /** Default read permission. */
-  private static final boolean READ = true;
-  /** Default write permission. */
-  private static final boolean WRITE = true;
-  /** Default create permission. */
-  private static final boolean CREATE = false;
-  /** Default admin permission. */
-  private static final boolean ADMIN = false;
+  /** Default permissions. */
+  private static final int PERM = User.READ | User.WRITE;
 
   /** User list. */
   private final ArrayList<User> users = new ArrayList<User>();
@@ -49,12 +43,9 @@ public final class Users {
    */
   public boolean create(final String usern, final String pass) {
     // check if user exists already
-    for(final User user : users) {
-      if(user.name.equals(usern)) return false;
-    }
+    if(get(usern) != null) return false;
 
-    final User user = new User(usern, crypt.encrypt(Token.token(pass)),
-        READ, WRITE, CREATE, ADMIN);
+    final User user = new User(usern, crypt.encrypt(Token.token(pass)), PERM);
     users.add(user);
     write();
     return true;
@@ -62,33 +53,36 @@ public final class Users {
 
   /**
    * Drops a user from the list.
-   * @param usern String
+   * @param usern user name
    * @return success of operation
    */
   public boolean drop(final String usern) {
-    for(int i = 0; i < users.size(); i++) {
-      if((users.get(i).name).equals(usern)) {
-        users.remove(i);
-        write();
-        return true;
-      }
-    }
-    return false;
+    final User user = get(usern);
+    if(user == null) return false;
+    users.remove(user);
+    write();
+    return true;
   }
 
   /**
-   * Returns a user if the name/password combination is correct.
-   * @param usern String
+   * Returns a user reference if the name/password combination is correct.
+   * @param usern user name 
    * @param pw password
    * @return success of operation
    */
   public User get(final String usern, final String pw) {
-    for(final User user : users) {
-      if(user.name.equals(usern)) {
-        byte[] pass = crypt.encrypt(Token.token(pw));
-        return Token.eq(pass, user.pw) ? user : null;
-      }
-    }
+    final User user = get(usern);
+    return user != null && Token.eq(crypt.encrypt(Token.token(pw)), user.pw) ?
+      user : null;
+  }
+
+  /**
+   * Returns a user reference with the specified name.
+   * @param usern user name
+   * @return success of operation
+   */
+  public User get(final String usern) {
+    for(final User user : users) if(user.name.equals(usern)) return user;
     return null;
   }
 
@@ -102,7 +96,7 @@ public final class Users {
         final int s = in.readNum();
         for(int u = 0; u < s; u++) {
           final User user = new User(in.readString(), in.readBytes(),
-              in.readBool(), in.readBool(), in.readBool(), in.readBool());
+              in.readNum());
           users.add(user);
         }
       } catch(final Exception ex) {
@@ -123,10 +117,7 @@ public final class Users {
         final User user = users.get(u);
         out.writeString(user.name);
         out.writeBytes(user.pw);
-        out.writeBool(user.read);
-        out.writeBool(user.write);
-        out.writeBool(user.create);
-        out.writeBool(user.admin);
+        out.writeNum(user.perm);
       }
       out.close();
     } catch(final Exception ex) {
@@ -136,7 +127,7 @@ public final class Users {
 
   /**
    * Returns information on all users.
-   * @return String
+   * @return user information
    */
   public String info() {
     final int size = users.size();
@@ -157,10 +148,10 @@ public final class Users {
       for(int i = 0; i < size; i++) {
         final User user = users.get(i);
         tb.add(ind[0], user.name);
-        tb.add(ind[1], user.read ? "X" : "");
-        tb.add(ind[2], user.write ? "X" : "");
-        tb.add(ind[3], user.create ? "X" : "");
-        tb.add(ind[4], user.admin ? "X" : "");
+        tb.add(ind[1], user.read() ? "X" : "");
+        tb.add(ind[2], user.write() ? "X" : "");
+        tb.add(ind[3], user.create() ? "X" : "");
+        tb.add(ind[4], user.admin() ? "X" : "");
         tb.add(NL);
       }
       tb.add(NL);
