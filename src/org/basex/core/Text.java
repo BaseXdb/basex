@@ -541,7 +541,7 @@ public interface Text {
   /** Index info. */
   String IDXENTRIES = LI + "Entries: ";
 
-  // XPATH COMMAND ============================================================
+  // XQUERY COMMAND ===========================================================
 
   /** Query info: query. */
   String QUERYQU = lang("qu_query") + COL + " ";
@@ -586,6 +586,11 @@ public interface Text {
   /** Query hits. */
   String VALHITS = "Items";
 
+  // USER COMMANDS ============================================================
+
+  /** User name. */
+  String[] USERS = { "Username",  "Read", "Write", "Create", "Admin" };
+  
   // UPDATE COMMANDS ==========================================================
 
   /** Insert query info. */
@@ -1203,8 +1208,6 @@ public interface Text {
   String FAALIAS = lang("df_aalias");
   /** Predefined font types. */
   String[] FONTTYPES = { lang("df_type1"), lang("df_type2"), lang("df_type3") };
-  /** Predefined font sizes. */
-  String[] FTSZ = { "8", "10", "12", "14", "16", "18", "20", "22", "24", "32" };
 
   /** Dialog title for treemap color schema. */
   String SCHEMATITLE = lang("ds_title");
@@ -1226,8 +1229,8 @@ public interface Text {
   };
   /** Predefined number of layouts. */
   String[] MAPALG = {
-    "Split Layout", "Strip Layout", "Squarified Layout", "Slice&Dice Layout",
-    "Binary Layout"
+    "Split Layout", "Strip Layout", "Squarified Layout",
+    "Slice&Dice Layout", "Binary Layout"
   };
 
   /** Map layout-algorithm. */

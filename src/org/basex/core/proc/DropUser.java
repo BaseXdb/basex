@@ -17,8 +17,7 @@ public final class DropUser extends ACreate {
 
   @Override
   protected boolean exec() {
-    final boolean check = context.users.dropUser(args[0]);
-    if(check) return check;
-    return error("User couldnt be dropped.");
+    return context.users.drop(args[0]) ||
+      error("User is unknown.");
   }
 }

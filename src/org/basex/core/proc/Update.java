@@ -30,7 +30,7 @@ public final class Update extends AUpdate {
     if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query
-    final CmdUpdate type = getType();
+    final CmdUpdate type = getOption(CmdUpdate.class);
     if(type == null) return false;
 
     final Nodes nodes = gui ? context.marked() : query(args[1], null);
@@ -94,7 +94,7 @@ public final class Update extends AUpdate {
    */
   private boolean node(final Data data, final Nodes nodes) {
     byte[] v = token(args[2]);
-    final int kind = getType().ordinal();
+    final int kind = getOption(CmdUpdate.class).ordinal();
     final boolean pi = kind == Data.PI;
 
     if(kind == Data.TEXT) {
@@ -121,7 +121,8 @@ public final class Update extends AUpdate {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Cmd.UPDATE + " " + getType());
+    final StringBuilder sb = new StringBuilder(Cmd.UPDATE + " " +
+          getOption(CmdUpdate.class));
     sb.append(quote(args[2]));
     if(args.length == 4) sb.append(quote(args[3]));
     return sb.append(' ' + AT + ' ' + args[1]).toString();

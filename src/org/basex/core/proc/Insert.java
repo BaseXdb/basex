@@ -55,7 +55,7 @@ public final class Insert extends AUpdate {
     if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query
-    final CmdUpdate type = getType();
+    final CmdUpdate type = getOption(CmdUpdate.class);
     if(type == null) return false;
 
     final Data data = context.data();
@@ -153,7 +153,7 @@ public final class Insert extends AUpdate {
    */
   private boolean node(final Data data, final Nodes nodes) {
     byte[] val = token(args[2]);
-    final int kind = getType().ordinal();
+    final int kind = getOption(CmdUpdate.class).ordinal();
     final boolean pi = kind == Data.PI;
     if(kind == Data.ELEM || pi) {
       if(!check(val)) return error(NAMEINVALID, val);
@@ -208,7 +208,7 @@ public final class Insert extends AUpdate {
 
   @Override
   public String toString() {
-    final CmdUpdate type = getType();
+    final CmdUpdate type = getOption(CmdUpdate.class);
     final StringBuilder sb = new StringBuilder(Cmd.INSERT + " " + type);
     sb.append(quote(args[2]));
     if(args.length == 4) sb.append(quote(args[3]));

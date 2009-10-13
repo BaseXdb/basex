@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-final class DataPool {
+public final class DataPool {
   /** Data references. */
   private Data[] data = new Data[1];
   /** Number of current database users. */
@@ -104,7 +104,7 @@ final class DataPool {
    * Returns information on the opened database instances.
    * @return data reference
    */
-  String info() {
+  public String info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVDATABASES, size);
     tb.add(size != 0 ? COL : DOT);

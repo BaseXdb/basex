@@ -25,12 +25,11 @@ abstract class AInfo extends Process {
    * @param tb token builder
    * @param key key
    * @param val value
-   * @param i maximum indent
    */
   protected static void format(final TokenBuilder tb, final String key,
-      final String val, final int i) {
+      final String val) {
     tb.add(' ');
-    tb.add(key, i);
+    tb.add(key);
     tb.add(": " + val + Prop.NL);
   }
 }

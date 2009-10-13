@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import org.basex.core.Process;
-import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.StringList;
@@ -28,19 +27,6 @@ abstract class AUpdate extends Process {
   protected AUpdate(final boolean g, final String... a) {
     super(DATAREF | UPDATING, a);
     gui = g;
-  }
-
-  /**
-   * Returns the update type.
-   * @return update type.
-   */
-  protected CmdUpdate getType() {
-    try {
-      return CmdUpdate.valueOf(args[0].toUpperCase());
-    } catch(final Exception ex) {
-      error(CMDWHICH, args[0]);
-      return null;
-    }
   }
 
   /**

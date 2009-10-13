@@ -70,7 +70,7 @@ public final class LockingTest {
     process(new DropDB("factbook"), session1);
     // concurrent create test
     conCreate();
-    System.out.println(server.context.info());
+    System.out.println(server.context.pool.info());
     if(server.context.size("factbook") == 2) {
       System.out.println("--> Test 1 successful, Test 2 started...");
     } else {

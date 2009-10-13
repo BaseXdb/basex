@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -248,18 +249,6 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Returns the length of the longest string.
-   * @param str strings
-   * @return maximum length
-   */
-  protected static int maxLength(final String[] str) {
-    int max = 0;
-    for(final String s : str)
-      if(max < s.length()) max = s.length();
-    return max;
-  }
-
-  /**
    * Returns the list of arguments.
    * @return arguments
    */
@@ -267,6 +256,21 @@ public abstract class Process extends Progress {
     final StringBuilder sb = new StringBuilder();
     for(final String a : args) if(a != null) sb.append(quote(a));
     return sb.toString();
+  }
+
+  /**
+   * Returns the command option.
+   * @param typ options enumeration
+   * @param <E> token type
+   * @return option
+   */
+  protected <E extends Enum<E>> E getOption(final Class<E> typ) {
+    try {
+      return Enum.valueOf(typ, args[0].toUpperCase());
+    } catch(final Exception ex) {
+      error(CMDWHICH, args[0]);
+      return null;
+    }
   }
 
   /**

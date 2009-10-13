@@ -12,7 +12,6 @@ import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -32,32 +31,33 @@ public final class List extends Process {
   @Override
   protected void out(final PrintOutput o) throws IOException {
     final String[] list = list(context).finish();
-    final int ml = maxLength(list) + 2;
+    int max = 0;
+    for(final String s : list) max = Math.max(max, s.length());
 
+    TokenBuilder tb = new TokenBuilder();
     if(list.length == 0) {
-      o.println(INFONODB);
+      tb.add(INFONODB + NL);
     } else {
-      final TokenBuilder t = new TokenBuilder();
-      o.print(Token.token(INFODBNAME), ml);
-      o.println(INFODOC);
-      o.println("--------------------------------------------");
+      tb.add(max + 2, INFODBNAME);
+      tb.add(INFODOC + NL);
+      tb.add("--------------------------------------------" + NL);
       for(final String name : list) {
-        o.print(Token.token(name), ml);
+        tb.add(max + 2, name);
         DataInput in = null;
         try {
           in = new DataInput(prop.dbfile(name, DATAINFO));
           final MetaData md = new MetaData(name, in, prop);
           in.close();
-          o.println(md.file.toString());
+          tb.add(md.file + NL);
         } catch(final IOException ex) {
-          o.println(INFODBERR);
+          tb.add(INFODBERR + NL);
         } finally {
           try { if(in != null) in.close(); } catch(final IOException ex) { }
         }
       }
-      o.print(t.finish());
-      o.print(NL + list.length + " " + INFODBLIST + NL);
+      tb.add(NL + list.length + " " + INFODBLIST + NL);
     }
+    o.print(tb.finish());
   }
 
   /**

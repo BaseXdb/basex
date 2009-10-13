@@ -52,28 +52,23 @@ public final class InfoDB extends AInfo {
     if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
 
     final TokenBuilder tb = new TokenBuilder();
-    final int l = maxLength(new String[] {
-        INFODBNAME, INFODBSIZE, INFODOC, INFOTIME, INFONDOCS, INFODOCSIZE,
-        INFOENCODING, INFONODES, INFOHEIGHT
-    }) + 1;
-
     final String header = (bold ?
         new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
     tb.add(header, INFODB);
-    format(tb, INFODBNAME, meta.name, l);
-    format(tb, INFODBSIZE, Performance.format(len), l);
-    format(tb, INFONODES, Integer.toString(meta.size), l);
-    format(tb, INFOHEIGHT, Integer.toString(meta.height), l);
+    format(tb, INFODBNAME, meta.name);
+    format(tb, INFODBSIZE, Performance.format(len));
+    format(tb, INFONODES, Integer.toString(meta.size));
+    format(tb, INFOHEIGHT, Integer.toString(meta.height));
 
     tb.add(NL);
     tb.add(header, INFOCREATE);
-    format(tb, INFODOC, meta.file.path(), l);
-    format(tb, INFOTIME, DATE.format(new Date(meta.time)), l);
-    format(tb, INFODOCSIZE, Performance.format(meta.filesize), l);
-    format(tb, INFOENCODING, meta.encoding, l);
-    format(tb, INFONDOCS, Integer.toString(meta.ndocs), l);
-    format(tb, INFOCHOP, Main.flag(meta.chop), 0);
-    format(tb, INFOENTITY, Main.flag(meta.entity), 0);
+    format(tb, INFODOC, meta.file.path());
+    format(tb, INFOTIME, DATE.format(new Date(meta.time)));
+    format(tb, INFODOCSIZE, Performance.format(meta.filesize));
+    format(tb, INFOENCODING, meta.encoding);
+    format(tb, INFONDOCS, Integer.toString(meta.ndocs));
+    format(tb, INFOCHOP, Main.flag(meta.chop));
+    format(tb, INFOENTITY, Main.flag(meta.entity));
 
     if(index) {
       tb.add(NL);
@@ -81,11 +76,11 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
-        format(tb, INFOPATHINDEX, Main.flag(meta.pathindex), 0);
-        format(tb, INFOTEXTINDEX, Main.flag(meta.txtindex), 0);
-        format(tb, INFOATTRINDEX, Main.flag(meta.atvindex), 0);
+        format(tb, INFOPATHINDEX, Main.flag(meta.pathindex));
+        format(tb, INFOTEXTINDEX, Main.flag(meta.txtindex));
+        format(tb, INFOATTRINDEX, Main.flag(meta.atvindex));
         format(tb, INFOFTINDEX, Main.flag(meta.ftxindex) + (meta.ftxindex &&
-            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""), 0);
+            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""));
       }
     }
     return tb;

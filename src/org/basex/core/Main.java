@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.BindException;
 import java.util.Random;
-import org.basex.BaseXServer;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
@@ -40,7 +39,6 @@ public abstract class Main {
    * @param args command line arguments
    */
   protected Main(final String... args) {
-    context.server = this instanceof BaseXServer;
     parseArguments(args);
     if(!ok) return;
 

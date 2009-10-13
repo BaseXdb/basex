@@ -146,7 +146,7 @@ public final class CommandParser extends InputParser {
             return new InfoTable(arg1, arg2);
           case USERS:
             return new InfoUsers();
-            }
+        }
         break;
       case CLOSE:
         return new Close();
@@ -369,9 +369,9 @@ public final class CommandParser extends InputParser {
 
   /**
    * Returns the index of the found string or throws an error.
-   * @param <E> token type
    * @param cmp possible completions
    * @param par parent command
+   * @param <E> token type
    * @return index
    * @throws QueryException query exception
    */
@@ -385,8 +385,7 @@ public final class CommandParser extends InputParser {
       final E cmd = Enum.valueOf(cmp, t);
       if(!(cmd instanceof Cmd)) return cmd;
       final Cmd c = (Cmd) cmd;
-      if(!c.help() && (internal || !c.internal()) &&
-          (ctx.server || !c.server())) return cmd;
+      if(!c.help() && (internal || !c.internal())) return cmd;
     } catch(final IllegalArgumentException ex) { }
 
     final Enum<?>[] alt = list(cmp, token);
@@ -402,8 +401,7 @@ public final class CommandParser extends InputParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
-      final boolean all = ctx.server || s instanceof Cmd && ((Cmd) s).server();
-      if(ls.similar(name, sm, 0) && all)
+      if(ls.similar(name, sm, 0) && s instanceof Cmd)
         error(list(alt), CMDSIMILAR, name, sm);
     }
 
@@ -422,7 +420,7 @@ public final class CommandParser extends InputParser {
    */
   protected void help(final StringList alt, final Cmd cmd)
       throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true, ctx.server));
+    error(alt, PROCSYNTAX, cmd.help(true));
   }
 
   /**

@@ -69,28 +69,6 @@ public class PrintOutput extends OutputStream {
   /**
    * Writes a string to the output stream.
    * @param str string to be written
-   * @param i number of spaces to indent
-   * @throws IOException I/O exception
-   */
-  public final void print(final int i, final byte[] str) throws IOException {
-    for(int a = 0; a < i - str.length; a++) print(' ');
-    print(str);
-  }
-
-  /**
-   * Writes a string to the output stream.
-   * @param str string to be written
-   * @param i number of spaces to indent
-   * @throws IOException I/O exception
-   */
-  public final void print(final byte[] str, final int i) throws IOException {
-    print(str);
-    for(int a = 0; a < i - str.length; a++) print(' ');
-  }
-
-  /**
-   * Writes a string to the output stream.
-   * @param str string to be written
    * @throws IOException I/O exception
    */
   public final void print(final String str) throws IOException {

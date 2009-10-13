@@ -1,8 +1,6 @@
 package org.basex.core.proc;
 
-import static org.basex.core.Text.*;
 import org.basex.core.Process;
-import org.basex.core.Commands.CmdShow;
 import org.basex.server.Sessions;
 
 /**
@@ -25,18 +23,5 @@ public final class Kill extends Process {
     final int s = ss.size();
     while(ss.size() > 0) ss.get(0).exit();
     return info("% sessions killed.", s);
-  }
-
-  /**
-   * Returns the update type.
-   * @return update type.
-   */
-  protected CmdShow getType() {
-    try {
-      return CmdShow.valueOf(args[0].toUpperCase());
-    } catch(final Exception ex) {
-      error(CMDWHICH, args[0]);
-      return null;
-    }
   }
 }

@@ -16,14 +16,12 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Current client connections. */
   public final Sessions sessions;
-  /** Database pool. */
-  private final DataPool pool;
   /** Users. */
   public final Users users;
   /** Database properties. */
   public Prop prop;
-  /** Server flag. */
-  public boolean server;
+  /** Database pool. */
+  public final DataPool pool;
   /** Central data reference. */
   private Data data;
   /** Current context. */
@@ -37,7 +35,10 @@ public final class Context {
    * Constructor.
    */
   public Context() {
-    this(null);
+    prop = new Prop();
+    pool = new DataPool();
+    sessions = new Sessions();
+    users = new Users(this);
   }
 
   /**
@@ -45,20 +46,10 @@ public final class Context {
    * @param ctx parent context
    */
   public Context(final Context ctx) {
-    this(new Prop(), ctx);
-  }
-
-  /**
-   * Constructor, defining an initial property file and an
-   * optional parent context.
-   * @param pr property file
-   * @param ctx parent context
-   */
-  private Context(final Prop pr, final Context ctx) {
-    prop = pr;
-    pool = ctx == null ? new DataPool() : ctx.pool;
-    sessions = ctx == null ? new Sessions() : ctx.sessions;
-    users = new Users(this);
+    prop = new Prop();
+    pool = ctx.pool;
+    sessions = ctx.sessions;
+    users = ctx.users;
   }
 
   /**
@@ -67,7 +58,6 @@ public final class Context {
   public void close() {
     while(sessions.size() > 0) sessions.get(0).exit();
     pool.close();
-    users.writeList();
   }
 
   /**
@@ -205,14 +195,6 @@ public final class Context {
    */
   public boolean pinned(final String db) {
     return pool.pinned(db);
-  }
-
-  /**
-   * Returns information on the opened database instances.
-   * @return data reference
-   */
-  public String info() {
-    return pool.info();
   }
   
   /**

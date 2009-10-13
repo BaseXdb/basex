@@ -11,17 +11,16 @@ import org.basex.io.PrintOutput;
  * @author Andreas Weiler
  */
 public final class InfoUsers extends AInfo {
-  
   /**
    * Default constructor.
    */
   public InfoUsers() {
-    super(PRINTING);
-  }
-  
-  @Override
-  protected void out(final PrintOutput out) throws IOException {
-    out.println(context.users.info());
+    super(DATAREF | PRINTING);
   }
 
+  @Override
+  protected void out(final PrintOutput out) throws IOException {
+    // [AW] ...should return users of current database
+    out.println(context.users.info());
+  }
 }

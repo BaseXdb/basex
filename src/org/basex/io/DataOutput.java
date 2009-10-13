@@ -34,6 +34,16 @@ public final class DataOutput extends OutputStream {
    * @param db name of the database
    * @throws IOException I/O exception
    */
+  public DataOutput(final String db) throws IOException {
+    this(new File(db));
+  }
+
+  /**
+   * Convenience constructor.
+   * A default buffer size will be used.
+   * @param db name of the database
+   * @throws IOException I/O exception
+   */
   public DataOutput(final File db) throws IOException {
     this(db, IO.BLOCKSIZE);
   }

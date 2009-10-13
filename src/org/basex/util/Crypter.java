@@ -1,11 +1,14 @@
 package org.basex.util;
 
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 
 /**
  * De- and encryption of passwords.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -20,15 +23,13 @@ public final class Crypter {
   /** Decryption cipher. */
   private Cipher decryptCipher;
   /** Encoder. */
-  private sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+  private final sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
   /** Decoder. */
-  private sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
-  /** Used coding. */
-  private String charset = "UTF16";
+  private final sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
 
   /** Standard constructor. */
   public Crypter() {
-    this.init(key.toCharArray(), salt);
+    init(key.toCharArray(), salt);
   }
 
   /**
@@ -53,15 +54,13 @@ public final class Crypter {
   }
 
   /**
-   * Encrypts a string.
-   * @param str Description of the Parameter
-   * @return String the encrypted string.
+   * Encrypts a token.
+   * @param tok token to be encrypted
+   * @return encrypted string.
    */
-  public synchronized String encrypt(final String str) {
+  public synchronized String encrypt(final byte[] tok) {
     try {
-      final byte[] b = str.getBytes(this.charset);
-      final byte[] enc = encryptCipher.doFinal(b);
-      return encoder.encode(enc);
+      return encoder.encode(encryptCipher.doFinal(tok));
     } catch(final Exception ex) {
       throw new SecurityException("Could not encrypt: " + ex.getMessage());
     }
@@ -70,13 +69,11 @@ public final class Crypter {
   /**
    * Decrypts a string.
    * @param str Description of the Parameter
-   * @return String the decrypted string.
+   * @return decrypted token.
    */
-  public synchronized String decrypt(final String str) {
+  public synchronized byte[] decrypt(final String str) {
     try {
-      final byte[] dec = decoder.decodeBuffer(str);
-      final byte[] b = decryptCipher.doFinal(dec);
-      return new String(b, this.charset);
+      return decryptCipher.doFinal(decoder.decodeBuffer(str));
     } catch(final Exception ex) {
       throw new SecurityException("Could not decrypt: " + ex.getMessage());
     }

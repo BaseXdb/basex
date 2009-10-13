@@ -1,6 +1,5 @@
 package org.basex.core.proc;
 
-import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Process;
 import org.basex.core.Commands.CmdShow;
@@ -23,36 +22,21 @@ public final class Show extends Process {
 
   @Override
   protected boolean exec() {
-    return getType() != null;
+    return getOption(CmdShow.class) != null;
   }
 
   @Override
   protected void out(final PrintOutput o) throws IOException {
-    final CmdShow type = getType();
-
-    switch(type) {
+    switch(getOption(CmdShow.class)) {
       case DATABASES:
-        o.println(context.info());
+        o.println(context.pool.info());
         break;
       case SESSIONS:
         o.println(context.sessions.info());
         break;
       case USERS:
-        o.println(context.users.show());
+        o.println(context.users.info());
         break;
-    }
-  }
-
-  /**
-   * Returns the update type.
-   * @return update type.
-   */
-  protected CmdShow getType() {
-    try {
-      return CmdShow.valueOf(args[0].toUpperCase());
-    } catch(final Exception ex) {
-      error(CMDWHICH, args[0]);
-      return null;
     }
   }
 }

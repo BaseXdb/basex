@@ -20,6 +20,10 @@ import org.basex.gui.layout.TableLayout;
  * @author Christian Gruen
  */
 public final class DialogFontChooser extends Dialog {
+  /** Predefined font sizes. */
+  private static final String[] FTSZ =
+    { "8", "10", "12", "14", "16", "18", "20", "22", "24", "32" };
+
   /** Font name chooser. */
   private final BaseXListChooser font;
   /** Font name chooser. */

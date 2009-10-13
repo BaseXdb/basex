@@ -17,8 +17,6 @@ public interface Commands {
   int INT = 2;
   /** Command flag: dummy command for formatting the help output. */
   int HLP = 4;
-  /** Command flag: command which can only be executed by the server. */
-  int SRV = 8;
 
   /** Command definitions. */
   enum Cmd {
@@ -30,7 +28,7 @@ public interface Commands {
     // Update commands
     HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
     // Server commands
-    HELPSERVER(HLP | SRV), KILL(SRV), SHOW(SRV), 
+    HELPSERVER(HLP), KILL(), SHOW(),
     // General commands
     HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands
@@ -79,27 +77,18 @@ public interface Commands {
     }
 
     /**
-     * Returns if this is a command which can only be executed by the server.
-     * @return result of check
-     */
-    boolean server() {
-      return (flags & SRV) != 0;
-    }
-
-    /**
      * Returns a help string.
      * @param detail show details
-     * @param server show server commands
      * @return string
      */
-    public final String help(final boolean detail, final boolean server) {
+    public final String help(final boolean detail) {
       final StringBuilder sb = new StringBuilder();
 
       final Object args = help(0);
       if(help()) {
-        if(!server() || server) sb.append(NL + args + NL + NL);
+        sb.append(NL + args + NL + NL);
       } else if(args != null && !help() && !internal() &&
-          (!hidden() || detail) && (!server() || server)) {
+          (!hidden() || detail)) {
         sb.append(this + " " + args + NL + "  " + help(1) + NL);
         if(detail) sb.append(NL + help(2) + NL);
       } else {

@@ -26,28 +26,24 @@ public final class Info extends AInfo {
   protected void out(final PrintOutput out) throws IOException {
     Performance.gc(1);
 
-    final int l = maxLength(new String[] {
-        INFODBPATH, INFOMEM, INFOMAINMEM, INFOINFO
-    });
-
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
-    format(tb, INFODBPATH, prop.get(Prop.DBPATH), l);
-    format(tb, INFOMEM, Performance.getMem(), l);
+    format(tb, INFODBPATH, prop.get(Prop.DBPATH));
+    format(tb, INFOMEM, Performance.getMem());
     format(tb, INFOINFO, Main.flag(prop.is(Prop.INFO)) +
-        (prop.is(Prop.ALLINFO) ? " (" + INFOALL + ")" : ""), l);
+        (prop.is(Prop.ALLINFO) ? " (" + INFOALL + ")" : ""));
 
     tb.add(NL + INFOCREATE + NL);
-    format(tb, INFOCHOP, Main.flag(prop.is(Prop.CHOP)), 0);
-    format(tb, INFOENTITY, Main.flag(prop.is(Prop.ENTITY)), 0);
+    format(tb, INFOCHOP, Main.flag(prop.is(Prop.CHOP)));
+    format(tb, INFOENTITY, Main.flag(prop.is(Prop.ENTITY)));
 
     tb.add(NL + INFOINDEX + NL);
-    format(tb, INFOPATHINDEX, Main.flag(prop.is(Prop.PATHINDEX)), 0);
-    format(tb, INFOTEXTINDEX, Main.flag(prop.is(Prop.TEXTINDEX)), 0);
-    format(tb, INFOATTRINDEX, Main.flag(prop.is(Prop.ATTRINDEX)), 0);
+    format(tb, INFOPATHINDEX, Main.flag(prop.is(Prop.PATHINDEX)));
+    format(tb, INFOTEXTINDEX, Main.flag(prop.is(Prop.TEXTINDEX)));
+    format(tb, INFOATTRINDEX, Main.flag(prop.is(Prop.ATTRINDEX)));
     format(tb, INFOFTINDEX, Main.flag(prop.is(Prop.FTINDEX)) +
         (prop.is(Prop.FTINDEX) && prop.is(Prop.FTFUZZY) ?
-        " (" + INFOFZINDEX + ")" : ""), 0);
+        " (" + INFOFZINDEX + ")" : ""));
     out.print(tb.finish());
   }
 }

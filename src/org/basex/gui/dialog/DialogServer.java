@@ -104,7 +104,7 @@ public final class DialogServer extends Dialog {
         final String u = user.getText();
         final String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
-          ctx.users.createUser(u, p);
+          ctx.users.create(u, p);
           user.setText("");
           pass.setText("");
           ((TableModel) table.getModel()).setData();
@@ -122,7 +122,7 @@ public final class DialogServer extends Dialog {
     delete.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String test = (String) userco.getSelectedItem();
-        ctx.users.dropUser(test);
+        ctx.users.drop(test);
         userco.removeItem(test);
         ((TableModel) table.getModel()).setData();
         if(getUsers().length == 0) delete.setEnabled(false);
@@ -213,8 +213,8 @@ public final class DialogServer extends Dialog {
   }
 
   /**
-   * Returns all user from the list.
-   * @return Stringarray
+   * Returns all users from the list.
+   * @return users
    */
   String[] getUsers() {
     final ArrayList<Object[]> list = ctx.users.getUsers();
@@ -231,16 +231,14 @@ public final class DialogServer extends Dialog {
   }
 
   /**
-   * Class of own tablemodel.
+   * Class of own table model.
    * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
   class TableModel extends AbstractTableModel {
-
-    /** Columnnames. */
+    /** Column names. */
     String[] columnNames = { "Username", "Read", "Write", "Create", "Admin"};
-
     /** Data. */
     private ArrayList<Object[]> data = ctx.users.getUsers();
 
@@ -269,8 +267,7 @@ public final class DialogServer extends Dialog {
 
     @Override
     public boolean isCellEditable(final int row, final int col) {
-      if(col != 0) return true;
-      return false;
+      return col != 0;
     }
 
     @Override

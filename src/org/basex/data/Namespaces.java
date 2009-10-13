@@ -166,10 +166,10 @@ public final class Namespaces extends Set {
       throws IOException {
 
     if(root.ch.length == 0) return;
-    out.print(s, token(TABLEPRE));
-    out.print(s + 1, token(TABLEDIST));
+    print(out, s, token(TABLEPRE));
+    print(out, s + 1, token(TABLEDIST));
     out.print(' ');
-    out.print(token(TABLEPREF), 11);
+    print(out, token(TABLEPREF), 11);
     out.println(token(TABLEURI));
     print(out, s, root, all);
     out.print(NL);
@@ -188,16 +188,42 @@ public final class Namespaces extends Set {
 
     final byte[] quote = { '"' };
     for(int i = 0; i < n.key.length; i++) {
-      out.print(s, token(n.pre));
-      out.print(s + 1, token(n.pre - n.par.pre));
+      print(out, s, token(n.pre));
+      print(out, s + 1, token(n.pre - n.par.pre));
       out.print(' ');
-      out.print(concat(quote, keys[n.key[i]], quote), 11);
+      print(out, concat(quote, keys[n.key[i]], quote), 11);
       out.print(keys[n.val[i]]);
       out.println(" (" + n.val[i] + ")");
     }
     if(all || n.key.length == 0) {
       for(final NSNode c : n.ch) print(out, s, c, all);
     }
+  }
+
+  /**
+   * Writes a string to the output stream.
+   * @param out output stream
+   * @param str string to be written
+   * @param i number of spaces to indent
+   * @throws IOException I/O exception
+   */
+  private void print(final PrintOutput out, final int i, final byte[] str)
+      throws IOException {
+    for(int a = 0; a < i - str.length; a++) out.print(' ');
+    out.print(str);
+  }
+
+  /**
+   * Writes a string to the output stream.
+   * @param out output stream
+   * @param str string to be written
+   * @param i number of spaces to indent
+   * @throws IOException I/O exception
+   */
+  private void print(final PrintOutput out, final byte[] str, final int i)
+      throws IOException {
+    out.print(str);
+    for(int a = 0; a < i - str.length; a++) out.print(' ');
   }
 
   /**
