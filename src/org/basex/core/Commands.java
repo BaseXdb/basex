@@ -30,7 +30,7 @@ public interface Commands {
     // Update commands
     HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
     // Server commands
-    HELPSERVER(HLP | SRV), KILL(SRV), SHOW(SRV),
+    HELPSERVER(HLP | SRV), KILL(SRV), SHOW(SRV), 
     // General commands
     HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands
@@ -167,13 +167,13 @@ public interface Commands {
   }
 
   /** Create command definitions. */
-  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX }
+  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
   /** Info command definitions. */
-  enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
+  enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE, USERS }
   /** Drop command definitions. */
-  enum CmdDrop { DATABASE, DB, INDEX }
+  enum CmdDrop { DATABASE, DB, INDEX, USER }
   /** Show command definitions. */
-  enum CmdShow { DATABASES, SESSIONS }
+  enum CmdShow { DATABASES, SESSIONS, USERS }
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,

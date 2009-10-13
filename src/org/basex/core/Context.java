@@ -18,6 +18,8 @@ public final class Context {
   public final Sessions sessions;
   /** Database pool. */
   private final DataPool pool;
+  /** Users. */
+  public final Users users;
   /** Database properties. */
   public Prop prop;
   /** Server flag. */
@@ -56,6 +58,7 @@ public final class Context {
     prop = pr;
     pool = ctx == null ? new DataPool() : ctx.pool;
     sessions = ctx == null ? new Sessions() : ctx.sessions;
+    users = new Users(this);
   }
 
   /**
@@ -64,6 +67,7 @@ public final class Context {
   public void close() {
     for(int i = 0; i < sessions.size();) sessions.get(i).exit();
     pool.close();
+    users.writeList();
   }
 
   /**

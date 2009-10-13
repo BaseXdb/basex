@@ -37,6 +37,9 @@ public final class Show extends Process {
       case SESSIONS:
         o.println(context.sessions.info());
         break;
+      case USERS:
+        o.println(context.users.show());
+        break;
     }
   }
 

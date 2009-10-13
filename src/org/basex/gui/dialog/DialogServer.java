@@ -5,13 +5,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.JPasswordField;
@@ -31,7 +26,6 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.server.ClientSession;
-import org.basex.util.Crypter;
 
 /**
  * Dialog window for displaying information about the server.
@@ -43,10 +37,6 @@ public class DialogServer extends Dialog {
 
   /** Context. */
   Context ctx = gui.context;
-  /** Crypter. */
-  private Crypter crypt = new Crypter();
-  /** Filename. */
-  private String file = ctx.prop.get(Prop.DBPATH) + "\\user.basex";
 
   /**
    * Default constructor.
@@ -114,7 +104,7 @@ public class DialogServer extends Dialog {
         String u = user.getText();
         String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
-          createUser(u, p);
+          ctx.users.createUser(u, p);
           user.setText("");
           pass.setText("");
           ((TableModel) table.getModel()).setData();
@@ -132,7 +122,7 @@ public class DialogServer extends Dialog {
     delete.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         String test = (String) userco.getSelectedItem();
-        dropUser(test);
+        ctx.users.dropUser(test);
         userco.removeItem(test);
         ((TableModel) table.getModel()).setData();
         if(getUsers().length == 0) delete.setEnabled(false);
@@ -152,7 +142,7 @@ public class DialogServer extends Dialog {
     final BaseXButton save = new BaseXButton("Save", null, this);
     save.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        writeList(((TableModel) table.getModel()).getData());
+        ((TableModel) table.getModel()).setData();
       }
     });
     p23.add(save);
@@ -227,7 +217,7 @@ public class DialogServer extends Dialog {
    * @return Stringarray
    */
   String[] getUsers() {
-    ArrayList<Object[]> list = getList();
+    ArrayList<Object[]> list = ctx.users.getUsers();
     if(list != null) {
       String[] t = new String[list.size()];
       int i = 0;
@@ -239,89 +229,7 @@ public class DialogServer extends Dialog {
     }
     return new String[] {};
   }
-
-  /**
-   * Strores a user and encrypted password.
-   * @param usern Username
-   * @param pass Password
-   */
-  void createUser(final String usern, final String pass) {
-    // username, read, write, create, admin, password
-    Object[] item = { usern, false, false, false, false, crypt.encrypt(pass)};
-    ArrayList<Object[]> list = getList();
-    if(list == null) list = new ArrayList<Object[]>();
-    boolean in = false;
-    for(Object[] s : list) {
-      if(s[0].equals(usern)) in = true;
-    }
-    if(!in) list.add(item);
-    writeList(list);
-  }
-
-  /**
-   * Drops a user from the list.
-   * @param usern String
-   */
-  void dropUser(final String usern) {
-    ArrayList<Object[]> list = getList();
-    if(list != null) {
-      int i = 0;
-      int t = 0;
-      for(Object[] s : list) {
-        if(s[0].equals(usern)) t = i;
-        i++;
-      }
-      list.remove(t);
-    }
-    writeList(list);
-  }
-
-  /**
-   * Returns list with all users and passwords.
-   * @return ArrayList
-   */
-  @SuppressWarnings("unchecked")
-  ArrayList<Object[]> getList() {
-    if(new File(file).exists()) {
-      try {
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-        return (ArrayList<Object[]>) in.readObject();
-      } catch(Exception e) {
-        e.printStackTrace();
-      }
-    }
-    return new ArrayList<Object[]>();
-  }
-
-  /**
-   * Writes list to the file.
-   * @param l List
-   */
-  void writeList(final ArrayList<Object[]> l) {
-    ObjectOutputStream out;
-    try {
-      out = new ObjectOutputStream(new FileOutputStream(file));
-      out.writeObject(l);
-      out.close();
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Sets up the choosebox column.
-   * @param column TableColumn
-   * 
-   *          public void setUpColumn(final TableColumn column) { // Set up the
-   *          editor for the cells. JComboBox comboBox = new JComboBox();
-   *          column.setCellEditor(new DefaultCellEditor(comboBox));
-   * 
-   *          // Set up tool tips for cells. DefaultTableCellRenderer renderer =
-   *          new DefaultTableCellRenderer();
-   *          renderer.setToolTipText("Click for combo box");
-   *          column.setCellRenderer(renderer); }
-   */
-
+  
   /**
    * Class of own tablemodel.
    * 
@@ -334,7 +242,7 @@ public class DialogServer extends Dialog {
     String[] columnNames = { "Username", "Read", "Write", "Create", "Admin"};
 
     /** Data. */
-    private ArrayList<Object[]> data = getList();
+    private ArrayList<Object[]> data = ctx.users.getUsers();
 
     public int getColumnCount() {
       return columnNames.length;
@@ -375,7 +283,7 @@ public class DialogServer extends Dialog {
      * Sets new data.
      */
     public void setData() {
-      data = getList();
+      data = ctx.users.getUsers();
       fireTableDataChanged();
     }
 

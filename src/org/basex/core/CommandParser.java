@@ -9,6 +9,7 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.Commands.CmdUpdate;
+import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
@@ -19,9 +20,11 @@ import org.basex.core.proc.CreateMAB;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.DropIndex;
+import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.InfoUsers;
 import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.IntOutput;
 import org.basex.core.proc.Help;
@@ -122,6 +125,8 @@ public final class CommandParser extends InputParser {
             return new CreateFS(string(cmd), name(cmd));
           case MAB:
             return new CreateMAB(string(cmd), name(null));
+          case USER:
+            return new CreateUser(string(cmd), name(cmd));
         }
         break;
       case OPEN: case O:
@@ -139,7 +144,9 @@ public final class CommandParser extends InputParser {
             final String arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
-        }
+          case USERS:
+            return new InfoUsers();
+            }
         break;
       case CLOSE:
         return new Close();
@@ -151,6 +158,8 @@ public final class CommandParser extends InputParser {
             return new DropDB(name(cmd));
           case INDEX:
             return new DropIndex(consume(CmdIndex.class, cmd));
+          case USER:
+            return new DropUser(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -240,6 +249,7 @@ public final class CommandParser extends InputParser {
         switch(show) {
           case DATABASES:
           case SESSIONS:
+          case USERS:
             return new Show(show);
           default:
         }
