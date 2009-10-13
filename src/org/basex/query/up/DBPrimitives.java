@@ -58,9 +58,6 @@ public final class DBPrimitives {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // [LK] sort operations after pre values of primitives, eliminate
-    // unnecessary ones and apply backwards
-    // [LK] trgt / rpl node must be different nodes
     // [LK] merge text nodes
     final int l = op.size();
     if(op.size() == 0) return;

@@ -1,11 +1,11 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryText.*;
-
+import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 
 /**
  * Insert before primitive.
@@ -25,19 +25,28 @@ public class InsertBeforePrimitive extends InsertPrimitive {
     super(n, copy, l);
   }
   
+  @SuppressWarnings("unused")
   @Override
   public void check() throws QueryException {
-    Err.or(UPDATE, this);
   }
 
   @Override
   public void apply() throws QueryException {
-    Err.or(UPDATE, this);
+    if(!(node instanceof DBNode)) return;
+    
+    final MemData m = buildDB();
+    // source nodes may be empty, thus insert has no effect at all
+    if(m == null) return;
+    final DBNode n = (DBNode) node;
+    final Data d = n.data;
+    // [LK] check if parent null?
+    d.insertSeq(n.pre - 1, d.parent(n.pre, Nod.kind(node.type)), m);
   }
 
+  @SuppressWarnings("unused")
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(UPDATE, this);
+    c.addLast(((NodeCopyPrimitive) p).c.getFirst());
   }
 
   @Override

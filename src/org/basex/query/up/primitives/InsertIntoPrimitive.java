@@ -1,16 +1,11 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.up.UpdateFunctions.*;
-
-import java.util.Iterator;
-
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 
 /**
  * Represents an insert into primitive.
@@ -38,23 +33,13 @@ public class InsertIntoPrimitive extends InsertPrimitive {
   @Override
   public void apply() throws QueryException {
     if(!(node instanceof DBNode)) return;
-
-    final SeqIter seq = new SeqIter();
-    final Iterator<Iter> it = c.iterator();
-    while(it.hasNext()) {
-      final Iter ni = it.next();
-      Item i = ni.next();
-      while(i != null) {
-        seq.add(i);
-        i = ni.next();
-      }
-    }
     
     final DBNode n = (DBNode) node;
     final Data d = n.data;
+    final MemData m = buildDB();
     // source nodes may be empty, thus insert has no effect at all
-    if(seq.size() == 0) return;
-    d.insertSeq(loc, n.pre, buildDB(seq, ((DBNode) node).data));
+    n.data.insertSeq(n.pre + d.attSize(n.pre, Nod.kind(node.type)), 
+        n.pre, m);
   }
 
   @SuppressWarnings("unused")

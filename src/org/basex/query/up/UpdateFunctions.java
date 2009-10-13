@@ -62,7 +62,6 @@ public final class UpdateFunctions {
     final int ss = m.size(0, m.kind(0));
 //    printTable(m);
     for(int s = 1; s < ss; s++) {
-      // [LK] removed -1 in next line ... test!
       final int p = pre + s - 1;
       d.insert(p, par, m.attName(s), m.attValue(s));
     }
@@ -80,7 +79,6 @@ public final class UpdateFunctions {
     if(k == Data.ELEM || k == Data.PI) data.update(pre, name);
     else if(k == Data.ATTR) {
       final byte[] v = data.attValue(pre);
-      // [LK] proc.Update
       data.update(pre, name, v);
     }
   }

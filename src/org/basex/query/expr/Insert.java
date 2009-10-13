@@ -11,7 +11,10 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.up.primitives.InsertAfterPrimitive;
 import org.basex.query.up.primitives.InsertAttribute;
+import org.basex.query.up.primitives.InsertIntoFirstPrimitive;
+import org.basex.query.up.primitives.InsertIntoLastPrimitive;
 import org.basex.query.up.primitives.InsertIntoPrimitive;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
@@ -101,14 +104,25 @@ public final class Insert extends Arr {
     }
     
     final DBNode dbn = (DBNode) n;
-    final Data d = dbn.data;
-    int p = dbn.pre;
-    int l = p + d.attSize(p, d.kind(p));
-    if(aSeq.size() > 0) ctx.updates.addPrimitive(
-        new InsertAttribute(n, aSeq, l));
+    final DBNode par = (DBNode) dbn.parent();
+    // [LK] check par == null?
+    if(aSeq.size() > 0) 
+      if(into) ctx.updates.addPrimitive(
+        new InsertAttribute(dbn, aSeq, -1));
+      if(before || after) {
+        if(par == null) Err.or(UPDATE, this);
+        ctx.updates.addPrimitive(
+            new InsertAttribute(par, aSeq, -1));
+      }
     if(seq.size() > 0) {
       UpdatePrimitive up = null;
-      if(into) up = new InsertIntoPrimitive(n, seq, l); 
+      if(into)
+        if(first) up = new InsertIntoFirstPrimitive(dbn, seq, -1);
+        else if(last) up = new InsertIntoLastPrimitive(dbn, seq, -1);
+        else up = new InsertIntoPrimitive(dbn, seq, -1);
+      // [LK] debug!
+//      else if(before) up = new InsertBeforePrimitive(dbn, seq, -1);
+      else if(after) up = new InsertAfterPrimitive(dbn, seq, -1);
       else Err.or(UPDATE, this);
       ctx.updates.addPrimitive(up);
     }

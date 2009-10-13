@@ -113,7 +113,6 @@ public final class Replace extends Arr {
       // [LK] if value is replaced source expression is evaluated like a
       // text node constructor
       i = r.next();
-      // [LK] check how to deal with empty sequences
       if(i == null) Err.or(UPDATE, this);
       final int k = Nod.kind(n.type);
       if(i.type.num || i.type.str)
