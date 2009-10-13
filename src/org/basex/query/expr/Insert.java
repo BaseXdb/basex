@@ -11,14 +11,10 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.primitives.InsertAfterPrimitive;
-import org.basex.query.up.primitives.InsertBeforePrimitive;
-import org.basex.query.up.primitives.InsertIntoFirstPrimitive;
-import org.basex.query.up.primitives.InsertIntoLastPrimitive;
+import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertIntoPrimitive;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
-
 
 /**
  * Insert expression.
@@ -59,6 +55,7 @@ public final class Insert extends Arr {
     // check source constraints
     final Iter s = SeqIter.get(expr[1].iter(ctx));
     final SeqIter seq = new SeqIter();
+    final SeqIter aSeq = new SeqIter();
     Item i = s.next();
     // e needed to track order of attribute / non attribute nodes XUTY0004
     boolean e = false;
@@ -70,11 +67,12 @@ public final class Insert extends Arr {
         final int k = Nod.kind(tn.type);
         if(k == Data.ATTR) {
           if(e) Err.or(UPNOATTRPER, this);
+          aSeq.add(tn);
+        } else {
+          e = true;
+          if(Nod.kind(tn.type) == Data.DOC) seq.add(tn.child());
+          else seq.add(tn);
         }
-        if(k != Data.ATTR) e = true;
-        if(Nod.kind(tn.type) == Data.DOC) 
-          seq.add(tn.child());
-        else seq.add(tn);
       } else Err.or(UPDATE, this);
       i = s.next();
     }
@@ -94,20 +92,26 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
-    int pl = -1;
-    if(n instanceof DBNode) {
-      final DBNode dn = (DBNode) n;
-      pl = dn.pre + dn.data.attSize(dn.pre, dn.data.kind(dn.pre));
+    if(!(n instanceof DBNode)) {
+      if(aSeq.size() > 0) ctx.updates.
+        addPrimitive(new InsertAttribute(n, aSeq, -1));
+      if(seq.size() > 0) ctx.updates.
+      addPrimitive(new InsertAttribute(n, seq, -1));
+      return Iter.EMPTY;
     }
-    UpdatePrimitive p = null;
-    if(into) p = first ? new InsertIntoFirstPrimitive(n, seq, pl) : 
-      last ? new InsertIntoLastPrimitive(n, seq, pl) : 
-        new InsertIntoPrimitive(n, seq, pl);
     
-    if(after) p = new InsertAfterPrimitive(n, seq, pl);
-    if(before) p = new InsertBeforePrimitive(n, seq, pl);
-    
-    ctx.updates.addPrimitive(p);
+    final DBNode dbn = (DBNode) n;
+    final Data d = dbn.data;
+    int p = dbn.pre;
+    int l = p + d.attSize(p, d.kind(p));
+    if(aSeq.size() > 0) ctx.updates.addPrimitive(
+        new InsertAttribute(n, aSeq, l));
+    if(seq.size() > 0) {
+      UpdatePrimitive up = null;
+      if(into) up = new InsertIntoPrimitive(n, seq, l); 
+      else Err.or(UPDATE, this);
+      ctx.updates.addPrimitive(up);
+    }
     return Iter.EMPTY;
   }
 

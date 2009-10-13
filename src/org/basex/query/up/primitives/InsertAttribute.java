@@ -1,11 +1,16 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.up.UpdateFunctions.*;
 
+import java.util.Iterator;
+
+import org.basex.data.Data;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
+import org.basex.query.iter.SeqIter;
 
 /**
  * Insert attribute primitive.
@@ -21,27 +26,43 @@ public class InsertAttribute extends InsertPrimitive {
    * @param copy insertion nods
    * @param l actual insert location
    */
-  protected InsertAttribute(final Nod n, final Iter copy, final int l) {
+  public InsertAttribute(final Nod n, final Iter copy, final int l) {
     super(n, copy, l);
+  }
+
+  @SuppressWarnings("unused")
+  @Override
+  public void check() throws QueryException {
   }
 
   @Override
   public void apply() throws QueryException {
-    Err.or(UPDATE, this);
+    if(!(node instanceof DBNode)) return;
+    
+    final SeqIter seq = new SeqIter();
+    final Iterator<Iter> it = c.iterator();
+    while(it.hasNext()) {
+      final Iter ni = it.next();
+      Item i = ni.next();
+      while(i != null) {
+        seq.add(i);
+        i = ni.next();
+      }
+    }
+    if(seq.size() == 0) return;
+    final DBNode n = (DBNode) node;
+    final Data d = n.data;
+    insertAttributes(loc, n.pre, d, buildDB(seq, d));
   }
 
-  @Override
-  public void check() throws QueryException {
-    Err.or(UPDATE, this);
-  }
-
+  @SuppressWarnings("unused")
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(UPDATE, this);
+    c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 
   @Override
   public Type type() {
-    return null;
+    return Type.INSERTATTR;
   }
 }

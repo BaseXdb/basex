@@ -44,12 +44,13 @@ public final class DBPrimitives {
     // fragments
     else i = ((FNode) p.node).id();
     UpdatePrimitive[] l = op.get(i);
-    // [LK] same node, same kind of operation - what you wanna do?
+    final int pos = p.type().ordinal();
     if(l == null) {
       l = new UpdatePrimitive[Type.values().length];
-      l[p.type().ordinal()] = p;
+      l[pos] = p;
       op.put(i, l);
-    } else l[p.type().ordinal()].merge(p);
+    } else if(l[pos] == null) l[pos] = p;
+    else l[pos].merge(p);
   }
 
   /**

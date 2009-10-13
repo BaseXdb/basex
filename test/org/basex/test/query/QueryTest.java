@@ -21,7 +21,7 @@ import org.basex.util.Performance;
 public final class QueryTest {
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
+    /*new SimpleTest(), new XPathMarkFTTest(), new FTTest(), */new XQUPTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
