@@ -33,11 +33,11 @@ public final class LockingTest {
   /** Test query. */
   private static final String QUERY = "for $c in //country for $n in"
       + " //city where $c/@id = $n/@country and $n/name = 'Tirane'" +
-      		" return $n/population/text()";
+        " return $n/population/text()";
   /** Test query 2. */
   private static final String QUERYN = "for $c in doc('factbook')" +
-  		"//country for $n in doc('factbook')//city where $c/@id =" +
-  				" $n/@country and $n/name = 'Tirane' return $n/population/text()";
+    "//country for $n in doc('factbook')//city where $c/@id =" +
+    " $n/@country and $n/name = 'Tirane' return $n/population/text()";
   /** Test query 3.
   private static final String QUERY3 = "for $c in doc('factbook')//node()" +
       "where contains($c/text(), 'a') return $c";
@@ -47,9 +47,9 @@ public final class LockingTest {
   /** Socket reference. */
   static Session session2;
   /** Status of test. */
-  boolean done = false;
+  boolean done;
   /** Number of done eff tests. */
-  int tdone = 0;
+  int tdone;
   /** Number of eff tests. */
   int tests = 5;
 
@@ -106,7 +106,7 @@ public final class LockingTest {
       err("test failed write read / read write");
     } else {
       System.out.println("--> All Locking Tests done...," +
-      		" efficiency test started...");
+        " efficiency test started...");
     }
     for(int i = 0; i < tests; i++) {
       startQueryT(createSession());
@@ -154,8 +154,8 @@ public final class LockingTest {
   ClientSession createSession() {
     try {
       return new ClientSession(server.context);
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
     return null;
   }
@@ -195,7 +195,7 @@ public final class LockingTest {
       @Override
       public void run() {
         Performance.sleep(300);
-        String result = process(new CreateDB(FILE), session2);
+        final String result = process(new CreateDB(FILE), session2);
         if(result == null) err("test failed conCreate");
         else System.out.println("Message: " + result);
       }
@@ -219,7 +219,7 @@ public final class LockingTest {
         String result = "";
         if(test2) {
           result = process(new XQuery(QUERY), session2);
-          String res = checkRes(session2);
+          final String res = checkRes(session2);
           if(!res.equals("192000")) err("test failed: " + res);
         } else {
           result = process(new Delete("//aa"), session2);
@@ -230,7 +230,7 @@ public final class LockingTest {
     }.start();
     if(test1) {
       process(new XQuery(QUERY), session1);
-      String res = checkRes(session1);
+      final String res = checkRes(session1);
       if(!res.equals("192000")) err("test failed: " + res);
     } else {
       process(new Insert(CmdUpdate.ELEMENT, "//members", "aa"), session1);
@@ -246,11 +246,11 @@ public final class LockingTest {
    * @return String result
    */
   String checkRes(final Session s) {
-    CachedOutput out = new CachedOutput();
+    final CachedOutput out = new CachedOutput();
     try {
       s.output(out);
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
     return out.toString();
   }

@@ -110,7 +110,7 @@ public class BaseXText extends BaseXPanel {
    * Sets the output text.
    * @param t output text
    */
-  public void setText(final byte[] t) {
+  public final void setText(final byte[] t) {
     setText(t, t.length);
   }
 
@@ -118,7 +118,7 @@ public class BaseXText extends BaseXPanel {
    * Adds a search dialog.
    * @param f search field
    */
-  public void addSearch(final BaseXTextField f) {
+  public final void addSearch(final BaseXTextField f) {
     f.addSearch(this);
     find = f;
   }
@@ -128,7 +128,7 @@ public class BaseXText extends BaseXPanel {
    * @param t output text
    * @param b backward browsing
    */
-  public void find(final String t, final boolean b) {
+  public final void find(final String t, final boolean b) {
     find(rend.find(t, b));
   }
 
@@ -136,7 +136,7 @@ public class BaseXText extends BaseXPanel {
    * Displays the search term.
    * @param y vertical position
    */
-  public void find(final int y) {
+  public final void find(final int y) {
     // updates the visible area
     final int p = scroll.pos();
     final int m = y + rend.fontH() * 3 - getHeight();
@@ -149,7 +149,7 @@ public class BaseXText extends BaseXPanel {
    * @param t output text
    * @param s text size
    */
-  public void setText(final byte[] t, final int s) {
+  public final void setText(final byte[] t, final int s) {
     // remove 0x0Ds (carriage return) and compare old with new string
     int ns = 0;
     final int ts = text.size();
@@ -176,7 +176,7 @@ public class BaseXText extends BaseXPanel {
    * Sets a syntax highlighter.
    * @param s syntax reference
    */
-  public void setSyntax(final BaseXSyntax s) {
+  public final void setSyntax(final BaseXSyntax s) {
     rend.setSyntax(s);
   }
 
@@ -184,7 +184,7 @@ public class BaseXText extends BaseXPanel {
    * Sets a new cursor position.
    * @param p cursor position
    */
-  public void setCaret(final int p) {
+  public final void setCaret(final int p) {
     text.setCaret(p);
     showCursor(1);
     cursor(true);
@@ -194,12 +194,12 @@ public class BaseXText extends BaseXPanel {
    * Returns the output text.
    * @return output text
    */
-  public byte[] getText() {
+  public final byte[] getText() {
     return text.finish();
   }
 
   @Override
-  public void setFont(final Font f) {
+  public final void setFont(final Font f) {
     if(rend != null) {
       rend.setFont(f);
       rend.repaint();
@@ -210,13 +210,13 @@ public class BaseXText extends BaseXPanel {
    * Refreshes the syntax highlighting.
    * @param s start of optional error mark
    */
-  public void error(final int s) {
+  public final void error(final int s) {
     text.error(s);
     rend.repaint();
   }
 
   @Override
-  public void setEnabled(final boolean e) {
+  public final void setEnabled(final boolean e) {
     super.setEnabled(e);
     rend.setEnabled(e);
     scroll.setEnabled(e);
@@ -226,7 +226,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Selects the whole text.
    */
-  public void selectAll() {
+  public final void selectAll() {
     text.pos(0);
     text.startMark();
     text.pos(text.size());
@@ -237,23 +237,23 @@ public class BaseXText extends BaseXPanel {
   // MOUSE INTERACTIONS =======================================================
 
   @Override
-  public void mouseEntered(final MouseEvent e) {
+  public final void mouseEntered(final MouseEvent e) {
     gui.cursor(GUIConstants.CURSORTEXT);
   }
 
   @Override
-  public void mouseExited(final MouseEvent e) {
+  public final void mouseExited(final MouseEvent e) {
     gui.cursor(GUIConstants.CURSORARROW);
   }
 
   @Override
-  public void mouseReleased(final MouseEvent e) {
+  public final void mouseReleased(final MouseEvent e) {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
     rend.stopSelect();
   }
 
   @Override
-  public void mouseDragged(final MouseEvent e) {
+  public final void mouseDragged(final MouseEvent e) {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
     // selection mode
@@ -264,7 +264,7 @@ public class BaseXText extends BaseXPanel {
   }
 
   @Override
-  public void mousePressed(final MouseEvent e) {
+  public final void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     if(!isEnabled()) return;
 
@@ -307,7 +307,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Selects the word at the cursor position.
    */
-  void selectLine() {
+  private void selectLine() {
     text.pos(text.cursor());
     text.home(true);
     text.startMark();
@@ -436,7 +436,7 @@ public class BaseXText extends BaseXPanel {
    * Displays the currently edited text area.
    * @param align vertical alignment
    */
-  public void showCursor(final int align) {
+  public final void showCursor(final int align) {
     // updates the visible area
     final int p = scroll.pos();
     final int y = rend.cursorY();
@@ -485,7 +485,7 @@ public class BaseXText extends BaseXPanel {
   }
 
   @Override
-  public void keyTyped(final KeyEvent e) {
+  public final void keyTyped(final KeyEvent e) {
     if(undo == null) return;
 
     // not nice here.. no alternative, though
@@ -539,7 +539,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Undoes the text.
    */
-  protected void undo() {
+  protected final void undo() {
     if(undo == null) return;
     text = new BaseXTextTokens(undo.prev());
     rend.setText(text);
@@ -549,7 +549,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Redoes the text.
    */
-  protected void redo() {
+  protected final void redo() {
     if(undo == null) return;
     text = new BaseXTextTokens(undo.next());
     rend.setText(text);
@@ -559,7 +559,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Cuts the selected text to the clipboard.
    */
-  protected void cut() {
+  protected final void cut() {
     text.pos(text.cursor());
     if(copy()) delete();
   }
@@ -568,7 +568,7 @@ public class BaseXText extends BaseXPanel {
    * Copies the selected text to the clipboard.
    * @return true if text was copied
    */
-  protected boolean copy() {
+  protected final boolean copy() {
     final String txt = text.copy();
     if(txt.length() == 0) {
       text.noMark();
@@ -584,7 +584,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Pastes the clipboard text.
    */
-  protected void paste() {
+  protected final void paste() {
     // copy selection to clipboard
     final String txt = clip();
     if(txt == null) return;
@@ -598,7 +598,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Deletes the selected text.
    */
-  protected void delete() {
+  protected final void delete() {
     text.pos(text.cursor());
     text.delete();
     if(undo != null) undo.store(text.finish(), text.cursor());
@@ -609,7 +609,7 @@ public class BaseXText extends BaseXPanel {
    * Returns the clipboard text.
    * @return text
    */
-  public String clip() {
+  public final String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable t = clip.getContents(null);
@@ -636,7 +636,7 @@ public class BaseXText extends BaseXPanel {
    * new one has been started.
    * @param start start/stop flag
    */
-  protected void cursor(final boolean start) {
+  protected final void cursor(final boolean start) {
     cursor.stop();
     if(start) cursor.start();
     rend.cursor(start);
@@ -644,13 +644,13 @@ public class BaseXText extends BaseXPanel {
   }
 
   @Override
-  public void mouseWheelMoved(final MouseWheelEvent e) {
+  public final void mouseWheelMoved(final MouseWheelEvent e) {
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
     rend.repaint();
   }
 
   @Override
-  public void componentResized(final ComponentEvent e) {
+  public final void componentResized(final ComponentEvent e) {
     scroll.pos(0);
     SwingUtilities.invokeLater(calc);
   }

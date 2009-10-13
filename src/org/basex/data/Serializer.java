@@ -209,7 +209,7 @@ public abstract class Serializer {
    * Closes the serializer.
    * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  public final void close() throws IOException {
     cls();
     if(tags.size() > 0) throw new IOException(
         "<" + string(tags.get(tags.size())) + "> still opened");

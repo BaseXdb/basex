@@ -39,7 +39,7 @@ public abstract class IndexBuilder extends Progress {
   }
 
   @Override
-  public void checkStop() {
+  public final void checkStop() {
     if(stopped) {
       try {
         data.close();
@@ -56,7 +56,7 @@ public abstract class IndexBuilder extends Progress {
   }
 
   @Override
-  public double prog() {
+  public final double prog() {
     return (double) id / total;
   }
 }

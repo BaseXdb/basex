@@ -47,7 +47,7 @@ public abstract class AProp {
     final File file = new File(filename);
     if(!file.exists()) return;
 
-    TokenBuilder err = new TokenBuilder();
+    final TokenBuilder err = new TokenBuilder();
     try {
       final BufferedReader br = new BufferedReader(new FileReader(file));
       String line = null;
@@ -103,7 +103,7 @@ public abstract class AProp {
   /**
    * Writes the properties to disk.
    */
-  public synchronized void write() {
+  public final synchronized void write() {
     final File file = new File(filename);
 
     try {
@@ -160,7 +160,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public Object object(final String key) {
+  public final Object object(final String key) {
     return props.get(key);
   }
 
@@ -169,7 +169,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public String get(final Object[] key) {
+  public final String get(final Object[] key) {
     return get(key, String.class).toString();
   }
 
@@ -178,7 +178,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public int num(final Object[] key) {
+  public final int num(final Object[] key) {
     return ((Integer) get(key, Integer.class)).intValue();
   }
 
@@ -187,7 +187,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public boolean is(final Object[] key) {
+  public final boolean is(final Object[] key) {
     return ((Boolean) get(key, Boolean.class)).booleanValue();
   }
 
@@ -196,7 +196,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public String[] strings(final Object[] key) {
+  public final String[] strings(final Object[] key) {
     return (String[]) get(key, String[].class);
   }
 
@@ -205,7 +205,7 @@ public abstract class AProp {
    * @param key key to be found
    * @return value
    */
-  public int[] nums(final Object[] key) {
+  public final int[] nums(final Object[] key) {
     return (int[]) get(key, int[].class);
   }
 
@@ -214,7 +214,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final Object[] key, final String val) {
+  public final void set(final Object[] key, final String val) {
     set(key, val, String.class);
   }
 
@@ -223,7 +223,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final Object[] key, final int val) {
+  public final void set(final Object[] key, final int val) {
     set(key, val, Integer.class);
   }
 
@@ -232,7 +232,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final Object[] key, final boolean val) {
+  public final void set(final Object[] key, final boolean val) {
     set(key, val, Boolean.class);
   }
 
@@ -241,7 +241,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final Object[] key, final String[] val) {
+  public final void set(final Object[] key, final String[] val) {
     set(key, val, String[].class);
   }
 
@@ -250,7 +250,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final Object[] key, final int[] val) {
+  public final void set(final Object[] key, final int[] val) {
     set(key, val, int[].class);
   }
 
@@ -259,7 +259,7 @@ public abstract class AProp {
    * @param key key to be found
    * @param val value to be written
    */
-  public void set(final String key, final Object val) {
+  public final void set(final String key, final Object val) {
     props.put(key, val);
     finish();
   }
@@ -269,7 +269,7 @@ public abstract class AProp {
    * @param key key
    * @return new value
    */
-  public boolean invert(final Object[] key) {
+  public final boolean invert(final Object[] key) {
     final boolean val = !is(key);
     set(key, val);
     return val;

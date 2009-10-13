@@ -31,9 +31,9 @@ public final class TreeView extends View {
   /** Current font height. */
   private int fontHeight;
   /** The sum of all size values of a node line. */
-  int sumNodeSizeInLine = 0;
+  int sumNodeSizeInLine;
   /** Array-list of array-list with the current rectangles. */
-  private ArrayList<ArrayList<TreeRect>> rectsPerLevel = null;
+  private ArrayList<ArrayList<TreeRect>> rectsPerLevel;
 
   // Constants
   /** Color for nodes. **/
@@ -55,18 +55,18 @@ public final class TreeView extends View {
 
   // Options
   /** Draw only element nodes. */
-  private boolean onlyElementNodes = false;
+  private final boolean onlyElementNodes = false;
   /** Show parent node. */
-  private boolean showParentNode = true;
+  private final boolean showParentNode = true;
   /** Show children nodes. */
-  private boolean showChildNodes = true;
+  private final boolean showChildNodes = true;
   /** Always draw same node space. */
-  private boolean consistentNodeSpace = true;
+  private final boolean consistentNodeSpace = true;
   /** Sum of spaces in current node line. */
   private int nodeSpacesPerLine = -1;
 
   /** Nodes in current line. */
-  private int nodeCount = 0;
+  private int nodeCount;
   /** Current mouse position x. */
   private int mousePosX = -1;
   /** Current mouse position y. */
@@ -76,27 +76,27 @@ public final class TreeView extends View {
   /** Window height. */
   private int wheight = -1;
   /** Currently focused rectangle. */
-  private TreeRect focusedRect = null;
+  private TreeRect focusedRect;
   /** Level of currently focused rectangle. */
   private int focusedRectLevel = -1;
   /** Current Image of visualization. */
-  private BufferedImage treeImage = null;
+  private BufferedImage treeImage;
   /** Depth of the document. */
   // private int documentDepth = -1;
   /** Notified focus flag. */
-  private boolean refreshedFocus = false;
+  private boolean refreshedFocus;
   /** Notified mark flag. */
-  private boolean refreshedMark = false;
+  private boolean refreshedMark;
   /** Height of the rectangles. */
   private int nodeHeight = -1;
   /** Distance between the levels. */
   private int levelDistance = -1;
   /** Image of the current marked nodes. */
-  private BufferedImage markedImage = null;
+  private BufferedImage markedImage;
   /** If something is selected. */
-  private boolean selection = false;
+  private boolean selection;
   /** The selection rectangle. */
-  private ViewRect selectRect = null;
+  private ViewRect selectRect;
 
   /**
    * Default Constructor.
@@ -228,7 +228,7 @@ public final class TreeView extends View {
     final IntList list = new IntList();
 
     for(int i = 0; i < size; i++) {
-      int yL = getYperLevel(i);
+      final int yL = getYperLevel(i);
 
       if((yL >= f || yL + nodeHeight >= f) &&
           (yL <= t || yL + nodeHeight <= t)) {
@@ -257,7 +257,7 @@ public final class TreeView extends View {
           boolean b = false;
 
           for(int j = 0; j < rList.size(); j++) {
-            TreeRect tR = rList.get(j);
+            final TreeRect tR = rList.get(j);
 
             if(!b && tR.contains(x)) b = true;
 
@@ -333,7 +333,7 @@ public final class TreeView extends View {
       while(iterator.more()) {
         final int pre = iterator.next();
 
-        if(!onlyElementNodes || data.kind(pre) == Data.ELEM) {
+        if(!onlyElementNodes) { // dead code..|| data.kind(pre) == Data.ELEM) {
           temp.add(pre);
           ++nCount;
         }
@@ -362,20 +362,20 @@ public final class TreeView extends View {
         (getSize().width - 1 / (double) numberOfRoots)
         : getSize().width - 1;
 
-    // calculate the important coordinate values of a rectangle
-    final int y = getYperLevel(level);
-    final int h = nodeHeight;
-    final int x = 0;
-    final int size = nodeList.length;
-    final double w = screenWidth
+        // calculate the important coordinate values of a rectangle
+        final int y = getYperLevel(level);
+        final int h = nodeHeight;
+        final int x = 0;
+        final int size = nodeList.length;
+        final double w = screenWidth
         / ((double) size - (consistentNodeSpace && level > 0 ? nodeSpacesPerLine
             : 0));
 
-    if(w < 2) {
-      drawBigRectangle(g, level, nodeList, screenWidth, y, h);
-    } else {
-      drawRectangles(g, level, nodeList, x, w, y, h, size);
-    }
+        if(w < 2) {
+          drawBigRectangle(g, level, nodeList, screenWidth, y, h);
+        } else {
+          drawRectangles(g, level, nodeList, x, w, y, h, size);
+        }
 
   }
 
@@ -390,13 +390,12 @@ public final class TreeView extends View {
    */
   private void drawBigRectangle(final Graphics g, final int level,
       final int[] nodeList, final double w, final int y, final int h) {
-    TreeRect bigRect = new TreeRect();
+    final TreeRect bigRect = new TreeRect();
     bigRect.x = 0;
     bigRect.w = (int) w;
 
-    IntList nodeLine = new IntList();
-    for(int i = 0; i < nodeList.length; i++) {
-      int pre = nodeList[i];
+    final IntList nodeLine = new IntList();
+    for(final int pre : nodeList) {
       if(pre > -1) nodeLine.add(pre);
     }
 
@@ -438,9 +437,9 @@ public final class TreeView extends View {
 
     for(int i = 0; i < size; i++) {
 
-      double boxMiddle = xx + w / 2f;
+      final double boxMiddle = xx + w / 2f;
 
-      int pre = nodeList[i];
+      final int pre = nodeList[i];
 
       if(pre == -1) {
 
@@ -493,7 +492,7 @@ public final class TreeView extends View {
     final Graphics mIg = markedImage.getGraphics();
 
     final int size = gui.context.marked().size();
-    int[] marked = new int[size];
+    final int[] marked = new int[size];
     System.arraycopy(gui.context.marked().sorted, 0, marked, 0, size);
 
     for(int k = 0; k < rectsPerLevel.size(); k++) {
@@ -505,15 +504,15 @@ public final class TreeView extends View {
         final TreeRect currRect = rList.get(0);
 
         for(int j = 0; j < size; j++) {
-          int pre = marked[j];
+          final int pre = marked[j];
 
           if(pre == -1) continue;
 
-          int index = searchPreArrayPosition(currRect.multiPres, pre);
+          final int index = searchPreArrayPosition(currRect.multiPres, pre);
 
           if(index > -1) {
 
-            int x = (int) (currRect.w * index /
+            final int x = (int) (currRect.w * index /
                 (double) currRect.multiPres.length);
 
             mIg.setColor(Color.RED);
@@ -527,11 +526,11 @@ public final class TreeView extends View {
       } else {
 
         for(int j = 0; j < size; j++) {
-          int pre = marked[j];
+          final int pre = marked[j];
 
           if(pre == -1) continue;
 
-          TreeRect rect = searchRect(rList, pre);
+          final TreeRect rect = searchRect(rList, pre);
 
           if(rect != null) {
             mIg.setColor(Color.RED);
@@ -593,7 +592,7 @@ public final class TreeView extends View {
 
           final int pIndex = searchPreArrayPosition(mPreRect.multiPres, par);
           final double pRatio = pIndex
-              / (double) (mPreRect.multiPres.length - 1);
+          / (double) (mPreRect.multiPres.length - 1);
 
           g.setColor(Color.RED);
           g.drawLine((int) (mPreRect.w * pRatio), getYperLevel(l),
@@ -668,7 +667,7 @@ public final class TreeView extends View {
     // + Token.string(data.attValue(pre + y + 1)) + "\" ";
     // }
 
-    int w = BaseXLayout.width(g, s);
+    final int w = BaseXLayout.width(g, s);
     g.setColor(highlightColor);
 
     if(r.pre == 0) {
@@ -726,7 +725,7 @@ public final class TreeView extends View {
       }
     } else {
 
-      int level = getLevelPerY(mousePosY);
+      final int level = getLevelPerY(mousePosY);
 
       if(level == -1 || level >= rectsPerLevel.size()) return false;
 
@@ -743,8 +742,8 @@ public final class TreeView extends View {
 
           // if multiple pre values, then approximate pre value
           if(r.multiPres != null) {
-            double ratio = mousePosX / (double) r.w;
-            int index = (int) ((r.multiPres.length - 1) * ratio);
+            final double ratio = mousePosX / (double) r.w;
+            final int index = (int) ((r.multiPres.length - 1) * ratio);
             pre = r.multiPres[index];
             r.pre = pre;
           }
@@ -868,7 +867,7 @@ public final class TreeView extends View {
     int r = rList.size() - 1;
 
     while(r >= l && rect == null) {
-      int m = l + (r - l) / 2;
+      final int m = l + (r - l) / 2;
 
       if(rList.get(m).pre < pre) {
         l = m + 1;
@@ -894,7 +893,7 @@ public final class TreeView extends View {
     int r = a.length - 1;
 
     while(r >= l && index == -1) {
-      int m = l + (r - l) / 2;
+      final int m = l + (r - l) / 2;
 
       if(a[m] < pre) {
         l = m + 1;
@@ -955,8 +954,8 @@ public final class TreeView extends View {
       selectRect.w = 1;
 
     } else {
-      int x = e.getX();
-      int y = e.getY();
+      final int x = e.getX();
+      final int y = e.getY();
 
       selectRect.w = x - selectRect.x;
       selectRect.h = y - selectRect.y;

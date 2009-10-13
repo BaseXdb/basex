@@ -46,7 +46,7 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx).addText(ctx);
     final boolean fast = ctx.ftfast;
     ctx.ftfast &= ctx.ftpos == null;
@@ -94,7 +94,8 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public final boolean indexAccessible(final IndexContext ic)
+      throws QueryException {
     // return if step is no text node, or if no index is available
     final Step s = CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftxindex &&
@@ -104,7 +105,8 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public final Expr indexEquivalent(final IndexContext ic)
+      throws QueryException {
     ic.ctx.compInfo(OPTFTXINDEX);
 
     final FTExpr ie = ftexpr.indexEquivalent(ic);
@@ -117,34 +119,34 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     return expr.uses(u, ctx) || ftexpr.uses(u, ctx);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v, final QueryContext ctx) {
     return expr.removable(v, ctx) && ftexpr.removable(v, ctx);
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     expr = expr.remove(v);
     ftexpr = ftexpr.remove(v);
     return this;
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.BLN;
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "33CC33";
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr.plan(ser);
     ftexpr.plan(ser);

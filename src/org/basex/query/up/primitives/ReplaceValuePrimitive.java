@@ -12,8 +12,7 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class ReplaceValuePrimitive extends NewValuePrimitive {
-
+public final class ReplaceValuePrimitive extends NewValuePrimitive {
   /**
    * Constructor.
    * @param n target node

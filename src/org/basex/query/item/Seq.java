@@ -73,7 +73,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public long size(final QueryContext ctx) {
+  public final long size(final QueryContext ctx) {
     return size;
   }
 
@@ -100,19 +100,19 @@ public class Seq extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
+  public final boolean eq(final Item it) throws QueryException {
     castErr(it);
     return false;
   }
 
   @Override
-  public int diff(final Item it) {
+  public final int diff(final Item it) {
     Main.notexpected();
     return 0;
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
+  public final void serialize(final Serializer ser) throws IOException {
     for(int i = 0; i < size; i++) {
       ser.openResult();
       val[i].serialize(ser);
@@ -121,24 +121,24 @@ public class Seq extends Item {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.SEQ;
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public final boolean duplicates(final QueryContext ctx) {
     return size != 0;
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(Token.token("sequence"), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder("(");
     for(int v = 0; v != size; v++) {
       sb.append((v != 0 ? ", " : "") + val[v]);

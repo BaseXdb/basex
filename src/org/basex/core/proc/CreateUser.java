@@ -6,8 +6,7 @@ package org.basex.core.proc;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class CreateUser extends ACreate {
-
+public final class CreateUser extends ACreate {
   /**
    * Default constructor.
    * @param name username
@@ -19,7 +18,7 @@ public class CreateUser extends ACreate {
 
   @Override
   protected boolean exec() {
-    boolean check = context.users.createUser(args[0], args[1]);
+    final boolean check = context.users.createUser(args[0], args[1]);
     if(check) return check;
     return error("User couldnt be created");
   }

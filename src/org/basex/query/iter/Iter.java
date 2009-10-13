@@ -94,7 +94,7 @@ public abstract class Iter implements Iterable<Item> {
     return Seq.get(item, s);
   }
 
-  public Iterator<Item> iterator() {
+  public final Iterator<Item> iterator() {
     return new Iterator<Item>() {
       private Item next;
       public boolean hasNext() {

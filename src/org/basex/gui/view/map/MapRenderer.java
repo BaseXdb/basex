@@ -782,7 +782,8 @@ final class MapRenderer {
       for(int i = 0; i < tl.size(); i++) {
         l = 0;
         final byte[] tok = tl.get(i);
-        for(int n = 0, ns = tok.length; n < ns; n += cl(tok[n])) {
+        final int ns = tok.length;
+        for(int n = 0; n < ns; n += cl(tok[n])) {
           l += BaseXLayout.width(g, cw, cp(tok, n));
         }
         if(wl + l + sw < wi) wl += l + sw;
@@ -806,7 +807,8 @@ final class MapRenderer {
 
       g.setColor(COLORS[20]);
       wl = 0;
-      for(int i = 0, is = tl.size(); i < is; i++) {
+      final int is = tl.size();
+      for(int i = 0; i < is; i++) {
         l = len.get(i);
         if(wl + l + sw >= wi) {
           yy += fs + 1;

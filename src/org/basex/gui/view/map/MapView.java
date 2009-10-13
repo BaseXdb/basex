@@ -96,11 +96,11 @@ public final class MapView extends View implements Runnable {
   /** Huge Map. */
   private BufferedImage hugeMap;
   /** Linear magnification. */
-  private boolean constMag = false;
+  private boolean constMag;
   /** Draw ThumbMap. */
-  private boolean thumbMap = false;
+  private boolean thumbMap;
   /** Mapdistortion. */
-  private boolean mapdist = false;
+  private boolean mapdist;
   /** scaling. */
   private static int fkt = 4;
   /** Y pos tiny Map. */
@@ -165,7 +165,8 @@ public final class MapView extends View implements Runnable {
     if(gui.focused == -1 && focused != null) focused = null;
 
     final MapRect m = focused;
-    for(int mi = 0, ms = mainRects.size; mi < ms; mi++) {
+    final int ms = mainRects.size;
+    for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
       if(gui.focused == rect.pre || mi + 1 < ms
           && gui.focused < mainRects.get(mi + 1).pre) {
@@ -505,8 +506,8 @@ public final class MapView extends View implements Runnable {
       g.setColor(Color.black);
       g.drawRect(tinyx, tinyy, tinyw, tinyh);
     } else if(gprop.is(GUIProp.MAPINTERACTION) && constMag) {
-      int fishw = gprop.num(GUIProp.FISHW);
-      int fishh = gprop.num(GUIProp.FISHH);
+      final int fishw = gprop.num(GUIProp.FISHW);
+      final int fishh = gprop.num(GUIProp.FISHH);
       int dxstart = mouseX - fishw / 2;
       int dxend = mouseX + fishw / 2;
       if(dxstart < 0) {
@@ -824,7 +825,8 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     final IntList il = new IntList();
     int np = 0;
-    for(int r = 0, rl = mainRects.size; r < rl; r++) {
+    final int rl = mainRects.size;
+    for(int r = 0; r < rl; r++) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {

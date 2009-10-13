@@ -47,7 +47,7 @@ public abstract class IO {
   protected byte[] cont;
 
   /** First call. */
-  protected boolean more = false;
+  protected boolean more;
 
   /** Empty Constructor. */
   protected IO() { }

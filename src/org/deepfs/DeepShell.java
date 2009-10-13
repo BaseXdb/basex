@@ -185,9 +185,9 @@ public final class DeepShell {
       help(new String[] { "help", "stat"});
       return;
     }
-    DeepStat dst = fs.stat(args[1]);
+    final DeepStat dst = fs.stat(args[1]);
     if(dst == null) System.err.printf("stat failed.\n");
-    PrintStream ps = new PrintStream(System.out);
+    final PrintStream ps = new PrintStream(System.out);
     dst.printFields("deepshell: ", ps);
     ps.flush();
   }
@@ -203,7 +203,7 @@ public final class DeepShell {
       help(new String[] { "help", "list"});
       return;
     }
-    byte[][] dents = fs.readdir(args[1]);
+    final byte[][] dents = fs.readdir(args[1]);
     if(dents == null) System.err.printf("listing failed.\n");
     for(byte[] de : dents)
       Main.out(">> " + string(de));
@@ -223,8 +223,8 @@ public final class DeepShell {
     try {
       new InfoTable(null, null).execute(fs.getContext(), new PrintOutput(
           System.out));
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
   }
 

@@ -15,8 +15,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertAttribute extends InsertPrimitive {
-
+public final class InsertAttribute extends InsertPrimitive {
   /**
    * Constructor.
    * @param n target node

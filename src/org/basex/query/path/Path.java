@@ -41,7 +41,7 @@ public abstract class Path extends Expr {
    * @param ctx query context
    * @return result of check
    */
-  protected boolean uses(final Expr[] step, final Use use,
+  protected final boolean uses(final Expr[] step, final Use use,
       final QueryContext ctx) {
 
     if(use == Use.CTX || use == Use.ELM)
@@ -56,7 +56,7 @@ public abstract class Path extends Expr {
    * @param ctx query context
    * @return root
    */
-  protected Item root(final QueryContext ctx) {
+  protected final Item root(final QueryContext ctx) {
     final Item it = ctx != null ? ctx.item : null;
     if(root == null) return it;
     if(root.i()) return (Item) root;
@@ -82,7 +82,7 @@ public abstract class Path extends Expr {
    * @param step step array
    * @throws IOException I/O exception
    */
-  void plan(final Serializer ser, final Expr[] step) throws IOException {
+  final void plan(final Serializer ser, final Expr[] step) throws IOException {
     ser.openElement(this);
     if(root != null) root.plan(ser);
     for(final Expr s : step) s.plan(ser);
@@ -94,7 +94,7 @@ public abstract class Path extends Expr {
    * @param step step array
    * @return string representation
    */
-  public String toString(final Expr[] step) {
+  public final String toString(final Expr[] step) {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
     for(final Expr s : step) sb.append((sb.length() != 0 ? "/" : "") + s);

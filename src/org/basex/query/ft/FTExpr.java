@@ -55,7 +55,7 @@ public abstract class FTExpr extends Expr {
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     for(final FTExpr e : expr) if(e.uses(u, ctx)) return true;
     return false;
   }
@@ -73,7 +73,7 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.BLN;
   }
 

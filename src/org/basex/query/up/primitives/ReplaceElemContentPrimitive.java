@@ -14,7 +14,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class ReplaceElemContentPrimitive extends UpdatePrimitive {
+public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
   /** Replacing text node. */ 
   public byte[] r;
 

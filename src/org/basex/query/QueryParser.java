@@ -161,7 +161,7 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public Expr parse(final String q, final IO f, final Uri u)
+  public final Expr parse(final String q, final IO f, final Uri u)
       throws QueryException {
     init(q);
     file = f;
@@ -180,7 +180,9 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public Expr parse(final Uri u, final boolean end) throws QueryException {
+  public final Expr parse(final Uri u, final boolean end)
+      throws QueryException {
+
     try {
       versionDecl();
       Expr ex = null;
@@ -529,7 +531,8 @@ public class QueryParser extends InputParser {
     try {
       if(fl.size() == 0) {
         boolean found = false;
-        for(int n = 0, ns = ctx.modules.size(); n < ns; n += 2) {
+        final int ns = ctx.modules.size();
+        for(int n = 0; n < ns; n += 2) {
           if(ctx.modules.get(n).equals(string(uri))) {
             module(ctx.modules.get(n + 1), name.uri);
             modLoaded.add(uri);
@@ -538,7 +541,8 @@ public class QueryParser extends InputParser {
         }
         if(!found) error(NOMODULE, uri);
       }
-      for(int n = 0, ns = fl.size(); n < ns; n++) {
+      final int ns = fl.size();
+      for(int n = 0; n < ns; n++) {
         module(string(fl.get(n)), name.uri);
         modLoaded.add(uri);
       }
@@ -673,7 +677,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected Expr expr() throws QueryException {
+  protected final Expr expr() throws QueryException {
     final Expr e = single();
     if(e == null) {
       if(more()) return null;
@@ -1227,7 +1231,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  public Expr path() throws QueryException {
+  public final Expr path() throws QueryException {
     checkInit();
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     if(s > 0) checkAxis(s == 2 ? Axis.DESC : Axis.CHILD);
@@ -1281,7 +1285,7 @@ public class QueryParser extends InputParser {
    * Returns a standard descendant-or-self::node() step.
    * @return step
    */
-  protected Step descOrSelf() {
+  protected final Step descOrSelf() {
     return Step.get(Axis.DESCORSELF, Test.NODE);
   }
 
@@ -1319,7 +1323,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected Expr step() throws QueryException {
+  protected final Expr step() throws QueryException {
     final Expr e = filter();
     return e != null ? e : axis();
   }
@@ -1329,7 +1333,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  Step axis() throws QueryException {
+  final Step axis() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1382,7 +1386,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected Test test(final boolean att) throws QueryException {
+  protected final Test test(final boolean att) throws QueryException {
     final int p = qp;
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
@@ -2653,7 +2657,7 @@ public class QueryParser extends InputParser {
    * @param tb token builder
    * @throws QueryException query exception
    */
-  void entity(final TokenBuilder tb) throws QueryException {
+  final void entity(final TokenBuilder tb) throws QueryException {
     final String ent = ent(tb);
     if(ent != null) error(ENTINVALID, ent);
   }
@@ -2665,7 +2669,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  protected Expr check(final Expr expr, final Object[] err)
+  protected final Expr check(final Expr expr, final Object[] err)
       throws QueryException {
     if(expr == null) error(err);
     return expr;
@@ -2687,7 +2691,7 @@ public class QueryParser extends InputParser {
    * @param s string to be found.
    * @throws QueryException query exception
    */
-  protected void check(final String s) throws QueryException {
+  protected final void check(final String s) throws QueryException {
     if(!consumeWS2(s)) error(WRONGCHAR, s, found());
   }
 
@@ -2730,7 +2734,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected boolean consumeWS(final String s1, final String s2,
+  protected final boolean consumeWS(final String s1, final String s2,
       final Object[] expr) throws QueryException {
     final int p = qp;
     if(!consumeWS(s1)) return false;
@@ -2748,7 +2752,7 @@ public class QueryParser extends InputParser {
    * @return true if string was found
    * @throws QueryException query exception
    */
-  protected boolean consumeWS2(final String str) throws QueryException {
+  protected final boolean consumeWS2(final String str) throws QueryException {
     skipWS();
     return consume(str);
   }
@@ -2806,7 +2810,7 @@ public class QueryParser extends InputParser {
    * Throws the alternative error message.
    * @throws QueryException query exception
    */
-  void error() throws QueryException {
+  final void error() throws QueryException {
     qp = ap;
     if(alter.length != 1) error(alter);
     ctx.fun.funError((QNm) alter[0]);
@@ -2830,7 +2834,9 @@ public class QueryParser extends InputParser {
    * @return new array
    * @throws QueryException query exception
    */
-  protected Expr[] add(final Expr[] ar, final Expr e) throws QueryException {
+  protected final Expr[] add(final Expr[] ar, final Expr e)
+      throws QueryException {
+
     if(e == null) error(INCOMPLETE);
     final int size = ar.length;
     final Expr[] t = new Expr[size + 1];

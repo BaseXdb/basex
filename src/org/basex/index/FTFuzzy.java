@@ -234,7 +234,7 @@ public final class FTFuzzy extends FTIndex {
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;
 
-    int err = data.meta.prop.num(Prop.LSERR);
+    final int err = data.meta.prop.num(Prop.LSERR);
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;

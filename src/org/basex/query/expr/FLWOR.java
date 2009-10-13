@@ -145,12 +145,12 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.VAR || ret.uses(u, ctx);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v, final QueryContext ctx) {
     for(final ForLet f : fl) {
       if(!f.removable(v, ctx)) return false;
       if(f.shadows(v)) return true;
@@ -160,7 +160,7 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     for(final ForLet f : fl) {
       f.remove(v);
       if(f.shadows(v)) return this;
@@ -172,7 +172,7 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.SEQ;
   }
 

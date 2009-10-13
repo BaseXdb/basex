@@ -98,7 +98,7 @@ public class Dur extends Item {
    * Returns the years.
    * @return year
    */
-  public int yea() {
+  public final int yea() {
     return mon / 12;
   }
 
@@ -106,7 +106,7 @@ public class Dur extends Item {
    * Returns the months.
    * @return year
    */
-  public int mon() {
+  public final int mon() {
     return mon % 12;
   }
 
@@ -114,7 +114,7 @@ public class Dur extends Item {
    * Returns the days.
    * @return day
    */
-  public long day() {
+  public final long day() {
     return sc.longValue() / DAYSECONDS;
   }
 
@@ -122,7 +122,7 @@ public class Dur extends Item {
    * Returns the time.
    * @return time
    */
-  public long tim() {
+  public final long tim() {
     return sc.longValue() % DAYSECONDS;
   }
 
@@ -130,7 +130,7 @@ public class Dur extends Item {
    * Returns the hours.
    * @return day
    */
-  public long hou() {
+  public final long hou() {
     return tim() / 3600;
   }
 
@@ -138,7 +138,7 @@ public class Dur extends Item {
    * Returns the minutes.
    * @return day
    */
-  public long min() {
+  public final long min() {
     return tim() % 3600 / 60;
   }
 
@@ -146,7 +146,7 @@ public class Dur extends Item {
    * Returns the seconds.
    * @return day
    */
-  public BigDecimal sec() {
+  public final BigDecimal sec() {
     return sc.remainder(BigDecimal.valueOf(60));
   }
 
@@ -172,7 +172,7 @@ public class Dur extends Item {
    * Returns the seconds in a token.
    * @return seconds
    */
-  protected byte[] sc() {
+  protected final byte[] sc() {
     return chopNumber(token(sec().abs().toPlainString()));
   }
 
@@ -182,7 +182,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) {
+  public final boolean eq(final Item it) {
     final Dur d = (Dur) it;
     final double s1 = sc == null ? 0 : sc.doubleValue();
     final double s2 = d.sc == null ? 0 : d.sc.doubleValue();

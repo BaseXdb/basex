@@ -19,13 +19,12 @@ final class StripAlgo extends MapAlgo {
     int start = ns;
 
     // setting initial proportions
+    final double yy = r.y;
+    final double hh = r.h;
     double xx = r.x;
-    double yy = r.y;
     double ww = r.w;
-    double hh = r.h;
 
     MapRects row = new MapRects();
-    int height = 0;
     int width = 0;
     double weight = 0;
     double sumweight = 1;
@@ -45,7 +44,7 @@ final class StripAlgo extends MapAlgo {
           (int) (ml.weight[i] / weight * hh);
         h = h > 0 ? h : 1;
 
-        if(yy + height <= yy + hh)
+        if(yy <= yy + hh)
           tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i),
               r.level));
         else break;

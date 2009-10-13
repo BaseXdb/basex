@@ -33,7 +33,7 @@ import org.basex.server.ClientSession;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class DialogServer extends Dialog {
+public final class DialogServer extends Dialog {
 
   /** Context. */
   Context ctx = gui.context;
@@ -66,7 +66,7 @@ public class DialogServer extends Dialog {
     try {
       new ClientSession(ctx);
       start.setEnabled(false);
-    } catch(IOException e1) {
+    } catch(final IOException e1) {
       stop.setEnabled(false);
     }
     p1.add(start);
@@ -101,8 +101,8 @@ public class DialogServer extends Dialog {
     final BaseXButton delete = new BaseXButton("Drop User", null, this);
     create.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        String u = user.getText();
-        String p = new String(pass.getPassword());
+        final String u = user.getText();
+        final String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
           ctx.users.createUser(u, p);
           user.setText("");
@@ -121,7 +121,7 @@ public class DialogServer extends Dialog {
     if(getUsers().length == 0) delete.setEnabled(false);
     delete.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        String test = (String) userco.getSelectedItem();
+        final String test = (String) userco.getSelectedItem();
         ctx.users.dropUser(test);
         userco.removeItem(test);
         ((TableModel) table.getModel()).setData();
@@ -189,9 +189,9 @@ public class DialogServer extends Dialog {
    */
   void startServer() {
     try {
-      ProcessBuilder pb = new ProcessBuilder("java", "-cp", Prop.WORK + "bin",
-          "org.basex.BaseXServer");
-      Process p = pb.start();
+      final ProcessBuilder pb = new ProcessBuilder(
+          "java", "-cp", Prop.WORK + "bin", "org.basex.BaseXServer");
+      final Process p = pb.start();
       final BufferedReader in = new BufferedReader(new InputStreamReader(
           p.getInputStream()));
       new Thread() {
@@ -202,13 +202,13 @@ public class DialogServer extends Dialog {
             while((line = in.readLine()) != null) {
               System.out.println(line);
             }
-          } catch(IOException e) {
-            e.printStackTrace();
+          } catch(final IOException ex) {
+            ex.printStackTrace();
           }
         }
       }.start();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -217,11 +217,11 @@ public class DialogServer extends Dialog {
    * @return Stringarray
    */
   String[] getUsers() {
-    ArrayList<Object[]> list = ctx.users.getUsers();
+    final ArrayList<Object[]> list = ctx.users.getUsers();
     if(list != null) {
-      String[] t = new String[list.size()];
+      final String[] t = new String[list.size()];
       int i = 0;
-      for(Object[] s : list) {
+      for(final Object[] s : list) {
         t[i] = (String) s[0];
         i++;
       }
@@ -229,7 +229,7 @@ public class DialogServer extends Dialog {
     }
     return new String[] {};
   }
-  
+
   /**
    * Class of own tablemodel.
    * 

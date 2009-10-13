@@ -172,7 +172,7 @@ final class FNStr extends Fun {
     final byte[] s = checkStr(it);
 
     return new Iter() {
-      int l = 0;
+      int l;
       @Override
       public Item next() {
         if(l == s.length) return null;

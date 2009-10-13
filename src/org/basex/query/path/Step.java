@@ -149,7 +149,9 @@ public class Step extends Preds {
    * @param data data reference
    * @return node array
    */
-  ArrayList<PathNode> count(final ArrayList<PathNode> nodes, final Data data) {
+  final ArrayList<PathNode> count(final ArrayList<PathNode> nodes,
+      final Data data) {
+
     if(pred.length != 0) return null;
     int kind = -1;
     byte[] n = null;
@@ -185,7 +187,7 @@ public class Step extends Preds {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
+  public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Step)) return false;
     final Step st = (Step) cmp;
     if(pred.length != st.pred.length || axis != st.axis ||
@@ -197,7 +199,7 @@ public class Step extends Preds {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.NODSEQ;
   }
 

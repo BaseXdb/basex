@@ -29,8 +29,7 @@ import org.basex.core.Main;
  * @author Bastian Lemke
  * 
  */
-public class ExifParser {
-
+public final class ExifParser {
   /**
    * <p>
    * Enum for all IFD tags that should be parsed. Each enum constant is the

@@ -99,7 +99,7 @@ public final class MAB2Parser extends Parser {
   /** Temporary read position. */
   private long off;
   /** Maximum mediovis id. */
-  private int maxid = 0;
+  private int maxid;
 
   /**
    * Constructor.

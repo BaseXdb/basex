@@ -148,7 +148,6 @@ public abstract class Date extends Item {
     final long d2 = ((Date) it).days();
     return d1 == d2 && seconds().doubleValue() ==
       ((Date) it).seconds().doubleValue();
-    //return d1 == d2 && seconds().equals(((Date) it).seconds());
   }
 
   @Override
@@ -174,7 +173,7 @@ public abstract class Date extends Item {
    * Returns the date in seconds.
    * @return seconds
    */
-  public BigDecimal seconds() {
+  public final BigDecimal seconds() {
     final int h = xc.getHour() == UNDEF ? 0 : xc.getHour();
     final int m = xc.getMinute() == UNDEF ? 0 : xc.getMinute();
     final int s = xc.getSecond() == UNDEF ? 0 : xc.getSecond();
@@ -188,7 +187,7 @@ public abstract class Date extends Item {
    * Returns the days.
    * @return seconds
    */
-  public long days() {
+  public final long days() {
     final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
     final int m = xc.getMonth() == UNDEF ? 0 : xc.getMonth() - 1;
     final int d = xc.getDay() == UNDEF ? 0 : xc.getDay() - 1;

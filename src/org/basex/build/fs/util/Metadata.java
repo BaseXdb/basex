@@ -483,13 +483,13 @@ public final class Metadata {
   private byte[] value;
 
   /** xml:base attribute value. */
-  private byte[] xmlBase = null;
+  private byte[] xmlBase;
   /** xml:id attribute value. */
-  private byte[] xmlId = null;
+  private byte[] xmlId;
   /** xml:lang attribute value. */
-  private byte[] xmlLang = null;
+  private byte[] xmlLang;
   /** xml:space attribute value. */
-  private byte[] xmlSpace = null;
+  private byte[] xmlSpace;
 
   /** Standard constructor. */
   public Metadata() {

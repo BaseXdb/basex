@@ -88,7 +88,7 @@ public final class DialogCreateFS extends Dialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
 
-    BaseXLabel lab = new BaseXLabel(IMPORTFSTEXT, false, true);
+    final BaseXLabel lab = new BaseXLabel(IMPORTFSTEXT, false, true);
     lab.setBorder(new EmptyBorder(4, 4, 0, 0));
     p.add(lab);
    
@@ -127,7 +127,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(all);
     
-    BaseXLabel lab1 = new BaseXLabel(CREATEFSNAME, false, true);
+    final BaseXLabel lab1 = new BaseXLabel(CREATEFSNAME, false, true);
     lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
     p.add(lab1);
     p.add(new BaseXLabel(""));

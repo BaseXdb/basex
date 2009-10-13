@@ -49,7 +49,7 @@ public class BaseX extends Main {
   /**
    * Constructor.
    */
-  protected void run() {
+  protected final void run() {
     boolean user = false;
     if(file != null) {
       // query file contents
@@ -97,7 +97,7 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected Session session() {
+  protected final Session session() {
     if(session == null) {
       if(sa()) {
         session = new LocalSession(context);

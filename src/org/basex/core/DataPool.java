@@ -19,7 +19,7 @@ final class DataPool {
   /** Number of current database users. */
   private int[] pins = new int[1];
   /** Number of data references. */
-  private int size = 0;
+  private int size;
 
   /**
    * Returns an existing data reference for the specified database, or null.

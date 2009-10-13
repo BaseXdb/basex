@@ -1,6 +1,5 @@
 package org.basex.build.fs.parser;
 
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +24,7 @@ import org.basex.util.TokenBuilder;
  * @author Bastian Lemke
  * @author Lukas Kircher
  */
-public class EMLParser extends AbstractParser {
+public final class EMLParser extends AbstractParser {
 
   static {
     NewFSParser.register("eml", EMLParser.class);

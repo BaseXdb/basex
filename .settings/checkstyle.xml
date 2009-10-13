@@ -62,7 +62,9 @@
     <module name="LeftCurly"/>
     <module name="RightCurly"/>
     <module name="DoubleCheckedLocking"/>
-    <module name="EqualsHashCode"/>
+    <module name="EqualsHashCode">
+      <property name="severity" value="ignore"/>
+    </module>
     <module name="HiddenField"/>
     <module name="IllegalInstantiation"/>
     <module name="MagicNumber">
@@ -83,9 +85,7 @@
     <module name="ArrayTypeStyle"/>
     <module name="CovariantEquals"/>
     <module name="DefaultComesLast"/>
-    <module name="ExplicitInitialization">
-      <property name="severity" value="ignore"/>
-    </module>
+    <module name="ExplicitInitialization"/>
     <module name="FallThrough"/>
     <module name="FinalLocalVariable">
       <property name="severity" value="ignore"/>
@@ -125,10 +125,30 @@
     <module name="MutableException">
       <property name="severity" value="ignore"/>
     </module>
+    <module name="AnnotationUseStyle">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="MissingDeprecated">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="MissingOverride">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="PackageAnnotation">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="SuppressWarnings">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="EqualsAvoidNull">
+      <property name="severity" value="ignore"/>
+    </module>
+    <module name="GenericWhitespace"/>
   </module>
   <module name="Translation"/>
   <module name="StrictDuplicateCode">
     <property name="severity" value="ignore"/>
     <property name="min" value="30"/>
   </module>
+  <module name="FileTabCharacter"/>
 </module>

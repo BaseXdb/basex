@@ -47,13 +47,13 @@ public class ViewRect {
    * @param yy y position
    * @return result of comparison
    */
-  public boolean contains(final int xx, final int yy) {
+  public final boolean contains(final int xx, final int yy) {
     return (xx >= x && xx <= x + w || xx >= x + w && xx <= x) &&
       (yy >= y && yy <= y + h || yy >= y + h && yy <= y);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Main.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
       ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }

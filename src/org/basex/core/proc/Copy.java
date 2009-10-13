@@ -48,8 +48,8 @@ public final class Copy extends AUpdate {
     if(!checkDB()) return false;
 
     final Data data = context.data();
-    Nodes src = gui ? context.copied() : query(args[0], null);
-    Nodes trg = gui ? context.marked() : query(args[1], COPYTAGS);
+    final Nodes src = gui ? context.copied() : query(args[0], null);
+    final Nodes trg = gui ? context.marked() : query(args[1], COPYTAGS);
     if(src == null || trg == null) return false;
     if(gui) context.copy(null);
 

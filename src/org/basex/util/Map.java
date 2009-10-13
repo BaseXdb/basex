@@ -18,7 +18,7 @@ public class Map<E> extends Set {
    * @param key key
    * @param val value
    */
-  public void add(final byte[] key, final E val) {
+  public final void add(final byte[] key, final E val) {
     final int i = add(key);
     values[Math.abs(i)] = val;
   }
@@ -28,7 +28,7 @@ public class Map<E> extends Set {
    * @param key key
    * @param val value
    */
-  public void set(final byte[] key, final E val) {
+  public final void set(final byte[] key, final E val) {
     final int i = id(key);
     if(i != 0) values[Math.abs(i)] = val;
   }
@@ -39,7 +39,7 @@ public class Map<E> extends Set {
    * @return value or null if nothing was found
    */
   @SuppressWarnings("unchecked")
-  public E get(final byte[] key) {
+  public final E get(final byte[] key) {
     return key != null ? (E) values[id(key)] : null;
   }
 
@@ -49,12 +49,12 @@ public class Map<E> extends Set {
    * @return value
    */
   @SuppressWarnings("unchecked")
-  public E value(final int p) {
+  public final E value(final int p) {
     return (E) values[p];
   }
 
   @Override
-  protected void rehash() {
+  protected final void rehash() {
     super.rehash();
     values = Array.extend(values);
   }

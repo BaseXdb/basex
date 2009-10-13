@@ -9,8 +9,7 @@ import javax.crypto.spec.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class Crypter {
-
+public final class Crypter {
   /** De- and encryption key. */
   private final String key = "BaseX";
   /** Bytes for de- and encryption. */
@@ -47,9 +46,9 @@ public class Crypter {
       encryptCipher.init(Cipher.ENCRYPT_MODE, k, ps);
       decryptCipher = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
       decryptCipher.init(Cipher.DECRYPT_MODE, k, ps);
-    } catch(Exception e) {
+    } catch(final Exception ex) {
       throw new SecurityException("Could not initialize CryptoLibrary: "
-          + e.getMessage());
+          + ex.getMessage());
     }
   }
 
@@ -60,11 +59,11 @@ public class Crypter {
    */
   public synchronized String encrypt(final String str) {
     try {
-      byte[] b = str.getBytes(this.charset);
-      byte[] enc = encryptCipher.doFinal(b);
+      final byte[] b = str.getBytes(this.charset);
+      final byte[] enc = encryptCipher.doFinal(b);
       return encoder.encode(enc);
-    } catch(Exception e) {
-      throw new SecurityException("Could not encrypt: " + e.getMessage());
+    } catch(final Exception ex) {
+      throw new SecurityException("Could not encrypt: " + ex.getMessage());
     }
   }
 
@@ -75,11 +74,11 @@ public class Crypter {
    */
   public synchronized String decrypt(final String str) {
     try {
-      byte[] dec = decoder.decodeBuffer(str);
-      byte[] b = decryptCipher.doFinal(dec);
+      final byte[] dec = decoder.decodeBuffer(str);
+      final byte[] b = decryptCipher.doFinal(dec);
       return new String(b, this.charset);
-    } catch(Exception e) {
-      throw new SecurityException("Could not decrypt: " + e.getMessage());
+    } catch(final Exception ex) {
+      throw new SecurityException("Could not decrypt: " + ex.getMessage());
     }
   }
 }

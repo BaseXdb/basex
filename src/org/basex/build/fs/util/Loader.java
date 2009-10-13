@@ -71,7 +71,7 @@ public final class Loader extends ClassLoader {
       File packageDir;
       try {
         packageDir = new File(pkgUrl.toURI());
-      } catch(IllegalArgumentException ex) {
+      } catch(final IllegalArgumentException ex) {
         packageDir = new File(pkgUrl.getFile());
       }
       if(packageDir.exists()) { // package located on disk (as directory)

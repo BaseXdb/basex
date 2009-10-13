@@ -271,7 +271,7 @@ public final class CommandParser extends InputParser {
     consumeWS();
     boolean q = false;
     while(more()) {
-      char c = curr();
+      final char c = curr();
       if((c <= ' ' || c == ';') && !q) break;
       if(c == '"') q ^= true;
       else tb.append(c);
@@ -470,7 +470,7 @@ public final class CommandParser extends InputParser {
    * @return string list
    */
   public StringList list(final Enum<?>[] comp) {
-    StringList list = new StringList();
+    final StringList list = new StringList();
     for(Enum<?> c : comp) list.add(c.name().toLowerCase());
     return list;
   }

@@ -90,11 +90,11 @@ public final class DialogMountFS extends Dialog {
     info.add(detail, BorderLayout.CENTER);
 
     // -- mount panel
-    BaseXBack m = new BaseXBack();
+    final BaseXBack m = new BaseXBack();
     m.setLayout(new TableLayout(3, 2, 0, 0));
     m.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5,
         5, 5)));
-    BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
+    final BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
     lab.setBorder(new EmptyBorder(5, 5, 5, 0));
     m.add(lab);
     m.add(new BaseXLabel(""));
@@ -195,7 +195,8 @@ public final class DialogMountFS extends Dialog {
           detail.setText(InfoDB.db(meta, true, true).finish());
           // check for valid mountpoint
           final IO file = IO.get(mp);
-          boolean mpok = mp.length() != 0 && file.exists() && file.isDir();
+          final boolean mpok = mp.length() != 0 && file.exists() &&
+            file.isDir();
           if (!mpok) {
             warn.setText(NOVALIDMOUNT);
             warn.setIcon(BaseXLayout.icon("error"));

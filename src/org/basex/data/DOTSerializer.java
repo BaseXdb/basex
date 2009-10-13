@@ -104,9 +104,8 @@ public final class DOTSerializer extends Serializer {
     if(--level < 0) return;
     final int c = nodes.get(level);
     final IntList il = children[level];
-    for(int i = 0, is = il.size(); i < is; i++) {
-      out.println(Main.info(LINK, c, il.get(i)));
-    }
+    final int is = il.size();
+    for(int i = 0; i < is; i++) out.println(Main.info(LINK, c, il.get(i)));
     color = null;
     il.reset();
   }

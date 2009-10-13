@@ -18,8 +18,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class Users {
-
+public final class Users {
   /** User list. */
   private final ArrayList<Object[]> users;
   /** Filename. */
@@ -44,7 +43,8 @@ public class Users {
    */
   public boolean createUser(final String usern, final String pass) {
     // username, read, write, create, admin, password
-    Object[] item = { usern, false, false, false, false, crypt.encrypt(pass)};
+    final Object[] item =
+      { usern, false, false, false, false, crypt.encrypt(pass)};
     boolean in = false;
     for(Object[] s : users) {
       if(s[0].equals(usern)) in = true;
@@ -86,9 +86,10 @@ public class Users {
   ArrayList<Object[]> getList() {
     if(new File(file).exists()) {
       try {
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+        final ObjectInputStream in =
+          new ObjectInputStream(new FileInputStream(file));
         return (ArrayList<Object[]>) in.readObject();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -104,7 +105,7 @@ public class Users {
       out = new ObjectOutputStream(new FileOutputStream(file));
       out.writeObject(users);
       out.close();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -114,7 +115,7 @@ public class Users {
    * @return String
    */
   public String show() {
-    int size = users.size();
+    final int size = users.size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add("% Users", size);
     tb.add(size != 0 ? COL : DOT);
@@ -127,7 +128,7 @@ public class Users {
    * @return String
    */
   public String info() {
-    int size = users.size();
+    final int size = users.size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add("% Users", size);
     tb.add(size != 0 ? COL : DOT);

@@ -22,15 +22,14 @@ import org.deepfs.jfuse.DeepStat;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
-public class DeepFSImpl extends FUSEFileSystemAdapter {
-
+public final class DeepFSImpl extends FUSEFileSystemAdapter {
   /** Actual directory token. */
   private static final byte[] DOT = token(".");
   /** Actual parent directory token. */
   private static final byte[] DOTDOT = token("..");
 
   /** Connection to database storage. */
-  private DeepFS dbfs;
+  private final DeepFS dbfs;
 
   /**
    * Constructor.
@@ -60,15 +59,15 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   @Override
   public int mknod(final ByteBuffer path, final short fileMode,
       final long devNum) {
-    String pathString = FUSEUtil.decodeUTF8(path);
-    int rc = dbfs.create(pathString, fileMode);
+    final String pathString = FUSEUtil.decodeUTF8(path);
+    final int rc = dbfs.create(pathString, fileMode);
     Main.debug("mknod: " + pathString + " (" + rc + ") device: " + devNum);
     return (rc == -1) ? -ENETRESET : 0;
   }
 
   @Override
   public int mkdir(final ByteBuffer path, final short createMode) {
-    String pathString = FUSEUtil.decodeUTF8(path);
+    final String pathString = FUSEUtil.decodeUTF8(path);
     int rc = 0;
     rc = dbfs.mkdir(pathString, createMode);
     Main.debug("mkdir: " + pathString + "(" + rc + ")");
@@ -83,9 +82,9 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
    */
   @Override
   public int getattr(final ByteBuffer path, final Stat stbuf) {
-    String pathString = FUSEUtil.decodeUTF8(path);
+    final String pathString = FUSEUtil.decodeUTF8(path);
     if (pathString == null) return -ENOENT;
-    DeepStat dst = dbfs.stat(pathString);
+    final DeepStat dst = dbfs.stat(pathString);
     if(dst == null) return -ENOENT;
     stbuf.st_ino = dst.stino;
     stbuf.st_atimespec.setToMillis(dst.statimespec);
@@ -103,15 +102,15 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   public int readdir(final ByteBuffer path, final FUSEFillDir filler,
       final long offset, final FUSEFileInfo fi) {
 
-    String pathString = FUSEUtil.decodeUTF8(path);
+    final String pathString = FUSEUtil.decodeUTF8(path);
     if(pathString == null) return -ENOENT;
 
-    byte[][] dents = dbfs.readdir(pathString);
+    final byte[][] dents = dbfs.readdir(pathString);
     if(dents == null) return -ENOENT;
 
     filler.fill(DOT, null, 0);
     filler.fill(DOTDOT, null, 0);
-    for(byte[] de : dents)
+    for(final byte[] de : dents)
       filler.fill(de, null, 0); // name, stat, offset
 
     return 0;
@@ -119,7 +118,7 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
 
   @Override
   public int open(final ByteBuffer path, final FUSEFileInfo fi) {
-    String pathString = FUSEUtil.decodeUTF8(path);
+    final String pathString = FUSEUtil.decodeUTF8(path);
     if(pathString == null) return -ENOENT;
 
     // if(!pathString.equals(helloPath)) return -ENOENT;
@@ -131,7 +130,7 @@ public class DeepFSImpl extends FUSEFileSystemAdapter {
   @Override
   public int read(final ByteBuffer path, final ByteBuffer buf,
       final long offset, final FUSEFileInfo fi) {
-    String pathString = FUSEUtil.decodeUTF8(path);
+    final String pathString = FUSEUtil.decodeUTF8(path);
     if(pathString == null) return -ENOENT;
     if(offset < 0 || offset > Integer.MAX_VALUE) return -EINVAL;
 

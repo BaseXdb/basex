@@ -75,7 +75,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public BigDecimal dec() {
+  public final BigDecimal dec() {
     return BigDecimal.valueOf(val);
   }
 
@@ -91,12 +91,12 @@ public class Itr extends Item {
   }
 
   @Override
-  public int hash() {
+  public final int hash() {
     return (int) val;
   }
 
   @Override
-  public Object java() {
+  public final Object java() {
     switch(type) {
       case BYT:
         return (byte) val;

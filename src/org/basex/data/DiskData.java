@@ -594,8 +594,8 @@ public final class DiskData extends Data {
     for(int s = sa; s < ss; s++) {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
-      int p = pre + s - 1;
-      int d = r > 0 ? s - r : p - par;
+      final int p = pre + s - 1;
+      final int d = r > 0 ? s - r : p - par;
 
       switch(k) {
         case ELEM:

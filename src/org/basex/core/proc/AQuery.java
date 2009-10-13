@@ -30,9 +30,9 @@ abstract class AQuery extends Process {
   /** Parsing time. */
   protected long pars;
   /** Compilation time. */
-  protected long comp = 0;
+  protected long comp;
   /** Evaluation time. */
-  protected long eval = 0;
+  protected long eval;
 
   /**
    * Protected constructor.

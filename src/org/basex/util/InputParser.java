@@ -10,7 +10,7 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class InputParser {
+public abstract class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found \"%\"";
   /** Parsing exception. */
@@ -33,7 +33,7 @@ public class InputParser {
    * Constructor.
    * @param q input query
    */
-  public void init(final String q) {
+  public final void init(final String q) {
     qu = q;
     ql = qu.length();
   }
@@ -42,7 +42,7 @@ public class InputParser {
    * Checks if the input is valid.
    * @return 0 if everything is valid
    */
-  public int valid() {
+  protected final int valid() {
     for(qp = ql; qp > 0; qp--) {
       if(!XMLToken.valid(qu.charAt(qp - 1))) return qu.charAt(qp - 1);
     }
@@ -53,7 +53,7 @@ public class InputParser {
    * Checks if more characters are found.
    * @return current character
    */
-  public boolean more() {
+  protected final boolean more() {
     return qp < ql;
   }
 
@@ -61,7 +61,7 @@ public class InputParser {
    * Returns the current character.
    * @return current character
    */
-  public char curr() {
+  protected final char curr() {
     return qp >= ql ? 0 : qu.charAt(qp);
   }
 
@@ -70,14 +70,14 @@ public class InputParser {
    * @param ch character to be checked
    * @return result of check
    */
-  public boolean curr(final int ch) {
+  protected final boolean curr(final int ch) {
     return curr() == ch;
   }
 
   /**
    * Remembers the current position.
    */
-  public void mark() {
+  protected final void mark() {
     qm = qp;
   }
 
@@ -85,7 +85,7 @@ public class InputParser {
    * Returns the next character.
    * @return result of check
    */
-  public char next() {
+  protected final char next() {
     return qp + 1 >= ql ? 0 : qu.charAt(qp + 1);
   }
 
@@ -93,7 +93,7 @@ public class InputParser {
    * Returns next character.
    * @return next character
    */
-  public char consume() {
+  protected final char consume() {
     return qp >= ql ? 0 : qu.charAt(qp++);
   }
 
@@ -102,7 +102,7 @@ public class InputParser {
    * @param ch character to consume
    * @return true if character was found
    */
-  public boolean consume(final int ch) {
+  protected final boolean consume(final int ch) {
     final boolean found = curr() == ch;
     if(found) qp++;
     return found;
@@ -113,7 +113,7 @@ public class InputParser {
    * @param ch character to be checked
    * @return result
    */
-  public boolean quote(final char ch) {
+  protected final boolean quote(final char ch) {
     return ch == '"' || ch == '\'';
   }
 
@@ -121,7 +121,7 @@ public class InputParser {
    * Consumes all whitespace characters from the beginning of the remaining
    * query.
    */
-  public void consumeWS() {
+  protected final void consumeWS() {
     while(qp < ql) {
       final char ch = qu.charAt(qp);
       if(ch <= 0 || ch > ' ') break;
@@ -136,7 +136,7 @@ public class InputParser {
    * @param str string to consume
    * @return true if string was found
    */
-  protected boolean consume(final String str) {
+  protected final boolean consume(final String str) {
     int p = qp;
     final int l = str.length();
     if(p + l > ql) return false;
@@ -149,7 +149,7 @@ public class InputParser {
    * Returns a "found" string, containing the current character.
    * @return completion
    */
-  public byte[] found() {
+  protected final byte[] found() {
     return curr() == 0 ? EMPTY : Main.inf(FOUND, curr());
   }
 
@@ -158,7 +158,7 @@ public class InputParser {
    * @param tb token builder
    * @return error string or null
    */
-  public String ent(final TokenBuilder tb) {
+  protected final String ent(final TokenBuilder tb) {
     final int p = qp;
     if(consume('&')) {
       if(consume('#')) {
@@ -210,7 +210,7 @@ public class InputParser {
    * @param p start position
    * @return entity
    */
-  public String invalidEnt(final int p) {
+  protected final String invalidEnt(final int p) {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
@@ -221,7 +221,7 @@ public class InputParser {
    * Returns the remaining, unscanned query substring.
    * @return query substring
    */
-  public String rest() {
+  protected final String rest() {
     final int e = Math.min(ql, qp + 15);
     return qu.substring(qp, e) + (e == ql ? "" : "...");
   }

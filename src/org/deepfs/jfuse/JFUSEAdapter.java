@@ -39,7 +39,7 @@ public final class JFUSEAdapter implements FileModeFlags {
     try {
       JNILoader.ensureLoaded();
       return true;
-    } catch(UnsatisfiedLinkError ex) {
+    } catch(final UnsatisfiedLinkError ex) {
       return false;
     }
     // return false;

@@ -51,7 +51,7 @@ final class FTHash extends Set {
   /** Integer list. */
   private IntList il;
   /** Current iterator. */
-  private int it = 0;
+  private int it;
 
   /**
    * Initializes the iterator, which sorts all hash entries. Note that the

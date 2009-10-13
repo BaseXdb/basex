@@ -74,7 +74,7 @@ public final class MetaData {
   /** DeepFS backing path. */
   public String backing = "";
   /** Flag for DeepFS instance. */
-  public boolean deepfs = false;
+  public boolean deepfs;
 
   /**
    * Constructor, specifying the database name.

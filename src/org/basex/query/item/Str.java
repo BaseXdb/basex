@@ -66,17 +66,17 @@ public class Str extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public final byte[] str() {
     return val;
   }
 
   @Override
-  public boolean bool() {
+  public final boolean bool() {
     return str().length != 0;
   }
 
   @Override
-  public long itr() throws QueryException {
+  public final long itr() throws QueryException {
     return Itr.parse(val);
   }
 
@@ -91,7 +91,7 @@ public class Str extends Item {
   }
 
   @Override
-  public BigDecimal dec() throws QueryException {
+  public final BigDecimal dec() throws QueryException {
     return Dec.parse(str());
   }
 
@@ -108,7 +108,7 @@ public class Str extends Item {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Main.info("\"%\"", val);
   }
 }

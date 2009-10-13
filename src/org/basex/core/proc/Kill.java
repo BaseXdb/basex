@@ -23,7 +23,7 @@ public final class Kill extends Process {
   protected boolean exec() {
     final Sessions ss = context.sessions;
     final int s = ss.size();
-    for(int i = 0; i < ss.size();) ss.get(i).exit();
+    while(ss.size() > 0) ss.get(0).exit();
     return info("% sessions killed.", s);
   }
 

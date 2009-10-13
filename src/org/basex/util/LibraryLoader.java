@@ -37,8 +37,8 @@ public final class LibraryLoader {
         return;
       }
 
-    } catch(UnsatisfiedLinkError e) {
-      Main.errln("Loading library failed (" + libName + ")." + e);
+    } catch(final UnsatisfiedLinkError ex) {
+      Main.errln("Loading library failed (" + libName + ")." + ex);
       Main.errln("-Djava.library.path is : '"
           + System.getProperty("java.library.path") + "'");
     }

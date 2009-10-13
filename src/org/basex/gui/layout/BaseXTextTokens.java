@@ -217,7 +217,8 @@ public final class BaseXTextTokens {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
     int cc = 0;
-    for(int c = 0, cl = str.length(); c < cl; c++) {
+    final int cl = str.length();
+    for(int c = 0; c < cl; c++) {
       final int ch = str.charAt(c);
       if(ch != '\r') {
         tb.addUTF(ch);
@@ -311,7 +312,8 @@ public final class BaseXTextTokens {
   String copy() {
     if(ms == -1) return "";
     final TokenBuilder tb = new TokenBuilder();
-    for(int s = ms < me ? ms : me, e = ms < me ? me : ms; s < e; s++) {
+    final int e = ms < me ? me : ms;
+    for(int s = ms < me ? ms : me; s < e; s++) {
       final byte t = text[s];
       if(t < 0 || t >= ' ' || t == 0x0A || t == 0x09) tb.add(t);
     }

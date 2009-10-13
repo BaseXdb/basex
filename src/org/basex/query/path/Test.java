@@ -61,7 +61,7 @@ public abstract class Test {
    * @param t test to be compared
    * @return result of check
    */
-  public boolean sameAs(final Test t) {
+  public final boolean sameAs(final Test t) {
     return kind == t.kind && type == t.type &&
       (name == t.name || name.eq(t.name));
   }

@@ -454,7 +454,7 @@ public abstract class Data {
   public abstract void setLock(final int l);
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Main.name(this) + "[" + meta.name + "]";
   }
 }

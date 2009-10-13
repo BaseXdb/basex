@@ -7,7 +7,7 @@ package org.basex.util;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class IntMap extends Set {
+public final class IntMap extends Set {
   /** Values. */
   private int[] values = new int[CAP];
 

@@ -69,7 +69,7 @@ public class BaseXTextField extends JTextField {
    * Adds search functionality to the text field.
    * @param area text area to search
    */
-  void addSearch(final BaseXText area) {
+  final void addSearch(final BaseXText area) {
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
     BaseXLayout.setWidth(this, 80);

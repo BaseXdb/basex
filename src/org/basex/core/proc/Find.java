@@ -178,7 +178,8 @@ public final class Find extends AQuery {
       final BoolList elem, final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0, is = filter.size(); i < is; i++) {
+    final int is = filter.size();
+    for(int i = 0; i < is; i++) {
       final String[] spl = split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);

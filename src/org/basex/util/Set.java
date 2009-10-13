@@ -24,7 +24,7 @@ public class Set {
    * @param key key
    * @return offset of added key, negative offset otherwise
    */
-  public int add(final byte[] key) {
+  public final int add(final byte[] key) {
     if(size == next.length) rehash();
     final int p = Token.hash(key) & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
@@ -92,7 +92,7 @@ public class Set {
    * Returns number of entries.
    * @return number of entries.
    */
-  public int size() {
+  public final int size() {
     return size - 1;
   }
 

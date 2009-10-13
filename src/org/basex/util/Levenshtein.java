@@ -40,7 +40,7 @@ public final class Levenshtein {
     if(sl < 4 || tl > MAX || sl > MAX) return eq(token, tl, sub);
 
     // skip different tokens with too different lengths
-    int k = err == 0 ? Math.max(1, sl >> 2) : err;
+    final int k = err == 0 ? Math.max(1, sl >> 2) : err;
     return Math.abs(sl - tl) <= k && ls(token, tl, sub, k);
   }
 

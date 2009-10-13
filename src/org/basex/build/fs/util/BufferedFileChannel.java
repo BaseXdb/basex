@@ -444,7 +444,8 @@ public final class BufferedFileChannel {
     final boolean utf = inputEncoding.equalsIgnoreCase(Token.UTF8);
     final TokenBuilder tb = new TokenBuilder(100);
     out: while(true) {
-      for(int i = 0, max = buf.remaining(); i < max; i++) {
+      final int max = buf.remaining();
+      for(int i = 0; i < max; i++) {
         final int b = get();
         if(b == '\n') {
           break out;

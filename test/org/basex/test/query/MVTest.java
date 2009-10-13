@@ -29,7 +29,7 @@ public final class MVTest {
   /** Stop after the specified number of queries. */
   private static final int STOPAFTER = Integer.MAX_VALUE;
   /** Query counter. */
-  int curr = 0;
+  int curr;
 
   /**
    * Constructor.

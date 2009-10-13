@@ -69,9 +69,9 @@ public final class WebServer {
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
-  boolean verbose = false;
+  boolean verbose;
   /** Flag for caching queries. */
-  boolean cache = false;
+  boolean cache;
 
   /** XQuery Cache. */
   final HashMap<String, QueryProcessor> map =
@@ -258,7 +258,7 @@ public final class WebServer {
     try {
       Prop.xquery = req.file;
       QueryProcessor xq = null;
-      String query = Token.string(req.file.content());
+      final String query = Token.string(req.file.content());
 
       // cache compiled query or create new one
       if(cache) {

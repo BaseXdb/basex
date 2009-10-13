@@ -96,7 +96,7 @@ public class Tokenizer implements IndexToken {
     }
   }
 
-  public Type type() {
+  public final Type type() {
     return Type.FTX;
   }
 
@@ -138,7 +138,7 @@ public class Tokenizer implements IndexToken {
   /**
    * Initializes the iterator.
    */
-  public void init() {
+  public final void init() {
     sent = 0;
     para = 0;
     pos = -1;
@@ -149,7 +149,7 @@ public class Tokenizer implements IndexToken {
    * Checks if more tokens are to be returned.
    * @return result of check
    */
-  public boolean more() {
+  public final boolean more() {
     final int l = text.length;
     pos++;
 
@@ -217,7 +217,7 @@ public class Tokenizer implements IndexToken {
    * @param tok input token
    * @return result
    */
-  public byte[] get(final byte[] tok) {
+  public final byte[] get(final byte[] tok) {
     byte[] n = tok;
     final boolean a = ascii(n);
     if(!dc) n = dia(n, a);
@@ -231,7 +231,7 @@ public class Tokenizer implements IndexToken {
    * Returns the original token.
    * @return original token
    */
-  public byte[] orig() {
+  public final byte[] orig() {
     return Array.create(text, s, p - s);
   }
 
@@ -239,7 +239,7 @@ public class Tokenizer implements IndexToken {
    * Counts the number of tokens.
    * @return number of tokens
    */
-  public int count() {
+  public final int count() {
     if(count == -1) {
       init();
       while(more());
@@ -255,7 +255,7 @@ public class Tokenizer implements IndexToken {
    * @param u unit
    * @return new position
    */
-  public int pos(final int w, final FTUnit u) {
+  public final int pos(final int w, final FTUnit u) {
     if(u == FTUnit.WORD) return w;
 
     // if necessary, calculate sentences and paragraphs
@@ -370,7 +370,7 @@ public class Tokenizer implements IndexToken {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Main.name(this) + '[' + string(text) + ']';
   }
 }

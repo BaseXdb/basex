@@ -62,7 +62,7 @@ final class XQueryText extends BaseXText {
   void parse() {
     final byte[] qu = getText();
     final boolean module = isModule(qu);
-    boolean mod = !Token.eq(qu, last);
+    final boolean mod = !Token.eq(qu, last);
     view.modified(view.modified || mod);
 
     if(gui.prop.is(GUIProp.EXECRT) && !module && mod) {

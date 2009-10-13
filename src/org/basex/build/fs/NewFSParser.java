@@ -129,7 +129,7 @@ public final class NewFSParser extends Parser {
   /**/REGISTRY = new HashMap<String, Class<? extends AbstractParser>>();
 
   /** Fallback parser for file suffixes that are not registered. */
-  static Class<? extends AbstractParser> fallbackParser = null;
+  static Class<? extends AbstractParser> fallbackParser;
 
   /**
    * Registers a parser implementation with the fs parser.
@@ -188,7 +188,7 @@ public final class NewFSParser extends Parser {
   /** Instantiated parsers. */
   private final Map<String, AbstractParser> parserInstances;
   /** Instantiated fallback parser. */
-  private AbstractParser fallbackParserInstance = null;
+  private AbstractParser fallbackParserInstance;
   /** The buffer to use for parsing the file contents. */
   private final ByteBuffer buffer;
 
@@ -199,7 +199,7 @@ public final class NewFSParser extends Parser {
   /** The currently processed file. */
   public File curr;
   /** Level counter. */
-  private int lvl = 0;
+  private int lvl;
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
 
@@ -210,14 +210,14 @@ public final class NewFSParser extends Parser {
    * First byte of the current file or content element in the current file. Is
    * always equals to 0 for file elements.
    */
-  private long lastContentOffset = 0;
+  private long lastContentOffset;
   /**
    * Size of the current file or content element in the current file. For file
    * elements this value is equals to the file size.
    */
   private long lastContentSize;
   /** Counts how many content elements have been opened. */
-  private int contentOpenedCounter = 0;
+  private int contentOpenedCounter;
 
   /**
    * Constructor.

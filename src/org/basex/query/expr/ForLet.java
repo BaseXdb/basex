@@ -30,12 +30,12 @@ public abstract class ForLet extends Single {
   abstract boolean standard();
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.VAR || super.uses(u, ctx);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v, final QueryContext ctx) {
     return expr.removable(v, ctx);
   }
 
@@ -46,7 +46,7 @@ public abstract class ForLet extends Single {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return Return.BLN;
   }
 

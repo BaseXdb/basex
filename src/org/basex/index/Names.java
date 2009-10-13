@@ -21,7 +21,7 @@ public final class Names extends Set {
   /** Statistic information. */
   private StatsKey[] stat;
   /** total number of entries. */
-  public int tn = 0;
+  public int tn;
 
   /**
    * Default constructor.

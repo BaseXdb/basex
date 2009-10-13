@@ -33,7 +33,7 @@ public abstract class NewValuePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public final void merge(final UpdatePrimitive p) throws QueryException {
     // [LK] throw CORRECT query exception: multiple renames on same node
     if(mult) Err.or(UPTRGMULT, node);
     mult = true;

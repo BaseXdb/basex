@@ -4,43 +4,43 @@ import java.io.PrintStream;
 
 /**
  * Internal representation of file status.
- * @author Alexander Holupirek
  *
+ * @author Alexander Holupirek
  */
-public class DeepStat {
+public final class DeepStat {
   /** Device inode resides on. Type: dev_t (4 bytes) */
-  public long stdev = 0;
+  public long stdev;
   /** Inode's number. Type: ino_t (4 bytes) */
-  public long stino = 0;
+  public long stino;
   /** Inode protection mode. Type: mode_t (2 or 4 bytes) */
-  public long stmode = 0;
+  public long stmode;
   /** Number of hard links to the file. Type: nlink_t (2 bytes) */
-  public long stnlink = 0;
+  public long stnlink;
   /** User-id of owner. Type: uid_t (4 bytes) */
-  public long stuid = 0;
+  public long stuid;
   /** Group-id of owner. Type: gid_t (4 bytes) */
-  public long stgid = 0;
+  public long stgid;
   /** Device type, for special file inode. Type: dev_t (4 bytes) */
-  public long strdev = 0;
+  public long strdev;
   /** Time of last access. */
 //  public final Timespec st_atimespec = new Timespec();
-  public long statimespec = 0;
+  public long statimespec;
   /** Time of last data modification. */
 //  public final Timespec st_mtimespec = new Timespec();
-  public long stmtimespec = 0;
+  public long stmtimespec;
   /** Time of last file status change. */
 //  public final Timespec st_ctimespec = new Timespec();
-  public long stctimespec = 0;
+  public long stctimespec;
   /** File size, in bytes. Type: off_t (8 bytes) */
-  public long stsize = 0;
+  public long stsize;
   /** Blocks allocated for file. Type: quad_t (8 bytes) */
-  public long stblocks = 0;
+  public long stblocks;
   /** Optimal file sys I/O ops blocksize. Type: u_long (4 bytes) */
-  public long stblocksize = 0;
+  public long stblocksize;
   /** User defined flags for file. Type: u_long (4 bytes) */
-  public long stflags = 0;
+  public long stflags;
   /** File generation number. Type: u_long (4 bytes) */
-  public long stgen = 0;
+  public long stgen;
   
   /**
    * Print stat fields to provided stream.

@@ -242,7 +242,8 @@ public final class GUIInput extends BaseXTextField {
    */
   private boolean comboChanged(final StringList sl) {
     if(sl.size() != box.getItemCount()) return true;
-    for(int i = 0, is = sl.size(); i < is; i++) {
+    final int is = sl.size();
+    for(int i = 0; i < is; i++) {
       if(!sl.get(i).equals(box.getItemAt(i))) return true;
     }
     return false;

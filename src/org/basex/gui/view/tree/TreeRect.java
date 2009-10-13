@@ -18,7 +18,7 @@ final class TreeRect {
   /**
    * array containing all pre values inside the rectangle.
    */
-  public int[] multiPres = null;
+  public int[] multiPres;
 
   /**
    * Verifies if the specified coordinates are inside the rectangle.

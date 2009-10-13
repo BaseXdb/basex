@@ -89,7 +89,8 @@ public class Pred extends Preds {
       ctx.size = si.size();
       ctx.pos = 1;
       int c = 0;
-      for(int s = 0, sl = si.size(); s < sl; s++) {
+      final int sl = si.size();
+      for(int s = 0; s < sl; s++) {
         ctx.item = si.item[s];
         if(p.test(ctx) != null) si.item[c++] = si.item[s];
         ctx.pos++;
@@ -104,17 +105,17 @@ public class Pred extends Preds {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     return root.uses(u, ctx) || super.uses(u, ctx);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v, final QueryContext ctx) {
     return root.removable(v, ctx) && super.removable(v, ctx);
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     root = root.remove(v);
     return super.remove(v);
   }

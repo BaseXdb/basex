@@ -174,7 +174,7 @@ public final class JPGParser extends AbstractParser {
     } finally {
       try {
         sub.finish();
-      } catch(Exception ex) {
+      } catch(final Exception ex) {
         Main.debug(ex);
       }
     }

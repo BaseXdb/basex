@@ -57,7 +57,7 @@ public abstract class Main {
    * Launches the console mode, waiting for and processing user input.
    * @return user interruption
    */
-  protected boolean console() {
+  protected final boolean console() {
     if(console && !set(Prop.INFO, ON)) return true;
 
     while(console) {
@@ -92,7 +92,7 @@ public abstract class Main {
    * @param in input commands
    * @return false if exit command was sent
    */
-  protected boolean process(final String in) {
+  protected final boolean process(final String in) {
     try {
       for(final Process p : new CommandParser(in, context).parse()) {
         if(!process(p, true)) break;
@@ -110,7 +110,7 @@ public abstract class Main {
    * @param v verbose flag
    * @return true if operation was successful
    */
-  protected boolean process(final Process pr, final boolean v) {
+  protected final boolean process(final Process pr, final boolean v) {
     try {
       final Session ss = session();
       if(ss == null) return false;
@@ -148,7 +148,7 @@ public abstract class Main {
    * @param arg argument
    * @return success flag
    */
-  protected boolean set(final Object[] opt, final Object arg) {
+  protected final boolean set(final Object[] opt, final Object arg) {
     return process(new Set(opt, arg), false);
   }
 
@@ -157,7 +157,7 @@ public abstract class Main {
    * @param ex exception reference
    * @param msg message
    */
-  protected void error(final Exception ex, final String msg) {
+  protected final void error(final Exception ex, final String msg) {
     errln((console ? "" : INFOERROR) + msg.trim());
     debug(ex);
   }

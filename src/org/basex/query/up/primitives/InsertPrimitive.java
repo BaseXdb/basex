@@ -25,7 +25,7 @@ public abstract class InsertPrimitive extends NodeCopyPrimitive {
   }
 
   @Override
-  public int ac() {
+  public final int ac() {
     return loc;
   }
 }

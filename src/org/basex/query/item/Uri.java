@@ -77,9 +77,4 @@ public final class Uri extends Str {
       return false;
     }
   }
-
-  @Override
-  public byte[] str() {
-    return val;
-  }
 }

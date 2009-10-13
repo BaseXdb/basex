@@ -26,7 +26,7 @@ public final class Group extends Expr {
   /**
    * Post grouped tuples.
    */
-  HashMap<Integer, int[]> groups = null;
+  HashMap<Integer, int[]> groups;
 
   /**
    * Constructor.

@@ -72,9 +72,9 @@ public final class InexSubmit {
   private IntList tid;
 
   /** PrintOutput for the submission file. */
-  private PrintOutput sub = null;
+  private PrintOutput sub;
   /** XMLSerializer for the submission file. */
-  private XMLSerializer xml = null;
+  private XMLSerializer xml;
 
   /** Collection for query result sizes. */
   private int[] qressizes;
@@ -87,7 +87,7 @@ public final class InexSubmit {
   /** Number of queries. */
   private int nqueries;
   /** Number of query times. */
-  private int c = 0;
+  private int c;
 
   /**
    * Main test method.
@@ -331,14 +331,14 @@ public final class InexSubmit {
     xml.openElement(token("general_description"));
     xml.text(token("BaseX is a native XML database and XPath/XQuery " +
         "processor, including support for the latest XQuery Full Text " +
-    		"recommendation. The client/server architecture of BaseX 5.75 was " +
+        "recommendation. The client/server architecture of BaseX 5.75 was " +
         "used to perform the tests. The test machine has an Intel Xeon " +
         "E5345 with 2 Quad-Core CPUs and 32 GB RAM."));
     xml.closeElement();
     xml.openElement(token("ranking_description"));
     xml.text(token("As we put our main focus on efficiency and generic " +
         "evaluation of all types of XQuery requests and input documents, " +
-    		"our scoring model is based on a classical TF/IDF implementation. " +
+        "our scoring model is based on a classical TF/IDF implementation. " +
         "Additional scoring calculations are performed by XQFT (ftand, ftor, " +
         "ftnot) and XQuery operators (union, location steps, ...). " +
         "A higher ranking is given to those text nodes which are closer to " +

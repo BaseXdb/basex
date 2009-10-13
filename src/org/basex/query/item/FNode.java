@@ -27,7 +27,7 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public boolean is(final Nod nod) {
+  public final boolean is(final Nod nod) {
     return id == nod.id;
   }
 
@@ -130,7 +130,7 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public NodeIter par() {
+  public final NodeIter par() {
     return new NodeIter() {
       /** First call. */
       private boolean more;

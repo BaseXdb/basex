@@ -55,12 +55,12 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public BigDecimal dec() throws QueryException {
+  public final BigDecimal dec() throws QueryException {
     return Dec.parse(str());
   }
 
   @Override
-  public double dbl() throws QueryException {
+  public final double dbl() throws QueryException {
     return Dbl.parse(str());
   }
 
@@ -100,7 +100,7 @@ public abstract class Nod extends Item {
    * Returns the node id.
    * @return id
    */
-  public int id() {
+  public final int id() {
     return id;
   }
 

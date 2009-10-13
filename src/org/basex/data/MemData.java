@@ -168,7 +168,7 @@ public class MemData extends Data {
    * @param t attribute value
    * @return index reference
    */
-  protected int attIndex(final byte[] t) {
+  protected final int attIndex(final byte[] t) {
     return ((MemValues) atvindex).index(t, meta.size);
   }
 
@@ -177,7 +177,7 @@ public class MemData extends Data {
    * @param t text node
    * @return index reference
    */
-  protected int textIndex(final byte[] t) {
+  protected final int textIndex(final byte[] t) {
     return ((MemValues) txtindex).index(t, meta.size);
   }
 

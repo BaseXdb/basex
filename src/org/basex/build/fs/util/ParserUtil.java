@@ -46,7 +46,7 @@ public final class ParserUtil {
   private static final byte[] PIB_STR = token(" PiB");
 
   /** Factory to create date and duration values. */
-  private static DatatypeFactory factory = null;
+  private static DatatypeFactory factory;
 
   static {
     try {

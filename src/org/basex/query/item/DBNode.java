@@ -81,24 +81,24 @@ public class DBNode extends Nod {
    * @param p pre value
    * @param k node kind
    */
-  public void set(final int p, final int k) {
+  public final void set(final int p, final int k) {
     type = TYPES[k];
     par = null;
     pre = p;
   }
 
   @Override
-  public byte[] str() {
+  public final byte[] str() {
     return data.atom(pre);
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
+  public final void serialize(final Serializer ser) throws IOException {
     ser.node(data, pre);
   }
 
   @Override
-  public byte[] nname() {
+  public final byte[] nname() {
     switch(type) {
       case ELM:
         return data.tag(pre);
@@ -114,12 +114,12 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public QNm qname() {
+  public final QNm qname() {
     return qname(new QNm());
   }
 
   @Override
-  public QNm qname(final QNm name) {
+  public final QNm qname(final QNm name) {
     final byte[] nm = nname();
     name.name(nm);
     name.uri = Uri.EMPTY;
@@ -133,7 +133,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public Atts ns() {
+  public final Atts ns() {
     if(type != Type.ELM || nsp != null) return nsp;
     nsp = new Atts();
     final int[] ns = data.ns(pre);
@@ -144,7 +144,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public byte[] base() {
+  public final byte[] base() {
     if(type != Type.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.file.path());
     final IO file = IO.get(string(data.text(pre)));
@@ -152,14 +152,14 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public boolean is(final Nod nod) {
+  public final boolean is(final Nod nod) {
     if(nod == this) return true;
     if(!(nod instanceof DBNode)) return false;
     return data == ((DBNode) nod).data && pre == ((DBNode) nod).pre;
   }
 
   @Override
-  public int diff(final Nod nod) {
+  public final int diff(final Nod nod) {
     if(!(nod instanceof DBNode) || data != ((DBNode) nod).data) {
       return id - nod.id;
     }
@@ -167,7 +167,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public DBNode copy() {
+  public final DBNode copy() {
     // par.finish() ?..
     final DBNode node = new DBNode(data, pre, par, type);
     node.root = root;
@@ -176,12 +176,12 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public DBNode finish() {
+  public final DBNode finish() {
     return copy();
   }
 
   @Override
-  public Nod parent() {
+  public final Nod parent() {
     if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
@@ -209,13 +209,13 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public void parent(final Nod p) {
+  public final void parent(final Nod p) {
     root = p;
     par = p;
   }
 
   @Override
-  public NodeIter anc() {
+  public final NodeIter anc() {
     return new NodeIter() {
       /** Temporary node. */
       private Nod node = copy();
@@ -229,7 +229,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter attr() {
+  public final NodeIter attr() {
     return new NodeIter() {
       final DBNode node = copy();
       final int s = pre + data.attSize(pre, data.kind(pre));
@@ -245,7 +245,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeMore child() {
+  public final NodeMore child() {
     return new NodeMore() {
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
@@ -271,7 +271,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter desc() {
+  public final NodeIter desc() {
     return new NodeIter() {
       /*final Stack<Integer> pres = new Stack<Integer>();
       final Stack<Integer> level = new Stack<Integer>();
@@ -325,7 +325,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter descOrSelf() {
+  public final NodeIter descOrSelf() {
     return new NodeIter() {
       final DBNode node = copy();
       final int s = pre + data.size(pre, data.kind(pre));
@@ -343,7 +343,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter par() {
+  public final NodeIter par() {
     return new NodeIter() {
       /** First call. */
       private boolean more;
@@ -358,12 +358,12 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "9999FF";
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, token(data.meta.file.name()), PRE, token(pre));
   }
 

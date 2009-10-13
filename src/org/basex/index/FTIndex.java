@@ -40,7 +40,7 @@ abstract class FTIndex extends Index {
       boolean f = true;
       long pos = p;
       int lpre, c;
-      int pre = 0;
+      int pre;
 
       @Override
       public boolean more() {

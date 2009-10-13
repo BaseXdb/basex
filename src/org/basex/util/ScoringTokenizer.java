@@ -20,7 +20,7 @@ public final class ScoringTokenizer extends Tokenizer{
   /** Container for frequency. */
   private IntMap freq;
   /** Flag for phrase processing. */
-  private boolean phrase = false;
+  private boolean phrase;
   
   /**
    * Empty constructor.

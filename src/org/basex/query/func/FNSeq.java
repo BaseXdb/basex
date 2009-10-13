@@ -167,7 +167,7 @@ public final class FNSeq extends Fun {
       }
     } : new Iter() {
       // run through all items
-      long c = 0;
+      long c;
 
       @Override
       public Item next() throws QueryException {

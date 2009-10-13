@@ -13,8 +13,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class InsertIntoPrimitive extends InsertPrimitive {
-
+public final class InsertIntoPrimitive extends InsertPrimitive {
   /**
    * Constructor.
    * @param n target node

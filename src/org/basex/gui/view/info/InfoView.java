@@ -196,7 +196,8 @@ public final class InfoView extends View {
     final int runs = gui.context.prop.num(Prop.RUNS);
     if(list.size() == 0) return;
     tb.high().add(head).norm().nl();
-    for(int i = 0, is = list.size(); i < is; i++) {
+    final int is = list.size();
+    for(int i = 0; i < is; i++) {
       String line = list.get(i);
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
         Performance.getTimer(stat.get(i) * 10000L * runs, runs);

@@ -114,17 +114,17 @@ public final class QueryContext extends Progress {
   public Uri collation = Uri.uri(URLCOLL);
 
   /** Default boundary-space. */
-  public boolean spaces = false;
+  public boolean spaces;
   /** Empty Order mode. */
-  public boolean orderGreatest = false;
+  public boolean orderGreatest;
   /** Preserve Namespaces. */
   public boolean nsPreserve = true;
   /** Inherit Namespaces. */
   public boolean nsInherit = true;
   /** Ordering mode. */
-  public boolean ordered = false;
+  public boolean ordered;
   /** Construction mode. */
-  public boolean construct = false;
+  public boolean construct;
   /** Revalidation Mode. */
   public int revalidate;
   /** Default encoding. */
@@ -206,7 +206,8 @@ public final class QueryContext extends Progress {
         if(nodes.doc) doc = new DBNode[nodes.size()];
 
         // create document nodes
-        for(int d = 0, dl = nodes.size(); d < dl; d++) {
+        final int dl = nodes.size();
+        for(int d = 0; d < dl; d++) {
           final int p = nodes.nodes[d];
           if(nodes.doc || data.kind(p) == Data.DOC) {
             addDoc(new DBNode(data, p, Data.DOC));
@@ -280,7 +281,8 @@ public final class QueryContext extends Progress {
       }
 
       // add nodes to standard iterator
-      for(int p = 0, ps = pre.size(); p < ps; p++)
+      final int ps = pre.size();
+      for(int p = 0; p < ps; p++)
         ir.add(new DBNode(data, pre.get(p)));
       ir.add(i);
     }
@@ -300,7 +302,7 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      Item i = iter(root).finish();
+      final Item i = iter(root).finish();
       updates.applyUpdates();
       return i.iter();
     } catch(final StackOverflowError ex) {

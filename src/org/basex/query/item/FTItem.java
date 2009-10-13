@@ -54,7 +54,7 @@ public final class FTItem extends DBNode {
   public double score() {
     if(score == -1) {
       if(ids) {
-        Iterator<FTStringMatch> i = all.match[0].iterator();
+        final Iterator<FTStringMatch> i = all.match[0].iterator();
         if(i.hasNext()) {
           score = i.next().e / 1000d;
         } else {

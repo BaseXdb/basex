@@ -96,7 +96,7 @@ public final class QueryTest {
    * @return true if everything went alright
    */
   private boolean test(final AbstractTest test, final String ext) {
-    String file = test.doc.replaceAll("\\\"", "\\\\\"");
+    final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(test);
     final boolean up = test instanceof XQUPTest;
     Process proc = new CreateDB(file, name);

@@ -144,7 +144,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     if(root instanceof Context) root = null;
 
@@ -329,7 +329,7 @@ public class AxisPath extends Path {
 
       // choose cheapest index access
       for(int p = 0; p < stp.pred.length; p++) {
-        IndexContext ic = new IndexContext(ctx, data, stp, d);
+        final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
         if(ic.is == 0) {
           if(ic.not) {
@@ -463,7 +463,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public long size(final QueryContext ctx) {
+  public final long size(final QueryContext ctx) {
     long res = -1;
 
     final Item rt = root(ctx);
@@ -584,7 +584,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public Expr addText(final QueryContext ctx) throws QueryException {
+  public final Expr addText(final QueryContext ctx) throws QueryException {
     final Step s = step[step.length - 1];
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
         s.test.type == Type.ATT) return this;
@@ -601,29 +601,29 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u, final QueryContext ctx) {
     return uses(step, u, ctx);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v, final QueryContext ctx) {
     for(final Step s : step) if(!s.removable(v, ctx)) return false;
     return true;
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     for(int s = 0; s != step.length; s++) step[s].remove(v);
     return super.remove(v);
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public final Return returned(final QueryContext ctx) {
     return size(ctx) == 1 ? Return.NOD : Return.NODSEQ;
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
+  public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof AxisPath)) return false;
     final AxisPath ap = (AxisPath) cmp;
     if((root == null || ap.root == null) && root != ap.root ||
@@ -637,12 +637,12 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     super.plan(ser, step);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return toString(step);
   }
 }

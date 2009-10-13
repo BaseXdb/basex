@@ -62,10 +62,10 @@ public final class Context {
   }
 
   /**
-   * Closes the database instance.
+   * Closes the database context.
    */
   public void close() {
-    for(int i = 0; i < sessions.size();) sessions.get(i).exit();
+    while(sessions.size() > 0) sessions.get(0).exit();
     pool.close();
     users.writeList();
   }

@@ -15,7 +15,6 @@ import org.basex.query.item.Nod;
  * @author Lukas Kircher
  */
 public final class RenamePrimitive extends NewValuePrimitive {
-
   /**
    * Constructor.
    * @param n target node

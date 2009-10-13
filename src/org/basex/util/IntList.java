@@ -43,7 +43,7 @@ public class IntList {
    * Adds next value.
    * @param v value to be added
    */
-  public void add(final int v) {
+  public final void add(final int v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
@@ -52,7 +52,7 @@ public class IntList {
    * Returns the number of entries.
    * @return number of entries
    */
-  public int size() {
+  public final int size() {
     return size;
   }
 
@@ -61,7 +61,7 @@ public class IntList {
    * @param p position
    * @return value
    */
-  public int get(final int p) {
+  public final int get(final int p) {
     return list[p];
   }
 
@@ -70,7 +70,7 @@ public class IntList {
    * @param v value to be added
    * @param p position
    */
-  public void set(final int v, final int p) {
+  public final void set(final int v, final int p) {
     while(p >= list.length) list = Array.extend(list);
     list[p] = v;
     size = Math.max(size, p + 1);
@@ -81,7 +81,7 @@ public class IntList {
    * @param v value to be added
    * @return true if value is found
    */
-  public boolean contains(final int v) {
+  public final boolean contains(final int v) {
     for(int i = 0; i < size; i++) if(list[i] == v) return true;
     return false;
   }
@@ -90,14 +90,14 @@ public class IntList {
    * Finishes the int array.
    * @return int array
    */
-  public int[] finish() {
+  public final int[] finish() {
     return size == list.length ? list : Array.finish(list, size);
   }
 
   /**
    * Resets the integer list.
    */
-  public void reset() {
+  public final void reset() {
     size = 0;
   }
 
@@ -116,7 +116,8 @@ public class IntList {
    * @param num numeric sort
    * @param asc ascending
    */
-  public void sort(final byte[][] tok, final boolean num, final boolean asc) {
+  public final void sort(final byte[][] tok, final boolean num,
+      final boolean asc) {
     sort(0, size, num, asc, tok);
   }
 
@@ -127,7 +128,7 @@ public class IntList {
    * @param num token array to sort by
    * @param asc ascending
    */
-  public void sort(final double[] num, final boolean asc) {
+  public final void sort(final double[] num, final boolean asc) {
     sort(0, size, asc, num);
   }
 
