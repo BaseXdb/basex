@@ -40,25 +40,26 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
       
     final MemData m = buildDB();
     final DBNode n = (DBNode) node;
+    final int p = n.pre + add;
     final Data d = n.data;
     // source nodes may be empty, thus the replace results in deleting the 
     // target node
     if(m == null) {
-      d.delete(n.pre);
+      d.delete(p);
       return;
     }
     final int k = Nod.kind(n.type);
-    final int par = d.parent(n.pre, d.kind(n.pre));
+    final int par = d.parent(p, k);
     final int s = m.size(0, Data.DOC) - 1;
     if(a)
-      UpdateFunctions.insertAttributes(n.pre, par, d, m);
-    else d.insertSeq(n.pre + d.size(n.pre, k), par , m);
-    d.delete(n.pre + (a ? s : 0));
+      UpdateFunctions.insertAttributes(p, par, d, m);
+    else d.insertSeq(p + d.size(p, k), par , m);
+    d.delete(p + (a ? s : 0));
   }
 
   @Override

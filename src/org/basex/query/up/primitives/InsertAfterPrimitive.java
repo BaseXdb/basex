@@ -30,17 +30,18 @@ public final class InsertAfterPrimitive extends InsertPrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
     final MemData m = buildDB();
     // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;
+    final int p = n.pre + add;
     final Data d = n.data;
     final int k = Nod.kind(node.type);
     // [LK] check if parent null?
-    d.insertSeq(n.pre + d.size(n.pre, k), d.parent(n.pre, k), m);
+    d.insertSeq(p + d.size(p, k), d.parent(p, k), m);
   }
 
   @SuppressWarnings("unused")

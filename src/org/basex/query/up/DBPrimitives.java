@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
+import org.basex.query.up.primitives.InsertBeforePrimitive;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.up.primitives.UpdatePrimitive.Type;
 
@@ -70,8 +73,15 @@ public final class DBPrimitives {
       final UpdatePrimitive[] pl = op.get(p[i]);
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
       if(f) return;
-      for(final UpdatePrimitive pp : pl) 
-        if(pp != null && pp.node instanceof DBNode) pp.apply();
+      int add = 0;
+      for(final UpdatePrimitive pp : pl) {
+        if(pp == null) continue;
+        if(pp.type().ordinal() == Type.INSERTBEFORE.ordinal()) {
+          final MemData m = ((InsertBeforePrimitive) pp).buildDB();
+          add = m.size(0, Data.DOC) - 1;
+        }
+        pp.apply(add);
+      }
     }
   }
 }

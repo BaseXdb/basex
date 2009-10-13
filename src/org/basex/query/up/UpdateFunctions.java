@@ -233,7 +233,8 @@ public final class UpdateFunctions {
     final Data data = n.data;
     final int k = Nod.kind(n.type);
     int pre = preVal;
-    // [LK] type DOC?
+    // [LK] type DOC? --- not possible --- DOC nodes are replaced by children,
+    // see specification insert/replace - check though!
     switch(k) {
       case Data.ELEM:
         m.addElem(m.tags.index(data.tag(n.pre), null, false),

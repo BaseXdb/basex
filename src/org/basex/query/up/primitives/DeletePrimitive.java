@@ -24,10 +24,11 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public void apply() {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
-    deleteDBNodes(new Nodes(new int[]{n.pre}, n.data));
+    final int p = n.pre + add;
+    deleteDBNodes(new Nodes(new int[]{p}, n.data));
   }
 
   @Override

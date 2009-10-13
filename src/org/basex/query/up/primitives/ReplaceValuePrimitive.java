@@ -23,7 +23,7 @@ public final class ReplaceValuePrimitive extends NewValuePrimitive {
   }
 
   @Override
-  public void apply() {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     
     final DBNode n = (DBNode) node;

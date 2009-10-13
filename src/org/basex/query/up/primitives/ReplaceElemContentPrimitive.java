@@ -35,10 +35,10 @@ public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
 
   @SuppressWarnings("unused")
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
-    final int p = n.pre;
+    final int p = n.pre + add;
     final Data d = n.data;
     final int j = p + d.attSize(p, Data.ELEM);
     int i = j;

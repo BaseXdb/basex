@@ -30,7 +30,7 @@ public final class InsertBeforePrimitive extends InsertPrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
     final MemData m = buildDB();

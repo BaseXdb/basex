@@ -44,6 +44,7 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
     final Iterator<Iter> it = c.iterator();
     while(it.hasNext()) {
       final Iter ni = it.next();
+      ni.reset();
       Item i = ni.next();
       while(i != null) {
         seq.add(i);

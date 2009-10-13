@@ -25,7 +25,7 @@ public final class RenamePrimitive extends NewValuePrimitive {
   }
 
   @Override
-  public void apply() {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     rename(n.pre, name, n.data);

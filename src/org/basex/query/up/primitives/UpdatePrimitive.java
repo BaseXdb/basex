@@ -72,10 +72,13 @@ public abstract class UpdatePrimitive {
   
   /**
    * Applies the update operation represented by this primitive to the 
-   * database. 
+   * database. If an 'insert before' primitive is applied to a target node t,
+   * the pre value of t changes. Thus the number of inserted nodes is added to
+   * the pre value of t for the following update operations.
+   * @param add size to add
    * @throws QueryException query exception 
    */
-  public abstract void apply() throws QueryException;
+  public abstract void apply(final int add) throws QueryException;
   
   /**
    * Merges if possible two update primitives of the same type if they are

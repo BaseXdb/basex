@@ -30,15 +30,16 @@ public final class InsertIntoLastPrimitive extends InsertPrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
     final MemData m = buildDB();
     if(m == null) return;
     final DBNode n = (DBNode) node;
+    final int p = n.pre + add;
     final Data d = n.data;
     // source nodes may be empty, thus insert has no effect at all
-    d.insertSeq(n.pre + d.size(n.pre, Nod.kind(node.type)), n.pre, m);
+    d.insertSeq(p + d.size(p, Nod.kind(node.type)), p, m);
   }
 
   @SuppressWarnings("unused")

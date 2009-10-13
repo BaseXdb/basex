@@ -30,7 +30,7 @@ public final class InsertIntoPrimitive extends InsertPrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
     final DBNode n = (DBNode) node;
