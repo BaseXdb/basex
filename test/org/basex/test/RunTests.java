@@ -1,6 +1,7 @@
 package org.basex.test;
 
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
@@ -34,33 +35,33 @@ public final class RunTests {
     final Context ctx = new Context();
     new CreateDB("input.xml").execute(ctx);
 
-    System.out.println("============= XQJ Tests =============");
+    Main.outln("============= XQJ Tests =============");
     XQJQuery.main(args);
     AllTests.main(args);
-    System.out.println();
+    Main.outln();
 
-    System.out.println("============= XMLDB Tests =============");
+    Main.outln("============= XMLDB Tests =============");
     org.basex.test.xmldb.AllTests.main(args);
     XMLDBQuery.main(args);
     XMLDBCreate.main(args);
     XMLDBInsert.main(args);
     XMLDBQuery.main(args);
     new DropDB(XMLDBCreate.COLL).execute(ctx);
-    System.out.println();
+    Main.outln();
 
-    System.out.println("=============  BaseX Examples =============");
+    Main.outln("=============  BaseX Examples =============");
     DBExample.main(args);
     UpdateExample.main(args);
     XQueryExample.main(args);
-    System.out.println();
+    Main.outln();
 
-    System.out.println("=============  XQuery Tests =============");
+    Main.outln("=============  XQuery Tests =============");
     QueryTest.main(args);
-    System.out.println();
-    System.out.println("=============>  Done.");
-    System.out.println();
+    Main.outln();
+    Main.outln("=============>  Done.");
+    Main.outln();
 
-    System.out.println("Additionally run the remaining JUnit tests.");
+    Main.outln("Additionally run the remaining JUnit tests.");
     new Close().execute(ctx);
     ctx.close();
   }

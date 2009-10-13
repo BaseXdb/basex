@@ -48,7 +48,7 @@ public final class XMLDBQuery {
         // Receive the next results.
         Resource res = iter.nextResource();
         // Writing the result to the console.
-        System.out.println((String) res.getContent());
+        System.out.println(res.getContent());
       }
     } catch(XMLDBException ex) {
       System.err.println("XML:DB Exception occured " + ex.errorCode);

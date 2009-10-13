@@ -416,10 +416,10 @@ public class XQJTest extends TestCase {
       for(int t = 1; t <= 51; t++) {
         try {
           conn.createItemFromObject(o, conn.createAtomicType(t));
-          //System.out.println("+ " + o.getClass() + " => " + t);
+          //Main.outln("+ " + o.getClass() + " => " + t);
         } catch(final Exception ex) {
-          //System.out.println("- " + o.getClass() + " => " + t);
-          //System.out.println("  (" + ex.getMessage() + ")");
+          //Main.outln("- " + o.getClass() + " => " + t);
+          //Main.outln("  (" + ex.getMessage() + ")");
         }
       }
     }
