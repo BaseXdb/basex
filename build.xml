@@ -4,6 +4,11 @@
 
   <property file="etc/build/build.properties"/>
 
+  <path id="build.classpath">
+    <pathelement location="${build}"/>
+    <pathelement location="lib/jfuse.jar"/>
+  </path>
+
   <target name="build_init">
     <tstamp/>
     <mkdir dir="${build}"/>
@@ -23,7 +28,9 @@
     <copy todir="${build}/org/basex/gui/img">
       <fileset dir="${src}/org/basex/gui/img"/>
     </copy>
-    <javac srcdir="${src}" destdir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}">
+	 <classpath refid="build.classpath"/>
+    </javac>
   </target>
 
   <!-- ... Compile BaseXClient ... -->
