@@ -19,12 +19,12 @@ import org.catacombae.jfuse.util.FUSEUtil;
  */
 public final class JFUSEAdapter implements FileModeFlags {
 
-//  /** Directory bit. */
-//  private static final int DFS_S_IFDIR = 0040000;
-//  /** Regular file bit. */
-//  private static final int DFS_S_IFREG = 0100000;
-//  /** File bit mask. */
-//  private static final int DFS_S_IFMT = 0170000;
+  /** Directory bit. */
+  private static final int DFS_S_IFDIR = 0040000;
+  /** Regular file bit. */
+  private static final int DFS_S_IFREG = 0100000;
+  /** File bit mask. */
+  private static final int DFS_S_IFMT = 0170000;
 
   /** Private utility constructor. */
   private JFUSEAdapter() {
@@ -73,8 +73,7 @@ public final class JFUSEAdapter implements FileModeFlags {
    * @return bitmask indicating a directory
    */
   public static int getSIFDIR() {
-    return S_IFDIR;
-    // return DFS_S_IFDIR;
+    return loadJFUSELibrary() ? S_IFDIR : DFS_S_IFDIR;
   }
 
   /**
@@ -83,8 +82,7 @@ public final class JFUSEAdapter implements FileModeFlags {
    * @return bitmask indicating a directory
    */
   public static int getSIFREG() {
-    return S_IFREG;
-    // return DFS_S_IFREG;
+    return loadJFUSELibrary() ? S_IFREG : DFS_S_IFREG;
   }
 
   /**
@@ -93,7 +91,8 @@ public final class JFUSEAdapter implements FileModeFlags {
    * @return true if mode is regular file
    */
   public static boolean isReg(final int mode) {
-    return (mode & S_IFMT) == S_IFREG;
-    // return (mode & DFS_S_IFMT) == DFS_S_IFREG;
+    if (loadJFUSELibrary())
+      return (mode & S_IFMT) == S_IFREG;
+    return (mode & DFS_S_IFMT) == DFS_S_IFREG;
   }
 }
