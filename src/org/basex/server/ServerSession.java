@@ -25,7 +25,7 @@ import org.basex.util.Performance;
 
 /**
  * Single session for a client-server connection.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -42,6 +42,8 @@ public final class ServerSession extends Thread {
   private Process core;
   /** Timeout thread. */
   private Thread timeout;
+  /** ClientProcess. */
+  private ClientProcess cp;
 
   /**
    * Constructor.
@@ -62,8 +64,8 @@ public final class ServerSession extends Thread {
     try {
       // get command and arguments
       final DataInputStream dis = new DataInputStream(socket.getInputStream());
-      final PrintOutput out = new PrintOutput(
-          new BufferedOutput(socket.getOutputStream()));
+      final PrintOutput out = new PrintOutput(new BufferedOutput(
+          socket.getOutputStream()));
 
       // [CG] handle unknown users and wrong passwords
       final String us = dis.readUTF();
@@ -102,10 +104,31 @@ public final class ServerSession extends Thread {
               new DataOutputStream(out).writeUTF(inf);
             }
             out.flush();
+            server.cp.remove(cp);
           } else {
             core = proc;
             startTimer(proc);
+            cp = new ClientProcess(this, proc.updating());
+            server.cp.add(cp);
+            if(server.cp.size() > 1) {
+              if(proc.updating()) {
+                server.cp.add(cp);
+                while(server.cp.indexOf(cp) != 0)
+                  Performance.sleep(50);
+              } else {
+                server.cp.add(cp);
+                boolean write = false;
+                for(int i = 0; i < server.cp.size(); i++) {
+                  if(server.cp.get(i).updating) write = true;
+                }
+                if(write) {
+                  while(server.cp.indexOf(cp) != 0)
+                    Performance.sleep(50);
+                }
+              }
+            }
             send(out, proc.execute(context));
+            if(!proc.printing()) server.cp.remove(cp);
             stopTimer();
 
             if(proc instanceof IntStop || proc instanceof Exit) {
@@ -138,7 +161,7 @@ public final class ServerSession extends Thread {
    * @throws IOException I/O exception
    */
   private void send(final PrintOutput out, final boolean ok)
-      throws IOException {
+  throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

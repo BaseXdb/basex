@@ -4,11 +4,14 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+
 import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.IntStop;
+import org.basex.server.ClientProcess;
 import org.basex.server.ClientSession;
 import org.basex.server.ServerSession;
 import org.basex.util.Args;
@@ -30,6 +33,8 @@ public final class BaseXServer extends Main implements Runnable {
   boolean running = true;
   /** Verbose mode. */
   boolean info;
+  /** List of clientprocesses. */
+  public final ArrayList<ClientProcess> cp;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -46,8 +51,8 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public BaseXServer(final String... args) {
     super(args);
+    cp = new ArrayList<ClientProcess>();
     if(!ok) return;
-
     try {
       server = new ServerSocket(context.prop.num(Prop.PORT));
       new Thread(this).start();
