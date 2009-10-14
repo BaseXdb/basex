@@ -112,11 +112,9 @@ public final class ServerSession extends Thread {
             server.cp.add(cp);
             if(server.cp.size() > 1) {
               if(proc.updating()) {
-                server.cp.add(cp);
                 while(server.cp.indexOf(cp) != 0)
                   Performance.sleep(50);
               } else {
-                server.cp.add(cp);
                 boolean write = false;
                 for(int i = 0; i < server.cp.size(); i++) {
                   if(server.cp.get(i).updating) write = true;
