@@ -71,7 +71,7 @@ public final class ServerSession extends Thread {
       final String us = dis.readUTF();
       final String pw = dis.readUTF();
       context.user = context.users.get(us, pw);
-      final boolean ok = context.user != null;
+      final boolean ok = us.equals("") || context.user != null;
       new DataOutputStream(out).writeUTF(ok ? "" : "Login failed.");
       out.flush();
 

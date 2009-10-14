@@ -17,11 +17,11 @@ public class User {
   public static final int ADMIN = 2048;
 
   /** User name. */
-  public String name;
+  String name;
   /** Password. */
-  public byte[] pw;
+  byte[] pw;
   /** Permission. */
-  public int perm;
+  int perm;
   
   /**
    * Constructor.
@@ -36,34 +36,11 @@ public class User {
   }
   
   /**
-   * Returns if the user has read permissions.
+   * Returns if the specified permission is set.
+   * @param flag flag to be checked
    * @return result of check
    */
-  public boolean read() {
-    return (perm & READ) != 0;
-  }
-  
-  /**
-   * Returns if the user has write permissions.
-   * @return result of check
-   */
-  public boolean write() {
-    return (perm & WRITE) != 0;
-  }
-  
-  /**
-   * Returns if the user has create permissions.
-   * @return result of check
-   */
-  public boolean create() {
-    return (perm & CREATE) != 0;
-  }
-  
-  /**
-   * Returns if the user has admin permissions.
-   * @return result of check
-   */
-  public boolean admin() {
-    return (perm & ADMIN) != 0;
+  public boolean perm(final int flag) {
+    return (perm & flag) != 0;
   }
 }

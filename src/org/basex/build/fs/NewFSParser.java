@@ -53,9 +53,9 @@ public final class NewFSParser extends Parser {
         /** DeepFS filesystem namespace. */
     DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
         /** DeepFS metadata namespace. */
-    FSMETA("fsmeta", "http://www.deepfs.org/fsmeta/1.0/"),
+    FSMETA("", "http://www.deepfs.org/fsmeta/1.0/"),
         /** Dublin Core metadata terms namespace. */
-    DCTERMS("dcterms", "http://purl.org/dc/terms/");
+    DCTERMS("", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
     private byte[] prefix;

@@ -86,10 +86,10 @@ public abstract class Process extends Progress {
     final User user = context.user;
     if(user != null) {
       String perm = null;
-      if(admin() && !user.admin()) perm = "admin";
-      else if(create() && !user.create()) perm = "create";
-      else if(write() && !user.write()) perm = "write";
-      else if(read() && !user.read()) perm = "read";
+      if(admin() && !user.perm(User.ADMIN)) perm = "admin";
+      else if(create() && !user.perm(User.CREATE)) perm = "create";
+      else if(write() && !user.perm(User.WRITE)) perm = "write";
+      else if(read() && !user.perm(User.READ)) perm = "read";
       if(perm != null)
         return error("User has no global '" + perm + "' rights.");
     }

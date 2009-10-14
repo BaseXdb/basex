@@ -33,7 +33,7 @@ public final class BaseXServer extends Main implements Runnable {
   boolean running = true;
   /** Verbose mode. */
   boolean info;
-  /** List of clientprocesses. */
+  /** List of client processes. */
   public final ArrayList<ClientProcess> cp;
 
   /**

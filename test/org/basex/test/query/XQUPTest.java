@@ -17,13 +17,13 @@ public class XQUPTest extends AbstractTest{
   /** S.a. */
   static final String SEQ3 = "(attribute n{'b'}, attribute c{'b'})";
   /** S.a. */
-  static final String SEQ4 = "(attribute n{'b'}, attribute n{'b'}," +
-  "attribute c{'b'})";
+  static final String SEQ4 =
+    "(attribute n{'b'}, attribute n{'b'}, attribute c{'b'})";
   /** S.a. */
   static final String SEQ5 = "(attribute n{'b'}, <a/>, 5, 'fooboo')";
   /** S.a. */
-  static final String SEQ6 = "(attribute n{'b'}, <a/>, 'fooboo', 5, 'fooboo'," +
-  		"aaaaaaaaaaaa)";
+  static final String SEQ6 =
+    "(attribute n{'b'}, <a/>, 'fooboo', 5, 'fooboo', aaaaaaaaaaaa)";
   
   /**
    * Constructor.

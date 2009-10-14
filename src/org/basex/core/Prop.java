@@ -157,7 +157,7 @@ public final class Prop extends AProp {
   public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 1048576 };
 
   /** FSParser implementation. If true, the new implementation is used. */
-  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
+  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", true };
   /** Fuse support. */
   public static final Object[] FUSE = { "FUSE", false };
   /** Flag for creating a native (joint) database. */

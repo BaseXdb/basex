@@ -7,7 +7,7 @@ package org.basex.server;
  * @author Andreas Weiler
  */
 public class ClientProcess {
-  /** Serversession. */
+  /** Server session. */
   ServerSession sess;
   /** Boolean if updating. */
   boolean updating;

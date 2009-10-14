@@ -148,10 +148,10 @@ public final class Users {
       for(int i = 0; i < size; i++) {
         final User user = users.get(i);
         tb.add(ind[0], user.name);
-        tb.add(ind[1], user.read() ? "X" : "");
-        tb.add(ind[2], user.write() ? "X" : "");
-        tb.add(ind[3], user.create() ? "X" : "");
-        tb.add(ind[4], user.admin() ? "X" : "");
+        tb.add(ind[1], user.perm(User.READ) ? "X" : "");
+        tb.add(ind[2], user.perm(User.WRITE) ? "X" : "");
+        tb.add(ind[3], user.perm(User.CREATE) ? "X" : "");
+        tb.add(ind[4], user.perm(User.ADMIN) ? "X" : "");
         tb.add(NL);
       }
       tb.add(NL);
