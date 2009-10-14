@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.core.Text.*;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.server.ServerSession;
@@ -41,11 +42,12 @@ public final class Context {
     prop = new Prop();
     pool = new DataPool();
     sessions = new Sessions();
-    users = new Users(this);
+    users = new Users();
+    user = users.get(ADMIN);
   }
 
   /**
-   * Constructor.
+   * Constructor. {@link #user} reference must be set after calling this.
    * @param ctx parent context
    */
   public Context(final Context ctx) {

@@ -218,7 +218,7 @@ public final class InexTest {
         }
       }
 
-      session = new ClientSession(ctx);
+      session = new ClientSession(ctx, ADMIN, ADMIN);
       session.execute(new Set(Prop.INFO, true));
       session.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {

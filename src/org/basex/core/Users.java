@@ -18,7 +18,6 @@ import org.basex.util.TokenBuilder;
 public final class Users {
   /** Default permissions. */
   private static final int PERM = User.READ | User.WRITE;
-
   /** User list. */
   private final ArrayList<User> users = new ArrayList<User>();
   /** Filename. */
@@ -28,10 +27,9 @@ public final class Users {
 
   /**
    * Standard constructor.
-   * @param ctx Context
    */
-  public Users(final Context ctx) {
-    file = ctx.prop.get(Prop.DBPATH) + "/users" + IO.BASEXSUFFIX;
+  public Users() {
+    file = Prop.HOME + ".basexperm";
     read();
   }
 
@@ -102,6 +100,11 @@ public final class Users {
       } catch(final Exception ex) {
         Main.debug(ex);
       }
+    } else {
+      // create admin user with all rights
+      users.add(new User(ADMIN, crypt.encrypt(Token.token(ADMIN)),
+          User.READ | User.WRITE | User.CREATE | User.ADMIN));
+      write();
     }
   }
 

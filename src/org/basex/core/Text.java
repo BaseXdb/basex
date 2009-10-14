@@ -115,6 +115,12 @@ public interface Text {
   String SERVERTIME = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
+  /** Login error. */
+  String SERVERLOGIN = lang("srv_login");
+  /** User name. */
+  String SERVERUSER = lang("srv_user") + COLS;
+  /** Password. */
+  String SERVERPW = lang("srv_pw") + COLS;
 
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
@@ -590,6 +596,8 @@ public interface Text {
 
   /** User name. */
   String[] USERS = { "Username",  "Read", "Write", "Create", "Admin" };
+  /** Admin user. */
+  String ADMIN = "admin";
   
   // UPDATE COMMANDS ==========================================================
 

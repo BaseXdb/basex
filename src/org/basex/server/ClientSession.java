@@ -46,16 +46,8 @@ public final class ClientSession implements Session {
   private final InputStream in;
 
   /**
-   * Constructor, specifying the server host:port and the command to be sent.
-   * @param context database context
-   * @throws IOException I/O exception
-   */
-  public ClientSession(final Context context) throws IOException {
-    this(context, null, null);
-  }
-
-  /**
-   * Constructor, specifying the server host:port and the command to be sent.
+   * Constructor, specifying the database context and the
+   * login and password.
    * @param context database context
    * @param user user name
    * @param pw password
@@ -67,7 +59,8 @@ public final class ClientSession implements Session {
   }
 
   /**
-   * Constructor, specifying the server host:port and the command to be sent.
+   * Constructor, specifying the server host:port combination and the
+   * login and password.
    * @param host server name
    * @param port server port
    * @param user user name
@@ -80,11 +73,10 @@ public final class ClientSession implements Session {
     in = socket.getInputStream();
     out = new DataOutputStream(socket.getOutputStream());
 
-    // [CG] handle server login feedback
-    out.writeUTF(user != null ? user : "");
-    out.writeUTF(pw != null ? pw : "");
-    final String fb = new DataInputStream(in).readUTF();
-    if(fb.length() != 0) throw new RuntimeException(fb);
+    // [CG] Server: handle server login feedback
+    out.writeUTF(user);
+    out.writeUTF(pw);
+    if(in.read() != 0) throw new LoginException();
   }
 
   public boolean execute(final String cmd) throws IOException {

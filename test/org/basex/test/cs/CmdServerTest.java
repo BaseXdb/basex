@@ -1,5 +1,6 @@
 package org.basex.test.cs;
 
+import static org.basex.core.Text.*;
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
@@ -27,7 +28,7 @@ public final class CmdServerTest extends CmdTest {
     }.start();
 
     try {
-      session = new ClientSession(CONTEXT);
+      session = new ClientSession(CONTEXT, ADMIN, ADMIN);
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }

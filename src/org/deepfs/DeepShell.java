@@ -9,7 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.basex.core.Main;
 import org.basex.core.proc.InfoTable;
@@ -99,14 +98,7 @@ public final class DeepShell {
    */
   private String input(final String prompt) {
     Main.out(prompt);
-    // get user input
-    try {
-      return new Scanner(System.in).nextLine();
-    } catch(final Exception ex) {
-      // catches forced interruptions such as ctrl+c
-      Main.outln();
-      return null;
-    }
+    return System.console().readLine();
   }
 
   /**

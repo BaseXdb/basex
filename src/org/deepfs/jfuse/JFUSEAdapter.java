@@ -14,6 +14,7 @@ import org.catacombae.jfuse.util.FUSEUtil;
  * it is intended to just exclude DeepFSImpl from the build path and to toggle
  * the (un)commented code here.
  * 
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek <alex@holupirek.de>
  * 
  */

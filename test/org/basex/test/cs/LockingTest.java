@@ -1,7 +1,7 @@
 package org.basex.test.cs;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.BaseXServer;
 import org.basex.core.Main;
 import org.basex.core.Session;
@@ -154,7 +154,7 @@ public final class LockingTest {
    */
   ClientSession createSession() {
     try {
-      return new ClientSession(server.context);
+      return new ClientSession(server.context, ADMIN, ADMIN);
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

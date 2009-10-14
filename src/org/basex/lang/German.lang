@@ -333,11 +333,14 @@ cs_local=Standalone
 cs_client=Client
 
 # Server Info
+srv_login=Zugriff verweigert.
 srv_connect=Server ist nicht erreichbar.
 srv_timeout=Der Prozess hat das Timeout überschritten.
 srv_bind=Server läuft, oder Zugriff wurde untersagt.
 srv_start=Wartet auf Anfragen...
 srv_stop=wurde gestoppt.
+srv_user=Benutzer
+srv_pw=Passwort
 
 # Bye
 bye1=Schönen Tag noch.

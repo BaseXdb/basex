@@ -1,5 +1,10 @@
 package org.basex;
 
+import static org.basex.core.Text.*;
+import org.basex.core.Main;
+import org.basex.core.Session;
+import org.basex.server.ClientSession;
+
 /**
  * This is the starter class for the client console mode.
  * It sends all commands to the server instance.
@@ -25,5 +30,34 @@ public final class BaseXClient extends BaseX {
    */
   public BaseXClient(final String... args) {
     super(args);
+  }
+
+  @Override
+  protected boolean sa() {
+    return false;
+  }
+
+  @Override
+  protected Session session() {
+    if(session == null) {
+      String pw = null;
+      // [CG] experimental user/password input
+      while(user == null) { // || user.length() == 0
+        Main.out(SERVERUSER);
+        user = System.console().readLine();
+      }
+      while(pw == null) { //  || pw.length() == 0
+        Main.out(SERVERPW);
+        pw = new String(System.console().readPassword());
+      }
+      try {
+        session = new ClientSession(context, user, pw);
+      } catch(final Exception ex) {
+        // no server available; switches to standalone mode
+        Main.error(ex, true);
+        ok = false;
+      }
+    }
+    return session;
   }
 }

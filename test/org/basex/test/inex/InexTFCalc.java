@@ -116,7 +116,7 @@ public final class InexTFCalc {
         }
       }
       if(ok) {
-        session = new ClientSession(ctx);
+        session = new ClientSession(ctx, ADMIN, ADMIN);
         session.execute(new Set(Prop.INFO, true));
         session.execute(new Set(Prop.ALLINFO, false));
       } else {

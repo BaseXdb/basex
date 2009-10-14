@@ -67,13 +67,12 @@ public final class ServerSession extends Thread {
       final PrintOutput out = new PrintOutput(new BufferedOutput(
           socket.getOutputStream()));
 
-      // [CG] handle unknown users and wrong passwords
+      // [CG] Server: handle unknown users and wrong passwords
       final String us = dis.readUTF();
       final String pw = dis.readUTF();
       context.user = context.users.get(us, pw);
-      final boolean ok = us.equals("") || context.user != null;
-      new DataOutputStream(out).writeUTF(ok ? "" : "Login failed.");
-      out.flush();
+      final boolean ok = context.user != null;
+      send(out, ok);
 
       if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + us);
       if(!ok) return;
@@ -146,7 +145,7 @@ public final class ServerSession extends Thread {
         if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
       }
 
-      if(info) Main.outln(this + " Logout: " + context.user);
+      if(info) Main.outln(this + " Logout: " + us);
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
@@ -159,7 +158,7 @@ public final class ServerSession extends Thread {
    * @throws IOException I/O exception
    */
   private void send(final PrintOutput out, final boolean ok)
-  throws IOException {
+      throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

@@ -132,7 +132,7 @@ public final class BaseXServer extends Main implements Runnable {
         ok = false;
         if(arg.string().equals("stop")) {
           try {
-            new ClientSession(context).execute(new IntStop());
+            new ClientSession(context, ADMIN, ADMIN).execute(new IntStop());
             outln(SERVERSTOPPED);
           } catch(final IOException ex) {
             error(ex, true);

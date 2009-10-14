@@ -5,6 +5,7 @@ import java.io.PrintStream;
 /**
  * Internal representation of file status.
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
 public final class DeepStat {
@@ -63,6 +64,5 @@ public final class DeepStat {
     ps.println(prefix + "st_blocksize = " + stblocksize);
     ps.println(prefix + "st_flags = " + stflags);
     ps.println(prefix + "st_gen = " + stgen);
-}
-
+  }
 }

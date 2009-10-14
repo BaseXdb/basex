@@ -21,6 +21,8 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Parser for EML files.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  * @author Lukas Kircher
  */

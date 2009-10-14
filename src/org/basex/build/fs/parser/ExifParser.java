@@ -18,13 +18,11 @@ import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.core.Main;
 
 /**
- * <p>
  * Parser for Exif data.
- * </p>
- * <p>
  * This is not a standalone parser. Only used for parsing Exif data that is
  * embedded in e.g. a TIFF file.
- * </p>
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  * 

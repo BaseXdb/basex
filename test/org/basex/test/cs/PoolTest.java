@@ -1,5 +1,6 @@
 package org.basex.test.cs;
 
+import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 import org.basex.BaseXServer;
 import org.basex.core.Process;
@@ -47,8 +48,8 @@ public class PoolTest {
     Performance.sleep(200);
 
     try {
-      session1 = new ClientSession(server.context);
-      session2 = new ClientSession(server.context);
+      session1 = new ClientSession(server.context, ADMIN, ADMIN);
+      session2 = new ClientSession(server.context, ADMIN, ADMIN);
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }

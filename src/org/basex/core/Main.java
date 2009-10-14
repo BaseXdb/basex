@@ -4,12 +4,12 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.Random;
-import java.util.Scanner;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
+import org.basex.server.LoginException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -59,25 +59,11 @@ public abstract class Main {
 
     while(console) {
       if(!process(new IntPrompt(), true)) break;
-      final String in = input();
+      final String in = System.console().readLine();
       if(in == null) break;
       if(!process(in)) return true;
     }
     return false;
-  }
-
-  /**
-   * Returns user input.
-   * @return user input
-   */
-  protected final String input() {
-    //return System.console().readLine();
-    try {
-      return new Scanner(System.in).nextLine();
-    } catch(final Exception ex) {
-      // catches forced interruptions such as ctrl+c
-      return null;
-    }
   }
 
   /**
@@ -294,6 +280,8 @@ public abstract class Main {
       debug(ex);
       if(ex instanceof BindException) {
         errln(SERVERBIND);
+      } else if(ex instanceof LoginException) {
+        errln(SERVERLOGIN);
       } else if(ex instanceof IOException) {
         errln(SERVERERR);
       } else {

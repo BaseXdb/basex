@@ -337,11 +337,14 @@ cs_local=Standalone
 cs_client=Client
 
 # Server Info
+srv_login=Access denied.
 srv_connect=Impossibile comunicare col Server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
 srv_start=Attendo richieste...
 srv_stop=fermato.
+srv_user=Username
+srv_pw=Password
 
 # Bye
 bye1=Buona giornata.

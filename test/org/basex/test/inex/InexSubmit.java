@@ -279,7 +279,7 @@ public final class InexSubmit {
         }
       }
       if(ok) {
-        session = new ClientSession(ctx);
+        session = new ClientSession(ctx, ADMIN, ADMIN);
         session.execute(new Set(Prop.INFO, true));
       } else {
         Main.outln("Usage: " + Main.name(this) + " [options]" + NL +

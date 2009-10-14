@@ -1,5 +1,6 @@
 package org.basex.gui.dialog;
 
+import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -8,12 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-
 import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -65,7 +64,7 @@ public final class DialogServer extends Dialog {
       }
     });
     try {
-      new ClientSession(ctx);
+      new ClientSession(ctx, ADMIN, ADMIN);
       start.setEnabled(false);
     } catch(final IOException e1) {
       stop.setEnabled(false);

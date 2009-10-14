@@ -8,7 +8,7 @@ import org.basex.core.AProp;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public class XQUPTest extends AbstractTest{
+public class XQUPTest extends AbstractTest {
   /** Testing sequence containing different kinds of fragments for 
    * insert / replace expressions. */
   static final String SEQ1 = "(<a/>, 5, 'fooboo')";
@@ -22,8 +22,8 @@ public class XQUPTest extends AbstractTest{
   /** S.a. */
   static final String SEQ5 = "(attribute n{'b'}, <a/>, 5, 'fooboo')";
   /** S.a. */
-  static final String SEQ6 = "(attribute n{'b'}, 'fooboo', 5, <a/>, 'fooboo'," +
-  		"'aaa')";
+  static final String SEQ6 =
+    "(attribute n{'b'}, 'fooboo', 5, <a/>, 'fooboo', 'aaa')";
   
   /**
    * Constructor.

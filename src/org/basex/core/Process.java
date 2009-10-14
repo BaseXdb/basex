@@ -82,17 +82,15 @@ public abstract class Process extends Progress {
     context = ctx;
     prop = ctx.prop;
 
-    // check user rights (experimental)
+    // [CG] Server: check user rights
     final User user = context.user;
-    if(user != null) {
-      String perm = null;
-      if(admin() && !user.perm(User.ADMIN)) perm = "admin";
-      else if(create() && !user.perm(User.CREATE)) perm = "create";
-      else if(write() && !user.perm(User.WRITE)) perm = "write";
-      else if(read() && !user.perm(User.READ)) perm = "read";
-      if(perm != null)
-        return error("User has no global '" + perm + "' rights.");
-    }
+    String perm = null;
+    if(admin() && !user.perm(User.ADMIN)) perm = "admin";
+    else if(create() && !user.perm(User.CREATE)) perm = "create";
+    else if(write() && !user.perm(User.WRITE)) perm = "write";
+    else if(read() && !user.perm(User.READ)) perm = "read";
+    if(perm != null)
+      return error("User has no global '" + perm + "' rights.");
 
     final Data data = context.data();
     // data reference needed?

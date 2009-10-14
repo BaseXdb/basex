@@ -39,7 +39,7 @@ public final class ServerExample {
     Performance.sleep(100);
 
     // Create client session, specifying the server name and port
-    session = new ClientSession("localhost", 1984, "user", "pw");
+    session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // Create a standard output stream.
     out = new PrintOutput(System.out);

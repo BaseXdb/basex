@@ -332,11 +332,14 @@ cs_local=Đứng một mình
 cs_client=Người dùng
 
 # Server Info
+srv_login=Access denied.
 srv_connect=Không liên lạc được với máy chủ.
 srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
 srv_bind=Máy chủ đang chạy hay không được phép.
 srv_start=Đang chờ yêu cầu...
 srv_stop=đã dừng.
+srv_user=Username
+srv_pw=Password
 
 # Bye
 bye1=Chúc một ngày vui.

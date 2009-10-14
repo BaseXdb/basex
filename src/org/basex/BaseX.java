@@ -8,7 +8,6 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
-import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Token;
 
@@ -28,7 +27,7 @@ public class BaseX extends Main {
   /** XQuery file. */
   private String file;
   /** User name. */
-  private String user;
+  protected String user;
 
   /**
    * Main method, launching the standalone console mode.
@@ -94,40 +93,13 @@ public class BaseX extends Main {
    * Returns if this is the standalone version.
    * @return standalone flag
    */
-  private boolean sa() {
-    return !(this instanceof BaseXClient);
+  protected boolean sa() {
+    return true;
   }
 
   @Override
-  protected final Session session() {
-    if(session == null) {
-      if(sa()) {
-        session = new LocalSession(context);
-      } else {
-        String pw = null;
-        // [CG] experimental user/password input
-        if(this instanceof BaseXClient) {
-          while(user == null || user.length() == 0) {
-            Main.out("Username: ");
-            user = input();
-            //user = System.console().readLine();
-          }
-          while(pw == null || pw.length() == 0) {
-            Main.out("Password: ");
-            pw = input();
-            // Java 1.6 needed to hide password
-            //pw = new String(System.console().readPassword());
-          }
-        }
-        try {
-          session = new ClientSession(context, user, pw);
-        } catch(final Exception ex) {
-          // no server available; switches to standalone mode
-          Main.error(ex, true);
-          ok = false;
-        }
-      }
-    }
+  protected Session session() {
+    if(session == null) session = new LocalSession(context);
     return session;
   }
 
