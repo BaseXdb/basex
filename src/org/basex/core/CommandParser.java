@@ -383,8 +383,9 @@ public final class CommandParser extends InputParser {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
       final E cmd = Enum.valueOf(cmp, t);
-      // [CG] should be the same?
-      // http://forums.sun.com/thread.jspa?threadID=5336141
+// [CG] rewrote this due to compiler bug out of eclipse
+// [CG] should be the same?
+// http://forums.sun.com/thread.jspa?threadID=5336141
 //      if(!(cmd instanceof Cmd)) return cmd;
 //      final Cmd c = (Cmd) cmd;
       if(!(Cmd.class.isInstance(cmd))) return cmd;
@@ -405,7 +406,9 @@ public final class CommandParser extends InputParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
-      if(ls.similar(name, sm, 0) && s instanceof Cmd)
+// [CG] rewrote this due to compiler bug out of eclipse
+//      if(ls.similar(name, sm, 0) && s instanceof Cmd)
+      if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
         error(list(alt), CMDSIMILAR, name, sm);
     }
 
@@ -440,8 +443,11 @@ public final class CommandParser extends InputParser {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      if(e instanceof Cmd) {
-        final Cmd c = (Cmd) e;
+// [CG] rewrote this due to compiler bug out of eclipse
+//      if(e instanceof Cmd) {
+//        final Cmd c = (Cmd) e;
+      if(Cmd.class.isInstance(e)) {
+        final Cmd c = Cmd.class.cast(e);
         if(c.help() || c.hidden() || c.internal()) continue;
       }
       if(e.name().startsWith(t)) {
