@@ -31,6 +31,7 @@ public final class ReplaceValuePrimitive extends NewValuePrimitive {
     final int k = d.kind(n.pre);
     if(k == Data.ATTR) d.update(n.pre, d.attName(n.pre), name);
     else d.update(n.pre, name);
+    // [LK] add delete if replace with empty string
   }
   
   @Override

@@ -25,7 +25,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.util.Token;
 
 /**
  * XQuery Update update functions.
@@ -40,7 +39,8 @@ public final class UpdateFunctions {
   private UpdateFunctions() { }
   
   /**
-   * Merges all adjacent text nodes in the given sequence.
+   * Merges all adjacent text nodes in the given sequence. The given iterator
+   * must contain 
    * @param n iterator
    * @return iterator with merged text nodes
    * @throws QueryException query exception
@@ -50,7 +50,7 @@ public final class UpdateFunctions {
     Nod i = (Nod) n.next();
     while(i != null) {
       if(Nod.kind(i.type) == Data.TEXT) {
-        byte[] t = Token.EMPTY;
+        byte[] t = EMPTY;
         while(i != null && Nod.kind(i.type) == Data.TEXT) {
           t = concat(t, i.str());
           i = (Nod) n.next();
@@ -60,6 +60,40 @@ public final class UpdateFunctions {
       }
       s.add(i);
       i = (Nod) n.next();
+    }
+    return s;
+  }
+  
+  /**
+   * Merges two adjacent text nodes in a database.
+   * @param d data reference
+   * @param a node
+   * @param b node
+   * @return true if nodes have been merged
+   */
+  public static boolean mergeTextNodes(final Data d, final int a, final int b) {
+    if(!(d.kind(a) == Data.TEXT && d.kind(b) == Data.TEXT)) return false;
+    d.update(a, concat(d.text(a), d.text(b)));
+    d.delete(b);
+    return true;
+  }
+  
+  /**
+   * Finds the left sibling of the given node.
+   * @param d data reference
+   * @param pre value of node for which to find sibling
+   * @return pre value of left sibling or -1 if non exists
+   */
+  public static int leftSibling(final Data d, final int pre) {
+    // [CG] We already have something like that?
+    if(pre < 1 || pre >= d.meta.size) return -1;
+    final int par = d.parent(pre, d.kind(pre));
+    int s = -1;
+    int p = par + 1;
+    while(p <= pre) {
+      p = p + d.size(p, d.kind(p));
+      if(p == pre) return s;
+      s = p;
     }
     return s;
   }

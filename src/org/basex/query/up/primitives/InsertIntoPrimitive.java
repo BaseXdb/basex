@@ -30,9 +30,18 @@ public final class InsertIntoPrimitive extends InsertPrimitive {
     
     final DBNode n = (DBNode) node;
     final Data d = n.data;
+    final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)); 
+//    int a = leftSibling(d, pos);
     // source nodes may be empty, thus insert has no effect at all
-    n.data.insertSeq(n.pre + d.size(n.pre, Nod.kind(node.type)), 
-        n.pre, m);
+    n.data.insertSeq(pos, n.pre, m);
+//    if(m.meta.size < 1) return;
+//    if(a > -1 && m.meta.size > a + 1) {
+//      mergeTextNodes(d, a, a + 1);
+//      // if nodes could be merged on left hand, no more merges possible
+//      return;
+//    }
+//    a = pos + m.meta.size;
+//    mergeTextNodes(d, a, a + d.size(a, d.kind(a)));
   }
 
   @SuppressWarnings("unused")

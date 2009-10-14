@@ -22,8 +22,8 @@ public class XQUPTest extends AbstractTest{
   /** S.a. */
   static final String SEQ5 = "(attribute n{'b'}, <a/>, 5, 'fooboo')";
   /** S.a. */
-  static final String SEQ6 =
-    "(attribute n{'b'}, <a/>, 'fooboo', 5, 'fooboo', aaaaaaaaaaaa)";
+  static final String SEQ6 = "(attribute n{'b'}, 'fooboo', 5, <a/>, 'fooboo'," +
+  		"'aaa')";
   
   /**
    * Constructor.
@@ -153,10 +153,11 @@ public class XQUPTest extends AbstractTest{
         { "ins2", nodes(7, 9, 10), 
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
-//        { "xxxins3", nodes(),
-//        "insert node //car[@id=3] into /up/cars/good/car[@id=1]"},
-//        { "ins3", nodes(7), 
-//        "//car[@id]/car, //car[@id]/car/text()" },
+        { "xxxins3", nodes(),
+        "insert node" + SEQ6 + " into /up/cars/good/car[@id=1]"},
+        { "ins3", nodes(5, 5), 
+        "/up/cars/good/car[text()='fooboo5'], " +
+        "/up/cars/good/car[text()='foobooaaa']" },
         
         // parser tests
     };
