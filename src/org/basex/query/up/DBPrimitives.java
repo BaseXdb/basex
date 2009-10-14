@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
@@ -71,16 +70,17 @@ public final class DBPrimitives {
     Arrays.sort(p);
     for(int i = l - 1; i >= 0; i--) {
       final UpdatePrimitive[] pl = op.get(p[i]);
+      // fragment constraints need to be checked
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
       if(f) return;
       int add = 0;
       for(final UpdatePrimitive pp : pl) {
         if(pp == null) continue;
-        if(pp.type().ordinal() == Type.INSERTBEFORE.ordinal()) {
-          final MemData m = ((InsertBeforePrimitive) pp).buildDB();
-          add = m.size(0, Data.DOC) - 1;
+        if(pp.type().equals(Type.INSERTBEFORE)) {
+          add = ((InsertBeforePrimitive) pp).m.size(0, Data.DOC) - 1;
         }
         pp.apply(add);
+        if(pp.type().equals(Type.REPLACENODE)) break;
       }
     }
   }

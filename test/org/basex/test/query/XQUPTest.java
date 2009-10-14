@@ -21,6 +21,9 @@ public class XQUPTest extends AbstractTest{
   "attribute c{'b'})";
   /** S.a. */
   static final String SEQ5 = "(attribute n{'b'}, <a/>, 5, 'fooboo')";
+  /** S.a. */
+  static final String SEQ6 = "(attribute n{'b'}, <a/>, 'fooboo', 5, 'fooboo'," +
+  		"aaaaaaaaaaaa)";
   
   /**
    * Constructor.
@@ -104,7 +107,7 @@ public class XQUPTest extends AbstractTest{
         { "ren3", nodes(28),
         "//processing-instruction('BADVICE')" },
         
-        //[LK] add fragment tests
+        //[LK] add fragment tests?
         // replace elem
         { "xxxrep1", nodes(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
@@ -124,7 +127,7 @@ public class XQUPTest extends AbstractTest{
         { "xxxrep4", nodes(),
         "replace node /up/cars/good/car/wheels/text() with " + SEQ1},
         { "rep4", nodes(11),
-        "/up/cars/good/car/wheels[text()='fooboo']" },
+        "/up/cars/good/car/wheels[text()='5fooboo']" },
         // replace attribute
         { "xxxrep5", nodes(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
@@ -132,22 +135,22 @@ public class XQUPTest extends AbstractTest{
         // replace comment
         { "xxxrep6", nodes(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", nodes(8, 9),  
+        { "rep6", nodes(8),  
         "/up/cars/good/car/text()" },
         // replace processing instruction
         { "xxxrep7", nodes(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", nodes(18, 19, 20), 
+        { "rep7", nodes(18, 19), 
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" }, 
     
         // insert
         { "xxxins1", nodes(),
         "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
-        { "ins1", nodes(7, 8, 9), 
+        { "ins1", nodes(8, 9), 
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
         { "xxxins2", nodes(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nodes(7, 8, 9, 10), 
+        { "ins2", nodes(7, 9, 10), 
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
 //        { "xxxins3", nodes(),

@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -26,14 +25,9 @@ public final class InsertIntoLastPrimitive extends InsertPrimitive {
   
   @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
-  }
-
-  @Override
   public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
-    final MemData m = buildDB();
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
@@ -45,7 +39,7 @@ public final class InsertIntoLastPrimitive extends InsertPrimitive {
   @SuppressWarnings("unused")
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    c.addLast(((NodeCopyPrimitive) p).c.getFirst());
+    c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 
   @Override

@@ -28,7 +28,11 @@ public final class DeletePrimitive extends UpdatePrimitive {
     if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
+//    System.out.println("before");
+//    UpdateFunctions.printTable(n.data);
     deleteDBNodes(new Nodes(new int[]{p}, n.data));
+//    System.out.println("after");
+//    UpdateFunctions.printTable(n.data);
   }
 
   @Override

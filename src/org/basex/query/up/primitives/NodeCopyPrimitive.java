@@ -12,6 +12,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.UpdateFunctions;
 
+import static org.basex.query.up.UpdateFunctions.*;
+
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted i.e..
  *
@@ -19,8 +21,10 @@ import org.basex.query.up.UpdateFunctions;
  * @author Lukas Kircher
  */
 public abstract class NodeCopyPrimitive extends UpdatePrimitive {
-  /** Copy of nodes to be inserted. */
+  /** Insertion nodes. */
   LinkedList<Iter> c;
+  /** Final copy of insertion nodes. */
+  public MemData m;
 
   /**
    * Constructor.
@@ -33,13 +37,18 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
     c.add(copy);
   }
   
+  @Override
+  public void check() throws QueryException {
+    m = buildDB();
+  }
+  
   /**
    * Builds MemData instance from iterator.
    * @return data instance
    * @throws QueryException query exception
    */
   public MemData buildDB() throws QueryException {
-    final SeqIter seq = new SeqIter();
+    SeqIter seq = new SeqIter();
     if(c.size() == 0) return null;
     final Iterator<Iter> it = c.iterator();
     while(it.hasNext()) {
@@ -51,6 +60,7 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
         i = ni.next();
       }
     }
+    seq = mergeTextNodes(seq);
     return UpdateFunctions.buildDB(seq, ((DBNode) node).data);
   }
 }

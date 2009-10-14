@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -26,14 +25,9 @@ public final class InsertBeforePrimitive extends InsertPrimitive {
   
   @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
-  }
-
-  @Override
   public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
     
-    final MemData m = buildDB();
     // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;

@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -28,14 +27,9 @@ public final class InsertAttribute extends InsertPrimitive {
 
   @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
-  }
-
-  @Override
   public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
 
-    final MemData m = buildDB();
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;

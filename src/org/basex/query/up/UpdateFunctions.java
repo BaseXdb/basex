@@ -1,6 +1,9 @@
 package org.basex.query.up;
 
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
@@ -21,7 +24,8 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import static org.basex.util.Token.*;
+import org.basex.query.iter.SeqIter;
+import org.basex.util.Token;
 
 /**
  * XQuery Update update functions.
@@ -34,6 +38,31 @@ public final class UpdateFunctions {
    * Constructor.
    */
   private UpdateFunctions() { }
+  
+  /**
+   * Merges all adjacent text nodes in the given sequence.
+   * @param n iterator
+   * @return iterator with merged text nodes
+   * @throws QueryException query exception
+   */
+  public static SeqIter mergeTextNodes(final Iter n) throws QueryException {
+    final SeqIter s = new SeqIter();
+    Nod i = (Nod) n.next();
+    while(i != null) {
+      if(Nod.kind(i.type) == Data.TEXT) {
+        byte[] t = Token.EMPTY;
+        while(i != null && Nod.kind(i.type) == Data.TEXT) {
+          t = concat(t, i.str());
+          i = (Nod) n.next();
+        }
+        s.add(new FTxt(t, null));
+        continue;
+      }
+      s.add(i);
+      i = (Nod) n.next();
+    }
+    return s;
+  }
 
   /**
    * Deletes nodes from database. Nodes are deleted backwards to preserve pre
