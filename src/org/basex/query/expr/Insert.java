@@ -13,6 +13,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.InsertAfterPrimitive;
 import org.basex.query.up.primitives.InsertAttribute;
+import org.basex.query.up.primitives.InsertBeforePrimitive;
 import org.basex.query.up.primitives.InsertIntoFirstPrimitive;
 import org.basex.query.up.primitives.InsertIntoLastPrimitive;
 import org.basex.query.up.primitives.InsertIntoPrimitive;
@@ -121,7 +122,7 @@ public final class Insert extends Arr {
         else if(last) up = new InsertIntoLastPrimitive(dbn, seq, -1);
         else up = new InsertIntoPrimitive(dbn, seq, -1);
       // [LK] debug!
-//      else if(before) up = new InsertBeforePrimitive(dbn, seq, -1);
+      else if(before) up = new InsertBeforePrimitive(dbn, seq, -1);
       else if(after) up = new InsertAfterPrimitive(dbn, seq, -1);
       else Err.or(UPDATE, this);
       ctx.updates.addPrimitive(up);

@@ -39,7 +39,7 @@ public final class InsertBeforePrimitive extends InsertPrimitive {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     // [LK] check if parent null?
-    d.insertSeq(n.pre - 1, d.parent(n.pre, Nod.kind(node.type)), m);
+    d.insertSeq(n.pre, d.parent(n.pre, Nod.kind(node.type)), m);
   }
 
   @SuppressWarnings("unused")
