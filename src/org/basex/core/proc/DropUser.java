@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.User;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'drop user' command and drops a user.
@@ -18,7 +19,7 @@ public final class DropUser extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     return context.users.drop(args[0]) ||
       error("User is unknown.");
   }

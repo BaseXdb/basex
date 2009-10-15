@@ -155,8 +155,7 @@ public final class InexTest {
     }
 
     session.execute(new Set(Prop.SERIALIZE, false));
-    if(session.execute(new XQuery(queries.get(qu)))) {
-      session.output(new CachedOutput());
+    if(session.execute(new XQuery(queries.get(qu)), new CachedOutput())) {
       if(!store) return;
 
       final String str = session.info();

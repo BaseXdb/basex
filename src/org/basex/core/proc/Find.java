@@ -5,6 +5,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
+import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
@@ -25,11 +26,11 @@ public final class Find extends AQuery {
    * @param query simplified query
    */
   public Find(final String query) {
-    super(DATAREF | PRINTING | User.READ, query);
+    super(DATAREF | User.READ, query);
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final String query = args[0] == null ? "" : args[0];
     return query(find(query, context, false));
   }

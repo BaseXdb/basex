@@ -10,6 +10,7 @@ import org.basex.core.Commands.*;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.io.NullOutput;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -392,7 +393,7 @@ public class CmdTest {
    */
   private String process(final Process pr) {
     try {
-      return session.execute(pr) ? null : session.info();
+      return session.execute(pr, new NullOutput()) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }

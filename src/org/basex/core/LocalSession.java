@@ -10,7 +10,7 @@ import org.basex.query.QueryException;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class LocalSession implements Session {
+public final class LocalSession extends Session {
   /** Database Context. */
   private final Context ctx;
   /** Process reference. */
@@ -24,27 +24,29 @@ public final class LocalSession implements Session {
     ctx = context;
   }
 
-  public boolean execute(final String str) throws IOException {
+  @Override
+  public boolean execute(final String str, final PrintOutput out)
+      throws IOException {
+
     try {
-      return execute(new CommandParser(str, ctx).parse()[0]);
+      return execute(new CommandParser(str, ctx).parse()[0], out);
     } catch(final QueryException ex) {
       throw new IOException(ex.getMessage());
     }
   }
 
-  public boolean execute(final Process pr) {
+  @Override
+  public boolean execute(final Process pr, final PrintOutput out) {
     proc = pr;
-    return pr.execute(ctx);
+    return pr.execute(ctx, out);
   }
 
-  public void output(final PrintOutput out) throws IOException {
-    proc.output(out);
-  }
-
+  @Override
   public String info() {
     return proc.info();
   }
 
+  @Override
   public void close() {
   }
 }

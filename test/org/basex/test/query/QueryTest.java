@@ -10,6 +10,7 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.io.NullOutput;
 import org.basex.util.Performance;
 
 /**
@@ -120,7 +121,7 @@ public final class QueryTest {
         proc = new XQuery(query);
         counter++;
 
-        if(proc.execute(context)) {
+        if(proc.execute(context, new NullOutput())) {
           final Result val = proc.result();
           final Result cmp = correct ? (Result) qu[1] : null;
           if(val instanceof Nodes && cmp instanceof Nodes) {

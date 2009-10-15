@@ -7,6 +7,7 @@ import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.proc.List;
+import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
@@ -52,7 +53,7 @@ public final class InexSingle {
     Main.outln(Main.name(InexSingle.class));
 
     // use tf/idf scoring model
-    session.execute("set indexscores on");
+    session.execute(new Set("indexscores", true));
     
     if(!parseArguments(args)) return;
 
@@ -85,14 +86,12 @@ public final class InexSingle {
       "[position() <= " + MAX + "]\n" +
       "return <results query=\"" + query + "\">{ $hits }</results>\n");
     
-    if(session.execute(new XQuery(qu.toString()))) {
-      String file = Integer.toString(quindex) + ".xml";
+    String file = Integer.toString(quindex) + ".xml";
+    final PrintOutput out = new PrintOutput(file);
+    final boolean ok = session.execute(new XQuery(qu.toString()), out);
+    out.close();
+    if(ok) {
       while(file.length() < 7) file = "0" + file;
-
-      final PrintOutput out = new PrintOutput(file);
-      session.output(out);
-      out.close();
-
       // output result
       Main.outln("- " + query);
       Main.outln("Result saved to % in %", file, p);

@@ -157,8 +157,7 @@ public final class InexTFCalc {
   private void query(final int db, final int qu) throws Exception {
     if(session.execute(new XQuery(
         "distinct-values((for $i in //*[text() ftcontains \""  +
-        words.get(qu) + "\"] return base-uri($i)))"))) {
-      session.output(new CachedOutput());
+        words.get(qu) + "\"] return base-uri($i)))"), new CachedOutput())) {
 
       final String str = session.info();
       final String items = find(str, "Results   : ([0-9]+) Item");

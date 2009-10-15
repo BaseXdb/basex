@@ -91,10 +91,7 @@ public final class ServerExample {
    */
   private static void launch(final String cmd) throws Exception {
     // Execute the process.
-    if(session.execute(cmd)) {
-      // Serialize the output if execution was successful.
-      session.output(out);
-    }
+    session.execute(cmd, out);
     // Show optional process information.
     out.print(session.info());
   }

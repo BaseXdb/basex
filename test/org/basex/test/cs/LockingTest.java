@@ -85,8 +85,7 @@ public final class LockingTest {
     
     // write write test
     runTest(false, false);
-    process(new XQuery("count(//aa)"), session1);
-    if(!checkRes(session1).equals("0")) {
+    if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       err("test failed write write");
     } else {
       Main.outln("--> Test 3 successful, Test 4 started...");
@@ -102,8 +101,7 @@ public final class LockingTest {
     runTest(true, false);
     Main.outln("--> Test 5 successful, last check...");
     
-    process(new XQuery("count(//aa)"), session1);
-    if(!checkRes(session1).equals("0")) {
+    if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       err("test failed write read / read write");
     } else {
       Main.outln("--> All Locking Tests done...," +
@@ -124,8 +122,8 @@ public final class LockingTest {
     new Thread() {
       @Override
       public void run() {
-        process(new XQuery(QUERYN), s);
-        if(!checkRes(s).equals("192000")) err("efficiency test failed");
+        if(!checkRes(new XQuery(QUERYN), s).equals("192000"))
+          err("efficiency test failed");
         closeSession(s);
         tdone++;
       }
@@ -217,21 +215,18 @@ public final class LockingTest {
       @Override
       public void run() {
         Performance.sleep(300);
-        String result = "";
         if(test2) {
-          result = process(new XQuery(QUERY), session2);
-          final String res = checkRes(session2);
+          final String res = checkRes(new XQuery(QUERY), session2);
           if(!res.equals("192000")) err("test failed: " + res);
         } else {
-          result = process(new Delete("//aa"), session2);
+          String result = process(new Delete("//aa"), session2);
+          if(result != null) err("test failed: " + result);
         }
-        if(result != null) err("test failed: " + result);
         done = true;
       }
     }.start();
     if(test1) {
-      process(new XQuery(QUERY), session1);
-      final String res = checkRes(session1);
+      final String res = checkRes(new XQuery(QUERY), session1);
       if(!res.equals("192000")) err("test failed: " + res);
     } else {
       process(new Insert(CmdUpdate.ELEMENT, "//members", "aa"), session1);
@@ -243,13 +238,14 @@ public final class LockingTest {
 
   /**
    * Returns query result.
-   * @param s Session
+   * @param pr process reference
+   * @param session session
    * @return String result
    */
-  String checkRes(final Session s) {
+  String checkRes(final Process pr, final Session session) {
     final CachedOutput out = new CachedOutput();
     try {
-      s.output(out);
+      session.execute(pr, out);
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

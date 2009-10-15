@@ -192,7 +192,7 @@ public final class InexSubmit {
 
     final Process proc = new XQuery(que);
     final CachedOutput res = new CachedOutput();
-    if(session.execute(proc)) session.output(res);
+    session.execute(proc, res);
 
     final SeqIter sq = new SeqIter();
     final StringTokenizer st = new StringTokenizer(res.toString(), " ");

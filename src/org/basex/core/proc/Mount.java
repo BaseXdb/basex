@@ -4,8 +4,7 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.data.Data;
-//import org.deepfs.fs.DeepFS;
-//import org.deepfs.fs.DeepFSImpl;
+import org.basex.io.PrintOutput;
 import org.deepfs.jfuse.JFUSEAdapter;
 
 /**
@@ -25,12 +24,12 @@ public final class Mount extends Process {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final String db = args[0];
 //    final String mp = args[1];
 
-    new Close().execute(context);
-    new Open(db).execute(context);
+    new Close().execute(context, out);
+    new Open(db).execute(context, out);
 
     final Data data = context.data();
     if(data.fs == null) {

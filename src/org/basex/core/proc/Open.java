@@ -11,6 +11,7 @@ import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -28,8 +29,8 @@ public final class Open extends Process {
   }
 
   @Override
-  protected boolean exec() {
-    new Close().execute(context);
+  protected boolean exec(final PrintOutput out) {
+    new Close().execute(context, out);
 
     final String db = args[0];
     Data data = context.data();

@@ -30,12 +30,13 @@ public final class InfoDB extends AInfo {
    * Default constructor.
    */
   public InfoDB() {
-    super(DATAREF | PRINTING | User.READ);
+    super(DATAREF | User.READ);
   }
 
   @Override
-  protected void out(final PrintOutput out) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     out.print(db(context.data().meta, false, true).finish());
+    return true;
   }
 
   /**

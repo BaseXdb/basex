@@ -5,6 +5,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
+import org.basex.io.PrintOutput;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -44,7 +45,7 @@ public final class Copy extends AUpdate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     if(!checkDB()) return false;
 
     final Data data = context.data();

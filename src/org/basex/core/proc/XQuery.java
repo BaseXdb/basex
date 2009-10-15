@@ -1,6 +1,9 @@
 package org.basex.core.proc;
 
+import java.io.IOException;
+
 import org.basex.core.Commands.Cmd;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
@@ -14,12 +17,12 @@ public final class XQuery extends AQuery {
    * @param query query to process
    */
   public XQuery(final String query) {
-    super(PRINTING, query);
+    super(STANDARD, query);
   }
 
   @Override
-  protected boolean exec() {
-    return query(args[0]);
+  protected boolean exec(final PrintOutput out) throws IOException {
+    return query(args[0]) && out(out);
   }
 
   @Override

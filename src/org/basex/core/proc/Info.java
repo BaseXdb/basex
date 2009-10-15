@@ -20,11 +20,11 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(PRINTING | User.READ);
+    super(User.READ);
   }
 
   @Override
-  protected void out(final PrintOutput out) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     Performance.gc(1);
 
     final TokenBuilder tb = new TokenBuilder();
@@ -46,5 +46,6 @@ public final class Info extends AInfo {
         (prop.is(Prop.FTINDEX) && prop.is(Prop.FTFUZZY) ?
         " (" + INFOFZINDEX + ")" : ""));
     out.print(tb.finish());
+    return true;
   }
 }

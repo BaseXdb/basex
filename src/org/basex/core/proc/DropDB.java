@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -22,8 +23,8 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
-    new Close().execute(context);
+  protected boolean exec(final PrintOutput out) {
+    new Close().execute(context, out);
 
     // check if database is still pinned
     final String db = args[0];

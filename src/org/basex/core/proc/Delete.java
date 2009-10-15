@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'delete' command and deletes nodes in the database.
@@ -28,7 +29,7 @@ public final class Delete extends AUpdate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     if(!checkDB()) return false;
 
     final Data data = context.data();

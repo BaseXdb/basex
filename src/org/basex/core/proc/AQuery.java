@@ -84,22 +84,28 @@ abstract class AQuery extends Process {
     return error(err);
   }
 
-  @Override
-  protected void out(final PrintOutput o) throws IOException {
+  /**
+   * Prints the result.
+   * @param out output stream
+   * @throws IOException I/O exception
+   * @return true
+   */
+  protected boolean out(final PrintOutput out) throws IOException {
     final boolean pretty = prop.is(Prop.XQFORMAT);
     final int runs = prop.num(Prop.RUNS);
     final boolean ser = prop.is(Prop.SERIALIZE);
     for(int i = 0; i < runs; i++) {
       final XMLSerializer xml = new XMLSerializer(i == 0 && ser ?
-          o : new NullOutput(!ser), prop.is(Prop.XMLOUTPUT), pretty);
+          out : new NullOutput(!ser), prop.is(Prop.XMLOUTPUT), pretty);
       result.serialize(xml);
       xml.close();
     }
     if(runs > 0) {
-      outInfo(o, result.size());
+      outInfo(out, result.size());
       qp.close();
     }
-    if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) o.println();
+    if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println();
+    return true;
   }
 
   // [LK] this method could be overwritten to check if the process

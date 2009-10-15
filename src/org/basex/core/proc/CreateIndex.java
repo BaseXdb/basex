@@ -12,6 +12,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -29,7 +30,7 @@ public final class CreateIndex extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final Data data = context.data();
 
     try {

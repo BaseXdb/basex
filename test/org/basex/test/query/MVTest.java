@@ -103,13 +103,10 @@ public final class MVTest {
       final Process proc = new XQueryMV(Integer.toString(MAX),
           Integer.toString(SUB), query.toString());
 
-      if(!proc.execute(context)) {
+      if(!proc.execute(context, new NullOutput())) {
         Main.outln("- " + proc.info());
         Main.outln("Query: " + query);
       } else {
-        // run serialization
-        proc.output(new NullOutput());
-
         // extract and print processing time
         final String info = proc.info();
 

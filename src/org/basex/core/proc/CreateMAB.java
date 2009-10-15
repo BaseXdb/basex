@@ -7,6 +7,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create mab' command and creates a new database.
@@ -26,7 +27,7 @@ public final class CreateMAB extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     // check if file exists
     final IO file = IO.get(args[0]);
     if(!file.exists()) return error(FILEWHICH, file);

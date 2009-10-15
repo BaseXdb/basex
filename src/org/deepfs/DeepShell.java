@@ -209,8 +209,8 @@ public final class DeepShell {
       return;
     }
     try {
-      final InfoTable pr = new InfoTable(null, null);
-      if(pr.execute(fs.getContext())) pr.output(new PrintOutput(System.out));
+      new InfoTable(null, null).execute(fs.getContext(),
+          new PrintOutput(System.out));
     } catch(final Exception ex) {
       ex.printStackTrace();
     }

@@ -15,7 +15,6 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntError;
 import org.basex.core.proc.IntInfo;
-import org.basex.core.proc.IntOutput;
 import org.basex.core.proc.IntStop;
 import org.basex.data.Data;
 import org.basex.io.BufferedOutput;
@@ -68,90 +67,112 @@ public final class ServerSession extends Thread {
       final PrintOutput out = new PrintOutput(new BufferedOutput(
           socket.getOutputStream()));
 
-      // [CG] Server: handle unknown users and wrong passwords
+      // handle unknown users and wrong passwords
       final String us = dis.readUTF();
       final String pw = dis.readUTF();
       context.user = context.users.get(us, pw);
       final boolean ok = context.user != null;
       send(out, ok);
 
-      if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + us);
-      if(!ok) return;
-
-      while(true) {
-        String in = null;
-        try {
-          in = dis.readUTF();
-        } catch(final IOException ex) {
-          // this exception is thrown for each session if the server is stopped
-          exit();
-          break;
-        }
-
-        // parse input and create process instance
-        final Performance perf = new Performance();
-        Process proc = null;
-        try {
-          proc = new CommandParser(in, context, true).parse()[0];
-
-          if(proc instanceof IntOutput || proc instanceof IntInfo) {
-            if(proc instanceof IntOutput) {
-              core.output(out);
-              out.write(new byte[IO.BLOCKSIZE]);
-            } else {
-              String inf = core.info();
-              if(inf.equals(PROGERR)) inf = SERVERTIME;
-              new DataOutputStream(out).writeUTF(inf);
-            }
-            out.flush();
-            server.cp.remove(cp);
-          } else {
-            core = proc;
-            startTimer(proc);
-            cp = new ClientProcess(this, proc.updating());
-            server.cp.add(cp);
-            if(server.cp.size() > 1) {
-              if(proc.updating()) {
-                while(server.cp.indexOf(cp) != 0)
-                  Performance.sleep(50);
-              } else {
-                boolean write = false;
-                for(int i = 0; i < server.cp.size(); i++) {
-                  if(server.cp.get(i).updating) write = true;
-                }
-                if(write) {
-                  while(server.cp.indexOf(cp) != 0)
-                    Performance.sleep(50);
-                }
-              }
-            }
-            send(out, proc.execute(context));
-            if(!proc.printing()) server.cp.remove(cp);
-            stopTimer();
-
-            if(proc instanceof IntStop || proc instanceof Exit) {
-              server.cp.remove(cp);
-              exit();
-              if(proc instanceof IntStop) server.quit(false);
-              break;
-            }
-          }
-        } catch(final QueryException ex) {
-          // invalid command was sent by a client; create empty process
-          // with error feedback
-          proc = new IntError(ex.extended());
-          core = proc;
-          send(out, false);
-        }
-        if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
+      if(ok) {
+        if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + us);
+        process(dis, out);
+        if(info) Main.outln(this + " Logout: " + us);
+      } else {
+        if(info) Main.outln(this + " Failed: " + us);
       }
-
-      if(info) Main.outln(this + " Logout: " + us);
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
   }
 
+  /**
+   * Processes all incoming client commands.
+   * @param dis input stream
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  void process(final DataInputStream dis, final PrintOutput out)
+      throws IOException {
+
+    while(true) {
+      String in = null;
+      try {
+        in = dis.readUTF();
+      } catch(final IOException ex) {
+        // this exception is thrown for each session if the server is stopped
+        exit();
+        return;
+      }
+
+      // parse input and create process instance
+      final Performance perf = new Performance();
+      Process proc = null;
+      try {
+        proc = new CommandParser(in, context, true).parse()[0];
+
+        if(proc instanceof IntInfo) {
+          String inf = core.info();
+          if(inf.equals(PROGERR)) inf = SERVERTIME;
+          new DataOutputStream(out).writeUTF(inf);
+          out.flush();
+        } else {
+          core = proc;
+          boolean updating = proc.updating();
+          cp = new ClientProcess(this, updating);
+          server.cp.add(cp);
+          startTimer(proc);
+
+          // wait for updating processes
+          if(server.cp.size() > 1) {
+            for(int i = 0; !updating && i < server.cp.size(); i++) {
+              updating = server.cp.get(i).updating;
+            }
+            if(updating) {
+              while(server.cp.indexOf(cp) != 0) Performance.sleep(50);
+            }
+          }
+
+          final boolean ok = proc.execute(context, out);
+          server.cp.remove(cp);
+          stopTimer();
+          out.write(new byte[IO.BLOCKSIZE]);
+          send(out, ok);
+
+          if(proc instanceof IntStop || proc instanceof Exit) {
+            server.cp.remove(cp);
+            exit();
+            if(proc instanceof IntStop) server.quit(false);
+            return;
+          }
+        }
+      } catch(final QueryException ex) {
+        // invalid command was sent by a client; create error feedback
+        proc = new IntError(ex.extended());
+        core = proc;
+        out.write(new byte[IO.BLOCKSIZE]);
+        send(out, false);
+      }
+
+      if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
+    }
+  }
+
+  /*
+          // wait for updating processes
+          boolean updating = false;
+          for(int i = 0; !updating && i < server.cp.size(); i++) {
+            updating = server.cp.get(i).updating;
+          }
+          if(updating) {
+            while(server.cp.indexOf(cp) != 0) {
+              System.out.println("!");
+              Performance.sleep(50);
+            }
+          }
+
+   */
+  
   /**
    * Sends the success flag to the client.
    * @param out output stream

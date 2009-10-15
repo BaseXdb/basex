@@ -42,11 +42,11 @@ public final class BaseXClient extends BaseX {
     if(session == null) {
       String pw = null;
       // [CG] experimental user/password input
-      while(user == null) { // || user.length() == 0
+      while(user == null || user.length() == 0) {
         Main.out(SERVERUSER);
         user = System.console().readLine();
       }
-      while(pw == null) { //  || pw.length() == 0
+      while(pw == null || pw.length() == 0) {
         Main.out(SERVERPW);
         pw = new String(System.console().readPassword());
       }
@@ -55,7 +55,7 @@ public final class BaseXClient extends BaseX {
       } catch(final Exception ex) {
         // no server available; switches to standalone mode
         Main.error(ex, true);
-        ok = false;
+        success = false;
       }
     }
     return session;

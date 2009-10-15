@@ -7,6 +7,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'optimize' command and optimizes the data structures of
@@ -30,7 +31,7 @@ public final class Optimize extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     // rebuild statistics
     final Data data = context.data();
     return !stats(data) ? error(DBOPTERR1) : info(DBOPTIMIZED, perf.getTimer());

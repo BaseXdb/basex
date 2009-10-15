@@ -42,11 +42,11 @@ public final class XQueryMV extends AQuery {
    * @param query query to process
    */
   public XQueryMV(final String hits, final String subhits, final String query) {
-    super(PRINTING, hits, subhits, query);
+    super(STANDARD, hits, subhits, query);
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     // cache verbose flag
     maxh = Token.toInt(args[0]);
     maxs = Token.toInt(args[1]);
@@ -99,20 +99,17 @@ public final class XQueryMV extends AQuery {
         fini += per.getTime();
       }
       execInfo();
-      return info(QUERYFINISH + Performance.getTimer(fini, runs));
+      info(QUERYFINISH + Performance.getTimer(fini, runs));
+
+      for(int i = 0; i < runs; i++) {
+        show(i == 0 && prop.is(Prop.SERIALIZE) ? out : new NullOutput());
+      }
+      outInfo(out, maxhits);
+      return true;
     } catch(final Exception ex) {
       Main.debug(ex);
       return error(ex.getMessage());
     }
-  }
-
-  @Override
-  protected void out(final PrintOutput o) throws IOException {
-    final int runs = prop.num(Prop.RUNS);
-    for(int i = 0; i < runs; i++) {
-      show(i == 0 && prop.is(Prop.SERIALIZE) ? o : new NullOutput());
-    }
-    if(prop.is(Prop.INFO)) outInfo(o, maxhits);
   }
 
   /**

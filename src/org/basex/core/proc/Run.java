@@ -6,6 +6,7 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -20,17 +21,17 @@ public final class Run extends AQuery {
    * @param file query file
    */
   public Run(final String file) {
-    super(PRINTING | User.READ, file);
+    super(User.READ, file);
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
     Prop.xquery = io;
 
     try {
-      return query(Token.string(io.content()));
+      return query(Token.string(io.content())) && out(out);
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();

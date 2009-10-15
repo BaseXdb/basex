@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -23,12 +24,10 @@ import org.basex.util.TokenBuilder;
 public abstract class Process extends Progress {
   /** Commands flag: standard. */
   protected static final int STANDARD = 256;
-  /** Commands flag: printing command. */
-  protected static final int PRINTING = 512;
   /** Commands flag: updating command. */
-  protected static final int UPDATING = 1024;
+  protected static final int UPDATING = 512;
   /** Commands flag: data reference needed. */
-  protected static final int DATAREF = 2048;
+  protected static final int DATAREF = 1024;
 
   /** Flags for controlling process evaluation. */
   private final int flags;
@@ -58,24 +57,32 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes the process and serializes the results. If an error happens, an
-   * exception is thrown.
+   * Executes the process and serializes the results.
+   * If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param out output stream reference
-   * @throws Exception execution exception
    */
-  public void exec(final Context ctx, final PrintOutput out) throws Exception {
-    if(!execute(ctx)) throw new BaseXException(info());
-    output(out);
-    out.print(info());
+  public void exec(final Context ctx, final PrintOutput out) {
+    if(!execute(ctx, out)) throw new BaseXException(info());
   }
 
   /**
-   * Executes the process and returns a success flag.
+   * Executes a process. This method should only be used if a command
+   * does not return textual results.
    * @param ctx database context
    * @return success flag
    */
   public final boolean execute(final Context ctx) {
+    return execute(ctx, null);
+  }
+
+  /**
+   * Executes the process, prints the result and returns a success flag.
+   * @param ctx database context
+   * @param out output stream
+   * @return success flag
+   */
+  public final boolean execute(final Context ctx, final PrintOutput out) {
     perf = new Performance();
     context = ctx;
     prop = ctx.prop;
@@ -106,10 +113,10 @@ public abstract class Process extends Progress {
         Performance.sleep(50);
     }*/
 
-    boolean ok = false;
-    if(data != null) data.setLock(updating() ? 2 : 1);
+    //boolean ok = false;
+    //if(data != null) data.setLock(updating() ? 2 : 1);
     try {
-      ok = exec();
+      return exec(out);
     } catch(final Throwable ex) {
       // catch unexpected errors...
       ex.printStackTrace();
@@ -120,24 +127,10 @@ public abstract class Process extends Progress {
         error(PROCERR, this, ex.toString());
       }
     }
-    if(data != null) data.setLock(0);
-    return ok;
-  }
-
-  /**
-   * Serializes the textual results.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  public final void output(final PrintOutput out) throws IOException {
-    final Data data = context.data();
-    try {
-      if(printing()) out(out);
-    } catch(final IOException ex) {
-      if(data != null) data.setLock(0);
-      throw ex;
-    }
-    if(data != null) data.setLock(0);
+    return false;
+    
+    //if(data != null) data.setLock(0);
+    //return ok;
   }
 
   /**
@@ -154,14 +147,6 @@ public abstract class Process extends Progress {
    */
   public final Result result() {
     return result;
-  }
-
-  /**
-   * Returns if the current command yields some output.
-   * @return result of check
-   */
-  public boolean printing() {
-    return (flags & PRINTING) != 0;
   }
 
   /**
@@ -215,21 +200,12 @@ public abstract class Process extends Progress {
   // PROTECTED METHODS ========================================================
   
   /**
-   * Executes a process. This method is overwritten by many processes.
-   * @return success of operation
-   */
-  protected boolean exec() {
-    return true;
-  }
-
-  /**
-   * Returns a query result. This method is overwritten by many processes.
+   * Executes a process and serializes the result.
    * @param out output stream
+   * @return success of operation
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  protected void out(final PrintOutput out) throws IOException {
-  }
+  protected abstract boolean exec(final PrintOutput out) throws IOException;
 
   /**
    * Adds the error message to the message buffer {@link #info}.

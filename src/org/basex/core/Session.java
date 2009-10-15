@@ -10,40 +10,48 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public interface Session {
+public abstract class Session {
   /**
-   * Executes the specified command.
+   * Executes a command and prints the result to the specified stream.
    * @param cmd command to be executed
+   * @param out output stream
    * @throws IOException I/O exception
    * @return success of operation
    */
-  boolean execute(final String cmd) throws IOException;
+  public abstract boolean execute(final String cmd, final PrintOutput out)
+    throws IOException;
 
   /**
-   * Executes a process.
+   * Executes a process and prints the result to the specified stream.
+   * @param pr process to be executed
+   * @param out output stream
+   * @throws IOException I/O exception
+   * @return success of operation
+   */
+  public abstract boolean execute(final Process pr, final PrintOutput out)
+    throws IOException;
+
+  /**
+   * Executes a process. This method should only be used if a command
+   * does not return textual results.
    * @param pr process to be executed
    * @throws IOException I/O exception
    * @return success of operation
    */
-  boolean execute(final Process pr) throws IOException;
-
-  /**
-   * Serializes the result to the specified output stream.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  void output(final PrintOutput out) throws IOException;
+  public final boolean execute(final Process pr) throws IOException {
+    return execute(pr, null);
+  }
 
   /**
    * Returns process info.
    * @return process info
    * @throws IOException I/O exception
    */
-  String info() throws IOException;
+  public abstract String info() throws IOException;
 
   /**
    * Closes the session.
    * @throws IOException I/O exception
    */
-  void close() throws IOException;
+  public abstract void close() throws IOException;
 }

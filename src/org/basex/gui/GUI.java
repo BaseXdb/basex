@@ -440,31 +440,20 @@ public final class GUI extends JFrame {
 
       // execute command
       updating = pr.updating();
-      final boolean ok = pr.execute(context);
+      // retrieve text result
+      final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));
+      final boolean ok = pr.execute(context, out);
       updating = false;
 
       // command info
       final String inf = pr.info();
+      // skip interrupted command
       if(!ok && inf.equals(PROGERR)) {
         proc = null;
         return false;
       }
 
-      // try to convert xquery result to nodeset
-      final Result result = pr.result();
-      final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
-
-      // treat text view different to other views
-      if(ok && pr.printing() && nodes == null) {
-        // display text view
-        if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-        // retrieve text result
-        final CachedOutput out = new CachedOutput(
-            context.prop.num(Prop.MAXTEXT));
-        pr.output(out);
-        text.setText(out);
-      }
-
+      // show query editor feedback
       boolean feedback = main;
       if(!main && query.visible() && pr instanceof XQuery) {
         feedback = true;
@@ -472,8 +461,9 @@ public final class GUI extends JFrame {
       }
 
       // show query info
-      if(prop.is(GUIProp.SHOWINFO) && (ok || main))
+      if(prop.is(GUIProp.SHOWINFO) && (ok || main)) {
         info.setInfo(Token.token(inf), ok);
+      }
 
       // check if query feedback was processed in the query view
       if(!ok) {
@@ -483,52 +473,59 @@ public final class GUI extends JFrame {
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
           text.setText(Token.token(inf));
         }
-        cursor(CURSORARROW, true);
-        proc = null;
-        return false;
-      }
-
-      final Data ndata = context.data();
-      final String time = perf.getTimer();
-      Nodes marked = context.marked();
-      if(ndata != data) {
-        // database reference has changed - notify views
-        notify.init();
-      } else if(pr.updating()) {
-        // update command
-        notify.update();
-      } else if(result != null) {
-        if(context.current() != current || prop.is(GUIProp.FILTERRT)) {
-          // refresh context
-          if(nodes != null) {
-            notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
-          }
-        } else if(marked != null) {
-          // refresh highlight
-          if(nodes != null) {
-            // use query result
-            marked = nodes;
-          } else if(marked.size() != 0) {
-            // remove old highlight
-            marked = new Nodes(data);
-          }
-          // highlights have changed.. refresh views
-          if(!marked.same(context.marked())) {
-            notify.mark(marked, null);
-          }
-          if(thread != threadID) {
-            proc = null;
-            return true;
+      } else {
+        // try to convert xquery result to nodeset
+        final Result result = pr.result();
+        final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
+  
+        // treat text view different to other views
+        if(ok && out.size() != 0 && nodes == null) {
+          // display text view
+          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
+          text.setText(out);
+        }
+  
+        final Data ndata = context.data();
+        final String time = perf.getTimer();
+        Nodes marked = context.marked();
+        if(ndata != data) {
+          // database reference has changed - notify views
+          notify.init();
+        } else if(pr.updating()) {
+          // update command
+          notify.update();
+        } else if(result != null) {
+          if(context.current() != current || prop.is(GUIProp.FILTERRT)) {
+            // refresh context
+            if(nodes != null) {
+              notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
+            }
+          } else if(marked != null) {
+            // refresh highlight
+            if(nodes != null) {
+              // use query result
+              marked = nodes;
+            } else if(marked.size() != 0) {
+              // remove old highlight
+              marked = new Nodes(data);
+            }
+            // highlights have changed.. refresh views
+            if(!marked.same(context.marked())) {
+              notify.mark(marked, null);
+            }
+            if(thread != threadID) {
+              proc = null;
+              return true;
+            }
           }
         }
+  
+        // show number of hits
+        setHits(result == null ? 0 : result.size());
+  
+        // show status info
+        status.setText(Main.info(PROCTIME, time));
       }
-
-      // show number of hits
-      setHits(result == null ? 0 : result.size());
-
-      // show status info
-      status.setText(Main.info(PROCTIME, time));
-
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();

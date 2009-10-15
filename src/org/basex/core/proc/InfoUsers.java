@@ -16,12 +16,13 @@ public final class InfoUsers extends AInfo {
    * Default constructor.
    */
   public InfoUsers() {
-    super(DATAREF | PRINTING | User.ADMIN);
+    super(DATAREF | User.ADMIN);
   }
 
   @Override
-  protected void out(final PrintOutput out) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     // [AW] ...should return users of current database
     out.println(context.users.info());
+    return true;
   }
 }

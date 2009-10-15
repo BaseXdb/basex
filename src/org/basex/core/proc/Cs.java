@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Nodes;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'cs' command and sets a new initial context set.
@@ -20,7 +21,7 @@ public final class Cs extends AQuery {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final Nodes nodes = query(args[0], null);
     if(nodes == null) return false;
 

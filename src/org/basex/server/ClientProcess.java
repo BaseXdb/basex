@@ -18,7 +18,7 @@ public class ClientProcess {
    * @param u boolean
    */
   public ClientProcess(final ServerSession s, final boolean u) {
-    this.sess = s;
-    this.updating = u;
+    sess = s;
+    updating = u;
   }
 }

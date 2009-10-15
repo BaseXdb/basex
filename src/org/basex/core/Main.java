@@ -24,7 +24,7 @@ public abstract class Main {
   /** Database Context. */
   public final Context context = new Context();
   /** Successful command line parsing. */
-  protected boolean ok;
+  protected boolean success;
   /** Output file for queries. */
   protected String output;
 
@@ -39,7 +39,7 @@ public abstract class Main {
    */
   protected Main(final String... args) {
     parseArguments(args);
-    if(!ok) return;
+    if(!success) return;
 
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -52,10 +52,10 @@ public abstract class Main {
 
   /**
    * Launches the console mode, waiting for and processing user input.
-   * @return user interruption
+   * @return true if exit command was sent
    */
   protected final boolean console() {
-    if(console && !set(Prop.INFO, ON)) return true;
+    if(!set(Prop.INFO, ON)) return false;
 
     while(console) {
       Main.out("> ");
@@ -106,20 +106,16 @@ public abstract class Main {
     try {
       final Session ss = session();
       if(ss == null) return false;
-      final boolean success = ss.execute(pr);
+      final PrintOutput out = output != null ? new PrintOutput(output) :
+        new PrintOutput(System.out);
+      final boolean ok = ss.execute(pr, out);
+      out.close();
       if(pr instanceof Exit) return true;
 
-      if(success) {
-        final PrintOutput out = output != null ? new PrintOutput(output) :
-            new PrintOutput(System.out);
-        ss.output(out);
-        out.close();
-      }
-
-      if(v || !success) {
+      if(v || !ok) {
         final String inf = ss.info();
         if(inf.length() != 0) {
-          if(!success) {
+          if(!ok) {
             error(null, inf);
           } else {
             out(inf);
@@ -127,7 +123,7 @@ public abstract class Main {
         }
       }
       if(v && console) outln();
-      return success;
+      return ok;
     } catch(final IOException ex) {
       error(ex, true);
       return false;

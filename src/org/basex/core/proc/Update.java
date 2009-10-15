@@ -6,6 +6,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'update' command and update nodes in the database.
@@ -26,7 +27,7 @@ public final class Update extends AUpdate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query

@@ -7,6 +7,7 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'close' command and closes the current database.
@@ -23,7 +24,7 @@ public final class Close extends Process {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     try {
       final Data data = context.data();
       if(data == null) return true;

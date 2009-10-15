@@ -33,7 +33,7 @@ public final class Export extends Process {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     try {
       final Data data = context.data();
       final int[] docs = data.doc();
@@ -44,11 +44,10 @@ public final class Export extends Process {
         if(docs.length != 1) {
           file = file.merge(IO.get(Token.string(data.text(pre))));
         }
-        final PrintOutput out = new PrintOutput(file.path());
-        out.println(Main.info(DOCDECL, Token.UTF8));
-        new XMLSerializer(out, false, data.meta.chop).node(data, pre);
-        out.close();
-
+        final PrintOutput po = new PrintOutput(file.path());
+        po.println(Main.info(DOCDECL, Token.UTF8));
+        new XMLSerializer(po, false, data.meta.chop).node(data, pre);
+        po.close();
       }
       return info(DBEXPORTED, data.meta.name, perf.getTimer());
     } catch(final IOException ex) {

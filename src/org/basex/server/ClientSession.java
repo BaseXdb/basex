@@ -25,9 +25,9 @@ import org.basex.io.PrintOutput;
  * <li> The {@link #execute} method sends database commands to the server
  * as UTF8 byte arrays. The byte array is preceded by two bytes (high/low byte)
  * containing the string length. A single byte is received as result,
- * determining if command execution was successful (0) or not (1).</li>
- * <li> The {@link #output} method sends the {@link Cmd#INTOUTPUT} command
- * to the server. As the length of the resulting byte array is unknown,
+ * determining if command execution was successful (0) or not (1).
+ * If the command was successful, the query result is sent.
+ * As the length of the resulting byte array is unknown,
  * it is concluded by {@link IO#BLOCKSIZE} zero bytes.</li>
  * <li> The {@link #info} method sends the {@link Cmd#INTINFO} command and
  * receives a UTF8 byte array as result, which has the format as the one sent
@@ -39,7 +39,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class ClientSession implements Session {
+public final class ClientSession extends Session {
   /** Output stream. */
   private final DataOutputStream out;
   /** Input stream. */
@@ -79,29 +79,32 @@ public final class ClientSession implements Session {
     if(in.read() != 0) throw new LoginException();
   }
 
-  public boolean execute(final String cmd) throws IOException {
+  @Override
+  public boolean execute(final String cmd, final PrintOutput o)
+      throws IOException {
+
     out.writeUTF(cmd);
-    return in.read() == 0;
-  }
-
-  public boolean execute(final Process pr) throws IOException {
-    return execute(pr.toString());
-  }
-
-  public void output(final PrintOutput o) throws IOException {
-    out.writeUTF(Cmd.INTOUTPUT.toString());
     final BufferInput bi = new BufferInput(in);
     int l;
     while((l = bi.read()) != 0) o.write(l);
     for(int i = 0; i < IO.BLOCKSIZE - 1; i++) bi.read();
+    return bi.read() == 0;
   }
 
+  @Override
+  public boolean execute(final Process pr, final PrintOutput o)
+      throws IOException {
+    return execute(pr.toString(), o);
+  }
+
+  @Override
   public String info() throws IOException {
     out.writeUTF(Cmd.INTINFO.toString());
     return new DataInputStream(in).readUTF();
   }
 
+  @Override
   public void close() throws IOException {
-    execute(Cmd.EXIT.toString());
+    execute(Cmd.EXIT.toString(), null);
   }
 }

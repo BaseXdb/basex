@@ -6,6 +6,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create fs' command and creates a new filesystem mapping
@@ -26,7 +27,7 @@ public final class CreateFS extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
     return prop.is(Prop.NEWFSPARSER) ?

@@ -22,11 +22,11 @@ public final class InfoIndex extends AInfo {
    * Default constructor.
    */
   public InfoIndex() {
-    super(DATAREF | PRINTING | User.READ);
+    super(DATAREF | User.READ);
   }
 
   @Override
-  protected void out(final PrintOutput out) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     final Data data = context.data();
     out.println(INFOTAGS);
     out.println(data.info(Type.TAG));
@@ -52,6 +52,7 @@ public final class InfoIndex extends AInfo {
       out.println(INFOPATHINDEX);
       out.println(data.path.info(data));
     }
+    return true;
   }
 
   @Override

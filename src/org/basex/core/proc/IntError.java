@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Process;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'info users' command and returns user information.
@@ -14,11 +15,12 @@ public final class IntError extends Process {
    * @param msg error message
    */
   public IntError(final String msg) {
-    super(STANDARD, msg);
+    super(STANDARD);
+    error(msg);
   }
 
   @Override
-  protected boolean exec() {
-    return error(args[0]);
+  protected boolean exec(final PrintOutput out) {
+    return true;
   }
 }

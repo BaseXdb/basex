@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.User;
+import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create user' command and creates a new user.
@@ -19,7 +20,7 @@ public final class CreateUser extends ACreate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     return context.users.create(args[0], args[1]) ||
       error("User exists already.");
   }

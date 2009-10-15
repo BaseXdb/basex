@@ -18,26 +18,24 @@ public final class Show extends Process {
    * @param cmd show command
    */
   public Show(final Object cmd) {
-    super(PRINTING | User.ADMIN, cmd.toString());
+    super(User.ADMIN, cmd.toString());
   }
 
   @Override
-  protected boolean exec() {
-    return getOption(CmdShow.class) != null;
-  }
-
-  @Override
-  protected void out(final PrintOutput o) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     switch(getOption(CmdShow.class)) {
       case DATABASES:
-        o.println(context.pool.info());
+        out.println(context.pool.info());
         break;
       case SESSIONS:
-        o.println(context.sessions.info());
+        out.println(context.sessions.info());
         break;
       case USERS:
-        o.println(context.users.info());
+        out.println(context.users.info());
         break;
+      default:
+        return false;
     }
+    return true;
   }
 }

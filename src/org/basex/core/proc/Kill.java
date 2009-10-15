@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import org.basex.core.Process;
 import org.basex.core.User;
+import org.basex.io.PrintOutput;
 import org.basex.server.Sessions;
 
 /**
@@ -19,7 +20,7 @@ public final class Kill extends Process {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     final Sessions ss = context.sessions;
     final int s = ss.size();
     while(ss.size() > 0) ss.get(0).exit();

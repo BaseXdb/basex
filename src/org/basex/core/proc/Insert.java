@@ -16,6 +16,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -51,7 +52,7 @@ public final class Insert extends AUpdate {
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) {
     if(!checkDB()) return false;
 
     // get sources from the marked node set or the specified query

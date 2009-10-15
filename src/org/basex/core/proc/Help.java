@@ -18,11 +18,11 @@ public final class Help extends Process {
    * @param arg optional argument
    */
   public Help(final String arg) {
-    super(PRINTING, arg);
+    super(STANDARD, arg);
   }
 
   @Override
-  protected void out(final PrintOutput out) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     try {
       final Cmd cmd = Cmd.valueOf(args[0]);
       out.print(cmd.help(true));
@@ -30,5 +30,6 @@ public final class Help extends Process {
       out.println(CMDHELP);
       for(final Cmd c : Cmd.values()) out.print(c.help(false));
     }
+    return true;
   }
 }

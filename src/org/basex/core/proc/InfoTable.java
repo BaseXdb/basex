@@ -25,21 +25,17 @@ public final class InfoTable extends AInfo {
    * @param arg optional arguments
    */
   public InfoTable(final String... arg) {
-    super(DATAREF | PRINTING | User.READ, arg);
+    super(DATAREF | User.READ, arg);
   }
 
   @Override
-  protected boolean exec() {
+  protected boolean exec(final PrintOutput out) throws IOException {
     // evaluate input as number range or xquery
     if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
       result = query(args[0], null);
       if(result == null) return false;
     }
-    return true;
-  }
 
-  @Override
-  protected void out(final PrintOutput out) throws IOException {
     final Data data = context.data();
 
     if(result != null) {
@@ -61,6 +57,7 @@ public final class InfoTable extends AInfo {
       }
       table(out, data, ps, pe);
     }
+    return true;
   }
 
   /**

@@ -26,11 +26,11 @@ public final class List extends Process {
    * Default constructor.
    */
   public List() {
-    super(PRINTING | User.ADMIN);
+    super(User.ADMIN);
   }
 
   @Override
-  protected void out(final PrintOutput o) throws IOException {
+  protected boolean exec(final PrintOutput out) throws IOException {
     final String[] list = list(context).finish();
     int max = 0;
     for(final String s : list) max = Math.max(max, s.length());
@@ -58,7 +58,8 @@ public final class List extends Process {
       }
       tb.add(NL + list.length + " " + INFODBLIST + NL);
     }
-    o.print(tb.finish());
+    out.print(tb.finish());
+    return true;
   }
 
   /**

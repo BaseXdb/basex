@@ -52,7 +52,7 @@ public final class BaseXServer extends Main implements Runnable {
   public BaseXServer(final String... args) {
     super(args);
     cp = new ArrayList<ClientProcess>();
-    if(!ok) return;
+    if(!success) return;
     try {
       server = new ServerSocket(context.prop.num(Prop.PORT));
       new Thread(this).start();
@@ -106,8 +106,8 @@ public final class BaseXServer extends Main implements Runnable {
   @Override
   protected void parseArguments(final String[] args) {
     final Args arg = new Args(args);
-    ok = true;
-    while(arg.more() && ok) {
+    success = true;
+    while(arg.more() && success) {
       if(arg.dash()) {
         final char c = arg.next();
         if(c == 'd') {
@@ -126,13 +126,14 @@ public final class BaseXServer extends Main implements Runnable {
           // show process info
           info = true;
         } else {
-          ok = false;
+          success = false;
         }
       } else {
-        ok = false;
+        success = false;
         if(arg.string().equals("stop")) {
           try {
-            new ClientSession(context, ADMIN, ADMIN).execute(new IntStop());
+            new ClientSession(context, ADMIN, ADMIN).
+              execute(new IntStop(), null);
             outln(SERVERSTOPPED);
           } catch(final IOException ex) {
             error(ex, true);
@@ -141,6 +142,6 @@ public final class BaseXServer extends Main implements Runnable {
         }
       }
     }
-    if(!ok) outln(SERVERINFO);
+    if(!success) outln(SERVERINFO);
   }
 }
