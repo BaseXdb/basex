@@ -9,7 +9,20 @@
     <pathelement location="lib/jfuse.jar"/>
   </path>
 
-  <target name="build_init">
+  <!-- Set jvm.ok property true or false according to detected jvm used by ant. -->
+  <condition property="wrong-jvm">
+    <not>
+      <contains string="${ant.java.version}" substring="1.6"/>
+    </not>
+  </condition>
+
+  <target name="check-jvm">
+    <echo message="Current ${ant.version}"/>
+    <echo message="Current Java Version ${java.version}"/>
+    <fail message="BaseX needs JVM 1.6 to compile (check $JAVA_HOME)" if="wrong-jvm"/>
+  </target>
+
+  <target name="build_init" depends="check-jvm">
     <tstamp/>
     <mkdir dir="${build}"/>
     <copy todir="${build}/org/basex/lang">
