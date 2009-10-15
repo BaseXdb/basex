@@ -15,6 +15,7 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.IntOutput;
+import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.IntStop;
 import org.basex.data.Data;
 import org.basex.io.BufferedOutput;
@@ -109,7 +110,7 @@ public final class ServerSession extends Thread {
             startTimer(proc);
             cp = new ClientProcess(this, proc.updating());
             server.cp.add(cp);
-            if(server.cp.size() > 1) {
+            if(server.cp.size() > 1 && !(proc instanceof IntPrompt)) {
               if(proc.updating()) {
                 while(server.cp.indexOf(cp) != 0)
                   Performance.sleep(50);
@@ -129,6 +130,7 @@ public final class ServerSession extends Thread {
             stopTimer();
 
             if(proc instanceof IntStop || proc instanceof Exit) {
+              server.cp.remove(cp);
               exit();
               if(proc instanceof IntStop) server.quit(false);
               break;
