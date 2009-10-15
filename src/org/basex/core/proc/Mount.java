@@ -4,8 +4,8 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.deepfs.fs.DeepFS;
-import org.deepfs.fs.DeepFSImpl;
+//import org.deepfs.fs.DeepFS;
+//import org.deepfs.fs.DeepFSImpl;
 import org.deepfs.jfuse.JFUSEAdapter;
 
 /**
@@ -27,7 +27,7 @@ public final class Mount extends Process {
   @Override
   protected boolean exec() {
     final String db = args[0];
-    final String mp = args[1];
+//    final String mp = args[1];
 
     new Close().execute(context);
     new Open(db).execute(context);
@@ -38,7 +38,7 @@ public final class Mount extends Process {
       return false;
     }
 
-    final DeepFS fs = new DeepFS(context);
+//    final DeepFS fs = new DeepFS(context);
 
     /* [AH] request Prop.JFUSE, ...
      * Class<?> cls = Class.forName("org.deepfs.DeepFS");
@@ -48,7 +48,7 @@ public final class Mount extends Process {
       new Thread() {
         @Override
         public void run() {
-          DeepFSImpl.mount(mp, fs);
+//          DeepFSImpl.mount(mp, fs);
         }
       }.start();
     } else {
