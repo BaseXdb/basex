@@ -1,5 +1,7 @@
 package org.basex.core.proc;
 
+import org.basex.core.User;
+
 /**
  * Evaluates the 'create user' command and creates a new user.
  *
@@ -13,7 +15,7 @@ public final class CreateUser extends ACreate {
    * @param pw password
    */
   public CreateUser(final String name, final String pw) {
-    super(STANDARD, name, pw);
+    super(STANDARD | User.ADMIN, name, pw);
   }
 
   @Override

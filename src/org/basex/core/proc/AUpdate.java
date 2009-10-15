@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.StringList;
@@ -25,7 +26,7 @@ abstract class AUpdate extends Process {
    * @param a arguments
    */
   protected AUpdate(final boolean g, final String... a) {
-    super(DATAREF | UPDATING, a);
+    super(DATAREF | UPDATING | User.WRITE, a);
     gui = g;
   }
 

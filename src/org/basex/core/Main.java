@@ -4,8 +4,9 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.Random;
+import java.util.Scanner;
+
 import org.basex.core.proc.Exit;
-import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Set;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -14,8 +15,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * This is the abstract class for all starter classes.
- * Add the '-h' option to get a list on all available command-line arguments.
+ * This is the abstract main class for all starter classes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -58,8 +58,8 @@ public abstract class Main {
     if(console && !set(Prop.INFO, ON)) return true;
 
     while(console) {
-      if(!process(new IntPrompt(), true)) break;
-      final String in = System.console().readLine();
+      Main.out("> ");
+      final String in = new Scanner(System.in).nextLine();
       if(in == null) break;
       if(!process(in)) return true;
     }
@@ -109,7 +109,7 @@ public abstract class Main {
       final boolean success = ss.execute(pr);
       if(pr instanceof Exit) return true;
 
-      if(success && pr.printing()) {
+      if(success) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
             new PrintOutput(System.out);
         ss.output(out);
@@ -126,7 +126,7 @@ public abstract class Main {
           }
         }
       }
-      if(v && console && !(pr instanceof IntPrompt)) outln();
+      if(v && console) outln();
       return success;
     } catch(final IOException ex) {
       error(ex, true);
@@ -186,7 +186,7 @@ public abstract class Main {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(bug(ext));
+    throw new BaseXException(bug(ext));
   }
 
   /**
@@ -197,7 +197,7 @@ public abstract class Main {
   public static Object notimplemented(final Object... ext) {
     final TokenBuilder sb = new TokenBuilder("Not Implemented.");
     if(ext.length != 0) sb.add(" (%)", ext);
-    throw new UnsupportedOperationException(sb.add('.').toString());
+    throw new BaseXException(sb.add('.').toString());
   }
 
   /**

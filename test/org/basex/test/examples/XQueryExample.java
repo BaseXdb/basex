@@ -56,7 +56,11 @@ public final class XQueryExample {
     // Creates a result serializer
     xml = new XMLSerializer(out);
     // Uses an iterator to serialize the result
-    for(Item item : iter) item.serialize(xml);
+    while(true) {
+      Item item = iter.next();
+      if(item == null) break;
+      item.serialize(xml);
+    }
     // Closes the serializer
     xml.close();
     // Closes the query processor
@@ -65,7 +69,7 @@ public final class XQueryExample {
     out.println("\n=== Third version: Using the database command");
 
     // Creates and executes a query
-    new XQuery(QUERY).execute(context, out);
+    new XQuery(QUERY).exec(context, out);
 
     // Closes the output stream
     out.close();

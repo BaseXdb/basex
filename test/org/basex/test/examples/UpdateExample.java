@@ -28,42 +28,42 @@ public final class UpdateExample {
     out.println("\n=== Create a database:");
 
     // Sets an option: activates command info output
-    new Set("info", true).execute(context, out);
+    new Set("info", true).exec(context, out);
     // Creates a new database instance; argument can be a file name or XML
-    new CreateDB("<doc a='b'>first</doc>", "Example").execute(context, out);
+    new CreateDB("<doc a='b'>first</doc>", "Example").exec(context, out);
 
     out.println("\n=== Insert a document:");
 
     // Inserts a document into the database; argument can be a file name or XML
     // Target: insert on root level
-    new Insert("fragment", "/", "<doc>second</doc>").execute(context, out);
+    new Insert("fragment", "/", "<doc>second</doc>").exec(context, out);
 
     out.println("\n=== Delete nodes");
 
     // Deletes all attributes in the database.
-    new Delete("//@*").execute(context, out);
+    new Delete("//@*").exec(context, out);
 
     out.println("\n=== Insert a node:");
 
     // Inserts an element fragment into the database
     // Position: 1 = as first child
     // Target: insert after all /doc elements...
-    new Insert("fragment", "/doc", 1, "<sub/>").execute(context, out);
+    new Insert("fragment", "/doc", 1, "<sub/>").exec(context, out);
 
     out.println("\n=== Optimize the database:");
 
     // Updates all indexes and database statistics
-    new Optimize().execute(context, out);
+    new Optimize().exec(context, out);
 
     out.println("\n=== Output the result:");
 
     // Serializes the database to show the result
-    new XQuery("/").execute(context, out);
+    new XQuery("/").exec(context, out);
 
     out.println("\n=== Drop the database:");
 
     // Removes the second database
-    new DropDB("Example").execute(context, out);
+    new DropDB("Example").exec(context, out);
 
     // Closes the output stream
     out.close();

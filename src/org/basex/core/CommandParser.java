@@ -38,7 +38,6 @@ import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
-import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
@@ -232,8 +231,6 @@ public final class CommandParser extends InputParser {
         return new Exit();
 
       // internal commands
-      case INTPROMPT:
-        return new IntPrompt();
       case INTOUTPUT:
         return new IntOutput();
       case INTINFO:
@@ -383,11 +380,6 @@ public final class CommandParser extends InputParser {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
       final E cmd = Enum.valueOf(cmp, t);
-// [CG] rewrote this due to compiler bug out of eclipse
-// [CG] should be the same?
-// http://forums.sun.com/thread.jspa?threadID=5336141
-//      if(!(cmd instanceof Cmd)) return cmd;
-//      final Cmd c = (Cmd) cmd;
       if(!(Cmd.class.isInstance(cmd))) return cmd;
       final Cmd c = Cmd.class.cast(cmd);
       if(!c.help() && (internal || !c.internal())) return cmd;
@@ -406,8 +398,6 @@ public final class CommandParser extends InputParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
-// [CG] rewrote this due to compiler bug out of eclipse
-//      if(ls.similar(name, sm, 0) && s instanceof Cmd)
       if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
         error(list(alt), CMDSIMILAR, name, sm);
     }

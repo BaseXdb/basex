@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Process;
+import org.basex.core.User;
 
 /**
  * Internal command, stopping the server.
@@ -13,6 +14,6 @@ public final class IntStop extends Process {
    * Default constructor.
    */
   public IntStop() {
-    super(STANDARD);
+    super(STANDARD | User.ADMIN);
   }
 }

@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
@@ -23,7 +25,7 @@ public final class InfoTable extends AInfo {
    * @param arg optional arguments
    */
   public InfoTable(final String... arg) {
-    super(DATAREF | PRINTING, arg);
+    super(DATAREF | PRINTING | User.READ, arg);
   }
 
   @Override

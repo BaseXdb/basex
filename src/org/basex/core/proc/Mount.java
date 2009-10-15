@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import org.basex.core.Main;
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fs.DeepFSImpl;
@@ -20,7 +21,7 @@ public final class Mount extends Process {
    * @param mountpoint filesystem path
    */
   public Mount(final String name, final String mountpoint) {
-    super(STANDARD, name, mountpoint);
+    super(STANDARD | User.ADMIN, name, mountpoint);
   }
 
   @Override

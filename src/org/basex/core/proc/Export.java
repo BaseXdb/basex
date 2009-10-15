@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
@@ -28,7 +29,7 @@ public final class Export extends Process {
    * @param path export path
    */
   public Export(final String path) {
-    super(DATAREF, path);
+    super(DATAREF | User.READ, path);
   }
 
   @Override

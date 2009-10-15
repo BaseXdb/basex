@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Main;
+import org.basex.core.User;
 import org.basex.data.Nodes;
 
 /**
@@ -15,7 +16,7 @@ public final class Cs extends AQuery {
    * @param query query
    */
   public Cs(final String query) {
-    super(DATAREF, query);
+    super(DATAREF | User.READ, query);
   }
 
   @Override

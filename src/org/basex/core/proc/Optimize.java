@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 
@@ -25,7 +26,7 @@ public final class Optimize extends ACreate {
    * Default constructor.
    */
   public Optimize() {
-    super(DATAREF | UPDATING);
+    super(DATAREF | UPDATING | User.CREATE);
   }
 
   @Override

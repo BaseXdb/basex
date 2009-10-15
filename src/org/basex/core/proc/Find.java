@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Context;
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -24,7 +25,7 @@ public final class Find extends AQuery {
    * @param query simplified query
    */
   public Find(final String query) {
-    super(DATAREF | PRINTING, query);
+    super(DATAREF | PRINTING | User.READ, query);
   }
 
   @Override

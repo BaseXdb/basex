@@ -455,17 +455,14 @@ public final class GUI extends JFrame {
       final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
       // treat text view different to other views
-      if(ok && pr.printing()) {
-        // display text view if result will not highlight any nodes
-        if(!text.visible() && nodes == null) GUICommands.SHOWTEXT.execute(this);
-
+      if(ok && pr.printing() && nodes == null) {
+        // display text view
+        if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
         // retrieve text result
-        if(text.visible()) {
-          final CachedOutput out = new CachedOutput(
-              context.prop.num(Prop.MAXTEXT));
-          pr.output(out);
-          text.setText(out);
-        }
+        final CachedOutput out = new CachedOutput(
+            context.prop.num(Prop.MAXTEXT));
+        pr.output(out);
+        text.setText(out);
       }
 
       boolean feedback = main;

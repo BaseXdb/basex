@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Main;
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.MetaData;
@@ -29,7 +30,7 @@ public final class InfoDB extends AInfo {
    * Default constructor.
    */
   public InfoDB() {
-    super(DATAREF | PRINTING);
+    super(DATAREF | PRINTING | User.READ);
   }
 
   @Override

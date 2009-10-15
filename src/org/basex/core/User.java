@@ -8,13 +8,13 @@ package org.basex.core;
  */
 public class User {
   /** Flag for read permissions. */
-  public static final int READ = 256;
+  public static final int READ = 1;
   /** Flag for write permissions. */
-  public static final int WRITE = 512;
+  public static final int WRITE = 2;
   /** Flag for create permissions. */
-  public static final int CREATE = 1024;
+  public static final int CREATE = 4;
   /** Flag for admin permissions. */
-  public static final int ADMIN = 2048;
+  public static final int ADMIN = 8;
 
   /** User name. */
   String name;

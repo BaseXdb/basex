@@ -203,7 +203,7 @@ public final class Context {
   }
   
   /**
-   * Returns number of references of the specified database in the pool.
+   * Returns the number of references of the specified database in the pool.
    * @param db name of the database
    * @return number of references
    */

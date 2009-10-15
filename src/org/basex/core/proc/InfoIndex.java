@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
@@ -20,7 +22,7 @@ public final class InfoIndex extends AInfo {
    * Default constructor.
    */
   public InfoIndex() {
-    super(DATAREF | PRINTING);
+    super(DATAREF | PRINTING | User.READ);
   }
 
   @Override

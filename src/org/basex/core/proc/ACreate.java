@@ -12,6 +12,7 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -34,7 +35,7 @@ abstract class ACreate extends Process {
    * @param a arguments
    */
   protected ACreate(final int p, final String... a) {
-    super(p, a);
+    super(p | User.CREATE, a);
   }
 
   /**

@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import java.io.IOException;
 
+import org.basex.core.User;
 import org.basex.io.PrintOutput;
 
 /**
@@ -15,7 +16,7 @@ public final class InfoUsers extends AInfo {
    * Default constructor.
    */
   public InfoUsers() {
-    super(DATAREF | PRINTING);
+    super(DATAREF | PRINTING | User.ADMIN);
   }
 
   @Override

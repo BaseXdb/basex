@@ -1,5 +1,7 @@
 package org.basex.core.proc;
 
+import org.basex.core.User;
+
 /**
  * Evaluates the 'drop user' command and drops a user.
  * 
@@ -12,7 +14,7 @@ public final class DropUser extends ACreate {
    * @param name name of user
    */
   public DropUser(final String name) {
-    super(STANDARD, name);
+    super(STANDARD | User.ADMIN, name);
   }
 
   @Override

@@ -200,9 +200,12 @@ public class AxisPath extends Path {
     final Data data = ctx.data();
     if(data != null) {
       boolean doc = true;
-      if(ctx.item.size(ctx) != ctx.docs || !(ctx.item instanceof Seq) ||
-          ((Seq) ctx.item).val != ctx.doc) {
-        for(final Item it : ctx.item.iter()) doc &= it.type == Type.DOC;
+      final Item item = ctx.item;
+      if(item.size(ctx) != ctx.docs || !(item instanceof Seq) ||
+          ((Seq) item).val != ctx.doc) {
+        final Iter iter = item.iter();
+        Item it;
+        while((it = iter.next()) != null) doc &= it.type == Type.DOC;
       }
 
       if(doc) {

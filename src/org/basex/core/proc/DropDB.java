@@ -4,6 +4,7 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.Prop;
+import org.basex.core.User;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -17,7 +18,7 @@ public final class DropDB extends ACreate {
    * @param name name of database
    */
   public DropDB(final String name) {
-    super(STANDARD, name);
+    super(STANDARD | User.CREATE, name);
   }
 
   @Override

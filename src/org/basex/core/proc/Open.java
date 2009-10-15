@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
@@ -23,7 +24,7 @@ public final class Open extends Process {
    * @param name name of database
    */
   public Open(final String name) {
-    super(STANDARD, name);
+    super(STANDARD | User.READ, name);
   }
 
   @Override

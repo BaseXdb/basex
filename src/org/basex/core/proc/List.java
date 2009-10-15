@@ -7,6 +7,7 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.DataInput;
 import org.basex.io.IO;
@@ -25,7 +26,7 @@ public final class List extends Process {
    * Default constructor.
    */
   public List() {
-    super(PRINTING);
+    super(PRINTING | User.ADMIN);
   }
 
   @Override

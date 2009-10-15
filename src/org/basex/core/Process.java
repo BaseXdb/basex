@@ -22,13 +22,13 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class Process extends Progress {
   /** Commands flag: standard. */
-  protected static final int STANDARD = 0;
+  protected static final int STANDARD = 256;
   /** Commands flag: printing command. */
-  protected static final int PRINTING = 1;
+  protected static final int PRINTING = 512;
   /** Commands flag: updating command. */
-  protected static final int UPDATING = 2;
+  protected static final int UPDATING = 1024;
   /** Commands flag: data reference needed. */
-  protected static final int DATAREF = 4;
+  protected static final int DATAREF = 2048;
 
   /** Flags for controlling process evaluation. */
   private final int flags;
@@ -64,10 +64,8 @@ public abstract class Process extends Progress {
    * @param out output stream reference
    * @throws Exception execution exception
    */
-  public void execute(final Context ctx, final PrintOutput out)
-      throws Exception {
-
-    if(!execute(ctx)) throw new RuntimeException(info());
+  public void exec(final Context ctx, final PrintOutput out) throws Exception {
+    if(!execute(ctx)) throw new BaseXException(info());
     output(out);
     out.print(info());
   }
@@ -127,14 +125,6 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes a process. This method is overwritten by many processes.
-   * @return success of operation
-   */
-  protected boolean exec() {
-    return true;
-  }
-
-  /**
    * Serializes the textual results.
    * @param out output stream
    * @throws IOException I/O exception
@@ -142,50 +132,12 @@ public abstract class Process extends Progress {
   public final void output(final PrintOutput out) throws IOException {
     final Data data = context.data();
     try {
-      out(out);
+      if(printing()) out(out);
     } catch(final IOException ex) {
       if(data != null) data.setLock(0);
       throw ex;
-    /*} catch(final Exception ex) {
-      out.print(ex.toString());
-      Main.debug(ex);*/
     }
     if(data != null) data.setLock(0);
-  }
-
-  /**
-   * Returns a query result. This method is overwritten by many processes.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  protected void out(final PrintOutput out) throws IOException {
-  }
-
-  /**
-   * Adds the error message to the message buffer {@link #info}.
-   * @param msg error message
-   * @param ext error extension
-   * @return false
-   */
-  public final boolean error(final String msg, final Object... ext) {
-    info.reset();
-    info.add(msg == null ? "" : msg, ext);
-    return false;
-  }
-
-  /**
-   * Adds information on the process execution.
-   * @param str information to be added
-   * @param ext extended info
-   * @return true
-   */
-  protected final boolean info(final String str, final Object... ext) {
-    if(prop.is(Prop.INFO)) {
-      info.add(str, ext);
-      info.add(Prop.NL);
-    }
-    return true;
   }
 
   /**
@@ -202,37 +154,6 @@ public abstract class Process extends Progress {
    */
   public final Result result() {
     return result;
-  }
-
-  /**
-   * Performs the specified XQuery.
-   * @param q query to be performed
-   * @param err this string is thrown as exception if the results are no
-   *    element nodes
-   * @return result set
-   */
-  protected final Nodes query(final String q, final String err) {
-    try {
-      final String query = q == null ? "" : q;
-      final QueryProcessor qu = new QueryProcessor(query, context);
-      progress(qu);
-      final Nodes nodes = qu.queryNodes();
-      // check if all result nodes are tags
-      if(err != null) {
-        final Data data = context.data();
-        for(int i = nodes.size() - 1; i >= 0; i--) {
-          if(data.kind(nodes.nodes[i]) != Data.ELEM) {
-            error(err);
-            return null;
-          }
-        }
-      }
-      return nodes;
-    } catch(final QueryException ex) {
-      Main.debug(ex);
-      error(ex.getMessage());
-      return null;
-    }
   }
 
   /**
@@ -291,14 +212,80 @@ public abstract class Process extends Progress {
     return (flags & User.ADMIN) != 0;
   }
 
+  // PROTECTED METHODS ========================================================
+  
   /**
-   * Returns the list of arguments.
-   * @return arguments
+   * Executes a process. This method is overwritten by many processes.
+   * @return success of operation
    */
-  public final String args() {
-    final StringBuilder sb = new StringBuilder();
-    for(final String a : args) if(a != null) sb.append(quote(a));
-    return sb.toString();
+  protected boolean exec() {
+    return true;
+  }
+
+  /**
+   * Returns a query result. This method is overwritten by many processes.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void out(final PrintOutput out) throws IOException {
+  }
+
+  /**
+   * Adds the error message to the message buffer {@link #info}.
+   * @param msg error message
+   * @param ext error extension
+   * @return false
+   */
+  protected final boolean error(final String msg, final Object... ext) {
+    info.reset();
+    info.add(msg == null ? "" : msg, ext);
+    return false;
+  }
+
+  /**
+   * Adds information on the process execution.
+   * @param str information to be added
+   * @param ext extended info
+   * @return true
+   */
+  protected final boolean info(final String str, final Object... ext) {
+    if(prop.is(Prop.INFO)) {
+      info.add(str, ext);
+      info.add(Prop.NL);
+    }
+    return true;
+  }
+
+  /**
+   * Performs the specified XQuery.
+   * @param q query to be performed
+   * @param err this string is thrown as exception if the results are no
+   *    element nodes
+   * @return result set
+   */
+  protected final Nodes query(final String q, final String err) {
+    try {
+      final String query = q == null ? "" : q;
+      final QueryProcessor qu = new QueryProcessor(query, context);
+      progress(qu);
+      final Nodes nodes = qu.queryNodes();
+      // check if all result nodes are tags
+      if(err != null) {
+        final Data data = context.data();
+        for(int i = nodes.size() - 1; i >= 0; i--) {
+          if(data.kind(nodes.nodes[i]) != Data.ELEM) {
+            error(err);
+            return null;
+          }
+        }
+      }
+      return nodes;
+    } catch(final QueryException ex) {
+      Main.debug(ex);
+      error(ex.getMessage());
+      return null;
+    }
   }
 
   /**
@@ -330,6 +317,16 @@ public abstract class Process extends Progress {
       sb.append(s);
       if(spc) sb.append('"');
     }
+    return sb.toString();
+  }
+
+  /**
+   * Returns the list of arguments.
+   * @return arguments
+   */
+  protected final String args() {
+    final StringBuilder sb = new StringBuilder();
+    for(final String a : args) if(a != null) sb.append(quote(a));
     return sb.toString();
   }
 

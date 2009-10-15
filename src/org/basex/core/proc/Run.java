@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.util.Token;
 
@@ -19,7 +20,7 @@ public final class Run extends AQuery {
    * @param file query file
    */
   public Run(final String file) {
-    super(PRINTING, file);
+    super(PRINTING | User.READ, file);
   }
 
   @Override

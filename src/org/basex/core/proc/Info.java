@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -19,7 +20,7 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(PRINTING);
+    super(PRINTING | User.READ);
   }
 
   @Override

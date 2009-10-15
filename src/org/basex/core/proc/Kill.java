@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Process;
+import org.basex.core.User;
 import org.basex.server.Sessions;
 
 /**
@@ -14,7 +15,7 @@ public final class Kill extends Process {
    * Default constructor.
    */
   public Kill() {
-    super(STANDARD);
+    super(STANDARD | User.ADMIN);
   }
 
   @Override

@@ -13,9 +13,9 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
+import org.basex.core.proc.IntError;
 import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.IntOutput;
-import org.basex.core.proc.IntPrompt;
 import org.basex.core.proc.IntStop;
 import org.basex.data.Data;
 import org.basex.io.BufferedOutput;
@@ -110,7 +110,7 @@ public final class ServerSession extends Thread {
             startTimer(proc);
             cp = new ClientProcess(this, proc.updating());
             server.cp.add(cp);
-            if(server.cp.size() > 1 && !(proc instanceof IntPrompt)) {
+            if(server.cp.size() > 1) {
               if(proc.updating()) {
                 while(server.cp.indexOf(cp) != 0)
                   Performance.sleep(50);
@@ -139,8 +139,7 @@ public final class ServerSession extends Thread {
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create empty process
           // with error feedback
-          proc = new Process(0) {};
-          proc.error(ex.extended());
+          proc = new IntError(ex.extended());
           core = proc;
           send(out, false);
         }

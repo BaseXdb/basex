@@ -28,36 +28,36 @@ public final class DBExample {
     out.println("\n=== Create a database from a file:");
 
     // Sets an option: activates command info output
-    new Set("info", true).execute(context, out);
+    new Set("info", true).exec(context, out);
     // Creates a database from the specified file.
-    new CreateDB("input.xml", "Example1").execute(context, out);
+    new CreateDB("input.xml", "Example1").exec(context, out);
     // Closes the database.
-    new Close().execute(context, out);
+    new Close().exec(context, out);
 
     out.println("\n=== Create a database from an input string:");
 
     // XML string.
     String xml = "<xml>This is a test</xml>";
     // Creates a database for the specified input.
-    new CreateDB(xml, "Example2").execute(context, out);
+    new CreateDB(xml, "Example2").exec(context, out);
     // Closes the database.
-    new Close().execute(context, out);
+    new Close().exec(context, out);
 
     out.println("\n=== Open an existing database and show database info:");
 
     // Opens an existing database
-    new Open("Example1").execute(context, out);
+    new Open("Example1").exec(context, out);
     // Dumps information on the specified database context
-    new InfoDB().execute(context, out);
+    new InfoDB().exec(context, out);
     // Closes the database.
-    new Close().execute(context, out);
+    new Close().exec(context, out);
 
     out.println("=== Drop databases:");
 
     // Removes the first database
-    new DropDB("Example1").execute(context, out);
+    new DropDB("Example1").exec(context, out);
     // Removes the second database
-    new DropDB("Example2").execute(context, out);
+    new DropDB("Example2").exec(context, out);
 
     // Closes the output stream
     out.close();
