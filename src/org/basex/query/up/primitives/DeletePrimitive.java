@@ -38,8 +38,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
     if(l == -1) return;
     final int lk = d.kind(l);
     final int r = l + d.size(l, lk);
-    if(d.parent(l, lk) == d.parent(r, d.kind(r)))
-    mergeTextNodes(d, l, r);
+    if(d.parent(l, lk) == d.parent(r, d.kind(r))) mergeTextNodes(d, l, r);
 //    System.out.println("after");
 //    UpdateFunctions.printTable(n.data);
   }

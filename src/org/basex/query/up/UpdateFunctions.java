@@ -90,7 +90,7 @@ public final class UpdateFunctions {
     final int par = d.parent(pre, d.kind(pre));
     int s = -1;
     int p = par + 1;
-    while(p <= pre) {
+    while(p < pre) {
       p = p + d.size(p, d.kind(p));
       if(p == pre) return s;
       s = p;
