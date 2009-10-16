@@ -162,12 +162,4 @@ public final class Users {
     tb.add(size + " Users registered.");
     return tb.toString();
   }
-
-  /**
-   * Get list (to be removed).
-   * @return list
-   */
-  public ArrayList<Object[]> getUsers() {
-    return new ArrayList<Object[]>();
-  }
 }

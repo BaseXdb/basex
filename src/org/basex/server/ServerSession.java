@@ -44,6 +44,8 @@ public final class ServerSession extends Thread {
   private Thread timeout;
   /** ClientProcess. */
   private ClientProcess cp;
+  /** Thread blocker. */
+  private String block = "";
 
   /**
    * Constructor.
@@ -129,12 +131,25 @@ public final class ServerSession extends Thread {
               updating = server.cp.get(i).updating;
             }
             if(updating) {
-              while(server.cp.indexOf(cp) != 0) Performance.sleep(50);
+              while(server.cp.indexOf(cp) != 0) {
+                synchronized(block) {
+                  try {
+                    block.wait();
+                  } catch(InterruptedException e) {
+                    e.printStackTrace();
+                  }
+                }
+              }
             }
           }
 
           final boolean ok = proc.execute(context, out);
           server.cp.remove(cp);
+          if(updating) {
+            synchronized(block) {
+            block.notifyAll();
+            }
+          }
           stopTimer();
           out.write(new byte[IO.BLOCKSIZE]);
           send(out, ok);

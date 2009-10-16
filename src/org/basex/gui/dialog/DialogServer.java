@@ -6,8 +6,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -15,7 +18,10 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.IntStop;
+import org.basex.core.proc.Show;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -24,6 +30,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 
 /**
@@ -36,6 +43,12 @@ public class DialogServer extends Dialog {
 
   /** Context. */
   Context ctx = gui.context;
+  /** ClientSession. */
+  ClientSession cs;
+  /** ArrayList for table. */
+  ArrayList<Object[]> data = new ArrayList<Object[]>();
+  /** Itemarray for combobox. */
+  String[] usernames = new String[] {};
 
   /**
    * Default constructor.
@@ -64,7 +77,7 @@ public class DialogServer extends Dialog {
         String.valueOf(ctx.prop.num(Prop.PORT)), null, this);
     final BaseXButton change = new BaseXButton("Change", null, this);
     try {
-      new ClientSession(ctx, ADMIN, ADMIN);
+      cs = new ClientSession(ctx, ADMIN, ADMIN);
       start.setEnabled(false);
       host.setEnabled(false);
       port.setEnabled(false);
@@ -82,6 +95,7 @@ public class DialogServer extends Dialog {
         port.setEnabled(false);
         change.setEnabled(false);
         tabs.setEnabledAt(1, true);
+        startServer();
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -92,6 +106,11 @@ public class DialogServer extends Dialog {
         port.setEnabled(true);
         change.setEnabled(true);
         tabs.setEnabledAt(1, false);
+        try {
+          cs.execute(new IntStop(), null);
+        } catch(IOException e1) {
+          e1.printStackTrace();
+        }
       }
     });
     p11.add(start);
@@ -138,7 +157,7 @@ public class DialogServer extends Dialog {
     final JTable table = new JTable(new TableModel());
     // Create the scroll pane and add the table to it.
     final JScrollPane scrollPane = new JScrollPane(table);
-    final BaseXCombo userco = new BaseXCombo(getUsers(), null, this);
+    final BaseXCombo userco = new BaseXCombo(usernames, null, this);
     p21.add(pass);
     // create
     final BaseXButton create = new BaseXButton("Create User", null, this);
@@ -146,7 +165,7 @@ public class DialogServer extends Dialog {
     final BaseXButton delete = new BaseXButton("Drop User", null, this);
     create.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        final String u = user.getText();
+        /*final String u = user.getText();
         final String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
           ctx.users.create(u, p);
@@ -155,7 +174,8 @@ public class DialogServer extends Dialog {
           ((TableModel) table.getModel()).setData();
           userco.addItem(u);
           delete.setEnabled(true);
-        }
+        }*/
+        fillLists();
       }
     });
     p21.add(create);
@@ -170,7 +190,7 @@ public class DialogServer extends Dialog {
         ctx.users.drop(test);
         userco.removeItem(test);
         ((TableModel) table.getModel()).setData();
-        if(getUsers().length == 0) delete.setEnabled(false);
+        if(usernames.length == 0) delete.setEnabled(false);
       }
     });
 
@@ -200,23 +220,56 @@ public class DialogServer extends Dialog {
     set(tabs, BorderLayout.CENTER);
     finish(null);
   }
+  
+   /**
+   * Starts a server as new process.
+   */
+  void startServer() {
+    try {
+      final ProcessBuilder pb = new ProcessBuilder(
+          "java", "-cp", Prop.WORK + "bin", "org.basex.BaseXServer");
+      final Process p = pb.start();
+      cs = new ClientSession(ctx, ADMIN, ADMIN);
+      final BufferedReader in = new BufferedReader(new InputStreamReader(
+          p.getInputStream()));
+      new Thread() {
+        @Override
+        public void run() {
+          String line = "";
+          try {
+            while((line = in.readLine()) != null) {
+              Main.outln(line);
+            }
+          } catch(final IOException ex) {
+            ex.printStackTrace();
+          }
+        }
+      }.start();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
+    }
+  }
 
   /**
-   * Returns all users from the list.
-   * @return users
+   * Fills all lists.
    */
-  String[] getUsers() {
-    final ArrayList<Object[]> list = ctx.users.getUsers();
-    if(list != null) {
-      final String[] t = new String[list.size()];
-      int i = 0;
-      for(final Object[] s : list) {
-        t[i] = (String) s[0];
-        i++;
-      }
-      return t;
+  void fillLists() {
+    final CachedOutput out = new CachedOutput();
+    try {
+      cs.execute(new Show("Users"), out);
+    } catch(IOException e) {
+      e.printStackTrace();
     }
-    return new String[] {};
+    String info = out.toString();
+    info = info.substring(info.lastIndexOf("-") + 3);
+    Scanner s = new Scanner(info);
+    while(s.hasNextLine()) {
+      String line = s.nextLine();
+      if(line.isEmpty()) break;
+      for(int i = 0; i < line.length(); i++) {
+        System.out.println(line.charAt(i));
+      }
+    }
   }
 
   /**
@@ -228,8 +281,6 @@ public class DialogServer extends Dialog {
   class TableModel extends AbstractTableModel {
     /** Column names. */
     String[] columnNames = { "Username", "Read", "Write", "Create", "Admin"};
-    /** Data. */
-    private ArrayList<Object[]> data = ctx.users.getUsers();
 
     public int getColumnCount() {
       return columnNames.length;
@@ -269,7 +320,7 @@ public class DialogServer extends Dialog {
      * Sets new data.
      */
     public void setData() {
-      data = ctx.users.getUsers();
+      fillLists();
       fireTableDataChanged();
     }
 

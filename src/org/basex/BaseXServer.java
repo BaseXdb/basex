@@ -51,7 +51,7 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public BaseXServer(final String... args) {
     super(args);
-    cp = new ArrayList<ClientProcess>();
+    cp = new ArrayList<ClientProcess>(); 
     if(!success) return;
     try {
       server = new ServerSocket(context.prop.num(Prop.PORT));
