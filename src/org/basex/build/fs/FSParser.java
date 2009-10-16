@@ -3,7 +3,6 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import static org.deepfs.jfuse.JFUSEAdapter.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +26,9 @@ import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
 import org.basex.util.Array;
-import org.basex.util.Atts;
 import org.basex.util.Map;
 import org.basex.util.Token;
+import org.deepfs.fs.DeepFS;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.
@@ -49,8 +48,6 @@ import org.basex.util.Token;
  * @author Alexander Holupirek, alex@holupirek.de
  */
 public final class FSParser extends Parser {
-  /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
-  public static final int SIZEOFFSET = 3;
   /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre value stack. */
@@ -129,7 +126,8 @@ public final class FSParser extends Parser {
 
         sizeStack[0] = 0;
         parse(f);
-        builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
+        builder.setAttValue(preStack[0] + DeepFS.getSizeOffset()
+            , token(sizeStack[0]));
       }
       builder.endElem(DEEPFS);
     }
@@ -147,41 +145,10 @@ public final class FSParser extends Parser {
 
     for(final File f : files) {
       if(!valid(f)) continue;
-
-      // [BL] changed backing semantics.
-//      final boolean fuse = prop.is(Prop.FUSE);
-      if(f.isDirectory()) {
-        // -- 'copy' directory to backing store
-//        if(fuse) new File(backingpath +
-//            f.getAbsolutePath().substring(importRootLength)).mkdir();
-        dir(f);
-      } else {
-        // -- copy file to backing store
-//        if(fuse) copy(f.getAbsoluteFile(), new File(backingpath +
-//            f.getAbsolutePath().substring(importRootLength)));
-        file(f);
-      }
+      if(f.isDirectory()) dir(f);
+      else file(f);
     }
   }
-
-//  /**
-//   * Copies a file to the backing store.
-//   * @param src file source
-//   * @param dst file destination in backing store
-//   */
-//  private void copy(final File src, final File dst) {
-//    try {
-//      final InputStream in = new FileInputStream(src);
-//      final OutputStream out = new FileOutputStream(dst);
-//      final byte[] buf = new byte[IO.BLOCKSIZE];
-//      int len;
-//      while((len = in.read(buf)) > 0) out.write(buf, 0, len);
-//      in.close();
-//      out.close();
-//    } catch(final IOException ex) {
-//      ex.getMessage();
-//    }
-//  }
 
   /**
    * Determines if the specified file is valid and no symbolic link.
@@ -203,7 +170,7 @@ public final class FSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void dir(final File f) throws IOException {
-    preStack[++lvl] = builder.startElem(DIR, atts(f, true));
+    preStack[++lvl] = builder.startElem(DIR, DeepFS.atts(f));
     sizeStack[lvl] = 0;
     parse(f);
     builder.endElem(DIR);
@@ -212,7 +179,7 @@ public final class FSParser extends Parser {
     // take into account that stored pre value is the one of the
     // element node, not the attributes one!
     final long size = sizeStack[lvl];
-    builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(size));
+    builder.setAttValue(preStack[lvl] + DeepFS.getSizeOffset(), token(size));
 
     // add file size to parent folder
     sizeStack[--lvl] += size;
@@ -226,7 +193,7 @@ public final class FSParser extends Parser {
   private void file(final File f) throws IOException {
     curr = f;
     if(!singlemode)
-      builder.startElem(FILE, atts(f, false));
+      builder.startElem(FILE, DeepFS.atts(f));
     if(f.canRead()) {
       if(prop.is(Prop.FSMETA) && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
@@ -267,43 +234,9 @@ public final class FSParser extends Parser {
       builder.endElem(FILE);
     // add file size to parent folder
     sizeStack[lvl] += f.length();
-  }
-
-  /**
-   * Constructs attributes for file and directory tags.
-   * @param f file name
-   * @param d directory flag
-   * @return attributes as byte[][]
-   */
-  private Atts atts(final File f, final boolean d) {
-    final String name = f.getName();
-    final int s = name.lastIndexOf('.');
-    final long time = f.lastModified();
-    final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
-
-    atts.reset();
-    atts.add(NAME, token(name));
-    atts.add(SUFFIX, suf);
-    atts.add(MTIME, token(time));
-    // [AH] combine that with create() in DeepFS class.
-    atts.add(CTIME, ZERO);
-    atts.add(ATIME, ZERO);
-    /* [AH] First alternative:
-     * if(jfuse != null) {
-     *   jfuse.getSIFDIR() / jfuse....invoke(...)
-     * }
-    /* [AH] Second alternative: FSParser could be overwritten and
-     * extended by JFUSE specific methods.
-     */
-    if (d)
-      atts.add(MODE, token(getSIFDIR() | 0755));
-    else
-      atts.add(MODE, token(getSIFREG() | 0644));
-    atts.add(SIZE, token(f.length()));
-    atts.add(UID, ZERO);
-    atts.add(GID, ZERO);
-    atts.add(NLINK, ZERO);
-    return atts;
+    for (long i : sizeStack)
+      System.err.print(i + " ");
+    System.err.println("--");
   }
 
   @Override

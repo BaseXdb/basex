@@ -2,11 +2,13 @@ package org.basex.build.fs;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.parser.AbstractParser;
@@ -26,6 +28,7 @@ import org.basex.io.IOFile;
 import org.basex.util.Atts;
 import org.basex.util.LibraryLoader;
 import org.basex.util.TokenBuilder;
+import org.deepfs.fs.DeepFS;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.
@@ -46,15 +49,15 @@ public final class NewFSParser extends Parser {
   // ----- Namespaces ----------------------------------------------------------
   /** All namespaces used in {@link NewFSParser}. */
   public enum NS {
-        /** XML schema namespace. */
+    /** XML schema namespace. */
     XS("xs", "http://www.w3.org/2001/XMLSchema"),
-        /** XML schema instance namespace. */
+    /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-        /** DeepFS filesystem namespace. */
+    /** DeepFS filesystem namespace. */
     DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
-        /** DeepFS metadata namespace. */
+    /** DeepFS metadata namespace. */
     FSMETA("", "http://www.deepfs.org/fsmeta/1.0/"),
-        /** Dublin Core metadata terms namespace. */
+    /** Dublin Core metadata terms namespace. */
     DCTERMS("", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
@@ -116,11 +119,11 @@ public final class NewFSParser extends Parser {
   /** Content tag in fs namespace. */
   private static final byte[] CONTENT_NS = NewFSParser.NS.DEEPURL.tag(CONTENT);
   /** Text content tag in fs namespace. */
-  private static final byte[] TEXT_CONTENT_NS =
-      NewFSParser.NS.DEEPURL.tag(TEXT_CONTENT);
+  private static final byte[] TEXT_CONTENT_NS = 
+    NewFSParser.NS.DEEPURL.tag(TEXT_CONTENT);
   /** XML content tag in fs namespace. */
   private static final byte[] XML_CONTENT_NS =
-      NewFSParser.NS.DEEPURL.tag(XML_CONTENT);
+    NewFSParser.NS.DEEPURL.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 
@@ -333,16 +336,6 @@ public final class NewFSParser extends Parser {
       atts.add(BACKINGSTORE, token(backingpath));
       atts.add(SIZE, ZERO);
 
-      // [BL] currently turned off (update problematic). define namespaces
-//      builder.startNS(FS, FSURL);
-//      if(prop.is(Prop.FSMETA)) {
-//        builder.startNS(FSMETAPREF, FSMETAURL);
-//        builder.startNS(FSDCPREF, FSDCURL);
-//      }
-//      if(ADD_ATTS) {
-//        builder.startNS(FSXSIPREF, FSXSIURL);
-//      }
-
       final int sizeAttId = builder.startElem(DEEPFS_NS, atts) + 3;
 
       for(final File f : root ? File.listRoots() : new File[] { new File(
@@ -365,49 +358,14 @@ public final class NewFSParser extends Parser {
   }
 
   /**
-   * Prepares the attributes for the current file node.
-   * @param f the current file.
-   * @return the attributes.
-   * @throws IOException I/O exception.
-   */
-  @SuppressWarnings("unused")
-  private Atts fsAtts(final File f)
-      throws IOException {
-    atts.reset();
-    final String name = f.getName();
-    atts.add(NAME, token(!name.equals("") ? name : f.getAbsolutePath()));
-    atts.add(SIZE, token(f.length()));
-    atts.add(MTIME, token(f.lastModified()));
-    return atts;
-  }
-
-  /**
    * Adds the size value to the current node.
    * @param id the ID of the size attribute.
    * @param size the size to set.
    * @throws IOException I/O exception.
    */
-  private void setSize(final int id, final long size)
-      throws IOException {
+  private void setSize(final int id, final long size) throws IOException {
     builder.setAttValue(id, token(size));
   }
-
-  // /**
-  // * Copies a file to the backing store.
-  // * @param src file source
-  // * @param dst file destination in backing store
-  // */
-  // private void copy(final File src, final File dst) {
-  // try {
-  // final FileChannel chIn = new FileInputStream(src).getChannel();
-  // final FileChannel chOut = new FileOutputStream(dst).getChannel();
-  // chIn.transferTo(0, chIn.size(), chOut);
-  // chIn.close();
-  // chOut.close();
-  // } catch(final IOException ex) {
-  // Main.debug(ex.getMessage());
-  // }
-  // }
 
   /**
    * Determines if the specified file is valid and no symbolic link.
@@ -432,25 +390,13 @@ public final class NewFSParser extends Parser {
     final File[] files = d.listFiles();
     if(files == null) return;
 
-    final int sizeAttId = builder.startElem(DIR_NS, fsAtts(d)) + 2;
+    final int sizeAttId = builder.startElem(DIR_NS, DeepFS.atts(d)) + 2;
     sizeStack[++lvl] = 0;
 
     for(final File f : files) {
       if(!valid(f) || f.isHidden()) continue;
-
-      // [BL] changed backing semantics.
-      // final boolean fuse = prop.is(Prop.FUSE);
-      if(f.isDirectory()) {
-        // // -- 'copy' directory to backing store
-        // if(fuse) new File(mybackingpath
-        // + f.getAbsolutePath().substring(importRootLength)).mkdir();
-        dir(f);
-      } else {
-        // // -- copy file to backing store
-        // if(fuse) copy(f.getAbsoluteFile(), new File(mybackingpath
-        // + f.getAbsolutePath().substring(importRootLength)));
-        file(f);
-      }
+      if(f.isDirectory()) dir(f);
+      else file(f);
     }
 
     final long size = sizeStack[lvl];
@@ -472,7 +418,7 @@ public final class NewFSParser extends Parser {
 
     if(!singlemode) {
       final String name = f.getName();
-      builder.startElem(FILE_NS, fsAtts(f));
+      builder.startElem(FILE_NS, DeepFS.atts(f));
       if((prop.is(Prop.FSMETA) || prop.is(Prop.FSCONT)) && f.canRead()
           && f.isFile()) {
         if(prop.is(Prop.SPOTLIGHT)) {
@@ -560,7 +506,7 @@ public final class NewFSParser extends Parser {
         } catch(final Exception ex) {
           Main.debug(
               "Failed to parse file fragment (file: %, offset: %, length: %): "
-              + "%", bfc.getFileName(), offset, size, ex);
+                  + "%", bfc.getFileName(), offset, size, ex);
           bfc.finish();
         }
       }

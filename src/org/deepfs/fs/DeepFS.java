@@ -3,8 +3,10 @@ package org.deepfs.fs;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -16,6 +18,7 @@ import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -257,7 +260,18 @@ public final class DeepFS implements DataText {
     final int s = path.lastIndexOf('/');
     return s > 0 ? path.substring(0, s) : "/";
   }
-
+  
+  /**
+   * Extract file name suffix.
+   * @param name of the file
+   * @return suffix or EMPTY token
+   */
+  private static byte[] getSuffix(final String name) {
+    final int s = name.lastIndexOf('.');
+    final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
+    return suf;
+  }
+  
   /**
    * Construct file node as MemData object, ready to be inserted into main
    * data instance.
@@ -267,7 +281,7 @@ public final class DeepFS implements DataText {
    */
   private MemData buildFileNode(final String path, final int mode) {
     final String fname = basename(path);
-    final int nodeSize = 10; // 1x elem, 9x attr
+    final int nodeSize = 11; // 1x elem, 10x attr
     final MemData m = new MemData(nodeSize, data.tags, data.atts, data.ns,
         data.path, data.meta.prop);
     final int tagID = isReg(mode) ? fileID : dirID;
@@ -276,14 +290,51 @@ public final class DeepFS implements DataText {
     m.addAtt(nameID , 0, token(fname), 1);
     m.addAtt(sizeID , 0, ZERO, 2);
     m.addAtt(modeID , 0, token(mode), 3);
-    m.addAtt(uidID  , 0, token(sUID), 4);
-    m.addAtt(gidID  , 0, token(sGID), 5);
+    m.addAtt(uidID  , 0, token(getUID()), 4);
+    m.addAtt(gidID  , 0, token(getGID()), 5);
     m.addAtt(atimeID, 0, time, 6);
-    m.addAtt(mtimeID, 0, time, 7);
-    m.addAtt(ctimeID, 0, time, 8);
+    m.addAtt(ctimeID, 0, time, 7);
+    m.addAtt(mtimeID, 0, time, 8);
     m.addAtt(nlinkID, 0, token("1"), 9);
+    m.addAtt(suffixID, 0, getSuffix(fname), 10);
     return m;
   }
+  
+  /**
+   * Offset of size value.
+   * Used to calculated the dir size in {@link FSParser}.
+   * @return offset of size attribute
+   */
+  public static int getSizeOffset() {
+    return 3;
+  }
+  
+  /**
+   * Constructs attributes for file and directory tags.
+   * @param f file name
+   * @return attributes as byte[][]
+   */
+  public static Atts atts(final File f) {
+    final String name = f.getName();
+    final byte[] time = token(System.currentTimeMillis());
+
+    /** Temporary attribute array. */
+    final Atts atts = new Atts();
+    atts.reset();
+    atts.add(NAME, token(name));
+    atts.add(SIZE, token(f.length()));
+    if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
+    else atts.add(MODE, token(getSIFREG() | 0644));
+    atts.add(UID, token(getUID()));
+    atts.add(GID, token(getGID()));
+    atts.add(ATIME, time);
+    atts.add(CTIME, time);
+    atts.add(MTIME, token(f.lastModified()));
+    atts.add(NLINK, token("1"));
+    atts.add(SUFFIX, getSuffix(name));
+    return atts;
+  }
+
 
   /**
    * Returns mountpoint attribute value.
@@ -477,7 +528,6 @@ public final class DeepFS implements DataText {
    * @return result of comparison
    */
   public boolean isDir(final int pre) {
-    // [AH] this.fileID may be sufficient?
     return data.kind(pre) == Data.ELEM
     && data.tagID(pre) == data.tags.id(DataText.DIR);
   }

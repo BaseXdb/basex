@@ -61,11 +61,6 @@ public final class ViewNotifier {
     if(db) {
       cont[0] = ctx.current();
       marked[0] = new Nodes(ctx.data());
-      /* [AH] temporarily removed..
-      if(Prop.fuse) {
-        BaseX.debug("[ViewNotifier] Setting gui reference in DeepFS.");
-        ctx.data().fs.gui = gui;
-      }*/
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
