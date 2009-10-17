@@ -114,6 +114,10 @@ public final class ServerSession extends Thread {
           if(inf.equals(PROGERR)) inf = SERVERTIME;
           new DataOutputStream(out).writeUTF(inf);
           out.flush();
+        } else if (proc instanceof IntStop || proc instanceof Exit) {
+          exit();
+          if(proc instanceof IntStop) server.quit(false);
+          return;
         } else {
           core = proc;
           startTimer(proc);
@@ -126,12 +130,6 @@ public final class ServerSession extends Thread {
           send(out, ok);
           if(up) server.sem.stopWrite(this);
           else server.sem.stopRead(this);
-          if(proc instanceof IntStop || proc instanceof Exit) {
-            server.sem.stopRead(this);
-            exit();
-            if(proc instanceof IntStop) server.quit(false);
-            return;
-          }
         }
       } catch(final QueryException ex) {
         // invalid command was sent by a client; create error feedback
