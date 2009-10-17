@@ -11,9 +11,9 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.IntStop;
 import org.basex.server.ClientSession;
+import org.basex.server.Semaphore;
 import org.basex.server.ServerSession;
 import org.basex.util.Args;
-import org.basex.util.Semaphore;
 
 /**
  * This is the starter class for the database server.

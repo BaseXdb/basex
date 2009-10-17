@@ -122,14 +122,20 @@ public final class ServerSession extends Thread {
           core = proc;
           startTimer(proc);
           boolean up = proc.updating();
-          if(up) server.sem.startWrite(this);
-          else server.sem.startRead(this);
+          if(up) {
+            server.sem.beforeWrite();
+          } else {
+            server.sem.beforeRead();
+          }
           final boolean ok = proc.execute(context, out);
           stopTimer();
           out.write(new byte[IO.BLOCKSIZE]);
           send(out, ok);
-          if(up) server.sem.stopWrite(this);
-          else server.sem.stopRead(this);
+          if(up) {
+            server.sem.afterWrite();
+          } else {
+            server.sem.afterRead();
+          }
         }
       } catch(final QueryException ex) {
         // invalid command was sent by a client; create error feedback
