@@ -42,10 +42,6 @@ public final class ServerSession extends Thread {
   private Process core;
   /** Timeout thread. */
   private Thread timeout;
-  /** ClientProcess. */
-  private ClientProcess cp;
-  /** Thread blocker. */
-  private String block = "";
 
   /**
    * Constructor.
@@ -120,43 +116,18 @@ public final class ServerSession extends Thread {
           out.flush();
         } else {
           core = proc;
-          boolean updating = proc.updating();
-          cp = new ClientProcess(this, updating);
-          server.cp.add(cp);
           startTimer(proc);
-          if(!updating) server.readers++;
-          // wait for updating processes
-          if(server.cp.size() > 1) {
-            for(int i = 0; !updating && i < server.cp.size(); i++) {
-              updating = server.cp.get(i).updating;
-            }
-            if(updating) {
-              while(server.cp.indexOf(cp) != 0) {
-                synchronized(block) {
-                  try {
-                    block.wait();
-                  } catch(InterruptedException e) {
-                    e.printStackTrace();
-                  }
-                }
-              }
-            }
-          }
-
+          boolean up = proc.updating();
+          if(up) server.sem.startWrite(this);
+          else server.sem.startRead(this);
           final boolean ok = proc.execute(context, out);
-          server.cp.remove(cp);
-          if(!updating) server.readers--;
-          if(server.cp.size() > 0 && server.readers == 0) {
-            synchronized(block) {
-            block.notifyAll();
-            }
-          }
           stopTimer();
           out.write(new byte[IO.BLOCKSIZE]);
           send(out, ok);
-
+          if(up) server.sem.stopWrite(this);
+          else server.sem.stopRead(this);
           if(proc instanceof IntStop || proc instanceof Exit) {
-            server.cp.remove(cp);
+            server.sem.stopRead(this);
             exit();
             if(proc instanceof IntStop) server.quit(false);
             return;
