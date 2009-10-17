@@ -124,7 +124,7 @@ public final class ServerSession extends Thread {
           cp = new ClientProcess(this, updating);
           server.cp.add(cp);
           startTimer(proc);
-
+          if(!updating) server.readers++;
           // wait for updating processes
           if(server.cp.size() > 1) {
             for(int i = 0; !updating && i < server.cp.size(); i++) {
@@ -145,7 +145,8 @@ public final class ServerSession extends Thread {
 
           final boolean ok = proc.execute(context, out);
           server.cp.remove(cp);
-          if(updating) {
+          if(!updating) server.readers--;
+          if(server.cp.size() > 0 && server.readers == 0) {
             synchronized(block) {
             block.notifyAll();
             }

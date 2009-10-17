@@ -267,7 +267,7 @@ public class DialogServer extends Dialog {
       String line = s.nextLine();
       if(line.isEmpty()) break;
       for(int i = 0; i < line.length(); i++) {
-        System.out.println(line.charAt(i));
+        //System.out.println(line.charAt(i));
       }
     }
   }
