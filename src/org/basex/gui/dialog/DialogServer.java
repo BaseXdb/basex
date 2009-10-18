@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Vector;
 
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -41,13 +42,13 @@ import org.basex.server.ClientSession;
  */
 public final class DialogServer extends Dialog {
   /** ArrayList for table. */
-  final ArrayList<Object[]> data = new ArrayList<Object[]>();
+  ArrayList<Object[]> data = new ArrayList<Object[]>();
   /** Context. */
   final Context ctx = gui.context;
   /** ClientSession. */
   ClientSession cs;
-  /** Item array for combobox. */
-  String[] usernames = new String[] {};
+  /** Vector for combobox. */
+  Vector<String> usernames = new Vector<String>();
 
   /**
    * Default constructor.
@@ -81,6 +82,7 @@ public final class DialogServer extends Dialog {
       host.setEnabled(false);
       port.setEnabled(false);
       change.setEnabled(false);
+      fillLists();
     } catch(final IOException e1) {
       stop.setEnabled(false);
       tabs.setEnabledAt(1, false);
@@ -95,6 +97,7 @@ public final class DialogServer extends Dialog {
         change.setEnabled(false);
         tabs.setEnabledAt(1, true);
         startServer();
+        fillLists();
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -164,6 +167,7 @@ public final class DialogServer extends Dialog {
     final BaseXButton delete = new BaseXButton("Drop User", null, this);
     create.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
+        // [AW] cs.execute(new CreateUser())...
         /*final String u = user.getText();
         final String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
@@ -174,7 +178,6 @@ public final class DialogServer extends Dialog {
           userco.addItem(u);
           delete.setEnabled(true);
         }*/
-        fillLists();
       }
     });
     p21.add(create);
@@ -182,14 +185,14 @@ public final class DialogServer extends Dialog {
     p22.setLayout(new TableLayout(2, 2, 6, 0));
     p22.add(new BaseXLabel("Drop User:", false, true));
     p22.add(new BaseXLabel(""));
-    // if(getUsers().length == 0) delete.setEnabled(false);
+    if(usernames.size() == 0) delete.setEnabled(false);
     delete.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        final String test = (String) userco.getSelectedItem();
-        ctx.users.drop(test);
-        userco.removeItem(test);
-        ((TableModel) table.getModel()).setData();
-        if(usernames.length == 0) delete.setEnabled(false);
+        //final String test = (String) userco.getSelectedItem();
+        // [AW] cs.execute(new DropUser())....
+        //userco.removeItem(test);
+        //((TableModel) table.getModel()).setData();
+        //if(usernames.size() == 0) delete.setEnabled(false);
       }
     });
 
@@ -262,12 +265,22 @@ public final class DialogServer extends Dialog {
     String info = out.toString();
     info = info.substring(info.lastIndexOf("-") + 3);
     final Scanner s = new Scanner(info);
+    int i = 0;
+    data = new ArrayList<Object[]>();
+    usernames = new Vector<String>();
     while(s.hasNextLine()) {
       final String line = s.nextLine();
       if(line.isEmpty()) break;
-      for(int i = 0; i < line.length(); i++) {
-        //System.out.println(line.charAt(i));
-      }
+      String username = line.substring(0, 10);
+      usernames.addElement(username);
+      Object[] user = new Object[5];
+      user[0] = username;
+      user[1] = line.substring(10, 16).contains("X");
+      user[2] = line.substring(16, 23).contains("X");;
+      user[3] = line.substring(23, 31).contains("X");;
+      user[4] = line.substring(31, 38).contains("X");;
+      data.add(user);
+      i++;
     }
   }
 
