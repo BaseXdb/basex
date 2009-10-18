@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -78,8 +77,6 @@ public final class DialogServer extends Dialog {
   final Context ctx = gui.context;
   /** ClientSession. */
   ClientSession cs;
-  /** Vector for combobox. */
-  Vector<String> usernames = new Vector<String>();
 
   /** Key listener. */
   final KeyAdapter keys = new KeyAdapter() {
@@ -135,10 +132,6 @@ public final class DialogServer extends Dialog {
     tabs.add(SERVER, p1);
     tabs.add(USERS, p2);
 
-    // Start-stop server panel
-    final BaseXBack p11 = new BaseXBack();
-    p11.setLayout(new TableLayout(1, 2, 6, 0));
-
     start = new BaseXButton(START, null, this);
     stop = new BaseXButton(STOP, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
@@ -147,9 +140,9 @@ public final class DialogServer extends Dialog {
     port.addKeyListener(keys);
     change = new BaseXButton(CHANGE, null, this);
 
-    // test if server is running
-    try { createSession(); } catch(final IOException e1) { }
-
+    // Start-stop server panel
+    final BaseXBack p11 = new BaseXBack();
+    p11.setLayout(new TableLayout(1, 2, 6, 0));
     p11.add(start);
     p11.add(stop);
 
@@ -169,6 +162,40 @@ public final class DialogServer extends Dialog {
     p1.add(p11);
     p1.add(p12);
     set(tabs, BorderLayout.CENTER);
+    
+    user = new BaseXTextField("", null, this);
+    user.addKeyListener(keys);
+    create = new BaseXButton(CREATE, null, this);
+    pass = new JPasswordField(10);
+    pass.addKeyListener(keys);
+    userco = new BaseXCombo(new String[] {}, null, this);
+    delete = new BaseXButton(DROP, null, this);
+    table = new JTable(new TableModel());
+    table.setPreferredScrollableViewportSize(new Dimension(420, 100));
+
+    p2.add(new BaseXLabel(CREATEUSER, false, true));
+    final BaseXBack p21 = new BaseXBack();
+    p21.setLayout(new TableLayout(1, 5, 6, 0));
+    p21.add(new BaseXLabel(SERVERUSER));
+    BaseXLayout.setWidth(user, 100);
+    p21.add(user);
+    p21.add(new BaseXLabel(SERVERPW));
+    p21.add(pass);
+    p21.add(create);
+    p2.add(p21);
+    p2.add(new BaseXLabel(DROPUSER, false, true));
+    final BaseXBack p22 = new BaseXBack();
+    p22.setLayout(new TableLayout(1, 2, 6, 0));
+    p22.add(userco);
+    p22.add(delete);
+    p2.add(p22);
+    p2.add(Box.createVerticalStrut(8));
+    p2.add(new BaseXLabel(PERMISSIONS + COL, false, true));
+    p2.add(new JScrollPane(table));
+
+    // test if server is running
+    try { createSession(); } catch(final IOException e1) { }
+
     action(null);
     finish(null);
   }
@@ -179,16 +206,16 @@ public final class DialogServer extends Dialog {
    */
   private void createSession() throws IOException {
     cs = new ClientSession(ctx, ADMIN, ADMIN);
-    fillLists();
-    fillUserTab();
+    setData();
   }
 
   @Override
   public void action(final String cmd) {
     if(START.equals(cmd)) {
       try {
-        // [AW] Prop,work + "bin" will not always work.
-        // hmm.. possible solution: add HOME key to .basex config file
+        // [AW] Prop,work + "bin" will not always work. hmm..
+        // - possible solution: add HOME key to .basex config file
+        // - next: other distributions (jar file..) should be supported as well
         final ProcessBuilder pb = new ProcessBuilder("java", "-cp", Prop.WORK
             + "bin", org.basex.BaseXServer.class.getName());
         pb.start();
@@ -205,7 +232,6 @@ public final class DialogServer extends Dialog {
       } catch(final IOException ex) {
         // [AW] to be visualized somewhere...
         Main.debug(ex);
-        ex.printStackTrace();
       }
     } else if(CHANGE.equals(cmd)) {
       ctx.prop.set(Prop.HOST, host.getText());
@@ -213,6 +239,7 @@ public final class DialogServer extends Dialog {
         final int p = Integer.parseInt(port.getText());
         ctx.prop.set(Prop.PORT, p);
       } catch(final NumberFormatException n) {
+        // [CG] can be ignored if input is verified before being set
         port.setText(Integer.toString(ctx.prop.num(Prop.PORT)));
       }
     } else if(CREATE.equals(cmd)) {
@@ -222,21 +249,19 @@ public final class DialogServer extends Dialog {
         cs.execute(new CreateUser(u, p));
         user.setText("");
         pass.setText("");
-        ((TableModel) table.getModel()).setData();
-        userco.addItem(u);
-        delete.setEnabled(true);
-      } catch(final IOException e1) {
-        e1.printStackTrace();
+        setData();
+      } catch(final IOException ex) {
+        // [AW] to be visualized somewhere...
+        Main.debug(ex);
       }
     } else if(DROP.equals(cmd)) {
       final String test = (String) userco.getSelectedItem();
       try {
         cs.execute(new DropUser(test));
-        userco.removeItem(test);
-        ((TableModel) table.getModel()).setData();
-        if(usernames.size() == 0) delete.setEnabled(false);
-      } catch(final IOException e1) {
-        e1.printStackTrace();
+        setData();
+      } catch(final IOException ex) {
+        // [AW] to be visualized somewhere...
+        Main.debug(ex);
       }
     }
 
@@ -249,51 +274,19 @@ public final class DialogServer extends Dialog {
     port.setEnabled(run);
     change.setEnabled(run && port.getText().matches("^[0-9]+$"));
     tabs.setEnabledAt(1, !run);
-    if(user != null) {
-      create.setEnabled(user.getText().matches("^[A-Za-z0-9_.-]+$") &&
-          new String(pass.getPassword()).matches("^[A-Za-z0-9_.-]+$"));
-      delete.setEnabled(usernames.size() != 0);
-    }
+    create.setEnabled(user.getText().matches("^[A-Za-z0-9_.-]+$") &&
+        new String(pass.getPassword()).matches("^[A-Za-z0-9_.-]+$"));
+    delete.setEnabled(data.size() != 0);
   }
-  
+
   /**
-   * Fills the user tab with components.
+   * Sets new data.
    */
-  void fillUserTab() {
-    p2.add(new BaseXLabel(CREATEUSER, false, true));
-
-    final BaseXBack p21 = new BaseXBack();
-    p21.setLayout(new TableLayout(1, 5, 6, 0));
-
-    p21.add(new BaseXLabel(SERVERUSER));
-    user = new BaseXTextField("", null, this);
-    BaseXLayout.setWidth(user, 100);
-    user.addKeyListener(keys);
-    p21.add(user);
-    p21.add(new BaseXLabel(SERVERPW));
-    pass = new JPasswordField(10);
-    pass.addKeyListener(keys);
-    p21.add(pass);
-    create = new BaseXButton(CREATE, null, this);
-    p21.add(create);
-    p2.add(p21);
-
-    p2.add(new BaseXLabel(DROPUSER, false, true));
-
-    final BaseXBack p22 = new BaseXBack();
-    p22.setLayout(new TableLayout(1, 2, 6, 0));
-    userco = new BaseXCombo(usernames, null, this);
-    p22.add(userco);
-    delete = new BaseXButton(DROP, null, this);
-    p22.add(delete);
-    p2.add(p22);
-
-    p2.add(Box.createVerticalStrut(8));
-    p2.add(new BaseXLabel(PERMISSIONS + COL, false, true));
-
-    table = new JTable(new TableModel());
-    table.setPreferredScrollableViewportSize(new Dimension(420, 100));
-    p2.add(new JScrollPane(table));
+  void setData() {
+    fillLists();
+    ((TableModel) table.getModel()).fireTableDataChanged();
+    userco.removeAllItems();
+    for(final Object[] o : data) userco.addItem(o[0]);
   }
 
   /**
@@ -304,9 +297,7 @@ public final class DialogServer extends Dialog {
       final CachedOutput out = new CachedOutput();
       cs.execute(new Show("Users"), out);
       data = new ArrayList<Object[]>();
-      usernames = new Vector<String>();
       for(final Object[] o : table(out.toString())) {
-        usernames.addElement(o[0].toString());
         for(int i = 1; i < o.length; i++) o[i] = o[i].toString().length() != 0;
         data.add(o);
       }
@@ -322,8 +313,10 @@ public final class DialogServer extends Dialog {
    * @return list
    */
   private ArrayList<Object[]> table(final String info) {
+    // not optimized yet
     final ArrayList<Object[]> list = new ArrayList<Object[]>();
     final Scanner s = new Scanner(info);
+    // header is used to calculate column widths
     String line = s.nextLine();
     final IntList il = new IntList();
     int i = 0;
@@ -345,7 +338,7 @@ public final class DialogServer extends Dialog {
   }
 
   /**
-   * Class of own table model.
+   * Dialog specific table model.
    *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
@@ -368,9 +361,8 @@ public final class DialogServer extends Dialog {
       return data.get(row)[col];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class getColumnClass(final int c) {
+    public Class<?> getColumnClass(final int c) {
       return getValueAt(0, c).getClass();
     }
 
@@ -383,41 +375,19 @@ public final class DialogServer extends Dialog {
     public void setValueAt(final Object value, final int row, final int col) {
       String right = "";
       if(col == 1) right = CmdPerm.READ.toString();
-      if(col == 2) right = CmdPerm.WRITE.toString();
-      if(col == 3) right = CmdPerm.CREATE.toString();
-      if(col == 4) right = CmdPerm.ADMIN.toString();
+      else if(col == 2) right = CmdPerm.WRITE.toString();
+      else if(col == 3) right = CmdPerm.CREATE.toString();
+      else if(col == 4) right = CmdPerm.ADMIN.toString();
       final String uname = (String) data.get(row)[0];
-      if(value.equals(true)) {
-        try {
-          cs.execute(new Grant(right, uname));
-        } catch(final IOException e) {
-          e.printStackTrace();
-        }
-      } else {
-        try {
-          cs.execute(new Revoke(right, uname));
-        } catch(final IOException e) {
-          e.printStackTrace();
-        }
+      try {
+        cs.execute(value.equals(true) ? new Grant(right, uname) :
+          new Revoke(right, uname));
+        data.get(row)[col] = value;
+        fireTableCellUpdated(row, col);
+      } catch(final IOException ex) {
+        // [AW] to be visualized somewhere...
+        ex.printStackTrace();
       }
-      data.get(row)[col] = value;
-      fireTableCellUpdated(row, col);
-    }
-
-    /**
-     * Sets new data.
-     */
-    public void setData() {
-      fillLists();
-      fireTableDataChanged();
-    }
-
-    /**
-     * Returns the data after updating.
-     * @return object array
-     */
-    public ArrayList<Object[]> getData() {
-      return data;
     }
   }
 }
