@@ -35,7 +35,7 @@ final class BXQStaticContext implements XQStaticContext {
   /** Language mode. */
   boolean xqueryx = true;
   /** Timeout. */
-  int timeout = 0;
+  int timeout;
 
   public void declareNamespace(final String prefix, final String uri)
       throws XQException {

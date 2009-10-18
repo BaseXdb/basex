@@ -109,7 +109,7 @@ public class XMLResourceTest extends TestCase {
   @Test
   public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
-      int count = 0;
+      int count;
       public void startElement(final String u, final String ln, final String qn,
           final Attributes a) {
         count++;
