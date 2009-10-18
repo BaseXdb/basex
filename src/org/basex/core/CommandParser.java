@@ -459,9 +459,6 @@ public final class CommandParser extends InputParser {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-// [CG] rewrote this due to compiler bug out of eclipse
-//      if(e instanceof Cmd) {
-//        final Cmd c = (Cmd) e;
       if(Cmd.class.isInstance(e)) {
         final Cmd c = Cmd.class.cast(e);
         if(c.help() || c.hidden() || c.internal()) continue;

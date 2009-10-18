@@ -611,7 +611,7 @@ public final class TreeView extends View {
     }
 
     if(showChildren && size > 1 && level + 1 < rectsPerLevel.size()) {
-      // TODO
+      // [WM]...
       //
       // final int l = level + 1;
       // final ArrayList<TreeRect> rList = rectsPerLevel.get(l);

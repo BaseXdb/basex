@@ -73,7 +73,7 @@ public final class ClientSession extends Session {
     in = socket.getInputStream();
     out = new DataOutputStream(socket.getOutputStream());
 
-    // [CG] Server: handle server login feedback
+    // send user name and password
     out.writeUTF(user);
     out.writeUTF(pw);
     if(in.read() != 0) throw new LoginException();

@@ -619,7 +619,7 @@ public interface Text {
   // USER COMMANDS ============================================================
 
   /** User name. */
-  String[] USERS = { "Username",  "Read", "Write", "Create", "Admin" };
+  String[] USERHEAD = { "Username",  "Read", "Write", "Create", "Admin" };
   /** Admin user. */
   String ADMIN = "admin";
   

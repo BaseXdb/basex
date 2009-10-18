@@ -946,21 +946,17 @@ public enum GUICommands implements GUICommand {
   public static IO save(final GUI gui, final boolean single) {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
-        gui.prop.get(GUIProp.CREATEPATH), gui);
+        gui.context.data().meta.file.path(), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
-    //final boolean single = gui.context.data().doc().length == 1;
     final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
       BaseXFileChooser.Mode.DSAVE);
-    if(file == null) return null;
-
-    if(single) file.suffix(IO.XMLSUFFIX);
-    gui.prop.set(GUIProp.CREATEPATH, file.path());
+    if(file != null && single) file.suffix(IO.XMLSUFFIX);
     return file;
   }
 
   /**
-   * Selects or deselects the specified component.
+   * Selects or de-selects the specified component.
    * @param but component
    * @param select selection flag
    */

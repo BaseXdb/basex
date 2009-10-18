@@ -44,7 +44,7 @@ public final class BaseXClient extends BaseX {
   protected Session session() throws IOException {
     if(session == null) {
       String pw = null;
-      // [CG] experimental user/password input
+      // user/password input
       while(user == null || user.length() == 0) {
         Main.out(SERVERUSER);
         user = System.console().readLine();

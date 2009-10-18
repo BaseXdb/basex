@@ -173,8 +173,8 @@ public final class Users {
       final int[] ind = new int[sz];
       for(final User u : users) ind[0] = Math.max(ind[0], u.name.length());
       for(int u = 0; u < sz; u++) {
-        ind[u] = Math.max(ind[u], USERS[u].length()) + 2;
-        tb.add(ind[u], USERS[u]);
+        ind[u] = Math.max(ind[u], USERHEAD[u].length()) + 2;
+        tb.add(ind[u], USERHEAD[u]);
       }
       tb.add(NL);
       for(int u = 0; u < sz; u++) {

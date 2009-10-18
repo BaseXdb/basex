@@ -104,7 +104,7 @@ public abstract class Dialog extends JDialog {
   /**
    * Called when GUI design has changed.
    */
-  public void refresh() { /* */}
+  public void refresh() { /* */ }
 
   /**
    * Cancels the dialog; can be overwritten.
