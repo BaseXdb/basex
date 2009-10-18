@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import org.basex.core.Main;
-import org.basex.util.Array;
 
 /**
  * Match full-text container,
@@ -42,9 +41,8 @@ public final class FTMatch implements Iterable<FTStringMatch> {
    * @return self reference
    */
   public FTMatch add(final FTStringMatch m) {
-    if(size == match.length) {
-      match = size == 0 ? new FTStringMatch[1] : Array.extend(match);
-    }
+    if(size == match.length) match = size == 0 ?
+        new FTStringMatch[1] : Arrays.copyOf(match, size << 1);
     match[size++] = m;
     return this;
   }

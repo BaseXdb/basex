@@ -158,17 +158,16 @@ public final class Var extends Expr {
   }
 
   /**
-   * Copies the variables.
+   * Returns a copy of the variable.
    * @return copied variable
    */
   public Var copy() {
     final Var v = new Var(name, type, global);
-    v.ret = ret;
     v.item = item;
     v.expr = expr;
+    v.ret = ret;
     return v;
   }
-
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {

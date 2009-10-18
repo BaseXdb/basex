@@ -44,7 +44,7 @@ public class IntList {
    * @param v value to be added
    */
   public final void add(final int v) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = v;
   }
 
@@ -71,7 +71,7 @@ public class IntList {
    * @param p position
    */
   public final void set(final int v, final int p) {
-    while(p >= list.length) list = Array.extend(list);
+    if(p >= list.length) list = Arrays.copyOf(list, p + 1);
     list[p] = v;
     size = Math.max(size, p + 1);
   }
@@ -91,7 +91,7 @@ public class IntList {
    * @return int array
    */
   public final int[] finish() {
-    return size == list.length ? list : Array.finish(list, size);
+    return size == list.length ? list : Arrays.copyOf(list, size);
   }
 
   /**

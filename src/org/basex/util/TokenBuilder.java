@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import java.util.Arrays;
+
 /**
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
@@ -120,7 +122,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte b) {
-    if(size == chars.length) chars = Array.extend(chars);
+    if(size == chars.length) chars = Arrays.copyOf(chars, size << 1);
     chars[size++] = b;
     return this;
   }
@@ -178,7 +180,7 @@ public final class TokenBuilder {
     if(size + bs > chars.length) {
       int ns = chars.length << 1;
       while(size + bs > ns) ns <<= 1;
-      chars = Array.resize(chars, size, size + ns);
+      chars = Arrays.copyOf(chars, size + ns);
     }
     System.arraycopy(b, s, chars, size, bs);
     size += bs;
@@ -244,12 +246,11 @@ public final class TokenBuilder {
   }
 
   /**
-   * Returns the token as a byte array. Unused array bytes are chopped
-   * before the token is returned.
+   * Returns the token as byte array.
    * @return character array
    */
   public byte[] finish() {
-    return Array.finish(chars, size);
+    return Arrays.copyOf(chars, size);
   }
 
   @Override

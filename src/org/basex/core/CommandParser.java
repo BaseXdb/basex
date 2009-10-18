@@ -7,6 +7,7 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.CreateUser;
@@ -24,6 +25,7 @@ import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.Grant;
 import org.basex.core.proc.InfoUsers;
 import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.Help;
@@ -37,6 +39,7 @@ import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
+import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
@@ -235,7 +238,7 @@ public final class CommandParser extends InputParser {
       case INTSTOP:
         return new IntStop();
 
-      // server commands
+      // admin commands
       case KILL:
         return new Kill();
       case SHOW:
@@ -248,6 +251,20 @@ public final class CommandParser extends InputParser {
           default:
         }
         break;
+      case GRANT:
+        CmdPerm perm = consume(CmdPerm.class, cmd);
+        if(perm == null) help(null, cmd);
+        String db = key(ON, null) ? name(cmd) : null;
+        key(TO, cmd);
+        return db == null ? new Grant(perm, name(cmd)) :
+          new Grant(perm, name(cmd), db);
+      case REVOKE:
+        perm = consume(CmdPerm.class, cmd);
+        if(perm == null) help(null, cmd);
+        db = key(ON, null) ? name(cmd) : null;
+        key(FROM, cmd);
+        return db == null ? new Revoke(perm, name(cmd)) :
+          new Revoke(perm, name(cmd), db);
 
       default:
     }
@@ -316,8 +333,7 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private String target(final String pre, final Cmd cmd) throws QueryException {
-    consumeWS();
-    if(!consume(pre) && !consume(pre.toLowerCase())) help(null, cmd);
+    key(pre, cmd);
     return xquery(cmd);
   }
 
@@ -328,9 +344,22 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private int pos(final Cmd cmd) throws QueryException {
+    return key(AT, null) ? Integer.parseInt(number(cmd)) : 0;
+  }
+
+  /**
+   * Parses and returns the specified keyword.
+   * @param key token to be parsed
+   * @param cmd referring command; if specified, the result must not be empty.
+   * @return position
+   * @throws QueryException query exception
+   */
+  private boolean key(final String key, final Cmd cmd) throws QueryException {
     consumeWS();
-    return consume(AT) || consume(AT.toLowerCase()) ?
-        Integer.parseInt(number(cmd)) : 0;
+    final boolean ok = consume(key) || consume(key.toLowerCase());
+    if(!ok && cmd != null) help(null, cmd);
+    consumeWS();
+    return ok;
   }
 
   /**

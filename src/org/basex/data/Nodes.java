@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -36,7 +35,7 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final Data d) {
-    this(Array.NOINTS, d);
+    this(new int[] {}, d);
   }
 
   /**
@@ -45,7 +44,7 @@ public final class Nodes implements Result {
    * @param ft ft position data
    */
   public Nodes(final Data d, final FTPosData ft) {
-    this(Array.NOINTS, d, ft);
+    this(new int[] {}, d, ft);
   }
 
   /**
@@ -141,7 +140,7 @@ public final class Nodes implements Result {
     int i = Integer.MIN_VALUE;
     for(final int n : nodes) {
       if(i > n) {
-        sorted = Array.finish(nodes, size);
+        sorted = Arrays.copyOf(nodes, size);
         Arrays.sort(sorted);
         return;
       }
@@ -151,7 +150,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * The specified pre value is added to or removed from the node array.
+   * Adds or removes the specified pre node.
    * @param p pre value
    */
   public void toggle(final int p) {
@@ -160,7 +159,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * The specified nodes are merged.
+   * Mergees the specified array with the existing pre nodes.
    * @param p pre value
    */
   public void union(final int[] p) {
@@ -168,7 +167,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Merges two integer arrays via union.
+   * Merges two sorted integer arrays via union.
    * Note that the input arrays must be sorted.
    * @param ai first set
    * @param bi second set

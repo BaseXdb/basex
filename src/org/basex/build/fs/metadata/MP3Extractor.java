@@ -8,11 +8,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.basex.build.Builder;
 import org.basex.build.fs.FSText;
 import org.basex.core.Main;
-import org.basex.util.Array;
 
 /**
  * Extractor for MP3s and ID3v2 meta data.
@@ -151,7 +151,7 @@ public final class MP3Extractor extends AbstractExtractor {
       boolean valid = true;
       for(int i = 0; i < fsize - 1; i++) {
         b = read();
-        if(i == content.length) content = Array.extend(content);
+        if(i == content.length) content = Arrays.copyOf(content, i << 1);
         content[i] = (byte) b;
         valid &= b != 0;
       }
@@ -202,13 +202,13 @@ public final class MP3Extractor extends AbstractExtractor {
     // check if there are still zero bytes
     int j = i;
     while(--j >= 0 && content[j] != 0);
-    if(j == -1) return Array.finish(content, i + 1);
+    if(j == -1) return Arrays.copyOf(content, i + 1);
 
     // return null if zero bytes have been found
     if(!conv) return null;
 
     for(int k = i; k > j; k--) if(content[k] == 0) content[k] = ' ';
-    return Array.create(content, j + 1, i - j);
+    return Arrays.copyOfRange(content, j + 1, i + 1);
   }
 
   @Override
@@ -390,15 +390,14 @@ public final class MP3Extractor extends AbstractExtractor {
   /**
    * Returns an ID3V1 tag.
    * @param input input byte array
-   * @param offset offset to look at
+   * @param off offset to look at
    * @param max maximum length
    * @return resulting tag
    */
-  private byte[] getTag(final byte[] input, final int offset, final int max) {
+  private byte[] getTag(final byte[] input, final int off, final int max) {
     int i = -1;
-    while(++i < max && input[offset + i] != 0);
-    while(--i >= 0 && input[offset + i] == 0x20) i--;
-    if(i < 0) return null;
-    return Array.create(input, offset, i + 1);
+    while(++i < max && input[off + i] != 0);
+    while(--i >= 0 && input[off + i] == 0x20) i--;
+    return i < 0 ? null : Arrays.copyOfRange(input, off, off + i + 1);
   }
 }

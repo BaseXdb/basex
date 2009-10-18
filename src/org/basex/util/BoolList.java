@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This is a simple container for native boolean values.
  *
@@ -32,7 +34,7 @@ public final class BoolList {
    * @param v value to be added
    */
   public void add(final boolean v) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = v;
   }
 
@@ -59,7 +61,7 @@ public final class BoolList {
    * @param p position
    */
   public void set(final boolean v, final int p) {
-    while(p >= list.length) list = Array.extend(list);
+    if(p >= list.length) list = Arrays.copyOf(list, p + 1);
     list[p] = v;
     size = Math.max(size, p + 1);
   }
@@ -69,6 +71,6 @@ public final class BoolList {
    * @return int array
    */
   public boolean[] finish() {
-    return size == list.length ? list : Array.finish(list, size);
+    return size == list.length ? list : Arrays.copyOf(list, size);
   }
 }

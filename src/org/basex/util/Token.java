@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 import org.basex.core.Main;
 
 /**
@@ -706,7 +708,7 @@ public final class Token {
    */
   public static byte[] substring(final byte[] tok, final int s, final int e) {
     if(s == 0 && e == tok.length) return tok;
-    return s >= e ? EMPTY : Array.create(tok, s, e - s);
+    return s >= e ? EMPTY : Arrays.copyOfRange(tok, s, e);
   }
 
   /**
@@ -733,7 +735,7 @@ public final class Token {
       }
     }
     if(sb.size() != 0) split[s++] = sb.finish();
-    return Array.finish(split, s);
+    return Arrays.copyOf(split, s);
   }
 
   /**
@@ -772,7 +774,7 @@ public final class Token {
     while(++s < e) if(t[s] > ' ' || t[s] < 0) break;
     while(--e > s) if(t[e] > ' ' || t[e] < 0) break;
     if(++e == t.length && s == 0) return t;
-    return s == e ? EMPTY : Array.create(t, s, e - s);
+    return s == e ? EMPTY : Arrays.copyOfRange(t, s, e);
   }
 
   /**
@@ -783,7 +785,7 @@ public final class Token {
    */
   public static byte[] chop(final byte[] t, final int l) {
     if(t.length <= l) return t;
-    final byte[] tt = Array.finish(t, l);
+    final byte[] tt = Arrays.copyOf(t, l);
     tt[l - 3] = '.';
     tt[l - 2] = '.';
     tt[l - 1] = '.';
@@ -801,7 +803,7 @@ public final class Token {
     final byte[] tmp = new byte[s];
     int l = 0;
     for(final byte[] tt : t) {
-      Array.copy(tt, tmp, l);
+      System.arraycopy(tt, 0, tmp, l, tt.length);
       l += tt.length;
     }
     return tmp;
@@ -836,7 +838,7 @@ public final class Token {
       ws1 = ws2;
     }
     if(c > 0 && ws(tmp[c - 1])) c--;
-    return c == l ? tmp : Array.finish(tmp, c);
+    return c == l ? tmp : Arrays.copyOf(tmp, c);
   }
 
   /**

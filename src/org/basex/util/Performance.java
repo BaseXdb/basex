@@ -126,7 +126,7 @@ public final class Performance {
   }
 
   /**
-   * Perform some garbage collection.
+   * Performs some garbage collection.
    * GC behavior in Java is a pretty complex task. Still, garbage collection
    * can be forced by calling it several times.
    * @param n number of times to execute garbage collection

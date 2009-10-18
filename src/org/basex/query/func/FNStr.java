@@ -2,6 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import java.util.Arrays;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -11,7 +14,6 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -215,7 +217,7 @@ final class FNStr extends Fun {
       if(p == e) ee = l;
     }
     if(p == e) ee = l;
-    return Str.get(Array.create(str, ss, ee - ss));
+    return Str.get(Arrays.copyOfRange(str, ss, ee));
   }
 
   /**

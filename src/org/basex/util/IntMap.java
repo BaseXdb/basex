@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This is a simple hash map, extending the even simpler
  * {@link Set hash set}.
@@ -23,13 +25,13 @@ public final class IntMap extends Set {
   }
 
   /**
-   * Update the old value of the entry.
+   * Updates the value of the specified key.
    * @param key key
    * @param val value
    */
   public void set(final byte[] key, final int val) {
     final int i = id(key);
-    if(i != 0) values[Math.abs(i)] = val;
+    if(i != 0) values[i] = val;
   }
 
   /**
@@ -53,6 +55,6 @@ public final class IntMap extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    values = Array.extend(values);
+    values = Arrays.copyOf(values, size << 1);
   }
 }

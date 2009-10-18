@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.File;
 import java.io.IOException;
-import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -86,7 +85,6 @@ public final class DataInput extends BufferInput {
    * @throws IOException IO Exception
    */
   public int[] readNums(final int s) throws IOException {
-    if(s == 0) return Array.NOINTS;
     final int[] array = new int[s];
     for(int a = 0; a < s; a++) array[a] = readNum();
     return array;

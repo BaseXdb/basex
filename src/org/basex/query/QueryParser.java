@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -798,7 +800,7 @@ public class QueryParser extends InputParser {
         ctx.vars.add(var);
 
         if(fl == null) fl = new ForLet[1];
-        else fl = Array.resize(fl, fl.length, fl.length + 1);
+        else fl = Arrays.copyOf(fl, fl.length + 1);
         if(sc != null) {
           if(sc.name.eq(name) || at != null && sc.name.eq(at.name))
             error(VARDEFINED, sc);
@@ -2838,6 +2840,10 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     if(e == null) error(INCOMPLETE);
-    return Array.add(ar, e);
+    final int s = ar.length;
+    final Expr[] tmp = new Expr[s + 1];
+    System.arraycopy(ar, 0, tmp, 0, s);
+    tmp[s] = e;
+    return tmp;
   }
 }

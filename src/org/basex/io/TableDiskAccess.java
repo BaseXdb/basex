@@ -2,6 +2,8 @@ package org.basex.io;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.Array;
@@ -353,8 +355,9 @@ public final class TableDiskAccess extends TableAccess {
     if(pre == nextPre) newBlocks--;
 
     // resize the index
-    firstPres = Array.resize(firstPres, nrBlocks, nrBlocks + newBlocks);
-    blocks = Array.resize(blocks, nrBlocks, nrBlocks + newBlocks);
+    final int s = nrBlocks + newBlocks;
+    firstPres = Arrays.copyOf(firstPres, s);
+    blocks = Arrays.copyOf(blocks, s);
 
     Array.move(firstPres, index + 1, newBlocks, indexSize - index - 1);
     Array.move(blocks, index + 1, newBlocks, indexSize - index - 1);

@@ -34,7 +34,6 @@ import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
@@ -403,7 +402,7 @@ public final class PlotView extends View implements Runnable {
 
     final Nodes marked = gui.context.marked();
     if(marked.size() <= 0) return;
-    final int[] m = Array.finish(marked.nodes, marked.nodes.length);
+    final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
     int i = 0;
 
     // no child nodes of the marked context nodes are marked
@@ -522,7 +521,7 @@ public final class PlotView extends View implements Runnable {
     // draw axis and assignment for TEXT data
     if(type == Kind.TEXT) {
       final int nrCats = axis.nrCats;
-      final double[] coSorted = Array.finish(axis.co, axis.co.length);
+      final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
       // draw min / max caption
       drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.firstCat) : "", 0);
       drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.lastCat) : "", 1);

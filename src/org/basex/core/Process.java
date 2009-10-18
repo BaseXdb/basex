@@ -270,7 +270,7 @@ public abstract class Process extends Progress {
    * @param <E> token type
    * @return option
    */
-  protected <E extends Enum<E>> E getOption(final Class<E> typ) {
+  public <E extends Enum<E>> E getOption(final Class<E> typ) {
     try {
       return Enum.valueOf(typ, args[0].toUpperCase());
     } catch(final Exception ex) {

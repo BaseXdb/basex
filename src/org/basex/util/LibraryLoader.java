@@ -20,7 +20,7 @@ public final class LibraryLoader {
   private static boolean jsdbfsLoaded;
 
   /**
-   * Load a native library from java.library.path.
+   * Loads a native library from java.library.path.
    * @param libName name of the library to be loaded.
    */
   private static void loadLibrary(final String libName) {
@@ -45,7 +45,7 @@ public final class LibraryLoader {
   }
 
   /**
-   * Load native library if not already present.
+   * Loads native library if not already present.
    * @param libName name of the library to be loaded.
    */
   public static void load(final String libName) {

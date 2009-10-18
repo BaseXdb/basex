@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -37,7 +38,6 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Variables;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -444,7 +444,7 @@ public final class QueryContext extends Progress {
    * @param node node to be added
    */
   public void addDoc(final DBNode node) {
-    if(docs == doc.length) doc = Array.extend(doc);
+    if(docs == doc.length) doc = Arrays.copyOf(doc, docs << 1);
     doc[docs++] = node;
   }
 
@@ -514,8 +514,8 @@ public final class QueryContext extends Progress {
    */
   public void addColl(final NodIter ni, final byte[] name) {
     if(colls == collect.length) {
-      collect = Array.extend(collect);
-      collName = Array.extend(collName);
+      collect = Arrays.copyOf(collect, colls << 1);
+      collName = Arrays.copyOf(collName, colls << 1);
     }
     collect[colls] = ni;
     collName[colls++] = name;

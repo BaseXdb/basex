@@ -10,8 +10,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.Arrays;
 import java.util.zip.ZipInputStream;
-import org.basex.util.Array;
 
 /**
  * This class serves as a buffered wrapper for input streams.
@@ -208,7 +208,7 @@ public class BufferInput {
       CACHE[p++] = ch;
       try {
         final CharBuffer cb = csd.decode(
-            ByteBuffer.wrap(Array.finish(CACHE, p)));
+            ByteBuffer.wrap(Arrays.copyOf(CACHE, p)));
         int i = 0;
         for(int c = 0; c < cb.limit(); c++) i |= cb.get(c) << (c << 3);
         return i;

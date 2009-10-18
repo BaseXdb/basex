@@ -1,7 +1,5 @@
 package org.basex.core.proc;
 
-import org.basex.core.Process;
-import org.basex.core.User;
 import org.basex.io.PrintOutput;
 import org.basex.server.Sessions;
 
@@ -11,12 +9,12 @@ import org.basex.server.Sessions;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Kill extends Process {
+public final class Kill extends AAdmin {
   /**
    * Default constructor.
    */
   public Kill() {
-    super(STANDARD | User.ADMIN);
+    super();
   }
 
   @Override

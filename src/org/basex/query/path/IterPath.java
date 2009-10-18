@@ -8,7 +8,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.util.Array;
 
 /**
  * Iterative path expression for location paths which return sorted and
@@ -40,11 +39,13 @@ public final class IterPath extends AxisPath {
       @Override
       public Nod next() throws QueryException {
         if(iter == null) {
-          final int o = root != null ? 1 : 0;
-          // copy expressions to be iterated
-          expr = new Expr[step.length + o];
-          expr[0] = root;
-          Array.copy(step, expr, o);
+          expr = step;
+          if(root != null) {
+            // copy expressions to be iterated
+            expr = new Expr[step.length + 1];
+            expr[0] = root;
+            System.arraycopy(step, 0, expr, 1, step.length);
+          }
           // create iterator array
           iter = new Iter[expr.length];
           iter[0] = ctx.iter(expr[0]);

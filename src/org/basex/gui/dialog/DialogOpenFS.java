@@ -171,9 +171,8 @@ public final class DialogOpenFS extends Dialog {
           final MetaData meta = new MetaData(db, in, ctx.prop);
           detail.setText(InfoDB.db(meta, true, true).finish());
           if (WTHROUGH.equals(cmd) && wth.isSelected()) {
-            final boolean dec = Dialog.confirmWarning(
-                this, Main.info(WTHROUGHOK, meta.name, meta.backing)
-                , WTHROUGHTITLE);
+            final boolean dec = Dialog.confirm(this,
+                Main.info(WTHROUGHOK, meta.name, meta.backing));
             ctx.prop.set(Prop.WTHROUGH, dec);
             gprop.set(GUIProp.FSWTHROUGH, dec);
             wth.setSelected(dec);

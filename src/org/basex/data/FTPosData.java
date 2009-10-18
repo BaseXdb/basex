@@ -1,5 +1,6 @@
 package org.basex.data;
 
+import java.util.Arrays;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
@@ -38,7 +39,7 @@ public final class FTPosData {
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
-      if(size == pos.length) pos = Array.extend(pos);
+      if(size == pos.length) pos = Arrays.copyOf(pos, size << 1);
       Array.move(pos, c, 1, size++ - c);
 
       pos[c] = new FTPos(pre, ps.finish(), pi.finish());
@@ -68,8 +69,9 @@ public final class FTPosData {
   boolean same(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; i++) {
-      if(pos[i].pre != ft.pos[i].pre || !Array.eq(pos[i].pos, ft.pos[i].pos) ||
-          !Array.eq(pos[i].poi, ft.pos[i].poi)) return false;
+      if(pos[i].pre != ft.pos[i].pre ||
+          !Arrays.equals(pos[i].pos, ft.pos[i].pos) ||
+          !Arrays.equals(pos[i].poi, ft.pos[i].poi)) return false;
     }
     return true;
   }

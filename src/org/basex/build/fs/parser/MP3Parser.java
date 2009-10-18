@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
@@ -15,7 +16,6 @@ import org.basex.build.fs.util.Metadata.MetaType;
 import org.basex.build.fs.util.Metadata.MimeType;
 import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.core.Main;
-import org.basex.util.Array;
 import org.basex.util.Token;
 import static org.basex.util.Token.*;
 
@@ -616,18 +616,13 @@ public final class MP3Parser extends AbstractParser {
   byte[] readTrack(final int s) throws IOException {
     final byte[] value = readText(s);
     final int size = value.length;
-    if(size == 0) return EMPTY;
     int i = 0;
-    while(i < size && (value[i] < '1' || value[i] > '9')) {
-      value[i++] = 0;
-    }
-    if(i == size) return EMPTY;
+    while(i < size && (value[i] < '1' || value[i] > '9')) value[i++] = 0;
+
     final int start = i; // first byte of the number
-    while(i < size && value[i] >= '0' && value[i] <= '9')
-      i++;
-    final int len = i - start; // number of bytes of the number
-    if(len == 0) return EMPTY;
-    return Array.create(value, start, len);
+    while(i < size && value[i] >= '0' && value[i] <= '9') i++;
+    // number of bytes of the number
+    return Arrays.copyOfRange(value, start, i);
   }
 
   /**

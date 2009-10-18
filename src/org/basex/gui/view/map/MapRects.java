@@ -3,7 +3,6 @@ package org.basex.gui.view.map;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.basex.core.Main;
-import org.basex.util.Array;
 
 /**
  * This class organizes all map rectangles in a simple list.
@@ -39,7 +38,7 @@ final class MapRects implements Iterable<MapRect> {
    * @param v value to be added
    */
   void add(final MapRect v) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = v;
   }
 
@@ -103,7 +102,7 @@ final class MapRects implements Iterable<MapRect> {
     int i = Integer.MIN_VALUE;
     for(final MapRect r : this) {
       if(i > r.pre) {
-        sorted = Array.finish(list, size);
+        sorted = Arrays.copyOf(list, size);
         Arrays.sort(sorted);
         return;
       }

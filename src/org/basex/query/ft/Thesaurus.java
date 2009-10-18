@@ -3,6 +3,8 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
@@ -12,7 +14,6 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
-import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -62,8 +63,9 @@ public final class Thesaurus {
      */
     void add(final ThesNode n, final byte[] r) {
       if(size == nodes.length) {
-        nodes = Array.extend(nodes);
-        rs = Array.extend(rs);
+        final int s = size << 1;
+        nodes = Arrays.copyOf(nodes, s);
+        rs = Arrays.copyOf(rs, s);
       }
       nodes[size] = n;
       rs[size++] = r;

@@ -1,8 +1,6 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
-import org.basex.core.Process;
-import org.basex.core.User;
 import org.basex.core.Commands.CmdShow;
 import org.basex.io.PrintOutput;
 
@@ -12,13 +10,13 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Show extends Process {
+public final class Show extends AAdmin {
   /**
    * Default constructor.
    * @param cmd show command
    */
   public Show(final Object cmd) {
-    super(User.ADMIN, cmd.toString());
+    super(cmd.toString());
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.Array;
@@ -92,8 +93,8 @@ public final class DataPool {
     if(d instanceof MemData) return;
 
     if(size == data.length) {
-      data = Array.extend(data);
-      pins = Array.extend(pins);
+      data = Arrays.copyOf(data, size << 1);
+      pins = Arrays.copyOf(pins, size << 1);
     }
     data[size] = d;
     pins[size] = 1;

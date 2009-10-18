@@ -169,8 +169,10 @@ public abstract class Builder extends Progress {
     if(level != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[level]));
 
     meta.lastid = meta.size;
+    // no nodes inserted: add default document node
     if(meta.size == 0) {
-      addDoc(utf8(token(db), Prop.ENCODING));
+      startDoc(token(db));
+      endDoc();
       setSize(0, meta.size);
     }
 

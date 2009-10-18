@@ -1,5 +1,6 @@
 package org.basex.data;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import org.basex.core.Main;
 import org.basex.util.Array;
@@ -68,9 +69,8 @@ public final class FTMatches implements Iterable<FTMatch> {
    * @param m match to be added
    */
   public void add(final FTMatch m) {
-    if(size == match.length) {
-      match = size == 0 ? new FTMatch[1] : Array.extend(match);
-    }
+    if(size == match.length) match = size == 0 ?
+        new FTMatch[1] : Arrays.copyOf(match, size << 1);
     match[size++] = m;
   }
 

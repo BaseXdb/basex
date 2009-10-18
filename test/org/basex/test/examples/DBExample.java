@@ -25,16 +25,14 @@ public final class DBExample {
     // Creates a standard output stream
     PrintOutput out = new PrintOutput(System.out);
 
-    out.println("\n=== Create a database from a file:");
+    out.println("\n=== Create a database from a file.");
 
-    // Sets an option: activates command info output
-    new Set("info", true).exec(context, out);
     // Creates a database from the specified file.
     new CreateDB("input.xml", "Example1").exec(context, out);
     // Closes the database.
     new Close().exec(context, out);
 
-    out.println("\n=== Create a database from an input string:");
+    out.println("\n=== Create a database from an input string.");
 
     // XML string.
     String xml = "<xml>This is a test</xml>";
@@ -52,7 +50,7 @@ public final class DBExample {
     // Closes the database.
     new Close().exec(context, out);
 
-    out.println("=== Drop databases:");
+    out.println("=== Drop databases.");
 
     // Removes the first database
     new DropDB("Example1").exec(context, out);
@@ -65,4 +63,3 @@ public final class DBExample {
     context.close();
   }
 }
-

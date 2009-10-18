@@ -1,9 +1,9 @@
 package org.basex.query.util;
 
+import java.util.Arrays;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.item.Item;
-import org.basex.util.Array;
 
 /**
  * Set for quickly indexing items.
@@ -70,8 +70,8 @@ public final class ItemSet {
       }
     }
     bucket = tmp;
-    next = Array.extend(next);
-    keys = Array.extend(keys);
-    values = Array.extend(values);
+    next = Arrays.copyOf(next, s);
+    keys = Arrays.copyOf(keys, s);
+    values = Arrays.copyOf(values, s);
   }
 }

@@ -30,10 +30,6 @@ public interface Text {
   /** List. */
   String LI = "- ";
   /** On flag. */
-  String ON = "ON";
-  /** Off flag. */
-  String OFF = "OFF";
-  /** On flag. */
   String TRUE = "TRUE";
   /** Off flag. */
   String FALSE = "FALSE";
@@ -179,6 +175,14 @@ public interface Text {
   String INTO = "INTO";
   /** Command help. */
   String AT = "AT";
+  /** Command help. */
+  String FROM = "FROM";
+  /** Command help. */
+  String TO = "TO";
+  /** Command help. */
+  String ON = "ON";
+  /** Command help. */
+  String OFF = "OFF";
 
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
@@ -360,7 +364,7 @@ public interface Text {
     Main.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL);
 
   /** Command help. */
-  String HELPSERVER0 = lang("ch_helpserver0");
+  String HELPADMIN0 = lang("ch_helpadmin0");
 
   /** Command help. */
   String KILL0 = "";
@@ -377,6 +381,24 @@ public interface Text {
   String SHOW2 = lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23");
+
+  /** Command help. */
+  String GRANT0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " +
+    TO + " [user]";
+  /** Command help. */
+  String GRANT1 = lang("ch_grant1");
+  /** Command help. */
+  String GRANT2 = lang("ch_grant2");
+
+  /** Command help. */
+  String REVOKE0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " +
+    FROM + " [user]";
+  /** Command help. */
+  String REVOKE1 = lang("ch_revoke1");
+  /** Command help. */
+  String REVOKE2 = lang("ch_revoke2");
 
   /** Command help. */
   String HELPGENERAL0 = lang("ch_helpgeneral0");
@@ -1128,8 +1150,6 @@ public interface Text {
   String WTHROUGHTT = lang("dfs_wrttt") + DOT;  
   /** Dialog question to activate write through. */
   String WTHROUGHOK = lang("dfs_wrtok");
-  /** Dialog question to activate write through. */
-  String WTHROUGHTITLE = lang("dfs_wrttitle");
   /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
   /** Import options. */

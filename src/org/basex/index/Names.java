@@ -2,6 +2,8 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -141,6 +143,6 @@ public final class Names extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    stat = Array.extend(stat);
+    stat = Arrays.copyOf(stat, size << 1);
   }
 }

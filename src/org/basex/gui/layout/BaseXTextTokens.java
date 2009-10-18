@@ -1,6 +1,6 @@
 package org.basex.gui.layout;
 
-import org.basex.util.Array;
+import java.util.Arrays;
 import org.basex.util.TokenBuilder;
 import static org.basex.util.Token.*;
 
@@ -154,7 +154,7 @@ public final class BaseXTextTokens {
    * @return character array
    */
   byte[] finish() {
-    return text.length == size ? text : Array.finish(text, size);
+    return text.length == size ? text : Arrays.copyOf(text, size);
   }
 
   // POSITION =================================================================

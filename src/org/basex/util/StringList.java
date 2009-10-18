@@ -22,7 +22,7 @@ public final class StringList implements Iterable<String> {
    * @param s string to be added
    */
   public void add(final String s) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = s;
   }
 
@@ -58,7 +58,7 @@ public final class StringList implements Iterable<String> {
    * @return array
    */
   public String[] finish() {
-    return Array.finish(list, size);
+    return Arrays.copyOf(list, size);
   }
 
   /**

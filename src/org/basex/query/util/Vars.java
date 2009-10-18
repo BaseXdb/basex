@@ -1,12 +1,12 @@
 package org.basex.query.util;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.core.Text;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.util.Array;
 
 /**
  * Variables.
@@ -25,7 +25,7 @@ public final class Vars extends ExprInfo {
    * @param v variable
    */
   void add(final Var v) {
-    if(size == vars.length) vars = Array.extend(vars);
+    if(size == vars.length) vars = Arrays.copyOf(vars, size << 1);
     vars[size++] = v;
   }
 

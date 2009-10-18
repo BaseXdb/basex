@@ -2,6 +2,7 @@ package org.basex.gui.view;
 
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXSplit;
+import org.basex.util.Array;
 
 /**
  * Layout class.
@@ -51,11 +52,7 @@ final class ViewAlignment implements ViewLayout {
    * @param o index
    */
   void remove(final int o) {
-    final int n = comp.length - 1;
-    final ViewLayout[] tmp = new ViewLayout[n];
-    System.arraycopy(comp, 0, tmp, 0, o);
-    System.arraycopy(comp, o + 1, tmp, o, n - o);
-    comp = tmp;
+    comp = Array.delete(comp, o);
   }
 
   /**

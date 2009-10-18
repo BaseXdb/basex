@@ -85,6 +85,22 @@ public final class Users {
   }
 
   /**
+   * Changes a permission for the specified user.
+   * @param usern user name
+   * @param set set/remove flag
+   * @param perm permission to be set
+   * @return success of operation
+   */
+  public boolean perm(final String usern, final boolean set, final int perm) {
+    final User user = get(usern);
+    if(user == null) return false;
+    if(set) user.perm |= perm;
+    else user.perm &= ~perm;
+    write();
+    return true;
+  }
+
+  /**
    * Reads users from disk.
    */
   private void read() {

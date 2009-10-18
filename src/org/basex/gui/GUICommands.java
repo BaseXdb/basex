@@ -734,8 +734,7 @@ public enum GUICommands implements GUICommand {
         if(new Close().execute(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
-        if(Dialog.confirmWarning(gui, NODEEPFSQUESTION, CREATEFSTITLE))
-          CREATEFS.execute(gui);
+        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
       }
     }
   },
@@ -749,8 +748,7 @@ public enum GUICommands implements GUICommand {
         if(new Close().execute(gui.context)) gui.notify.init();
         gui.execute(new Mount(dialog.db(), dialog.mp()));
       } else if(dialog.nodb()) {
-        if(Dialog.confirmWarning(gui, NODEEPFSQUESTION, CREATEFSTITLE))
-          CREATEFS.execute(gui);
+        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
       }
     }
     

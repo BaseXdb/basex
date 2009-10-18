@@ -1,10 +1,10 @@
 package org.basex.data;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.Array;
 
 /**
  * This class provides a single namespace node.
@@ -26,8 +26,8 @@ final class NSNode {
 
   /** Default constructor. */
   NSNode() {
-    key = Array.NOINTS;
-    val = Array.NOINTS;
+    key = new int[] {};
+    val = new int[] {};
     ch = new NSNode[0];
   }
 
@@ -66,8 +66,11 @@ final class NSNode {
    * @param v value
    */
   void add(final int k, final int v) {
-    key = Array.add(key, k);
-    val = Array.add(val, v);
+    final int s = key.length;
+    key = Arrays.copyOf(key, s + 1);
+    val = Arrays.copyOf(val, s + 1);
+    key[s] = k;
+    val[s] = v;
   }
 
   /**
@@ -75,7 +78,9 @@ final class NSNode {
    * @param c child
    */
   void add(final NSNode c) {
-    ch = Array.add(ch, c);
+    final int s = ch.length;
+    ch = Arrays.copyOf(ch, s + 1);
+    ch[s] = c;
   }
 
   /**

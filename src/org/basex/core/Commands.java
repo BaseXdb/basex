@@ -28,7 +28,7 @@ public interface Commands {
     // Update commands
     HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
     // Server commands
-    HELPSERVER(HLP), KILL(), SHOW(),
+    HELPADMIN(HLP), KILL(), SHOW(), GRANT(), REVOKE(),
     // General commands
     HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands
@@ -163,6 +163,8 @@ public interface Commands {
   enum CmdDrop { DATABASE, DB, INDEX, USER }
   /** Show command definitions. */
   enum CmdShow { DATABASES, SESSIONS, USERS }
+  /** Show command definitions. */
+  enum CmdPerm { READ, WRITE, CREATE, ADMIN }
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,

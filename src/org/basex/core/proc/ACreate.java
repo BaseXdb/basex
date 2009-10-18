@@ -47,7 +47,7 @@ abstract class ACreate extends Process {
    */
   protected final boolean build(final Parser p, final String db) {
     new Close().execute(context);
-
+    
     final boolean mem = db == null || prop.is(Prop.MAINMEM);
     if(!mem) {
       if(context.pinned(db) || p.prop.dbpath(db + ".tmp").exists())

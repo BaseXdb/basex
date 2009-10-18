@@ -18,6 +18,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.Arrays;
+
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -28,7 +30,6 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.Array;
 import org.basex.util.Undo;
 import static org.basex.util.Token.*;
 
@@ -167,8 +168,7 @@ public class BaseXText extends BaseXPanel {
       rend.setText(text);
       scroll.pos(0);
     }
-
-    if(undo != null) undo.store(t.length != ns ? Array.finish(t, ns) : t, 0);
+    if(undo != null) undo.store(t.length != ns ? Arrays.copyOf(t, ns) : t, 0);
     SwingUtilities.invokeLater(calc);
   }
 

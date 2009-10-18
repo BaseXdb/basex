@@ -58,7 +58,7 @@ public final class Semaphore {
   }
 
   /**
-   * Notify readers.
+   * Notifies the readers.
    */
   private synchronized void notifyReaders() {
     notifyAll();
@@ -67,7 +67,7 @@ public final class Semaphore {
   }
 
   /**
-   * Notify writers.
+   * Notifies the writers.
    */
   private synchronized void notifyWriter() {
     if(waitingWriters.size() > 0) {

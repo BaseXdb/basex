@@ -15,7 +15,7 @@ public final class IntStop extends Process {
    * Default constructor.
    */
   public IntStop() {
-    super(STANDARD | User.ADMIN);
+    super(User.ADMIN);
   }
   
   @Override

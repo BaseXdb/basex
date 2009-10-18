@@ -1,6 +1,5 @@
 package org.basex.core.proc;
 
-import org.basex.core.User;
 import org.basex.io.PrintOutput;
 
 /**
@@ -9,19 +8,19 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class CreateUser extends ACreate {
+public final class CreateUser extends AAdmin {
   /**
    * Default constructor.
    * @param name user name
    * @param pw password
    */
   public CreateUser(final String name, final String pw) {
-    super(STANDARD | User.ADMIN, name, pw);
+    super(name, pw);
   }
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    return context.users.create(args[0], args[1]) ||
-      error("User exists already.");
+    return context.users.create(args[0], args[1]) ?
+      info("User created.") : error("User exists already.");
   }
 }

@@ -1,10 +1,10 @@
 package org.basex.query.item;
 
+import java.util.Arrays;
 import org.basex.query.QueryException;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
-import org.basex.util.Array;
 
 /**
  * Node type.
@@ -118,7 +118,7 @@ public abstract class FNode extends Nod {
         if(node != null) {
           final NodeMore ch = node.child();
           if(ch.more()) {
-            if(l + 1 == it.length) it = Array.extend(it);
+            if(l + 1 == it.length) it = Arrays.copyOf(it, (l + 1) << 1);
             it[++l] = ch;
           } else {
             while(!it[l].more()) if(l-- <= 0) break;

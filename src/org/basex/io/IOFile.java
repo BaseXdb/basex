@@ -196,6 +196,7 @@ public final class IOFile extends IO {
   private static String file(final String url) {
     final String fn = url.startsWith(PREFILE) ?
         url.substring(PREFILE.length()) : url;
-    return fn.matches("/.:.*") ? fn.substring(1) : fn;
+    return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
+        fn.substring(1) : fn;
   }
 }

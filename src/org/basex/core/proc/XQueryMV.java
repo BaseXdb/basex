@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.build.mediovis.MAB2;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -12,7 +14,6 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Set;
@@ -240,7 +241,7 @@ public final class XQueryMV extends AQuery {
     @Override
     protected void rehash() {
       super.rehash();
-      values = Array.extend(values);
+      values = Arrays.copyOf(values, size << 1);
     }
   }
 

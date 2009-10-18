@@ -38,7 +38,7 @@ public final class TokenList implements Iterable<byte[]> {
    * @param v value to be added
    */
   public void add(final byte[] v) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = v;
   }
 
@@ -91,7 +91,7 @@ public final class TokenList implements Iterable<byte[]> {
    * @return array
    */
   public byte[][] finish() {
-    return size == list.length ? list : Array.finish(list, size);
+    return size == list.length ? list : Arrays.copyOf(list, size);
   }
 
   /**

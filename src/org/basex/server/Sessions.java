@@ -1,6 +1,9 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
+
+import java.util.Arrays;
+
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
@@ -21,7 +24,7 @@ public final class Sessions {
    * @param s string to be added
    */
   public void add(final ServerSession s) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = s;
   }
 

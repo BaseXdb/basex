@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This is a simple hash map, extending the even simpler
  * {@link Set hash set}.
@@ -56,6 +58,6 @@ public class Map<E> extends Set {
   @Override
   protected final void rehash() {
     super.rehash();
-    values = Array.extend(values);
+    values = Arrays.copyOf(values, size << 1);
   }
 }

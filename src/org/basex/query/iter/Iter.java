@@ -1,5 +1,7 @@
 package org.basex.query.iter;
 
+import java.util.Arrays;
+
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -82,9 +84,7 @@ public abstract class Iter {
     Item[] item = { i };
     int s = 1;
     while((i = next()) != null) {
-      final Item[] tmp = new Item[s << 1];
-      System.arraycopy(item, 0, tmp, 0, s);
-      item = tmp;
+      if(s == item.length) item = Arrays.copyOf(item, s << 1);
       item[s++] = i;
     }
     return Seq.get(item, s);

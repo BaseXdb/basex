@@ -17,7 +17,6 @@ import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
-import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -270,7 +269,7 @@ public final class DiskData extends Data {
 
   @Override
   public int[] ns(final int pre) {
-    return (table.read1(pre, 0) & 0x08) != 0 ? ns.get(pre) : Array.NOINTS;
+    return (table.read1(pre, 0) & 0x08) != 0 ? ns.get(pre) : new int[] {};
   }
 
   @Override
@@ -644,7 +643,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert text node without updating the size and distance values
+   * Inserts text node without updating the size and distance values
    * of the table.
    * @param pre insert position
    * @param s node size
@@ -664,8 +663,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert text node updating the size and distance values
-   * of the table.
+   * Inserts a text, comment or processing instruction
+   * without updating the size and distance values of the table.
    * @param pre insert position
    * @param dis parent distance
    * @param val tag name or text node
@@ -687,8 +686,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert attribute updating the size and distance values
-   * of the table.
+   * Inserts an attribute
+   * without updating the size and distance values of the table.
    * @param pre pre value
    * @param dis parent distance
    * @param name attribute name
@@ -712,7 +711,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the distance for the specified node.
+   * Sets the distance for the specified node.
    * @param pre pre value
    * @param kind node kind
    * @param v value
@@ -723,7 +722,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the tag ID.
+   * Sets the tag ID.
    * @param pre pre value
    * @param v tag id
    */
@@ -732,7 +731,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the attribute name ID.
+   * Sets the attribute name ID.
    * @param pre pre value
    * @param v attribute name ID
    */
@@ -741,7 +740,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the disk offset of a text/attribute value.
+   * Sets the disk offset of a text/attribute value.
    * @param pre pre value
    * @param off offset
    */
@@ -750,7 +749,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the attribute size.
+   * Sets the attribute size.
    * @param pre pre value
    * @param kind node kind
    * @param v value
@@ -760,7 +759,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes the size values.
+   * Sets the size values.
    * @param pre pre value
    * @param kind node kind
    * @param v value

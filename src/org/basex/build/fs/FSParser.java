@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -25,7 +26,6 @@ import org.basex.core.Text;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
-import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.Token;
 import org.deepfs.fs.DeepFS;
@@ -224,7 +224,7 @@ public final class FSParser extends Parser {
         if(c == l) {
           while(--c >= 0 && cc[c] <= 0x20 && cc[c] >= 0);
           if(++c != 0) {
-            builder.nodeAndText(CONTENT, atts.reset(), Array.finish(cc, c));
+            builder.nodeAndText(CONTENT, atts.reset(), Arrays.copyOf(cc, c));
           }
         }
       }

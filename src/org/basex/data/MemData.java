@@ -1,11 +1,11 @@
 package org.basex.data;
 
+import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
-import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -120,7 +120,7 @@ public class MemData extends Data {
 
   @Override
   public final int[] ns(final int pre) {
-    return (val1[pre] & 1L << 59) != 0 ? ns.get(pre) : Array.NOINTS;
+    return (val1[pre] & 1L << 59) != 0 ? ns.get(pre) : new int[] {};
   }
 
   @Override
@@ -259,8 +259,9 @@ public class MemData extends Data {
    */
   private void check() {
     if(meta.size == val1.length) {
-      val1 = Array.extend(val1);
-      val2 = Array.extend(val2);
+      final int s = val1.length << 1;
+      val1 = Arrays.copyOf(val1, s);
+      val2 = Arrays.copyOf(val2, s);
     }
   }
 

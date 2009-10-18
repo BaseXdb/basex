@@ -15,6 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -26,7 +28,6 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -148,7 +149,7 @@ public final class FolderView extends View {
     if(opened == null) return;
     final Data data = gui.context.data();
     if(opened.length < data.meta.size)
-      opened = Array.finish(opened, data.meta.size);
+      opened = Arrays.copyOf(opened, data.meta.size);
 
     startY = 0;
     scroll.pos(0);

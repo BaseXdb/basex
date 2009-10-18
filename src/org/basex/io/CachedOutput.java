@@ -1,7 +1,7 @@
 package org.basex.io;
 
 import static org.basex.core.Text.*;
-import org.basex.util.Array;
+import java.util.Arrays;
 import org.basex.util.Token;
 
 /**
@@ -34,7 +34,7 @@ public final class CachedOutput extends PrintOutput {
   @Override
   public void write(final int b) {
     if(size == max) return;
-    if(size == buf.length) buf = Array.extend(buf);
+    if(size == buf.length) buf = Arrays.copyOf(buf, size << 1);
     buf[size++] = (byte) b;
   }
 
@@ -43,7 +43,7 @@ public final class CachedOutput extends PrintOutput {
    * @return byte array
    */
   public byte[] finish() {
-    return Array.finish(buf, size);
+    return Arrays.copyOf(buf, size);
   }
 
   @Override
@@ -57,8 +57,9 @@ public final class CachedOutput extends PrintOutput {
    */
   public byte[] buffer() {
     if(finished()) {
+      // add dots at the end of the output
       final byte[] chop = Token.token(DOTS);
-      Array.copy(chop, buf, size - chop.length);
+      System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     return buf;
   }

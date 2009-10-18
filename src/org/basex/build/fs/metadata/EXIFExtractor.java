@@ -3,10 +3,10 @@ package org.basex.build.fs.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.basex.build.fs.FSText;
 import org.basex.build.fs.metadata.EXIFIndex.EXIFInfo;
 import org.basex.core.Main;
-import org.basex.util.Array;
 import org.basex.util.Token;
 import static org.basex.build.fs.FSText.*;
 
@@ -152,7 +152,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
         final int n = getInt(e + 8);
         v = inf.val(getInt(n + 4), getInt(n));
       } else if(format == EXIFIndex.UNDEFINED) {
-        v = inf.val(Array.create(buffer, e + 8, 4));
+        v = inf.val(Arrays.copyOfRange(buffer, e + 8, e + 12));
       } else {
         throw new MetaDataException(Main.info(FSText.EXIFUNKNOWN,
             Integer.toHexString(tagnr), format));

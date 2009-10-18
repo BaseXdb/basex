@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.util.Array;
+import java.util.Arrays;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Set;
@@ -43,9 +43,10 @@ final class FTHash extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    pre = Array.extend(pre);
-    pos = Array.extend(pos);
-    ns = Array.extend(ns);
+    final int s = size << 1;
+    pre = Arrays.copyOf(pre, s);
+    pos = Arrays.copyOf(pos, s);
+    ns = Arrays.copyOf(ns, s);
   }
 
   /** Integer list. */

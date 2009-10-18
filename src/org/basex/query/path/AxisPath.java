@@ -5,6 +5,8 @@ import static org.basex.query.path.Axis.*;
 import static org.basex.query.path.Test.NODE;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;
@@ -505,7 +507,7 @@ public class AxisPath extends Path {
     }
     if(ll != step.length) {
       ctx.compInfo(OPTDESC);
-      step = Array.finish(step, ll);
+      step = Arrays.copyOf(step, ll);
     }
   }
 

@@ -210,21 +210,8 @@ public abstract class Dialog extends JDialog {
    */
   public static boolean confirm(final Component comp, final String text) {
     return JOptionPane.showConfirmDialog(comp, text, NAME,
-        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
-  }
-
-  /**
-   * Static yes/no dialog with warning symbol.
-   * @param comp parent reference
-   * @param text text
-   * @param title of warning dialog
-   * @return true if dialog was confirmed
-   */
-  public static boolean confirmWarning(final Component comp, final String text,
-      final String title) {
-    return JOptionPane.showConfirmDialog(comp, text, NAME + " - " + title,
-        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) 
-        == JOptionPane.YES_OPTION;
+        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) ==
+          JOptionPane.YES_OPTION;
   }
 
   /**

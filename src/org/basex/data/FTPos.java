@@ -1,7 +1,7 @@
 package org.basex.data;
 
+import java.util.Arrays;
 import org.basex.core.Main;
-import org.basex.util.Array;
 
 /**
  * This class contains full-text positions.
@@ -45,7 +45,7 @@ public final class FTPos {
    */
   void union(final int[] ps, final byte[] pi) {
     // skip existing values
-    if(Array.eq(pos, ps)) return;
+    if(Arrays.equals(pos, ps)) return;
 
     // merge entries with the same pre value
     final int prs = ps.length;

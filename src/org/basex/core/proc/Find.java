@@ -1,12 +1,12 @@
 package org.basex.core.proc;
 
+import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.io.PrintOutput;
-import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -271,7 +271,7 @@ public final class Find extends AQuery {
       }
     }
     if(tb.length() != 0) split[s++] = tb.toString();
-    return Array.finish(split, s);
+    return Arrays.copyOf(split, s);
   }
 
   @Override

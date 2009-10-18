@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This is a simple container for attributes (keys and values).
  *
@@ -34,8 +36,9 @@ public final class Atts {
    */
   public Atts add(final byte[] k, final byte[] v) {
     if(size == key.length) {
-      key = Array.extend(key);
-      val = Array.extend(val);
+      final int s = size << 1;
+      key = Arrays.copyOf(key, s);
+      val = Arrays.copyOf(val, s);
     }
     key[size] = k;
     val[size++] = v;

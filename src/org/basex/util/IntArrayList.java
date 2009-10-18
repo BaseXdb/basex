@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import org.basex.core.Main;
 
@@ -35,7 +36,7 @@ public final class IntArrayList implements Iterable<int[]> {
    * @param v value to be added
    */
   public void add(final int[] v) {
-    if(size == list.length) list = Array.extend(list);
+    if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = v;
   }
 

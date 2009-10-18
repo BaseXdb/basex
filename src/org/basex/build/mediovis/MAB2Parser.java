@@ -4,6 +4,8 @@ import static org.basex.build.mediovis.MAB2.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -12,7 +14,6 @@ import org.basex.core.Prop;
 import org.basex.io.DataAccess;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.TokenMap;
 import org.basex.util.Performance;
@@ -254,7 +255,7 @@ public final class MAB2Parser extends Parser {
     int l = 0;
     byte b;
     while((b = in.read1()) >= ' ') CACHE[l++] = b;
-    return Array.finish(CACHE, l);
+    return Arrays.copyOf(CACHE, l);
   }
 
   /** Buffer. */
@@ -449,7 +450,7 @@ public final class MAB2Parser extends Parser {
         if(c == 4) return n;
       }
     }
-    return c != 0 ? Array.finish(n, c) : null;
+    return c != 0 ? Arrays.copyOf(n, c) : null;
   }
 
   /**
@@ -475,7 +476,7 @@ public final class MAB2Parser extends Parser {
     int oy = yr != null ? toInt(yr) : 0;
     if(oy >= 1400 && oy <= 1950) return yr;
 
-    final byte[] y = Array.create(line, j + 1, 4);
+    final byte[] y = Arrays.copyOfRange(line, j + 1, j + 5);
     oy = toInt(y);
     return oy >= 1500 && oy <= 2050 ? y : yr;
   }
@@ -538,9 +539,7 @@ public final class MAB2Parser extends Parser {
       space = b == ' ';
       tmp[c++] = b;
     }
-
-    if(c == tmp.length) return tmp;
-    return Array.finish(tmp, c);
+    return c == tmp.length ? tmp : Arrays.copyOf(tmp, c);
   }
 
   /**
@@ -552,7 +551,7 @@ public final class MAB2Parser extends Parser {
     final int l = line.length;
     int s = 3;
     while(++s < l && line[s] == '0');
-    return Array.create(line, s, line.length - s);
+    return Arrays.copyOfRange(line, s, line.length);
   }
 
   /**
@@ -604,7 +603,8 @@ public final class MAB2Parser extends Parser {
      */
     void add(final long c) {
       if(children == null) children = new long[1];
-      else if(children.length == size) children = Array.extend(children);
+      else if(size == children.length)
+        children = Arrays.copyOf(children, size << 1);
       children[size++] = c;
     }
 

@@ -2,9 +2,9 @@ package org.basex.build.fs.metadata;
 
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.core.Main;
-import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -246,8 +246,7 @@ public final class EXIFIndex {
             toInt(buffer, s + 17, s + 19));
         return toBytes(gc.getTimeInMillis());
       }*/
-
-      return Array.create(buffer, s, e + 1 - s);
+      return Arrays.copyOfRange(buffer, s, e + 1);
     }
   }
 

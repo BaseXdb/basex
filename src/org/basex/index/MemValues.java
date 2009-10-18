@@ -1,7 +1,7 @@
 package org.basex.index;
 
+import java.util.Arrays;
 import org.basex.core.Main;
-import org.basex.util.Array;
 import org.basex.util.Set;
 import org.basex.util.Token;
 
@@ -73,7 +73,7 @@ public final class MemValues extends Index {
       } else {
         i = -i;
         final int l = len[i];
-        if(ids[i].length == l) ids[i] = Array.extend(ids[i]);
+        if(l == ids[i].length) ids[i] = Arrays.copyOf(ids[i], l << 1);
         ids[i][l] = id;
       }
       len[i]++;
@@ -101,8 +101,9 @@ public final class MemValues extends Index {
     @Override
     public void rehash() {
       super.rehash();
-      ids = Array.extend(ids);
-      len = Array.extend(len);
+      final int s = size << 1;
+      ids = Arrays.copyOf(ids, s);
+      len = Arrays.copyOf(len, s);
     }
   }
 }

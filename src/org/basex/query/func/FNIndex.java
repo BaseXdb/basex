@@ -2,11 +2,11 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
-import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.Set;
 
@@ -94,6 +94,6 @@ public final class FNIndex extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    funcs = Array.extend(funcs);
+    funcs = Arrays.copyOf(funcs, size << 1);
   }
 }

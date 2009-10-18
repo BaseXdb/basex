@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.util.Array;
+import java.util.Arrays;
 import org.basex.util.Set;
 
 /**
@@ -50,7 +50,8 @@ final class FTTokenMap extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    pointers = Array.extend(pointers);
-    sizes = Array.extend(sizes);
+    final int s = size << 1;
+    pointers = Arrays.copyOf(pointers, s);
+    sizes = Arrays.copyOf(sizes, s);
   }
 }

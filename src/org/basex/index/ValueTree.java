@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.util.Array;
+import java.util.Arrays;
 import org.basex.util.Num;
 import org.basex.util.Token;
 
@@ -46,7 +46,7 @@ final class ValueTree {
         if(c == 0) {
           ++size;
           c = size << 1;
-          if(c == z.length) z = Array.extend(z);
+          if(c == z.length) z = Arrays.copyOf(z, c << 1);
           add(k, pr);
           if(d > 0) z[n + 1] = c;
           else z[n] = c;
@@ -64,9 +64,10 @@ final class ValueTree {
    */
   private void add(final byte[] tok, final int id) {
     if(size == pre.length) {
-      pre = Array.extend(pre);
-      ns = Array.extend(ns);
-      t = Array.extend(t);
+      final int s = size << 1;
+      pre = Arrays.copyOf(pre, s);
+      ns = Arrays.copyOf(ns, s);
+      t = Arrays.copyOf(t, s);
     }
     t[size] = tok;
     pre[size] = Num.newNum(id);
@@ -129,7 +130,7 @@ final class ValueTree {
    * @param n value to be pushed
    */
   private void push(final int n) {
-    if(spos == stack.length) stack = Array.extend(stack);
+    if(spos == stack.length) stack = Arrays.copyOf(stack, spos << 1);
     stack[spos++] = n;
   }
 
