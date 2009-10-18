@@ -40,7 +40,7 @@ public final class Users {
           // create initial admin user with all rights
           users.add(new User(ADMIN, Crypter.encrypt(Token.token(ADMIN)),
               User.READ | User.WRITE | User.CREATE | User.ADMIN));
-          write(null);
+          write();
         }
       } catch(final IOException ex) {
         Main.debug(ex);
