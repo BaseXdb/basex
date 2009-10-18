@@ -21,7 +21,11 @@ import javax.swing.table.AbstractTableModel;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.CreateUser;
+import org.basex.core.proc.DropUser;
+import org.basex.core.proc.Grant;
 import org.basex.core.proc.IntStop;
+import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
@@ -49,6 +53,10 @@ public final class DialogServer extends Dialog {
   ClientSession cs;
   /** Vector for combobox. */
   Vector<String> usernames = new Vector<String>();
+  /** Server panel. */
+  BaseXBack p1 = new BaseXBack();
+  /** User panel. */
+  BaseXBack p2 = new BaseXBack();
 
   /**
    * Default constructor.
@@ -57,11 +65,10 @@ public final class DialogServer extends Dialog {
   public DialogServer(final GUI main) {
     super(main, "Server...");
     final BaseXTabs tabs = new BaseXTabs(this);
+    tabs.setPreferredSize(new Dimension(600, 300));
     // Server panel
-    final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(3, 1));
     // User management panel
-    final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(3, 1));
     p2.setBorder(8, 8, 8, 8);
     tabs.add("Server...", p1);
@@ -83,6 +90,7 @@ public final class DialogServer extends Dialog {
       port.setEnabled(false);
       change.setEnabled(false);
       fillLists();
+      fillUserTab();
     } catch(final IOException e1) {
       stop.setEnabled(false);
       tabs.setEnabledAt(1, false);
@@ -98,6 +106,7 @@ public final class DialogServer extends Dialog {
         tabs.setEnabledAt(1, true);
         startServer();
         fillLists();
+        fillUserTab();
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -143,6 +152,17 @@ public final class DialogServer extends Dialog {
     p12.setBorder(8, 8, 8, 8);
     p11.setBorder(8, 8, 8, 8);
 
+    // adding to main panel
+    p1.add(p11);
+    p1.add(p12);
+    set(tabs, BorderLayout.CENTER);
+    finish(null);
+  }
+
+  /**
+   * Fills the user tab with components.
+   */
+  void fillUserTab() {
     // Top panel
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(4, 5, 6, 0));
@@ -167,17 +187,20 @@ public final class DialogServer extends Dialog {
     final BaseXButton delete = new BaseXButton("Drop User", null, this);
     create.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        // [AW] cs.execute(new CreateUser())...
-        /*final String u = user.getText();
+        final String u = user.getText();
         final String p = new String(pass.getPassword());
         if(!u.equals("") && !p.equals("")) {
-          ctx.users.create(u, p);
-          user.setText("");
-          pass.setText("");
-          ((TableModel) table.getModel()).setData();
-          userco.addItem(u);
-          delete.setEnabled(true);
-        }*/
+          try {
+            cs.execute(new CreateUser(u, p));
+            user.setText("");
+            pass.setText("");
+            ((TableModel) table.getModel()).setData();
+            userco.addItem(u);
+            delete.setEnabled(true);
+          } catch(IOException e1) {
+            e1.printStackTrace();
+          }
+        }
       }
     });
     p21.add(create);
@@ -188,11 +211,15 @@ public final class DialogServer extends Dialog {
     if(usernames.size() == 0) delete.setEnabled(false);
     delete.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        //final String test = (String) userco.getSelectedItem();
-        // [AW] cs.execute(new DropUser())....
-        //userco.removeItem(test);
-        //((TableModel) table.getModel()).setData();
-        //if(usernames.size() == 0) delete.setEnabled(false);
+        final String test = (String) userco.getSelectedItem();
+        try {
+          cs.execute(new DropUser(test));
+          userco.removeItem(test);
+          ((TableModel) table.getModel()).setData();
+          if(usernames.size() == 0) delete.setEnabled(false);
+        } catch(IOException e1) {
+          e1.printStackTrace();
+        }
       }
     });
 
@@ -204,32 +231,19 @@ public final class DialogServer extends Dialog {
     p23.add(new BaseXLabel("User rights management:", false, true));
     // create JTable
     table.setPreferredScrollableViewportSize(new Dimension(500, 70));
-    table.setFillsViewportHeight(true);
     p23.add(scrollPane);
-    final BaseXButton save = new BaseXButton("Save", null, this);
-    save.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        ((TableModel) table.getModel()).setData();
-      }
-    });
-    p23.add(save);
     p2.add(p21);
     p2.add(p22);
     p2.add(p23);
-    // adding to main panel
-    p1.add(p11);
-    p1.add(p12);
-    set(tabs, BorderLayout.CENTER);
-    finish(null);
   }
-  
-   /**
+
+  /**
    * Starts a server as new process.
    */
   void startServer() {
     try {
-      final ProcessBuilder pb = new ProcessBuilder(
-          "java", "-cp", Prop.WORK + "bin", "org.basex.BaseXServer");
+      final ProcessBuilder pb = new ProcessBuilder("java", "-cp", Prop.WORK
+          + "bin", "org.basex.BaseXServer");
       final Process p = pb.start();
       cs = new ClientSession(ctx, ADMIN, ADMIN);
       final BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -271,14 +285,17 @@ public final class DialogServer extends Dialog {
     while(s.hasNextLine()) {
       final String line = s.nextLine();
       if(line.isEmpty()) break;
-      String username = line.substring(0, 10);
+      String username = line.substring(0, 10).trim();
       usernames.addElement(username);
       Object[] user = new Object[5];
       user[0] = username;
       user[1] = line.substring(10, 16).contains("X");
-      user[2] = line.substring(16, 23).contains("X");;
-      user[3] = line.substring(23, 31).contains("X");;
-      user[4] = line.substring(31, 38).contains("X");;
+      user[2] = line.substring(16, 23).contains("X");
+      ;
+      user[3] = line.substring(23, 31).contains("X");
+      ;
+      user[4] = line.substring(31, 38).contains("X");
+      ;
       data.add(user);
       i++;
     }
@@ -324,6 +341,25 @@ public final class DialogServer extends Dialog {
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
+      String right = "";
+      if(col == 1) right = "read";
+      if(col == 2) right = "write";
+      if(col == 3) right = "create";
+      if(col == 4) right = "admin";
+      String uname = (String) data.get(row)[0];
+      if(value.equals(true)) {
+        try {
+          cs.execute(new Grant(right, uname));
+        } catch(IOException e) {
+          e.printStackTrace();
+        }
+      } else {
+        try {
+          cs.execute(new Revoke(right, uname));
+        } catch(IOException e) {
+          e.printStackTrace();
+        }
+      }
       data.get(row)[col] = value;
       fireTableCellUpdated(row, col);
     }
