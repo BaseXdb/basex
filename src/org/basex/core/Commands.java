@@ -164,7 +164,7 @@ public interface Commands {
   /** Show command definitions. */
   enum CmdShow { DATABASES, SESSIONS, USERS }
   /** Show command definitions. */
-  enum CmdPerm { READ, WRITE, CREATE, ADMIN }
+  enum CmdPerm { READ, WRITE, CREATE, ADMIN, ALL }
   /** Set command definitions. */
   enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,

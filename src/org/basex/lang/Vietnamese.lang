@@ -316,7 +316,7 @@ db_optimized=Cơ sở dữ liệu tối ưu trong %.
 db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.
 db_notdropped=Cơ sở dữ liệu không xóa bỏ được.
 db_inuse=Database is currently accessed by other clients.
-db_notopened=Cơ sở dữ liệu không mở được.
+db_notopened=Cơ sở dữ liệu '%' không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
 
@@ -381,9 +381,17 @@ uc_invalid=Tên "%" không phù hợp.
 uc_txtinvalid=Nút văn bản (text) không thề để trống.
 uc_namespaces=Không thề thay đổi văn bản có namespace.
 
-# Server Commands
-sv_databases=% opened database(s)
-sv_sessions=% session(s)
+# Admin Commands
+ad_databases=% opened database(s)
+ad_sessions=% session(s)
+ad_permno=% permission needed.
+ad_perminv=Invalid permissions specified.
+ad_permdel=Permission revoked.
+ad_permadd=Permission granted.
+ad_userno=User '%' is unknown.
+ad_userknown=User '%' exists already.
+ad_usercreate=User '%' created.
+ad_userdrop=User '%' dropped.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -495,6 +503,7 @@ ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
+ch_show24=shows database users.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions to a user.
 ch_revoke1=Revoke user permissions.

@@ -2523,6 +2523,7 @@ public class QueryParser extends InputParser {
     if(!(into ^ after ^ before)) Err.or(UPDATE, this);
     
     final Expr trg = check(single(), UPEXPSIMPLE);
+    ctx.updating = true;
     return new Insert(s, first, last, before, after, trg);
   }
 
@@ -2539,6 +2540,7 @@ public class QueryParser extends InputParser {
       return null;
     }
     final Expr n = check(single(), UPEXPSIMPLE);
+    ctx.updating = true;
     return new Delete(n);
   }
 
@@ -2557,6 +2559,7 @@ public class QueryParser extends InputParser {
     final Expr trg = check(single(), UPEXPSIMPLE);
     check(AS);
     final Expr n = check(single(), UPEXPSIMPLE);
+    ctx.updating = true;
     return new Rename(trg, n);
   }
 
@@ -2577,6 +2580,7 @@ public class QueryParser extends InputParser {
     final Expr t = check(single(), UPEXPSIMPLE);
     check(WITH);
     final Expr r = check(single(), UPEXPSIMPLE);
+    ctx.updating = true;
     return new Replace(t, r, v);
   }
 

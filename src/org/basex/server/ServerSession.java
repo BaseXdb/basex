@@ -120,8 +120,9 @@ public final class ServerSession extends Thread {
           return;
         } else {
           core = proc;
+          core.context = context;
           startTimer(proc);
-          final boolean up = proc.updating();
+          final boolean up = proc.write();
           if(up) {
             server.sem.beforeWrite();
           } else {

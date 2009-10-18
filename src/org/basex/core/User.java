@@ -17,11 +17,11 @@ public class User {
   public static final int ADMIN = 8;
 
   /** User name. */
-  String name;
+  public String name;
   /** Password. */
-  byte[] pw;
+  public byte[] pw;
   /** Permission. */
-  int perm;
+  public int perm;
   
   /**
    * Constructor.
@@ -42,5 +42,23 @@ public class User {
    */
   public boolean perm(final int flag) {
     return (perm & flag) != 0;
+  }
+
+  /**
+   * Changes the permission flag.
+   * @param set set/remove flag
+   * @param p permission to be set/removed
+   */
+  public void perm(final boolean set, final int p) {
+    if(set) perm |= p;
+    else perm &= ~p;
+  }
+  
+  /**
+   * Returns a copy of this user.
+   * @return user copy
+   */
+  public User copy() {
+    return new User(name, pw, perm); 
   }
 }

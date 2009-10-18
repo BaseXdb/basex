@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -21,7 +20,7 @@ public final class Run extends AQuery {
    * @param file query file
    */
   public Run(final String file) {
-    super(User.READ, file);
+    super(STANDARD, file);
   }
 
   @Override
@@ -34,8 +33,16 @@ public final class Run extends AQuery {
       return query(Token.string(io.content())) && out(out);
     } catch(final IOException ex) {
       Main.debug(ex);
-      final String msg = ex.getMessage();
-      return error(msg != null ? msg : args[0]);
+      return error(ex.getMessage());
+    }
+  }
+
+  @Override
+  public boolean write() {
+    try {
+      return updating(Token.string(IO.get(args[0]).content()));
+    } catch(final IOException ex) {
+      return super.write();
     }
   }
 }

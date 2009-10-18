@@ -321,7 +321,7 @@ db_optimized=Database ottimizzato in %.
 db_dropped=Database '%' cancellato.
 db_notdropped=Impossibile cancellare il Database.
 db_inuse=Database is currently accessed by other clients.
-db_notopened=Impossibile aprire il Database.
+db_notopened=Impossibile aprire il Database '%'.
 db_opened=Database '%' aperto in %.
 db_exported=Database '%' esportato in %.
 
@@ -386,9 +386,17 @@ uc_invalid=Il nome "%" non è valido.
 uc_txtinvalid=I nodi testo non possono essere vuoti.
 uc_namespaces=Impossibile aggiornare documenti con namespace.
 
-# Server Commands
-sv_databases=% opened database(s)
-sv_sessions=% session(s)
+# Admin Commands
+ad_databases=% opened database(s)
+ad_sessions=% session(s)
+ad_permno=% permission needed.
+ad_perminv=Invalid permissions specified.
+ad_permdel=Permission revoked.
+ad_permadd=Permission granted.
+ad_userno=User '%' is unknown.
+ad_userknown=User '%' exists already.
+ad_usercreate=User '%' created.
+ad_userdrop=User '%' dropped.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -500,6 +508,7 @@ ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
+ch_show24=shows database users.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions to a user.
 ch_revoke1=Revoke user permissions.

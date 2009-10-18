@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
@@ -26,7 +25,7 @@ public final class CreateIndex extends ACreate {
    * @param type index type, defined in {@link CmdIndex}
    */
   public CreateIndex(final Object type) {
-    super(DATAREF | User.CREATE, type.toString());
+    super(DATAREF, type.toString());
   }
 
   @Override

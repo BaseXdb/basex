@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -16,21 +17,52 @@ import org.basex.util.TokenBuilder;
  * @author Andreas Weiler
  */
 public final class Users {
-  /** Default permissions. */
-  private static final int PERM = User.READ | User.WRITE;
   /** User list. */
   private final ArrayList<User> users = new ArrayList<User>();
-  /** Filename. */
-  private final String file;
-  /** Crypter. */
-  private final Crypter crypt = new Crypter();
+  /** Default permissions. */
+  private static final int PERM = User.READ | User.WRITE;
+  /** Filename; set to null for local user permissions. */
+  private String file;
 
   /**
-   * Standard constructor.
+   * Global constructor.
+   * @param global global flag
    */
-  public Users() {
-    file = Prop.HOME + ".basexperm";
-    read();
+  public Users(final boolean global) {
+    if(global) {
+      file = Prop.HOME + ".basexperm";
+      try {
+        if(IO.get(file).exists()) {
+          final DataInput in = new DataInput(file);
+          read(in);
+          in.close();
+        } else {
+          // create initial admin user with all rights
+          users.add(new User(ADMIN, Crypter.encrypt(Token.token(ADMIN)),
+              User.READ | User.WRITE | User.CREATE | User.ADMIN));
+          write(null);
+        }
+      } catch(final IOException ex) {
+        Main.debug(ex);
+      }
+    }
+  }
+
+  /**
+   * Local constructor.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public Users(final DataInput in) throws IOException {
+    read(in);
+  }
+
+  /**
+   * Adds the specified user.
+   * @param user user reference
+   */
+  public void add(final User user) {
+    users.add(user);
   }
 
   /**
@@ -43,7 +75,7 @@ public final class Users {
     // check if user exists already
     if(get(usern) != null) return false;
 
-    final User user = new User(usern, crypt.encrypt(Token.token(pass)), PERM);
+    final User user = new User(usern, Crypter.encrypt(Token.token(pass)), PERM);
     users.add(user);
     write();
     return true;
@@ -70,7 +102,7 @@ public final class Users {
    */
   public User get(final String usern, final String pw) {
     final User user = get(usern);
-    return user != null && Token.eq(crypt.encrypt(Token.token(pw)), user.pw) ?
+    return user != null && Token.eq(Crypter.encrypt(Token.token(pw)), user.pw) ?
       user : null;
   }
 
@@ -85,62 +117,46 @@ public final class Users {
   }
 
   /**
-   * Changes a permission for the specified user.
-   * @param usern user name
-   * @param set set/remove flag
-   * @param perm permission to be set
-   * @return success of operation
-   */
-  public boolean perm(final String usern, final boolean set, final int perm) {
-    final User user = get(usern);
-    if(user == null) return false;
-    if(set) user.perm |= perm;
-    else user.perm &= ~perm;
-    write();
-    return true;
-  }
-
-  /**
    * Reads users from disk.
+   * @param in input stream
+   * @throws IOException I/O exception
    */
-  private void read() {
-    if(IO.get(file).exists()) {
-      try {
-        final DataInput in = new DataInput(file);
-        final int s = in.readNum();
-        for(int u = 0; u < s; u++) {
-          final User user = new User(in.readString(), in.readBytes(),
-              in.readNum());
-          users.add(user);
-        }
-      } catch(final Exception ex) {
-        Main.debug(ex);
-      }
-    } else {
-      // create initial admin user with all rights
-      users.add(new User(ADMIN, crypt.encrypt(Token.token(ADMIN)),
-          User.READ | User.WRITE | User.CREATE | User.ADMIN));
-      write();
+  private void read(final DataInput in) throws IOException {
+    final int s = in.readNum();
+    for(int u = 0; u < s; u++) {
+      final User user = new User(in.readString(), in.readBytes(),
+          in.readNum());
+      users.add(user);
     }
   }
 
   /**
-   * Writes users to disk.
+   * Writes global permissions to disk.
    */
-  private void write() {
+  public void write() {
     try {
       final DataOutput out = new DataOutput(file);
-      final int s = users.size();
-      out.writeNum(s);
-      for(int u = 0; u < s; u++) {
-        final User user = users.get(u);
-        out.writeString(user.name);
-        out.writeBytes(user.pw);
-        out.writeNum(user.perm);
-      }
+      write(out);
       out.close();
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       Main.debug(ex);
+    }
+  }
+  
+  /**
+   * Writes permissions to disk.
+   * @param out output stream; if set to null, the global rights are written
+   * @throws IOException I/O exception
+   */
+  public void write(final DataOutput out) throws IOException {
+    // skip writing of local rights
+    final int s = users.size();
+    out.writeNum(s);
+    for(int u = 0; u < s; u++) {
+      final User user = users.get(u);
+      out.writeString(user.name);
+      out.writeBytes(user.pw);
+      out.writeNum(user.perm);
     }
   }
 
@@ -153,14 +169,15 @@ public final class Users {
     final TokenBuilder tb = new TokenBuilder();
     if(size != 0) {
       // get maximum column widths
-      final int[] ind = new int[5];
+      final int sz = file == null ? 3 : 5;
+      final int[] ind = new int[sz];
       for(final User u : users) ind[0] = Math.max(ind[0], u.name.length());
-      for(int u = 0; u < USERS.length; u++) {
+      for(int u = 0; u < sz; u++) {
         ind[u] = Math.max(ind[u], USERS[u].length()) + 2;
         tb.add(ind[u], USERS[u]);
       }
       tb.add(NL);
-      for(int u = 0; u < USERS.length; u++) {
+      for(int u = 0; u < sz; u++) {
         for(int i = 0; i < ind[u]; i++) tb.add('-');
       }
       tb.add(NL);
@@ -169,8 +186,10 @@ public final class Users {
         tb.add(ind[0], user.name);
         tb.add(ind[1], user.perm(User.READ) ? "X" : "");
         tb.add(ind[2], user.perm(User.WRITE) ? "X" : "");
-        tb.add(ind[3], user.perm(User.CREATE) ? "X" : "");
-        tb.add(ind[4], user.perm(User.ADMIN) ? "X" : "");
+        if(file != null) {
+          tb.add(ind[3], user.perm(User.CREATE) ? "X" : "");
+          tb.add(ind[4], user.perm(User.ADMIN) ? "X" : "");
+        }
         tb.add(NL);
       }
       tb.add(NL);

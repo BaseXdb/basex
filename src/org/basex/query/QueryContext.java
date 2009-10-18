@@ -157,8 +157,11 @@ public final class QueryContext extends Progress {
   private int rootDocs;
   /** Info flag. */
   private final boolean inf;
+
   /** XQueryUP pending updates. */
-  public PendingUpdates updates;
+  public PendingUpdates updates = new PendingUpdates();
+  /** Updating flag. */
+  public boolean updating;
 
   /**
    * Constructor.
@@ -168,7 +171,6 @@ public final class QueryContext extends Progress {
     context = ctx;
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
-    updates = new PendingUpdates();
   }
 
   /**
@@ -303,8 +305,7 @@ public final class QueryContext extends Progress {
   public Iter iter() throws QueryException {
     try {
       final Iter iter = iter(root);
-      // [LK] CG: only call iter.finish() for updates (..needed at all?)
-      //if(!updates) return iter;
+      if(!updating) return iter;
 
       final Item i = iter.finish();
       updates.applyUpdates();

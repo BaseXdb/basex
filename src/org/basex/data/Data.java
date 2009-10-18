@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -438,23 +437,4 @@ public abstract class Data {
    * @param dt data instance to copy from
    */
   public abstract void insertSeq(final int pre, final int par, final Data dt);
-
-  /**
-   * Returns the locking situation of the data.
-   * @return locked flag
-   */
-  public abstract int getLock();
-
-  /**
-   * Locks and unlocks the data reference.
-   * @param l int kind of lock
-   *        1 = read lock
-   *        2 = write lock
-   */
-  public abstract void setLock(final int l);
-
-  @Override
-  public final String toString() {
-    return Main.name(this) + "[" + meta.name + "]";
-  }
 }

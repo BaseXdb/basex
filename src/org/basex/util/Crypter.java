@@ -19,23 +19,26 @@ public final class Crypter {
   /** De- and encryption key. */
   private static final String KEY = "BaseX";
   /** Encryption cipher. */
-  private Cipher encrypt;
+  private static final Cipher ENCRYPT;
   /** Decryption cipher. */
-  private Cipher decrypt;
+  private static final Cipher DECRYPT;
+
+  /** Private constructor. */
+  private Crypter() { }
 
   /**
    * Standard constructor.
    */
-  public Crypter() {
+  static {
     try {
       final PBEParameterSpec ps = new PBEParameterSpec(SALT, 20);
       final SecretKeyFactory kf =
         SecretKeyFactory.getInstance("PBEWithMD5AndDES");
       final SecretKey k = kf.generateSecret(new PBEKeySpec(KEY.toCharArray()));
-      encrypt = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
-      encrypt.init(Cipher.ENCRYPT_MODE, k, ps);
-      decrypt = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
-      decrypt.init(Cipher.DECRYPT_MODE, k, ps);
+      ENCRYPT = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
+      ENCRYPT.init(Cipher.ENCRYPT_MODE, k, ps);
+      DECRYPT = Cipher.getInstance("PBEWithMD5AndDES/CBC/PKCS5Padding");
+      DECRYPT.init(Cipher.DECRYPT_MODE, k, ps);
     } catch(final Exception ex) {
       throw new SecurityException("Could not initialize CryptoLibrary: "
           + ex.getMessage());
@@ -47,9 +50,9 @@ public final class Crypter {
    * @param tok token to be encrypted
    * @return encrypted string.
    */
-  public synchronized byte[] encrypt(final byte[] tok) {
+  public static synchronized byte[] encrypt(final byte[] tok) {
     try {
-      return encrypt.doFinal(tok);
+      return ENCRYPT.doFinal(tok);
     } catch(final Exception ex) {
       throw new SecurityException("Could not encrypt: " + ex.getMessage());
     }
@@ -60,9 +63,9 @@ public final class Crypter {
    * @param str Description of the Parameter
    * @return decrypted token.
    */
-  public synchronized byte[] decrypt(final byte[] str) {
+  public static synchronized byte[] decrypt(final byte[] str) {
     try {
-      return decrypt.doFinal(str);
+      return DECRYPT.doFinal(str);
     } catch(final Exception ex) {
       throw new SecurityException("Could not decrypt: " + ex.getMessage());
     }

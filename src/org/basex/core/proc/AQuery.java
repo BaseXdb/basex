@@ -108,13 +108,19 @@ abstract class AQuery extends Process {
     return true;
   }
 
-  // [LK] this method could be overwritten to check if the process
-  //   performs updates
-  @Override
-  public boolean updating() {
-    // final QueryParser p = new QueryParser(new QueryContext(context));
-    // ...
-    return super.updating();
+  /**
+   * Checks if the specified query is updating.
+   * @param qu query
+   * @return result of check
+   */
+  protected boolean updating(final String qu) {
+    try {
+      final QueryProcessor proc = new QueryProcessor(qu, context);
+      proc.parse();
+      return proc.ctx.updating;
+    } catch(final QueryException ex) {
+    }
+    return super.write();
   }
 
   /**

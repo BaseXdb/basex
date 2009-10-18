@@ -42,7 +42,7 @@ public final class Context {
     prop = new Prop();
     pool = new DataPool();
     sessions = new Sessions();
-    users = new Users();
+    users = new Users(true);
     user = users.get(ADMIN);
   }
 

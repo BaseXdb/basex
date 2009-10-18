@@ -1,5 +1,9 @@
 package org.basex.core.proc;
 
+import static org.basex.core.Text.*;
+
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.io.PrintOutput;
 
 /**
@@ -20,7 +24,13 @@ public final class CreateUser extends AAdmin {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    return context.users.create(args[0], args[1]) ?
-      info("User created.") : error("User exists already.");
+    final String user = args[0];
+    return context.users.create(user, args[1]) ?
+      info(USERCREATE, user) : error(USERKNOWN, user);
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.CREATE + " " + CmdCreate.USER + args();
   }
 }

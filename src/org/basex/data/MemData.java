@@ -301,12 +301,4 @@ public class MemData extends Data {
   public final void update(final int pre, final byte[] text) {
     Main.notimplemented();
   }
-
-  @Override
-  public final int getLock() {
-    return 0;
-  }
-
-  @Override
-  public final void setLock(final int l) { }
 }

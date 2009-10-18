@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import java.util.Arrays;
 import org.basex.core.Context;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -26,13 +25,18 @@ public final class Find extends AQuery {
    * @param query simplified query
    */
   public Find(final String query) {
-    super(DATAREF | User.READ, query);
+    super(DATAREF, query);
   }
 
   @Override
   protected boolean exec(final PrintOutput out) {
     final String query = args[0] == null ? "" : args[0];
     return query(find(query, context, false));
+  }
+
+  @Override
+  public boolean write() {
+    return false;
   }
 
   /**

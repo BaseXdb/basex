@@ -383,9 +383,17 @@ uc_invalid=不正な名 "%"
 uc_txtinvalid=テキストノードを空に出来ません。
 uc_namespaces=名前空間付きの文書を更新できません。
 
-# Server Commands
-sv_databases=% opened database(s)
-sv_sessions=% session(s)
+# Admin Commands
+ad_databases=% opened database(s)
+ad_sessions=% session(s)
+ad_permno=% permission needed.
+ad_perminv=Invalid permissions specified.
+ad_permdel=Permission revoked.
+ad_permadd=Permission granted.
+ad_userno=User '%' is unknown.
+ad_userknown=User '%' exists already.
+ad_usercreate=User '%' created.
+ad_userdrop=User '%' dropped.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -496,6 +504,7 @@ ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
+ch_show24=shows database users.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions to a user.
 ch_revoke1=Revoke user permissions.

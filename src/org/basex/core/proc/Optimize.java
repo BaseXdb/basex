@@ -27,7 +27,7 @@ public final class Optimize extends ACreate {
    * Default constructor.
    */
   public Optimize() {
-    super(DATAREF | UPDATING | User.CREATE);
+    super(DATAREF | User.WRITE);
   }
 
   @Override

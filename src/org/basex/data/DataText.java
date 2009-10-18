@@ -61,6 +61,8 @@ public interface DataText {
   String DBLID = "LASTID";
   /** FS Mount point. */
   String DBMNT = "MOUNT";
+  /** Permissions. */
+  String DBPERM = "PERM";
   /** FS Backing store. */
   String DBBCK = "BACKING";
   /** DeepFS instance. */

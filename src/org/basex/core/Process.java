@@ -1,9 +1,8 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
-
+import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -24,8 +23,6 @@ import org.basex.util.TokenBuilder;
 public abstract class Process extends Progress {
   /** Commands flag: standard. */
   protected static final int STANDARD = 256;
-  /** Commands flag: updating command. */
-  protected static final int UPDATING = 512;
   /** Commands flag: data reference needed. */
   protected static final int DATAREF = 1024;
 
@@ -35,7 +32,7 @@ public abstract class Process extends Progress {
   /** Command arguments. */
   public String[] args;
   /** Database context. */
-  protected Context context;
+  public Context context;
   /** Database properties. */
   protected Prop prop;
 
@@ -87,34 +84,36 @@ public abstract class Process extends Progress {
     context = ctx;
     prop = ctx.prop;
 
-    // [CG] Server: check user rights
-    final User user = context.user;
-    String perm = null;
-    if(admin() && !user.perm(User.ADMIN)) perm = "admin";
-    else if(create() && !user.perm(User.CREATE)) perm = "create";
-    else if(write() && !user.perm(User.WRITE)) perm = "write";
-    else if(read() && !user.perm(User.READ)) perm = "read";
-    if(perm != null)
-      return error("User has no global '" + perm + "' rights.");
-
+    // check if process needs data reference
     final Data data = context.data();
-    // data reference needed?
     if(data()) {
       if(data == null) return error(PROCNODB);
       // check update commands..
-      if(updating() && (prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM)))
+      if(write() && (prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM)))
         return error(PROCMM);
     }
 
-    // [AW] comment this out to disable database locking
-    /*if(data != null) {
-      // wait until update and read operations have been completed..
-      while(data.getLock() == 2 || (updating() && data.getLock() != 0))
-        Performance.sleep(50);
-    }*/
+    // check permissions
+    User user = context.user;
+    CmdPerm perm = null;
+    if(admin() && !user.perm(User.ADMIN)) {
+      perm = CmdPerm.ADMIN;
+    } else if(create() && !user.perm(User.CREATE)) {
+      perm = CmdPerm.CREATE;
+    } else {
+      // include local rights
+      if(data != null) {
+        final User us = data.meta.users.get(user.name);
+        if(us != null) user = us;
+      }
+      if(write() && !user.perm(User.WRITE)) {
+        perm = CmdPerm.WRITE;
+      } else if(read() && !user.perm(User.READ)) {
+        perm = CmdPerm.READ;
+      }
+    }
+    if(perm != null) return error(PERMNO, perm);
 
-    //boolean ok = false;
-    //if(data != null) data.setLock(updating() ? 2 : 1);
     try {
       return exec(out);
     } catch(final Throwable ex) {
@@ -122,15 +121,10 @@ public abstract class Process extends Progress {
       ex.printStackTrace();
       if(ex instanceof OutOfMemoryError) {
         Performance.gc(2);
-        error(PROCOUTMEM);
-      } else {
-        error(PROCERR, this, ex.toString());
+        return error(PROCOUTMEM);
       }
+      return error(PROCERR, this, ex.toString());
     }
-    return false;
-    
-    //if(data != null) data.setLock(0);
-    //return ok;
   }
 
   /**
@@ -155,14 +149,6 @@ public abstract class Process extends Progress {
    */
   public boolean data() {
     return (flags & DATAREF) != 0;
-  }
-
-  /**
-   * Returns if the current command generates updates in the data structure.
-   * @return result of check
-   */
-  public boolean updating() {
-    return (flags & UPDATING) != 0;
   }
 
   /**

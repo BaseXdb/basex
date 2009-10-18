@@ -1,8 +1,12 @@
 package org.basex.core.proc;
 
+import static org.basex.core.Text.*;
+import java.io.IOException;
+import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.data.Data;
 
 /**
  * Evaluates the 'create user' command and creates a new user.
@@ -27,21 +31,50 @@ public abstract class AAdmin extends Process {
   protected boolean perm(final boolean set) {
     final String db = args[2];
 
+    // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
     int perm = -1;
     if(cmd == CmdPerm.READ) {
       perm = User.READ;
     } else if(cmd == CmdPerm.WRITE) {
       perm = User.WRITE;
-    } else if(db == null && cmd == CmdPerm.CREATE) {
+    } else if(cmd == CmdPerm.CREATE && db == null) {
       perm = User.CREATE;
-    } else if(db == null && cmd == CmdPerm.ADMIN) {
+    } else if(cmd == CmdPerm.ADMIN && db == null) {
       perm = User.ADMIN;
+    } else if(cmd == CmdPerm.ALL) {
+      perm = db == null ? User.READ | User.WRITE | User.CREATE | User.ADMIN :
+        User.READ | User.WRITE;
     }
-    if(perm == -1) return error("Invalid permission flag.");
+    if(perm == -1) return error(PERMINV);
 
-    // [AW] Missing: permissions for specific databases
-    return context.users.perm(args[1], set, perm) ?
-        info("Permission removed.") : error("User is unknown");
+    final User user = context.users.get(args[1]);
+    if(user == null) return error(USERNO, args[1]);
+
+    if(db == null) {
+      // global permissions
+      user.perm(set, perm);
+      context.users.write();
+    } else {
+      try {
+        final Data data = Open.open(context, db);
+        User u = data.meta.users.get(args[1]);
+        // add local user reference
+        if(u == null) {
+          u = user.copy();
+          u.perm(false, User.ADMIN);
+          u.perm(false, User.CREATE);
+          data.meta.users.add(u);
+        }
+        u.perm(set, perm);
+        data.meta.dirty = true;
+        Close.close(context, data);
+      } catch(final IOException ex) {
+        Main.debug(ex);
+        final String msg = ex.getMessage();
+        return msg.length() != 0 ? error(msg) : error(DBOPENERR, db);
+      }
+    }
+    return info(set ? PERMADD : PERMDEL);
   }
 }

@@ -20,7 +20,7 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(User.READ);
+    super(User.READ | User.CREATE);
   }
 
   @Override

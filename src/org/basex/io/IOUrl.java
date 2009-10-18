@@ -25,21 +25,6 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public boolean exists() {
-    return true;
-    /*
-    try {
-      // enough?...
-      //new URL(path).openConnection();
-      new URL(path).openStream();
-      return true;
-    } catch(IOException ex) {
-      BaseX.debug(ex);
-      return false;
-    }*/
-  }
-
-  @Override
   public InputSource inputSource() {
     return new InputSource(path);
   }

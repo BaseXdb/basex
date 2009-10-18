@@ -3,6 +3,8 @@ package org.basex.core.proc;
 import java.io.IOException;
 
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdInfo;
 import org.basex.io.PrintOutput;
 
 /**
@@ -21,8 +23,12 @@ public final class InfoUsers extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    // [AW] ...should return users of current database
-    out.println(context.users.info());
+    out.println(context.data().meta.users.info());
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.INFO + " " + CmdInfo.USERS;
   }
 }

@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.NewFSParser;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.PrintOutput;
@@ -23,7 +22,7 @@ public final class CreateFS extends ACreate {
    * @param name name of database
    */
   public CreateFS(final String path, final String name) {
-    super(STANDARD | User.CREATE, path, name);
+    super(STANDARD, path, name);
   }
 
   @Override

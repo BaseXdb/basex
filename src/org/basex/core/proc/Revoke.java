@@ -1,5 +1,8 @@
 package org.basex.core.proc;
 
+import static org.basex.core.Text.*;
+
+import org.basex.core.Commands.Cmd;
 import org.basex.io.PrintOutput;
 
 /**
@@ -31,5 +34,12 @@ public final class Revoke extends AAdmin {
   @Override
   protected boolean exec(final PrintOutput out) {
     return perm(false);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Cmd.REVOKE + " " + args[0]);
+    if(args[2] != null) sb.append(" " + ON + " " + args[2]);
+    return sb.append(" " +  FROM + " " + args[1]).toString();
   }
 }

@@ -27,6 +27,7 @@ public final class QueryProcessor extends Progress {
   public final QueryContext ctx;
   /** Initial node set. */
   public String query;
+
   /** Parsed flag. */
   private boolean parsed;
   /** Compilation flag. */

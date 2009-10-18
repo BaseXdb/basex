@@ -439,7 +439,8 @@ public final class GUI extends JFrame {
       proc = pr;
 
       // execute command
-      updating = pr.updating();
+      final boolean up = pr.write();
+      updating = up;
       // retrieve text result
       final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));
       final boolean ok = pr.execute(context, out);
@@ -491,7 +492,7 @@ public final class GUI extends JFrame {
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(pr.updating()) {
+        } else if(up) {
           // update command
           notify.update();
         } else if(result != null) {

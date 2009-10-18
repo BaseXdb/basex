@@ -20,7 +20,7 @@ public final class Close extends Process {
    * Default constructor.
    */
   public Close() {
-    super(STANDARD | User.READ);
+    super(User.READ);
   }
 
   @Override

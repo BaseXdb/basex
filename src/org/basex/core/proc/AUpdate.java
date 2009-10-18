@@ -26,7 +26,7 @@ abstract class AUpdate extends Process {
    * @param a arguments
    */
   protected AUpdate(final boolean g, final String... a) {
-    super(DATAREF | UPDATING | User.WRITE, a);
+    super(DATAREF | User.WRITE, a);
     gui = g;
   }
 

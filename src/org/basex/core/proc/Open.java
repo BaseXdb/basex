@@ -25,7 +25,7 @@ public final class Open extends Process {
    * @param name name of database
    */
   public Open(final String name) {
-    super(STANDARD | User.READ, name);
+    super(STANDARD, name);
   }
 
   @Override
@@ -38,6 +38,11 @@ public final class Open extends Process {
     try {
       if(data == null || !data.meta.name.equals(db)) {
         data = open(context, db);
+        
+        User user = context.user;
+        final User us = data.meta.users.get(user.name);
+        if(us != null) user = us;
+        
         context.openDB(data);
         if(data.meta.oldindex) info(INDUPDATE);
       }
@@ -45,7 +50,7 @@ public final class Open extends Process {
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
-      return error(msg.length() != 0 ? msg : DBOPENERR);
+      return msg.length() != 0 ? error(msg) : error(DBOPENERR, db);
     }
   }
 

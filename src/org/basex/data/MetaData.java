@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Users;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -23,6 +24,8 @@ public final class MetaData {
 
   /** Database name. */
   public String name;
+  /** Database users. */
+  public Users users;
   
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
@@ -94,6 +97,7 @@ public final class MetaData {
     ftst = prop.is(Prop.FTST);
     ftdc = prop.is(Prop.FTDC);
     ftcs = prop.is(Prop.FTCS);
+    users = new Users(false);
   }
 
   /**
@@ -166,6 +170,10 @@ public final class MetaData {
     while(true) {
       final String k = in.readString();
       if(k.length() == 0) break;
+      if(k.equals(DBPERM)) {
+        users = new Users(in);
+        continue;
+      }
       final String v = in.readString();
 
       if(k.equals(DBSTR))         storage   = v;
@@ -194,7 +202,6 @@ public final class MetaData {
       else if(k.equals(DBBCK))    backing   = v;
       else if(k.equals(DBDEEPFS)) deepfs    = toBool(v);
     }
-
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) {
       oldindex = true;
@@ -212,7 +219,7 @@ public final class MetaData {
   }
 
   /**
-   * Writes the database to the specified path.
+   * Writes the meta data to the specified output stream.
    * @param out output stream
    * @throws IOException IO Exception
    */
@@ -241,6 +248,8 @@ public final class MetaData {
     writeInfo(out, DBBCK,    backing);
     writeInfo(out, DBMNT,    mount);
     writeInfo(out, DBDEEPFS, deepfs);
+    out.writeString(DBPERM);
+    users.write(out);
     out.write(0);
   }
 

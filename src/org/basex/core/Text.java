@@ -374,18 +374,20 @@ public interface Text {
   String KILL2 = lang("ch_kill2");
 
   /** Command help. */
-  String SHOW0 = "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "]";
+  String SHOW0 = "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
+    CmdShow.USERS + "]";
   /** Command help. */
   String SHOW1 = lang("ch_show1");
   /** Command help. */
   String SHOW2 = lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
-    LI + CmdShow.SESSIONS + ": " + lang("ch_show23");
+    LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
+    LI + CmdShow.USERS + ": " + lang("ch_show24");
 
   /** Command help. */
   String GRANT0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " +
-    TO + " [user]";
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" +
+    ON + " [db]) " + TO + " [user]";
   /** Command help. */
   String GRANT1 = lang("ch_grant1");
   /** Command help. */
@@ -393,8 +395,8 @@ public interface Text {
 
   /** Command help. */
   String REVOKE0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " +
-    FROM + " [user]";
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" +
+    ON + " [db]) " + FROM + " [user]";
   /** Command help. */
   String REVOKE1 = lang("ch_revoke1");
   /** Command help. */
@@ -652,12 +654,28 @@ public interface Text {
   /** Update namespaces error. */
   String UPDATENS = lang("uc_namespaces");
 
-  // SERVER COMMANDS ==========================================================
+  // ADMIN COMMANDS ==========================================================
 
-  /** Database not found. */
-  String SRVDATABASES = lang("sv_databases");
-  /** Database not found. */
-  String SRVSESSIONS = lang("sv_sessions");
+  /** Show databases. */
+  String SRVDATABASES = lang("ad_databases");
+  /** Show sessions. */
+  String SRVSESSIONS = lang("ad_sessions");
+  /** Show sessions. */
+  String PERMNO = lang("ad_permno");
+  /** Invalid permissions. */
+  String PERMINV = lang("ad_perminv");
+  /** Permission granted. */
+  String PERMDEL = lang("ad_permdel");
+  /** Permission revoked. */
+  String PERMADD = lang("ad_permadd");
+  /** User not found. */
+  String USERNO = lang("ad_userno");
+  /** User dropped. */
+  String USERDROP = lang("ad_userdrop");
+  /** User added. */
+  String USERCREATE = lang("ad_usercreate");
+  /** User added. */
+  String USERKNOWN = lang("ad_userknown");
 
   // GENERAL COMMANDS =========================================================
 
