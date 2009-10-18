@@ -79,7 +79,6 @@ public final class GUIStatus extends BaseXPanel {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    BaseXLayout.antiAlias(g, gui.prop);
 
     final int ww = getWidth() - MEMW;
     final int hh = getHeight();

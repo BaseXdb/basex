@@ -1,5 +1,7 @@
 package org.basex.gui;
 
+import java.awt.Font;
+
 import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -19,15 +21,13 @@ public final class GUIProp extends AProp {
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Default GUI Font. */
-  public static final Object[] FONT = { "FONT", "SansSerif" };
+  public static final Object[] FONT = { "FONT", Font.SANS_SERIF };
   /** Default GUI Monospace Font. */
-  public static final Object[] MONOFONT = { "MONOFONT", "Monospaced" };
+  public static final Object[] MONOFONT = { "MONOFONT", Font.MONOSPACED };
   /** Font TYPE = plain, bold, italics). */
   public static final Object[] FONTTYPE = { "FONTTYPE", 0 };
   /** Font size. */
   public static final Object[] FONTSIZE = { "FONTSIZE", 12 };
-  /** Anti-aliasing mode. */
-  public static final Object[] FONTALIAS = { "FONTALIAS", 1 };
 
   /** Red GUI color factor. */
   public static final Object[] COLORRED = { "COLORRED", 18 };

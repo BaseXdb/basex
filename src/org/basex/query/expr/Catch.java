@@ -57,13 +57,13 @@ public final class Catch extends Single {
 
     final int s = ctx.vars.size();
     if(var.length > 0) {
-      ctx.vars.add(var[0].bind(new QNm(code), ctx).clone());
+      ctx.vars.add(var[0].bind(new QNm(code), ctx).copy());
     }
     if(var.length > 1) {
-      ctx.vars.add(var[1].bind(Str.get(ex.simple()), ctx).clone());
+      ctx.vars.add(var[1].bind(Str.get(ex.simple()), ctx).copy());
     }
     if(var.length > 2) {
-      ctx.vars.add(var[2].bind(ex.iter.finish(), ctx).clone());
+      ctx.vars.add(var[2].bind(ex.iter.finish(), ctx).copy());
     }
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);

@@ -11,7 +11,6 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
@@ -242,7 +241,6 @@ public final class InfoView extends View {
     super.paintComponent(g);
     final int l = stat.size();
     if(l == 0) return;
-    BaseXLayout.antiAlias(g, gui.prop);
 
     h = north.getHeight();
     w = getWidth() - 8;

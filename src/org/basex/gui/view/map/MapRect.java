@@ -9,7 +9,7 @@ import org.basex.gui.view.ViewRect;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
+final class MapRect extends ViewRect implements Comparable<MapRect> {
   /** File Type. */
   short type = -1;
   /** Thumbnail view. */
@@ -67,6 +67,23 @@ final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
   }
 
   /**
+   * Copies the rectangle.
+   * @return rectangle
+   */
+  MapRect copy() {
+    final MapRect rect = new MapRect(x, y, w, h, pre, level);
+    rect.pos = pos;
+    rect.type = type;
+    rect.thumbal = thumbal;
+    rect.thumbfh = thumbfh;
+    rect.thumblh = thumblh;
+    rect.thumbf = thumbf;
+    rect.thumbsw = thumbsw;
+    rect.isLeaf = isLeaf;
+    return rect;
+  }
+
+  /**
    * Verifies if the specified rectangle is contained inside the rectangle.
    * @param r rectangle
    * @return result of comparison
@@ -77,14 +94,5 @@ final class MapRect extends ViewRect implements Cloneable, Comparable<MapRect> {
 
   public int compareTo(final MapRect r) {
     return pre - r.pre;
-  }
-
-  @Override
-  public MapRect clone() {
-    try {
-      return (MapRect) super.clone();
-    } catch(final CloneNotSupportedException ex) {
-      return null;
-    }
   }
 }

@@ -64,7 +64,7 @@ public final class Users {
 
   /**
    * Returns a user reference if the name/password combination is correct.
-   * @param usern user name 
+   * @param usern user name
    * @param pw password
    * @return success of operation
    */
@@ -101,7 +101,7 @@ public final class Users {
         Main.debug(ex);
       }
     } else {
-      // create admin user with all rights
+      // create initial admin user with all rights
       users.add(new User(ADMIN, crypt.encrypt(Token.token(ADMIN)),
           User.READ | User.WRITE | User.CREATE | User.ADMIN));
       write();
@@ -137,7 +137,7 @@ public final class Users {
     final TokenBuilder tb = new TokenBuilder();
     if(size != 0) {
       // get maximum column widths
-      int[] ind = new int[5];
+      final int[] ind = new int[5];
       for(final User u : users) ind[0] = Math.max(ind[0], u.name.length());
       for(int u = 0; u < USERS.length; u++) {
         ind[u] = Math.max(ind[u], USERS[u].length()) + 2;

@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This class provides operations to compress and decompress integer values
  * in byte arrays to save memory.
@@ -93,10 +95,7 @@ public final class Num {
    */
   private static byte[] check(final byte[] tmp, final int pos, final int len) {
     final int s = tmp.length;
-    if(pos + len < s) return tmp;
-    final byte[] t = new byte[s + Math.max(len, s >> 3)];
-    System.arraycopy(tmp, 0, t, 0, s);
-    return t;
+    return pos + len < s ? tmp : Arrays.copyOf(tmp, s + Math.max(len, s >> 3));
   }
 
   /**

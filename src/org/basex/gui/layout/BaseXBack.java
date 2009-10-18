@@ -2,6 +2,10 @@ package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Toolkit;
+import java.util.Map;
+
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUIConstants;
@@ -14,6 +18,9 @@ import org.basex.gui.GUIConstants.Fill;
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
+  /** Desktop hints. */
+  protected static final Map<?, ?> HINTS = (Map<?, ?>)
+    (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
   /** Fill mode. */
   private Fill mode;
 
@@ -52,6 +59,7 @@ public class BaseXBack extends JPanel {
     } else {
       super.paintComponent(g);
     }
+    ((Graphics2D) g).addRenderingHints(HINTS);
   }
 
   /**

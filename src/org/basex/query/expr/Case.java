@@ -56,7 +56,7 @@ public final class Case extends Single {
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
-    ctx.vars.add(var.bind(seq.finish(), ctx).clone());
+    ctx.vars.add(var.bind(seq.finish(), ctx).copy());
     final Iter ir = ctx.iter(expr);
     ctx.vars.reset(s);
     return ir;

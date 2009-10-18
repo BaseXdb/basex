@@ -7,9 +7,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
@@ -294,36 +292,6 @@ public final class BaseXLayout {
 
     fill(g, focus ? COLORCELL : Color.white, COLORCELL,
         xs + 2, ys + 2, xe - 1, ye - 1);
-  }
-
-  /**
-   * Sets the specified anti-aliasing rendering.
-   * @param g graphics reference
-   * @param pr database properties
-   */
-  public static void antiAlias(final Graphics g, final GUIProp pr) {
-    Object rh = RenderingHints.VALUE_ANTIALIAS_ON;
-    try {
-      rh = RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_" +
-          GUIConstants.FONTALIAS[pr.num(GUIProp.FONTALIAS)]).get(null);
-    } catch(final Exception ex) {
-      Main.debug(ex);
-    }
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, rh);
-  }
-
-  /**
-   * Checks if the Java version supports all anti-aliasing variants.
-   * @return result of check
-   */
-  public static boolean fullAlias() {
-    try {
-      // check if Java 1.6 rendering is available; if not, use default rendering
-      RenderingHints.class.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
-      return true;
-    } catch(final Exception ex) {
-      return false;
-    }
   }
 
   /**

@@ -82,11 +82,9 @@ public abstract class Iter {
     Item[] item = { i };
     int s = 1;
     while((i = next()) != null) {
-      if(s == item.length) {
-        final Item[] tmp = new Item[s << 1];
-        System.arraycopy(item, 0, tmp, 0, s);
-        item = tmp;
-      }
+      final Item[] tmp = new Item[s << 1];
+      System.arraycopy(item, 0, tmp, 0, s);
+      item = tmp;
       item[s++] = i;
     }
     return Seq.get(item, s);

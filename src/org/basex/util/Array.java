@@ -9,8 +9,6 @@ package org.basex.util;
 public final class Array {
   /** Empty integer array. */
   public static final int[] NOINTS = {};
-  /** Empty integer array. */
-  public static final int[][] NOINTS2 = {};
 
   /** Private constructor. */
   private Array() { }

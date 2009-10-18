@@ -35,7 +35,7 @@ public final class List extends Process {
     int max = 0;
     for(final String s : list) max = Math.max(max, s.length());
 
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(list.length == 0) {
       tb.add(INFONODB + NL);
     } else {

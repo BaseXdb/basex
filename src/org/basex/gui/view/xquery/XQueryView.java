@@ -91,8 +91,7 @@ public final class XQueryView extends View {
           }
         };
 
-        final String[] hs = gui.prop.strings(GUIProp.QUERIES);
-        for(final String en : hs) {
+        for(final String en : gui.prop.strings(GUIProp.QUERIES)) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
           popup.add(jmi);

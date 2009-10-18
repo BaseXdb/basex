@@ -39,15 +39,14 @@ import org.basex.server.ClientSession;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class DialogServer extends Dialog {
-
+public final class DialogServer extends Dialog {
+  /** ArrayList for table. */
+  final ArrayList<Object[]> data = new ArrayList<Object[]>();
   /** Context. */
-  Context ctx = gui.context;
+  final Context ctx = gui.context;
   /** ClientSession. */
   ClientSession cs;
-  /** ArrayList for table. */
-  ArrayList<Object[]> data = new ArrayList<Object[]>();
-  /** Itemarray for combobox. */
+  /** Item array for combobox. */
   String[] usernames = new String[] {};
 
   /**
@@ -108,7 +107,7 @@ public class DialogServer extends Dialog {
         tabs.setEnabledAt(1, false);
         try {
           cs.execute(new IntStop(), null);
-        } catch(IOException e1) {
+        } catch(final IOException e1) {
           e1.printStackTrace();
         }
       }
@@ -132,7 +131,7 @@ public class DialogServer extends Dialog {
         try {
           p = Integer.parseInt(port.getText());
           ctx.prop.set(Prop.PORT, p);
-        } catch(NumberFormatException n) {
+        } catch(final NumberFormatException n) {
           port.setText(String.valueOf(p));
         }
       }
@@ -257,14 +256,14 @@ public class DialogServer extends Dialog {
     final CachedOutput out = new CachedOutput();
     try {
       cs.execute(new Show("Users"), out);
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
     String info = out.toString();
     info = info.substring(info.lastIndexOf("-") + 3);
-    Scanner s = new Scanner(info);
+    final Scanner s = new Scanner(info);
     while(s.hasNextLine()) {
-      String line = s.nextLine();
+      final String line = s.nextLine();
       if(line.isEmpty()) break;
       for(int i = 0; i < line.length(); i++) {
         //System.out.println(line.charAt(i));

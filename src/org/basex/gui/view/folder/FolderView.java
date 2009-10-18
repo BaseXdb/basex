@@ -183,7 +183,6 @@ public final class FolderView extends View {
 
     super.paintComponent(g);
     if(opened == null) return;
-    BaseXLayout.antiAlias(g, gui.prop);
 
     gui.painting = true;
     startY = -scroll.pos();

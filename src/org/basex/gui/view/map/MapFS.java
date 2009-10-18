@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.data.Data;
@@ -105,10 +107,9 @@ final class MapFS extends MapPainter {
       // skip drawing of string when left space is too small
       if(r.w < min || r.h < min) continue;
 
-      final MapRect cr = r.clone();
-      if(drawRectangle(g, cr)) {
-        cr.x += 4;
-        cr.w -= 8;
+      if(drawRectangle(g, r.copy())) {
+        r.x += 4;
+        r.w -= 8;
 
         final TokenBuilder tb = new TokenBuilder();
         int k = data.kind(pre);
@@ -129,8 +130,10 @@ final class MapFS extends MapPainter {
           }
           p += data.attSize(p, k);
         }
+        r.x -= 4;
+        r.w += 8;
         g.setFont(mfont);
-        MapRenderer.drawText(g, cr, tb.finish(), fsz);
+        MapRenderer.drawText(g, r, tb.finish(), fsz);
       }
     }
   }
@@ -166,10 +169,8 @@ final class MapFS extends MapPainter {
           iw *= min;
           ih *= min;
         }
-        rect.x += PICOFFSET;
-        rect.y += PICOFFSET;
-        g.drawImage(image, rect.x + (ww - (int) iw >> 1),
-            rect.y + (hh - (int) ih >> 1), (int) iw, (int) ih, view);
+        g.drawImage(image, rect.x + PICOFFSET + (ww - (int) iw >> 1), rect.y +
+            PICOFFSET + (hh - (int) ih >> 1), (int) iw, (int) ih, view);
         return false;
       }
     }
@@ -289,11 +290,7 @@ final class MapFS extends MapPainter {
     }
 
     // draw file contents or binary information
-    if(s < fileBuf.length) {
-      final byte[] tmp = new byte[(int) s];
-      System.arraycopy(fileBuf, 0, tmp, 0, (int) s);
-      fileBuf = tmp;
-    }
+    if(s < fileBuf.length) fileBuf = Arrays.copyOf(fileBuf, (int) s);
 
     final int size = data.size(pre, Data.ELEM);
     rect.pos = null;

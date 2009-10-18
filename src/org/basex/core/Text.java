@@ -1212,8 +1212,6 @@ public interface Text {
 
   /** Dialog title for choosing a font. */
   String FONTTITLE = lang("df_title");
-  /** Anti-Aliasing information. */
-  String FAALIAS = lang("df_aalias");
   /** Predefined font types. */
   String[] FONTTYPES = { lang("df_type1"), lang("df_type2"), lang("df_type3") };
 

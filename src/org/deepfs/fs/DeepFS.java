@@ -2,10 +2,9 @@ package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -713,19 +712,10 @@ public final class DeepFS implements DataText {
   public void launch(final int pre) {
     if(pre == -1 || !isFile(pre)) return;
 
-    final String path = string(path(pre, false));
     try {
-      final Runtime run = Runtime.getRuntime();
-      if(Prop.MAC) {
-        run.exec(new String[] { "open", path});
-      } else if(Prop.UNIX) {
-        run.exec(new String[] { "xdg-open", path});
-      } else {
-        run.exec("rundll32.exe url.dll,FileProtocolHandler " + path);
-      }
-    } catch(final IOException ex) {
+      Desktop.getDesktop().open(new File(string(path(pre, false))));
+    } catch(final Exception ex) {
       Main.debug(ex);
-      ex.printStackTrace();
     }
   }
 

@@ -51,21 +51,25 @@ public class BaseX extends Main {
    * Constructor.
    */
   protected final void run() {
-    boolean u = false;
-    if(file != null) {
-      // query file contents
-      Prop.xquery = IO.get(file);
-      final String query = content();
-      if(query != null) process(new XQuery(query), true);
-    } else if(commands != null) {
-      // process command-line arguments
-      process(commands);
-    } else {
-      // enter interactive mode
-      outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
-      u = console();
+    try {
+      boolean u = false;
+      if(file != null) {
+        // query file contents
+        Prop.xquery = IO.get(file);
+        final String query = content();
+        if(query != null) process(new XQuery(query), true);
+      } else if(commands != null) {
+        // process command-line arguments
+        process(commands);
+      } else {
+        // enter interactive mode
+        outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
+        u = console();
+      }
+      quit(u);
+    } catch(final IOException ex) {
+      error(ex, true);
     }
-    quit(u);
   }
 
   /**
@@ -95,71 +99,77 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected Session session() {
+  @SuppressWarnings("unused")
+  protected Session session() throws IOException {
     if(session == null) session = new LocalSession(context);
     return session;
   }
 
   @Override
   protected final void parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    success = true;
-    while(arg.more() && success) {
-      if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'c') {
-          // send database commands
-          commands = arg.remaining();
-        } else if(c == 'd') {
-          // activate debug mode
-          context.prop.set(Prop.DEBUG, true);
-        } else if(c == 'D' && sa()) {
-          // hidden option: show dot query graph
-          success = set(Prop.DOTPLAN, true);
-        } else if(c == 'm') {
-          // hidden option: activate table main memory mode
-          success = set(Prop.TABLEMEM, true);
-        } else if(c == 'M') {
-          // hidden option: activate main memory mode
-          success = set(Prop.MAINMEM, true);
-        } else if(c == 'n' && !sa()) {
-          // parse server name
-          context.prop.set(Prop.HOST, arg.string());
-        } else if(c == 'o') {
-          // specify file for result output
-          output = arg.string();
-        } else if(c == 'p' && !sa()) {
-          // parse server port
-          context.prop.set(Prop.PORT, arg.num());
-        } else if(c == 'r') {
-          // hidden option: parse number of runs
-          success = set(Prop.RUNS, arg.string());
-        } else if(c == 'u' && !sa()) {
-          // specify user name
-          user = arg.string();
-        } else if(c == 'v') {
-          // show process info
-          success = set(Prop.INFO, true);
-        } else if(c == 'V') {
-          // show all process info
-          success = set(Prop.INFO, ALL);
-        } else if(c == 'x') {
-          // activate well-formed XML output
-          success = set(Prop.XMLOUTPUT, true);
-        } else if(c == 'X') {
-          // hidden option: show xml query plan
-          success = set(Prop.XMLPLAN, true);
-        } else if(c == 'z') {
-          // turn off result serialization
-          success = set(Prop.SERIALIZE, false);
+    try {
+      final Args arg = new Args(args);
+      success = true;
+      while(arg.more() && success) {
+        if(arg.dash()) {
+          final char c = arg.next();
+          if(c == 'c') {
+            // send database commands
+            commands = arg.remaining();
+          } else if(c == 'd') {
+            // activate debug mode
+            context.prop.set(Prop.DEBUG, true);
+          } else if(c == 'D' && sa()) {
+            // hidden option: show dot query graph
+            success = set(Prop.DOTPLAN, true);
+          } else if(c == 'm') {
+            // hidden option: activate table main memory mode
+            success = set(Prop.TABLEMEM, true);
+          } else if(c == 'M') {
+            // hidden option: activate main memory mode
+            success = set(Prop.MAINMEM, true);
+          } else if(c == 'n' && !sa()) {
+            // parse server name
+            context.prop.set(Prop.HOST, arg.string());
+          } else if(c == 'o') {
+            // specify file for result output
+            output = arg.string();
+          } else if(c == 'p' && !sa()) {
+            // parse server port
+            context.prop.set(Prop.PORT, arg.num());
+          } else if(c == 'r') {
+            // hidden option: parse number of runs
+            success = set(Prop.RUNS, arg.string());
+          } else if(c == 'u' && !sa()) {
+            // specify user name
+            user = arg.string();
+          } else if(c == 'v') {
+            // show process info
+            success = set(Prop.INFO, true);
+          } else if(c == 'V') {
+            // show all process info
+            success = set(Prop.INFO, ALL);
+          } else if(c == 'x') {
+            // activate well-formed XML output
+            success = set(Prop.XMLOUTPUT, true);
+          } else if(c == 'X') {
+            // hidden option: show xml query plan
+            success = set(Prop.XMLPLAN, true);
+          } else if(c == 'z') {
+            // turn off result serialization
+            success = set(Prop.SERIALIZE, false);
+          } else {
+            success = false;
+          }
         } else {
-          success = false;
+          file = file == null ? arg.string() : file + " " + arg.string();
         }
-      } else {
-        file = file == null ? arg.string() : file + " " + arg.string();
       }
+      console = file == null && commands == null;
+      if(!success) outln(sa() ? LOCALINFO : CLIENTINFO);
+    } catch(final IOException ex) {
+      error(ex, true);
+      success = false;
     }
-    console = file == null && commands == null;
-    if(!success) outln(sa() ? LOCALINFO : CLIENTINFO);
   }
 }

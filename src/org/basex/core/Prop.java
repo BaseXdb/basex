@@ -26,10 +26,11 @@ public final class Prop extends AProp {
   public static final String HOME = System.getProperty("user.home") + SEP;
   /** System's temporary directory. */
   public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
+
   /** OS Flag (should be ignored whenever possible). */
-  public static final String OS = System.getProperty("os.name");
-  /** Flag denoting if OS belongs not to Windows family. */
-  public static final boolean UNIX = OS.charAt(0) != 'W';
+  private static final String OS = System.getProperty("os.name");
+  /** Flag denoting if OS belongs not to Windows family.
+  public static final boolean UNIX = OS.charAt(0) != 'W';*/
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
 
@@ -222,6 +223,7 @@ public final class Prop extends AProp {
 
   @Override
   protected void finish() {
+    // set static properties
     Prop.language = get(Prop.LANGUAGE);
     Prop.langkeys = is(Prop.LANGKEYS);
     Prop.debug = is(Prop.DEBUG);

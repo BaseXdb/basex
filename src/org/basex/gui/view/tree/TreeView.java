@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
@@ -151,8 +152,6 @@ public final class TreeView extends View {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-
-    BaseXLayout.antiAlias(g, gui.prop);
     g.setFont(GUIConstants.font);
 
     // timer
@@ -486,14 +485,12 @@ public final class TreeView extends View {
    * Highlights the marked nodes.
    */
   private void markNodes() {
-
     refreshedMark = false;
     markedImage = createImage();
     final Graphics mIg = markedImage.getGraphics();
 
     final int size = gui.context.marked().size();
-    final int[] marked = new int[size];
-    System.arraycopy(gui.context.marked().sorted, 0, marked, 0, size);
+    final int[] marked = Arrays.copyOf(gui.context.marked().sorted, size);
 
     for(int k = 0; k < rectsPerLevel.size(); k++) {
 

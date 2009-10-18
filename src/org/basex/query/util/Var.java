@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Var extends Expr implements Cloneable {
+public final class Var extends Expr {
   /** Return type. */
   public Return ret = Return.SEQ;
   /** Global flag. */
@@ -157,13 +157,16 @@ public final class Var extends Expr implements Cloneable {
     return type.cast(it, ctx);
   }
 
-  @Override
-  public Var clone() {
-    try {
-      return (Var) super.clone();
-    } catch(final CloneNotSupportedException ex) {
-      return null;
-    }
+  /**
+   * Copies the variables.
+   * @return copied variable
+   */
+  public Var copy() {
+    final Var v = new Var(name, type, global);
+    v.ret = ret;
+    v.item = item;
+    v.expr = expr;
+    return v;
   }
 
 

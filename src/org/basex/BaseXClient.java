@@ -1,6 +1,9 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
+
+import java.io.IOException;
+
 import org.basex.core.Main;
 import org.basex.core.Session;
 import org.basex.server.ClientSession;
@@ -38,7 +41,7 @@ public final class BaseXClient extends BaseX {
   }
 
   @Override
-  protected Session session() {
+  protected Session session() throws IOException {
     if(session == null) {
       String pw = null;
       // [CG] experimental user/password input
@@ -50,13 +53,7 @@ public final class BaseXClient extends BaseX {
         Main.out(SERVERPW);
         pw = new String(System.console().readPassword());
       }
-      try {
-        session = new ClientSession(context, user, pw);
-      } catch(final Exception ex) {
-        // no server available; switches to standalone mode
-        Main.error(ex, true);
-        success = false;
-      }
+      session = new ClientSession(context, user, pw);
     }
     return session;
   }

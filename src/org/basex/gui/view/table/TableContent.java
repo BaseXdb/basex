@@ -55,8 +55,6 @@ final class TableContent extends BaseXBack {
     if(tdata.rows == null) return;
 
     gui.painting = true;
-
-    BaseXLayout.antiAlias(g, gui.prop);
     g.setFont(GUIConstants.font);
 
     final int w = getWidth() - scroll.getWidth();

@@ -299,8 +299,6 @@ public final class PlotView extends View implements Runnable {
     super.paintComponent(g);
     if(data == null || !data.meta.pathindex) return;
 
-    BaseXLayout.antiAlias(g, gui.prop);
-
     if(plotData == null) {
       refreshInit();
       return;

@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import java.util.Arrays;
+
 /**
  * Simple stemming algorithm, based on
  * "Porter [1980], An algorithm for suffix stripping".
@@ -86,11 +88,7 @@ final class Stemming {
   byte[] stem(final byte[] str) {
     te = str.length;
     tok = str;
-    if(!s()) return str;
-
-    final byte[] word = new byte[te];
-    System.arraycopy(str, 0, word, 0, te);
-    return word;
+    return !s() ? str : Arrays.copyOf(str, te);
   }
 
   /**

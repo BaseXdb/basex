@@ -144,7 +144,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
     g.setFont(getFont().deriveFont(22f));
-    BaseXLayout.antiAlias(g, gui.prop);
     BaseXLayout.drawCenter(g, VERSINFO, w, y + 30 + lh);
   }
 

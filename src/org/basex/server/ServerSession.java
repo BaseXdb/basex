@@ -25,7 +25,7 @@ import org.basex.util.Performance;
 
 /**
  * Single session for a client-server connection.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -121,7 +121,7 @@ public final class ServerSession extends Thread {
         } else {
           core = proc;
           startTimer(proc);
-          boolean up = proc.updating();
+          final boolean up = proc.updating();
           if(up) {
             server.sem.beforeWrite();
           } else {
@@ -163,7 +163,7 @@ public final class ServerSession extends Thread {
           }
 
    */
-  
+
   /**
    * Sends the success flag to the client.
    * @param out output stream

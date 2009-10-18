@@ -7,9 +7,6 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.TableLayout;
 
@@ -32,8 +29,6 @@ public final class DialogFontChooser extends Dialog {
   private final BaseXListChooser type;
   /** Font size chooser. */
   private final BaseXListChooser size;
-  /** Anti-Aliasing mode. */
-  private final BaseXCombo aalias;
 
   /**
    * Default constructor.
@@ -46,7 +41,7 @@ public final class DialogFontChooser extends Dialog {
       getAvailableFontFamilyNames();
 
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 4, 6, 6));
+    p.setLayout(new TableLayout(1, 4, 6, 6));
 
     font = new BaseXListChooser(fonts, HELPFONT, this);
     font.setSize(150, 112);
@@ -67,17 +62,6 @@ public final class DialogFontChooser extends Dialog {
     type.setValue(FONTTYPES[gprop.num(GUIProp.FONTTYPE)]);
     size.setValue(Integer.toString(gui.prop.num(GUIProp.FONTSIZE)));
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(1, 2, 5, 5));
-    pp.add(new BaseXLabel(FAALIAS));
-
-    final String[] combo = BaseXLayout.fullAlias() ? GUIConstants.FONTALIAS :
-      new String[] { GUIConstants.FONTALIAS[0], GUIConstants.FONTALIAS[1] };
-    aalias = new BaseXCombo(combo, HELPFALIAS, this);
-    aalias.setSelectedIndex(gprop.num(GUIProp.FONTALIAS));
-
-    pp.add(aalias);
-    p.add(pp);
     set(p, BorderLayout.CENTER);
 
     finish(gprop.nums(GUIProp.FONTSLOC));
@@ -91,7 +75,6 @@ public final class DialogFontChooser extends Dialog {
     gprop.set(GUIProp.MONOFONT, font2.getValue());
     gprop.set(GUIProp.FONTTYPE, type.getIndex());
     gprop.set(GUIProp.FONTSIZE, size.getNum());
-    gprop.set(GUIProp.FONTALIAS, aalias.getSelectedIndex());
     GUIConstants.initFonts(gprop);
     gui.notify.layout();
   }

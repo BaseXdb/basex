@@ -88,16 +88,15 @@ final class TableHeader extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    BaseXLayout.antiAlias(g, gui.prop);
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
-
     g.setFont(font);
     g.setColor(Color.black);
     if(tdata.rows == null) {
       BaseXLayout.drawCenter(g, NOTABLE, getWidth(), getHeight() / 2);
       return;
     }
+
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
 
     final int fsz = gui.prop.num(GUIProp.FONTSIZE);
     final int bs = BaseXBar.SIZE;

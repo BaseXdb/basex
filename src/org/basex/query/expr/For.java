@@ -72,9 +72,9 @@ public final class For extends ForLet {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    final Var v = var.clone();
-    final Var p = pos != null ? pos.clone() : null;
-    final Var s = score != null ? score.clone() : null;
+    final Var v = var.copy();
+    final Var p = pos != null ? pos.copy() : null;
+    final Var s = score != null ? score.copy() : null;
 
     return new Iter() {
       /** Variable stack size. */

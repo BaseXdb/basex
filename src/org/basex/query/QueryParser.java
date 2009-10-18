@@ -2838,10 +2838,6 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     if(e == null) error(INCOMPLETE);
-    final int size = ar.length;
-    final Expr[] t = new Expr[size + 1];
-    System.arraycopy(ar, 0, t, 0, size);
-    t[size] = e;
-    return t;
+    return Array.add(ar, e);
   }
 }

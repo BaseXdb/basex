@@ -302,7 +302,11 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      final Item i = iter(root).finish();
+      final Iter iter = iter(root);
+      // [LK] CG: only call iter.finish() for updates (..needed at all?)
+      //if(!updates) return iter;
+
+      final Item i = iter.finish();
       updates.applyUpdates();
       return i.iter();
     } catch(final StackOverflowError ex) {

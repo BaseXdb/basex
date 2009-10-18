@@ -228,7 +228,8 @@ public final class TokenBuilder {
    */
   public void add(final int m, final String s) {
     add(s);
-    for(int i = 0, is = m - s.length(); i < is; i++) add(' ');
+    final int is = m - s.length();
+    for(int i = 0; i < is; i++) add(' ');
   }
 
   /**

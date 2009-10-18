@@ -41,7 +41,7 @@ abstract class AQuery extends Process {
    * @param a arguments
    */
   protected AQuery(final int p, final String... a) {
-    super(p | User.READ, a);
+    super(p | User.READ | User.WRITE, a);
   }
 
   /**

@@ -36,7 +36,7 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final Data d) {
-    this(new int[] { }, d);
+    this(Array.NOINTS, d);
   }
 
   /**
@@ -45,7 +45,7 @@ public final class Nodes implements Result {
    * @param ft ft position data
    */
   public Nodes(final Data d, final FTPosData ft) {
-    this(new int[] { }, d, ft);
+    this(Array.NOINTS, d, ft);
   }
 
   /**

@@ -53,7 +53,7 @@ public final class Let extends ForLet {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    final Var v = var.clone();
+    final Var v = var.copy();
 
     return new Iter() {
       /** Variable stack size. */

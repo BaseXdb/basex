@@ -277,7 +277,7 @@ public final class MapView extends View implements Runnable {
     // choose zooming rectangle
     final int hist = gui.notify.hist;
     if(more) {
-      rectHist[hist] = focused.clone();
+      rectHist[hist] = focused;
       mainRect = rectHist[hist];
     } else {
       mainRect = rectHist[hist + 1];
@@ -469,7 +469,6 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
-      BaseXLayout.antiAlias(g, gui.prop);
       g.setFont(font);
       if(data.kind(focused.pre) == Data.ELEM) {
         String tt = Token.string(ViewData.tag(gprop, data, focused.pre));
@@ -649,14 +648,13 @@ public final class MapView extends View implements Runnable {
    * Creates a buffered image for the treemap.
    * @param map Image to draw the map on
    * @param rects calculated rectangles
-   * @param scale scale the rectangles
+   * @param sc scale the rectangles
    */
-  void drawMap(final BufferedImage map, final MapRects rects,
-      final float scale) {
+  void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
+    ((Graphics2D) g).addRenderingHints(HINTS);
     g.setColor(COLORS[2]);
-    BaseXLayout.antiAlias(g, gui.prop);
-    if(rects != null) painter.drawRectangles(g, rects, scale);
+    if(rects != null) painter.drawRectangles(g, rects, sc);
   }
 
   /**
@@ -909,7 +907,7 @@ public final class MapView extends View implements Runnable {
         || key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT;
     if(!cursor) return;
 
-    if(focused == null) focused = mainRects.get(0).clone();
+    if(focused == null) focused = mainRects.get(0);
 
     final int fs = gui.prop.num(GUIProp.FONTSIZE);
     int o = fs + 4;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.io.BufferInput;
 import org.basex.io.CachedInput;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -101,11 +102,7 @@ public final class XMLInput {
    * @param ci buffer to be added
    */
   private void a(final CachedInput ci) {
-    if(in.length == ++ip) {
-      final BufferInput[] tmp = new BufferInput[ip + 1];
-      System.arraycopy(in, 0, tmp, 0, ip);
-      in = tmp;
-    }
+    if(++ip == in.length) in = Array.extend(in);
     in[ip] = ci;
     ci.encoding();
   }

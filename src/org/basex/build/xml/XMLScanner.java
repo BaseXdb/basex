@@ -5,6 +5,8 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Main;
@@ -707,7 +709,8 @@ public final class XMLScanner extends Progress {
 
         final XMLInput tin = input;
         try {
-          IO file = IO.get(input.file.dir() + "/" + name);
+          final String dir = input.file.dir();
+          IO file = IO.get(dir == null ? name : dir + "/" + name);
           if(!file.exists()) file = input.file.merge(IO.get(name));
           cont = file.content();
           input = new XMLInput(new IOContent(cont, name));
@@ -723,10 +726,7 @@ public final class XMLScanner extends Progress {
           ch = nextChar();
           if(s(ch)) ch = nextChar();
           if(ch != '?' || nextChar() != '>') error(DECLWRONG);
-
-          final byte[] c = new byte[cont.length - input.pos()];
-          System.arraycopy(cont, input.pos(), c, 0, c.length);
-          cont = c;
+          cont = Arrays.copyOfRange(cont, input.pos(), cont.length);
         }
 
         s();

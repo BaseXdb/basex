@@ -53,9 +53,10 @@ public abstract class Main {
   /**
    * Launches the console mode, waiting for and processing user input.
    * @return true if exit command was sent
+   * @throws IOException I/O exception
    */
-  protected final boolean console() {
-    if(!set(Prop.INFO, ON)) return false;
+  protected final boolean console() throws IOException {
+    set(Prop.INFO, ON);
 
     while(console) {
       Main.out("> ");
@@ -70,25 +71,26 @@ public abstract class Main {
    * Quits the console mode.
    * @param user quit by user
    */
-  public synchronized void quit(final boolean user) {
-    if(!user) {
+  protected synchronized void quit(final boolean user) {
+    try {
       process(new Exit(), true);
-    } else {
-      outln(CLIENTBYE[new Random().nextInt(4)]);
+    } catch(final IOException ex) {
+      error(ex, true);
     }
+    if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
   /**
-   * Evaluates the input, which can be interactive input or the commands
-   * specified after the <code>-q</code> command-line argument.
+   * Parses and evaluates the input string.
    * @param in input commands
    * @return false if exit command was sent
+   * @throws IOException I/O exception
    */
-  protected final boolean process(final String in) {
+  protected final boolean process(final String in) throws IOException {
     try {
       for(final Process p : new CommandParser(in, context).parse()) {
-        if(!process(p, true)) break;
         if(p instanceof Exit) return false;
+        if(!process(p, true)) break;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());
@@ -101,33 +103,31 @@ public abstract class Main {
    * @param pr process
    * @param v verbose flag
    * @return true if operation was successful
+   * @throws IOException I/O exception
    */
-  protected final boolean process(final Process pr, final boolean v) {
-    try {
-      final Session ss = session();
-      if(ss == null) return false;
-      final PrintOutput out = output != null ? new PrintOutput(output) :
-        new PrintOutput(System.out);
-      final boolean ok = ss.execute(pr, out);
-      out.close();
-      if(pr instanceof Exit) return true;
+  protected final boolean process(final Process pr, final boolean v)
+      throws IOException {
 
-      if(v || !ok) {
-        final String inf = ss.info();
-        if(inf.length() != 0) {
-          if(!ok) {
-            error(null, inf);
-          } else {
-            out(inf);
-          }
+    final Session ss = session();
+    if(ss == null) return false;
+    final PrintOutput out = output != null ? new PrintOutput(output) :
+      new PrintOutput(System.out);
+    final boolean ok = ss.execute(pr, out);
+    out.close();
+    if(pr instanceof Exit) return true;
+
+    if(v || !ok) {
+      final String inf = ss.info();
+      if(inf.length() != 0) {
+        if(!ok) {
+          error(null, inf);
+        } else {
+          out(inf);
         }
       }
-      if(v && console) outln();
-      return ok;
-    } catch(final IOException ex) {
-      error(ex, true);
-      return false;
     }
+    if(v && console) outln();
+    return ok;
   }
 
   /**
@@ -135,8 +135,10 @@ public abstract class Main {
    * @param opt option to be set
    * @param arg argument
    * @return success flag
+   * @throws IOException I/O exception
    */
-  protected final boolean set(final Object[] opt, final Object arg) {
+  protected final boolean set(final Object[] opt, final Object arg)
+      throws IOException {
     return process(new Set(opt, arg), false);
   }
 
@@ -153,8 +155,9 @@ public abstract class Main {
   /**
    * Returns the session.
    * @return session
+   * @throws IOException I/O exception
    */
-  protected abstract Session session();
+  protected abstract Session session() throws IOException;
 
   /**
    * Parses the command-line arguments, specified by the user.

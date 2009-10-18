@@ -4,6 +4,8 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Arrays;
+
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.IntList;
@@ -116,11 +118,9 @@ final class MapRenderer {
             if(twl + l >= ww) break;
             twl += l;
           }
-          final byte[] ntok = new byte[n + 2];
-          System.arraycopy(tok, 0, ntok, 0, n);
-          ntok[n] = '.';
-          ntok[n + 1] = '.';
-          tok = ntok;
+          tok = Arrays.copyOf(tok, n + 2);
+          tok[n] = '.';
+          tok[n + 1] = '.';
         }
       }
 
