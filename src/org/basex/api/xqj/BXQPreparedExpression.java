@@ -1,6 +1,9 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
+import java.util.Arrays;
+
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQPreparedExpression;
@@ -97,6 +100,6 @@ final class BXQPreparedExpression extends BXQDynamicContext
   private Var[] getVariables() throws XQException {
     opened();
     final Vars vars = query.ctx.vars.getGlobal();
-    return Array.finish(vars.vars, vars.size);
+    return Arrays.copyOf(vars.vars, vars.size);
   }
 }
