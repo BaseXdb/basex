@@ -38,7 +38,7 @@ import org.basex.util.IntList;
 
 /**
  * Dialog window for displaying information about the server.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -70,7 +70,7 @@ public final class DialogServer extends Dialog {
   static final String DROP = "Drop";
   /** Server string. */
   static final String PERMISSIONS = "Permissions";
-  
+
   /** ArrayList for table. */
   ArrayList<Object[]> data = new ArrayList<Object[]>();
   /** Context. */
@@ -81,7 +81,9 @@ public final class DialogServer extends Dialog {
   /** Key listener. */
   final KeyAdapter keys = new KeyAdapter() {
     @Override
-    public void keyReleased(final KeyEvent e) { action(null); }
+    public void keyReleased(final KeyEvent e) {
+      action(null);
+    }
   };
 
   /** Server panel. */
@@ -111,7 +113,11 @@ public final class DialogServer extends Dialog {
   /** User columns. */
   BaseXCombo userco;
   /** User table. */
-  JTable table; 
+  JTable table;
+  /** Info label. */
+  BaseXLabel infop1;
+  /** Info label. */
+  BaseXLabel infop2;
 
   /**
    * Default constructor.
@@ -121,12 +127,12 @@ public final class DialogServer extends Dialog {
     super(main, SERVERTITLE);
 
     tabs = new BaseXTabs(this);
-    tabs.setPreferredSize(new Dimension(450, 300));
+    tabs.setPreferredSize(new Dimension(450, 350));
 
     // Server panel
     p1.setLayout(new TableLayout(3, 1));
     // User management panel
-    p2.setLayout(new TableLayout(7, 1, 0, 4));
+    p2.setLayout(new TableLayout(8, 1, 0, 4));
     p2.setBorder(8, 8, 8, 8);
 
     tabs.add(SERVER, p1);
@@ -135,9 +141,10 @@ public final class DialogServer extends Dialog {
     start = new BaseXButton(START, null, this);
     stop = new BaseXButton(STOP, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
-    port = new BaseXTextField(
-        Integer.toString(ctx.prop.num(Prop.PORT)), null, this);
+    port = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
+        this);
     port.addKeyListener(keys);
+    host.addKeyListener(keys);
     change = new BaseXButton(CHANGE, null, this);
 
     // Start-stop server panel
@@ -161,8 +168,11 @@ public final class DialogServer extends Dialog {
     // adding to main panel
     p1.add(p11);
     p1.add(p12);
+    infop1 = new BaseXLabel(" ");
+    infop1.setBorder(40, 0, 0, 0);
+    p1.add(infop1);
     set(tabs, BorderLayout.CENTER);
-    
+
     user = new BaseXTextField("", null, this);
     user.addKeyListener(keys);
     create = new BaseXButton(CREATE, null, this);
@@ -192,9 +202,14 @@ public final class DialogServer extends Dialog {
     p2.add(Box.createVerticalStrut(8));
     p2.add(new BaseXLabel(PERMISSIONS + COL, false, true));
     p2.add(new JScrollPane(table));
+    infop2 = new BaseXLabel(" HELLO ");
+    infop2.setBorder(40, 0, 0, 0);
+    p2.add(infop2);
 
     // test if server is running
-    try { createSession(); } catch(final IOException e1) { }
+    try {
+      createSession();
+    } catch(final IOException e1) { }
 
     action(null);
     finish(null);
@@ -272,10 +287,34 @@ public final class DialogServer extends Dialog {
     start.setEnabled(run);
     host.setEnabled(run);
     port.setEnabled(run);
-    change.setEnabled(run && port.getText().matches("^[0-9]+$"));
+    boolean onep1 = port.getText().matches("^[0-9]+$");
+    boolean twop1 = host.getText().isEmpty();
+    change.setEnabled(run && onep1 && !twop1);
+    if(!onep1 || twop1) {
+      infop1.setIcon(BaseXLayout.icon("warn"));
+      if(!onep1) {
+        infop1.setText("Invalid port");
+      } else {
+        infop1.setText("Invalid hostname");
+      }
+    } else {
+      infop1.setText("");
+      infop1.setIcon(null);
+    }
     tabs.setEnabledAt(1, !run);
-    create.setEnabled(user.getText().matches("^[A-Za-z0-9_.-]+$") &&
-        new String(pass.getPassword()).matches("^[A-Za-z0-9_.-]+$"));
+    boolean onep2 = user.getText().matches("^[A-Za-z0-9_.-]+$");
+    boolean twop2 = new String(pass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    create.setEnabled(onep2 && twop2);
+    if(!onep2 && !user.getText().isEmpty()) {
+      infop2.setIcon(BaseXLayout.icon("warn"));
+      infop2.setText("Invalid username");
+    } else if(!twop2 && !new String(pass.getPassword()).isEmpty()) {
+      infop2.setIcon(BaseXLayout.icon("warn"));
+      infop2.setText("Invalid password");
+    } else {
+      infop2.setText("");
+      infop2.setIcon(null);
+    }
     delete.setEnabled(data.size() != 0);
   }
 
@@ -286,7 +325,8 @@ public final class DialogServer extends Dialog {
     fillLists();
     ((TableModel) table.getModel()).fireTableDataChanged();
     userco.removeAllItems();
-    for(final Object[] o : data) userco.addItem(o[0]);
+    for(final Object[] o : data)
+      userco.addItem(o[0]);
   }
 
   /**
@@ -298,7 +338,8 @@ public final class DialogServer extends Dialog {
       cs.execute(new Show("Users"), out);
       data = new ArrayList<Object[]>();
       for(final Object[] o : table(out.toString())) {
-        for(int i = 1; i < o.length; i++) o[i] = o[i].toString().length() != 0;
+        for(int i = 1; i < o.length; i++)
+          o[i] = o[i].toString().length() != 0;
         data.add(o);
       }
     } catch(final IOException ex) {
@@ -307,8 +348,7 @@ public final class DialogServer extends Dialog {
   }
 
   /**
-   * Parses the user table.
-   * [AW] might be generalized and moved to another class
+   * Parses the user table. [AW] might be generalized and moved to another class
    * @param info input
    * @return list
    */
@@ -322,8 +362,10 @@ public final class DialogServer extends Dialog {
     int i = 0;
     while(i < line.length()) {
       il.add(i);
-      while(++i < line.length() && line.charAt(i) != ' ');
-      while(++i < line.length() && line.charAt(i) == ' ');
+      while(++i < line.length() && line.charAt(i) != ' ')
+        ;
+      while(++i < line.length() && line.charAt(i) == ' ')
+        ;
     }
     s.nextLine();
     while((line = s.nextLine()).length() != 0) {
@@ -339,7 +381,7 @@ public final class DialogServer extends Dialog {
 
   /**
    * Dialog specific table model.
-   *
+   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
@@ -380,8 +422,8 @@ public final class DialogServer extends Dialog {
       else if(col == 4) right = CmdPerm.ADMIN.toString();
       final String uname = (String) data.get(row)[0];
       try {
-        cs.execute(value.equals(true) ? new Grant(right, uname) :
-          new Revoke(right, uname));
+        cs.execute(value.equals(true) ? new Grant(right, uname) : new Revoke(
+            right, uname));
         data.get(row)[col] = value;
         fireTableCellUpdated(row, col);
       } catch(final IOException ex) {
