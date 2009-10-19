@@ -4,7 +4,6 @@ import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -30,17 +29,13 @@ public final class DeletePrimitive extends UpdatePrimitive {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int p = n.pre + add;
-//    System.out.println("before");
-//    UpdateFunctions.printTable(n.data);
-    final int l = leftSibling(d, p);
-    deleteDBNodes(new Nodes(new int[]{p}, d));
-    // [LK] merging text nodes ... looks crappy 
-    if(l == -1) return;
-    final int lk = d.kind(l);
-    final int r = l + d.size(l, lk);
-    if(d.parent(l, lk) == d.parent(r, d.kind(r))) mergeTextNodes(d, l, r);
-//    System.out.println("after");
-//    UpdateFunctions.printTable(n.data);
+    final int ls = leftSibling(d, p);
+    d.delete(p);
+    if(ls == -1) return;
+    final int rs = ls + d.size(ls, d.kind(ls));
+    if(rs >= d.size(0, d.kind(0)) || d.parent(rs, d.kind(rs)) != 
+      d.parent(ls, d.kind(ls))) return;
+    mergeTextNodes(d, ls, rs);
   }
 
   @Override

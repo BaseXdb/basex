@@ -86,14 +86,13 @@ public final class UpdateFunctions {
    */
   public static int leftSibling(final Data d, final int pre) {
     // [CG] We already have something like that?
-    if(pre < 1 || pre >= d.meta.size) return -1;
+    if(pre < 1 || pre >= d.size(0, d.kind(0))) return -1;
     final int par = d.parent(pre, d.kind(pre));
     int s = -1;
     int p = par + 1;
     while(p < pre) {
-      p = p + d.size(p, d.kind(p));
-      if(p == pre) return s;
       s = p;
+      p = p + d.size(p, d.kind(p));
     }
     return s;
   }

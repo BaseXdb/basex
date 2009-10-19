@@ -64,8 +64,8 @@ public class XQUPTest extends AbstractTest {
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-        { "xxxxxxxxxxxxx", nodes(5),
-        "/up/cars/good/car[@id='1']" },
+        { "xxxxxxxxxxxxx", nodes(11),
+        "/up/cars/good/car/wheels[text()='optional']" },
         
         // delete
         { "xxxdel1", nodes(),
@@ -158,6 +158,13 @@ public class XQUPTest extends AbstractTest {
         { "ins3", nodes(5, 5), 
         "/up/cars/good/car[text()='fooboo5'], " +
         "/up/cars/good/car[text()='foobooaaa']" },
+        
+        // merge text nodes
+        { "xxxMERGEins", nodes(),
+          "insert node 'foo' into /up/cars/good/car/wheels"},
+          { "MERGEins", nodes(11), 
+          "/up/cars/good/car/wheels[text()='optionalfoo']" },
+        // [LK] test emtpy insertion node set for insert/replace
         
         // parser tests
     };

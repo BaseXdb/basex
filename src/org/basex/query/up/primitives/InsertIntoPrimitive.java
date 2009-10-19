@@ -1,5 +1,7 @@
 package org.basex.query.up.primitives;
 
+import static org.basex.query.up.UpdateFunctions.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -30,18 +32,14 @@ public final class InsertIntoPrimitive extends InsertPrimitive {
     
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)); 
-//    int a = leftSibling(d, pos);
-    // source nodes may be empty, thus insert has no effect at all
+    final int pos = n.pre + d.size(n.pre, Nod.kind(node.type));
     n.data.insertSeq(pos, n.pre, m);
-//    if(m.meta.size < 1) return;
-//    if(a > -1 && m.meta.size > a + 1) {
-//      mergeTextNodes(d, a, a + 1);
-//      // if nodes could be merged on left hand, no more merges possible
-//      return;
-//    }
-//    a = pos + m.meta.size;
-//    mergeTextNodes(d, a, a + d.size(a, d.kind(a)));
+    final int ls = leftSibling(d, pos);
+    if(mergeTextNodes(d, ls, pos)) return;
+    final int rs = pos + d.size(pos, d.kind(pos));
+    if(rs == d.size(0, d.kind(0)) || d.parent(rs, d.kind(rs)) != 
+      d.parent(pos, d.kind(pos))) return;
+    mergeTextNodes(d, pos, rs);
   }
 
   @SuppressWarnings("unused")
