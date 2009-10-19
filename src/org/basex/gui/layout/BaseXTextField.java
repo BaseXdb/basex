@@ -56,7 +56,7 @@ public class BaseXTextField extends JTextField {
       public void keyPressed(final KeyEvent e) {
         final int c = e.getKeyCode();
         if((Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &
-            e.getModifiers()) != 0 && (c == 'z' || c == 'y')) {
+            e.getModifiers()) != 0 && (c == 'Z' || c == 'Y')) {
           final String t = getText();
           setText(last);
           last = t;

@@ -6,8 +6,6 @@ import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -34,7 +32,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
-import org.basex.util.IntList;
+import org.basex.util.Table;
 
 /**
  * Dialog window for displaying information about the server.
@@ -72,7 +70,7 @@ public final class DialogServer extends Dialog {
   static final String PERMISSIONS = "Permissions";
 
   /** ArrayList for table. */
-  ArrayList<Object[]> data = new ArrayList<Object[]>();
+  Table data = new Table();
   /** Context. */
   final Context ctx = gui.context;
   /** ClientSession. */
@@ -127,7 +125,6 @@ public final class DialogServer extends Dialog {
     super(main, SERVERTITLE);
 
     tabs = new BaseXTabs(this);
-    tabs.setPreferredSize(new Dimension(450, 350));
 
     // Server panel
     p1.setLayout(new TableLayout(3, 1));
@@ -175,9 +172,11 @@ public final class DialogServer extends Dialog {
 
     user = new BaseXTextField("", null, this);
     user.addKeyListener(keys);
+    BaseXLayout.setWidth(user, 100);
     create = new BaseXButton(CREATE, null, this);
-    pass = new JPasswordField(10);
+    pass = new JPasswordField();
     pass.addKeyListener(keys);
+    BaseXLayout.setWidth(pass, 100);
     userco = new BaseXCombo(new String[] {}, null, this);
     delete = new BaseXButton(DROP, null, this);
     table = new JTable(new TableModel());
@@ -187,7 +186,6 @@ public final class DialogServer extends Dialog {
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(1, 5, 6, 0));
     p21.add(new BaseXLabel(SERVERUSER));
-    BaseXLayout.setWidth(user, 100);
     p21.add(user);
     p21.add(new BaseXLabel(SERVERPW));
     p21.add(pass);
@@ -202,8 +200,8 @@ public final class DialogServer extends Dialog {
     p2.add(Box.createVerticalStrut(8));
     p2.add(new BaseXLabel(PERMISSIONS + COL, false, true));
     p2.add(new JScrollPane(table));
-    infop2 = new BaseXLabel(" HELLO ");
-    infop2.setBorder(40, 0, 0, 0);
+    infop2 = new BaseXLabel(" ");
+    infop2.setBorder(0, 0, 0, 0);
     p2.add(infop2);
 
     // test if server is running
@@ -287,15 +285,15 @@ public final class DialogServer extends Dialog {
     start.setEnabled(run);
     host.setEnabled(run);
     port.setEnabled(run);
-    boolean onep1 = port.getText().matches("^[0-9]+$");
-    boolean twop1 = host.getText().isEmpty();
-    change.setEnabled(run && onep1 && !twop1);
-    if(!onep1 || twop1) {
+    boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
+    boolean valp = port.getText().matches("^[0-9]{2,5}$");
+    change.setEnabled(run && valp && valh);
+    if(!valp || !valh) {
       infop1.setIcon(BaseXLayout.icon("warn"));
-      if(!onep1) {
-        infop1.setText("Invalid port");
-      } else {
+      if(!valh) {
         infop1.setText("Invalid hostname");
+      } else {
+        infop1.setText("Invalid port");
       }
     } else {
       infop1.setText("");
@@ -315,7 +313,7 @@ public final class DialogServer extends Dialog {
       infop2.setText("");
       infop2.setIcon(null);
     }
-    delete.setEnabled(data.size() != 0);
+    delete.setEnabled(data.contents.size() != 0);
   }
 
   /**
@@ -325,7 +323,7 @@ public final class DialogServer extends Dialog {
     fillLists();
     ((TableModel) table.getModel()).fireTableDataChanged();
     userco.removeAllItems();
-    for(final Object[] o : data)
+    for(final Object[] o : data.contents)
       userco.addItem(o[0]);
   }
 
@@ -336,47 +334,10 @@ public final class DialogServer extends Dialog {
     try {
       final CachedOutput out = new CachedOutput();
       cs.execute(new Show("Users"), out);
-      data = new ArrayList<Object[]>();
-      for(final Object[] o : table(out.toString())) {
-        for(int i = 1; i < o.length; i++)
-          o[i] = o[i].toString().length() != 0;
-        data.add(o);
-      }
+      data = new Table(out.toString());
     } catch(final IOException ex) {
       ex.printStackTrace();
     }
-  }
-
-  /**
-   * Parses the user table. [AW] might be generalized and moved to another class
-   * @param info input
-   * @return list
-   */
-  private ArrayList<Object[]> table(final String info) {
-    // not optimized yet
-    final ArrayList<Object[]> list = new ArrayList<Object[]>();
-    final Scanner s = new Scanner(info);
-    // header is used to calculate column widths
-    String line = s.nextLine();
-    final IntList il = new IntList();
-    int i = 0;
-    while(i < line.length()) {
-      il.add(i);
-      while(++i < line.length() && line.charAt(i) != ' ')
-        ;
-      while(++i < line.length() && line.charAt(i) == ' ')
-        ;
-    }
-    s.nextLine();
-    while((line = s.nextLine()).length() != 0) {
-      final Object[] entry = new Object[il.size()];
-      for(int e = 0; e < entry.length; e++) {
-        entry[e] = line.substring(il.get(e),
-            e + 1 == entry.length ? line.length() : il.get(e + 1)).trim();
-      }
-      list.add(entry);
-    }
-    return list;
   }
 
   /**
@@ -391,7 +352,7 @@ public final class DialogServer extends Dialog {
     }
 
     public int getRowCount() {
-      return data.size();
+      return data.contents.size();
     }
 
     @Override
@@ -400,7 +361,8 @@ public final class DialogServer extends Dialog {
     }
 
     public Object getValueAt(final int row, final int col) {
-      return data.get(row)[col];
+      final String o = data.contents.get(row)[col];
+      return o.equals("") ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
     }
 
     @Override
@@ -415,16 +377,12 @@ public final class DialogServer extends Dialog {
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
-      String right = "";
-      if(col == 1) right = CmdPerm.READ.toString();
-      else if(col == 2) right = CmdPerm.WRITE.toString();
-      else if(col == 3) right = CmdPerm.CREATE.toString();
-      else if(col == 4) right = CmdPerm.ADMIN.toString();
-      final String uname = (String) data.get(row)[0];
+      final String uname = data.contents.get(row)[0];
+      final String right = CmdPerm.values()[col - 1].toString();
       try {
-        cs.execute(value.equals(true) ? new Grant(right, uname) : new Revoke(
-            right, uname));
-        data.get(row)[col] = value;
+        cs.execute(value.equals(true) ? new Grant(right, uname) :
+          new Revoke(right, uname));
+        data.contents.get(row)[col] = value == Boolean.TRUE ? "X" : "";
         fireTableCellUpdated(row, col);
       } catch(final IOException ex) {
         // [AW] to be visualized somewhere...

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
-import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 
@@ -20,7 +19,7 @@ public final class Close extends Process {
    * Default constructor.
    */
   public Close() {
-    super(User.READ);
+    super(STANDARD);
   }
 
   @Override
