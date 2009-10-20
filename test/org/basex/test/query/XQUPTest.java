@@ -160,7 +160,7 @@ public class XQUPTest extends AbstractTest {
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
         { "xxxins2", nodes(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nodes(7, 9, 10), 
+        { "ins2", nodes(6, 9, 10), 
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
         { "xxxins3", nodes(),
