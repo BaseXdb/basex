@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Replace element content primitive.  
@@ -37,13 +38,13 @@ public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
   @Override
   public void apply(final int add) throws QueryException {
     if(!(node instanceof DBNode)) return;
+    Token.string(r);
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
     final int j = p + d.attSize(p, Data.ELEM);
-    int i = j;
-    final int l = p + d.size(p, Data.ELEM);
-    while(i < l) d.delete(i++);
+    int i = p + d.size(p, Data.ELEM) - 1;
+    while(i >= j) d.delete(i--);
     d.insert(j, p, r, Data.TEXT);
   }
 

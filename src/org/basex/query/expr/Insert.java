@@ -96,14 +96,13 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
-    // [LK] need that? -> decide, what to do with fragments ...
-//    if(!(n instanceof DBNode)) {
-//      if(aSeq.size() > 0) ctx.updates.
-//        addPrimitive(new InsertAttribute(n, aSeq, -1));
-//      if(seq.size() > 0) ctx.updates.
-//      addPrimitive(new InsertAttribute(n, seq, -1));
-//      return Iter.EMPTY;
-//    }
+    if(!(n instanceof DBNode)) {
+      if(aSeq.size() > 0) ctx.updates.
+        addPrimitive(new InsertAttribute(n, aSeq, -1));
+      if(seq.size() > 0) ctx.updates.
+      addPrimitive(new InsertAttribute(n, seq, -1));
+      return Iter.EMPTY;
+    }
     
     final DBNode dbn = (DBNode) n;
     final DBNode par = (DBNode) dbn.parent();

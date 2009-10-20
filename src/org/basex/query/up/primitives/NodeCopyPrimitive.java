@@ -39,6 +39,7 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   
   @Override
   public void check() throws QueryException {
+    if(!(node instanceof DBNode)) return;
     m = buildDB();
   }
   

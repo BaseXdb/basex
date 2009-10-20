@@ -141,7 +141,17 @@ public class XQUPTest extends AbstractTest {
         { "xxxrep7", nodes(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
         { "rep7", nodes(18, 19), 
-        "/up/cars/bad/car/a, /up/cars/bad/car/text()" }, 
+        "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
+        // replace element content
+        { "xxxrep8", nodes(),
+        "replace value of node //car[@id=1] with 'foo'"},
+        { "rep8", nodes(5), 
+        "//car[text()='foo']" },
+        // "no man's land"
+        { "xxxrep9", nodes(),
+        "replace value of node //car[@id=1] with \"no man's land\""},
+        { "rep9", nodes(5),
+        "//car[text()=\"no man's land\"]" },
     
         // insert
         { "xxxins1", nodes(),
