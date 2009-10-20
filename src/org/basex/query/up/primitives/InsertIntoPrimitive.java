@@ -35,7 +35,7 @@ public final class InsertIntoPrimitive extends InsertPrimitive {
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type));
     n.data.insertSeq(pos, n.pre, m);
     final int ls = leftSibling(d, pos);
-    if(mergeTextNodes(d, ls, pos)) return;
+    if(ls != -1 && mergeTextNodes(d, ls, pos)) return;
     final int rs = pos + d.size(pos, d.kind(pos));
     if(rs == d.size(0, d.kind(0)) || d.parent(rs, d.kind(rs)) != 
       d.parent(pos, d.kind(pos))) return;
