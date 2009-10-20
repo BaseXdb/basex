@@ -33,8 +33,9 @@ public final class InsertAttribute extends InsertPrimitive {
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    insertAttributes(n.pre + d.attSize(n.pre, Nod.kind(node.type)), 
-        n.pre, d, m);
+//    insertAttributes(n.pre + d.attSize(n.pre, Nod.kind(node.type)), 
+//        n.pre, d, m);
+    insertAttributes(n.pre + 1, n.pre, d, m);
   }
 
   @SuppressWarnings("unused")
