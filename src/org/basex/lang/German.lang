@@ -58,6 +58,7 @@ dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente
+dc_jardesc=Java Archiv
 dc_xqdesc=XQuery-Anfragen
 dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen

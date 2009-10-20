@@ -58,6 +58,7 @@ dc_name=データベースの名前
 dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書
 dc_gzdesc=GZip圧縮されたXML文書
+dc_jardesc=Java archive
 dc_xqdesc=XQueryファイル
 dc_advtitle=データベースオプション
 dc_chop=空白を取り除く

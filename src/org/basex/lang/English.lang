@@ -58,6 +58,7 @@ dc_name=Name of Database
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
+dc_jardesc=Java archive
 dc_xqdesc=XQuery files
 dc_advtitle=Create Database
 dc_chop=Chop Whitespaces

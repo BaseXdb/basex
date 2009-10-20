@@ -58,6 +58,7 @@ dc_name=Nome del Database
 dc_xmldesc=Documenti XML
 dc_zipdesc=Documenti XML in formato Zip
 dc_gzdesc=Documenti XML in formato GZip
+dc_jardesc=Java archive
 dc_xqdesc=file XQuery
 dc_advtitle=Crea Database
 dc_chop=Rimuovi spazi vuoti

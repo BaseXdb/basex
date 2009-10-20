@@ -57,6 +57,7 @@ dc_name=Tện cơ sở dữ liệu
 dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip
 dc_gzdesc=Văn bản XML nén GZip
+dc_jardesc=Java archive
 dc_xqdesc=Những tệp XQuery
 dc_advtitle=Tạo cơ sở dữ liệu
 dc_chop=Cắt hết khoảng trống

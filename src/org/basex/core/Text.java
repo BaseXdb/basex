@@ -1086,6 +1086,8 @@ public interface Text {
   String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
   /** GZ file description. */
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
+  /** JAR file description. */
+  String CREATEJARDESC = lang("dc_jardesc") + " (*.jar)";
   /** XQ file description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog title for database options. */
