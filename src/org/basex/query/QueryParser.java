@@ -374,6 +374,7 @@ public class QueryParser extends InputParser {
     ctx.revalidate = consumeWS2(STRICT) ? 0 : consumeWS2(LAX) ? 1 :
         consumeWS2(SKIP) ? 2 : -1;
     declReval = true;
+    error(NOREVAL);
   }
 
   /**

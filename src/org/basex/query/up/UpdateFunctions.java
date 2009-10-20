@@ -1,9 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-
-import java.io.IOException;
-
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
@@ -12,7 +10,6 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.PathSummary;
 import org.basex.index.Names;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
@@ -341,10 +338,6 @@ public final class UpdateFunctions {
    * @param d data reference
    */
   public static void printTable(final Data d) {
-    try {
-      InfoTable.table(new PrintOutput(System.out), d, 0, Integer.MAX_VALUE);
-    } catch(final IOException e) {
-      e.printStackTrace();
-    }
+    Main.outln(string(InfoTable.table(d, 0, Integer.MAX_VALUE)));
   }
 }

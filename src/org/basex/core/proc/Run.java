@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -38,11 +40,11 @@ public final class Run extends AQuery {
   }
 
   @Override
-  public boolean write() {
+  public boolean updating(final Context ctx) {
     try {
-      return updating(Token.string(IO.get(args[0]).content()));
+      return updating(ctx, Token.string(IO.get(args[0]).content()));
     } catch(final IOException ex) {
-      return super.write();
+      return true;
     }
   }
 }

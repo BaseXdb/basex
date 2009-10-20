@@ -100,7 +100,7 @@ public class Table {
     }
     tb.add(NL);
     for(int u = 0; u < sz; u++) {
-      for(int i = 0; i < ind[u] + DIST; i++) tb.add('-');
+      for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); i++) tb.add('-');
     }
     tb.add(NL);
     for(final StringList e : contents) {

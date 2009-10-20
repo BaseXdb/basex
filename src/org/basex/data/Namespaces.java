@@ -6,9 +6,10 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.PrintOutput;
 import org.basex.util.Map;
 import org.basex.util.Set;
+import org.basex.util.StringList;
+import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
@@ -156,74 +157,39 @@ public final class Namespaces extends Set {
   // === Printing Namespaces ==================================================
 
   /**
-   * Prints the namespace structure to the specified output stream.
-   * @param out output stream
-   * @param s space for pre value
+   * Returns a tabular representation of the namespaces.
    * @param all print all namespaces or just the root entries
-   * @throws IOException I/O exception
+   * @return namespaces
    */
-  public void print(final PrintOutput out, final int s, final boolean all)
-      throws IOException {
+  public byte[] table(final boolean all) {
+    if(root.ch.length == 0) return null;
 
-    if(root.ch.length == 0) return;
-    print(out, s, token(TABLEPRE));
-    print(out, s + 1, token(TABLEDIST));
-    out.print(' ');
-    print(out, token(TABLEPREF), 11);
-    out.println(token(TABLEURI));
-    print(out, s, root, all);
-    out.print(NL);
+    final Table t = new Table();
+    t.header.add(TABLEPRE);
+    t.header.add(TABLEDIST);
+    t.header.add(TABLEPREF);
+    t.header.add(TABLEURI);
+    for(int i = 0; i < 2; i++) t.align.add(true);
+    table(t, root, all);
+    return t.finish();
   }
 
   /**
-   * Prints the namespace structure to the specified node.
-   * @param out output stream
-   * @param s space for pre value
+   * Adds the namespace structure for a node to the specified table.
+   * @param t table
    * @param n namespace node
    * @param all print all namespaces or just the root entries
-   * @throws IOException I/O exception
    */
-  private void print(final PrintOutput out, final int s, final NSNode n,
-      final boolean all) throws IOException {
-
-    final byte[] quote = { '"' };
+  private void table(final Table t, final NSNode n, final boolean all) {
     for(int i = 0; i < n.key.length; i++) {
-      print(out, s, token(n.pre));
-      print(out, s + 1, token(n.pre - n.par.pre));
-      out.print(' ');
-      print(out, concat(quote, keys[n.key[i]], quote), 11);
-      out.print(keys[n.val[i]]);
-      out.println(" (" + n.val[i] + ")");
+      StringList sl = new StringList();
+      sl.add(n.pre);
+      sl.add(n.pre - n.par.pre);
+      sl.add("\"" + string(keys[n.key[i]]) + "\"");
+      sl.add(string(keys[n.val[i]]) + " (" + n.val[i] + ")");
+      t.contents.add(sl);
     }
-    if(all || n.key.length == 0) {
-      for(final NSNode c : n.ch) print(out, s, c, all);
-    }
-  }
-
-  /**
-   * Writes a string to the output stream.
-   * @param out output stream
-   * @param str string to be written
-   * @param i number of spaces to indent
-   * @throws IOException I/O exception
-   */
-  private void print(final PrintOutput out, final int i, final byte[] str)
-      throws IOException {
-    for(int a = 0; a < i - str.length; a++) out.print(' ');
-    out.print(str);
-  }
-
-  /**
-   * Writes a string to the output stream.
-   * @param out output stream
-   * @param str string to be written
-   * @param i number of spaces to indent
-   * @throws IOException I/O exception
-   */
-  private void print(final PrintOutput out, final byte[] str, final int i)
-      throws IOException {
-    out.print(str);
-    for(int a = 0; a < i - str.length; a++) out.print(' ');
+    if(all || n.key.length == 0) for(final NSNode c : n.ch) table(t, c, all);
   }
 
   /**

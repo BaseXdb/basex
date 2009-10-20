@@ -1,12 +1,15 @@
 package org.basex.query.up;
 
+import static org.basex.query.QueryText.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.util.Err;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -39,6 +42,8 @@ public final class PendingUpdates {
     if(p.node instanceof FNode) fragPrimitives.addPrimitive(p);
     else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
+      if(d instanceof MemData) Err.or(MMUP);
+
       DBPrimitives dp = dbPrimitives.get(d);
       if(dp == null) {
         dp = new DBPrimitives(false);

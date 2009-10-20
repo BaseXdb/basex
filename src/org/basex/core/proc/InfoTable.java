@@ -1,5 +1,6 @@
 package org.basex.core.proc;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
 import org.basex.util.Table;
+import org.basex.util.TokenBuilder;
 
 /**
  * Evaluates the 'info table' command and returns the table representation
@@ -40,7 +42,7 @@ public final class InfoTable extends AInfo {
     if(result != null) {
       final Table table = th();
       for(final int n : ((Nodes) result).nodes) table(table, data, n);
-      out.print(table.toString());
+      out.print(table.finish());
     } else {
       int ps = 0;
       int pe = data.meta.size;
@@ -54,29 +56,32 @@ public final class InfoTable extends AInfo {
           pe = ps + 1;
         }
       }
-      table(out, data, ps, pe);
+      out.print(table(data, ps, pe));
     }
     return true;
   }
 
   /**
    * Prints the specified range of the table.
-   * @param out output stream
    * @param data data reference
    * @param s first node to be printed
    * @param e last node to be printed
-   * @throws IOException I/O exception
+   * @return table
    */
-  public static void table(final PrintOutput out, final Data data,
-      final int s, final int e) throws IOException {
-
+  public static byte[] table(final Data data, final int s, final int e) {
+    final TokenBuilder tb = new TokenBuilder();
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
-    final boolean all = ps == 0 && pe == data.meta.size;
-    data.ns.print(out, numDigits(data.meta.size) + 1, all);
+    final byte[] ns = data.ns.table(ps == 0 && pe == data.meta.size);
+    if(ns != null) {
+      tb.add(ns);
+      tb.add(NL);
+    }
+    
     final Table table = th();
     for(int p = ps; p < pe; p++) table(table, data, p);
-    out.print(table.toString());
+    tb.add(table.finish());
+    return tb.finish();
   }
 
   /**

@@ -11,9 +11,9 @@ public class User {
   public static final int READ = 1;
   /** Flag for write permissions. */
   public static final int WRITE = 2;
-  /** Flag for create permissions. */
+  /** Flag for create permissions. Only used for global permissions. */
   public static final int CREATE = 4;
-  /** Flag for admin permissions. */
+  /** Flag for admin permissions. Only used for global permissions. */
   public static final int ADMIN = 8;
 
   /** User name. */

@@ -26,13 +26,10 @@ public abstract class Process extends Progress {
   /** Commands flag: data reference needed. */
   protected static final int DATAREF = 1024;
 
-  /** Flags for controlling process evaluation. */
-  private final int flags;
-
   /** Command arguments. */
-  public String[] args;
+  protected String[] args;
   /** Database context. */
-  public Context context;
+  protected Context context;
   /** Database properties. */
   protected Prop prop;
 
@@ -42,6 +39,9 @@ public abstract class Process extends Progress {
   protected Performance perf;
   /** Temporary query result. */
   protected Result result;
+
+  /** Flags for controlling process evaluation. */
+  private final int flags;
 
   /**
    * Constructor.
@@ -86,33 +86,23 @@ public abstract class Process extends Progress {
 
     // check if process needs data reference
     final Data data = context.data();
-    if(data()) {
-      if(data == null) return error(PROCNODB);
-      // check update commands..
-      if(write() && (prop.is(Prop.TABLEMEM) || prop.is(Prop.MAINMEM)))
-        return error(PROCMM);
-    }
+    if(data() && data == null) return error(PROCNODB);
 
     // check permissions
-    User user = context.user;
-    CmdPerm perm = null;
-    if(admin() && !user.perm(User.ADMIN)) {
-      perm = CmdPerm.ADMIN;
-    } else if(create() && !user.perm(User.CREATE)) {
-      perm = CmdPerm.CREATE;
-    } else {
-      // include local rights
-      if(data != null) {
-        final User us = data.meta.users.get(user.name);
-        if(us != null) user = us;
-      }
-      if(write() && !user.perm(User.WRITE)) {
-        perm = CmdPerm.WRITE;
-      } else if(read() && !user.perm(User.READ)) {
-        perm = CmdPerm.READ;
-      }
+    final User user = context.user;
+    int up = user.perm;
+    if(data != null) {
+      final User us = data.meta.users.get(user.name);
+      if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
     }
-    if(perm != null) return error(PERMNO, perm);
+    int fp = flags & (User.READ | User.WRITE | User.CREATE | User.ADMIN);
+    if(updating(ctx)) fp |= User.WRITE;
+    int i = 4;
+    while(--i >= 0) {
+      final int f = 1 << i;
+      if((f & fp) != 0 && (f & up) == 0) break;
+    }
+    if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 
     try {
       return exec(out);
@@ -144,7 +134,7 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Returns if the current command needs a data reference for processing.
+   * Returns if the command needs a data reference for processing.
    * @return result of check
    */
   public boolean data() {
@@ -152,39 +142,17 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Returns if the current command is an read command.
+   * Returns if the command performs updates.
+   * @param ctx context reference
    * @return result of check
    */
-  public boolean read() {
-    return (flags & User.READ) != 0;
-  }
-
-  /**
-   * Returns if the current command is a write command.
-   * @return result of check
-   */
-  public boolean write() {
-    return (flags & User.WRITE) != 0;
-  }
-
-  /**
-   * Returns if the current command is a create command.
-   * @return result of check
-   */
-  public boolean create() {
-    return (flags & User.CREATE) != 0;
-  }
-
-  /**
-   * Returns if the current command is an admin command.
-   * @return result of check
-   */
-  public boolean admin() {
-    return (flags & User.ADMIN) != 0;
+  @SuppressWarnings("unused")
+  public boolean updating(final Context ctx) {
+    return false;
   }
 
   // PROTECTED METHODS ========================================================
-  
+
   /**
    * Executes a process and serializes the result.
    * @param out output stream

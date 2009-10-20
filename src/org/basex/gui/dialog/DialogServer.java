@@ -279,7 +279,6 @@ public final class DialogServer extends Dialog {
       } catch(final Exception ex) {
         ex.printStackTrace();
       }
-
     } else if(STOP.equals(cmd)) {
       try {
         cs.execute(new IntStop(), null);

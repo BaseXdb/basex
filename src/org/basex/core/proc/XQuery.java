@@ -1,6 +1,8 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.PrintOutput;
 
@@ -25,8 +27,8 @@ public final class XQuery extends AQuery {
   }
 
   @Override
-  public boolean write() {
-    return updating(args[0]);
+  public boolean updating(final Context ctx) {
+    return updating(ctx, args[0]);
   }
 
   @Override

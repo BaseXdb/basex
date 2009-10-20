@@ -73,7 +73,7 @@ public final class List extends Process {
     db.sort(false);
     return db;
   }
-  
+
   /**
    * Returns a list of all DeepFS databases.
    * @param ctx context reference
@@ -95,7 +95,7 @@ public final class List extends Process {
           if (meta.deepfs)
             dbl.add(dbname);
         } catch(final IOException ex) {
-          Main.debug(ex.getMessage()); 
+          Main.debug(ex.getMessage());
         } finally {
           try { if(in != null) in.close(); } catch(final IOException ex) { }
         }

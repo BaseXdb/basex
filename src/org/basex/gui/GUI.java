@@ -439,8 +439,7 @@ public final class GUI extends JFrame {
       proc = pr;
 
       // execute command
-      pr.context = context;
-      final boolean up = pr.write();
+      final boolean up = pr.updating(context);
       updating = up;
       // retrieve text result
       final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));

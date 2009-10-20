@@ -34,11 +34,6 @@ public final class Find extends AQuery {
     return query(find(query, context, false));
   }
 
-  @Override
-  public boolean write() {
-    return false;
-  }
-
   /**
    * Creates an XQuery representation for the specified query.
    * @param query query

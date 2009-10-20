@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
@@ -110,17 +112,18 @@ abstract class AQuery extends Process {
 
   /**
    * Checks if the specified query is updating.
+   * @param ctx context reference
    * @param qu query
    * @return result of check
    */
-  protected boolean updating(final String qu) {
+  protected boolean updating(final Context ctx, final String qu) {
     try {
-      final QueryProcessor proc = new QueryProcessor(qu, context);
+      final QueryProcessor proc = new QueryProcessor(qu, ctx);
       proc.parse();
       return proc.ctx.updating;
     } catch(final QueryException ex) {
+      return true;
     }
-    return super.write();
   }
 
   /**

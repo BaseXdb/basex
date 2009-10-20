@@ -91,10 +91,8 @@ public final class DiskData extends Data {
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
       }
 
-      // table main memory mode..
+      // open data and indexes..
       init();
-
-      // open indexes..
       if(meta.txtindex) txtindex = new Values(this, true);
       if(meta.atvindex) atvindex = new Values(this, false);
       if(meta.ftxindex) ftxindex = meta.ftfz ?

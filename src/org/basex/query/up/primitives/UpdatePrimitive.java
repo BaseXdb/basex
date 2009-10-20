@@ -21,7 +21,6 @@ public abstract class UpdatePrimitive {
    *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Lukas Kircher
-   *
    */
   public enum Type { 
     /** Type Insert into. */ INSERTINTO,

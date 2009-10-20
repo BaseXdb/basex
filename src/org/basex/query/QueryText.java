@@ -27,9 +27,8 @@ public interface QueryText {
   /** XQST Error type. */ String XQST = "XQST";
   /** XQTY Error type. */ String XQTY = "XQTY";
   /** XUDY Error type. */ String XUDY = "XUDY";
-  /** XQUS Error type. */ String XUST = "XQUS";
+  /** XQUS Error type. */ String XUST = "XUST";
   /** XUTY Error type. */ String XUTY = "XUTY";
-
 
   /** BASX0001: Evaluation exception. */
   Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
@@ -39,6 +38,8 @@ public interface QueryText {
   Object[] NOFILE = { BASX, 3, "Text node could not be created (%)." };
   /** BASX0003: Evaluation exception. */
   Object[] NODB = { BASX, 4, "Database '%' not found." };
+  /** BASX0004: Evaluation exception. */
+  Object[] MMUP = { BASX, 5, "No updates supported for main memory data." };
 
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
@@ -497,6 +498,8 @@ public interface QueryText {
   Object[] UPEXPSIMPLE = { XUST, 1, "Expecting simple expression." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
+  /** XUST0026: Parsing exception. */
+  Object[] NOREVAL = { XUST, 26, "Revalidation mode not supported." };
 
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
