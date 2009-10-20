@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -193,9 +194,15 @@ public final class IOFile extends IO {
    * @param url url to be converted
    * @return file path
    */
-  private static String file(final String url) {
-    final String fn = url.startsWith(PREFILE) ?
-        url.substring(PREFILE.length()) : url;
+  public static String file(final String url) {
+    String file = url;
+    if(file.indexOf("%") != -1) {
+      try {
+        file = URLDecoder.decode(file, Prop.ENCODING);
+      } catch(final Exception ex) { /* ignored. */ }
+    }
+    final String fn = file.startsWith(PREFILE) ?
+        file.substring(PREFILE.length()) : file;
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }

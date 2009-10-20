@@ -13,7 +13,7 @@ import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
-import org.basex.util.TokenBuilder;
+import org.basex.util.Table;
 
 /**
  * Evaluates the 'list' command and shows all available databases.
@@ -31,41 +31,34 @@ public final class List extends Process {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    final String[] list = list(context).finish();
-    int max = 0;
-    for(final String s : list) max = Math.max(max, s.length());
+    final Table table = new Table();
+    table.desc = "Databases";
+    table.header.add(INFODBNAME);
+    table.header.add(INFODOC);
 
-    final TokenBuilder tb = new TokenBuilder();
-    if(list.length == 0) {
-      tb.add(INFONODB + NL);
-    } else {
-      tb.add(max + 2, INFODBNAME);
-      tb.add(INFODOC + NL);
-      tb.add("--------------------------------------------" + NL);
-      for(final String name : list) {
-        tb.add(max + 2, name);
-        DataInput in = null;
-        try {
-          in = new DataInput(prop.dbfile(name, DATAINFO));
-          final MetaData md = new MetaData(name, in, prop);
-          in.close();
-          tb.add(md.file + NL);
-        } catch(final IOException ex) {
-          tb.add(INFODBERR + NL);
-        } finally {
-          try { if(in != null) in.close(); } catch(final IOException ex) { }
-        }
+    for(final String name : list(context)) {
+      final StringList entry = new StringList();
+      entry.add(name);
+      DataInput in = null;
+      try {
+        in = new DataInput(prop.dbfile(name, DATAINFO));
+        entry.add(new MetaData(name, in, prop).file.toString());
+      } catch(final IOException ex) {
+        entry.add(INFODBERR);
+      } finally {
+        try { if(in != null) in.close(); } catch(final IOException ex) { }
       }
-      tb.add(NL + list.length + " " + INFODBLIST + NL);
+      table.contents.add(entry);
     }
-    out.print(tb.finish());
+    table.sort();
+    out.println(table.finish());
     return true;
   }
 
   /**
    * Returns a list of all databases.
    * @param ctx context reference
-   * @return available databases.
+   * @return available databases
    */
   public static StringList list(final Context ctx) {
     // create database list

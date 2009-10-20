@@ -15,8 +15,14 @@ import java.util.Scanner;
 public class Table {
   /** Table header. */
   public StringList header = new StringList();
+  /** Distance between table columns. */
+  public static final int DIST = 2;
+  /** Alignment (false: left, true: right alignment). */
+  public BoolList align = new BoolList();
   /** Data (usually strings). */
-  public ArrayList<String[]> contents = new ArrayList<String[]>();
+  public ArrayList<StringList> contents = new ArrayList<StringList>();
+  /** Data description. */
+  public String desc;
 
   /**
    * Default constructor.
@@ -47,35 +53,72 @@ public class Table {
     // parse table entries
     final int s = il.size() - 1;
     while((line = scan.nextLine()).length() != 0) {
-      final String[] entry = new String[s];
-      for(int e = 0; e < entry.length; e++) {
-        entry[e] = line.substring(il.get(e),
-            e + 1 == entry.length ? line.length() : il.get(e + 1)).trim();
+      final StringList entry = new StringList();
+      for(int e = 0; e < s; e++) {
+        entry.add(line.substring(il.get(e), il.get(e + 1)).trim());
       }
       contents.add(entry);
     }
   }
 
-  @Override
-  public String toString() {
+  /**
+   * Sorts the table by the first column.
+   */
+  public void sort() {
+    for(int i = 0; i < contents.size() - 2; i++) {
+      final String s = contents.get(i).get(0).toLowerCase();
+      for(int j = i + 1; j < contents.size(); j++) {
+        if(s.compareTo(contents.get(j).get(0).toLowerCase()) > 0) {
+          final StringList tmp = contents.get(i);
+          contents.set(i, contents.get(j));
+          contents.set(j, tmp);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns a textual representation of the table.
+   * @return text
+   */
+  public byte[] finish() {
     final int[] ind = new int[header.size()];
     final int sz = header.size();
     for(int s = 0; s < sz; s++) {
-      for(final String[] e : contents) ind[s] = Math.max(ind[s], e[s].length());
-      ind[s] = Math.max(ind[s], header.get(s).length()) + 2;
+      for(final StringList e : contents) {
+        ind[s] = Math.max(ind[s], e.get(s).length());
+      }
+      ind[s] = Math.max(ind[s], header.get(s).length());
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int u = 0; u < sz; u++) tb.add(ind[u], header.get(u));
+    for(int u = 0; u < sz; u++) {
+      final String s = header.get(u);
+      final int is = ind[u] - s.length() + DIST;
+      tb.add(s);
+      for(int i = 0; i < is; i++) tb.add(' ');
+    }
     tb.add(NL);
     for(int u = 0; u < sz; u++) {
-      for(int i = 0; i < ind[u]; i++) tb.add('-');
+      for(int i = 0; i < ind[u] + DIST; i++) tb.add('-');
     }
     tb.add(NL);
-    for(final String[] e : contents) {
-      for(int u = 0; u < sz; u++) tb.add(ind[u], e[u]);
+    for(final StringList e : contents) {
+      for(int u = 0; u < sz; u++) {
+        final String s = e.get(u);
+        final int is = ind[u] - s.length();
+        if(u < align.size() && align.get(u)) {
+          for(int i = 0; i < is; i++) tb.add(' ');
+          tb.add(s);
+        } else {
+          tb.add(s);
+          for(int i = 0; i < is; i++) tb.add(' ');
+        }
+        for(int i = 0; i < DIST; i++) tb.add(' ');
+      }
       tb.add(NL);
     }
-    return tb.toString();
+    if(desc != null) tb.add(NL + contents.size() + ' ' + desc + " found.");
+    return tb.finish();
   }
 }

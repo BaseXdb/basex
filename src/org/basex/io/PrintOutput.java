@@ -43,11 +43,12 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Constructor, given an output stream.
+   * Protected constructor, given an output stream and
+   * a maximum number of bytes to write.
    * @param out output stream reference
    * @param m maximum number of bytes to write
    */
-  public PrintOutput(final OutputStream out, final int m) {
+  protected PrintOutput(final OutputStream out, final int m) {
     os = out;
     max = m;
   }

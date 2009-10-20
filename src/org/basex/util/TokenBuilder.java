@@ -224,17 +224,6 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a string with the specified left indentation.
-   * @param m maximum indentation
-   * @param s string
-   */
-  public void add(final int m, final String s) {
-    add(s);
-    final int is = m - s.length();
-    for(int i = 0; i < is; i++) add(' ');
-  }
-
-  /**
    * Chops leading and trailing whitespaces.
    */
   public void chop() {

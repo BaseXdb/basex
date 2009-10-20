@@ -1,16 +1,16 @@
 package org.basex.core.proc;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
+import org.basex.util.StringList;
+import org.basex.util.Table;
 
 /**
  * Evaluates the 'info table' command and returns the table representation
@@ -37,11 +37,10 @@ public final class InfoTable extends AInfo {
     }
 
     final Data data = context.data();
-
     if(result != null) {
-      final int[] nodes = ((Nodes) result).nodes;
-      tableHeader(out, data);
-      for(final int n : nodes) table(out, data, n);
+      final Table table = th();
+      for(final int n : ((Nodes) result).nodes) table(table, data, n);
+      out.print(table.toString());
     } else {
       int ps = 0;
       int pe = data.meta.size;
@@ -71,88 +70,50 @@ public final class InfoTable extends AInfo {
   public static void table(final PrintOutput out, final Data data,
       final int s, final int e) throws IOException {
 
-    final boolean all = s == 0 && e == data.meta.size;
-    data.ns.print(out, numDigits(data.meta.size) + 1, all);
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
-    tableHeader(out, data);
-    for(int p = ps; p < pe; p++) table(out, data, p);
+    final boolean all = ps == 0 && pe == data.meta.size;
+    data.ns.print(out, numDigits(data.meta.size) + 1, all);
+    final Table table = th();
+    for(int p = ps; p < pe; p++) table(table, data, p);
+    out.print(table.toString());
   }
 
   /**
    * Writes the header for the 'table' command.
-   * @param out output stream
-   * @param data data reference
-   * @throws IOException I/O exception
+   * @return table
    */
-  private static void tableHeader(final PrintOutput out, final Data data)
-      throws IOException {
-    // write table header
-    final int len = Math.max(2, numDigits(data.meta.size));
-    format(out, token(TABLEPRE), len + 1);
-    format(out, token(TABLEDIST), len + 2);
-    format(out, token(TABLESIZE), len + 2);
-    format(out, token(TABLEATS), 4);
-    format(out, token(TABLENS), 4);
-    out.println(TABLEKIND);
+  private static Table th() {
+    final Table t = new Table();
+    t.header.add(TABLEPRE);
+    t.header.add(TABLEDIST);
+    t.header.add(TABLESIZE);
+    t.header.add(TABLEATS);
+    t.header.add(TABLENS);
+    t.header.add(TABLEKND);
+    t.header.add(TABLECON);
+    for(int i = 0; i < 6; i++) t.align.add(true);
+    return t;
   }
 
   /**
-   * Writes the table representation of the database to the specified output
-   * stream.
-   * @param out output stream
+   * Writes the entry for the specified pre value to the table.
+   * @param t table reference
    * @param data data reference
    * @param p node to be printed
-   * @throws IOException I/O exception
    */
-  private static void table(final PrintOutput out, final Data data,
-      final int p) throws IOException {
-
-    final int len = Math.max(2, numDigits(data.meta.size));
-    format(out, p, len + 1);
+  private static void table(final Table t, final Data data, final int p) {
     final int k = data.kind(p);
-    format(out, p - data.parent(p, k), len + 2);
-    format(out, data.size(p, k), len + 2);
-    format(out, data.attSize(p, k), 4);
-    format(out, data.tagNS(p), 4);
-    out.print("  ");
-    out.print(TABLEKINDS[k]);
-
-    out.print("  ");
-    out.print(k == Data.ELEM ? data.tag(p) : k == Data.ATTR ?
-      data.attName(p) : data.text(p));
-
-    if(k == Data.ATTR) {
-      out.print(ATT1);
-      out.print(data.attValue(p));
-      out.print(ATT2);
-    }
-    out.print(NL);
-  }
-
-  /**
-   * Formats an integer value for the table output.
-   * @param out output stream
-   * @param n number to be formatted
-   * @param left size of the table entry
-   * @throws IOException I/O exception
-   */
-  private static void format(final PrintOutput out, final int n,
-      final int left) throws IOException {
-    format(out, token(n), left);
-  }
-
-  /**
-   * Formats an output string for the table output.
-   * @param out output stream
-   * @param t text to be formatted
-   * @param s size of the table entry
-   * @throws IOException I/O exception
-   */
-  private static void format(final PrintOutput out, final byte[] t,
-      final int s) throws IOException {
-    for(int i = 0; i < s - t.length; i++) out.print(' ');
-    out.print(t);
+    final StringList sl = new StringList();
+    sl.add(p);
+    sl.add(p - data.parent(p, k));
+    sl.add(data.size(p, k));
+    sl.add(data.attSize(p, k));
+    sl.add(data.tagNS(p));
+    sl.add(TABLEKINDS[k]);
+    sl.add(string(k == Data.ELEM ? data.tag(p) : k != Data.ATTR ?
+        data.text(p) : concat(data.attName(p), ATT1, data.attValue(p), ATT2)));
+    t.contents.add(sl);
   }
 
   @Override

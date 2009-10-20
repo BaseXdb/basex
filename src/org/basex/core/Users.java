@@ -7,6 +7,7 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Crypter;
+import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
 
@@ -158,7 +159,7 @@ public final class Users {
       Main.debug(ex);
     }
   }
-  
+
   /**
    * Writes permissions to disk.
    * @param out output stream; if set to null, the global rights are written
@@ -180,25 +181,27 @@ public final class Users {
    * Returns information on all users.
    * @return user information
    */
-  public String info() {
+  public byte[] info() {
     final Table table = new Table();
+    table.desc = "Users";
+
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);
 
     final int size = users.size();
     for(int i = 0; i < size; i++) {
       final User user = users.get(i);
-      final String[] entry = new String[sz];
-      entry[0] = user.name;
-      entry[1] = user.perm(User.READ) ? "X" : "";
-      entry[2] = user.perm(User.WRITE) ? "X" : "";
+      final StringList entry = new StringList();
+      entry.add(user.name);
+      entry.add(user.perm(User.READ) ? "X" : "");
+      entry.add(user.perm(User.WRITE) ? "X" : "");
       if(sz == 5) {
-        entry[3] = user.perm(User.CREATE) ? "X" : "";
-        entry[4] = user.perm(User.ADMIN) ? "X" : "";
+        entry.add(user.perm(User.CREATE) ? "X" : "");
+        entry.add(user.perm(User.ADMIN) ? "X" : "");
       }
       table.contents.add(entry);
     }
-    final StringBuilder sb = new StringBuilder(table.toString());
-    return sb.append(NL + size + " Users found.").toString();
+    table.sort();
+    return table.finish();
   }
 }

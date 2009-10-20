@@ -1,23 +1,17 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
-
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -40,7 +34,9 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
+import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
+import org.basex.util.StringList;
 import org.basex.util.Table;
 
 /**
@@ -271,24 +267,19 @@ public final class DialogServer extends Dialog {
       ctx.prop.set(Prop.HOST, host.getText());
       final int p = Integer.parseInt(port.getText());
       ctx.prop.set(Prop.PORT, p);
-      // Get the location of this class
-      ProtectionDomain pDomain = this.getClass().getProtectionDomain();
-      CodeSource cSource = pDomain.getCodeSource();
-      URL loc = cSource.getLocation();
-      String path = loc.getPath().substring(1);
-      if(path.contains("%20")) {
-        path = path.replace("%20", " ");
-        path = "\"" + path + "\""; 
-      }
-      final Runtime run = Runtime.getRuntime();
+
       try {
-        String exec = "java -cp " + path + " org.basex.BaseXServer";
-        System.out.println(exec);
-        run.exec(exec);
+        final String path = IOFile.file(getClass().getProtectionDomain().
+            getCodeSource().getLocation().toString());
+        final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
+        final String clazz = org.basex.BaseXServer.class.getName();
+        new ProcessBuilder(
+            new String[] { "java", mem, "-cp", path, clazz }).start();
         createSession();
-      } catch(IOException e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
       }
+
     } else if(STOP.equals(cmd)) {
       try {
         cs.execute(new IntStop(), null);
@@ -388,10 +379,10 @@ public final class DialogServer extends Dialog {
     ((TableModel) table.getModel()).fireTableChanged(null);
     userco1.removeAllItems();
     userco2.removeAllItems();
-    for(final Object[] o : data.contents) {
-      userco2.addItem(o[0]);
-      if(!o[0].equals(ADMIN)) {
-        userco1.addItem(o[0]);
+    for(final StringList o : data.contents) {
+      userco2.addItem(o.get(0));
+      if(!o.get(0).equals(ADMIN)) {
+        userco1.addItem(o.get(0));
       }
     }
   }
@@ -430,7 +421,7 @@ public final class DialogServer extends Dialog {
     }
 
     public Object getValueAt(final int row, final int col) {
-      final String o = data.contents.get(row)[col];
+      final String o = data.contents.get(row).get(col);
       return o.equals("") ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
     }
 
@@ -446,11 +437,11 @@ public final class DialogServer extends Dialog {
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
-      final String uname = data.contents.get(row)[0];
+      final String uname = data.contents.get(row).get(0);
       final String right = CmdPerm.values()[col - 1].toString();
       permps.add(value.equals(true) ? new Grant(right, uname) : new Revoke(
           right, uname));
-      data.contents.get(row)[col] = value == Boolean.TRUE ? "X" : "";
+      data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
       fireTableCellUpdated(row, col);
     }
   }

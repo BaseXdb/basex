@@ -439,6 +439,7 @@ public final class GUI extends JFrame {
       proc = pr;
 
       // execute command
+      pr.context = context;
       final boolean up = pr.write();
       updating = up;
       // retrieve text result

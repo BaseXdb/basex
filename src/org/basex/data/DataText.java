@@ -260,6 +260,12 @@ public interface DataText {
   /** Table Kinds. */
   String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
 
+  /** Fifth table Header. */
+  String TABLEKND = "KIND";
+  /** Fifth table Header. */
+  String TABLECON = "CONTENT";
+  
+  
   // DATABASE FILES ===========================================================
 
   /** Database - Info. */
