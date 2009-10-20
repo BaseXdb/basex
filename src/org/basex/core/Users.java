@@ -7,8 +7,8 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Crypter;
+import org.basex.util.Table;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class organizes all users.
@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
 public final class Users {
   /** User list. */
   private final ArrayList<User> users = new ArrayList<User>();
-  /** Default permissions. */
+  /** Default permissions for new users. */
   private static final int PERM = User.READ | User.WRITE;
   /** Filename; set to null for local user permissions. */
   private String file;
@@ -77,6 +77,22 @@ public final class Users {
 
     final User user = new User(usern, Crypter.encrypt(Token.token(pass)), PERM);
     users.add(user);
+    write();
+    return true;
+  }
+
+  /**
+   * Changes the password of a user.
+   * @param usern user name
+   * @param pass password
+   * @return success of operation
+   */
+  public boolean alter(final String usern, final String pass) {
+    // check if user exists already
+    final User user = get(usern);
+    if(user == null) return false;
+
+    user.pw = Crypter.encrypt(Token.token(pass));
     write();
     return true;
   }
@@ -165,36 +181,24 @@ public final class Users {
    * @return user information
    */
   public String info() {
+    final Table table = new Table();
+    final int sz = file == null ? 3 : 5;
+    for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);
+
     final int size = users.size();
-    final TokenBuilder tb = new TokenBuilder();
-    if(size != 0) {
-      // get maximum column widths
-      final int sz = file == null ? 3 : 5;
-      final int[] ind = new int[sz];
-      for(final User u : users) ind[0] = Math.max(ind[0], u.name.length());
-      for(int u = 0; u < sz; u++) {
-        ind[u] = Math.max(ind[u], USERHEAD[u].length()) + 2;
-        tb.add(ind[u], USERHEAD[u]);
+    for(int i = 0; i < size; i++) {
+      final User user = users.get(i);
+      final String[] entry = new String[sz];
+      entry[0] = user.name;
+      entry[1] = user.perm(User.READ) ? "X" : "";
+      entry[2] = user.perm(User.WRITE) ? "X" : "";
+      if(sz == 5) {
+        entry[3] = user.perm(User.CREATE) ? "X" : "";
+        entry[4] = user.perm(User.ADMIN) ? "X" : "";
       }
-      tb.add(NL);
-      for(int u = 0; u < sz; u++) {
-        for(int i = 0; i < ind[u]; i++) tb.add('-');
-      }
-      tb.add(NL);
-      for(int i = 0; i < size; i++) {
-        final User user = users.get(i);
-        tb.add(ind[0], user.name);
-        tb.add(ind[1], user.perm(User.READ) ? "X" : "");
-        tb.add(ind[2], user.perm(User.WRITE) ? "X" : "");
-        if(file != null) {
-          tb.add(ind[3], user.perm(User.CREATE) ? "X" : "");
-          tb.add(ind[4], user.perm(User.ADMIN) ? "X" : "");
-        }
-        tb.add(NL);
-      }
-      tb.add(NL);
+      table.contents.add(entry);
     }
-    tb.add(size + " Users registered.");
-    return tb.toString();
+    final StringBuilder sb = new StringBuilder(table.toString());
+    return sb.append(NL + size + " Users found.").toString();
   }
 }

@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
@@ -39,9 +40,16 @@ public final class Open extends Process {
       if(data == null || !data.meta.name.equals(db)) {
         data = open(context, db);
         
+        // check if user has rights to access this database
+        // might lead to side effects if rights are revoked
+        // from the user after database has been opened
         User user = context.user;
         final User us = data.meta.users.get(user.name);
         if(us != null) user = us;
+        if(!user.perm(User.READ)) {
+          Close.close(context, data);
+          return error(PERMNO, CmdPerm.READ);
+        }
         
         context.openDB(data);
         if(data.meta.oldindex) info(INDUPDATE);

@@ -10,6 +10,7 @@ import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.Commands.CmdUpdate;
+import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -127,9 +128,12 @@ public final class CommandParser extends InputParser {
           case MAB:
             return new CreateMAB(string(cmd), name(null));
           case USER:
-            return new CreateUser(string(cmd), name(cmd));
+            return new CreateUser(name(cmd), name(cmd));
         }
         break;
+      case ALTER:
+        key(USER, cmd);
+        return new AlterUser(name(cmd), name(cmd));
       case OPEN: case O:
         return new Open(name(cmd));
       case INFO: case I:

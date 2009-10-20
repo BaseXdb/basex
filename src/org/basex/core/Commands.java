@@ -27,8 +27,8 @@ public interface Commands {
     HELPQUERY(HLP), X(HID), XQUERY(), XQUERYMV(HID), RUN(), FIND(), CS(),
     // Update commands
     HELPUPDATE(HLP), COPY(), DELETE(), INSERT(), UPDATE(),
-    // Server commands
-    HELPADMIN(HLP), KILL(), SHOW(), GRANT(), REVOKE(),
+    // Admin commands
+    HELPADMIN(HLP), KILL(), SHOW(), GRANT(), REVOKE(), ALTER(),
     // General commands
     HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands

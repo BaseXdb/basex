@@ -24,6 +24,7 @@ b_ok=OK
 b_opt=Tối ưu...
 b_rename=Đổi tên...
 b_open=Mở 
+b_mount= Mount 
 b_cancel=Hủy
 b_drop=Xóa
 b_cmd=Lệnh
@@ -87,6 +88,11 @@ dc_ft=Nội dung
 
 do_title=Mở cơ sở dữ liệu
 do_nodbquestion=Bạn muốn tạo một cái mới không?
+
+dqe_title=Open DeepFS instance
+
+dmnt_title=Mount DeepFS instance
+dmnt_nomountpath=No valid mount point
 
 dq_open=Mở tệp XQuery
 dq_save=Lưu tệp XQuery
@@ -219,6 +225,8 @@ c_createfs=Create DeepFS mapping
 c_createfstt=Creates a DeepFS filesystem representation starting from a given directory. The resulting database may later be used to start BaseX as a Desktop Query Engine or to mount the database as filesystem in userspace.
 c_dqe=Desktop Query Engine
 c_dqett=Open DeepFS database and use it as Desktop Search/Query Engine
+c_mountfs=Mount DB as FUSE
+c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Thông tin
 c_propstt=Hiển thị thông tin trên cơ sở dữ liệu đang mở.
 c_insert=Mới
@@ -391,6 +399,7 @@ ad_permadd=Permission granted.
 ad_userno=User '%' is unknown.
 ad_userknown=User '%' exists already.
 ad_usercreate=User '%' created.
+ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 
 # General Commands
@@ -452,6 +461,7 @@ ch_create3=creates the database [%] for the file or directory [%]
 ch_create4=creates the specified index
 ch_create5=creates filesystem database [%] for [%]
 ch_create6=(using [%] and [%] if FUSE is activated)
+ch_create7=creates the specified user
 ch_open1=Mở cơ sở dữ liệu.
 ch_open2=Mở_đặc_biệt [%].
 ch_info1=Hiển thị thông tin trên cơ sở dữ liệu hiện tại.
@@ -466,8 +476,11 @@ ch_list1=Liệt kê tất cả cơ sở dữ liệu.
 ch_list2=Liệt kê tất cả cơ sở dữ liệu.
 ch_drop1=Xóa bỏ cơ sở dữ liệu hoặc index.
 ch_drop2=Tham số sau có thể được cụ thể hóa:
-ch_drop21=drops cơ_sở_dữ_liệu [%]
+ch_drop21=drops cơ_sở_dữ_liệu
 ch_drop22=drops index_đặc_biệt
+ch_drop3=drops the specified user
+ch_alter1=Alter user password.
+ch_alter2=Alters the password of a user.
 ch_optimize1=Tối ưu cơ sở dữ liệu.
 ch_optimize2=Tối ưu cấu trúc cơ sở dữ liệu hiện tại.
 ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.

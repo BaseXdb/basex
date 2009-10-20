@@ -1,10 +1,13 @@
 package org.basex.util;
 
+import static org.basex.core.Text.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * This is a simple container for native int values.
+ * This is a table representation for textual table output.
+ * It should be guaranteed that the {@link #header} object has the
+ * same number of entries as all {@link #contents} string arrays.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -51,5 +54,28 @@ public class Table {
       }
       contents.add(entry);
     }
+  }
+
+  @Override
+  public String toString() {
+    final int[] ind = new int[header.size()];
+    final int sz = header.size();
+    for(int s = 0; s < sz; s++) {
+      for(final String[] e : contents) ind[s] = Math.max(ind[s], e[s].length());
+      ind[s] = Math.max(ind[s], header.get(s).length()) + 2;
+    }
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(int u = 0; u < sz; u++) tb.add(ind[u], header.get(u));
+    tb.add(NL);
+    for(int u = 0; u < sz; u++) {
+      for(int i = 0; i < ind[u]; i++) tb.add('-');
+    }
+    tb.add(NL);
+    for(final String[] e : contents) {
+      for(int u = 0; u < sz; u++) tb.add(ind[u], e[u]);
+      tb.add(NL);
+    }
+    return tb.toString();
   }
 }

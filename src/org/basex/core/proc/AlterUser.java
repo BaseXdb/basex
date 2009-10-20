@@ -6,26 +6,26 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'create user' command and creates a new user.
+ * Evaluates the 'alter user' command and alters the password of a user.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class CreateUser extends AAdmin {
+public final class AlterUser extends AAdmin {
   /**
    * Default constructor.
    * @param name user name
    * @param pw password
    */
-  public CreateUser(final String name, final String pw) {
+  public AlterUser(final String name, final String pw) {
     super(name, pw);
   }
 
   @Override
   protected boolean exec(final PrintOutput out) {
     final String user = args[0];
-    return context.users.create(user, args[1]) ?
-      info(USERCREATE, user) : error(USERKNOWN, user);
+    return context.users.alter(user, args[1]) ?
+      info(USERALTER, user) : error(USERNO, user);
   }
 
   @Override

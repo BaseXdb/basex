@@ -66,7 +66,8 @@ public final class Sessions {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVSESSIONS, size);
     tb.add(size != 0 ? COL : DOT);
-    for(int i = 0; i < size; i++) tb.add(NL + LI + list[i].info());
+    for(int i = 0; i < size; i++) tb.add(NL + LI +
+        list[i].context.user.name + " " + list[i].info());
     return tb.toString();
   }
 }

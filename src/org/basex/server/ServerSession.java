@@ -31,7 +31,7 @@ import org.basex.util.Performance;
  */
 public final class ServerSession extends Thread {
   /** Database context. */
-  private final Context context;
+  public final Context context;
   /** Socket reference. */
   private final Socket socket;
   /** Server reference. */

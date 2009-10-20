@@ -321,10 +321,9 @@ public final class DialogServer extends Dialog {
    */
   void setData() {
     fillLists();
-    ((TableModel) table.getModel()).fireTableDataChanged();
+    ((TableModel) table.getModel()).fireTableChanged(null);
     userco.removeAllItems();
-    for(final Object[] o : data.contents)
-      userco.addItem(o[0]);
+    for(final Object[] o : data.contents) userco.addItem(o[0]);
   }
 
   /**
@@ -348,7 +347,7 @@ public final class DialogServer extends Dialog {
    */
   class TableModel extends AbstractTableModel {
     public int getColumnCount() {
-      return USERHEAD.length;
+      return data.header.size();
     }
 
     public int getRowCount() {
@@ -357,7 +356,7 @@ public final class DialogServer extends Dialog {
 
     @Override
     public String getColumnName(final int col) {
-      return USERHEAD[col];
+      return data.header.get(col);
     }
 
     public Object getValueAt(final int row, final int col) {

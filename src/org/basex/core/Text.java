@@ -170,6 +170,8 @@ public interface Text {
   /** Command help. */
   String NAM = "name";
   /** Command help. */
+  String PW = "password";
+  /** Command help. */
   String POS = "pos";
   /** Command help. */
   String INTO = "INTO";
@@ -183,6 +185,8 @@ public interface Text {
   String ON = "ON";
   /** Command help. */
   String OFF = "OFF";
+  /** Command help. */
+  String USER = "USER";
 
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
@@ -192,7 +196,7 @@ public interface Text {
 
   /** Command help. */
   String CREATE0 = "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "] [...]";
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]";
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
@@ -205,7 +209,9 @@ public interface Text {
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
       "] ([mountpoint] [backingstore]): " + NL +
       "  " + Main.info(lang("ch_create5"), NAM, PATH) + NL +
-      "  " + Main.info(lang("ch_create6"), "mountpoint", "backingstore");
+      "  " + Main.info(lang("ch_create6"), "mountpoint", "backingstore") + NL +
+    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "]: " + NL +
+      "  " + lang("ch_create7");
 
   /** Command help. */
   String OPEN0 = "[" + NAM + "]";
@@ -241,16 +247,26 @@ public interface Text {
   String LIST2 = lang("ch_list2");
 
   /** Command help. */
-  String DROP0 = "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "] [...]";
+  String DROP0 = "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" +
+    CmdDrop.USER + "] [...]";
   /** Command help. */
   String DROP1 = lang("ch_drop1");
   /** Command help. */
   String DROP2 = lang("ch_drop2") + NL +
     LI + CmdDrop.DB + " [" + NAM + "]:" + NL +
-      "  " + Main.info(lang("ch_drop21"), NAM) + NL +
+      "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.SUMMARY + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
-      "  " + lang("ch_drop22");
+      "  " + lang("ch_drop22") + NL +
+    LI + CmdDrop.USER + " [" + NAM + "]:" + NL +
+      "  " + Main.info(lang("ch_drop3"), NAM);
+
+  /** Command help. */
+  String ALTER0 = USER + " [name] [password]";
+  /** Command help. */
+  String ALTER1 = lang("ch_alter1");
+  /** Command help. */
+  String ALTER2 = lang("ch_alter2");
 
   /** Command help. */
   String OPTIMIZE0 = "";
@@ -674,6 +690,8 @@ public interface Text {
   String USERDROP = lang("ad_userdrop");
   /** User added. */
   String USERCREATE = lang("ad_usercreate");
+  /** User changed. */
+  String USERALTER = lang("ad_useralter");
   /** User added. */
   String USERKNOWN = lang("ad_userknown");
 

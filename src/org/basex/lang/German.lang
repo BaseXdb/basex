@@ -25,6 +25,7 @@ b_ok=  OK
 b_opt=Optimieren...
 b_rename=Umbenennen...
 b_open=Öffnen
+b_mount= Mount 
 b_cancel=Abbrechen
 b_drop=Löschen
 b_browse=Auswahl
@@ -88,6 +89,11 @@ dc_ft=Volltext
 
 do_title=Datenbank öffnen
 do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
+
+dqe_title=Open DeepFS instance
+
+dmnt_title=Mount DeepFS instance
+dmnt_nomountpath=No valid mount point
 
 dq_open=XQuery-Datei öffnen
 dq_save=XQuery-Datei speichern
@@ -220,6 +226,8 @@ c_createfs=Neue DeepFS DB
 c_createfstt=Erstellt, ausgehend von einem Verzeichnis, eine DeepFS Dateisystemrepräsentation. Die erstellte Datenbank kann anschliessend als Desktop Query Engine benutzt oder als Dateisystem eingebunden werden.
 c_dqe=Desktop Query Engine
 c_dqett=Öffnet eine DeepFS Datenbank um sie als Desktop Search/Query Engine zu benutzen
+c_mountfs=Mount DB as FUSE
+c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Eigenschaften
 c_propstt=Zeigt Informationen über die aktuelle Datenbank an.
 c_insert=Neu
@@ -388,10 +396,11 @@ ad_sessions=%-Recht benötigt.
 ad_permno=% permission needed.
 ad_perminv=Angabe von ungültigen Benutzerrechten.
 ad_permdel=Benutzerrecht entzogen.
-ad_useradd=Benutzerrecht zugewiesen.
+ad_permadd=Benutzerrecht zugewiesen.
 ad_userno=Unbekannter Benutzer '%'.
 ad_userknown=Benutzer '%' existiert schon.
 ad_usercreate=Benutzer '%' erzeugt.
+ad_useralter=Passwort von Benutzer '%' geändert.
 ad_userdrop=Benutzer '%' entfernt.
 
 # General Commands
@@ -447,12 +456,13 @@ info_entries=% Einträge
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
 ch_helpdatabase0=Datenbank-Befehle:
-ch_create1=Erstellen einer Datenbank oder eines Index.
-ch_create2=Erstellt eine Datenbank von einem XML-Dokument\noder Dateisystem oder erstellt einen Index:
-ch_create3=erstellt die Datenbank [%] aus der Datei/dem Verzeichnis [%]
-ch_create4=erstellt den angegebenen Index
-ch_create5=erstellt eine Filesystem-Datenbank [%] von [%]
+ch_create1=Erzeugen einer Datenbank, eines Index oder Benutzers.
+ch_create2=erzeugt eine Datenbank von einem XML-Dokument\noder Dateisystem oder erstellt einen Index:
+ch_create3=erzeugt die Datenbank [%] aus der Datei/dem Verzeichnis [%]
+ch_create4=erzeugt den angegebenen Index
+ch_create5=erzeugt eine Filesystem-Datenbank [%] von [%]
 ch_create6=(mit [%] und [%], wenn FUSE aktiviert ist)
+ch_create7=erzeugt den angegebenen Benutzer
 ch_open1=Öffnen einer Datenbank.
 ch_open2=Öffnet die angegebene Datenbank [%].
 ch_info1=Zeige Informationen zur aktuellen Datenbank.
@@ -465,10 +475,13 @@ ch_close1=Schließen der aktuellen Datenbank.
 ch_close2=Schließt die aktuelle Datenbank.
 ch_list1=Anzeige aller Datenbanken.
 ch_list2=Listet alle verfügbaren Datenbanken auf.
-ch_drop1=Entfernen einer Datenbank oder eines Index.
+ch_drop1=Entfernen einer Datenbank, eines Index oder Benutzers.
 ch_drop2=Die folgenden Argumente sind erlaubt:
-ch_drop21=entfernt die Datenbank [%]
+ch_drop21=entfernt die Datenbank
 ch_drop22=entfernt den angegebenen Index
+ch_drop3=entfernt den angegebenen Benutzer
+ch_alter1=Ändern eines Benutzerpassworts.
+ch_alter2=Ändert das Passwort eines Benutzers.
 ch_optimize1=Optimieren der Datenbank.
 ch_optimize2=Optimiert die aktuelle Datenbankstruktur.
 ch_export1=Exportieren der Datenbank als XML.

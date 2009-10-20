@@ -4,7 +4,7 @@ package org.basex.core;
  * This class contains information on a single user.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public class User {
   /** Flag for read permissions. */
@@ -19,9 +19,9 @@ public class User {
   /** User name. */
   public String name;
   /** Password. */
-  public byte[] pw;
+  byte[] pw;
   /** Permission. */
-  public int perm;
+  int perm;
   
   /**
    * Constructor.

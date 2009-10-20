@@ -25,6 +25,7 @@ b_ok=  OK
 b_opt=Ottimizza...
 b_rename=Rinomina...
 b_open= Apri 
+b_mount= Mount 
 b_cancel=Annulla
 b_drop=Cancella
 b_cmd=Comando
@@ -88,6 +89,11 @@ dc_ft=Full-Text
 
 do_title=Apri Database
 do_nodbquestion=Vuoi crearne uno nuovo?
+
+dqe_title=Open DeepFS instance
+
+dmnt_title=Mount DeepFS instance
+dmnt_nomountpath=No valid mount point
 
 dq_open=Apri un file XQuery
 dq_save=Salva un file XQuery
@@ -223,6 +229,8 @@ c_createfs=Create DeepFS mapping
 c_createfstt=Creates a DeepFS filesystem representation starting from a given directory. The resulting database may later be used to start BaseX as a Desktop Query Engine or to mount the database as filesystem in userspace.
 c_dqe=Desktop Query Engine
 c_dqett=Open DeepFS database and use it as Desktop Search/Query Engine
+c_mountfs=Mount DB as FUSE
+c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Informazioni
 c_propstt=Mostra le informazioni sul Database attualmente in uso.
 c_insert=Nuovo
@@ -396,6 +404,7 @@ ad_permadd=Permission granted.
 ad_userno=User '%' is unknown.
 ad_userknown=User '%' exists already.
 ad_usercreate=User '%' created.
+ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 
 # General Commands
@@ -451,12 +460,13 @@ info_entries=% registrazioni
 # Command Help
 ch_nohelp=Spiacente, nessun aiuto disponibile.
 ch_helpdatabase0=Comandi del Database:
-ch_create1=Crea un Database o un Indice.
+ch_create1=Crea un Database, Indice o User.
 ch_create2=Crea un Database da XML o Filesystem, oppure crea un Indice:
 ch_create3=crea un Database [%] per il file o la directory [%]
 ch_create4=crea l'indice specificato
 ch_create5=Crea un DeepFS Filesystem [%] per [%]
 ch_create6=(using [%] and [%] if FUSE is activated)
+ch_create7=creates the specified user
 ch_open1=Apri un Database.
 ch_open2=apre il Database [%] specificato.
 ch_info1=Mostra informazioni sul Database attuale.
@@ -469,10 +479,13 @@ ch_close1=Ciudi Database in uso.
 ch_close2=Chiude il Database in uso.
 ch_list1=Mostra Database disponibili.
 ch_list2=Mostra tutti i Database disponibili.
-ch_drop1=Cancella Database o Indice.
+ch_drop1=Cancella Database, Indice o User.
 ch_drop2=I seguenti argomenti possono essere specificati:
-ch_drop21=cancella il Database [%]
+ch_drop21=cancella il Database
 ch_drop22=cancella l'Idnice specificato
+ch_drop3=drops the specified user
+ch_alter1=Alter user password.
+ch_alter2=Alters the password of a user.
 ch_optimize1=Ottimizza il Database.
 ch_optimize2=Ottimizza le strutture del Database in uso.
 ch_export1=Esporta Database come XML.
