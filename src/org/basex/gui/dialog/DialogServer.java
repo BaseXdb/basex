@@ -7,6 +7,9 @@ import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 
 import javax.swing.Box;
@@ -14,6 +17,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -27,18 +31,15 @@ import org.basex.core.proc.IntStop;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
-import org.basex.io.IO;
 import org.basex.server.ClientSession;
 import org.basex.util.Table;
 
@@ -116,8 +117,6 @@ public final class DialogServer extends Dialog {
   final BaseXTextField port;
   /** Change button. */
   final BaseXButton change;
-  /** Browse button. */
-  final BaseXButton browse;
   /** Alter button. */
   final BaseXButton alter;
   /** Change button. */
@@ -128,8 +127,6 @@ public final class DialogServer extends Dialog {
   BaseXButton delete;
   /** Username textfield. */
   BaseXTextField user;
-  /** Serverpath textfield. */
-  BaseXTextField srvpath;
   /** Password textfield. */
   JPasswordField pass;
   /** Password textfield. */
@@ -155,7 +152,6 @@ public final class DialogServer extends Dialog {
     super(main, SERVERTITLE);
 
     tabs = new BaseXTabs(this);
-
     // Server panel
     p1.setLayout(new TableLayout(4, 1));
     // User management panel
@@ -181,18 +177,11 @@ public final class DialogServer extends Dialog {
 
     // Server preferences panel.
     final BaseXBack p12 = new BaseXBack();
-    p12.setLayout(new TableLayout(3, 3, 2, 2));
+    p12.setLayout(new TableLayout(2, 2, 2, 2));
     p12.add(new BaseXLabel(HOST));
     p12.add(host);
-    p12.add(new BaseXLabel(""));
     p12.add(new BaseXLabel(PORT));
     p12.add(port);
-    p12.add(new BaseXLabel(""));
-    browse = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
-    p12.add(new BaseXLabel(SRVPATH));
-    srvpath = new BaseXTextField("C:\\basex\\basex.jar", null, this);
-    p12.add(srvpath);
-    p12.add(browse);
     // adding to main panel
     p12.setBorder(8, 8, 8, 8);
     p11.setBorder(8, 8, 8, 8);
@@ -282,15 +271,23 @@ public final class DialogServer extends Dialog {
       ctx.prop.set(Prop.HOST, host.getText());
       final int p = Integer.parseInt(port.getText());
       ctx.prop.set(Prop.PORT, p);
-      final String path = srvpath.getText();
-      if(path.endsWith(".jar")) {
-        final Runtime run = Runtime.getRuntime();
-        try {
-          run.exec("java -cp \"" + path + "\" org.basex.BaseXServer");
-          //createSession();
-        } catch(IOException e) {
-          e.printStackTrace();
-        }
+      // Get the location of this class
+      ProtectionDomain pDomain = this.getClass().getProtectionDomain();
+      CodeSource cSource = pDomain.getCodeSource();
+      URL loc = cSource.getLocation();
+      String path = loc.getPath().substring(1);
+      if(path.contains("%20")) {
+        path = path.replace("%20", " ");
+        path = "\"" + path + "\""; 
+      }
+      final Runtime run = Runtime.getRuntime();
+      try {
+        String exec = "java -cp " + path + " org.basex.BaseXServer";
+        System.out.println(exec);
+        run.exec(exec);
+        createSession();
+      } catch(IOException e) {
+        e.printStackTrace();
       }
     } else if(STOP.equals(cmd)) {
       try {
@@ -325,8 +322,8 @@ public final class DialogServer extends Dialog {
       final String u = (String) userco1.getSelectedItem();
       try {
         if(Dialog.confirm(this, SURE)) {
-        cs.execute(new DropUser(u));
-        setData();
+          cs.execute(new DropUser(u));
+          setData();
         }
       } catch(final IOException ex) {
         // [AW] to be visualized somewhere...
@@ -340,23 +337,13 @@ public final class DialogServer extends Dialog {
       } catch(IOException e) {
         e.printStackTrace();
       }
-    } else if(BUTTONBROWSE.equals(cmd)) {
-      final GUIProp gprop = gui.prop;
-      final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-          gprop.get(GUIProp.CREATEPATH), gui);
-      fc.addFilter(CREATEJARDESC, IO.JARSUFFIX);
-      final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
-      if(file != null) srvpath.setText(file.path());
     }
-
     // [AW] info labels should be added for simple input checks
     // (hosts/ports, user/passwords, see: DialogCreate.info)
     final boolean run = cs == null;
     stop.setEnabled(!run);
     host.setEnabled(run);
     port.setEnabled(run);
-    srvpath.setEnabled(run);
-    browse.setEnabled(run);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
     boolean valp = port.getText().matches("^[0-9]{2,5}$");
     start.setEnabled(run && valp && valh);
@@ -373,17 +360,17 @@ public final class DialogServer extends Dialog {
     }
     tabs.setEnabledAt(1, !run);
     boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
-    boolean valpass = new String(pass.getPassword()).
-      matches("^[A-Za-z0-9_.-]+$");
-    boolean valnewpass = new String(newpass.getPassword()).
-    matches("^[A-Za-z0-9_.-]+$");
+    boolean valpass = new String(
+        pass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    boolean valnewpass = new String(
+        newpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
     alter.setEnabled(valnewpass);
     create.setEnabled(valuname && valpass);
     if(!valuname && !user.getText().isEmpty()) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText("Invalid username");
-    } else if((!valpass && !new String(pass.getPassword()).isEmpty()) ||
-        (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
+    } else if((!valpass && !new String(pass.getPassword()).isEmpty())
+        || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText("Invalid password");
     } else {
