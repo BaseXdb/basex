@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
@@ -96,32 +95,37 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
-    if(!(n instanceof DBNode)) {
-      if(aSeq.size() > 0) ctx.updates.
-        addPrimitive(new InsertAttribute(n, aSeq, -1));
-      if(seq.size() > 0) ctx.updates.
-      addPrimitive(new InsertAttribute(n, seq, -1));
-      return Iter.EMPTY;
-    }
+//    if(!(n instanceof DBNode)) {
+//      if(aSeq.size() > 0) {
+//        if(k == Data.DOC) Err.or(UPWRTRGTYP2, this);
+//        ctx.updates.addPrimitive(new InsertAttribute(n, aSeq, -1));
+//      }
+//      if(seq.size() > 0) ctx.updates.
+//      addPrimitive(new InsertAttribute(n, seq, -1));
+//      return Iter.EMPTY;
+//    }
     
-    final DBNode dbn = (DBNode) n;
-    final DBNode par = (DBNode) dbn.parent();
+    final Nod par = n.parent();
     if(aSeq.size() > 0) 
-      if(into) ctx.updates.addPrimitive(
-        new InsertAttribute(dbn, aSeq, -1));
+      if(into) {
+        if(k == Data.DOC) Err.or(UPWRTRGTYP2, this); 
+        ctx.updates.addPrimitive(
+            new InsertAttribute(n, aSeq, -1));
+      }
       if(before || after) {
         if(par == null) Err.or(UPDATE, this);
+        if(Nod.kind(par.type) == Data.DOC) Err.or(UPWRTRGTYP2, this);
         ctx.updates.addPrimitive(
             new InsertAttribute(par, aSeq, -1));
       }
     if(seq.size() > 0) {
       UpdatePrimitive up = null;
       if(into)
-        if(first) up = new InsertIntoFirstPrimitive(dbn, seq, -1);
-        else if(last) up = new InsertIntoLastPrimitive(dbn, seq, -1);
-        else up = new InsertIntoPrimitive(dbn, seq, -1);
-      else if(before) up = new InsertBeforePrimitive(dbn, seq, -1);
-      else if(after) up = new InsertAfterPrimitive(dbn, seq, -1);
+        if(first) up = new InsertIntoFirstPrimitive(n, seq, -1);
+        else if(last) up = new InsertIntoLastPrimitive(n, seq, -1);
+        else up = new InsertIntoPrimitive(n, seq, -1);
+      else if(before) up = new InsertBeforePrimitive(n, seq, -1);
+      else if(after) up = new InsertAfterPrimitive(n, seq, -1);
       else Err.or(UPDATE, this);
       ctx.updates.addPrimitive(up);
     }
