@@ -46,43 +46,6 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {
-  // [AW] to be externalized...
-  /** Server string. */
-  static final String START = "Start server";
-  /** Server string. */
-  static final String STOP = "Stop server";
-  /** Server string. */
-  static final String CHANGE = "Change";
-  /** Server string. */
-  static final String SERVERTITLE = "Server Properties";
-  /** Server string. */
-  static final String SERVER = "Server";
-  /** Server string. */
-  static final String USERS = "Users";
-  /** Server string. */
-  static final String HOST = "Host" + COLS;
-  /** Server string. */
-  static final String PORT = "Port" + COLS;
-  /** Server string. */
-  static final String CREATEUSER = "Create User" + COL;
-  /** Server string. */
-  static final String DROPUSER = "Drop User" + COL;
-  /** Server string. */
-  static final String CREATE = "Create";
-  /** Server string. */
-  static final String DROP = "Drop";
-  /** Server string. */
-  static final String PERMISSIONS = "Permissions" + COL;
-  /** Server string. */
-  static final String SURE = "Are you really sure?";
-  /** Server String. */
-  static final String ALTERP = "Alter password" + COL;
-  /** Server String. */
-  static final String NEWP = "New password" + COL;
-  /** Server String. */
-  static final String ALTER = "Alter";
-  /** Server String. */
-  static final String SRVPATH = "Serverpath" + COL;
 
   /** ArrayList for table. */
   Table data = new Table();
@@ -145,7 +108,7 @@ public final class DialogServer extends Dialog {
    * @param main reference to the main window
    */
   public DialogServer(final GUI main) {
-    super(main, SERVERTITLE);
+    super(main, SRVTITLE);
 
     tabs = new BaseXTabs(this);
     // Server panel
@@ -154,11 +117,11 @@ public final class DialogServer extends Dialog {
     p2.setLayout(new TableLayout(12, 1, 0, 4));
     p2.setBorder(8, 8, 8, 8);
 
-    tabs.add(SERVER, p1);
+    tabs.add(SERVERN, p1);
     tabs.add(USERS, p2);
 
-    start = new BaseXButton(START, null, this);
-    stop = new BaseXButton(STOP, null, this);
+    start = new BaseXButton(BUTTONSTASERV, null, this);
+    stop = new BaseXButton(BUTTONSTOSERV, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
     port = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
         this);
@@ -174,9 +137,9 @@ public final class DialogServer extends Dialog {
     // Server preferences panel.
     final BaseXBack p12 = new BaseXBack();
     p12.setLayout(new TableLayout(2, 2, 2, 2));
-    p12.add(new BaseXLabel(HOST));
+    p12.add(new BaseXLabel(HOST + COLS));
     p12.add(host);
-    p12.add(new BaseXLabel(PORT));
+    p12.add(new BaseXLabel(PORT + COLS));
     p12.add(port);
     // adding to main panel
     p12.setBorder(8, 8, 8, 8);
@@ -191,25 +154,25 @@ public final class DialogServer extends Dialog {
     user = new BaseXTextField("", null, this);
     user.addKeyListener(keys);
     BaseXLayout.setWidth(user, 100);
-    create = new BaseXButton(CREATE, null, this);
+    create = new BaseXButton(BUTTONCREATE, null, this);
     pass = new JPasswordField();
     pass.addKeyListener(keys);
     BaseXLayout.setWidth(pass, 100);
     userco1 = new BaseXCombo(new String[] {}, null, this);
-    delete = new BaseXButton(DROP, null, this);
+    delete = new BaseXButton(BUTTONDROP, null, this);
     table = new JTable(new TableModel());
     table.setPreferredScrollableViewportSize(new Dimension(420, 100));
 
-    p2.add(new BaseXLabel(CREATEUSER, false, true));
+    p2.add(new BaseXLabel(CREATEU, false, true));
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(1, 5, 6, 0));
-    p21.add(new BaseXLabel(SERVERUSER));
+    p21.add(new BaseXLabel(SERVERUSER + COLS));
     p21.add(user);
-    p21.add(new BaseXLabel(SERVERPW));
+    p21.add(new BaseXLabel(SERVERPW + COLS));
     p21.add(pass);
     p21.add(create);
     p2.add(p21);
-    p2.add(new BaseXLabel(DROPUSER, false, true));
+    p2.add(new BaseXLabel(DROPU, false, true));
     final BaseXBack p22 = new BaseXBack();
     p22.setLayout(new TableLayout(1, 2, 6, 0));
     p22.add(userco1);
@@ -217,17 +180,17 @@ public final class DialogServer extends Dialog {
     p2.add(p22);
     final BaseXBack p23 = new BaseXBack();
     p23.setLayout(new TableLayout(2, 4, 6, 0));
-    p23.add(new BaseXLabel(ALTERP, false, true));
+    p23.add(new BaseXLabel(ALTERPW, false, true));
     p23.add(new BaseXLabel(" "));
     p23.add(new BaseXLabel(" "));
     p23.add(new BaseXLabel(" "));
     newpass = new JPasswordField();
-    alter = new BaseXButton(ALTER, null, this);
+    alter = new BaseXButton(BUTTONALTER, null, this);
     userco2 = new BaseXCombo(new String[] {}, null, this);
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
     p23.add(userco2);
-    p23.add(new BaseXLabel(NEWP));
+    p23.add(new BaseXLabel(NEWPW));
     p23.add(newpass);
     p23.add(alter);
     p21.setBorder(0, 0, 5, 0);
@@ -235,10 +198,10 @@ public final class DialogServer extends Dialog {
     p23.setBorder(0, 0, 5, 0);
     p2.add(p23);
     p2.add(Box.createVerticalStrut(8));
-    p2.add(new BaseXLabel(PERMISSIONS, false, true));
+    p2.add(new BaseXLabel(PERMS, false, true));
     p2.add(new JScrollPane(table));
     infop2 = new BaseXLabel(" ");
-    change = new BaseXButton(CHANGE, null, this);
+    change = new BaseXButton(BUTTONCHANGE, null, this);
     p2.add(change);
     p2.add(infop2);
     p2.add(new BaseXLabel(" "));
@@ -263,7 +226,7 @@ public final class DialogServer extends Dialog {
 
   @Override
   public void action(final String cmd) {
-    if(START.equals(cmd)) {
+    if(BUTTONSTASERV.equals(cmd)) {
       ctx.prop.set(Prop.HOST, host.getText());
       final int p = Integer.parseInt(port.getText());
       ctx.prop.set(Prop.PORT, p);
@@ -279,7 +242,7 @@ public final class DialogServer extends Dialog {
       } catch(final Exception ex) {
         ex.printStackTrace();
       }
-    } else if(STOP.equals(cmd)) {
+    } else if(BUTTONSTOSERV.equals(cmd)) {
       try {
         cs.execute(new IntStop(), null);
         cs = null;
@@ -287,7 +250,7 @@ public final class DialogServer extends Dialog {
         // [AW] to be visualized somewhere...
         Main.debug(ex);
       }
-    } else if(CHANGE.equals(cmd)) {
+    } else if(BUTTONCHANGE.equals(cmd)) {
       for(Process p : permps) {
         try {
           cs.execute(p);
@@ -296,7 +259,7 @@ public final class DialogServer extends Dialog {
         }
       }
       permps.clear();
-    } else if(CREATE.equals(cmd)) {
+    } else if(BUTTONCREATE.equals(cmd)) {
       final String u = user.getText();
       final String p = new String(pass.getPassword());
       try {
@@ -308,10 +271,10 @@ public final class DialogServer extends Dialog {
         // [AW] to be visualized somewhere...
         Main.debug(ex);
       }
-    } else if(DROP.equals(cmd)) {
+    } else if(BUTTONDROP.equals(cmd)) {
       final String u = (String) userco1.getSelectedItem();
       try {
-        if(Dialog.confirm(this, SURE)) {
+        if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
           cs.execute(new DropUser(u));
           setData();
         }
@@ -319,7 +282,7 @@ public final class DialogServer extends Dialog {
         // [AW] to be visualized somewhere...
         Main.debug(ex);
       }
-    } else if(ALTER.equals(cmd)) {
+    } else if(BUTTONALTER.equals(cmd)) {
       final String u = (String) userco2.getSelectedItem();
       final String p = new String(newpass.getPassword());
       try {
@@ -340,9 +303,9 @@ public final class DialogServer extends Dialog {
     if(!valp || !valh) {
       infop1.setIcon(BaseXLayout.icon("warn"));
       if(!valh) {
-        infop1.setText("Invalid hostname");
+        infop1.setText(HOST + INVALID);
       } else {
-        infop1.setText("Invalid port");
+        infop1.setText(PORT + INVALID);
       }
     } else {
       infop1.setText(" ");
@@ -358,11 +321,11 @@ public final class DialogServer extends Dialog {
     create.setEnabled(valuname && valpass);
     if(!valuname && !user.getText().isEmpty()) {
       infop2.setIcon(BaseXLayout.icon("warn"));
-      infop2.setText("Invalid username");
+      infop2.setText(SERVERUSER + INVALID);
     } else if((!valpass && !new String(pass.getPassword()).isEmpty())
         || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
       infop2.setIcon(BaseXLayout.icon("warn"));
-      infop2.setText("Invalid password");
+      infop2.setText(SERVERPW + INVALID);
     } else {
       infop2.setText(" ");
       infop2.setIcon(null);

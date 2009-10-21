@@ -32,6 +32,11 @@ b_xquery=XQuery
 b_browse=Trình duyệt
 #b_simple=Đơn giản
 b_search=Tìm kiếm
+b_change=Change
+b_create=Create
+b_alter=Alter
+b_staserv=Start server
+b_stoserv=Stop server
 
 # Status messages
 s_ok=OK
@@ -57,7 +62,6 @@ dc_name=Tện cơ sở dữ liệu
 dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip
 dc_gzdesc=Văn bản XML nén GZip
-dc_jardesc=Java archive
 dc_xqdesc=Những tệp XQuery
 dc_advtitle=Tạo cơ sở dữ liệu
 dc_chop=Cắt hết khoảng trống
@@ -278,6 +282,19 @@ c_xqopen=Mở XQuery
 c_xqopentt=Mở tệp lệnh hỏi
 c_xqsave=Lưu XQuery
 c_xqsavett=Lưu tệp lệnh hỏi
+
+s_servdia=Server Properties
+s_server=Server
+s_users=User
+s_host=Host
+s_port=Port
+s_createu=Create User
+s_dropu=Drop User
+s_perms=Permissions
+s_drquestion=User '%' will be dropped.\nAre you sure?
+s_alterpw=Alter Password
+s_newpw=New Password
+s_invalid=Invalid
 
 # Commands & Processes
 proc_time=Thời gian cần

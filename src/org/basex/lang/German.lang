@@ -33,6 +33,11 @@ b_xquery=XQuery
 b_cmd=Befehl
 #b_simple=Einfacher
 b_search=Suche
+b_change=Ändern
+b_create=Erstellen
+b_alter=Abändern
+b_staserv=Starte Server
+b_stoserv=Stop Server
 
 # Status messages
 s_ok=OK
@@ -58,7 +63,6 @@ dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente
-dc_jardesc=Java Archiv
 dc_xqdesc=XQuery-Anfragen
 dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen
@@ -279,6 +283,19 @@ c_xqopen=XQuery öffnen
 c_xqopentt=Öffnet eine XQuery-Datei
 c_xqsave=XQuery speichern
 c_xqsavett=Speichert die XQuery-Datei
+
+s_servdia=Server Eigenschaften
+s_server=Server
+s_users=Benutzer
+s_host=Host
+s_port=Port
+s_createu=Erstelle Benutzer
+s_dropu=Lösche Benutzer
+s_perms=Genehmigungen
+s_drquestion=Benutzer '%' wird gelöscht.\nSind Sie sicher?
+s_alterpw=Passwort abändern
+s_newpw=Neues Passwort
+s_invalid= ungültig
 
 # Commands & Processes
 proc_time=Benötigte Zeit

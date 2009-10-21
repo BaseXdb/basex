@@ -114,9 +114,10 @@ public interface Text {
   /** Login error. */
   String SERVERLOGIN = lang("srv_login");
   /** User name. */
-  String SERVERUSER = lang("srv_user") + COLS;
+  String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw") + COLS;
+  
 
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
@@ -1012,6 +1013,7 @@ public interface Text {
   String GUIXQSAVE = lang("c_xqsave") + DOTS;
   /** Command info. */
   String GUIXQSAVETT = lang("c_xqsavett");
+  
 
   // BUTTONS ==================================================================
 
@@ -1037,6 +1039,16 @@ public interface Text {
   String BUTTONDROP = lang("b_drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
+  /** Button text for changing things. */
+  String BUTTONCHANGE = lang("b_change");
+  /** Button text for creating things. */
+  String BUTTONCREATE = lang("b_create");
+  /** Button text for alter password. */
+  String BUTTONALTER = lang("b_alter");
+  /** Button for starting the server. */
+  String BUTTONSTASERV = lang("b_staserv");
+  /** Button for starting the server. */
+  String BUTTONSTOSERV = lang("b_stoserv");
 
   // STATUS BAR ===============================================================
 
@@ -1086,8 +1098,6 @@ public interface Text {
   String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
   /** GZ file description. */
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
-  /** JAR file description. */
-  String CREATEJARDESC = lang("dc_jardesc") + " (*.jar)";
   /** XQ file description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog title for database options. */
@@ -1335,6 +1345,31 @@ public interface Text {
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;
+  
+  /** Server title. */
+  String SRVTITLE = lang("s_servdia");
+  /** Server. */
+  String SERVERN = lang("s_server");
+  /** Users. */
+  String USERS = lang("s_users");
+  /** Host. */
+  String HOST = lang("s_host");
+  /** PORT. */
+  String PORT = lang("s_port");
+  /** Create User. */
+  String CREATEU = lang("s_createu") + COLS;
+  /** Drop User. */
+  String DROPU = lang("s_dropu") + COLS;
+  /** Permissions. */
+  String PERMS = lang("s_perms") + COLS;
+  /** Question for dropping user. */
+  String DRQUESTION = lang("s_drquestion");
+  /** Alter password. */
+  String ALTERPW = lang("s_alterpw") + COLS;
+  /** New password. */
+  String NEWPW = lang("s_newpw") + COLS;
+  /** Invalid. */
+  String INVALID = lang("s_invalid");
 
   // HELP TEXTS ===============================================================
 

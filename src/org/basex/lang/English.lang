@@ -33,6 +33,11 @@ b_xquery=XQuery
 b_browse=Browse
 #b_simple=Simple
 b_search=Search
+b_change=Change
+b_create=Create
+b_alter=Alter
+b_staserv=Start server
+b_stoserv=Stop server
 
 # Status messages
 s_ok=OK
@@ -58,7 +63,6 @@ dc_name=Name of Database
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
-dc_jardesc=Java archive
 dc_xqdesc=XQuery files
 dc_advtitle=Create Database
 dc_chop=Chop Whitespaces
@@ -279,6 +283,19 @@ c_xqopen=Open XQuery
 c_xqopentt=Opens an XQuery file
 c_xqsave=Save XQuery
 c_xqsavett=Saves the XQuery file
+
+s_servdia=Server Properties
+s_server=Server
+s_users=User
+s_host=Host
+s_port=Port
+s_createu=Create User
+s_dropu=Drop User
+s_perms=Permissions
+s_drquestion=User '%' will be dropped.\nAre you sure?
+s_alterpw=Alter Password
+s_newpw=New Password
+s_invalid= invalid
 
 # Commands & Processes
 proc_time=Time Needed

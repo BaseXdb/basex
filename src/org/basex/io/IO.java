@@ -28,8 +28,6 @@ public abstract class IO {
   public static final String ZIPSUFFIX = ".zip";
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
-  /** JAR Suffix. */
-  public static final String JARSUFFIX = ".jar";
 
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";

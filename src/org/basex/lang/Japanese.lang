@@ -33,6 +33,11 @@ b_xquery=XQuery
 b_browse=参照
 #b_simple=簡易
 b_search=検索
+b_change=Change
+b_create=Create
+b_alter=Alter
+b_staserv=Start server
+b_stoserv=Stop server
 
 # Status messages
 s_ok=OK
@@ -58,7 +63,6 @@ dc_name=データベースの名前
 dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書
 dc_gzdesc=GZip圧縮されたXML文書
-dc_jardesc=Java archive
 dc_xqdesc=XQueryファイル
 dc_advtitle=データベースオプション
 dc_chop=空白を取り除く
@@ -279,6 +283,19 @@ c_xqopen=XQuery 開く
 c_xqopentt=XQueryファイルを開きます。
 c_xqsave=XQuery 保存
 c_xqsavett=現在のXQueryを保存します。
+
+s_servdia=Server Properties
+s_server=Server
+s_users=User
+s_host=Host
+s_port=Port
+s_createu=Create User
+s_dropu=Drop User
+s_perms=Permissions
+s_drquestion=User '%' will be dropped.\nAre you sure?
+s_alterpw=Alter Password
+s_newpw=New Password
+s_invalid=Invalid
 
 # Commands & Processes
 proc_time=所要時間
