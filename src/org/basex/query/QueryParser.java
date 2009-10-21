@@ -144,6 +144,8 @@ public class QueryParser extends InputParser {
   private boolean declPres;
   /** Declaration flag. */
   private boolean declBase;
+  /** Declaration flag. */
+  private boolean declVar;
 
   /***
    * Constructor.
@@ -608,7 +610,9 @@ public class QueryParser extends InputParser {
     } else {
       if(old != null) error(VARDEFINE, var);
       check(ASSIGN);
+      declVar = true;
       ctx.vars.addGlobal(var.bind(check(single(), VARMISSING), ctx));
+      declVar = false;
     }
   }
 
@@ -2497,6 +2501,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
+    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(INSERT)) return null;
     if(!consumeWS(NODE) && !consumeWS(NODES)) {
@@ -2534,6 +2539,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr deletee() throws QueryException {
+    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(DELETE)) return null;
     if(!consumeWS(NODES) && !consumeWS(NODE)) {
@@ -2551,6 +2557,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
+    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(RENAME)) return null;
     if(!consumeWS(NODE)) {
@@ -2570,6 +2577,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
+    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(REPLACE)) return null;
     final boolean v = consumeWS(VALUEE);

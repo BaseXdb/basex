@@ -22,7 +22,7 @@ import org.basex.util.Performance;
 public final class QueryTest {
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    /*new SimpleTest(), new XPathMarkFTTest(), new FTTest(), */new XQUPTest()
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
@@ -105,7 +105,6 @@ public final class QueryTest {
 
     if(ok) {
       for(final Object[] qu : test.queries) {
-//        UpdateFunctions.printTable(context.data());
         // added to renew document after each update test
         if(up && ((String) qu[0]).startsWith("xxx")) {
           proc = new CreateDB(file, name);

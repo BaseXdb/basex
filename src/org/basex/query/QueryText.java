@@ -496,6 +496,8 @@ public interface QueryText {
   Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
   /** XUST0001: Parsing exception. */
   Object[] UPEXPSIMPLE = { XUST, 1, "Expecting simple expression." };
+  /** XUST0001: Parsing exception. */
+  Object[] UPNOUPDT = { XUST, 1, "No update expression allowed." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
   /** XUST0026: Parsing exception. */
@@ -528,6 +530,8 @@ public interface QueryText {
   Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
   /** XUTY0012: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP = { XUTY, 12, "Wrong target type." };
+  /** XUTY0022: XQuery Update dynamic exception. */
+  Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
 
   // OPTIMIZATIONS
 

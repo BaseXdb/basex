@@ -41,7 +41,7 @@ public final class InsertAfterPrimitive extends InsertPrimitive {
   @SuppressWarnings("unused")
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    c.addLast(((NodeCopyPrimitive) p).c.getFirst());
+    c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 
   @Override
