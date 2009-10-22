@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.Array;
@@ -17,7 +16,7 @@ import org.basex.util.Array;
  */
 public final class TableDiskAccess extends TableAccess {
   /** Max entries per block. */
-  private static final int ENTRIES = IO.BLOCKSIZE >>> IO.NODEPOWER;
+  static final int ENTRIES = IO.BLOCKSIZE >>> IO.NODEPOWER;
   /** Entries per new block. */
   private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
 
@@ -28,59 +27,50 @@ public final class TableDiskAccess extends TableAccess {
 
   /** File storing all blocks. */
   public final RandomAccessFile file;
-  /** Filename prefix. */
-  private final String pref;
-  /** Name of the database. */
-  private final String db;
-  /** Database properties. */
-  private final Prop prop;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;
   /** Index array storing the BlockNumbers. */
-  private int[] blocks;
+  private int[] blockIndex;
 
   /** Number of the first entry in the current block. */
   private int firstPre = -1;
   /** FirstPre of the next block. */
   private int nextPre = -1;
 
-  /** Number of entries in the index (used blocks). */
-  private int indexSize;
   /** Number of blocks in the data file (including unused). */
-  private int nrBlocks;
+  private int allBlocks;
+  /** Number of entries in the index (used blocks). */
+  private int blocks;
   /** Index number of the current block, referencing indexBlockNumber array. */
   private int index = -1;
   /** Number of entries in the storage. */
-  private int count;
-  /** Dirty index flag. */
-  private boolean dirty;
+  private int size;
 
   /**
    * Constructor.
    * @param nm name of the database
-   * @param f prefix for all files (no ending)
+   * @param fn prefix for all files (no ending)
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final String nm, final String f, final Prop pr)
+  public TableDiskAccess(final String nm, final String fn, final Prop pr)
       throws IOException {
-    db = nm;
-    pref = f;
-    prop = pr;
+
+    super(nm, fn, pr);
 
     // READ INFO FILE AND INDEX
-    final DataInput in = new DataInput(pr.dbfile(nm, f + 'i'));
-    nrBlocks = in.readNum();
-    indexSize = in.readNum();
-    count = in.readNum();
+    final DataInput in = new DataInput(pr.dbfile(nm, fn + 'i'));
+    allBlocks = in.readNum();
+    blocks = in.readNum();
+    size = in.readNum();
     firstPres = in.readNums();
-    blocks = in.readNums();
+    blockIndex = in.readNums();
     in.close();
 
     // INITIALIZE FILE
-    file = new RandomAccessFile(pr.dbfile(nm, f), "rw");
-    readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
+    file = new RandomAccessFile(pr.dbfile(nm, fn), "rw");
+    readBlock(0, 0, blocks > 1 ? firstPres[1] : size);
   }
 
   /**
@@ -94,7 +84,7 @@ public final class TableDiskAccess extends TableAccess {
     int np = nextPre;
 
     if(pre < fp || pre >= np) {
-      final int last = indexSize - 1;
+      final int last = blocks - 1;
       int l = 0;
       int h = last;
       int m = index;
@@ -107,7 +97,7 @@ public final class TableDiskAccess extends TableAccess {
         np = m == last ? fp + ENTRIES : firstPres[m + 1];
       }
       if(l > h) Main.notexpected("Invalid Data Access [pre:" + pre +
-          ", indexSize:" + indexSize + ", access:" + l + " > " + h + "]");
+          ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
       readBlock(m, fp, np);
     }
@@ -128,7 +118,7 @@ public final class TableDiskAccess extends TableAccess {
     firstPre = first;
     nextPre = next;
 
-    final int b = blocks[ind];
+    final int b = blockIndex[ind];
     final boolean ch = bm.cursor(b);
     bf = bm.curr();
     if(ch) {
@@ -158,7 +148,7 @@ public final class TableDiskAccess extends TableAccess {
    * Fetches next block.
    */
   private synchronized void nextBlock() {
-    readBlock(index + 1, nextPre, index + 2 >= indexSize ? count :
+    readBlock(index + 1, nextPre, index + 2 >= blocks ? size :
       firstPres[index + 2]);
   }
 
@@ -168,11 +158,11 @@ public final class TableDiskAccess extends TableAccess {
 
     if(dirty) {
       final DataOutput out = new DataOutput(prop.dbfile(db, pref + 'i'));
-      out.writeNum(nrBlocks);
-      out.writeNum(indexSize);
-      out.writeNum(count);
+      out.writeNum(allBlocks);
+      out.writeNum(blocks);
+      out.writeNum(size);
       out.writeNums(firstPres);
-      out.writeNums(blocks);
+      out.writeNums(blockIndex);
       out.close();
       dirty = false;
     }
@@ -274,9 +264,9 @@ public final class TableDiskAccess extends TableAccess {
 
       // if whole block was deleted, remove it from the index
       if(nextPre == firstPre) {
-        Array.move(firstPres, index + 1, -1, indexSize - index - 1);
-        Array.move(blocks, index + 1, -1, indexSize - index - 1);
-        readBlock(index, firstPre, index + 2 > --indexSize ? count :
+        Array.move(firstPres, index + 1, -1, blocks - index - 1);
+        Array.move(blockIndex, index + 1, -1, blocks - index - 1);
+        readBlock(index, firstPre, index + 2 > --blocks ? size :
           firstPres[index + 1]);
       }
       return;
@@ -294,9 +284,9 @@ public final class TableDiskAccess extends TableAccess {
 
     // now remove them from the index
     if(unused > 0) {
-      Array.move(firstPres, index, -unused, indexSize - index);
-      Array.move(blocks, index, -unused, indexSize - index);
-      indexSize -= unused;
+      Array.move(firstPres, index, -unused, blocks - index);
+      Array.move(blockIndex, index, -unused, blocks - index);
+      blocks -= unused;
       index -= unused;
     }
 
@@ -315,16 +305,16 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
-    for(int i = index + 1; i < indexSize; i++) firstPres[i] -= nr;
-    count -= nr;
-    nextPre = index + 1 >= indexSize ? count : firstPres[index + 1];
+    for(int i = index + 1; i < blocks; i++) firstPres[i] -= nr;
+    size -= nr;
+    nextPre = index + 1 >= blocks ? size : firstPres[index + 1];
   }
 
   @Override
   public synchronized void insert(final int pre, final byte[] entries) {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
-    count += nr;
+    size += nr;
     cursor(pre - 1);
 
     final int ins = pre - firstPre;
@@ -336,7 +326,7 @@ public final class TableDiskAccess extends TableAccess {
       copy(entries, 0, bf.buf, ins, nr);
 
       // update index entries
-      for(int i = index + 1; i < indexSize; i++) firstPres[i] += nr;
+      for(int i = index + 1; i < blocks; i++) firstPres[i] += nr;
       nextPre += nr;
       return;
     }
@@ -355,12 +345,12 @@ public final class TableDiskAccess extends TableAccess {
     if(pre == nextPre) newBlocks--;
 
     // resize the index
-    final int s = nrBlocks + newBlocks;
+    final int s = allBlocks + newBlocks;
     firstPres = Arrays.copyOf(firstPres, s);
-    blocks = Arrays.copyOf(blocks, s);
+    blockIndex = Arrays.copyOf(blockIndex, s);
 
-    Array.move(firstPres, index + 1, newBlocks, indexSize - index - 1);
-    Array.move(blocks, index + 1, newBlocks, indexSize - index - 1);
+    Array.move(firstPres, index + 1, newBlocks, blocks - index - 1);
+    Array.move(blockIndex, index + 1, newBlocks, blocks - index - 1);
 
     // add blocks for new entries
     int remain = nr;
@@ -370,8 +360,8 @@ public final class TableDiskAccess extends TableAccess {
       copy(entries, pos, bf.buf, 0, Math.min(remain, NEWENTRIES));
 
       firstPres[++index] = nr - remain + pre;
-      blocks[index] = (int) bf.pos;
-      indexSize++;
+      blockIndex[index] = (int) bf.pos;
+      blocks++;
       remain -= NEWENTRIES;
       pos += NEWENTRIES;
     }
@@ -382,17 +372,17 @@ public final class TableDiskAccess extends TableAccess {
       copy(rest, 0, bf.buf, 0, move);
 
       firstPres[++index] = pre + nr;
-      blocks[index] = (int) bf.pos;
-      indexSize++;
+      blockIndex[index] = (int) bf.pos;
+      blocks++;
     }
 
     // update index entries
-    for(int i = index + 1; i < indexSize; i++) firstPres[i] += nr;
+    for(int i = index + 1; i < blocks; i++) firstPres[i] += nr;
 
     // update cached variables
     firstPre = pre;
     if(rest.length > 0) firstPre += nr;
-    nextPre = index + 1 >= indexSize ? count : firstPres[index + 1];
+    nextPre = index + 1 >= blocks ? size : firstPres[index + 1];
   }
 
   /**
@@ -404,7 +394,7 @@ public final class TableDiskAccess extends TableAccess {
     } catch(final IOException ex) {
       ex.printStackTrace();
     }
-    bf.pos = nrBlocks++;
+    bf.pos = allBlocks++;
     bf.dirty = true;
   }
 
@@ -428,7 +418,7 @@ public final class TableDiskAccess extends TableAccess {
    * @return number of entries in storage.
    */
   public synchronized int size() {
-    return count;
+    return size;
   }
 
   /**
@@ -436,6 +426,6 @@ public final class TableDiskAccess extends TableAccess {
    * @return number of used blocks.
    */
   public synchronized int blocks() {
-    return indexSize;
+    return blocks;
   }
 }

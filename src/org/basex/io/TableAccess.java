@@ -2,6 +2,8 @@ package org.basex.io;
 
 import java.io.IOException;
 
+import org.basex.core.Prop;
+
 /**
  * This abstract class defines the methods for accessing the
  * database table representation.
@@ -10,6 +12,27 @@ import java.io.IOException;
  * @author Christian Gruen
  */
 public abstract class TableAccess {
+  /** Database properties. */
+  protected final Prop prop;
+  /** Name of the database. */
+  protected final String db;
+  /** Filename prefix. */
+  protected final String pref;
+  /** Dirty index flag. */
+  protected boolean dirty;
+
+  /**
+   * Constructor.
+   * @param nm name of the database
+   * @param f prefix for all files (no ending)
+   * @param pr database properties
+   */
+  public TableAccess(final String nm, final String f, final Prop pr) {
+    db = nm;
+    pref = f;
+    prop = pr;
+  }
+  
   /**
    * Reads a byte value and returns it as an integer value.
    * @param p pre value

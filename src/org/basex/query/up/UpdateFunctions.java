@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
@@ -336,6 +335,6 @@ public final class UpdateFunctions {
    * @param d data reference
    */
   public static void printTable(final Data d) {
-    Main.outln(string(InfoTable.table(d, 0, Integer.MAX_VALUE)));
+    Main.outln(d.toString());
   }
 }

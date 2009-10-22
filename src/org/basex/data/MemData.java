@@ -267,7 +267,7 @@ public class MemData extends Data {
   public final void attValue(final int pre, final byte[] val) {
     val1[pre] = val1[pre] & 0xFFFFFF0000000000L | attIndex(val);
   }
-  
+
   @Override
   public void dist(final int pre, final int kind, final int val) {
     if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | val;
@@ -284,7 +284,7 @@ public class MemData extends Data {
     if(kind == ELEM || kind == DOC)
       val2[pre] = (int) val2[pre] | (long) val << 32;
   }
-  
+
   // UPDATES ON VALUE ARRAYS ==================================================
 
   @Override
@@ -296,48 +296,28 @@ public class MemData extends Data {
   @Override
   protected void insertElem(final int pre, final int dis, final byte[] tag,
       final int as, final int s) {
-
-    final long t = tags.index(tag, null, false);
-    move(pre, pre + 1);
-    val1[pre] = (long) ELEM << 56 | t << 40 | (long) as << 32 | dis;
-    val2[pre] = (long) s << 32 | ++meta.lastid;
-    meta.size++;
+    insert(pre, (long) ELEM << 56 | (long) tags.index(tag, null, false) << 40 |
+        (long) as << 32 | dis, (long) s << 32 | ++meta.lastid);
   }
 
   @Override
   protected void insertDoc(final int pre, final int s, final byte[] val) {
-    // build and insert new entry
-
-    final long txt = ((MemValues) txtindex).index(val, pre);
-    move(pre, pre + 1);
-    val1[pre] = (long) DOC << 56 | txt;
-    val2[pre] = (long) s << 32 | ++meta.lastid;
-    meta.size++;
+    insert(pre, (long) DOC << 56 | ((MemValues) txtindex).index(val, pre),
+      (long) s << 32 | ++meta.lastid);
   }
 
   @Override
   protected void insertText(final int pre, final int dis, final byte[] val,
       final int kind) {
-
-    // build and insert new entry
-    final int txt = ((MemValues) txtindex).index(val, pre);
-    move(pre, pre + 1);
-    val1[pre] = (long) TEXT << 56 | txt;
-    val2[pre] = (long) dis << 32 | ++meta.lastid;
-    meta.size++;
+    insert(pre, (long) TEXT << 56 | ((MemValues) txtindex).index(val, pre),
+      (long) dis << 32 | ++meta.lastid);
   }
 
   @Override
   protected void insertAttr(final int pre, final int dis, final byte[] name,
       final byte[] val) {
-
-    // add attribute to text storage
-    final long t = atts.index(name, null, false);
-    final long txt = ((MemValues) atvindex).index(val, pre);
-    move(pre, pre + 1);
-    val1[pre] = (long) ATTR << 56 | t << 40 | txt;
-    val2[pre] = (long) dis << 32 | ++meta.lastid;
-    meta.size++;
+    insert(pre, (long) ATTR << 56 | (long) atts.index(name, null, false) << 40 |
+      ((MemValues) atvindex).index(val, pre), (long) dis << 32 | ++meta.lastid);
   }
 
   @Override
@@ -368,5 +348,18 @@ public class MemData extends Data {
     }
     System.arraycopy(val1, sp, val1, dp, l);
     System.arraycopy(val2, sp, val2, dp, l);
+  }
+
+  /**
+   * Inserts the specified entries into the table.
+   * @param pre pre value
+   * @param v1 first entry
+   * @param v2 second entry
+   */
+  private void insert(final int pre, final long v1, final long v2) {
+    move(pre, pre + 1);
+    val1[pre] = v1;
+    val2[pre] = v2;
+    meta.size++;
   }
 }

@@ -29,6 +29,8 @@ public abstract class UpdateTest {
   private static final String DBNAME = UpdateTest.class.getSimpleName();
   /** Main memory flag. */
   private static boolean mainmem = true;
+  /** Table memory flag. */
+  private static boolean tablemem = true;
 
   /** JUnit tag. */
   protected static final byte[] JUNIT = token("junit");
@@ -46,6 +48,7 @@ public abstract class UpdateTest {
     prop.set(Prop.TEXTINDEX, false);
     prop.set(Prop.ATTRINDEX, false);
     prop.set(Prop.MAINMEM, mainmem);
+    prop.set(Prop.TABLEMEM, tablemem);
   }
 
   /**
