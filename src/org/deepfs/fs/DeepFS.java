@@ -281,8 +281,7 @@ public final class DeepFS implements DataText {
   private MemData buildFileNode(final String path, final int mode) {
     final String fname = basename(path);
     final int nodeSize = 11; // 1x elem, 10x attr
-    final MemData m = new MemData(nodeSize, data.tags, data.atts, data.ns,
-        data.path, data.meta.prop);
+    final MemData m = new MemData(nodeSize, data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
     m.addElem(tagID , 0, 1, nodeSize, nodeSize, false);

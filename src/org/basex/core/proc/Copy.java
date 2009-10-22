@@ -134,8 +134,7 @@ public final class Copy extends AUpdate {
     // size of the data instance
     final int size = data.size(pre, data.kind(pre));
     // create temporary data instance, adopting the indexes of the source data
-    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns,
-        data.path, data.meta.prop);
+    final MemData tmp = new MemData(size, data);
 
     // copy all nodes
     for(int p = pre; p < pre + size; p++) {

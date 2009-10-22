@@ -7,6 +7,7 @@ import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
@@ -145,6 +146,14 @@ public abstract class Data {
   public abstract int parent(int pre, int kind);
 
   /**
+   * Returns the distance of the specified node.
+   * @param pre pre value
+   * @param k node kind
+   * @return distance
+   */
+  protected abstract int dist(final int pre, final int k);
+
+  /**
    * Returns a size value (number of descendant table entries).
    * @param pre pre value
    * @param kind node kind
@@ -266,6 +275,30 @@ public abstract class Data {
   public abstract double attNum(int pre);
 
   /**
+   * Sets the distance for the specified node.
+   * @param pre pre value
+   * @param kind node kind
+   * @param v value
+   */
+  public abstract void dist(final int pre, final int kind, final int v);
+
+  /**
+   * Sets the attribute size.
+   * @param pre pre value
+   * @param kind node kind
+   * @param v value
+   */
+  public abstract void attSize(final int pre, final int kind, final int v);
+
+  /**
+   * Stores a size value to the table.
+   * @param pre pre reference
+   * @param kind node kind
+   * @param val value to be stored
+   */
+  public abstract void size(final int pre, final int kind, final int val);
+  
+  /**
    * Finds the specified attribute and returns its value.
    * @param att the attribute id of the attribute to be found
    * @param pre pre value
@@ -382,11 +415,62 @@ public abstract class Data {
   }
 
   /**
+   * Deletes a node and its descendants.
+   * @param pre pre value of the node to delete
+   */
+  public final void delete(final int pre) {
+    meta.update();
+    // size of the subtree to delete
+    int k = kind(pre);
+    int s = size(pre, k);
+    // ignore deletions of single root node
+    if(pre == 0 && s == meta.size) return;
+    // reduce size of ancestors
+    int par = pre;
+    // check if we are an attribute (different size counters)
+    if(k == ATTR) {
+      par = parent(par, ATTR);
+      attSize(par, ELEM, attSize(par, ELEM) - 1);
+      size(par, ELEM, size(par, ELEM) - 1);
+      k = kind(par);
+    }
+    // reduce size of remaining ancestors
+    while(par > 0 && k != DOC) {
+      par = parent(par, k);
+      k = kind(par);
+      size(par, k, size(par, k) - s);
+    }
+    // preserve empty root node
+    int p = pre;
+    final boolean empty = p == 0 && s == meta.size;
+    if(empty) {
+      p++;
+      s = size(p, kind(p));
+    }
+    // delete node from table structure and reduce document size
+    delete(p, s);
+    meta.size -= s;
+    updateDist(p, -s);
+    // restore root node
+    if(empty) {
+      size(0, DOC, 1);
+      update(0, Token.EMPTY, true);
+    }
+  }
+
+  /**
    * Updates a tag name, text node, comment or processing instruction.
    * @param pre pre of the text node to change
    * @param val value to be updated
    */
-  public abstract void update(int pre, byte[] val);
+  public final void update(final int pre, final byte[] val) {
+    meta.update();
+    if(kind(pre) == ELEM) {
+      tagID(pre, tags.index(val, null, false));
+    } else {
+      update(pre, val, true);
+    }
+  }
 
   /**
    * Updates an attribute name and value.
@@ -394,13 +478,11 @@ public abstract class Data {
    * @param name attribute name
    * @param val attribute value
    */
-  public abstract void update(int pre, byte[] name, byte[] val);
-
-  /**
-   * Deletes a node and its descendants.
-   * @param pre pre value of the node to delete
-   */
-  public abstract void delete(final int pre);
+  public final void update(final int pre, final byte[] name, final byte[] val) {
+    meta.update();
+    update(pre, val, false);
+    attNameID(pre, atts.index(name, val, false));
+  }
 
   /**
    * Inserts a tag name, text node, comment or processing instruction.
@@ -409,7 +491,19 @@ public abstract class Data {
    * @param val value to be inserted
    * @param kind node kind
    */
-  public abstract void insert(int pre, int par, byte[] val, int kind);
+  public final void insert(final int pre, final int par, final byte[] val,
+      final int kind) {
+
+    meta.update();
+    if(kind == ELEM) {
+      insertElem(pre, pre - par, val, 1, 1);
+    } else if(kind == DOC) {
+      insertDoc(pre, 1, val);
+    } else {
+      insertText(pre, pre - par, val, kind);
+    }
+    updateTable(pre, par, 1);
+  }
 
   /**
    * Inserts an attribute.
@@ -418,16 +512,67 @@ public abstract class Data {
    * @param name attribute name
    * @param val attribute value
    */
-  public abstract void insert(int pre, int par, byte[] name, byte[] val);
+  public final void insert(final int pre, final int par, final byte[] name,
+      final byte[] val) {
+
+    meta.update();
+    // insert attribute and increase attSize of parent element
+    insertAttr(pre, pre - par, name, val);
+    attSize(par, ELEM, attSize(par, ELEM) + 1);
+    updateTable(pre, par, 1);
+  }
 
   /**
    * Inserts a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
    * @param pre value at which to insert new data
    * @param par parent pre value of node
-   * @param d data instance to copy from
+   * @param dt data instance to copy from
    */
-  public abstract void insert(int pre, int par, Data d);
+  public final void insert(final int pre, final int par, final Data dt) {
+    meta.update();
+
+    // first source node to be copied; if input is a document, skip first node
+    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
+    // number of nodes to be inserted
+    final int ss = dt.size(sa, dt.kind(sa));
+
+    // copy database entries
+    for(int s = sa; s < sa + ss; s++) {
+      final int k = dt.kind(s);
+      final int r = dt.parent(s, k);
+      // recalculate distance for root nodes
+      // [CG] Updates/Insert: test collections
+      final int d = r < sa ? pre - par : s - r;
+      final int p = pre + s - sa;
+
+      switch(k) {
+        case ELEM:
+          // add element
+          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
+          break;
+        case DOC:
+          // add document
+          insertDoc(p, dt.size(s, k), dt.text(s));
+          break;
+        case TEXT:
+        case COMM:
+        case PI:
+          // add text
+          insertText(p, d, dt.text(s), k);
+          break;
+        case ATTR:
+          // add attribute
+          insertAttr(p, d, dt.attName(s), dt.attValue(s));
+          break;
+      }
+    }
+    // update table if no document was inserted
+    if(par != 0) updateTable(pre, par, ss);
+
+    // delete old empty root node
+    if(size(0, DOC) == 1) delete(0);
+  }
   
   /**
    * Inserts a data instance at the specified pre value.
@@ -436,5 +581,151 @@ public abstract class Data {
    * @param par parent pre value of node
    * @param dt data instance to copy from
    */
-  public abstract void insertSeq(final int pre, final int par, final Data dt);
+  public final void insertSeq(final int pre, final int par, final Data dt) {
+    meta.update();
+    final int sa = 1;
+    // number of nodes to be inserted
+    final int ss = dt.size(0, dt.kind(0));
+
+    // copy database entries
+    for(int s = sa; s < ss; s++) {
+      final int k = dt.kind(s);
+      final int r = dt.parent(s, k);
+      final int p = pre + s - 1;
+      final int d = r > 0 ? s - r : p - par;
+
+      switch(k) {
+        case ELEM:
+          // add element
+          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
+          break;
+        case DOC:
+          // add document
+          insertDoc(p, dt.size(s, k), dt.text(s));
+          break;
+        case TEXT:
+        case COMM:
+        case PI:
+          // add text
+          insertText(p, d, dt.text(s), k);
+          break;
+        case ATTR:
+          // add attribute
+          insertAttr(p, d, dt.attName(s), dt.attValue(s));
+          break;
+      }
+    }
+    // [LK] test insertion of document nodes
+    updateTable(pre, par, ss - 1);
+  }
+
+  /**
+   * This method is called after a table modification. It updates the
+   * size values of the ancestors and the distance values of the
+   * following siblings.
+   * @param pre root node
+   * @param par parent node
+   * @param s size to be added
+   */
+  private void updateTable(final int pre, final int par, final int s) {
+    // increase sizes
+    int p = par;
+    while(p >= 0) {
+      final int k = kind(p);
+      size(p, k, size(p, k) + s);
+      p = parent(p, k);
+    }
+    updateDist(pre + s, s);
+  }
+
+  /**
+   * This method updates the distance values of the specified pre value
+   * and the following siblings.
+   * @param pre root node
+   * @param s size to be added/removed
+   */
+  private void updateDist(final int pre, final int s) {
+    int p = pre;
+    while(p < meta.size) {
+      final int k = kind(p);
+      dist(p, k, dist(p, k) + s);
+      p += size(p, kind(p));
+    }
+  }
+
+  // PROTECTED UPDATE OPERATIONS ==============================================
+
+  /**
+   * Updates the specified text or attribute value.
+   * @param pre pre value
+   * @param val content
+   * @param txt text flag
+   */
+  protected abstract void update(final int pre, final byte[] val,
+      final boolean txt);
+  
+  /**
+   * Inserts an element node without updating the size and distance values
+   * of the table.
+   * @param pre insert position
+   * @param dis parent distance
+   * @param tag tag name index
+   * @param as number of attributes
+   * @param s node size
+   */
+  protected abstract void insertElem(final int pre, final int dis,
+      final byte[] tag, final int as, final int s);
+
+  /**
+   * Inserts text node without updating the size and distance values
+   * of the table.
+   * @param pre insert position
+   * @param s node size
+   * @param val tag name or text node
+   */
+  protected abstract void insertDoc(final int pre, final int s,
+      final byte[] val);
+
+  /**
+   * Inserts a text, comment or processing instruction
+   * without updating the size and distance values of the table.
+   * @param pre insert position
+   * @param dis parent distance
+   * @param val tag name or text node
+   * @param kind node kind
+   */
+  protected abstract void insertText(final int pre, final int dis,
+      final byte[] val, final int kind);
+
+  /**
+   * Inserts an attribute
+   * without updating the size and distance values of the table.
+   * @param pre pre value
+   * @param dis parent distance
+   * @param name attribute name
+   * @param val attribute value
+   */
+  protected abstract void insertAttr(final int pre, final int dis,
+      final byte[] name, final byte[] val);
+
+  /**
+   * Deletes the specified number of entries from the table.
+   * @param pre pre value of the first node to delete
+   * @param nr number of entries to be deleted
+   */
+  protected abstract void delete(final int pre, final int nr);
+
+  /**
+   * Stores the tag ID.
+   * @param pre pre value
+   * @param v tag id
+   */
+  protected abstract void tagID(final int pre, final int v);
+
+  /**
+   * Sets the attribute name ID.
+   * @param pre pre value
+   * @param v attribute name ID
+   */
+  protected abstract void attNameID(final int pre, final int v);
 }

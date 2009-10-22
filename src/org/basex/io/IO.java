@@ -193,6 +193,14 @@ public abstract class IO {
   }
 
   /**
+   * Creates a URL from the specified path.
+   * @return URL
+   */
+  public String url() {
+    return path;
+  }
+
+  /**
    * Returns the directory.
    * @return chopped filename
    */
@@ -275,13 +283,5 @@ public abstract class IO {
       if(!Token.ftChar(c) && INVALID.indexOf(c) != -1) return false;
     }
     return true;
-  }
-
-  /**
-   * Creates a URL from the specified path.
-   * @return URL
-   */
-  public String url() {
-    return path;
   }
 }

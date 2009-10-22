@@ -62,7 +62,6 @@ public final class DBPrimitives {
   public void apply() throws QueryException {
     // [LK] merge text nodes
     final int l = op.size();
-    if(op.size() == 0) return;
     final Integer[] t = new Integer[l];
     op.keySet().toArray(t);
     final int[] p = new int[l];

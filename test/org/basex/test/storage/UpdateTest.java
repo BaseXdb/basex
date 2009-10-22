@@ -27,6 +27,8 @@ public abstract class UpdateTest {
   private static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
   private static final String DBNAME = UpdateTest.class.getSimpleName();
+  /** Main memory flag. */
+  private static boolean mainmem = true;
 
   /** JUnit tag. */
   protected static final byte[] JUNIT = token("junit");
@@ -43,6 +45,7 @@ public abstract class UpdateTest {
     final Prop prop = CONTEXT.prop;
     prop.set(Prop.TEXTINDEX, false);
     prop.set(Prop.ATTRINDEX, false);
+    prop.set(Prop.MAINMEM, mainmem);
   }
 
   /**
@@ -67,6 +70,7 @@ public abstract class UpdateTest {
    */
   @After
   public void tearDown() {
+    if(mainmem) return;
     exec(new Close());
     exec(new DropDB(DBNAME));
   }
@@ -75,6 +79,7 @@ public abstract class UpdateTest {
    * Reloads the database.
    */
   protected void reload() {
+    if(mainmem) return;
     exec(new Close());
     exec(new Open(DBNAME));
   }
@@ -106,7 +111,7 @@ public abstract class UpdateTest {
    */
   private void exec(final Process proc) {
     if(!proc.execute(CONTEXT)) {
-      Main.outln(proc.info());
+      Main.errln(proc + ": " + proc.info());
       System.exit(1);
     }
   }

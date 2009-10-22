@@ -117,7 +117,8 @@ public final class InfoTable extends AInfo {
     sl.add(data.tagNS(p));
     sl.add(TABLEKINDS[k]);
     sl.add(string(k == Data.ELEM ? data.tag(p) : k != Data.ATTR ?
-        data.text(p) : concat(data.attName(p), ATT1, data.attValue(p), ATT2)));
+        data.text(p) : concat(data.attName(p), ATT1,
+        data.attValue(p), ATT2)).replaceAll("\n", "\\\\n"));
     t.contents.add(sl);
   }
 

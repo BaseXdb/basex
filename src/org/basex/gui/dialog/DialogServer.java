@@ -46,11 +46,10 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {
-
-  /** ArrayList for table. */
-  Table data = new Table();
   /** Context. */
   final Context ctx = gui.context;
+  /** ArrayList for table. */
+  Table data = new Table();
   /** ClientSession. */
   ClientSession cs;
 

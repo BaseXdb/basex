@@ -1,10 +1,8 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.index.FTFuzzy;
 import org.basex.index.FTTrie;
@@ -45,7 +43,7 @@ import org.basex.util.Token;
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  SIZE: Number of descendants
  * - Byte 12-15:  UNID: Unique Node ID
- * TEXT NODES:
+ * TEXT, COMMENT, PI NODES:
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
@@ -226,13 +224,8 @@ public final class DiskData extends Data {
     return pre - dist(pre, kind);
   }
 
-  /**
-   * Returns the distance of the specified node.
-   * @param pre pre value
-   * @param kind node kind
-   * @return distance
-   */
-  private int dist(final int pre, final int kind) {
+  @Override
+  protected int dist(final int pre, final int kind) {
    switch(kind) {
       case ELEM: return table.read4(pre, 4);
       case TEXT:
@@ -377,30 +370,35 @@ public final class DiskData extends Data {
     return num;
   }
 
-  @Override
-  public void update(final int pre, final byte[] val) {
-    meta.update();
-     if(kind(pre) == ELEM) {
-      tagID(pre, tags.index(val, null, false));
-    } else {
-      update(pre, val, true);
-    }
-  }
-
-  @Override
-  public void update(final int pre, final byte[] name, final byte[] val) {
-    meta.update();
-    update(pre, val, false);
-    attNameID(pre, atts.index(name, val, false));
-  }
-
   /**
-   * Updates the specified text or attribute value.
+   * Sets the disk offset of a text/attribute value.
    * @param pre pre value
-   * @param val content
-   * @param txt text flag
+   * @param off offset
    */
-  private void update(final int pre, final byte[] val, final boolean txt) {
+  private void textOff(final int pre, final long off) {
+    table.write5(pre, 3, off);
+  }
+
+  @Override
+  public void dist(final int pre, final int kind, final int v) {
+    if(kind == ATTR) table.write1(pre, 11, v);
+    else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, v);
+  }
+
+  @Override
+  public void attSize(final int pre, final int kind, final int v) {
+    if(kind == ELEM) table.write1(pre, 3, v);
+  }
+
+  @Override
+  public void size(final int pre, final int kind, final int v) {
+    if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
+  }
+
+  // TABLE UPDATES ============================================================
+
+  @Override
+  protected void update(final int pre, final byte[] val, final boolean txt) {
     final long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
       textOff(pre, v | 0x8000000000L);
@@ -424,209 +422,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void delete(final int pre) {
-    meta.update();
-
-    // size of the subtree to delete
-    int k = kind(pre);
-    int s = size(pre, k);
-    // ignore deletions of single root node
-    if(pre == 0 && s == meta.size) return;
-
-    // reduce size of ancestors
-    int par = pre;
-
-    // check if we are an attribute (different size counters)
-    if(k == ATTR) {
-      par = parent(par, ATTR);
-      attSize(par, ELEM, attSize(par, ELEM) - 1);
-      size(par, ELEM, size(par, ELEM) - 1);
-      k = kind(par);
-    }
-
-    // reduce size of remaining ancestors
-    while(par > 0 && k != DOC) {
-      par = parent(par, k);
-      k = kind(par);
-      size(par, k, size(par, k) - s);
-    }
-
-    // preserve empty root node
-    int p = pre;
-    final boolean empty = p == 0 && s == meta.size;
-    if(empty) {
-      p++;
-      s = size(p, kind(p));
-    }
-
-    // delete node from table structure and reduce document size
-    table.delete(p, s);
-    meta.size -= s;
-    updateDist(p, -s);
-
-    if(empty) {
-      size(0, DOC, 1);
-      update(0, Token.EMPTY, true);
-    }
-  }
-
-  /**
-   * This method is called after a table modification. It updates the
-   * size values of the ancestors and the distance values of the
-   * following siblings.
-   * @param pre root node
-   * @param par parent node
-   * @param s size to be added
-   */
-  private void updateTable(final int pre, final int par, final int s) {
-    // increase sizes
-    int p = par;
-    while(p >= 0) {
-      final int k = kind(p);
-      size(p, k, size(p, k) + s);
-      p = parent(p, k);
-    }
-    updateDist(pre + s, s);
-  }
-
-  /**
-   * This method updates the distance values of the specified pre value
-   * and the following siblings.
-   * @param pre root node
-   * @param s size to be added/removed
-   */
-  private void updateDist(final int pre, final int s) {
-    int p = pre;
-    while(p < meta.size) {
-      final int k = kind(p);
-      dist(p, k, dist(p, k) + s);
-      p += size(p, kind(p));
-    }
-  }
-
-  @Override
-  public void insert(final int pre, final int par, final byte[] val,
-      final int kind) {
-
-    meta.update();
-
-    if(kind == ELEM) {
-      insertElem(pre, pre - par, val, 1, 1);
-    } else if(kind == DOC) {
-      insertDoc(pre, 1, val);
-    } else {
-      insertText(pre, pre - par, val, kind);
-    }
-    updateTable(pre, par, 1);
-  }
-
-  @Override
-  public void insert(final int pre, final int par, final byte[] name,
-      final byte[] val) {
-
-    meta.update();
-
-    // insert attribute and increase attSize of parent element
-    insertAttr(pre, pre - par, name, val);
-    attSize(par, ELEM, attSize(par, ELEM) + 1);
-    updateTable(pre, par, 1);
-  }
-
-  @Override
-  public void insert(final int pre, final int par, final Data dt) {
-    meta.update();
-
-    // first source node to be copied; if input is a document, skip first node
-    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
-    // number of nodes to be inserted
-    final int ss = dt.size(sa, dt.kind(sa));
-
-    // copy database entries
-    for(int s = sa; s < sa + ss; s++) {
-      final int k = dt.kind(s);
-      final int r = dt.parent(s, k);
-      // recalculate distance for root nodes
-      // [CG] Updates/Insert: test collections
-      final int d = r < sa ? pre - par : s - r;
-      final int p = pre + s - sa;
-
-      switch(k) {
-        case ELEM:
-          // add element
-          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
-          break;
-        case DOC:
-          // add document
-          insertDoc(p, dt.size(s, k), dt.text(s));
-          break;
-        case TEXT:
-        case COMM:
-        case PI:
-          // add text
-          insertText(p, d, dt.text(s), k);
-          break;
-        case ATTR:
-          // add attribute
-          insertAttr(p, d, dt.attName(s), dt.attValue(s));
-          break;
-      }
-    }
-    // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss);
-
-    // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
-  }
-  
-  @Override
-  public void insertSeq(final int pre, final int par, final Data dt) {
-    meta.update();
-    final int sa = 1;
-    // number of nodes to be inserted
-    final int ss = dt.size(0, dt.kind(0));
-
-    // copy database entries
-    for(int s = sa; s < ss; s++) {
-      final int k = dt.kind(s);
-      final int r = dt.parent(s, k);
-      final int p = pre + s - 1;
-      final int d = r > 0 ? s - r : p - par;
-
-      switch(k) {
-        case ELEM:
-          // add element
-          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
-          break;
-        case DOC:
-          // add document
-          insertDoc(p, dt.size(s, k), dt.text(s));
-          break;
-        case TEXT:
-        case COMM:
-        case PI:
-          // add text
-          insertText(p, d, dt.text(s), k);
-          break;
-        case ATTR:
-          // add attribute
-          insertAttr(p, d, dt.attName(s), dt.attValue(s));
-          break;
-      }
-    }
-    // [LK] test insertion of document nodes
-    updateTable(pre, par, ss - 1);
-  }
-
-  /**
-   * Inserts an element node without updating the size and distance values
-   * of the table.
-   * @param pre insert position
-   * @param dis parent distance
-   * @param tag tag name index
-   * @param as number of attributes
-   * @param s node size
-   */
-  private void insertElem(final int pre, final int dis, final byte[] tag,
+  protected void insertElem(final int pre, final int dis, final byte[] tag,
       final int as, final int s) {
 
     final long id = ++meta.lastid;
@@ -638,14 +434,8 @@ public final class DiskData extends Data {
     meta.size++;
   }
 
-  /**
-   * Inserts text node without updating the size and distance values
-   * of the table.
-   * @param pre insert position
-   * @param s node size
-   * @param val tag name or text node
-   */
-  private void insertDoc(final int pre, final int s, final byte[] val) {
+  @Override
+  protected void insertDoc(final int pre, final int s, final byte[] val) {
     // build and insert new entry
     final long id = ++meta.lastid;
     final long txt = texts.length();
@@ -658,15 +448,8 @@ public final class DiskData extends Data {
     meta.size++;
   }
 
-  /**
-   * Inserts a text, comment or processing instruction
-   * without updating the size and distance values of the table.
-   * @param pre insert position
-   * @param dis parent distance
-   * @param val tag name or text node
-   * @param kind node kind
-   */
-  private void insertText(final int pre, final int dis, final byte[] val,
+  @Override
+  protected void insertText(final int pre, final int dis, final byte[] val,
       final int kind) {
 
     // build and insert new entry
@@ -681,15 +464,8 @@ public final class DiskData extends Data {
     meta.size++;
   }
 
-  /**
-   * Inserts an attribute
-   * without updating the size and distance values of the table.
-   * @param pre pre value
-   * @param dis parent distance
-   * @param name attribute name
-   * @param val attribute value
-   */
-  private void insertAttr(final int pre, final int dis, final byte[] name,
+  @Override
+  protected void insertAttr(final int pre, final int dis, final byte[] name,
       final byte[] val) {
 
     // add attribute to text storage
@@ -706,61 +482,18 @@ public final class DiskData extends Data {
     meta.size++;
   }
 
-  /**
-   * Sets the distance for the specified node.
-   * @param pre pre value
-   * @param kind node kind
-   * @param v value
-   */
-  private void dist(final int pre, final int kind, final int v) {
-    if(kind == ATTR) table.write1(pre, 11, v);
-    else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, v);
-  }
-
-  /**
-   * Sets the tag ID.
-   * @param pre pre value
-   * @param v tag id
-   */
-  private void tagID(final int pre, final int v) {
+  @Override
+  protected void tagID(final int pre, final int v) {
     table.write2(pre, 1, v);
   }
 
-  /**
-   * Sets the attribute name ID.
-   * @param pre pre value
-   * @param v attribute name ID
-   */
-  private void attNameID(final int pre, final int v) {
+  @Override
+  protected void attNameID(final int pre, final int v) {
     table.write2(pre, 1, v);
   }
 
-  /**
-   * Sets the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @param off offset
-   */
-  private void textOff(final int pre, final long off) {
-    table.write5(pre, 3, off);
-  }
-
-  /**
-   * Sets the attribute size.
-   * @param pre pre value
-   * @param kind node kind
-   * @param v value
-   */
-  private void attSize(final int pre, final int kind, final int v) {
-    if(kind == ELEM) table.write1(pre, 3, v);
-  }
-
-  /**
-   * Sets the size values.
-   * @param pre pre value
-   * @param kind node kind
-   * @param v value
-   */
-  private void size(final int pre, final int kind, final int v) {
-    if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
+  @Override
+  protected void delete(final int pre, final int nr) {
+    table.delete(pre, nr);
   }
 }

@@ -36,51 +36,6 @@ public final class UpdateTestBulk extends UpdateTest {
   }
 
   /**
-   * Tests nodes for deep equality (including atts/children).
-   * @param data1 first node data
-   * @param pre1 first node pre
-   * @param data2 second node data
-   * @param pre2 second node pre
-   */
-  private void assertNodesDeepEqual(final Data data1, final int pre1,
-      final Data data2, final int pre2) {
-
-    final int kind = data1.kind(pre1);
-    assertEquals(kind, data2.kind(pre2));
-    switch(kind) {
-      case Data.TEXT:
-        assertByteArraysEqual(data1.text(pre1), data2.text(pre2));
-        break;
-      case Data.ATTR:
-        assertByteArraysEqual(data1.attName(pre1), data2.attName(pre2));
-        assertByteArraysEqual(data1.attValue(pre1), data2.attValue(pre2));
-        break;
-      case Data.ELEM:
-        assertByteArraysEqual(data1.tag(pre1), data2.tag(pre2));
-        assertEquals(data1.size(pre1, kind), data2.size(pre2, kind));
-        final int siz = data1.size(pre1, kind);
-        int pos = 1;
-        while(pos < siz) {
-          assertNodesDeepEqual(data1, pre1 + pos, data2, pre2 + pos);
-          pos += data1.size(pre1 + pos, data1.kind(pre1 + pos));
-        }
-        break;
-      default:
-        fail("Unknown nodekind!");
-    }
-  }
-
-  /**
-   * Tests nodes for correct parent reference.
-   * @param par parent value
-   * @param pre pre value
-   * @param d node data
-   */
-  private void assertParentEqual(final int par, final int pre, final Data d) {
-    assertEquals(par, d.parent(pre, d.kind(pre)));
-  }
-
-  /**
    * Tests bulk insertion.
    */
   @Test
@@ -125,5 +80,50 @@ public final class UpdateTestBulk extends UpdateTest {
       }
     }
     data.insert(pre, par, tmp);
+  }
+
+  /**
+   * Tests nodes for deep equality (including atts/children).
+   * @param data1 first node data
+   * @param pre1 first node pre
+   * @param data2 second node data
+   * @param pre2 second node pre
+   */
+  private void assertNodesDeepEqual(final Data data1, final int pre1,
+      final Data data2, final int pre2) {
+
+    final int kind = data1.kind(pre1);
+    assertEquals(kind, data2.kind(pre2));
+    switch(kind) {
+      case Data.TEXT:
+        assertByteArraysEqual(data1.text(pre1), data2.text(pre2));
+        break;
+      case Data.ATTR:
+        assertByteArraysEqual(data1.attName(pre1), data2.attName(pre2));
+        assertByteArraysEqual(data1.attValue(pre1), data2.attValue(pre2));
+        break;
+      case Data.ELEM:
+        assertByteArraysEqual(data1.tag(pre1), data2.tag(pre2));
+        assertEquals(data1.size(pre1, kind), data2.size(pre2, kind));
+        final int siz = data1.size(pre1, kind);
+        int pos = 1;
+        while(pos < siz) {
+          assertNodesDeepEqual(data1, pre1 + pos, data2, pre2 + pos);
+          pos += data1.size(pre1 + pos, data1.kind(pre1 + pos));
+        }
+        break;
+      default:
+        fail("Unknown nodekind!");
+    }
+  }
+
+  /**
+   * Tests nodes for correct parent reference.
+   * @param par parent value
+   * @param pre pre value
+   * @param d node data
+   */
+  private void assertParentEqual(final int par, final int pre, final Data d) {
+    assertEquals(par, d.parent(pre, d.kind(pre)));
   }
 }

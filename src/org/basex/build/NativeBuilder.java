@@ -2,6 +2,8 @@ package org.basex.build;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.NativeData;
 
@@ -79,11 +81,11 @@ public final class NativeBuilder extends Builder {
 
   @Override
   public void setSize(final int pre, final int val) {
-    data.setSize(pre, val);
+    data.size(pre, Data.ELEM, val);
   }
 
   @Override
   public void setAttValue(final int pre, final byte[] val) {
-    data.setAttValue(pre, val);
+    data.attValue(pre, val);
   }
 }

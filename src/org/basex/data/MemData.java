@@ -44,6 +44,23 @@ public class MemData extends Data {
     path = s;
   }
 
+  /**
+   * Constructor, adopting meta data from the specified database.
+   * @param cap initial array capacity
+   * @param data data reference
+   */
+  public MemData(final int cap, final Data data) {
+    val1 = new long[cap];
+    val2 = new long[cap];
+    txtindex = new MemValues();
+    atvindex = new MemValues();
+    meta = new MetaData("", data.meta.prop);
+    tags = data.tags;
+    atts = data.atts;
+    ns = data.ns;
+    path = data.path;
+  }
+
   @Override
   public final void flush() { }
 
@@ -78,16 +95,11 @@ public class MemData extends Data {
     return pre - dist(pre, k);
   }
 
-  /**
-   * Returns the distance of the specified node.
-   * @param pre pre value
-   * @param k node kind
-   * @return distance
-   */
-  private int dist(final int pre, final int k) {
+  @Override
+  protected int dist(final int pre, final int k) {
     switch(k) {
       case ELEM:
-        return (int) (val1[pre] & 0xFFFF);
+        return (int) (val1[pre] & 0xFFFFFFFF);
       case TEXT:
       case COMM:
       case PI:
@@ -237,24 +249,6 @@ public class MemData extends Data {
   }
 
   /**
-   * Stores a size value to the table.
-   * @param pre pre reference
-   * @param val value to be stored
-   */
-  public final void setSize(final int pre, final int val) {
-    val2[pre] = (int) val2[pre] | (long) val << 32;
-  }
-
-  /**
-   * Stores an attribute value to the table.
-   * @param pre pre reference
-   * @param val value to be stored
-   */
-  public final void setAttValue(final int pre, final byte[] val) {
-    val1[pre] = val1[pre] & 0xFFFFFF0000000000L | attIndex(val);
-  }
-
-  /**
    * Checks the array sizes.
    */
   private void check() {
@@ -265,40 +259,114 @@ public class MemData extends Data {
     }
   }
 
-  @Override
-  public final void delete(final int pre) {
-    Main.notimplemented();
-  }
-
-  @Override
-  public final void update(final int pre, final byte[] name, final byte[] v) {
-    Main.notimplemented();
-  }
-
-  @Override
-  public final void insert(final int pre, final int par, final byte[] tag,
-      final int kind) {
-    Main.notimplemented();
-  }
-
-  @Override
-  public final void insert(final int pre, final int par, final byte[] name,
-      final byte[] v) {
-    Main.notimplemented();
-  }
-
-  @Override
-  public final void insert(final int pre, final int par, final Data d) {
-    Main.notimplemented();
+  /**
+   * Stores an attribute value to the table.
+   * @param pre pre reference
+   * @param val value to be stored
+   */
+  public final void attValue(final int pre, final byte[] val) {
+    val1[pre] = val1[pre] & 0xFFFFFF0000000000L | attIndex(val);
   }
   
   @Override
-  public final void insertSeq(final int pre, final int par, final Data d) {
-    Main.notimplemented();
+  public void dist(final int pre, final int kind, final int val) {
+    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | val;
+    else if(kind != DOC) val2[pre] = (int) val2[pre] | (long) val << 32;
   }
 
   @Override
-  public final void update(final int pre, final byte[] text) {
-    Main.notimplemented();
+  public void attSize(final int pre, final int kind, final int v) {
+    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFF00FFFFFFFFL | v;
+  }
+
+  @Override
+  public final void size(final int pre, final int kind, final int val) {
+    if(kind == ELEM || kind == DOC)
+      val2[pre] = (int) val2[pre] | (long) val << 32;
+  }
+  
+  // UPDATES ON VALUE ARRAYS ==================================================
+
+  @Override
+  protected void update(final int pre, final byte[] val, final boolean txt) {
+    final long t = ((MemValues) (txt ? txtindex : atvindex)).index(val, pre);
+    val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | t;
+  }
+
+  @Override
+  protected void insertElem(final int pre, final int dis, final byte[] tag,
+      final int as, final int s) {
+
+    final long t = tags.index(tag, null, false);
+    move(pre, pre + 1);
+    val1[pre] = (long) ELEM << 56 | t << 40 | (long) as << 32 | dis;
+    val2[pre] = (long) s << 32 | ++meta.lastid;
+    meta.size++;
+  }
+
+  @Override
+  protected void insertDoc(final int pre, final int s, final byte[] val) {
+    // build and insert new entry
+
+    final long txt = ((MemValues) txtindex).index(val, pre);
+    move(pre, pre + 1);
+    val1[pre] = (long) DOC << 56 | txt;
+    val2[pre] = (long) s << 32 | ++meta.lastid;
+    meta.size++;
+  }
+
+  @Override
+  protected void insertText(final int pre, final int dis, final byte[] val,
+      final int kind) {
+
+    // build and insert new entry
+    final int txt = ((MemValues) txtindex).index(val, pre);
+    move(pre, pre + 1);
+    val1[pre] = (long) TEXT << 56 | txt;
+    val2[pre] = (long) dis << 32 | ++meta.lastid;
+    meta.size++;
+  }
+
+  @Override
+  protected void insertAttr(final int pre, final int dis, final byte[] name,
+      final byte[] val) {
+
+    // add attribute to text storage
+    final long t = atts.index(name, null, false);
+    final long txt = ((MemValues) atvindex).index(val, pre);
+    move(pre, pre + 1);
+    val1[pre] = (long) ATTR << 56 | t << 40 | txt;
+    val2[pre] = (long) dis << 32 | ++meta.lastid;
+    meta.size++;
+  }
+
+  @Override
+  protected void tagID(final int pre, final int v) {
+    val1[pre] = val1[pre] & 0xFF0000FFFFFFFFFFL | (long) v << 40;
+  }
+
+  @Override
+  protected void attNameID(final int pre, final int v) {
+    val1[pre] = val1[pre] & 0xFF0000FFFFFFFFFFL | (long) v << 40;
+  }
+
+  @Override
+  protected void delete(final int pre, final int nr) {
+    move(pre + nr, pre);
+  }
+
+  /**
+   * Moves data inside the value arrays.
+   * @param sp source position
+   * @param dp destination position
+   */
+  private void move(final int sp, final int dp) {
+    final int l = meta.size - sp;
+    while(dp > sp && l + dp >= val1.length) {
+      val1 = Arrays.copyOf(val1, val1.length << 1);
+      val2 = Arrays.copyOf(val2, val2.length << 1);
+    }
+    System.arraycopy(val1, sp, val1, dp, l);
+    System.arraycopy(val2, sp, val2, dp, l);
   }
 }

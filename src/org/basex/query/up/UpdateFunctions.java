@@ -7,7 +7,6 @@ import org.basex.core.proc.InfoTable;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
-import org.basex.data.Nodes;
 import org.basex.data.PathSummary;
 import org.basex.index.Names;
 import org.basex.query.QueryException;
@@ -82,11 +81,10 @@ public final class UpdateFunctions {
    * @return pre value of left sibling or -1 if non exists
    */
   public static int leftSibling(final Data d, final int pre) {
-    // [CG] We already have something like that?
     if(pre < 1 || pre >= d.size(0, d.kind(0))) return -1;
     final int par = d.parent(pre, d.kind(pre));
     int s = -1;
-    int p = par + 1;
+    int p = par + d.attSize(par, d.kind(par));
     while(p < pre) {
       s = p;
       p = p + d.size(p, d.kind(p));
@@ -98,8 +96,7 @@ public final class UpdateFunctions {
    * Deletes nodes from database. Nodes are deleted backwards to preserve pre
    * values. All given nodes are part of the same Data instance.
    * @param nodes nodes to delete
-   */
-  public static void deleteDBNodes(final Nodes nodes) {
+  private static void deleteDBNodes(final Nodes nodes) {
     final Data data = nodes.data;
     final int size = nodes.size();
     for(int i = size - 1; i >= 0; i--) {
@@ -108,6 +105,7 @@ public final class UpdateFunctions {
       data.delete(pre);
     }
   }
+   */
   
   /**
    * Adds a set of attributes to a node.
@@ -156,7 +154,7 @@ public final class UpdateFunctions {
     // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
     if(d == null) m = new MemData(20, new Names(), new Names(),
         new Namespaces(), new PathSummary(), new Prop());
-    else m = new MemData(20, d.tags, d.atts, d.ns, d.path, d.meta.prop);
+    else m = new MemData(20, d);
     // add parent node
     final Iter i = ch;
     Nod n = (Nod) i.next();
@@ -199,7 +197,7 @@ public final class UpdateFunctions {
    * @return number of descendants + 1 or attribute size + 1
    * @throws QueryException query exception
    */
-  public static int fragmentSize(final FNode n, final boolean attr)
+  private static int fragmentSize(final FNode n, final boolean attr)
   throws QueryException {
     int s = 1;
     final NodeIter at = n.attr();
