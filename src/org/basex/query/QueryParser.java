@@ -2501,13 +2501,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
-    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(INSERT)) return null;
     if(!consumeWS(NODE) && !consumeWS(NODES)) {
       qp = p;
       return null;
     }
+    if(declVar) Err.or(UPNOUPDT, this);
+
     // [LK] evaluate as element constructor?
     final Expr s = check(single(), UPEXPSIMPLE);
     boolean first = false;
@@ -2539,13 +2540,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr deletee() throws QueryException {
-    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(DELETE)) return null;
     if(!consumeWS(NODES) && !consumeWS(NODE)) {
       qp = p;
       return null;
     }
+    if(declVar) Err.or(UPNOUPDT, this);
+
     final Expr n = check(single(), UPEXPSIMPLE);
     ctx.updating = true;
     return new Delete(n);
@@ -2557,13 +2559,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
-    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(RENAME)) return null;
     if(!consumeWS(NODE)) {
       qp = p;
       return null;
     }
+    if(declVar) Err.or(UPNOUPDT, this);
+
     final Expr trg = check(single(), UPEXPSIMPLE);
     check(AS);
     final Expr n = check(single(), UPEXPSIMPLE);
@@ -2577,7 +2580,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
-    if(declVar) Err.or(UPNOUPDT, this);
     final int p = qp;
     if(!consumeWS(REPLACE)) return null;
     final boolean v = consumeWS(VALUEE);
@@ -2586,6 +2588,8 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
+    if(declVar) Err.or(UPNOUPDT, this);
+
     final Expr t = check(single(), UPEXPSIMPLE);
     check(WITH);
     final Expr r = check(single(), UPEXPSIMPLE);

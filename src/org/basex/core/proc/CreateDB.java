@@ -81,7 +81,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     final Prop pr = p.prop;
-    if(pr.is(Prop.MAINMEM)) new MemBuilder(p).build(db);
+    if(pr.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
 
     if(ctx.pinned(db) || p.prop.dbpath(db + ".tmp").exists())
       throw new IOException(DBINUSE);

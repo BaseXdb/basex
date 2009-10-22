@@ -197,6 +197,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     context.prop.set(Prop.XQFORMAT, false);
     context.prop.set(Prop.MAINMEM, false);
+    context.prop.set(Prop.TABLEMEM, false);
     context.prop.set(Prop.CHOP, false);
 
     new CreateDB(path + input).execute(context);

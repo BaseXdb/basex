@@ -248,7 +248,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(gui, n) &&
+      BaseXLayout.enable(button, updatable(n) &&
           (n.size() != 1 || n.nodes[0] != 0));
     }
   },
@@ -284,7 +284,7 @@ public enum GUICommands implements GUICommand {
       final Context context = gui.context;
       // disallow copy of empty node set or root node
       final Nodes n = context.marked();
-      boolean s = updatable(gui, n) && context.copied() != null &&
+      boolean s = updatable(n) && context.copied() != null &&
         n.size() != 0 && (n.size() != 1 || n.nodes[0] != 0);
       if(s) {
         final Data d = n.data;
@@ -312,7 +312,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(gui, n) && n.size() != 0);
+      BaseXLayout.enable(button, updatable(n) && n.size() != 0);
     }
   },
 
@@ -331,7 +331,7 @@ public enum GUICommands implements GUICommand {
       final Context context = gui.context;
       final Nodes n = context.marked();
       final Data d = context.data();
-      BaseXLayout.enable(button, updatable(gui, n) && n.size() == 1 &&
+      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
           (d.kind(n.nodes[0]) == Data.ELEM || d.kind(n.nodes[0]) == Data.DOC));
     }
   },
@@ -351,7 +351,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context context = gui.context;
       final Nodes n = context.marked();
-      BaseXLayout.enable(button, updatable(gui, n) && n.size() == 1 &&
+      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
           context.data().kind(n.nodes[0]) != Data.DOC);
     }
   },
@@ -966,13 +966,10 @@ public enum GUICommands implements GUICommand {
 
   /**
    * Checks if data can be updated (disk mode, nodes defined, no namespaces).
-   * @param gui gui reference
    * @param n node instance
    * @return result of check
    */
-  static boolean updatable(final GUI gui, final Nodes n) {
-    final Prop prop = gui.context.prop;
-    return !prop.is(Prop.TABLEMEM) && !prop.is(Prop.MAINMEM) &&
-      n != null && n.data.ns.size() == 0;
+  static boolean updatable(final Nodes n) {
+    return n != null && n.data.ns.size() == 0;
   }
 }

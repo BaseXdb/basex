@@ -53,8 +53,8 @@ public final class TableMemAccess extends TableAccess {
         np = c == firstPres.length ? Integer.MAX_VALUE : firstPres[c];
         l = 0;
       }
-      buf1[i] = getLong(array, l++);
-      buf2[i] = getLong(array, l++);
+      buf1[i] = getLong(array, l++ << 3);
+      buf2[i] = getLong(array, l++ << 3);
     }
     f.close();
   }
@@ -126,6 +126,7 @@ public final class TableMemAccess extends TableAccess {
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 7 : 15) - o) << 3;
     buf[p] = buf[p] & ~(0xFFL << d) | (long) v << d;
+    dirty = true;
   }
 
   @Override
@@ -133,6 +134,7 @@ public final class TableMemAccess extends TableAccess {
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 6 : 14) - o) << 3;
     buf[p] = buf[p] & ~(0xFFFFL << d) | (long) v << d;
+    dirty = true;
   }
 
   @Override
@@ -140,6 +142,7 @@ public final class TableMemAccess extends TableAccess {
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 4 : 12) - o) << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFL << d) | (long) v << d;
+    dirty = true;
   }
 
   @Override
@@ -147,6 +150,7 @@ public final class TableMemAccess extends TableAccess {
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 3 : 11) - o) << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFFFL << d) | v << d;
+    dirty = true;
   }
 
   @Override
@@ -160,17 +164,8 @@ public final class TableMemAccess extends TableAccess {
   public void insert(final int pre, final byte[] entries) {
     dirty = true;
     move(pre, pre + 1);
-    //buf1[pre] = getLong(entries, 0);
-    //buf2[pre] = getLong(entries, 8);
-
-    buf1[pre] = (entries[0] & 0xFFL) << 56 | (entries[1] & 0xFFL) << 48 |
-      (entries[2] & 0xFFL) << 40 | (entries[3] & 0xFFL) << 32 |
-      (entries[4] & 0xFFL) << 24 | (entries[5] & 0xFFL) << 16 |
-      (entries[6] & 0xFFL) <<  8 | (entries[7] & 0xFFL);
-    buf2[pre] = (entries[8] & 0xFFL) << 56 | (entries[9] & 0xFFL) << 48 |
-      (entries[10] & 0xFFL) << 40 | (entries[11] & 0xFFL) << 32 |
-      (entries[12] & 0xFFL) << 24 | (entries[13] & 0xFFL) << 16 |
-      (entries[14] & 0xFFL) <<  8 | (entries[15] & 0xFFL);
+    buf1[pre] = getLong(entries, 0);
+    buf2[pre] = getLong(entries, 8);
     size++;
   }
 
@@ -196,11 +191,10 @@ public final class TableMemAccess extends TableAccess {
    * @return long value
    */
   private long getLong(final byte[] v, final int i) {
-    final int j = i << 3;
-    return ((long) (v[j] & 0xFF) << 56) + ((long) (v[j + 1] & 0xFF) << 48) +
-       ((long) (v[j + 2] & 0xFF) << 40) + ((long) (v[j + 3] & 0xFF) << 32) +
-       ((long) (v[j + 4] & 0xFF) << 24) + ((v[j + 5] & 0xFF) << 16) +
-       ((v[j + 6] & 0xFF) <<  8) + (v[j + 7] & 0xFF);
+    return ((v[i] & 0xFFL) << 56) + ((v[i + 1] & 0xFFL) << 48) +
+       ((v[i + 2] & 0xFFL) << 40) + ((v[i + 3] & 0xFFL) << 32) +
+       ((v[i + 4] & 0xFFL) << 24) + ((v[i + 5] & 0xFFL) << 16) +
+       ((v[i + 6] & 0xFFL) <<  8) + (v[i + 7] & 0xFFL);
   }
 
   /**
