@@ -506,6 +506,12 @@ public interface QueryText {
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target node has no parent." };
+  /** XUDY0015: XQuery Update dynamic exception. */
+  Object[] UPMULTREN = { XUDY, 15, "Multiple renames on same node." };
+  /** XUDY0016: XQuery Update dynamic exception. */
+  Object[] UPMULTREPL = { XUDY, 16, "Multiple replaces on same node." };
+  /** XUDY0017: XQuery Update dynamic exception. */
+  Object[] UPMULTREPV = { XUDY, 17, "Multiple replaces on same node." };
   /** XUDY0023: XQuery Update dynamic exception. */
   Object[] UPCONFNSPAR = { XUDY, 23, "Namespace conflicts." };
   /** XUDY0024: XQuery Update dynamic exception. */

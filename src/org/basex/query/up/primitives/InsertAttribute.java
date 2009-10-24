@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Data;
-import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
@@ -25,22 +24,18 @@ public final class InsertAttribute extends InsertPrimitive {
     super(n, copy, l);
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void apply(final int add) throws QueryException {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
 
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-//    insertAttributes(n.pre + d.attSize(n.pre, Nod.kind(node.type)), 
-//        n.pre, d, m);
     insertAttributes(n.pre + 1, n.pre, d, m);
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) {
     c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 

@@ -29,14 +29,12 @@ public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
     r = tn;
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
+  public void check() {
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void apply(final int add) throws QueryException {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     Token.string(r);
     final DBNode n = (DBNode) node;
@@ -50,13 +48,11 @@ public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    if(mult) Err.or(UPTRGMULT, node);
-    mult = true;
+    Err.or(UPMULTREPV, node);
   }
 
   @Override
   public Type type() {
     return Type.REPLACEELEMCONT;
   }
-
 }

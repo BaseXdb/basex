@@ -1,10 +1,6 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryText.*;
-
-import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
-import org.basex.query.util.Err;
 
 /**
  * Abstract udpate primitive which holds an aditional 'name' attribute to for
@@ -27,14 +23,7 @@ public abstract class NewValuePrimitive extends UpdatePrimitive {
     name = newName;
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
-  }
-
-  @Override
-  public final void merge(final UpdatePrimitive p) throws QueryException {
-    if(mult) Err.or(UPTRGMULT, node);
-    mult = true;
+  public void check() {
   }
 }

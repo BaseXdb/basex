@@ -95,18 +95,8 @@ public final class Insert extends Arr {
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
     }
     
-//    if(!(n instanceof DBNode)) {
-//      if(aSeq.size() > 0) {
-//        if(k == Data.DOC) Err.or(UPWRTRGTYP2, this);
-//        ctx.updates.addPrimitive(new InsertAttribute(n, aSeq, -1));
-//      }
-//      if(seq.size() > 0) ctx.updates.
-//      addPrimitive(new InsertAttribute(n, seq, -1));
-//      return Iter.EMPTY;
-//    }
-    
     final Nod par = n.parent();
-    if(aSeq.size() > 0) 
+    if(aSeq.size() > 0) {
       if(into) {
         if(k == Data.DOC) Err.or(UPWRTRGTYP2, this); 
         ctx.updates.addPrimitive(
@@ -118,6 +108,7 @@ public final class Insert extends Arr {
         ctx.updates.addPrimitive(
             new InsertAttribute(par, aSeq, -1));
       }
+    }
     if(seq.size() > 0) {
       UpdatePrimitive up = null;
       if(into)
@@ -126,7 +117,6 @@ public final class Insert extends Arr {
         else up = new InsertIntoPrimitive(n, seq, -1);
       else if(before) up = new InsertBeforePrimitive(n, seq, -1);
       else if(after) up = new InsertAfterPrimitive(n, seq, -1);
-      else Err.or(UPDATE, this);
       ctx.updates.addPrimitive(up);
     }
     return Iter.EMPTY;

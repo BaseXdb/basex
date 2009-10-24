@@ -4,7 +4,6 @@ import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
-import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
@@ -29,13 +28,11 @@ public final class DeletePrimitive extends UpdatePrimitive {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int p = n.pre + add;
-    final int ls = leftSibling(d, p);
     d.delete(p);
-    if(ls == -1) return;
-    final int rs = ls + d.size(ls, d.kind(ls));
-    if(rs >= d.size(0, d.kind(0)) || d.parent(rs, d.kind(rs)) != 
-      d.parent(ls, d.kind(ls))) return;
-    mergeTextNodes(d, ls, rs);
+    if(p >= d.meta.size) return;
+    final int l = p - 1; 
+    if(l > 1 && d.parent(l, d.kind(l)) == d.parent(p, d.kind(p))) 
+      mergeTextNodes(d, l, p);
   }
 
   @Override
@@ -43,9 +40,8 @@ public final class DeletePrimitive extends UpdatePrimitive {
     return DELETE;
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void check() throws QueryException {
+  public void check() {
   }
 
   @Override

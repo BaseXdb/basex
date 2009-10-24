@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.up.UpdateFunctions.*;
 
 import org.basex.data.Data;
-import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
@@ -25,26 +24,24 @@ public final class InsertIntoPrimitive extends InsertPrimitive {
     super(n, copy, l);
   }
   
-  @SuppressWarnings("unused")
   @Override
-  public void apply(final int add) throws QueryException {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type));
     n.data.insertSeq(pos, n.pre, m);
-    final int ls = leftSibling(d, pos);
-    if(ls != -1 && mergeTextNodes(d, ls, pos)) return;
-    final int rs = pos + d.size(pos, d.kind(pos));
-    if(rs == d.size(0, d.kind(0)) || d.parent(rs, d.kind(rs)) != 
-      d.parent(pos, d.kind(pos))) return;
-    mergeTextNodes(d, pos, rs);
+    final int l = pos - 1;
+    if(d.parent(l, d.kind(l)) == d.parent(pos, d.kind(pos)) && 
+        mergeTextNodes(d, pos - 1, pos)) return;
+    final int r = pos + m.size(0, m.kind(0));
+    if(r < d.meta.size && d.parent(r, d.kind(r)) == 
+      d.parent(r - 1, d.kind(r - 1))) mergeTextNodes(d, r, r - 1);
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) {
     c.add(((NodeCopyPrimitive) p).c.getFirst());
   }
 

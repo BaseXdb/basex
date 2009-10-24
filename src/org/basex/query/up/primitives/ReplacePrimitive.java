@@ -33,9 +33,8 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
     a = attr;
   }
   
-  @SuppressWarnings("unused")
   @Override
-  public void apply(final int add) throws QueryException {
+  public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
       
     final DBNode n = (DBNode) node;
@@ -63,7 +62,6 @@ public final class ReplacePrimitive extends NodeCopyPrimitive {
   
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    if(mult) Err.or(UPTRGMULT, node);
-    mult = true;
+    Err.or(UPMULTREPL, node);
   }
 }

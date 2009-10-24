@@ -717,7 +717,7 @@ public class QueryParser extends InputParser {
     if(e == null) e = or();
     return e;
   }
-
+  
   /**
    * [ 33] Parses a FLWORExpr.
    * [ 37] Parses a WhereClause.
@@ -2547,7 +2547,6 @@ public class QueryParser extends InputParser {
       return null;
     }
     if(declVar) Err.or(UPNOUPDT, this);
-
     final Expr n = check(single(), UPEXPSIMPLE);
     ctx.updating = true;
     return new Delete(n);
