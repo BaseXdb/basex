@@ -97,6 +97,7 @@ public final class ServerSession extends Thread {
       String in = null;
       try {
         in = dis.readUTF();
+        //System.out.println(in);
       } catch(final IOException ex) {
         // this exception is thrown for each session if the server is stopped
         exit();
@@ -148,21 +149,6 @@ public final class ServerSession extends Thread {
       if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
     }
   }
-
-  /*
-          // wait for updating processes
-          boolean updating = false;
-          for(int i = 0; !updating && i < server.cp.size(); i++) {
-            updating = server.cp.get(i).updating;
-          }
-          if(updating) {
-            while(server.cp.indexOf(cp) != 0) {
-              System.out.println("!");
-              Performance.sleep(50);
-            }
-          }
-
-   */
 
   /**
    * Sends the success flag to the client.

@@ -165,9 +165,9 @@ public final class DialogServer extends Dialog {
     p2.add(new BaseXLabel(CREATEU, false, true));
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(1, 5, 6, 0));
-    p21.add(new BaseXLabel(SERVERUSER + COLS));
+    p21.add(new BaseXLabel(SERVERUSER));
     p21.add(user);
-    p21.add(new BaseXLabel(SERVERPW + COLS));
+    p21.add(new BaseXLabel(SERVERPW));
     p21.add(pass);
     p21.add(create);
     p2.add(p21);
