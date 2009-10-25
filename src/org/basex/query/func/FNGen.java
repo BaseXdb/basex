@@ -28,6 +28,9 @@ public final class FNGen extends Fun {
         final Item it = iter != null ? iter.next() : null;
         if(iter != null && it == null) Err.empty(this);
         return ctx.coll(iter == null ? null : checkStr(it));
+      case PUT:
+        // [LK] store document...
+        return Iter.EMPTY;
       default:
         return super.iter(ctx);
     }
@@ -90,5 +93,10 @@ public final class FNGen extends Fun {
   static Item atom(final Item it) {
     return it.node() ? it.type == Type.PI || it.type == Type.COM ?
         Str.get(it.str()) : new Atm(it.str()) : it;
+  }
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.UPD ? func == FunDef.PUT : super.uses(u, ctx);
   }
 }

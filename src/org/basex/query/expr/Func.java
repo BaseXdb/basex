@@ -23,6 +23,8 @@ public final class Func extends Single {
   public Var[] args;
   /** Declaration flag. */
   public boolean decl;
+  /** Updating flag. */
+  public boolean updating;
 
   /**
    * Function constructor.

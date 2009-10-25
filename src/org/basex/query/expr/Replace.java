@@ -2,10 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -137,6 +135,11 @@ public final class Replace extends Arr {
       return !s.add(Token.string(((FNode) n).nname()));
     final DBNode dn = (DBNode) n;
     return !s.add(Token.string(dn.data.attName(dn.pre)));
+  }
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.UPD || super.uses(u, ctx);
   }
 
   @Override

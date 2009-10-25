@@ -149,7 +149,7 @@ public interface QueryText {
   /** FTST0000: Parsing exception. */
   Object[] THESRNG = { FTST, 0, "Only integers allowed for thesaurus level." };
   /** FTST0007: Parsing exception. */
-  Object[] FTIGNORE = { FTST, 7, "Ignore option not supported yet." };
+  Object[] FTIGNORE = { FTST, 7, "Ignore option not supported." };
   /** FTST0008: Parsing exception. */
   Object[] NOSTOPFILE = { FTST, 8, "Stop word file not found: \"%\"." };
   /** FTST0009: Parsing exception. */
@@ -322,9 +322,9 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPSORT = { XPTY, 4, "No sequences allowed as sort keys." };
   /** XPTY0004: Typing exception. */
-  Object[] XPSEQ = { XPTY, 4, "No sequence % allowed here." };
+  Object[] XPSEQ = { XPTY, 4, "No sequence % allowed." };
   /** XPTY0004: Typing exception. */
-  Object[] XPEMPTY = { XPTY, 4, "Empty sequence not allowed here." };
+  Object[] XPEMPTY = { XPTY, 4, "Empty sequence not allowed." };
   /** XPTY0004: Typing exception. */
   Object[] XPINVCAST = { XPTY, 4, "Invalid cast from % to %: %." };
   /** XPTY0004: Typing exception. */
@@ -488,20 +488,23 @@ public interface QueryText {
   Object[] NOATTALL = { XQTY, 24,
       "Attributes must directly follow element nodes." };
 
-  // [LK] CG: dummy error for various unspecified exceptions
-  /** XPST0003: Parsing exception. */
-  Object[] UPDATE = { XUST, 0, "Update error." };
-  
   /** XUST0000: Parsing exception. */
   Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
   /** XUST0001: Parsing exception. */
-  Object[] UPEXPSIMPLE = { XUST, 1, "Expecting simple expression." };
-  /** XUST0001: Parsing exception. */
-  Object[] UPNOUPDT = { XUST, 1, "No update expression allowed." };
+  Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
+  /** XUST0002: Parsing exception. */
+  Object[] UPEXPECT = { XUST, 2, "Updating expression expected." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
   /** XUST0026: Parsing exception. */
   Object[] NOREVAL = { XUST, 26, "Revalidation mode not supported." };
+  /** XUST0028: Parsing exception. */
+  Object[] UPFUNCTYPE = { XUST, 28,
+      "No return type allowed in updating functions." };
+
+  /** XUDY0009: XQuery Update dynamic exception. */
+  // [LK] CG: dummy error for various unspecified exceptions
+  Object[] UPDATE = { XUDY, 0, "Update error." };
 
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */

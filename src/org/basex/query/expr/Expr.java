@@ -23,10 +23,11 @@ public abstract class Expr extends ExprInfo {
   /** Usage flags. */
   public enum Use {
     /** Context.   */ CTX,
+    /** Root Flag. */ ELM,
     /** Fragment.  */ FRG,
     /** Position.  */ POS,
+    /** Updates.   */ UPD,
     /** Variable.  */ VAR,
-    /** Root Flag. */ ELM,
   }
   /** Undefined value. */
   protected static final int UNDEF = Integer.MIN_VALUE;
@@ -114,6 +115,14 @@ public abstract class Expr extends ExprInfo {
    */
   public boolean e() {
     return false;
+  }
+
+  /**
+   * Returns if this is a vacuous expression (empty sequence or error function).
+   * @return result of check
+   */
+  public boolean v() {
+    return e();
   }
 
   /**

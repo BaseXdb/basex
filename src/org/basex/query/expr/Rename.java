@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -56,6 +55,11 @@ public final class Rename extends Arr {
     return Iter.EMPTY;
   }
   
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.UPD || super.uses(u, ctx);
+  }
+
   @Override
   public String toString() {
     return null;

@@ -78,7 +78,6 @@ public final class UpdateFunctions {
    * @param d data reference
    * @param pre value of node for which to find sibling
    * @return pre value of left sibling or -1 if non exists
-   */
   public static int leftSibling(final Data d, final int pre) {
     if(pre < 1 || pre >= d.size(0, d.kind(0))) return -1;
     final int par = d.parent(pre, d.kind(pre));
@@ -90,6 +89,7 @@ public final class UpdateFunctions {
     }
     return s;
   }
+   */
 
   /**
    * Deletes nodes from database. Nodes are deleted backwards to preserve pre
@@ -133,10 +133,7 @@ public final class UpdateFunctions {
   public static void rename(final int pre, final byte[] name, final Data data) {
     final int k = data.kind(pre);
     if(k == Data.ELEM || k == Data.PI) data.update(pre, name);
-    else if(k == Data.ATTR) {
-      final byte[] v = data.attValue(pre);
-      data.update(pre, name, v);
-    }
+    else if(k == Data.ATTR) data.update(pre, name, data.attValue(pre));
   }
 
   /**

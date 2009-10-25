@@ -124,6 +124,8 @@ public enum FunDef {
   DOCAVAIL(FNURI, FNGen.class, 1, 1, "doc-available(item)", BLN),
   /** XQuery function. */
   DOC(FNURI, FNGen.class, 1, 1, "doc(item)", NODSEQ),
+  /** XQuery function. */
+  PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", NONUMSEQ),
 
   /* FNId functions. */
 

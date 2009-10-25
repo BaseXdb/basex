@@ -75,7 +75,7 @@ public final class DBPrimitives {
       int add = 0;
       for(final UpdatePrimitive pp : pl) {
         if(pp == null) continue;
-        if(pp.type() == Type.INSERTBEFORE ) {
+        if(pp.type() == Type.INSERTBEFORE) {
           add = ((InsertBeforePrimitive) pp).m.size(0, Data.DOC) - 1;
         }
         pp.apply(add);

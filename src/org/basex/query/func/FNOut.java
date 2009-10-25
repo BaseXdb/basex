@@ -50,10 +50,14 @@ final class FNOut extends Fun {
         final Iter si = SeqIter.get(expr[0].iter(ctx));
         msg = Token.string(checkStr(expr[1], ctx)) + " " + si;
         ctx.evalInfo(msg);
-        //BaseX.outln(msg);
         return si;
       default:
         return super.iter(ctx);
     }
+  }
+
+  @Override
+  public boolean v() {
+    return func == FunDef.ERROR;
   }
 }

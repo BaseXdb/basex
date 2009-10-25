@@ -19,17 +19,15 @@ public final class Transform extends Arr {
    * @param e2 expression
    */
   public Transform(final ForLet[] f, final Expr e1, final Expr e2) {
+    super(e1, e2);
     fl = f;
-    expr[0] = e1;
-    expr[1] = e2;
   }
   
   @Override
   public String toString() {
-    String s = "";
-    for(final ForLet t : fl) {
-      s += t.var + ASSIGN + t.expr;
-    }
-    return COPY + s + MODIFY + expr[0] + RETURN + expr[1];
+    final StringBuilder sb = new StringBuilder(COPY + ' ');
+    for(final ForLet t : fl) sb.append(t.var + ASSIGN + t.expr + ' ');
+    return sb.append(MODIFY + ' ' + expr[0] + ' '  + RETURN + ' ' +
+        expr[1]).toString();
   }
 }

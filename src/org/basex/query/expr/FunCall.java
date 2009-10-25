@@ -56,6 +56,12 @@ public final class FunCall extends Arr {
   }
 
   @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    final Func f = func == null ? ctx.fun.get(id) : func;
+    return u == Use.UPD ? f.updating : super.uses(u, ctx);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, ID, Token.token(id));
     for(final Expr e : expr) e.plan(ser);

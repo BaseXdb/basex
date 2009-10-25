@@ -43,7 +43,7 @@ public final class ReplaceValuePrimitive extends NewValuePrimitive {
   }
   
   @Override
-  public final void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPV, node);
   }
 }
