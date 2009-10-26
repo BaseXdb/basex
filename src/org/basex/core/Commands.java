@@ -30,7 +30,7 @@ public interface Commands {
     // Admin commands
     HELPADMIN(HLP), KILL(), SHOW(), GRANT(), REVOKE(), ALTER(),
     // General commands
-    HELPGENERAL(HLP), SET(), HELP(), EXIT(), Q(HID), QUIT(HID),
+    HELPGENERAL(HLP), SET(), PASSWORD(), HELP(), EXIT(), Q(HID), QUIT(HID),
     // Internal commands
     INTPROMPT(INT), INTOUTPUT(INT), INTINFO(INT), INTSTOP(INT);
 

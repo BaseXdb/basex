@@ -40,6 +40,7 @@ import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
+import org.basex.core.proc.Password;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
@@ -226,6 +227,8 @@ public final class CommandParser extends InputParser {
         final Object type = ctx.prop.object(opt.toUpperCase());
         if(type == null) help(null, cmd);
         return new Set(opt, val);
+      case PASSWORD:
+        return new Password(name(null));
       case HELP:
         String hc = name(null);
         if(hc != null) {

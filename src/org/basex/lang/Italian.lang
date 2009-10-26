@@ -425,6 +425,7 @@ ad_userknown=User '%' exists already.
 ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
+ad_passno=No password specified.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -558,6 +559,8 @@ ch_set27=Parsing delle entità XML
 ch_set28=Indicizzando testo
 ch_set29=Indicizzando valori attributi
 ch_set31=Indicizzando full-text
+ch_password1=Change password.
+ch_password2=Changes the user's password.
 ch_help1=Ottieni aiuto su % comandi.
 ch_help2=Se è specificato [%], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.\nSe è specificato 'all', anche i comandi nascosti sono inclusi.
 ch_exit1=Esci

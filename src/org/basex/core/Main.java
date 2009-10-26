@@ -1,12 +1,12 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.util.Random;
-import java.util.Scanner;
-
 import org.basex.core.proc.Exit;
+import org.basex.core.proc.Password;
 import org.basex.core.proc.Set;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -60,7 +60,7 @@ public abstract class Main {
 
     while(console) {
       Main.out("> ");
-      final String in = new Scanner(System.in).nextLine();
+      final String in = System.console().readLine();
       if(in == null) break;
       if(!process(in)) return true;
     }
@@ -90,6 +90,10 @@ public abstract class Main {
     try {
       for(final Process p : new CommandParser(in, context).parse()) {
         if(p instanceof Exit) return false;
+        if(p instanceof Password && p.args[0] == null) {
+          Main.out(SERVERPW);
+          p.args[0] = new String(System.console().readPassword());
+        }
         if(!process(p, true)) break;
       }
     } catch(final QueryException ex) {

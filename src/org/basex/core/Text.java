@@ -263,7 +263,7 @@ public interface Text {
       "  " + Main.info(lang("ch_drop3"), NAM);
 
   /** Command help. */
-  String ALTER0 = USER + " [name] [password]";
+  String ALTER0 = USER + " [" + NAME + "] [" + PW + "]";
   /** Command help. */
   String ALTER1 = lang("ch_alter1");
   /** Command help. */
@@ -438,6 +438,13 @@ public interface Text {
     LI + CmdSet.TEXTINDEX + COLS + lang("ch_set28") + NL +
     LI + CmdSet.ATTRINDEX + COLS + lang("ch_set29") + NL +
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31");
+
+  /** Command help. */
+  String PASSWORD0 = "[" + PW + "]";
+  /** Command help. */
+  String PASSWORD1 = lang("ch_password1");
+  /** Command help. */
+  String PASSWORD2 = lang("ch_password2");
 
   /** Command help. */
   String HELP0 = "[command]?";
@@ -695,6 +702,8 @@ public interface Text {
   String USERALTER = lang("ad_useralter");
   /** User added. */
   String USERKNOWN = lang("ad_userknown");
+  /** User not found. */
+  String PASSNO = lang("ad_passno");
 
   // GENERAL COMMANDS =========================================================
 

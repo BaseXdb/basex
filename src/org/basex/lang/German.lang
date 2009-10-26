@@ -421,6 +421,7 @@ ad_userknown=Benutzer '%' existiert schon.
 ad_usercreate=Benutzer '%' erzeugt.
 ad_useralter=Passwort von Benutzer '%' geändert.
 ad_userdrop=Benutzer '%' entfernt.
+ad_passno=Kein Passwort angegeben.
 
 # General Commands
 gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.
@@ -554,6 +555,8 @@ ch_set27=Parsen von XML-Entities
 ch_set28=Text-Indexierung
 ch_set29=Attributwert-Indexierung
 ch_set31=Volltext-Indexierung
+ch_password1=Ändern des Passworts.
+ch_password2=Ändert das Benutzerpasswort.
 ch_help1=Zeige Hilfe für %-Befehle.
 ch_help2=Wenn [%] angegeben wurde, werden Informationen\nzum eingegebenen Befehl dargestellt; ansonsten werden\nalle Befehle aufgelistet. Wenn 'all' angegeben wurde,\nwerden auch versteckte Befehle angezeigt.
 ch_exit1=Beende

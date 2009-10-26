@@ -420,6 +420,7 @@ ad_userknown=User '%' exists already.
 ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
+ad_passno=No password specified.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -553,6 +554,8 @@ ch_set27=Phân tích các XML thực thể
 ch_set28=Index văn bản
 ch_set29=Index giá trị thuộc tính
 ch_set31=Index nội dung
+ch_password1=Change password.
+ch_password2=Changes the user's password.
 ch_help1=Nhờ giúp đỡ % những câu lệnh.
 ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.\nNếu 'tất cả' là cụ thể(specified), sẽ bao gồm những câu lệnh ẩn.
 ch_exit1=Thoát
