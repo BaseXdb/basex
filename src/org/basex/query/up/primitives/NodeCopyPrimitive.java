@@ -22,7 +22,7 @@ import static org.basex.query.up.UpdateFunctions.*;
  */
 public abstract class NodeCopyPrimitive extends UpdatePrimitive {
   /** Insertion nodes. */
-  LinkedList<Iter> c;
+  final LinkedList<Iter> c = new LinkedList<Iter>();
   /** Final copy of insertion nodes. */
   public MemData m;
 
@@ -33,35 +33,22 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
    */
   protected NodeCopyPrimitive(final Nod n, final Iter copy) {
     super(n);
-    c = new LinkedList<Iter>();
     c.add(copy);
   }
-  
+
   @Override
   public void check() throws QueryException {
     if(!(node instanceof DBNode)) return;
-    m = buildDB();
-  }
-  
-  /**
-   * Builds MemData instance from iterator.
-   * @return data instance
-   * @throws QueryException query exception
-   */
-  public MemData buildDB() throws QueryException {
-    SeqIter seq = new SeqIter();
-    if(c.size() == 0) return null;
+
+    if(c.size() == 0) return;
+    final SeqIter seq = new SeqIter();
     final Iterator<Iter> it = c.iterator();
     while(it.hasNext()) {
       final Iter ni = it.next();
       ni.reset();
-      Item i = ni.next();
-      while(i != null) {
-        seq.add(i);
-        i = ni.next();
-      }
+      Item i;
+      while((i = ni.next()) != null) seq.add(i);
     }
-    seq = mergeTextNodes(seq);
-    return UpdateFunctions.buildDB(seq, ((DBNode) node).data);
+    m = UpdateFunctions.buildDB(mergeTextNodes(seq), ((DBNode) node).data);
   }
 }

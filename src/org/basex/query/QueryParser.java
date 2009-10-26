@@ -2542,8 +2542,7 @@ public class QueryParser extends InputParser {
         error(THESRNG);
       }
     }
-    final Thesaurus th = new Thesaurus(fl, rel, min, max, ctx.context);
-    thes.add(th);
+    thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
 
   /**
@@ -2554,8 +2553,7 @@ public class QueryParser extends InputParser {
    */
   private Expr insert() throws QueryException {
     final int p = qp;
-    if(!consumeWS(INSERT)) return null;
-    if(!consumeWS(NODE) && !consumeWS(NODES)) {
+    if(!consumeWS(INSERT) || !consumeWS(NODE) && !consumeWS(NODES)) {
       qp = p;
       return null;
     }
@@ -2564,22 +2562,20 @@ public class QueryParser extends InputParser {
     final Expr s = simple(check(single(), INCOMPLETE));
     boolean first = false;
     boolean last = false;
-    boolean into = false;
     boolean before = false;
     boolean after = false;
     if(consumeWS(AS)) {
-      if(!consumeWS(FIRST)) {
+      first = consumeWS(FIRST);
+      if(!first) {
         check(LAST);
         last = true;
-      } else first = true;
+      }
       check(INTO);
-      into = true;
+    } else if(!consumeWS(INTO)) {
+      after = consumeWS(AFTER);
+      before = !after && consumeWS(BEFORE);
+      if(!after && !before) Err.or(INCOMPLETE);
     }
-    if(!into) into = consumeWS(INTO);
-    after = consumeWS(AFTER);
-    before = consume(BEFORE);
-    if(!(into || after || before)) Err.or(INCOMPLETE);
-//
     final Expr trg = simple(check(single(), INCOMPLETE));
     ctx.updating = true;
     return new Insert(s, first, last, before, after, trg);
@@ -2592,8 +2588,7 @@ public class QueryParser extends InputParser {
    */
   private Expr deletee() throws QueryException {
     final int p = qp;
-    if(!consumeWS(DELETE)) return null;
-    if(!consumeWS(NODES) && !consumeWS(NODE)) {
+    if(!consumeWS(DELETE) || !consumeWS(NODES) && !consumeWS(NODE)) {
       qp = p;
       return null;
     }
@@ -2608,8 +2603,7 @@ public class QueryParser extends InputParser {
    */
   private Expr rename() throws QueryException {
     final int p = qp;
-    if(!consumeWS(RENAME)) return null;
-    if(!consumeWS(NODE)) {
+    if(!consumeWS(RENAME) || !consumeWS(NODE)) {
       qp = p;
       return null;
     }
@@ -2629,6 +2623,7 @@ public class QueryParser extends InputParser {
   private Expr replace() throws QueryException {
     final int p = qp;
     if(!consumeWS(REPLACE)) return null;
+
     final boolean v = consumeWS(VALUEE);
     if(v) check(OF);
     if(!consumeWS(NODE)) {
@@ -2650,6 +2645,7 @@ public class QueryParser extends InputParser {
    */
   private Expr transform() throws QueryException {
     if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
+
     ForLet[] fl = {};
     do {
       final Var v = new Var(varName());

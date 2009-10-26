@@ -1,13 +1,14 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import org.basex.data.Data;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.InsertAfterPrimitive;
 import org.basex.query.up.primitives.InsertAttribute;
@@ -51,71 +52,52 @@ public final class Insert extends Arr {
     before = b;
     after = a;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    // check source constraints
-    final Iter s = SeqIter.get(expr[1].iter(ctx));
-    final SeqIter seq = new SeqIter();
-    final SeqIter aSeq = new SeqIter();
-    Item i = s.next();
-    // e needed to track order of attribute / non attribute nodes XUTY0004
-    boolean e = false;
-    while(i != null) {
-      // [LK] check  use of txt node constructor
-      if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
-      else if(i instanceof Nod) {
-        final Nod tn = (Nod) i;
-        final int k = Nod.kind(tn.type);
-        if(k == Data.ATTR) {
-          if(e) Err.or(UPNOATTRPER, this);
-          aSeq.add(tn);
-        } else {
-          e = true;
-          if(Nod.kind(tn.type) == Data.DOC) seq.add(tn.child());
-          else seq.add(tn);
-        }
-      } else Err.or(UPDATE, this);
-      i = s.next();
-    }
-    seq.reset();
-    
-    final boolean into = !(before || after);
+    final Constr c = new Constr(ctx, expr[1]);
+    final NodIter seq = c.children;
+    final NodIter aSeq = c.ats;
+    if(c.errAtt) Err.or(UPNOATTRPER);
+    if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
+
     // check target constraints
     final Iter t = SeqIter.get(expr[0].iter(ctx));
-    i = t.next();
+    Item i = t.next();
     if(i == null) Err.or(UPSEQEMP, this);
     if(!(i instanceof Nod) || t.size() > 1) Err.or(UPTRGTYP, this);
+
     final Nod n = (Nod) i;
-    final int k = Nod.kind(n.type);
-    if(into && (!(k == Data.ELEM || k == Data.DOC))) Err.or(UPTRGTYP, this);
+
     if(before || after) {
-      if(k == Data.ATTR) Err.or(UPTRGTYP2, this);
+      if(n.type == Type.ATT) Err.or(UPTRGTYP2, this);
       if(n.parent() == null) Err.or(UPPAREMPTY, this);
+    } else {
+      if(n.type != Type.ELM && n.type != Type.DOC) Err.or(UPTRGTYP, this);
     }
-    
+
     final Nod par = n.parent();
     if(aSeq.size() > 0) {
-      if(into) {
-        if(k == Data.DOC) Err.or(UPWRTRGTYP2, this); 
-        ctx.updates.addPrimitive(
-            new InsertAttribute(n, aSeq, -1));
-      }
       if(before || after) {
         if(par == null) Err.or(UPDATE, this);
-        if(Nod.kind(par.type) == Data.DOC) Err.or(UPWRTRGTYP2, this);
-        ctx.updates.addPrimitive(
-            new InsertAttribute(par, aSeq, -1));
+        if(par.type == Type.DOC) Err.or(UPWRTRGTYP2, this);
+        ctx.updates.addPrimitive(new InsertAttribute(par, aSeq, -1));
+      } else {
+        if(n.type == Type.DOC) Err.or(UPWRTRGTYP2, this);
+        ctx.updates.addPrimitive(new InsertAttribute(n, aSeq, -1));
       }
     }
     if(seq.size() > 0) {
       UpdatePrimitive up = null;
-      if(into)
+      if(before) {
+        up = new InsertBeforePrimitive(n, seq, -1);
+      } else if(after) {
+        up = new InsertAfterPrimitive(n, seq, -1);
+      } else {
         if(first) up = new InsertIntoFirstPrimitive(n, seq, -1);
         else if(last) up = new InsertIntoLastPrimitive(n, seq, -1);
         else up = new InsertIntoPrimitive(n, seq, -1);
-      else if(before) up = new InsertBeforePrimitive(n, seq, -1);
-      else if(after) up = new InsertAfterPrimitive(n, seq, -1);
+      }
       ctx.updates.addPrimitive(up);
     }
     return Iter.EMPTY;

@@ -1,11 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.RenamePrimitive;
@@ -35,12 +35,10 @@ public final class Rename extends Arr {
     
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, this);
-    if(t.size() != 1) Err.or(UPWRTRGTYP, this);
-    if(!(i instanceof Nod)) Err.or(UPWRTRGTYP, this);
+    if(!(i instanceof Nod) || t.size() != 1) Err.or(UPWRTRGTYP, this);
     final Nod n = (Nod) i;
-    final int k = Nod.kind(n.type);
-    if(!(k == Data.ELEM || k == Data.ATTR || k == Data.PI))
-        Err.or(UPWRTRGTYP, this); 
+    if(n.type != Type.ELM && n.type != Type.ATT && n.type != Type.PI)
+      Err.or(UPWRTRGTYP, this);
 
     // check new name constraints
     final Iter na = SeqIter.get(expr[1].iter(ctx));

@@ -31,8 +31,7 @@ public final class InsertIntoFirstPrimitive extends InsertPrimitive {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-    d.insertSeq(p + d.attSize(p, Nod.kind(node.type)), 
-        p, m);
+    d.insertSeq(p + d.attSize(p, Nod.kind(node.type)), p, m);
   }
 
   @Override

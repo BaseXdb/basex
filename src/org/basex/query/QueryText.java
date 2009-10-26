@@ -421,8 +421,6 @@ public interface QueryText {
   Object[] FUNCDUPL = { XQST, 39, "Duplicate function argument %." };
   /** XQST0040: Parsing exception. */
   Object[] ATTDUPL = { XQST, 40, "Duplicate attribute \"%\"." };
-  /** XQST0040: Parsing exception. */
-  Object[] ATTNSDUPL = { XQST, 40, "Duplicate attributes %/%." };
   /** XQST0045: Parsing exception. */
   Object[] NAMERES = { XQST, 45, "Function %(...) uses reserved namespace." };
   /** XQST0045: Parsing exception. */
@@ -485,22 +483,7 @@ public interface QueryText {
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
 
   /** XQTY0024: Parsing exception. */
-  Object[] NOATTALL = { XQTY, 24,
-      "Attributes must directly follow element nodes." };
-
-  /** XUST0000: Parsing exception. */
-  Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
-  /** XUST0001: Parsing exception. */
-  Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
-  /** XUST0002: Parsing exception. */
-  Object[] UPEXPECT = { XUST, 2, "Updating expression expected." };
-  /** XUST0003: Parsing exception. */
-  Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
-  /** XUST0026: Parsing exception. */
-  Object[] NOREVAL = { XUST, 26, "Revalidation mode not supported." };
-  /** XUST0028: Parsing exception. */
-  Object[] UPFUNCTYPE = { XUST, 28,
-      "No return type allowed in updating functions." };
+  Object[] NOATTALL = { XQTY, 24, "Attribute must follow root element." };
 
   /** XUDY0009: XQuery Update dynamic exception. */
   // [LK] CG: dummy error for various unspecified exceptions
@@ -515,6 +498,8 @@ public interface QueryText {
   Object[] UPMULTREPL = { XUDY, 16, "Multiple replaces on same node." };
   /** XUDY0017: XQuery Update dynamic exception. */
   Object[] UPMULTREPV = { XUDY, 17, "Multiple replaces on same node." };
+  /** XUDY0021: XQuery Update dynamic exception. */
+  Object[] UPATTDUPL = { XUDY, 21, "Duplicate attribute \"%\"." };
   /** XUDY0023: XQuery Update dynamic exception. */
   Object[] UPCONFNSPAR = { XUDY, 23, "Namespace conflicts." };
   /** XUDY0024: XQuery Update dynamic exception. */
@@ -523,8 +508,9 @@ public interface QueryText {
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
+
   /** XUTY0004: XQuery Update dynamic exception. */
-  Object[] UPNOATTRPER = { XUTY, 4, "Attribute following non attribute node." };
+  Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
   /** XUTY0005: XQuery Update dynamic exception. */
   Object[] UPTRGTYP = { XUTY, 5, "Wrong type of target node." };
   /** XUTY0006: XQuery Update dynamic exception. */
@@ -541,6 +527,20 @@ public interface QueryText {
   Object[] UPWRTRGTYP = { XUTY, 12, "Wrong target type." };
   /** XUTY0022: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
+
+  /** XUST0000: Parsing exception. */
+  Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
+  /** XUST0001: Parsing exception. */
+  Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
+  /** XUST0002: Parsing exception. */
+  Object[] UPEXPECT = { XUST, 2, "Updating expression expected." };
+  /** XUST0003: Parsing exception. */
+  Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
+  /** XUST0026: Parsing exception. */
+  Object[] NOREVAL = { XUST, 26, "Revalidation mode not supported." };
+  /** XUST0028: Parsing exception. */
+  Object[] UPFUNCTYPE = { XUST, 28,
+      "No return type allowed in updating functions." };
 
   // OPTIMIZATIONS
 

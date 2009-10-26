@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.util.HashSet;
 import java.util.Set;
-import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -12,6 +11,7 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.ReplaceElemContentPrimitive;
@@ -51,7 +51,7 @@ public final class Replace extends Arr {
     if(t.size() > 1 || !(i instanceof Nod)) Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
     final Nod p = n.parent();
-    final boolean a = Nod.kind(n.type) == Data.ATTR;
+    final boolean a = n.type == Type.ATT;
     if(p == null) Err.or(UPNOPAR, i);
     
     // check replace constraints
@@ -64,9 +64,8 @@ public final class Replace extends Arr {
         if(i.type.num || i.type.str) seq.add(new FTxt(i.str(), null));
         else if(i instanceof Nod) {
           final Nod tn = (Nod) i;
-          if(Nod.kind(tn.type) == Data.ATTR) Err.or(UPWRELM, i);
-          if(Nod.kind(tn.type) == Data.DOC) 
-            seq.add(tn.child());
+          if(tn.type == Type.ATT) Err.or(UPWRELM, i);
+          if(tn.type == Type.DOC) seq.add(tn.child());
           else seq.add(tn);
         } else Err.or(UPDATE, this);
         i = r.next();
@@ -88,8 +87,7 @@ public final class Replace extends Arr {
       // ... this results in XUDY0024.
       boolean brep = false;
       while(i != null) {
-        if(!(i instanceof Nod) || !(Nod.kind(i.type) == Data.ATTR))
-          Err.or(UPWRATTR, i);
+        if(i.type != Type.ATT) Err.or(UPWRATTR, i);
         // check namespace constraints in replace node set (dupl. attributes...)
         brep = checkNS(set, (Nod) i) | brep;
         i = r.next();
@@ -112,15 +110,13 @@ public final class Replace extends Arr {
       // text node constructor
       i = r.next();
       if(i == null) Err.or(UPDATE, this);
-      final int k = Nod.kind(n.type);
       if(i.type.num || i.type.str)
-        ctx.updates.addPrimitive(k == Data.ELEM ? 
-            new ReplaceElemContentPrimitive(n, i.str()) : 
-              new ReplaceValuePrimitive(n, i.str()));
+        ctx.updates.addPrimitive(n.type == Type.ELM ? 
+          new ReplaceElemContentPrimitive(n, i.str()) :
+          new ReplaceValuePrimitive(n, i.str()));
       
       else Err.or(UPDATE, this);
     }
-      
     return Iter.EMPTY;
   }
   
@@ -130,9 +126,8 @@ public final class Replace extends Arr {
    * @param n node ns to add
    * @return true if duplicates exist
    */
-  public static boolean checkNS(final Set<String> s, final Nod n) {
-    if(n instanceof FNode) 
-      return !s.add(Token.string(((FNode) n).nname()));
+  private static boolean checkNS(final Set<String> s, final Nod n) {
+    if(n instanceof FNode) return !s.add(Token.string(((FNode) n).nname()));
     final DBNode dn = (DBNode) n;
     return !s.add(Token.string(dn.data.attName(dn.pre)));
   }

@@ -11,12 +11,11 @@ import org.basex.index.Names;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
-import org.basex.query.item.FComm;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FNode;
-import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
@@ -44,9 +43,9 @@ public final class UpdateFunctions {
     final SeqIter s = new SeqIter();
     Nod i = (Nod) n.next();
     while(i != null) {
-      if(Nod.kind(i.type) == Data.TEXT) {
+      if(i.type == Type.TXT) {
         byte[] t = EMPTY;
-        while(i != null && Nod.kind(i.type) == Data.TEXT) {
+        while(i != null && i.type == Type.TXT) {
           t = concat(t, i.str());
           i = (Nod) n.next();
         }
@@ -243,13 +242,9 @@ public final class UpdateFunctions {
             0, fat.str(), pre - par);
         return ++pre;
       case Data.TEXT:
-        m.addText(((FTxt) n).str(), pre - par, k);
-        return ++pre;
       case Data.PI:
-        m.addText(((FPI) n).str(), pre - par, k);
-        return ++pre;
       case Data.COMM:
-        m.addText(((FComm) n).str(), pre - par, k);
+        m.addText(n.str(), pre - par, k);
         return ++pre;
     }
 
@@ -300,11 +295,7 @@ public final class UpdateFunctions {
             0, data.attValue(n.pre), pre - par);
         return ++pre;
       case Data.TEXT:
-        m.addText(data.text(n.pre), pre - par, k);
-        return ++pre;
       case Data.PI:
-        m.addText(data.text(n.pre), pre - par, k);
-        return ++pre;
       case Data.COMM:
         m.addText(data.text(n.pre), pre - par, k);
         return ++pre;
