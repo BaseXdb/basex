@@ -295,7 +295,8 @@ s_perms=Permissions
 s_drquestion=User '%' will be dropped.\nAre you sure?
 s_alterpw=Alter Password
 s_newpw=New Password
-s_invalid=Invalid
+s_invalid= invalid
+s_failed= failed.
 
 # Commands & Processes
 proc_time=所要時間

@@ -296,6 +296,7 @@ s_drquestion=Benutzer '%' wird gelöscht.\nSind Sie sicher?
 s_alterpw=Passwort abändern
 s_newpw=Neues Passwort
 s_invalid= ungültig
+s_failed= fehlgeschlagen.
 
 # Commands & Processes
 proc_time=Benötigte Zeit

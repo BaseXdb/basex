@@ -1370,6 +1370,8 @@ public interface Text {
   String NEWPW = lang("s_newpw") + COLS;
   /** Invalid. */
   String INVALID = lang("s_invalid");
+  /** Failed. */
+  String FAILED = lang("s_failed");
 
   // HELP TEXTS ===============================================================
 

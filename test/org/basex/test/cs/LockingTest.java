@@ -179,12 +179,6 @@ public final class LockingTest {
     new BaseXServer("stop");
   }
 
-  /*
-   * [AW] to add.. - concurrent create commands - concurrent queries -
-   * concurrent updates - Test results of queries/commands/... - done flag:
-   * method shouldn't be left before all commands have been processed
-   */
-
   /**
    * Tests concurrent create commands.
    */

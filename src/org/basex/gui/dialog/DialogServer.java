@@ -101,6 +101,8 @@ public final class DialogServer extends Dialog {
   BaseXLabel infop2;
   /** List of permission processes. */
   ArrayList<Process> permps = new ArrayList<Process>();
+  /** String for error messages. */
+  String err;
 
   /**
    * Default constructor.
@@ -229,7 +231,6 @@ public final class DialogServer extends Dialog {
       ctx.prop.set(Prop.HOST, host.getText());
       final int p = Integer.parseInt(port.getText());
       ctx.prop.set(Prop.PORT, p);
-
       try {
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
@@ -239,14 +240,15 @@ public final class DialogServer extends Dialog {
             new String[] { "java", mem, "-cp", path, clazz }).start();
         createSession();
       } catch(final Exception ex) {
-        ex.printStackTrace();
+        err = BUTTONSTASERV + FAILED;
+        Main.debug(ex);
       }
     } else if(BUTTONSTOSERV.equals(cmd)) {
       try {
         cs.execute(new IntStop(), null);
         cs = null;
       } catch(final IOException ex) {
-        // [AW] to be visualized somewhere...
+        err = BUTTONSTOSERV + FAILED;
         Main.debug(ex);
       }
     } else if(BUTTONCHANGE.equals(cmd)) {
@@ -254,7 +256,8 @@ public final class DialogServer extends Dialog {
         try {
           cs.execute(p);
         } catch(IOException e) {
-          e.printStackTrace();
+          err = BUTTONCHANGE + FAILED;
+          Main.debug(e);
         }
       }
       permps.clear();
@@ -267,7 +270,7 @@ public final class DialogServer extends Dialog {
         pass.setText("");
         setData();
       } catch(final IOException ex) {
-        // [AW] to be visualized somewhere...
+        err = CREATEU + FAILED;
         Main.debug(ex);
       }
     } else if(BUTTONDROP.equals(cmd)) {
@@ -278,7 +281,7 @@ public final class DialogServer extends Dialog {
           setData();
         }
       } catch(final IOException ex) {
-        // [AW] to be visualized somewhere...
+        err = DROPU + FAILED;
         Main.debug(ex);
       }
     } else if(BUTTONALTER.equals(cmd)) {
@@ -287,11 +290,10 @@ public final class DialogServer extends Dialog {
       try {
         cs.execute(new AlterUser(u, p));
       } catch(IOException e) {
-        e.printStackTrace();
+        err = ALTERPW + FAILED;
+        Main.debug(e);
       }
     }
-    // [AW] info labels should be added for simple input checks
-    // (hosts/ports, user/passwords, see: DialogCreate.info)
     final boolean run = cs == null;
     stop.setEnabled(!run);
     host.setEnabled(run);
@@ -306,6 +308,10 @@ public final class DialogServer extends Dialog {
       } else {
         infop1.setText(PORT + INVALID);
       }
+    } else if(err != null) {
+      infop1.setText(err);
+      infop1.setIcon(BaseXLayout.icon("error"));
+      err = null;
     } else {
       infop1.setText(" ");
       infop1.setIcon(null);
@@ -325,6 +331,10 @@ public final class DialogServer extends Dialog {
         || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText(SERVERPW + INVALID);
+    } else if(err != null) {
+      infop2.setText(err);
+      infop2.setIcon(BaseXLayout.icon("error"));
+      err = null;
     } else {
       infop2.setText(" ");
       infop2.setIcon(null);
