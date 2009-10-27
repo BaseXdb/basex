@@ -37,6 +37,7 @@ b_create=Create
 b_alter=Alter
 b_staserv=Start server
 b_stoserv=Stop server
+b_connect=Connect
 
 # Status messages
 s_ok=OK
@@ -296,6 +297,8 @@ s_alterpw=Alter Password
 s_newpw=New Password
 s_invalid= invalid
 s_failed= failed. 
+s_login=Login
+s_local=Local 
 
 # Commands & Processes
 proc_time=Thời gian cần

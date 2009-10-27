@@ -1058,6 +1058,8 @@ public interface Text {
   String BUTTONSTASERV = lang("b_staserv");
   /** Button for starting the server. */
   String BUTTONSTOSERV = lang("b_stoserv");
+  /** Button for connecting. */
+  String BUTTONCONNECT = lang("b_connect");
 
   // STATUS BAR ===============================================================
 
@@ -1381,6 +1383,10 @@ public interface Text {
   String INVALID = lang("s_invalid");
   /** Failed. */
   String FAILED = lang("s_failed");
+  /** Login. */
+  String LOGIN = lang("s_login");
+  /** Local. */
+  String LOCAL = lang("s_local");
 
   // HELP TEXTS ===============================================================
 

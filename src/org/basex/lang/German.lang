@@ -38,6 +38,7 @@ b_create=Erstellen
 b_alter=Abändern
 b_staserv=Starte Server
 b_stoserv=Stop Server
+b_connect=Verbinden
 
 # Status messages
 s_ok=OK
@@ -297,6 +298,8 @@ s_alterpw=Passwort abändern
 s_newpw=Neues Passwort
 s_invalid= ungültig
 s_failed= fehlgeschlagen. 
+s_login=Login
+s_local=Lokaler  
 
 # Commands & Processes
 proc_time=Benötigte Zeit

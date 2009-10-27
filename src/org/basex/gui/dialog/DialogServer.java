@@ -70,9 +70,13 @@ public final class DialogServer extends Dialog {
   final BaseXButton stop;
   /** Start button. */
   final BaseXButton start;
-  /** L Server host. */
+  /** Connect button. */
+  final BaseXButton connect;
+  /** Server host. */
   final BaseXTextField host;
-  /** L Server port. */
+  /** Local server port. */
+  final BaseXTextField portl;
+  /** Server port. */
   final BaseXTextField port;
   /** Change button. */
   final BaseXButton change;
@@ -86,10 +90,14 @@ public final class DialogServer extends Dialog {
   BaseXButton delete;
   /** Username textfield. */
   BaseXTextField user;
+  /** Username textfield. */
+  BaseXTextField loguser;
   /** Password textfield. */
   JPasswordField pass;
   /** Password textfield. */
   JPasswordField newpass;
+  /** Password textfield. */
+  JPasswordField logpass;
   /** User columns. */
   BaseXCombo userco1;
   /** User columns. */
@@ -115,8 +123,10 @@ public final class DialogServer extends Dialog {
     super(main, SRVTITLE);
 
     tabs = new BaseXTabs(this);
+    
     // Server panel
-    p1.setLayout(new TableLayout(5, 1));
+    p1.setLayout(new TableLayout(5, 1, 0, 4));
+    p1.setBorder(8, 8, 8, 8);
     // User management panel
     p2.setLayout(new TableLayout(12, 1, 0, 4));
     p2.setBorder(8, 8, 8, 8);
@@ -126,61 +136,59 @@ public final class DialogServer extends Dialog {
 
     start = new BaseXButton(BUTTONSTASERV, null, this);
     stop = new BaseXButton(BUTTONSTOSERV, null, this);
+    connect = new BaseXButton(BUTTONCONNECT, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
+    portl = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
+        this);
     port = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
         this);
+    portl.addKeyListener(keys);
     port.addKeyListener(keys);
     host.addKeyListener(keys);
 
-    // Start-stop server panel
+    // Local server panel.
     final BaseXBack p11 = new BaseXBack();
-    p11.setLayout(new TableLayout(1, 2, 6, 0));
-    p11.add(start);
-    p11.add(stop);
-
-    // Server preferences panel.
+    p11.setLayout(new TableLayout(3, 2, -18, 2));
+    p11.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
+    p11.add(new BaseXLabel(" "));
+    p11.add(new BaseXLabel(PORT + COLS));
+    p11.add(portl);
+    p11.add(new BaseXLabel(" "));
+    final BaseXBack p111 = new BaseXBack();
+    p111.setLayout(new TableLayout(1, 2, 2, 2));
+    p111.add(start);
+    p111.add(stop);
+    p11.add(p111);
+    
+    // Login panel.
     final BaseXBack p12 = new BaseXBack();
-    p12.setLayout(new TableLayout(3, 2, 2, 2));
-    p12.add(new BaseXLabel("Local Server:", false, true));
+    p12.setLayout(new TableLayout(6, 2, 2, 2));
+    p12.add(new BaseXLabel("Login:", false, true));
     p12.add(new BaseXLabel("  "));
+    p12.add(new BaseXLabel(SERVERUSER + COLS));
+    loguser = new BaseXTextField("", null, this);
+    loguser.addKeyListener(keys);
+    p12.add(loguser);
+    p12.add(new BaseXLabel(SERVERPW + COLS));
+    logpass = new JPasswordField();
+    logpass.addKeyListener(keys);
+    BaseXLayout.setWidth(logpass, 200);
+    p12.add(logpass);
     p12.add(new BaseXLabel(HOST + COLS));
     p12.add(host);
     p12.add(new BaseXLabel(PORT + COLS));
     p12.add(port);
-    
-    final BaseXBack p13 = new BaseXBack();
-    p13.setLayout(new TableLayout(4, 2, 2, 2));
-    p13.add(new BaseXLabel("Remote Server:", false, true));
-    p13.add(new BaseXLabel("  "));
-    p13.add(new BaseXLabel("Host:"));
-    p13.add(new BaseXTextField(" ", null, this));
-    p13.add(new BaseXLabel("Port:"));
-    p13.add(new BaseXTextField(" ", null, this));
-    p13.add(new BaseXButton("Connect", null, this));
-    p13.add(new BaseXButton("Disconnect", null, this));
-    
-    final BaseXBack p14 = new BaseXBack();
-    p14.setLayout(new TableLayout(4, 2, 2, 2));
-    p14.add(new BaseXLabel("Login:", false, true));
-    p14.add(new BaseXLabel("  "));
-    p14.add(new BaseXLabel("Username:"));
-    p14.add(new BaseXTextField(" ", null, this));
-    p14.add(new BaseXLabel("Password:"));
-    p14.add(new BaseXTextField(" ", null, this));
-    p14.add(new BaseXButton("Login", null, this));
-    p14.add(new BaseXButton("Logout", null, this));
+    p12.add(new BaseXLabel("  "));
+    p12.add(connect);
     
     // adding to main panel
-    p12.setBorder(8, 8, 8, 8);
     p11.setBorder(8, 8, 8, 8);
-    p13.setBorder(8, 8, 8, 8);
-    p14.setBorder(8, 8, 8, 8);
-    p1.add(p12);
-    p1.add(p11);
+    p12.setBorder(8, 8, 8, 8);
     infop1 = new BaseXLabel(" ");
     infop1.setBorder(40, 0, 0, 0);
-    p1.add(p13);
-    p1.add(p14);
+    
+    p1.add(p11);
+    p1.add(p12);
     p1.add(infop1);
     set(tabs, BorderLayout.CENTER);
 
@@ -270,7 +278,7 @@ public final class DialogServer extends Dialog {
                 host.getText() }).start();
         createSession();
         ctx.prop.set(Prop.HOST, host.getText());
-        final int p = Integer.parseInt(port.getText());
+        final int p = Integer.parseInt(portl.getText());
         ctx.prop.set(Prop.PORT, p);
       } catch(final Exception ex) {
         err1 = BUTTONSTASERV + FAILED + ex.getMessage();
@@ -330,9 +338,9 @@ public final class DialogServer extends Dialog {
     final boolean run = cs == null;
     stop.setEnabled(!run);
     host.setEnabled(run);
-    port.setEnabled(run);
+    portl.setEnabled(run);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
-    boolean valp = port.getText().matches("^[0-9]{2,5}$");
+    boolean valp = portl.getText().matches("^[0-9]{2,5}$");
     start.setEnabled(run && valp && valh);
     if(!valp || !valh) {
       infop1.setIcon(BaseXLayout.icon("warn"));
