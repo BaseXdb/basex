@@ -552,7 +552,8 @@ public final class TreeView extends View {
    * @param showChildren show children.
    */
   private void highlightNode(final Graphics g, final Color c, final TreeRect r,
-      final int level, final int childX, final boolean showParent, final boolean showChildren) {
+      final int level, final int childX, final boolean showParent,
+      final boolean showChildren) {
 
     if(level == -1) return;
 
@@ -576,8 +577,9 @@ public final class TreeView extends View {
       g.drawLine(multiPreX, y, multiPreX, y + nodeHeight);
     }
     
-    if(childX > -1){
-      g.drawLine(childX , getYperLevel(level + 1) - 1 , multiPreX == -1 ? (2 * r.x + r.w) / 2 : multiPreX, y + nodeHeight + 1);
+    if(childX > -1) {
+      g.drawLine(childX , getYperLevel(level + 1) - 1 , multiPreX == -1 ?
+          (2 * r.x + r.w) / 2 : multiPreX, y + nodeHeight + 1);
     }
 
     if(showParent && pre > 0) {
@@ -660,7 +662,7 @@ public final class TreeView extends View {
     // + Token.string(data.attValue(pre + y + 1)) + "\" ";
     // }
 
-    final int w = BaseXLayout.width(g, s);
+    //final int w = BaseXLayout.width(g, s);
     g.setColor(highlightColor);
 
 //    if(r.pre == 0) {

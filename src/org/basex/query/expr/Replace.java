@@ -89,7 +89,7 @@ public final class Replace extends Arr {
       boolean brep = false;
       while(i != null) {
         if(i.type != Type.ATT) Err.or(UPWRATTR, i);
-        // check namespace constraints for replace node set (dupl. attributes...)
+        // check namespace constraints for replace node set (dupl. attributes..)
         brep = checkNS(set, (Nod) i) | brep;
         i = r.next();
       }

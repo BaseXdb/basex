@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -18,7 +17,9 @@ import org.basex.query.up.UpdateFunctions;
  */
 public final class Transform extends Arr {
   /** Variable bindings created by copy clause. */
-  private final For[] copies;
+  private final Let[] copies;
+
+  // [LK] modified a little. still work in progress, though.
 
   /**
    * Constructor.
@@ -26,18 +27,27 @@ public final class Transform extends Arr {
    * @param m modify expression
    * @param r return expression
    */
-  public Transform(final For[] c, final Expr m, final Expr r) {
+  public Transform(final Let[] c, final Expr m, final Expr r) {
     super(m, r);
     copies = c;
   }
-  
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    final int s = ctx.vars.size();
+    for(final Let c : copies) ctx.vars.add(c.var);
+    super.comp(ctx);
+    ctx.vars.reset(s);
+    return this;
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final int c = ctx.vars.size();
-    for(final For fo : copies) {
+    for(final Let fo : copies) {
       // [LK] copied node is a DOC node ? ... attributes ?
       final MemData m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
-      fo.var.bind(new DBNode(m, 1), ctx);
+      ctx.vars.add(fo.var.bind(new DBNode(m, 1), ctx).copy());
     }
     
     final PendingUpdates upd = ctx.updates;
@@ -46,8 +56,14 @@ public final class Transform extends Arr {
     ctx.updates.applyUpdates();
     ctx.updates = upd;
 
+    final Iter ir = expr[1].iter(ctx);
     ctx.vars.reset(c);
-    return expr[1].iter(ctx);
+    return ir;
+  }
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u != Use.UPD && super.uses(u, ctx);
   }
   
   @Override

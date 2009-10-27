@@ -509,7 +509,7 @@ public interface QueryText {
   /** XUDY0024: XQuery Update dynamic exception. */
   Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
   /** XUDY0027: XQuery Update dynamic exception. */
-  Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
+  Object[] UPSEQEMP = { XUDY, 27, "Target must not be empty." };
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
   /** XUDY0030: XQuery Update dynamic exception. */
@@ -531,7 +531,8 @@ public interface QueryText {
   /** XUTY0010: XQuery Update dynamic exception. */
   Object[] UPWRATTR = { XUTY, 11, "Replace nodes must be attribute nodes." };
   /** XUTY0012: XQuery Update dynamic exception. */
-  Object[] UPWRTRGTYP = { XUTY, 12, "Wrong target type." };
+  Object[] UPWRTRGTYP = { XUTY, 12,
+      "Target must be element, attribute or processing instruction." };
   /** XUTY0022: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
 

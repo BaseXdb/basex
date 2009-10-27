@@ -2614,13 +2614,13 @@ public class QueryParser extends InputParser {
   private Expr transform() throws QueryException {
     if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
 
-    For[] fl = {};
+    Let[] fl = {};
     do {
       final Var v = new Var(varName());
       check(ASSIGN);
       final Expr e = simple(check(single(), INCOMPLETE));
       ctx.vars.add(v);
-      fl = Array.add(fl, new For(e, v, null, null));
+      fl = Array.add(fl, new Let(e, v, false));
     } while(consumeWS(COMMA));
     check(MODIFY);
 
