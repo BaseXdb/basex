@@ -296,7 +296,7 @@ s_drquestion=User '%' will be dropped.\nAre you sure?
 s_alterpw=Alter Password
 s_newpw=New Password
 s_invalid= invalid
-s_failed= failed.
+s_failed= failed. 
 
 # Commands & Processes
 proc_time=Time Needed

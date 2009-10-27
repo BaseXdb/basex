@@ -1366,15 +1366,15 @@ public interface Text {
   /** PORT. */
   String PORT = lang("s_port");
   /** Create User. */
-  String CREATEU = lang("s_createu") + COLS;
+  String CREATEU = lang("s_createu");
   /** Drop User. */
-  String DROPU = lang("s_dropu") + COLS;
+  String DROPU = lang("s_dropu");
   /** Permissions. */
   String PERMS = lang("s_perms") + COLS;
   /** Question for dropping user. */
   String DRQUESTION = lang("s_drquestion");
   /** Alter password. */
-  String ALTERPW = lang("s_alterpw") + COLS;
+  String ALTERPW = lang("s_alterpw");
   /** New password. */
   String NEWPW = lang("s_newpw") + COLS;
   /** Invalid. */

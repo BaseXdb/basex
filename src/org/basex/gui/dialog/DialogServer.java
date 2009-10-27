@@ -7,6 +7,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -102,7 +103,9 @@ public final class DialogServer extends Dialog {
   /** List of permission processes. */
   ArrayList<Process> permps = new ArrayList<Process>();
   /** String for error messages. */
-  String err;
+  String err1;
+  /** String for error messages. */
+  String err2;
 
   /**
    * Default constructor.
@@ -164,7 +167,7 @@ public final class DialogServer extends Dialog {
     table = new JTable(new TableModel());
     table.setPreferredScrollableViewportSize(new Dimension(420, 100));
 
-    p2.add(new BaseXLabel(CREATEU, false, true));
+    p2.add(new BaseXLabel(CREATEU + COLS, false, true));
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(1, 5, 6, 0));
     p21.add(new BaseXLabel(SERVERUSER));
@@ -173,7 +176,7 @@ public final class DialogServer extends Dialog {
     p21.add(pass);
     p21.add(create);
     p2.add(p21);
-    p2.add(new BaseXLabel(DROPU, false, true));
+    p2.add(new BaseXLabel(DROPU + COLS, false, true));
     final BaseXBack p22 = new BaseXBack();
     p22.setLayout(new TableLayout(1, 2, 6, 0));
     p22.add(userco1);
@@ -181,7 +184,7 @@ public final class DialogServer extends Dialog {
     p2.add(p22);
     final BaseXBack p23 = new BaseXBack();
     p23.setLayout(new TableLayout(2, 4, 6, 0));
-    p23.add(new BaseXLabel(ALTERPW, false, true));
+    p23.add(new BaseXLabel(ALTERPW + COLS, false, true));
     p23.add(new BaseXLabel(" "));
     p23.add(new BaseXLabel(" "));
     p23.add(new BaseXLabel(" "));
@@ -228,19 +231,20 @@ public final class DialogServer extends Dialog {
   @Override
   public void action(final String cmd) {
     if(BUTTONSTASERV.equals(cmd)) {
-      ctx.prop.set(Prop.HOST, host.getText());
-      final int p = Integer.parseInt(port.getText());
-      ctx.prop.set(Prop.PORT, p);
       try {
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
         final String clazz = org.basex.BaseXServer.class.getName();
         new ProcessBuilder(
-            new String[] { "java", mem, "-cp", path, clazz }).start();
+            new String[] { "java", mem, "-cp", path, clazz, "-n",
+                host.getText() }).start();
         createSession();
+        ctx.prop.set(Prop.HOST, host.getText());
+        final int p = Integer.parseInt(port.getText());
+        ctx.prop.set(Prop.PORT, p);
       } catch(final Exception ex) {
-        err = BUTTONSTASERV + FAILED;
+        err1 = BUTTONSTASERV + FAILED + ex.getMessage();
         Main.debug(ex);
       }
     } else if(BUTTONSTOSERV.equals(cmd)) {
@@ -248,7 +252,7 @@ public final class DialogServer extends Dialog {
         cs.execute(new IntStop(), null);
         cs = null;
       } catch(final IOException ex) {
-        err = BUTTONSTOSERV + FAILED;
+        err1 = BUTTONSTOSERV + FAILED + ex.getMessage();
         Main.debug(ex);
       }
     } else if(BUTTONCHANGE.equals(cmd)) {
@@ -256,7 +260,7 @@ public final class DialogServer extends Dialog {
         try {
           cs.execute(p);
         } catch(IOException e) {
-          err = BUTTONCHANGE + FAILED;
+          err2 = BUTTONCHANGE + FAILED + e.getMessage();
           Main.debug(e);
         }
       }
@@ -270,18 +274,18 @@ public final class DialogServer extends Dialog {
         pass.setText("");
         setData();
       } catch(final IOException ex) {
-        err = CREATEU + FAILED;
+        err2 = CREATEU + FAILED + ex.getMessage();
         Main.debug(ex);
       }
     } else if(BUTTONDROP.equals(cmd)) {
-      final String u = (String) userco1.getSelectedItem();
       try {
+        final String u = (String) userco1.getSelectedItem();
         if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
           cs.execute(new DropUser(u));
           setData();
         }
-      } catch(final IOException ex) {
-        err = DROPU + FAILED;
+      } catch(final Exception ex) {
+        err2 = DROPU + FAILED + ex.getMessage();
         Main.debug(ex);
       }
     } else if(BUTTONALTER.equals(cmd)) {
@@ -290,7 +294,7 @@ public final class DialogServer extends Dialog {
       try {
         cs.execute(new AlterUser(u, p));
       } catch(IOException e) {
-        err = ALTERPW + FAILED;
+        err2 = ALTERPW + FAILED + e.getMessage();
         Main.debug(e);
       }
     }
@@ -308,10 +312,10 @@ public final class DialogServer extends Dialog {
       } else {
         infop1.setText(PORT + INVALID);
       }
-    } else if(err != null) {
-      infop1.setText(err);
+    } else if(err1 != null) {
+      infop1.setText(err1);
       infop1.setIcon(BaseXLayout.icon("error"));
-      err = null;
+      err1 = null;
     } else {
       infop1.setText(" ");
       infop1.setIcon(null);
@@ -331,10 +335,10 @@ public final class DialogServer extends Dialog {
         || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText(SERVERPW + INVALID);
-    } else if(err != null) {
-      infop2.setText(err);
+    } else if(err2 != null) {
+      infop2.setText(err2);
       infop2.setIcon(BaseXLayout.icon("error"));
-      err = null;
+      err2 = null;
     } else {
       infop2.setText(" ");
       infop2.setIcon(null);
