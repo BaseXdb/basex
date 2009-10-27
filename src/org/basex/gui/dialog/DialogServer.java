@@ -70,9 +70,9 @@ public final class DialogServer extends Dialog {
   final BaseXButton stop;
   /** Start button. */
   final BaseXButton start;
-  /** Server host. */
+  /** L Server host. */
   final BaseXTextField host;
-  /** Server port. */
+  /** L Server port. */
   final BaseXTextField port;
   /** Change button. */
   final BaseXButton change;
@@ -116,7 +116,7 @@ public final class DialogServer extends Dialog {
 
     tabs = new BaseXTabs(this);
     // Server panel
-    p1.setLayout(new TableLayout(4, 1));
+    p1.setLayout(new TableLayout(5, 1));
     // User management panel
     p2.setLayout(new TableLayout(12, 1, 0, 4));
     p2.setBorder(8, 8, 8, 8);
@@ -140,18 +140,47 @@ public final class DialogServer extends Dialog {
 
     // Server preferences panel.
     final BaseXBack p12 = new BaseXBack();
-    p12.setLayout(new TableLayout(2, 2, 2, 2));
+    p12.setLayout(new TableLayout(3, 2, 2, 2));
+    p12.add(new BaseXLabel("Local Server:", false, true));
+    p12.add(new BaseXLabel("  "));
     p12.add(new BaseXLabel(HOST + COLS));
     p12.add(host);
     p12.add(new BaseXLabel(PORT + COLS));
     p12.add(port);
+    
+    final BaseXBack p13 = new BaseXBack();
+    p13.setLayout(new TableLayout(4, 2, 2, 2));
+    p13.add(new BaseXLabel("Remote Server:", false, true));
+    p13.add(new BaseXLabel("  "));
+    p13.add(new BaseXLabel("Host:"));
+    p13.add(new BaseXTextField(" ", null, this));
+    p13.add(new BaseXLabel("Port:"));
+    p13.add(new BaseXTextField(" ", null, this));
+    p13.add(new BaseXButton("Connect", null, this));
+    p13.add(new BaseXButton("Disconnect", null, this));
+    
+    final BaseXBack p14 = new BaseXBack();
+    p14.setLayout(new TableLayout(4, 2, 2, 2));
+    p14.add(new BaseXLabel("Login:", false, true));
+    p14.add(new BaseXLabel("  "));
+    p14.add(new BaseXLabel("Username:"));
+    p14.add(new BaseXTextField(" ", null, this));
+    p14.add(new BaseXLabel("Password:"));
+    p14.add(new BaseXTextField(" ", null, this));
+    p14.add(new BaseXButton("Login", null, this));
+    p14.add(new BaseXButton("Logout", null, this));
+    
     // adding to main panel
     p12.setBorder(8, 8, 8, 8);
     p11.setBorder(8, 8, 8, 8);
+    p13.setBorder(8, 8, 8, 8);
+    p14.setBorder(8, 8, 8, 8);
     p1.add(p12);
     p1.add(p11);
     infop1 = new BaseXLabel(" ");
     infop1.setBorder(40, 0, 0, 0);
+    p1.add(p13);
+    p1.add(p14);
     p1.add(infop1);
     set(tabs, BorderLayout.CENTER);
 
