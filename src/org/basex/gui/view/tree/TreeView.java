@@ -199,7 +199,7 @@ public final class TreeView extends View {
     // highlights the focused node
 
     if(focus()) {
-      highlightNode(g, markColor, focusedRect, focusedRectLevel,
+      highlightNode(g, markColor, focusedRect, focusedRectLevel, -1,
           showParentNode, showChildNodes);
     }
 
@@ -547,11 +547,12 @@ public final class TreeView extends View {
    * @param c the color.
    * @param r the rectangle to highlight.
    * @param level the level.
+   * @param childX the child's x value.
    * @param showParent show parent.
    * @param showChildren show children.
    */
   private void highlightNode(final Graphics g, final Color c, final TreeRect r,
-      final int level, final boolean showParent, final boolean showChildren) {
+      final int level, final int childX, final boolean showParent, final boolean showChildren) {
 
     if(level == -1) return;
 
@@ -562,14 +563,21 @@ public final class TreeView extends View {
     final int pre = r.pre;
     final int kind = data.kind(pre);
     final int size = data.size(pre, kind);
+    int multiPreX = -1;
 
     g.setColor(c);
     g.drawRect(r.x, y, r.w, h);
+    
 
     if(r.multiPres != null) {
       final int index = searchPreArrayPosition(r.multiPres, pre);
       final double ratio = index / (double) (r.multiPres.length - 1);
-      g.drawLine((int) (r.w * ratio), y, (int) (r.w * ratio), y + nodeHeight);
+      multiPreX = (int) (r.w * ratio);
+      g.drawLine(multiPreX, y, multiPreX, y + nodeHeight);
+    }
+    
+    if(childX > -1){
+      g.drawLine(childX , getYperLevel(level + 1) - 1 , multiPreX == -1 ? (2 * r.x + r.w) / 2 : multiPreX, y + nodeHeight + 1);
     }
 
     if(showParent && pre > 0) {
@@ -584,27 +592,16 @@ public final class TreeView extends View {
           final TreeRect mPreRect = rList.get(0);
           mPreRect.pre = par;
 
-          g.drawLine(mPreRect.w / 2, getYperLevel(l) + nodeHeight + 1,
-              mPreRect.w / 2, y - 1);
-
-          final int pIndex = searchPreArrayPosition(mPreRect.multiPres, par);
-          final double pRatio = pIndex
-          / (double) (mPreRect.multiPres.length - 1);
-
-          g.setColor(Color.RED);
-          g.drawLine((int) (mPreRect.w * pRatio), getYperLevel(l),
-              (int) (mPreRect.w * pRatio), getYperLevel(l) + nodeHeight);
-
-          highlightNode(g, Color.RED, mPreRect, l, true, false);
+          highlightNode(g, Color.DARK_GRAY, mPreRect, l, multiPreX == -1 ? 
+              (2 * r.x + r.w) / 2 : multiPreX, true, false);
 
         } else {
 
           parRect = searchRect(rList, par);
 
           if(parRect != null) {
-            g.drawLine((2 * parRect.x + parRect.w) / 2, getYperLevel(l)
-                + nodeHeight + 1, (2 * r.x + r.w) / 2, y - 1);
-            highlightNode(g, Color.RED, parRect, l, true, false);
+            highlightNode(g, Color.DARK_GRAY, parRect, l, multiPreX == -1 ? 
+                (2 * r.x + r.w) / 2 : multiPreX, true, false);
           }
         }
       }
@@ -666,18 +663,18 @@ public final class TreeView extends View {
     final int w = BaseXLayout.width(g, s);
     g.setColor(highlightColor);
 
-    if(r.pre == 0) {
-
-      g.fillRect(r.x, y + fontHeight + 1, w + 2, h);
-      g.setColor(Color.WHITE);
-      g.drawString(s, r.x + 1, y + fontHeight + h - 2);
-
-    } else {
-      g.fillRect(r.x, y - fontHeight, w + 2, h);
-      g.setColor(Color.WHITE);
-      g.drawString(s, r.x + 1, (int) (y - h / (float) fontHeight) - 2);
-
-    }
+//    if(r.pre == 0) {
+//
+//      g.fillRect(r.x, y + fontHeight + 1, w + 2, h);
+//      g.setColor(Color.WHITE);
+//      g.drawString(s, r.x + 1, y + fontHeight + h - 2);
+//
+//    } else {
+//      g.fillRect(r.x, y - fontHeight, w + 2, h);
+//      g.setColor(Color.WHITE);
+//      g.drawString(s, r.x + 1, (int) (y - h / (float) fontHeight) - 2);
+//
+//    }
   }
 
   /**
