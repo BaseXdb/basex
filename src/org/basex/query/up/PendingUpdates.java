@@ -2,6 +2,7 @@ package org.basex.query.up;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -29,7 +30,7 @@ public final class PendingUpdates {
     dbPrimitives = new HashMap<Data, DBPrimitives>();
     fragPrimitives = new DBPrimitives(true);
   }
-
+  
   /**
    * Adds an update primitive to the corresponding primitive list.
    * @param p primitive to add
@@ -39,7 +40,6 @@ public final class PendingUpdates {
     if(p.node instanceof FNode) fragPrimitives.addPrimitive(p);
     else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
-      //if(d instanceof MemData) Err.or(MMUP);
 
       DBPrimitives dp = dbPrimitives.get(d);
       if(dp == null) {

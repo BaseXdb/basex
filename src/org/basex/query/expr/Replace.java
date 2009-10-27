@@ -81,15 +81,15 @@ public final class Replace extends Arr {
     if(a && !value) {
       i = r.next();
       final HashSet<String> set = new HashSet<String>();
-      // bpar states if ns constraints for parent of target are hurt. 
+      // bpar states if ns constraints for target parent are hurt. 
       // Error results in XUDY0023.
       boolean bpar = false;
-      // brep states if a ns constraint in the replace node set is hurt ...
+      // brep states if a ns constraint is hurt by the replacing node set ...
       // ... this results in XUDY0024.
       boolean brep = false;
       while(i != null) {
         if(i.type != Type.ATT) Err.or(UPWRATTR, i);
-        // check namespace constraints in replace node set (dupl. attributes...)
+        // check namespace constraints for replace node set (dupl. attributes...)
         brep = checkNS(set, (Nod) i) | brep;
         i = r.next();
       }

@@ -21,7 +21,7 @@ public final class Vars extends ExprInfo {
   public int size;
 
   /**
-   * Indexes the specified variable name and returns its id.
+   * Indexes the specified variable name.
    * @param v variable
    */
   void add(final Var v) {

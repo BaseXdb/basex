@@ -1906,7 +1906,7 @@ public class QueryParser extends InputParser {
       name = simple(check(expr(), NOTAGNAME));
       check(BRACE2);
     }
-
+    
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = simple(expr());
     check(BRACE2);
@@ -2614,7 +2614,7 @@ public class QueryParser extends InputParser {
   private Expr transform() throws QueryException {
     if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
 
-    ForLet[] fl = {};
+    For[] fl = {};
     do {
       final Var v = new Var(varName());
       check(ASSIGN);
@@ -2629,8 +2629,6 @@ public class QueryParser extends InputParser {
     check(RETURN);
     final Expr r = simple(check(single(), INCOMPLETE));
 
-    // [LK] missing.. ;)
-    error(UPIMPL);
     return new Transform(fl, m, r);
   }
 
