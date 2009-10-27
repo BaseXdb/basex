@@ -485,9 +485,13 @@ public interface QueryText {
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, "Attribute must follow root element." };
 
-  /** XUDY0009: XQuery Update dynamic exception. */
-  // [LK] CG: dummy error for various unspecified exceptions
-  Object[] UPDATE = { XUDY, 0, "Update error." };
+  // [LK] CG: dummy errors for various unspecified exceptions
+  /** XUDY0000: XQuery Update dynamic exception. */
+  Object[] UPMISS1 = { XUDY, 1, "Replace error (1)." };
+  /** XUDY0000: XQuery Update dynamic exception. */
+  Object[] UPMISS2 = { XUDY, 2, "Replace error (2)." };
+  /** XUDY0000: XQuery Update dynamic exception. */
+  Object[] UPMISS3 = { XUDY, 3, "Replace error (3)." };
 
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
@@ -532,7 +536,7 @@ public interface QueryText {
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
 
   /** XUST0000: Parsing exception. */
-  Object[] UPIMPL = { XUST, 0, "Update feature not implemented yet." };
+  Object[] UPIMPL = { XUST, 0, "Transform expression not implemented yet." };
   /** XUST0001: Parsing exception. */
   Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
   /** XUST0002: Parsing exception. */

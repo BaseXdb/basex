@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.Nod;
 
 /**
  * Fragment constructor.
@@ -16,6 +18,9 @@ public abstract class CFrag extends Arr {
   public CFrag(final Expr... n) {
     super(n);
   }
+
+  @Override
+  public abstract Nod atomic(final QueryContext ctx) throws QueryException;
 
   @Override
   public final boolean uses(final Use u, final QueryContext ctx) {

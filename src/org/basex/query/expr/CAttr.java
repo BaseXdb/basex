@@ -49,7 +49,7 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public FAttr atomic(final QueryContext ctx) throws QueryException {
     final Item it = atn.atomic(ctx);
     if(it == null) Err.empty(this);
     final QNm name = name(ctx, it);

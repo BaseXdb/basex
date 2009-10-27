@@ -81,10 +81,10 @@ public final class Insert extends Arr {
 
     if(aSeq.size() > 0) {
       if(before || after) {
-        if(par.type == Type.DOC) Err.or(UPATTDOC, this);
+        if(par.type != Type.ELM) Err.or(UPATTDOC, this);
         ctx.updates.addPrimitive(new InsertAttribute(par, aSeq, -1));
       } else {
-        if(n.type == Type.DOC) Err.or(UPWRTRGTYP2, this);
+        if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
         ctx.updates.addPrimitive(new InsertAttribute(n, aSeq, -1));
       }
     }

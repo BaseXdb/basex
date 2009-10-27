@@ -60,7 +60,7 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public FElem atomic(final QueryContext ctx) throws QueryException {
     final Item it = tag.atomic(ctx);
     if(it == null) Err.empty(CElem.this);
     final int s = ctx.ns.size();
@@ -86,7 +86,7 @@ public final class CElem extends CFrag {
     ctx.ns.size(s);
     return node;
   }
-
+  
   @Override
   public Expr remove(final Var v) {
     tag = tag.remove(v);

@@ -23,7 +23,7 @@ public final class CText extends CFrag {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public FTxt atomic(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
     Item it = iter.next();
     if(it == null) return null;

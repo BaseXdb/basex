@@ -31,7 +31,7 @@ public final class CDoc extends CFrag {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public FDoc atomic(final QueryContext ctx) throws QueryException {
     final NodIter nodes = new NodIter();
     final Iter iter = ctx.iter(expr[0]);
     final byte[] base = Token.EMPTY;

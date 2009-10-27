@@ -39,29 +39,33 @@ public final class TypeSwitch extends Expr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     ts = checkUp(ts, ctx).comp(ctx);
 
-    final Expr[] tmp = new Expr[cs.length];
-    for(int i = 0; i < cs.length; i++) tmp[i] = cs[i].expr;
-    List.updating(ctx, tmp);
-
-    for(int c = 0; c < cs.length; c++) {
-      if(ts.i() && cs[c].var.type != null) {
-        if(cs[c].var.type.instance(ts.iter(ctx))) {
-          // pre-evaluate result
-          final Expr e = cs[c].comp(ctx, (Item) ts).expr;
-          ctx.compInfo(OPTPRE, this);
-          return e;
-        }
-        // remove case that never yield a result
-        cs = Array.delete(cs, c);
-      } else {
-        cs[c] = cs[c].comp(ctx);
-      }
-    }
+    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].comp(ctx);
 
     boolean em = true;
-    for(final Expr t : tmp) em &= t.e();
-    if(em) ctx.compInfo(OPTTRUE);
-    return em ? Seq.EMPTY : this;
+    final Expr[] tmp = new Expr[cs.length];
+    for(int i = 0; i < cs.length; i++) {
+      tmp[i] = cs[i].expr;
+      em &= tmp[i].e();
+    }
+    if(em) {
+      ctx.compInfo(OPTTRUE);
+      return Seq.EMPTY;
+    }
+    List.updating(ctx, tmp);
+
+    // pre-evaluate type switch
+    if(ts.i()) {
+      for(int c = 0; c < cs.length; c++) {
+        if(cs[c].var.type != null) {
+          if(cs[c].var.type.instance(ts.iter(ctx))) {
+            ctx.compInfo(OPTPRE, this);
+            return cs[c].comp(ctx, (Item) ts).expr;
+          }
+          cs = Array.delete(cs, c);
+        }
+      }
+    }
+    return this;
   }
 
   @Override

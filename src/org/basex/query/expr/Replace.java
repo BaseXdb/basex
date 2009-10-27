@@ -68,7 +68,7 @@ public final class Replace extends Arr {
           if(tn.type == Type.ATT) Err.or(UPWRELM, i);
           if(tn.type == Type.DOC) seq.add(tn.child());
           else seq.add(tn);
-        } else Err.or(UPDATE, this);
+        } else Err.or(UPMISS1, this);
         i = r.next();
       }
       seq.reset();
@@ -110,13 +110,13 @@ public final class Replace extends Arr {
       // [LK] if value is replaced source expression is evaluated like a
       // text node constructor
       i = r.next();
-      if(i == null) Err.or(UPDATE, this);
+      if(i == null) Err.or(UPMISS2, this);
       if(i.type.num || i.type.str)
         ctx.updates.addPrimitive(n.type == Type.ELM ? 
           new ReplaceElemContentPrimitive(n, i.str()) :
           new ReplaceValuePrimitive(n, i.str()));
       
-      else Err.or(UPDATE, this);
+      else Err.or(UPMISS3, this);
     }
     return Iter.EMPTY;
   }

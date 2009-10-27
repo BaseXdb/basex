@@ -5,12 +5,13 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
+import org.basex.util.Atts;
 
 /**
  * Rename expression.
@@ -27,32 +28,31 @@ public final class Rename extends Arr {
   public Rename(final Expr tg, final Expr n) {
     super(tg, n);
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter t = SeqIter.get(expr[0].iter(ctx));
-    Item i = t.next();
-    
+    final Item i = t.next();
+
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, this);
-    if(!(i instanceof Nod) || t.size() != 1) Err.or(UPWRTRGTYP, this);
-    final Nod n = (Nod) i;
-    if(n.type != Type.ELM && n.type != Type.ATT && n.type != Type.PI)
-      Err.or(UPWRTRGTYP, this);
+    if(t.size() != 1) Err.or(UPWRTRGTYP, this);
 
-    // check new name constraints
-    final Iter na = SeqIter.get(expr[1].iter(ctx));
-    i = na.next();
-    // [LK] temporary solution, use parts of node constructor in parser?
-    byte[] name = Token.token("");
-    if(i == null) Err.or(UPDATE, this);
-    if(i.type.num || i.type.str) name = i.str();
-    if(name.length == 0) Err.or(UPDATE, this);
-    ctx.updates.addPrimitive(new RenamePrimitive(n, name));
-    
+    CFrag ex = null;
+    if(i.type == Type.ELM) {
+      ex = new CElem(expr[1], new Expr[0], new Atts());
+    } else if(i.type == Type.ATT) {
+      ex = new CAttr(expr[1], new Expr[0], false);
+    } else if(i.type == Type.PI) {
+      ex = new CPI(expr[1], Seq.EMPTY);
+    } else {
+      Err.or(UPWRTRGTYP, this);
+    }
+    ctx.updates.addPrimitive(
+        new RenamePrimitive((Nod) i, ex.atomic(ctx).qname().ln()));
     return Iter.EMPTY;
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.UPD || super.uses(u, ctx);
