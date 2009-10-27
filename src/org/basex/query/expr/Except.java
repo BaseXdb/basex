@@ -1,14 +1,17 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
+import org.basex.util.Array;
 
 /**
  * Except expression.
@@ -24,6 +27,18 @@ public final class Except extends Arr {
    */
   public Except(final Expr[] e) {
     super(e);
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    final int el = expr.length;
+    for(int e = 0; e != expr.length; e++) {
+      if(checkUp(expr[e], ctx).e() && e != 0) expr = Array.delete(expr, e--);
+    }
+    final boolean em = expr[0].e();
+    if(el != expr.length || em) ctx.compInfo(OPTEMPTY);
+    return em ? Seq.EMPTY : this;
   }
 
   @Override

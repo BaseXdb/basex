@@ -17,7 +17,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class Delete extends Single {
+public final class Delete extends Update {
   /**
    * Constructor.
    * @param r return expression
@@ -28,7 +28,7 @@ public final class Delete extends Single {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter t = SeqIter.get(expr.iter(ctx));
+    final Iter t = SeqIter.get(expr[0].iter(ctx));
     Item i = t.next();
     while(i != null) {
       if(!(i instanceof Nod)) Err.or(UPTRGDELEMPT, this);
@@ -39,12 +39,7 @@ public final class Delete extends Single {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD || super.uses(u, ctx);
-  }
-
-  @Override
   public String toString() {
-    return DELETE + ' ' + NODES + ' ' + expr;
+    return DELETE + ' ' + NODES + ' ' + expr[0];
   }
 }

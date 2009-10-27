@@ -50,7 +50,7 @@ public final class Ord extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(expr != null) expr = expr.comp(ctx);
+    if(expr != null) expr = checkUp(expr, ctx).comp(ctx);
     return this;
   }
 

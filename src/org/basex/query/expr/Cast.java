@@ -35,7 +35,7 @@ public final class Cast extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!expr.i()) return this;
+    if(!checkUp(expr, ctx).i()) return this;
     ctx.compInfo(OPTPRE, this);
     final Item it = atomic(ctx);
     return it != null ? it : Seq.EMPTY;

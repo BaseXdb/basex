@@ -33,7 +33,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public Catch comp(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
     for(final Var v : var) ctx.vars.add(v);
     super.comp(ctx);

@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -19,7 +21,7 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class Rename extends Arr {
+public final class Rename extends Update {
   /**
    * Constructor.
    * @param tg target expression
@@ -54,12 +56,7 @@ public final class Rename extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD || super.uses(u, ctx);
-  }
-
-  @Override
   public String toString() {
-    return null;
+    return RENAME + "...";
   }
 }

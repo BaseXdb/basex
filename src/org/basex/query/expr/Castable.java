@@ -34,7 +34,7 @@ public final class Castable extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!expr.i()) return this;
+    if(!checkUp(expr, ctx).i()) return this;
     final Item ok = atomic(ctx);
     ctx.compInfo(ok == Bln.TRUE ? OPTTRUE : OPTFALSE, this);
     return ok;

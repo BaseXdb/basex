@@ -31,6 +31,13 @@ public final class CDoc extends CFrag {
   }
 
   @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    checkUp(expr[0], ctx);
+    return this;
+  }
+
+  @Override
   public FDoc atomic(final QueryContext ctx) throws QueryException {
     final NodIter nodes = new NodIter();
     final Iter iter = ctx.iter(expr[0]);

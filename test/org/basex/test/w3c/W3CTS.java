@@ -245,12 +245,13 @@ public abstract class W3CTS {
     final Nodes nodes = nodes("//*:test-case", root);
     //final Nodes nodes = nodes(
     //  "//*:test-group[starts-with(@name, 'Minimal')]//*:test-case", root);
-    final int total = nodes.size();
+    int total = nodes.size();
     for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(!verbose && t % 1000 == 0) Main.out(".");
     }
     Main.outln();
+    total = ok + ok2 + err + err2;
 
     final String time = perf.getTimer();
     Main.outln("Writing log file..." + NL);

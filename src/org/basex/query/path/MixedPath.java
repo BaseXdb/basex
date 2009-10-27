@@ -41,6 +41,7 @@ public final class MixedPath extends Path {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    for(final Expr e : step) checkUp(e, ctx);
     if(root instanceof Context) root = null;
 
     final Item ci = ctx.item;

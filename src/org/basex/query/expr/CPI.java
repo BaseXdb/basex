@@ -35,7 +35,7 @@ public final class CPI extends CFrag {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(expr[0].e()) Err.empty(this);
+    if(checkUp(expr[0], ctx).e()) Err.empty(this);
     return this;
   }
 

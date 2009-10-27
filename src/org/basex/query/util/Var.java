@@ -67,7 +67,7 @@ public final class Var extends Expr {
 
   @Override
   public Var comp(final QueryContext ctx) throws QueryException {
-    if(expr != null) bind(expr.comp(ctx), ctx);
+    if(expr != null) bind(checkUp(expr, ctx).comp(ctx), ctx);
     return this;
   }
 

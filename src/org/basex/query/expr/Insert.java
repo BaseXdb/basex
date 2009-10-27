@@ -26,7 +26,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class Insert extends Arr {
+public final class Insert extends Update {
   /** First flag. */
   final boolean first;
   /** Last flag. */
@@ -53,7 +53,7 @@ public final class Insert extends Arr {
     before = b;
     after = a;
   }
-
+  
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
@@ -102,11 +102,6 @@ public final class Insert extends Arr {
       ctx.updates.addPrimitive(up);
     }
     return Iter.EMPTY;
-  }
-
-  @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD || super.uses(u, ctx);
   }
 
   @Override

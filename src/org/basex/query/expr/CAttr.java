@@ -44,7 +44,7 @@ public final class CAttr extends CFrag {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    atn = atn.comp(ctx);
+    atn = checkUp(atn, ctx).comp(ctx);
     return this;
   }
 

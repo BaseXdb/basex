@@ -26,7 +26,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class Replace extends Arr {
+public final class Replace extends Update {
   /** 'Value of' flag. */
   private final boolean value;
 
@@ -131,11 +131,6 @@ public final class Replace extends Arr {
     if(n instanceof FNode) return !s.add(Token.string(((FNode) n).nname()));
     final DBNode dn = (DBNode) n;
     return !s.add(Token.string(dn.data.attName(dn.pre)));
-  }
-
-  @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD || super.uses(u, ctx);
   }
 
   @Override

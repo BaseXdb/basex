@@ -30,7 +30,10 @@ public final class Try extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int c = 0; c < ctch.length; c++) ctch[c] = (Catch) ctch[c].comp(ctx);
+    for(int c = 0; c < ctch.length; c++) {
+      ctch[c] = ((Catch) checkUp(ctch[c], ctx)).comp(ctx);
+    }
+    checkUp(expr, ctx);
     return super.comp(ctx);
   }
 

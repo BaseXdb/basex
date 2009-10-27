@@ -35,7 +35,7 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    weight = weight.comp(ctx);
+    weight = checkUp(weight, ctx).comp(ctx);
     return super.comp(ctx);
   }
 

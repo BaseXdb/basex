@@ -29,6 +29,7 @@ public final class Range extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
 
     Expr e = this;
     if(expr[0].e() || expr[1].e()) {

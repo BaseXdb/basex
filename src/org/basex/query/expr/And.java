@@ -27,6 +27,8 @@ public final class And extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
+
     for(int e = 0; e < expr.length; e++) {
       if(!expr[e].i()) continue;
 

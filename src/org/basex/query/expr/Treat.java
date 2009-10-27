@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -33,6 +34,14 @@ public final class Treat extends Single {
     seq = s;
   }
 
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    if(!checkUp(expr, ctx).i()) return this;
+    ctx.compInfo(OPTPRE, this);
+    return atomic(ctx);
+  }
+  
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr);

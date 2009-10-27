@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 
 /**
@@ -33,10 +34,16 @@ public final class If extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     List.updating(ctx, new Expr[] { expr[1], expr[2] });
-    if(!expr[0].i()) return this;
-    // static result: return then or else branch
-    final Expr e = expr[((Item) expr[0]).bool() ? 1 : 2];
-    ctx.compInfo(OPTSIMPLE, this, e);
+    
+    Expr e = this;
+    if(checkUp(expr[0], ctx).i()) {
+      // static result: return then or else branch
+      e = expr[((Item) expr[0]).bool() ? 1 : 2];
+    } else if(expr[1].e() && expr[2].e()) {
+      // both branches are empty
+      e = Seq.EMPTY;
+    }
+    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 

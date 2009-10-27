@@ -148,6 +148,7 @@ public class AxisPath extends Path {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    for(final Step s : step) checkUp(s, ctx);
     if(root instanceof Context) root = null;
 
     // merge two axis paths

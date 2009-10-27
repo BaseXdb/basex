@@ -38,8 +38,8 @@ public class Pred extends Preds {
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
+    root = checkUp(root, ctx).comp(ctx);
     if(super.comp(ctx) != this) return Seq.EMPTY;
-    root = root.comp(ctx);
 
     if(root.e()) {
       ctx.compInfo(OPTPRE, this);

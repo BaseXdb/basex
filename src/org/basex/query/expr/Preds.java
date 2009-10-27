@@ -32,6 +32,8 @@ public abstract class Preds extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    for(final Expr e : pred) checkUp(e, ctx);
+    
     final Item ci = ctx.item;
     final Type ct = ci != null ? ci.type : null;
     // predicates will not necessarily start from the document node..

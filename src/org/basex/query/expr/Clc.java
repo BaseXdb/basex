@@ -34,13 +34,11 @@ public final class Clc extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
 
-    final Expr e1 = expr[0];
-    final Expr e2 = expr[1];
+    final Expr e = expr[0].i() && expr[1].i() ? atomic(ctx) :
+      expr[0].e() || expr[1].e() ? Seq.EMPTY : this;
 
-    Expr e = this;
-    if(e1.i() && e2.i()) e = atomic(ctx);
-    if(e1.e() || e2.e()) e = Seq.EMPTY;
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }

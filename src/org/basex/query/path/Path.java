@@ -30,7 +30,7 @@ public abstract class Path extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(root != null) root = root.comp(ctx);
+    if(root != null) root = checkUp(root, ctx).comp(ctx);
     return this;
   }
 

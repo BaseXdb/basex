@@ -20,6 +20,13 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
+    return this;
+  }
+
+  @Override
   public abstract Nod atomic(final QueryContext ctx) throws QueryException;
 
   @Override

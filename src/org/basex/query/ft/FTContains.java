@@ -47,7 +47,7 @@ public class FTContains extends Expr {
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
-    expr = expr.comp(ctx).addText(ctx);
+    expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
     final boolean fast = ctx.ftfast;
     ctx.ftfast &= ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);

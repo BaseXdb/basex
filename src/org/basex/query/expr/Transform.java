@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
@@ -8,6 +9,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.PendingUpdates;
 import org.basex.query.up.UpdateFunctions;
+import org.basex.query.util.Err;
 
 /**
  * Transform expression.
@@ -35,8 +37,13 @@ public final class Transform extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    for(final Let c : copies) ctx.vars.add(c.var);
+    for(final Let c : copies) {
+      checkUp(c, ctx);
+      ctx.vars.add(c.var);
+    }
     super.comp(ctx);
+    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
+    checkUp(expr[1], ctx);
     ctx.vars.reset(s);
     return this;
   }

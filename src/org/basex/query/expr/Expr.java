@@ -296,7 +296,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Adds a text to an expression.
+   * Optionally adds a text node to an expression for potential index rewriting.
    * @param ctx query context
    * @return expression
    * @throws QueryException query exception

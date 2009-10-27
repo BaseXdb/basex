@@ -32,7 +32,7 @@ public final class InterSect extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     for(final Expr e : expr) {
-      if(e.e()) {
+      if(checkUp(e, ctx).e()) {
         ctx.compInfo(OPTSIMPLE, this, e);
         return Seq.EMPTY;
       }
