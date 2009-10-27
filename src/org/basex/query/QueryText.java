@@ -508,6 +508,9 @@ public interface QueryText {
   Object[] UPSEQEMP = { XUDY, 27, "Target expression empty." };
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
+  /** XUDY0030: XQuery Update dynamic exception. */
+  Object[] UPATTDOC = { XUDY, 30,
+      "Attribute cannot be inserted after/before a document node." };
 
   /** XUTY0004: XQuery Update dynamic exception. */
   Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
@@ -515,14 +518,14 @@ public interface QueryText {
   Object[] UPTRGTYP = { XUTY, 5, "Wrong type of target node." };
   /** XUTY0006: XQuery Update dynamic exception. */
   Object[] UPTRGTYP2 = { XUTY, 6, "Wrong type of target node." };
-  /** XUTY0006: XQuery Update dynamic exception. */
+  /** XUTY0007: XQuery Update dynamic exception. */
   Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
   /** XUTY0008: XQuery Update dynamic exception. */
   Object[] UPTRGMULT = { XUTY, 8, "Target result must be a single node." };
-  /** XUTY0010: XQuery Update dynamic exception. */
-  Object[] UPWRATTR = { XUTY, 10, "Replace nodes must be attribute nodes." };
-  /** XUTY0010: XQuery Update dynamic exception. */
+  /** XUTY0011: XQuery Update dynamic exception. */
   Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
+  /** XUTY0010: XQuery Update dynamic exception. */
+  Object[] UPWRATTR = { XUTY, 11, "Replace nodes must be attribute nodes." };
   /** XUTY0012: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP = { XUTY, 12, "Wrong target type." };
   /** XUTY0022: XQuery Update dynamic exception. */

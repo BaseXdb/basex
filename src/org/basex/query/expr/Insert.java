@@ -67,22 +67,21 @@ public final class Insert extends Arr {
 
     Item i = t.next();
     if(i == null) Err.or(UPSEQEMP, this);
-    if(!(i instanceof Nod) || t.size() > 1) Err.or(UPTRGTYP, this);
+    if(!(i instanceof Nod) || t.size() > 1)
+      Err.or(before || after ? UPTRGTYP2 : UPTRGTYP, this);
 
     final Nod n = (Nod) i;
-
+    final Nod par = n.parent();
     if(before || after) {
-      if(n.type == Type.ATT) Err.or(UPTRGTYP2, this);
-      if(n.parent() == null) Err.or(UPPAREMPTY, this);
+      if(n.type == Type.ATT || n.type == Type.DOC) Err.or(UPTRGTYP2, this);
+      if(par == null) Err.or(UPPAREMPTY, this);
     } else {
       if(n.type != Type.ELM && n.type != Type.DOC) Err.or(UPTRGTYP, this);
     }
 
-    final Nod par = n.parent();
     if(aSeq.size() > 0) {
       if(before || after) {
-        if(par == null) Err.or(UPDATE, this);
-        if(par.type == Type.DOC) Err.or(UPWRTRGTYP2, this);
+        if(par.type == Type.DOC) Err.or(UPATTDOC, this);
         ctx.updates.addPrimitive(new InsertAttribute(par, aSeq, -1));
       } else {
         if(n.type == Type.DOC) Err.or(UPWRTRGTYP2, this);

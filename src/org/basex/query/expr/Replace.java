@@ -48,7 +48,8 @@ public final class Replace extends Arr {
     
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, i);
-    if(t.size() > 1 || !(i instanceof Nod)) Err.or(UPTRGMULT, i);
+    if(t.size() > 1 || !(i instanceof Nod) || i.type == Type.DOC) 
+      Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
     final Nod p = n.parent();
     final boolean a = n.type == Type.ATT;
