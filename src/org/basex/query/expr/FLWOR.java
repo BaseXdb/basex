@@ -63,43 +63,47 @@ public class FLWOR extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    checkUp(where, ctx);
+    
     final int vs = ctx.vars.size();
-
     for(int f = 0; f != fl.length; f++) {
       // disable fast ftcontains evaluation if score value exists
       final boolean fast = ctx.ftfast;
       ctx.ftfast &= fl[f].standard();
       final Expr e = fl[f].comp(ctx);
+      fl[f] = e == Seq.EMPTY ? null : (ForLet) e; 
       ctx.ftfast = fast;
-
-      if(e.e()) {
-        ctx.vars.reset(vs);
-        ctx.compInfo(OPTFLWOR);
-        return e;
-      }
-      fl[f] = (ForLet) e;
     }
-
+    
+    boolean em = false;
     if(where != null) {
-      where = where.comp(ctx);
-      final boolean e = where.e();
-      if(e || where.i()) {
+      where = checkUp(where, ctx).comp(ctx);
+      em = where.e();
+      if(!em && where.i()) {
         // test is always false: no results
-        if(e || !((Item) where).bool()) {
-          ctx.compInfo(OPTFALSE, where);
-          ctx.vars.reset(vs);
-          return Seq.EMPTY;
+        em = !((Item) where).bool();
+        if(!em) {
+          // always true: test can be skipped
+          ctx.compInfo(OPTTRUE, where);
+          where = null;
         }
-        // always true: test can be skipped
-        ctx.compInfo(OPTTRUE, where);
-        where = null;
       }
     }
     if(group != null) group.comp(ctx);
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
-
     ctx.vars.reset(vs);
+
+    if(em) {
+      ctx.compInfo(OPTFALSE, where);
+      return Seq.EMPTY;
+    }
+    for(final ForLet e : fl) {
+      if(e == null) {
+        ctx.compInfo(OPTFLWOR);
+        return Seq.EMPTY;
+      }
+    }
     return this;
   }
 

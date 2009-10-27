@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -36,7 +37,7 @@ public final class Let extends ForLet {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    expr = expr.comp(ctx);
+    expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if expression uses no var, pos, ctx or fragment
     if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
@@ -46,9 +47,8 @@ public final class Let extends ForLet {
     } else {
       var.ret = expr.returned(ctx);
     }
-
     ctx.vars.add(var);
-    return this;
+    return expr.e() ? Seq.EMPTY : this;
   }
 
   @Override

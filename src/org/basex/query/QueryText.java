@@ -561,6 +561,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFLWOR = "Simplifying FLWOR expression";
   /** Optimization info. */
+  String OPTTYPE = "Simplifying Typeswitch expression.)";
+  /** Optimization info. */
   String OPTWHERE = "Converting where clause to predicate";
   /** Optimization info. */
   String OPTVAR = "Removing variable %";

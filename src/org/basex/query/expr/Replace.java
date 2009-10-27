@@ -139,7 +139,7 @@ public final class Replace extends Arr {
 
   @Override
   public String toString() {
-    return REPLACE + (value ? VALUEE + OF : "") + NODE + expr[0] +
-    WITH + expr[1];
+    return REPLACE + ' ' + (value ? VALUEE + ' ' + OF : "") +
+      ' ' + NODE +  ' ' + expr[0] + ' ' + WITH + ' ' + expr[1];
   }
 }

@@ -1,12 +1,15 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.Token;
 
 /**
  * Case expression.
@@ -16,7 +19,7 @@ import org.basex.query.util.Var;
  */
 public final class Case extends Single {
   /** Variable. */
-  private final Var var;
+  final Var var;
 
   /**
    * Constructor.
@@ -29,7 +32,35 @@ public final class Case extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  public Case comp(final QueryContext ctx) throws QueryException {
+    if(var.name == null) {
+      super.comp(ctx);
+    } else {
+      final int s = ctx.vars.size();
+      ctx.vars.add(var);
+      super.comp(ctx);
+      ctx.vars.reset(s);
+    }
+    return this;
+  }
+
+  /**
+   * Compiles the expression.
+   * @param ctx query context
+   * @param it item to be bound
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  public Case comp(final QueryContext ctx, final Item it)
+      throws QueryException {
+    if(var.name == null) {
+      super.comp(ctx);
+    } else {
+      final int s = ctx.vars.size();
+      ctx.vars.add(var.bind(it, ctx).copy());
+      super.comp(ctx);
+      ctx.vars.reset(s);
+    }
     return this;
   }
 
@@ -45,14 +76,14 @@ public final class Case extends Single {
   }
 
   /**
-   * Evaluates the given sequence.
+   * Evaluates the expression.
    * @param ctx query context
    * @param seq sequence to be checked
    * @return resulting item
    * @throws QueryException query exception
    */
   Iter iter(final QueryContext ctx, final Iter seq) throws QueryException {
-    if(!var.type.instance(seq)) return null;
+    if(var.type != null && !var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
@@ -69,13 +100,14 @@ public final class Case extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name.str());
+    ser.openElement(this, VAR, var.name != null ? var.name.str() : Token.EMPTY);
     expr.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return CASE + " " + var.type + " " + RETURN + " " + expr;
+    return (var.type == null ? DEFAULT : CASE + ' ' + var) +
+        ' ' + RETURN + ' ' + expr;
   }
 }

@@ -45,11 +45,11 @@ public final class BaseXClient extends BaseX {
     if(session == null) {
       String pw = null;
       // user/password input
-      while(user == null || user.length() == 0) {
+      while(user == null) {
         Main.out(SERVERUSER + COLS);
         user = System.console().readLine();
       }
-      while(pw == null || pw.length() == 0) {
+      while(pw == null) {
         Main.out(SERVERPW + COLS);
         pw = new String(System.console().readPassword());
       }

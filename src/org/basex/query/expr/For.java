@@ -43,8 +43,7 @@ public final class For extends ForLet {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     // empty sequence - empty loop
-    expr = expr.comp(ctx);
-    if(expr.e()) return Seq.EMPTY;
+    expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if single value is returned and if no variables are used
     if(pos == null && score == null && expr.returned(ctx).single &&
@@ -67,7 +66,7 @@ public final class For extends ForLet {
       ctx.vars.add(score);
       score.ret = Return.NUM;
     }
-    return this;
+    return expr.e() ? Seq.EMPTY : this;
   }
 
   @Override

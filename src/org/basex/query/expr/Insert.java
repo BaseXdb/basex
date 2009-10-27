@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -63,6 +64,7 @@ public final class Insert extends Arr {
 
     // check target constraints
     final Iter t = SeqIter.get(expr[0].iter(ctx));
+
     Item i = t.next();
     if(i == null) Err.or(UPSEQEMP, this);
     if(!(i instanceof Nod) || t.size() > 1) Err.or(UPTRGTYP, this);
@@ -110,6 +112,6 @@ public final class Insert extends Arr {
 
   @Override
   public String toString() {
-    return null;
+    return INSERT + ' ' + NODE + ' ' + expr[1] + ' ' + INTO + ' ' + expr[0];
   }
 }

@@ -32,6 +32,7 @@ public final class If extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    List.updating(ctx, new Expr[] { expr[1], expr[2] });
     if(!expr[0].i()) return this;
     // static result: return then or else branch
     final Expr e = expr[((Item) expr[0]).bool() ? 1 : 2];

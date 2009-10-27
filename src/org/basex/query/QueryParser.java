@@ -701,24 +701,7 @@ public class QueryParser extends InputParser {
       final Expr ex = single();
       if(!ex.e()) list = add(list, ex);
     } while(consumeWS2(COMMA));
-    updating(list);
     return list.length == 1 ? e : new List(list);
-  }
-
-  /**
-   * Returns if the specified expressions are updating or vacuous.
-   * @param expr expression array
-   * @throws QueryException query exception
-   */
-  private void updating(final Expr[] expr) throws QueryException {
-    if(!ctx.updating) return;
-    int s = 0;
-    for(final Expr e : expr) {
-      if(e.v()) continue;
-      final boolean u = e.uses(Use.UPD, ctx);
-      if(u && s == 2 || !u && s == 1) error(UPNOT);
-      s = u ? 1 : 2;
-    }
   }
 
   /**
@@ -771,7 +754,7 @@ public class QueryParser extends InputParser {
     Expr where = null;
     if(consumeWS(WHERE)) {
       ap = qp;
-      where = simple(check(single(), NOWHERE));
+      where = check(single(), NOWHERE);
       alter = NOWHERE;
     }
 
@@ -837,7 +820,7 @@ public class QueryParser extends InputParser {
         final Var sc = fr && consumeWS(SCORE) ? new Var(varName()) : null;
 
         check(fr ? IN : ASSIGN);
-        final Expr e = simple(check(single(), VARMISSING));
+        final Expr e = check(single(), VARMISSING);
         ctx.vars.add(var);
 
         if(fl == null) fl = new ForLet[1];
@@ -937,44 +920,30 @@ public class QueryParser extends InputParser {
   private Expr typeswitch() throws QueryException {
     if(!consumeWS(TYPESWITCH, PAR1, TYPEPAR)) return null;
     check(PAR1);
-    final Expr e = simple(check(expr(), NOTYPESWITCH));
+    final Expr ts = check(expr(), NOTYPESWITCH);
     check(PAR2);
 
     Case[] cases = {};
-    Expr[] list = {};
-    while(consumeWS(CASE)) {
-      final int s = ctx.vars.size();
+    final int s = ctx.vars.size();
+    boolean cs = true;
+    do {
+      cs = consumeWS(CASE);
+      if(!cs) check(DEFAULT);
       skipWS();
       QNm name = null;
       if(curr() == '$') {
         name = varName();
-        check(AS);
+        if(cs) check(AS);
       }
-      final Var var = new Var(name, sequenceType(), false);
+      final Var var = new Var(name, cs ? sequenceType() : null, false);
       if(name != null) ctx.vars.add(var);
       check(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      list = add(list, ret);
       cases = Array.add(cases, new Case(var, ret));
       ctx.vars.reset(s);
-    }
-    if(cases.length == 0) error(NOTYPESWITCH);
-
-    check(DEFAULT);
-    skipWS();
-    final int s = ctx.vars.size();
-    final QNm name = curr() == '$' ? varName() : null;
-    final Var var = name != null ? new Var(name, null, false) : null;
-    if(var != null) ctx.vars.add(var);
-    check(RETURN);
-    final Expr ret = check(single(), NOTYPESWITCH);
-    list = add(list, ret);
-    updating(list);
-
-    ctx.vars.reset(s);
-    boolean em = true;
-    for(final Expr l : list) em &= l.e();
-    return em ? Seq.EMPTY : new TypeSwitch(e, cases, var, ret);
+    } while(cs);
+    if(cases.length == 1) error(NOTYPESWITCH);
+    return new TypeSwitch(ts, cases);
   }
 
   /**
@@ -991,7 +960,6 @@ public class QueryParser extends InputParser {
     final Expr thn = check(single(), NOIF);
     if(!consumeWS(ELSE)) error(NOIF);
     final Expr els = check(single(), NOIF);
-    updating(new Expr[] { thn, els });
     return thn.e() && els.e() ? Seq.EMPTY : new If(e, thn, els);
   }
 

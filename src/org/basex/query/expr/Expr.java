@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.core.Main;
 import org.basex.query.ExprInfo;
 import org.basex.query.IndexContext;
@@ -222,6 +223,19 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public boolean sameAs(final Expr cmp) {
     return false;
+  }
+
+  /**
+   * Checks if the specified expressions is no updating expression.
+   * @param e expression
+   * @param ctx query context
+   * @return expression
+   * @throws QueryException query exception
+   */
+  protected Expr checkUp(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    if(e != null && ctx.updating && e.uses(Use.UPD, ctx)) Err.or(UPNOT);
+    return e;
   }
 
   /**
