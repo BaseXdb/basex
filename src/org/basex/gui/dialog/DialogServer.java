@@ -163,8 +163,8 @@ public final class DialogServer extends Dialog {
     // Login panel.
     final BaseXBack p12 = new BaseXBack();
     p12.setLayout(new TableLayout(6, 2, 2, 2));
-    p12.add(new BaseXLabel("Login:", false, true));
-    p12.add(new BaseXLabel("  "));
+    p12.add(new BaseXLabel(LOGIN + COLS, false, true));
+    p12.add(new BaseXLabel(" "));
     p12.add(new BaseXLabel(SERVERUSER + COLS));
     loguser = new BaseXTextField("", null, this);
     loguser.addKeyListener(keys);
@@ -178,7 +178,7 @@ public final class DialogServer extends Dialog {
     p12.add(host);
     p12.add(new BaseXLabel(PORT + COLS));
     p12.add(port);
-    p12.add(new BaseXLabel("  "));
+    p12.add(new BaseXLabel(" "));
     p12.add(connect);
     
     // adding to main panel
@@ -334,18 +334,23 @@ public final class DialogServer extends Dialog {
         err2 = ALTERPW + FAILED + e.getMessage();
         Main.debug(e);
       }
+    } else if(BUTTONCONNECT.equals(cmd)) {
+      //[AW] to be implemented...
     }
     final boolean run = cs == null;
+    //[AW] to be revised...
     stop.setEnabled(!run);
-    host.setEnabled(run);
     portl.setEnabled(run);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
-    boolean valp = portl.getText().matches("^[0-9]{2,5}$");
-    start.setEnabled(run && valp && valh);
-    if(!valp || !valh) {
+    boolean valpl = portl.getText().matches("^[0-9]{2,5}$");
+    boolean valp = port.getText().matches("^[0-9]{2,5}$");
+    start.setEnabled(run && valpl);
+    if(!valpl || !valh || !valp) {
       infop1.setIcon(BaseXLayout.icon("warn"));
       if(!valh) {
         infop1.setText(HOST + INVALID);
+      } else if(!valpl) {
+        infop1.setText(LOCAL + PORT + INVALID);
       } else {
         infop1.setText(PORT + INVALID);
       }
