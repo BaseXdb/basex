@@ -114,9 +114,9 @@ public interface Text {
   /** Login error. */
   String SERVERLOGIN = lang("srv_login");
   /** User name. */
-  String SERVERUSER = lang("srv_user") + COLS;
+  String SERVERUSER = lang("srv_user");
   /** Password. */
-  String SERVERPW = lang("srv_pw") + COLS;
+  String SERVERPW = lang("srv_pw");
   
 
   /** Start information. */

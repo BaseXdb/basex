@@ -347,15 +347,21 @@ public final class DialogServer extends Dialog {
    */
   void setData() {
     fillLists();
-    ((TableModel) table.getModel()).fireTableChanged(null);
     userco1.removeAllItems();
     userco2.removeAllItems();
+    StringList tmp = new StringList();
     for(final StringList o : data.contents) {
-      userco2.addItem(o.get(0));
-      if(!o.get(0).equals(ADMIN)) {
-        userco1.addItem(o.get(0));
+      String check = o.get(0);
+      if(!check.equals(ADMIN)) {
+        userco1.addItem(check);
+        userco2.addItem(check);
+      } else {
+        userco2.addItem(check);
+        tmp = o;
       }
     }
+    data.contents.remove(tmp);
+    ((TableModel) table.getModel()).fireTableChanged(null);
   }
 
   /**
