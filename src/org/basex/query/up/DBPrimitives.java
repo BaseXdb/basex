@@ -69,7 +69,7 @@ public final class DBPrimitives {
     Arrays.sort(p);
     for(int i = l - 1; i >= 0; i--) {
       final UpdatePrimitive[] pl = op.get(p[i]);
-      // fragment constraints need to be checked
+      // w3c wants us to check fragment constraints
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
       if(f) return;
       int add = 0;

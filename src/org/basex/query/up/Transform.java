@@ -2,6 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,6 +12,7 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -61,7 +63,8 @@ public final class Transform extends Arr {
 
     final PendingUpdates upd = ctx.updates;
     ctx.updates = new PendingUpdates();
-    ctx.iter(expr[0]).next();
+    final Iter it = ctx.iter(expr[0]);
+    while(it.next() != null);
     ctx.updates.apply();
     ctx.updates = upd;
 
