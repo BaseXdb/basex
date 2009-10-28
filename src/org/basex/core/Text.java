@@ -1060,6 +1060,8 @@ public interface Text {
   String BUTTONSTOSERV = lang("b_stoserv");
   /** Button for connecting. */
   String BUTTONCONNECT = lang("b_connect");
+  /** Button for disconnecting. */
+  String BUTTONDISCONNECT = lang("b_disconnect");
 
   // STATUS BAR ===============================================================
 

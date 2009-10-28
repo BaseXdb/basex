@@ -39,6 +39,7 @@ b_alter=Abändern
 b_staserv=Starte Server
 b_stoserv=Stop Server
 b_connect=Verbinden
+b_disconnect=Trennen
 
 # Status messages
 s_ok=OK

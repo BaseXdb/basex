@@ -38,6 +38,7 @@ b_alter=Alter
 b_staserv=Start server
 b_stoserv=Stop server
 b_connect=Connect
+b_disconnect=Disconnect
 
 # Status messages
 s_ok=OK

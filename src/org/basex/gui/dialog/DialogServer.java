@@ -21,6 +21,7 @@ import org.basex.core.Process;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropUser;
+import org.basex.core.proc.Exit;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.IntStop;
 import org.basex.core.proc.Revoke;
@@ -72,6 +73,8 @@ public final class DialogServer extends Dialog {
   final BaseXButton start;
   /** Connect button. */
   final BaseXButton connect;
+  /** Disconnect button. */
+  final BaseXButton disconnect;
   /** Server host. */
   final BaseXTextField host;
   /** Local server port. */
@@ -114,6 +117,10 @@ public final class DialogServer extends Dialog {
   String err1;
   /** String for error messages. */
   String err2;
+  /** Boolean for check is server is running. */
+  boolean run;
+  /** Boolean for check if client is connected. */
+  boolean connected;
 
   /**
    * Default constructor.
@@ -137,6 +144,7 @@ public final class DialogServer extends Dialog {
     start = new BaseXButton(BUTTONSTASERV, null, this);
     stop = new BaseXButton(BUTTONSTOSERV, null, this);
     connect = new BaseXButton(BUTTONCONNECT, null, this);
+    disconnect = new BaseXButton(BUTTONDISCONNECT, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
     portl = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
         this);
@@ -179,7 +187,11 @@ public final class DialogServer extends Dialog {
     p12.add(new BaseXLabel(PORT + COLS));
     p12.add(port);
     p12.add(new BaseXLabel(" "));
-    p12.add(connect);
+    final BaseXBack p121 = new BaseXBack();
+    p121.setLayout(new TableLayout(1, 2, 2, 2));
+    p121.add(connect);
+    p121.add(disconnect);
+    p12.add(p121);
     
     // adding to main panel
     p11.setBorder(8, 8, 8, 8);
@@ -249,8 +261,10 @@ public final class DialogServer extends Dialog {
 
     // test if server is running
     try {
-      createSession();
-    } catch(final IOException e1) { }
+      run = true;
+      createSession(ADMIN, ADMIN, true);
+      cs = null;
+    } catch(final IOException e1) { run = false; }
 
     action(null);
     finish(null);
@@ -258,36 +272,43 @@ public final class DialogServer extends Dialog {
 
   /**
    * Creates a new client session.
+   * @param u username
+   * @param p password
+   * @param l boolean for local
    * @throws IOException I/O exception
    */
-  private void createSession() throws IOException {
-    cs = new ClientSession(ctx, ADMIN, ADMIN);
-    setData();
+  private void createSession(final String u, final String p, final boolean l)
+  throws IOException {
+    if(l) cs = new ClientSession(ctx, u, p);
+    cs = new ClientSession(host.getText(), Integer.parseInt(port.getText()),
+        u, p);
   }
 
   @Override
   public void action(final String cmd) {
     if(BUTTONSTASERV.equals(cmd)) {
       try {
+        final int p = Integer.parseInt(portl.getText());
+        ctx.prop.set(Prop.PORT, p);
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
         final String clazz = org.basex.BaseXServer.class.getName();
         new ProcessBuilder(
-            new String[] { "java", mem, "-cp", path, clazz, "-n",
-                host.getText() }).start();
-        createSession();
-        ctx.prop.set(Prop.HOST, host.getText());
-        final int p = Integer.parseInt(portl.getText());
-        ctx.prop.set(Prop.PORT, p);
+            new String[] { "java", mem, "-cp", path, clazz, "-p",
+                String.valueOf(p) }).start();
+        run = true;
       } catch(final Exception ex) {
         err1 = BUTTONSTASERV + FAILED + ex.getMessage();
         Main.debug(ex);
       }
     } else if(BUTTONSTOSERV.equals(cmd)) {
       try {
+        createSession(ADMIN, ADMIN, true);
         cs.execute(new IntStop(), null);
         cs = null;
+        run = false;
+        connected = false;
       } catch(final IOException ex) {
         err1 = BUTTONSTOSERV + FAILED + ex.getMessage();
         Main.debug(ex);
@@ -335,24 +356,53 @@ public final class DialogServer extends Dialog {
         Main.debug(e);
       }
     } else if(BUTTONCONNECT.equals(cmd)) {
-      //[AW] to be implemented...
+      try {
+        createSession(loguser.getText(), new String(logpass.getPassword()),
+            false);
+        connected = true;
+        setData();
+      } catch(IOException e) {
+        err1 = BUTTONCONNECT + FAILED + e.getMessage();
+        Main.debug(e);
+      }
+    } else if(BUTTONDISCONNECT.equals(cmd)) {
+      try {
+        cs.execute(new Exit());
+        loguser.setText("");
+        logpass.setText("");
+        connected = false;
+      } catch(IOException e) {
+        err1 = BUTTONDISCONNECT + FAILED + e.getMessage();
+        Main.debug(e);
+      }
     }
-    final boolean run = cs == null;
-    //[AW] to be revised...
-    stop.setEnabled(!run);
-    portl.setEnabled(run);
+    
+    stop.setEnabled(run);
+    portl.setEnabled(!run);
+    loguser.setEnabled(!connected);
+    logpass.setEnabled(!connected);
+    port.setEnabled(!connected);
+    host.setEnabled(!connected);
+    connect.setEnabled(!connected);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
     boolean valpl = portl.getText().matches("^[0-9]{2,5}$");
     boolean valp = port.getText().matches("^[0-9]{2,5}$");
-    start.setEnabled(run && valpl);
-    if(!valpl || !valh || !valp) {
+    boolean vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
+    boolean vallp = new String(
+        logpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    start.setEnabled(!run && valpl);
+    if(!valpl || !valh || !valp || !vallu || !vallp) {
       infop1.setIcon(BaseXLayout.icon("warn"));
       if(!valh) {
         infop1.setText(HOST + INVALID);
       } else if(!valpl) {
         infop1.setText(LOCAL + PORT + INVALID);
-      } else {
+      } else if(!valp) {
         infop1.setText(PORT + INVALID);
+      } else if(!vallu) {
+        infop1.setText(SERVERUSER + INVALID);
+      } else {
+        infop1.setText(SERVERPW + INVALID);
       }
     } else if(err1 != null) {
       infop1.setText(err1);
@@ -362,7 +412,7 @@ public final class DialogServer extends Dialog {
       infop1.setText(" ");
       infop1.setIcon(null);
     }
-    tabs.setEnabledAt(1, !run);
+    tabs.setEnabledAt(1, connected);
     boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
     boolean valpass = new String(
         pass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
