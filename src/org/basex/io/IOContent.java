@@ -1,6 +1,8 @@
 package org.basex.io;
 
 import java.io.ByteArrayInputStream;
+
+import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
 /**
@@ -44,5 +46,10 @@ public final class IOContent extends IO {
   @Override
   public IO merge(final IO f) {
     return f;
+  }
+
+  @Override
+  public String toString() {
+    return Token.string(cont);
   }
 }

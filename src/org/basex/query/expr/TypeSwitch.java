@@ -38,19 +38,17 @@ public final class TypeSwitch extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     ts = checkUp(ts, ctx).comp(ctx);
-
-    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].comp(ctx);
+    for(final Case c : cs) c.comp(ctx);
 
     boolean em = true;
-    final Expr[] tmp = new Expr[cs.length];
-    for(int i = 0; i < cs.length; i++) {
-      tmp[i] = cs[i].expr;
-      em &= tmp[i].e();
-    }
+    for(final Case c : cs) em &= c.e();
     if(em) {
       ctx.compInfo(OPTTRUE);
       return Seq.EMPTY;
     }
+
+    final Expr[] tmp = new Expr[cs.length];
+    for(int i = 0; i < cs.length; i++) tmp[i] = cs[i].expr;
     List.updating(ctx, tmp);
 
     // pre-evaluate type switch

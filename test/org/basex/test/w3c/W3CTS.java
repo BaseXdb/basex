@@ -28,6 +28,7 @@ import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -108,6 +109,8 @@ public abstract class W3CTS {
   private boolean reporting;
   /** Verbose flag. */
   private boolean verbose;
+  /** Debug flag. */
+  private boolean debug;
 
   /** Cached source files. */
   private final HashMap<String, String> srcs = new HashMap<String, String>();
@@ -162,6 +165,8 @@ public abstract class W3CTS {
         if(c == 'r') {
           reporting = true;
           currTime = true;
+        } else if(c == 'd') {
+          debug = true;
         } else if(c == 'p') {
           path = arg.string() + "/";
         } else if(c == 'v') {
@@ -178,6 +183,7 @@ public abstract class W3CTS {
     if(!o) {
       Main.outln(NL + Main.name(this) + " Test Suite [pat]" + NL +
           " [pat] perform only tests with the specified pattern" + NL +
+          " -d show debugging info" + NL +
           " -h show this help" + NL +
           " -p change path" + NL +
           " -r create report" + NL +
@@ -463,24 +469,33 @@ public abstract class W3CTS {
           if(xml || frag) {
             iter.reset();
 
-            String rin = result.get(s).trim();
-            if(!doc || frag) {
-              if(rin.startsWith("<?xml")) rin = rin.replaceAll("^<.*?>", "");
-              rin = "<X>" + rin + "</X>";
+            String ri = result.get(s).trim();
+            if(!doc) {
+              if(ri.startsWith("<?xml")) ri = ri.replaceAll("^<.*?>\\s*", "");
+              ri = "<X>" + ri + "</X>";
             }
 
-            final Data rdata = CreateDB.xml(IO.get(rin), context.prop);
+            final Data rdata = CreateDB.xml(IO.get(ri), context.prop);
             final SeqIter si = new SeqIter();
-            int pre = doc ? 0 : 2;
-            final int size = rdata.meta.size;
-            while(pre < size) {
-              final int k = rdata.kind(pre);
-              if(k != Data.TEXT || !ws(rdata.atom(pre))) {
-                si.add(new DBNode(rdata, pre));
-              }
-              pre += rdata.size(pre, k);
+            for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
+              si.add(new DBNode(rdata, pre));
+              pre += rdata.size(pre, rdata.kind(pre));
             }
+            
             final boolean eq = FNSeq.deep(iter, si);
+            if(!eq && debug) {
+              iter.reset();
+              si.reset();
+              final XMLSerializer ser = new XMLSerializer(
+                  new PrintOutput(System.out));
+              Item it;
+              Main.outln(NL + "=== " + testid + " ===");
+              while((it = si.next()) != null) it.serialize(ser);
+              Main.outln(NL + "=== " + NAME + " ===");
+              while((it = iter.next()) != null) it.serialize(ser);
+              Main.outln();
+            }
+
             rdata.close();
             if(eq) break;
           }

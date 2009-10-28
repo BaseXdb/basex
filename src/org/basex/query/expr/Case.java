@@ -33,15 +33,7 @@ public final class Case extends Single {
 
   @Override
   public Case comp(final QueryContext ctx) throws QueryException {
-    if(var.name == null) {
-      super.comp(ctx);
-    } else {
-      final int s = ctx.vars.size();
-      ctx.vars.add(var);
-      super.comp(ctx);
-      ctx.vars.reset(s);
-    }
-    return this;
+    return comp(ctx, null);
   }
 
   /**
@@ -57,7 +49,7 @@ public final class Case extends Single {
       super.comp(ctx);
     } else {
       final int s = ctx.vars.size();
-      ctx.vars.add(var.bind(it, ctx).copy());
+      ctx.vars.add(it == null ? var : var.bind(it, ctx).copy());
       super.comp(ctx);
       ctx.vars.reset(s);
     }
@@ -88,9 +80,9 @@ public final class Case extends Single {
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq.finish(), ctx).copy());
-    final Iter ir = ctx.iter(expr);
+    final Item im = ctx.iter(expr).finish();
     ctx.vars.reset(s);
-    return ir;
+    return im.iter();
   }
 
   @Override

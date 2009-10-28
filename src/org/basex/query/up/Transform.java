@@ -10,6 +10,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
@@ -65,14 +66,14 @@ public final class Transform extends Arr {
     ctx.updates.apply();
     ctx.updates = upd;
 
-    final Iter ir = expr[1].iter(ctx);
+    final Item im = expr[1].iter(ctx).finish();
     ctx.vars.reset(c);
-    return ir;
+    return im.iter();
   }
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u != Use.UPD && super.uses(u, ctx);
+    return u == Use.VAR || u != Use.UPD && super.uses(u, ctx);
   }
   
   @Override

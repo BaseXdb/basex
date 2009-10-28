@@ -55,12 +55,12 @@ public final class Rename extends Update {
     } else {
       Err.or(UPWRTRGTYP, this);
     }
-    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).qname().ln()));
+    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).nname()));
     return Iter.EMPTY;
   }
 
   @Override
   public String toString() {
-    return RENAME + "...";
+    return RENAME + ' ' + NODE + ' ' + expr[0] + ' ' + AS + ' ' + expr[1];
   }
 }
