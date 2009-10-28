@@ -47,9 +47,12 @@ public final class Func extends Single {
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
     final boolean u = expr.uses(Use.UPD, ctx);
-    if(updating && !u && !expr.v()) Err.or(UPEXPECT);
-    if(!updating && u) Err.or(UPNOT);
-    if(updating && var.type != null) Err.or(UPFUNCTYPE);
+    if(updating) {
+      if(var.type != null) Err.or(UPFUNCTYPE);
+      if(!u && !expr.v()) Err.or(UPEXPECT);
+    } else if(u) {
+      Err.or(UPNOT);
+    }
     ctx.vars.reset(s);
     return this;
   }

@@ -11,7 +11,6 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -52,34 +51,35 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final int c = ctx.vars.size();
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final int s = ctx.vars.size();
     for(final Let fo : copies) {
       // [LK] copied node is a DOC node ? ... attributes ?
       final Data m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
       ctx.vars.add(fo.var.bind(new DBNode(m, 1), ctx).copy());
     }
-    
+
     final PendingUpdates upd = ctx.updates;
     ctx.updates = new PendingUpdates();
-    expr[0].iter(ctx);
+    ctx.iter(expr[0]).next();
     ctx.updates.apply();
     ctx.updates = upd;
 
     final Item im = expr[1].iter(ctx).finish();
-    ctx.vars.reset(c);
-    return im.iter();
+    ctx.vars.reset(s);
+    return im;
   }
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.VAR || u != Use.UPD && super.uses(u, ctx);
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final ForLet t : copies) sb.append(t.var + ASSIGN + t.expr + ' ');
+    for(final ForLet t : copies)
+      sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
     return sb.append(MODIFY + ' ' + expr[0] + ' '  + RETURN + ' ' +
         expr[1]).toString();
   }

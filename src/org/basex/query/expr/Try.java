@@ -40,6 +40,7 @@ public final class Try extends Single {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
+      final int s = ctx.vars.size();
       Iter it;
 
       @Override
@@ -52,6 +53,7 @@ public final class Try extends Single {
             it = c.iter(ctx, ex);
             if(it != null) return it.next();
           }
+          ctx.vars.reset(s);
           throw ex;
         }
       }

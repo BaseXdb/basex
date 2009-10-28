@@ -64,7 +64,7 @@ public final class NameTest extends Test {
     // check namespace context
     if(ctx.ns.size() != 0) {
       if(name != null && name.uri == Uri.EMPTY) {
-        name.uri = Uri.uri(ctx.ns.uri(name.pre()));
+        name.uri = Uri.uri(ctx.ns.uri(name.pre(), false));
       }
     } else {
       final Data data = ctx.data();

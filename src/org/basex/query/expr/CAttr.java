@@ -72,9 +72,7 @@ public final class CAttr extends CFrag {
    * @return result
    * @throws QueryException query exception
    */
-  static QNm name(final QueryContext ctx, final Item i)
-      throws QueryException {
-
+  static QNm name(final QueryContext ctx, final Item i) throws QueryException {
     QNm name = null;
     if(i.type == Type.QNM) {
       name = (QNm) i;
@@ -85,7 +83,8 @@ public final class CAttr extends CFrag {
       name = new QNm(nm);
     }
 
-    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pre()));
+    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pre(),
+        name != i));
     return name;
   }
 

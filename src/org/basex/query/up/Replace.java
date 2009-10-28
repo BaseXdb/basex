@@ -12,6 +12,7 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -43,7 +44,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Seq atomic(final QueryContext ctx) throws QueryException {
     final Iter t = SeqIter.get(expr[0].iter(ctx));
     Item i = t.next();
     
@@ -75,7 +76,7 @@ public final class Replace extends Update {
       seq.reset();
       // [LK] evtl merge text nodes in sequence iterator here?
       ctx.updates.add(new ReplacePrimitive(n, seq, false));
-      return Iter.EMPTY;
+      return Seq.EMPTY;
     }
     
     // replace attribute node
@@ -119,7 +120,7 @@ public final class Replace extends Update {
       
       else Err.or(UPMISS3, this);
     }
-    return Iter.EMPTY;
+    return Seq.EMPTY;
   }
   
   /**

@@ -37,7 +37,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Seq atomic(final QueryContext ctx) throws QueryException {
     final Iter t = SeqIter.get(expr[0].iter(ctx));
     final Item i = t.next();
 
@@ -56,7 +56,7 @@ public final class Rename extends Update {
       Err.or(UPWRTRGTYP, this);
     }
     ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).nname()));
-    return Iter.EMPTY;
+    return Seq.EMPTY;
   }
 
   @Override

@@ -58,13 +58,16 @@ public final class NSLocal {
   /**
    * Finds the uri for the specified prefix in the local and global namespaces.
    * @param pre prefix of the namespace
+   * @param dn dynamic error
    * @return uri
    * @throws QueryException query exception
    */
-  public byte[] uri(final byte[] pre) throws QueryException {
+  public byte[] uri(final byte[] pre, final boolean dn) throws QueryException {
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
-    if(uri.length == 0 && pre.length != 0) Err.or(PREUNKNOWN, pre);
+    if(uri.length == 0 && pre.length != 0) {
+      Err.or(dn ? INVAL : PREUNKNOWN, pre);
+    }
     return uri;
   }
 

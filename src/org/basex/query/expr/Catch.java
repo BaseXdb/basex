@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
@@ -65,9 +66,9 @@ public final class Catch extends Single {
     if(var.length > 2) {
       ctx.vars.add(var[2].bind(ex.iter.finish(), ctx).copy());
     }
-    final Iter iter = ctx.iter(expr);
+    final Item it = ctx.iter(expr).finish();
     ctx.vars.reset(s);
-    return iter;
+    return it.iter();
   }
 
   /**

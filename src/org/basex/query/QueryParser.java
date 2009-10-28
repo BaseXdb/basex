@@ -631,7 +631,7 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final boolean up) throws QueryException {
     final QNm name = new QNm(qName(DECLFUNC));
-    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc);
+    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre(), false) : ctx.nsFunc);
 
     if(name.pre().length == 0 && Type.find(name, true) != null)
       error(FUNCRES, name);
@@ -1417,7 +1417,7 @@ public class QueryParser extends InputParser {
         // name test "pre:*"
         if(consume('*')) {
           final QNm nm = new QNm(EMPTY);
-          nm.uri = Uri.uri(ctx.ns.uri(name));
+          nm.uri = Uri.uri(ctx.ns.uri(name, false));
           return new NameTest(nm, NameTest.Kind.NS, att);
         }
       }
@@ -1521,7 +1521,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     check(DOLLAR);
     final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pre()));
+    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pre(), false));
     ctx.ns.uri(name);
     return name;
   }
@@ -1558,7 +1558,8 @@ public class QueryParser extends InputParser {
         alter = new Object[] { name };
         ap = qp;
         ctx.ns.uri(name);
-        name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc);
+        name.uri = Uri.uri(name.ns() ?
+            ctx.ns.uri(name.pre(), false) : ctx.nsFunc);
         final Expr func = ctx.fun.get(name, exprs);
         if(func != null) {
           alter = null;
@@ -1868,7 +1869,7 @@ public class QueryParser extends InputParser {
 
     Expr name;
     if(XMLToken.isXMLLetter(curr())) {
-      name = Str.get(qName(null));
+      name = new QNm(qName(null));
     } else {
       if(!consumeWS2(BRACE1)) return null;
       name = check(expr(), NOTAGNAME);
@@ -1892,7 +1893,7 @@ public class QueryParser extends InputParser {
 
     Expr nm;
     if(XMLToken.isXMLLetter(curr())) {
-      nm = Str.get(qName(null));
+      nm = new QNm(qName(null));
     } else {
       if(!consumeWS2(BRACE1)) return null;
       nm = expr();
@@ -1992,7 +1993,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final int mode = consume('?') ? 1 : consume('+') ? 2 :
       consume('*') ? 3 : 0;
-    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pre()));
+    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pre(), false));
 
     final byte[] ext = tok.finish();
     final SeqType seq = new SeqType(type, mode, true);

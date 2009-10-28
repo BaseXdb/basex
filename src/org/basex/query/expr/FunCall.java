@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 
@@ -45,9 +46,9 @@ public final class FunCall extends Arr {
       ctx.vars.add(func.args[a].bind(ctx.iter(expr[a]).finish(), ctx).copy());
     }
     // evaluate function and reset variable scope
-    final Iter ir = ctx.iter(func);
+    final Item im = ctx.iter(func).finish();
     ctx.vars.reset(s);
-    return ir;
+    return im.iter();
   }
 
   @Override
