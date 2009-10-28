@@ -387,9 +387,14 @@ public final class DialogServer extends Dialog {
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
     boolean valpl = portl.getText().matches("^[0-9]{2,5}$");
     boolean valp = port.getText().matches("^[0-9]{2,5}$");
-    boolean vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
-    boolean vallp = new String(
-        logpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    boolean vallu = true;
+    if(!loguser.getText().isEmpty()) {
+    vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
+    }
+    boolean vallp = true;
+    if(!new String(logpass.getPassword()).isEmpty()) {
+      vallp = new String(logpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    }
     start.setEnabled(!run && valpl);
     if(!valpl || !valh || !valp || !vallu || !vallp) {
       infop1.setIcon(BaseXLayout.icon("warn"));
