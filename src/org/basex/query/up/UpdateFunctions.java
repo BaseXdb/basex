@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -254,13 +253,5 @@ public final class UpdateFunctions {
     ir = n.child();
     while((i = ir.next()) != null) pre = addDBNode((DBNode) i, m, pre, pval);
     return pre;
-  }
-
-  /**
-   * Prints database table.
-   * @param d data reference
-   */
-  public static void printTable(final Data d) {
-    Main.outln(d);
   }
 }

@@ -436,6 +436,7 @@ public abstract class Data {
       size(par, ELEM, size(par, ELEM) - 1);
       k = kind(par);
     }
+    
     // reduce size of remaining ancestors
     while(par > 0 && k != DOC) {
       par = parent(par, k);

@@ -12,7 +12,6 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -40,6 +39,9 @@ public final class Transform extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    final boolean u = ctx.updating;
+    ctx.updating = true;
+    
     final int s = ctx.vars.size();
     for(final Let c : copies) {
       checkUp(c, ctx);
@@ -49,6 +51,8 @@ public final class Transform extends Arr {
     if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
+
+    ctx.updating = u;
     return this;
   }
 
@@ -63,8 +67,7 @@ public final class Transform extends Arr {
 
     final PendingUpdates upd = ctx.updates;
     ctx.updates = new PendingUpdates();
-    final Iter it = ctx.iter(expr[0]);
-    while(it.next() != null);
+    ctx.iter(expr[0]).finish();
     ctx.updates.apply();
     ctx.updates = upd;
 

@@ -162,7 +162,7 @@ public final class QueryContext extends Progress {
 
   /** XQueryUP pending updates. */
   public PendingUpdates updates = new PendingUpdates();
-  /** Updating flag. */
+  /** Indicates if this query performs updates. */
   public boolean updating;
 
   /**

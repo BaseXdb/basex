@@ -31,11 +31,10 @@ public final class Delete extends Update {
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Iter t = SeqIter.get(expr[0].iter(ctx));
-    Item i = t.next();
-    while(i != null) {
+    Item i;
+    while((i = t.next()) != null) {
       if(!(i instanceof Nod)) Err.or(UPTRGDELEMPT, this);
       ctx.updates.add(new DeletePrimitive((Nod) i));
-      i = t.next();
     }
     return Seq.EMPTY;
   }

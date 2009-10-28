@@ -2583,6 +2583,7 @@ public class QueryParser extends InputParser {
   private Expr transform() throws QueryException {
     if(!consumeWS(COPY, DOLLAR, INCOMPLETE)) return null;
     final boolean u = ctx.updating;
+    ctx.updating = false;
 
     Let[] fl = {};
     do {

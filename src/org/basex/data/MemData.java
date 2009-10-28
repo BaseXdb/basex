@@ -276,7 +276,8 @@ public class MemData extends Data {
 
   @Override
   public void attSize(final int pre, final int kind, final int v) {
-    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFF00FFFFFFFFL | v;
+    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFF00FFFFFFFFL |
+      (long) v << 32;
   }
 
   @Override
