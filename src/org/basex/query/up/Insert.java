@@ -1,22 +1,24 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Constr;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.primitives.InsertAfterPrimitive;
+import org.basex.query.up.primitives.InsertAfter;
 import org.basex.query.up.primitives.InsertAttribute;
-import org.basex.query.up.primitives.InsertBeforePrimitive;
-import org.basex.query.up.primitives.InsertIntoFirstPrimitive;
-import org.basex.query.up.primitives.InsertIntoLastPrimitive;
-import org.basex.query.up.primitives.InsertIntoPrimitive;
+import org.basex.query.up.primitives.InsertBefore;
+import org.basex.query.up.primitives.InsertIntoFirst;
+import org.basex.query.up.primitives.InsertIntoLast;
+import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
 
@@ -79,27 +81,28 @@ public final class Insert extends Update {
       if(n.type != Type.ELM && n.type != Type.DOC) Err.or(UPTRGTYP, this);
     }
 
+    UpdatePrimitive up = null;
     if(aSeq.size() > 0) {
       if(before || after) {
         if(par.type != Type.ELM) Err.or(UPATTDOC, this);
-        ctx.updates.addPrimitive(new InsertAttribute(par, aSeq, -1));
+        up = new InsertAttribute(par, aSeq, -1);
       } else {
         if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
-        ctx.updates.addPrimitive(new InsertAttribute(n, aSeq, -1));
+        up = new InsertAttribute(n, aSeq, -1);
       }
+      ctx.updates.add(up);
     }
     if(seq.size() > 0) {
-      UpdatePrimitive up = null;
       if(before) {
-        up = new InsertBeforePrimitive(n, seq, -1);
+        up = new InsertBefore(n, seq, -1);
       } else if(after) {
-        up = new InsertAfterPrimitive(n, seq, -1);
+        up = new InsertAfter(n, seq, -1);
       } else {
-        if(first) up = new InsertIntoFirstPrimitive(n, seq, -1);
-        else if(last) up = new InsertIntoLastPrimitive(n, seq, -1);
-        else up = new InsertIntoPrimitive(n, seq, -1);
+        if(first) up = new InsertIntoFirst(n, seq, -1);
+        else if(last) up = new InsertIntoLast(n, seq, -1);
+        else up = new InsertInto(n, seq, -1);
       }
-      ctx.updates.addPrimitive(up);
+      ctx.updates.add(up);
     }
     return Iter.EMPTY;
   }

@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
+public final class ReplaceElemContent extends UpdatePrimitive {
   /** Replacing text node. */ 
   public byte[] r;
 
@@ -24,7 +24,7 @@ public final class ReplaceElemContentPrimitive extends UpdatePrimitive {
    * @param n target node
    * @param tn replacing content
    */
-  public ReplaceElemContentPrimitive(final Nod n, final byte[] tn) {
+  public ReplaceElemContent(final Nod n, final byte[] tn) {
     super(n);
     r = tn;
   }

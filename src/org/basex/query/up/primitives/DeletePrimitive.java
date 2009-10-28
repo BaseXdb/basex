@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
-
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -31,8 +30,8 @@ public final class DeletePrimitive extends UpdatePrimitive {
     d.delete(p);
     if(p >= d.meta.size) return;
     final int l = p - 1; 
-    if(l > 1 && d.parent(l, d.kind(l)) == d.parent(p, d.kind(p))) 
-      mergeTextNodes(d, l, p);
+    if(l > 0 && d.parent(l, d.kind(l)) == d.parent(p, d.kind(p))) 
+      mergeText(d, l, p);
   }
 
   @Override

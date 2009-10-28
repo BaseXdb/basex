@@ -15,7 +15,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class RenamePrimitive extends NewValuePrimitive {
+public final class RenamePrimitive extends NewValue {
   /**
    * Constructor.
    * @param n target node

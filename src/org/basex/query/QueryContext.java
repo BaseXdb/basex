@@ -310,7 +310,7 @@ public final class QueryContext extends Progress {
       if(!updating) return iter;
 
       final Item i = iter.finish();
-      updates.applyUpdates();
+      updates.apply();
       return i.iter();
     } catch(final StackOverflowError ex) {
       if(Prop.debug) ex.printStackTrace();

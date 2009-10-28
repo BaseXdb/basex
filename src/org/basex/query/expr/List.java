@@ -26,7 +26,7 @@ public final class List extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     updating(ctx, expr);
 
     for(final Expr e : expr) if(!e.i() && !e.e()) return this;

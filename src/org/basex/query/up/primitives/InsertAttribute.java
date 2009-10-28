@@ -36,7 +36,7 @@ public final class InsertAttribute extends InsertPrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    c.add(((NodeCopyPrimitive) p).c.getFirst());
+    c.add(((NodeCopy) p).c.getFirst());
   }
 
   @Override

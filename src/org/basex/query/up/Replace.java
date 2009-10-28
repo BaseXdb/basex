@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.item.FTxt;
@@ -14,9 +15,9 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.primitives.ReplaceElemContentPrimitive;
+import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
-import org.basex.query.up.primitives.ReplaceValuePrimitive;
+import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -73,7 +74,7 @@ public final class Replace extends Update {
       }
       seq.reset();
       // [LK] evtl merge text nodes in sequence iterator here?
-      ctx.updates.addPrimitive(new ReplacePrimitive(n, seq, false));
+      ctx.updates.add(new ReplacePrimitive(n, seq, false));
       return Iter.EMPTY;
     }
     
@@ -103,7 +104,7 @@ public final class Replace extends Update {
       if(bpar) Err.or(UPCONFNSPAR, i);
       if(brep) Err.or(UPCONFNS, i);
       r.reset();
-      ctx.updates.addPrimitive(new ReplacePrimitive(n, r, true));
+      ctx.updates.add(new ReplacePrimitive(n, r, true));
       
     // replace value / element content
     } else {
@@ -112,9 +113,9 @@ public final class Replace extends Update {
       i = r.next();
       if(i == null) Err.or(UPMISS2, this);
       if(i.type.num || i.type.str)
-        ctx.updates.addPrimitive(n.type == Type.ELM ? 
-          new ReplaceElemContentPrimitive(n, i.str()) :
-          new ReplaceValuePrimitive(n, i.str()));
+        ctx.updates.add(n.type == Type.ELM ? 
+          new ReplaceElemContent(n, i.str()) :
+          new ReplaceValue(n, i.str()));
       
       else Err.or(UPMISS3, this);
     }

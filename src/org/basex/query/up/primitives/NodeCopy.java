@@ -2,8 +2,7 @@ package org.basex.query.up.primitives;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import org.basex.data.MemData;
+import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -11,7 +10,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.UpdateFunctions;
-
 import static org.basex.query.up.UpdateFunctions.*;
 
 /**
@@ -20,18 +18,18 @@ import static org.basex.query.up.UpdateFunctions.*;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public abstract class NodeCopyPrimitive extends UpdatePrimitive {
+public abstract class NodeCopy extends UpdatePrimitive {
   /** Insertion nodes. */
   final LinkedList<Iter> c = new LinkedList<Iter>();
   /** Final copy of insertion nodes. */
-  public MemData m;
+  public Data m;
 
   /**
    * Constructor.
    * @param n target node
    * @param copy node copy
    */
-  protected NodeCopyPrimitive(final Nod n, final Iter copy) {
+  protected NodeCopy(final Nod n, final Iter copy) {
     super(n);
     c.add(copy);
   }
@@ -49,6 +47,6 @@ public abstract class NodeCopyPrimitive extends UpdatePrimitive {
       Item i;
       while((i = ni.next()) != null) seq.add(i);
     }
-    m = UpdateFunctions.buildDB(mergeTextNodes(seq), ((DBNode) node).data);
+    m = UpdateFunctions.buildDB(mergeText(seq), ((DBNode) node).data);
   }
 }

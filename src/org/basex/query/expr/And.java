@@ -27,17 +27,17 @@ public final class And extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    for(final Expr e : expr) checkUp(e, ctx);
 
     for(int e = 0; e < expr.length; e++) {
-      if(!expr[e].i()) continue;
+      final Expr ex = expr[e];
+      if(!ex.i()) continue;
 
-      if(!((Item) expr[e]).bool()) {
+      if(!((Item) ex).bool()) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTFALSE, expr[e]);
+        ctx.compInfo(OPTFALSE, ex);
         return Bln.FALSE;
       }
-      ctx.compInfo(OPTTRUE, expr[e]);
+      ctx.compInfo(OPTTRUE, ex);
       expr = Array.delete(expr, e--);
       if(expr.length == 0) return Bln.TRUE;
     }

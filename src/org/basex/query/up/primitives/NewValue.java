@@ -9,7 +9,7 @@ import org.basex.query.item.Nod;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public abstract class NewValuePrimitive extends UpdatePrimitive {
+public abstract class NewValue extends UpdatePrimitive {
   /** New name. */
   final byte[] name;
 
@@ -18,7 +18,7 @@ public abstract class NewValuePrimitive extends UpdatePrimitive {
    * @param n target node
    * @param newName new name
    */
-  public NewValuePrimitive(final Nod n, final byte[] newName) {
+  public NewValue(final Nod n, final byte[] newName) {
     super(n);
     name = newName;
   }

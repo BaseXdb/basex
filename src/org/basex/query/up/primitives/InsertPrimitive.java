@@ -9,7 +9,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-abstract class InsertPrimitive extends NodeCopyPrimitive {
+abstract class InsertPrimitive extends NodeCopy {
   /** Actual insert location of nodes. */
   private final int loc;
 

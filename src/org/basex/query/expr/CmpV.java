@@ -133,9 +133,7 @@ public final class CmpV extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    for(int e = 0; e != expr.length; e++) {
-      expr[e] = checkUp(expr[e], ctx).addText(ctx);
-    }
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
     if(expr[0].i() && !expr[1].i()) {
       final Expr tmp = expr[0];

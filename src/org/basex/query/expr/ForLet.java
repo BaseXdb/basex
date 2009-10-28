@@ -11,14 +11,14 @@ import org.basex.query.util.Var;
  */
 public abstract class ForLet extends Single {
   /** Variable. */
-  protected Var var;
+  public Var var;
 
   /**
    * Constructor.
    * @param e variable input
    * @param v variable
    */
-  public ForLet(final Expr e, final Var v) {
+  protected ForLet(final Expr e, final Var v) {
     super(e);
     var = v;
   }
@@ -55,7 +55,7 @@ public abstract class ForLet extends Single {
    * @param v variable to be checked
    * @return result of check
    */
-  public boolean shadows(final Var v) {
+  boolean shadows(final Var v) {
     return !v.visible(var);
   }
 

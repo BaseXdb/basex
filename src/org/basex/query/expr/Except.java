@@ -33,8 +33,8 @@ public final class Except extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     final int el = expr.length;
-    for(int e = 0; e != expr.length; e++) {
-      if(checkUp(expr[e], ctx).e() && e != 0) expr = Array.delete(expr, e--);
+    for(int e = 1; e < expr.length; e++) {
+      if(expr[e].e()) expr = Array.delete(expr, e--);
     }
     final boolean em = expr[0].e();
     if(el != expr.length || em) ctx.compInfo(OPTEMPTY);

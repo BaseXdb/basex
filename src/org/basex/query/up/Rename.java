@@ -1,10 +1,15 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.CAttr;
+import org.basex.query.expr.CElem;
+import org.basex.query.expr.CFrag;
+import org.basex.query.expr.CPI;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
@@ -50,8 +55,7 @@ public final class Rename extends Update {
     } else {
       Err.or(UPWRTRGTYP, this);
     }
-    ctx.updates.addPrimitive(
-        new RenamePrimitive((Nod) i, ex.atomic(ctx).qname().ln()));
+    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).qname().ln()));
     return Iter.EMPTY;
   }
 

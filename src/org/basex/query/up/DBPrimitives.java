@@ -8,7 +8,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
-import org.basex.query.up.primitives.InsertBeforePrimitive;
+import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.up.primitives.UpdatePrimitive.Type;
 
@@ -38,7 +38,7 @@ public final class DBPrimitives {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  public void addPrimitive(final UpdatePrimitive p) throws QueryException {
+  public void add(final UpdatePrimitive p) throws QueryException {
     Integer i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
     // possible to use node id 'cause nodes in map belong to the same
@@ -76,7 +76,7 @@ public final class DBPrimitives {
       for(final UpdatePrimitive pp : pl) {
         if(pp == null) continue;
         if(pp.type() == Type.INSERTBEFORE) {
-          add = ((InsertBeforePrimitive) pp).m.size(0, Data.DOC) - 1;
+          add = ((InsertBefore) pp).m.size(0, Data.DOC) - 1;
         }
         pp.apply(add);
         if(pp.type() == Type.REPLACENODE) break;

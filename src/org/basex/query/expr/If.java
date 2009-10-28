@@ -26,13 +26,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return ctx.iter(expr[expr[0].ebv(ctx).bool() ? 1 : 2]);
-  }
-
-  @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     List.updating(ctx, new Expr[] { expr[1], expr[2] });
     
     Expr e = this;
@@ -45,6 +40,11 @@ public final class If extends Arr {
     }
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return ctx.iter(expr[expr[0].ebv(ctx).bool() ? 1 : 2]);
   }
 
   @Override

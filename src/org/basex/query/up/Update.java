@@ -1,7 +1,8 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
+import org.basex.query.expr.Arr;
+import org.basex.query.expr.Expr;
 
 /**
  * Abstract update expression.
@@ -16,12 +17,6 @@ public abstract class Update extends Arr {
    */
   protected Update(final Expr... e) {
     super(e);
-  }
-
-  @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Expr e : expr) checkUp(e, ctx);
-    return super.comp(ctx);
   }
 
   @Override

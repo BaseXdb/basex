@@ -39,7 +39,7 @@ public abstract class Fun extends Arr {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     final Expr e = c(ctx);
-    if(e != this) ctx.compInfo(OPTPRE, this, e);
+    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 

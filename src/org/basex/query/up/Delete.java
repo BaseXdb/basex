@@ -1,9 +1,10 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
@@ -32,7 +33,7 @@ public final class Delete extends Update {
     Item i = t.next();
     while(i != null) {
       if(!(i instanceof Nod)) Err.or(UPTRGDELEMPT, this);
-      ctx.updates.addPrimitive(new DeletePrimitive((Nod) i));
+      ctx.updates.add(new DeletePrimitive((Nod) i));
       i = t.next();
     }
     return Iter.EMPTY;

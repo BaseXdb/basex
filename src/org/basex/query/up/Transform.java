@@ -1,14 +1,16 @@
-package org.basex.query.expr;
+package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-import org.basex.data.MemData;
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Arr;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.ForLet;
+import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.iter.Iter;
-import org.basex.query.up.PendingUpdates;
-import org.basex.query.up.UpdateFunctions;
 import org.basex.query.util.Err;
 
 /**
@@ -41,7 +43,7 @@ public final class Transform extends Arr {
       checkUp(c, ctx);
       ctx.vars.add(c.var);
     }
-    super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
@@ -53,14 +55,14 @@ public final class Transform extends Arr {
     final int c = ctx.vars.size();
     for(final Let fo : copies) {
       // [LK] copied node is a DOC node ? ... attributes ?
-      final MemData m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
+      final Data m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
       ctx.vars.add(fo.var.bind(new DBNode(m, 1), ctx).copy());
     }
     
     final PendingUpdates upd = ctx.updates;
     ctx.updates = new PendingUpdates();
     expr[0].iter(ctx);
-    ctx.updates.applyUpdates();
+    ctx.updates.apply();
     ctx.updates = upd;
 
     final Iter ir = expr[1].iter(ctx);

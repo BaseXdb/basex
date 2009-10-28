@@ -30,7 +30,8 @@ public abstract class Arr extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
+    for(int e = 0; e != expr.length; e++)
+      expr[e] = checkUp(expr[e].comp(ctx), ctx);
     return this;
   }
 

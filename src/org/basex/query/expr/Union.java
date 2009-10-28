@@ -32,7 +32,7 @@ public final class Union extends Arr {
     super.comp(ctx);
     final int el = expr.length;
     for(int e = 0; e != expr.length; e++) {
-      if(checkUp(expr[e], ctx).e()) expr = Array.delete(expr, e--);
+      if(expr[e].e()) expr = Array.delete(expr, e--);
     }
     if(el != expr.length) ctx.compInfo(OPTEMPTY);
 

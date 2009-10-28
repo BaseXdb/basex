@@ -21,21 +21,22 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class Constr {
+public final class Constr {
+  /** Node array. */
+  public final NodIter children = new NodIter();
+  /** Attribute array. */
+  public final NodIter ats = new NodIter();
+  /** Error: attribute position. */
+  public boolean errAtt;
+  /** Error: duplicate attribute. */
+  public byte[] duplAtt;
+
   /** Text cache. */
   final TokenBuilder text = new TokenBuilder();
-  /** Node array. */
-  final NodIter children = new NodIter();
-  /** Attribute array. */
-  final NodIter ats = new NodIter();
   /** Space separator flag. */
   boolean more;
   /** Base URI. */
   byte[] base = EMPTY;
-  /** Error: attribute position. */
-  boolean errAtt;
-  /** Error: duplicate attribute. */
-  byte[] duplAtt;
 
   /**
    * Creates the children of the constructor.
@@ -43,7 +44,9 @@ final class Constr {
    * @param expr input expressions
    * @throws QueryException query exception
    */
-  Constr(final QueryContext ctx, final Expr... expr) throws QueryException {
+  public Constr(final QueryContext ctx, final Expr... expr)
+      throws QueryException {
+
     for(final Expr e : expr) {
       more = false;
       final Iter iter = ctx.iter(e);

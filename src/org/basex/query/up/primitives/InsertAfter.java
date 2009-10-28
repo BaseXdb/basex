@@ -6,41 +6,43 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 
 /**
- * Insert into as last primitive.
+ * Insert after primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class InsertIntoLastPrimitive extends InsertPrimitive {  
+public final class InsertAfter extends InsertPrimitive {  
   /**
    * Constructor.
    * @param n target node
    * @param copy copy of nodes to be inserted
    * @param l actual pre location where nodes are inserted
    */
-  public InsertIntoLastPrimitive(final Nod n, final Iter copy, final int l) {
+  public InsertAfter(final Nod n, final Iter copy, final int l) {
     super(n, copy, l);
   }
-  
+
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
     
+    // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-    // source nodes may be empty, thus insert has no effect at all
-    d.insertSeq(p + d.size(p, Nod.kind(node.type)), p, m);
+    final int k = Nod.kind(node.type);
+    // [LK] check if parent null?
+    d.insertSeq(p + d.size(p, k), d.parent(p, k), m);
   }
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    c.add(((NodeCopyPrimitive) p).c.getFirst());
+    c.add(((NodeCopy) p).c.getFirst());
   }
 
   @Override
   public Type type() {
-    return Type.INSERTINTOLA;
+    return Type.INSERTAFTER;
   }
 }

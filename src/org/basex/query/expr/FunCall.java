@@ -33,9 +33,7 @@ public final class FunCall extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     func = ctx.fun.get(id);
-    super.comp(ctx);
-    for(final Expr e : expr) checkUp(e, ctx);
-    return this;
+    return super.comp(ctx);
   }
 
   @Override

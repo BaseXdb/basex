@@ -17,7 +17,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class ReplacePrimitive extends NodeCopyPrimitive {
+public final class ReplacePrimitive extends NodeCopy {
   /** Target node is an attribute. */
   public boolean a;
 

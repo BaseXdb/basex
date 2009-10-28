@@ -2,6 +2,8 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.proc.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -728,4 +730,9 @@ public abstract class Data {
    * @param v attribute name ID
    */
   protected abstract void attNameID(final int pre, final int v);
+  
+  @Override
+  public String toString() {
+    return string(InfoTable.table(this, 0, meta.size));
+  }
 }

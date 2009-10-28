@@ -15,13 +15,13 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class ReplaceValuePrimitive extends NewValuePrimitive {
+public final class ReplaceValue extends NewValue {
   /**
    * Constructor.
    * @param n target node
    * @param newName new name
    */
-  public ReplaceValuePrimitive(final Nod n, final byte[] newName) {
+  public ReplaceValue(final Nod n, final byte[] newName) {
     super(n, newName);
   }
 
