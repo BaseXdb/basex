@@ -60,12 +60,17 @@ public final class UpdateFunctions {
   /**
    * Merges two adjacent text nodes in a database.
    * @param d data reference
-   * @param a node
-   * @param b node
+   * @param a node pre value
+   * @param b node pre value
    * @return true if nodes have been merged
    */
-  public static boolean mergeText(final Data d, final int a, final int b) {
+  public static boolean mergeTextNodes(final Data d, final int a, final int b) {
+    // some pre value checks to prevent databases errors
+    final int s = d.meta.size;
+    if(a >= s || b >= s || a == b || a < 0 || b < 0) return false;
     if(!(d.kind(a) == Data.TEXT && d.kind(b) == Data.TEXT)) return false;
+    if(d.parent(a, d.kind(a)) != d.parent(b, d.kind(b))) return false;
+    
     d.update(a, concat(d.text(a), d.text(b)));
     d.delete(b);
     return true;

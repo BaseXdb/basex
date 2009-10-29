@@ -122,6 +122,7 @@ public final class Constr {
       }
       more = false;
     } else {
+      // [LK] XQUP: no whitespace added when merging text nodes!
       if(more && it.type != Type.TXT) text.add(' ');
       text.add(it.str());
       more = it.type != Type.TXT;

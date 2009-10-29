@@ -86,22 +86,22 @@ public final class Insert extends Update {
     if(aSeq.size() > 0) {
       if(before || after) {
         if(par.type != Type.ELM) Err.or(UPATTDOC, this);
-        up = new InsertAttribute(par, aSeq, -1);
+        up = new InsertAttribute(par, aSeq);
       } else {
         if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
-        up = new InsertAttribute(n, aSeq, -1);
+        up = new InsertAttribute(n, aSeq);
       }
       ctx.updates.add(up);
     }
     if(seq.size() > 0) {
       if(before) {
-        up = new InsertBefore(n, seq, -1);
+        up = new InsertBefore(n, seq);
       } else if(after) {
-        up = new InsertAfter(n, seq, -1);
+        up = new InsertAfter(n, seq);
       } else {
-        if(first) up = new InsertIntoFirst(n, seq, -1);
-        else if(last) up = new InsertIntoLast(n, seq, -1);
-        else up = new InsertInto(n, seq, -1);
+        if(first) up = new InsertIntoFirst(n, seq);
+        else if(last) up = new InsertIntoLast(n, seq);
+        else up = new InsertInto(n, seq);
       }
       ctx.updates.add(up);
     }

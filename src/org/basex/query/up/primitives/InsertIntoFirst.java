@@ -11,15 +11,14 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class InsertIntoFirst extends InsertPrimitive {
+public final class InsertIntoFirst extends NodeCopy {
   /**
    * Constructor.
    * @param n target node
    * @param copy copy of nodes to be inserted
-   * @param l actual pre location where nodes are inserted
    */
-  public InsertIntoFirst(final Nod n, final Iter copy, final int l) {
-    super(n, copy, l);
+  public InsertIntoFirst(final Nod n, final Iter copy) {
+    super(n, copy);
   }
   
   @Override

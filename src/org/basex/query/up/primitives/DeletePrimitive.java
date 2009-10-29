@@ -28,10 +28,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
     final Data d = n.data;
     final int p = n.pre + add;
     d.delete(p);
-    if(p >= d.meta.size) return;
-    final int l = p - 1; 
-    if(l > 0 && d.parent(l, d.kind(l)) == d.parent(p, d.kind(p))) 
-      mergeText(d, l, p);
+    mergeTextNodes(d, p - 1, p);
   }
 
   @Override
