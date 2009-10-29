@@ -14,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -134,7 +133,7 @@ public final class DialogServer extends Dialog {
     tabs = new BaseXTabs(this);
 
     // Server panel
-    p1.setLayout(new TableLayout(5, 1, 0, 4));
+    p1.setLayout(new TableLayout(6, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
     // User management panel
     p2.setLayout(new TableLayout(13, 1, 0, 4));
@@ -148,26 +147,31 @@ public final class DialogServer extends Dialog {
     connect = new BaseXButton(BUTTONCONNECT, null, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
+    host.addKeyListener(keys);
     ports = new BaseXTextField(
         Integer.toString(ctx.prop.num(Prop.SERVERPORT)), null, this);
+    ports.addKeyListener(keys);
     portc = new BaseXTextField(
         Integer.toString(ctx.prop.num(Prop.PORT)), null, this);
-    ports.addKeyListener(keys);
     portc.addKeyListener(keys);
-    host.addKeyListener(keys);
+    loguser = new BaseXTextField(ADMIN, null, this);
+    loguser.addKeyListener(keys);
+    logpass = new JPasswordField();
+    logpass.addKeyListener(keys);
+
+    p1.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
 
     // Local server panel.
     final BaseXBack p11 = new BaseXBack();
-    p11.setLayout(new TableLayout(3, 2, -18, 2));
-    p11.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
-    p11.add(new BaseXLabel(" "));
+    p11.setLayout(new TableLayout(2, 2, 0, 2));
     p11.add(new BaseXLabel(PORT + COLS));
     p11.add(ports);
-    p11.add(new BaseXLabel(" "));
+
     final BaseXBack p111 = new BaseXBack();
     p111.setLayout(new TableLayout(1, 2, 2, 2));
     p111.add(start);
     p111.add(stop);
+    p11.add(new BaseXLabel(" "));
     p11.add(p111);
 
     // Login panel.
@@ -176,12 +180,8 @@ public final class DialogServer extends Dialog {
     p12.add(new BaseXLabel(LOGIN + COLS, false, true));
     p12.add(new BaseXLabel(" "));
     p12.add(new BaseXLabel(SERVERUSER + COLS));
-    loguser = new BaseXTextField(ADMIN, null, this);
-    loguser.addKeyListener(keys);
     p12.add(loguser);
     p12.add(new BaseXLabel(SERVERPW + COLS));
-    logpass = new JPasswordField();
-    logpass.addKeyListener(keys);
     BaseXLayout.setWidth(logpass, 200);
     p12.add(logpass);
     p12.add(new BaseXLabel(HOST + COLS));
@@ -268,7 +268,7 @@ public final class DialogServer extends Dialog {
     // test if server is running
     try {
       run = true;
-      createSession(ADMIN, ADMIN, true);
+      createSession(ADMIN, ADMIN);
       cs = null;
     } catch(final IOException e1) {
       run = false;
@@ -280,14 +280,12 @@ public final class DialogServer extends Dialog {
 
   /**
    * Creates a new client session.
-   * @param u username
+   * @param u user name
    * @param p password
-   * @param l boolean for local
    * @throws IOException I/O exception
    */
-  private void createSession(final String u, final String p, final boolean l)
+  private void createSession(final String u, final String p)
       throws IOException {
-    if(l) cs = new ClientSession(ctx, u, p);
     cs = new ClientSession(ctx.prop.get(Prop.HOST),
         ctx.prop.num(Prop.PORT), u, p);
   }
@@ -298,6 +296,8 @@ public final class DialogServer extends Dialog {
       try {
         final int p = Integer.parseInt(ports.getText());
         ctx.prop.set(Prop.SERVERPORT, p);
+        ctx.prop.write();
+
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
@@ -311,7 +311,7 @@ public final class DialogServer extends Dialog {
       }
     } else if(BUTTONSTOSERV.equals(cmd)) {
       try {
-        createSession(ADMIN, ADMIN, true);
+        createSession(ADMIN, ADMIN);
         cs.execute(new IntStop(), null);
         cs = null;
         run = false;
@@ -366,20 +366,17 @@ public final class DialogServer extends Dialog {
       try {
         ctx.prop.set(Prop.PORT, Integer.parseInt(ports.getText()));
         ctx.prop.set(Prop.HOST, host.getText());
+        ctx.prop.write();
 
-        createSession(loguser.getText(), new String(logpass.getPassword()),
-            false);
+        createSession(loguser.getText(), new String(logpass.getPassword()));
         setData();
         connected = true;
       } catch(Exception e) {
-        logpass.setText("");
         err1 = BUTTONCONNECT + FAILED + error(e);
       }
     } else if(BUTTONDISCONNECT.equals(cmd)) {
       try {
         cs.execute(new Exit());
-        loguser.setText("");
-        logpass.setText("");
         connected = false;
       } catch(final IOException e) {
         err1 = BUTTONDISCONNECT + FAILED + error(e);
@@ -485,7 +482,7 @@ public final class DialogServer extends Dialog {
   void fillLists() throws IOException {
     final CachedOutput out = new CachedOutput();
     if(!cs.execute(new Show("Users"), out)) {
-      throw new BaseXException(Main.info(PERMNO, ADMIN));
+      throw new IOException(cs.info());
     }
     data = new Table(out.toString());
   }

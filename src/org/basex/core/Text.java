@@ -121,7 +121,7 @@ public interface Text {
 
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: java " + NAME + SERVERMODE + " [-dnpv] [stop]" + NL +
+    "Usage: java " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
     " -p<port> specify server port" + NL +

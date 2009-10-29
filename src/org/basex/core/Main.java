@@ -91,7 +91,7 @@ public abstract class Main {
       for(final Process p : new CommandParser(in, context).parse()) {
         if(p instanceof Exit) return false;
         if(p instanceof Password && p.args[0] == null) {
-          Main.out(SERVERPW);
+          Main.out(SERVERPW + COLS);
           p.args[0] = new String(System.console().readPassword());
         }
         if(!process(p, true)) break;

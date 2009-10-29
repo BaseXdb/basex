@@ -191,10 +191,9 @@ public final class ServerSession extends Thread {
    * Exits the session.
    */
   public void exit() {
+    new Close().execute(context);
     if(core != null) core.stop();
     stopTimer();
-
-    new Close().execute(context);
     context.delete(this);
 
     try {
