@@ -55,7 +55,7 @@ public final class Rename extends Update {
     } else {
       Err.or(UPWRTRGTYP, this);
     }
-    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).nname()));
+    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).nname()), ctx);
     return Seq.EMPTY;
   }
 

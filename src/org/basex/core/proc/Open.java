@@ -39,18 +39,6 @@ public final class Open extends Process {
     try {
       if(data == null || !data.meta.name.equals(db)) {
         data = open(context, db);
-        
-        // check if user has rights to access this database
-        // might lead to side effects if rights are revoked
-        // from the user after database has been opened
-        User user = context.user;
-        final User us = data.meta.users.get(user.name);
-        if(us != null) user = us;
-        if(!user.perm(User.READ)) {
-          Close.close(context, data);
-          return error(PERMNO, CmdPerm.READ);
-        }
-        
         context.openDB(data);
         if(data.meta.oldindex) info(INDUPDATE);
       }
@@ -80,6 +68,15 @@ public final class Open extends Process {
 
       data = new DiskData(db, ctx.prop);
       ctx.addToPool(data);
+    }
+
+    // check permissions
+    User user = ctx.user;
+    final User us = data.meta.users.get(user.name);
+    if(us != null) user = us;
+    if(!user.perm(User.READ)) {
+      Close.close(ctx, data);
+      throw new IOException(Main.info(PERMNO, CmdPerm.READ));
     }
     return data;
   }

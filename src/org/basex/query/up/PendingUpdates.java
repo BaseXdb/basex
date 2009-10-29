@@ -1,8 +1,13 @@
 package org.basex.query.up;
 
+import static org.basex.core.Text.*;
 import java.util.HashMap;
 import java.util.Map;
+import org.basex.core.Main;
+import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
@@ -18,33 +23,43 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  */
 public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  private final Map<Data, DBPrimitives> dbPrimitives;
+  private final Map<Data, DBPrimitives> dbs;
   /** Update primitives which target nodes are fragments. */
-  private final DBPrimitives fragPrimitives;
+  private final DBPrimitives frags;
 
   /**
    * Constructor.
    */
   public PendingUpdates() {
-    dbPrimitives = new HashMap<Data, DBPrimitives>();
-    fragPrimitives = new DBPrimitives(true);
+    dbs = new HashMap<Data, DBPrimitives>();
+    frags = new DBPrimitives(true);
   }
 
   /**
    * Adds an update primitive to the corresponding primitive list.
    * @param p primitive to add
+   * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final UpdatePrimitive p) throws QueryException {
+  public void add(final UpdatePrimitive p, final QueryContext ctx)
+      throws QueryException {
+
     if(p.node instanceof FNode) {
-      fragPrimitives.add(p);
+      frags.add(p);
     } else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
-
-      DBPrimitives dp = dbPrimitives.get(d);
+      
+      // check permissions
+      User user = ctx.context.user;
+      final User us = d.meta.users.get(user.name);
+      if(us != null) user = us;
+      if(!user.perm(User.READ))
+        throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
+      
+      DBPrimitives dp = dbs.get(d);
       if(dp == null) {
         dp = new DBPrimitives(false);
-        dbPrimitives.put(d, dp);
+        dbs.put(d, dp);
       }
       dp.add(p);
     }
@@ -58,9 +73,9 @@ public final class PendingUpdates {
    */
   public void apply() throws QueryException {
     // only constraints are checked for fragment primitives
-    fragPrimitives.apply();
-    final DBPrimitives[] dp = new DBPrimitives[dbPrimitives.size()];
-    dbPrimitives.values().toArray(dp);
+    frags.apply();
+    final DBPrimitives[] dp = new DBPrimitives[dbs.size()];
+    dbs.values().toArray(dp);
     for(final DBPrimitives p : dp) p.apply();
   }
 }

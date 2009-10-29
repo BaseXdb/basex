@@ -2,13 +2,11 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.data.DOTSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -43,7 +41,7 @@ abstract class AQuery extends Process {
    * @param a arguments
    */
   protected AQuery(final int p, final String... a) {
-    super(p | User.READ | User.WRITE, a);
+    super(p, a);
   }
 
   /**

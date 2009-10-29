@@ -75,7 +75,7 @@ public final class Replace extends Update {
       }
       seq.reset();
       // [LK] evtl merge text nodes in sequence iterator here?
-      ctx.updates.add(new ReplacePrimitive(n, seq, false));
+      ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
       return Seq.EMPTY;
     }
     
@@ -105,7 +105,7 @@ public final class Replace extends Update {
       if(bpar) Err.or(UPCONFNSPAR, i);
       if(brep) Err.or(UPCONFNS, i);
       r.reset();
-      ctx.updates.add(new ReplacePrimitive(n, r, true));
+      ctx.updates.add(new ReplacePrimitive(n, r, true), ctx);
       
     // replace value / element content
     } else {
@@ -116,7 +116,7 @@ public final class Replace extends Update {
       if(i.type.num || i.type.str)
         ctx.updates.add(n.type == Type.ELM ? 
           new ReplaceElemContent(n, i.str()) :
-          new ReplaceValue(n, i.str()));
+          new ReplaceValue(n, i.str()), ctx);
       
       else Err.or(UPMISS3, this);
     }

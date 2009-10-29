@@ -91,7 +91,7 @@ public final class Insert extends Update {
         if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
         up = new InsertAttribute(n, aSeq);
       }
-      ctx.updates.add(up);
+      ctx.updates.add(up, ctx);
     }
     if(seq.size() > 0) {
       if(before) {
@@ -103,7 +103,7 @@ public final class Insert extends Update {
         else if(last) up = new InsertIntoLast(n, seq);
         else up = new InsertInto(n, seq);
       }
-      ctx.updates.add(up);
+      ctx.updates.add(up, ctx);
     }
     return Seq.EMPTY;
   }

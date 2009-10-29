@@ -34,7 +34,7 @@ public final class Delete extends Update {
     Item i;
     while((i = t.next()) != null) {
       if(!(i instanceof Nod)) Err.or(UPTRGDELEMPT, this);
-      ctx.updates.add(new DeletePrimitive((Nod) i));
+      ctx.updates.add(new DeletePrimitive((Nod) i), ctx);
     }
     return Seq.EMPTY;
   }
