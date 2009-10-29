@@ -1,11 +1,13 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.BindException;
 import java.util.ArrayList;
 
 import javax.swing.Box;
@@ -14,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -38,6 +41,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
+import org.basex.server.LoginException;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 
@@ -130,7 +134,7 @@ public final class DialogServer extends Dialog {
     super(main, SRVTITLE);
 
     tabs = new BaseXTabs(this);
-    
+
     // Server panel
     p1.setLayout(new TableLayout(5, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
@@ -167,7 +171,7 @@ public final class DialogServer extends Dialog {
     p111.add(start);
     p111.add(stop);
     p11.add(p111);
-    
+
     // Login panel.
     final BaseXBack p12 = new BaseXBack();
     p12.setLayout(new TableLayout(6, 2, 2, 2));
@@ -192,13 +196,13 @@ public final class DialogServer extends Dialog {
     p121.add(connect);
     p121.add(disconnect);
     p12.add(p121);
-    
+
     // adding to main panel
     p11.setBorder(8, 8, 8, 8);
     p12.setBorder(8, 8, 8, 8);
     infop1 = new BaseXLabel(" ");
     infop1.setBorder(40, 0, 0, 0);
-    
+
     p1.add(p11);
     p1.add(p12);
     p1.add(infop1);
@@ -264,7 +268,9 @@ public final class DialogServer extends Dialog {
       run = true;
       createSession(ADMIN, ADMIN, true);
       cs = null;
-    } catch(final IOException e1) { run = false; }
+    } catch(final IOException e1) {
+      run = false;
+    }
 
     action(null);
     finish(null);
@@ -278,10 +284,10 @@ public final class DialogServer extends Dialog {
    * @throws IOException I/O exception
    */
   private void createSession(final String u, final String p, final boolean l)
-  throws IOException {
+      throws IOException {
     if(l) cs = new ClientSession(ctx, u, p);
-    cs = new ClientSession(host.getText(), Integer.parseInt(port.getText()),
-        u, p);
+    cs = new ClientSession(host.getText(), Integer.parseInt(port.getText()), u,
+        p);
   }
 
   @Override
@@ -294,12 +300,11 @@ public final class DialogServer extends Dialog {
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
         final String clazz = org.basex.BaseXServer.class.getName();
-        new ProcessBuilder(
-            new String[] { "java", mem, "-cp", path, clazz, "-p",
-                String.valueOf(p) }).start();
+        new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
+            "-p", String.valueOf(p)}).start();
         run = true;
       } catch(final Exception ex) {
-        err1 = BUTTONSTASERV + FAILED + ex.getMessage();
+        err1 = BUTTONSTASERV + FAILED + error(ex);
         Main.debug(ex);
       }
     } else if(BUTTONSTOSERV.equals(cmd)) {
@@ -310,7 +315,7 @@ public final class DialogServer extends Dialog {
         run = false;
         connected = false;
       } catch(final IOException ex) {
-        err1 = BUTTONSTOSERV + FAILED + ex.getMessage();
+        err1 = BUTTONSTOSERV + FAILED + error(ex);
         Main.debug(ex);
       }
     } else if(BUTTONCHANGE.equals(cmd)) {
@@ -318,7 +323,7 @@ public final class DialogServer extends Dialog {
         try {
           cs.execute(p);
         } catch(IOException e) {
-          err2 = BUTTONCHANGE + FAILED + e.getMessage();
+          err2 = BUTTONCHANGE + FAILED + error(e);
           Main.debug(e);
         }
       }
@@ -332,7 +337,7 @@ public final class DialogServer extends Dialog {
         pass.setText("");
         setData();
       } catch(final IOException ex) {
-        err2 = CREATEU + FAILED + ex.getMessage();
+        err2 = CREATEU + FAILED + error(ex);
         Main.debug(ex);
       }
     } else if(BUTTONDROP.equals(cmd)) {
@@ -343,7 +348,7 @@ public final class DialogServer extends Dialog {
           setData();
         }
       } catch(final Exception ex) {
-        err2 = DROPU + FAILED + ex.getMessage();
+        err2 = DROPU + FAILED + error(ex);
         Main.debug(ex);
       }
     } else if(BUTTONALTER.equals(cmd)) {
@@ -352,17 +357,18 @@ public final class DialogServer extends Dialog {
       try {
         cs.execute(new AlterUser(u, p));
       } catch(IOException e) {
-        err2 = ALTERPW + FAILED + e.getMessage();
+        err2 = ALTERPW + FAILED + error(e);
         Main.debug(e);
       }
     } else if(BUTTONCONNECT.equals(cmd)) {
       try {
         createSession(loguser.getText(), new String(logpass.getPassword()),
             false);
-        connected = true;
         setData();
-      } catch(IOException e) {
-        err1 = BUTTONCONNECT + FAILED + e.getMessage();
+        connected = true;
+      } catch(Exception e) {
+        logpass.setText("");
+        err1 = BUTTONCONNECT + FAILED + error(e);
         Main.debug(e);
       }
     } else if(BUTTONDISCONNECT.equals(cmd)) {
@@ -372,29 +378,29 @@ public final class DialogServer extends Dialog {
         logpass.setText("");
         connected = false;
       } catch(IOException e) {
-        err1 = BUTTONDISCONNECT + FAILED + e.getMessage();
+        err1 = BUTTONDISCONNECT + FAILED + error(e);
         Main.debug(e);
       }
     }
-    
+
     stop.setEnabled(run);
     portl.setEnabled(!run);
     loguser.setEnabled(!connected);
     logpass.setEnabled(!connected);
     port.setEnabled(!connected);
     host.setEnabled(!connected);
-    connect.setEnabled(!connected);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
     boolean valpl = portl.getText().matches("^[0-9]{2,5}$");
     boolean valp = port.getText().matches("^[0-9]{2,5}$");
     boolean vallu = true;
     if(!loguser.getText().isEmpty()) {
-    vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
+      vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
     }
     boolean vallp = true;
     if(!new String(logpass.getPassword()).isEmpty()) {
       vallp = new String(logpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
     }
+    disconnect.setEnabled(connected);
     start.setEnabled(!run && valpl);
     if(!valpl || !valh || !valp || !vallu || !vallp) {
       infop1.setIcon(BaseXLayout.icon("warn"));
@@ -414,15 +420,17 @@ public final class DialogServer extends Dialog {
       infop1.setIcon(BaseXLayout.icon("error"));
       err1 = null;
     } else {
+      connect.setEnabled(!connected && !loguser.getText().isEmpty()
+          && !new String(logpass.getPassword()).isEmpty());
       infop1.setText(" ");
       infop1.setIcon(null);
     }
     tabs.setEnabledAt(1, connected);
     boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
-    boolean valpass = new String(
-        pass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
-    boolean valnewpass = new String(
-        newpass.getPassword()).matches("^[A-Za-z0-9_.-]+$");
+    boolean valpass = new String(pass.getPassword()).
+    matches("^[A-Za-z0-9_.-]+$");
+    boolean valnewpass = new String(newpass.getPassword()).
+    matches("^[A-Za-z0-9_.-]+$");
     alter.setEnabled(valnewpass);
     create.setEnabled(valuname && valpass);
     if(!valuname && !user.getText().isEmpty()) {
@@ -445,8 +453,9 @@ public final class DialogServer extends Dialog {
 
   /**
    * Sets new data.
+   * @throws IOException Exception
    */
-  void setData() {
+  void setData() throws IOException {
     fillLists();
     userco1.removeAllItems();
     userco2.removeAllItems();
@@ -467,14 +476,30 @@ public final class DialogServer extends Dialog {
 
   /**
    * Fills all lists.
+   * @throws IOException Exception
    */
-  void fillLists() {
-    try {
-      final CachedOutput out = new CachedOutput();
-      cs.execute(new Show("Users"), out);
-      data = new Table(out.toString());
-    } catch(final IOException ex) {
-      ex.printStackTrace();
+  void fillLists() throws IOException {
+    final CachedOutput out = new CachedOutput();
+    if(!cs.execute(new Show("Users"), out)) {
+      throw new BaseXException(Main.info(PERMNO, ADMIN));
+    }
+    data = new Table(out.toString());
+  }
+
+  /**
+   * Returns a server error message.
+   * @param ex exception reference
+   * @return String error message
+   */
+  String error(final Exception ex) {
+    if(ex instanceof BindException) {
+      return SERVERBIND;
+    } else if(ex instanceof LoginException) {
+      return SERVERLOGIN;
+    } else if(ex instanceof IOException) {
+      return SERVERERR;
+    } else {
+      return ex.getMessage();
     }
   }
 
