@@ -2,6 +2,8 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -59,8 +61,9 @@ public abstract class Process extends Progress {
    * @param ctx database context
    * @param out output stream reference
    */
-  public void exec(final Context ctx, final PrintOutput out) {
-    if(!execute(ctx, out)) throw new BaseXException(info());
+  public void exec(final Context ctx, final OutputStream out) {
+    if(!execute(ctx, out instanceof PrintOutput ? (PrintOutput) out :
+      new PrintOutput(out))) throw new BaseXException(info());
   }
 
   /**

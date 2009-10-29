@@ -124,7 +124,6 @@ public interface Text {
     "Usage: java " + NAME + SERVERMODE + " [-dnpv] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
-    " -n<name> specify server address" + NL +
     " -p<port> specify server port" + NL +
     " -v       verbose mode";
 

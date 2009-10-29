@@ -78,6 +78,13 @@ public class Seq extends Item {
   }
 
   @Override
+  public Object java() {
+    final Object[] obj = new Object[size];
+    for(int s = 0; s < size; s++) obj[s] = val[s].java();
+    return obj;
+  }
+
+  @Override
   public Iter iter() {
     return new SeqIter(val, size);
   }

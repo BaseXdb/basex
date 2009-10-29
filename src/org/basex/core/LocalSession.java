@@ -1,6 +1,8 @@
 package org.basex.core;
 
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 
@@ -25,7 +27,7 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public boolean execute(final String str, final PrintOutput out)
+  public boolean execute(final String str, final OutputStream out)
       throws IOException {
 
     try {
@@ -36,9 +38,10 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public boolean execute(final Process pr, final PrintOutput out) {
+  public boolean execute(final Process pr, final OutputStream out) {
     proc = pr;
-    return pr.execute(ctx, out);
+    return pr.execute(ctx, out instanceof PrintOutput ? (PrintOutput) out :
+      new PrintOutput(out));
   }
 
   @Override

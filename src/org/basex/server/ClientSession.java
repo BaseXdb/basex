@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.Context;
@@ -12,7 +13,6 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 
 /**
  * This wrapper sends commands to the server instance over a socket
@@ -80,7 +80,7 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public boolean execute(final String cmd, final PrintOutput o)
+  public boolean execute(final String cmd, final OutputStream o)
       throws IOException {
 
     out.writeUTF(cmd);
@@ -92,7 +92,7 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public boolean execute(final Process pr, final PrintOutput o)
+  public boolean execute(final Process pr, final OutputStream o)
       throws IOException {
     return execute(pr.toString(), o);
   }

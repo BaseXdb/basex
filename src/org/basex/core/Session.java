@@ -1,7 +1,7 @@
 package org.basex.core;
 
 import java.io.IOException;
-import org.basex.io.PrintOutput;
+import java.io.OutputStream;
 
 /**
  * This class allows a generic process execution.
@@ -18,7 +18,7 @@ public abstract class Session {
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public abstract boolean execute(final String cmd, final PrintOutput out)
+  public abstract boolean execute(final String cmd, final OutputStream out)
     throws IOException;
 
   /**
@@ -28,7 +28,7 @@ public abstract class Session {
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public abstract boolean execute(final Process pr, final PrintOutput out)
+  public abstract boolean execute(final Process pr, final OutputStream out)
     throws IOException;
 
   /**

@@ -2,7 +2,6 @@ package org.basex.test.examples;
 
 import org.basex.core.*;
 import org.basex.core.proc.*;
-import org.basex.io.*;
 
 /**
  * This class demonstrates how new are created and deleted.
@@ -17,48 +16,43 @@ public final class DBExample {
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
-   * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String[] args) {
     // Creates a new database context, referencing the database.
     Context context = new Context();
-    // Creates a standard output stream
-    PrintOutput out = new PrintOutput(System.out);
 
-    out.println("\n=== Create a database from a file.");
+    System.out.println("\n=== Create a database from a file.");
 
     // Creates a database from the specified file.
-    new CreateDB("input.xml", "Example1").exec(context, out);
+    new CreateDB("input.xml", "Example1").exec(context, System.out);
     // Closes the database.
-    new Close().exec(context, out);
+    new Close().exec(context, System.out);
 
-    out.println("\n=== Create a database from an input string.");
+    System.out.println("\n=== Create a database from an input string.");
 
     // XML string.
     String xml = "<xml>This is a test</xml>";
     // Creates a database for the specified input.
-    new CreateDB(xml, "Example2").exec(context, out);
+    new CreateDB(xml, "Example2").exec(context, System.out);
     // Closes the database.
-    new Close().exec(context, out);
+    new Close().exec(context, System.out);
 
-    out.println("\n=== Open an existing database and show database info:");
+    System.out.println("\n=== Open a database and show database info:");
 
     // Opens an existing database
-    new Open("Example1").exec(context, out);
+    new Open("Example1").exec(context, System.out);
     // Dumps information on the specified database context
-    new InfoDB().exec(context, out);
+    new InfoDB().exec(context, System.out);
     // Closes the database.
-    new Close().exec(context, out);
+    new Close().exec(context, System.out);
 
-    out.println("=== Drop databases.");
+    System.out.println("=== Drop databases.");
 
     // Removes the first database
-    new DropDB("Example1").exec(context, out);
+    new DropDB("Example1").exec(context, System.out);
     // Removes the second database
-    new DropDB("Example2").exec(context, out);
+    new DropDB("Example2").exec(context, System.out);
 
-    // Closes the output stream
-    out.close();
     // Closes the database context
     context.close();
   }

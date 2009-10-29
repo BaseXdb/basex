@@ -81,11 +81,9 @@ public final class UpdateFunctions {
   public static void insertAttributes(final int pre, final int par,
       final Data d, final Data m) {
     final int ss = m.size(0, m.kind(0));
-    //printTable(m);
     for(int s = 1; s < ss; s++) {
       d.insert(pre + s - 1, par, m.attName(s), m.attValue(s));
     }
-    //printTable(d);
   }
 
   /**

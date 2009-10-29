@@ -29,8 +29,11 @@ public final class XQueryExample {
   public static void main(final String[] args) throws Exception {
     // Creates a database context
     Context context = new Context();
-    // Creates a standard output stream
+
+    // Creates a print output
     PrintOutput out = new PrintOutput(System.out);
+    // Alternative: write results to disk
+    // PrintOutput out = new PrintOutput("result.txt");
 
     out.println("=== First version: Processing a result instance");
 

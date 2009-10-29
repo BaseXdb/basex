@@ -1,9 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.BaseXServer;
-import org.basex.io.*;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
 
 /**
  * This class demonstrates how the database can be accessed via the
@@ -15,8 +13,6 @@ import org.basex.util.Performance;
 public final class ServerExample {
   /** Session. */
   static ClientSession session;
-  /** Output stream reference. */
-  static PrintOutput out;
 
   /** Private constructor. */
   private ServerExample() { }
@@ -36,48 +32,39 @@ public final class ServerExample {
     }.start();
 
     // Wait for the thread to be started.
-    Performance.sleep(100);
+    Thread.sleep(100);
 
     // Create client session, specifying the server name and port
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
-    // Create a standard output stream.
-    out = new PrintOutput(System.out);
+    System.out.println("\n=== Create a database:");
 
-    // Alternative: write results to disk
-    //out = new PrintOutput("result.txt");
-
-    out.println("\n=== Create a database:");
-
-    // Set an option: activate command info output.
+    // Set an option: shows command info output.
     launch("set info true");
     // Create a database from the specified file.
     launch("create db \"input.xml\" input");
 
-    out.println("\n=== Run a query:");
+    System.out.println("\n=== Run a query:");
 
     // Create a database for the specified input.
     launch("xquery //li");
 
-    out.println("\n=== Show database information:");
+    System.out.println("\n=== Show database information:");
 
     // Create a database for the specified input.
     launch("info db");
 
-    out.println("\n=== Close and drop the database:");
+    System.out.println("\n=== Close and drop the database:");
 
     // Close the database.
     launch("close");
     // Drop the database.
     launch("drop db input");
 
-    out.println("\n=== Stop the server:");
+    System.out.println("\n=== Stop the server:");
 
     // Close the session.
     session.close();
-
-    // Close the output stream
-    out.close();
 
     // Stop server instance.
     new BaseXServer("stop");
@@ -91,8 +78,8 @@ public final class ServerExample {
    */
   private static void launch(final String cmd) throws Exception {
     // Execute the process.
-    session.execute(cmd, out);
+    session.execute(cmd, System.out);
     // Show optional process information.
-    out.print(session.info());
+    System.out.print(session.info());
   }
 }

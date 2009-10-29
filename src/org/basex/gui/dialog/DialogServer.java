@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
@@ -9,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
-
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -47,7 +45,7 @@ import org.basex.util.Table;
 
 /**
  * Dialog window for displaying information about the server.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -82,9 +80,9 @@ public final class DialogServer extends Dialog {
   /** Server host. */
   final BaseXTextField host;
   /** Local server port. */
-  final BaseXTextField portl;
+  final BaseXTextField ports;
   /** Server port. */
-  final BaseXTextField port;
+  final BaseXTextField portc;
   /** Change button. */
   final BaseXButton change;
   /** Alter button. */
@@ -139,7 +137,7 @@ public final class DialogServer extends Dialog {
     p1.setLayout(new TableLayout(5, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
     // User management panel
-    p2.setLayout(new TableLayout(12, 1, 0, 4));
+    p2.setLayout(new TableLayout(13, 1, 0, 4));
     p2.setBorder(8, 8, 8, 8);
 
     tabs.add(SERVERN, p1);
@@ -150,12 +148,12 @@ public final class DialogServer extends Dialog {
     connect = new BaseXButton(BUTTONCONNECT, null, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, null, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), null, this);
-    portl = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
-        this);
-    port = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), null,
-        this);
-    portl.addKeyListener(keys);
-    port.addKeyListener(keys);
+    ports = new BaseXTextField(
+        Integer.toString(ctx.prop.num(Prop.SERVERPORT)), null, this);
+    portc = new BaseXTextField(
+        Integer.toString(ctx.prop.num(Prop.PORT)), null, this);
+    ports.addKeyListener(keys);
+    portc.addKeyListener(keys);
     host.addKeyListener(keys);
 
     // Local server panel.
@@ -164,7 +162,7 @@ public final class DialogServer extends Dialog {
     p11.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
     p11.add(new BaseXLabel(" "));
     p11.add(new BaseXLabel(PORT + COLS));
-    p11.add(portl);
+    p11.add(ports);
     p11.add(new BaseXLabel(" "));
     final BaseXBack p111 = new BaseXBack();
     p111.setLayout(new TableLayout(1, 2, 2, 2));
@@ -178,7 +176,7 @@ public final class DialogServer extends Dialog {
     p12.add(new BaseXLabel(LOGIN + COLS, false, true));
     p12.add(new BaseXLabel(" "));
     p12.add(new BaseXLabel(SERVERUSER + COLS));
-    loguser = new BaseXTextField("", null, this);
+    loguser = new BaseXTextField(ADMIN, null, this);
     loguser.addKeyListener(keys);
     p12.add(loguser);
     p12.add(new BaseXLabel(SERVERPW + COLS));
@@ -189,7 +187,7 @@ public final class DialogServer extends Dialog {
     p12.add(new BaseXLabel(HOST + COLS));
     p12.add(host);
     p12.add(new BaseXLabel(PORT + COLS));
-    p12.add(port);
+    p12.add(portc);
     p12.add(new BaseXLabel(" "));
     final BaseXBack p121 = new BaseXBack();
     p121.setLayout(new TableLayout(1, 2, 2, 2));
@@ -219,49 +217,53 @@ public final class DialogServer extends Dialog {
     delete = new BaseXButton(BUTTONDROP, null, this);
     table = new JTable(new TableModel());
     table.setPreferredScrollableViewportSize(new Dimension(420, 100));
-
     p2.add(new BaseXLabel(CREATEU + COLS, false, true));
+
     final BaseXBack p21 = new BaseXBack();
     p21.setLayout(new TableLayout(1, 5, 6, 0));
+    p21.setBorder(0, 0, 5, 0);
     p21.add(new BaseXLabel(SERVERUSER));
     p21.add(user);
     p21.add(new BaseXLabel(SERVERPW));
     p21.add(pass);
     p21.add(create);
     p2.add(p21);
-    p2.add(new BaseXLabel(DROPU + COLS, false, true));
+    p2.add(new BaseXLabel(ALTERPW + COLS, false, true));
+
     final BaseXBack p22 = new BaseXBack();
-    p22.setLayout(new TableLayout(1, 2, 6, 0));
-    p22.add(userco1);
-    p22.add(delete);
-    p2.add(p22);
-    final BaseXBack p23 = new BaseXBack();
-    p23.setLayout(new TableLayout(2, 4, 6, 0));
-    p23.add(new BaseXLabel(ALTERPW + COLS, false, true));
-    p23.add(new BaseXLabel(" "));
-    p23.add(new BaseXLabel(" "));
-    p23.add(new BaseXLabel(" "));
+    p22.setLayout(new TableLayout(1, 4, 6, 0));
+    p22.setBorder(0, 0, 5, 0);
     newpass = new JPasswordField();
     alter = new BaseXButton(BUTTONALTER, null, this);
     userco2 = new BaseXCombo(new String[] {}, null, this);
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
-    p23.add(userco2);
-    p23.add(new BaseXLabel(NEWPW));
-    p23.add(newpass);
-    p23.add(alter);
-    p21.setBorder(0, 0, 5, 0);
-    p22.setBorder(0, 0, 5, 0);
-    p23.setBorder(0, 0, 5, 0);
-    p2.add(p23);
-    p2.add(Box.createVerticalStrut(8));
+    p22.add(userco2);
+    p22.add(new BaseXLabel(NEWPW));
+    p22.add(newpass);
+    p22.add(alter);
+    p2.add(p22);
     p2.add(new BaseXLabel(PERMS, false, true));
     p2.add(new JScrollPane(table));
-    infop2 = new BaseXLabel(" ");
     change = new BaseXButton(BUTTONCHANGE, null, this);
-    p2.add(change);
+
+    final BaseXBack p23 = new BaseXBack();
+    p23.setLayout(new BorderLayout());
+    p23.add(new BaseXLabel(DROPU + COLS, false, true), BorderLayout.WEST);
+    p23.add(change, BorderLayout.EAST);
+    BaseXLayout.setWidth(p23, 420);
+    p2.add(p23);
+
+    final BaseXBack p24 = new BaseXBack();
+    p24.setLayout(new TableLayout(1, 2, 6, 0));
+    p24.setBorder(0, 0, 5, 0);
+    p24.add(userco1);
+    p24.add(delete);
+    p2.add(p24);
+
+    infop2 = new BaseXLabel(" ");
     p2.add(infop2);
-    p2.add(new BaseXLabel(" "));
+    p2.add(Box.createVerticalStrut(16));
 
     // test if server is running
     try {
@@ -286,16 +288,16 @@ public final class DialogServer extends Dialog {
   private void createSession(final String u, final String p, final boolean l)
       throws IOException {
     if(l) cs = new ClientSession(ctx, u, p);
-    cs = new ClientSession(host.getText(), Integer.parseInt(port.getText()), u,
-        p);
+    cs = new ClientSession(ctx.prop.get(Prop.HOST),
+        ctx.prop.num(Prop.PORT), u, p);
   }
 
   @Override
   public void action(final String cmd) {
     if(BUTTONSTASERV.equals(cmd)) {
       try {
-        final int p = Integer.parseInt(portl.getText());
-        ctx.prop.set(Prop.PORT, p);
+        final int p = Integer.parseInt(ports.getText());
+        ctx.prop.set(Prop.SERVERPORT, p);
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
@@ -319,10 +321,10 @@ public final class DialogServer extends Dialog {
         Main.debug(ex);
       }
     } else if(BUTTONCHANGE.equals(cmd)) {
-      for(Process p : permps) {
+      for(final Process p : permps) {
         try {
           cs.execute(p);
-        } catch(IOException e) {
+        } catch(final IOException e) {
           err2 = BUTTONCHANGE + FAILED + error(e);
           Main.debug(e);
         }
@@ -356,12 +358,15 @@ public final class DialogServer extends Dialog {
       final String p = new String(newpass.getPassword());
       try {
         cs.execute(new AlterUser(u, p));
-      } catch(IOException e) {
+      } catch(final IOException e) {
         err2 = ALTERPW + FAILED + error(e);
         Main.debug(e);
       }
     } else if(BUTTONCONNECT.equals(cmd)) {
       try {
+        ctx.prop.set(Prop.PORT, Integer.parseInt(ports.getText()));
+        ctx.prop.set(Prop.HOST, host.getText());
+
         createSession(loguser.getText(), new String(logpass.getPassword()),
             false);
         setData();
@@ -369,7 +374,6 @@ public final class DialogServer extends Dialog {
       } catch(Exception e) {
         logpass.setText("");
         err1 = BUTTONCONNECT + FAILED + error(e);
-        Main.debug(e);
       }
     } else if(BUTTONDISCONNECT.equals(cmd)) {
       try {
@@ -377,21 +381,21 @@ public final class DialogServer extends Dialog {
         loguser.setText("");
         logpass.setText("");
         connected = false;
-      } catch(IOException e) {
+      } catch(final IOException e) {
         err1 = BUTTONDISCONNECT + FAILED + error(e);
         Main.debug(e);
       }
     }
 
     stop.setEnabled(run);
-    portl.setEnabled(!run);
+    ports.setEnabled(!run);
     loguser.setEnabled(!connected);
     logpass.setEnabled(!connected);
-    port.setEnabled(!connected);
+    portc.setEnabled(!connected);
     host.setEnabled(!connected);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
-    boolean valpl = portl.getText().matches("^[0-9]{2,5}$");
-    boolean valp = port.getText().matches("^[0-9]{2,5}$");
+    boolean valpl = ports.getText().matches("^[0-9]{2,5}$");
+    boolean valp = portc.getText().matches("^[0-9]{2,5}$");
     boolean vallu = true;
     if(!loguser.getText().isEmpty()) {
       vallu = loguser.getText().matches("^[A-Za-z0-9_.-]+$");
@@ -426,11 +430,11 @@ public final class DialogServer extends Dialog {
       infop1.setIcon(null);
     }
     tabs.setEnabledAt(1, connected);
-    boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
-    boolean valpass = new String(pass.getPassword()).
-    matches("^[A-Za-z0-9_.-]+$");
-    boolean valnewpass = new String(newpass.getPassword()).
-    matches("^[A-Za-z0-9_.-]+$");
+    final boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
+    final boolean valpass = new String(pass.getPassword()).
+      matches("^[A-Za-z0-9_.-]+$");
+    final boolean valnewpass = new String(newpass.getPassword()).
+      matches("^[A-Za-z0-9_.-]+$");
     alter.setEnabled(valnewpass);
     create.setEnabled(valuname && valpass);
     if(!valuname && !user.getText().isEmpty()) {
@@ -461,7 +465,7 @@ public final class DialogServer extends Dialog {
     userco2.removeAllItems();
     StringList tmp = new StringList();
     for(final StringList o : data.contents) {
-      String check = o.get(0);
+      final String check = o.get(0);
       if(!check.equals(ADMIN)) {
         userco1.addItem(check);
         userco2.addItem(check);
@@ -505,7 +509,7 @@ public final class DialogServer extends Dialog {
 
   /**
    * Dialog specific table model.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */

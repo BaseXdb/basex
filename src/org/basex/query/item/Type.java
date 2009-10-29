@@ -822,7 +822,7 @@ public enum Type {
    * @return result of check
    */
   public boolean instance(final Type t) {
-    return this == t ? true : par == null ? false : par.instance(t);
+    return this == t || par != null && par.instance(t);
   }
 
   /**

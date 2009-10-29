@@ -47,22 +47,18 @@ public final class Prop extends AProp {
 
   /** Database path. */
   public static final Object[] DBPATH = { "DBPATH", HOME + Text.NAME + "Data" };
-  /** Web Server path. */
-  public static final Object[] WEBPATH = { "WEBPATH", WORK + "web" };
-  /** Path to dotty. */
-  public static final Object[] DOTTY = { "DOTTY", "dotty" };
 
   /** Language Name (currently: English or German). */
   public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 
-  /** Host for client/server communication. */
+  /** Client/server communication: host. */
   public static final Object[] HOST = { "HOST", "localhost" };
-  /** Port for client/server communication. */
+  /** Client/server communication: client port. */
   public static final Object[] PORT = { "PORT", 1984 };
-  /** Port for web server. */
-  public static final Object[] WEBPORT = { "WEBPORT", 8080 };
+  /** Client/server communication: server port. */
+  public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
 
   // TRANSIENT OPTIONS ========================================================
 
@@ -84,6 +80,8 @@ public final class Prop extends AProp {
   public static final Object[] XMLOUTPUT = { "XMLOUTPUT", false };
   /** Dots the query plan. */
   public static final Object[] DOTPLAN = { "DOTPLAN", false };
+  /** Path to dotty. */
+  public static final Object[] DOTTY = { "DOTTY", "dotty" };
   /** Prints a XML plan. */
   public static final Object[] XMLPLAN = { "XMLPLAN", false };
   /** Creates the query plan before or after compilation. */

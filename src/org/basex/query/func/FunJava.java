@@ -13,6 +13,8 @@ import java.math.BigInteger;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -45,14 +47,14 @@ public final class FunJava extends Arr {
     String.class, boolean.class, Boolean.class, byte.class, Byte.class,
     short.class, Short.class, int.class, Integer.class, long.class, Long.class,
     float.class, Float.class, double.class, Double.class, BigDecimal.class,
-    BigInteger.class, QName.class, CharSequence.class
+    BigInteger.class, QName.class, CharSequence.class, Object[].class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
     Type.STR, Type.BLN, Type.BLN, Type.BYT, Type.BYT,
     Type.SHR, Type.SHR, Type.INT, Type.INT, Type.LNG, Type.LNG,
     Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC,
-    Type.ITR, Type.QNM, Type.STR
+    Type.ITR, Type.QNM, Type.STR, Type.SEQ
   };
   /** Java class. */
   private final Class<?> cls;
@@ -75,14 +77,15 @@ public final class FunJava extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item[] arg = new Item[expr.length];
     for(int a = 0; a < expr.length; a++) {
-      arg[a] = expr[a].atomic(ctx);
-      if(arg[a] == null) Err.empty(this);
+      arg[a] = expr[a].iter(ctx).finish();
+      if(arg[a].size(ctx) == 0) Err.empty(this);
     }
-
+    
     Object result = null;
     try {
       result = mth.equals("new") ? constructor(arg) : method(arg);
     } catch(final Exception ex) {
+      Main.debug(ex);
       Err.or(FUNJAVA, info());
     }
     return result == null ? Iter.EMPTY : iter(result);
@@ -99,7 +102,7 @@ public final class FunJava extends Arr {
       final Object[] arg = args(con.getParameterTypes(), ar, true);
       if(arg != null) return con.newInstance(arg);
     }
-    return null;
+    throw new Exception();
   }
 
   /**
@@ -125,11 +128,11 @@ public final class FunJava extends Arr {
       final Object[] arg = args(meth.getParameterTypes(), ar, st);
       if(arg != null) return meth.invoke(st ? null : ((Jav) ar[0]).val, arg);
     }
-    return null;
+    throw new Exception();
   }
 
   /**
-   * Checks if the arguments fit to the specified parameters.
+   * Checks if the arguments conform with the specified parameters.
    * @param params parameters
    * @param args arguments
    * @param stat static flag
@@ -147,16 +150,12 @@ public final class FunJava extends Arr {
     int a = 0;
 
     for(final Class<?> par : params) {
-      final Type jType = type(par);
-      if(jType == null) return null;
-
+      final Type jtype = type(par);
+      if(jtype == null) return null;
+      
       final Item arg = args[s + a];
-
-      if(jType == Type.JAVA && arg.type != Type.JAVA) return null;
-      if(!arg.type.instance(jType) && !jType.instance(arg.type)) return null;
-
-      final Object o = arg.java();
-      val[a++] = o;
+      if(!arg.type.instance(jtype) && !jtype.instance(arg.type)) return null;
+      val[a++] = arg.java();
     }
     return val;
   }
@@ -248,7 +247,8 @@ public final class FunJava extends Arr {
 
   @Override
   public String info() {
-    return cls + "." + mth + "(...)";
+    return cls.getName() + "." + mth + "(...)" + (mth.equals("new") ?
+        " constructor" : " method");
   }
 
   @Override

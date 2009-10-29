@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
@@ -53,7 +52,7 @@ public final class BaseXServer extends Main implements Runnable {
     sem = new Semaphore();
     if(!success) return;
     try {
-      server = new ServerSocket(context.prop.num(Prop.PORT));
+      server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
@@ -115,12 +114,9 @@ public final class BaseXServer extends Main implements Runnable {
         } else if(c == 'i') {
           // activate interactive mode
           console = true;
-        } else if(c == 'n') {
-          // parse server name
-          context.prop.set(Prop.HOST, arg.string());
         } else if(c == 'p') {
           // parse server port
-          context.prop.set(Prop.PORT, arg.num());
+          context.prop.set(Prop.SERVERPORT, arg.num());
         } else if(c == 'v') {
           // show process info
           info = true;

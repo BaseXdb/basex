@@ -351,7 +351,7 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
-  Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
+  Object[] NAMEWRONG = { XPTY, 4, "Invalid QName: \"%\"." };
 
   /** Example for a Date format. */
   String XDATE = "2000-12-31";
