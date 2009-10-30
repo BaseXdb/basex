@@ -6,8 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+
 import javax.swing.JPasswordField;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -160,13 +159,8 @@ public final class DialogServer extends Dialog {
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
-    Socket s = new Socket();
-    try {
-      run = true;
-      s.connect(new InetSocketAddress("localhost", ctx.prop.num(Prop.PORT)));
-    } catch(IOException e) {
-      run = false;
-    }
+    run = ping();
+    
     action(null);
     finish(null);
   }
@@ -183,6 +177,20 @@ public final class DialogServer extends Dialog {
         p);
     p2.setCs(cs);
   }
+  
+  /**
+   * Checks if a server is started, ping like.
+   * @return boolean success
+   */
+  boolean ping() {
+    try {
+      new ClientSession(ctx.prop.get(Prop.HOST),
+          ctx.prop.num(Prop.PORT), "", "");
+    } catch(IOException e) {
+      if(e instanceof LoginException) return true;
+    }
+    return false;
+  }
 
   @Override
   public void action(final String cmd) {
@@ -198,7 +206,7 @@ public final class DialogServer extends Dialog {
         final String clazz = org.basex.BaseXServer.class.getName();
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
-        run = true;
+        run = ping();
       } catch(final Exception ex) {
         err1 = BUTTONSTASERV + FAILED + error(ex);
         Main.debug(ex);

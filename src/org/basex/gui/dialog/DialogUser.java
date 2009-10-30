@@ -39,6 +39,8 @@ import org.basex.io.CachedOutput;
 import org.basex.server.LoginException;
 import org.basex.util.StringList;
 import org.basex.util.Table;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Panel for displaying information about global/lokal users.
@@ -215,7 +217,11 @@ public class DialogUser extends BaseXBack {
     final boolean valnewpass = new String(newpass.getPassword()).
     matches("^[A-Za-z0-9_.-]+$");
     alter.setEnabled(valnewpass);
-    create.setEnabled(valuname && valpass);
+    boolean disname = true;
+    for(int i = 0; i < userco1.getItemCount(); i++) {
+      if(user.getText().equals(userco1.getItemAt(i))) disname = false;
+    }
+    create.setEnabled(valuname && valpass && disname);
     if(!valuname && !user.getText().isEmpty()) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText(SERVERUSER + INVALID);
@@ -223,6 +229,10 @@ public class DialogUser extends BaseXBack {
         || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
       infop2.setIcon(BaseXLayout.icon("warn"));
       infop2.setText(SERVERPW + INVALID);
+    } else if(!disname) {
+      infop2.setIcon(BaseXLayout.icon("warn"));
+      infop2.setText(Token.string(new TokenBuilder().add(
+          USERKNOWN, user.getText()).finish()));
     } else if(err2 != null) {
       infop2.setText(err2);
       infop2.setIcon(BaseXLayout.icon("error"));
