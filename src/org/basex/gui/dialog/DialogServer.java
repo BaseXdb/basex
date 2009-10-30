@@ -7,6 +7,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.JPasswordField;
@@ -266,14 +268,13 @@ public final class DialogServer extends Dialog {
     p2.add(Box.createVerticalStrut(16));
 
     // test if server is running
+    Socket s = new Socket();
     try {
       run = true;
-      createSession(ADMIN, ADMIN);
-      cs = null;
-    } catch(final IOException e1) {
+      s.connect(new InetSocketAddress("localhost", ctx.prop.num(Prop.PORT)));
+    } catch(IOException e) {
       run = false;
     }
-
     action(null);
     finish(null);
   }
