@@ -182,7 +182,7 @@ public final class DialogMountFS extends Dialog {
 //      DeepFSImpl.main(new String[] {mp, db});
       close();
     } else {
-      ok = db.length() != 0 && ctx.prop.dbpath(db).exists();
+      ok = !db.isEmpty() && ctx.prop.dbpath(db).exists();
       warn.setText(" ");
       warn.setIcon(null);
       if(ok) {
@@ -195,7 +195,7 @@ public final class DialogMountFS extends Dialog {
           detail.setText(InfoDB.db(meta, true, true).finish());
           // check for valid mountpoint
           final IO file = IO.get(mp);
-          final boolean mpok = mp.length() != 0 && file.exists() &&
+          final boolean mpok = !mp.isEmpty() && file.exists() &&
             file.isDir();
           if (!mpok) {
             warn.setText(NOVALIDMOUNT);

@@ -243,7 +243,7 @@ public abstract class Process extends Progress {
    */
   protected String quote(final String s) {
     final StringBuilder sb = new StringBuilder();
-    if(s.length() != 0) {
+    if(!s.isEmpty()) {
       sb.append(' ');
       final boolean spc = s.indexOf(' ') != -1;
       if(spc) sb.append('"');

@@ -48,7 +48,7 @@ public final class Find extends AQuery {
     if(query.startsWith("/")) return query;
 
     final boolean r = root || ctx.root();
-    if(query.length() == 0) return r ? "/" : ".";
+    if(query.isEmpty()) return r ? "/" : ".";
 
     // file system instance
     final Data data = ctx.data();
@@ -86,7 +86,7 @@ public final class Find extends AQuery {
         pre += "descendant-or-self::*[@name ftcontains \"" + term + "\"] | ";
       }
     }
-    if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
+    if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
     return pre + (r ? "/" : "") + "descendant-or-self::" + tag + preds;
   }
 
@@ -138,7 +138,7 @@ public final class Find extends AQuery {
 
       if(pred == DataText.S_SIZE) {
         t = Long.toString(calcNum(token(t)));
-        if(name.length() != 0) name = "file";
+        if(!name.isEmpty()) name = "file";
       } else {
         // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");

@@ -70,7 +70,7 @@ public final class YMd extends Dur {
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;
 
     mon = y * 12 + m;
-    if(mt.group(1).length() != 0) mon = -mon;
+    if(!mt.group(1).isEmpty()) mon = -mon;
   }
 
   /**

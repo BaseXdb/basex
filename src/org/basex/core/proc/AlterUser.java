@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.PrintOutput;
@@ -24,12 +25,14 @@ public final class AlterUser extends AAdmin {
   @Override
   protected boolean exec(final PrintOutput out) {
     final String user = args[0];
-    return context.users.alter(user, args[1]) ?
+    final String pass = args[1];
+    return pass == null || pass.isEmpty() ? error(PASSNO, user) :
+      context.users.alter(user, pass) ?
       info(USERALTER, user) : error(USERNO, user);
   }
 
   @Override
   public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.USER + args();
+    return Cmd.ALTER + " " + CmdCreate.USER + args();
   }
 }

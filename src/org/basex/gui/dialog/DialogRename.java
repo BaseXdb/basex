@@ -72,8 +72,8 @@ public final class DialogRename extends Dialog {
     ok = !db.contains(nm) || nm.equals(old);
     String inf = ok ? "" : RENAMEEXISTS;
     if(ok) {
-      ok = nm.length() != 0 && IO.valid(nm);
-      if(!ok && nm.length() != 0) inf = RENAMEINVALID;
+      ok = !nm.isEmpty() && IO.valid(nm);
+      if(!ok && !nm.isEmpty()) inf = RENAMEINVALID;
     }
     info.setText(inf);
     enableOK(buttons, BUTTONOK, ok);

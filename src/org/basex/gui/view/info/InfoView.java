@@ -212,7 +212,7 @@ public final class InfoView extends View {
    * @param txt text
    */
   private void add(final TokenBuilder tb, final String head, final String txt) {
-    if(txt.length() == 0) return;
+    if(txt.isEmpty()) return;
     tb.high().add(head).norm().add(txt).nl().hl();
   }
 

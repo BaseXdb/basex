@@ -131,7 +131,7 @@ abstract class AQuery extends Process {
     if(!prop.is(Prop.INFO)) return;
     final int runs = prop.num(Prop.RUNS);
     final String opt = qp.info(prop.is(Prop.ALLINFO));
-    if(opt.length() != 0) info(opt);
+    if(!opt.isEmpty()) info(opt);
     info(QUERYPARSE + Performance.getTimer(pars, runs));
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));
     info(QUERYEVALUATE + Performance.getTimer(eval, runs));

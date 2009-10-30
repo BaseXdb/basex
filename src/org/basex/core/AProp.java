@@ -54,7 +54,7 @@ public abstract class AProp {
 
       while((line = br.readLine()) != null) {
         line = line.trim();
-        if(line.length() == 0 || line.charAt(0) == '#') continue;
+        if(line.isEmpty() || line.charAt(0) == '#') continue;
         final int d = line.indexOf('=');
         if(d < 0) {
           err.add("%: \"%\" ignored. " + NL, filename, line);

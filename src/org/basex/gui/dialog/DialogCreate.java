@@ -248,11 +248,11 @@ public final class DialogCreate extends Dialog {
 
     final String pth = path();
     final IO file = IO.get(pth);
-    final boolean exists = pth.length() != 0 && file.exists();
+    final boolean exists = !pth.isEmpty() && file.exists();
     if(exists) gui.prop.set(GUIProp.CREATEPATH, file.path());
 
     final String nm = dbname();
-    ok = exists && nm.length() != 0;
+    ok = exists && !nm.isEmpty();
 
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
     ImageIcon img = null;
@@ -266,7 +266,7 @@ public final class DialogCreate extends Dialog {
       }
     }
 
-    final boolean err = inf.trim().length() != 0;
+    final boolean err = !inf.trim().isEmpty();
     info.setText(inf);
     info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
     filter.setEnabled(exists && file.isDir());

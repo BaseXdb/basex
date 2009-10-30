@@ -570,7 +570,7 @@ public class BaseXText extends BaseXPanel {
    */
   protected final boolean copy() {
     final String txt = text.copy();
-    if(txt.length() == 0) {
+    if(txt.isEmpty()) {
       text.noMark();
       return false;
     }

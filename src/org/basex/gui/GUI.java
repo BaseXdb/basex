@@ -371,7 +371,7 @@ public final class GUI extends JFrame {
     final Namespaces ns = context.data().ns;
     final int def = ns.get(Token.EMPTY, 0);
     String in = qu;
-    if(in.trim().length() == 0) in = ".";
+    if(in.trim().isEmpty()) in = ".";
     if(def != 0) in = "declare default element namespace \"" +
       Token.string(ns.key(def)) + "\"; " + in;
     execute(new XQuery(in), main);
@@ -531,7 +531,7 @@ public final class GUI extends JFrame {
       // unexpected error
       ex.printStackTrace();
       Dialog.error(this, Main.info(PROCERR, pr,
-          ex.toString().length() != 0 ? ex.toString() : ex.getMessage()));
+          !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }
 

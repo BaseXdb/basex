@@ -82,7 +82,7 @@ public final class DiskData extends Data {
 
       while(true) {
         final String k = in.readString();
-        if(k.length() == 0) break;
+        if(k.isEmpty()) break;
         if(k.equals(DBTAGS))      tags = new Names(in);
         else if(k.equals(DBATTS)) atts = new Names(in);
         else if(k.equals(DBPATH)) path = new PathSummary(in);

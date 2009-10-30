@@ -88,7 +88,7 @@ public class Dur extends Item {
     mon = y * 12 + m;
     sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
     sc = sc.add(BigDecimal.valueOf(s));
-    if(mt.group(1).length() != 0) {
+    if(!mt.group(1).isEmpty()) {
       mon = -mon;
       sc = sc.negate();
     }

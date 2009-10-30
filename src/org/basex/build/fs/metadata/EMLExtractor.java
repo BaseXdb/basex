@@ -80,7 +80,7 @@ public final class EMLExtractor extends AbstractExtractor {
     mBoundary = "";
     getHeaderData(build);
 
-    if(mBoundary.length() != 0) {
+    if(!mBoundary.isEmpty()) {
       // currently, mContextType can still be empty..
       mMultiPart = mContentType != null && mContentType.contains("multipart");
 
@@ -97,7 +97,7 @@ public final class EMLExtractor extends AbstractExtractor {
 
     build.endElem(EMAIL);
 
-    while(readLine() && mCurrLine.length() == 0);
+    while(readLine() && mCurrLine.isEmpty());
     return mCurrLine != null;
   }
 
@@ -110,7 +110,7 @@ public final class EMLExtractor extends AbstractExtractor {
   private boolean getBodyData(final Builder build) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
 
-    final boolean bound = mBoundary.length() != 0;
+    final boolean bound = !mBoundary.isEmpty();
     if(bound) getSectionContentType();
 
     while(readLine()) {
@@ -153,9 +153,7 @@ public final class EMLExtractor extends AbstractExtractor {
    * @throws IOException I/O exception
    */
   private void getHeaderData(final Builder build) throws IOException {
-    do {
-      checkHeaderLine(build);
-    } while(mCurrLine.length() != 0);
+    do checkHeaderLine(build); while(!mCurrLine.isEmpty());
   }
 
   /**
@@ -265,7 +263,7 @@ public final class EMLExtractor extends AbstractExtractor {
         mBodyCharset = mCurrLine.split("charset=")[1];
         mBodyCharset = mBodyCharset.replace("\"", "").trim();
       }
-    } while(readLine() && mCurrLine.length() != 0);
+    } while(readLine() && !mCurrLine.isEmpty());
   }
 
   /**
@@ -305,7 +303,7 @@ public final class EMLExtractor extends AbstractExtractor {
     addressPool.append(mCurrLine);
 
     // get all lines up to the next attribute
-    while(readLine() && mCurrLine.length() != 0 && !mCurrLine.contains(": ")) {
+    while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": ")) {
       addressPool.append(mCurrLine);
     }
 
@@ -322,7 +320,7 @@ public final class EMLExtractor extends AbstractExtractor {
   private void getSubject(final Builder build) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mCurrLine);
-    while(readLine() && mCurrLine.length() != 0 && !mCurrLine.contains(": ")) {
+    while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": ")) {
       tb.add(mCurrLine);
     }
     byte[] text = tb.finish();

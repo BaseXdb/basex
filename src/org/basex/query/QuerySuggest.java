@@ -52,7 +52,7 @@ public final class QuerySuggest extends QueryParser {
     if(show) {
       for(final PathNode n : curr) {
         final String nm = string(n.token(data));
-        if(nm.length() != 0 && !sl.contains(nm)) sl.add(nm);
+        if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
       sl.sort(true);
     }

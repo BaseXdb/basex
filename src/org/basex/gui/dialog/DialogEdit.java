@@ -123,14 +123,14 @@ public final class DialogEdit extends Dialog {
     result = new StringList();
     result.add(in);
     if(kind == Data.ELEM || kind == Data.DOC) {
-      if(in.length() == 0 || in.equals(old1)) return;
+      if(in.isEmpty() || in.equals(old1)) return;
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       if(in.equals(old2)) return;
     } else {
       final String in2 = kind == Data.ATTR ? input2.getText() :
         string(input3.getText());
 
-      if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
+      if(in.isEmpty() || in.equals(old1) && in2.equals(old2)) return;
       result.add(in2);
     }
   }

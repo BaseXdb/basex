@@ -795,7 +795,7 @@ public final class Metadata {
   public String toString() {
     final String k = string(key);
     final String v = string(value);
-    final boolean empty = v.length() == 0;
+    final boolean empty = v.isEmpty();
     final StringBuilder xmlAttrsStr = new StringBuilder("");
     final Atts atts = getAtts();
     for(int i = 0; i < atts.size; i++) {

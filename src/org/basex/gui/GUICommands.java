@@ -806,7 +806,7 @@ public enum GUICommands implements GUICommand {
       final String tt = gui.notify.tooltip(true);
       final boolean en = tt != null;
       BaseXLayout.enable(button, en);
-      button.setToolTipText(en && tt.length() == 0 ? GUIGOBACKTT : tt);
+      button.setToolTipText(en && tt.isEmpty() ? GUIGOBACKTT : tt);
     }
   },
 
@@ -822,7 +822,7 @@ public enum GUICommands implements GUICommand {
       final String tt = gui.notify.tooltip(false);
       final boolean en = tt != null;
       BaseXLayout.enable(button, en);
-      button.setToolTipText(en && tt.length() == 0 ? GUIGOFORWARDTT : tt);
+      button.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARDTT : tt);
     }
   },
 

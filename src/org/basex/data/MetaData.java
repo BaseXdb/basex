@@ -132,7 +132,7 @@ public final class MetaData {
       String str = "", k;
       IO f = null;
       long t = 0;
-      while((k = in.readString()).length() != 0) {
+      while(!(k = in.readString()).isEmpty()) {
         final String v = in.readString();
         if(k.equals(DBSTR)) str = v;
         else if(k.equals(DBFNAME)) f = IO.get(v);
@@ -169,7 +169,7 @@ public final class MetaData {
     String storage = "", istorage = "";
     while(true) {
       final String k = in.readString();
-      if(k.length() == 0) break;
+      if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
         users = new Users(in);
         continue;

@@ -93,13 +93,13 @@ public final class XMLTS {
             (success ? "correct" : "wrong") + (correct ? " (OK)" : " (WRONG)"));
         if(verbose) {
           String inf = proc.info();
-          if(inf.length() != 0) Main.outln("[BASEX ] " + inf);
+          if(!inf.isEmpty()) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
           new Close().execute(context);
           proc = new CreateDB(PATH + uri);
           proc.execute(context);
           inf = proc.info();
-          if(inf.length() != 0) Main.outln("[XERCES] " + inf);
+          if(!inf.isEmpty()) Main.outln("[XERCES] " + inf);
         }
       }
       if(correct) ok++;

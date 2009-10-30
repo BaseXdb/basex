@@ -91,7 +91,7 @@ public final class Users {
   public boolean alter(final String usern, final String pass) {
     // check if user exists already
     final User user = get(usern);
-    if(user == null || pass == null) return false;
+    if(user == null) return false;
 
     user.pw = Crypter.encrypt(Token.token(pass));
     write();

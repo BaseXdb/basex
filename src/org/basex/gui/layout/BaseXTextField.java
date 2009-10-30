@@ -80,7 +80,7 @@ public class BaseXTextField extends JTextField {
         final String text = getText();
         final int co = e.getKeyCode();
         final boolean enter = co == KeyEvent.VK_ENTER;
-        if(co == KeyEvent.VK_ESCAPE || enter && text.length() == 0) {
+        if(co == KeyEvent.VK_ESCAPE || enter && text.isEmpty()) {
           area.requestFocusInWindow();
         } else if(enter || co == KeyEvent.VK_F3) {
           area.find(text, e.isShiftDown());

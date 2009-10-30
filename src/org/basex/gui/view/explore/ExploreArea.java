@@ -273,7 +273,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       String val2 = null;
       if(comp instanceof BaseXTextField) {
         val1 = ((BaseXTextField) comp).getText();
-        if(val1.length() != 0) {
+        if(!val1.isEmpty()) {
           if(val1.startsWith("\"")) {
             val1 = val1.replaceAll("\"", "");
             pattern = PATEX;
@@ -301,7 +301,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
       if(attr) {
         if(tb.size() == 0) tb.add("//*");
-        if(pattern.length() == 0) pattern = PATSIMPLE;
+        if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
         tb.add("//" + key);
         key = "text()";
@@ -312,15 +312,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     String qu = tb.toString();
     final boolean root = gui.context.root();
     final boolean rt = gui.prop.is(GUIProp.FILTERRT);
-    if(qu.length() != 0 && !rt && !root) qu = "." + qu;
+    if(!qu.isEmpty() && !rt && !root) qu = "." + qu;
 
     String simple = all.getText().trim();
-    if(simple.length() != 0) {
+    if(!simple.isEmpty()) {
       simple = Find.find(simple, gui.context, rt);
-      qu = qu.length() != 0 ? simple + " | " + qu : simple;
+      qu = !qu.isEmpty() ? simple + " | " + qu : simple;
     }
 
-    if(qu.length() == 0) qu = rt || root ? "/" : ".";
+    if(qu.isEmpty()) qu = rt || root ? "/" : ".";
 
     if(!force && last.equals(qu)) return;
     last = qu;

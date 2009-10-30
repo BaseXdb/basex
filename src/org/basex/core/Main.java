@@ -5,6 +5,9 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.Random;
+
+import org.basex.core.proc.AlterUser;
+import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Password;
 import org.basex.core.proc.Set;
@@ -90,9 +93,14 @@ public abstract class Main {
     try {
       for(final Process p : new CommandParser(in, context).parse()) {
         if(p instanceof Exit) return false;
-        if(p instanceof Password && p.args[0] == null) {
+
+        // offer optional password input
+        final int i = p instanceof Password && p.args[0] == null ? 0 :
+          (p instanceof CreateUser || p instanceof AlterUser) &&
+            p.args[1] == null ? 1 : -1;
+        if(i != -1) {
           Main.out(SERVERPW + COLS);
-          p.args[0] = new String(System.console().readPassword());
+          p.args[i] = new String(System.console().readPassword());
         }
         if(!process(p, true)) break;
       }
@@ -122,7 +130,7 @@ public abstract class Main {
 
     if(v || !ok) {
       final String inf = ss.info();
-      if(inf.length() != 0) {
+      if(!inf.isEmpty()) {
         if(!ok) {
           error(null, inf);
         } else {

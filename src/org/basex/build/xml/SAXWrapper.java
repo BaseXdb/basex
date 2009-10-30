@@ -90,7 +90,7 @@ public final class SAXWrapper extends Parser {
     if(is == null) return null;
     final String id = is.getSystemId();
     if(!Prop.gui || is.getByteStream() != null || id == null ||
-        id.length() == 0) return is;
+        id.isEmpty()) return is;
 
     length = IO.get(id).length();
     final FileInputStream fis = new FileInputStream(io.path()) {

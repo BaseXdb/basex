@@ -36,7 +36,7 @@ public final class BXNamespaceContext implements NamespaceContext {
   public Iterator<String> getPrefixes(final String uri) {
     final ArrayList<String> list = new ArrayList<String>();
     final String pre = getPrefix(uri);
-    if(pre.length() != 0) list.add(pre);
+    if(!pre.isEmpty()) list.add(pre);
     return list.iterator();
   }
 }

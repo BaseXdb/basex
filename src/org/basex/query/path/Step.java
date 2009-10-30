@@ -224,7 +224,6 @@ public class Step extends Preds {
       else if(axis != Axis.CHILD) sb.append(axis + "::");
       sb.append(test);
     }
-    sb.append(super.toString());
-    return sb.toString();
+    return sb.append(super.toString()).toString();
   }
 }

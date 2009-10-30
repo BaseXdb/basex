@@ -436,7 +436,7 @@ public abstract class W3CTS {
       final boolean print = currTime || !logStr.contains("current-");
 
       boolean correctError = false;
-      if(error != null && (outFiles.size() == 0 || expError.length() != 0)) {
+      if(error != null && (outFiles.size() == 0 || !expError.isEmpty())) {
         expError = error(pth + outname, expError);
         final String code = error.substring(0, Math.min(8, error.length()));
         for(final String er : SLASH.split(expError)) {
@@ -500,7 +500,7 @@ public abstract class W3CTS {
             if(eq) break;
           }
         }
-        if((rs > 0 || expError.length() != 0) && s == rs && !inspect) {
+        if((rs > 0 || !expError.isEmpty()) && s == rs && !inspect) {
           if(print) {
             if(outFiles.size() == 0) result.add(error(pth + outname, expError));
             logErr.append(logStr);
@@ -527,7 +527,7 @@ public abstract class W3CTS {
           ok++;
         }
       } else {
-        if(outFiles.size() == 0 || expError.length() != 0) {
+        if(outFiles.size() == 0 || !expError.isEmpty()) {
           if(print) {
             logOK2.append(logStr);
             logOK2.append("[" + testid + " ] ");

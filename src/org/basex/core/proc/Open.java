@@ -46,7 +46,7 @@ public final class Open extends Process {
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
-      return msg.length() != 0 ? error(msg) : error(DBOPENERR, db);
+      return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
     }
   }
 

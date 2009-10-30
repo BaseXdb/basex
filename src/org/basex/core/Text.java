@@ -210,7 +210,7 @@ public interface Text {
       "] ([mountpoint] [backingstore]): " + NL +
       "  " + Main.info(lang("ch_create5"), NAM, PATH) + NL +
       "  " + Main.info(lang("ch_create6"), "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "]: " + NL +
+    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "]?: " + NL +
       "  " + lang("ch_create7");
 
   /** Command help. */
@@ -262,7 +262,7 @@ public interface Text {
       "  " + Main.info(lang("ch_drop3"), NAM);
 
   /** Command help. */
-  String ALTER0 = USER + " [" + NAME + "] [" + PW + "]";
+  String ALTER0 = USER + " [" + NAME + "] [" + PW + "]?";
   /** Command help. */
   String ALTER1 = lang("ch_alter1");
   /** Command help. */
@@ -439,7 +439,7 @@ public interface Text {
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31");
 
   /** Command help. */
-  String PASSWORD0 = "[" + PW + "]";
+  String PASSWORD0 = "[" + PW + "]?";
   /** Command help. */
   String PASSWORD1 = lang("ch_password1");
   /** Command help. */

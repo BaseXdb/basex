@@ -100,7 +100,7 @@ public final class DTd extends Dur {
 
     sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
     sc = sc.add(BigDecimal.valueOf(s));
-    if(mt.group(1).length() != 0) sc = sc.negate();
+    if(!mt.group(1).isEmpty()) sc = sc.negate();
   }
 
   /**

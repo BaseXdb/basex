@@ -129,12 +129,12 @@ public final class CommandParser extends InputParser {
           case MAB:
             return new CreateMAB(string(cmd), name(null));
           case USER:
-            return new CreateUser(name(cmd), name(cmd));
+            return new CreateUser(name(cmd), name(null));
         }
         break;
       case ALTER:
         key(USER, cmd);
-        return new AlterUser(name(cmd), name(cmd));
+        return new AlterUser(name(cmd), name(null));
       case OPEN: case O:
         return new Open(name(cmd));
       case INFO: case I:

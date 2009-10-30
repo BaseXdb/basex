@@ -69,7 +69,7 @@ public final class EMLParser extends AbstractParser {
       public boolean parse(final EMLParser obj) throws IOException {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(obj.mCurrLine);
-        while(obj.readLine() && obj.mCurrLine.length() != 0
+        while(obj.readLine() && !obj.mCurrLine.isEmpty()
             && !obj.mCurrLine.contains(": ")) {
           tb.add(obj.mCurrLine);
         }
@@ -298,7 +298,7 @@ public final class EMLParser extends AbstractParser {
         getCharset();
       }
       if(readNext && !readLine()) return true;
-    } while(mCurrLine.length() != 0);
+    } while(!mCurrLine.isEmpty());
     return true;
   }
 
@@ -322,7 +322,7 @@ public final class EMLParser extends AbstractParser {
         getCharset();
       }
       if(!readLine()) return;
-    } while(mCurrLine.length() != 0);
+    } while(!mCurrLine.isEmpty());
 
     parseContent();
   }
@@ -342,7 +342,7 @@ public final class EMLParser extends AbstractParser {
    */
   private void parseContent() throws IOException {
     boolean multipart = false;
-    if(mBoundary != null && mBoundary.length() != 0) {
+    if(mBoundary != null && !mBoundary.isEmpty()) {
       // multipart
       if(mContentType != null && mContentType.startsWith("multipart")) {
         multipart = true;
@@ -451,7 +451,7 @@ public final class EMLParser extends AbstractParser {
           getCharset();
         }
       } else getCharset();
-    } while(readLine() && mCurrLine.length() != 0);
+    } while(readLine() && !mCurrLine.isEmpty());
     if(!plaintext) return false;
     return true;
   }
@@ -476,7 +476,7 @@ public final class EMLParser extends AbstractParser {
   void parseMailAddresses(final StringField field) throws IOException {
     final StringBuilder addresses = new StringBuilder();
     addresses.append(mCurrLine);
-    while(readLine() && mCurrLine.length() != 0 && !mCurrLine.contains(": ")) {
+    while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": ")) {
       addresses.append(mCurrLine);
     }
     for(final Matcher m = MAILPATTERN.matcher(addresses); m.find();) {

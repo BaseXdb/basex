@@ -570,7 +570,7 @@ public final class MP3Parser extends AbstractParser {
     if(size <= 1 || encoding == null) return EMPTY;
     if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
     else size--;
-    if(encoding.length() == 0) { // no encoding specified
+    if(encoding.isEmpty()) { // no encoding specified
       return bfc.get(new byte[size]);
     }
     final byte[] array = new byte[size - 1];

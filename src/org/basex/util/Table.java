@@ -52,7 +52,7 @@ public class Table {
 
     // parse table entries
     final int s = il.size() - 1;
-    while((line = scan.nextLine()).length() != 0) {
+    while(!(line = scan.nextLine()).isEmpty()) {
       final StringList entry = new StringList();
       for(int e = 0; e < s; e++) {
         entry.add(line.substring(il.get(e), il.get(e + 1)).trim());

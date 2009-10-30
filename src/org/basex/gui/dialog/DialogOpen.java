@@ -126,7 +126,7 @@ public final class DialogOpen extends Dialog {
       close();
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
-      if(db.length() == 0) return;
+      if(db.isEmpty()) return;
       if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
         if(ctx.data() != null && ctx.data().meta.name.equals(db)) {
           new Close().execute(gui.context);
@@ -138,7 +138,7 @@ public final class DialogOpen extends Dialog {
       }
     } else {
       final String db = choice.getValue().trim();
-      ok = db.length() != 0 && ctx.prop.dbpath(db).exists();
+      ok = !db.isEmpty() && ctx.prop.dbpath(db).exists();
       if(ok) doc.setText(db);
       enableOK(buttons, BUTTONDROP, ok);
 

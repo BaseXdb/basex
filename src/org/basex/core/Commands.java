@@ -122,7 +122,7 @@ public interface Commands {
 
           boolean first = true;
           for(String s : help2.split(NL)) {
-            if(s.length() == 0) continue;
+            if(s.isEmpty()) continue;
             if(s.startsWith("- ")) {
               sb.append((first ? "<ul>" : "</li>") + NL);
               sb.append(s.replaceAll(

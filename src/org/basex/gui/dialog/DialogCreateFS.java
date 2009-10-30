@@ -257,7 +257,7 @@ public final class DialogCreateFS extends Dialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
     final String nm = dbname.getText().trim();
-    cNam = nm.length() != 0;
+    cNam = !nm.isEmpty();
     if(cNam) gprop.set(GUIProp.FSDBNAME, nm);
     ok = cNam;
 
@@ -267,7 +267,7 @@ public final class DialogCreateFS extends Dialog {
     if(!cAll && cNam) {
       final String p = path.getText().trim();
       final IO file = IO.get(p);
-      cAll = p.length() != 0 && file.exists();
+      cAll = !p.isEmpty() && file.exists();
     }
     ok &= cAll;
 
@@ -289,7 +289,7 @@ public final class DialogCreateFS extends Dialog {
       }
     }
 
-    final boolean err = inf.trim().length() != 0;
+    final boolean err = !inf.trim().isEmpty();
     info.setText(inf);
     info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
     enableOK(buttons, BUTTONOK, ok);

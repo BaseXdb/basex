@@ -3,7 +3,6 @@ package org.basex;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
@@ -68,8 +67,8 @@ public final class BaseXServer extends Main implements Runnable {
   public void run() {
     while(running) {
       try {
-        final Socket s = server.accept();
-        context.add(new ServerSession(s, this, info));
+        final ServerSession s = new ServerSession(server.accept(), this, info);
+        if(s.init()) context.add(s);
       } catch(final IOException ex) {
         // socket was closed..
         break;

@@ -38,6 +38,10 @@ public final class ServerSession extends Thread {
   private final BaseXServer server;
   /** Info flag. */
   private final boolean info;
+  /** Input stream. */
+  private DataInputStream dis;
+  /** Output stream. */
+  private PrintOutput out;
   /** Core. */
   private Process core;
   /** Timeout thread. */
@@ -54,110 +58,105 @@ public final class ServerSession extends Thread {
     socket = s;
     server = b;
     info = i;
-    start();
   }
 
-  @Override
-  public void run() {
+  /**
+   * Initializes the session.
+   * @return success flag
+   */
+  public boolean init() {
     try {
-      // get command and arguments
-      final DataInputStream dis = new DataInputStream(socket.getInputStream());
-      final PrintOutput out = new PrintOutput(new BufferedOutput(
-          socket.getOutputStream()));
+      dis = new DataInputStream(socket.getInputStream());
+      out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
 
-      // handle unknown users and wrong passwords
+      // evaluate login data
       final String us = dis.readUTF();
       final String pw = dis.readUTF();
       context.user = context.users.get(us, pw);
       final boolean ok = context.user != null;
-      send(out, ok);
+      send(ok);
 
       if(ok) {
-        if(info) Main.outln(this + (ok ? " Login: " : " Failed: ") + us);
-        process(dis, out);
-        if(info) Main.outln(this + " Logout: " + us);
+        start();
       } else {
         if(info) Main.outln(this + " Failed: " + us);
       }
+      return ok;
+    } catch(final IOException ex) {
+      Main.error(ex, false);
+      return false;
+    }
+  }
+
+  @Override
+  public void run() {
+    if(info) Main.outln(this + " Login: " + context.user.name);
+    try {
+      while(true) {
+        String in = null;
+        try {
+          in = dis.readUTF();
+        } catch(final IOException ex) {
+          // this exception is thrown for each session if the server is stopped
+          exit();
+          break;
+        }
+
+        // parse input and create process instance
+        final Performance perf = new Performance();
+        Process proc = null;
+        try {
+          proc = new CommandParser(in, context, true).parse()[0];
+
+          if(proc instanceof IntInfo) {
+            String inf = core.info();
+            if(inf.equals(PROGERR)) inf = SERVERTIME;
+            new DataOutputStream(out).writeUTF(inf);
+            out.flush();
+          } else if (proc instanceof IntStop || proc instanceof Exit) {
+            exit();
+            if(proc instanceof IntStop) server.quit(false);
+            break;
+          } else {
+            core = proc;
+            startTimer(proc);
+            final boolean up = proc.updating(context);
+            if(up) {
+              server.sem.beforeWrite();
+            } else {
+              server.sem.beforeRead();
+            }
+            final boolean ok = proc.execute(context, out);
+            stopTimer();
+            out.write(new byte[IO.BLOCKSIZE]);
+            send(ok);
+            if(up) {
+              server.sem.afterWrite();
+            } else {
+              server.sem.afterRead();
+            }
+          }
+        } catch(final QueryException ex) {
+          // invalid command was sent by a client; create error feedback
+          proc = new IntError(ex.extended());
+          core = proc;
+          out.write(new byte[IO.BLOCKSIZE]);
+          send(false);
+        }
+        if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
+      }
+      if(info) Main.outln(this + " Logout: " + context.user.name);
     } catch(final IOException ex) {
       Main.error(ex, false);
     }
   }
 
   /**
-   * Processes all incoming client commands.
-   * @param dis input stream
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  void process(final DataInputStream dis, final PrintOutput out)
-      throws IOException {
-
-    while(true) {
-      String in = null;
-      try {
-        in = dis.readUTF();
-        //System.out.println(in);
-      } catch(final IOException ex) {
-        // this exception is thrown for each session if the server is stopped
-        exit();
-        return;
-      }
-
-      // parse input and create process instance
-      final Performance perf = new Performance();
-      Process proc = null;
-      try {
-        proc = new CommandParser(in, context, true).parse()[0];
-
-        if(proc instanceof IntInfo) {
-          String inf = core.info();
-          if(inf.equals(PROGERR)) inf = SERVERTIME;
-          new DataOutputStream(out).writeUTF(inf);
-          out.flush();
-        } else if (proc instanceof IntStop || proc instanceof Exit) {
-          exit();
-          if(proc instanceof IntStop) server.quit(false);
-          return;
-        } else {
-          core = proc;
-          startTimer(proc);
-          final boolean up = proc.updating(context);
-          if(up) {
-            server.sem.beforeWrite();
-          } else {
-            server.sem.beforeRead();
-          }
-          final boolean ok = proc.execute(context, out);
-          stopTimer();
-          out.write(new byte[IO.BLOCKSIZE]);
-          send(out, ok);
-          if(up) {
-            server.sem.afterWrite();
-          } else {
-            server.sem.afterRead();
-          }
-        }
-      } catch(final QueryException ex) {
-        // invalid command was sent by a client; create error feedback
-        proc = new IntError(ex.extended());
-        core = proc;
-        out.write(new byte[IO.BLOCKSIZE]);
-        send(out, false);
-      }
-
-      if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
-    }
-  }
-
-  /**
    * Sends the success flag to the client.
-   * @param out output stream
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  private void send(final PrintOutput out, final boolean ok)
-      throws IOException {
+  private void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

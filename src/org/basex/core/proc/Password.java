@@ -22,7 +22,8 @@ public final class Password extends Process {
   @Override
   protected boolean exec(final PrintOutput out) {
     final String user = context.user.name;
-    return context.users.alter(user, args[0]) ?
+    final String pass = args[1];
+    return pass != null && !pass.isEmpty() && context.users.alter(user, pass) ?
         info(USERALTER, user) : error(PASSNO, user);
   }
 }

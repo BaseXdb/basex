@@ -104,7 +104,7 @@ final class FNPat extends Fun {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     final SeqIter sb = new SeqIter();
     final String str = Token.string(val);
-    if(str.length() != 0) {
+    if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
       int s = 0;
       while(m.find()) {

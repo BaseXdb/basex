@@ -342,7 +342,7 @@ public final class PlotView extends View implements Runnable {
         final String x = formatString(true);
         final String y = formatString(false);
         String label = x.length() > 16 ? x.substring(0, 14) + ".." : x;
-        if(x.length() != 0 && y.length() != 0) label += " | ";
+        if(!x.isEmpty() && !y.isEmpty()) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
         final int xa = calcCoordinate(true, x1) + 15;
         int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
@@ -365,7 +365,7 @@ public final class PlotView extends View implements Runnable {
             BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
           }
         } else
-          if(ol > 1) label = label.length() == 0 ? ol + "x" :
+          if(ol > 1) label = label.isEmpty() ? ol + "x" :
             ol + "x: " + label + ", ...";
           BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
       }

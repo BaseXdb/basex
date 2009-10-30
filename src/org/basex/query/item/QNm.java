@@ -78,7 +78,7 @@ public final class QNm extends Item {
   private static String qname(final QName qn) {
     final String name = qn.getLocalPart();
     final String pre = qn.getPrefix();
-    return pre.length() != 0 ? pre + ":" + name : name;
+    return !pre.isEmpty() ? pre + ":" + name : name;
   }
 
   /**
