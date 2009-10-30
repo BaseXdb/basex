@@ -128,7 +128,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
       // create new id, if necessary
-      final String uid = id == null || id.length() == 0 ? createId() : id;
+      final String uid = id == null || id.isEmpty() ? createId() : id;
       return new BXXMLResource(null, 0, uid, this);
     }
     // reject binary and other resources

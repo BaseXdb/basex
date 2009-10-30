@@ -49,7 +49,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   public void setNamespace(final String pre, final String uri)
       throws XMLDBException {
 
-    if(uri != null && uri.length() != 0) ns.put(pre == null ? "" : pre, uri);
+    if(uri != null && !uri.isEmpty()) ns.put(pre == null ? "" : pre, uri);
     else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
   }
 
