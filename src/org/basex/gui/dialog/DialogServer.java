@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -335,11 +336,13 @@ public final class DialogServer extends Dialog {
       final String u = user.getText();
       final String p = new String(pass.getPassword());
       try {
-        cs.execute(new CreateUser(u, p));
+        if(!cs.execute(new CreateUser(u, p))) {
+          throw new BaseXException(cs.info());
+        }
         user.setText("");
         pass.setText("");
         setData();
-      } catch(final IOException ex) {
+      } catch(final Exception ex) {
         err2 = CREATEU + FAILED + error(ex);
         Main.debug(ex);
       }
@@ -392,7 +395,8 @@ public final class DialogServer extends Dialog {
     portc.setEnabled(!connected);
     host.setEnabled(!connected);
     boolean valh = host.getText().matches("^([A-Za-z]+://)?[A-Za-z0-9-.]+$");
-    boolean valpl = ports.getText().matches("^[0-9]{2,5}$");
+    boolean valpl = ports.getText().matches("^[0-9]{2,5}$") &&
+    Integer.parseInt(ports.getText()) <= 65535;
     boolean valp = portc.getText().matches("^[0-9]{2,5}$");
     boolean vallu = true;
     if(!loguser.getText().isEmpty()) {
@@ -451,13 +455,14 @@ public final class DialogServer extends Dialog {
       infop2.setIcon(null);
     }
     delete.setEnabled(data.contents.size() != 0);
+    change.setEnabled(false);
   }
 
   /**
    * Sets new data.
-   * @throws IOException Exception
+   * @throws Exception Exception
    */
-  void setData() throws IOException {
+  void setData() throws Exception {
     fillLists();
     userco1.removeAllItems();
     userco2.removeAllItems();
@@ -478,12 +483,12 @@ public final class DialogServer extends Dialog {
 
   /**
    * Fills all lists.
-   * @throws IOException Exception
+   * @throws Exception Exception
    */
-  void fillLists() throws IOException {
+  void fillLists() throws Exception {
     final CachedOutput out = new CachedOutput();
     if(!cs.execute(new Show("Users"), out)) {
-      throw new IOException(cs.info());
+      throw new BaseXException(cs.info());
     }
     data = new Table(out.toString());
   }
@@ -548,6 +553,7 @@ public final class DialogServer extends Dialog {
           right, uname));
       data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
       fireTableCellUpdated(row, col);
+      change.setEnabled(true);
     }
   }
 }
