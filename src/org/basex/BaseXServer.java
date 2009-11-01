@@ -9,6 +9,7 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.IntStop;
 import org.basex.server.ClientSession;
+import org.basex.server.LoginException;
 import org.basex.server.Semaphore;
 import org.basex.server.ServerSession;
 import org.basex.util.Args;
@@ -68,6 +69,12 @@ public final class BaseXServer extends Main implements Runnable {
     while(running) {
       try {
         final ServerSession s = new ServerSession(server.accept(), this, info);
+        context.setProp(new Prop());
+        if(context.prop.is(Prop.STOP)) {
+          context.prop.set(Prop.STOP, false);
+          context.prop.write();
+          quit(false);
+        }
         if(s.init()) context.add(s);
       } catch(final IOException ex) {
         // socket was closed..
@@ -126,11 +133,16 @@ public final class BaseXServer extends Main implements Runnable {
         success = false;
         if(arg.string().equals("stop")) {
           try {
+            context.prop.set(Prop.STOP, true);
+            context.prop.write();
             new ClientSession("localhost", context.prop.num(Prop.PORT),
-                ADMIN, ADMIN).execute(new IntStop(), null);
-            outln(SERVERSTOPPED);
+                "", "").execute(new IntStop(), null);
           } catch(final IOException ex) {
+            if(ex instanceof LoginException) {
+              outln(SERVERSTOPPED);
+            } else {
             error(ex, true);
+            }
           }
           return;
         }

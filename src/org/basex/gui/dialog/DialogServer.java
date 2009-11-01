@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.net.BindException;
 import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
+
+import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
-import org.basex.core.proc.IntStop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -196,9 +197,7 @@ public final class DialogServer extends Dialog {
             "-p", String.valueOf(p)}).start();
         running = ping(true);
       } else if(BUTTONSTOSERV.equals(cmd)) {
-        // [AW] to be revised...
-        new ClientSession("localhost", ctx.prop.num(Prop.SERVERPORT),
-            ADMIN, ADMIN).execute(new IntStop());
+        new BaseXServer("stop");
         running = ping(true);
         connected = connected && ping(false);
       } else if(BUTTONCONNECT.equals(cmd)) {

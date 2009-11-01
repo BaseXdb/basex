@@ -20,7 +20,7 @@ public final class Context {
   /** Users. */
   public final Users users;
   /** Database properties. */
-  public final Prop prop;
+  public Prop prop;
   /** Database pool. */
   public final DataPool pool;
   /** Current user. */
@@ -225,5 +225,13 @@ public final class Context {
    */
   public void delete(final ServerSession s) {
     sessions.delete(s);
+  }
+  
+  /**
+   * Sets properties.
+   * @param p Prop
+   */
+  public void setProp(final Prop p) {
+    this.prop = p;
   }
 }
