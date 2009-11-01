@@ -46,25 +46,24 @@ public final class BaseXLayout {
   private BaseXLayout() { }
 
   /**
-   * Returns the gui reference of the specified container.
+   * Sets the help text for the specified component.
    * @param cont input container
    * @param help help text
    */
-  public static void help(final Component cont, final byte[] help) {
+  public static void focus(final Component cont, final byte[] help) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    final GUIProp gprop = gui.prop;
-    if(gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
+    if(gui.prop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
     if(gui.fullscreen) return;
-    if(help != null && gprop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
+    if(help != null && gui.prop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
   }
 
   /**
-   * Returns the gui reference of the specified container.
+   * Returns the class reference of the specified container.
    * @param cont input container
    * @return gui
    */
-  static GUI gui(final Component cont) {
+  private static GUI gui(final Component cont) {
     final Container c = cont.getParent();
     return c == null || c instanceof GUI ? (GUI) c : gui(c);
   }
@@ -109,7 +108,7 @@ public final class BaseXLayout {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        help(comp, hlp);
+        focus(comp, hlp);
       }
     });
 

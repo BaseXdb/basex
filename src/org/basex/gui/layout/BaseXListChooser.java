@@ -37,27 +37,17 @@ public final class BaseXListChooser extends BaseXBack {
   /**
    * Default constructor.
    * @param choice the input values for the list.
-   * @param help help text
    * @param d dialog reference
    */
-  public BaseXListChooser(final String[] choice, final byte[] help,
-      final Dialog d) {
-
+  public BaseXListChooser(final String[] choice, final Dialog d) {
     // cache list values
     values = choice.clone();
 
     // checks if list is purely numeric
-    for(final String v : values) {
-      for(int c = 0; c < v.length(); c++) {
-        num &= v.charAt(c) >= '0' && v.charAt(c) <= '9';
-      }
-      if(!num) break;
-    }
+    for(final String v : values) num &= v.matches("[0-9]+");
 
-    // initialize panel
     setLayout(new TableLayout(2, 1));
-    // create a text field
-    text = new BaseXTextField(help, d);
+    text = new BaseXTextField(d);
     text.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -133,12 +123,12 @@ public final class BaseXListChooser extends BaseXBack {
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        BaseXLayout.help(text, help);
+        BaseXLayout.focus(text, null);
       }
       @Override
       public void mousePressed(final MouseEvent e) {
         final Object i = list.getSelectedValue();
-        if (i == null) return;
+        if(i == null) return;
         text.setText(i.toString());
         focus();
         text.selectAll();
@@ -157,14 +147,13 @@ public final class BaseXListChooser extends BaseXBack {
       }
     };
 
-    // initialize list
     list = new JList(choice);
     list.setFocusable(false);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
-    BaseXLayout.addInteraction(list, help, d);
+    BaseXLayout.addInteraction(list, null, d);
 
     scroll = new JScrollPane(list,
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

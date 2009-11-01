@@ -148,8 +148,7 @@ public abstract class Dialog extends JDialog {
    * @return button list
    */
   protected static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, true, new String[] { BUTTONOK, BUTTONCANCEL},
-        new byte[][] { HELPOK, HELPCANCEL});
+    return newButtons(dialog, true, new String[] { BUTTONOK, BUTTONCANCEL});
   }
 
   /**
@@ -157,11 +156,10 @@ public abstract class Dialog extends JDialog {
    * @param dialog reference to the component, reacting on button clicks.
    * @param hor horizontal alignment
    * @param texts button names
-   * @param help help texts
    * @return button list
    */
   protected static BaseXBack newButtons(final Dialog dialog, final boolean hor,
-      final String[] texts, final byte[][] help) {
+      final String[] texts) {
 
     // horizontal/vertical layout
     final BaseXBack panel = new BaseXBack();
@@ -173,7 +171,7 @@ public abstract class Dialog extends JDialog {
       panel.setLayout(new GridLayout(texts.length, 1, 0, 3));
     }
     for(int i = 0; i < texts.length; i++) {
-      panel.add(new BaseXButton(texts[i], help[i], dialog));
+      panel.add(new BaseXButton(texts[i], dialog));
     }
 
     final BaseXBack buttons = new BaseXBack();

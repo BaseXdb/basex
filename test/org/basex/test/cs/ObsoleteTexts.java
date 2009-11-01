@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.core.Main;
 
 /**
@@ -22,12 +21,9 @@ public final class ObsoleteTexts {
     Pattern.compile("\\b([A-Z][A-Z0-9_]+)\\b");
   /** Classes to test. */
   private static final Class<?>[] CLASSES = {
-    org.basex.core.Text.class,
-    org.basex.build.BuildText.class,
-    org.basex.build.fs.FSText.class,
-    org.basex.data.DataText.class,
-    org.basex.api.dom.BXText.class,
-    org.basex.query.QueryText.class,
+    org.basex.core.Text.class,       org.basex.build.BuildText.class,
+    org.basex.build.fs.FSText.class, org.basex.data.DataText.class,
+    org.basex.api.dom.BXText.class,  org.basex.query.QueryText.class
   }; 
 
   /** Private constructor, preventing instantiation. */
@@ -43,11 +39,16 @@ public final class ObsoleteTexts {
     read(new File("src"), set);
     
     for(final Class<?> c : CLASSES) {
-      Main.outln(c.getSimpleName() + ".java");
+      int i = 0;
       for(final Field f : c.getDeclaredFields()) {
         final String name = f.getName();
-        if(!set.contains(name)) Main.outln("- " + name);
+        if(!set.contains(name)) {
+          if(i == 0) Main.outln(c.getSimpleName() + ".java");
+          if(++i % 10 == 0) Main.out("\n");
+          Main.out(name + " ");
+        }
       }
+      if(i != 0) Main.outln("\n");
     }
   }
   

@@ -90,43 +90,8 @@ public interface DataText {
   String S_SIZE = "size";
   /** Time of last modification. */
   String S_MTIME = "mtime";
-  /** Time of last access token. */
-  String S_ATIME = "atime";
-  /** Time of creation token. */
-  String S_CTIME = "ctime";
-  /** Number of links token. */
-  String S_NLINK = "nlink";
-  /** User ID token. */
-  String S_UID = "uid";
-  /** Group ID token. */
-  String S_GID = "gid";
   /** Time of last modification. */
   String S_SUFFIX = "suffix";
-  /** DeepFS prefix. */
-  String S_FS = "fs";
-  /** DeepFS URL string. */
-  //String S_FSURL = "http://www.deepfs.org/fs/1.0/";
-  /** XMLNS prefix. */
-  String S_XMLNS = "xmlns";
-  /** DeepFS namespace declaration. */
-  //String S_DPFSNS = "declare namespace fs = \"" + S_FSURL + "\"; ";
-
-  /** DeepFS prefix. */
-  byte[] FS = token(S_FS);
-  /** DeepFS url. */
-//  byte[] FSURL = token(S_FSURL);
-  /** DeepFS prefix. */
-  byte[] FSMETAPREF = token("fsmeta");
-  /** DeepFS url. */
-//  byte[] FSMETAURL = token("http://www.deepfs.org/fsmeta/1.0/");
-  /** DeepFS prefix. */
-  byte[] FSDCPREF = token("dcterms");
-  /** DeepFS url. */
-  byte[] FSDCURL = token("http://purl.org/dc/terms/");
-  /** DeepFS prefix. */
-  byte[] FSXSIPREF = token("xsi");
-  /** DeepFS url. */
-  byte[] FSXSIURL = token("http://www.w3.org/2001/XMLSchema-instance");
 
   /** DeepFS token. */
   byte[] DEEPFS = token(S_DEEPFS);
@@ -149,18 +114,18 @@ public interface DataText {
   byte[] SIZE = token(S_SIZE);
   /** Time of last modification token. */
   byte[] MTIME = token(S_MTIME);
-  /** Time of last access token. */
-  byte[] ATIME = token(S_ATIME);
-  /** Time of creation token. */
-  byte[] CTIME = token(S_CTIME);
-  /** Number of links token. */
-  byte[] NLINK = token(S_NLINK);
-  /** User ID token. */
-  byte[] UID = token(S_UID);
-  /** Group ID token. */
-  byte[] GID = token(S_GID);
   /** Suffix attribute. */
   byte[] SUFFIX = token(S_SUFFIX);
+  /** Time of last access token. */
+  byte[] ATIME = token("atime");
+  /** Time of creation token. */
+  byte[] CTIME = token("ctime");
+  /** Number of links token. */
+  byte[] NLINK = token("nlink");
+  /** User ID token. */
+  byte[] UID = token("uid");
+  /** Group ID token. */
+  byte[] GID = token("gid");
   /** Offset attribute. */
   byte[] OFFSET = token("offset");
   /** File mode attribute. */
@@ -171,8 +136,6 @@ public interface DataText {
   byte[] BACKINGSTORE = token("backingstore");
   /** Negative mount point attribute. */
   byte[] NOTMOUNTED = token("(not mounted)");
-  /** Negative backing store attribute. */
-  byte[] NOBACKING = token("(no backing store)");
 
   // XML SERIALIZATION ========================================================
 
@@ -255,8 +218,6 @@ public interface DataText {
   String TABLEPREF = "PREFIX";
   /** URI header. */
   String TABLEURI = "NAMESPACE";
-  /** Fifth table Header. */
-  String TABLEKIND = "  KIND  CONTENT";
   /** Table Kinds. */
   String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
 

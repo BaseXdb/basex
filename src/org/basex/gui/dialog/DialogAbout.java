@@ -64,7 +64,7 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.NORTH);
 
     p = new BaseXBack();
-    p.add(new BaseXButton(BUTTONOK, null, this), BorderLayout.EAST);
+    p.add(new BaseXButton(BUTTONOK, this), BorderLayout.EAST);
     add(p, BorderLayout.EAST);
 
     finish(null);

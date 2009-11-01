@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -87,7 +86,7 @@ abstract class AUpdate extends Process {
    */
   protected boolean checkDB() {
     final Data data = context.data();
-    return data.ns.size() != 0 ? error(UPDATENS) : data instanceof MemData ?
-        error(PROCMM) : pos < 0 ? error(POSINVALID) : true;
+    return data.ns.size() != 0 ? error(UPDATENS) :
+      pos < 0 ? error(POSINVALID) : true;
   }
 }

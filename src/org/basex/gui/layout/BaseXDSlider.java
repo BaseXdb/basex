@@ -60,13 +60,11 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param main reference to the main window
    * @param mn min value
    * @param mx max value
-   * @param hlp help text
    * @param list listener
    */
   public BaseXDSlider(final GUI main, final double mn, final double mx,
-      final byte[] hlp, final ActionListener list) {
-
-    super(hlp, main);
+      final ActionListener list) {
+    super(null, main);
     listener = list;
     totMin = mn;
     totMax = mx;

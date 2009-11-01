@@ -1,6 +1,5 @@
 package org.basex.gui.view.xquery;
 
-import static org.basex.core.Text.*;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +38,7 @@ final class XQueryText extends BaseXText {
    * @param v view reference
    */
   XQueryText(final XQueryView v) {
-    super(HELPXQUERY, true, v.gui);
+    super(true, v.gui);
     view = v;
     setSyntax(new XQuerySyntax());
   }

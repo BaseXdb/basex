@@ -43,12 +43,12 @@ public final class DialogMapLayout extends Dialog {
     p.setLayout(new TableLayout(4, 1, 0, 8));
 
     // create list
-    algo = new BaseXListChooser(MAPALG, HELPMAPLAYOUT, this);
+    algo = new BaseXListChooser(MAPALG, this);
     p.add(algo);
 
     // create drop down
     final GUIProp gprop = gui.prop;
-    border = new BaseXCombo(MAPOFFSET, HELPMAPOFF, this);
+    border = new BaseXCombo(MAPOFFSET, this);
     border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
 
     BaseXBack tmp = new BaseXBack();
@@ -62,8 +62,7 @@ public final class DialogMapLayout extends Dialog {
 
     // create slider
     sizeLabel = new BaseXLabel(MAPSIZE);
-    sizeSlider = new BaseXSlider(0, 100,
-        gprop.num(GUIProp.MAPWEIGHT), HELPMAPSIZE, this);
+    sizeSlider = new BaseXSlider(0, 100, gprop.num(GUIProp.MAPWEIGHT), this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
     tmp = new BaseXBack();
@@ -73,8 +72,7 @@ public final class DialogMapLayout extends Dialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(MAPATT, HELPMAPATTS,
-        gprop.is(GUIProp.MAPATTS), this);
+    atts = new BaseXCheckBox(MAPATT, gprop.is(GUIProp.MAPATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);

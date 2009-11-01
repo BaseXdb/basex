@@ -67,7 +67,7 @@ public final class DialogPrefs extends Dialog {
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
-    path = new BaseXTextField(prop.get(Prop.DBPATH), HELPDBPATH, this);
+    path = new BaseXTextField(prop.get(Prop.DBPATH), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -75,7 +75,7 @@ public final class DialogPrefs extends Dialog {
       }
     });
 
-    final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
@@ -95,23 +95,19 @@ public final class DialogPrefs extends Dialog {
     pp.add(label);
 
     // checkbox for realtime mouse focus
-    javalook = new BaseXCheckBox(PREFLF, HELPLF,
-        gprop.is(GUIProp.JAVALOOK), this);
+    javalook = new BaseXCheckBox(PREFLF, gprop.is(GUIProp.JAVALOOK), this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS,
-        gprop.is(GUIProp.MOUSEFOCUS), this);
+    focus = new BaseXCheckBox(PREFFOCUS, gprop.is(GUIProp.MOUSEFOCUS), this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLEFILE, HELPSIMPLEFILE,
-        gprop.is(GUIProp.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLEFILE, gprop.is(GUIProp.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(PREFNAME, HELPNAME,
-        gprop.is(GUIProp.SHOWNAME), 12, this);
+    names = new BaseXCheckBox(PREFNAME, gprop.is(GUIProp.SHOWNAME), 12, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
@@ -123,7 +119,7 @@ public final class DialogPrefs extends Dialog {
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 12, 0));
 
-    lang = new BaseXCombo(LANGS[0], HELPLANG, this);
+    lang = new BaseXCombo(LANGS[0], this);
     lang.setSelectedItem(prop.get(Prop.LANGUAGE));
 
     p.add(lang);

@@ -51,7 +51,7 @@ public final class Lang {
    * @param lang language
    * @param chk check flag
    */
-  private static void read(final String lang, final boolean chk) {
+  private static synchronized void read(final String lang, final boolean chk) {
     try {
       if(DISALLOW) throw new Error("Language file was accessed.");
       if(chk) check = new HashMap<String, Boolean>();
@@ -90,7 +90,7 @@ public final class Lang {
    * @param key key
    * @return string
    */
-  public static String lang(final String key) {
+  public static synchronized String lang(final String key) {
     if(key == null) {
       if(CHECK && check.size() != 0) {
         final Iterator<String> it = check.keySet().iterator();
@@ -111,10 +111,20 @@ public final class Lang {
   }
 
   /**
+   * Returns the specified string with some text extensions included.
+   * @param key key
+   * @param e text text extensions
+   * @return string
+   */
+  public static synchronized String lang(final String key, final Object... e) {
+    return Main.info(lang(key), e);
+  }
+
+  /**
    * Parse all available language files and return the names and credits.
    * @return language arrays
    */
-  public static String[][] parse() {
+  public static synchronized String[][] parse() {
     final StringList langs = new StringList();
     final StringList creds = new StringList();
 
@@ -154,7 +164,7 @@ public final class Lang {
    * @param cont content
    * @return credits
    */
-  private static String credits(final byte[] cont) {
+  private static synchronized String credits(final byte[] cont) {
     final StringTokenizer st = new StringTokenizer(Token.string(cont), "\n");
     st.nextToken();
     return st.nextToken().replaceAll("# ", "");

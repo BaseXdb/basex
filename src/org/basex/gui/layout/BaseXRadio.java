@@ -17,17 +17,14 @@ public final class BaseXRadio extends JRadioButton {
   /**
    * Default constructor.
    * @param label button title
-   * @param hlp help text
    * @param sel initial selection state
    * @param win parent window
    */
-  public BaseXRadio(final String label, final byte[] hlp, final boolean sel,
-      final Window win) {
-
+  public BaseXRadio(final String label, final boolean sel, final Window win) {
     super(label, sel);
     setOpaque(false);
     setBorder(new EmptyBorder(0, 0, 0, 16));
-    BaseXLayout.addInteraction(this, hlp, win);
+    BaseXLayout.addInteraction(this, null, win);
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {

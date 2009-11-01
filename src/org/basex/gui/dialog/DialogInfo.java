@@ -91,7 +91,7 @@ public final class DialogInfo extends Dialog {
     // third tab
     BaseXBack tab3 = null;
     final boolean pi = data.meta.pathindex;
-    indexes[0] = new BaseXCheckBox(INFOPATHINDEX, null, pi, 0, this);
+    indexes[0] = new BaseXCheckBox(INFOPATHINDEX, pi, 0, this);
 
     tab3 = new BaseXBack();
     tab3.setLayout(new GridLayout(1, 1));
@@ -100,7 +100,7 @@ public final class DialogInfo extends Dialog {
     final BaseXBack north = new BaseXBack();
     north.setLayout(new BorderLayout());
     north.add(indexes[0], BorderLayout.WEST);
-    final BaseXButton export = new BaseXButton(GUIEXPORT, null, this);
+    final BaseXButton export = new BaseXButton(GUIEXPORT, this);
     export.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = GUICommands.save(gui, true);
@@ -134,8 +134,7 @@ public final class DialogInfo extends Dialog {
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    indexes[1] = new BaseXCheckBox(INFOTEXTINDEX,
-        Token.token(TXTINDEXINFO), meta.txtindex, 0, this);
+    indexes[1] = new BaseXCheckBox(INFOTEXTINDEX, meta.txtindex, 0, this);
     p.add(indexes[1], BorderLayout.NORTH);
 
     p.add(text(meta.txtindex ? data.info(Type.TXT) :
@@ -145,8 +144,7 @@ public final class DialogInfo extends Dialog {
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    indexes[2] = new BaseXCheckBox(INFOATTRINDEX,
-        Token.token(ATTINDEXINFO), meta.atvindex, 0, this);
+    indexes[2] = new BaseXCheckBox(INFOATTRINDEX, meta.atvindex, 0, this);
     p.add(indexes[2], BorderLayout.NORTH);
 
     p.add(text(meta.atvindex ? data.info(Type.ATV) :
@@ -159,8 +157,7 @@ public final class DialogInfo extends Dialog {
     tab5.setBorder(8, 8, 8, 8);
 
     ftedit = !meta.ftxindex;
-    indexes[3] = new BaseXCheckBox(INFOFTINDEX,
-        Token.token(FTINDEXINFO), meta.ftxindex, 0, this);
+    indexes[3] = new BaseXCheckBox(INFOFTINDEX, meta.ftxindex, 0, this);
 
     p = new BaseXBack();
     p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());
@@ -172,7 +169,7 @@ public final class DialogInfo extends Dialog {
       final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
       final boolean[] val = { meta.ftfz, meta.ftst, meta.ftdc, meta.ftcs };
       for(int f = 0; f < ft.length; f++) {
-        ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
+        ft[f] = new BaseXCheckBox(cb[f], val[f], 0, this);
         fl[f] = new BaseXLabel(desc[f], true, false);
         p.add(ft[f]);
         p.add(fl[f]);
@@ -192,8 +189,7 @@ public final class DialogInfo extends Dialog {
     set(tabs, BorderLayout.CENTER);
 
     buttons = newButtons(this, true,
-        new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
-        new byte[][] { HELPOPT, HELPOK, HELPCANCEL });
+        new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL });
     set(buttons, BorderLayout.SOUTH);
 
     action(null);
@@ -225,7 +221,7 @@ public final class DialogInfo extends Dialog {
    * @return text box
    */
   private BaseXText text(final byte[] txt) {
-    final BaseXText text = new BaseXText(null, false, this);
+    final BaseXText text = new BaseXText(false, this);
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
     text.setText(txt);
     BaseXLayout.setWidth(text, 550);

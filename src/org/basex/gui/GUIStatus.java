@@ -38,7 +38,7 @@ public final class GUIStatus extends BaseXPanel {
    * @param main reference to the main window
    */
   GUIStatus(final GUI main) {
-    super(HELPGUISTATUS, main);
+    super(null, main);
     BaseXLayout.setHeight(this, getFont().getSize() + 6);
     addKeyListener(this);
     addMouseListener(this);
@@ -141,7 +141,6 @@ public final class GUIStatus extends BaseXPanel {
   @Override
   public void mouseMoved(final MouseEvent e) {
     memfocus = e.getX() > getWidth() - MEMW;
-    if(memfocus) BaseXLayout.help(this, HELPMEM);
     gui.cursor(memfocus ? CURSORHAND : CURSORARROW);
   }
 

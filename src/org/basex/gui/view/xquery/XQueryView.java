@@ -63,7 +63,7 @@ public final class XQueryView extends View {
    * @param man view manager
    */
   public XQueryView(final ViewNotifier man) {
-    super(HELPXQUERY, man);
+    super(HELPXQUERYY, man);
 
     setLayout(new BorderLayout());
     setBorder(6, 8, 8, 8);
@@ -77,7 +77,7 @@ public final class XQueryView extends View {
 
     final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
     final BaseXButton save = BaseXButton.command(GUICommands.XQSAVE, gui);
-    final BaseXTextField find = new BaseXTextField(null, gui);
+    final BaseXTextField find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) open.getPreferredSize().getHeight());
 
     final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
@@ -155,6 +155,7 @@ public final class XQueryView extends View {
 
     sp = new BaseXBack(Fill.NONE);
     sp.setLayout(new TableLayout(1, 5));
+    sp.setBorder(4, 0, 0, 0);
     sp.add(stop);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(go);

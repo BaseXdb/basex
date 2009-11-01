@@ -60,7 +60,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.setBorder(10, 0, 0, 0);
-    if(cnc) p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this),
+    if(cnc) p.add(new BaseXButton(BUTTONCANCEL, this),
         BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
     finish(null);

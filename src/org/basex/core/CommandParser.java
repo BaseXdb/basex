@@ -470,10 +470,7 @@ public final class CommandParser extends InputParser {
         final Cmd c = Cmd.class.cast(e);
         if(c.help() || c.hidden() || c.internal()) continue;
       }
-      if(e.name().startsWith(t)) {
-        list = Array.add(list, e);
-        //list.add(e.name().toLowerCase());
-      }
+      if(e.name().startsWith(t)) list = Array.add(list, e);
     }
     return list;
   }

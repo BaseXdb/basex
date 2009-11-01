@@ -57,15 +57,14 @@ public class BaseXText extends BaseXPanel {
 
   /**
    * Default constructor.
-   * @param help help text
    * @param edit editable flag
    * @param win parent window
    */
-  public BaseXText(final byte[] help, final boolean edit, final Window win) {
-    super(help, win);
+  public BaseXText(final boolean edit, final Window win) {
+    super(null, win);
     setFocusable(true);
 
-    BaseXLayout.addInteraction(this, help, win);
+    BaseXLayout.addInteraction(this, null, win);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addComponentListener(this);

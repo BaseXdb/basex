@@ -59,7 +59,7 @@ public final class TextView extends View {
 
     final BaseXButton export = BaseXButton.command(GUICommands.SAVE, gui);
     final BaseXButton root = BaseXButton.command(GUICommands.HOME, gui);
-    find = new BaseXTextField(null, gui);
+    find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) root.getPreferredSize().getHeight());
 
     final BaseXBack sp = new BaseXBack(Fill.NONE);
@@ -72,7 +72,7 @@ public final class TextView extends View {
     back.add(sp, BorderLayout.EAST);
     add(back, BorderLayout.NORTH);
 
-    area = new BaseXText(HELPTEXT, false, gui);
+    area = new BaseXText(false, gui);
     area.addSearch(find);
     add(area, BorderLayout.CENTER);
 

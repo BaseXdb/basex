@@ -45,7 +45,7 @@ public final class DialogRename extends Dialog {
     info = new BaseXLabel(" ");
     info.setForeground(GUIConstants.COLORERROR);
 
-    name = new BaseXTextField(dbname, null, this);
+    name = new BaseXTextField(dbname, this);
     name.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {

@@ -70,7 +70,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     setLayout(new BorderLayout(0, 5));
     setMode(Fill.NONE);
 
-    all = new BaseXTextField(null, gui);
+    all = new BaseXTextField(gui);
     all.addKeyListener(main);
     all.addKeyListener(new KeyAdapter() {
       @Override
@@ -121,7 +121,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    */
   private void addInput(final int pos) {
-    final BaseXTextField txt = new BaseXTextField(HELPCATINPUT, gui);
+    final BaseXTextField txt = new BaseXTextField(gui);
     BaseXLayout.setWidth(txt, COMPW);
     BaseXLayout.setHeight(txt, txt.getFont().getSize() + 11);
     txt.setMargin(new Insets(0, 0, 0, 10));
@@ -153,7 +153,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.finish());
-    final BaseXCombo cm = new BaseXCombo(keys, HELPSEARCHCAT, gui);
+    final BaseXCombo cm = new BaseXCombo(keys, gui);
     cm.addActionListener(this);
     cm.addKeyListener(main);
     panel.add(cm);
@@ -166,7 +166,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    */
   private void addCombo(final String[] values, final int pos) {
-    final BaseXCombo cm = new BaseXCombo(values, HELPCAT, gui);
+    final BaseXCombo cm = new BaseXCombo(values, gui);
     BaseXLayout.setWidth(cm, COMPW);
     cm.addActionListener(this);
     cm.addKeyListener(main);
@@ -184,7 +184,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private void addSlider(final double min, final double max, final int pos,
       final boolean kb, final boolean date, final boolean itr) {
-    final BaseXDSlider sl = new BaseXDSlider(gui, min, max, HELPDS, this);
+    final BaseXDSlider sl = new BaseXDSlider(gui, min, max, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
     sl.kb = kb;
     sl.date = date;

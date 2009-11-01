@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Main;
+import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
@@ -31,7 +32,7 @@ public final class DropIndex extends ACreate {
   protected boolean exec(final PrintOutput out) {
     final Data data = context.data();
 
-    switch(getType(args[0])) {
+    switch(getOption(CmdIndex.class)) {
       case TEXT:
         data.meta.txtindex = false;
         return drop(Type.TXT, DATATXT);

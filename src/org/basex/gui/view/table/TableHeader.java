@@ -62,7 +62,7 @@ final class TableHeader extends BaseXPanel {
    * @param v view reference
    */
   TableHeader(final TableView v) {
-    super(HELPTABLEHEAD, v.gui);
+    super(null, v.gui);
     setMode(Fill.UP);
     tdata = v.tdata;
     view = v;

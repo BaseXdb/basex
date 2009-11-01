@@ -65,12 +65,12 @@ public final class DialogEdit extends Dialog {
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       final byte[] txt = kind == Data.ELEM ? data.tag(pre) : data.text(pre);
-      input = new BaseXTextField(string(txt), null, this);
+      input = new BaseXTextField(string(txt), this);
       old1 = input.getText();
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       setResizable(true);
-      input3 = new BaseXText(null, true, this);
+      input3 = new BaseXText(true, this);
       input3.setText(data.text(pre));
       input3.setPreferredSize(new Dimension(320, 200));
       old1 = string(input3.getText());
@@ -90,13 +90,13 @@ public final class DialogEdit extends Dialog {
       }
       final BaseXBack b = new BaseXBack();
       b.setLayout(new TableLayout(2, 1, 0, 8));
-      input = new BaseXTextField(old1, null, this);
+      input = new BaseXTextField(old1, this);
       b.add(input);
       if(kind == Data.ATTR) {
-        input2 = new BaseXTextField(old2, null, this);
+        input2 = new BaseXTextField(old2, this);
         b.add(input2);
       } else {
-        input3 = new BaseXText(null, true, this);
+        input3 = new BaseXText(true, this);
         input3.setText(token(old2));
         input3.setPreferredSize(new Dimension(400, 200));
         b.add(input3);

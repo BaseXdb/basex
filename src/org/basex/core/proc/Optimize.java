@@ -32,18 +32,16 @@ public final class Optimize extends ACreate {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    // rebuild statistics
-    final Data data = context.data();
-    return !stats(data) ? error(DBOPTERR1) : info(DBOPTIMIZED, perf.getTimer());
+    stats(context.data());
+    return info(DBOPTIMIZED, perf.getTimer());
   }
 
   /**
    * Creates new statistics.
    * @param data data reference
-   * @return true if operation was successful
    */
-  private boolean stats(final Data data) {
-    // refresh statistics
+  private void stats(final Data data) {
+    // refresh indexes
     data.path.init();
     data.tags.init();
     data.atts.init();
@@ -94,7 +92,6 @@ public final class Optimize extends ACreate {
     }
 
     data.flush();
-    return true;
   }
 
   @Override

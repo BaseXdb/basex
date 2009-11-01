@@ -23,23 +23,20 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Constructor.
-   * @param hlp help text
    * @param win parent window
    */
-  public BaseXTextField(final byte[] hlp, final Window win) {
-    this(null, hlp, win);
+  public BaseXTextField(final Window win) {
+    this(null, win);
   }
 
   /**
    * Constructor.
    * @param txt input text
-   * @param hlp help text
    * @param win parent window
    */
-  public BaseXTextField(final String txt, final byte[] hlp, final Window win) {
+  public BaseXTextField(final String txt, final Window win) {
     BaseXLayout.setWidth(this, 200);
     BaseXLayout.addInteraction(this, null, win);
-    help = hlp;
 
     if(txt != null) {
       setText(txt);
@@ -48,7 +45,7 @@ public class BaseXTextField extends JTextField {
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        BaseXLayout.help(e.getComponent(), help);
+        BaseXLayout.focus(e.getComponent(), help);
       }
     });
     addKeyListener(new KeyAdapter() {

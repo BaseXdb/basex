@@ -23,13 +23,12 @@ public final class BaseXButton extends JButton {
   /**
    * Default constructor.
    * @param l button title
-   * @param hlp help text
    * @param win parent window
    */
-  public BaseXButton(final String l, final byte[] hlp, final Window win) {
+  public BaseXButton(final String l, final Window win) {
     super(l);
     setOpaque(false);
-    BaseXLayout.addInteraction(this, hlp, win);
+    BaseXLayout.addInteraction(this, null, win);
     if(!(win instanceof Dialog)) return;
 
     final Dialog d = (Dialog) win;

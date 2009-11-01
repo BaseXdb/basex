@@ -181,8 +181,8 @@ public final class GUI extends JFrame {
     nav.setLayout(new BorderLayout(5, 0));
     nav.setBorder(2, 2, 0, 2);
 
-    mode = new BaseXCombo(new String[] {
-        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE, this);
+    mode = new BaseXCombo(
+        new String[] { BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, this);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
@@ -252,7 +252,7 @@ public final class GUI extends JFrame {
     notify = new ViewNotifier(this);
     query = new XQueryView(notify);
     text = new TextView(notify);
-    info = new InfoView(notify, HELPINFO);
+    info = new InfoView(notify);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
     final ViewPanel querypanel = new ViewPanel(query, XQUERYVIEW);
     final ViewPanel infopanel = new ViewPanel(info, INFOVIEW);

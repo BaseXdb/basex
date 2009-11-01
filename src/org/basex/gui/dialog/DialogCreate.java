@@ -22,7 +22,6 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * Dialog window for specifying options for creating a new database.
@@ -85,7 +84,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(CREATEFILT + ":", false, true));
     p.add(new BaseXLabel(""));
 
-    path = new BaseXTextField(gprop.get(GUIProp.CREATEPATH), null, this);
+    path = new BaseXTextField(gprop.get(GUIProp.CREATEPATH), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -93,7 +92,7 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(path, 240);
     p.add(path);
 
-    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), null, this);
+    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -101,8 +100,7 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(filter, 54);
     p.add(filter);
 
-    final BaseXButton button = new BaseXButton(BUTTONBROWSE,
-        HELPBROWSE, this);
+    final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
@@ -112,7 +110,7 @@ public final class DialogCreate extends Dialog {
     final BaseXLabel l = new BaseXLabel(CREATENAME, false, true);
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
-    dbname = new BaseXTextField(null, this);
+    dbname = new BaseXTextField(this);
     dbname.setText(IO.get(gprop.get(GUIProp.CREATEPATH)).dbname());
     dbname.addKeyListener(new KeyAdapter() {
       @Override
@@ -130,21 +128,18 @@ public final class DialogCreate extends Dialog {
     p2.setLayout(new TableLayout(9, 1));
     p2.setBorder(8, 8, 8, 8);
 
-    intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
+    intparse = new BaseXCheckBox(CREATEINTPARSE,
         prop.is(Prop.INTPARSE), 0, this);
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, true, false));
 
-    entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
-        prop.is(Prop.ENTITY), this);
+    entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), this);
     p2.add(entities);
 
-    dtd = new BaseXCheckBox(CREATEDTD, Token.token(DTDINFO),
-        prop.is(Prop.DTD), 12, this);
+    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, this);
     p2.add(dtd);
 
-    chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
-        prop.is(Prop.CHOP), 0, this);
+    chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
 
@@ -153,17 +148,17 @@ public final class DialogCreate extends Dialog {
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    pathindex = new BaseXCheckBox(INFOPATHINDEX, Token.token(PATHINDEXINFO),
+    pathindex = new BaseXCheckBox(INFOPATHINDEX,
         prop.is(Prop.PATHINDEX), 0, this);
     p3.add(pathindex);
     p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
-    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
 
-    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
+    atvindex = new BaseXCheckBox(INFOATTRINDEX,
         prop.is(Prop.ATTRINDEX), 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
@@ -173,18 +168,16 @@ public final class DialogCreate extends Dialog {
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        prop.is(Prop.FTINDEX), 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
-    final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO };
     final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
         prop.is(Prop.FTCS), prop.is(Prop.FTDC)
     };
     for(int f = 0; f < ft.length; f++) {
-      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], this);
+      ft[f] = new BaseXCheckBox(cb[f], val[f], this);
       p4.add(ft[f]);
     }
 

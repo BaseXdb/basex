@@ -68,7 +68,7 @@ public final class DialogMountFS extends Dialog {
     // create database chooser
     final StringList db = List.listFS(main.context);
 
-    choice = new BaseXListChooser(db.finish(), HELPOPEN, this);
+    choice = new BaseXListChooser(db.finish(), this);
 
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 420);
@@ -83,7 +83,7 @@ public final class DialogMountFS extends Dialog {
     doc.setBorder(0, 0, 2, 0);
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXText(HELPOPENINFO, false, this);
+    detail = new BaseXText(false, this);
     detail.setFont(getFont().deriveFont(10f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     BaseXLayout.setWidth(detail, 420);
@@ -98,8 +98,7 @@ public final class DialogMountFS extends Dialog {
     lab.setBorder(new EmptyBorder(5, 5, 5, 0));
     m.add(lab);
     m.add(new BaseXLabel(""));
-    mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), HELPFSMOUNT,
-        this);
+    mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), this);
     mountpoint.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -108,7 +107,7 @@ public final class DialogMountFS extends Dialog {
     });
     BaseXLayout.setWidth(mountpoint, 300);
     m.add(mountpoint);
-    button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, mountpoint.getText(),
@@ -130,12 +129,9 @@ public final class DialogMountFS extends Dialog {
     pp.add(info, BorderLayout.CENTER);
 
     // create buttons
+    buttons = newButtons(this, true, new String[] { BUTTONMOUNT, BUTTONCANCEL});
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
-
-    buttons = newButtons(this, true, new String[] { BUTTONMOUNT,
-        BUTTONCANCEL}, new byte[][] { HELPOPENDB, HELPCANCEL});
-
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 

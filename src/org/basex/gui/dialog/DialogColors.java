@@ -59,8 +59,7 @@ public final class DialogColors extends Dialog {
    * @return slider reference
    */
   private BaseXSlider newSlider(final int v) {
-    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR,
-        MAXCOLOR - v, HELPCOLORS, this);
+    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, MAXCOLOR - v, this);
     BaseXLayout.setWidth(slider, 150);
     return slider;
   }

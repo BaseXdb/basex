@@ -49,7 +49,7 @@ public interface Text {
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
-  String VERSINFO = Main.info(lang("version"), VERSION);
+  String VERSINFO = lang("version", VERSION);
 
   /** Title and version. */
   String TITLE = NAME + " " + VERSION;
@@ -61,7 +61,7 @@ public interface Text {
   /** Console text. */
   String CONSOLE = TITLE + " [%]" + NL + "%";
   /** Console text. */
-  String CONSOLE2 = Main.info(lang("help_intro"), Cmd.HELP) + NL;
+  String CONSOLE2 = lang("help_intro", "help") + NL;
 
   /** Goodbye information. */
   String[] CLIENTBYE = {
@@ -118,7 +118,6 @@ public interface Text {
   /** Password. */
   String SERVERPW = lang("srv_pw");
   
-
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
     "Usage: java " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
@@ -127,29 +126,7 @@ public interface Text {
     " -p<port> specify server port" + NL +
     " -v       verbose mode";
 
-  // WEB SERVER ===============================================================
-
-  /** Web server start. */
-  String WSERVERSTART = NL + TITLE + " WebServer " + lang("srv_start");
-  /** Web server stop. */
-  String WSERVERSTOPPED = "WebServer " + lang("srv_stop");
-
-  /** Start information. */
-  String WSERVERINFO = CONSOLEINFO + NL +
-    "Usage: java " + NAME + "WebServer [options]" + NL +
-    " stop     stop server" + NL +
-    " -c       cache queries" + NL +
-    " -d       debug mode" + NL +
-    " -h       show this help" + NL +
-    " -p<port> specify server port" + NL +
-    " -v       verbose mode";
-
-  /* COMMANDS =================================================================
-   *
-   * The command strings must equal the command definitions in {@link Commands}.
-   * The help texts are called via reflection to avoid a too early
-   * initialization of the {@link Lang} class.
-   */
+  // COMMANDS =================================================================
 
   /** Command help. */
   String FRAGMENT = "fragment";
@@ -192,158 +169,102 @@ public interface Text {
   String NOHELP = lang("ch_nohelp");
 
   /** Database separator. */
-  String HELPDATABASE0 = lang("ch_helpdatabase0");
-
+  String[] HELPDB = { lang("ch_helpdatabase0") };
   /** Command help. */
-  String CREATE0 = "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]";
-  /** Command help. */
-  String CREATE1 = lang("ch_create1");
-  /** Command help. */
-  String CREATE2 = lang("ch_create2") + NL +
+  String[] HELPCREATE = {
+    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
+    lang("ch_create1"),
+    lang("ch_create2") + NL +
     LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "]?:" + NL +
-      "  " + Main.info(lang("ch_create3"), NAM, PATH) + NL +
+      "  " + lang("ch_create3", NAM, PATH) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
       "  " + lang("ch_create4") + NL +
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
       "] ([mountpoint] [backingstore]): " + NL +
-      "  " + Main.info(lang("ch_create5"), NAM, PATH) + NL +
-      "  " + Main.info(lang("ch_create6"), "mountpoint", "backingstore") + NL +
+      "  " + lang("ch_create5", NAM, PATH) + NL +
+      "  " + lang("ch_create6", "mountpoint", "backingstore") + NL +
     LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "]?: " + NL +
-      "  " + lang("ch_create7");
-
+      "  " + lang("ch_create7")
+  };
   /** Command help. */
-  String OPEN0 = "[" + NAM + "]";
+  String[] HELPOPEN = {
+    "[" + NAM + "]", lang("ch_open1"), lang("ch_open2", NAM)
+  };
   /** Command help. */
-  String OPEN1 = lang("ch_open1");
-  /** Command help. */
-  String OPEN2 = Main.info(lang("ch_open2"), NAM);
-
-  /** Command help. */
-  String INFO0 = "[" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" +
-    CmdInfo.TABLE + "]?";
-  /** Command help. */
-  String INFO1 = lang("ch_info1");
-  /** Command help. */
-  String INFO2 = lang("ch_info21") + NL +
+  String[] HELPINFO = {
+    "[" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.TABLE + "]?",
+    lang("ch_info1"),
+    lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
     LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
-    LI + CmdInfo.TABLE + " [start end] | [" + QUERY + "]: " + lang("ch_info25");
-
+    LI + CmdInfo.TABLE + " [start end] | [" + QUERY + "]: " + lang("ch_info25")
+  };
   /** Command help. */
-  String CLOSE0 = "";
+  String[] HELPCLOSE = {
+    "", lang("ch_close1"), lang("ch_close2")
+  };
   /** Command help. */
-  String CLOSE1 = lang("ch_close1");
+  String[] HELPLIST = {
+    "", lang("ch_list1"), lang("ch_list2")
+  };
   /** Command help. */
-  String CLOSE2 = lang("ch_close2");
-
-  /** Command help. */
-  String LIST0 = "";
-  /** Command help. */
-  String LIST1 = lang("ch_list1");
-  /** Command help. */
-  String LIST2 = lang("ch_list2");
-
-  /** Command help. */
-  String DROP0 = "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" +
-    CmdDrop.USER + "] [...]";
-  /** Command help. */
-  String DROP1 = lang("ch_drop1");
-  /** Command help. */
-  String DROP2 = lang("ch_drop2") + NL +
+  String[] HELPDROP = {
+    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
+    lang("ch_drop1"),
+    lang("ch_drop2") + NL +
     LI + CmdDrop.DB + " [" + NAM + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.SUMMARY + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + NAM + "]:" + NL +
-      "  " + Main.info(lang("ch_drop3"), NAM);
+    LI + CmdDrop.USER + " [" + NAM + "]:" + NL + "  " + lang("ch_drop3", NAM)
+  };
+  /** Command help. */
+  String[] HELPEXPORT = {
+    "[" + PATH + "]", lang("ch_export1"), lang("ch_export2", PATH)
+  };
+  /** Command help. */
+  String[] HELPOPTIMIZE = {
+    "", lang("ch_optimize1"), lang("ch_optimize2")
+  };
 
   /** Command help. */
-  String ALTER0 = USER + " [" + NAME + "] [" + PW + "]?";
-  /** Command help. */
-  String ALTER1 = lang("ch_alter1");
-  /** Command help. */
-  String ALTER2 = lang("ch_alter2");
+  String[] HELPQ = { lang("ch_helpquery0") };
 
   /** Command help. */
-  String OPTIMIZE0 = "";
+  String[] HELPXQUERY = {
+    "[" + QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
+  };
   /** Command help. */
-  String OPTIMIZE1 = lang("ch_optimize1");
+  String[] HELPFIND = {
+    "[" + QUERY + "]", lang("ch_find1"), lang("ch_find2")
+  };
   /** Command help. */
-  String OPTIMIZE2 = lang("ch_optimize2");
+  String[] HELPRUN = {
+    "[" + PATH + "]", lang("ch_run1"), lang("ch_run2", PATH)
+  };
+  /** Command help. */
+  String[] HELPCS = {
+    "[" + QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
+  };
 
   /** Command help. */
-  String EXPORT0 = "[" + PATH + "]";
+  String[] HELPU = { lang("ch_helpupdate0") };
   /** Command help. */
-  String EXPORT1 = lang("ch_export1");
+  String[] HELPCOPY = {
+    "[" + SOURCE + "] " + INTO + " [" + TARGET + "] " + AT + " [" + POS + "]",
+    lang("ch_copy1"),
+    lang("ch_copy2", SOURCE, TARGET, POS)
+  };
   /** Command help. */
-  String EXPORT2 = Main.info(lang("ch_export2"), PATH);
-
-  /** Command help. */
-  String HELPQUERY0 = lang("ch_helpquery0");
-
-  /** Command help. */
-  String XQUERYMV0 = "[hits] [subhits] [" + QUERY + "]";
-  /** Command help. */
-  String XQUERYMV1 = lang("ch_xquerymv1");
-  /** Command help. */
-  String XQUERYMV2 = Main.info(lang("ch_xquerymv2"), QUERY, "hits", "subhits");
-
-  /** Command help. */
-  String XQUERY0 = "[" + QUERY + "]";
-  /** Command help. */
-  String XQUERY1 = lang("ch_xquery1");
-  /** Command help. */
-  String XQUERY2 = Main.info(lang("ch_xquery2"), QUERY);
-
-  /** Command help. */
-  String RUN0 = "[" + PATH + "]";
-  /** Command help. */
-  String RUN1 = lang("ch_run1");
-  /** Command help. */
-  String RUN2 = Main.info(lang("ch_run2"), PATH);
-
-  /** Command help. */
-  String FIND0 = "[" + QUERY + "]";
-  /** Command help. */
-  String FIND1 = lang("ch_find1");
-  /** Command help. */
-  String FIND2 = lang("ch_find2");
-
-  /** Command help. */
-  String CS0 = "[" + QUERY + "]";
-  /** Command help. */
-  String CS1 = lang("ch_cs1");
-  /** Command help. */
-  String CS2 = lang("ch_cs2");
-
-  /** Command help. */
-  String HELPUPDATE0 = lang("ch_helpupdate0");
-
-  /** Command help. */
-  String COPY0 = "[" + SOURCE + "] " + INTO + " [" + TARGET + "] " + AT +
-    " [" + POS + "]";
-  /** Command help. */
-  String COPY1 = lang("ch_copy1");
-  /** Command help. */
-  String COPY2 = Main.info(lang("ch_copy2"), SOURCE, TARGET, POS);
-
-  /** Command help. */
-  String DELETE0 = "[" + TARGET + "]";
-  /** Command help. */
-  String DELETE1 = lang("ch_delete1");
-  /** Command help. */
-  String DELETE2 = Main.info(lang("ch_delete2"), TARGET);
-
-  /** Command help. */
-  String INSERT0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
-    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" + CmdUpdate.PI + "|" +
-    CmdUpdate.FRAGMENT + "] [...]";
-  /** Command help. */
-  String INSERT1 = lang("ch_insert1");
+  String[] HELPDELETE = {
+    "[" + TARGET + "]",
+    lang("ch_delete1"),
+    lang("ch_delete2", TARGET)
+  };
   /** Command help. */
   String INSERTTMP1 = LI + "% [%] " + INTO + " [" + TARGET + "] " +
     AT + " [" + POS + "]: " + lang("ch_insert21");
@@ -351,20 +272,19 @@ public interface Text {
   String INSERTTMP2 = LI + "% [%] [%] " + INTO + " [" + TARGET + "] " +
     AT + " [" + POS + "]: " + lang("ch_insert22");
   /** Command help. */
-  String INSERT2 = Main.info(lang("ch_insert2"), POS, TARGET) + NL +
+  String[] HELPINSERT = {
+    "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
+    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" + CmdUpdate.PI + "|" +
+    CmdUpdate.FRAGMENT + "] [...]",
+    lang("ch_insert1"),
+    lang("ch_insert2", POS, TARGET) + NL +
     Main.info(INSERTTMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
     Main.info(INSERTTMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
     Main.info(INSERTTMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
     Main.info(INSERTTMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
     Main.info(INSERTTMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL) + NL +
-    Main.info(INSERTTMP1, CmdUpdate.FRAGMENT, FRAGMENT, FRAGMENT);
-
-  /** Command help. */
-  String UPDATE0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
-    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" +
-    CmdUpdate.PI + "] [...]";
-  /** Command help. */
-  String UPDATE1 = lang("ch_update1");
+    Main.info(INSERTTMP1, CmdUpdate.FRAGMENT, FRAGMENT, FRAGMENT)
+  };
   /** Command help. */
   String UPDATETMP1 = LI + "% [%] " + AT + " [" + TARGET + "]: " +
     lang("ch_update21");
@@ -372,61 +292,62 @@ public interface Text {
   String UPDATETMP2 = LI + "% [%] [%] " + AT + " [" + TARGET + "]: " +
     lang("ch_update22");
   /** Command help. */
-  String UPDATE2 = Main.info(lang("ch_update2"), TARGET) + NL +
+  String[] HELPUPDATE = {
+    "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
+    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" +
+    CmdUpdate.PI + "] [...]",
+    lang("ch_update1"),
+    lang("ch_update2", TARGET) + NL +
     Main.info(UPDATETMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
     Main.info(UPDATETMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
     Main.info(UPDATETMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
     Main.info(UPDATETMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
-    Main.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL);
+    Main.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL)
+  };
 
   /** Command help. */
-  String HELPADMIN0 = lang("ch_helpadmin0");
-
+  String[] HELPA = { lang("ch_helpadmin0") };
   /** Command help. */
-  String KILL0 = "";
+  String[] HELPKILL = {
+    "", lang("ch_kill1"), lang("ch_kill2")
+  };
   /** Command help. */
-  String KILL1 = lang("ch_kill1");
-  /** Command help. */
-  String KILL2 = lang("ch_kill2");
-
-  /** Command help. */
-  String SHOW0 = "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "]";
-  /** Command help. */
-  String SHOW1 = lang("ch_show1");
-  /** Command help. */
-  String SHOW2 = lang("ch_show21") + NL +
+  String[] HELPSHOW = {
+    "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
+    CmdShow.USERS + "]",
+    lang("ch_show1"),
+    lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
-    LI + CmdShow.USERS + ": " + lang("ch_show24");
+    LI + CmdShow.USERS + ": " + lang("ch_show24")
+  };
+  /** Command help. */
+  String[] HELPGRANT = {
+    "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" + CmdPerm.CREATE + "|" +
+    CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" + ON + " [db]) " + TO + " [user]",
+    lang("ch_grant1"),
+    lang("ch_grant2")
+  };
+  /** Command help. */
+  String[] HELPREVOKE = {
+    "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" + CmdPerm.CREATE + "|" +
+    CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" + ON + " [db]) " +
+    FROM + " [user]",
+    lang("ch_revoke1"),
+    lang("ch_revoke2")
+  };
+  /** Command help. */
+  String[] HELPALTER = {
+    USER + " [" + NAME + "] [" + PW + "]?", lang("ch_alter1"), lang("ch_alter2")
+  };
 
   /** Command help. */
-  String GRANT0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" +
-    ON + " [db]) " + TO + " [user]";
+  String[] HELPG = { lang("ch_helpgeneral0") };
   /** Command help. */
-  String GRANT1 = lang("ch_grant1");
-  /** Command help. */
-  String GRANT2 = lang("ch_grant2");
-
-  /** Command help. */
-  String REVOKE0 = "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" +
-    ON + " [db]) " + FROM + " [user]";
-  /** Command help. */
-  String REVOKE1 = lang("ch_revoke1");
-  /** Command help. */
-  String REVOKE2 = lang("ch_revoke2");
-
-  /** Command help. */
-  String HELPGENERAL0 = lang("ch_helpgeneral0");
-
-  /** Command help. */
-  String SET0 = "[option] [value]?";
-  /** Command help. */
-  String SET1 = Main.info(lang("ch_set1"), Cmd.INFO);
-  /** Command help. */
-  String SET2 = Main.info(lang("ch_set2"), "option", "value") + NL +
+  String[] HELPSET = {
+    "[option] [value]?",
+    lang("ch_set1", "info"),
+    lang("ch_set2", "option", "value") + NL +
     LI + CmdSet.INFO + " [all]?" + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
@@ -436,35 +357,20 @@ public interface Text {
     LI + CmdSet.ENTITY    + COLS + lang("ch_set27") + NL +
     LI + CmdSet.TEXTINDEX + COLS + lang("ch_set28") + NL +
     LI + CmdSet.ATTRINDEX + COLS + lang("ch_set29") + NL +
-    LI + CmdSet.FTINDEX   + COLS + lang("ch_set31");
-
+    LI + CmdSet.FTINDEX   + COLS + lang("ch_set31")
+  };
   /** Command help. */
-  String PASSWORD0 = "[" + PW + "]?";
+  String[] HELPPASSWORD = {
+    "[" + PW + "]?", lang("ch_password1"), lang("ch_password2")
+  };
   /** Command help. */
-  String PASSWORD1 = lang("ch_password1");
+  String[] HELPHELP = {
+    "[command]?", lang("ch_help1", NAME), lang("ch_help2", "command")
+  };
   /** Command help. */
-  String PASSWORD2 = lang("ch_password2");
-
-  /** Command help. */
-  String HELP0 = "[command]?";
-  /** Command help. */
-  String HELP1 = Main.info(lang("ch_help1"), NAME);
-  /** Command help. */
-  String HELP2 = Main.info(lang("ch_help2"), "command");
-
-  /** Command help. */
-  String EXIT0 = "";
-  /** Command help. */
-  String EXIT1 = lang("ch_exit1") + " " + NAME + DOT;
-  /** Command help. */
-  String EXIT2 = EXIT1;
-
-  /** Command help. */
-  String QUIT0 = "";
-  /** Command help. */
-  String QUIT1 = EXIT1;
-  /** Command help. */
-  String QUIT2 = EXIT2;
+  String[] HELPEXIT = {
+    "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
+  };
 
   // STARTER WINDOW ===========================================================
 
@@ -495,12 +401,11 @@ public interface Text {
   /** Unknown command error. */
   String CMDUNKNOWN = lang("cmd_unknown");
   /** Unknown command error. */
-  String CMDWHICH = CMDUNKNOWN + "; " +
-    Main.info(lang("help_short"), Cmd.HELP) + DOT;
+  String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short", "help") + DOT;
   /** Unknown command error. */
   String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
   /** Database closed. */
-  String CMDHELP = Main.info(lang("help_long"), Cmd.HELP);
+  String CMDHELP = lang("help_long", "help");
 
   // CREATE COMMAND ===========================================================
 
@@ -525,11 +430,11 @@ public interface Text {
   /** Scanner position. */
   String SCANPOS = lang("pc_pos");
 
-  /** Create database information. */
+  /** Create database index. */
   String INDEXTXT = lang("pc_indextxt") + DOTS;
-  /** Create database information. */
+  /** Create database index. */
   String INDEXATT = lang("pc_indexatt") + DOTS;
-  /** Create database information. */
+  /** Create database index. */
   String INDEXFTX = lang("pc_indexftx") + DOTS;
 
   /** Database created. */
@@ -543,8 +448,6 @@ public interface Text {
   String PATHWHICH = lang("pc_pathnf");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
-  /** Missing mount point. */
-  String MOUNTWHICH = lang("pc_mountnf");
 
   // DATABASE COMMANDS ========================================================
 
@@ -569,9 +472,6 @@ public interface Text {
 
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
-  /** Database optimization. */
-  String DBOPTERR1 = "Could not write statistics...";
-
   /** Index created. */
   String DBINDEXED = lang("in_created");
   /** Index dropped. */
@@ -749,9 +649,7 @@ public interface Text {
   /** Info on database path. */
   String INFODBPATH = lang("info_dbpath");
   /** No document opened. */
-  String INFONODB = lang("info_nodb");
-  /** Info on database. */
-  String INFODBLIST = lang("info_dblist");
+  String INFONODB = lang("info_nodb") + DOT;
   /** Info on database. */
   String INFODBERR = lang("info_dberror");
 
@@ -767,10 +665,6 @@ public interface Text {
   String INFOENTITY = lang("info_entities");
   /** Info on result serialization. */
   String INFOSERIALIZE = lang("info_serialize");
-  /** Info on well-formed XML serialization. */
-  String INFOXMLOUTPUT = lang("info_xmloutput");
-  /** Info on main memory mode. */
-  String INFOMAINMEM = lang("info_mainmem");
   /** Info on tags. */
   String INFOTAGS = lang("info_tags");
   /** Info on attributes. */
@@ -836,7 +730,7 @@ public interface Text {
   // GUI COMMANDS =============================================================
 
   /** Command info. */
-  String GUIABOUT = Main.info(lang("c_about") + DOTS, NAME);
+  String GUIABOUT = lang("c_about", NAME) + DOTS;
   /** Command info. */
   String GUIABOUTTT = lang("c_abouttt");
   /** Command info. */
@@ -1136,10 +1030,6 @@ public interface Text {
   String CHOPPINGINFO = lang("dc_chopinfo");
   /** Whitespaces information. */
   String INTPARSEINFO = lang("dc_intparseinfo");
-  /** Entities information. */
-  String ENTITIESINFO = lang("dc_entitiesinfo");
-  /** Entities information. */
-  String DTDINFO = lang("dc_dtdinfo");
 
   /** Path summary information. */
   String PATHINDEXINFO = lang("dc_pathinfo");
@@ -1174,11 +1064,10 @@ public interface Text {
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
   /** Dialog asking if a new database should be be created. */
-  String NODBQUESTION = INFONODB
-    + DOT + NL + lang("do_nodbquestion") + NL + " ";
+  String NODBQUESTION = INFONODB + NL + lang("do_nodbquestion") + NL + " ";
   /** Dialog asking if a new database should be be created. */
-  String NODEEPFSQUESTION = lang("info_nodeepfs") 
-    + DOT + NL + lang("do_nodbquestion") + NL + " ";
+  String NODEEPFSQUESTION = lang("info_nodeepfs") + DOT + NL +
+    lang("do_nodbquestion") + NL + " ";
   
   /** File dialog title. */
   String XQOPENTITLE = lang("dq_open");
@@ -1193,6 +1082,35 @@ public interface Text {
 
   /** Dialog title for exporting XML. */
   String EXPORTTITLE = lang("d_export");
+  
+  /** Server title. */
+  String SRVTITLE = lang("ds_servdia");
+  /** Server. */
+  String SERVERN = lang("ds_server");
+  /** Users. */
+  String USERS = lang("ds_users");
+  /** Host. */
+  String HOST = lang("ds_host");
+  /** PORT. */
+  String PORT = lang("ds_port");
+  /** Create User. */
+  String CREATEU = lang("ds_createu");
+  /** Drop User. */
+  String DROPU = lang("ds_dropu");
+  /** Permissions. */
+  String PERMS = lang("ds_perms") + COLS;
+  /** Question for dropping user. */
+  String DRQUESTION = lang("ds_drquestion");
+  /** Alter password. */
+  String ALTERPW = lang("ds_alterpw");
+  /** New password. */
+  String NEWPW = lang("ds_newpw") + COLS;
+  /** Invalid. */
+  String INVALID = ' ' + lang("ds_invalid");
+  /** Login. */
+  String LOGIN = lang("ds_login");
+  /** Local. */
+  String LOCAL = lang("ds_local");
 
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
@@ -1206,8 +1124,6 @@ public interface Text {
   String IMPORTALLINFO = lang("dfs_allinfo") + DOT;
   /** Write from db to fs option. */
   String WTHROUGH = lang("dfs_wrt");
-  /** Import options. */
-  String WTHROUGHTT = lang("dfs_wrttt") + DOT;  
   /** Dialog question to activate write through. */
   String WTHROUGHOK = lang("dfs_wrtok");
   /** Import options. */
@@ -1216,8 +1132,6 @@ public interface Text {
   String IMPORTFSTEXT1 = lang("dfs_text1") + COL;
   /** Import options. */
   String IMPORTFSTEXT2 = lang("dfs_text2") + COL;
-  /** Import options. */
-  String IMPORTFSMAXINFO = lang("dfs_maxinfo") + DOT;
   /** Import options. */
   String IMPORTCONT = lang("dfs_cont");
   /** Import options. */
@@ -1296,13 +1210,13 @@ public interface Text {
   String[] FONTTYPES = { lang("df_type1"), lang("df_type2"), lang("df_type3") };
 
   /** Dialog title for treemap color schema. */
-  String SCHEMATITLE = lang("ds_title");
+  String SCHEMATITLE = lang("dy_title");
   /** Color schema information. */
-  String SCHEMARED = lang("ds_red");
+  String SCHEMARED = lang("dy_red");
   /** Color schema information. */
-  String SCHEMAGREEN = lang("ds_green");
+  String SCHEMAGREEN = lang("dy_green");
   /** Color schema information. */
-  String SCHEMABLUE = lang("ds_blue");
+  String SCHEMABLUE = lang("dy_blue");
 
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
@@ -1343,7 +1257,7 @@ public interface Text {
   String MEMHELP = lang("dz_help");
 
   /** About text. */
-  String ABOUTTITLE = Main.info(lang("da_title"), NAME);
+  String ABOUTTITLE = lang("da_title", NAME);
   /** Copyright info. */
   String COPYRIGHT = "©2005-09 " + COMPANY;
   /** License info. */
@@ -1357,108 +1271,17 @@ public interface Text {
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;
-  
-  /** Server title. */
-  String SRVTITLE = lang("s_servdia");
-  /** Server. */
-  String SERVERN = lang("s_server");
-  /** Users. */
-  String USERS = lang("s_users");
-  /** Host. */
-  String HOST = lang("s_host");
-  /** PORT. */
-  String PORT = lang("s_port");
-  /** Create User. */
-  String CREATEU = lang("s_createu");
-  /** Drop User. */
-  String DROPU = lang("s_dropu");
-  /** Permissions. */
-  String PERMS = lang("s_perms") + COLS;
-  /** Question for dropping user. */
-  String DRQUESTION = lang("s_drquestion");
-  /** Alter password. */
-  String ALTERPW = lang("s_alterpw");
-  /** New password. */
-  String NEWPW = lang("s_newpw") + COLS;
-  /** Invalid. */
-  String INVALID = lang("s_invalid");
-  /** Failed. */
-  String FAILED = lang("s_failed");
-  /** Login. */
-  String LOGIN = lang("s_login");
-  /** Local. */
-  String LOCAL = lang("s_local");
 
   // HELP TEXTS ===============================================================
 
   /** Help string. */
   byte[] HELPGO = token(lang("h_go"));
   /** Help string. */
-  byte[] HELPHIST = token(lang("h_hist"));
-  /** Help string. */
   byte[] HELPSTOP = token(lang("h_stop"));
   /** Help string. */
-  byte[] HELPCANCEL = token(lang("h_cancel"));
-  /** Help string. */
-  byte[] HELPMODE = token(lang("h_mode"));
-  /** Help string. */
-  byte[] HELPOK = token(lang("h_ok"));
-  /** Help string. */
-  byte[] HELPOPT = token(lang("h_opt"));
-  /** Help string. */
-  byte[] HELPRENAMEDB = token(lang("h_renamedb"));
-  /** Help string. */
-  byte[] HELPOPENDB = token(lang("h_opendb"));
-  /** Help string. */
-  byte[] HELPOPENINFO = token(lang("h_openinfo"));
+  byte[] HELPHIST = token(lang("h_hist"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help string. */
-  byte[] HELPFALIAS = token(lang("h_falias"));
-  /** Help string. */
-  byte[] HELPBROWSE = token(lang("h_browse"));
-  /** Help string. */
-  byte[] HELPFSPATH = token(lang("h_fspath"));
-  /** Help string. */
-  byte[] HELPDBPATH = token(lang("h_dbpath"));
-  /** Help string. */
-  byte[] HELPLANG = token(lang("h_lang"));
-  /** Help string. */
-  byte[] HELPNAME = token(lang("h_names"));
-  /** Help string. */
-  byte[] HELPFSNAME = token(lang("h_fsname"));
-  /** Help string. */
-  byte[] HELPFSALL = token(lang("h_fsall"));
-  /** Help string. */
-  byte[] HELPFSMOUNT = token(lang("h_fsmount"));
-  /** Help string. */
-  byte[] HELPMETA = token(lang("h_meta"));
-  /** Help string. */
-  byte[] HELPCONT = token(lang("h_cont"));
-  /** Help string. */
-  byte[] HELPFSMAX = token(lang("h_fsmax"));
-  /** Help string. */
-  byte[] HELPMAPATTS = token(lang("h_mapatts"));
-  /** Help string. */
-  byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
-  /** Help string. */
-  byte[] HELPMAPOFF = token(lang("h_mapoff"));
-  /** HelpString. */
-  byte[] HELPMAPSIZE = token(lang("h_mapsize"));
-  /** Help string. */
-  byte[] HELPDROP = token(lang("h_drop"));
-  /** Help string. */
-  byte[] HELPLF = token(lang("h_lf"));
-  /** Help string. */
-  byte[] HELPFOCUS = token(lang("h_focus"));
-  /** Help string. */
-  byte[] HELPSIMPLEFILE = token(lang("h_simplefd"));
-  /** Help string. */
-  byte[] HELPOPEN = token(lang("h_open"));
-  /** Help string. */
-  byte[] HELPFONT = token(lang("h_font"));
-  /** Help string. */
-  byte[] HELPCOLORS = token(lang("h_colors"));
   /** Help Dialog. */
   byte[] HELPCMD = token(lang("h_cmd"));
   /** Help Dialog. */
@@ -1472,45 +1295,19 @@ public interface Text {
   /** Help string. */
   byte[] HELPPLOT = token(lang("h_plot"));
   /** Help string. */
-  byte[] HELPPLOTAXISX = token(lang("h_plotaxisx"));
-  /** Help string. */
-  byte[] HELPPLOTAXISY = token(lang("h_plotaxisy"));
-  /** Help string. */
-  byte[] HELPPLOTXLOG = token(lang("h_plotxlog"));
-  /** Help string. */
-  byte[] HELPPLOTYLOG = token(lang("h_plotylog"));
-  /** Help string. */
-  byte[] HELPPLOTDOTS = token(lang("h_plotdots"));
-  /** Help string. */
-  byte[] HELPPLOTITEM = token(lang("h_plotitem"));
-  /** Help string. */
   byte[] HELPFOLDER = token(lang("h_folder"));
   /** Help string. */
   byte[] HELPTABLE = token(lang("h_table"));
   /** Help string. */
   byte[] HELPTEXT = token(lang("h_text"));
   /** Help string. */
-  byte[] HELPINFO = token(lang("h_info"));
-  /** Help string. */
-  byte[] HELPSEARCHCAT = token(lang("h_searchcat"));
-  /** Help string. */
-  byte[] HELPCAT = token(lang("h_cat"));
-  /** Help string. */
-  byte[] HELPDS = token(lang("h_ds"));
-  /** Help string. */
-  byte[] HELPCATINPUT = token(lang("h_catinput"));
-  /** Help string. */
-  byte[] HELPMOVER = token(lang("h_mover"));
-  /** Help string. */
-  byte[] HELPTABLEHEAD = token(lang("h_tablehead"));
-  /** Help string. */
-  byte[] HELPMEM = token(lang("h_mem"));
-  /** Help string. */
-  byte[] HELPGUISTATUS = token(lang("h_guistatus"));
+  byte[] HELPINFOO = token(lang("h_info"));
   /** Help string. */
   byte[] HELPEXPLORE = token(lang("h_explore"));
   /** Help string. */
-  byte[] HELPXQUERY = token(lang("h_xquery"));
+  byte[] HELPXQUERYY = token(lang("h_xquery"));
+  /** Help string. */
+  byte[] HELPMOVER = token(lang("h_mover"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);

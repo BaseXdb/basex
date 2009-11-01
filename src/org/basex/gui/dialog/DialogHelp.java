@@ -9,7 +9,6 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.view.text.XMLSyntax;
-import org.basex.util.Token;
 
 /**
  * Dialog window for displaying information about the project.
@@ -30,7 +29,7 @@ public final class DialogHelp extends Dialog {
     panel.setBorder(5, 5, 5, 5);
     panel.setBackground(Color.white);
 
-    area = new BaseXText(Token.EMPTY, false, gui);
+    area = new BaseXText(false, gui);
     area.setSyntax(new XMLSyntax());
     set(area, BorderLayout.CENTER);
 

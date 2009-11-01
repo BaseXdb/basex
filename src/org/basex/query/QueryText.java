@@ -38,8 +38,6 @@ public interface QueryText {
   Object[] NOFILE = { BASX, 3, "Text node could not be created (%)." };
   /** BASX0003: Evaluation exception. */
   Object[] NODB = { BASX, 4, "Database '%' not found." };
-  /** BASX0004: Evaluation exception. */
-  Object[] MMUP = { BASX, 5, "No updates supported for main memory data." };
 
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
@@ -536,8 +534,6 @@ public interface QueryText {
   /** XUTY0022: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
 
-  /** XUST0000: Parsing exception. */
-  Object[] UPIMPL = { XUST, 0, "Transform expression not implemented yet." };
   /** XUST0001: Parsing exception. */
   Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
   /** XUST0002: Parsing exception. */
@@ -568,8 +564,6 @@ public interface QueryText {
   String OPTSIMPLE = "Simplifying: % => %";
   /** Optimization info. */
   String OPTFLWOR = "Simplifying FLWOR expression";
-  /** Optimization info. */
-  String OPTTYPE = "Simplifying Typeswitch expression.)";
   /** Optimization info. */
   String OPTWHERE = "Converting where clause to predicate";
   /** Optimization info. */

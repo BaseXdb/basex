@@ -118,7 +118,7 @@ public final class PlotView extends View implements Runnable {
     panel.setLayout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
-    xLog = new BaseXCheckBox(PLOTLOG, HELPPLOTXLOG, false, null);
+    xLog = new BaseXCheckBox(PLOTLOG, false, null);
     xLog.setSelected(gui.prop.is(GUIProp.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -131,9 +131,9 @@ public final class PlotView extends View implements Runnable {
         gui.prop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
       }
-    }, -10, 10, gui.prop.num(GUIProp.PLOTDOTS), HELPPLOTDOTS, gui);
+    }, -10, 10, gui.prop.num(GUIProp.PLOTDOTS), gui);
     BaseXLayout.setWidth(dots, 40);
-    yLog = new BaseXCheckBox(PLOTLOG, HELPPLOTYLOG, false, null);
+    yLog = new BaseXCheckBox(PLOTLOG, false, null);
     yLog.setSelected(gui.prop.is(GUIProp.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -149,7 +149,7 @@ public final class PlotView extends View implements Runnable {
     panel.add(box, BorderLayout.NORTH);
 
     box = new Box(BoxLayout.X_AXIS);
-    xCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISX, gui);
+    xCombo = new BaseXCombo(new String[] {}, gui);
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
@@ -159,7 +159,7 @@ public final class PlotView extends View implements Runnable {
         }
       }
     });
-    yCombo = new BaseXCombo(new String[] {}, HELPPLOTAXISY, gui);
+    yCombo = new BaseXCombo(new String[] {}, gui);
     yCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
@@ -169,7 +169,7 @@ public final class PlotView extends View implements Runnable {
         }
       }
     });
-    itemCombo = new BaseXCombo(new String[] {}, HELPPLOTITEM, gui);
+    itemCombo = new BaseXCombo(new String[] {}, gui);
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();

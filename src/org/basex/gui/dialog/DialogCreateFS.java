@@ -1,16 +1,13 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import javax.swing.ImageIcon;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -27,7 +24,6 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * Dialog window for specifying the options for importing a file system.
@@ -92,7 +88,7 @@ public final class DialogCreateFS extends Dialog {
     lab.setBorder(new EmptyBorder(4, 4, 0, 0));
     p.add(lab);
    
-    button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
@@ -105,8 +101,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(button);
     
-    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING),
-        HELPFSPATH, this);
+    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -116,8 +111,7 @@ public final class DialogCreateFS extends Dialog {
     BaseXLayout.setWidth(path, 240);
     p.add(path);
 
-    all = new BaseXCheckBox(IMPORTALL, HELPFSALL,
-        gprop.is(GUIProp.FSALL), this);
+    all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
     all.setToolTipText(IMPORTALLINFO);
     all.setBorder(new EmptyBorder(4, 4, 0, 0));
     all.addActionListener(new ActionListener() {
@@ -132,7 +126,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(lab1);
     p.add(new BaseXLabel(""));
     
-    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), HELPFSNAME, this);
+    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -155,8 +149,7 @@ public final class DialogCreateFS extends Dialog {
     // Include metadata checkbox
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
     p2.add(label);
-    meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, prop.is(Prop.FSMETA),
-        12, this);
+    meta = new BaseXCheckBox(IMPORTMETA, prop.is(Prop.FSMETA), 12, this);
     p2.add(meta);
 
     label = new BaseXLabel(IMPORTFSTEXT2, false, true);
@@ -165,7 +158,7 @@ public final class DialogCreateFS extends Dialog {
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    cont = new BaseXCheckBox(IMPORTCONT, HELPCONT, prop.is(Prop.FSCONT), this);
+    cont = new BaseXCheckBox(IMPORTCONT, prop.is(Prop.FSCONT), this);
     cont.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         action(null);
@@ -173,8 +166,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(cont, BorderLayout.WEST);
 
-    maxsize = new BaseXCombo(IMPORTFSMAX, HELPFSMAX, this);
-    maxsize.setToolTipText(IMPORTFSMAXINFO);
+    maxsize = new BaseXCombo(IMPORTFSMAX, this);
 
     final int m = prop.num(Prop.FSTEXTMAX);
     int i = -1;
@@ -191,17 +183,17 @@ public final class DialogCreateFS extends Dialog {
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    pathindex = new BaseXCheckBox(INFOPATHINDEX, Token.token(PATHINDEXINFO),
+    pathindex = new BaseXCheckBox(INFOPATHINDEX,
         prop.is(Prop.PATHINDEX), 0, this);
     p3.add(pathindex);
     p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
-    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
 
-    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
+    atvindex = new BaseXCheckBox(INFOATTRINDEX,
         prop.is(Prop.ATTRINDEX), 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
@@ -210,18 +202,16 @@ public final class DialogCreateFS extends Dialog {
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        true, 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, true, 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
-    final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO };
     final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
         prop.is(Prop.FTCS), prop.is(Prop.FTDC)
     };
     for(int f = 0; f < ft.length; f++) {
-      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], this);
+      ft[f] = new BaseXCheckBox(cb[f], val[f], this);
       p4.add(ft[f]);
     }
 

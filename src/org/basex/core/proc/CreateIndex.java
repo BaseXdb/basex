@@ -34,7 +34,7 @@ public final class CreateIndex extends ACreate {
 
     try {
       Type index = null;
-      switch(getType(args[0])) {
+      switch(getOption(CmdIndex.class)) {
         case TEXT:
           data.meta.txtindex = true;
           index = Type.TXT;

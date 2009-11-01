@@ -13,7 +13,6 @@ import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
@@ -134,19 +133,5 @@ abstract class ACreate extends Process {
     d.closeIndex(i);
     progress(builder);
     d.setIndex(i, builder.build());
-  }
-
-  /**
-   * Returns the index type or creates an error message and returns null.
-   * @param type index string
-   * @return index type.
-   */
-  protected CmdIndex getType(final String type) {
-    try {
-      return CmdIndex.valueOf(type.toUpperCase());
-    } catch(final Exception ex) {
-      error(CMDWHICH, type);
-      return null;
-    }
   }
 }

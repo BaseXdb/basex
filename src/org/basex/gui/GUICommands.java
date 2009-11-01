@@ -46,7 +46,6 @@ import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogMapLayout;
 import org.basex.gui.dialog.DialogMountFS;
 import org.basex.gui.dialog.DialogOpen;
-import org.basex.gui.dialog.DialogOpenFS;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.dialog.DialogServer;
@@ -87,7 +86,7 @@ public enum GUICommands implements GUICommand {
   OPEN(false, GUIOPEN, "% O", GUIOPENTT) {
     @Override
     public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false);
+      final DialogOpen dialog = new DialogOpen(gui, false, false);
       if(dialog.ok()) {
         if(new Close().execute(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));
@@ -150,7 +149,7 @@ public enum GUICommands implements GUICommand {
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true).nodb()) Dialog.info(gui, INFONODB);
+      if(new DialogOpen(gui, true, false).nodb()) Dialog.info(gui, INFONODB);
     }
   },
 
@@ -729,7 +728,7 @@ public enum GUICommands implements GUICommand {
   DQE(false, GUIDQE, null, GUIDQETT) {
     @Override
     public void execute(final GUI gui) {
-      final DialogOpenFS dialog = new DialogOpenFS(gui, false);
+      final DialogOpen dialog = new DialogOpen(gui, false, true);
       if(dialog.ok()) {
         if(new Close().execute(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));

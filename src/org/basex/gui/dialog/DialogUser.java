@@ -9,14 +9,12 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
-
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-
-import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Session;
@@ -39,125 +37,124 @@ import org.basex.io.CachedOutput;
 import org.basex.server.LoginException;
 import org.basex.util.StringList;
 import org.basex.util.Table;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * Panel for displaying information about global/lokal users.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class DialogUser extends BaseXBack {
-
+public final class DialogUser extends BaseXBack {
   /** ArrayList for table. */
   Table data = new Table();
+  /** Session. */
+  Session cs;
+
+  /** List of permission processes. */
+  final ArrayList<Process> permps = new ArrayList<Process>();
+  /** Change button. */
+  final BaseXButton change;
+
+  /** Alter button. */
+  private final BaseXButton alter;
+  /** Create button. */
+  private final BaseXButton create;
+  /** Delete button. */
+  private final BaseXButton delete;
+  /** Username textfield. */
+  private final BaseXTextField user;
+  /** Password textfield. */
+  private final JPasswordField pass;
+  /** Password textfield. */
+  private final JPasswordField newpass;
+  /** User columns. */
+  private final BaseXCombo userco1;
+  /** User columns. */
+  private final BaseXCombo userco2;
+  /** User table. */
+  private final JTable table;
+  /** Info label. */
+  private final BaseXLabel info;
+  /** Flag global/local. */
+  private final boolean global;
+
   /** Key listener. */
-  final KeyAdapter keys = new KeyAdapter() {
+  private final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
       action(null);
     }
   };
 
-  /** Change button. */
-  final BaseXButton change;
-  /** Alter button. */
-  final BaseXButton alter;
-  /** Create button. */
-  BaseXButton create;
-  /** Delete button. */
-  BaseXButton delete;
-  /** Username textfield. */
-  BaseXTextField user;
-  /** Password textfield. */
-  JPasswordField pass;
-  /** Password textfield. */
-  JPasswordField newpass;
-  /** User columns. */
-  BaseXCombo userco1;
-  /** User columns. */
-  BaseXCombo userco2;
-  /** User table. */
-  JTable table;
-  /** Info label. */
-  BaseXLabel infop2;
-  /** List of permission processes. */
-  ArrayList<Process> permps = new ArrayList<Process>();
-  /** String for error messages. */
-  String err2;
-  /** Session. */
-  Session cs;
-  /** Flag global/lokal. */
-  boolean global;
-
   /**
    * Constructor.
-   * @param g global/lokal flag
+   * @param g global/local flag
    * @param d Dialog window
    */
   public DialogUser(final boolean g, final Dialog d) {
     global = g;
-    setLayout(new TableLayout(13, 1, 0, 4));
+
+    setLayout(new TableLayout(11, 1, 0, 4));
     setBorder(8, 8, 8, 8);
-    user = new BaseXTextField("", null, d);
+
+    user = new BaseXTextField("", d);
     user.addKeyListener(keys);
     BaseXLayout.setWidth(user, 100);
-    create = new BaseXButton(BUTTONCREATE, null, d);
+    create = new BaseXButton(BUTTONCREATE, d);
     pass = new JPasswordField();
     pass.addKeyListener(keys);
     BaseXLayout.setWidth(pass, 100);
-    userco1 = new BaseXCombo(new String[] {}, null, d);
-    delete = new BaseXButton(BUTTONDROP, null, d);
     table = new JTable(new TableModel());
     table.setPreferredScrollableViewportSize(new Dimension(420, 100));
-    add(new BaseXLabel(CREATEU + COLS, false, true));
-
-    final BaseXBack p21 = new BaseXBack();
-    p21.setLayout(new TableLayout(1, 5, 6, 0));
-    p21.setBorder(0, 0, 5, 0);
-    p21.add(new BaseXLabel(SERVERUSER));
-    p21.add(user);
-    p21.add(new BaseXLabel(SERVERPW));
-    p21.add(pass);
-    p21.add(create);
-    add(p21);
-    add(new BaseXLabel(ALTERPW + COLS, false, true));
-
-    final BaseXBack p22 = new BaseXBack();
-    p22.setLayout(new TableLayout(1, 4, 6, 0));
-    p22.setBorder(0, 0, 5, 0);
     newpass = new JPasswordField();
-    alter = new BaseXButton(BUTTONALTER, null, d);
-    userco2 = new BaseXCombo(new String[] {}, null, d);
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
-    p22.add(userco2);
-    p22.add(new BaseXLabel(NEWPW));
-    p22.add(newpass);
-    p22.add(alter);
-    add(p22);
+    alter = new BaseXButton(BUTTONALTER, d);
+    userco2 = new BaseXCombo(new String[] {}, d);
+    change = new BaseXButton(BUTTONCHANGE, d);
+    userco1 = new BaseXCombo(new String[] {}, d);
+    delete = new BaseXButton(BUTTONDROP, d);
+    info = new BaseXLabel(" ");
+
+    add(new BaseXLabel(CREATEU + COLS, false, true));
+
+    final BaseXBack p1 = new BaseXBack();
+    p1.setLayout(new TableLayout(1, 5, 6, 0));
+    p1.setBorder(0, 0, 5, 0);
+    p1.add(new BaseXLabel(SERVERUSER));
+    p1.add(user);
+    p1.add(new BaseXLabel(SERVERPW));
+    p1.add(pass);
+    p1.add(create);
+    add(p1);
+    add(new BaseXLabel(ALTERPW + COLS, false, true));
+
+    final BaseXBack p2 = new BaseXBack();
+    p2.setLayout(new TableLayout(1, 4, 6, 0));
+    p2.add(userco2);
+    p2.add(new BaseXLabel(NEWPW));
+    p2.add(newpass);
+    p2.add(alter);
+    add(p2);
     add(new BaseXLabel(PERMS, false, true));
     add(new JScrollPane(table));
-    change = new BaseXButton(BUTTONCHANGE, null, d);
 
-    final BaseXBack p23 = new BaseXBack();
-    p23.setLayout(new BorderLayout());
-    p23.add(new BaseXLabel(DROPU + COLS, false, true), BorderLayout.WEST);
-    p23.add(change, BorderLayout.EAST);
-    BaseXLayout.setWidth(p23, 420);
-    add(p23);
+    final BaseXBack p3 = new BaseXBack();
+    p3.setLayout(new BorderLayout());
+    p3.add(new BaseXLabel(DROPU + COLS, false, true), BorderLayout.WEST);
+    p3.add(change, BorderLayout.EAST);
+    BaseXLayout.setWidth(p3, 420);
+    add(p3);
 
-    final BaseXBack p24 = new BaseXBack();
-    p24.setLayout(new TableLayout(1, 2, 6, 0));
-    p24.setBorder(0, 0, 5, 0);
-    p24.add(userco1);
-    p24.add(delete);
-    add(p24);
+    final BaseXBack p4 = new BaseXBack();
+    p4.setLayout(new TableLayout(1, 2, 6, 0));
+    p4.setBorder(0, 0, 5, 0);
+    p4.add(userco1);
+    p4.add(delete);
+    add(p4);
 
-    infop2 = new BaseXLabel(" ");
-    add(infop2);
-    add(Box.createVerticalStrut(16));
+    add(info);
+    add(Box.createVerticalStrut(38));
     action(null);
   }
 
@@ -166,91 +163,76 @@ public class DialogUser extends BaseXBack {
    * @param cmd Command
    */
   public void action(final String cmd) {
-    if(BUTTONCHANGE.equals(cmd)) {
-      for(final Process p : permps) {
-        try {
-          cs.execute(p);
-        } catch(final IOException e) {
-          err2 = BUTTONCHANGE + FAILED + error(e);
-          Main.debug(e);
-        }
-      }
-      permps.clear();
-    } else if(BUTTONCREATE.equals(cmd)) {
-      final String u = user.getText();
-      final String p = new String(pass.getPassword());
-      try {
-        if(!cs.execute(new CreateUser(u, p))) {
-          throw new BaseXException(cs.info());
-        }
+    ImageIcon icon = null;
+    String msg = "";
+
+    try {
+      if(BUTTONCHANGE.equals(cmd)) {
+        for(final Process p : permps) if(!cs.execute(p)) msg = cs.info();
+        permps.clear();
+        setData();
+      } else if(BUTTONCREATE.equals(cmd)) {
+        final String u = user.getText();
+        final String p = new String(pass.getPassword());
+        if(!cs.execute(new CreateUser(u, p))) msg = cs.info();
         user.setText("");
         pass.setText("");
         setData();
-      } catch(final Exception ex) {
-        err2 = CREATEU + FAILED + error(ex);
-        Main.debug(ex);
-      }
-    } else if(BUTTONDROP.equals(cmd)) {
-      try {
-        final String u = (String) userco1.getSelectedItem();
+      } else if(BUTTONDROP.equals(cmd)) {
+        final String u = userco1.getSelectedItem().toString();
         if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
-          cs.execute(new DropUser(u));
-          setData();
+          if(!cs.execute(new DropUser(u))) msg = cs.info();
         }
-      } catch(final Exception ex) {
-        err2 = DROPU + FAILED + error(ex);
-        Main.debug(ex);
+        setData();
+      } else if(BUTTONALTER.equals(cmd)) {
+        final String u = userco2.getSelectedItem().toString();
+        final String p = new String(newpass.getPassword());
+        if(!cs.execute(new AlterUser(u, p))) msg = cs.info();
+        newpass.setText("");
       }
-    } else if(BUTTONALTER.equals(cmd)) {
-      final String u = (String) userco2.getSelectedItem();
-      final String p = new String(newpass.getPassword());
-      try {
-        cs.execute(new AlterUser(u, p));
-      } catch(final IOException e) {
-        err2 = ALTERPW + FAILED + error(e);
-        Main.debug(e);
-      }
+    } catch(final IOException ex) {
+      Main.debug(ex);
+      if(ex instanceof BindException) msg = SERVERBIND;
+      else if(ex instanceof LoginException) msg = SERVERLOGIN;
+      else msg = ex.getMessage(); //SERVERERR;
     }
-    final boolean valuname = user.getText().matches("^[A-Za-z0-9_.-]+$");
-    final boolean valpass = new String(pass.getPassword()).
-    matches("^[A-Za-z0-9_.-]+$");
-    final boolean valnewpass = new String(newpass.getPassword()).
-    matches("^[A-Za-z0-9_.-]+$");
-    alter.setEnabled(valnewpass);
-    boolean disname = true;
+
+    final boolean valuname = user.getText().matches("[\\w]*");
+    final boolean valpass = new String(pass.getPassword()).matches("[\\w]*");
+    final boolean valnewpass = new String(
+        newpass.getPassword()).matches("[\\w]*");
+    boolean disname = !user.getText().equals(ADMIN);
     for(int i = 0; i < userco1.getItemCount(); i++) {
-      if(user.getText().equals(userco1.getItemAt(i))) disname = false;
+      disname &= !user.getText().equals(userco1.getItemAt(i).toString());
     }
-    create.setEnabled(valuname && valpass && disname);
-    if(!valuname && !user.getText().isEmpty()) {
-      infop2.setIcon(BaseXLayout.icon("warn"));
-      infop2.setText(SERVERUSER + INVALID);
-    } else if((!valpass && !new String(pass.getPassword()).isEmpty())
-        || (!valnewpass && !new String(newpass.getPassword()).isEmpty())) {
-      infop2.setIcon(BaseXLayout.icon("warn"));
-      infop2.setText(SERVERPW + INVALID);
-    } else if(!disname) {
-      infop2.setIcon(BaseXLayout.icon("warn"));
-      infop2.setText(Token.string(new TokenBuilder().add(
-          USERKNOWN, user.getText()).finish()));
-    } else if(err2 != null) {
-      infop2.setText(err2);
-      infop2.setIcon(BaseXLayout.icon("error"));
-      err2 = null;
-    } else {
-      infop2.setText(" ");
-      infop2.setIcon(null);
+
+    if(!msg.isEmpty()) {
+      icon = BaseXLayout.icon("error");
+    } else if(!(valuname && valpass && valnewpass && disname)) {
+      icon = BaseXLayout.icon("warn");
+      msg = !valuname ? SERVERUSER + INVALID : !valpass || !valnewpass ?
+          SERVERPW + INVALID : Main.info(USERKNOWN, user.getText());
     }
+
+    alter.setEnabled(valnewpass && newpass.getPassword().length != 0);
+    create.setEnabled(valuname && valpass && disname &&
+        !user.getText().isEmpty() && pass.getPassword().length != 0);
     delete.setEnabled(data.contents.size() != 0);
     change.setEnabled(false);
+    info.setText(msg);
+    info.setIcon(icon);
   }
 
   /**
    * Sets new data.
-   * @throws Exception Exception
+   * @throws IOException I/O Exception
    */
-  public void setData() throws Exception {
-    fillLists();
+  public void setData() throws IOException {
+    final CachedOutput out = new CachedOutput();
+    if(!cs.execute(global ? new Show("Users") : new InfoUsers(), out)) {
+      throw new IOException(cs.info());
+    }
+    data = new Table(out.toString());
     userco1.removeAllItems();
     userco2.removeAllItems();
     StringList tmp = new StringList();
@@ -269,51 +251,18 @@ public class DialogUser extends BaseXBack {
   }
 
   /**
-   * Fills all lists.
-   * @throws Exception Exception
-   */
-  void fillLists() throws Exception {
-    final CachedOutput out = new CachedOutput();
-    if(global) {
-      if(!cs.execute(new Show("Users"), out)) {
-        throw new BaseXException(cs.info());
-      }
-    } else {
-      if(!cs.execute(new InfoUsers(), out)) {
-        throw new BaseXException(cs.info());
-      }
-    }
-    data = new Table(out.toString());
-  }
-
-  /**
    * Sets session.
    * @param s session
+   * @throws IOException I/O Exception
    */
-  public void setCs(final Session s) {
-    this.cs = s;
-  }
-
-  /**
-   * Returns a server error message.
-   * @param ex exception reference
-   * @return String error message
-   */
-  String error(final Exception ex) {
-    if(ex instanceof BindException) {
-      return SERVERBIND;
-    } else if(ex instanceof LoginException) {
-      return SERVERLOGIN;
-    } else if(ex instanceof IOException) {
-      return SERVERERR;
-    } else {
-      return ex.getMessage();
-    }
+  public void setCs(final Session s) throws IOException {
+    cs = s;
+    setData();
   }
 
   /**
    * Dialog specific table model.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */

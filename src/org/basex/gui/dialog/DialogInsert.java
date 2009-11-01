@@ -58,10 +58,10 @@ public final class DialogInsert extends Dialog {
     label2 = new BaseXLabel(INSERTVALUE, true, true);
     label2.setBorder(0, 0, 0, 0);
 
-    input1 = new BaseXTextField(null, this);
+    input1 = new BaseXTextField(this);
     BaseXLayout.setWidth(input1, 320);
 
-    input2 = new BaseXText(null, true, this);
+    input2 = new BaseXText(true, this);
     input2.setFont(GUIConstants.mfont);
     BaseXLayout.setWidth(input2, 320);
 
@@ -77,7 +77,7 @@ public final class DialogInsert extends Dialog {
 
     radio = new BaseXRadio[EDITKIND.length];
     for(int i = 1; i < EDITKIND.length; i++) {
-      radio[i] = new BaseXRadio(EDITKIND[i], null, false, this);
+      radio[i] = new BaseXRadio(EDITKIND[i], false, this);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
       group.add(radio[i]);

@@ -43,12 +43,11 @@ public final class BaseXSlider extends BaseXPanel {
    * @param mx max value
    * @param i initial value
    * @param list listener
-   * @param h help text
-   * @param win reference to the main window
+   * @param w reference to the main window
    */
   public BaseXSlider(final ActionListener list, final int mn, final int mx,
-      final int i, final byte[] h, final Window win) {
-    this(mn, mx, i, h, win);
+      final int i, final Window w) {
+    this(mn, mx, i, w);
     al = list;
   }
 
@@ -57,13 +56,10 @@ public final class BaseXSlider extends BaseXPanel {
    * @param mn min value
    * @param mx max value
    * @param i initial value
-   * @param help help text
-   * @param win parent window
+   * @param w parent window
    */
-  public BaseXSlider(final int mn, final int mx, final int i, final byte[] help,
-      final Window win) {
-
-    super(help, win);
+  public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
+    super(null, w);
     min = mn;
     max = mx;
     curr = i;
@@ -87,8 +83,8 @@ public final class BaseXSlider extends BaseXPanel {
     addMouseListener(this);
     addMouseMotionListener(this);
 
-    if(!(win instanceof Dialog)) return;
-    dl = (Dialog) win;
+    if(!(w instanceof Dialog)) return;
+    dl = (Dialog) w;
 }
 
   /**

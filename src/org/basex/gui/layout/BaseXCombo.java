@@ -16,12 +16,11 @@ public final class BaseXCombo extends JComboBox {
   /**
    * Constructor.
    * @param ch combobox choices.
-   * @param hlp help text
    * @param win parent window
    */
-  public BaseXCombo(final String[] ch, final byte[] hlp, final Window win) {
+  public BaseXCombo(final String[] ch, final Window win) {
     super(ch);
-    BaseXLayout.addInteraction(this, hlp, win);
+    BaseXLayout.addInteraction(this, null, win);
 
     if(!(win instanceof Dialog)) return;
 
