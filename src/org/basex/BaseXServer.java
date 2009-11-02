@@ -70,8 +70,8 @@ public final class BaseXServer extends Main implements Runnable {
     while(running) {
       try {
         final ServerSession s = new ServerSession(server.accept(), this, info);
-        context.setProp(new Prop());
-        if(context.prop.is(Prop.STOP)) {
+        Prop tmp = new Prop();
+        if(tmp.is(Prop.STOP)) {
           context.prop.set(Prop.STOP, false);
           context.prop.write();
           quit(false);
