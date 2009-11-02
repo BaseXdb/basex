@@ -404,7 +404,13 @@ public final class CommandParser extends InputParser {
         final Cmd c = Cmd.class.cast(e);
         if(c.help() || c.hidden() || c.internal()) continue;
       }
-      if(e.name().startsWith(t)) list = Array.add(list, e);
+      if(e.name().startsWith(t)) {
+        final int s = list.length;
+        final Enum<?>[] tmp = new Enum<?>[s + 1];
+        System.arraycopy(list, 0, tmp, 0, s);
+        tmp[s] = e;
+        list = tmp;
+      }
     }
     return list;
   }

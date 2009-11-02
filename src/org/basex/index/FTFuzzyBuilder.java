@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
@@ -112,10 +113,44 @@ public final class FTFuzzyBuilder extends FTBuilder {
         int lpre = 4;
         int lpos = 4;
 
-        // ftdata is stored here, with pre1, pos1, ..., preu, posu
+        if (false) {
+          // documentnode based scoring
+          int co = 1;
+          final int size = Num.size(vpre);
+          int npre = Num.read(vpre, lpre);
+          IntList freq = new IntList();
+          final int[] docs = data.doc();
+          final int[] max = new int[docs.length];
+          int cr = 1;
+          while(lpre < size) {
+            final int pre = npre;
+            lpre += Num.len(vpre, lpre);
+            // find document root
+            while (cr < docs.length && pre > docs[cr]) cr++;
+            if (cr == docs.length || pre < docs[cr]) {
+              if (lpre < size) npre = Num.read(vpre, lpre);
+              else max[cr - 1] = co > max[cr - 1] ? co : max[cr - 1];
+              if (npre == pre) co++;
+              else {
+                max[cr - 1] = co > max[cr - 1] ? co : max[cr - 1];
+                freq.add(co);
+                co = 1;
+              }
+            } else cr ++;            
+          }
+          for (int i = 0; i < max.length; i++)
+          System.out.println(new String(key) + " max:" + max[i]);
+      }        
+
+        lpre = 4;
+        lpos = 4;
+        
+        // fulltext data is stored here, with pre1, pos1, ..., preu, posu
         final int pres = Num.size(vpre);
         final int poss = Num.size(vpos);
         while(lpre < pres && lpos < poss) {
+          // first write score value
+          
           for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
             outz.write(vpre[lpre++]);
           for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)

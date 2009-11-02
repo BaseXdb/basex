@@ -50,8 +50,13 @@ abstract class FTBuilder extends IndexBuilder {
         token("global warming"), token("human activity"), 
         token("paul is dead"), token("virtual museums"), 
     };
+    int cd = 0;
     for(id = 0; id < total; id++) {
-      if(data.kind(id) != Data.TEXT) continue;
+      if(data.kind(id) != Data.TEXT) {
+        if(data.kind(id) == Data.DOC) cd++;
+        continue; 
+      }
+      
       checkStop();
       int p = 0, i = 0, j = 0;
       wp.init(data.text(id));
