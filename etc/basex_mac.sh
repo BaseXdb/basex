@@ -1,7 +1,13 @@
 #!/bin/sh
 
-# BaseX classpath
-cp="../bin"
-img="./images/BaseX.icns"
+if [ -z "$BASEX_PATH" ] 
+then
+	echo "Environment variable BASEX_PATH is not set."
+	BASEX_PATH="."
+fi
 
-java -Xdock:name="BaseX" -Xdock:icon="${img}" -cp ${cp} org.basex.BaseX
+# BaseX classpath
+cp="$BASEX_PATH/bin"
+img="$BASEX_PATH/images/BaseX.icns"
+
+java -Xdock:name="BaseX" -Xdock:icon="${img}" -cp ${cp} org.basex.BaseX $@
