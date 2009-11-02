@@ -871,6 +871,8 @@ public interface Text {
   String BUTTONCONNECT = lang("b_connect");
   /** Button for disconnecting. */
   String BUTTONDISCONNECT = lang("b_disconnect");
+  /** Button for refreshing. */
+  String BUTTONREFRESH = lang("b_refresh");
 
   // STATUS BAR ===============================================================
 
@@ -1027,7 +1029,11 @@ public interface Text {
   String LOGIN = lang("ds_login");
   /** Local. */
   String LOCAL = lang("ds_local");
-
+  /** Databases. */
+  String DATABASES = lang("ds_databases");
+  /** Sessions. */
+  String SESSIONS = lang("ds_sessions");
+  
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
   /** Dialog title for import options. */

@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.net.BindException;
 import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
+import javax.swing.border.EmptyBorder;
+
 import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
+import org.basex.core.proc.Show;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -18,11 +21,14 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
+import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.io.CachedOutput;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
+import org.basex.util.Token;
 
 /**
  * Dialog window for displaying information about the server.
@@ -40,6 +46,8 @@ public final class DialogServer extends Dialog {
   private final BaseXBack conn = new BaseXBack();
   /** User panel. */
   private final DialogUser user = new DialogUser(true, this);
+  /** Sessions/Databases panel. */
+  private final BaseXBack sedb = new BaseXBack();
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -48,6 +56,8 @@ public final class DialogServer extends Dialog {
   private final BaseXButton connect;
   /** Disconnect button. */
   private final BaseXButton disconnect;
+  /** Refresh button. */
+  private final BaseXButton refresh;
   /** Server host. */
   private final BaseXTextField host;
   /** Local server port. */
@@ -83,11 +93,13 @@ public final class DialogServer extends Dialog {
 
     tabs.add(SERVERN, conn);
     tabs.add(USERS, user);
+    tabs.add("Sessions/Databases", sedb);
 
     start = new BaseXButton(BUTTONSTASERV, this);
     stop = new BaseXButton(BUTTONSTOSERV, this);
     connect = new BaseXButton(BUTTONCONNECT, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
+    refresh = new BaseXButton(BUTTONREFRESH, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), this);
     host.addKeyListener(keys);
     ports = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.SERVERPORT)),
@@ -195,10 +207,13 @@ public final class DialogServer extends Dialog {
         cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER),
             gui.prop.get(GUIProp.SERVERPASS));
         user.setCs(cs);
+        fillsedb();
         connected = true;
       } else if(BUTTONDISCONNECT.equals(cmd)) {
         cs.execute(new Exit());
         connected = false;
+      } else if(BUTTONREFRESH.equals(cmd)) {
+        fillsedb();
       } else if(connected) {
         user.action(cmd);
       }
@@ -236,9 +251,48 @@ public final class DialogServer extends Dialog {
         !loguser.getText().isEmpty() && logpass.getPassword().length != 0);
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
+    tabs.setEnabledAt(2, connected);
     info.setText(msg);
     info.setIcon(icon);
     ctx.prop.write();
+  }
+  
+  /**
+   * Fills sessions/databases panel.
+   * @throws IOException Exception
+   */
+  private void fillsedb() throws IOException {
+    sedb.removeAll();
+    sedb.setLayout(new TableLayout(4, 1, 2, 2));
+    sedb.setBorder(8, 8, 8, 8);
+    final BaseXBack sess = new BaseXBack();
+    CachedOutput out = new CachedOutput();
+    sess.setLayout(new TableLayout(2, 1, 2, 2));
+    sess.add(new BaseXLabel(SESSIONS + COLS, false, true));
+    cs.execute(new Show("Sessions"), out);
+    BaseXText text = new BaseXText(false, this);
+    text.setFont(getFont());
+    text.setBorder(new EmptyBorder(5, 5, 5, 5));
+    text.setText(Token.token(out.toString()));
+    BaseXLayout.setWidth(text, 420);
+    BaseXLayout.setHeight(text, 100);
+    sess.add(text);
+    sedb.add(sess);
+    sedb.add(new BaseXLabel("  "));
+    final BaseXBack dbs = new BaseXBack();
+    dbs.setLayout(new TableLayout(2, 1, 2, 2));
+    out = new CachedOutput();
+    cs.execute(new Show("Databases"), out);
+    BaseXText text1 = new BaseXText(false, this);
+    text1.setFont(getFont());
+    text1.setBorder(new EmptyBorder(5, 5, 5, 5));
+    text1.setText(Token.token(out.toString()));
+    BaseXLayout.setWidth(text1, 420);
+    BaseXLayout.setHeight(text1, 100);
+    dbs.add(new BaseXLabel(DATABASES + COLS, false, true));
+    dbs.add(text1);
+    sedb.add(dbs);
+    sedb.add(refresh);
   }
 
   @Override

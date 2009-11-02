@@ -40,6 +40,7 @@ b_staserv=Starte Server
 b_stoserv=Stop Server
 b_connect=Verbinden
 b_disconnect=Trennen
+b_refresh=Aktualisieren
 
 # Status messages
 s_ok=OK
@@ -296,6 +297,8 @@ ds_newpw=Neues Passwort
 ds_invalid=% ist ungültig
 ds_login=Login
 ds_local=Lokaler  
+ds_databases=Datenbanken
+ds_sessions=Verbindungen
 
 # Commands & Processes
 proc_time=Benötigte Zeit
