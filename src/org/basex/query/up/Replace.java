@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 
 import java.util.Set;
 
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
@@ -14,7 +15,6 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
@@ -57,30 +57,32 @@ public final class Replace extends Update {
     Item i = t.next();
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, i);
-    if(t.size() > 1 || !(i instanceof Nod) || i.type == Type.DOC) 
+    final int k = Nod.kind(i.type);
+    if(t.size() > 1 || !(i instanceof Nod) || k == Data.DOC) 
       Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
     final Nod p = n.parent();
     if(p == null) Err.or(UPNOPAR, i);
     
-    // check replace constraints
-    // non attribute non value
-    if(aSeq.size < 1 && !value) {
-      ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
+    // replace node
+    if(!value) {
+      if(k != Data.ATTR) {
+        // replace non-attribute node
+        if(aSeq.size() > 0) Err.or(UPWRELM, i);
+        ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
+      } else {
+        // replace attribute node
+        if(seq.size() - aSeq.size() > 0) Err.or(UPWRATTR, i);
+        ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
+      }
       return Seq.EMPTY;
     }
     
-    // replace attribute node
-    if(aSeq.size() > 0 && !value) {
-      ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
-      
-    // replace value / element content
-    } else {
-      ctx.updates.add(n.type == Type.ELM ? 
-          new ReplaceElemContent(n, seq.get(0).str()) :
-            new ReplaceValue(n, seq.get(0).str()), 
-            ctx);
-    }
+    // replace value of node
+    ctx.updates.add(k == Data.ELEM ? 
+        new ReplaceElemContent(n, seq.get(0).str()) :
+          new ReplaceValue(n, seq.get(0).str()), 
+          ctx);
     return Seq.EMPTY;
   }
   
