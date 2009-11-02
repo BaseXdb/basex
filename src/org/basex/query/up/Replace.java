@@ -2,8 +2,9 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-import java.util.HashSet;
+
 import java.util.Set;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -81,29 +82,29 @@ public final class Replace extends Update {
     
     // replace attribute node
     if(a && !value) {
-      i = r.next();
-      final HashSet<String> set = new HashSet<String>();
-      // bpar states if ns constraints for target parent are hurt. 
-      // Error results in XUDY0023.
-      boolean bpar = false;
-      // brep states if a ns constraint is hurt by the replacing node set ...
-      // ... this results in XUDY0024.
-      boolean brep = false;
-      while(i != null) {
-        if(i.type != Type.ATT) Err.or(UPWRATTR, i);
-        // check namespace constraints for replace node set (dupl. attributes..)
-        brep = checkNS(set, (Nod) i) | brep;
-        i = r.next();
-      }
-      // check attributes of parent of target node for namespace constraints
-      final SeqIter tAttr = SeqIter.get(n.parent().attr());
-      i = tAttr.next();
-      while(i != null) {
-        bpar = checkNS(set, (Nod) i) | bpar;
-        i = tAttr.next();
-      }
-      if(bpar) Err.or(UPCONFNSPAR, i);
-      if(brep) Err.or(UPCONFNS, i);
+//      i = r.next();
+//      final HashSet<String> set = new HashSet<String>();
+//      // bpar states if ns constraints for target parent are hurt. 
+//      // Error results in XUDY0023.
+//      boolean bpar = false;
+//      // brep states if a ns constraint is hurt by the replacing node set ...
+//      // ... this results in XUDY0024.
+//      boolean brep = false;
+//      while(i != null) {
+//        if(i.type != Type.ATT) Err.or(UPWRATTR, i);
+//        // check namespace constraints for replace node set (dupl. attributes..)
+//        brep = checkNS(set, (Nod) i) | brep;
+//        i = r.next();
+//      }
+//      // check attributes of parent of target node for namespace constraints
+//      final SeqIter tAttr = SeqIter.get(n.parent().attr());
+//      i = tAttr.next();
+//      while(i != null) {
+//        bpar = checkNS(set, (Nod) i) | bpar;
+//        i = tAttr.next();
+//      }
+//      if(bpar) Err.or(UPCONFNSPAR, i);
+//      if(brep) Err.or(UPCONFNS, i);
       r.reset();
       ctx.updates.add(new ReplacePrimitive(n, r, true), ctx);
       
@@ -129,7 +130,7 @@ public final class Replace extends Update {
    * @param n node ns to add
    * @return true if duplicates exist
    */
-  private static boolean checkNS(final Set<String> s, final Nod n) {
+  public static boolean checkNS(final Set<String> s, final Nod n) {
     if(n instanceof FNode) return !s.add(Token.string(((FNode) n).nname()));
     final DBNode dn = (DBNode) n;
     return !s.add(Token.string(dn.data.attName(dn.pre)));

@@ -40,6 +40,7 @@ public final class ReplacePrimitive extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
+//    InfoTable.pT(d, 100, -1);
     // source nodes may be empty, thus the replace results in deleting the 
     // target node
     if(m == null) {
