@@ -7,7 +7,6 @@ import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.IntStop;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
 import org.basex.server.Semaphore;
@@ -33,6 +32,8 @@ public final class BaseXServer extends Main implements Runnable {
   boolean info;
   /** Semaphore for managing processes. */
   public final Semaphore sem;
+  /** Port test. */
+  private int p;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -121,8 +122,9 @@ public final class BaseXServer extends Main implements Runnable {
           // activate interactive mode
           console = true;
         } else if(c == 'p') {
+          p = arg.num();
           // parse server port
-          context.prop.set(Prop.SERVERPORT, arg.num());
+          context.prop.set(Prop.SERVERPORT, p);
         } else if(c == 'v') {
           // show process info
           info = true;
@@ -135,8 +137,13 @@ public final class BaseXServer extends Main implements Runnable {
           try {
             context.prop.set(Prop.STOP, true);
             context.prop.write();
-            new ClientSession("localhost", context.prop.num(Prop.PORT),
-                "", "").execute(new IntStop(), null);
+            if(p != 0) {
+              new ClientSession("localhost", p,
+                  "", "");
+            } else {
+              new ClientSession("localhost", context.prop.num(Prop.PORT),
+                  "", "");
+            }
           } catch(final IOException ex) {
             if(ex instanceof LoginException) {
               outln(SERVERSTOPPED);
