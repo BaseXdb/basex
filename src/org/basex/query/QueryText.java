@@ -38,6 +38,8 @@ public interface QueryText {
   Object[] NOFILE = { BASX, 3, "Text node could not be created (%)." };
   /** BASX0003: Evaluation exception. */
   Object[] NODB = { BASX, 4, "Database '%' not found." };
+  /** BASX0003: Evaluation exception. */
+  Object[] NOPRE = { BASX, 5, "Database pre value '%' out of range." };
 
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };

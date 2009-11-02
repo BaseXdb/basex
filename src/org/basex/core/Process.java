@@ -193,8 +193,7 @@ public abstract class Process extends Progress {
   /**
    * Performs the specified XQuery.
    * @param q query to be performed
-   * @param err this string is thrown as exception if the results are no
-   *    element nodes
+   * @param err if this error message is not null, all results must be elements
    * @return result set
    */
   protected final Nodes query(final String q, final String err) {

@@ -95,6 +95,6 @@ public final class CDoc extends CFrag {
 
   @Override
   public String toString() {
-    return toString(name());
+    return toString(Type.DOC);
   }
 }

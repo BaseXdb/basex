@@ -4,6 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.TokenBuilder;
 
@@ -62,6 +63,6 @@ public final class CText extends CFrag {
 
   @Override
   public String toString() {
-    return toString("text");
+    return toString(Type.TXT);
   }
 }

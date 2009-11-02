@@ -243,21 +243,20 @@ public final class FNSeq extends Fun {
       final NodeIter niter2 = ((Nod) it2).descOrSelf();
 
       Nod n1 = null, n2 = null;
-      // explicit non-short-circuit..
       while(true) {
-        n1 = nextDeep(niter1);
-        n2 = nextDeep(niter2);
+        n1 = niter1.next();
+        n2 = niter2.next();
         if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
         if(n1.type != n2.type) return false;
 
-        if(n1.type == Type.ELM && !n1.qname().eq(n2.qname())) return false;
-
-        if(n1.type == Type.ATT) {
-          if(!n1.qname().eq(n2.qname()) || !Token.eq(n1.str(), n2.str()))
-            return false;
+        final Item qn1 = n1.qname();
+        if(qn1 != null && !qn1.eq(n2.qname())) return false;
+        
+        if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM) {
+          if(!Token.eq(n1.str(), n2.str())) return false;
           continue;
         }
-
+        
         NodeIter att1 = n1.attr();
         int s1 = 0;
         while(att1.next() != null) s1++;
@@ -283,18 +282,5 @@ public final class FNSeq extends Fun {
       if(n1 != n2) return false;
     }
     return it1 == it2;
-  }
-
-  /**
-   * Returns the next node for deep comparison.
-   * @param iter iterator
-   * @return node
-   * @throws QueryException query exception
-   */
-  private static Nod nextDeep(final NodeIter iter) throws QueryException {
-    while(true) {
-      final Nod n = iter.next();
-      if(n == null || n.type != Type.COM && n.type != Type.PI) return n;
-    }
   }
 }

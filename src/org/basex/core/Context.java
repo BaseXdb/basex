@@ -108,7 +108,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc(), data, true);
+    if(data != null) current = new Nodes(data.doc(), data, true);
   }
 
   /**

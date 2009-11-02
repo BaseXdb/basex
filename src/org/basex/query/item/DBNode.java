@@ -371,14 +371,14 @@ public class DBNode extends Nod {
   public String toString() {
     switch(type) {
       case ATT:
-        return type + "{" + string(data.attName(pre)) + "=\"" +
-        string(data.attValue(pre)) + "\"}";
+        return type + " { " + string(data.attName(pre)) + "=\"" +
+        string(data.attValue(pre)) + "\" }";
       case DOC:
-        return type + "{\"" + data.meta.name + "\"}";
+        return type + " { \"" + data.meta.name + "\" }";
       case ELM:
-        return type + "{" + string(data.tag(pre)) + "," + pre + "}";
+        return type + " { " + string(data.tag(pre)) + "," + pre + " }";
       default:
-        return type + "{" + Err.chop(str()) + "}";
+        return type + " { \"" + Err.chop(str()) + "\" }";
     }
   }
 

@@ -7,6 +7,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
@@ -33,6 +35,14 @@ public abstract class Dialog extends JDialog {
   protected BaseXBack panel;
   /** Dialog position. */
   private int[] loc;
+
+  /** Key listener. */
+  protected final KeyAdapter keys = new KeyAdapter() {
+    @Override
+    public void keyReleased(final KeyEvent e) {
+      action(null);
+    }
+  };
 
   /**
    * Default constructor.

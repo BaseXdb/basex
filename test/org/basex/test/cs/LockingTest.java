@@ -6,11 +6,8 @@ import org.basex.BaseXServer;
 import org.basex.core.Main;
 import org.basex.core.Session;
 import org.basex.core.Process;
-import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Insert;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.XQuery;
 import org.basex.io.CachedOutput;
@@ -213,7 +210,7 @@ public final class LockingTest {
           final String res = checkRes(new XQuery(QUERY), session2);
           if(!res.equals("192000")) err("test failed: " + res);
         } else {
-          String result = process(new Delete("//aa"), session2);
+          String result = process(new XQuery("delete nodes //aa"), session2);
           if(result != null) err("test failed: " + result);
         }
         done = true;
@@ -223,7 +220,8 @@ public final class LockingTest {
       final String res = checkRes(new XQuery(QUERY), session1);
       if(!res.equals("192000")) err("test failed: " + res);
     } else {
-      process(new Insert(CmdUpdate.ELEMENT, "//members", "aa"), session1);
+      process(new XQuery(
+          "for $i in //members return insert node <aa/> into $i"), session1);
     }
     while(!done) {
       Performance.sleep(200);

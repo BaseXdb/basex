@@ -1,35 +1,27 @@
 package org.basex.gui;
-
+ 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
-
 import javax.swing.AbstractButton;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Close;
-import org.basex.core.proc.Copy;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.Cs;
-import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.Export;
-import org.basex.core.proc.Insert;
 import org.basex.core.proc.Mount;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Update;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -53,8 +45,10 @@ import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
+import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.Performance;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.deepfs.jfuse.JFUSEAdapter;
 
@@ -234,24 +228,6 @@ public enum GUICommands implements GUICommand {
 
   /* EDIT COMMANDS */
 
-  /** Copies the currently marked nodes. */
-  COPY(true, GUICOPY, "", GUICOPYTT) {
-    @Override
-    public void execute(final GUI gui) {
-      final Context context = gui.context;
-      final Nodes nodes = context.marked();
-      context.copy(new Nodes(nodes.nodes, nodes.data));
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      // disallow copy of empty node set or root node
-      final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(n) &&
-          (n.size() != 1 || n.nodes[0] != 0));
-    }
-  },
-
   /** Copies the current path. */
   COPYPATH(true, GUICPPATH, "% shift C", GUICPPATHTT) {
     @Override
@@ -271,30 +247,43 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Pastes the copied nodes. */
-  PASTE(true, GUIPASTE, "", GUIPASTETT) {
+  /** Copies the currently marked nodes. */
+  COPY(true, GUICOPY, "", GUICOPYTT) {
     @Override
     public void execute(final GUI gui) {
-      gui.execute(new Copy());
+      final Context ctx = gui.context;
+      final Nodes n = ctx.marked();
+      ctx.copy(new Nodes(n.nodes, n.data));
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      final Context context = gui.context;
       // disallow copy of empty node set or root node
-      final Nodes n = context.marked();
-      boolean s = updatable(n) && context.copied() != null &&
-        n.size() != 0 && (n.size() != 1 || n.nodes[0] != 0);
-      if(s) {
-        final Data d = n.data;
-        for(final int pre : n.nodes) {
-          if(d.kind(pre) != Data.ELEM) {
-            s = false;
-            break;
-          }
-        }
+      BaseXLayout.enable(button, updatable(gui.context.marked()));
+    }
+  },
+
+  /** Pastes the copied nodes. */
+  PASTE(true, GUIPASTE, "", GUIPASTETT) {
+    @Override
+    public void execute(final GUI gui) {
+      final StringBuilder sb = new StringBuilder();
+      final Nodes n = gui.context.copied();
+      for(int i = 0; i < n.size(); i++) {
+        if(i > 0) sb.append(',');
+        sb.append(fndb(n, i));
       }
-      BaseXLayout.enable(button, s);
+      gui.context.copy(null);
+      gui.exec(new XQuery("insert nodes (" + sb + ") into " +
+        fndb(gui.context.marked(), 0)), false);
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final Context ctx = gui.context;
+      // disallow copy of empty node set or root node
+      BaseXLayout.enable(button, updatable(ctx.marked(), Data.DOC) &&
+          ctx.copied() != null);
     }
   },
 
@@ -303,15 +292,23 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(Dialog.confirm(gui, DELETECONF)) {
-        gui.execute(new Delete());
+        final StringBuilder sb = new StringBuilder();
+        final Nodes n = gui.context.marked();
+        for(int i = 0; i < n.size(); i++) {
+          if(i > 0) sb.append(',');
+          sb.append(fndb(n, i));
+        }
+        gui.context.marked(new Nodes(n.data));
+        gui.context.copy(null);
+        gui.focused = -1;
+        gui.exec(new XQuery("delete nodes (" + sb + ")"), false);
       }
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
-      final Nodes n = gui.context.marked();
-      BaseXLayout.enable(button, updatable(n) && n.size() != 0);
+      BaseXLayout.enable(button, updatable(gui.context.marked()));
     }
   },
 
@@ -319,19 +316,35 @@ public enum GUICommands implements GUICommand {
   INSERT(true, GUIINSERT, "", GUIINSERTTT) {
     @Override
     public void execute(final GUI gui) {
+      final Nodes n = gui.context.marked();
       final DialogInsert insert = new DialogInsert(gui);
-      if(insert.result == null) return;
-      final CmdUpdate type = CmdUpdate.values()[insert.kind];
-      gui.execute(new Insert(type, null, insert.result.finish()));
+      if(!insert.ok()) return;
+      
+      final StringList sl = insert.result;
+      String item = null;
+      final int k = insert.kind;
+      if(k == Data.ELEM) {
+        item = Type.ELM + " { " + quote(sl.get(0)) + " } { () }";
+      } else if(k == Data.ATTR) {
+        item = Type.ATT + " { " + quote(sl.get(0)) +
+          " } { " + quote(sl.get(1)) + " }";
+      } else if(k == Data.PI) {
+        item = Type.PI + " { " + quote(sl.get(0)) +
+          " } { " + quote(sl.get(1)) + " }";
+      } else if(k == Data.TEXT) {
+        item = Type.TXT + " { " + quote(sl.get(0)) + " }";
+      } else if(k == Data.COMM) {
+        item = Type.COM + " { " + quote(sl.get(0)) + " }";
+      }
+      gui.context.copy(null);
+      gui.exec(new XQuery("insert node " + item + " into " + fndb(n, 0)),
+          false);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      final Context context = gui.context;
-      final Nodes n = context.marked();
-      final Data d = context.data();
-      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
-          (d.kind(n.nodes[0]) == Data.ELEM || d.kind(n.nodes[0]) == Data.DOC));
+      BaseXLayout.enable(button, updatable(gui.context.marked(),
+          Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
     }
   },
 
@@ -339,19 +352,29 @@ public enum GUICommands implements GUICommand {
   EDIT(true, GUIEDIT, "", GUIEDITTT) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes nodes = gui.context.marked();
-      final DialogEdit edit = new DialogEdit(gui, nodes.nodes[0]);
-      if(edit.result == null) return;
-      final CmdUpdate type = CmdUpdate.values()[edit.kind];
-      gui.execute(new Update(type, null, edit.result.finish()));
+      final Nodes n = gui.context.marked();
+      final DialogEdit edit = new DialogEdit(gui, n.nodes[0]);
+      if(!edit.ok()) return;
+
+      String rename = null;
+      String replace = null;
+      final int k = edit.kind;
+      if(k == Data.ELEM || k == Data.PI || k == Data.ATTR) {
+        rename = edit.result.get(0);
+        if(k != Data.ELEM) replace = edit.result.get(1);
+      } else {
+        replace = edit.result.get(0);
+      }
+
+      if(rename != null) gui.exec(new XQuery("rename node " +
+        fndb(n, 0) + " as " + quote(rename)), false);
+      if(replace != null) gui.exec(new XQuery("replace value of node " +
+        fndb(n, 0) + " with " + quote(replace)), false);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      final Context context = gui.context;
-      final Nodes n = context.marked();
-      BaseXLayout.enable(button, updatable(n) && n.size() == 1 &&
-          context.data().kind(n.nodes[0]) != Data.DOC);
+      BaseXLayout.enable(button, updatable(gui.context.marked(), Data.DOC));
     }
   },
 
@@ -359,12 +382,12 @@ public enum GUICommands implements GUICommand {
   FILTER(true, GUIFILTER, "% ENTER", GUIFILTERTT) {
     @Override
     public void execute(final GUI gui) {
-      final Context context = gui.context;
-      Nodes marked = context.marked();
+      final Context ctx = gui.context;
+      Nodes marked = ctx.marked();
       if(marked.size() == 0) {
         final int pre = gui.focused;
         if(pre == -1) return;
-        marked = new Nodes(pre, context.data());
+        marked = new Nodes(pre, ctx.data());
       }
       gui.notify.context(marked, false, null);
       gui.input.requestFocusInWindow();
@@ -649,19 +672,19 @@ public enum GUICommands implements GUICommand {
       gui.refreshControls();
       gui.notify.layout();
 
-      final Context context = gui.context;
-      final boolean root = context.root();
+      final Context ctx = gui.context;
+      final boolean root = ctx.root();
       if(!rt) {
         if(!root) {
-          gui.notify.context(new Nodes(0, context.data()), true, null);
-          gui.notify.mark(context.current(), null);
+          gui.notify.context(new Nodes(0, ctx.data()), true, null);
+          gui.notify.mark(ctx.current(), null);
         }
       } else {
         if(root) {
-          gui.notify.mark(new Nodes(context.data()), null);
+          gui.notify.mark(new Nodes(ctx.data()), null);
         } else {
-          final Nodes mark = context.marked();
-          context.marked(new Nodes(context.data()));
+          final Nodes mark = ctx.marked();
+          ctx.marked(new Nodes(ctx.data()));
           gui.notify.context(mark, true, null);
         }
       }
@@ -891,7 +914,7 @@ public enum GUICommands implements GUICommand {
 
   public String key() { return key; }
 
-  // =========================================================================
+  // STATIC METHODS ===========================================================
 
   /**
    * Performs a process, showing a progress dialog.
@@ -923,7 +946,7 @@ public enum GUICommands implements GUICommand {
 
           // return user information
           if(ok) {
-            gui.status.setText(Main.info(PROCTIME, perf.getTimer()));
+            gui.status.setText(Main.info(PROCTIME, perf));
             if(op) Dialog.info(gui, INFOOPTIM);
           } else {
             final String info = p.info();
@@ -966,9 +989,34 @@ public enum GUICommands implements GUICommand {
   /**
    * Checks if data can be updated (disk mode, nodes defined, no namespaces).
    * @param n node instance
+   * @param no disallowed node types
    * @return result of check
    */
-  static boolean updatable(final Nodes n) {
-    return n != null && n.data.ns.size() == 0;
+  static boolean updatable(final Nodes n, final int... no) {
+    if(n == null || n.data.ns.size() != 0 || (no.length == 0 ?
+        n.size() < 1 : n.size() != 1)) return false;
+
+    final int k = n.data.kind(n.nodes[0]);
+    for(final int i : no) if(k == i) return false;
+    return true;
+  }
+
+  /**
+   * Returns an quoted string.
+   * @param s string to encode
+   * @return quoted string
+   */
+  static String quote(final String s) {
+    return "\"" + s.replaceAll("\\\"", "&quot;") + "\"";
+  }
+
+  /**
+   * Returns a database function for the first node in a node set.
+   * @param n node set
+   * @param i offset
+   * @return function string
+   */
+  static String fndb(final Nodes n, final int i) {
+    return "basex:db('" + n.data.meta.name + "'," + n.nodes[i] + ")";
   }
 }

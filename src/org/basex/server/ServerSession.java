@@ -143,7 +143,7 @@ public final class ServerSession extends Thread {
           out.write(new byte[IO.BLOCKSIZE]);
           send(false);
         }
-        if(info) Main.outln(this + " " + in + ": " + perf.getTimer());
+        if(info) Main.outln(this + " " + in + ": " + perf);
       }
       if(info) Main.outln(this + " Logout: " + context.user.name);
     } catch(final IOException ex) {

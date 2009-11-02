@@ -391,21 +391,7 @@ qu_tabtotal=Gesamt
 qu_tabmem=Speicher    
 qu_tabprinted=Gedruckt    
 qu_tabhits=Ergebnisse  
-
-# Update Commands
-uc_querynodeserr=Anfrage muss ein Knotenset liefern.
-uc_deleteinfo=% Knoten gelöscht in %.
-uc_copyroot=Nach Wurzelknoten kann nicht eingefügt werden.
-uc_insertinfo=% Knoten eingefügt in %.
-uc_updateinfo=% Knoten aktualisiert in %.
-uc_updatenode=Knoten der aktualisiert wird muss ein % sein.
-uc_copytags=Zielknoten müssen Elemente sein.
-uc_attinvalid="%" ist kein gültiger Attributname.
-uc_attdupl=Doppeltes Attribut "%" gefunden.
-uc_posinvalid=Ungültiger Positionswert "%".
-uc_invalid=Name "%" ist ungültig.
-uc_txtinvalid=Textknoten können nicht leer sein.
-uc_namespaces=Dokumente mit Namespaces können nicht verändert werden.
+qu_nodeserr=Anfrage muss ein Knotenset liefern.
 
 # Admin Commands
 ad_databases=% geöffnete Datenbanken
@@ -503,26 +489,13 @@ ch_export1=Exportieren der Datenbank als XML.
 ch_export2=Exportiert die Datenbank nach [%].
 ch_helpquery0=Query-Befehle:
 ch_xquery1=Ausführung einer XQuery-Anfrage.
-ch_xquery2=Führt die XQuery [%] aus und zeigt das Ergebnis an.
+ch_xquery2=Führt eine XQuery-Anfrage aus und zeigt das Ergebnis an.
 ch_run1=Ausführung einer Datei als XQuery-Anfrage.
 ch_run2=Führt die XQuery-Anfrage in der Datei [%]\n  aus und zeigt das Ergebnis an.
 ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen
 ch_cs1=Ausführung einer XQuery-Anfrage und Wechsel zu neuem Kontextset.
-ch_cs2=Führt die angegebene XQuery [%] aus und setzt das\nErgebnis als neues Kontextset.
-ch_helpupdate0=Update-Befehle:
-ch_copy1=Kopieren von XML-Knoten.
-ch_copy2=Führt [%1] als XQuery aus und fügt das Ergebnis\nals Kind [%3] (0 = letztes Kind) der angegebenen\n[%2]-Anfrage ein.
-ch_delete1=Löschen von XML-Knoten.
-ch_delete2=Löscht die Knoten, die der angegebenen\n[%]-Anfrage entsprechen.
-ch_insert1=Einfügen von XML-Knoten.
-ch_insert2=Fügt ein Fragment oder einen angegebenen Knoten als\nKind [%] (0 = letztes Kind) der angegebenen\n[%]-Anfrage ein:
-ch_insert21=fügt [%] ein
-ch_insert22=fügt [%] und [%] ein
-ch_update1=Aktualisieren von XML-Knoten.
-ch_update2=Aktualisiert Knoten, die der angegebenen [%]-Anfrage entsprechen:
-ch_update21=aktualisiert mit [%]
-ch_update22=aktualisiert mit [%] und [%]
+ch_cs2=Führt die angegebene XQuery aus und setzt das\nErgebnis als neues Kontextset.
 ch_helpadmin0=Administrator-Befehle:
 ch_kill1=Beenden der Datenbank-Sessions.
 ch_kill2=Beendet alle Datenbank-Sessions.

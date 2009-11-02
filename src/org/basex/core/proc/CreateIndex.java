@@ -60,7 +60,7 @@ public final class CreateIndex extends ACreate {
 
       data.flush();
       buildIndex(index, data);
-      return info(DBINDEXED, perf.getTimer());
+      return info(DBINDEXED, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
       return error(ex.getMessage());

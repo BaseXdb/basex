@@ -392,21 +392,7 @@ qu_tabtotal=合計時間　　
 qu_tabmem=メモリー　　
 qu_tabprinted=印刷しました
 qu_tabhits=結果　　　　
-
-# Update Commands
-uc_querynodeserr=クエリーはノードセットを返さなければいけません。
-uc_deleteinfo=%2 で %1 個のノードが削除されました。
-uc_copyroot=ルートノードの後には挿入できません。
-uc_insertinfo=%個のノードが%に挿入されました。.
-uc_updateinfo=%個のノードが更新されました %.
-uc_updatenode=更新するノードは%でなければいけません。.
-uc_copytags=対象ノードはXML要素でなければいけません。
-uc_attinvalid=「%」は有効な属性名ではありません。
-uc_attdupl=属性「%」は既に定義されています。
-uc_posinvalid=不正な位置 "%".
-uc_invalid=不正な名 "%"
-uc_txtinvalid=テキストノードを空に出来ません。
-uc_namespaces=名前空間付きの文書を更新できません。
+qu_nodeserr=クエリーはノードセットを返さなければいけません。
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -509,20 +495,7 @@ ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。
 ch_cs1=XQueryクエリーを評価、結果を新しいコンテキストセットに（？）
-ch_cs2=指定されたXQuery [%] を評価し、結果を新しい\nコンテキストセットにします。
-ch_helpupdate0=更新コマンド:
-ch_copy1=XMLノードのコピー
-ch_copy2=[%] を評価し、結果を [%] の [%] 番目の\n子ノードとしてコピーします。 (0=末尾).
-ch_delete1=XMLノードの削除
-ch_delete2=指定された [%] クエリーを満たすノードを削除します。
-ch_insert1=XMLノードの挿入
-ch_insert2=ノード（または断片）を[%2] の [%1] 番目の\n子ノード(0=最後の子ノード)として挿入:
-ch_insert21=[%] の挿入
-ch_insert22=[%] と [%] の挿入
-ch_update1=XMLノードの更新
-ch_update2=指定された [%] クエリーを満たすノードを更新します。:
-ch_update21=ターゲットを [%] に更新
-ch_update22=ターゲットを  [%] と [%] に更新
+ch_cs2=指定されたXQueryを評価し、結果を新しい\nコンテキストセットにします。
 ch_helpadmin0=Admin Commands:
 ch_kill1=Kill database sessions.
 ch_kill2=Kills all current database sessions.

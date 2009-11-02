@@ -176,10 +176,8 @@ public final class MAB2Parser extends Parser {
       }
     }
 
-    if(Prop.debug) {
-      Main.err("\nParse Offsets (%): %/%\n", ids.size(), p.getTimer(),
-          Performance.getMem());
-    }
+    if(Prop.debug) Main.err("\nParse Offsets (%): %/%\n", ids.size(), p,
+        Performance.getMem());
 
     // create all titles
     for(i = 1; i <= ids.size(); i++) {
@@ -194,9 +192,7 @@ public final class MAB2Parser extends Parser {
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
     }
 
-    if(Prop.debug) {
-      Main.err("\nCreate Titles: %/%\n", p.getTimer(), Performance.getMem());
-    }
+    if(Prop.debug) Main.err("\nCreate Titles: %/%\n", p, Performance.getMem());
 
     builder.endElem(LIBRARY);
     builder.endDoc();

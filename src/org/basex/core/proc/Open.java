@@ -42,7 +42,7 @@ public final class Open extends Process {
         context.openDB(data);
         if(data.meta.oldindex) info(INDUPDATE);
       }
-      return info(DBOPENED, db, perf.getTimer());
+      return info(DBOPENED, db, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();

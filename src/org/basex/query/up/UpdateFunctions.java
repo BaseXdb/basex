@@ -1,6 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -98,10 +99,18 @@ public final class UpdateFunctions {
    * @param data data reference
    */
   public static void rename(final int pre, final byte[] name, final Data data) {
-    // passed nodes must be element, pi or attribute
+    // passed on pre value must refer to element, pi or attribute node
     final int k = data.kind(pre);
-    if(k == Data.ELEM || k == Data.PI) data.update(pre, name);
-    else data.update(pre, name, data.attValue(pre));
+    if(k == Data.ELEM) {
+      data.update(pre, name);
+    } else if(k == Data.PI) {
+      byte[] val = data.text(pre);
+      final int i = indexOf(val, ' ');
+      data.update(pre, i == -1 ? name :
+        concat(name, SPACE, substring(val, i + 1)));
+    } else {
+      data.update(pre, name, data.attValue(pre));
+    }
   }
 
   /**
@@ -194,8 +203,12 @@ public final class UpdateFunctions {
         // needed to build data instance from attribute sequence
         m.addAtt(m.atts.index(n.nname(), null, false), 0, n.str(), pre - par);
         return ++pre;
-      case Data.TEXT:
       case Data.PI:
+        final byte[] nm = n.nname();
+        final byte[] vl = n.str();
+        m.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
+        return ++pre;
+      case Data.TEXT:
       case Data.COMM:
         m.addText(n.str(), pre - par, k);
         return ++pre;
@@ -224,7 +237,7 @@ public final class UpdateFunctions {
   private static int addDBNode(final DBNode n, final MemData m,
       final int pval, final int par) throws QueryException {
 
-    // [LK] copy nodes directly from table instead of using iterators
+    // [LK] copy nodes directly from table - see copy() method below
     final Data data = n.data;
     final int k = Nod.kind(n.type);
     int pre = pval;
@@ -240,8 +253,12 @@ public final class UpdateFunctions {
         // needed to build data instance from attribute sequence
         m.addAtt(m.atts.index(n.nname(), null, false), 0, n.str(), pre - par);
         return ++pre;
-      case Data.TEXT:
       case Data.PI:
+        final byte[] nm = n.nname();
+        final byte[] vl = n.str();
+        m.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
+        return ++pre;
+      case Data.TEXT:
       case Data.COMM:
         m.addText(n.str(), pre - par, k);
         return ++pre;
@@ -257,4 +274,42 @@ public final class UpdateFunctions {
     while((i = ir.next()) != null) pre = addDBNode((DBNode) i, m, pre, pval);
     return pre;
   }
+
+  /**
+   * Creates a memory data instance from the specified database and pre value.
+   * @param data data reference
+   * @param pre pre value
+   * @return database instance
+   */
+  public static MemData copy(final Data data, final int pre) {
+    // size of the data instance
+    final int size = data.size(pre, data.kind(pre));
+    // create temporary data instance, adopting the indexes of the source data
+    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns,
+        data.path, data.meta.prop);
+
+    // copy all nodes
+    for(int p = pre; p < pre + size; p++) {
+      final int k = data.kind(p);
+      final int d = p - data.parent(p, k);
+      switch(k) {
+        case Data.DOC:
+          tmp.addDoc(data.text(p), data.size(p, k));
+          break;
+        case Data.ELEM:
+          tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
+              data.size(p, k), data.ns(p).length != 0);
+          break;
+        case Data.ATTR:
+          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d);
+          break;
+        case Data.TEXT:
+        case Data.COMM:
+        case Data.PI:
+          tmp.addText(data.text(p), d, k);
+          break;
+      }
+    }
+    return tmp;
+  }  
 }

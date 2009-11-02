@@ -2,9 +2,9 @@ package org.basex.test.storage;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.XMLParser;
-import org.basex.core.proc.Copy;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.query.up.UpdateFunctions;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -41,7 +41,7 @@ public final class UpdateTestBulk extends UpdateTest {
   @Test
   public void testBulkInsertSmall() {
     final Data data = CONTEXT.data();
-    insert(6, 2, Copy.copy(insertData, 3));
+    insert(6, 2, UpdateFunctions.copy(insertData, 3));
     assertEquals(size + 4, data.meta.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
     assertParentEqual(11, 13, data);
@@ -53,7 +53,7 @@ public final class UpdateTestBulk extends UpdateTest {
   @Test
   public void testBulkInsertLarge() {
     final Data data = CONTEXT.data();
-    insert(6, 2, Copy.copy(insertData, 5));
+    insert(6, 2, UpdateFunctions.copy(insertData, 5));
     assertEquals(size + 2, data.meta.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
     assertParentEqual(21, 22, data);

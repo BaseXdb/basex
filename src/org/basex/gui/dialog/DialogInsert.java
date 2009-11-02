@@ -1,6 +1,8 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +19,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * Dialog window for inserting new database nodes.
@@ -25,26 +28,30 @@ import org.basex.util.Token;
  * @author Lukas Kircher
  */
 public final class DialogInsert extends Dialog {
-  /** Remembers the last insertion type. */
-  private static int lkind = 1;
-
   /** Resulting update arguments. */
-  public StringList result;
+  public final StringList result = new StringList();
   /** Node kind. */
   public int kind;
 
+  /** Button panel. */
+  private final BaseXBack buttons;
   /** Background panel. */
-  BaseXBack back;
+  private final BaseXBack back;
+  /** Info label. */
+  private final BaseXLabel info;
   /** Text area. */
-  BaseXTextField input1;
+  private final BaseXTextField input1;
   /** Text area. */
-  BaseXText input2;
+  private final BaseXText input2;
   /** First label. */
-  BaseXLabel label1;
+  private final BaseXLabel label1;
   /** Second label. */
-  BaseXLabel label2;
+  private final BaseXLabel label2;
   /** Insert kind selection buttons. */
-  BaseXRadio[] radio;
+  private final BaseXRadio[] radio;
+
+  /** Remembers the last insertion type. */
+  private static int lkind = 1;
 
   /**
    * Default constructor.
@@ -59,10 +66,12 @@ public final class DialogInsert extends Dialog {
     label2.setBorder(0, 0, 0, 0);
 
     input1 = new BaseXTextField(this);
+    input1.addKeyListener(keys);
     BaseXLayout.setWidth(input1, 320);
 
     input2 = new BaseXText(true, this);
     input2.setFont(GUIConstants.mfont);
+    input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 320);
 
     final BaseXBack knd = new BaseXBack();
@@ -80,6 +89,7 @@ public final class DialogInsert extends Dialog {
       radio[i] = new BaseXRadio(EDITKIND[i], false, this);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
+      radio[i].addKeyListener(keys);
       group.add(radio[i]);
       knd.add(radio[i]);
     }
@@ -87,9 +97,17 @@ public final class DialogInsert extends Dialog {
 
     back = new BaseXBack();
     back.setBorder(10, 0, 0, 0);
-
     set(back, BorderLayout.CENTER);
-    set(okCancel(this), BorderLayout.SOUTH);
+
+    final BaseXBack pp = new BaseXBack();
+    pp.setLayout(new BorderLayout());
+    info = new BaseXLabel(" ");
+    info.setBorder(8, 0, 2, 0);
+    pp.add(info, BorderLayout.WEST);
+
+    buttons = okCancel(this);
+    pp.add(buttons, BorderLayout.EAST);
+    set(pp, BorderLayout.SOUTH);
 
     setResizable(true);
     change(radio[lkind]);
@@ -120,15 +138,27 @@ public final class DialogInsert extends Dialog {
   }
 
   @Override
+  public void action(final String cmd) {
+    for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
+    lkind = kind;
+    
+    String msg = null;
+    if(kind != Data.TEXT && kind != Data.COMM &&
+        !XMLToken.isQName(token(input1.getText()))) msg = "Invalid name";
+    if(kind == Data.TEXT && input2.getText().length == 0) msg = "Invalid text";
+
+    ok = msg == null;
+    info.setIcon(ok ? null : BaseXLayout.icon("warn"));
+    info.setText(ok ? " " : msg);
+    enableOK(buttons, BUTTONOK, ok);
+  }
+  
+  @Override
   public void close() {
     super.close();
 
     final String in1 = input1.getText();
     final String in2 = Token.string(input2.getText());
-
-    for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
-
-    result = new StringList();
     switch(kind) {
       case Data.ATTR: case Data.PI:
         result.add(in1);
@@ -141,6 +171,5 @@ public final class DialogInsert extends Dialog {
         result.add(in2);
         break;
     }
-    lkind = kind;
   }
 }

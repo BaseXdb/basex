@@ -422,6 +422,8 @@ public abstract class Data {
    */
   public final void delete(final int pre) {
     meta.update();
+    //if(fs != null) fs.delete(pre);
+    
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);

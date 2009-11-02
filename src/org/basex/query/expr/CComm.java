@@ -6,6 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FComm;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
@@ -54,6 +55,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString("comment");
+    return toString(Type.COM);
   }
 }

@@ -2,13 +2,10 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
 import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
-
 import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -38,14 +35,6 @@ public final class DialogServer extends Dialog {
   final Context ctx = gui.context;
   /** ClientSession. */
   ClientSession cs;
-
-  /** Key listener. */
-  final KeyAdapter keys = new KeyAdapter() {
-    @Override
-    public void keyReleased(final KeyEvent e) {
-      action(null);
-    }
-  };
 
   /** Server panel. */
   private final BaseXBack conn = new BaseXBack();
@@ -112,6 +101,8 @@ public final class DialogServer extends Dialog {
     logpass = new JPasswordField(gui.prop.get(GUIProp.SERVERPASS));
     logpass.addKeyListener(keys);
     BaseXLayout.setWidth(logpass, 200);
+    info = new BaseXLabel(" ");
+    info.setBorder(8, 0, 0, 0);
 
     // Local server panel.
     final BaseXBack p1 = new BaseXBack();
@@ -144,10 +135,6 @@ public final class DialogServer extends Dialog {
     p21.add(connect);
     p21.add(disconnect);
     p2.add(p21);
-
-    // adding to main panel
-    info = new BaseXLabel(" ");
-    info.setBorder(8, 0, 0, 0);
 
     conn.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
     conn.add(p1);

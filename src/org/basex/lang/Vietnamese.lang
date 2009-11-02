@@ -390,21 +390,7 @@ qu_tabtotal=Thời gian
 qu_tabmem=Bộ nhớ    
 qu_tabprinted=Đã in   
 qu_tabhits=Kết quả   
-
-# Update Commands
-uc_querynodeserr=Lệnh hỏi phải lấy một tập nút.
-uc_deleteinfo=% nút được xóa trong %.
-uc_copyroot=Không chèn được vào sau nút.
-uc_insertinfo=% nút được chèn trong %.
-uc_updateinfo=% nút được đổi trong %.
-uc_updatenode=Nút bị đổi phải được %.
-uc_copytags=Nút mục tiêu phải là phần tử (elements).
-uc_attinvalid=Không có tên thuộc tính "%" .
-uc_attdupl=Thuộc tính "%" đã được định nghĩa.
-uc_posinvalid=Giá trị vị trí không phù hợp "%".
-uc_invalid=Tên "%" không phù hợp.
-uc_txtinvalid=Nút văn bản (text) không thề để trống.
-uc_namespaces=Không thề thay đổi văn bản có namespace.
+qu_nodeserr==Lệnh hỏi phải lấy một tập nút.
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -502,26 +488,13 @@ ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.
 ch_export2=Xuất khẩu thiết lập hiện tại ra XML [%].
 ch_helpquery0=Lệnh hỏi:
 ch_xquery1=Đánh giá lệnh hỏi XQuery.
-ch_xquery2=Đánh giá lệnh hỏi XQuery [%] và in ra kết quả.
+ch_xquery2=Đánh giá lệnh hỏi XQuery và in ra kết quả.
 ch_run1=Evaluate file as XQuery.
 ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=Đánh giá lệnh hỏi từ khóa.
 ch_find2=Những từ bổ nghỉa sau được dùng:\n =  : tìm chính xác những nút văn bản"\n @= : tìm chính xác những thuộc tính\n @  : tìm những thuộc tính
 ch_cs1=Đánh giá lệnh hỏi XQuery và gán kết quả theo tập hợp ngữ cảnh mới.
-ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể [%] và gán kết quả\ntheo tập hợp ngữ cảnh mới.
-ch_helpupdate0=Những câu lệnh cập nhật:
-ch_copy1=Chép những nút XML.
-ch_copy2=Đánh giá [%] và chép kết quả tới [%]\n như là con [%] (0=last child).
-ch_delete1=Xóa những nút XML.
-ch_delete2=Xóa những nút thỏa lệnh hỏi [%].
-ch_insert1=Chèn những nút XML.
-ch_insert2=Chèn một mảng (frag) hay nút là con [%]\n (0=con út) cả lệnh hỏi [%]:
-ch_insert21=Insert [%]
-ch_insert22=Insert [%], [%]
-ch_update1=Cập nhật những nút XML.
-ch_update2=Cập nhật những nút thỏa lệnh hỏi [%]:
-ch_update21=Update with [%]
-ch_update22=Update with [%] and [%]
+ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể và gán kết quả\ntheo tập hợp ngữ cảnh mới.
 ch_helpadmin0=Admin Commands:
 ch_kill1=Kill database sessions.
 ch_kill2=Kills all current database sessions.

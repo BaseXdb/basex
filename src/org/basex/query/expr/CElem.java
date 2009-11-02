@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -108,6 +109,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return toString("elem " + tag);
+    return toString(Type.ELM + " " + tag);
   }
 }

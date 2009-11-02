@@ -17,6 +17,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -33,9 +34,6 @@ import org.basex.util.TokenBuilder;
 public final class FNBaseX extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] arg = new Iter[expr.length];
-    for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
-
     switch(func) {
       case EVAL:  return eval(ctx);
       case INDEX: return index(ctx);
@@ -55,7 +53,8 @@ public final class FNBaseX extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.DB && expr[0].i() ? db(ctx) : this;
+    return func == FunDef.DB && expr[0].i() &&
+      (expr.length == 1 || expr[1].i()) ? db(ctx) : this;
   }
 
   /**
@@ -72,7 +71,7 @@ public final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the eval function.
+   * Performs the text function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
@@ -97,13 +96,22 @@ public final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the eval function.
+   * Performs the db function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
   private Item db(final QueryContext ctx) throws QueryException {
-    return ctx.doc(checkStr(expr[0], ctx), false, true);
+    DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true);
+
+    if(expr.length == 2) {
+      final Item it = expr[1].atomic(ctx);
+      if(it == null || !it.u() && !it.n()) Err.num(info(), it);
+      final long pre = it.itr();
+      if(pre < 0 || pre >= node.data.meta.size) Err.or(NOPRE, pre);
+      node = new DBNode(node.data, (int) pre);
+    }
+    return node;
   }
 
   /**

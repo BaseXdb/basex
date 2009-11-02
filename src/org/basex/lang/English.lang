@@ -391,21 +391,7 @@ qu_tabtotal=Total Time
 qu_tabmem=Memory    
 qu_tabprinted=Printed   
 qu_tabhits=Results   
-
-# Update Commands
-uc_querynodeserr=Query must yield a nodeset.
-uc_deleteinfo=% node(s) deleted in %.
-uc_copyroot=Cannot insert after root node.
-uc_insertinfo=% node(s) inserted in %.
-uc_updateinfo=% node(s) updated in %.
-uc_updatenode=Node to be updated must be %.
-uc_copytags=Target nodes must be elements.
-uc_attinvalid="%" is not a valid attribute name.
-uc_attdupl=Duplicate attribute "%" found.
-uc_posinvalid=Invalid position value "%".
-uc_invalid=Name "%" is invalid.
-uc_txtinvalid=Text nodes cannot be empty.
-uc_namespaces=Cannot update documents with namespaces.
+qu_nodeserr=Query must yield a nodeset.
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -503,26 +489,13 @@ ch_export1=Export database as XML.
 ch_export2=Exports the database to [%].
 ch_helpquery0=Query Commands:
 ch_xquery1=Evaluate XQuery.
-ch_xquery2=Evaluates the XQuery [%] and prints the result.
+ch_xquery2=Evaluates the specified XQuery and prints the result.
 ch_run1=Evaluate file as XQuery.
 ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=Evaluate a keyword query.
 ch_find2=The following modifiers can be used:\n =  : looks for exact text nodes"\n @= : looks for exact attributes\n @  : looks for attributes
-ch_cs1=Evaluate XQuery [%] and set result as new context set.
-ch_cs2=Evaluates the specified XQuery [%] and set the result\nas new context set.
-ch_helpupdate0=Update Commands:
-ch_copy1=Copy XML nodes.
-ch_copy2=Evaluates [%] and copies the result to [%]\n as child [%] (0=last child).
-ch_delete1=Delete XML nodes.
-ch_delete2=Deletes nodes satisfying the specified [%] query.
-ch_insert1=Insert XML nodes.
-ch_insert2=Inserts a fragment or specific node as\n child [%] (0=last child) of the given [%] query:
-ch_insert21=insert [%]
-ch_insert22=insert [%] and [%]
-ch_update1=Update XML nodes.
-ch_update2=Updates nodes satisfying the specified [%] query:
-ch_update21=update with [%]
-ch_update22=update with [%] and [%]
+ch_cs1=Evaluate XQuery and set result as new context set.
+ch_cs2=Evaluates the specified XQuery and set the result\nas new context set.
 ch_helpadmin0=Admin Commands:
 ch_kill1=Kill database sessions.
 ch_kill2=Kills all current database sessions.

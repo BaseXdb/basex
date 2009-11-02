@@ -417,7 +417,7 @@ public final class GUI extends JFrame {
   /**
    * Launches the specified process.
    * @param pr process to be launched
-   * @param main call from the main window
+   * @param main call from the main input field
    * @return success flag
    */
   boolean exec(final Process pr, final boolean main) {

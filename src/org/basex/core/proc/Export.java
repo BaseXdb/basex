@@ -49,7 +49,7 @@ public final class Export extends Process {
         new XMLSerializer(po, false, data.meta.chop).node(data, pre);
         po.close();
       }
-      return info(DBEXPORTED, data.meta.name, perf.getTimer());
+      return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
       return error(ex.getMessage());

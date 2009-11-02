@@ -394,21 +394,7 @@ qu_tabtotal=Tempo totale
 qu_tabmem=Memoria   
 qu_tabprinted=Stampato  
 qu_tabhits=Results   
-
-# Update Commands
-uc_querynodeserr=La query deve contenere un nodeset.
-uc_deleteinfo=% nodo/i cancellato/i in %.
-uc_copyroot=Impossibile inserire dopo il nodo root.
-uc_insertinfo=% nodo/i inserito/i in %.
-uc_updateinfo=% nodo/i aggiornato/i in %.
-uc_updatenode=Il nodo da aggiornare dev'essere %.
-uc_copytags=I nodi target devono essere elementi.
-uc_attinvalid="%" non è un nome di attributo valido.
-uc_attdupl=L'attributo "%" è già definito.
-uc_posinvalid=Valore di posizione non valido "%".
-uc_invalid=Il nome "%" non è valido.
-uc_txtinvalid=I nodi testo non possono essere vuoti.
-uc_namespaces=Impossibile aggiornare documenti con namespace.
+qu_nodeserr=La query deve contenere un nodeset.
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -506,26 +492,13 @@ ch_export1=Esporta Database come XML.
 ch_export2=Esporta il Database in [%].
 ch_helpquery0=Comandi Query:
 ch_xquery1=Esegui XQuery.
-ch_xquery2=Esegue il query [%] e stampa il risultato.
+ch_xquery2=Esegue il specifica query e stampa il risultato.
 ch_run1=Evaluate file as XQuery.
 ch_run2=Evaluates an XQuery from [%] and prints the result.
 ch_find1=Esegui keyword query.
 ch_find2=I seguenti modificatori possono essere usati:\n =  : cerca nodi di testo con corrispondenza esatta"\n @= : cerca attributi con corrispondenza esatta\n @  : cerca attributi
 ch_cs1=Esegui query XQuery ed imposta i risultati come un nuovo context set.
-ch_cs2=Esegue la specifica [%] XQuery ed imposta i risultati\ncome un nuovo context set.
-ch_helpupdate0=Aggiorna comandi:
-ch_copy1=Copia nodi XML.
-ch_copy2=Esegue [%] e copia il risultato in [%]\n come figlio [%] (0=ultimo figlio).
-ch_delete1=Cancella nodi XML.
-ch_delete2=Cancella i nodi che soddisfano la query [%] specificata.
-ch_insert1=Inserisci nodi XML.
-ch_insert2=Inserisce un frammento o un nodo specifico\n come figlio [%] (0=ultimo figlio) della query [%] data:
-ch_insert21=Inserisci [%]
-ch_insert22=Inserisci [%] e [%]
-ch_update1=Aggiorna nodi XML.
-ch_update2=Aggiorna i nodi che soddisfano la query [%] specificata:
-ch_update21=Update with [%]
-ch_update22=Update with [%] and [%]
+ch_cs2=Esegue la specifica XQuery ed imposta i risultati\ncome un nuovo context set.
 ch_helpadmin0=Admin comandi:
 ch_kill1=Kill database sessions.
 ch_kill2=Kills all current database sessions.

@@ -49,15 +49,15 @@ public final class PendingUpdates {
     } else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
       
-      // check permissions
-      User user = ctx.context.user;
-      final User us = d.meta.users.get(user.name);
-      if(us != null) user = us;
-      if(!user.perm(User.READ))
-        throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
-      
       DBPrimitives dp = dbs.get(d);
       if(dp == null) {
+        // check permissions
+        User user = ctx.context.user;
+        final User us = d.meta.users.get(user.name);
+        if(us != null) user = us;
+        if(!user.perm(User.READ))
+          throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
+
         dp = new DBPrimitives(false);
         dbs.put(d, dp);
       }
@@ -74,8 +74,9 @@ public final class PendingUpdates {
   public void apply() throws QueryException {
     // only constraints are checked for fragment primitives
     frags.apply();
-    final DBPrimitives[] dp = new DBPrimitives[dbs.size()];
-    dbs.values().toArray(dp);
-    for(final DBPrimitives p : dp) p.apply();
+    for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
+      dbs.get(d).apply();
+      d.flush();
+    }
   }
 }

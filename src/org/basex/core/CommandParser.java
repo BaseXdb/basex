@@ -9,17 +9,14 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
-import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
-import org.basex.core.proc.Copy;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.CreateMAB;
-import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.DropUser;
@@ -34,7 +31,6 @@ import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.InfoIndex;
 import org.basex.core.proc.InfoTable;
-import org.basex.core.proc.Insert;
 import org.basex.core.proc.IntStop;
 import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
@@ -45,7 +41,6 @@ import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
-import org.basex.core.proc.Update;
 import org.basex.core.proc.XQueryMV;
 import org.basex.core.proc.XQuery;
 import org.basex.query.QueryContext;
@@ -182,45 +177,6 @@ public final class CommandParser extends InputParser {
         return new Find(string(cmd));
       case CS:
         return new Cs(xquery(cmd));
-      case COPY:
-        return new Copy(xquery(cmd), target(INTO, cmd), pos(cmd));
-      case DELETE:
-        return new Delete(xquery(cmd));
-      case INSERT:
-        final CmdUpdate ins = consume(CmdUpdate.class, cmd);
-        switch(ins) {
-          case ELEMENT:
-            String val = name(cmd);
-            return new Insert(ins, target(INTO, cmd), pos(cmd), val);
-          case TEXT: case COMMENT: case FRAGMENT:
-            val = string(cmd);
-            return new Insert(ins, target(INTO, cmd), pos(cmd), val);
-          case PI:
-            val = name(cmd);
-            String val2 = string(cmd);
-            return new Insert(ins, target(INTO, cmd), pos(cmd), val, val2);
-          case ATTRIBUTE:
-            val = name(cmd);
-            val2 = string(cmd);
-            return new Insert(ins, target(INTO, cmd), val, val2);
-        }
-        break;
-      case UPDATE:
-        final CmdUpdate upd = consume(CmdUpdate.class, cmd);
-        switch(upd) {
-          case ELEMENT:
-            String val = name(cmd);
-            return new Update(upd, target(AT, cmd), val);
-          case TEXT: case COMMENT:
-            val = string(cmd);
-            return new Update(upd, target(AT, cmd), val);
-          case PI: case ATTRIBUTE:
-            val = name(cmd);
-            String val2 = string(cmd);
-            return new Update(upd, target(AT, cmd), val, val2);
-          default:
-        }
-        break;
       case SET:
         final String opt = name(cmd);
         String val = string(null);
@@ -330,28 +286,6 @@ public final class CommandParser extends InputParser {
     final StringBuilder sb = new StringBuilder();
     while(letterOrDigit(curr()) || curr('.') || curr('-')) sb.append(consume());
     return finish(cmd, sb);
-  }
-
-  /**
-   * Parses and returns an XQuery target, prefixed by the specified string.
-   * @param pre prefix
-   * @param cmd referring command; if specified, the result must not be empty.
-   * @return target
-   * @throws QueryException query exception
-   */
-  private String target(final String pre, final Cmd cmd) throws QueryException {
-    key(pre, cmd);
-    return xquery(cmd);
-  }
-
-  /**
-   * Parses and returns a number, prefixed by the keyword {@link Text#AT}.
-   * @param cmd referring command; if specified, the result must not be empty.
-   * @return position
-   * @throws QueryException query exception
-   */
-  private int pos(final Cmd cmd) throws QueryException {
-    return key(AT, null) ? Integer.parseInt(number(cmd)) : 0;
   }
 
   /**

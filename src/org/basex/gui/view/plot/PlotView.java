@@ -295,8 +295,8 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data();
-    super.paintComponent(g);
     if(data == null || !data.meta.pathindex) return;
+    super.paintComponent(g);
 
     if(plotData == null) {
       refreshInit();

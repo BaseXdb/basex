@@ -7,7 +7,6 @@ import org.basex.core.Process;
 import org.basex.core.Text;
 import org.basex.core.proc.*;
 import org.basex.core.Commands.*;
-import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
@@ -65,23 +64,6 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
-  public final void copy() {
-    no(new Copy("//title", "// li"));
-    ok(new CreateDB(FILE));
-
-    final Data data = CONTEXT.data();
-    final int size = data != null ? data.meta.size : 0;
-
-    ok(new Copy("//unknown", "//li"));
-    ok(data, size);
-    ok(new Copy("//title", "//li"));
-    ok(data, size + 4);
-    ok(new Copy("//  title", "//li", 1));
-    no(new Copy("/", "//text()"));
-  }
-
-  /** Command Test. */
-  @Test
   public final void createDB() {
     ok(new CreateDB(FILE));
     ok(new InfoDB());
@@ -123,15 +105,6 @@ public class CmdTest {
     ok(CONTEXT.current(), 2);
     ok(new Cs("/"));
     ok(CONTEXT.current(), 1);
-  }
-
-  /** Command Test. */
-  @Test
-  public final void delete() {
-    no(new Delete("/"));
-    ok(new CreateDB(FILE));
-    ok(new Delete("// node()"));
-    no(new Delete(""));
   }
 
   /** Command Test. */
@@ -212,46 +185,6 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
-  public final void insert() {
-    no(new Insert(CmdUpdate.ELEMENT, "//title", "name"));
-    ok(new CreateDB(FILE));
-
-    final Data data = CONTEXT.data();
-    final int size = data != null ? data.meta.size : 0;
-
-    ok(new Insert(CmdUpdate.ELEMENT, "//unknown", "name"));
-    ok(data, size);
-    no(new Insert(CmdUpdate.ELEMENT, "//title", "in valid"));
-    ok(data, size);
-    ok(new Insert(CmdUpdate.ELEMENT, "//  title", "name"));
-    ok(data, size + 1);
-
-    ok(new Insert(CmdUpdate.TEXT, "//title", "abc"));
-    ok(data, size + 2);
-    // text is added to existing texts
-    ok(new Insert(CmdUpdate.TEXT, "//li", "abc"));
-    ok(data, size + 2);
-
-    no(new Insert(CmdUpdate.ATTRIBUTE, "//title", "in valid", "new value"));
-    ok(new Insert(CmdUpdate.ATTRIBUTE, "//title", "name", "new value"));
-    ok(data, size + 3);
-
-    ok(new Insert(CmdUpdate.COMMENT, "//title", "new value"));
-    ok(data, size + 4);
-
-    no(new Insert(CmdUpdate.PI, "//title", 1, "in valid", "new value"));
-    ok(new Insert(CmdUpdate.PI, "//title", 1, "name", "new value"));
-    ok(data, size + 5);
-
-    no(new Insert(CmdUpdate.FRAGMENT, "//title", 1, "<xml"));
-    ok(new Insert(CmdUpdate.FRAGMENT, "//title", 1, "<xml/>"));
-    ok(data, size + 6);
-    ok(new Insert("FRAGMENT", "//title", 1, "<xml/>"));
-    ok(new Insert("fragment", "//title", 1, "<xml/>"));
-  }
-
-  /** Command Test. */
-  @Test
   public final void list() {
     ok(new List());
     ok(new CreateDB(FILE));
@@ -302,32 +235,6 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
-  public final void update() {
-    no(new Update(CmdUpdate.ELEMENT, "//title", "name"));
-    ok(new CreateDB(FILE));
-
-    ok(new Update(CmdUpdate.ELEMENT, "//unknown", "name"));
-    no(new Update(CmdUpdate.ELEMENT, "//title", ""));
-    no(new Update(CmdUpdate.ELEMENT, "//title", "in valid"));
-    ok(new Update(CmdUpdate.ELEMENT, "//  title", "name"));
-
-    ok(new Update(CmdUpdate.TEXT, "//title", "abc"));
-
-    no(new Update(CmdUpdate.ATTRIBUTE, "//title", "", "new value"));
-    no(new Update(CmdUpdate.ATTRIBUTE, "//title", "in valid", "new value"));
-    ok(new Update(CmdUpdate.ATTRIBUTE, "//title", "name", "new value"));
-
-    ok(new Update(CmdUpdate.COMMENT, "//title", "new value"));
-
-    no(new Update(CmdUpdate.PI, "//title", "", "new value"));
-    no(new Update(CmdUpdate.PI, "//title", "in valid", "new value"));
-    ok(new Update(CmdUpdate.PI, "//title", "name", "new value"));
-    ok(new Update("PI", "//title", "name", "new value"));
-    ok(new Update("pi", "//  title", "name", "new value"));
-  }
-
-  /** Command Test. */
-  @Test
   public final void xQuery() {
     no(new XQuery("/"));
     ok(new CreateDB(FILE));
@@ -349,15 +256,6 @@ public class CmdTest {
    */
   private static void ok(final boolean flag) {
     assertTrue(flag);
-  }
-
-  /**
-   * Assumes that the database has the specified number of nodes.
-   * @param data data reference
-   * @param size expected size
-   */
-  private static void ok(final Data data, final int size) {
-    if(data != null) assertEquals(data.meta.size, size);
   }
 
   /**

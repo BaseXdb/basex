@@ -48,7 +48,7 @@ public final class DropIndex extends ACreate {
           data.path.root = null;
           data.flush();
         }
-        return info(DBDROP, perf.getTimer());
+        return info(DBDROP, perf);
       default:
         return false;
     }
@@ -67,7 +67,7 @@ public final class DropIndex extends ACreate {
       data.flush();
       data.closeIndex(index);
       return DropDB.delete(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
-          info(DBDROP, perf.getTimer()) : error(DBDROPERR);
+          info(DBDROP, perf) : error(DBDROPERR);
     } catch(final IOException ex) {
       Main.debug(ex);
       return error(ex.getMessage());

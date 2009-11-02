@@ -113,6 +113,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return toString("attribute" + atn);
+    return toString(Type.ATT + " " + atn);
   }
 }

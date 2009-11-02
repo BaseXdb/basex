@@ -10,10 +10,12 @@ import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.StringList;
+import org.basex.util.XMLToken;
 
 /**
  * Dialog window for editing XML nodes.
@@ -23,10 +25,16 @@ import org.basex.util.StringList;
  */
 public final class DialogEdit extends Dialog {
   /** Resulting update arguments. */
-  public StringList result;
+  public final StringList result = new StringList();
   /** Node kind. */
   public final int kind;
+  /** Pre value. */
+  private final int pre;
 
+  /** Button panel. */
+  private final BaseXBack buttons;
+  /** Info label. */
+  private final BaseXLabel info;
   /** Text area. */
   private BaseXTextField input;
   /** Text area. */
@@ -37,10 +45,8 @@ public final class DialogEdit extends Dialog {
   private String old1;
   /** Old content. */
   private String old2;
-  /** Button panel. */
-  private final BaseXBack buttons;
-  /** Pre value. */
-  private final int pre;
+  /** Old content. */
+  private byte[] old3;
 
   /**
    * Default constructor.
@@ -52,7 +58,7 @@ public final class DialogEdit extends Dialog {
     pre = p;
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack();
+    BaseXBack pp = new BaseXBack();
     pp.setLayout(new BorderLayout());
 
     final Context context = gui.context;
@@ -63,75 +69,86 @@ public final class DialogEdit extends Dialog {
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
-    if(kind == Data.ELEM || kind == Data.DOC) {
-      final byte[] txt = kind == Data.ELEM ? data.tag(pre) : data.text(pre);
-      input = new BaseXTextField(string(txt), this);
-      old1 = input.getText();
-      pp.add(input, BorderLayout.CENTER);
+    if(kind == Data.ELEM) {
+      old1 = string(data.tag(pre));
+    } else if(kind == Data.DOC) {
+      old1 = string(data.text(pre));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      setResizable(true);
-      input3 = new BaseXText(true, this);
-      input3.setText(data.text(pre));
-      input3.setPreferredSize(new Dimension(320, 200));
-      old1 = string(input3.getText());
-      pp.add(input3, BorderLayout.CENTER);
+      old3 = data.text(pre);
+    } else if(kind == Data.ATTR) {
+      old1 = string(data.attName(pre));
+      old2 = string(data.attValue(pre));
     } else {
-      if(kind == Data.ATTR) {
-        old1 = string(data.attName(pre));
-        old2 = string(data.attValue(pre));
-      } else {
-        old1 = string(data.text(pre));
-        old2 = "";
-        final int i = old1.indexOf(' ');
-        if(i != -1) {
-          old2 = old1.substring(i + 1);
-          old1 = old1.substring(0, i);
-        }
-      }
-      final BaseXBack b = new BaseXBack();
-      b.setLayout(new TableLayout(2, 1, 0, 8));
-      input = new BaseXTextField(old1, this);
-      b.add(input);
-      if(kind == Data.ATTR) {
-        input2 = new BaseXTextField(old2, this);
-        b.add(input2);
-      } else {
-        input3 = new BaseXText(true, this);
-        input3.setText(token(old2));
-        input3.setPreferredSize(new Dimension(400, 200));
-        b.add(input3);
-      }
-      pp.add(b, BorderLayout.CENTER);
+      final String[] v = string(data.text(pre)).split(" ", 2);
+      old1 = v[0];
+      old3 = v.length == 1 ? EMPTY : token(v[1]);
     }
-    if(input != null) input.selectAll();
-    else input3.selectAll();
+    final BaseXBack b = new BaseXBack();
+    b.setLayout(new TableLayout(2, 1, 0, 4));
+    if(old1 != null) {
+      input = new BaseXTextField(old1, this);
+      input.addKeyListener(keys);
+      BaseXLayout.setWidth(input, 320);
+      b.add(input);
+    }
+    if(old2 != null) {
+      input2 = new BaseXTextField(old2, this);
+      input2.addKeyListener(keys);
+      b.add(input2);
+    }
+    if(old3 != null) {
+      input3 = new BaseXText(true, this);
+      input3.setText(old3);
+      input3.addKeyListener(keys);
+      input3.setPreferredSize(new Dimension(320, 200));
+      b.add(input3);
+      setResizable(true);
+    }
+    pp.add(b, BorderLayout.CENTER);
     set(pp, BorderLayout.CENTER);
+    
+    pp = new BaseXBack();
+    pp.setLayout(new BorderLayout());
+    info = new BaseXLabel(" ");
+    info.setBorder(8, 0, 2, 0);
+    pp.add(info, BorderLayout.WEST);
 
     // create buttons
     buttons = okCancel(this);
-    set(buttons, BorderLayout.SOUTH);
+    pp.add(buttons, BorderLayout.EAST);
+    
+    set(pp, BorderLayout.SOUTH);
     finish(null);
+  }
+
+  @Override
+  public void action(final String cmd) {
+    String msg = null;
+    if(kind != Data.TEXT && kind != Data.COMM &&
+        !XMLToken.isQName(token(input.getText()))) msg = "Invalid name";
+    if(kind == Data.TEXT && input3.getText().length == 0) msg = "Invalid text";
+
+    ok = msg == null;
+    info.setIcon(ok ? null : BaseXLayout.icon("warn"));
+    info.setText(ok ? " " : msg);
+    enableOK(buttons, BUTTONOK, ok);
   }
 
   @Override
   public void close() {
     super.close();
-
-    final String in = input != null ? input.getText() :
-      string(input3.getText());
-
-    result = new StringList();
-    result.add(in);
-    if(kind == Data.ELEM || kind == Data.DOC) {
-      if(in.isEmpty() || in.equals(old1)) return;
-    } else if(kind == Data.TEXT || kind == Data.COMM) {
-      if(in.equals(old2)) return;
-    } else {
-      final String in2 = kind == Data.ATTR ? input2.getText() :
-        string(input3.getText());
-
-      if(in.isEmpty() || in.equals(old1) && in2.equals(old2)) return;
-      result.add(in2);
+    ok = false;
+    if(old1 != null) {
+      result.add(input.getText());
+      ok |= !input.getText().equals(old1);
+    }
+    if(old2 != null) {
+      result.add(input2.getText());
+      ok |= !input2.getText().equals(old2);
+    }
+    if(old3 != null) {
+      result.add(string(input3.getText()));
+      ok |= !eq(input3.getText(), old3);
     }
   }
 }

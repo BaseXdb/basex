@@ -233,7 +233,6 @@ public interface Text {
 
   /** Command help. */
   String[] HELPQ = { lang("ch_helpquery0") };
-
   /** Command help. */
   String[] HELPXQUERY = {
     "[" + QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
@@ -249,60 +248,6 @@ public interface Text {
   /** Command help. */
   String[] HELPCS = {
     "[" + QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
-  };
-
-  /** Command help. */
-  String[] HELPU = { lang("ch_helpupdate0") };
-  /** Command help. */
-  String[] HELPCOPY = {
-    "[" + SOURCE + "] " + INTO + " [" + TARGET + "] " + AT + " [" + POS + "]",
-    lang("ch_copy1"),
-    lang("ch_copy2", SOURCE, TARGET, POS)
-  };
-  /** Command help. */
-  String[] HELPDELETE = {
-    "[" + TARGET + "]",
-    lang("ch_delete1"),
-    lang("ch_delete2", TARGET)
-  };
-  /** Command help. */
-  String INSERTTMP1 = LI + "% [%] " + INTO + " [" + TARGET + "] " +
-    AT + " [" + POS + "]: " + lang("ch_insert21");
-  /** Command help. */
-  String INSERTTMP2 = LI + "% [%] [%] " + INTO + " [" + TARGET + "] " +
-    AT + " [" + POS + "]: " + lang("ch_insert22");
-  /** Command help. */
-  String[] HELPINSERT = {
-    "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
-    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" + CmdUpdate.PI + "|" +
-    CmdUpdate.FRAGMENT + "] [...]",
-    lang("ch_insert1"),
-    lang("ch_insert2", POS, TARGET) + NL +
-    Main.info(INSERTTMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
-    Main.info(INSERTTMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
-    Main.info(INSERTTMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
-    Main.info(INSERTTMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
-    Main.info(INSERTTMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL) + NL +
-    Main.info(INSERTTMP1, CmdUpdate.FRAGMENT, FRAGMENT, FRAGMENT)
-  };
-  /** Command help. */
-  String UPDATETMP1 = LI + "% [%] " + AT + " [" + TARGET + "]: " +
-    lang("ch_update21");
-  /** Command help. */
-  String UPDATETMP2 = LI + "% [%] [%] " + AT + " [" + TARGET + "]: " +
-    lang("ch_update22");
-  /** Command help. */
-  String[] HELPUPDATE = {
-    "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.TEXT + "|" +
-    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.COMMENT + "|" +
-    CmdUpdate.PI + "] [...]",
-    lang("ch_update1"),
-    lang("ch_update2", TARGET) + NL +
-    Main.info(UPDATETMP1, CmdUpdate.ELEMENT, NAM, NAM) + NL +
-    Main.info(UPDATETMP1, CmdUpdate.TEXT, TEXT, TEXT) + NL +
-    Main.info(UPDATETMP2, CmdUpdate.ATTRIBUTE, NAM, VAL, NAM, VAL) + NL +
-    Main.info(UPDATETMP1, CmdUpdate.COMMENT, TEXT, TEXT) + NL +
-    Main.info(UPDATETMP2, CmdUpdate.PI, NAM, VAL, NAM, VAL)
   };
 
   /** Command help. */
@@ -533,6 +478,8 @@ public interface Text {
   String QUERYMEM = lang("qu_tabmem") + ": %";
   /** Query hits. */
   String HITS = lang("qu_hits");
+  /** Insert query info. */
+  String QUERYNODESERR = lang("qu_nodeserr");
 
   /** Query hits. */
   String VALHIT = "Item";
@@ -546,37 +493,6 @@ public interface Text {
   /** Admin user. */
   String ADMIN = "admin";
   
-  // UPDATE COMMANDS ==========================================================
-
-  /** Insert query info. */
-  String QUERYNODESERR = lang("uc_querynodeserr");
-
-  /** Deletion info. */
-  String DELETEINFO = lang("uc_deleteinfo");
-  /** Insert query info. */
-  String COPYROOT = lang("uc_copyroot");
-
-  /** Insert query info. */
-  String INSERTINFO = lang("uc_insertinfo");
-  /** Update query info. */
-  String UPDATEINFO = lang("uc_updateinfo");
-  /** Update node info. */
-  String UPDATENODE = lang("uc_updatenode");
-  /** Insert query info. */
-  String COPYTAGS = lang("uc_copytags");
-  /** Update element info. */
-  String ATTINVALID = lang("uc_attinvalid");
-  /** Duplicate attribute info. */
-  String ATTDUPL = lang("uc_attdupl");
-  /** Invalid position. */
-  String POSINVALID = lang("uc_posinvalid");
-  /** Update processing instruction info. */
-  String NAMEINVALID = lang("uc_invalid");
-  /** Update text info. */
-  String TXTINVALID = lang("uc_txtinvalid");
-  /** Update namespaces error. */
-  String UPDATENS = lang("uc_namespaces");
-
   // ADMIN COMMANDS ==========================================================
 
   /** Show databases. */

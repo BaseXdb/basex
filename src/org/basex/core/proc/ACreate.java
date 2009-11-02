@@ -68,7 +68,7 @@ abstract class ACreate extends Process {
         if(!move(db, p.prop)) throw new Exception();
         new Open(db).execute(context);
       }
-      return info(DBCREATED, db, perf.getTimer());
+      return info(DBCREATED, db, perf);
     } catch(final FileNotFoundException ex) {
       Main.debug(ex);
       err = Main.info(FILEWHICH, p.io);
