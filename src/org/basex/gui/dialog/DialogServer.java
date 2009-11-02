@@ -93,7 +93,7 @@ public final class DialogServer extends Dialog {
 
     tabs.add(SERVERN, conn);
     tabs.add(USERS, user);
-    tabs.add("Sessions/Databases", sedb);
+    tabs.add(SESSIONS + "/" + DATABASES, sedb);
 
     start = new BaseXButton(BUTTONSTASERV, this);
     stop = new BaseXButton(BUTTONSTOSERV, this);
