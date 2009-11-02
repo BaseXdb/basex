@@ -31,7 +31,6 @@ import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.InfoIndex;
 import org.basex.core.proc.InfoTable;
-import org.basex.core.proc.IntStop;
 import org.basex.core.proc.Kill;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
@@ -198,8 +197,6 @@ public final class CommandParser extends InputParser {
       // internal commands
       case INTINFO:
         return new IntInfo();
-      case INTSTOP:
-        return new IntStop();
 
       // admin commands
       case KILL:

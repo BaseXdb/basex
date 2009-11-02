@@ -15,7 +15,6 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.IntError;
 import org.basex.core.proc.IntInfo;
-import org.basex.core.proc.IntStop;
 import org.basex.data.Data;
 import org.basex.io.BufferedOutput;
 import org.basex.io.IO;
@@ -35,7 +34,7 @@ public final class ServerSession extends Thread {
   /** Socket reference. */
   private final Socket socket;
   /** Server reference. */
-  private final BaseXServer server;
+  private final Semaphore sem;
   /** Info flag. */
   private final boolean info;
   /** Input stream. */
@@ -55,8 +54,8 @@ public final class ServerSession extends Thread {
    */
   public ServerSession(final Socket s, final BaseXServer b, final boolean i) {
     context = new Context(b.context);
+    sem = b.sem;
     socket = s;
-    server = b;
     info = i;
   }
 
@@ -113,28 +112,21 @@ public final class ServerSession extends Thread {
             if(inf.equals(PROGERR)) inf = SERVERTIME;
             new DataOutputStream(out).writeUTF(inf);
             out.flush();
-          } else if (proc instanceof IntStop || proc instanceof Exit) {
+          } else if(proc instanceof Exit) {
             exit();
-            if(proc instanceof IntStop) server.quit(false);
             break;
           } else {
             core = proc;
             startTimer(proc);
             final boolean up = proc.updating(context);
-            if(up) {
-              server.sem.beforeWrite();
-            } else {
-              server.sem.beforeRead();
-            }
+            if(up) sem.beforeWrite();
+            else sem.beforeRead();
             final boolean ok = proc.execute(context, out);
             stopTimer();
             out.write(new byte[IO.BLOCKSIZE]);
             send(ok);
-            if(up) {
-              server.sem.afterWrite();
-            } else {
-              server.sem.afterRead();
-            }
+            if(up) sem.afterWrite();
+            else sem.afterRead();
           }
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create error feedback

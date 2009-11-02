@@ -59,8 +59,6 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: server port. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
-  /** Flag for server stopping. */
-  public static final Object[] STOP = { "STOP", false };
 
   // TRANSIENT OPTIONS ========================================================
 

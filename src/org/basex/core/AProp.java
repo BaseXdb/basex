@@ -75,7 +75,7 @@ public abstract class AProp {
 
         final Object entry = props.get(key);
         if(entry == null) {
-          System.err.println(filename + ": \"" + key + "\" not found.");
+          err.add("%: \"%\" not found. " + NL, filename, key);
         } else if(entry instanceof String) {
           props.put(key, val);
         } else if(entry instanceof Integer) {
@@ -97,7 +97,10 @@ public abstract class AProp {
       err.add("% could not be parsed." + NL, filename);
       Main.debug(ex);
     }
-    if(err.size() != 0) Main.err(err.toString());
+    if(err.size() != 0) {
+      Main.err(err.toString());
+      write();
+    }
   }
 
   /**

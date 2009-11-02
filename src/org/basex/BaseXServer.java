@@ -3,15 +3,16 @@ package org.basex;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.server.ClientSession;
-import org.basex.server.LoginException;
+import org.basex.io.IO;
 import org.basex.server.Semaphore;
 import org.basex.server.ServerSession;
 import org.basex.util.Args;
+import org.basex.util.Token;
 
 /**
  * This is the starter class for the database server.
@@ -24,16 +25,16 @@ import org.basex.util.Args;
  * @author Christian Gruen
  */
 public final class BaseXServer extends Main implements Runnable {
+  /** Semaphore for managing processes. */
+  public final Semaphore sem = new Semaphore();
+  /** Stop file. */
+  private static final IO STOP = IO.get(Prop.TMP + "bxs");
   /** Server socket. */
   ServerSocket server;
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
   boolean info;
-  /** Semaphore for managing processes. */
-  public final Semaphore sem;
-  /** Port test. */
-  private int p;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -50,7 +51,6 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public BaseXServer(final String... args) {
     super(args);
-    sem = new Semaphore();
     if(!success) return;
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
@@ -70,13 +70,12 @@ public final class BaseXServer extends Main implements Runnable {
     while(running) {
       try {
         final ServerSession s = new ServerSession(server.accept(), this, info);
-        Prop tmp = new Prop();
-        if(tmp.is(Prop.STOP)) {
-          context.prop.set(Prop.STOP, false);
-          context.prop.write();
+        if(STOP.exists()) {
+          STOP.delete();
           quit(false);
+        } else if(s.init()) {
+          context.add(s);
         }
-        if(s.init()) context.add(s);
       } catch(final IOException ex) {
         // socket was closed..
         break;
@@ -122,9 +121,8 @@ public final class BaseXServer extends Main implements Runnable {
           // activate interactive mode
           console = true;
         } else if(c == 'p') {
-          p = arg.num();
           // parse server port
-          context.prop.set(Prop.SERVERPORT, p);
+          context.prop.set(Prop.SERVERPORT, arg.num());
         } else if(c == 'v') {
           // show process info
           info = true;
@@ -135,21 +133,11 @@ public final class BaseXServer extends Main implements Runnable {
         success = false;
         if(arg.string().equals("stop")) {
           try {
-            context.prop.set(Prop.STOP, true);
-            context.prop.write();
-            if(p != 0) {
-              new ClientSession("localhost", p,
-                  "", "");
-            } else {
-              new ClientSession("localhost", context.prop.num(Prop.PORT),
-                  "", "");
-            }
+            STOP.write(Token.EMPTY);
+            new Socket("localhost", context.prop.num(Prop.SERVERPORT));
+            outln(SERVERSTOPPED);
           } catch(final IOException ex) {
-            if(ex instanceof LoginException) {
-              outln(SERVERSTOPPED);
-            } else {
             error(ex, true);
-            }
           }
           return;
         }

@@ -52,7 +52,7 @@ public interface Commands {
     HG(HID, HELPG), SET(HELPSET), PASSWORD(HELPPASSWORD),
     HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID),
     // Internal commands
-    INTINFO(INT), INTSTOP(INT);
+    INTINFO(INT);
 
     /** Flags for controlling command parsing. */
     private final int flags;

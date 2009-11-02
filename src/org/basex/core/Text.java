@@ -90,7 +90,7 @@ public interface Text {
 
   /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [-cdovVxz] [query]" + NL +
+    "Usage: " + NAME + " [-cdiovVxz] [query]" + NL +
     "  [query]    specify query file" + NL +
     "  -c<cmd>    send database commands" + NL +
     "  -d         debug mode" + NL +
