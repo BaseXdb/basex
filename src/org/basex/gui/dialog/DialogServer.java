@@ -4,10 +4,8 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.BindException;
-import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -179,8 +177,7 @@ public final class DialogServer extends Dialog {
 
   @Override
   public void action(final String cmd) {
-    ImageIcon icon = null;
-    String msg = "";
+    String msg = null;
 
     try {
       if(BUTTONSTASERV.equals(cmd)) {
@@ -232,13 +229,14 @@ public final class DialogServer extends Dialog {
     final boolean vallp = new String(logpass.getPassword()).matches("[\\w]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
-    if(!msg.isEmpty()) {
-      icon = BaseXLayout.icon("error");
+    boolean warn = true;
+    if(msg != null) {
+      warn = false;
     } else if(!(valpl && valh && valp && vallu && vallp)) {
-      icon = BaseXLayout.icon("warn");
-      msg = (!valpl ? LOCAL + PORT : !valh ? HOST : !valp ? PORT :
-        !vallu ? SERVERUSER : SERVERPW) + INVALID;
+      msg = Main.info(INVALID, !valpl ? LOCAL + PORT : !valh ? HOST :
+        !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
     }
+    info.setError(msg, warn);
 
     ports.setEnabled(!running);
     start.setEnabled(!running && valpl);
@@ -252,8 +250,6 @@ public final class DialogServer extends Dialog {
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
-    info.setText(msg);
-    info.setIcon(icon);
     ctx.prop.write();
   }
   

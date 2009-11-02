@@ -25,7 +25,7 @@ import org.basex.util.Performance;
  */
 abstract class AQuery extends Process {
   /** Performance measurements. */
-  protected final Performance per = new Performance();
+  protected Performance per;
   /** Query processor. */
   protected QueryProcessor qp;
   /** Parsing time. */
@@ -50,6 +50,8 @@ abstract class AQuery extends Process {
    * @return query instance
    */
   protected final boolean query(final String query) {
+    per = new Performance();
+    
     final int runs = prop.num(Prop.RUNS);
     String err = null;
     try {

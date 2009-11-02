@@ -396,6 +396,10 @@ qu_tabmem=メモリー　　
 qu_tabprinted=印刷しました
 qu_tabhits=結果　　　　
 qu_nodeserr=クエリーはノードセットを返さなければいけません。
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
 
 # Admin Commands
 ad_databases=% opened database(s)

@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
@@ -261,27 +260,24 @@ public final class DialogCreateFS extends Dialog {
     }
     ok &= cAll;
 
-    String inf = " ";
+    String inf = null;
 
     if(!ok) {
       if(!cAll) inf = PATHWHICH;
       if(!cNam) inf = DBWHICH;
     }
 
-    ImageIcon img = null;
+    boolean warn = false;
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
         inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
-        img = BaseXLayout.icon("warn");
+        warn = true;
       }
     }
-
-    final boolean err = !inf.trim().isEmpty();
-    info.setText(inf);
-    info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
+    info.setError(inf, warn);
     enableOK(buttons, BUTTONOK, ok);
   }
 

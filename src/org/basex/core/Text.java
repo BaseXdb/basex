@@ -94,6 +94,7 @@ public interface Text {
     "  [query]    specify query file" + NL +
     "  -c<cmd>    send database commands" + NL +
     "  -d         debug mode" + NL +
+    "  -i<file>   specify XML input" + NL +
     "  -o<file>   specify output file" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -x         print result as xml" + NL +
@@ -480,6 +481,15 @@ public interface Text {
   String HITS = lang("qu_hits");
   /** Insert query info. */
   String QUERYNODESERR = lang("qu_nodeserr");
+
+  /** Position info. */
+  String STOPPED = lang("qu_stopped");
+  /** Position info. */
+  String LINEINFO = lang("qu_line");
+  /** Position info. */
+  String COLINFO = lang("qu_col");
+  /** Position info. */
+  String FILEINFO = lang("qu_file");
 
   /** Query hits. */
   String VALHIT = "Item";
@@ -1024,7 +1034,7 @@ public interface Text {
   /** New password. */
   String NEWPW = lang("ds_newpw") + COLS;
   /** Invalid. */
-  String INVALID = ' ' + lang("ds_invalid");
+  String INVALID = lang("ds_invalid");
   /** Login. */
   String LOGIN = lang("ds_login");
   /** Local. */
@@ -1078,9 +1088,9 @@ public interface Text {
   String RENAMEINVALID = lang("dr_invalid");
   /** Info for renaming a database. */
   String RENAMEEXISTS = lang("dr_exists");
-  /** Info for overwrite a database. */
+  /** Info for overwriting  a database. */
   String RENAMEOVER = lang("dr_over");
-  /** Info for overwrite a database and deletion of backing store. */
+  /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking");
 
   /** Dialog title for dropping a database. */

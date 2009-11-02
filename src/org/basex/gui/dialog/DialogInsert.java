@@ -111,6 +111,8 @@ public final class DialogInsert extends Dialog {
 
     setResizable(true);
     change(radio[lkind]);
+
+    action(null);
     finish(null);
   }
 
@@ -143,16 +145,15 @@ public final class DialogInsert extends Dialog {
     lkind = kind;
     
     String msg = null;
-    if(kind != Data.TEXT && kind != Data.COMM &&
-        !XMLToken.isQName(token(input1.getText()))) msg = "Invalid name";
-    if(kind == Data.TEXT && input2.getText().length == 0) msg = "Invalid text";
-
-    ok = msg == null;
-    info.setIcon(ok ? null : BaseXLayout.icon("warn"));
-    info.setText(ok ? " " : msg);
+    ok = kind != Data.TEXT || input2.getText().length != 0;
+    if(kind != Data.TEXT && kind != Data.COMM) {
+      ok = XMLToken.isQName(token(input1.getText()));
+      if(!ok && input1.getText().length() != 0) msg = "Invalid name";
+    }
+    info.setError(msg, true);
     enableOK(buttons, BUTTONOK, ok);
   }
-  
+
   @Override
   public void close() {
     super.close();

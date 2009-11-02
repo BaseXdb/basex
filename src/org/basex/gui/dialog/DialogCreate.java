@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -247,23 +246,19 @@ public final class DialogCreate extends Dialog {
     final String nm = dbname();
     ok = exists && !nm.isEmpty();
 
-    String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
-    ImageIcon img = null;
+    String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
+    boolean warn = false;
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
         inf = RENAMEINVALID;
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
-        img = BaseXLayout.icon("warn");
+        warn = true;
       }
     }
-
-    final boolean err = !inf.trim().isEmpty();
-    info.setText(inf);
-    info.setIcon(err ? img != null ? img : BaseXLayout.icon("error") : null);
+    info.setError(inf, warn);
     filter.setEnabled(exists && file.isDir());
-
     enableOK(buttons, BUTTONOK, ok);
   }
 

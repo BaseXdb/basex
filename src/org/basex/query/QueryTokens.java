@@ -434,13 +434,4 @@ public interface QueryTokens {
 
   /** Default language. */
   byte[] EN = token("en");
-
-  /** Position info. */
-  String STOPPED = "Stopped at ";
-  /** Position info. */
-  String LINEINFO = "line %";
-  /** Position info. */
-  String COLINFO = ", column %";
-  /** Position info. */
-  String FILEINFO = " in %";
 }

@@ -6,6 +6,7 @@ import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.util.Args;
@@ -53,6 +54,8 @@ public class BaseX extends Main {
   protected final void run() {
     try {
       boolean u = false;
+      if(input != null) process(new CreateDB(input), true);
+      
       if(file != null) {
         // query file contents
         Prop.xquery = IO.get(file);
@@ -122,6 +125,9 @@ public class BaseX extends Main {
           } else if(c == 'D' && sa()) {
             // hidden option: show dot query graph
             success = set(Prop.DOTPLAN, true);
+          } else if(c == 'i' && sa()) {
+            // hidden option: show dot query graph
+            input = arg.string();
           } else if(c == 'm') {
             // hidden option: activate table main memory mode
             success = set(Prop.TABLEMEM, true);

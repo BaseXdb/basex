@@ -915,7 +915,7 @@ public final class TreeView extends View {
   public void mouseClicked(final MouseEvent e) {
 
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final boolean right = SwingUtilities.isRightMouseButton(e);
+    final boolean right = !left;
     if(!right && !left || focusedRect == null) return;
 
     if(left) {

@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -163,8 +161,7 @@ public final class DialogUser extends BaseXBack {
    * @param cmd Command
    */
   public void action(final String cmd) {
-    ImageIcon icon = null;
-    String msg = "";
+    String msg = null;
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
@@ -206,21 +203,20 @@ public final class DialogUser extends BaseXBack {
       disname &= !user.getText().equals(userco1.getItemAt(i).toString());
     }
 
-    if(!msg.isEmpty()) {
-      icon = BaseXLayout.icon("error");
+    boolean warn = true;
+    if(msg != null) {
+      warn = false;
     } else if(!(valuname && valpass && valnewpass && disname)) {
-      icon = BaseXLayout.icon("warn");
-      msg = !valuname ? SERVERUSER + INVALID : !valpass || !valnewpass ?
-          SERVERPW + INVALID : Main.info(USERKNOWN, user.getText());
+      msg = !disname ? Main.info(USERKNOWN, user.getText()) :
+        Main.info(INVALID, !valuname ? SERVERUSER : SERVERPW);
     }
+    info.setError(msg, warn);
 
     alter.setEnabled(valnewpass && newpass.getPassword().length != 0);
     create.setEnabled(valuname && valpass && disname &&
         !user.getText().isEmpty() && pass.getPassword().length != 0);
     delete.setEnabled(data.contents.size() != 0);
     change.setEnabled(false);
-    info.setText(msg);
-    info.setIcon(icon);
   }
 
   /**

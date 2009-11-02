@@ -176,7 +176,7 @@ public abstract class W3CTS {
         }
       } else {
         single = arg.string();
-        maxout *= 10;
+        maxout = Integer.MAX_VALUE;
       }
     }
 
@@ -385,7 +385,7 @@ public abstract class W3CTS {
 
       } catch(final QueryException ex) {
         error = ex.getMessage();
-        if(error.startsWith("Stopped at")) {
+        if(error.startsWith(STOPPED)) {
           error = error.substring(error.indexOf('\n') + 1);
         }
 

@@ -14,10 +14,10 @@ import org.basex.query.iter.Iter;
  * @author Lukas Kircher
  */
 public final class InsertInto extends NodeCopy {
-  /** Insert into or insert into as last */
+  /** Insert into or insert into as last. */
   private boolean last;
   /** Index of most recently added 'insert into' nodes. */
-  private int i = 0;
+  private int i;
   
   /**
    * Constructor.

@@ -395,6 +395,10 @@ qu_tabmem=Memory
 qu_tabprinted=Printed   
 qu_tabhits=Results   
 qu_nodeserr=Query must yield a nodeset.
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
 
 # Admin Commands
 ad_databases=% opened database(s)

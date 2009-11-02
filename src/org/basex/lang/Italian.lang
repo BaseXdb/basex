@@ -398,6 +398,10 @@ qu_tabmem=Memoria
 qu_tabprinted=Stampato  
 qu_tabhits=Results   
 qu_nodeserr=La query deve contenere un nodeset.
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
 
 # Admin Commands
 ad_databases=% opened database(s)

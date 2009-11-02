@@ -1,8 +1,7 @@
 package org.basex.query;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.core.Text.*;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputParser;
@@ -45,8 +44,6 @@ public final class QueryException extends Exception {
    */
   public QueryException(final Object[] s, final Object... e) {
     this(s[2], e);
-    // skip error codes in gui mode
-    if(Prop.gui) return;
     code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 
@@ -129,10 +126,10 @@ public final class QueryException extends Exception {
   public String getMessage() {
     final StringBuilder sb = new StringBuilder();
     if(line != 0) {
-      sb.append(STOPPED);
+      sb.append(STOPPED + ' ');
       sb.append(Main.info(LINEINFO, line));
-      if(col != 0) sb.append(Main.info(COLINFO, col));
-      if(file != null) sb.append(Main.info(FILEINFO, file));
+      if(col != 0) sb.append(", " + Main.info(COLINFO, col));
+      if(file != null) sb.append(Main.info(' ' + FILEINFO, file));
       sb.append(": \n");
     }
     return sb.append(extended()).toString();

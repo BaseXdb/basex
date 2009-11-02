@@ -67,15 +67,15 @@ public interface QueryText {
   /** FODC0002: Evaluation exception. */
   Object[] UNDOC = { FODC, 2, "Document node could not be created (%)." };
   /** FODC0002: Evaluation exception. */
-  Object[] COLLINV = { FODC, 2, "Collection name \"%\" is invalid." };
+  Object[] COLLINV = { FODC, 2, "Invalid collection \"%\"." };
   /** FODC0002: Evaluation exception. */
-  Object[] COLLDEF = { FODC, 2, "No default collection found." };
+  Object[] COLLDEF = { FODC, 2, "No default collection available." };
   /** FODC0002: Evaluation exception. */
-  Object[] NODOC = { FODC, 2, "%" };
+  Object[] NODOC = { FODC, 2, "Document \"%\" could not be opened." };
   /** FODC0004: Evaluation exception. */
-  Object[] NOCOLL = { FODC, 4, "%" };
+  Object[] NOCOLL = { FODC, 4, "Collection \"%\" could not be opened." };
   /** FODC0005: Evaluation exception. */
-  Object[] INVDOC = { FODC, 5, "Invalid file path: \"%\"." };
+  Object[] INVDOC = { FODC, 5, "Invalid document \"%\"." };
 
   /** FODT0002: Evaluation exception. */
   Object[] DATEZERO = { FODT, 2, "Invalid infinity/zero calculation in %." };

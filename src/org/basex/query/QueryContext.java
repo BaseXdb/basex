@@ -429,7 +429,7 @@ public final class QueryContext extends Progress {
       try {
         data = Open.open(context, nm);
       } catch(final IOException ex) {
-        Err.or(db ? NODB : INVDOC, nm);
+        Err.or(db ? NODB : NODOC, nm);
       }
     } else {
       final IO file = file();
@@ -467,7 +467,7 @@ public final class QueryContext extends Progress {
     try {
       return Open.check(context, path);
     } catch(final IOException ex) {
-      if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
+      if(err) Err.or(coll ? NOCOLL : NODOC, path);
       return null;
     }
   }

@@ -1105,7 +1105,7 @@ public final class PlotView extends View implements Runnable {
 
     // determine if a following context filter operation is possibly triggered
     // by popup menu
-    final boolean r = SwingUtilities.isRightMouseButton(e);
+    final boolean r = !SwingUtilities.isLeftMouseButton(e);
     if(r) { rightClick = true; return; }
     // no item is focused. no nodes marked after mouse click
     if(gui.focused == -1) {

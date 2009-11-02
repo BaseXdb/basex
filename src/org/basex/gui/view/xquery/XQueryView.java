@@ -164,7 +164,6 @@ public final class XQueryView extends View {
     south.add(sp, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
 
-    Prop.xquery = IO.get("query.xq");
     refreshLayout();
   }
 
@@ -246,7 +245,7 @@ public final class XQueryView extends View {
   public void info(final String inf, final boolean ok) {
     final int error = text.error(inf, ok);
     info.setName(error != -1 ? Integer.toString(error) : null);
-    info.setText(ok ? STATUSOK : inf.replaceAll("Stopped.*", ""));
+    info.setText(ok ? STATUSOK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""));
     info.setIcon(ok ? OKICON : ERRICON);
     info.setToolTipText(ok ? null : inf);
 
@@ -258,6 +257,7 @@ public final class XQueryView extends View {
    * Show a quit dialog for saving the opened XQuery.
    */
   public void confirm() {
+    if(Prop.xquery == null) Prop.xquery = IO.get("query.xq");
     if(modified && Dialog.confirm(gui, Main.info(XQUERYCONF,
         Prop.xquery.name()))) GUICommands.XQSAVE.execute(gui);
   }

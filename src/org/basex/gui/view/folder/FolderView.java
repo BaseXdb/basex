@@ -396,31 +396,27 @@ public final class FolderView extends View {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    super.mousePressed(e);
     if(gui.updating || opened == null) return;
+    super.mousePressed(e);
 
     if(!focus(e.getX(), e.getY())) return;
 
-    final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final int pre = gui.focused;
-
     // add or remove marked node
     final Nodes marked = gui.context.marked();
-    if(!left) {
-      if(marked.contains(pre)) gui.notify.mark(0, null);
-    } else if(getCursor() == CURSORHAND) {
-      // open/close entry
-      opened[pre] ^= true;
-      refreshHeight();
-      repaint();
-    } else if(e.getClickCount() == 2) {
+    if(e.getClickCount() == 2) {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
     } else if(e.isControlDown()) {
       gui.notify.mark(2, null);
+    } else if(!SwingUtilities.isLeftMouseButton(e) ||
+        getCursor() != CURSORHAND) {
+      if(!marked.contains(gui.focused)) gui.notify.mark(0, null);
     } else {
-      if(!marked.contains(pre)) gui.notify.mark(0, null);
+      // open/close entry
+      opened[gui.focused] ^= true;
+      refreshHeight();
+      repaint();
     }
   }
 
@@ -454,8 +450,8 @@ public final class FolderView extends View {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    super.keyPressed(e);
     if(gui.updating || opened == null) return;
+    super.keyPressed(e);
 
     int focus = focusedPos == -1 ? 0 : focusedPos;
     if(gui.focused == -1) gui.focused = 0;

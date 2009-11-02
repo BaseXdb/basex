@@ -394,6 +394,10 @@ qu_tabmem=Bộ nhớ
 qu_tabprinted=Đã in   
 qu_tabhits=Kết quả   
 qu_nodeserr==Lệnh hỏi phải lấy một tập nút.
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
 
 # Admin Commands
 ad_databases=% opened database(s)

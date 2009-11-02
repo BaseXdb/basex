@@ -730,8 +730,8 @@ public final class MapView extends View implements Runnable {
     if(gui.updating) return;
 
     // process mouse clicks by the specific painter
-    if(SwingUtilities.isLeftMouseButton(e) && focused != null) painter.mouse(
-        focused, mouseX, mouseY, true);
+    if(SwingUtilities.isLeftMouseButton(e) && focused != null)
+      painter.mouse(focused, mouseX, mouseY, true);
 
     if(gui.prop.is(GUIProp.MAPINTERACTION) && !mapdist) {
       thumbMap = true;
@@ -781,28 +781,22 @@ public final class MapView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     if(gui.updating) return;
     super.mousePressed(e);
+
     mouseX = e.getX();
     mouseY = e.getY();
     dragTol = 0;
     if(!focus() && gui.focused == -1) return;
 
-    // left/right mouse click?
-    final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final int pre = gui.focused;
-
     // add or remove marked node
     final Nodes marked = gui.context.marked();
-    if(!left) {
-      // right mouse button
-      if(!marked.contains(pre)) gui.notify.mark(0, null);
-    } else if(e.getClickCount() == 2) {
+    if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
     } else if(e.isControlDown()) {
       gui.notify.mark(2, null);
     } else {
-      if(!marked.contains(pre)) gui.notify.mark(0, null);
+      if(!marked.contains(gui.focused)) gui.notify.mark(0, null);
     }
   }
 

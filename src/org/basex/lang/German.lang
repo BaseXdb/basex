@@ -394,7 +394,11 @@ qu_tabtotal=Gesamt
 qu_tabmem=Speicher    
 qu_tabprinted=Gedruckt    
 qu_tabhits=Ergebnisse  
-qu_nodeserr=Anfrage muss ein Knotenset liefern.
+qu_nodeserr=Anfrage muss eine Knotenmenge zurückliefern.
+qu_stopped=Gestoppt bei
+qu_line=Zeile %
+qu_col=Spalte %
+qu_file=in %
 
 # Admin Commands
 ad_databases=% geöffnete Datenbanken

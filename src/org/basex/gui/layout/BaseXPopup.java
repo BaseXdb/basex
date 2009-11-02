@@ -38,7 +38,7 @@ public final class BaseXPopup extends JPopupMenu {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(final MouseEvent e) {
-        if(!gui.updating && SwingUtilities.isRightMouseButton(e))
+        if(!gui.updating && !SwingUtilities.isLeftMouseButton(e))
           show(e.getComponent(), e.getX() - 10, e.getY() - 15);
       }
     });

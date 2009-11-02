@@ -173,7 +173,7 @@ public final class InfoView extends View {
       tm = strings.get(il.size() - 1) + ": " + Performance.getTimer(
           stat.get(il.size() - 1) * 10000L * runs, runs);
     } else if(!ok) {
-      add(tb, "Error:  ", err);
+      add(tb, INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
       tm = "";
     }
 
@@ -230,7 +230,7 @@ public final class InfoView extends View {
 
     final int runs = gui.context.prop.num(Prop.RUNS);
     final int f = focus == -1 ? l - 1 : focus;
-    timer.setText(f == -1 ? "" : " " + strings.get(f) + ": " +
+    timer.setText(strings.get(f) + ": " +
         Performance.getTimer(stat.get(f) * 10000L * runs, runs));
     repaint();
   }
@@ -244,17 +244,17 @@ public final class InfoView extends View {
     h = north.getHeight();
     w = getWidth() - 8;
     bw = gui.prop.num(GUIProp.FONTSIZE) * 2 + w / 10;
-    bs = bw / l;
+    bs = bw / (l - 1);
 
     // find maximum value
     int m = 0;
-    for(int i = 0; i < l; i++) m = Math.max(m, stat.get(i));
+    for(int i = 0; i < l - 1; i++) m = Math.max(m, stat.get(i));
 
     // draw focused bar
     final int by = 10;
     final int bh = h - by;
 
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l - 1; i++) {
       if(i != focus) continue;
       final int bx = w - bw + bs * i;
       g.setColor(color4);
@@ -262,7 +262,7 @@ public final class InfoView extends View {
     }
 
     // draw all bars
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l - 1; i++) {
       final int bx = w - bw + bs * i;
       g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
       final int p = Math.max(1, stat.get(i) * bh / m);

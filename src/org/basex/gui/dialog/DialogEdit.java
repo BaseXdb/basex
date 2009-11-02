@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.basex.core.Context;
@@ -36,7 +37,7 @@ public final class DialogEdit extends Dialog {
   /** Info label. */
   private final BaseXLabel info;
   /** Text area. */
-  private BaseXTextField input;
+  private BaseXTextField input1;
   /** Text area. */
   private BaseXTextField input2;
   /** Text area. */
@@ -86,10 +87,10 @@ public final class DialogEdit extends Dialog {
     final BaseXBack b = new BaseXBack();
     b.setLayout(new TableLayout(2, 1, 0, 4));
     if(old1 != null) {
-      input = new BaseXTextField(old1, this);
-      input.addKeyListener(keys);
-      BaseXLayout.setWidth(input, 320);
-      b.add(input);
+      input1 = new BaseXTextField(old1, this);
+      input1.addKeyListener(keys);
+      BaseXLayout.setWidth(input1, 320);
+      b.add(input1);
     }
     if(old2 != null) {
       input2 = new BaseXTextField(old2, this);
@@ -124,13 +125,12 @@ public final class DialogEdit extends Dialog {
   @Override
   public void action(final String cmd) {
     String msg = null;
-    if(kind != Data.TEXT && kind != Data.COMM &&
-        !XMLToken.isQName(token(input.getText()))) msg = "Invalid name";
-    if(kind == Data.TEXT && input3.getText().length == 0) msg = "Invalid text";
-
-    ok = msg == null;
-    info.setIcon(ok ? null : BaseXLayout.icon("warn"));
-    info.setText(ok ? " " : msg);
+    ok = kind != Data.TEXT || input3.getText().length != 0;
+    if(kind != Data.TEXT && kind != Data.COMM) {
+      ok = XMLToken.isQName(token(input1.getText()));
+      if(!ok && input1.getText().length() != 0) msg = "Invalid name";
+    }
+    info.setError(msg, true);
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -139,8 +139,8 @@ public final class DialogEdit extends Dialog {
     super.close();
     ok = false;
     if(old1 != null) {
-      result.add(input.getText());
-      ok |= !input.getText().equals(old1);
+      result.add(input1.getText());
+      ok |= !input1.getText().equals(old1);
     }
     if(old2 != null) {
       result.add(input2.getText());

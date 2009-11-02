@@ -30,6 +30,8 @@ public abstract class Main {
   protected boolean success;
   /** Output file for queries. */
   protected String output;
+  /** Input file for queries. */
+  protected String input;
 
   /** Session. */
   protected Session session;
