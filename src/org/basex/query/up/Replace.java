@@ -70,7 +70,7 @@ public final class Replace extends Update {
         ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
       } else {
         // replace attribute node
-        if(seq.size() - aSeq.size() > 0) Err.or(UPWRATTR, i);
+        if(seq.size() > 0) Err.or(UPWRATTR, i);
         ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
       }
       return Seq.EMPTY;

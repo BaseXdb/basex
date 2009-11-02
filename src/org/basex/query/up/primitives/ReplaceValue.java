@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
+import static org.basex.util.Token.*;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -32,9 +33,14 @@ public final class ReplaceValue extends NewValue {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
-    if(k == Data.ATTR) d.update(n.pre, d.attName(n.pre), name);
+    if(k == Data.ATTR) 
+      d.update(n.pre, d.attName(n.pre), name);
+    else if(k == Data.PI) {
+      final byte[] nm = n.nname();
+      d.update(n.pre, concat(nm, SPACE, name));
+    }
     else d.update(n.pre, name);
-    // [LK] add delete if replace with empty string
+    // [LK] add delete if replace with empty string ?
   }
   
   @Override
