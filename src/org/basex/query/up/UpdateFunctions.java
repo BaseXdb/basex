@@ -281,6 +281,7 @@ public final class UpdateFunctions {
    * @param pre pre value
    * @return database instance
    */
+  // [LK] need it or not?
   public static MemData copy(final Data data, final int pre) {
     // size of the data instance
     final int size = data.size(pre, data.kind(pre));
