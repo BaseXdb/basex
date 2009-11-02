@@ -64,7 +64,7 @@ public class XQUPTest extends AbstractTest {
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-       /* { "xxxxxxxxxxxxx", nodes(11),
+        { "xxxxxxxxxxxxx", nodes(11),
         "/up/cars/good/car/wheels[text()='optional']" },
         
         // delete
@@ -162,7 +162,7 @@ public class XQUPTest extends AbstractTest {
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
         { "ins2", nodes(6, 9, 10), 
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
-        "/up/cars/good/car/text()" },*/
+        "/up/cars/good/car/text()" },
         { "xxxins3", nodes(),
         "insert node" + SEQ6 + " into /up/cars/good/car[@id=1]"},
         { "ins3", nodes(5, 5), 

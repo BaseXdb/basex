@@ -83,6 +83,16 @@ public final class InfoTable extends AInfo {
     tb.add(table.finish());
     return tb.finish();
   }
+  
+  /**
+   * Print table to standard output for testing purposes. 
+   * @param d data 
+   * @param s start node
+   * @param e end node
+   */
+  public static void pT(final Data d, final int s, final int e) {
+    System.out.println(string(table(d, s, e > 0 ? e : d.meta.size)));
+  }
 
   /**
    * Writes the header for the 'table' command.
