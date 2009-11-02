@@ -146,7 +146,7 @@ public final class BaseXServer extends Main implements Runnable {
             }
           } catch(final IOException ex) {
             if(ex instanceof LoginException) {
-              if(console) outln(SERVERSTOPPED);
+              outln(SERVERSTOPPED);
             } else {
             error(ex, true);
             }

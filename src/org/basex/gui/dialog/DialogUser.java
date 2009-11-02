@@ -58,7 +58,7 @@ public final class DialogUser extends BaseXBack {
   /** Create button. */
   private final BaseXButton create;
   /** Delete button. */
-  private final BaseXButton delete;
+  private final BaseXButton drop;
   /** Username textfield. */
   private final BaseXTextField user;
   /** Password textfield. */
@@ -111,7 +111,7 @@ public final class DialogUser extends BaseXBack {
     userco2 = new BaseXCombo(new String[] {}, d);
     change = new BaseXButton(BUTTONCHANGE, d);
     userco1 = new BaseXCombo(new String[] {}, d);
-    delete = new BaseXButton(BUTTONDROP, d);
+    drop = new BaseXButton(BUTTONDROP, d);
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
@@ -119,9 +119,9 @@ public final class DialogUser extends BaseXBack {
     final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(1, 5, 6, 0));
     p1.setBorder(0, 0, 5, 0);
-    p1.add(new BaseXLabel(SERVERUSER));
+    p1.add(new BaseXLabel(SERVERUSER + COLS));
     p1.add(user);
-    p1.add(new BaseXLabel(SERVERPW));
+    p1.add(new BaseXLabel(SERVERPW + COLS));
     p1.add(pass);
     p1.add(create);
     add(p1);
@@ -148,7 +148,7 @@ public final class DialogUser extends BaseXBack {
     p4.setLayout(new TableLayout(1, 2, 6, 0));
     p4.setBorder(0, 0, 5, 0);
     p4.add(userco1);
-    p4.add(delete);
+    p4.add(drop);
     add(p4);
 
     add(info);
@@ -212,10 +212,11 @@ public final class DialogUser extends BaseXBack {
     }
     info.setError(msg, warn);
 
-    alter.setEnabled(valnewpass && newpass.getPassword().length != 0);
+    alter.setEnabled(valnewpass && newpass.getPassword().length != 0 &&
+        userco2.getSelectedIndex() != -1);
     create.setEnabled(valuname && valpass && disname &&
         !user.getText().isEmpty() && pass.getPassword().length != 0);
-    delete.setEnabled(data.contents.size() != 0);
+    drop.setEnabled(userco1.getSelectedIndex() != -1);
     change.setEnabled(false);
   }
 
@@ -242,6 +243,8 @@ public final class DialogUser extends BaseXBack {
         tmp = o;
       }
     }
+    userco1.setSelectedIndex(-1);
+    userco2.setSelectedIndex(-1);
     data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
   }
