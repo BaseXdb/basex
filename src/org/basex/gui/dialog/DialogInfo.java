@@ -9,6 +9,8 @@ import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.basex.core.LocalSession;
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
@@ -49,6 +51,8 @@ public final class DialogInfo extends Dialog {
   private final BaseXBack buttons;
   /** Optimize flag. */
   public boolean opt;
+  /** DialogUser table. */
+  private DialogUser dia;
 
   /**
    * Default constructor.
@@ -185,6 +189,15 @@ public final class DialogInfo extends Dialog {
     tabs.addTab(INFOPATHINDEX, tab3);
     tabs.addTab(INDEXINFO, tab4);
     tabs.addTab(FTINFO, tab5);
+    dia = new DialogUser(false, this);
+    try {
+      dia.setSess(new LocalSession(gui.context));
+    } catch(IOException e1) {
+      e1.printStackTrace();
+    }
+    BaseXBack users = dia.getTablePanel();
+    users.setBorder(8, 8, 8, 8);
+    tabs.addTab(USERS, users);
 
     set(tabs, BorderLayout.CENTER);
 
@@ -251,6 +264,7 @@ public final class DialogInfo extends Dialog {
         fl[f].setEnabled(ftx);
       }
     }
+    dia.action(cmd);
     final Data data = gui.context.data();
     enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }

@@ -202,7 +202,7 @@ public final class DialogServer extends Dialog {
         ctx.prop.set(Prop.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER),
             gui.prop.get(GUIProp.SERVERPASS));
-        user.setCs(cs);
+        user.setSess(cs);
         fillsedb();
         connected = true;
       } else if(BUTTONDISCONNECT.equals(cmd)) {

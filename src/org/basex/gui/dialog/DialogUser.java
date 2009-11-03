@@ -46,7 +46,7 @@ public final class DialogUser extends BaseXBack {
   /** ArrayList for table. */
   Table data = new Table();
   /** Session. */
-  Session cs;
+  Session sess;
 
   /** List of permission processes. */
   final ArrayList<Process> permps = new ArrayList<Process>();
@@ -74,7 +74,11 @@ public final class DialogUser extends BaseXBack {
   /** Info label. */
   private final BaseXLabel info;
   /** Flag global/local. */
-  private final boolean global;
+  final boolean global;
+  /** Dialog. */
+  final Dialog dia;
+  /** Table panel. */
+  BaseXBack tablePanel;
 
   /** Key listener. */
   private final KeyAdapter keys = new KeyAdapter() {
@@ -91,14 +95,15 @@ public final class DialogUser extends BaseXBack {
    */
   public DialogUser(final boolean g, final Dialog d) {
     global = g;
+    dia = d;
 
     setLayout(new TableLayout(11, 1, 0, 4));
     setBorder(8, 8, 8, 8);
 
-    user = new BaseXTextField("", d);
+    user = new BaseXTextField("", dia);
     user.addKeyListener(keys);
     BaseXLayout.setWidth(user, 100);
-    create = new BaseXButton(BUTTONCREATE, d);
+    create = new BaseXButton(BUTTONCREATE, dia);
     pass = new JPasswordField();
     pass.addKeyListener(keys);
     BaseXLayout.setWidth(pass, 100);
@@ -107,11 +112,11 @@ public final class DialogUser extends BaseXBack {
     newpass = new JPasswordField();
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
-    alter = new BaseXButton(BUTTONALTER, d);
-    userco2 = new BaseXCombo(new String[] {}, d);
-    change = new BaseXButton(BUTTONCHANGE, d);
-    userco1 = new BaseXCombo(new String[] {}, d);
-    drop = new BaseXButton(BUTTONDROP, d);
+    alter = new BaseXButton(BUTTONALTER, dia);
+    userco2 = new BaseXCombo(new String[] {}, dia);
+    change = new BaseXButton(BUTTONCHANGE, dia);
+    userco1 = new BaseXCombo(new String[] {}, dia);
+    drop = new BaseXButton(BUTTONDROP, dia);
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
@@ -134,19 +139,22 @@ public final class DialogUser extends BaseXBack {
     p2.add(newpass);
     p2.add(alter);
     add(p2);
-    add(new BaseXLabel(PERMS, false, true));
-    add(new JScrollPane(table));
-
-    final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new BorderLayout());
-    p3.add(new BaseXLabel(DROPU + COLS, false, true), BorderLayout.WEST);
-    p3.add(change, BorderLayout.EAST);
-    BaseXLayout.setWidth(p3, 420);
-    add(p3);
-
+    tablePanel = new BaseXBack();
+    tablePanel.setLayout(new TableLayout(3, 1, 2, 2));
+    tablePanel.add(new BaseXLabel(PERMS, false, true));
+    tablePanel.add(new JScrollPane(table));
+    final BaseXBack tablePanel1 = new BaseXBack();
+    tablePanel1.setLayout(new BorderLayout());
+    tablePanel1.add(change, BorderLayout.EAST);
+    BaseXLayout.setWidth(tablePanel1, 420);
+    tablePanel.add(tablePanel1);
+    add(tablePanel);
+    
     final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(1, 2, 6, 0));
+    p4.setLayout(new TableLayout(2, 2, 6, 0));
     p4.setBorder(0, 0, 5, 0);
+    p4.add(new BaseXLabel(DROPU + COLS, false, true));
+    p4.add(new BaseXLabel(" "));
     p4.add(userco1);
     p4.add(drop);
     add(p4);
@@ -165,26 +173,26 @@ public final class DialogUser extends BaseXBack {
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
-        for(final Process p : permps) if(!cs.execute(p)) msg = cs.info();
+        for(final Process p : permps) if(!sess.execute(p)) msg = sess.info();
         permps.clear();
         setData();
       } else if(BUTTONCREATE.equals(cmd)) {
         final String u = user.getText();
         final String p = new String(pass.getPassword());
-        if(!cs.execute(new CreateUser(u, p))) msg = cs.info();
+        if(!sess.execute(new CreateUser(u, p))) msg = sess.info();
         user.setText("");
         pass.setText("");
         setData();
       } else if(BUTTONDROP.equals(cmd)) {
         final String u = userco1.getSelectedItem().toString();
         if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
-          if(!cs.execute(new DropUser(u))) msg = cs.info();
+          if(!sess.execute(new DropUser(u))) msg = sess.info();
         }
         setData();
       } else if(BUTTONALTER.equals(cmd)) {
         final String u = userco2.getSelectedItem().toString();
         final String p = new String(newpass.getPassword());
-        if(!cs.execute(new AlterUser(u, p))) msg = cs.info();
+        if(!sess.execute(new AlterUser(u, p))) msg = sess.info();
         newpass.setText("");
       }
     } catch(final IOException ex) {
@@ -226,8 +234,8 @@ public final class DialogUser extends BaseXBack {
    */
   public void setData() throws IOException {
     final CachedOutput out = new CachedOutput();
-    if(!cs.execute(global ? new Show("Users") : new InfoUsers(), out)) {
-      throw new IOException(cs.info());
+    if(!sess.execute(global ? new Show("Users") : new InfoUsers(), out)) {
+      throw new IOException(sess.info());
     }
     data = new Table(out.toString());
     userco1.removeAllItems();
@@ -254,9 +262,17 @@ public final class DialogUser extends BaseXBack {
    * @param s session
    * @throws IOException I/O Exception
    */
-  public void setCs(final Session s) throws IOException {
-    cs = s;
+  public void setSess(final Session s) throws IOException {
+    sess = s;
     setData();
+  }
+  
+  /**
+   * Returns tablepanel.
+   * @return BaseXBack
+   */
+  public BaseXBack getTablePanel() {
+    return tablePanel;
   }
 
   /**
@@ -298,8 +314,14 @@ public final class DialogUser extends BaseXBack {
     public void setValueAt(final Object value, final int row, final int col) {
       final String uname = data.contents.get(row).get(0);
       final String right = CmdPerm.values()[col - 1].toString();
+      if(global) {
       permps.add(value.equals(true) ? new Grant(right, uname) : new Revoke(
           right, uname));
+      } else {
+        String db = dia.gui.context.data().meta.name;
+        permps.add(value.equals(true) ? new Grant(right, uname,
+            db) : new Revoke(right, uname, db));
+      }
       data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
       fireTableCellUpdated(row, col);
       change.setEnabled(true);
