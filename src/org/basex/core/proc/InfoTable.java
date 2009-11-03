@@ -85,13 +85,14 @@ public final class InfoTable extends AInfo {
   }
   
   /**
-   * Print table to standard output for testing purposes. 
+   * Print table to standard output for testing purposes.  
    * @param d data 
    * @param s start node
    * @param e end node
    */
   public static void pT(final Data d, final int s, final int e) {
-    System.out.println(string(table(d, s, e > 0 ? e : d.meta.size)));
+    System.out.println(string(table(d, s > 0 ? s : 0, 
+        e > 0 ? e : d.meta.size)));
   }
 
   /**

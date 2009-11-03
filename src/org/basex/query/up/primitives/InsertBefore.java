@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives;
 
-//import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -31,14 +30,13 @@ public final class InsertBefore extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre;
-    // [LK] check if parent null?
+//    InfoTable.pT(d, 180, -1);
     d.insertSeq(pos, d.parent(pos, Nod.kind(node.type)), m);
-//    if(!mergeTextNodes(d, pos - 1, pos)) {
-//      // the number of inserted nodes equals (m.meta.size - 1) because
-//      // the DOC root node of the insertion data set is not inserted
-//      final int s = m.meta.size - 1;
-//      mergeTextNodes(d, pos - s, pos - s - 1);
-//    }
+//    final int s = m.meta.size - 1;
+//    InfoTable.pT(d, 180, -1);
+//    if(!mergeTextNodes(d, pos + s - 1, pos + s)) 
+//      mergeTextNodes(d, pos - 1, pos);
+//    InfoTable.pT(d, 180, -1);
   }
 
   @Override

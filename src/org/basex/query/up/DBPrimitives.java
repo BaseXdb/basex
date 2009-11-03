@@ -79,6 +79,7 @@ public final class DBPrimitives {
           add = ((InsertBefore) pp).m.size(0, Data.DOC) - 1;
         }
         pp.apply(add);
+        // operations cannot be applied to a node which has been replaced
         if(pp.type() == Type.REPLACENODE) break;
       }
     }

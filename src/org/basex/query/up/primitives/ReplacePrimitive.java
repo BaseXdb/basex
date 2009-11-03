@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 
 import org.basex.data.Data;
@@ -8,7 +9,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.up.UpdateFunctions;
 import org.basex.query.util.Err;
 
 /**
@@ -40,7 +40,6 @@ public final class ReplacePrimitive extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-//    InfoTable.pT(d, 100, -1);
     // source nodes may be empty, thus the replace results in deleting the 
     // target node
     if(m == null) {
@@ -49,11 +48,12 @@ public final class ReplacePrimitive extends NodeCopy {
     }
     final int k = Nod.kind(n.type);
     final int par = d.parent(p, k);
-    final int s = m.size(0, Data.DOC) - 1;
     if(a)
-      UpdateFunctions.insertAttributes(p, par, d, m);
-    else d.insertSeq(p + d.size(p, k), par , m);
-    d.delete(p + (a ? s : 0));
+      insertAttributes(p, par, d, m);
+    else d.insertSeq(p, par , m);
+    d.delete(p + m.meta.size - 1);
+    mergeTextNodes(d, p, p + 1);
+    mergeTextNodes(d, p - 1, p);
   }
 
   @Override

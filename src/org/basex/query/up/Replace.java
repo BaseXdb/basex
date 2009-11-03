@@ -20,7 +20,7 @@ import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * Replace expression.
@@ -77,10 +77,13 @@ public final class Replace extends Update {
     }
     
     // replace value of node
+    final byte[] txt = seq.size() < 1 ? EMPTY : seq.get(0).str();
+    if(k == Data.COMM && (contains(txt, token("--")) || 
+        endsWith(txt, token("-")))) Err.or(COMINVALID, i);
+    if(k == Data.PI && (contains(txt, token("?>")) || 
+        endsWith(txt, token("-")))) Err.or(CPICONT, i);
     ctx.updates.add(k == Data.ELEM ? 
-        new ReplaceElemContent(n, seq.get(0).str()) :
-          new ReplaceValue(n, seq.get(0).str()), 
-          ctx);
+        new ReplaceElemContent(n, txt) : new ReplaceValue(n, txt), ctx);
     return Seq.EMPTY;
   }
   
@@ -91,9 +94,9 @@ public final class Replace extends Update {
    * @return true if duplicates exist
    */
   public static boolean checkNS(final Set<String> s, final Nod n) {
-    if(n instanceof FNode) return !s.add(Token.string(((FNode) n).nname()));
+    if(n instanceof FNode) return !s.add(string(((FNode) n).nname()));
     final DBNode dn = (DBNode) n;
-    return !s.add(Token.string(dn.data.attName(dn.pre)));
+    return !s.add(string(dn.data.attName(dn.pre)));
   }
 
   @Override
