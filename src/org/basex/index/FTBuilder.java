@@ -21,11 +21,11 @@ abstract class FTBuilder extends IndexBuilder {
   /** Initial nodes for tfidf calculation. */
   final IntList nodes = new IntList();
   /** Container for maximal frequencies. */
-  int[] maxfreq = null;
+  int[] maxfreq;
   /** Container for all frequencies. */
-  int[] freq = null;
+  int[] freq;
   /** Container for number of documents with token i. */
-  int[] nmbdocwt = null;
+  int[] nmbdocwt;
   
   /**
    * Constructor.

@@ -121,15 +121,17 @@ public final class FTFuzzyBuilder extends FTBuilder {
 //        int cn = 1;
         while(lpre < pres && lpos < poss) {
           // first write score value
-//          while (cn < nodes.size() && nodes.get(cn) < Num.read(vpre, lpre)) cn++;
-//          if (cn < nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre) && nodes.get(cn) > Num.read(vpre, lpre) || 
-//              cn == nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre)) {
-//            System.out.print("A,");
-//            cn++;
-////            ScoringTokenizer.score(nodes.size(), nmbdocwt[c], maxfreq[cn - 1], freq[fc++]);
-//          }
-//          System.out.print(Num.read(vpre, lpre) + ",");
-//          System.out.print(Num.read(vpos, lpos) + ",");
+//while (cn < nodes.size() && nodes.get(cn) < Num.read(vpre, lpre)) cn++;
+//if (cn < nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre) &&
+//  nodes.get(cn) > Num.read(vpre, lpre) || 
+//    cn == nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre)) {
+//  System.out.print("A,");
+//  cn++;
+//    ScoringTokenizer.score(nodes.size(), nmbdocwt[c], maxfreq[cn - 1],
+//      freq[fc++]);
+//}
+//System.out.print(Num.read(vpre, lpre) + ",");
+//System.out.print(Num.read(vpos, lpos) + ",");
           for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
             outz.write(vpre[lpre++]);
           for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
@@ -152,7 +154,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
   
   @Override
-  final void getFreq() {
+  void getFreq() {
     byte j = 1;
     maxfreq = new int[nodes.size()];
     IntList fre = new IntList();

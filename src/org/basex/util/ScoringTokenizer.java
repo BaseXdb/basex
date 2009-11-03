@@ -70,7 +70,8 @@ public final class ScoringTokenizer extends Tokenizer{
    * @param f frequency of the term 
    * @return score value
    */
-  public static int score(final int numdoc, final int numdocterm, final int max, final int f) {
+  public static int score(final int numdoc, final int numdocterm,
+      final int max, final int f) {
     return Math.max(1, (int) (Math.log(numdoc / numdocterm) * f * 1000 / max));
   }
 
