@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -44,10 +43,12 @@ public final class Transform extends Arr {
     
     final int s = ctx.vars.size();
     for(final Let c : copies) {
-      checkUp(c, ctx);
+      c.expr = checkUp(c.expr, ctx).comp(ctx);
+      c.var.ret = c.expr.returned(ctx);
       ctx.vars.add(c.var);
     }
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
+
     if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
@@ -62,7 +63,8 @@ public final class Transform extends Arr {
     for(final Let fo : copies) {
       // [LK] copied node is a DOC node ? ... attributes ?
       final Data m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
-      ctx.vars.add(fo.var.bind(new DBNode(m, 1), ctx).copy());
+      ctx.vars.add(fo.var.bind(new DBNode(m,
+          Math.min(1, m.meta.size - 1)), ctx).copy());
     }
 
     final PendingUpdates upd = ctx.updates;

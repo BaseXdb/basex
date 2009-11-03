@@ -111,8 +111,8 @@ public class MemData extends Data {
   }
 
   @Override
-  public final int attSize(final int pre, final int kind) {
-    return kind == ELEM ? (int) (val1[pre] >> 32) & 0xFF : 1;
+  public final int attSize(final int pre, final int k) {
+    return k == ELEM ? (int) (val1[pre] >> 32) & 0xFF : 1;
   }
 
   @Override
@@ -269,21 +269,20 @@ public class MemData extends Data {
   }
 
   @Override
-  public void dist(final int pre, final int kind, final int val) {
-    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | val;
-    else if(kind != DOC) val2[pre] = (int) val2[pre] | (long) val << 32;
+  public void dist(final int pre, final int k, final int val) {
+    if(k == ELEM) val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | val;
+    else if(k != DOC) val2[pre] = (int) val2[pre] | (long) val << 32;
   }
 
   @Override
-  public void attSize(final int pre, final int kind, final int v) {
-    if(kind == ELEM) val1[pre] = val1[pre] & 0xFFFFFF00FFFFFFFFL |
+  public void attSize(final int pre, final int k, final int v) {
+    if(k == ELEM) val1[pre] = val1[pre] & 0xFFFFFF00FFFFFFFFL |
       (long) v << 32;
   }
 
   @Override
-  public final void size(final int pre, final int kind, final int val) {
-    if(kind == ELEM || kind == DOC)
-      val2[pre] = (int) val2[pre] | (long) val << 32;
+  public final void size(final int pre, final int k, final int val) {
+    if(k == ELEM || k == DOC) val2[pre] = (int) val2[pre] | (long) val << 32;
   }
 
   // UPDATES ON VALUE ARRAYS ==================================================
@@ -309,7 +308,7 @@ public class MemData extends Data {
 
   @Override
   protected void insertText(final int pre, final int dis, final byte[] val,
-      final int kind) {
+      final int k) {
     insert(pre, (long) TEXT << 56 | ((MemValues) txtindex).index(val, pre),
       (long) dis << 32 | ++meta.lastid);
   }

@@ -234,9 +234,11 @@ public final class FSParser extends Parser {
       builder.endElem(FILE);
     // add file size to parent folder
     sizeStack[lvl] += f.length();
+    /*
     for (long i : sizeStack)
       System.err.print(i + " ");
     System.err.println("--");
+    */
   }
 
   @Override

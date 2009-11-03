@@ -194,6 +194,7 @@ public final class DialogUser extends BaseXBack {
         final String p = new String(newpass.getPassword());
         if(!sess.execute(new AlterUser(u, p))) msg = sess.info();
         newpass.setText("");
+        setData();
       }
     } catch(final IOException ex) {
       Main.debug(ex);

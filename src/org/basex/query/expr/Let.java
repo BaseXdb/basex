@@ -38,7 +38,7 @@ public final class Let extends ForLet {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx);
-
+    
     // bind variable if expression uses no var, pos, ctx or fragment
     if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
         expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))) {

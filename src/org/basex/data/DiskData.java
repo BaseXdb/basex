@@ -220,13 +220,13 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int parent(final int pre, final int kind) {
-    return pre - dist(pre, kind);
+  public int parent(final int pre, final int k) {
+    return pre - dist(pre, k);
   }
 
   @Override
-  protected int dist(final int pre, final int kind) {
-   switch(kind) {
+  protected int dist(final int pre, final int k) {
+   switch(k) {
       case ELEM: return table.read4(pre, 4);
       case TEXT:
       case COMM:
@@ -237,13 +237,13 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int attSize(final int pre, final int kind) {
-    return kind == ELEM ? table.read1(pre, 3) : 1;
+  public int attSize(final int pre, final int k) {
+    return k == ELEM ? table.read1(pre, 3) : 1;
   }
 
   @Override
-  public int size(final int pre, final int kind) {
-    return kind == ELEM || kind == DOC ? table.read4(pre, 8) : 1;
+  public int size(final int pre, final int k) {
+    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
   }
 
   @Override
@@ -380,19 +380,19 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void dist(final int pre, final int kind, final int v) {
-    if(kind == ATTR) table.write1(pre, 11, v);
-    else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, v);
+  public void dist(final int pre, final int k, final int v) {
+    if(k == ATTR) table.write1(pre, 11, v);
+    else if(k != DOC) table.write4(pre, k == ELEM ? 4 : 8, v);
   }
 
   @Override
-  public void attSize(final int pre, final int kind, final int v) {
-    if(kind == ELEM) table.write1(pre, 3, v);
+  public void attSize(final int pre, final int k, final int v) {
+    if(k == ELEM) table.write1(pre, 3, v);
   }
 
   @Override
-  public void size(final int pre, final int kind, final int v) {
-    if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
+  public void size(final int pre, final int k, final int v) {
+    if(k == ELEM || k == DOC) table.write4(pre, 8, v);
   }
 
   // TABLE UPDATES ============================================================
@@ -450,14 +450,14 @@ public final class DiskData extends Data {
 
   @Override
   protected void insertText(final int pre, final int dis, final byte[] val,
-      final int kind) {
+      final int k) {
 
     // build and insert new entry
     final long id = ++meta.lastid;
     final long txt = texts.length();
     texts.writeBytes(txt, val);
 
-    table.insert(pre, new byte[] { (byte) kind, 0, 0, (byte) (txt >> 32),
+    table.insert(pre, new byte[] { (byte) k, 0, 0, (byte) (txt >> 32),
         (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });

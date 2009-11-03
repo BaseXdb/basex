@@ -181,9 +181,11 @@ public final class DialogServer extends Dialog {
     try {
       if(BUTTONSTASERV.equals(cmd)) {
         final int p = Integer.parseInt(ports.getText());
-        ctx.prop.set(Prop.PORT, p);
         ctx.prop.set(Prop.SERVERPORT, p);
-        portc.setText(ports.getText());
+        if(host.getText().equals("localhost")) {
+          ctx.prop.set(Prop.PORT, p);
+          portc.setText(ports.getText());
+        }
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
