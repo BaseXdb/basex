@@ -155,6 +155,9 @@ public final class FTTrieBuilder extends FTBuilder {
     outS.close();
   }
 
+  @Override
+  void getFreq() {    
+  }
   /**
    * Converts long values split with toArray back.
    * @param ar int[] with values

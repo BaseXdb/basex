@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.util.IntList;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
@@ -17,7 +18,15 @@ import org.basex.util.Tokenizer;
 abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
   final Tokenizer wp;
-
+  /** Initial nodes for tfidf calculation. */
+  final IntList nodes = new IntList();
+  /** Container for maximal frequencies. */
+  int[] maxfreq = null;
+  /** Container for all frequencies. */
+  int[] freq = null;
+  /** Container for number of documents with token i. */
+  int[] nmbdocwt = null;
+  
   /**
    * Constructor.
    * @param d data reference
@@ -50,13 +59,14 @@ abstract class FTBuilder extends IndexBuilder {
         token("global warming"), token("human activity"), 
         token("paul is dead"), token("virtual museums"), 
     };
-    int cd = 0;
+    
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) {
-        if(data.kind(id) == Data.DOC) cd++;
+        if(data.kind(id) == Data.DOC) nodes.add(id);
         continue; 
-      }
+      } 
       
+//      nodes.add(id);
       checkStop();
       int p = 0, i = 0, j = 0;
       wp.init(data.text(id));
@@ -91,9 +101,11 @@ abstract class FTBuilder extends IndexBuilder {
         }          
       }
     }
+    getFreq();
     write();
   }
 
+  
   /**
    * Indexes a single token.
    * @param tok token to be indexed
@@ -105,6 +117,11 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   abstract void write() throws IOException;
+  
+  /**
+   * Evaluates the maximum frequencies for tfidf. 
+   */
+  abstract void getFreq();
 
   @Override
   public final String det() {

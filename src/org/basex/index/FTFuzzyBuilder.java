@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
@@ -39,6 +40,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   private FTHash[] tree = new FTHash[Token.MAXLEN + 1];
   /** Number of indexed words. */
   private byte isize = 1;
+  
 
   /**
    * Constructor.
@@ -84,6 +86,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     long dr = 0;
     int tr = 0;
     byte j = 1;
+//    int fc = 0;
     for(int c = 0; j < tree.length && c < isize - 1; j++) {
       final FTHash tre = tree[j];
       if(tre == null) continue;
@@ -112,53 +115,27 @@ public final class FTFuzzyBuilder extends FTBuilder {
         int lpre = 4;
         int lpos = 4;
 
-        /* [SG] Eclipse warning: "dead code" -> due to "if(false)..."
-        if (false) {
-          // document node based scoring
-          int co = 1;
-          final int size = Num.size(vpre);
-          int npre = Num.read(vpre, lpre);
-          IntList freq = new IntList();
-          final int[] docs = data.doc();
-          final int[] max = new int[docs.length];
-          int cr = 1;
-          while(lpre < size) {
-            final int pre = npre;
-            lpre += Num.len(vpre, lpre);
-            // find document root
-            while (cr < docs.length && pre > docs[cr]) cr++;
-            if (cr == docs.length || pre < docs[cr]) {
-              if (lpre < size) npre = Num.read(vpre, lpre);
-              else max[cr - 1] = co > max[cr - 1] ? co : max[cr - 1];
-              if (npre == pre) co++;
-              else {
-                max[cr - 1] = co > max[cr - 1] ? co : max[cr - 1];
-                freq.add(co);
-                co = 1;
-              }
-              // [SG] Checkstyle (kinda pedantic):
-              //  "Vor ++ befindet sich ein Leerzeichen"
-            } else cr ++;            
-          }
-          for (int i = 0; i < max.length; i++)
-          System.out.println(new String(key) + " max:" + max[i]);
-        }*/
-
-        lpre = 4;
-        lpos = 4;
-        
         // fulltext data is stored here, with pre1, pos1, ..., preu, posu
         final int pres = Num.size(vpre);
         final int poss = Num.size(vpos);
+//        int cn = 1;
         while(lpre < pres && lpos < poss) {
           // first write score value
-          
+//          while (cn < nodes.size() && nodes.get(cn) < Num.read(vpre, lpre)) cn++;
+//          if (cn < nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre) && nodes.get(cn) > Num.read(vpre, lpre) || 
+//              cn == nodes.size() && nodes.get(cn - 1) < Num.read(vpre, lpre)) {
+//            System.out.print("A,");
+//            cn++;
+////            ScoringTokenizer.score(nodes.size(), nmbdocwt[c], maxfreq[cn - 1], freq[fc++]);
+//          }
+//          System.out.print(Num.read(vpre, lpre) + ",");
+//          System.out.print(Num.read(vpos, lpos) + ",");
           for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
             outz.write(vpre[lpre++]);
           for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
             outz.write(vpos[lpos++]);
         }
-
+//        System.out.println();
         dr = outz.size();
         tr = (int) outy.size();
       }
@@ -173,4 +150,51 @@ public final class FTFuzzyBuilder extends FTBuilder {
     outy.close();
     outz.close();
   }
+  
+  @Override
+  final void getFreq() {
+    byte j = 1;
+    maxfreq = new int[nodes.size()];
+    IntList fre = new IntList();
+    nmbdocwt = new int[isize - 1];
+    for(int c = 0; j < tree.length && c < isize - 1; j++) {
+      final FTHash tre = tree[j];
+      if(tre == null) continue;
+      tre.init();
+      while(tre.more()) {
+        final int p = tre.next();
+        final byte[] vpre = tre.pre[p];
+        int lpre = 4;
+        final int size = Num.size(vpre);        
+        int cr = 1;
+        int co = 0;
+        int pre = Num.read(vpre, lpre);
+        int le = Num.len(vpre, lpre);
+        while(lpre < size) {
+          // find document root
+          while (cr < nodes.size() && pre > nodes.get(cr)) cr++;
+          while (cr == nodes.size() || pre < nodes.get(cr)) {              
+            co++;
+            lpre += le;
+            if (lpre >= size) break;
+            pre = Num.read(vpre, lpre);
+            le = Num.len(vpre, lpre);            
+          }
+          maxfreq[cr - 1] = co > maxfreq[cr - 1] ? co : maxfreq[cr - 1];
+          fre.add(co);
+          if (co > 0) nmbdocwt[c]++;
+          co = 0;
+          cr++;
+        }
+      }
+      c++;
+    }
+//    for (int i = 0; i < maxfreq.length; i++)
+//      System.out.println(" max:" + maxfreq[i]);
+//
+//    for (int i = 0; i < freq.size(); i++)
+//      System.out.print(freq.get(i) + ",");
+
+    freq = fre.finish();
+  }  
 }

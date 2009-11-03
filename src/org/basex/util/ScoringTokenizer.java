@@ -8,7 +8,7 @@ import org.basex.query.ft.FTOpt;
 
 /**
  * Full-text tokenizer with scoring support.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
@@ -61,6 +61,19 @@ public final class ScoringTokenizer extends Tokenizer{
   public void phrase() {
     phrase = true;
   }
+
+  /**
+   * Returns the score for the specified key.
+   * @param numdoc number of documents in the collection
+   * @param numdocterm number of documents containing the term
+   * @param max maximum occurrence a term
+   * @param f frequency of the term 
+   * @return score value
+   */
+  public static int score(final int numdoc, final int numdocterm, final int max, final int f) {
+    return Math.max(1, (int) (Math.log(numdoc / numdocterm) * f * 1000 / max));
+  }
+
   
   /**
    * Returns the score for the specified key.
