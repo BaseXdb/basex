@@ -177,7 +177,7 @@ public interface Text {
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "]?:" + NL +
+    LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "?]:" + NL +
       "  " + lang("ch_create3", NAM, PATH) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
@@ -186,7 +186,7 @@ public interface Text {
       "] ([mountpoint] [backingstore]): " + NL +
       "  " + lang("ch_create5", NAM, PATH) + NL +
       "  " + lang("ch_create6", "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "]?: " + NL +
+    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "?]: " + NL +
       "  " + lang("ch_create7")
   };
   /** Command help. */
@@ -284,17 +284,17 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    USER + " [" + NAME + "] [" + PW + "]?", lang("ch_alter1"), lang("ch_alter2")
+    USER + " [" + NAM + "] [" + PW + "?]", lang("ch_alter1"), lang("ch_alter2")
   };
 
   /** Command help. */
   String[] HELPG = { lang("ch_helpgeneral0") };
   /** Command help. */
   String[] HELPSET = {
-    "[option] [value]?",
+    "[option] [value?]",
     lang("ch_set1", "info"),
     lang("ch_set2", "option", "value") + NL +
-    LI + CmdSet.INFO + " [all]?" + COLS + lang("ch_set21") + NL +
+    LI + CmdSet.INFO + " [all?]" + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
     LI + CmdSet.XMLOUTPUT + COLS + lang("ch_set24") + NL +
@@ -307,11 +307,11 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPPASSWORD = {
-    "[" + PW + "]?", lang("ch_password1"), lang("ch_password2")
+    "[" + PW + "?]", lang("ch_password1"), lang("ch_password2")
   };
   /** Command help. */
   String[] HELPHELP = {
-    "[command]?", lang("ch_help1", NAME), lang("ch_help2", "command")
+    "[command?]", lang("ch_help1", NAME), lang("ch_help2", "command")
   };
   /** Command help. */
   String[] HELPEXIT = {
@@ -1015,12 +1015,16 @@ public interface Text {
   String SRVTITLE = lang("ds_servdia");
   /** Server. */
   String SERVERN = lang("ds_server");
+  /** Server. */
+  String LOCALSERVER = lang("ds_localserver");
   /** Users. */
   String USERS = lang("ds_users");
   /** Host. */
   String HOST = lang("ds_host");
   /** PORT. */
   String PORT = lang("ds_port");
+  /** Local. */
+  String LOCALPORT = lang("ds_localport");
   /** Create User. */
   String CREATEU = lang("ds_createu");
   /** Drop User. */
@@ -1034,11 +1038,9 @@ public interface Text {
   /** New password. */
   String NEWPW = lang("ds_newpw") + COLS;
   /** Invalid. */
-  String INVALID = lang("ds_invalid");
+  String INVALID = lang("ds_invalid") + DOT;
   /** Login. */
   String LOGIN = lang("ds_login");
-  /** Local. */
-  String LOCAL = lang("ds_local");
   /** Databases. */
   String DATABASES = lang("ds_databases");
   /** Sessions. */
@@ -1085,8 +1087,6 @@ public interface Text {
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */
-  String RENAMEINVALID = lang("dr_invalid");
-  /** Info for renaming a database. */
   String RENAMEEXISTS = lang("dr_exists");
   /** Info for overwriting  a database. */
   String RENAMEOVER = lang("dr_over");
@@ -1122,13 +1122,12 @@ public interface Text {
 
   /** Dialog title for inserting new data. */
   String INSERTTITLE = lang("dn_title");
-  /** Insert name. */
-  String INSERTNAME = lang("dn_name") + COL;
-  /** Insert value. */
-  String INSERTVALUE = lang("dn_value") + COL;
-
   /** Dialog title for updating document data. */
   String EDITTITLE = lang("de_title");
+  /** Insert name. */
+  String EDITNAME = lang("de_name");
+  /** Insert value. */
+  String EDITVALUE = lang("de_value");
   /** Dialog title for updating text. */
   String EDITTEXT = lang("de_text");
   /** Dialog title for updating text. */

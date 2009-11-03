@@ -122,7 +122,6 @@ dr_title=Đổi tên cơ sở dữ liệu
 dr_exists=Cơ sở dữ liệu đã có rồi.
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè.
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè.
-dr_invalid=Tên không hợp lệ.
 
 dd_title=Xóa bỏ cơ sở dữ liệu
 dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
@@ -141,10 +140,9 @@ dp_lang=Ngôn ngữ
 dp_restart=cần khởi động lại
 
 dn_title=Nhập dữ liệu mới
+de_title=Soạn thảo dữ liệu
 dn_name=Tên
 dn_value=Giá trị
-
-de_title=Soạn thảo dữ liệu
 de_text=Soạn thảo %
 de_kind1=Văn bản
 de_kind2=Element
@@ -284,9 +282,11 @@ c_xqsavett=Lưu tệp lệnh hỏi
 
 ds_servdia=Server Properties
 ds_server=Server
+ds_localserver=Local Server
 ds_users=User
 ds_host=Host
 ds_port=Port
+ds_localport=Local Port
 ds_createu=Create User
 ds_dropu=Drop User
 ds_perms=Permissions
@@ -295,7 +295,6 @@ ds_alterpw=Alter Password
 ds_newpw=New Password
 ds_invalid=% is invalid
 ds_login=Login
-ds_local=Local 
 ds_databases=Databases
 ds_sessions=Sessions
 

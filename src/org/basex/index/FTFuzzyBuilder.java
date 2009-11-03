@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Token;
@@ -113,8 +112,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
         int lpre = 4;
         int lpos = 4;
 
+        /* [SG] Eclipse warning: "dead code" -> due to "if(false)..."
         if (false) {
-          // documentnode based scoring
+          // document node based scoring
           int co = 1;
           final int size = Num.size(vpre);
           int npre = Num.read(vpre, lpre);
@@ -136,11 +136,13 @@ public final class FTFuzzyBuilder extends FTBuilder {
                 freq.add(co);
                 co = 1;
               }
+              // [SG] Checkstyle (kinda pedantic):
+              //  "Vor ++ befindet sich ein Leerzeichen"
             } else cr ++;            
           }
           for (int i = 0; i < max.length; i++)
           System.out.println(new String(key) + " max:" + max[i]);
-      }        
+        }*/
 
         lpre = 4;
         lpos = 4;

@@ -1,9 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -73,7 +76,7 @@ public final class DialogRename extends Dialog {
     String inf = ok ? "" : RENAMEEXISTS;
     if(ok) {
       ok = !nm.isEmpty() && IO.valid(nm);
-      if(!ok && !nm.isEmpty()) inf = RENAMEINVALID;
+      if(!ok && !nm.isEmpty()) inf = Main.info(INVALID, EDITNAME);
     }
     info.setText(inf);
     enableOK(buttons, BUTTONOK, ok);

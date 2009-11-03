@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -271,7 +273,7 @@ public final class DialogCreateFS extends Dialog {
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
-        inf = RENAMEINVALID;
+        inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
         warn = true;

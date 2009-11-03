@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import org.basex.core.Context;
 import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
@@ -132,17 +134,26 @@ public final class BaseXServer extends Main implements Runnable {
       } else {
         success = false;
         if(arg.string().equals("stop")) {
-          try {
-            STOP.write(Token.EMPTY);
-            new Socket("localhost", context.prop.num(Prop.SERVERPORT));
-            outln(SERVERSTOPPED);
-          } catch(final IOException ex) {
-            error(ex, true);
-          }
+          stop(context);
           return;
         }
       }
     }
     if(!success) outln(SERVERINFO);
+  }
+  
+  /**
+   * Stops the server.
+   * @param ctx context reference
+   */
+  public static void stop(final Context ctx) {
+    try {
+      STOP.write(Token.EMPTY);
+      new Socket("localhost", ctx.prop.num(Prop.SERVERPORT));
+      outln(SERVERSTOPPED);
+    } catch(final IOException ex) {
+      error(ex, true);
+    }
+    return;
   }
 }

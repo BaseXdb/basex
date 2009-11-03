@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
+
+import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -60,9 +62,9 @@ public final class DialogInsert extends Dialog {
   public DialogInsert(final GUI main) {
     super(main, INSERTTITLE);
 
-    label1 = new BaseXLabel(INSERTNAME, true, true);
+    label1 = new BaseXLabel(EDITNAME + COLS, true, true);
     label1.setBorder(0, 0, 0, 0);
-    label2 = new BaseXLabel(INSERTVALUE, true, true);
+    label2 = new BaseXLabel(EDITVALUE + COLS, true, true);
     label2.setBorder(0, 0, 0, 0);
 
     input1 = new BaseXTextField(this);
@@ -148,7 +150,7 @@ public final class DialogInsert extends Dialog {
     ok = kind != Data.TEXT || input2.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && input1.getText().length() != 0) msg = "Invalid name";
+      if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
     }
     info.setError(msg, true);
     enableOK(buttons, BUTTONOK, ok);

@@ -128,7 +128,7 @@ public final class DialogEdit extends Dialog {
     ok = kind != Data.TEXT || input3.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && input1.getText().length() != 0) msg = "Invalid name";
+      if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
     }
     info.setError(msg, true);
     enableOK(buttons, BUTTONOK, ok);

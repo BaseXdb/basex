@@ -122,9 +122,7 @@ dfs_meta=Includi i metadata
 dr_title=Rinomina Database
 dr_exists=Il Database esiste già.
 dr_over=Il vecchio Database verrà sovrascritto.
-# ADDED
 dr_overbacking=Old database and backing store will be overwritten.
-dr_invalid=Nome non valido.
 
 dd_title=Cancella Database
 dd_question=Il Database '%' verrà cancellato.\nSei sicuro?
@@ -144,10 +142,9 @@ dp_lang=Lingua
 dp_restart=Richiede un riavvio
 
 dn_title=Inserisci nuovi dati
-dn_name=Nome
-dn_value=Valore
-
 de_title=Modifica dati
+de_name=Nome
+de_value=Valore
 de_text=Modifica %
 de_kind1=Documento
 de_kind2=Elemento
@@ -288,18 +285,19 @@ c_xqsavett=Salva la file XQuery
 
 ds_servdia=Server Properties
 ds_server=Server
+ds_localserver=Local Server
 ds_users=User
 ds_host=Host
 ds_port=Port
+ds_localport=Local Port
 ds_createu=Create User
 ds_dropu=Drop User
 ds_perms=Permissions
 ds_drquestion=User '%' will be dropped.\nAre you sure?
 ds_alterpw=Alter Password
 ds_newpw=New Password
-ds_invalid=% is invalid
+ds_invalid=% non valido
 ds_login=Login
-ds_local=Local 
 ds_databases=Databases
 ds_sessions=Sessions
 

@@ -123,7 +123,6 @@ dr_title=Rename Database
 dr_exists=Database exists already.
 dr_over=Old database will be overwritten.
 dr_overbacking=Old database and backing store will be overwritten.
-dr_invalid=Invalid name.
 
 dd_title=Drop Database
 dd_question=Database '%' will be dropped.\nAre you sure?
@@ -142,10 +141,9 @@ dp_lang=Language
 dp_restart=requires a restart
 
 dn_title=Insert new data
-dn_name=Name
-dn_value=Value
-
 de_title=Edit data
+de_name=Name
+de_value=Value
 de_text=Edit %
 de_kind1=Document
 de_kind2=Element
@@ -285,9 +283,11 @@ c_xqsavett=Saves the XQuery file
 
 ds_servdia=Server Properties
 ds_server=Server
+ds_localserver=Local Server
 ds_users=User
 ds_host=Host
 ds_port=Port
+ds_localport=Local Port
 ds_createu=Create User
 ds_dropu=Drop User
 ds_perms=Permissions
@@ -296,7 +296,6 @@ ds_alterpw=Alter Password
 ds_newpw=New Password
 ds_invalid=% is invalid
 ds_login=Login 
-ds_local=Local 
 ds_databases=Databases
 ds_sessions=Sessions
 
@@ -510,7 +509,7 @@ ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
-ch_show24=shows database users.
+ch_show24=shows registered users.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions to a user.
 ch_revoke1=Revoke user permissions.

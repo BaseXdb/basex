@@ -1,11 +1,14 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
@@ -251,7 +254,7 @@ public final class DialogCreate extends Dialog {
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
-        inf = RENAMEINVALID;
+        inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
         warn = true;

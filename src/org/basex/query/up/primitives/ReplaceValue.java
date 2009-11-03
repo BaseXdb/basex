@@ -33,13 +33,14 @@ public final class ReplaceValue extends NewValue {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
-    if(k == Data.ATTR) 
+    if(k == Data.ATTR) {
       d.update(n.pre, d.attName(n.pre), name);
-    else if(k == Data.PI) {
+    } else if(k == Data.PI) {
       final byte[] nm = n.nname();
       d.update(n.pre, concat(nm, SPACE, name));
+    } else {
+      d.update(n.pre, name);
     }
-    else d.update(n.pre, name);
     // [LK] add delete if replace with empty string ?
   }
   

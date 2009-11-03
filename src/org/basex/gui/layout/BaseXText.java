@@ -47,7 +47,7 @@ public class BaseXText extends BaseXPanel {
   protected final BaseXTextRenderer rend;
   /** Search field. */
   protected BaseXTextField find;
-  /** Undo history. */
+  /** Undo history; if set to <code>null</code>, text is read-only. */
   protected Undo undo;
 
   /** Scrollbar reference. */
@@ -359,14 +359,16 @@ public class BaseXText extends BaseXPanel {
         return;
       }
 
-      if(c == 'X') {
-        cut();
-      } else if(c == 'V') {
-        paste();
-      } else if(c == 'Z') {
-        undo();
-      } else if(c == 'Y') {
-        redo();
+      if(undo != null) {
+        if(c == 'X') {
+          cut();
+        } else if(c == 'V') {
+          paste();
+        } else if(c == 'Z') {
+          undo();
+        } else if(c == 'Y') {
+          redo();
+        }
       }
     }
 

@@ -50,12 +50,11 @@ abstract class AQuery extends Process {
    * @return query instance
    */
   protected final boolean query(final String query) {
-    per = new Performance();
-    
     final int runs = prop.num(Prop.RUNS);
     String err = null;
     try {
       for(int i = 0; i < runs; i++) {
+        per = new Performance();
         qp = new QueryProcessor(query, context);
         progress(qp);
 

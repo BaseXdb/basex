@@ -116,11 +116,10 @@ public final class DialogServer extends Dialog {
 
     // Local server panel.
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(2, 2, 0, 2));
+    p1.setLayout(new TableLayout(2, 2, 8, 2));
     p1.setBorder(8, 0, 8, 0);
     p1.add(new BaseXLabel(PORT + COLS));
     p1.add(ports);
-
     final BaseXBack p11 = new BaseXBack();
     p11.setLayout(new TableLayout(1, 2, 2, 2));
     p11.add(start);
@@ -130,7 +129,7 @@ public final class DialogServer extends Dialog {
 
     // Login panel.
     final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(5, 2, 2, 2));
+    p2.setLayout(new TableLayout(5, 2, 8, 2));
     p2.add(new BaseXLabel(SERVERUSER + COLS));
     p2.add(loguser);
     p2.add(new BaseXLabel(SERVERPW + COLS));
@@ -146,7 +145,7 @@ public final class DialogServer extends Dialog {
     p21.add(disconnect);
     p2.add(p21);
 
-    conn.add(new BaseXLabel(LOCAL + SERVERN + COLS, false, true));
+    conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
     conn.add(p1);
     conn.add(new BaseXLabel(LOGIN + COLS, false, true));
     conn.add(p2);
@@ -193,7 +192,7 @@ public final class DialogServer extends Dialog {
             "-p", String.valueOf(p)}).start();
         running = ping(true);
       } else if(BUTTONSTOSERV.equals(cmd)) {
-        new BaseXServer("stop");
+        BaseXServer.stop(gui.context);
         running = ping(true);
         connected = connected && ping(false);
       } else if(BUTTONCONNECT.equals(cmd)) {
@@ -233,7 +232,7 @@ public final class DialogServer extends Dialog {
     if(msg != null) {
       warn = false;
     } else if(!(valpl && valh && valp && vallu && vallp)) {
-      msg = Main.info(INVALID, !valpl ? LOCAL + PORT : !valh ? HOST :
+      msg = Main.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
         !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
     }
     info.setError(msg, warn);
