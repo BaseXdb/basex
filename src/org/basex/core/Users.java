@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.Crypter;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 
@@ -39,7 +38,7 @@ public final class Users {
           in.close();
         } else {
           // create initial admin user with all rights
-          users.add(new User(ADMIN, Crypter.encrypt(token(md5(ADMIN))),
+          users.add(new User(ADMIN, token(md5(ADMIN)),
               User.READ | User.WRITE | User.CREATE | User.ADMIN));
           write();
         }
@@ -76,7 +75,7 @@ public final class Users {
     // check if user exists already
     if(get(usern) != null) return false;
 
-    final User user = new User(usern, Crypter.encrypt(token(md5(pass))), PERM);
+    final User user = new User(usern, token(md5(pass)), PERM);
     users.add(user);
     write();
     return true;
@@ -93,7 +92,7 @@ public final class Users {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.pw = Crypter.encrypt(token(md5(pass)));
+    user.pw = token(md5(pass));
     write();
     return true;
   }
@@ -119,7 +118,7 @@ public final class Users {
    */
   public User get(final String usern, final String pw) {
     final User u = get(usern);
-    return u != null && eq(Crypter.encrypt(token(pw)), u.pw) ? u : null;
+    return u != null && eq(token(pw), u.pw) ? u : null;
   }
 
   /**
