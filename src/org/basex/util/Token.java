@@ -962,16 +962,20 @@ public final class Token {
    * @return String 
    */
   public static String md5(final String pw) {
-    final StringBuilder hex = new StringBuilder();
+    final TokenBuilder hex = new TokenBuilder();
     try {
       final MessageDigest digest = MessageDigest.getInstance("MD5");
       digest.update(Token.token(pw));
-      for(final byte h : digest.digest()) {
-        hex.append(Integer.toHexString(h & 0xFF));
+      for(final byte b : digest.digest()) {
+        final int l = b & 0x0F;
+        final int h = b >> 4 & 0x0F;
+        hex.add((byte) (h + (h > 9 ? 0x57 : 0x30)));
+        hex.add((byte) (l + (l > 9 ? 0x57 : 0x30)));
       }
     } catch(final Exception ex) {
       Main.notexpected(ex);
     }
+    System.out.println(hex);
     return hex.toString();
   }
 

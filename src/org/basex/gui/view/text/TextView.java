@@ -15,7 +15,6 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
@@ -37,8 +36,6 @@ public final class TextView extends View {
   private final BaseXLabel header;
   /** Find text field. */
   private final BaseXTextField find;
-  /** Painted flag. */
-  private boolean refreshed;
 
   /**
    * Default constructor.
@@ -73,6 +70,7 @@ public final class TextView extends View {
     add(back, BorderLayout.NORTH);
 
     area = new BaseXText(false, gui);
+    area.setSyntax(new XMLSyntax());
     area.addSearch(find);
     add(area, BorderLayout.CENTER);
 
@@ -81,7 +79,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshInit() {
-    refreshText(gui.context.current());
+    setText(gui.context.current());
   }
 
   @Override
@@ -90,34 +88,12 @@ public final class TextView extends View {
 
   @Override
   public void refreshMark() {
-    // skip refresh if text has already been updated
-    if(refreshed) refreshed = false;
-    else refreshText(gui.context.marked());
+    setText(gui.context.marked());
   }
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    refreshText(gui.context.current());
-  }
-
-  /**
-   * Refreshes the text view.
-   * @param nodes nodes to display
-   */
-  private void refreshText(final Nodes nodes) {
-    if(!visible()) return;
-
-    try {
-      final CachedOutput out = new CachedOutput(
-          gui.context.prop.num(Prop.MAXTEXT));
-      if(nodes != null) {
-        nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
-      }
-      setText(out);
-      refreshed = false;
-    } catch(final IOException ex) {
-      Main.debug(ex);
-    }
+    setText(gui.context.current());
   }
 
   @Override
@@ -138,27 +114,38 @@ public final class TextView extends View {
   }
 
   /**
-   * Sets the output text.
-   * @param out output cache
+   * Serializes the specified nodes.
+   * @param nodes nodes to display
    */
-  public void setText(final CachedOutput out) {
-    area.setSyntax(new XMLSyntax());
-
-    final byte[] buf = out.buffer();
-    String head = TEXTTIT;
-    if(out.finished()) head += RESULTCHOP;
-    area.setText(buf, out.size());
-    header.setText(head);
-    refreshed = true;
+  private void setText(final Nodes nodes) {
+    if(!visible()) return;
+    try {
+      final CachedOutput out = new CachedOutput(
+          gui.context.prop.num(Prop.MAXTEXT));
+      if(nodes != null) {
+        nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
+      }
+      setText(out);
+    } catch(final IOException ex) {
+      Main.debug(ex);
+    }
   }
 
   /**
    * Sets the output text.
+   * @param out output cache
+   */
+  public void setText(final CachedOutput out) {
+    area.setText(out.buffer(), out.size());
+    header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
+  }
+
+  /**
+   * Sets the output as simple sting.
    * @param txt text
    */
   public void setText(final byte[] txt) {
-    area.setSyntax(BaseXSyntax.SIMPLE);
-    area.setText(txt, txt.length);
+    area.setText(txt);
   }
 
   /**

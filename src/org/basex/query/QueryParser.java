@@ -690,10 +690,7 @@ public class QueryParser extends InputParser {
 
     if(!consumeWS2(COMMA)) return e;
     Expr[] list = { e };
-    do {
-      final Expr ex = single();
-      if(!ex.e()) list = add(list, ex);
-    } while(consumeWS2(COMMA));
+    do list = add(list, single()); while(consumeWS2(COMMA));
     return list.length == 1 ? e : new List(list);
   }
 

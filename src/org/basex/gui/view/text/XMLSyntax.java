@@ -36,11 +36,11 @@ public final class XMLSyntax extends BaseXSyntax {
         return GUIConstants.COLORERROR;
       }
       if(ch == '>') tag = false;
-      return GUIConstants.COLORS[16];
+      return GUIConstants.COLORS[12];
     }
     if(ch == '<') {
       tag = true;
-      return GUIConstants.COLORS[16];
+      return GUIConstants.COLORS[12];
     }
     return Color.black;
   }
