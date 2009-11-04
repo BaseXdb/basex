@@ -303,7 +303,7 @@ public final class InexSubmit {
 
     xml = new XMLSerializer(sub, false, true);
     xml.doctype(token("efficiency-submission"),
-        token("\"efficiency-submission.dtd\""), null);
+        token("efficiency-submission.dtd"), null);
 
     // print header in output file
     xml.openElement(token("efficiency-submission"),

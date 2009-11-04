@@ -54,6 +54,34 @@ public final class XMLSerializer extends Serializer {
     }
   }
 
+  /**
+   * Doctype declaration.
+   * @param t document root element tag
+   * @param te external subset
+   * @param ti internal subset
+   * @throws IOException IOException
+   */
+  public void doctype(final byte[] t, final byte[] te,
+      final byte[] ti) throws IOException {
+    out.print(DOCTYPE);
+    out.print(' ');
+    out.print(t);
+    if(te != null) {
+      out.print(' ');
+      out.print(SYSTEM);
+      out.print(' ');
+      out.print(te);
+    }
+    if(ti != null) {
+      out.print(' ');
+      out.print('"');
+      out.print(ti);
+      out.print('"');
+    }
+    out.print(ELEM2);
+    out.println();
+  }
+
   @Override
   public void cls() throws IOException {
     if(xml) closeElement();
@@ -199,32 +227,6 @@ public final class XMLSerializer extends Serializer {
     out.print(t);
     out.print(ELEM2);
     indent = pretty;
-  }
-
-  /**
-   * Doctype declaration.
-   * @param t document root element tag
-   * @param te external subset
-   * @param ti internal subset
-   * @throws IOException IOException
-   */
-  public void doctype(final byte[] t, final byte[] te,
-      final byte[] ti) throws IOException {
-    out.print(DT);
-    out.print(' ');
-    out.print(t);
-    if(te != null) {
-      out.print(' ');
-      out.print(SYS);
-      out.print(' ');
-      out.print(te);
-    }
-    if(ti != null) {
-      out.print(' ');
-      out.print(ti);
-    }
-    out.print(ELEM2);
-    out.println();
   }
 
   /**

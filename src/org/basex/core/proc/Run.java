@@ -2,9 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
@@ -26,17 +24,11 @@ public final class Run extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean exec(final PrintOutput out) throws IOException {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
     Prop.xquery = io;
-
-    try {
-      return query(Token.string(io.content())) && out(out);
-    } catch(final IOException ex) {
-      Main.debug(ex);
-      return error(ex.getMessage());
-    }
+    return query(Token.string(io.content()), out);
   }
 
   @Override

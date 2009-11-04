@@ -50,6 +50,7 @@ public final class QueryTest {
   private QueryTest() {
     final Performance p = new Performance();
     final Prop prop = context.prop;
+    prop.set(Prop.CACHEQUERY, true);
     boolean ok = true;
 
     if(ALL) {

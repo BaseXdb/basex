@@ -22,7 +22,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 abstract class AbstractTest {
-  /** Dummy data reference. */
+  /** Dummy data reference to suppress exception. */
   private static final Data DATA = new MemData(1, new Names(), new Names(),
       new Namespaces(), new PathSummary(), new Prop());
   /** Document. */

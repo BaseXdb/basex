@@ -118,7 +118,8 @@ public final class Users {
    */
   public User get(final String usern, final String pw) {
     final User u = get(usern);
-    return u != null && eq(token(pw), u.pw) ? u : null;
+    return u != null && (eq(token(pw), u.pw) || eq(token(md5(pw)), u.pw)) ?
+        u : null;
   }
 
   /**

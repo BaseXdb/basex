@@ -1,7 +1,7 @@
 package org.basex.core.proc;
 
-import org.basex.core.Main;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 
@@ -22,18 +22,14 @@ public final class Cs extends AQuery {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    final Nodes nodes = query(args[0], null);
-    if(nodes == null) return false;
-
-    if(nodes.size() != 0) {
-      context.current(nodes);
-      result = nodes;
-    }
+    queryNodes();
+    if(result == null) return false;
+    if(result.size() != 0) context.current((Nodes) result);
     return true;
   }
 
   @Override
   public String toString() {
-    return Main.name(this).toUpperCase() + ' ' + args[0];
+    return Cmd.CS + " " + args[0];
   }
 }

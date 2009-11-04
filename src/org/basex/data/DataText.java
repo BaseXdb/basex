@@ -167,9 +167,9 @@ public interface DataText {
   /** Count attribute. */
   byte[] COUNT = token("count");
   /** Doctype output. */
-  byte[] DT = token("<!DOCTYPE");
+  byte[] DOCTYPE = token("<!DOCTYPE");
   /** Doctype system keyword. */
-  byte[] SYS = token("SYSTEM");
+  byte[] SYSTEM = token("SYSTEM");
   /** Comment output. */
   byte[] COM1 = token("<!--");
   /** Comment output. */

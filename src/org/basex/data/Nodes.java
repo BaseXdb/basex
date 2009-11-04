@@ -89,16 +89,6 @@ public final class Nodes implements Result {
     set(n);
   }
 
-  /**
-   * Sets the specified nodes.
-   * @param n values
-   */
-  public void set(final int[] n) {
-    nodes = n;
-    size = n.length;
-    sorted = null;
-  }
-
   public int size() {
     return size;
   }
@@ -132,24 +122,6 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Creates a sorted node array. If the original array is already sorted,
-   * the same reference is used.
-   */
-  public void sort() {
-    if(sorted != null) return;
-    int i = Integer.MIN_VALUE;
-    for(final int n : nodes) {
-      if(i > n) {
-        sorted = Arrays.copyOf(nodes, size);
-        Arrays.sort(sorted);
-        return;
-      }
-      i = n;
-    }
-    sorted = nodes;
-  }
-
-  /**
    * Adds or removes the specified pre node.
    * @param p pre value
    */
@@ -159,7 +131,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Mergees the specified array with the existing pre nodes.
+   * Merges the specified array with the existing pre nodes.
    * @param p pre value
    */
   public void union(final int[] p) {
@@ -206,6 +178,34 @@ public final class Nodes implements Result {
     }
     while(a != al) c.add(ai[a++]);
     return c.finish();
+  }
+
+  /**
+   * Sets the specified nodes.
+   * @param n values
+   */
+  private void set(final int[] n) {
+    nodes = n;
+    size = n.length;
+    sorted = null;
+  }
+
+  /**
+   * Creates a sorted node array. If the original array is already sorted,
+   * the same reference is used.
+   */
+  private void sort() {
+    if(sorted != null) return;
+    int i = Integer.MIN_VALUE;
+    for(final int n : nodes) {
+      if(i > n) {
+        sorted = Arrays.copyOf(nodes, size);
+        Arrays.sort(sorted);
+        return;
+      }
+      i = n;
+    }
+    sorted = nodes;
   }
 
   public void serialize(final Serializer ser) throws IOException {

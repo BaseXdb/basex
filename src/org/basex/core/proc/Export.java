@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.User;
-import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
@@ -29,7 +28,7 @@ public final class Export extends Process {
    * @param path export path
    */
   public Export(final String path) {
-    super(DATAREF | User.READ, path);
+    super(DATAREF | User.READ | User.WRITE, path);
   }
 
   @Override
@@ -54,10 +53,5 @@ public final class Export extends Process {
       Main.debug(ex);
       return error(ex.getMessage());
     }
-  }
-
-  @Override
-  public String toString() {
-    return Cmd.EXPORT + args();
   }
 }

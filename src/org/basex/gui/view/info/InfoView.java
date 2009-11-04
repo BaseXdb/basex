@@ -162,7 +162,7 @@ public final class InfoView extends View {
     evaluate = eval;
     plan = pln;
 
-    final int runs = gui.context.prop.num(Prop.RUNS);
+    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(sl.size() != 0) {
       add(tb, QUERYQU, query);
       add(tb, QUERYCOMP, compile);
@@ -191,7 +191,7 @@ public final class InfoView extends View {
   private void add(final TokenBuilder tb, final String head,
       final StringList list) {
 
-    final int runs = gui.context.prop.num(Prop.RUNS);
+    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(list.size() == 0) return;
     tb.high().add(head).norm().nl();
     final int is = list.size();
@@ -228,7 +228,7 @@ public final class InfoView extends View {
       }
     }
 
-    final int runs = gui.context.prop.num(Prop.RUNS);
+    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     final int f = focus == -1 ? l - 1 : focus;
     timer.setText(strings.get(f) + ": " +
         Performance.getTimer(stat.get(f) * 10000L * runs, runs));

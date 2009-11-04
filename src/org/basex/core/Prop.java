@@ -87,8 +87,10 @@ public final class Prop extends AProp {
   /** Creates the query plan before or after compilation. */
   public static final Object[] COMPPLAN = { "COMPPLAN", true };
 
-  /** Format XQuery output. */
+  /** Formats the query output. */
   public static final Object[] XQFORMAT = { "XQFORMAT", true };
+  /** Caches the query results. */
+  public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };

@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.build.mediovis.MAB2;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -13,6 +12,7 @@ import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -47,16 +47,18 @@ public final class XQueryMV extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean exec(final PrintOutput out) throws IOException {
     // cache verbose flag
     maxh = Token.toInt(args[0]);
     maxs = Token.toInt(args[1]);
     final String query = "(" + args[2] + ")[position() <= " + maxh * maxs + "]";
     long fini = 0;
 
-    final int runs = prop.num(Prop.RUNS);
+    final int runs = Math.max(1, prop.num(Prop.RUNS));
     try {
       for(int i = 0; i < runs; i++) {
+        final Performance per = new Performance();
+
         qp = new QueryProcessor(query, context);
         progress(qp);
 
@@ -98,16 +100,15 @@ public final class XQueryMV extends AQuery {
         }
         maxhits = ids.size();
         fini += per.getTime();
-      }
-      execInfo();
-      info(QUERYFINISH + Performance.getTimer(fini, runs));
 
-      for(int i = 0; i < runs; i++) {
         show(i == 0 && prop.is(Prop.SERIALIZE) ? out : new NullOutput());
+        qp.close();
       }
-      outInfo(out, maxhits);
+
+      evalInfo(out, maxhits, runs);
+      info(QUERYFINISH + Performance.getTimer(fini, runs));
       return true;
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       Main.debug(ex);
       return error(ex.getMessage());
     }

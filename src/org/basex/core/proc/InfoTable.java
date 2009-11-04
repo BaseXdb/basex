@@ -34,7 +34,7 @@ public final class InfoTable extends AInfo {
   protected boolean exec(final PrintOutput out) throws IOException {
     // evaluate input as number range or xquery
     if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
-      result = query(args[0], null);
+      queryNodes();
       if(result == null) return false;
     }
 

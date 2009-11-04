@@ -30,8 +30,7 @@ public final class Find extends AQuery {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    final String query = args[0] == null ? "" : args[0];
-    return query(find(query, context, false));
+    return query(find(args[0], context, false), out);
   }
 
   /**

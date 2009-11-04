@@ -1,7 +1,5 @@
 package org.basex.core.proc;
 
-import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.PrintOutput;
@@ -22,8 +20,8 @@ public final class XQuery extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
-    return query(args[0]) && out(out);
+  protected boolean exec(final PrintOutput out) {
+    return query(args[0], out);
   }
 
   @Override
