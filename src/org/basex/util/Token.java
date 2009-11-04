@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import org.basex.core.Main;
 
@@ -953,6 +955,29 @@ public final class Token {
   public static byte[] pref(final byte[] name) {
     final int i = indexOf(name, ':');
     return i == -1 ? EMPTY : substring(name, 0, i);
+  }
+  
+  /**
+   * Returns a md5 hash.
+   * @param pw String
+   * @return String 
+   */
+  public static String md5(final String pw) {
+    MessageDigest digest;
+    byte[] hash = null;
+    StringBuffer hexString = null;
+    try {
+      digest = MessageDigest.getInstance("MD5");
+      digest.update(Token.token(pw));
+      hash = digest.digest();
+      hexString = new StringBuffer();
+      for (int i = 0; i < hash.length; i++) {
+        hexString.append(Integer.toHexString(0xFF & hash[i]));
+      }
+    } catch(NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+    return hexString.toString();
   }
 
   /**

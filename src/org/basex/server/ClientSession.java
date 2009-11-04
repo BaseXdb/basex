@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
 import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -13,6 +14,7 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
+import org.basex.util.Token;
 
 /**
  * This wrapper sends commands to the server instance over a socket
@@ -74,8 +76,8 @@ public final class ClientSession extends Session {
     out = new DataOutputStream(socket.getOutputStream());
 
     // send user name and password
-    out.writeUTF(user);
-    out.writeUTF(pw);
+    out.writeUTF(user);    
+    out.writeUTF(Token.md5(pw));
     if(in.read() != 0) throw new LoginException();
   }
 

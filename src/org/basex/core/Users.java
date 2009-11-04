@@ -39,7 +39,8 @@ public final class Users {
           in.close();
         } else {
           // create initial admin user with all rights
-          users.add(new User(ADMIN, Crypter.encrypt(Token.token(ADMIN)),
+          users.add(new User(ADMIN, Crypter.encrypt(Token.
+              token(Token.md5(ADMIN))),
               User.READ | User.WRITE | User.CREATE | User.ADMIN));
           write();
         }
@@ -76,7 +77,8 @@ public final class Users {
     // check if user exists already
     if(get(usern) != null) return false;
 
-    final User user = new User(usern, Crypter.encrypt(Token.token(pass)), PERM);
+    final User user = new User(usern, Crypter.encrypt(Token.
+        token(Token.md5(pass))), PERM);
     users.add(user);
     write();
     return true;
@@ -93,7 +95,7 @@ public final class Users {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.pw = Crypter.encrypt(Token.token(pass));
+    user.pw = Crypter.encrypt(Token.token(Token.md5(pass)));
     write();
     return true;
   }
