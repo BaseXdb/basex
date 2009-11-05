@@ -13,46 +13,67 @@ public final class LibraryLoader {
   public static final String SPOTEXLIBNAME = "deepfs_spotex";
   /** Name of joint storage library. */
   public static final String JSDBFSLIBNAME = "deepfs_jsdbfs";
+  /** Name of FUSE java bindings library. */
+  public static final String JFUSELIBNAME = "jfuse";
+  /** Name of DeepFUSE library. */
+  public static final String DEEPFUSELIBNAME = "deepfuse";
 
   /** Spotlight library presence flag. */
   private static boolean spotexLoaded;
   /** Joint storage library presence flag. */
   private static boolean jsdbfsLoaded;
+  /** jFUSE bindings presence flag. */
+  private static boolean jfuseLoaded;
+  /** DeepFUSE presence flag. */
+  private static boolean deepfuseLoaded;
 
   /**
    * Loads a native library from java.library.path.
    * @param libName name of the library to be loaded.
+   * @return true on success
    */
-  private static void loadLibrary(final String libName) {
+  private static boolean loadLibrary(final String libName) {
     try {
       System.loadLibrary(libName);
-      Main.debug("Loading library ... OK (" + libName + ").");
+      Main.debug("Loading library (" + libName + ") ... OK.");
 
       if(libName.equals(SPOTEXLIBNAME)) {
         spotexLoaded = true;
-        return;
+        return true;
       }
       if(libName.equals(JSDBFSLIBNAME)) {
         jsdbfsLoaded = true;
-        return;
+        return true;
       }
-
+      if(libName.equals(JFUSELIBNAME)) {
+        jfuseLoaded = true;
+        return true;
+      }
+      if(libName.equals(DEEPFUSELIBNAME)) {
+        deepfuseLoaded = true;
+        return true;
+      }
+      return false;
     } catch(final UnsatisfiedLinkError ex) {
-      Main.errln("Loading library failed (" + libName + ")." + ex);
-      Main.errln("-Djava.library.path is : '"
-          + System.getProperty("java.library.path") + "'");
+//      Main.debug("Loading library (" + libName + ") ... FAILED.\n" + ex);
+//      Main.debug("-Djava.library.path is : '"
+//          + System.getProperty("java.library.path") + "'");
+      return false;
     }
   }
 
   /**
    * Loads native library if not already present.
    * @param libName name of the library to be loaded.
+   * @return true on success 
    */
-  public static void load(final String libName) {
-    if(libName.equals(SPOTEXLIBNAME) && spotexLoaded) return;
-    if(libName.equals(JSDBFSLIBNAME) && jsdbfsLoaded) return;
+  public static boolean load(final String libName) {
+    if(libName.equals(SPOTEXLIBNAME) && spotexLoaded) return true;
+    if(libName.equals(JSDBFSLIBNAME) && jsdbfsLoaded) return true;
+    if(libName.equals(JFUSELIBNAME) && jfuseLoaded) return true;
+    if(libName.equals(JFUSELIBNAME) && deepfuseLoaded) return true;
 
-    loadLibrary(libName);
+    return loadLibrary(libName);
   }
 
   /**
@@ -62,8 +83,10 @@ public final class LibraryLoader {
    */
   public static boolean isLoaded(final String libName) {
     if(libName.equals(SPOTEXLIBNAME)) return spotexLoaded;
-    else if(libName.equals(JSDBFSLIBNAME)) return jsdbfsLoaded;
-    else return false;
+    if(libName.equals(JSDBFSLIBNAME)) return jsdbfsLoaded;
+    if(libName.equals(JFUSELIBNAME)) return jfuseLoaded;
+    if(libName.equals(DEEPFUSELIBNAME)) return deepfuseLoaded;
+    return false;
   }
 
   /** Default constructor disabled. */

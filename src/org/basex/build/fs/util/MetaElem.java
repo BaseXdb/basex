@@ -128,7 +128,7 @@ public enum MetaElem {
   /** Default XML data type. */
   private final Type dt;
   /** More precise data type. */
-  private Type pdt = null;
+  private Type pdt;
   /** content container element. */
   private final TreeMap<MetaElem, byte[]> c;
 

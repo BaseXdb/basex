@@ -47,10 +47,10 @@ import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
+import org.basex.util.LibraryLoader;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Token;
-import org.deepfs.jfuse.JFUSEAdapter;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
@@ -777,7 +777,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disable mount button, if native library is not available.
-      BaseXLayout.enable(button, JFUSEAdapter.loadJFUSELibrary());
+      BaseXLayout.enable(button,
+          LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
   },
  

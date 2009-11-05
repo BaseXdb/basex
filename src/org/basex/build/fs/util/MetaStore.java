@@ -56,22 +56,22 @@ public class MetaStore {
 
   /**
    * Add a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
+   * @param e metadata element (the key).
    * @param value value as byte array. Must contain only correct UTF-8 values!
    * @param dataType the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used.
    */
-  private void add(final MetaElem elem, final byte[] value, final Type dataType) {
-    if(elem.equals(MetaElem.TYPE) | elem.equals(MetaElem.FORMAT)) {
+  private void add(final MetaElem e, final byte[] value, final Type dataType) {
+    if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
       Main.bug(
           "The metadata attributes " + MetaElem.TYPE + " and "
           + MetaElem.FORMAT
           + " must not be set by an addMetaElem() method." +
           " Use setMetaType() and setFormat() instead.");
     }
-    if(dataType != null) elem.refineDataType(dataType);
-    else elem.reset();
-    metaElements.put(elem, value);
+    if(dataType != null) e.refineDataType(dataType);
+    else e.reset();
+    metaElements.put(e, value);
   }
 
   /**

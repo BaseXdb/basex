@@ -133,7 +133,7 @@ public final class SpotlightExtractor {
         if(check(o, String.class)) meta.add(MetaElem.ALBUM, (String) o);
       }
     },
-        /** Track number of a song or composition when it is part of an album. */
+        /** Track number of a song or composition when it's part of an album. */
     AudioTrackNumber {
       @Override
       public void parse(final MetaStore meta, final Object o) {
@@ -474,13 +474,13 @@ public final class SpotlightExtractor {
 
     /**
      * Converts the object to a Duration and adds it to the metadata store.
-     * @param meta the metadata store for the current file.
-     * @param elem the corresponding metadata element for this object.
+     * @param ms the metadata store for the current file.
+     * @param e the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseDuration(final MetaStore meta, final MetaElem elem, final Object o) {
+    void parseDuration(final MetaStore ms, final MetaElem e, final Object o) {
       final Long value = long0(o);
-      if(value != null) meta.add(elem,
+      if(value != null) ms.add(e,
           ParserUtil.convertMsDuration((int) (value * 1000)));
     }
 

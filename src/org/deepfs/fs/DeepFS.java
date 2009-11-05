@@ -367,7 +367,7 @@ public final class DeepFS implements DataText {
    * Refreshes the data reference and GUI.
    */
   private void refresh() {
-    // [AH] gui reference temporarily removed..
+    // gui reference temporarily removed..
     // if(gui != null) gui.notify.update();
     // data.flush();
   }

@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.File;
+
 import org.basex.io.IO;
 
 /**
@@ -159,7 +160,7 @@ public final class Prop extends AProp {
 
   /** FSParser implementation. If true, the new implementation is used. */
   public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
-  /** Fuse support. */
+  /** Fuse support. [AH] check this flag. */
   public static final Object[] FUSE = { "FUSE", false };
   /** Flag for creating a native (joint) database. */
   public static final Object[] NATIVEDATA = { "NATIVEDATA", false };
@@ -225,21 +226,5 @@ public final class Prop extends AProp {
     Prop.language = get(Prop.LANGUAGE);
     Prop.langkeys = is(Prop.LANGKEYS);
     Prop.debug = is(Prop.DEBUG);
-
-    /* [AH] JFUSE property could be set here
-    Prop.... =
-    try {
-      Class<?> cls = Class.forName("org.deepfs.jfuse.JFUSEAdapter");
-      cls.getMethod("loadJFUSELibrary").invoke(null);
-      //JFUSEAdapter.loadJFUSELibrary()
-      enabled = true;
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
-    
-    // Alternative:
-    Class<?> cls = Class.forName("org.deepfs.DeepFS");
-    cls.getMethod("load").invoke(null);
-     */
   }
 }

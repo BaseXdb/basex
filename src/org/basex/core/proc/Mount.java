@@ -3,7 +3,8 @@ package org.basex.core.proc;
 import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
-import org.deepfs.jfuse.JFUSEAdapter;
+import org.basex.util.LibraryLoader;
+import org.deepfs.fs.DeepFS;
 
 /**
  * Evaluates the 'mount' command and mounts a DeepFS database as FUSE.
@@ -24,7 +25,7 @@ public final class Mount extends AAdmin {
   @Override
   protected boolean exec(final PrintOutput out) {
     final String db = args[0];
-//    final String mp = args[1];
+    final String mp = args[1];
 
     new Close().execute(context, out);
     new Open(db).execute(context, out);
@@ -35,21 +36,26 @@ public final class Mount extends AAdmin {
       return false;
     }
 
-//    final DeepFS fs = new DeepFS(context);
+    final DeepFS fs = new DeepFS(context);
 
-    /* [AH] request Prop.JFUSE, ...
-     * Class<?> cls = Class.forName("org.deepfs.DeepFS");
-     * cls.getMethod("mount", ...).invoke(null, ...);
-     */
-    if(JFUSEAdapter.loadJFUSELibrary()) {
+    if(LibraryLoader.load(LibraryLoader.JFUSELIBNAME)) {
       new Thread() {
         @Override
         public void run() {
-//          DeepFSImpl.mount(mp, fs);
+          try {
+            // DeepFSImpl.mount(mp, fs);
+            Class<?> cls = Class.forName("org.deepfs.DeepFSImpl");
+            Class<?>[] signature = new Class[2];
+            signature[0] = String.class;
+            signature[1] = DeepFS.class;
+            cls.getMethod("mount", signature).invoke(null, mp, fs);
+          } catch (Exception e) {
+            Main.err("Can not mount: ", e);
+          }
         }
       }.start();
     } else {
-      Main.err("Missing native jfuse library.");
+      Main.err("Missing native fuse support.");
       return false;
     }
 
