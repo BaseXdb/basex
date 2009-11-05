@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.xml.XMLInput;
 import org.basex.core.Main;
-import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
 import org.basex.io.IO;
@@ -79,7 +79,7 @@ public final class FNBaseX extends Fun {
   private Item text(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
     final IO io = IO.get(string(name));
-    if(!Prop.web && io.exists()) {
+    if(ctx.context.user.perm(User.ADMIN) && io.exists()) {
       try {
         final XMLInput in = new XMLInput(io);
         final int len = (int) in.length();

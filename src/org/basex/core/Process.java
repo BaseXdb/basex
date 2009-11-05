@@ -24,7 +24,7 @@ public abstract class Process extends Progress {
   /** Commands flag: standard. */
   protected static final int STANDARD = 256;
   /** Commands flag: data reference needed. */
-  protected static final int DATAREF = 1024;
+  protected static final int DATAREF = 512;
 
   /** Command arguments. */
   protected String[] args;
@@ -90,19 +90,10 @@ public abstract class Process extends Progress {
     if(data() && data == null) return error(PROCNODB);
 
     // check permissions
-    final User user = context.user;
-    int up = user.perm;
-    if(data != null) {
-      final User us = data.meta.users.get(user.name);
-      if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
-    }
-    int fp = flags & (User.READ | User.WRITE | User.CREATE | User.ADMIN);
-    if(updating(ctx)) fp |= User.WRITE;
-    int i = 4;
-    while(--i >= 0) {
-      final int f = 1 << i;
-      if((f & fp) != 0 && (f & up) == 0) break;
-    }
+    // [CG] correct?
+    //final int i = context.perm((updating(ctx) ? User.WRITE : 0) |
+    //    flags & 0xFF, data);
+    final int i = context.perm(flags & 0xFF, data);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 
     try {
@@ -209,7 +200,7 @@ public abstract class Process extends Progress {
    * @param <E> token type
    * @return option
    */
-  protected <E extends Enum<E>> E getOption(final Class<E> typ) {
+  protected final <E extends Enum<E>> E getOption(final Class<E> typ) {
     try {
       return Enum.valueOf(typ, args[0].toUpperCase());
     } catch(final Exception ex) {

@@ -71,10 +71,7 @@ public final class Open extends Process {
     }
 
     // check permissions
-    User user = ctx.user;
-    final User us = data.meta.users.get(user.name);
-    if(us != null) user = us;
-    if(!user.perm(User.READ)) {
+    if(ctx.perm(User.READ, data) != -1) {
       Close.close(ctx, data);
       throw new IOException(Main.info(PERMNO, CmdPerm.READ));
     }

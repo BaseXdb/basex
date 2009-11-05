@@ -49,6 +49,7 @@ import org.basex.util.Array;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
+import org.basex.util.TokenBuilder;
 
 /**
  * This is a parser for command strings, creating {@link Process} instances.
@@ -238,14 +239,14 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    final StringBuilder tb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     consumeWS();
     boolean q = false;
     while(more()) {
       final char c = curr();
-      if((c <= ' ' || c == ';') && !q) break;
+      if(!q && (c <= ' ' || c == ';')) break;
       if(c == '"') q ^= true;
-      else tb.append(c);
+      else tb.add(c);
       consume();
     }
     return finish(cmd, tb);
@@ -259,16 +260,16 @@ public final class CommandParser extends InputParser {
    */
   private String xquery(final Cmd cmd) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(more() && !curr(';')) {
       final QueryParser p = new QueryParser(new QueryContext(ctx));
       p.init(qu);
       p.qp = qp;
       p.parse(null, false);
-      sb.append(qu.substring(qp, p.qp));
+      tb.add(qu.substring(qp, p.qp));
       qp = p.qp;
     }
-    return finish(cmd, sb);
+    return finish(cmd, tb);
   }
 
   /**
@@ -280,9 +281,9 @@ public final class CommandParser extends InputParser {
    */
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(letterOrDigit(curr()) || curr('.') || curr('-')) sb.append(consume());
-    return finish(cmd, sb);
+    final TokenBuilder tb = new TokenBuilder();
+    while(letterOrDigit(curr()) || curr('.') || curr('-')) tb.add(consume());
+    return finish(cmd, tb);
   }
 
   /**
@@ -307,9 +308,9 @@ public final class CommandParser extends InputParser {
    * @return name
    * @throws QueryException query exception
    */
-  private String finish(final Cmd cmd, final StringBuilder s)
+  private String finish(final Cmd cmd, final TokenBuilder s)
       throws QueryException {
-    if(s.length() != 0) return s.toString();
+    if(s.size() != 0) return s.toString();
     if(cmd != null) help(null, cmd);
     return null;
   }
@@ -322,9 +323,9 @@ public final class CommandParser extends InputParser {
    */
   private String number(final Cmd cmd) throws QueryException {
     consumeWS();
-    final StringBuilder tb = new StringBuilder();
-    if(curr() == '-') tb.append(consume());
-    while(digit(curr())) tb.append(consume());
+    final TokenBuilder tb = new TokenBuilder();
+    if(curr() == '-') tb.add(consume());
+    while(digit(curr())) tb.add(consume());
     return finish(cmd, tb);
   }
 

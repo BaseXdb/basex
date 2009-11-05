@@ -16,7 +16,7 @@ import org.junit.Before;
  *
  * [AH] Test needs to be reworked.
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Alexander Holupirek, alex@holupirek.de
+ * @author Alexander Holupirek
  */
 public final class DeepBaseTest {
   /** Name of test database. */

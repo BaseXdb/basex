@@ -5,7 +5,7 @@ import org.basex.core.Main;
 /**
  * Utility class to load shared libraries.
  *
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
 public final class LibraryLoader {

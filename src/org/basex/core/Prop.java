@@ -180,8 +180,6 @@ public final class Prop extends AProp {
 
   /** GUI mode. */
   public static boolean gui;
-  /** Web Server mode. */
-  public static boolean web;
   /** Debug mode. */
   public static boolean debug;
 
@@ -227,7 +225,6 @@ public final class Prop extends AProp {
     Prop.language = get(Prop.LANGUAGE);
     Prop.langkeys = is(Prop.LANGKEYS);
     Prop.debug = is(Prop.DEBUG);
-    Prop.web = is(Prop.WEB);
 
     /* [AH] JFUSE property could be set here
     Prop.... =

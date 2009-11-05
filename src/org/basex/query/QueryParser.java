@@ -1557,7 +1557,7 @@ public class QueryParser extends InputParser {
         ctx.ns.uri(name);
         name.uri = Uri.uri(name.ns() ?
             ctx.ns.uri(name.pre(), false) : ctx.nsFunc);
-        final Expr func = ctx.fun.get(name, exprs);
+        final Expr func = ctx.fun.get(name, exprs, ctx);
         if(func != null) {
           alter = null;
           return func;

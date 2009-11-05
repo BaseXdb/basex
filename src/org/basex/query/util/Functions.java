@@ -5,8 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
@@ -48,10 +47,13 @@ public final class Functions extends ExprInfo {
    * Returns the specified function.
    * @param name name of the function
    * @param args optional arguments
+   * @param ctx query context
    * @return function instance
    * @throws QueryException query exception
    */
-  public Expr get(final QNm name, final Expr[] args) throws QueryException {
+  public Expr get(final QNm name, final Expr[] args, final QueryContext ctx)
+      throws QueryException {
+
     // find function
     final byte[] uri = name.uri.str();
     final byte[] ln = name.ln();
@@ -64,8 +66,8 @@ public final class Functions extends ExprInfo {
       return new Cast(args[0], seq);
     }
 
-    // check Java functions - not supported in web server mode
-    if(!Prop.web && startsWith(uri, JAVAPRE)) {
+    // check Java functions - only allowed with administrator permissions
+    if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
       final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);

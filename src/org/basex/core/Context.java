@@ -202,7 +202,7 @@ public final class Context {
   public boolean pinned(final String db) {
     return pool.pinned(db);
   }
-  
+
   /**
    * Returns the number of references of the specified database in the pool.
    * @param db name of the database
@@ -226,5 +226,23 @@ public final class Context {
    */
   public void delete(final ServerSession s) {
     sessions.delete(s);
+  }
+
+  /**
+   * Checks if the current user has the specified permissions.
+   * @param p permissions
+   * @param d optional data reference
+   * @return result of check (-1: ok, other: failure)
+   */
+  public int perm(final int p, final Data d) {
+    final User u = user;
+    int up = u.perm;
+    if(d != null) {
+      final User us = d.meta.users.get(u.name);
+      if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
+    }
+    int i = 4;
+    while(--i >= 0 && (1 << i & p) == 0 || (1 << i & up) != 0);
+    return i;
   }
 }

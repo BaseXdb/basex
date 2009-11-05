@@ -15,7 +15,7 @@ package org.deepfs.jfuse;
  * the (un)commented code here.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Alexander Holupirek <alex@holupirek.de>
+ * @author Alexander Holupirek
  * 
  */
 public final class JFUSEAdapter { //implements FileModeFlags {

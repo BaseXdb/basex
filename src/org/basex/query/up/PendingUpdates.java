@@ -52,11 +52,8 @@ public final class PendingUpdates {
       DBPrimitives dp = dbs.get(d);
       if(dp == null) {
         // check permissions
-        User user = ctx.context.user;
-        final User us = d.meta.users.get(user.name);
-        if(us != null) user = us;
-        if(!user.perm(User.READ))
-          throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
+        if(ctx.context.perm(User.WRITE, d) != -1)
+          throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
         dp = new DBPrimitives(false);
         dbs.put(d, dp);

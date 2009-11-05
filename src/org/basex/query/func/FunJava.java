@@ -119,8 +119,7 @@ public final class FunJava extends Arr {
       if(ar.length == (st ? 0 : 1)) {
         return f.get(st ? null : ((Jav) ar[0]).val);
       }
-    } catch(final NoSuchFieldException ex) {
-    }
+    } catch(final NoSuchFieldException ex) { /* ignored */ }
 
     for(final Method meth : cls.getMethods()) {
       if(!meth.getName().equals(mth)) continue;

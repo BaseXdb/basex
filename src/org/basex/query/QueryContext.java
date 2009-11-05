@@ -425,7 +425,7 @@ public final class QueryContext extends Progress {
     // get database instance
     Data data = null;
 
-    if(Prop.web || db) {
+    if(db) {
       try {
         data = Open.open(context, nm);
       } catch(final IOException ex) {
