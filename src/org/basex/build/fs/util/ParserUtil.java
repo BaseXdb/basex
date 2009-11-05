@@ -1,16 +1,16 @@
 package org.basex.build.fs.util;
 
 import static org.basex.util.Token.*;
-import java.io.File;
-import java.io.IOException;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.Metadata.DateField;
 import org.basex.core.Main;
 import org.basex.util.Token;
 
@@ -121,48 +121,17 @@ public final class ParserUtil {
   }
 
   /**
-   * Converts a time value to an {@link XMLGregorianCalendar} instance. The
-   * {@link DatatypeFactory} <code>factory</code> has to be initialized.
-   * @param time the time value to convert.
-   * @return {@link XMLGregorianCalendar} representing the time value
-   */
-  private static XMLGregorianCalendar getGCal(final long time) {
-    if(time == 0) return null;
-    final GregorianCalendar gc = new GregorianCalendar();
-    gc.setTimeInMillis(time);
-    return factory.newXMLGregorianCalendar(gc);
-  }
-
-  /**
-   * Converts a date value to an {@link XMLGregorianCalendar} instance.
+   * Converts a date value to an xml date value.
    * @param date the {@link Date} value to convert.
-   * @return the {@link XMLGregorianCalendar} instance or <code>null</code> if
-   *         the conversion fails.
+   * @return byte array, containing the date value as xml date value or
+   *         <code>null</code> if the conversion fails.
    */
-  public static XMLGregorianCalendar convertDate(final Date date) {
+  protected static byte[] convertDate(final Date date) {
     final GregorianCalendar gc = new GregorianCalendar();
     gc.setTime(date);
-    return factory == null ? null : factory.newXMLGregorianCalendar(gc);
-  }
-
-  /**
-   * Writes the date values of the file to the parser.
-   * @param parser the {@link NewFSParser} instance to fire
-   *          {@link NewFSParser#metaEvent(Metadata)} events.
-   * @param meta the metadata item to use.
-   * @param file the file to read time values from.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  public static void fireDateEvents(final NewFSParser parser,
-      final Metadata meta, final File file) throws IOException {
-    if(factory == null) return;
-    XMLGregorianCalendar xmlCal;
-    final long time = file.lastModified();
-    if(time != 0) {
-      xmlCal = getGCal(time);
-      meta.setDate(DateField.DATE_CONTENT_MODIFIED, xmlCal);
-      parser.metaEvent(meta);
-    }
+    final XMLGregorianCalendar xgc = factory == null ? null
+        : factory.newXMLGregorianCalendar(gc);
+    return token(xgc.toXMLFormat());
   }
 
   /**

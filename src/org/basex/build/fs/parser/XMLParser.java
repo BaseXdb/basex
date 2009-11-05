@@ -7,9 +7,8 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
@@ -93,27 +92,22 @@ public final class XMLParser extends AbstractParser {
   }
 
   @Override
-  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
+  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser) {
     if(!check(bfc)) return;
-    setTypeAndFormat(bfc, parser);
+    setTypeAndFormat(bfc);
   }
 
   /**
    * Sets {@link MetaType} and {@link MimeType}.
    * @param bfc the {@link BufferedFileChannel} to read from
-   * @param parser the {@link NewFSParser}
-   * @throws IOException if any error occurs
    */
-  private void setTypeAndFormat(final BufferedFileChannel bfc,
-      final NewFSParser parser) throws IOException {
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.XML));
+  private void setTypeAndFormat(final BufferedFileChannel bfc) {
+    meta.setType(MetaType.XML);
     final String name = bfc.getFileName();
     final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
     final MimeType mime = SUFFIXES.get(suf);
     if(mime == null) Main.notexpected();
-    parser.metaEvent(meta.setMimeType(mime));
+    meta.setFormat(mime);
   }
 
   @Override
@@ -124,7 +118,7 @@ public final class XMLParser extends AbstractParser {
       parser.parseWithFallbackParser(bfc, true);
       return true;
     }
-    setTypeAndFormat(bfc, parser);
+    setTypeAndFormat(bfc);
     parse(bfc, parser);
     return true;
   }

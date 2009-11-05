@@ -1,14 +1,14 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 
@@ -21,11 +21,14 @@ import org.basex.util.TokenBuilder;
 public final class TXTParser extends AbstractParser {
 
   /** Suffixes of all file formats, this parser is able to parse. */
-  private static final TreeSet<String> SUFFIXES = new TreeSet<String>();
+  private static final TreeMap<String, MimeType> SUFFIXES =
+      new TreeMap<String, MimeType>();
 
   static {
-    SUFFIXES.add("txt");
-    for(String suf : SUFFIXES)
+    SUFFIXES.put("txt", MimeType.TXT);
+    SUFFIXES.put("html", MimeType.HTML);
+    SUFFIXES.put("htm", MimeType.HTML);
+    for(String suf : SUFFIXES.keySet())
       NewFSParser.register(suf, TXTParser.class);
     NewFSParser.registerFallback(TXTParser.class);
   }
@@ -35,23 +38,33 @@ public final class TXTParser extends AbstractParser {
   public boolean check(final BufferedFileChannel bfc) {
     final String name = bfc.getFileName();
     final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
-    return SUFFIXES.contains(suf);
+    return SUFFIXES.keySet().contains(suf);
     // [BL] search for invalid characters?
   }
 
-  /** {@inheritDoc} */
-  @Override
-  protected void meta(final BufferedFileChannel bfc, //
-      final NewFSParser parser) throws IOException {
-    if(!check(bfc)) return;
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.TEXT));
-    parser.metaEvent(meta.setMimeType(MimeType.TXT));
+  /**
+   * Sets {@link MetaType} and {@link MimeType}.
+   * @param bfc the {@link BufferedFileChannel} to read from
+   */
+  private void setTypeAndFormat(final BufferedFileChannel bfc) {
+    meta.setType(MetaType.TEXT);
+    final String name = bfc.getFileName();
+    final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+    MimeType mime = SUFFIXES.get(suf);
+    if(mime == null) mime = MimeType.UNKNOWN;
+    meta.setFormat(mime);
   }
 
   /** {@inheritDoc} */
   @Override
-  protected void content(final BufferedFileChannel bfc, //
+  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser) {
+    if(!check(bfc)) return;
+    setTypeAndFormat(bfc);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void content(final BufferedFileChannel bfc,
       final NewFSParser parser) throws IOException {
     if(bfc.getFileName().endsWith(".emlxpart")) return; // ignore *.emlx files
     final int len = (int) Math.min(bfc.size(), parser.prop.num(Prop.FSTEXTMAX));

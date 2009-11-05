@@ -7,21 +7,16 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.Metadata.DateField;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore;
 import org.basex.core.Main;
 
 /**
- * Parser for Exif data.
- * This is not a standalone parser. Only used for parsing Exif data that is
- * embedded in e.g. a TIFF file.
- *
+ * Parser for Exif data. This is not a standalone parser. Only used for parsing
+ * Exif data that is embedded in e.g. a TIFF file.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
@@ -52,35 +47,29 @@ public final class ExifParser {
     /** Image width. */
     h100 {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            o.meta.setShort(IntField.PIXEL_WIDTH,
-                (short) (buf.getShort() & 0xFFFF));
+            o.meta.add(MetaElem.PIXEL_WIDTH, buf.getShort() & 0xFFFF);
             buf.getShort(); // empty two bytes
           } else if(type == IFD_TYPE_LONG) {
-            // [BL] bit operation is redundant...
-            o.meta.setInt(IntField.PIXEL_WIDTH, buf.getInt() & 0xFFFFFFFF);
+            o.meta.add(MetaElem.PIXEL_WIDTH, buf.getInt());
           } else error(o, "Image width (0x0100)");
-          o.fsparser.metaEvent(o.meta);
         } else error(o, "Image width (0x0100)");
       }
     },
         /** Image length. */
     h101 {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
+      void parse(final ExifParser o, final ByteBuffer buf) {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            o.meta.setShort(IntField.PIXEL_HEIGHT,
-                (short) (buf.getShort() & 0xFFFF));
+            o.meta.add(MetaElem.PIXEL_HEIGHT, buf.getShort() & 0xFFFF);
           } else if(type == IFD_TYPE_LONG) {
-            // [BL] bit operation is redundant...
-            o.meta.setInt(IntField.PIXEL_HEIGHT, buf.getInt() & 0xFFFFFFFF);
+            o.meta.add(MetaElem.PIXEL_HEIGHT, buf.getInt());
           } else error(o, "Image length (0x0101)");
-          o.fsparser.metaEvent(o.meta);
         } else error(o, "Image length (0x0101)");
       }
     },
@@ -89,8 +78,7 @@ public final class ExifParser {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.meta.setString(StringField.DESCRIPTION, o.readAscii(buf));
-          o.fsparser.metaEvent(o.meta);
+          o.meta.add(MetaElem.DESCRIPTION, o.readAscii(buf));
         } else error(o, "Image description (0x010E)");
       }
     },
@@ -103,7 +91,7 @@ public final class ExifParser {
           o.bfc.buffer(20);
           final byte[] data = new byte[20];
           o.bfc.get(data);
-          o.dateEvent(DateField.DATE_CREATED, data);
+          o.dateEvent(MetaElem.DATE_CREATED, data);
         } else error(o, "DateTime (0x0132)");
       }
     },
@@ -112,9 +100,7 @@ public final class ExifParser {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.meta.setString(StringField.CREATOR, //
-              o.readAscii(buf));
-          o.fsparser.metaEvent(o.meta);
+          o.meta.add(MetaElem.CREATOR, o.readAscii(buf));
         } else error(o, "Creator (0x013B)");
       }
     },
@@ -235,11 +221,19 @@ public final class ExifParser {
   NewFSParser fsparser;
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
-  /** Metadata item. */
-  Metadata meta = new Metadata();
+  /** The metadata store. */
+  final MetaStore meta;
   /** The format of the date values. */
   private static final SimpleDateFormat SDF = new SimpleDateFormat(
       "yyyy:MM:dd HH:mm:ss");
+
+  /**
+   * Constructor.
+   * @param metaStore the metadata store to store the metadata elements to.
+   */
+  public ExifParser(final MetaStore metaStore) {
+    meta = metaStore;
+  }
 
   /**
    * Checks if the Exif IFD is valid.
@@ -328,16 +322,13 @@ public final class ExifParser {
 
   /**
    * Converts the date to the correct format and fires a date event.
-   * @param field the {@link DateField} to use for the metadata item.
+   * @param elem the metadata element to use for the metadata item.
    * @param date the date value.
-   * @throws IOException if any error occurs while writing to the parser.
    */
-  void dateEvent(final DateField field, final byte[] date) throws IOException {
+  void dateEvent(final MetaElem elem, final byte[] date) {
     try {
       final Date d = SDF.parse(new String(date));
-      final XMLGregorianCalendar gcal = ParserUtil.convertDate(d);
-      meta.setDate(field, gcal);
-      fsparser.metaEvent(meta);
+      meta.add(elem, d);
     } catch(final ParseException ex) {
       if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
     }

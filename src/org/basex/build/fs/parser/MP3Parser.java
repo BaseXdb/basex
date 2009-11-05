@@ -8,13 +8,10 @@ import java.util.Arrays;
 import java.util.Date;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
+import org.basex.build.fs.util.MetaElem;
 import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.Metadata.DateField;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
-import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
 import org.basex.util.Token;
 import static org.basex.util.Token.*;
@@ -289,8 +286,6 @@ public final class MP3Parser extends AbstractParser {
   BufferedFileChannel bfc;
   /** The {@link NewFSParser} instance to fire events. */
   NewFSParser fsparser;
-  /** Metadata item. */
-  Metadata meta = new Metadata();
 
   @Override
   public boolean check(final BufferedFileChannel bufFC) throws IOException {
@@ -319,13 +314,10 @@ public final class MP3Parser extends AbstractParser {
     return false;
   }
 
-  /**
-   * Sets {@link MetaType} and {@link MimeType}.
-   * @throws IOException if any error occurs.
-   */
-  private void setTypeAndFormat() throws IOException {
-    fsparser.metaEvent(meta.setMetaType(MetaType.AUDIO));
-    fsparser.metaEvent(meta.setMimeType(MimeType.MP3));
+  /** Sets {@link MetaType} and {@link MimeType}. */
+  private void setTypeAndFormat() {
+    meta.setType(MetaType.AUDIO);
+    meta.setFormat(MimeType.MP3);
   }
 
   // ---------------------------------------------------------------------------
@@ -351,28 +343,23 @@ public final class MP3Parser extends AbstractParser {
   /**
    * Reads the ID3v1 metadata from the file. {@link #checkID3v1()} must be
    * called before (and must return <code>true</code>).
-   * @throws IOException if any error occurs while reading the ID3v1 tag.
    */
-  private void readMetaID3v1() throws IOException {
+  private void readMetaID3v1() {
     setTypeAndFormat();
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.TITLE, array,
-        true));
+    if(!ws(array)) meta.add(MetaElem.TITLE, Token.trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.CREATOR,
-        array, true));
+    if(!ws(array)) meta.add(MetaElem.CREATOR, Token.trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.ALBUM, array,
-        true));
+    if(!ws(array)) meta.add(MetaElem.ALBUM, Token.trim(array));
     final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
     if(!ws(array)) {
       try {
         final Date d = SDF.parse(new String(a2));
-        fsparser.metaEvent(meta.setDate(DateField.DATE,
-            ParserUtil.convertDate(d)));
+        meta.add(MetaElem.DATE, d);
       } catch(final ParseException ex) {
         if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
       }
@@ -380,15 +367,13 @@ public final class MP3Parser extends AbstractParser {
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
-        fsparser.metaEvent(meta.setInt(IntField.TRACK, array[29]));
+        meta.add(MetaElem.TRACK, array[29]);
         array[29] = 0;
       }
     }
-    if(!ws(array)) fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-        array, true));
+    if(!ws(array)) meta.add(MetaElem.DESCRIPTION, Token.trim(array));
     final int genreId = bfc.get() & 0xFF;
-    if(genreId != 0) fsparser.metaEvent(meta.setString(StringField.GENRE,
-        getGenre(genreId)));
+    if(genreId != 0) meta.add(MetaElem.GENRE, getGenre(genreId));
   }
 
   // ---------------------------------------------------------------------------
@@ -595,12 +580,10 @@ public final class MP3Parser extends AbstractParser {
     if(id == Integer.MIN_VALUE) {
       final byte[][] arrays = Token.split(value, ',');
       for(final byte[] a : arrays) {
-        meta.setString(StringField.GENRE, a, true);
-        fsparser.metaEvent(meta);
+        meta.add(MetaElem.GENRE, Token.trim(a));
       }
     } else {
-      meta.setString(StringField.GENRE, getGenre(id), false);
-      fsparser.metaEvent(meta);
+      meta.add(MetaElem.GENRE, getGenre(id));
     }
   }
 
@@ -617,10 +600,12 @@ public final class MP3Parser extends AbstractParser {
     final byte[] value = readText(s);
     final int size = value.length;
     int i = 0;
-    while(i < size && (value[i] < '1' || value[i] > '9')) value[i++] = 0;
+    while(i < size && (value[i] < '1' || value[i] > '9'))
+      value[i++] = 0;
 
     final int start = i; // first byte of the number
-    while(i < size && value[i] >= '0' && value[i] <= '9') i++;
+    while(i < size && value[i] >= '0' && value[i] <= '9')
+      i++;
     // number of bytes of the number
     return Arrays.copyOfRange(value, start, i);
   }
@@ -691,24 +676,21 @@ public final class MP3Parser extends AbstractParser {
     TIT2 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.setString(StringField.TITLE, obj.readText(size));
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.TITLE, obj.readText(size));
       }
     },
         /** */
     TPE1 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.setString(StringField.CREATOR, obj.readText(size));
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.CREATOR, obj.readText(size));
       }
     },
         /** */
     TALB {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.setString(StringField.ALBUM, obj.readText(size));
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.ALBUM, obj.readText(size));
       }
     },
         /** */
@@ -717,9 +699,7 @@ public final class MP3Parser extends AbstractParser {
       void parse(final MP3Parser obj, final int size) throws IOException {
         try {
           final Date d = SDF.parse(new String(obj.readText(size)));
-          obj.meta.setDate(DateField.DATE, //
-              ParserUtil.convertDate(d));
-          obj.fsparser.metaEvent(obj.meta);
+          obj.meta.add(MetaElem.DATE, d);
         } catch(final ParseException ex) {
           if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
         }
@@ -749,26 +729,22 @@ public final class MP3Parser extends AbstractParser {
         while(obj.bfc.get() != 0 && ++pos < size)
           ;
         if(pos >= size) return;
-        obj.meta.setString(StringField.DESCRIPTION, obj.readText(size - pos,
-            encoding));
-        if(!ws(lang) && lang[0] != 'X') obj.meta.setXmlLang(lang);
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.DESCRIPTION, obj.readText(size - pos, encoding));
       }
     },
         /** */
     TRCK {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.setInt(IntField.TRACK, obj.readTrack(size));
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.TRACK, obj.readTrack(size));
       }
     },
         /** */
     TLEN {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.fsparser.metaEvent(obj.meta.setDuration(//
-        ParserUtil.convertDuration(obj.readText(size))));
+        obj.meta.add(MetaElem.DURATION,
+            ParserUtil.convertDuration(obj.readText(size)));
       }
     },
         /** */

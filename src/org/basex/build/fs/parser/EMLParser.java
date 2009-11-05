@@ -1,6 +1,7 @@
 package org.basex.build.fs.parser;
 
 import java.io.IOException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,19 +10,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.Metadata.DateField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
-import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
  * Parser for EML files.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  * @author Lukas Kircher
@@ -44,18 +43,17 @@ public final class EMLParser extends AbstractParser {
     FROM {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(StringField.SENDER);
+        obj.parseMailAddresses(MetaElem.SENDER);
         return false;
       }
     },
         /** Date when the mail was sended. */
     DATE {
       @Override
-      public boolean parse(final EMLParser obj) throws IOException {
+      public boolean parse(final EMLParser obj) {
         try {
           final Date d = SDF.parse(obj.mCurrLine);
-          obj.meta.setDate(DateField.DATE_CREATED, ParserUtil.convertDate(d));
-          obj.fsparser.metaEvent(obj.meta);
+          obj.meta.add(MetaElem.DATE_CREATED, d);
         } catch(final ParseException ex) {
           if(NewFSParser.VERBOSE) Main.debug("%: %", obj.bfc.getFileName(),
               ex.getMessage());
@@ -83,8 +81,6 @@ public final class EMLParser extends AbstractParser {
           while(i < len && text[i] != '=')
             tmp.add(text[i++]);
           if(i + 4 >= len) {
-            // [BL] FindBugs warning: variable i is not used anymore..
-            i = len;
             break;
           }
           // char '=' detected -> must be encoded text
@@ -119,8 +115,7 @@ public final class EMLParser extends AbstractParser {
         }
         text = tmp.finish();
         text = Token.replace(text, '_', ' ');
-        obj.meta.setString(StringField.SUBJECT, text);
-        obj.fsparser.metaEvent(obj.meta);
+        obj.meta.add(MetaElem.SUBJECT, text);
         return false;
       }
     },
@@ -128,7 +123,7 @@ public final class EMLParser extends AbstractParser {
     TO {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(StringField.RECEIVER);
+        obj.parseMailAddresses(MetaElem.RECEIVER);
         return false;
       }
     },
@@ -136,7 +131,7 @@ public final class EMLParser extends AbstractParser {
     CC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(StringField.COPY_RECEIVER);
+        obj.parseMailAddresses(MetaElem.COPY_RECEIVER);
         return false;
       }
     },
@@ -144,14 +139,14 @@ public final class EMLParser extends AbstractParser {
     BCC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(StringField.HIDDEN_RECEIVER);
+        obj.parseMailAddresses(MetaElem.HIDDEN_RECEIVER);
         return false;
       }
     },
         /** The content type. */
     CONTENT_TYPE {
       @Override
-      public boolean parse(final EMLParser obj) throws IOException {
+      public boolean parse(final EMLParser obj) {
         obj.getContentType();
         return true;
       }
@@ -254,8 +249,6 @@ public final class EMLParser extends AbstractParser {
   BufferedFileChannel bfc;
   /** The {@link NewFSParser} instance to fire events. */
   NewFSParser fsparser;
-  /** Metadata item. */
-  Metadata meta = new Metadata();
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
@@ -279,8 +272,8 @@ public final class EMLParser extends AbstractParser {
   private boolean meta0(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f)) return false;
-    parser.metaEvent(meta.setMetaType(MetaType.MESSAGE));
-    parser.metaEvent(meta.setMimeType(MimeType.EML));
+    meta.setType(MetaType.MESSAGE);
+    meta.setFormat(MimeType.EML);
     fsparser = parser;
     mBoundary = "";
     do {
@@ -366,8 +359,9 @@ public final class EMLParser extends AbstractParser {
     final long bodyStartPos = bfc.absolutePosition();
 
     if(multipart) fsparser.startContent(bodyStartPos);
+    MetaStore contentMeta = new MetaStore();
     // if we have a multipart message, extract text only if it is plaintext.
-    if(multipart ? readSectionHeader() : mContentType == null
+    if(multipart ? readSectionHeader(contentMeta) : mContentType == null
         || mContentType.startsWith("text")) {
       final long pos2 = bfc.absolutePosition();
       final TokenBuilder tb = new TokenBuilder();
@@ -406,6 +400,7 @@ public final class EMLParser extends AbstractParser {
       final int readAhead = mCurrLine == null ? 0 : mCurrLine.length();
       fsparser.setContentSize(bfc.absolutePosition() - bodyStartPos - readAhead
           - 1);
+      contentMeta.write(fsparser);
       fsparser.endContent();
     }
 
@@ -415,10 +410,12 @@ public final class EMLParser extends AbstractParser {
   /**
    * Extracts content-type information of the body or the attachment. true means
    * body, false means attachment.
+   * @param contentMeta metadata store for the current section.
    * @return true if content is plaintext, false otherwise.
    * @throws IOException I/O exception
    */
-  private boolean readSectionHeader() throws IOException {
+  private boolean readSectionHeader(final MetaStore contentMeta)
+      throws IOException {
     boolean plaintext = false;
     do {
       String type = "";
@@ -443,11 +440,11 @@ public final class EMLParser extends AbstractParser {
         mime = MimeType.getItem(mimeString);
         if(mime != null) {
           for(final MetaType mt : mime.getMetaTypes()) {
-            fsparser.metaEvent(meta.setMetaType(mt));
+            contentMeta.setType(mt);
             // [BL] handle mail attachments that are not plaintext
             if(mt == MetaType.TEXT) plaintext = true;
           }
-          fsparser.metaEvent(meta.setMimeType(mime));
+          contentMeta.setFormat(mime);
           getCharset();
         }
       } else getCharset();
@@ -470,18 +467,17 @@ public final class EMLParser extends AbstractParser {
 
   /**
    * Parses mail addresses and fires parser events.
-   * @param field the address field to set.
+   * @param elem the metadata element to set.
    * @throws IOException if any error occurs while reading from the file.
    */
-  void parseMailAddresses(final StringField field) throws IOException {
+  void parseMailAddresses(final MetaElem elem) throws IOException {
     final StringBuilder addresses = new StringBuilder();
     addresses.append(mCurrLine);
     while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": ")) {
       addresses.append(mCurrLine);
     }
     for(final Matcher m = MAILPATTERN.matcher(addresses); m.find();) {
-      meta.setString(field, m.group());
-      fsparser.metaEvent(meta);
+      meta.add(elem, m.group());
     }
   }
 
@@ -495,23 +491,19 @@ public final class EMLParser extends AbstractParser {
   /**
    * Gets the content-type, boundary and charset. Fires a parser event if the
    * charset was found.
-   * @throws IOException if any I/O error occurs.
    */
-  void getContentType() throws IOException {
+  void getContentType() {
     mContentType = mCurrLine;
     getBoundary();
     getCharset();
   }
 
-  /**
-   * Gets the charset and fires a parser event.
-   * @throws IOException if any I/O error occurs.
-   */
-  void getCharset() throws IOException {
+  /** Gets the charset and fires a parser event. */
+  void getCharset() {
     if(mCurrLine.contains("charset=")) {
       mBodyCharset = mCurrLine.split("charset=")[1].split(";")[0].replace("\"",
           "").trim();
-      fsparser.metaEvent(meta.setString(StringField.ENCODING, mBodyCharset));
+      meta.add(MetaElem.ENCODING, mBodyCharset);
     }
   }
 

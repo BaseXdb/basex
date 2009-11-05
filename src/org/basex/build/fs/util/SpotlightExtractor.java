@@ -6,14 +6,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.parser.MP3Parser;
-import org.basex.build.fs.util.Metadata.DateField;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
-import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
 import org.basex.util.LibraryLoader;
 import org.basex.util.Token;
@@ -34,39 +30,39 @@ public final class SpotlightExtractor {
    * @author Bastian Lemke
    */
   enum SpotlightContentType {
-    /** MP3 file. */
+        /** MP3 file. */
     PUBLIC_MP3(MimeType.MP3),
-    /** JPEG file. */
+        /** JPEG file. */
     PUBLIC_JPEG(MimeType.JPG),
-    /** PNG file. */
+        /** PNG file. */
     PUBLIC_PNG(MimeType.PNG),
-    /** GIF file. */
+        /** GIF file. */
     COM_COMPUSERVE_GIF(MimeType.GIF),
-    /** BMP file. */
+        /** BMP file. */
     COM_MICROSOFT_BMP(MimeType.BMP),
-    /** TIFF file. */
+        /** TIFF file. */
     PUBLIC_TIFF(MimeType.TIFF),
-    /** HTML file. */
+        /** HTML file. */
     PUBLIC_HTML(MimeType.HTML),
-    /** Plain text file. */
+        /** Plain text file. */
     PUBLIC_PLAIN_TEXT(MimeType.TXT),
-    /** CSS file. */
+        /** CSS file. */
     COM_APPLE_DASHCODE_CSS(MimeType.CSS),
-    /** Word file. */
+        /** Word file. */
     COM_MICROSOFT_WORD_DOC(MimeType.DOC),
-    /** PDF file. */
+        /** PDF file. */
     COM_ADOBE_PDF(MimeType.PDF),
-    /** Image. */
+        /** Image. */
     PUBLIC_IMAGE(MetaType.PICTURE),
-    /** Audio. */
+        /** Audio. */
     PUBLIC_AUDIO(MetaType.AUDIO),
-    /** Audiovisual content. */
+        /** Audiovisual content. */
     PUBLIC_AUDIOVISUAL_CONTENT(MetaType.VIDEO),
-    /** Data. */
+        /** Data. */
     PUBLIC_DATA(),
-    /** Item. */
+        /** Item. */
     PUBLIC_ITEM(),
-    /** Content. */
+        /** Content. */
     PUBLIC_CONTENT();
 
     /** The {@link MetaType}. */
@@ -119,85 +115,78 @@ public final class SpotlightExtractor {
    * Registered metadata items and corresponding actions for metadata events.
    */
   enum Item {
-    /** Date and time of the last change made to a metadata attribute. */
+        /** Date and time of the last change made to a metadata attribute. */
     AttributeChangeDate {
       @Override
-      void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_ATTRIBUTE_MODIFIED, o);
+      void parse(final MetaStore meta, final Object o) {
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_ATTRIBUTE_MODIFIED,
+            (Date) o);
       }
     },
-    /**
+        /**
      * Title for the collection containing this item. This is analogous to a
      * record label or photo album.
      */
     Album {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.ALBUM, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.ALBUM, (String) o);
       }
     },
-    /** Track number of a song or composition when it is part of an album. */
+        /** Track number of a song or composition when it is part of an album. */
     AudioTrackNumber {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.TRACK, o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.TRACK, o);
       }
     },
-    /** The author of the contents of the file. */
+        /** The author of the contents of the file. */
     Authors {
       @Override
-      void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.CREATOR, o);
+      void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.CREATOR, (String) o);
       }
     },
-    /**
+        /**
      * Identifies city of origin according to guidelines established by the
      * provider. For example, "New York", "Cupertino", or "Toronto".
      */
     City {
       @Override
-      void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.SPATIAL, o);
+      void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.CITY, (String) o);
       }
     },
-    /**
+        /**
      * A comment related to the file. This comment is not displayed by the
      * Finder.
      */
     Comment {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.DESCRIPTION, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.DESCRIPTION, (String) o);
       }
     },
-    /** Composer of the song in the audio file. */
+        /** Composer of the song in the audio file. */
     Composer {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.COMPOSER, (String) o);
       }
     },
-    /** The date and time that the content was created. */
+        /** The date and time that the content was created. */
     ContentCreationDate {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_CREATED, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (String) o);
       }
     },
-    // /** Date and time when the content of this item was modified. */
+        // /** Date and time when the content of this item was modified. */
     // ContentModificationDate {
     // @Override
-    // public void parse(final SpotlightExtractor obj, final Object o) throws
-    // IOException {
-    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+    // public void parse(final MetaStore meta, final Object o) {
+    // if(check(o, Date.class)) meta.add(MetaElem.DATE_CONTENT_MODIFIED,
+    // (String) o);
     // }
     // },
     /**
@@ -206,295 +195,328 @@ public final class SpotlightExtractor {
      */
     ContentTypeTree {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
+      public void parse(final MetaStore meta, final Object o) {
         try {
           String key = ((String) o).toUpperCase();
           key = key.replace('.', '_').replace('-', '_');
-          obj.contentTypeEvent(SpotlightContentType.valueOf(key));
+          final SpotlightContentType ct = SpotlightContentType.valueOf(key);
+          final MetaType me = ct.getType();
+          if(me != null) meta.setType(me);
+          else {
+            final MimeType mi = ct.getFormat();
+            if(mi != null) meta.setFormat(mi);
+          }
         } catch(final IllegalArgumentException ex) {
           Main.debug("SpotlightExtractor: unsupported ContentType found (%)",
               (String) o);
         }
       }
     },
-    /**
+        /**
      * Entity responsible for making contributions to the content of the
      * resource. Examples of a contributor include a person, an organization or
      * a service.
      */
     Contributors {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.CONTRIBUTOR, (String) o);
       }
     },
-    /**
+        /**
      * The full, publishable name of the country or primary location where the
      * intellectual property of the item was created, according to guidelines of
      * the provider.
      */
     Country {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.SPATIAL, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.COUNTRY, (String) o);
       }
     },
-    /** Description of the kind of item this file represents. */
+        /** Description of the kind of item this file represents. */
     Description {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.DESCRIPTION, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.DESCRIPTION, (String) o);
       }
     },
-    /**
+        /**
      * The duration, in seconds, of the content of the item. A value of 10.5
      * represents media that is 10 and 1/2 seconds long.
      */
     DurationSeconds {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.durationEvent(o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseDuration(meta, MetaElem.DURATION, o);
       }
     },
-    /** Mac OS X Finder comments for this item. */
+        /** Mac OS X Finder comments for this item. */
     FinderComment {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.DESCRIPTION, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.COMMENT, (String) o);
       }
     },
-    // /** Date the file contents last changed. */
+        // /** Date the file contents last changed. */
     // FSContentChangeDate {
     // @Override
-    // void parse(final SpotlightExtractor obj, final Object o)
-    // throws IOException {
-    // obj.dateEvent(DateField.DATE_CONTENT_MODIFIED, o);
+    // void parse(final MetaStore meta, final Object o) {
+    // if(check(o, Date.class)) meta.add(MetaElem.DATE_CONTENT_MODIFIED,
+    // (String) o);
     // }
     // },
     // /** Date that the contents of the file were created. */
     // FSCreationDate {
     // @Override
-    // public void parse(final SpotlightExtractor obj, final Object o)
-    // throws IOException {
+    // public void parse(final MetaStore meta, final Object o) {
     // obj.dateEvent(DateField.DATE_CREATED, o);
     // }
     // },
     /** Group ID of the owner of the file. */
     FSOwnerGroupID {
       @Override
-      void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.FS_OWNER_GROUP_ID, o);
+      void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.FS_OWNER_GROUP_ID, o);
       }
     },
-    /** User ID of the owner of the file. */
+        /** User ID of the owner of the file. */
     FSOwnerUserID {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.FS_OWNER_USER_ID, o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.FS_OWNER_USER_ID, o);
       }
     },
-    // /** Size, in bytes, of the file on disk. */
-    // FSSize {
-    // @Override
-    // public void parse(final SpotlightExtractor obj, final Object o)
-    // throws IOException {
-    // obj.intEvent(IntField.FS_SIZE, o);
-    // }
-    // },
-    /**
+        /**
      * Publishable entry providing a synopsis of the contents of the item. For
      * example, "Apple Introduces the iPod Photo".
      */
     Headline {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.TITLE, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.HEADLINE, (String) o);
       }
     },
-    /**
+        /**
      * Formal identifier used to reference the resource within a given context.
      * For example, the Message-ID of a mail message.
      */
     Identifier {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.IDENTIFIER, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.IDENTIFIER, (String) o);
       }
     },
-    /**
+        /**
      * Keywords associated with this file. For example, "Birthday", "Important",
      * etc.
      */
     Keywords {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.KEYWORD, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.KEYWORD, (String) o);
       }
     },
-    /**
+        /**
      * Indicates the languages used by the item. The recommended best practice
      * for the values of this attribute are defined by RFC 3066.
      */
     Languages {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.LANGUAGE, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.LANGUAGE, (String) o);
       }
     },
-    /**
+        /**
      * Date and time that the file was last used. This value is updated
      * automatically by LaunchServices everytime a file is opened by double
      * clicking, or by asking LaunchServices to open a file.
      */
     LastUsedDate {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_LAST_USED, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_LAST_USED, (String) o);
       }
     },
-    /** Lyricist of the song in the audio file. */
+        /** Lyricist of the song in the audio file. */
     Lyricist {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.CONTRIBUTOR, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.LYRICIST, (String) o);
       }
     },
-    /**
+        /**
      * Musical genre of the song or composition contained in the audio file. For
      * example: "Jazz", "Pop", "Rock", "Classical".
      */
     MusicalGenre {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        final StringField field = StringField.GENRE;
+      public void parse(final MetaStore meta, final Object o) {
         String g = (String) o;
         try {
           if(g.charAt(0) == '(') g = g.substring(1, g.length() - 2);
           final int genreId = Integer.parseInt(g);
-          obj.stringEvent(field, new String(MP3Parser.getGenre(genreId)));
+          meta.add(MetaElem.GENRE, MP3Parser.getGenre(genreId));
         } catch(final NumberFormatException ex) {
           if(g.contains(",")) {
             final StringTokenizer tok = new StringTokenizer(g, ", ");
             while(tok.hasMoreTokens())
-              obj.stringEvent(field, tok.nextToken());
+              meta.add(MetaElem.GENRE, tok.nextToken());
           } else {
-            obj.stringEvent(field, g);
+            meta.add(MetaElem.GENRE, g);
           }
         }
       }
     },
-    /** Number of pages in the document. */
+        /** Number of pages in the document. */
     NumberOfPages {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.NUMBER_OF_PAGES, o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.NUMBER_OF_PAGES, o);
       }
     },
-    /**
+        /**
      * Height, in pixels, of the contents. For example, the image height or the
      * video frame height.
      */
     PixelHeight {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.PIXEL_HEIGHT, o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.PIXEL_HEIGHT, o);
       }
     },
-    /**
+        /**
      * Width, in pixels, of the contents. For example, the image width or the
      * video frame width.
      */
     PixelWidth {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.intEvent(IntField.PIXEL_WIDTH, o);
+      public void parse(final MetaStore meta, final Object o) {
+        parseInt(meta, MetaElem.PIXEL_WIDTH, o);
       }
     },
-    /**
+        /**
      * Publishers of the item. For example, a person, an organization, or a
      * service.
      */
     Publisher {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.PUBLISHER, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.PUBLISHER, (String) o);
       }
     },
-    /** Recipients of this item. */
+        /** Recipients of this item. */
     Recipients {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.RECEIVER, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.RECEIVER, (String) o);
       }
     },
-    /**
+        /**
      * Recording date of the song or composition. This is in contrast to
      * kMDItemContentCreationDate which, could indicate the creation date of an
      * edited or "mastered" version of the original art.
      */
     RecordingDate {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.dateEvent(DateField.DATE_CREATED, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (String) o);
       }
     },
-    // /**
-    // * Contains a text representation of the content of the document.
-    // */
-    // TextContent {
-    // @Override
-    // public void parse(final SpotlightExtractor obj, final Object o)
-    // throws IOException {
-    // assert o instanceof String;
-    // String s = (String) o;
-    // obj.parser.textContent(-1, s.length(), s, false);
-    // }
-    // },
-    /**
+        /**
      * Title of the item. For example, this could be the title of a document,
      * the name of an song, or the subject of an email message.
      */
     Title {
       @Override
-      public void parse(final SpotlightExtractor obj, final Object o)
-          throws IOException {
-        obj.stringEvent(StringField.TITLE, o);
+      public void parse(final MetaStore meta, final Object o) {
+        if(check(o, String.class)) meta.add(MetaElem.TITLE, (String) o);
       }
     };
 
     /**
      * Parses the data and fires parser events.
-     * @param obj the {@link SpotlightExtractor} object to fire events from.
+     * @param meta {@link MetaStore} to store the metadata information to
      * @param o the data to parse.
-     * @throws IOException if any error occurs while writing to the parser.
      */
-    abstract void parse(final SpotlightExtractor obj, final Object o)
-        throws IOException;
+    abstract void parse(final MetaStore meta, final Object o);
 
     @Override
     public String toString() {
       return "kMDItem" + name();
+    }
+
+    /**
+     * Checks the type of the given object.
+     * @param o the object to check.
+     * @param c the data type.
+     * @return true if the object is an instance of the given class, false
+     *         otherwise.
+     */
+    boolean check(final Object o, final Class<?> c) {
+      if(c.isInstance(o)) return true;
+      Main.debug("SpotlightExtractor: wrong data type for attribute " +
+          this.toString());
+      return false;
+    }
+
+    /**
+     * Converts the object to a Byte/Short/Integer/Long/Float or Double and adds
+     * it to the metadata store.
+     * @param meta the metadata store for the current file.
+     * @param elem the corresponding metadata element for this object.
+     * @param o the object to convert.
+     */
+    void parseInt(final MetaStore meta, final MetaElem elem, final Object o) {
+      final Long value = long0(o);
+      if(value != null) meta.add(elem, value);
+    }
+
+    /**
+     * Converts the object to a Duration and adds it to the metadata store.
+     * @param meta the metadata store for the current file.
+     * @param elem the corresponding metadata element for this object.
+     * @param o the object to convert.
+     */
+    void parseDuration(final MetaStore meta, final MetaElem elem, final Object o) {
+      final Long value = long0(o);
+      if(value != null) meta.add(elem,
+          ParserUtil.convertMsDuration((int) (value * 1000)));
+    }
+
+    /**
+     * Returns the long value for an object.
+     * @param o the object to parse.
+     * @return the long value or <code>null</code> if the object can't be
+     *         parsed.
+     */
+    private Long long0(final Object o) {
+      long value;
+      // most objects will be Integer, Long or Double
+      if(o instanceof Integer) value = (Integer) o;
+      else if(o instanceof Double) value = ((Double) o).longValue();
+      else if(o instanceof Long) value = (Long) o;
+      else if(o instanceof Short) value = (Short) o;
+      else if(o instanceof Byte) value = (Byte) o;
+      else if(o instanceof Float) value = ((Float) o).longValue();
+      else if(o instanceof String) {
+        final byte[] a = Token.token((String) o);
+        int i = 0;
+        final int len = a.length;
+        while(i < len && a[i] >= '0' && a[i] <= '9')
+          i++;
+        value = Token.toLong(a, 0, i);
+        if(value == Long.MIN_VALUE) {
+          Main.debug("SpotlightExtractor: invalid value for int field: %",
+              (String) o);
+          return null;
+        }
+      } else {
+        Main.debug("SpotlightExtractor: unsupported data type: %",
+            o.getClass().getName());
+        return null;
+      }
+      return value;
     }
 
     /**
@@ -509,9 +531,7 @@ public final class SpotlightExtractor {
   }
 
   /** The parser instance. */
-  final NewFSParser parser;
-  /** Metadata object. */
-  final Metadata meta;
+  private final NewFSParser parser;
 
   /**
    * Initializes the spotlight extractor.
@@ -519,7 +539,6 @@ public final class SpotlightExtractor {
    */
   public SpotlightExtractor(final NewFSParser fsParser) {
     parser = fsParser;
-    meta = new Metadata();
   }
 
   /**
@@ -528,6 +547,7 @@ public final class SpotlightExtractor {
    * @throws IOException if any error occurs...
    */
   public void parse(final File file) throws IOException {
+    final MetaStore meta = new MetaStore();
     final Map<String, Object> metadata = getMetadata(file.getAbsolutePath());
     if(metadata == null) return;
     for(final Entry<String, Object> e : metadata.entrySet()) {
@@ -535,128 +555,14 @@ public final class SpotlightExtractor {
         final Item item = Item.getValue(e.getKey());
         final Object val = e.getValue();
         if(val instanceof Object[]) {
-          for(final Object o : (Object[]) val) {
-            item.parse(this, o);
-          }
-        } else {
-          item.parse(this, val);
-        }
+          for(final Object o : (Object[]) val)
+            item.parse(meta, o);
+        } else item.parse(meta, val);
       } catch(final IllegalArgumentException ex) {
         // item is not in enum ...do nothing
       }
     }
-  }
-
-  /**
-   * Converts the object to the correct xml format and fires an event.
-   * @param field the {@link DateField}.
-   * @param o the object containing the date to convert.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void dateEvent(final DateField field, final Object o) throws IOException {
-    assert o instanceof Date;
-    XMLGregorianCalendar gcal = null;
-    gcal = ParserUtil.convertDate((Date) o);
-    if(gcal == null) return;
-    meta.setDate(field, gcal);
-    parser.metaEvent(meta);
-  }
-
-  /**
-   * Converts the object to a Byte/Short/Integer/Long/Float or Double and fires
-   * an event.
-   * @param field the {@link IntField}.
-   * @param o the object to convert.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void intEvent(final IntField field, final Object o) throws IOException {
-    long value;
-    // most objects will be Integer, Long or Double
-    if(o instanceof Integer) value = (Integer) o;
-    else if(o instanceof Long) value = (Long) o;
-    else if(o instanceof Double) value = ((Double) o).longValue();
-    else if(o instanceof Short) value = (Short) o;
-    else if(o instanceof Byte) value = (Byte) o;
-    else if(o instanceof Float) value = ((Float) o).longValue();
-    else if(o instanceof String) {
-      final byte[] a = Token.token((String) o);
-      int i = 0;
-      final int len = a.length;
-      while(i < len && a[i] >= '0' && a[i] <= '9')
-        i++;
-      value = Token.toLong(a, 0, i);
-      if(value == Long.MIN_VALUE) {
-        Main.debug("SpotlightExtractor: invalid value for int field: %",
-            (String) o);
-        return;
-      }
-    } else {
-      Main.debug("SpotlightExtractor: unsupported data type: %",
-          o.getClass().getName());
-      return;
-    }
-    if(value > Integer.MAX_VALUE) meta.setLong(field, value);
-    else if(value > Short.MAX_VALUE) meta.setInt(field, (int) value);
-    else meta.setShort(field, (short) value);
-    parser.metaEvent(meta);
-  }
-
-  /**
-   * Converts the object to a String and fires an event.
-   * @param field the {@link StringField}.
-   * @param o the object to convert.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void stringEvent(final StringField field, final Object o) throws IOException {
-    assert o instanceof String;
-    meta.setString(field, (String) o, true);
-    parser.metaEvent(meta);
-  }
-
-  /**
-   * Converts an object that contains a seconds value to a XML duration object
-   * and fires an event.
-   * @param o the object to convert.
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void durationEvent(final Object o) throws IOException {
-    double value;
-    // most objects will be Double
-    if(o instanceof Double) value = (Double) o;
-    else if(o instanceof Integer) value = (Integer) o;
-    else if(o instanceof Long) value = (Long) o;
-    else if(o instanceof Short) value = (Short) o;
-    else if(o instanceof Byte) value = (Byte) o;
-    else if(o instanceof Float) value = (Float) o;
-    else if(o instanceof String) {
-      try {
-        value = Double.parseDouble((String) o);
-      } catch(final NumberFormatException e) {
-        Main.debug("SpotlightExtractor: invalid value for int field: %",
-            (String) o);
-        return;
-      }
-    } else {
-      Main.debug("SpotlightExtractor: unsupported data type: %",
-          o.getClass().getName());
-      return;
-    }
-    meta.setDuration(ParserUtil.convertMsDuration((int) (value * 1000)));
-    parser.metaEvent(meta);
-  }
-
-  /**
-   * Sets the MIME type for the current item.
-   * @param ct the spotlight content type
-   * @throws IOException if any error occurs while writing to the parser.
-   */
-  void contentTypeEvent(final SpotlightContentType ct) throws IOException {
-    final MetaType me = ct.getType();
-    if(me != null) parser.metaEvent(meta.setMetaType(me));
-    else {
-      final MimeType mi = ct.getFormat();
-      if(mi != null) parser.metaEvent(meta.setMimeType(mi));
-    }
+    meta.write(parser);
   }
 
   /**

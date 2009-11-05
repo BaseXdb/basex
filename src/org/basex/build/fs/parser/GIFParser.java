@@ -5,10 +5,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 
 /**
  * Parser for GIF files.
@@ -46,15 +45,12 @@ public final class GIFParser extends AbstractParser {
     }
     if(!check(f)) return;
 
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-    parser.metaEvent(meta.setMimeType(MimeType.GIF));
+    meta.setType(MetaType.PICTURE);
+    meta.setFormat(MimeType.GIF);
 
     // extract image dimensions
-    meta.setInt(IntField.PIXEL_WIDTH, f.get() + (f.get() << 8));
-    parser.metaEvent(meta);
-    meta.setInt(IntField.PIXEL_HEIGHT, f.get() + (f.get() << 8));
-    parser.metaEvent(meta);
+    meta.add(MetaElem.PIXEL_WIDTH, f.get() + (f.get() << 8));
+    meta.add(MetaElem.PIXEL_HEIGHT, f.get() + (f.get() << 8));
   }
 
   @Override

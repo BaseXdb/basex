@@ -3,9 +3,8 @@ package org.basex.build.fs.parser;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 
 /**
  * Parser for TIF files.
@@ -22,7 +21,7 @@ public final class TIFFParser extends AbstractParser {
   }
 
   /** Parser for Exif data. */
-  private final ExifParser exifParser = new ExifParser();
+  private final ExifParser exifParser = new ExifParser(meta);
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
@@ -33,9 +32,8 @@ public final class TIFFParser extends AbstractParser {
   protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f)) return;
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-    parser.metaEvent(meta.setMimeType(MimeType.TIFF));
+    meta.setType(MetaType.PICTURE);
+    meta.setFormat(MimeType.TIFF);
     exifParser.parse(f, parser);
   }
 

@@ -3,10 +3,9 @@ package org.basex.build.fs.parser;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import static org.basex.util.Token.*;
 
 /**
@@ -43,11 +42,10 @@ public final class PNGParser extends AbstractParser {
   protected void meta(final BufferedFileChannel bfc, final NewFSParser parser)
       throws IOException {
     if(!check(bfc)) return;
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-    parser.metaEvent(meta.setMimeType(MimeType.PNG));
-    parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, bfc.getInt()));
-    parser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, bfc.getInt()));
+    meta.setType(MetaType.PICTURE);
+    meta.setFormat(MimeType.PNG);
+    meta.add(MetaElem.PIXEL_WIDTH, bfc.getInt());
+    meta.add(MetaElem.PIXEL_HEIGHT, bfc.getInt());
   }
 
   @Override

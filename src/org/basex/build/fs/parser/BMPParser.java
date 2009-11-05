@@ -1,14 +1,14 @@
 package org.basex.build.fs.parser;
 
 import static org.basex.util.Token.*;
+
 import java.io.EOFException;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 
 /**
  * Parser for BMP files.
@@ -44,15 +44,14 @@ public final class BMPParser extends AbstractParser {
       return;
     }
 
-    final Metadata meta = new Metadata();
-    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-    parser.metaEvent(meta.setMimeType(MimeType.BMP));
-    
+    meta.setType(MetaType.PICTURE);
+    meta.setFormat(MimeType.BMP);
+
     // extract image dimensions
     final int w = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
     final int h = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
-    parser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, w));
-    parser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, h));
+    meta.add(MetaElem.PIXEL_WIDTH, w);
+    meta.add(MetaElem.PIXEL_HEIGHT, h);
   }
 
   @Override

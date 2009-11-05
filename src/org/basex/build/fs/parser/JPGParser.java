@@ -4,11 +4,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.Metadata;
-import org.basex.build.fs.util.Metadata.IntField;
-import org.basex.build.fs.util.Metadata.MetaType;
-import org.basex.build.fs.util.Metadata.MimeType;
-import org.basex.build.fs.util.Metadata.StringField;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore;
+import org.basex.build.fs.util.MetaStore.MetaType;
+import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
 
 /**
@@ -41,10 +40,8 @@ public final class JPGParser extends AbstractParser {
   { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
   private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00};
-  /** Metadata item. */
-  private final Metadata meta = new Metadata();
   /** Parser for Exif data. */
-  private final ExifParser exifParser = new ExifParser();
+  private final ExifParser exifParser = new ExifParser(meta);
   /** The {@link NewFSParser} instance to fire events. */
   private NewFSParser fsparser;
   /** The {@link BufferedFileChannel} to read from. */
@@ -67,8 +64,8 @@ public final class JPGParser extends AbstractParser {
   protected void meta(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f)) return;
-    parser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-    parser.metaEvent(meta.setMimeType(MimeType.JPG));
+    meta.setType(MetaType.PICTURE);
+    meta.setFormat(MimeType.JPG);
     bfc = f;
     fsparser = parser;
     bfc.skip(-2);
@@ -150,8 +147,8 @@ public final class JPGParser extends AbstractParser {
     if(bfc.get() == 8) {
       final int height = bfc.getShort();
       final int width = bfc.getShort();
-      fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
-      fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
+      meta.add(MetaElem.PIXEL_HEIGHT, height);
+      meta.add(MetaElem.PIXEL_WIDTH, width);
     } else {
       if(NewFSParser.VERBOSE) Main.debug(
           "JPGParser: Wrong data precision field (%).", bfc.getFileName());
@@ -211,41 +208,37 @@ public final class JPGParser extends AbstractParser {
       return;
     }
     int s = size - HEADER_JFXX.length - 1;
-    int width = 0;
-    int height = 0;
+    fsparser.startContent(bfc.absolutePosition(), s);
+    MetaStore contentMeta = new MetaStore();
     switch(bfc.get()) { // extension code
       case 0x10: // Thumbnail coded using JPEG
-        fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-        fsparser.metaEvent(meta.setMimeType(MimeType.JPG));
-        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
+        contentMeta.setType(MetaType.PICTURE);
+        contentMeta.setFormat(MimeType.JPG);
+        contentMeta.add(MetaElem.TITLE, "Thumbnail");
         break;
       case 0x11: // Thumbnail coded using 1 byte/pixel
-        width = bfc.get();
-        height = bfc.get();
         s -= 2;
-        fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
-        fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-            "Thumbnail coded using 1 byte/pixel."));
+        contentMeta.setType(MetaType.PICTURE);
+        contentMeta.add(MetaElem.TITLE, "Thumbnail");
+        contentMeta.add(MetaElem.DESCRIPTION,
+            "Thumbnail coded using 1 byte/pixel.");
+        contentMeta.add(MetaElem.PIXEL_WIDTH, bfc.get());
+        contentMeta.add(MetaElem.PIXEL_HEIGHT, bfc.get());
         break;
       case 0x13: // Thumbnail coded using 3 bytes/pixel
-        width = bfc.get();
-        height = bfc.get();
         s -= 2;
-        fsparser.startContent(bfc.absolutePosition(), s);
-        fsparser.metaEvent(meta.setMetaType(MetaType.PICTURE));
-        fsparser.metaEvent(meta.setString(StringField.TITLE, "Thumbnail"));
-        fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-            "Thumbnail coded using 3 bytes/pixel."));
+        contentMeta.setType(MetaType.PICTURE);
+        contentMeta.add(MetaElem.TITLE, "Thumbnail");
+        contentMeta.add(MetaElem.DESCRIPTION,
+            "Thumbnail coded using 3 bytes/pixel.");
+        contentMeta.add(MetaElem.PIXEL_WIDTH, bfc.get());
+        contentMeta.add(MetaElem.PIXEL_HEIGHT, bfc.get());
         break;
       default:
         Main.debug("JPGParser: Illegal or unsupported JFIF header (%)",
             bfc.getFileName());
     }
-    fsparser.metaEvent(meta.setInt(IntField.PIXEL_WIDTH, width));
-    fsparser.metaEvent(meta.setInt(IntField.PIXEL_HEIGHT, height));
+    contentMeta.write(fsparser);
     fsparser.endContent();
     bfc.skip(s);
   }
@@ -256,7 +249,6 @@ public final class JPGParser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   private void readComment(final int size) throws IOException {
-    fsparser.metaEvent(meta.setString(StringField.DESCRIPTION,
-        bfc.get(new byte[size])));
+    meta.add(MetaElem.DESCRIPTION, bfc.get(new byte[size]));
   }
 }

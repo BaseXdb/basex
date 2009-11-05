@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -15,10 +16,9 @@ import org.basex.build.fs.parser.AbstractParser;
 import org.basex.build.fs.parser.TXTParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Loader;
-import org.basex.build.fs.util.Metadata;
+import org.basex.build.fs.util.MetaElem;
 import org.basex.build.fs.util.ParserUtil;
 import org.basex.build.fs.util.SpotlightExtractor;
-import org.basex.build.fs.util.Metadata.StringField;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -32,19 +32,18 @@ import org.deepfs.fs.DeepFS;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.
- * 
  * In more detail importing a file hierarchy means to map a file hierarchy into
  * an XML representation according to an XML document valid against the DeepFSML
  * specification.
- * 
  * This class {@link NewFSParser} instantiates the parsers to extract metadata
  * and content from files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
  */
 public final class NewFSParser extends Parser {
+
+  // [BL] list metadata elements before content
 
   // ----- Namespaces ----------------------------------------------------------
   /** All namespaces used in {@link NewFSParser}. */
@@ -119,11 +118,11 @@ public final class NewFSParser extends Parser {
   /** Content tag in fs namespace. */
   private static final byte[] CONTENT_NS = NewFSParser.NS.DEEPURL.tag(CONTENT);
   /** Text content tag in fs namespace. */
-  private static final byte[] TEXT_CONTENT_NS = 
-    NewFSParser.NS.DEEPURL.tag(TEXT_CONTENT);
+  private static final byte[] TEXT_CONTENT_NS =
+      NewFSParser.NS.DEEPURL.tag(TEXT_CONTENT);
   /** XML content tag in fs namespace. */
   private static final byte[] XML_CONTENT_NS =
-    NewFSParser.NS.DEEPURL.tag(XML_CONTENT);
+      NewFSParser.NS.DEEPURL.tag(XML_CONTENT);
 
   // ---------------------------------------------------------------------------
 
@@ -177,8 +176,6 @@ public final class NewFSParser extends Parser {
 
   /** If true, verbose debug messages are created (e.g. for corrupt files). */
   public static final boolean VERBOSE = true;
-  /** If true, the <code>type=""</code> attributes are added to the XML doc. */
-  private static final boolean ADD_ATTS = false;
 
   /** Empty attribute array. */
   private static final Atts EMPTY_ATTS = new Atts();
@@ -205,9 +202,6 @@ public final class NewFSParser extends Parser {
   private int lvl;
   /** Do not expect complete file hierarchy, but parse single files. */
   private boolean singlemode;
-
-  /** Metadata item. */
-  Metadata meta = new Metadata();
 
   /**
    * First byte of the current file or content element in the current file. Is
@@ -494,10 +488,9 @@ public final class NewFSParser extends Parser {
       final long offset = bfc.absolutePosition();
       final long size = bfc.size();
       startContent(offset, size);
-      if(title != null) {
-        meta.setString(StringField.TITLE, token(title));
-        metaEvent(meta);
-      }
+      // [BL] more generic method for setting metadata for file fragments
+      if(title != null) builder.nodeAndText(MetaElem.TITLE.get(), EMPTY_ATTS,
+          token(title));
       if(parser != null) {
         try {
           lastContentOffset = offset;
@@ -571,7 +564,7 @@ public final class NewFSParser extends Parser {
    * Deletes a non-empty directory.
    * @param dir to be deleted.
    * @return boolean true for success, false for failure.
-   * */
+   */
   public static boolean deleteDir(final File dir) {
     if(dir.isDirectory()) {
       for(final String child : dir.list()) {
@@ -586,18 +579,17 @@ public final class NewFSParser extends Parser {
   // ---------------------------------------------------------------------------
 
   /**
-   * Generates the xml representation for a key-value pair and adds it to the
-   * current file element.
-   * @param m the {@link Metadata} object containing all metadata information.
-   * @throws IOException if any error occurs while generating the xml code.
+   * Generates the xml representation for a map with key-value pairs that
+   * contains the metadata information for the current file.
+   * @param metaElements {@link TreeMap}, containing metadata information for
+   *          the current file.
+   * @throws IOException if any error occurs.
    */
-  @SuppressWarnings("all")
-  // suppress dead code warning for ADD_ATTS
-  public void metaEvent(final Metadata m) throws IOException {
+  public void setMeta(final TreeMap<MetaElem, byte[]> metaElements)
+      throws IOException {
     if(!prop.is(Prop.FSMETA)) return;
-    final byte[] data = ParserUtil.checkUTF(m.getValue());
-    if(ws(data)) return;
-    builder.nodeAndText(m.getKey(), ADD_ATTS ? m.getAtts() : EMPTY_ATTS, data);
+    for(final Map.Entry<MetaElem, byte[]> entry : metaElements.entrySet())
+      builder.nodeAndText(entry.getKey().get(), EMPTY_ATTS, entry.getValue());
   }
 
   /**
@@ -653,21 +645,14 @@ public final class NewFSParser extends Parser {
   public void textContent(final long offset, final long size,
       final TokenBuilder text, final boolean preserveSpace) throws IOException {
     if(!prop.is(Prop.FSCONT)) return;
-    // startContent(offset, size);
     atts.reset();
     atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
     atts.add(SIZE, token(size));
-    if(ADD_ATTS) {
-      atts.add(Metadata.DATA_TYPE, Metadata.DATA_TYPE_STRING);
-      if(preserveSpace) atts.add(Metadata.XML_SPACE,
-          Metadata.XmlSpace.PRESERVE.get());
-    }
     if(!preserveSpace) text.chop();
     if(text.size() == 0) return;
     builder.startElem(TEXT_CONTENT_NS, atts);
     builder.text(text, false);
     builder.endElem(TEXT_CONTENT_NS);
-    // endContent();
   }
 
   /**
