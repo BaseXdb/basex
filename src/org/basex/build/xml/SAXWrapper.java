@@ -81,16 +81,15 @@ public final class SAXWrapper extends Parser {
   }
 
   /**
-   * Wraps the input stream to track the number of read bytes.
-   * @param is input stream
+   * Wraps the input source with a stream which counts the number of read bytes.
+   * @param is input source
    * @return resulting stream
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
     if(is == null) return null;
     final String id = is.getSystemId();
-    if(!Prop.gui || is.getByteStream() != null || id == null ||
-        id.isEmpty()) return is;
+    if(is.getByteStream() != null || id == null || id.isEmpty()) return is;
 
     length = IO.get(id).length();
     final FileInputStream fis = new FileInputStream(io.path()) {

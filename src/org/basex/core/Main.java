@@ -1,17 +1,15 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.BindException;
 import java.util.Random;
-
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Password;
 import org.basex.core.proc.Set;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.server.LoginException;
 import org.basex.util.Token;
@@ -29,7 +27,7 @@ public abstract class Main {
   /** Successful command line parsing. */
   protected boolean success;
   /** Output file for queries. */
-  protected String output;
+  protected OutputStream out = System.out;
   /** Input file for queries. */
   protected String input;
 
@@ -79,6 +77,7 @@ public abstract class Main {
   protected synchronized void quit(final boolean user) {
     try {
       process(new Exit(), true);
+      out.close();
     } catch(final IOException ex) {
       error(ex, true);
     }
@@ -124,10 +123,7 @@ public abstract class Main {
 
     final Session ss = session();
     if(ss == null) return false;
-    final PrintOutput out = output != null ? new PrintOutput(output) :
-      new PrintOutput(System.out);
     final boolean ok = ss.execute(pr, out);
-    out.close();
     if(pr instanceof Exit) return true;
 
     if(v || !ok) {

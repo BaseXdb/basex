@@ -90,9 +90,6 @@ public abstract class Process extends Progress {
     if(data() && data == null) return error(PROCNODB);
 
     // check permissions
-    // [CG] correct?
-    //final int i = context.perm((updating(ctx) ? User.WRITE : 0) |
-    //    flags & 0xFF, data);
     final int i = context.perm(flags & 0xFF, data);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 

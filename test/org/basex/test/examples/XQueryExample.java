@@ -35,29 +35,19 @@ public final class XQueryExample {
     // Alternative: write results to disk
     // PrintOutput out = new PrintOutput("result.txt");
 
-    out.println("=== First version: Processing a result instance");
+    out.println("\n=== First version: Using the database command");
 
-    // Creates a query instance
-    QueryProcessor processor = new QueryProcessor(QUERY, context);
-    // Executes the query.
-    Result result = processor.query();
-    // Creates a result serializer
-    XMLSerializer xml = new XMLSerializer(out);
-    // Serializes the result
-    result.serialize(xml);
-    // Closes the serializer
-    xml.close();
-    // Closes the query processor
-    processor.close();
+    // Creates and executes a query
+    new XQuery(QUERY).exec(context, out);
 
     out.println("\n=== Second version: Iterating through all results");
 
     // Creates a query instance
-    processor = new QueryProcessor(QUERY, context);
+    QueryProcessor processor = new QueryProcessor(QUERY, context);
     // Returns a query iterator
     Iter iter = processor.iter();
     // Creates a result serializer
-    xml = new XMLSerializer(out);
+    XMLSerializer xml = new XMLSerializer(out);
     // Uses an iterator to serialize the result
     while(true) {
       Item item = iter.next();
@@ -69,10 +59,20 @@ public final class XQueryExample {
     // Closes the query processor
     processor.close();
 
-    out.println("\n=== Third version: Using the database command");
+    out.println("=== Third version: Processing a result instance");
 
-    // Creates and executes a query
-    new XQuery(QUERY).exec(context, out);
+    // Creates a query instance
+    processor = new QueryProcessor(QUERY, context);
+    // Executes the query.
+    Result result = processor.query();
+    // Creates a result serializer
+    xml = new XMLSerializer(out);
+    // Serializes the result
+    result.serialize(xml);
+    // Closes the serializer
+    xml.close();
+    // Closes the query processor
+    processor.close();
 
     // Closes the output stream
     out.close();

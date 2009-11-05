@@ -9,6 +9,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Token;
 
@@ -139,7 +140,7 @@ public class BaseX extends Main {
             context.prop.set(Prop.HOST, arg.string());
           } else if(c == 'o') {
             // specify file for result output
-            output = arg.string();
+            out = new PrintOutput(arg.string());
           } else if(c == 'p' && !sa()) {
             // parse server port
             context.prop.set(Prop.PORT, arg.num());
