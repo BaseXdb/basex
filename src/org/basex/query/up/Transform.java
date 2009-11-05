@@ -11,6 +11,7 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -61,8 +62,8 @@ public final class Transform extends Arr {
   public Item atomic(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
     for(final Let fo : copies) {
-      // [LK] copied node is a DOC node ? ... attributes ?
-      final Data m = UpdateFunctions.buildDB(fo.expr.iter(ctx), null);
+      final Iter iter = fo.expr.iter(ctx);
+      final Data m = UpdateFunctions.buildDB(iter, null);
       ctx.vars.add(fo.var.bind(new DBNode(m,
           Math.min(1, m.meta.size - 1)), ctx).copy());
     }
