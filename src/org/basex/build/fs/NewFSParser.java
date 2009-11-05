@@ -16,7 +16,6 @@ import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Loader;
 import org.basex.build.fs.util.MetaElem;
 import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.SpotlightExtractor;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -24,11 +23,12 @@ import org.basex.core.proc.CreateFS;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Atts;
-import org.basex.util.LibraryLoader;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.fsml.extractors.SpotlightExtractor;
 import org.deepfs.fsml.parsers.AbstractParser;
 import org.deepfs.fsml.parsers.TXTParser;
+import org.deepfs.util.LibraryLoader;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.

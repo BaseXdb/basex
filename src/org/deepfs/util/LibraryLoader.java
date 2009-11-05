@@ -1,4 +1,4 @@
-package org.basex.util;
+package org.deepfs.util;
 
 import org.basex.core.Main;
 

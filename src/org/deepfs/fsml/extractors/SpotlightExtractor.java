@@ -1,4 +1,4 @@
-package org.basex.build.fs.util;
+package org.deepfs.fsml.extractors;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,12 +7,15 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import org.basex.build.fs.NewFSParser;
+import org.basex.build.fs.util.MetaElem;
+import org.basex.build.fs.util.MetaStore;
+import org.basex.build.fs.util.ParserUtil;
 import org.basex.build.fs.util.MetaStore.MetaType;
 import org.basex.build.fs.util.MetaStore.MimeType;
 import org.basex.core.Main;
-import org.basex.util.LibraryLoader;
 import org.basex.util.Token;
 import org.deepfs.fsml.parsers.MP3Parser;
+import org.deepfs.util.LibraryLoader;
 
 /**
  * Extracts metadata from Apple's Spotlight.

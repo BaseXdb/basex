@@ -2,7 +2,7 @@ package org.basex.data;
 
 import org.basex.core.Prop;
 import org.basex.index.Names;
-import org.basex.util.LibraryLoader;
+import org.deepfs.util.LibraryLoader;
 
 /**
  * This class stores and organizes the database table and the index structures

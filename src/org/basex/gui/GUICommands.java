@@ -47,10 +47,10 @@ import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
-import org.basex.util.LibraryLoader;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.deepfs.util.LibraryLoader;
 
 /**
  * This enumeration encapsulates all commands that are triggered by

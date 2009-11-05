@@ -3,8 +3,8 @@ package org.basex.core.proc;
 import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
-import org.basex.util.LibraryLoader;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.util.LibraryLoader;
 
 /**
  * Evaluates the 'mount' command and mounts a DeepFS database as FUSE.
