@@ -1,4 +1,4 @@
-package org.basex.build.fs.metadata;
+package org.deepfs.fsml.extractors;
 
 import java.io.IOException;
 import org.basex.core.Main;

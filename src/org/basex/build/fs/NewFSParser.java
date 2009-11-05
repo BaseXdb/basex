@@ -12,8 +12,6 @@ import java.util.TreeMap;
 
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.build.fs.parser.AbstractParser;
-import org.basex.build.fs.parser.TXTParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.Loader;
 import org.basex.build.fs.util.MetaElem;
@@ -29,6 +27,8 @@ import org.basex.util.Atts;
 import org.basex.util.LibraryLoader;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.fsml.parsers.AbstractParser;
+import org.deepfs.fsml.parsers.TXTParser;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.

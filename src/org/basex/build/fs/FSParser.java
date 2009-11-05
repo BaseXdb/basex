@@ -10,16 +10,6 @@ import java.util.Arrays;
 
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.build.fs.metadata.AbstractExtractor;
-import org.basex.build.fs.metadata.BMPExtractor;
-import org.basex.build.fs.metadata.EMLExtractor;
-import org.basex.build.fs.metadata.GIFExtractor;
-import org.basex.build.fs.metadata.JPGExtractor;
-import org.basex.build.fs.metadata.MP3Extractor;
-import org.basex.build.fs.metadata.MetaDataException;
-import org.basex.build.fs.metadata.PNGExtractor;
-import org.basex.build.fs.metadata.TIFExtractor;
-import org.basex.build.fs.metadata.XMLExtractor;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -29,6 +19,16 @@ import org.basex.io.IO;
 import org.basex.util.Map;
 import org.basex.util.Token;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.fsml.extractors.AbstractExtractor;
+import org.deepfs.fsml.extractors.BMPExtractor;
+import org.deepfs.fsml.extractors.EMLExtractor;
+import org.deepfs.fsml.extractors.GIFExtractor;
+import org.deepfs.fsml.extractors.JPGExtractor;
+import org.deepfs.fsml.extractors.MP3Extractor;
+import org.deepfs.fsml.extractors.MetaDataException;
+import org.deepfs.fsml.extractors.PNGExtractor;
+import org.deepfs.fsml.extractors.TIFExtractor;
+import org.deepfs.fsml.extractors.XMLExtractor;
 
 /**
  * Imports/shreds/parses a file hierarchy into a database.

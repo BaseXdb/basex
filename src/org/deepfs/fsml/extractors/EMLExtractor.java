@@ -1,4 +1,4 @@
-package org.basex.build.fs.metadata;
+package org.deepfs.fsml.extractors;
 
 import static org.basex.build.fs.FSText.*;
 import static org.basex.util.Token.*;

@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
 import java.util.TreeMap;

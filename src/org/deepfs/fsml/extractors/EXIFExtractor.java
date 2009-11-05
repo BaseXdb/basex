@@ -1,13 +1,14 @@
-package org.basex.build.fs.metadata;
+package org.deepfs.fsml.extractors;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.basex.build.fs.FSText;
-import org.basex.build.fs.metadata.EXIFIndex.EXIFInfo;
 import org.basex.core.Main;
 import org.basex.util.Token;
+import org.deepfs.fsml.extractors.EXIFIndex.EXIFInfo;
+
 import static org.basex.build.fs.FSText.*;
 
 /**

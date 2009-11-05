@@ -5,7 +5,8 @@ import java.io.File;
 /**
  * Produces tree(1)-like output of a directory hierarchy.
  * 
- * @author Alexander Holupirek for group 42, XML & DB, Winter Term 2009
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ * @author Alexander Holupirek
  */
 public final class TreePrinter extends FSTraversal {
 

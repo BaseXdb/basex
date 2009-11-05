@@ -1,4 +1,4 @@
-package org.basex.build.fs.parser;
+package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
 import java.io.EOFException;
