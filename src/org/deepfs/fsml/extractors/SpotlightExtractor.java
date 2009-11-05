@@ -181,7 +181,7 @@ public final class SpotlightExtractor {
     ContentCreationDate {
       @Override
       public void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (String) o);
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (Date) o);
       }
     },
         // /** Date and time when the content of this item was modified. */
@@ -338,7 +338,7 @@ public final class SpotlightExtractor {
     LastUsedDate {
       @Override
       public void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_LAST_USED, (String) o);
+        if(check(o, Date.class)) meta.add(MetaElem.DATE_LAST_USED, (Date) o);
       }
     },
         /** Lyricist of the song in the audio file. */
