@@ -20,10 +20,10 @@ public final class TreePrinter extends FSTraversal {
      * For each level a separate indentation string is stored in
      * {@link #indentStrings}.  This methods prints an indentation
      * string by concatenating all prior indent strings.
-     * @param level of indentation 
+     * @param depth of indentation 
      */
-    private void printIndent(final int level) {
-        for (int i = 0; i < level; i++) System.out.print(indentStrings[i]);
+    private void printIndent(final int depth) {
+        for (int i = 0; i < depth; i++) System.out.print(indentStrings[i]);
     }
     
     /**
