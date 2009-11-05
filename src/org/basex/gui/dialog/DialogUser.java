@@ -239,6 +239,28 @@ public final class DialogUser extends BaseXBack {
       throw new IOException(sess.info());
     }
     data = new Table(out.toString());
+    if (!global) {
+      final CachedOutput out2 = new CachedOutput();
+      sess.execute(new Show("Users"), out2);
+      Table data2 = new Table(out2.toString());
+      StringList tmp1 = new StringList();
+      for(StringList l : data.contents) {
+        tmp1.add(l.get(0));
+      }
+      StringList tmp2 = new StringList();
+      for(StringList l : data2.contents) {
+        tmp2.add(l.get(0));
+      }
+      for(String s : tmp2) {
+        if(!tmp1.contains(s)) {
+          StringList item = new StringList();
+          item.add(s);
+          item.add("");
+          item.add("");
+          data.contents.add(item);
+        }
+      }
+    }
     userco1.removeAllItems();
     userco2.removeAllItems();
     StringList tmp = new StringList();
@@ -254,7 +276,7 @@ public final class DialogUser extends BaseXBack {
     }
     userco1.setSelectedIndex(-1);
     userco2.setSelectedIndex(-1);
-    data.contents.remove(tmp);
+    if(global) data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
   }
 
