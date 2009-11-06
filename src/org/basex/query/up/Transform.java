@@ -2,16 +2,17 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
+import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -61,15 +62,19 @@ public final class Transform extends Arr {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
+    final PendingUpdates tUpd = new PendingUpdates(true);
     for(final Let fo : copies) {
-      final Iter iter = fo.expr.iter(ctx);
-      final Data m = UpdateFunctions.buildDB(iter, null);
+      final Constr c = new Constr(ctx, fo.expr);
+      if(c.children.size() + c.ats.size() > 1) Err.or(UPCOPYMULT, this);
+      final Data m = UpdateFunctions.buildDB(c.children.size() > 0 ? 
+          c.children : c.ats, null);
       ctx.vars.add(fo.var.bind(new DBNode(m,
           Math.min(1, m.meta.size - 1)), ctx).copy());
+      tUpd.addDataReference(m);
     }
 
     final PendingUpdates upd = ctx.updates;
-    ctx.updates = new PendingUpdates();
+    ctx.updates = tUpd;
     ctx.iter(expr[0]).finish();
     ctx.updates.apply();
     ctx.updates = upd;

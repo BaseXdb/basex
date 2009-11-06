@@ -38,12 +38,10 @@ public final class ReplaceElemContent extends UpdatePrimitive {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-//    InfoTable.pT(d, 0, -1);
     final int j = p + d.attSize(p, Data.ELEM);
     int i = p + d.size(p, Data.ELEM) - 1;
     while(i >= j) d.delete(i--);
     if(r.length > 0) d.insert(j, p, r, Data.TEXT);
-//    InfoTable.pT(d, 0, -1);
   }
 
   @Override

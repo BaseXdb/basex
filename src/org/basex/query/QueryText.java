@@ -496,6 +496,8 @@ public interface QueryText {
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target node has no parent." };
+  /** XUDY0014: XQuery Update dynamic exception. */
+  Object[] UPWRONGTRG = { XUDY, 14, "Target node not copied in copy clause." };
   /** XUDY0015: XQuery Update dynamic exception. */
   Object[] UPMULTREN = { XUDY, 15, "Multiple renames on same node." };
   /** XUDY0016: XQuery Update dynamic exception. */
@@ -533,6 +535,9 @@ public interface QueryText {
   /** XUTY0012: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP = { XUTY, 12,
       "Target must be element, attribute or processing instruction." };
+  /** XUTY0013: XQuery Update dynamic exception. */
+  Object[] UPCOPYMULT = { XUTY, 13, 
+      "Source expression in copy clause must return single node." };
   /** XUTY0022: XQuery Update dynamic exception. */
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
 
