@@ -65,8 +65,10 @@ public final class Transform extends Arr {
     final PendingUpdates tUpd = new PendingUpdates(true);
     for(final Let fo : copies) {
       final Constr c = new Constr(ctx, fo.expr);
-      if(c.children.size() + c.ats.size() > 1) Err.or(UPCOPYMULT, this);
-      final Data m = UpdateFunctions.buildDB(c.children.size() > 0 ? 
+      final int cs = c.children.size();
+      final int os = cs + c.ats.size();
+      if(os > 1 || os == 0) Err.or(UPCOPYMULT, this);
+      final Data m = UpdateFunctions.buildDB(cs > 0 ?
           c.children : c.ats, null);
       ctx.vars.add(fo.var.bind(new DBNode(m,
           Math.min(1, m.meta.size - 1)), ctx).copy());

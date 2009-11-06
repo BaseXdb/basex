@@ -2,6 +2,9 @@ package org.basex.query.up;
 
 import static org.basex.util.Token.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -56,6 +59,37 @@ public final class UpdateFunctions {
       }
     }
     return s;
+  }
+  
+  /**
+   * Blabooo.
+   * @param at ?
+   * @param r ?
+   * @param m ?
+   * @return ?
+   * @throws QueryException ?
+   */
+  public static boolean checkAttNames(final Iter at, final Iter r, 
+      final String m) throws QueryException {
+    final Set<String> s = new HashSet<String>();
+    Nod n = (Nod) at.next();
+    
+    while(n != null) {
+      s.add(string(n.nname()));
+      n = (Nod) at.next();
+    }
+    
+    n = (Nod) r.next();
+    while(n != null) {
+      final String t = string(n.nname());
+      final boolean b = s.add(t);
+      if(!b) {
+        if(m == null) return false;
+        if(!t.equals(m)) return false;
+      }
+      n = (Nod) r.next();
+    }
+    return true;
   }
 
   /**

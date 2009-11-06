@@ -17,8 +17,8 @@ import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.InsertAfter;
 import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
-import org.basex.query.up.primitives.InsertIntoFirst;
 import org.basex.query.up.primitives.InsertInto;
+import org.basex.query.up.primitives.InsertIntoFirst;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
 
@@ -85,9 +85,13 @@ public final class Insert extends Update {
     if(aSeq.size() > 0) {
       if(before || after) {
         if(par.type != Type.ELM) Err.or(UPATTDOC, this);
+        if(!UpdateFunctions.checkAttNames(par.attr(), aSeq, null))
+          Err.or(UPATTDUPL, n.nname());
         up = new InsertAttribute(par, aSeq);
       } else {
         if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
+        if(!UpdateFunctions.checkAttNames(n.attr(), aSeq, null))
+          Err.or(UPATTDUPL, n.nname());
         up = new InsertAttribute(n, aSeq);
       }
       ctx.updates.add(up, ctx);

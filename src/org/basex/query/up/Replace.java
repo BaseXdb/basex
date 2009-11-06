@@ -2,14 +2,13 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-import java.util.Set;
+import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
@@ -20,7 +19,6 @@ import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.Err;
-import static org.basex.util.Token.*;
 
 /**
  * Replace expression.
@@ -71,6 +69,8 @@ public final class Replace extends Update {
       } else {
         // replace attribute node
         if(seq.size() > 0) Err.or(UPWRATTR, i);
+        if(!UpdateFunctions.checkAttNames(p.attr(), aSeq, string(n.nname())))
+          Err.or(UPATTDUPL, n.nname());
         ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
       }
       return Seq.EMPTY;
@@ -87,18 +87,6 @@ public final class Replace extends Update {
     return Seq.EMPTY;
   }
   
-  /**
-   * Checks for duplicates/namespace conflicts in the given set. 
-   * @param s set
-   * @param n node ns to add
-   * @return true if duplicates exist
-   */
-  public static boolean checkNS(final Set<String> s, final Nod n) {
-    if(n instanceof FNode) return !s.add(string(((FNode) n).nname()));
-    final DBNode dn = (DBNode) n;
-    return !s.add(string(dn.data.attName(dn.pre)));
-  }
-
   @Override
   public String toString() {
     return REPLACE + ' ' + (value ? VALUEE + ' ' + OF : "") +
