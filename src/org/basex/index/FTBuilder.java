@@ -5,7 +5,9 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.io.DataOutput;
 import org.basex.util.IntList;
+import org.basex.util.Num;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
@@ -28,6 +30,10 @@ abstract class FTBuilder extends IndexBuilder {
   int[] nmbdocwt;
   /** Scoring mode. 1 = document based, 2 = textnode based .*/
   int scm;
+  /** Frequency counter. */
+  int fc;
+  /** Entry counter. */
+  int c;
     
   /**
    * Constructor.
@@ -107,6 +113,88 @@ abstract class FTBuilder extends IndexBuilder {
     }
     write();
   }
+
+  /**
+   * Write full-text data to disk.
+   * @param out DataOutput for disk access
+   * @param vpre compressed pre values
+   * @param vpos compressed pos values 
+   * @throws IOException IOException
+   */
+  
+  final void writeFTData(final DataOutput out, final byte[] vpre, 
+      final byte[] vpos) throws IOException {
+    int lpre = 4;
+    int lpos = 4;
+
+    // fulltext data is stored here, with -scoreU, pre1, pos1, ..., -scoreU, preU, posU
+    final int pres = Num.size(vpre);
+    final int poss = Num.size(vpos);
+    int cn = scm == 1 ? 1 : 0; 
+    int lastpre = -1;
+    int pre = -1;
+    while(lpre < pres && lpos < poss) {
+      if (scm > 0) {
+        if (lastpre < pre) fc++;
+        pre = Num.read(vpre, lpre);
+        
+        while (cn < nodes.size() && nodes.get(cn) < pre) cn++;
+        if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
+            nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) < pre)
+            && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
+          final int score = ScoringTokenizer.score(nodes.size(), 
+              nmbdocwt[c], maxfreq[cn - scm == 1 ? 1 : 0], freq.get(fc));
+          // first write score value
+          out.write(Num.num(-score));
+          if (scm == 2) {
+            fc++;
+            cn++;
+          }
+        }
+        lastpre = pre;
+      }
+
+      // write fulltext data
+      for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
+        out.write(vpre[lpre++]);
+      for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
+        out.write(vpos[lpos++]);
+    }
+
+  }
+  
+  /**
+   * Calculate frequencies for tfidf.
+   * @param vpre pre values for a token
+   */
+  final void getFreq(final byte[] vpre) {
+    int lpre = 4;
+    final int size = Num.size(vpre);        
+    int cr = 1;
+    int co = 0;
+    int pre = Num.read(vpre, lpre);
+    int le = Num.len(vpre, lpre);
+    while(lpre < size) {
+      // find document root
+      while (cr < nodes.size() && pre > nodes.get(cr)) cr++;
+      while ((scm == 1 && (cr == nodes.size() || pre < nodes.get(cr))) ||
+          scm == 2 && pre == nodes.get(cr - 1)) {              
+        co++;
+        lpre += le;
+        if (lpre >= size) break;
+        pre = Num.read(vpre, lpre);
+        le = Num.len(vpre, lpre);            
+      }
+      if (co > 0) {
+        maxfreq[cr - 1] = co > maxfreq[cr - 1] ? co : maxfreq[cr - 1];
+        freq.add(co);
+      }
+      if (co > 0) nmbdocwt[c]++;
+      co = 0;
+      cr++;
+    }
+    c++;
+  }  
 
   
   /**

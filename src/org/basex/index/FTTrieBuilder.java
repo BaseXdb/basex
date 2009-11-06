@@ -6,7 +6,6 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.IntArrayList;
-import org.basex.util.Num;
 import org.basex.util.TokenList;
 
 /**
@@ -48,20 +47,21 @@ public final class FTTrieBuilder extends FTBuilder {
     final Prop pr = data.meta.prop;
     final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));
 
-    hash.init();
-
+    hash.initIter();
+    c = 0;
+    
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
       final int ds = hash.ns[p];
       final long cpre = outb.size();
-
       // write compressed pre and pos arrays
       final byte[] vpre = hash.pre[p];
       final byte[] vpos = hash.pos[p];
-      int lpre = 4;
-      int lpos = 4;
-
+      
+      fc = 0;
+      writeFTData(outb, vpre, vpos);
+      /*
       // ftdata is stored here, with pre1, pos1, ..., preu, posu
       final int pres = Num.size(vpre);
       final int poss = Num.size(vpos);
@@ -70,8 +70,9 @@ public final class FTTrieBuilder extends FTBuilder {
           outb.write(vpre[lpre++]);
         for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
           outb.write(vpos[lpos++]);
-      }
+      }*/
       index.insertSorted(tok, ds, cpre);
+      c++;
     }
 
     hash = null;
@@ -156,7 +157,15 @@ public final class FTTrieBuilder extends FTBuilder {
   }
 
   @Override
-  void getFreq() {    
+  void getFreq() {
+    maxfreq = new int[nodes.size()];
+    nmbdocwt = new int[hash.size()];
+    c = 0;
+    hash.init();
+    
+    while(hash.more()) {
+      getFreq(hash.pre[hash.next()]);
+    }
   }
   /**
    * Converts long values split with toArray back.

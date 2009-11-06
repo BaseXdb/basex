@@ -66,6 +66,13 @@ final class FTHash extends Set {
     il.sort(keys, false, true);
     it = 0;
   }
+  
+  /**
+   * Initialize the iterator. init() has to be called first!
+   */
+  void initIter() {
+    it = 0;
+  }
 
   /**
    * Checks if more nodes can be returned.
