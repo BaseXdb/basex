@@ -39,15 +39,17 @@ public final class FTItem extends DBNode {
    * @param tis total size indexed results
    * @param tol token length
    * @param indexedScore flag for usage of indexed score values
+   * @param s score value out of the index
    */
   public FTItem(final FTMatches a, final Data d, final int p, final int tol, 
-      final int tis, final boolean indexedScore) {
+      final int tis, final boolean indexedScore, final double s) {
     super(d, p, null, Type.TXT);
     all = a;
     score = -1;
     tl = tol;
     is = tis;
     ids = indexedScore;
+    score = s;
   }
 
   @Override
@@ -55,9 +57,7 @@ public final class FTItem extends DBNode {
     if(score == -1) {
       if(ids) {
         final Iterator<FTStringMatch> i = all.match[0].iterator();
-        if(i.hasNext()) {
-          score = i.next().e / 1000d;
-        } else {
+        if(!i.hasNext()) {
           score = Math.max((double) all.size / (double) is,
               Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
         }

@@ -15,6 +15,8 @@ public abstract class IndexIterator {
     public boolean more() { return false; };
     @Override
     public int next() { return 0; };
+    @Override
+    public double score() { return -1; }
   };
 
   /**
@@ -29,6 +31,13 @@ public abstract class IndexIterator {
    */
   public abstract int next();
 
+  /**
+   * Returns the scoring value out of the index.
+   * socre = -1 => no scoring value indexed
+   * @return scoring value
+   */
+  public abstract double score();
+  
   /**
    * Returns the number of index results. A new iterator must be created
    * after this method has been called.

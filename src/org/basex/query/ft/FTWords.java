@@ -114,7 +114,7 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          if (ctx.context.prop.is(Prop.INDEXSCORES)) {
+          if (ctx.context.prop.num(Prop.FTSCTYPE) > 0) {
             //[SG] INEX phrase processing 
             final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt),
                 ctx.ftopt, fast, ctx.context.prop);
@@ -136,7 +136,7 @@ public final class FTWords extends FTExpr {
         }        
         return iat.more() ? new FTItem(iat.matches(),
             data, iat.next(), txt.length, iat.indexSize(),
-            ctx.context.prop.is(Prop.INDEXSCORES)) : null;
+            ctx.context.prop.num(Prop.FTSCTYPE) > 0, iat.score()) : null;
       }
     };
   }
@@ -267,7 +267,7 @@ public final class FTWords extends FTExpr {
     }
 
     // [SG] INEX phrase processing
-    if (ic.ctx.context.prop.is(Prop.INDEXSCORES)) {      
+    if (ic.ctx.context.prop.num(Prop.FTSCTYPE) > 0) {      
       final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt),
           fto, fast, ic.ctx.context.prop);
       st.phrase();

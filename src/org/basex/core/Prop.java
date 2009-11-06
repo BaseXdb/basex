@@ -132,6 +132,8 @@ public final class Prop extends AProp {
   public static final Object[] FTCS = { "FTCS", false };
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
+  /** Flag for full-text scoring algorithm. */
+  public static final Object[] FTSCTYPE = { "FTSCTYPE", 0}; 
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };
@@ -141,14 +143,6 @@ public final class Prop extends AProp {
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
 
-  //[SG] INEX budget time
-  /** INEX budget for queries. */
-  public static final Object[] IBT = { "INDEXBUDGETTIME", -1 };
-
-  /** Indexing scores in place of pos values. */
-  public static final Object[] INDEXSCORES = { "INDEXSCORES", false };
-
-  
   // DEEPFS OPTIONS ===========================================================
   
   /** Flag for importing file metadata. */

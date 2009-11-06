@@ -94,6 +94,9 @@ public final class Values extends Index {
         p = idxl.pos();
         return v;
       }
+
+      @Override
+      public double score() { return -1; }
     };
   }
 
@@ -147,6 +150,9 @@ public final class Values extends Index {
       public boolean more() { return ++p < ids.size(); }
       @Override
       public int next() { return ids.get(p); }
+      @Override
+      public double score() { return -1; }
+
     };
   }
 

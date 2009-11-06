@@ -23,6 +23,8 @@ public abstract class FTIndexIterator extends IndexIterator {
     public int next() { return 0; };
     @Override
     public FTMatches matches() { return null; };
+    @Override
+    public double score() { return -1; };
   };
 
   /**
@@ -86,6 +88,12 @@ public abstract class FTIndexIterator extends IndexIterator {
         i1.toknum = tn;
         i2.toknum = tn;
       }
+      
+      @Override 
+      public double score() {
+        return Math.max(i1.score(), i2.score());
+      }
+
     };
   }
 
@@ -127,6 +135,11 @@ public abstract class FTIndexIterator extends IndexIterator {
       public void setTokenNum(final byte tn) {
         i1.toknum = tn;
         i2.toknum = tn;
+      }
+      
+      @Override 
+      public double score() {
+        return (i1.score() + i2.score()) / 2;
       }
     };
   }

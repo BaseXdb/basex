@@ -95,6 +95,8 @@ public final class MemValues extends Index {
         public boolean more() { return ++p < len[i]; }
         @Override
         public int next() { return ids[i][p]; }
+        @Override
+        public double score() { return -1; }
       };
     }
 

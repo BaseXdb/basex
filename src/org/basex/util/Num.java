@@ -29,6 +29,19 @@ public final class Num {
   }
 
   /**
+   * Creates a new number array.
+   * @param val initial value to be stored
+   * @return new number array
+   */
+  public static byte[] num(final int val) {
+    final int len = len(val);
+    final byte[] array = new byte[len];
+    add(array, val, 0, len);
+    return array;
+  }
+  
+  
+  /**
    * Compresses and writes an integer value to the specified array and
    * returns the array.
    * @param array array

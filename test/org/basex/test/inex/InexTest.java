@@ -151,7 +151,7 @@ public final class InexTest {
         }
         return;
       }
-      session.execute(new Set(Prop.IBT, timer));
+//      session.execute(new Set(Prop.IBT, timer));
     }
 
     session.execute(new Set(Prop.SERIALIZE, false));

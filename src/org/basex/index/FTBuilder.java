@@ -23,10 +23,12 @@ abstract class FTBuilder extends IndexBuilder {
   /** Container for maximal frequencies. */
   int[] maxfreq;
   /** Container for all frequencies. */
-  int[] freq;
+  IntList freq;
   /** Container for number of documents with token i. */
   int[] nmbdocwt;
-  
+  /** Scoring mode. 1 = document based, 2 = textnode based .*/
+  int scm;
+    
   /**
    * Constructor.
    * @param d data reference
@@ -34,10 +36,8 @@ abstract class FTBuilder extends IndexBuilder {
    */
   protected FTBuilder(final Data d, final Prop pr) {
     super(d);
-    if (pr.is(Prop.INDEXSCORES)) 
-      wp = new ScoringTokenizer(pr);
-    else 
-      wp = new Tokenizer(pr);
+    scm = pr.num(Prop.FTSCTYPE);
+    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);    
   }
 
   /**
@@ -62,11 +62,11 @@ abstract class FTBuilder extends IndexBuilder {
     
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) {
-        if(data.kind(id) == Data.DOC) nodes.add(id);
+        if(data.kind(id) == Data.DOC && scm == 1) nodes.add(id);
         continue; 
       } 
       
-//      nodes.add(id);
+      if (scm == 2) nodes.add(id);
       checkStop();
       int p = 0, i = 0, j = 0;
       wp.init(data.text(id));
@@ -101,7 +101,10 @@ abstract class FTBuilder extends IndexBuilder {
         }          
       }
     }
-    getFreq();
+    if (scm > 0) {
+      freq = new IntList();
+      getFreq();
+    }
     write();
   }
 

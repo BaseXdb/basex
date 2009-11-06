@@ -70,9 +70,16 @@ public final class ScoringTokenizer extends Tokenizer{
    * @param f frequency of the term 
    * @return score value
    */
-  public static int score(final int numdoc, final int numdocterm,
-      final int max, final int f) {
-    return Math.max(1, (int) (Math.log(numdoc / numdocterm) * f * 1000 / max));
+  public static int score(final double numdoc, final double numdocterm,
+      final double max, final double f) {
+//    System.out.println("freq. token in document: " + f);
+//    System.out.println("max freq. any token in document: " + max);
+//    System.out.println("numb documents: " + numdoc);
+//    System.out.println("numb documents with token: " + numdocterm);
+//    System.out.println("score: " + (numdoc != numdocterm ?  
+//    Math.log(numdoc / numdocterm) : 1) * f /max);
+    return (int) ((numdoc != numdocterm ? 
+        Math.log(numdoc / numdocterm) : 1) * f * 1000 / max);
   }
 
   
