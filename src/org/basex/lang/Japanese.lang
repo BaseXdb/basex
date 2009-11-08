@@ -101,12 +101,6 @@ dqe_title=Open DeepFS instance
 dmnt_title=Mount DeepFS instance
 dmnt_nomountpath=No valid mount point
 
-dq_open=XQueryファイルを開く
-dq_save=XQueryファイルを保存
-dq_notopened=ファイルが開けませんでした。
-dq_notsaved=ファイルを保存できませんでした。
-dq_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
-
 dfs_newtitle=Create new DeepFS Database
 dfs_name=Name of Filesystem Database
 dfs_all=全てインポートする
@@ -278,13 +272,17 @@ c_showxquerytt=クエリーパネルを表示します。
 c_undo=アンドゥ
 c_xqopen=XQuery 開く
 c_xqopentt=XQueryファイルを開きます。
-c_xqsave=XQuery 保存
-c_xqsavett=現在のXQueryを保存します。
+c_save=Save
+c_savett=Saves the file
+c_saveas=Save as
+c_notopened=ファイルが開けませんでした。
+c_notsaved=ファイルを保存できませんでした。
+c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
 
 ds_servdia=Server Properties
 ds_server=Server
 ds_localserver=Local Server
-ds_users=User
+ds_users=Users
 ds_host=Host
 ds_port=Port
 ds_localport=Local Port
@@ -536,6 +534,7 @@ ch_exit2=Exits %.
 
 # Help Texts
 h_hist=入力履歴の表示
+h_save=Saves the result.
 h_go=クエリーを実行します。
 h_stop=現在の操作を中止します。
 h_recent=最近オープンしたファイル

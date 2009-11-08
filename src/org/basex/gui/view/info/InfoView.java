@@ -17,7 +17,6 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -118,7 +117,7 @@ public final class InfoView extends View {
    * @param inf info string
    * @param ok success flag
    */
-  public void setInfo(final byte[] inf, final boolean ok) {
+  public void setInfo(final String inf, final boolean ok) {
     final IntList il = new IntList();
     final StringList sl = new StringList();
     final StringList cmp = new StringList();
@@ -126,7 +125,7 @@ public final class InfoView extends View {
     final StringList pln = new StringList();
     String err = "";
 
-    final String[] split = Token.string(inf).split(NL);
+    final String[] split = inf.split(NL);
     for(int i = 0; i < split.length; i++) {
       final String line = split[i];
       final int s = line.indexOf(':');
@@ -149,7 +148,7 @@ public final class InfoView extends View {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
       } else if(!ok) {
-        err += line;
+        err += line + NL;
       }
     }
 

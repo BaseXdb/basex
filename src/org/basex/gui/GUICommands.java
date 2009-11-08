@@ -10,7 +10,6 @@ import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Process;
-import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -64,7 +63,7 @@ public enum GUICommands implements GUICommand {
   /* FILE MENU */
 
   /** Opens a dialog to create a new database. */
-  CREATE(false, GUICREATE, "% N", GUICREATETT) {
+  CREATE(false, GUICREATE + DOTS, "% N", GUICREATETT) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -77,7 +76,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to open a database. */
-  OPEN(false, GUIOPEN, "% O", GUIOPENTT) {
+  OPEN(false, GUIOPEN + DOTS, "% O", GUIOPENTT) {
     @Override
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, false);
@@ -91,7 +90,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows database info. */
-  INFO(true, GUIINFO, "% D", GUIINFOTT) {
+  INFO(true, GUIINFO + DOTS, "% D", GUIINFOTT) {
     @Override
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);
@@ -131,7 +130,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exports a document. */
-  EXPORT(true, GUIEXPORT, null, GUIEXPORTTT) {
+  EXPORT(true, GUIEXPORT + DOTS, null, GUIEXPORTTT) {
     @Override
     public void execute(final GUI gui) {
       final IO file = save(gui, gui.context.data().doc().length == 1);
@@ -140,7 +139,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to drop databases. */
-  DROP(false, GUIDROP, null, GUIDROPTT) {
+  DROP(false, GUIDROP + DOTS, null, GUIDROPTT) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogOpen(gui, true, false).nodb()) Dialog.info(gui, INFONODB);
@@ -165,13 +164,13 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens an XQuery file. */
-  XQOPEN(false, GUIXQOPEN, "% R", GUIXQOPENTT) {
+  XQOPEN(false, GUIXQOPEN + DOTS, "% R", GUIXQOPENTT) {
     @Override
     public void execute(final GUI gui) {
       gui.query.confirm();
 
       // open file chooser for XML creation
-      final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
+      final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
           gui.prop.get(GUIProp.XQPATH), gui);
       fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
 
@@ -181,18 +180,13 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Saves the current XQuery. */
-  XQSAVE(false, GUIXQSAVE, "% S", GUIXQSAVETT) {
+  XQSAVE(false, GUISAVE, "% S", GUISAVETT) {
     @Override
     public void execute(final GUI gui) {
-      // open file chooser for XML creation
-      final String fn = Prop.xquery == null ? null : Prop.xquery.path();
-      final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
-          fn == null ? gui.prop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
-
-      final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
-      if(file != null) {
-        file.suffix(IO.XQSUFFIX);
+      final IO file = gui.context.query;
+      if(file == null) {
+        XQSAVEAS.execute(gui);
+      } else {
         try {
           file.write(gui.query.getQuery());
           gui.query.setQuery(file);
@@ -203,18 +197,21 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Saves the result text. */
-  SAVE(true, GUIEXPORT, "", GUIEXPORTTT) {
+  /** Saves the current XQuery. */
+  XQSAVEAS(false, GUISAVEAS + DOTS, "% shift S", GUISAVETT) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = save(gui, true);
-      if(file != null) {
-        try {
-          file.write(gui.text.getText());
-        } catch(final IOException ex) {
-          Dialog.error(gui, NOTSAVED);
-        }
-      }
+      // open file chooser for XML creation
+      final String fn = gui.context.query == null ? null :
+        gui.context.query.path();
+      final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+          fn == null ? gui.prop.get(GUIProp.XQPATH) : fn, gui);
+      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
+
+      final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+      if(file == null) return;
+      gui.context.query = file;
+      XQSAVE.execute(gui);
     }
   },
 
@@ -288,7 +285,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Deletes the currently marked nodes. */
-  DELETE(true, GUIDELETE, "", GUIDELETETT) {
+  DELETE(true, GUIDELETE + DOTS, "", GUIDELETETT) {
     @Override
     public void execute(final GUI gui) {
       if(Dialog.confirm(gui, DELETECONF)) {
@@ -313,7 +310,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Inserts new nodes. */
-  INSERT(true, GUIINSERT, "", GUIINSERTTT) {
+  INSERT(true, GUIINSERT + DOTS, "", GUIINSERTTT) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked();
@@ -349,7 +346,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  EDIT(true, GUIEDIT, "", GUIEDITTT) {
+  EDIT(true, GUIEDIT + DOTS, "", GUIEDITTT) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked();
@@ -404,8 +401,8 @@ public enum GUICommands implements GUICommand {
   SHOWXQUERY(false, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
     @Override
     public void execute(final GUI gui) {
-      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTXQUERY);
-      else gui.prop.invert(GUIProp.SHOWXQUERY);
+      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTXQUERY :
+        GUIProp.SHOWXQUERY);
       gui.layoutViews();
     }
 
@@ -424,8 +421,8 @@ public enum GUICommands implements GUICommand {
   SHOWINFO(false, GUISHOWINFO, "% I", GUISHOWINFOTT) {
     @Override
     public void execute(final GUI gui) {
-      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTINFO);
-      else gui.prop.invert(GUIProp.SHOWINFO);
+      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTINFO :
+        GUIProp.SHOWINFO);
       gui.layoutViews();
     }
 
@@ -520,8 +517,8 @@ public enum GUICommands implements GUICommand {
   SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
     public void execute(final GUI gui) {
-      if(gui.context.data() == null) gui.prop.invert(GUIProp.SHOWSTARTTEXT);
-      else gui.prop.invert(GUIProp.SHOWTEXT);
+      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTTEXT :
+        GUIProp.SHOWTEXT);
       gui.layoutViews();
     }
 
@@ -701,7 +698,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Color schema. */
-  COLOR(false, GUICOLOR, null, GUICOLORTT) {
+  COLOR(false, GUICOLOR + DOTS, null, GUICOLORTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogColors(gui);
@@ -725,7 +722,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  PREFS(false, GUIPREFS, "% P", GUIPREFSTT) {
+  PREFS(false, GUIPREFS + DOTS, "% P", GUIPREFSTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);
@@ -735,7 +732,7 @@ public enum GUICommands implements GUICommand {
   /* DEEPFS MENU */
 
   /** Opens a dialog to import given directory as DeepFS instance. */
-  CREATEFS(false, GUICREATEFS, null, GUICREATEFSTT) {
+  CREATEFS(false, GUICREATEFS + DOTS, null, GUICREATEFSTT) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogCreateFS(gui).ok()) return;
@@ -748,7 +745,7 @@ public enum GUICommands implements GUICommand {
   },
   
   /** Opens a dialog to use DeepFS instance as Desktop Query Engine. */
-  DQE(false, GUIDQE, null, GUIDQETT) {
+  DQE(false, GUIDQE + DOTS, null, GUIDQETT) {
     @Override
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, true);
@@ -762,7 +759,7 @@ public enum GUICommands implements GUICommand {
   },
   
   /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace. */
-  MOUNTFS(false, GUIMOUNTFS, null, GUIMOUNTFSTT) {
+  MOUNTFS(false, GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT) {
     @Override
     public void execute(final GUI gui) {
       final DialogMountFS dialog = new DialogMountFS(gui);
@@ -808,7 +805,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows the "about" information. */
-  ABOUT(false, GUIABOUT, null, GUIABOUTTT) {
+  ABOUT(false, GUIABOUT + DOTS, null, GUIABOUTTT) {
     @Override
     public void execute(final GUI gui) {
       new DialogAbout(gui);
@@ -968,13 +965,13 @@ public enum GUICommands implements GUICommand {
    */
   public static IO save(final GUI gui, final boolean single) {
     // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
-        gui.context.data().meta.file.path(), gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+        gui.prop.get(GUIProp.SAVEPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
     final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
       BaseXFileChooser.Mode.DSAVE);
-    if(file != null && single) file.suffix(IO.XMLSUFFIX);
+    if(file != null) gui.prop.set(GUIProp.SAVEPATH, file.path());
     return file;
   }
 
@@ -1003,7 +1000,7 @@ public enum GUICommands implements GUICommand {
   }
 
   /**
-   * Returns an quoted string.
+   * Returns a quoted string.
    * @param s string to encode
    * @return quoted string
    */

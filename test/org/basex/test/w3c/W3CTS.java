@@ -201,7 +201,6 @@ public abstract class W3CTS {
     final String dat = sdf.format(Calendar.getInstance().getTime());
 
     final Performance perf = new Performance();
-    context.prop.set(Prop.XQFORMAT, false);
     context.prop.set(Prop.MAINMEM, false);
     context.prop.set(Prop.TABLEMEM, false);
     context.prop.set(Prop.CHOP, false);
@@ -333,8 +332,8 @@ public abstract class W3CTS {
       final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
       
       final String inname = text("*:query/@name", state);
-      Prop.xquery = IO.get(queries + pth + inname + ".xq");
-      final String in = read(Prop.xquery);
+      context.query = IO.get(queries + pth + inname + ".xq");
+      final String in = read(context.query);
       String error = null;
       SeqIter iter = null;
       boolean doc = true;
@@ -374,7 +373,7 @@ public abstract class W3CTS {
 
         // evaluate and serialize query
         final XMLSerializer xml = new XMLSerializer(out, false,
-            context.prop.is(Prop.XQFORMAT));
+            context.prop.is(Prop.CHOP));
         iter = SeqIter.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {

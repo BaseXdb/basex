@@ -112,9 +112,7 @@ public final class DialogMountFS extends Dialog {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, mountpoint.getText(),
             main).select(BaseXFileChooser.Mode.DOPEN);
-         if(file != null) {
-          mountpoint.setText(file.path());
-        }
+         if(file != null) mountpoint.setText(file.path());
       }
     });
     m.add(button);

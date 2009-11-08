@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import java.awt.Font;
-
 import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -134,7 +133,9 @@ public final class GUIProp extends AProp {
     { "HELPSIZE", new int[] { 300, 250 } };
 
   /** Path for creating new XML Documents. */
-  public static final Object[] CREATEPATH = { "CREATEPATH", Prop.WORK };
+  public static final Object[] OPENPATH = { "OPENPATH", Prop.WORK };
+  /** Path for creating new XML Documents. */
+  public static final Object[] SAVEPATH = { "SAVEPATH", Prop.WORK };
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
 
@@ -213,13 +214,12 @@ public final class GUIProp extends AProp {
     if(file != null) {
       path = file.path();
       set(XQPATH, file.getDir());
-      Prop.xquery = file;
       sl.add(path);
     }
     final String[] qu = strings(QUERIES);
     for(int q = 0; q < qu.length && q < 9; q++) {
       final String f = qu[q];
-      if(!f.equals(path) && IO.get(f).exists()) sl.add(f);
+      if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
     set(QUERIES, sl.finish());
   }

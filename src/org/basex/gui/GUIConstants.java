@@ -106,7 +106,7 @@ public final class GUIConstants {
   /** Two-dimensional Menu entries, containing the menu item commands. */
   public static final Object[][] MENUITEMS = { {
     MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, null,
-    XQOPEN, XQSAVE, null, SERVER, null, EXIT
+    XQOPEN, XQSAVE, XQSAVEAS, null, SERVER, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
     SHOWXQUERY, SHOWINFO, null, COPYPATH, FILTER
@@ -152,11 +152,6 @@ public final class GUIConstants {
     /** Transparent mode.  */ NONE,
     /** Upward gradient.   */ UP,
     /** Downward gradient. */ DOWN
-  };
-
-  /** Anti-alias modes. */
-  public static final String[] FONTALIAS = {
-    "OFF", "ON", "GASP", "LCD_HRGB", "LCD_HBGR", "LCD_VRGB", "LCD_VBGR"
   };
 
   // COLORS ===================================================================
@@ -304,7 +299,6 @@ public final class GUIConstants {
    */
   public static void initFonts(final GUIProp prop) {
     final Container comp = new Container();
-
     final String f = prop.get(GUIProp.FONT);
     final int type = prop.num(GUIProp.FONTTYPE);
     final int size = prop.num(GUIProp.FONTSIZE);

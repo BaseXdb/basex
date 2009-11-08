@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -76,7 +75,7 @@ public final class XQueryView extends View {
     back.add(header, BorderLayout.CENTER);
 
     final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
-    final BaseXButton save = BaseXButton.command(GUICommands.XQSAVE, gui);
+    final BaseXButton save = BaseXButton.command(GUICommands.XQSAVEAS, gui);
     final BaseXTextField find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) open.getPreferredSize().getHeight());
 
@@ -87,10 +86,10 @@ public final class XQueryView extends View {
         final ActionListener al = new ActionListener() {
           public void actionPerformed(final ActionEvent ac) {
             confirm();
-            setQuery(IO.get(ac.getActionCommand()));
+            final IO file = IO.get(ac.getActionCommand());
+            setQuery(file);
           }
         };
-
         for(final String en : gui.prop.strings(GUIProp.QUERIES)) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -210,6 +209,7 @@ public final class XQueryView extends View {
    */
   public void setQuery(final IO file) {
     gui.prop.files(file);
+    gui.context.query = file;
     try {
       setQuery(file.content());
     } catch(final IOException ex) {
@@ -223,9 +223,9 @@ public final class XQueryView extends View {
    */
   public void setQuery(final byte[] qu) {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
+    modified(false, true);
     text.setText(qu);
     text.query();
-    modified(false);
   }
 
   /**
@@ -233,7 +233,7 @@ public final class XQueryView extends View {
    * @return XQuery
    */
   public byte[] getQuery() {
-    modified(false);
+    modified(false, true);
     return text.getText();
   }
 
@@ -254,20 +254,24 @@ public final class XQueryView extends View {
   }
 
   /**
-   * Show a quit dialog for saving the opened XQuery.
+   * Shows a quit dialog for saving the opened XQuery.
    */
   public void confirm() {
-    if(Prop.xquery == null) Prop.xquery = IO.get("query.xq");
-    if(modified && Dialog.confirm(gui, Main.info(XQUERYCONF,
-        Prop.xquery.name()))) GUICommands.XQSAVE.execute(gui);
+    if(gui.context.query != null && modified && Dialog.confirm(gui, Main.info(
+        XQUERYCONF, gui.context.query.name()))) GUICommands.XQSAVE.execute(gui);
   }
 
   /**
    * Sets the query modification flag.
    * @param mod modification flag
+   * @param force action
    */
-  void modified(final boolean mod) {
-    if(modified != mod) header.setText(XQUERYTIT + (mod ? "*" : ""));
+  void modified(final boolean mod, final boolean force) {
+    if(modified != mod || force) {
+      String title = XQUERYTIT;
+      if(gui.context.query != null) title += " - " + gui.context.query.name();
+      header.setText(title + (mod ? "*" : ""));
+    }
     modified = mod;
   }
 }

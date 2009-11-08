@@ -27,6 +27,14 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
 
   /**
    * Constructor, setting the help text.
+   * @param win parent reference, {@link Dialog} or {@link GUI} instance
+   */
+  protected BaseXPanel(final Window win) {
+    this(null, win);
+  }
+
+  /**
+   * Constructor, setting the help text.
    * @param hlp help text
    * @param win parent reference, {@link Dialog} or {@link GUI} instance
    */

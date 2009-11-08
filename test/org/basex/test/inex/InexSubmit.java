@@ -301,7 +301,7 @@ public final class InexSubmit {
   private void openSubFile() throws Exception {
     sub = new PrintOutput(SUBMISSION);
 
-    xml = new XMLSerializer(sub, false, true);
+    xml = new XMLSerializer(sub);
     xml.doctype(token("efficiency-submission"),
         token("efficiency-submission.dtd"), null);
 

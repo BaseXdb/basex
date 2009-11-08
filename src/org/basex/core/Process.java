@@ -54,7 +54,7 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes the process and serializes the results.
+   * Convenience method for executing a process and printing textual results.
    * If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param out output stream reference
@@ -65,8 +65,8 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes a process. This method should only be used if a command
-   * does not return textual results.
+   * Executes a process. This method must only be used if a command
+   * does not generate textual results.
    * @param ctx database context
    * @return success flag
    */
@@ -75,7 +75,8 @@ public abstract class Process extends Progress {
   }
 
   /**
-   * Executes the process, prints the result and returns a success flag.
+   * Executes the process, prints the result to the specified output stream
+   * and returns a success flag.
    * @param ctx database context
    * @param out output stream
    * @return success flag
@@ -85,10 +86,9 @@ public abstract class Process extends Progress {
     context = ctx;
     prop = ctx.prop;
 
-    // check if process needs data reference
+    // check data reference
     final Data data = context.data();
-    if(data() && data == null) return error(PROCNODB);
-
+    if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
     // check permissions
     final int i = context.perm(flags & 0xFF, data);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
@@ -123,14 +123,6 @@ public abstract class Process extends Progress {
    */
   public final Result result() {
     return result;
-  }
-
-  /**
-   * Returns if the command needs a data reference for processing.
-   * @return result of check
-   */
-  private boolean data() {
-    return (flags & DATAREF) != 0;
   }
 
   /**

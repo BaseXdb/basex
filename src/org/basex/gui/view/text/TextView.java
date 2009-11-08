@@ -1,10 +1,14 @@
 package org.basex.gui.view.text;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.core.Main;
+import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -12,8 +16,10 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
@@ -22,6 +28,8 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
+import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 
 /**
  * This class offers a fast text view, using the {@link BaseXText} class.
@@ -29,13 +37,17 @@ import org.basex.io.CachedOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class TextView extends View {
-  /** Text Area. */
-  private final BaseXText area;
-  /** Header string. */
-  private final BaseXLabel header;
+public final class TextView extends View implements ActionListener {
   /** Find text field. */
   private final BaseXTextField find;
+  /** Header string. */
+  private final BaseXLabel header;
+  /** Text Area. */
+  private final BaseXText area;
+  /** Result process. */
+  private Process proc;
+  /** Result nodes. */
+  private Nodes ns;
 
   /**
    * Default constructor.
@@ -54,18 +66,18 @@ public final class TextView extends View {
     back.setLayout(new BorderLayout());
     back.add(header, BorderLayout.CENTER);
 
-    final BaseXButton export = BaseXButton.command(GUICommands.SAVE, gui);
-    final BaseXButton root = BaseXButton.command(GUICommands.HOME, gui);
+    final BaseXButton save = new BaseXButton(gui, "save", HELPSAVE);
+    save.addActionListener(this);
     find = new BaseXTextField(gui);
-    BaseXLayout.setHeight(find, (int) root.getPreferredSize().getHeight());
+    BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
 
     final BaseXBack sp = new BaseXBack(Fill.NONE);
     sp.setLayout(new TableLayout(1, 5));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
-    sp.add(root);
+    sp.add(save);
     sp.add(Box.createHorizontalStrut(1));
-    sp.add(export);
+    sp.add(BaseXButton.command(GUICommands.HOME, gui));
     back.add(sp, BorderLayout.EAST);
     add(back, BorderLayout.NORTH);
 
@@ -115,17 +127,20 @@ public final class TextView extends View {
 
   /**
    * Serializes the specified nodes.
-   * @param nodes nodes to display
+   * @param n nodes to display
    */
-  private void setText(final Nodes nodes) {
+  private void setText(final Nodes n) {
+    ns = n;
     if(!visible()) return;
     try {
       final CachedOutput out = new CachedOutput(
           gui.context.prop.num(Prop.MAXTEXT));
-      if(nodes != null) {
-        nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
+      if(n != null) {
+        final XMLSerializer xml = new XMLSerializer(out);
+        n.serialize(xml);
+        xml.close();
       }
-      setText(out);
+      setText(out, null);
     } catch(final IOException ex) {
       Main.debug(ex);
     }
@@ -134,25 +149,34 @@ public final class TextView extends View {
   /**
    * Sets the output text.
    * @param out output cache
+   * @param p process
    */
-  public void setText(final CachedOutput out) {
+  public void setText(final CachedOutput out, final Process p) {
     area.setText(out.buffer(), out.size());
     header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
+    if(!out.finished()) {
+      proc = null;
+      ns = null;
+    } else {
+      proc = p;
+    }
   }
 
-  /**
-   * Sets the output as simple sting.
-   * @param txt text
-   */
-  public void setText(final byte[] txt) {
-    area.setText(txt);
-  }
+  public void actionPerformed(final ActionEvent e) {
+    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+        gui.prop.get(GUIProp.SAVEPATH), gui);
+    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    if(file == null) return;
+    gui.prop.set(GUIProp.SAVEPATH, file.path());
 
-  /**
-   * Returns the text.
-   * @return XQuery
-   */
-  public byte[] getText() {
-    return area.getText();
+    try {
+      final PrintOutput out = new PrintOutput(file.toString());
+      if(proc != null) proc.execute(gui.context, out);
+      else if(ns != null) ns.serialize(new XMLSerializer(out));
+      else out.write(area.getText());
+      out.close();
+    } catch(final IOException ex) {
+      Dialog.error(gui, NOTSAVED);
+    }
   }
 }

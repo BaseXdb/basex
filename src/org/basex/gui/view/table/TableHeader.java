@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -62,7 +60,7 @@ final class TableHeader extends BaseXPanel {
    * @param v view reference
    */
   TableHeader(final TableView v) {
-    super(null, v.gui);
+    super(v.gui);
     setMode(Fill.UP);
     tdata = v.tdata;
     view = v;
@@ -94,9 +92,6 @@ final class TableHeader extends BaseXPanel {
       BaseXLayout.drawCenter(g, NOTABLE, getWidth(), getHeight() / 2);
       return;
     }
-
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
 
     final int fsz = gui.prop.num(GUIProp.FONTSIZE);
     final int bs = BaseXBar.SIZE;
@@ -155,10 +150,11 @@ final class TableHeader extends BaseXPanel {
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
     g.setColor(Color.black);
     g.setFont(bfont);
+    smooth(g);
 
     int o = header && clicked ? 1 : 0;
-    g.fillPolygon(new int[] { (int) x + o + 3, (int) x + o + bs - 5,
-        (int) x + o + bs / 2 - 1 }, new int[] { o + 6, o + 6, o + bs - 3 }, 3);
+    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4,
+        (int) x + o + bs / 2 }, new int[] { o + 6, o + 6, o + bs - 3 }, 3);
 
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };

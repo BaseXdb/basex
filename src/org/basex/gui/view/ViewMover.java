@@ -1,14 +1,13 @@
 package org.basex.gui.view;
 
 import static org.basex.core.Text.*;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 
 /**
@@ -29,7 +28,7 @@ final class ViewMover extends BaseXPanel {
    */
   ViewMover(final GUI main) {
     super(HELPMOVER, main);
-    setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), SIZE));
+    BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
@@ -38,27 +37,13 @@ final class ViewMover extends BaseXPanel {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Color color1 = active ? GUIConstants.COLORS[4] :
-      GUIConstants.color2;
-    final Color color2 = active ? GUIConstants.COLORS[20] :
-      GUIConstants.COLORS[10];
-
     final int w = getWidth();
     final int h = getHeight();
-    g.setColor(color1);
+    g.setColor(GUIConstants.COLORS[active ? 4 : 1]);
     g.fillRect(0, 0, w, h);
-    g.setColor(color2);
+    g.setColor(GUIConstants.COLORS[active ? 20 : 10]);
     for(int x = -4; x < w; x += 4) g.drawLine(x + 4, 1, x, h - 2);
     g.drawRect(0, 0, w - 1, h - 1);
-
-    /*
-    g.setColor(color2);
-    g.fillRect(w - SIZE - 2, 0, SIZE + 2, SIZE);
-    g.setColor(color1);
-    g.drawLine(w - SIZE - 1, 0, w - SIZE - 1, SIZE);
-    g.drawLine(w - SIZE + 1, 1, w - 2, SIZE - 2);
-    g.drawLine(w - SIZE + 1, SIZE - 2, w - 2, 1);
-    */
   }
 
   @Override

@@ -304,7 +304,7 @@ public final class DialogCreateFS extends Dialog {
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSBACKING, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());
-    gprop.set(GUIProp.CREATEPATH, path.getText());
+    gprop.set(GUIProp.OPENPATH, path.getText());
 
     super.close();
   }

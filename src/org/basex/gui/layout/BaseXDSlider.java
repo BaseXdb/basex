@@ -64,7 +64,7 @@ public final class BaseXDSlider extends BaseXPanel {
    */
   public BaseXDSlider(final GUI main, final double mn, final double mx,
       final ActionListener list) {
-    super(null, main);
+    super(main);
     listener = list;
     totMin = mn;
     totMax = mx;
@@ -275,6 +275,7 @@ public final class BaseXDSlider extends BaseXPanel {
     g.setColor(Color.black);
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
+
     g.drawString(value(mn) + " - " + value(mx), w + 15,
         h - (h - getFont().getSize()) / 2);
   }

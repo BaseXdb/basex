@@ -54,8 +54,8 @@ abstract class FTIndex extends Index {
         if(f) {
           if (scm > 0) {
             nscore = -da.readNum(pos) / 1000d;
-	          pos = da.pos();	          
-	        }
+            pos = da.pos();
+          }
           lpre = da.readNum(pos);
           pos = da.pos();
           f = false;

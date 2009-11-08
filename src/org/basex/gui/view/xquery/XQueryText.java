@@ -62,7 +62,7 @@ final class XQueryText extends BaseXText {
     final byte[] qu = getText();
     final boolean module = isModule(qu);
     final boolean mod = !Token.eq(qu, last);
-    view.modified(view.modified || mod);
+    view.modified(view.modified || mod, false);
 
     if(gui.prop.is(GUIProp.EXECRT) && !module && mod) {
       query(qu, true);
@@ -99,7 +99,7 @@ final class XQueryText extends BaseXText {
       BaseXLayout.enable(view.stop, true);
       gui.execute(new XQuery(query.length == 0 ? "." : Token.string(query)));
     } else {
-      showError();
+      markError();
     }
   }
 
@@ -145,14 +145,14 @@ final class XQueryText extends BaseXText {
         }
       }
     }
-    showError();
+    markError();
     return error;
   }
 
   /**
    * Highlights the error.
    */
-  private void showError() {
+  private void markError() {
     final int thread = ++threadID;
     final int sleep = error == -1 ? 0 : 500;
     new Thread() {

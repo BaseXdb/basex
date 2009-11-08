@@ -59,7 +59,7 @@ public final class XQueryExample {
     // Closes the query processor
     processor.close();
 
-    out.println("=== Third version: Processing a result instance");
+    out.println("\n=== Third version: Processing a result instance");
 
     // Creates a query instance
     processor = new QueryProcessor(QUERY, context);

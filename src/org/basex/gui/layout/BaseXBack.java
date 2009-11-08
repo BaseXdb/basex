@@ -3,9 +3,9 @@ package org.basex.gui.layout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.util.Map;
-
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUIConstants;
@@ -21,6 +21,8 @@ public class BaseXBack extends JPanel {
   /** Desktop hints. */
   protected static final Map<?, ?> HINTS = (Map<?, ?>)
     (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+  /** Desktop hints. */
+  protected static RenderingHints oldHints;
   /** Fill mode. */
   private Fill mode;
 
@@ -72,5 +74,14 @@ public class BaseXBack extends JPanel {
   public final void setBorder(final int t, final int l, final int b,
       final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
+  }
+    
+  /**
+   * Activates graphics anti-aliasing.
+   * @param g graphics reference
+   */
+  protected void smooth(final Graphics g) {
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
   }
 }

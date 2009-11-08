@@ -127,7 +127,8 @@ abstract class FTBuilder extends IndexBuilder {
     int lpre = 4;
     int lpos = 4;
 
-    // fulltext data is stored here, with -scoreU, pre1, pos1, ..., -scoreU, preU, posU
+    // fulltext data is stored here, with -scoreU, pre1, pos1, ...,
+    // -scoreU, preU, posU
     final int pres = Num.size(vpre);
     final int poss = Num.size(vpos);
     int cn = scm == 1 ? 1 : 0; 
@@ -140,8 +141,8 @@ abstract class FTBuilder extends IndexBuilder {
         
         while (cn < nodes.size() && nodes.get(cn) < pre) cn++;
         if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
-            nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) < pre)
-            && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
+            nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
+            pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
           final int score = ScoringTokenizer.score(nodes.size(), 
               nmbdocwt[c], maxfreq[cn - scm == 1 ? 1 : 0], freq.get(fc));
           // first write score value

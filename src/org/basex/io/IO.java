@@ -156,11 +156,12 @@ public abstract class IO {
   }
 
   /**
-   * Sets the specified suffix if none exists.
-   * @param suf suffix
+   * Creates the directory.
+   * @return contents
    */
-  public final void suffix(final String suf) {
-    if(path.indexOf(".") == -1) path += suf;
+  public boolean md() {
+    Main.notexpected();
+    return false;
   }
 
   /**

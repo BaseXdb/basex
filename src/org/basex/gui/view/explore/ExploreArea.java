@@ -64,7 +64,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param m main panel
    */
   ExploreArea(final ExploreView m) {
-    super(null, m.gui);
+    super(m.gui);
     main = m;
 
     setLayout(new BorderLayout(0, 5));

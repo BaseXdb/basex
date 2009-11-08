@@ -9,7 +9,7 @@ package org.basex.io;
  */
 public final class NullOutput extends PrintOutput {
   /** Skip flag. */
-  private final boolean skip;
+  private final boolean stop;
 
   /**
    * Constructor.
@@ -20,10 +20,10 @@ public final class NullOutput extends PrintOutput {
 
   /**
    * Constructor.
-   * @param s if set to true, streaming is canceled as soon as possible.
+   * @param s flag for stopping serialization as early as possible
    */
   public NullOutput(final boolean s) {
-    skip = s;
+    stop = s;
   }
 
   @Override
@@ -37,6 +37,6 @@ public final class NullOutput extends PrintOutput {
 
   @Override
   public boolean finished() {
-    return skip;
+    return stop;
   }
 }

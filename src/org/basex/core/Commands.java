@@ -144,7 +144,7 @@ public interface Commands {
         boolean first = true;
         for(String s : help2.split(NL)) {
           if(s.isEmpty()) continue;
-          if(s.startsWith("- ")) {
+          if(s.startsWith(LI)) {
             sb.append((first ? "<ul>" : "</li>") + NL);
             sb.append(s.replaceAll(
                 "- (.*?):(.*)", "<li><code>$1</code>: $2<br/>") + NL);

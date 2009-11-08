@@ -100,12 +100,6 @@ dqe_title=Open DeepFS instance
 dmnt_title=Mount DeepFS instance
 dmnt_nomountpath=No valid mount point
 
-dq_open=Mở tệp XQuery
-dq_save=Lưu tệp XQuery
-dq_notopened=Tệp không mở được.
-dq_notsaved=Tệp không lưu được.
-dq_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
-
 dfs_newtitle=Create new DeepFS Database
 dfs_name=Name of Filesystem Database
 dfs_all=Nhập tất cả
@@ -277,13 +271,17 @@ c_showxquerytt=Hiển thị soạn thảo lệnh hỏi.
 c_undo=Làm lại
 c_xqopen=Mở XQuery
 c_xqopentt=Mở tệp lệnh hỏi
-c_xqsave=Lưu XQuery
-c_xqsavett=Lưu tệp lệnh hỏi
+c_save=Lưu
+c_savett=Lưu tệp lệnh hỏi
+c_saveas=Save as
+c_notopened=Tệp không mở được.
+c_notsaved=Tệp không lưu được.
+c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
 
 ds_servdia=Server Properties
 ds_server=Server
 ds_localserver=Local Server
-ds_users=User
+ds_users=Users
 ds_host=Host
 ds_port=Port
 ds_localport=Local Port
@@ -535,6 +533,7 @@ ch_exit2=Exits %.
 
 # Help Texts
 h_hist=Hiển thị lich sử thông tin nhập.
+h_save=Saves the result.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
 h_recent=Những tệp vừa được mở

@@ -10,13 +10,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -181,7 +179,6 @@ public final class FolderView extends View {
       refreshInit();
       return;
     }
-
     super.paintComponent(g);
     if(opened == null) return;
 
@@ -348,8 +345,7 @@ public final class FolderView extends View {
     emptyBox = new BufferedImage(boxW + 1, boxW + 1,
         BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = emptyBox.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
     g.setColor(color6);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color4);
@@ -358,8 +354,7 @@ public final class FolderView extends View {
     openedBox = new BufferedImage(boxW + 1, boxW + 1,
         BufferedImage.TYPE_INT_ARGB);
     g = openedBox.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
 
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
@@ -373,8 +368,7 @@ public final class FolderView extends View {
     closedBox = new BufferedImage(boxW + 1, boxW + 1,
         BufferedImage.TYPE_INT_ARGB);
     g = closedBox.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
 
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);

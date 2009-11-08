@@ -101,12 +101,6 @@ dqe_title=Open DeepFS instance
 dmnt_title=Mount DeepFS instance
 dmnt_nomountpath=No valid mount point
 
-dq_open=XQuery-Datei öffnen
-dq_save=XQuery-Datei speichern
-dq_notopened=Die Datei konnte nicht geöffnet werden.
-dq_notsaved=Die Datei konnte nicht gespeichert werden.
-dq_replace=Die Datei "%" besteht bereits.\nMöchten Sie sie ersetzen?
-
 dfs_newtitle=Neue DeepFS Instanz erstellen
 dfs_name=Name der Dateisystem Datenbank
 dfs_all=Komplett
@@ -278,8 +272,12 @@ c_showxquerytt=Zeigt den Anfrage-Editor an.
 c_undo=Rückgängig
 c_xqopen=XQuery öffnen
 c_xqopentt=Öffnet eine XQuery-Datei
-c_xqsave=XQuery speichern
-c_xqsavett=Speichert die XQuery-Datei
+c_save=Speichern
+c_savett=Speichert die Datei
+c_saveas=Speichern unter
+c_notopened=Die Datei konnte nicht geöffnet werden.
+c_notsaved=Die Datei konnte nicht gespeichert werden.
+c_replace=% besteht bereits.\nMöchten Sie sie ersetzen?
 
 ds_servdia=Server Eigenschaften
 ds_server=Server
@@ -536,6 +534,7 @@ ch_exit2=Beendet %.
 
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.
+h_save=Speichert das Ergebnis.
 h_go=Führt die Anfrage aus.
 h_stop=Stoppt den aktuellen Prozess.
 h_recent=Zuletzt geöffnete Dateien

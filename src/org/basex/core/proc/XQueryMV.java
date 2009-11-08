@@ -120,7 +120,7 @@ public final class XQueryMV extends AQuery {
    * @throws IOException I/O exception
    */
   private void show(final PrintOutput out) throws IOException {
-    final XMLSerializer xml = new XMLSerializer(out, false, true);
+    final XMLSerializer xml = new XMLSerializer(out);
 
     // get index references for mediovis attributes
     final Data data = context.data();

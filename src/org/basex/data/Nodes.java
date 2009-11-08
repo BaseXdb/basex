@@ -82,7 +82,7 @@ public final class Nodes implements Result {
    * @param d data reference
    * @param ft ft position data
    */
-  Nodes(final int[] n, final Data d, final FTPosData ft) {
+  private Nodes(final int[] n, final Data d, final FTPosData ft) {
     if(d == null) Main.notexpected("No data available");
     data = d;
     ftpos = ft;

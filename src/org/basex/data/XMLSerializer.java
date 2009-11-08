@@ -31,7 +31,7 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   public XMLSerializer(final PrintOutput o) throws IOException {
-    this(o, false, false);
+    this(o, false, true);
   }
 
   /**

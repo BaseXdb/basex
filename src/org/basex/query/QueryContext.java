@@ -4,11 +4,9 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Progress;
@@ -107,11 +105,10 @@ public final class QueryContext extends Progress {
 
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
-  /** Static Base URI. */
-  public Uri baseURI = Uri.uri(Prop.xquery != null ?
-      token(Prop.xquery.url()) : EMPTY);
   /** Default element namespace. */
   public byte[] nsElem = EMPTY;
+  /** Static Base URI. */
+  public Uri baseURI = Uri.EMPTY;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
@@ -173,6 +170,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
+    if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
 
   /**

@@ -39,13 +39,13 @@ public interface Text {
   /** Project name. */
   String NAME = "BaseX";
   /** Project namespace. */
-  String NAMESPACE = NAME.toLowerCase();
+  String NAMELC = NAME.toLowerCase();
   /** URL. */
-  String URL = "http://www." + NAMESPACE + ".org";
+  String URL = "http://www." + NAMELC + ".org";
   /** Mail. */
-  String MAIL = "info@" + NAMESPACE + ".org";
+  String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.74";
+  String VERSION = "5.8";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -656,7 +656,7 @@ public interface Text {
   // GUI COMMANDS =============================================================
 
   /** Command info. */
-  String GUIABOUT = lang("c_about", NAME) + DOTS;
+  String GUIABOUT = lang("c_about", NAME);
   /** Command info. */
   String GUIABOUTTT = lang("c_abouttt");
   /** Command info. */
@@ -664,7 +664,7 @@ public interface Text {
   /** Command info. */
   String GUICLOSETT = lang("c_closett");
   /** Command info. */
-  String GUICOLOR = lang("c_color") + DOTS;
+  String GUICOLOR = lang("c_color");
   /** Command info. */
   String GUICOLORTT = lang("c_colortt");
   /** Command info. */
@@ -680,21 +680,21 @@ public interface Text {
   /** Command info. */
   String GUICPPATHTT = lang("c_cppathtt");
   /** Command info. */
-  String GUICREATE = lang("c_create") + DOTS;
+  String GUICREATE = lang("c_create");
   /** Command info. */
   String GUICREATETT = lang("c_creatett");
   /** Command info. */
-  String GUIDELETE = lang("c_delete") + DOTS;
+  String GUIDELETE = lang("c_delete");
   /** Command info. */
   String GUIDEL = lang("c_delete");
   /** Command info. */
   String GUIDELETETT = lang("c_deletett");
   /** Command info. */
-  String GUIDROP = lang("c_drop") + DOTS;
+  String GUIDROP = lang("c_drop");
   /** Command info. */
   String GUIDROPTT = lang("c_droptt");
   /** Command info. */
-  String GUIEDIT = lang("c_edit") + DOTS;
+  String GUIEDIT = lang("c_edit");
   /** Command info. */
   String GUIEDITTT = lang("c_edittt");
   /** Command info. */
@@ -702,7 +702,7 @@ public interface Text {
   /** Command info. */
   String GUIEXITTT = lang("c_exittt");
   /** Command info. */
-  String GUIEXPORT = lang("c_export") + DOTS;
+  String GUIEXPORT = lang("c_export");
   /** Command info. */
   String GUIEXPORTTT = lang("c_exporttt");
   /** Command info. */
@@ -730,23 +730,23 @@ public interface Text {
   /** Command info. */
   String GUIGOUPTT = lang("c_gouptt");
   /** Command info. */
-  String GUICREATEFS = lang("c_createfs") + DOTS;
+  String GUICREATEFS = lang("c_createfs");
   /** Command info. */
   String GUICREATEFSTT = lang("c_createfstt");
   /** Command info. */
-  String GUIDQE = lang("c_dqe") + DOTS;
+  String GUIDQE = lang("c_dqe");
   /** Command info. */
   String GUIDQETT = lang("c_dqett") + DOT;
   /** Command info. */
-  String GUIMOUNTFS = lang("c_mountfs") + DOTS;
+  String GUIMOUNTFS = lang("c_mountfs");
   /** Command info. */
   String GUIMOUNTFSTT = lang("c_mountfstt") + DOT;
   /** Command info. */
-  String GUIINFO = lang("c_props") + DOTS;
+  String GUIINFO = lang("c_props");
   /** Command info. */
   String GUIINFOTT = lang("c_propstt");
   /** Command info. */
-  String GUIINSERT = lang("c_insert") + DOTS;
+  String GUIINSERT = lang("c_insert");
   /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");
   /** Command info. */
@@ -754,7 +754,7 @@ public interface Text {
   /** Command info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
   /** Command info. */
-  String GUIOPEN = lang("c_open") + DOTS;
+  String GUIOPEN = lang("c_open");
   /** Command info. */
   String GUIOPENTT = lang("c_opentt");
   /** Command info. */
@@ -762,7 +762,7 @@ public interface Text {
   /** Command info. */
   String GUIPASTETT = lang("c_pastett");
   /** Command info. */
-  String GUIPREFS = lang("c_prefs") + DOTS;
+  String GUIPREFS = lang("c_prefs");
   /** Command info. */
   String GUIPREFSTT = lang("c_prefstt");
   /** Command info. */
@@ -834,14 +834,15 @@ public interface Text {
   /** Command info. */
   String GUIUNDO = lang("c_undo");
   /** Command info. */
-  String GUIXQOPEN = lang("c_xqopen") + DOTS;
+  String GUIXQOPEN = lang("c_xqopen");
   /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
   /** Command info. */
-  String GUIXQSAVE = lang("c_xqsave") + DOTS;
+  String GUISAVE = lang("c_save");
   /** Command info. */
-  String GUIXQSAVETT = lang("c_xqsavett");
-  
+  String GUISAVETT = lang("c_savett");
+  /** Command info. */
+  String GUISAVEAS = lang("c_saveas");
 
   // BUTTONS ==================================================================
 
@@ -997,17 +998,13 @@ public interface Text {
   String NODEEPFSQUESTION = lang("info_nodeepfs") + DOT + NL +
     lang("do_nodbquestion") + NL + " ";
   
-  /** File dialog title. */
-  String XQOPENTITLE = lang("dq_open");
-  /** File dialog title. */
-  String XQSAVETITLE = lang("dq_save");
   /** File dialog error. */
-  String NOTOPENED = lang("dq_notopened");
+  String NOTOPENED = lang("c_notopened");
   /** File dialog error. */
-  String NOTSAVED = lang("dq_notsaved");
+  String NOTSAVED = lang("c_notsaved");
   /** File dialog replace information. */
-  String FILEREPLACE = lang("dq_replace");
-
+  String FILEREPLACE = lang("c_replace");
+  
   /** Dialog title for exporting XML. */
   String EXPORTTITLE = lang("d_export");
   
@@ -1211,6 +1208,8 @@ public interface Text {
   byte[] HELPSTOP = token(lang("h_stop"));
   /** Help string. */
   byte[] HELPHIST = token(lang("h_hist"));
+  /** Help string. */
+  byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
   /** Help Dialog. */

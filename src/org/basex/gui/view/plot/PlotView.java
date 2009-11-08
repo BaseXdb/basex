@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -241,8 +240,7 @@ public final class PlotView extends View implements Runnable {
         Transparency.TRANSLUCENT);
 
     final Graphics g = img.getGraphics();
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-       RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
 
     Color c = color;
     if(marked) c = colormarkA;
@@ -261,8 +259,7 @@ public final class PlotView extends View implements Runnable {
     plotImg = new BufferedImage(getWidth(), getHeight(),
         Transparency.BITMASK);
     final Graphics g = plotImg.getGraphics();
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
 
     // overdraw plot background
     /*g.setColor(color1);
@@ -397,8 +394,7 @@ public final class PlotView extends View implements Runnable {
     markedImg = new BufferedImage(getWidth(), getHeight(),
         Transparency.BITMASK);
     final Graphics gi = markedImg.getGraphics();
-    ((Graphics2D) gi).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(gi);
 
     final Nodes marked = gui.context.marked();
     if(marked.size() <= 0) return;
@@ -735,14 +731,10 @@ public final class PlotView extends View implements Runnable {
     final BufferedImage img = new BufferedImage(imgW, imgH,
         Transparency.BITMASK);
     final Graphics2D g2d = img.createGraphics();
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.rotate(ROTATE, imgW, 0 + textH);
     g2d.setFont(font);
-    g2d.setColor(Color.black);
-    if(im) g2d.setColor(color4);
+    g2d.setColor(im ? color4 : Color.black);
     g2d.drawString(caption, fs, fs);
-
     return img;
   }
 

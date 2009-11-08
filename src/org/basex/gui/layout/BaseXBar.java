@@ -2,8 +2,6 @@ package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
@@ -78,7 +76,7 @@ public final class BaseXBar extends BaseXPanel {
    * the displayed content needs no scrollbar.
    */
   public BaseXBar(final BaseXPanel cmp, final boolean vis) {
-    super(null, cmp.gui);
+    super(cmp.gui);
     comp = cmp;
     visible = vis;
     addMouseListener(this);
@@ -149,9 +147,7 @@ public final class BaseXBar extends BaseXPanel {
     g.drawLine(5, bh, ww - 6, bh);
     g.drawLine(5, bh - 2, ww - 6, bh - 2);
     g.drawLine(5, bh + 2, ww - 6, bh + 2);
-
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    smooth(g);
 
     // draw scroll buttons
     drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } },

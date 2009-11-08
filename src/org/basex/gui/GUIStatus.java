@@ -38,7 +38,7 @@ public final class GUIStatus extends BaseXPanel {
    * @param main reference to the main window
    */
   GUIStatus(final GUI main) {
-    super(null, main);
+    super(main);
     BaseXLayout.setHeight(this, getFont().getSize() + 6);
     addKeyListener(this);
     addMouseListener(this);

@@ -38,7 +38,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   /** Number of unique word lengths. */
   private byte isize = 1;
   /** Number of indexed tokens. */
-  private int ntok = 0; 
+  private int ntok;
   
 
   /**
@@ -130,7 +130,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     maxfreq = new int[nodes.size()];
     nmbdocwt = new int[ntok];
     c = 0;
-    for(;j < tree.length; j++) {
+    for(; j < tree.length; j++) {
       final FTHash tre = tree[j];
       if (tre != null) {
         tre.init();

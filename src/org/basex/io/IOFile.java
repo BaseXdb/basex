@@ -149,6 +149,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean md() {
+    return file.mkdirs();
+  }
+
+  @Override
   public String dir() {
     return file.isDirectory() ? file.getPath() : file.getParent();
   }

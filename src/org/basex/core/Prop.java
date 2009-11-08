@@ -88,8 +88,6 @@ public final class Prop extends AProp {
   /** Creates the query plan before or after compilation. */
   public static final Object[] COMPPLAN = { "COMPPLAN", true };
 
-  /** Formats the query output. */
-  public static final Object[] XQFORMAT = { "XQFORMAT", true };
   /** Caches the query results. */
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
 
@@ -182,9 +180,6 @@ public final class Prop extends AProp {
   public static String language = LANGUAGE[1].toString();
   /** Flag for showing language keys. */
   public static boolean langkeys;
-
-  /** Last XQuery file. */
-  public static IO xquery;
 
   /**
    * Constructor.

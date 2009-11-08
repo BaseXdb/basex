@@ -100,10 +100,10 @@ public final class BaseXLayout {
    * Adds default interactions to the specified component.
    * @param comp component
    * @param hlp help text
-   * @param par parent window
+   * @param win parent window
    */
   static void addInteraction(final Component comp, final byte[] hlp,
-        final Window par) {
+        final Window win) {
 
     comp.addMouseListener(new MouseAdapter() {
       @Override
@@ -112,13 +112,13 @@ public final class BaseXLayout {
       }
     });
 
-    final boolean dialog = par instanceof Dialog;
-    final GUI gui = dialog ? ((Dialog) par).gui : par instanceof GUI ?
-        (GUI) par : null;
+    final boolean dialog = win instanceof Dialog;
+    final GUI gui = dialog ? ((Dialog) win).gui : win instanceof GUI ?
+        (GUI) win : null;
 
     if(dialog) {
       // add default keys
-      final Dialog d = (Dialog) par;
+      final Dialog d = (Dialog) win;
       comp.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {

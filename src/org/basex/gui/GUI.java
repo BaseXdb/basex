@@ -55,7 +55,6 @@ import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class is the main window of the GUI. It is the central instance
@@ -83,6 +82,13 @@ public final class GUI extends JFrame {
   /** Search view. */
   public final XQueryView query;
 
+  /** Painting flag. */
+  public boolean painting;
+  /** Working flag. */
+  public boolean updating;
+  /** Currently focused node (pre value). */
+  public int focused = -1;
+
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Help dialog. */
@@ -96,8 +102,6 @@ public final class GUI extends JFrame {
   final BaseXButton hist;
   /** Current input Mode. */
   final BaseXCombo mode;
-  /** Top panel. */
-  final BaseXBack top;
   /** Result panel. */
   final GUIMenu menu;
   /** Button panel. */
@@ -105,6 +109,8 @@ public final class GUI extends JFrame {
   /** Query panel. */
   final BaseXBack nav;
 
+  /** Top panel. */
+  private final BaseXBack top;
   /** Execution Button. */
   private final BaseXButton go;
   /** Control panel. */
@@ -118,12 +124,10 @@ public final class GUI extends JFrame {
   /** Fullscreen Window. */
   private JFrame fullscr;
 
-  /** Painting flag. */
-  public boolean painting;
-  /** Working flag. */
-  public boolean updating;
-  /** Currently focused node (pre value). */
-  public int focused = -1;
+  /** Thread counter. */
+  private int threadID;
+  /** Current process. */
+  private Process proc;
 
   /**
    * Default constructor.
@@ -134,6 +138,7 @@ public final class GUI extends JFrame {
     context = ctx;
     prop = gprops;
     setTitle(Text.TITLE);
+    // [CG] use setIconImages(...)
     setIconImage(BaseXLayout.image("icon"));
 
     // set window size
@@ -330,10 +335,10 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Queries the current input, depending on the current input mode.
+   * Executes a command, depending on the current input.
    */
   protected void execute() {
-    String in = input.getText();
+    final String in = input.getText();
     final boolean db = context.data() != null;
     final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
@@ -347,22 +352,20 @@ public final class GUI extends JFrame {
             if(!exec(p, p instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
-          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(new TokenBuilder(ex.getMessage()).finish());
+          if(!info.visible()) GUICommands.SHOWINFO.execute(this);
+          info.setInfo(ex.getMessage(), false);
         }
       }
+    } else if(prop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
+      xquery(in, true);
     } else {
-      if(prop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
-        xquery(in, true);
-      } else {
-        in = Find.find(in, context, prop.is(GUIProp.FILTERRT));
-        execute(new XQuery(in), true);
-      }
+      execute(new XQuery(Find.find(in, context, prop.is(GUIProp.FILTERRT))),
+          true);
     }
   }
 
   /**
-   * Launches an XQuery. Adds the default namespace, if available.
+   * Launches a query. Adds the default namespace, if available.
    * @param qu query to be run
    * @param main main window
    */
@@ -400,11 +403,6 @@ public final class GUI extends JFrame {
     }.start();
   }
 
-  /** Thread counter. */
-  private int threadID;
-  /** Current process. */
-  private Process proc;
-
   /**
    * Stops the current process.
    */
@@ -420,6 +418,7 @@ public final class GUI extends JFrame {
    * @param main call from the main input field
    * @return success flag
    */
+  // [CG] check exec/execute/... references
   boolean exec(final Process pr, final boolean main) {
     final int thread = ++threadID;
 
@@ -438,54 +437,46 @@ public final class GUI extends JFrame {
       final Data data = context.data();
       proc = pr;
 
-      // execute command
+      // execute command and cache result
+      final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));
       final boolean up = pr.updating(context);
       updating = up;
-      // retrieve text result
-      final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));
       final boolean ok = pr.execute(context, out);
+      final String inf = pr.info();
       updating = false;
 
-      // command info
-      final String inf = pr.info();
-      // skip interrupted command
       if(!ok && inf.equals(PROGERR)) {
+        // command was interrupted..
         proc = null;
         return false;
       }
 
-      // show query editor feedback
+      // show query info
+      info.setInfo(inf, ok);
+
+      // show feedback in query editor
       boolean feedback = main;
       if(!main && query.visible() && pr instanceof XQuery) {
-        feedback = true;
         query.info(inf, ok);
-      }
-
-      // show query info
-      if(prop.is(GUIProp.SHOWINFO) && (ok || main)) {
-        info.setInfo(Token.token(inf), ok);
+        feedback = true;
       }
 
       // check if query feedback was processed in the query view
       if(!ok) {
-        // show error info
-        if(!feedback) {
-          // display text view if text output is not shown
-          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(Token.token(inf));
-        }
+        // display error in info view
+        if(!feedback && !info.visible()) GUICommands.SHOWINFO.execute(this);
       } else {
-        // try to convert xquery result to nodeset
+        // get query result
         final Result result = pr.result();
         final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
-  
+
         // treat text view different to other views
         if(ok && out.size() != 0 && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(out);
+          text.setText(out, pr);
         }
-  
+
         final Data ndata = context.data();
         final String time = perf.getTimer();
         Nodes marked = context.marked();
@@ -520,10 +511,10 @@ public final class GUI extends JFrame {
             }
           }
         }
-  
+
         // show number of hits
         setHits(result == null ? 0 : result.size());
-  
+
         // show status info
         status.setText(Main.info(PROCTIME, time));
       }

@@ -284,7 +284,7 @@ public final class DeepShell {
     try {
       final Nodes n = new QueryProcessor("/", fs.getContext()).queryNodes();
       final PrintOutput out = new PrintOutput(System.out);
-      final XMLSerializer xml = new XMLSerializer(out, false, true);
+      final XMLSerializer xml = new XMLSerializer(out);
       n.serialize(xml);
       out.flush();
       xml.close();

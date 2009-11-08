@@ -70,10 +70,10 @@ abstract class AQuery extends Process {
         qp.compile();
         comp += per.getTime();
         if(i == 0) plan(qp, true);
-        
+
         final XMLSerializer xml = new XMLSerializer(
             i == 0 && ser ? out : new NullOutput(!ser),
-            prop.is(Prop.XMLOUTPUT), prop.is(Prop.XQFORMAT));
+            prop.is(Prop.XMLOUTPUT), prop.is(Prop.CHOP));
 
         if(context.prop.is(Prop.CACHEQUERY)) {
           result = qp.query();
@@ -167,13 +167,12 @@ abstract class AQuery extends Process {
         ser.close();
         final String dot = "plan.dot";
         IO.get(dot).write(out.finish());
-        new ProcessBuilder(prop.get(Prop.DOTTY), dot).start().waitFor();
-        //f.delete();
+        new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
         final CachedOutput out = new CachedOutput();
-        qu.plan(new XMLSerializer(out, false, true));
+        qu.plan(new XMLSerializer(out));
         info(QUERYPLAN);
         info.add(out.toString());
         info.add(NL);

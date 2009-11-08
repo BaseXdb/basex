@@ -33,6 +33,8 @@ public final class BaseXFileChooser {
   private JFileChooser fc;
   /** Simple file dialog. */
   private FileDialog fd;
+  /** File suffix. */
+  private String suffix;
 
   /**
    * Default constructor.
@@ -60,9 +62,10 @@ public final class BaseXFileChooser {
    * @param dsc description
    * @param suf suffixes
    */
-  public void addFilter(final String dsc, final String... suf) {
+  public void addFilter(final String dsc, final String suf) {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
-    else for(final String s : suf) fd.setFile("*" + s);
+    else fd.setFile("*" + suf);
+    suffix = suf;
   }
 
   /**
@@ -71,18 +74,19 @@ public final class BaseXFileChooser {
    * @return resulting input reference
    */
   public IO select(final Mode mode) {
+    IO io = null;
     if(fd != null) {
       if(mode == Mode.FDOPEN) fd.setFile(" ");
       fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?
           FileDialog.SAVE : FileDialog.LOAD);
       fd.setVisible(true);
-      if(fd.getFile() == null) return null;
+      String f = fd.getFile();
+      if(f == null) return null;
 
       final String dir = fd.getDirectory();
       return IO.get(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
         dir + "/" + fd.getFile());
     }
-
     int state = 0;
     switch(mode) {
       case FOPEN:
@@ -102,18 +106,25 @@ public final class BaseXFileChooser {
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return null;
+    io = IO.get(fc.getSelectedFile().getPath());
 
-    final IO io = IO.get(fc.getSelectedFile().getPath());
-    return mode != Mode.FSAVE || !io.exists() ||
-      Dialog.confirm(gui, Main.info(FILEREPLACE, io.name())) ? io : null;
+    if(mode != Mode.FSAVE) return io;
+
+    // add file suffix to file to be saved
+    if(suffix != null && io.path().indexOf(".") == -1)
+      io = IO.get(io.path() + suffix);
+
+    // show replace dialog
+    return !io.exists() || Dialog.confirm(gui, Main.info(FILEREPLACE, io)) ?
+        io : null;
   }
-
+  
   /**
    * Defines a file filter for XML documents.
    */
   static class Filter extends FileFilter {
     /** Suffix. */
-    private final String[] suf;
+    private final String suf;
     /** Description. */
     private final String desc;
 
@@ -122,7 +133,7 @@ public final class BaseXFileChooser {
      * @param s suffix
      * @param d description
      */
-    Filter(final String[] s, final String d) {
+    Filter(final String s, final String d) {
       suf = s;
       desc = d;
     }
@@ -131,7 +142,7 @@ public final class BaseXFileChooser {
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;
       final String name = file.getName().toLowerCase();
-      for(final String s : suf) if(name.endsWith(s)) return true;
+      if(name.endsWith(suf)) return true;
       return false;
     }
     @Override

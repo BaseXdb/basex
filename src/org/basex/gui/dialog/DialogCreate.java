@@ -86,7 +86,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(CREATEFILT + ":", false, true));
     p.add(new BaseXLabel(""));
 
-    path = new BaseXTextField(gprop.get(GUIProp.CREATEPATH), this);
+    path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -113,7 +113,7 @@ public final class DialogCreate extends Dialog {
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
     dbname = new BaseXTextField(this);
-    dbname.setText(IO.get(gprop.get(GUIProp.CREATEPATH)).dbname());
+    dbname.setText(IO.get(gprop.get(GUIProp.OPENPATH)).dbname());
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -204,7 +204,7 @@ public final class DialogCreate extends Dialog {
   public void choose() {
     final GUIProp gprop = gui.prop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.CREATEPATH), gui);
+        gprop.get(GUIProp.OPENPATH), gui);
     fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
     fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIX);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
@@ -213,7 +213,7 @@ public final class DialogCreate extends Dialog {
     if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname());
-      gprop.set(GUIProp.CREATEPATH, file.getDir());
+      gprop.set(GUIProp.OPENPATH, file.getDir());
     }
   }
 
@@ -244,7 +244,7 @@ public final class DialogCreate extends Dialog {
     final String pth = path();
     final IO file = IO.get(pth);
     final boolean exists = !pth.isEmpty() && file.exists();
-    if(exists) gui.prop.set(GUIProp.CREATEPATH, file.path());
+    if(exists) gui.prop.set(GUIProp.OPENPATH, file.path());
 
     final String nm = dbname();
     ok = exists && !nm.isEmpty();

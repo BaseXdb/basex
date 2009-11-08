@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.io.IO;
 import org.basex.server.ServerSession;
 import org.basex.server.Sessions;
 
@@ -25,6 +26,8 @@ public final class Context {
   public final DataPool pool;
   /** Current user. */
   public User user;
+  /** Current query file. */
+  public IO query;
 
   /** Central data reference. */
   private Data data;

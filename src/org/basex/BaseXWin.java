@@ -74,7 +74,7 @@ public final class BaseXWin {
         if(args.length != 0) {
           final String db = args[0].replace('\\', '/');
           gui.execute(new CreateDB(db));
-          gprop.set(GUIProp.CREATEPATH, IO.get(db).path());
+          gprop.set(GUIProp.OPENPATH, IO.get(db).path());
         }
         // close wait panel
         wait.dispose();

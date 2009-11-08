@@ -36,16 +36,15 @@ public final class Export extends Process {
     try {
       final Data data = context.data();
       final int[] docs = data.doc();
+      final IO io = IO.get(args[0]);
+      if(docs.length != 1) io.md();
       for(final int pre : docs) {
-        IO file = IO.get(args[0]);
+        final IO file = docs.length == 1 ? io :
+          io.merge(IO.get(Token.string(data.text(pre))));
 
-        // more documents - use original name and argument as path
-        if(docs.length != 1) {
-          file = file.merge(IO.get(Token.string(data.text(pre))));
-        }
         final PrintOutput po = new PrintOutput(file.path());
         po.println(Main.info(DOCDECL, Token.UTF8));
-        new XMLSerializer(po, false, data.meta.chop).node(data, pre);
+        new XMLSerializer(po).node(data, pre);
         po.close();
       }
       return info(DBEXPORTED, data.meta.name, perf);

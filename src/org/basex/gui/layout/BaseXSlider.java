@@ -59,7 +59,7 @@ public final class BaseXSlider extends BaseXPanel {
    * @param w parent window
    */
   public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
-    super(null, w);
+    super(w);
     min = mn;
     max = mx;
     curr = i;

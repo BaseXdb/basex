@@ -43,7 +43,7 @@ public final class PendingUpdates {
 
   /**
    * Constructor.
-   * @param transform update operations are triggered by a transform expression  
+   * @param transform update operations are triggered by a transform expression
    */
   public PendingUpdates(final boolean transform) {
     t = transform;

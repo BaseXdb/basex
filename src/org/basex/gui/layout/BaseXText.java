@@ -61,7 +61,7 @@ public class BaseXText extends BaseXPanel {
    * @param win parent window
    */
   public BaseXText(final boolean edit, final Window win) {
-    super(null, win);
+    super(win);
     setFocusable(true);
 
     BaseXLayout.addInteraction(this, null, win);
