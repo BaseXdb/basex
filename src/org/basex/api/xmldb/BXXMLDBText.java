@@ -11,7 +11,7 @@ import static org.basex.core.Text.*;
  */
 interface BXXMLDBText {
   /** DB URI. */
-  String DBURI = NAMESPACE + "://";
+  String DBURI = NAMELC + "://";
   /** XMLDB URI. */
   String XMLDB = "xmldb:";
   /** XMLDB URI. */

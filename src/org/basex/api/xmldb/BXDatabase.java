@@ -39,7 +39,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   public String getName() {
-    return NAMESPACE;
+    return NAMELC;
   }
 
   public String getProperty(final String key) {

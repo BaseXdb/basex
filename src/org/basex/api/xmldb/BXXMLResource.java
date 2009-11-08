@@ -99,7 +99,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final CachedOutput out = new CachedOutput();
-        final XMLSerializer xml = new XMLSerializer(out);
+        final XMLSerializer xml = new XMLSerializer(out, false, false);
         if(data != null) {
           new DBNode(data, pre).serialize(xml);
         } else if(result != null) {
@@ -196,7 +196,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      * @throws IOException I/O exception
      */
     BXSAXContentHandler(final BXXMLResource r) throws IOException {
-      xml = new XMLSerializer(out);
+      xml = new XMLSerializer(out, false, false);
       res = r;
     }
 
