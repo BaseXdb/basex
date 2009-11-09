@@ -290,10 +290,12 @@ public enum FunDef {
   EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", SEQ),
   /** Project specific function - returns a random number. */
   RANDOM(BXURI, FNBaseX.class, 1, 1, "random()", NUM),
-  /** XProject specific function - accesses an index. */
+  /** Project specific function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN),
-  /** XProject specific function - opens and returns file contents. */
+  /** Project specific function - opens and returns file contents. */
   READ(BXURI, FNBaseX.class, 1, 1, "read(string)", STR),
+  /** Project specific function - evaluated the specified query file. */
+  RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", SEQ),
   /** Project specific function - opens a database instance. */
   DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD);
 

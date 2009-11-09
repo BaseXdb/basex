@@ -158,7 +158,7 @@ public final class QueryContext extends Progress {
   /** Info flag. */
   private final boolean inf;
 
-  /** XQueryUP pending updates. */
+  /** Pending updates. */
   public PendingUpdates updates = new PendingUpdates(false);
   /** Indicates if this query performs updates. */
   public boolean updating;
@@ -169,6 +169,7 @@ public final class QueryContext extends Progress {
    */
   public QueryContext(final Context ctx) {
     context = ctx;
+    nodes = ctx.current();
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));

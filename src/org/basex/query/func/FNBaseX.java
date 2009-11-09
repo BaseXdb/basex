@@ -37,6 +37,7 @@ public final class FNBaseX extends Fun {
     switch(func) {
       case EVAL:  return eval(ctx);
       case INDEX: return index(ctx);
+      case RUN:   return run(ctx);
       default:    return super.iter(ctx);
     }
   }
@@ -44,7 +45,7 @@ public final class FNBaseX extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case READ:   return text(ctx);
+      case READ:   return read(ctx);
       case RANDOM: return random();
       case DB:     return db(ctx);
       default:     return super.atomic(ctx);
@@ -64,8 +65,39 @@ public final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Iter eval(final QueryContext ctx) throws QueryException {
+    return eval(ctx, checkStr(expr[0], ctx));
+  }
+
+  /**
+   * Performs the query function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter run(final QueryContext ctx) throws QueryException {
+    final byte[] name = checkStr(expr[0], ctx);
+    final IO io = IO.get(string(name));
+    if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(NODOC, name);
+    try {
+      return eval(ctx, io.content());
+    } catch(final IOException ex) {
+      Main.debug(ex);
+      Err.or(FILEERR, name);
+      return null;
+    }
+  }
+
+  /**
+   * Evaluates the specified string.
+   * @param ctx query context
+   * @param qu query string
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter eval(final QueryContext ctx, final byte[] qu)
+      throws QueryException {
     final QueryContext qt = new QueryContext(ctx.context);
-    qt.parse(string(checkStr(expr[0], ctx)));
+    qt.parse(string(qu));
     qt.compile();
     return qt.iter();
   }
@@ -76,23 +108,22 @@ public final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item text(final QueryContext ctx) throws QueryException {
+  private Item read(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
     final IO io = IO.get(string(name));
-    if(ctx.context.user.perm(User.ADMIN) && io.exists()) {
-      try {
-        final XMLInput in = new XMLInput(io);
-        final int len = (int) in.length();
-        final TokenBuilder tb = new TokenBuilder(len);
-        while(in.pos() < len) tb.addUTF(in.next());
-        in.finish();
-        return Str.get(tb.finish());
-      } catch(final IOException ex) {
-        Main.debug(ex);
-      }
+    if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(NODOC, name);
+    try {
+      final XMLInput in = new XMLInput(io);
+      final int len = (int) in.length();
+      final TokenBuilder tb = new TokenBuilder(len);
+      while(in.pos() < len) tb.addUTF(in.next());
+      in.finish();
+      return Str.get(tb.finish());
+    } catch(final IOException ex) {
+      Main.debug(ex);
+      Err.or(FILEERR, name);
+      return null;
     }
-    Err.or(NOFILE, name);
-    return null;
   }
 
   /**
