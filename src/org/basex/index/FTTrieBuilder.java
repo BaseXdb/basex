@@ -47,7 +47,8 @@ public final class FTTrieBuilder extends FTBuilder {
     final Prop pr = data.meta.prop;
     final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));
 
-    hash.initIter();
+    if (scm == 0) hash.init();
+    else hash.initIter();
     c = 0;
     
     while(hash.more()) {
