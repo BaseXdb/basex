@@ -197,7 +197,7 @@ public final class MetaData {
       else if(k.equals(DBFTST))   ftst      = toBool(v);
       else if(k.equals(DBFTCS))   ftcs      = toBool(v);
       else if(k.equals(DBFTDC))   ftdc      = toBool(v);
-      else if(k.equals(DBFTST))   ftmaxscore = Token.toInt(v);
+      else if(k.equals(DBFTMSC))   ftmaxscore = Token.toInt(v);
       else if(k.equals(DBTIME))   time      = Token.toLong(v);
       else if(k.equals(DBUTD))    uptodate  = toBool(v);
       else if(k.equals(DBLID))    lastid    = Token.toInt(v);
@@ -210,6 +210,7 @@ public final class MetaData {
       oldindex = true;
       update();
     }
+    System.out.println(ftmaxscore);
   }
 
   /**
@@ -245,7 +246,7 @@ public final class MetaData {
     writeInfo(out, DBFTST,   ftst);
     writeInfo(out, DBFTCS,   ftcs);
     writeInfo(out, DBFTDC,   ftdc);
-    writeInfo(out, DBFTMSC, ftmaxscore);
+    writeInfo(out, DBFTMSC,  ftmaxscore);
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
@@ -255,6 +256,8 @@ public final class MetaData {
     out.writeString(DBPERM);
     users.write(out);
     out.write(0);
+    
+    System.out.println(ftmaxscore);
   }
 
   /**

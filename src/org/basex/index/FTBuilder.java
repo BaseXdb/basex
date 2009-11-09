@@ -8,6 +8,7 @@ import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.IntList;
 import org.basex.util.Num;
+import org.basex.util.Performance;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
@@ -54,21 +55,6 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException IO exception
    */
   final void index() throws IOException {
-    final byte[][] st = {
-        token("natural disaster"), token("wonder girls"), 
-        token("plays of shakespeare"), token("cloud computing"), 
-        token("evidence theory"), token("dempster schafer"), 
-        token("opengl shading language"), token("rabindranath tagore"), 
-        token("finland industry manufacturer"), token("saab sisu car"), 
-        token("slumdog millionaire"), token("danny boyle"), 
-        token("tiananmen square"), token("hard disk"), 
-        token("stock exchange"), token("insider trading"), 
-        token("game show"), token("hatha yoga"), 
-        token("world wide web"), token("french revolution"), 
-        token("global warming"), token("human activity"), 
-        token("paul is dead"), token("virtual museums"), 
-    };
-    
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) {
         if(data.kind(id) == Data.DOC && scm == 1) nodes.add(id);
@@ -77,48 +63,24 @@ abstract class FTBuilder extends IndexBuilder {
       
       if (scm == 2) nodes.add(id);
       checkStop();
-      int p = 0, i = 0, j = 0;
       wp.init(data.text(id));
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens
         if(tok.length <= MAXLEN) index(tok);
-        
-        // [SG] INEX index phrases
-        if(wp instanceof ScoringTokenizer) {
-          if(j == 0) {
-            for(i = 0; i < st.length; i++) { 
-              if(startsWith(st[i], tok)) {
-                p++;
-                j += tok.length + 1;
-                break;
-              }
-            }
-          } else {
-            if(st[i].length >= j + tok.length &&
-                eq(substring(st[i], j, j + tok.length), tok)) {
-              if(j + tok.length == st[i].length) {
-                index(st[i]);
-                j = 0;
-              } else {
-                j += tok.length + 1;
-              }
-            } else {
-              j = 0;
-            }
-          }                        
-        }          
       }
     }
     if (scm > 0) {
       freq = new IntList();
       getFreq();
     }
+    Performance.gc(5);
+    System.out.println(Performance.getMem());
     write();
     if (scm > 0) {
       data.meta.ftmaxscore = maxscore;
-    }
-    
+      data.meta.dirty = true;
+    }    
   }
 
   /**

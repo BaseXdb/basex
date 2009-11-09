@@ -140,7 +140,7 @@ public final class DiskData extends Data {
    * Writes all meta data to disk.
    * @throws IOException I/O exception
    */
-  private void write() throws IOException {
+  public void write() throws IOException {
     final File file = meta.prop.dbfile(meta.name, DATAINFO);
     final DataOutput out = new DataOutput(file);
     meta.write(out);
