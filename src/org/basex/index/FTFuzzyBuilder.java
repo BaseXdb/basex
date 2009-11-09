@@ -74,11 +74,12 @@ public final class FTFuzzyBuilder extends FTBuilder {
     final Prop pr = data.meta.prop;
     final DataOutput outx = new DataOutput(pr.dbfile(db, DATAFTX + 'x'));
     final DataOutput outy = new DataOutput(pr.dbfile(db, DATAFTX + 'y'));
-    final DataOutput outz = new DataOutput(pr.dbfile(db, DATAFTX + 'z'));
+    final DataOutput outftdata = new DataOutput(pr.dbfile(db, DATAFTX + 'z'));
 
     // write index size
     outx.write(isize);
-    long dr = 0;
+    // first max score value is written
+    long dr = 4;
     int tr = 0;
     byte j = 1;
     for(c = 0; j < tree.length && c < ntok; j++) {
@@ -107,9 +108,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
         // write compressed pre and pos arrays
         final byte[] vpre = tre.pre[p];
         final byte[] vpos = tre.pos[p];
-        writeFTData(outz, vpre, vpos);
+        writeFTData(outftdata, vpre, vpos);
 
-        dr = outz.size();
+        dr = outftdata.size();
         tr = (int) outy.size();
         c++;
       }      
@@ -121,7 +122,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
     outx.close();
     outy.close();
-    outz.close();
+    outftdata.close();
   }
 
   @Override

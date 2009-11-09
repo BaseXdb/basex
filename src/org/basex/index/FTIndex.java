@@ -72,6 +72,8 @@ abstract class FTIndex extends Index {
         }
         if (scm > 0 && lpre < 0) {
           nscore = -lpre / 1000d;
+//          nscore = nscore / (data.meta.ftmaxscore / 1000d);
+//          System.out.println((double) data.meta.ftmaxscore);
           lpre =  da.readNum();          
         }
         pos = da.pos();

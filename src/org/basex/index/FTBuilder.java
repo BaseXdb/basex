@@ -34,6 +34,9 @@ abstract class FTBuilder extends IndexBuilder {
   int fc;
   /** Entry counter. */
   int c;
+  /** Maximum indexed score. */
+  int maxscore = 0;
+  
     
   /**
    * Constructor.
@@ -112,6 +115,10 @@ abstract class FTBuilder extends IndexBuilder {
       getFreq();
     }
     write();
+    if (scm > 0) {
+      data.meta.ftmaxscore = maxscore;
+    }
+    
   }
 
   /**
@@ -144,7 +151,8 @@ abstract class FTBuilder extends IndexBuilder {
             nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
             pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
           final int score = ScoringTokenizer.score(nodes.size(), 
-              nmbdocwt[c], maxfreq[cn - scm == 1 ? 1 : 0], freq.get(fc));
+              nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
+          if (score > maxscore) maxscore = score;
           // first write score value
           out.write(Num.num(-score));
           if (scm == 2) {
