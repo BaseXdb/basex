@@ -29,6 +29,8 @@ public abstract class AAdmin extends Process {
    * @return permissions or -1
    */
   protected boolean perm(final boolean set) {
+    if(args[1].equals(ADMIN)) return error(USERADMIN);
+    
     final String db = args[2];
 
     // find permission

@@ -76,12 +76,12 @@ public abstract class Main {
    */
   protected synchronized void quit(final boolean user) {
     try {
+      if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
       process(new Exit(), true);
       out.close();
     } catch(final IOException ex) {
       error(ex, true);
     }
-    if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
   /**
@@ -98,7 +98,7 @@ public abstract class Main {
         // offer optional password input
         final int i = p instanceof Password && p.args[0] == null ? 0 :
           (p instanceof CreateUser || p instanceof AlterUser) &&
-            p.args[1] == null ? 1 : -1;
+          p.args[1] == null ? 1 : -1;
         if(i != -1) {
           Main.out(SERVERPW + COLS);
           p.args[i] = new String(System.console().readPassword());

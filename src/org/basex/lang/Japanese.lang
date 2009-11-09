@@ -50,7 +50,6 @@ no_table=No table available for this data
 no_space=Too less space
 map_binary=バイナリーファイル
 info_title=クエリー情報
-info_no=クエリーを実行して下さい。
 help_title=ヘルプ
 text_title=テキスト
 explore_title=Explore
@@ -58,7 +57,6 @@ explore_title=Explore
 # Dialog Windows
 d_info=情報
 d_fctitle=ディレクトリの選択
-d_export=保存
 
 dc_filter=フィルター
 dc_title=XML文書の保存
@@ -343,6 +341,7 @@ db_dropped=データベース '%' が削除されました。
 db_notdropped=データベースを削除できませんでした。
 info_nodeepfs=No DeepFS database found
 db_inuse=Database is currently accessed by other users.
+db_tmp="%.tmp" exists already.
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
@@ -352,17 +351,13 @@ in_created=% にインデックスが作成されました。
 in_dropped=% インデックスを削除しました。
 in_notdropped=インデックスを削除できませんでした。
 
-# Console Info
-cs_local=スタンドアローン
-cs_client=クライアント
-
 # Server Info
 srv_login=Access denied.
 srv_connect=サーバーと通信できません。
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
 srv_start=リクエストを待っています。
-srv_stop=停止しました。
+srv_stop=Server 停止しました。
 srv_user=Username
 srv_pw=Password
 
@@ -386,7 +381,6 @@ qu_tabquery=クエリー　　
 qu_tabpars=パース中　　
 qu_tabcomp=コンパイル中
 qu_tabeval=計算中　　　
-qu_tabfinish=終了処理中　
 qu_tabprint=印刷中　　　
 qu_tabtotal=合計時間　　
 qu_tabmem=メモリー　　
@@ -411,6 +405,7 @@ ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 ad_passno=No password specified.
+ad_admin=Admin user cannot be modified.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.

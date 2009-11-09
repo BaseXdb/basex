@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * Storage for metadata information for a single file.
  * @author Bastian Lemke
  */
-public class MetaStore {
+public final class MetaStore {
   
   // [BL] allow nesting of content-elements (nested MetaStores)
 
@@ -152,17 +152,17 @@ public class MetaStore {
     add(elem, Token.token(value.toString()), null);
   }
 
-  /**
+  /*
    * Checks if the given {@link MetaElem} was added before for this file and
    * returns the string value of the corresponding metadata attribute.
    * @param elem metadata element to check.
    * @return the metadata value as string.
-   */
   public String getValueAsString(final MetaElem elem) {
     return metaElements.containsKey(elem) ?
         Token.string(metaElements.get(elem)) :
         null;
   }
+   */
 
   // ---------------------------------------------------------------------------
   // ----- enums for metadata type and format ----------------------------------

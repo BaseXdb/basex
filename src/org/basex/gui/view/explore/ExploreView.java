@@ -14,7 +14,6 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
@@ -87,9 +86,9 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshMark() {
-    BaseXLayout.enable(go, !gui.prop.is(GUIProp.EXECRT));
+    go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked();
-    BaseXLayout.enable(filter, !gui.prop.is(GUIProp.FILTERRT) &&
+    filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 

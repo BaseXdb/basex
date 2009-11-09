@@ -50,7 +50,6 @@ no_table=Tabelle für aktuelle Daten nicht verfügbar
 no_space=Zu wenig Platz
 map_binary=Binärdatei
 info_title=Query-Info
-info_no=Bitte starten Sie eine Anfrage...
 help_title=Hilfe
 text_title=Text
 explore_title=Explore
@@ -58,7 +57,6 @@ explore_title=Explore
 # Dialog Windows
 d_info=Information
 d_fctitle=Verzeichnis
-d_export=Exportieren
 
 dc_filter=Filter
 dc_title=XML-Dokument oder Verzeichnis
@@ -342,6 +340,7 @@ db_optimized=Datenbank optimiert in %.
 db_dropped=Datenbank '%' wurde gelöscht.
 db_notdropped=Datenbank konnte nicht gelöscht werden.
 db_inuse=Datenbank wird von anderen Clients benutzt.
+db_tmp="%.tmp" besteht schon.
 db_notopened=Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet in %.
 db_exported=Datenbank '%' exportiert in %.
@@ -351,17 +350,13 @@ in_created=Index wurde erzeugt in %.
 in_dropped=Index wurde gelöscht in %.
 in_notdropped=Index konnte nicht gelöscht werden.
 
-# Console Info
-cs_local=Standalone
-cs_client=Client
-
 # Server Info
 srv_login=Zugriff verweigert.
 srv_connect=Server ist nicht erreichbar.
 srv_timeout=Der Prozess hat das Timeout überschritten.
 srv_bind=Server läuft, oder Zugriff wurde untersagt.
 srv_start=Wartet auf Anfragen...
-srv_stop=wurde gestoppt.
+srv_stop=Server wurde gestoppt.
 srv_user=Benutzer
 srv_pw=Passwort
 
@@ -385,7 +380,6 @@ qu_tabquery=Anfrage
 qu_tabpars=Parsing     
 qu_tabcomp=Kompilierung
 qu_tabeval=Ausführung 
-qu_tabfinish=Abschluss   
 qu_tabprint=Ausgabe     
 qu_tabtotal=Gesamt      
 qu_tabmem=Speicher    
@@ -410,6 +404,7 @@ ad_usercreate=Benutzer '%' erzeugt.
 ad_useralter=Passwort von Benutzer '%' geändert.
 ad_userdrop=Benutzer '%' entfernt.
 ad_passno=Kein Passwort angegeben.
+ad_admin=Admin-Benutzer kann nicht modifiziert werden.
 
 # General Commands
 gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.

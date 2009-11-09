@@ -43,7 +43,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   /** Exact search pattern. */
   private static final String PATEX = "[% = \"%\"]";
   /** Substring search pattern. */
-  private static final String PATSUB = "[% ftcontains \"%\"]";
+  private static final String PATSUB = "[% contains text \"%\"]";
   /** Numeric search pattern. */
   private static final String PATNUM = "[% >= % and % <= %]";
   /** Simple search pattern. */

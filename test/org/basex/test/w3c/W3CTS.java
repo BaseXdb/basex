@@ -20,9 +20,9 @@ import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -344,7 +344,7 @@ public abstract class W3CTS {
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
       if(cont.size() != 0) {
-        final Data d = Open.check(context,
+        final Data d = Check.check(context,
             srcs.get(string(data.atom(cont.nodes[0]))));
         curr = new Nodes(d.doc(), d, true);
       }

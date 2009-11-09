@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.proc.XQuery;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -96,8 +95,9 @@ final class XQueryText extends BaseXText {
     if(force) {
       last = query;
       if(isModule(query)) return;
-      BaseXLayout.enable(view.stop, true);
-      gui.execute(new XQuery(query.length == 0 ? "." : Token.string(query)));
+      view.stop.setEnabled(true);
+      final String qu = Token.string(query);
+      gui.execute(new XQuery(qu.trim().length() == 0 ? "()" : qu));
     } else {
       markError();
     }

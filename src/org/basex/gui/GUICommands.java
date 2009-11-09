@@ -41,7 +41,6 @@ import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.layout.BaseXFileChooser;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.item.Type;
@@ -195,6 +194,11 @@ public enum GUICommands implements GUICommand {
         }
       }
     }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      button.setEnabled(gui.query.modified());
+    }
   },
 
   /** Saves the current XQuery. */
@@ -240,7 +244,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
       final Nodes marked = gui.context.marked();
-      BaseXLayout.enable(button, marked != null && marked.size() != 0);
+      button.setEnabled(marked != null && marked.size() != 0);
     }
   },
 
@@ -256,7 +260,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
-      BaseXLayout.enable(button, updatable(gui.context.marked()));
+      button.setEnabled(updatable(gui.context.marked()));
     }
   },
 
@@ -279,7 +283,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final Context ctx = gui.context;
       // disallow copy of empty node set or root node
-      BaseXLayout.enable(button, updatable(ctx.marked(), Data.DOC) &&
+      button.setEnabled(updatable(ctx.marked(), Data.DOC) &&
           ctx.copied() != null);
     }
   },
@@ -305,7 +309,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
-      BaseXLayout.enable(button, updatable(gui.context.marked()));
+      button.setEnabled(updatable(gui.context.marked()));
     }
   },
 
@@ -340,7 +344,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      BaseXLayout.enable(button, updatable(gui.context.marked(),
+      button.setEnabled(updatable(gui.context.marked(),
           Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
     }
   },
@@ -371,7 +375,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      BaseXLayout.enable(button, updatable(gui.context.marked(), Data.DOC));
+      button.setEnabled(updatable(gui.context.marked(), Data.DOC));
     }
   },
 
@@ -393,7 +397,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final Nodes marked = gui.context.marked();
-      BaseXLayout.enable(button, marked != null && marked.size() != 0);
+      button.setEnabled(marked != null && marked.size() != 0);
     }
   },
 
@@ -774,8 +778,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       // disable mount button, if native library is not available.
-      BaseXLayout.enable(button,
-          LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
+      button.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
   },
  
@@ -825,7 +828,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final String tt = gui.notify.tooltip(true);
       final boolean en = tt != null;
-      BaseXLayout.enable(button, en);
+      button.setEnabled(en);
       button.setToolTipText(en && tt.isEmpty() ? GUIGOBACKTT : tt);
     }
   },
@@ -841,7 +844,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton button) {
       final String tt = gui.notify.tooltip(false);
       final boolean en = tt != null;
-      BaseXLayout.enable(button, en);
+      button.setEnabled(en);
       button.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARDTT : tt);
     }
   },
@@ -855,7 +858,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
-      BaseXLayout.enable(button, !gui.context.root());
+      button.setEnabled(!gui.context.root());
     }
   },
 
@@ -901,7 +904,8 @@ public enum GUICommands implements GUICommand {
   public abstract void execute(final GUI gui);
 
   public void refresh(final GUI gui, final AbstractButton button) {
-    BaseXLayout.enable(button, !data || gui.context.data() != null);
+    final boolean e = !data || gui.context.data() != null;
+    if(button.isEnabled() != e) button.setEnabled(e);
   }
 
   public boolean checked() { return false; }

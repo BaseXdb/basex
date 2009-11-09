@@ -49,7 +49,6 @@ no_table=Không bản nào trống cho dữ liệu này
 no_space=Thiếu chỗ
 map_binary=Tệp nhị phân
 info_title=Thông tin câu hỏi
-info_no=Xin bắt đầu một câu hỏi...
 help_title=Giúp đỡ
 text_title=Văn bản
 explore_title=Khảo sát
@@ -57,7 +56,6 @@ explore_title=Khảo sát
 # Dialog Windows
 d_info=Thông tin
 d_fctitle=Chọn thư mục
-d_export=Xuất khẩu
 
 dc_title=Nhập vào tệp hoặc thư mục
 dc_filter=Bộ lọc
@@ -341,6 +339,7 @@ db_optimized=Cơ sở dữ liệu tối ưu trong %.
 db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.
 db_notdropped=Cơ sở dữ liệu không xóa bỏ được.
 db_inuse=Database is currently accessed by other users.
+db_tmp="%.tmp" exists already.
 db_notopened=Cơ sở dữ liệu '%' không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
@@ -350,17 +349,13 @@ in_created=Index được tạo ở %.
 in_dropped=Index được xóa ở %.
 in_notdropped=Index không xóa được.
 
-# Console Info
-cs_local=Đứng một mình
-cs_client=Người dùng
-
 # Server Info
 srv_login=Access denied.
 srv_connect=Không liên lạc được với máy chủ.
 srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
 srv_bind=Máy chủ đang chạy hay không được phép.
 srv_start=Đang chờ yêu cầu...
-srv_stop=đã dừng.
+srv_stop=Server đã dừng.
 srv_user=Username
 srv_pw=Password
 
@@ -384,7 +379,6 @@ qu_tabquery=Hỏi
 qu_tabpars=Phân tích   
 qu_tabcomp=Dịch 
 qu_tabeval=Đáng giá
-qu_tabfinish=Xong 
 qu_tabprint=In ra  
 qu_tabtotal=Thời gian
 qu_tabmem=Bộ nhớ    
@@ -409,6 +403,7 @@ ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 ad_passno=No password specified.
+ad_admin=Admin user cannot be modified.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.

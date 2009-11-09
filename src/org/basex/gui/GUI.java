@@ -374,9 +374,12 @@ public final class GUI extends JFrame {
     final Namespaces ns = context.data().ns;
     final int def = ns.get(Token.EMPTY, 0);
     String in = qu;
-    if(in.trim().isEmpty()) in = ".";
-    if(def != 0) in = "declare default element namespace \"" +
-      Token.string(ns.key(def)) + "\"; " + in;
+    if(in.trim().isEmpty()) {
+      in = ".";
+    } else if(def != 0) {
+      in = "declare default element namespace \"" +
+        Token.string(ns.key(def)) + "\"; " + in;
+    }
     execute(new XQuery(in), main);
   }
 
@@ -501,17 +504,14 @@ public final class GUI extends JFrame {
               // remove old highlight
               marked = new Nodes(data);
             }
-            // highlights have changed.. refresh views
-            if(!marked.same(context.marked())) {
-              notify.mark(marked, null);
-            }
+            // refresh views
+            notify.mark(marked, null);
             if(thread != threadID) {
               proc = null;
               return true;
             }
           }
         }
-
         // show number of hits
         setHits(result == null ? 0 : result.size());
 
@@ -597,7 +597,7 @@ public final class GUI extends JFrame {
     final Nodes marked = context.marked();
     if(marked != null) setHits(marked.size());
 
-    BaseXLayout.enable(filter, marked != null && marked.size() != 0);
+    filter.setEnabled(marked != null && marked.size() != 0);
     refreshMode();
     toolbar.refresh();
     menu.refresh();

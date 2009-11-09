@@ -24,7 +24,7 @@ public final class DropUser extends AAdmin {
   @Override
   protected boolean exec(final PrintOutput out) {
     final String user = args[0];
-    return context.users.drop(args[0]) ?
+    return user.equals(ADMIN) ? error(USERADMIN) : context.users.drop(args[0]) ?
       info(USERDROP, user) : error(USERNO, user);
   }
 

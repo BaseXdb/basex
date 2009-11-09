@@ -7,7 +7,6 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Array;
 
 /**
@@ -100,7 +99,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
     context.marked(mark);
     for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
-    BaseXLayout.enable(gui.filter, context.marked().size() != 0);
+    gui.filter.setEnabled(context.marked().size() != 0);
     gui.refreshControls();
   }
 

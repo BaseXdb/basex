@@ -69,46 +69,48 @@ public interface Text {
   };
 
   /** Local (standalone) mode. */
-  String LOCALMODE = lang("cs_local");
+  String LOCALMODE = "Standalone";
   /** Client mode. */
-  String CLIENTMODE = lang("cs_client");
+  String CLIENTMODE = "Client";
   /** Local (standalone) mode. */
   String SERVERMODE = "Server";
 
   /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + CLIENTMODE + " [-np] [-cdovVxz] [query]" + NL +
-    "  [query]    specify query file" + NL +
-    "  -c<cmd>    send database commands" + NL +
+    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-dovVxz] [query] [-c]" + NL +
+    "  [query]    query file" + NL +
+    "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
-    "  -n<name>   specify server name" + NL +
-    "  -o<file>   specify output file" + NL +
-    "  -p<port>   specify server port" + NL +
+    "  -n<name>   server name" + NL +
+    "  -o<file>   output file" + NL +
+    "  -p<port>   server port" + NL +
+    "  -P<pass>   user password" + NL +
+    "  -U<name>   user name" + NL +
     "  -v/V       show (all) process info" + NL +
-    "  -x         print result as xml" + NL +
+    "  -x         wrap query result to xml" + NL +
     "  -z         skip query output";
 
   /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [-cdiovVxz] [query]" + NL +
-    "  [query]    specify query file" + NL +
-    "  -c<cmd>    send database commands" + NL +
+    "Usage: " + NAME + " [-diovVxz] [query] [-c]" + NL +
+    "  [query]    query file" + NL +
+    "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
-    "  -i<file>   specify XML input" + NL +
-    "  -o<file>   specify output file" + NL +
+    "  -i<file>   XML input" + NL +
+    "  -o<file>   output file" + NL +
     "  -v/V       show (all) process info" + NL +
-    "  -x         print result as xml" + NL +
+    "  -x         wrap query result to xml" + NL +
     "  -z         skip query output";
 
   // SERVER ===================================================================
 
   /** Server start. */
-  String SERVERSTART = lang("srv_start") + NL;
+  String SERVERSTART = lang("srv_start");
   /** Server stop. */
-  String SERVERSTOPPED = SERVERMODE + ' ' + lang("srv_stop");
+  String SERVERSTOPPED = lang("srv_stop");
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
-  /** Error shown in the client console when timeout is reached. */
+  /** Timeout error. */
   String SERVERTIME = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
@@ -121,10 +123,10 @@ public interface Text {
   
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: java " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
+    "Usage: " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
-    " -p<port> specify server port" + NL +
+    " -p<port> server port" + NL +
     " -v       verbose mode";
 
   // COMMANDS =================================================================
@@ -409,6 +411,8 @@ public interface Text {
   String DBNOTDROPPED = lang("db_notdropped");
   /** Database is in use by a other client. */
   String DBINUSE = lang("db_inuse");
+  /** Temporary database is found. */
+  String DBTMP = lang("db_tmp");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */
@@ -465,8 +469,6 @@ public interface Text {
   String QUERYCOMPILE = lang("qu_tabcomp") + COLS;
   /** Query info: evaluating. */
   String QUERYEVALUATE = lang("qu_tabeval") + COLS;
-  /** Query info: finishing. */
-  String QUERYFINISH = lang("qu_tabfinish") + COLS;
   /** Query info: time for printing. */
   String QUERYPRINT = lang("qu_tabprint") + COLS;
   /** Query info: total time. */
@@ -529,6 +531,8 @@ public interface Text {
   String USERKNOWN = lang("ad_userknown");
   /** User not found. */
   String PASSNO = lang("ad_passno");
+  /** User not found. */
+  String USERADMIN = lang("ad_admin");
 
   // GENERAL COMMANDS =========================================================
 
@@ -900,8 +904,6 @@ public interface Text {
   byte[] MAPBINARY = token(lang("map_binary"));
   /** Query info title. */
   String INFOTIT = lang("info_title");
-  /** No query info. */
-  String INFONO = lang("info_no");
   /** Query title. */
   String EXPLORETIT = lang("explore_title");
   /** Help title. */
@@ -1004,9 +1006,6 @@ public interface Text {
   String NOTSAVED = lang("c_notsaved");
   /** File dialog replace information. */
   String FILEREPLACE = lang("c_replace");
-  
-  /** Dialog title for exporting XML. */
-  String EXPORTTITLE = lang("d_export");
   
   /** Server title. */
   String SRVTITLE = lang("ds_servdia");

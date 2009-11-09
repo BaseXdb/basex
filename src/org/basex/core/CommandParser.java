@@ -10,6 +10,7 @@ import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.AlterUser;
+import org.basex.core.proc.Check;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -40,7 +41,6 @@ import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
-import org.basex.core.proc.XQueryMV;
 import org.basex.core.proc.XQuery;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -132,6 +132,8 @@ public final class CommandParser extends InputParser {
         return new AlterUser(name(cmd), name(null));
       case OPEN: case O:
         return new Open(name(cmd));
+      case CHECK:
+        return new Check(string(cmd));
       case INFO: case I:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -169,8 +171,6 @@ public final class CommandParser extends InputParser {
         return new Export(string(cmd));
       case XQUERY: case X:
         return new XQuery(xquery(cmd));
-      case XQUERYMV:
-        return new XQueryMV(number(cmd), number(cmd), xquery(cmd));
       case RUN:
         return new Run(string(cmd));
       case FIND:

@@ -74,6 +74,7 @@ public final class BaseXServer extends Main implements Runnable {
         final ServerSession s = new ServerSession(server.accept(), this, info);
         if(STOP.exists()) {
           STOP.delete();
+          outln(SERVERSTOPPED);
           quit(false);
         } else if(s.init()) {
           context.add(s);

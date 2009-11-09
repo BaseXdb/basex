@@ -32,7 +32,7 @@ public final class List extends Process {
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
     final Table table = new Table();
-    table.desc = "Databases";
+    table.desc = DATABASES;
     table.header.add(INFODBNAME);
     table.header.add(INFODOC);
 

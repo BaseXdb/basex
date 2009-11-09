@@ -182,7 +182,7 @@ public final class Users {
    */
   public byte[] info() {
     final Table table = new Table();
-    table.desc = "Users";
+    table.desc = USERS;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);

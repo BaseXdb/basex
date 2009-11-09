@@ -28,7 +28,7 @@ public final class Export extends Process {
    * @param path export path
    */
   public Export(final String path) {
-    super(DATAREF | User.READ | User.WRITE, path);
+    super(DATAREF | User.READ | User.ADMIN, path);
   }
 
   @Override

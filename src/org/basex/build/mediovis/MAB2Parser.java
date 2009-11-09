@@ -268,8 +268,7 @@ public final class MAB2Parser extends Parser {
     while(in.more()) {
       final byte c = in.read1();
       if(c == delim) return buffer.finish();
-      if(c < ' ') continue;
-      buffer.add(c);
+      if(c < 0 || c >= ' ') buffer.add(c);
     }
     return null;
   }
@@ -519,7 +518,6 @@ public final class MAB2Parser extends Parser {
    */
   private static byte[] string(final byte[] line) {
     final byte[] tmp = new byte[line.length - 4];
-
     int c = 0;
     final int l = line.length;
     boolean space = false;

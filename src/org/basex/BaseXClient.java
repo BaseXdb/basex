@@ -43,17 +43,16 @@ public final class BaseXClient extends BaseX {
   @Override
   protected Session session() throws IOException {
     if(session == null) {
-      String pw = null;
       // user/password input
       while(user == null) {
         Main.out(SERVERUSER + COLS);
         user = System.console().readLine();
       }
-      while(pw == null) {
+      while(pass == null) {
         Main.out(SERVERPW + COLS);
-        pw = new String(System.console().readPassword());
+        pass = new String(System.console().readPassword());
       }
-      session = new ClientSession(context, user, pw);
+      session = new ClientSession(context, user, pass);
     }
     return session;
   }

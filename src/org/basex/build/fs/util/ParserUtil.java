@@ -88,7 +88,7 @@ public final class ParserUtil {
    * @return the {@link Duration} instance or <code>null</code> if the
    *         conversion fails.
    */
-  public static Duration convertMinSecDuration(final byte[] minSec) {
+  private static Duration convertMinSecDuration(final byte[] minSec) {
     if(factory == null) return null;
     byte b;
     int i = 0;

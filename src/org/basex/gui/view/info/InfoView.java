@@ -153,7 +153,7 @@ public final class InfoView extends View {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    String tm = INFONO;
+    String tm = "";
 
     stat = il;
     strings = sl;

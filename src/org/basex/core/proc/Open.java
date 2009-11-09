@@ -10,8 +10,6 @@ import org.basex.core.Process;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
@@ -34,14 +32,10 @@ public final class Open extends Process {
     new Close().execute(context, out);
 
     final String db = args[0];
-    Data data = context.data();
-
     try {
-      if(data == null || !data.meta.name.equals(db)) {
-        data = open(context, db);
-        context.openDB(data);
-        if(data.meta.oldindex) info(INDUPDATE);
-      }
+      final Data data = open(context, db);
+      context.openDB(data);
+      if(data.meta.oldindex) info(INDUPDATE);
       return info(DBOPENED, db, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -76,22 +70,5 @@ public final class Open extends Process {
       throw new IOException(Main.info(PERMNO, CmdPerm.READ));
     }
     return data;
-  }
-
-  /**
-   * Opens the specified database; if it does not exist, create a new
-   * database instance.
-   * @param ctx database context
-   * @param path document path
-   * @return data reference
-   * @throws IOException I/O exception
-   */
-  public static Data check(final Context ctx, final String path)
-      throws IOException {
-
-    final IO f = IO.get(path);
-    final String db = f.dbname();
-    return MetaData.found(path, db, ctx.prop) ? open(ctx, db) :
-      CreateDB.xml(ctx, f, db);
   }
 }

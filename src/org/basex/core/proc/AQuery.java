@@ -27,15 +27,15 @@ import org.basex.util.Performance;
  */
 abstract class AQuery extends Process {
   /** Query processor. */
-  protected QueryProcessor qp;
+  private QueryProcessor qp;
   /** Parsing time. */
-  protected long pars;
+  private long pars;
   /** Compilation time. */
-  protected long comp;
+  private long comp;
   /** Evaluation time. */
-  protected long eval;
+  private long eval;
   /** Printing time. */
-  protected long prnt;
+  private long prnt;
 
   /**
    * Protected constructor.
@@ -135,7 +135,7 @@ abstract class AQuery extends Process {
    * @param hits information
    * @param runs number of runs
    */
-  protected final void evalInfo(final PrintOutput out, final long hits,
+  private void evalInfo(final PrintOutput out, final long hits,
       final int runs) {
     if(!prop.is(Prop.INFO)) return;
     final String opt = qp.info(prop.is(Prop.ALLINFO));

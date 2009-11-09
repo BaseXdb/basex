@@ -120,6 +120,8 @@ public final class XQueryView extends View {
 
     info = new BaseXLabel(" ");
     info.setCursor(GUIConstants.CURSORHAND);
+    info.setText(STATUSOK);
+    info.setIcon(OKICON);
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
@@ -129,17 +131,16 @@ public final class XQueryView extends View {
       }
     });
     south.add(info, BorderLayout.CENTER);
-    BaseXLayout.enable(info, false);
 
     stop = new BaseXButton(gui, "stop", HELPSTOP);
     stop.addKeyListener(this);
     stop.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        BaseXLayout.enable(stop, false);
+        stop.setEnabled(false);
         gui.stop();
       }
     });
-    BaseXLayout.enable(stop, false);
+    stop.setEnabled(false);
 
     go = new BaseXButton(gui, "go", HELPGO);
     go.addKeyListener(this);
@@ -187,9 +188,9 @@ public final class XQueryView extends View {
 
   @Override
   protected void refreshMark() {
-    BaseXLayout.enable(go, !gui.prop.is(GUIProp.EXECRT));
+    go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked();
-    BaseXLayout.enable(filter, !gui.prop.is(GUIProp.FILTERRT) &&
+    filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -248,9 +249,7 @@ public final class XQueryView extends View {
     info.setText(ok ? STATUSOK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""));
     info.setIcon(ok ? OKICON : ERRICON);
     info.setToolTipText(ok ? null : inf);
-
-    BaseXLayout.enable(stop, false);
-    BaseXLayout.enable(info, !ok);
+    stop.setEnabled(false);
   }
 
   /**
@@ -262,6 +261,14 @@ public final class XQueryView extends View {
   }
 
   /**
+   * Returns the modified flag.
+   * @return modified flag
+   */
+  public boolean modified() {
+    return modified;
+  }
+
+  /**
    * Sets the query modification flag.
    * @param mod modification flag
    * @param force action
@@ -269,9 +276,13 @@ public final class XQueryView extends View {
   void modified(final boolean mod, final boolean force) {
     if(modified != mod || force) {
       String title = XQUERYTIT;
-      if(gui.context.query != null) title += " - " + gui.context.query.name();
-      header.setText(title + (mod ? "*" : ""));
+      if(gui.context.query != null) {
+        title += " - " + gui.context.query.name();
+        if(mod) title += "*";
+      }
+      header.setText(title);
+      modified = mod;
+      gui.refreshControls();
     }
-    modified = mod;
   }
 }

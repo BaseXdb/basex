@@ -218,13 +218,11 @@ public class AxisPath extends Path {
           final Expr e = index(ctx, data);
           if(e != this) return e;
         }
-
         // check children path rewriting
         final Expr e = children(ctx, data);
         if(e != this) return e;
       }
     }
-
     // if applicable, return iterator
     return iterator(ctx);
   }
@@ -318,9 +316,6 @@ public class AxisPath extends Path {
   private Expr index(final QueryContext ctx, final Data data)
       throws QueryException {
 
-    // skip position predicates and horizontal axes
-    for(final Step s : step) if(!s.axis.down) return this;
-
     // cache index access costs
     IndexContext ics = null;
     int ips = 0;
@@ -330,6 +325,8 @@ public class AxisPath extends Path {
     for(int s = 0; s < step.length; s++) {
       // find cheapest index access
       final Step stp = step[s];
+      if(!stp.axis.down) break;
+
       // check if resulting index path will be duplicate free
       final boolean d = pathNodes(data, s) == null;
 

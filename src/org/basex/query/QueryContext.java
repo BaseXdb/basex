@@ -11,6 +11,7 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
+import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
@@ -463,7 +464,7 @@ public final class QueryContext extends Progress {
       throws QueryException {
 
     try {
-      return Open.check(context, path);
+      return Check.check(context, path);
     } catch(final IOException ex) {
       if(err) Err.or(coll ? NOCOLL : NODOC, path);
       return null;

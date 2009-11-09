@@ -84,4 +84,9 @@ public final class BaseXButton extends JButton {
     });
     return button;
   }
+  
+  @Override
+  public void setEnabled(final boolean flag) {
+    if(flag != isEnabled()) super.setEnabled(flag);
+  }
 }

@@ -155,6 +155,6 @@ public class FTContains extends Expr {
 
   @Override
   public String toString() {
-    return expr + " " + FTCONTAINS + " " + ftexpr;
+    return expr + " " + CONTAINS + " " + TEXT + " " + ftexpr;
   }
 }

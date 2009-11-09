@@ -485,14 +485,6 @@ public interface QueryText {
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, "Attribute must follow root element." };
 
-  // [LK] CG: dummy errors for various unspecified exceptions
-  /** XUDY0000: XQuery Update dynamic exception. */
-  Object[] UPMISS1 = { XUDY, 1, "Replace error (1)." };
-  /** XUDY0000: XQuery Update dynamic exception. */
-  Object[] UPMISS2 = { XUDY, 2, "Replace error (2)." };
-  /** XUDY0000: XQuery Update dynamic exception. */
-  Object[] UPMISS3 = { XUDY, 3, "Replace error (3)." };
-
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target node has no parent." };

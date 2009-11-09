@@ -71,7 +71,7 @@ public final class XMLParser extends AbstractParser {
   protected void content(final BufferedFileChannel f, final NewFSParser parser)
       throws IOException {
     if(!check(f, parser)) {
-      // try to extract content as plaintext
+      // try to extract content as plain text
       parser.parseWithFallbackParser(f, true);
       return;
     }
@@ -114,7 +114,7 @@ public final class XMLParser extends AbstractParser {
   protected boolean metaAndContent(final BufferedFileChannel bfc,
       final NewFSParser parser) throws IOException {
     if(!check(bfc, parser)) {
-      // try to extract content as plaintext
+      // try to extract content as plain text
       parser.parseWithFallbackParser(bfc, true);
       return true;
     }

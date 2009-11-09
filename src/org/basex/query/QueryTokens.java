@@ -350,7 +350,6 @@ public interface QueryTokens {
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
   /** Database URI. */
-  //  Locally defined to avoid dependencies to other files
   byte[] BXURI = token("http://www.basex.org");
 
   /** Java prefix. */
@@ -369,7 +368,6 @@ public interface QueryTokens {
   /** FN token. */
   byte[] FN = token("fn");
   /** Database token. */
-  //  Locally defined to avoid dependencies to other files
   byte[] BASEX = token("basex");
   /** XS token. */
   byte[] XS = token("xs");
@@ -382,6 +380,8 @@ public interface QueryTokens {
 
   // QUERY PLAN ===============================================================
 
+  /** Query Plan. */
+  String ARG = "arg";
   /** Query Plan. */
   byte[] NS = token("timer");
   /** Query Plan. */
@@ -420,18 +420,12 @@ public interface QueryTokens {
   byte[] AXIS = token("axis");
   /** Query Plan. */
   byte[] TEST = token("test");
-  /** Query Plan. */
-  byte[] PREDS = token("Preds");
   /** Minimum . */
   byte[] MIN = token("min");
   /** Attribute name. */
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
-
-  /** Query Plan. */
-  String ARG = "arg";
-
   /** Default language. */
   byte[] EN = token("en");
 }

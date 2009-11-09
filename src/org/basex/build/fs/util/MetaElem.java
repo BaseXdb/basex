@@ -1,9 +1,6 @@
 package org.basex.build.fs.util;
 
 import static org.basex.util.Token.string;
-
-import java.util.TreeMap;
-
 import org.basex.build.fs.NewFSParser.NS;
 import org.basex.core.Main;
 import org.basex.query.item.Type;
@@ -129,8 +126,9 @@ public enum MetaElem {
   private final Type dt;
   /** More precise data type. */
   private Type pdt;
-  /** content container element. */
+  /* content container element.
   private final TreeMap<MetaElem, byte[]> c;
+  */
 
   /**
    * Constructor for key-value pairs.
@@ -142,7 +140,7 @@ public enum MetaElem {
     ns = namespace;
     n = ns.tag(name);
     dt = dataType;
-    c = null;
+    //c = null;
   }
 
   /**
@@ -155,7 +153,7 @@ public enum MetaElem {
     ns = namespace;
     n = ns.tag(name);
     dt = null;
-    c = new TreeMap<MetaElem, byte[]>();
+    //c = new TreeMap<MetaElem, byte[]>();
   }
 
   /**
@@ -178,10 +176,10 @@ public enum MetaElem {
   /**
    * Returns the content for a container element.
    * @return the content as map (containing key-value pairs).
-   */
   public TreeMap<MetaElem, byte[]> getContent() {
     return c;
   }
+   */
 
   @Override
   public String toString() {

@@ -42,11 +42,6 @@ public final class BaseXLabel extends JLabel {
     setBorder(new EmptyBorder(t, l, b, r));
   }
 
-  @Override
-  public void setText(final String t) {
-    if(!t.equals(getText())) super.setText(t);
-  }
-
   /**
    * Shows an error text, preceded by an error/warning icon.
    * If the text is <code>null</code>, no text and icon is shown.
@@ -56,5 +51,10 @@ public final class BaseXLabel extends JLabel {
   public void setError(final String text, final boolean warning) {
     setIcon(text == null ? null : BaseXLayout.icon(warning ? "warn" : "error"));
     setText(text == null ? " " : text);
+  }
+  
+  @Override
+  public void setEnabled(final boolean flag) {
+    if(flag != isEnabled()) super.setEnabled(flag);
   }
 }

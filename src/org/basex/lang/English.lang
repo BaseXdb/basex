@@ -49,7 +49,6 @@ no_table=No table available for this data
 no_space=Too less space
 map_binary=Binary File
 info_title=Query Info
-info_no=Please launch a query...
 help_title=Help
 text_title=Text
 explore_title=Explore
@@ -57,7 +56,6 @@ explore_title=Explore
 # Dialog Windows
 d_info=Information
 d_fctitle=Choose Directory
-d_export=Export
 
 dc_title=Input file or directory
 dc_filter=Filter
@@ -341,6 +339,7 @@ db_optimized=Database optimized in %.
 db_dropped=Database '%' was dropped.
 db_notdropped=Database could not be dropped.
 db_inuse=Database is currently accessed by other users.
+db_tmp="%.tmp" exists already.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
@@ -350,17 +349,13 @@ in_created=Index created in %.
 in_dropped=Index dropped in %.
 in_notdropped=Index could not be dropped.
 
-# Console Info
-cs_local=Standalone
-cs_client=Client
-
 # Server Info
 srv_login=Access denied.
 srv_connect=Can't communicate with the server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
 srv_start=Waiting for requests...
-srv_stop=stopped.
+srv_stop=Server stopped.
 srv_user=Username
 srv_pw=Password
 
@@ -384,7 +379,6 @@ qu_tabquery=Query
 qu_tabpars=Parsing   
 qu_tabcomp=Compiling 
 qu_tabeval=Evaluating
-qu_tabfinish=Finishing 
 qu_tabprint=Printing  
 qu_tabtotal=Total Time
 qu_tabmem=Memory    
@@ -409,6 +403,7 @@ ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 ad_passno=No password specified.
+ad_admin=Admin user cannot be modified.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.

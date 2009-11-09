@@ -69,20 +69,20 @@ public final class Find extends AQuery {
         preds += "[text() ~> \"" + term.substring(1) + "\"]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[@* ftcontains \"" + term.substring(1) + "\"]";
+        preds += "[@* contains text \"" + term.substring(1) + "\"]";
         term = term.substring(1);
         // add valid name tests
         if(XMLToken.isName(token(term))) {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
-        preds += "[text() ftcontains \"" + term + "\"]";
+        preds += "[text() contains text \"" + term + "\"]";
         // add valid name tests
         if(XMLToken.isName(token(term))) {
           pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
         }
         // add name test...
-        pre += "descendant-or-self::*[@name ftcontains \"" + term + "\"] | ";
+        pre += "descendant-or-self::*[@name contains text \"" + term + "\"] | ";
       }
     }
     if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
@@ -148,7 +148,8 @@ public final class Find extends AQuery {
         t = "\"" + t + "\"";
       }
       // add predicate
-      xquery.add(name + "[@" + pred + (exact ? op : " ftcontains ") + t + "]");
+      xquery.add(name + "[@" + pred + (exact ? op : " contains text ") +
+          t + "]");
 
       qu = qu.substring(i + 1);
       name = "";
@@ -158,7 +159,7 @@ public final class Find extends AQuery {
     for(final String t : split(query)) {
       if(Character.isLetterOrDigit(t.charAt(0))) {
         if(f) xquery.add(" | " + (r ? "/" : "") + "descendant-or-self::file");
-        xquery.add("[descendant::text() ftcontains \"" + t + "\"]");
+        xquery.add("[descendant::text() contains text \"" + t + "\"]");
         f = false;
       }
     }
@@ -196,7 +197,7 @@ public final class Find extends AQuery {
           tb.add(term[0]);
           tb.add(calcNum(substring(term, 1)));
         } else {
-          tb.add(" ftcontains \"");
+          tb.add(" contains text \"");
           tb.add(term);
           tb.add("\"");
         }

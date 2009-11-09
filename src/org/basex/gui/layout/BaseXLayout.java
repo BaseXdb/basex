@@ -173,15 +173,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Enables or disables the specified component.
-   * @param comp component
-   * @param enable boolean flag
-   */
-  public static void enable(final Component comp, final boolean enable) {
-    if(comp.isEnabled() != enable) comp.setEnabled(enable);
-  }
-
-  /**
    * Returns the specified image as icon.
    * @param name name of icon
    * @return icon

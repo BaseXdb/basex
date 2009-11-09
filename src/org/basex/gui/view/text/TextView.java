@@ -42,12 +42,16 @@ public final class TextView extends View implements ActionListener {
   private final BaseXTextField find;
   /** Header string. */
   private final BaseXLabel header;
+  /** Home button. */
+  private final BaseXButton home;
   /** Text Area. */
   private final BaseXText area;
   /** Result process. */
   private Process proc;
   /** Result nodes. */
   private Nodes ns;
+  /** Refresh flag. */
+  private boolean refresh;
 
   /**
    * Default constructor.
@@ -67,6 +71,8 @@ public final class TextView extends View implements ActionListener {
     back.add(header, BorderLayout.CENTER);
 
     final BaseXButton save = new BaseXButton(gui, "save", HELPSAVE);
+    home = BaseXButton.command(GUICommands.HOME, gui);
+    home.setEnabled(false);
     save.addActionListener(this);
     find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
@@ -77,7 +83,7 @@ public final class TextView extends View implements ActionListener {
     sp.add(Box.createHorizontalStrut(5));
     sp.add(save);
     sp.add(Box.createHorizontalStrut(1));
-    sp.add(BaseXButton.command(GUICommands.HOME, gui));
+    sp.add(home);
     back.add(sp, BorderLayout.EAST);
     add(back, BorderLayout.NORTH);
 
@@ -91,7 +97,7 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshInit() {
-    setText(gui.context.current());
+    refreshContext(true, true);
   }
 
   @Override
@@ -100,7 +106,8 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshMark() {
-    setText(gui.context.marked());
+    if(refresh) refresh = false;
+    else setText(gui.context.marked());
   }
 
   @Override
@@ -116,7 +123,7 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshUpdate() {
-    refreshContext(false, true);
+    refreshContext(true, true);
   }
 
   @Override
@@ -141,6 +148,7 @@ public final class TextView extends View implements ActionListener {
         xml.close();
       }
       setText(out, null);
+      refresh = false;
     } catch(final IOException ex) {
       Main.debug(ex);
     }
@@ -154,6 +162,8 @@ public final class TextView extends View implements ActionListener {
   public void setText(final CachedOutput out, final Process p) {
     area.setText(out.buffer(), out.size());
     header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
+    home.setEnabled(gui.context.data() != null);
+    refresh = true;
     if(!out.finished()) {
       proc = null;
       ns = null;

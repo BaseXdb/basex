@@ -238,9 +238,9 @@ public final class DialogCreateFS extends Dialog {
     for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
 
     final boolean sel = !all.isSelected();
-    BaseXLayout.enable(path, sel);
-    BaseXLayout.enable(button, sel);
-    BaseXLayout.enable(maxsize, cont.isSelected());
+    path.setEnabled(sel);
+    button.setEnabled(sel);
+    maxsize.setEnabled(cont.isSelected());
 
     boolean cAll; // import all is chosen?
     boolean cNam; // dbname given?

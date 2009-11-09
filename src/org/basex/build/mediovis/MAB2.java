@@ -9,17 +9,10 @@ import static org.basex.util.Token.token;
  * @author Christian Gruen
  */
 public interface MAB2 {
-  /** Root tag. */
-  byte[] ROOT = token("MEDIOVIS");
-  /** Hits Attribute. */
-  byte[] HITS = token("hits");
-  /** Approximate Hits Attribute. */
-  byte[] APPROX = token("appr");
-
   /** Root Tag. */
-  byte[] LIBRARY = token("LIBRARY");
+  byte[] LIBRARY = token("Library");
   /** Medium Tag. */
-  byte[] MEDIUM = token("MEDIUM");
+  byte[] MEDIUM = token("Medium");
   /** ID Attribute. */
   byte[] MV_ID = token("mv_id");
   /** ID Attribute. */
@@ -28,49 +21,47 @@ public interface MAB2 {
   byte[] MAX = token("max");
 
   /** Tag. */
-  byte[] DESCRIPTION = token("DES");
+  byte[] DESCRIPTION = token("Desc");
   /** Tag. */
-  byte[] DETAILS = token("DET");
+  byte[] DETAILS = token("Detail");
   /** Tag. */
-  byte[] FORMAT = token("FRM");
+  byte[] FORMAT = token("Format");
   /** Tag. */
-  byte[] INSTITUTE = token("INS");
+  byte[] INSTITUTE = token("Institution");
   /** Tag. */
-  byte[] ISBN = token("ISB");
+  byte[] ISBN = token("ISBN");
   /** Tag. */
-  byte[] POSTER = token("POS");
+  byte[] POSTER = token("Poster");
   /** Tag. */
-  byte[] GENRE = token("GEN");
+  byte[] GENRE = token("Genre");
   /** Tag. */
-  byte[] LANGUAGE = token("LAN");
+  byte[] LANGUAGE = token("Language");
   /** Tag. */
-  byte[] NOTE = token("ANN");
+  byte[] NOTE = token("Note");
   /** Tag. */
-  byte[] ORIGINAL = token("ORI");
+  byte[] ORIGINAL = token("Original");
   /** Tag. */
-  byte[] PERSON = token("PER");
+  byte[] PERSON = token("Person");
   /** Tag. */
-  byte[] PUBLISHER = token("PUB");
+  byte[] PUBLISHER = token("Publisher");
   /** Tag. */
-  byte[] SIGNATURE = token("SIG");
+  byte[] SIGNATURE = token("Signature");
   /** Tag. */
-  byte[] SUBJECT = token("SEC");
+  byte[] SUBJECT = token("Subject");
   /** Tag. */
-  byte[] SUBTITLE = token("SUB");
+  byte[] SUBTITLE = token("Subtitle");
   /** Tag. */
-  byte[] TITLE = token("TIT");
+  byte[] TITLE = token("Title");
   /** Tag. */
-  byte[] TOWN = token("TOW");
+  byte[] TOWN = token("Town");
   /** Tag. */
-  byte[] TYPE = token("TYP");
+  byte[] TYPE = token("Type");
   /** Tag. */
-  byte[] YEAR = token("YEA");
+  byte[] YEAR = token("Year");
   /** Tag. */
   byte[] LENDINGS = token("Lendings");
   /** Tag. */
   byte[] STATUS = token("Status");
-  /** Missing MV ID. */
-  byte[] MISSING = token("#");
   /** Semicolon. */
   byte[] SEMI = token("; ");
 }

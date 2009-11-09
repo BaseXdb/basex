@@ -67,7 +67,7 @@ public class FLWOR extends Expr {
     
     final int vs = ctx.vars.size();
     for(int f = 0; f != fl.length; f++) {
-      // disable fast ftcontains evaluation if score value exists
+      // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
       ctx.ftfast &= fl[f].standard();
       final Expr e = fl[f].comp(ctx);

@@ -23,7 +23,9 @@ public final class ObsoleteTexts {
   private static final Class<?>[] CLASSES = {
     org.basex.core.Text.class,       org.basex.build.BuildText.class,
     org.basex.build.fs.FSText.class, org.basex.data.DataText.class,
-    org.basex.api.dom.BXText.class,  org.basex.query.QueryText.class
+    org.basex.api.dom.BXText.class,  org.basex.query.QueryText.class,
+    org.basex.query.QueryTokens.class,
+    org.basex.build.mediovis.MAB2.class,
   }; 
 
   /** Private constructor, preventing instantiation. */
@@ -44,7 +46,7 @@ public final class ObsoleteTexts {
         final String name = f.getName();
         if(!set.contains(name)) {
           if(i == 0) Main.outln(c.getSimpleName() + ".java");
-          if(++i % 10 == 0) Main.out("\n");
+          if(++i % 8 == 0) Main.out("\n");
           Main.out(name + " ");
         }
       }
@@ -77,7 +79,6 @@ public final class ObsoleteTexts {
         while(true) {
           final String l = br.readLine();
           if(l == null) break;
-
           final Matcher m = CONSTANTS.matcher(l);
           while(m.find()) set.add(m.group(1));
         }

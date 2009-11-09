@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 
 /**
@@ -201,11 +200,11 @@ public abstract class Dialog extends JDialog {
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {
         continue;
-      } else if(!(c instanceof BaseXButton)) {
-        enableOK((JComponent) c, label, enabled);
-      } else {
+      } else if(c instanceof BaseXButton) {
         final BaseXButton b = (BaseXButton) c;
-        if(b.getText().equals(label)) BaseXLayout.enable(b, enabled);
+        if(b.getText().equals(label)) b.setEnabled(enabled);
+      } else {
+        enableOK((JComponent) c, label, enabled);
       }
     }
   }

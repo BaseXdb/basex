@@ -243,13 +243,6 @@ public class CmdTest {
     no(new XQuery("1+"));
   }
 
-  /** Command Test. */
-  @Test
-  public final void xQueryMV() {
-    // no test file available
-    no(new XQueryMV("1", "1", "// li"));
-  }
-
   /**
    * Assumes that the specified flag is successful.
    * @param flag flag

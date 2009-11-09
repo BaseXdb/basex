@@ -97,7 +97,7 @@ public final class DialogUser extends BaseXBack {
     global = g;
     dia = d;
 
-    setLayout(new TableLayout(11, 1, 0, 4));
+    setLayout(new TableLayout(8, 1, 0, 4));
     setBorder(8, 8, 8, 8);
 
     user = new BaseXTextField("", dia);
@@ -139,6 +139,14 @@ public final class DialogUser extends BaseXBack {
     p2.add(newpass);
     p2.add(alter);
     add(p2);
+
+    add(new BaseXLabel(DROPU + COLS, false, true));
+    final BaseXBack p4 = new BaseXBack();
+    p4.setLayout(new TableLayout(1, 2, 6, 0));
+    p4.add(userco1);
+    p4.add(drop);
+    add(p4);
+
     tablePanel = new BaseXBack();
     tablePanel.setLayout(new TableLayout(3, 1, 2, 2));
     tablePanel.add(new BaseXLabel(PERMS, false, true));
@@ -146,21 +154,11 @@ public final class DialogUser extends BaseXBack {
     final BaseXBack tablePanel1 = new BaseXBack();
     tablePanel1.setLayout(new BorderLayout());
     tablePanel1.add(change, BorderLayout.EAST);
+    tablePanel1.add(info, BorderLayout.WEST);
     BaseXLayout.setWidth(tablePanel1, 420);
     tablePanel.add(tablePanel1);
     add(tablePanel);
-    
-    final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(2, 2, 6, 0));
-    p4.setBorder(0, 0, 5, 0);
-    p4.add(new BaseXLabel(DROPU + COLS, false, true));
-    p4.add(new BaseXLabel(" "));
-    p4.add(userco1);
-    p4.add(drop);
-    add(p4);
-
-    add(info);
-    add(Box.createVerticalStrut(38));
+    add(Box.createVerticalStrut(20));
     action(null);
   }
 

@@ -8,7 +8,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -39,29 +38,29 @@ public final class BufferedFileChannel {
    */
   private long rem;
 
-  /**
+  /*
    * Standard constructor for creating a {@link BufferedFileChannel} from a
    * complete file.
    * @param file the file to read from.
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
-   */
   public BufferedFileChannel(final File file) throws IOException {
     this(file, IO.BLOCKSIZE);
   }
+   */
 
-  /**
+  /*
    * Creates a {@link BufferedFileChannel} from a complete file with the given
    * buffer size.
    * @param file the file to read from.
    * @param bufferSize the size of the buffer.
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
-   */
   public BufferedFileChannel(final File file, final int bufferSize)
       throws IOException {
     this(file, ByteBuffer.allocate(bufferSize));
   }
+   */
 
   /**
    * Creates a {@link BufferedFileChannel} from a complete file and uses the
@@ -207,7 +206,7 @@ public final class BufferedFileChannel {
    * Returns the number of remaining bytes in this {@link BufferedFileChannel}.
    * @return the number of remaining bytes.
    */
-  public long remaining() {
+  private long remaining() {
     assert rem + buf.remaining() >= 0;
     return rem + buf.remaining();
   }
@@ -416,7 +415,6 @@ public final class BufferedFileChannel {
    * {@link #getShort()} and {@link #getInt()} methods.
    * @param order The new byte order, either {@link ByteOrder#BIG_ENDIAN
    *          BIG_ENDIAN} or {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}
-   * 
    */
   public void setByteOrder(final ByteOrder order) {
     buf.order(order);

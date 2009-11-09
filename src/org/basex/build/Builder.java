@@ -351,7 +351,6 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   private int addElem(final byte[] name, final Atts att) throws IOException {
-
     // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
 

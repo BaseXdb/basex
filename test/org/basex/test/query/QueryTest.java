@@ -27,7 +27,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = false;
+  private static final boolean ALL = true;
   /** Database Context. */
   private final Context context = new Context();
 
@@ -70,9 +70,9 @@ public final class QueryTest {
       // single test
       prop.set(Prop.FTINDEX, true);
       prop.set(Prop.FTFUZZY, true);
-      prop.set(Prop.FTST, false);
-      prop.set(Prop.FTDC, false);
-      prop.set(Prop.FTCS, false);
+      prop.set(Prop.FTST, true);
+      prop.set(Prop.FTDC, true);
+      prop.set(Prop.FTCS, true);
       ok &= test(prop);
     }
 

@@ -10,7 +10,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.iter.Iter;
 
 /**
- * Sequential FTContains expression with index access.
+ * Sequential equality expression with index access.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen

@@ -6,7 +6,7 @@ import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Check;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
@@ -30,6 +30,8 @@ public class BaseX extends Main {
   private String file;
   /** User name. */
   protected String user;
+  /** Password. */
+  protected String pass;
 
   /**
    * Main method, launching the standalone console mode.
@@ -55,7 +57,7 @@ public class BaseX extends Main {
   protected final void run() {
     try {
       boolean u = false;
-      if(input != null) process(new CreateDB(input), true);
+      if(input != null) process(new Check(input), true);
       
       if(file != null) {
         // query file contents
@@ -144,10 +146,13 @@ public class BaseX extends Main {
           } else if(c == 'p' && !sa()) {
             // parse server port
             context.prop.set(Prop.PORT, arg.num());
+          } else if(c == 'P' && !sa()) {
+            // specify password
+            pass = arg.string();
           } else if(c == 'r') {
             // hidden option: parse number of runs
             success = set(Prop.RUNS, arg.string());
-          } else if(c == 'u' && !sa()) {
+          } else if(c == 'U' && !sa()) {
             // specify user name
             user = arg.string();
           } else if(c == 'v') {
