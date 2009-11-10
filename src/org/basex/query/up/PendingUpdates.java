@@ -74,9 +74,8 @@ public final class PendingUpdates {
       throws QueryException {
 
     final boolean frag = p.node instanceof FNode;
-    if(t && 
-        (!refs.contains(((DBNode) p.node).data) || frag)) 
-      Err.or(UPWRONGTRG, p);
+    if(t && (!refs.contains(((DBNode) p.node).data) || frag)) 
+      Err.or(UPWRONGTRG, p.node);
     
     if(frag) {
       frags.add(p);

@@ -232,7 +232,7 @@ public final class FElem extends FNode {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
     if(atts.size() != 0 || ns.size != 0 || children.size() != 0)
-      sb.append("...");
+      sb.append(" ...");
     return sb.append("/>").toString();
   }
 

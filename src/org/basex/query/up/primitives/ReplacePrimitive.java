@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -63,6 +62,6 @@ public final class ReplacePrimitive extends NodeCopy {
   
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(UPMULTREPL, node);
+    Err.or(UPMULTREPL, node.qname());
   }
 }

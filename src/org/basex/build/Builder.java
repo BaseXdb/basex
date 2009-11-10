@@ -404,7 +404,6 @@ public abstract class Builder extends Progress {
       else if(c % 50000 == 0) Main.err("!");
       else if(c % 10000 == 0) Main.err(".");
     }
-
     return pre;
   }
 
