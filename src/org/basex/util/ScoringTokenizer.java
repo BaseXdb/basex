@@ -1,8 +1,5 @@
 package org.basex.util;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
 
@@ -28,7 +25,6 @@ public final class ScoringTokenizer extends Tokenizer{
    */
   public ScoringTokenizer(final Prop pr) {
     super(Token.EMPTY, pr);
-    readFrequency();
   }
   
   /**
@@ -99,27 +95,7 @@ public final class ScoringTokenizer extends Tokenizer{
     }
     return c == 0 ? 0 : Math.max(1, c * 1000 / max);
   }
-
-  /**
-   * Reads the frequency out of an external file.
-   */
-  public void readFrequency() {
-    try {
-      final BufferedReader br = new BufferedReader(
-          new FileReader("words.freq"));
-      String l;
-      freq = new IntMap();
-      while((l = br.readLine()) != null) {
-        final int i = l.indexOf(';');
-        freq.add(Token.token(l.substring(0, i)),
-            Token.toInt(l.substring(i + 1)));
-      }
-      br.close();
-    } catch(final Exception ex) {
-      Main.errln(ex);
-    }
-  }
-
+ 
   /**
    * Initializes the scoring process.
    */
