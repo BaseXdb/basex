@@ -8,10 +8,12 @@ import java.io.File;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  */
-public final class TreePrinter extends FSTraversal {
+public final class TreePrinter implements FSTraversal {
 
     /** Maximal depth of indentation. */
     private static final int MAX_DEPTH = 64;
+    /** Maximal depth of indentation. */
+    private int level;
     /** Indentation strings for each level. */
     private String[] indentStrings = new String[MAX_DEPTH];
     
@@ -64,7 +66,7 @@ public final class TreePrinter extends FSTraversal {
      * traversal.
      */
     @Override
-    void preDirectoryVisit(final File d) {
+    public void preDirectoryVisit(final File d) {
         printFileNode(d);
     }
     
@@ -72,7 +74,7 @@ public final class TreePrinter extends FSTraversal {
      * Nothing is done when a directory is left.  This method contains no code.
      */
     @Override
-    void postDirectoryVisit(final File d) { 
+    public void postDirectoryVisit(final File d) { 
         /* NOT USED. */ 
     }
 
@@ -83,7 +85,7 @@ public final class TreePrinter extends FSTraversal {
      * traversal.
      */
     @Override
-    void regularFileVisit(final File f) {
+    public void regularFileVisit(final File f) {
         printFileNode(f);
     }
     
@@ -94,7 +96,7 @@ public final class TreePrinter extends FSTraversal {
      * traversal. The traversal will not follow the link.
      */
     @Override
-    void symLinkVisit(final File f) {
+    public void symLinkVisit(final File f) {
         printFileNode(f);
     }
         
@@ -104,7 +106,7 @@ public final class TreePrinter extends FSTraversal {
      * @param d directory the traversal starts from
      */
     @Override
-    void preTraversalVisit(final File d) {
+    public void preTraversalVisit(final File d) {
         System.out.println(d.getAbsolutePath());    
     }
     
@@ -113,8 +115,12 @@ public final class TreePrinter extends FSTraversal {
      * This method contains no code.
      */
     @Override
-    void postTraversalVisit(final File d) {
+    public void postTraversalVisit(final File d) {
         /* NOT_USED */
     }
 
+    @Override
+    public void levelUpdate(final int l) {
+      level = l;
+    }
 }

@@ -23,6 +23,7 @@ import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.jfuse.DeepStat;
+import org.deepfs.util.FSWalker;
 import org.deepfs.util.TreePrinter;
 
 /**
@@ -193,13 +194,14 @@ public final class DeepShell {
       args = "<directory>", help = "tree(1)-like output directory hierarchy")
   public void tree(final String[] args) {
     if(args.length == 1) {
-      new TreePrinter().startTraversal(new File(Prop.WORK));
+      // [BL] Treeprinter registers for notifications during traversal.
+      new FSWalker(new TreePrinter()).traverse(new File(Prop.WORK));
       return;
     }
     if(args.length == 2) {
       final File d = new File(args[1]);
       if (d.isDirectory()) { 
-        new TreePrinter().startTraversal(d);
+        new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
       System.out.println("No such directory " + d.getAbsolutePath());
