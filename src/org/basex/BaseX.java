@@ -26,8 +26,10 @@ import org.basex.util.Token;
 public class BaseX extends Main {
   /** User query. */
   private String commands;
-  /** XQuery file. */
+  /** Query file. */
   private String file;
+  /** Query. */
+  private String query;
   /** User name. */
   protected String user;
   /** Password. */
@@ -62,7 +64,10 @@ public class BaseX extends Main {
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
-        final String query = content();
+        final String qu = content();
+        if(qu != null) process(new XQuery(qu), true);
+      } else if(query != null) {
+        // query file contents
         if(query != null) process(new XQuery(query), true);
       } else if(commands != null) {
         // process command-line arguments
@@ -149,6 +154,9 @@ public class BaseX extends Main {
           } else if(c == 'P' && !sa()) {
             // specify password
             pass = arg.string();
+          } else if(c == 'q') {
+            // specify password
+            query = arg.remaining();
           } else if(c == 'r') {
             // hidden option: parse number of runs
             success = set(Prop.RUNS, arg.string());
