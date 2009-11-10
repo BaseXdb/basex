@@ -34,10 +34,11 @@ public final class PendingUpdates {
   private final DBPrimitives frags;
   /** The update operations are part of a transform expression. */
   private final boolean t;
-  /** Holds all data references created in the copy clause of a transform
-   * expression. Adding an update primitive will cause a query exception
-   * (XUDY0014) if the data reference of the target node is not part of this
-   * set. 
+  /** Holds all data references created by the copy clause of a transform
+   * expression. Adding an update primitive that was declared within the modify
+   * clause of this transform expression will cause a query exception
+   * (XUDY0014) if the data reference of the corresponding target node is not 
+   * part of this set, hence the target node has not been copied.
    */
   private Set<Data> refs;
 
@@ -102,9 +103,10 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // for fragment primitives only constraints are checked
+    frags.finish();
     frags.apply();
     for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
+      dbs.get(d).finish();
       dbs.get(d).apply();
       d.flush();
     }

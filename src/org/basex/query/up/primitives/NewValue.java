@@ -23,8 +23,7 @@ public abstract class NewValue extends UpdatePrimitive {
     super(n);
     name = newName;
   }
-
+  
   @Override
-  public void check() {
-  }
+  public void check() {}
 }

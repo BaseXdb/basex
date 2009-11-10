@@ -20,6 +20,9 @@ public final class DeletePrimitive extends UpdatePrimitive {
   public DeletePrimitive(final Nod n) {
     super(n);
   }
+  
+  @Override
+  public void check() {}
 
   @Override
   public void apply(final int add) {
@@ -34,10 +37,6 @@ public final class DeletePrimitive extends UpdatePrimitive {
   @Override
   public Type type() {
     return DELETE;
-  }
-
-  @Override
-  public void check() {
   }
 
   @Override

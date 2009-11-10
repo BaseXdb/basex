@@ -47,6 +47,8 @@ public abstract class NodeCopy extends UpdatePrimitive {
       Item i;
       while((i = ni.next()) != null) seq.add(i);
     }
+    // Text nodes still need to be merged. Two adjacent iterators in c may
+    // lead to two adjacent text nodes.
     m = UpdateFunctions.buildDB(mergeText(seq), ((DBNode) node).data);
   }
 }

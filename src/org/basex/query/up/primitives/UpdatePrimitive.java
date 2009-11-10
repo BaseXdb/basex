@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
 /**
@@ -48,20 +47,8 @@ public abstract class UpdatePrimitive {
   public abstract Type type();
   
   /**
-   * Returns the actual pre location an update takes place in a database. For
-   * the greater part of update primitives this function returns the pre 
-   * value of the target node. For an 'insert into' command i.e. the position of
-   * the new nodes differs from the position of the target node.
-   * @return pre value
-   */
-  public int ac() {
-    if(node instanceof DBNode) return ((DBNode) node).pre;
-    return node.id();
-  }
-  
-  /**
    * Checks for constraints, etc.
-   * @throws QueryException query exception 
+   * @throws QueryException query exception
    */
   public abstract void check() throws QueryException;
   

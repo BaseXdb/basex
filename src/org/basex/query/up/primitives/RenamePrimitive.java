@@ -37,10 +37,6 @@ public final class RenamePrimitive extends NewValue {
   public Type type() {
     return RENAME;
   }
-
-  @Override
-  public void check() {
-  }
   
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {

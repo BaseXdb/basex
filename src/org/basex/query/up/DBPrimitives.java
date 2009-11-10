@@ -23,6 +23,8 @@ public final class DBPrimitives {
   private Map<Integer, UpdatePrimitive[]> op;
   /** Target nodes of update primitives are fragments. */
   private final boolean f;
+  /** Pre values of the target nodes which are updated, sorted ascending. */
+  private int[] sortedPre;
 
   /**
    * Constructor.
@@ -41,9 +43,9 @@ public final class DBPrimitives {
   public void add(final UpdatePrimitive p) throws QueryException {
     Integer i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
-    // possible to use node id 'cause nodes in map belong to the same
-    // database. thus there won't be any collisions between dbnodes and 
-    // fragments
+    // Possible to use node id cause nodes in map belong to the same
+    // database. Thus there won't be any collisions between dbnodes and 
+    // fragments.
     else i = ((FNode) p.node).id();
     UpdatePrimitive[] l = op.get(i);
     final int pos = p.type().ordinal();
@@ -54,27 +56,40 @@ public final class DBPrimitives {
     } else if(l[pos] == null) l[pos] = p;
     else l[pos].merge(p);
   }
-
+  
+  /**
+   * Finishes something. Not finished yet.
+   */
+  public void finish() {
+    // get keys (pre values) and sort ascending
+    final int l = op.size();
+    final Integer[] t = new Integer[l];
+    op.keySet().toArray(t);
+    sortedPre = new int[l];
+    for(int i = 0; i < l; i++) sortedPre[i] = t[i];
+    Arrays.sort(sortedPre);
+  }
+  
   /**
    * Checks constraints and applies all updates to the data bases.
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // [LK] merge text nodes
-    final int l = op.size();
-    final Integer[] t = new Integer[l];
-    op.keySet().toArray(t);
-    final int[] p = new int[l];
-    for(int i = 0; i < l; i++) p[i] = t[i];
-    Arrays.sort(p);
+    // apply updates backwards, starting with the highest pre value -> no id's
+    // needed and less table alterations
+    final int l = sortedPre.length;
     for(int i = l - 1; i >= 0; i--) {
-      final UpdatePrimitive[] pl = op.get(p[i]);
-      // w3c wants us to check fragment constraints
+      final UpdatePrimitive[] pl = op.get(sortedPre[i]);
+      // W3C wants us to check fragment constraints as well
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
       if(f) return;
       int add = 0;
+      // apply all updates for current database node
       for(final UpdatePrimitive pp : pl) {
         if(pp == null) continue;
+        // An 'insert before' update moves the currently updated db node 
+        // further down, hence increases its pre value by the number of 
+        // inserted nodes.
         if(pp.type() == Type.INSERTBEFORE) {
           add = ((InsertBefore) pp).m.size(0, Data.DOC) - 1;
         }

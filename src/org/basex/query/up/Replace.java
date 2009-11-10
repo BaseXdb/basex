@@ -72,8 +72,8 @@ public final class Replace extends Update {
       } else {
         // replace attribute node
         if(seq.size() > 0) Err.or(UPWRATTR, i);
-        if(!UpdateFunctions.checkAttNames(p.attr(), aSeq, string(n.nname())))
-          Err.or(UPATTDUPL, n.nname());
+//        if(!UpdateFunctions.checkAttNames(p.attr(), aSeq, string(n.nname())))
+//          Err.or(UPATTDUPL, n.nname());
         ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
       }
     } else {
