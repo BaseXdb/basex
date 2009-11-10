@@ -3,7 +3,10 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 
+import java.io.IOException;
+
 import org.basex.data.Data;
+import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
@@ -89,6 +92,14 @@ public final class Transform extends Arr {
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.VAR || u != Use.UPD && super.uses(u, ctx);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    for(final Expr c : copies) c.plan(ser);
+    for(final Expr e : expr) e.plan(ser);
+    ser.closeElement();
   }
 
   @Override

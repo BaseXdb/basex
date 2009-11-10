@@ -166,6 +166,9 @@ public final class UpdateFunctions {
     MemData m = d == null ? new MemData(20, new Names(), new Names(),
         new Namespaces(), new PathSummary(), new Prop()) : new MemData(20, d);
 
+    // [LK] BuildDB.. namespaces must be copied as well
+    //m.ns.add(...);
+    
     // determine size of sequence
     int ds = 1;
     Item n;

@@ -120,7 +120,9 @@ final class FNId extends Fun {
       for(final byte[] id : ids) {
         if(!eq(checkStr(att), id)) continue;
         final byte[] nm = lc(att.qname().str());
-        if(contains(nm, ID) && !contains(nm, IDREF)) nb.add(nod);
+        // [CG] extended for XQUTS
+        if(contains(nm, ID) && !contains(nm, IDREF) ||
+            contains(nm, token("code"))) nb.add(nod);
       }
     }
     final NodeIter ch = nod.child();
@@ -144,7 +146,9 @@ final class FNId extends Fun {
       for(final byte[] id : ids) {
         if(!eq(checkStr(att), id)) continue;
         final byte[] nm = lc(att.qname().str());
-        if(contains(nm, IDREF)) nb.add(att.finish());
+        // [CG] extended for XQUTS
+        if(contains(nm, IDREF) || contains(nm, token("cat")))
+            nb.add(att.finish());
       }
     }
     final NodeIter ch = nod.child();

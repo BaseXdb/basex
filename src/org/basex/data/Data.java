@@ -587,6 +587,9 @@ public abstract class Data {
    * @param dt data instance to copy from
    */
   public final void insertSeq(final int pre, final int par, final Data dt) {
+
+    // [LK] should be merged again with insert()
+    
     meta.update();
     final int sa = 1;
     // number of nodes to be inserted
