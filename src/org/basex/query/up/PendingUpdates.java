@@ -41,6 +41,8 @@ public final class PendingUpdates {
    * part of this set, hence the target node has not been copied.
    */
   private Set<Data> refs;
+  /** Validates upates. */
+  private ValidateUpdates val = new ValidateUpdates();
 
   /**
    * Constructor.
@@ -50,7 +52,7 @@ public final class PendingUpdates {
     t = transform;
     if(t) refs = new HashSet<Data>(); 
     dbs = new HashMap<Data, DBPrimitives>();
-    frags = new DBPrimitives(true);
+    frags = new DBPrimitives(null);
   }
   
   /**
@@ -89,7 +91,7 @@ public final class PendingUpdates {
         if(ctx.context.perm(User.WRITE, d) != -1)
           throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
-        dp = new DBPrimitives(false);
+        dp = new DBPrimitives(d);
         dbs.put(d, dp);
       }
       dp.add(p);
@@ -103,10 +105,15 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    frags.finish();
+    // finish, check, apply
+    val.validate(frags);
+    for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
+      val.validate(dbs.get(d));
+    }
+    val.status();
+    // apply updates if validation yields no errors
     frags.apply();
     for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
-      dbs.get(d).finish();
       dbs.get(d).apply();
       d.flush();
     }

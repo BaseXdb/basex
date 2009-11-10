@@ -20,21 +20,58 @@ import org.basex.query.up.primitives.UpdatePrimitive.Type;
  */
 public final class DBPrimitives {
   /** Atomic update operations hashed after pre value. */
-  private Map<Integer, UpdatePrimitive[]> op;
+  public Map<Integer, UpdatePrimitive[]> op;
   /** Target nodes of update primitives are fragments. */
   private final boolean f;
   /** Pre values of the target nodes which are updated, sorted ascending. */
   private int[] sortedPre;
-
+  /** Data reference. */
+  private final Data d;
+  /** Primitives for this database are finished. */
+  private boolean finished;
+  
   /**
-   * Constructor.
-   * @param fragment target nodes are fragments
+   * Constructor. 
+   * @param data Data reference. If data == null, all target nodes 
+   * are fragments.
    */
-  public DBPrimitives(final boolean fragment) {
-    f = fragment;
+  public DBPrimitives(final Data data) {
+    d = data;
+    f = d == null;
     op = new HashMap<Integer, UpdatePrimitive[]>();
   }
-
+  
+  /**
+   * Getter.
+   * @return data reference
+   */
+  public Data data() {
+    return d;
+  }
+  
+  /**
+   * Finishes something. Not finished yet.
+   */
+  private void finish() {
+    // get keys (pre values) and sort ascending
+    final int l = op.size();
+    final Integer[] t = new Integer[l];
+    op.keySet().toArray(t);
+    sortedPre = new int[l];
+    for(int i = 0; i < l; i++) sortedPre[i] = t[i];
+    Arrays.sort(sortedPre);
+    finished = true;
+  }
+  
+  /**
+   * Getter.
+   * @return sorted pre values of target nodes
+   */
+  public int[] getNodes() {
+    if(!finished) finish();
+    return sortedPre;
+  }
+  
   /**
    * Adds a primitive to a primitive list depending on its type.
    * @param p update primitive
@@ -55,19 +92,6 @@ public final class DBPrimitives {
       op.put(i, l);
     } else if(l[pos] == null) l[pos] = p;
     else l[pos].merge(p);
-  }
-  
-  /**
-   * Finishes something. Not finished yet.
-   */
-  public void finish() {
-    // get keys (pre values) and sort ascending
-    final int l = op.size();
-    final Integer[] t = new Integer[l];
-    op.keySet().toArray(t);
-    sortedPre = new int[l];
-    for(int i = 0; i < l; i++) sortedPre[i] = t[i];
-    Arrays.sort(sortedPre);
   }
   
   /**
