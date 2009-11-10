@@ -77,7 +77,8 @@ public final class Namespaces extends Set {
   }
 
   /**
-   * Returns the namespace offset for the specified qname.
+   * Returns the namespace offset for the specified qname,
+   * or 0 if namespace cannot be found.
    * @param n tag/attribute name
    * @return namespace
    */
@@ -135,7 +136,8 @@ public final class Namespaces extends Set {
   }
 
   /**
-   * Returns the namespace for the specified qname.
+   * Returns the namespace for the specified prefix,
+   * or 0 if namespace cannot be found.
    * @param p prefix
    * @param node node to start with
    * @return namespace

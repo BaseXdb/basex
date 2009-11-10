@@ -8,6 +8,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.util.Err;
 
 /**
@@ -22,7 +23,7 @@ public final class ReplaceValue extends NewValue {
    * @param n target node
    * @param newName new name
    */
-  public ReplaceValue(final Nod n, final byte[] newName) {
+  public ReplaceValue(final Nod n, final QNm newName) {
     super(n, newName);
   }
 
@@ -33,13 +34,15 @@ public final class ReplaceValue extends NewValue {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
+    // [LK] update methods should consider namespace, defined in QName (name)
+    final byte[] nn = name.str();
     if(k == Data.ATTR) {
-      d.update(n.pre, d.attName(n.pre), name);
+      d.update(n.pre, d.attName(n.pre), nn);
     } else if(k == Data.PI) {
       final byte[] nm = n.nname();
-      d.update(n.pre, concat(nm, SPACE, name));
+      d.update(n.pre, concat(nm, SPACE, nn));
     } else {
-      d.update(n.pre, name);
+      d.update(n.pre, nn);
     }
     // [LK] add delete if replace with empty string ?
   }

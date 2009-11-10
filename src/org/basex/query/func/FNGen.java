@@ -1,5 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.core.Text.*;
+import static org.basex.query.QueryText.*;
+import java.io.IOException;
+import org.basex.core.Main;
+import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
+import org.basex.data.XMLSerializer;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -10,6 +18,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Generating functions.
@@ -24,12 +33,35 @@ public final class FNGen extends Fun {
       case DATA:
         return data(ctx.iter(expr[0]));
       case COLLECT:
-        final Iter iter = expr.length != 0 ? ctx.iter(expr[0]) : null;
-        final Item it = iter != null ? iter.next() : null;
+        Iter iter = expr.length != 0 ? ctx.iter(expr[0]) : null;
+        Item it = iter != null ? iter.next() : null;
         if(iter != null && it == null) Err.empty(this);
         return ctx.coll(iter == null ? null : checkStr(it));
       case PUT:
-        // [LK] store document...
+        /* [LK] fn:put() operations should be moved to pending list
+         * - FOUP0002 could be revised (kinda dirty right now)
+         * - XUDY0031 missing
+         * - as usual, check other notes in specs (2.6.1)
+         */
+        if(!ctx.context.user.perm(User.ADMIN))
+          throw new QueryException(Main.info(PERMNO, CmdPerm.ADMIN));
+
+        final byte[] file = checkStr(expr[1], ctx);
+        it = expr[0].atomic(ctx);
+        if(it == null || it.type != Type.DOC && it.type != Type.ELM)
+          Err.or(UPFOTYPE, expr[0]);
+
+        try {
+          final PrintOutput out = new PrintOutput(Token.string(file));
+          final XMLSerializer xml = new XMLSerializer(out);
+          it.serialize(xml);
+          xml.close();
+          out.close();
+        } catch(final IOException ex) {
+          Main.debug(ex);
+          Err.or(UPFOURI, file);
+          return null;
+        }
         return Iter.EMPTY;
       default:
         return super.iter(ctx);

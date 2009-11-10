@@ -45,9 +45,8 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
 /**
- * This abstract query expression provides the architecture
- * for a compiled query.
-// *
+ * This abstract query expression provides the architecture for a compiled
+ * query. // *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
@@ -218,7 +217,8 @@ public final class QueryContext extends Progress {
           }
         }
         if(docs == 0) {
-          for(final int p : data.doc()) addDoc(new DBNode(data, p));
+          for(final int p : data.doc())
+            addDoc(new DBNode(data, p));
         }
         rootDocs = docs;
 
@@ -356,7 +356,8 @@ public final class QueryContext extends Progress {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
+    for(int d = rootDocs; d < docs; d++)
+      Close.close(context, doc[d].data);
   }
 
   /**
@@ -398,8 +399,8 @@ public final class QueryContext extends Progress {
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] path, final boolean coll,
-      final boolean db) throws QueryException {
+  public DBNode doc(final byte[] path, final boolean coll, final boolean db)
+      throws QueryException {
     if(contains(path, '<') || contains(path, '>')) Err.or(INVDOC, path);
 
     // check if the collections contain the document
@@ -414,7 +415,7 @@ public final class QueryContext extends Progress {
     // check if the database has already been opened
     final String nm = string(path);
     for(int d = 0; d < docs; d++)
-    if(doc[d].data.meta.name.equals(nm)) return doc[d];
+      if(doc[d].data.meta.name.equals(nm)) return doc[d];
 
     // check if the document has already been opened
     final IO io = IO.get(string(path));
@@ -453,8 +454,8 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Opens the database or creates a new database instance
-   * for the specified document.
+   * Opens the database or creates a new database instance for the specified
+   * document.
    * @param path document path
    * @param err error flag
    * @param coll collection flag
@@ -486,8 +487,8 @@ public final class QueryContext extends Progress {
     }
 
     // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\'))
-      Err.or(COLLINV, Err.chop(coll));
+    if(contains(coll, '<') || contains(coll, '\\')) Err.or(COLLINV,
+        Err.chop(coll));
 
     int c = -1;
     while(true) {
@@ -534,8 +535,8 @@ public final class QueryContext extends Progress {
     if(item == null) return null;
     Data data = null;
 
-    if(item.size(this) == docs && item instanceof Seq &&
-        ((Seq) item).val == doc) return doc[0].data;
+    if(item.size(this) == docs && item instanceof Seq
+        && ((Seq) item).val == doc) return doc[0].data;
 
     final Iter iter = item.iter();
     Item it;
@@ -555,7 +556,7 @@ public final class QueryContext extends Progress {
   public IO file() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.str())) : null;
   }
-  
+
   /**
    * Returns query background information.
    * @return warning

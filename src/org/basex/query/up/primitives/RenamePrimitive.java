@@ -6,6 +6,7 @@ import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.util.Err;
 
 
@@ -21,7 +22,7 @@ public final class RenamePrimitive extends NewValue {
    * @param n target node
    * @param newName new name
    */
-  public RenamePrimitive(final Nod n, final byte[] newName) {
+  public RenamePrimitive(final Nod n, final QNm newName) {
     super(n, newName);
   }
 

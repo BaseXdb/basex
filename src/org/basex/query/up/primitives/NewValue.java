@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 
 /**
  * Abstract udpate primitive which holds an aditional 'name' attribute to for
@@ -11,14 +12,14 @@ import org.basex.query.item.Nod;
  */
 public abstract class NewValue extends UpdatePrimitive {
   /** New name. */
-  final byte[] name;
+  final QNm name;
 
   /**
    * Constructor.
    * @param n target node
    * @param newName new name
    */
-  public NewValue(final Nod n, final byte[] newName) {
+  public NewValue(final Nod n, final QNm newName) {
     super(n);
     name = newName;
   }

@@ -360,12 +360,14 @@ public abstract class W3CTS {
       try {
         files.add(file(nodes("*:input-file", state),
             nodes("*:input-file/@variable", state), qctx, n == 0));
-        files.add(file(nodes("*:input-URI", state),
-            nodes("*:input-URI/@variable", state), qctx, n == 0));
+        //files.add(file(nodes("*:input-URI", state),
+        //    nodes("*:input-URI/@variable", state), qctx, n == 0));
         files.add(file(nodes("*:defaultCollection", state),
             null, qctx, n == 0));
 
-        var(nodes("*:input-query/@name", state),
+        var(nodes("*:input-URI", state),
+            nodes("*:input-URI/@variable", state), qctx);
+        eval(nodes("*:input-query/@name", state),
             nodes("*:input-query/@variable", state), pth, qctx);
 
         parse(qctx, state);
@@ -657,6 +659,38 @@ public abstract class W3CTS {
   }
 
   /**
+   * Assigns the nodes to the specified variables.
+   * @param nod nodes
+   * @param var variables
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  private void var(final Nodes nod, final Nodes var,
+      final QueryContext ctx) throws QueryException {
+
+    for(int c = 0; c < nod.size(); c++) {
+      final byte[] nm = data.atom(nod.nodes[c]);
+      final String src = srcs.get(string(nm));
+
+      Expr expr = null;
+      if(src == null) {
+        // assign collection
+        final NodIter col = new NodIter();
+        for(final byte[] cl : colls.get(string(nm))) {
+          col.add(ctx.doc(cl, true, false));
+        }
+        ctx.addColl(col, nm);
+        expr = Uri.uri(nm);
+      } else {
+        // assign document
+        expr = Str.get(src);
+      }
+      final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
+      ctx.vars.addGlobal(v.bind(expr, ctx));
+    }
+  }
+
+  /**
    * Evaluates the the input files and assigns the result to the specified
    * variables.
    * @param nod variables
@@ -665,7 +699,7 @@ public abstract class W3CTS {
    * @param ctx query context
    * @throws Exception exception
    */
-  private void var(final Nodes nod, final Nodes var, final String pth,
+  private void eval(final Nodes nod, final Nodes var, final String pth,
       final QueryContext ctx) throws Exception {
 
     for(int c = 0; c < nod.size(); c++) {

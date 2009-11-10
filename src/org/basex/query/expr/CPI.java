@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FPI;
@@ -57,9 +59,18 @@ public final class CPI extends CFrag {
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = Token.substring(v, i);
-    if(Token.contains(v, CLOSE)) Err.or(CPICONT, v);
+    return new FPI(new QNm(nm), check(v), null);
+  }
 
-    return new FPI(new QNm(nm), v, null);
+  /**
+   * Checks the specified token for validity.
+   * @param atom token to be checked
+   * @return token
+   * @throws QueryException query exception
+   */
+  public static byte[] check(final byte[] atom) throws QueryException {
+    if(contains(atom, CLOSE)) Err.or(CPICONT, atom);
+    return atom;
   }
 
   @Override
@@ -69,6 +80,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.PI);
+    return Type.PI + " " + expr[0];
   }
 }

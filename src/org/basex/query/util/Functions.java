@@ -16,6 +16,7 @@ import org.basex.query.expr.FunCall;
 import org.basex.query.expr.Func;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.Fun;
+import org.basex.query.func.FunDef;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -96,7 +97,10 @@ public final class Functions extends ExprInfo {
 
     // check predefined functions
     final Fun fun = FNIndex.get().get(ln, uri, args);
-    if(fun != null) return fun;
+    if(fun != null) {
+      ctx.updating |= fun.func == FunDef.PUT;
+      return fun;
+    }
 
     // find local function
     for(int l = 0; l < size; l++) {

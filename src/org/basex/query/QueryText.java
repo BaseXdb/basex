@@ -17,7 +17,7 @@ public interface QueryText {
   /** FONS Error type. */ String FONS = "FONS";
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
-  /** FOTY Error type. */ String FOTY = "FOTY";
+  /** FOTY Error type. */ String FOUP = "FOUP";
   /** FTDY Error type. */ String FTDY = "FTDY";
   /** FTST Error type. */ String FTST = "FTST";
   /** XPDY Error type. */ String XPDY = "XPDY";
@@ -136,6 +136,12 @@ public interface QueryText {
   Object[] FUNREGREP = { FORX, 4, "Invalid replacement expression." };
   /** FORX0004: Evaluation exception. */
   Object[] REGERR = { FORX, 4, "Regular expression: '%'." };
+
+  // [LK] to be revised...
+  /** FOUP0001: Evaluation exception. */
+  Object[] UPFOTYPE = { FOUP, 1, "Document or element expected, % found." };
+  /** FOUP0002: Evaluation exception. */
+  Object[] UPFOURI = { FOUP, 2, "No valid URI: '%'." };
 
   /** FTDY0016: Evaluation exception. */
   Object[] FTWEIGHT = { FTDY, 16, "Invalid weight value: %" };

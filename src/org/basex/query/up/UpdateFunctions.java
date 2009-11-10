@@ -17,6 +17,7 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
@@ -134,18 +135,19 @@ public final class UpdateFunctions {
    * @param name new name
    * @param data data reference
    */
-  public static void rename(final int pre, final byte[] name, final Data data) {
+  public static void rename(final int pre, final QNm name, final Data data) {
     // passed on pre value must refer to element, pi or attribute node
     final int k = data.kind(pre);
+    // [LK] update methods should consider namespace, defined in QName (name)
     if(k == Data.ELEM) {
-      data.update(pre, name);
+      data.update(pre, name.str());
     } else if(k == Data.PI) {
       byte[] val = data.text(pre);
       final int i = indexOf(val, ' ');
-      data.update(pre, i == -1 ? name :
-        concat(name, SPACE, substring(val, i + 1)));
+      data.update(pre, i == -1 ? name.str() :
+        concat(name.str(), SPACE, substring(val, i + 1)));
     } else {
-      data.update(pre, name, data.attValue(pre));
+      data.update(pre, name.str(), data.attValue(pre));
     }
   }
 

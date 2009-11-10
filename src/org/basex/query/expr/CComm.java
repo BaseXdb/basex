@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class CComm extends CFrag {
   /** Two Dashes. */
-  private static final byte[] DASHES = { '-', '-' };
+  public static final byte[] DASHES = { '-', '-' };
 
   /**
    * Constructor.
@@ -41,13 +41,20 @@ public final class CComm extends CFrag {
       tb.add(it.str());
       more = true;
     }
-    final byte[] atom = tb.finish();
-    if(contains(atom, DASHES) || startsWith(atom, '-') || endsWith(atom, '-'))
-      Err.or(COMINVALID, atom);
-
-    return new FComm(atom, null);
+    return new FComm(check(tb.finish()), null);
   }
 
+  /**
+   * Checks the specified token for validity.
+   * @param atom token to be checked
+   * @return token
+   * @throws QueryException query exception
+   */
+  public static byte[] check(final byte[] atom) throws QueryException {
+    if(contains(atom, DASHES) || endsWith(atom, '-')) Err.or(COMINVALID, atom);
+    return atom;
+  }
+  
   @Override
   public String info() {
     return "comment constructor";

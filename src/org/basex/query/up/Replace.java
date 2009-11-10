@@ -7,10 +7,13 @@ import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.CComm;
+import org.basex.query.expr.CPI;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -73,17 +76,15 @@ public final class Replace extends Update {
           Err.or(UPATTDUPL, n.nname());
         ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
       }
-      return Seq.EMPTY;
+    } else {
+      // replace value of node
+      final byte[] txt = seq.size() < 1 ? EMPTY : seq.get(0).str();
+      if(k == Data.COMM) CComm.check(txt);
+      if(k == Data.PI) CPI.check(txt);
+      ctx.updates.add(k == Data.ELEM ? new ReplaceElemContent(n, txt) :
+        // [LK] rewritten to pass on QNm - probably wrong for comments etc.
+        new ReplaceValue(n, new QNm(txt)), ctx);
     }
-    
-    // replace value of node
-    final byte[] txt = seq.size() < 1 ? EMPTY : seq.get(0).str();
-    if(k == Data.COMM && (contains(txt, token("--")) || 
-        endsWith(txt, token("-")))) Err.or(COMINVALID, i);
-    if(k == Data.PI && (contains(txt, token("?>")) || 
-        endsWith(txt, token("-")))) Err.or(CPICONT, i);
-    ctx.updates.add(k == Data.ELEM ? 
-        new ReplaceElemContent(n, txt) : new ReplaceValue(n, txt), ctx);
     return Seq.EMPTY;
   }
   
