@@ -2,6 +2,7 @@ package org.basex.index;
 
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
+import org.basex.query.ft.Scoring;
 
 /**
  * This interface provides methods for returning index results.
@@ -139,7 +140,7 @@ public abstract class FTIndexIterator extends IndexIterator {
       
       @Override 
       public double score() {
-        return (i1.score() + i2.score()) / 2;
+        return Scoring.scorePhrase(i1.score(), i2.score());
       }
     };
   }

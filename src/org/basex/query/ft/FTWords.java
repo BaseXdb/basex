@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -125,7 +124,7 @@ public final class FTWords extends FTExpr {
         }        
         return iat.more() ? new FTItem(iat.matches(),
             data, iat.next(), txt.length, iat.indexSize(),
-            ctx.context.prop.num(Prop.FTSCTYPE) > 0, iat.score()) : null;
+            iat.score()) : null;
       }
     };
   }
@@ -254,16 +253,6 @@ public final class FTWords extends FTExpr {
         if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
       }
     }
-
-//    // [SG] INEX phrase processing
-//    if (ic.ctx.context.prop.num(Prop.FTSCTYPE) > 0) {      
-//      final ScoringTokenizer st = new ScoringTokenizer(Token.lc(txt),
-//          fto, fast, ic.ctx.context.prop);
-//      st.phrase();
-//      st.more();
-//      ic.is = ic.data.nrIDs(st);
-//      return true;
-//    }
     
     // summarize number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);

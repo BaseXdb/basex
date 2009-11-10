@@ -1,7 +1,9 @@
 package org.basex.query.ft;
 
+import org.basex.data.Data;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 
 /**
@@ -13,6 +15,9 @@ import org.basex.query.item.FTItem;
 public final class Scoring {
   /** Logarithmic base for calculating the score value. */
   private static final double LOG = Math.E - 1;
+  /** Scoring step. */
+  private static final double SCORESTEP = 0.8;
+
 
   /**
    * Calculates a score value, based on the token length
@@ -120,4 +125,103 @@ public final class Scoring {
   public double ftNot(final double d) {
     return 1 - d;
   }
+  
+  /**
+   * Returns the score for the specified key.
+   * @param numdoc number of documents in the collection
+   * @param numdocterm number of documents containing the term
+   * @param max maximum occurrence a term
+   * @param f frequency of the term 
+   * @return score value
+   */
+  public static int scoreTFIDF(final double numdoc, final double numdocterm,
+      final double max, final double f) {
+//    System.out.println("freq. token in document: " + f);
+//    System.out.println("max freq. any token in document: " + max);
+//    System.out.println("numb documents: " + numdoc);
+//    System.out.println("numb documents with token: " + numdocterm);
+//    System.out.println("score: " + (numdoc != numdocterm ?  
+//    Math.log(numdoc / numdocterm) : 1) * f /max);
+    return (int) ((numdoc != numdocterm ? 
+        Math.log(numdoc / numdocterm) : 1) * f * 1000 / max);
+  }
+  
+  /**
+   * Returns the score for a text node.
+   * Used when no index score is available. 
+   * @param npv number of pos values
+   * @param is index size
+   * @param tokl token length
+   * @param tl text length
+   * @return score value
+   */
+  public static double scoreTextNode(final double npv, final double is, 
+      final double tokl, final double tl) {
+    return Math.max(npv / is, Math.log(tokl * npv + 1) / Math.log(tl + 1));
+  }
+  
+  /**
+   * Returns the scoring value for a phrase. 
+   * @param w1 score of word1
+   * @param w2 score of word2
+   * @return score of the phrase
+   */
+  public static double scorePhrase(final double w1, final double w2) {
+    return (w1 + w2) / 2;
+  }
+
+  /**
+   * Scoring the parent axis step.  
+   * @param sc current score value
+   * @return new score value
+   */
+  public static double scoreParentAxis(final double sc) {
+    return sc * SCORESTEP;
+  }
+
+  /**
+   * Scoring the child axis step.  
+   * @param sc current score value
+   * @return new score value
+   */
+  public static double scoreChildAxis(final double sc) {
+    return sc * SCORESTEP;
+  }
+
+  /**
+   * Scoring the descendant axis step.  
+   * @param sc current score value
+   * @return new score value
+   */
+  public static double scoreDescAxis(final double sc) {
+    return sc * SCORESTEP;
+  }
+
+  /**
+   * Scoring the parent axis step by using meta information.
+   * @param data Data reference
+   * @param nod current node
+   * @return score value
+   */
+  public static double scoreParentAxis(final Data data, 
+      final DBNode nod) {
+    return nod.score() * (1d - (double) distToRoot(data, nod.pre) / (double) data.meta.height);
+  }
+  
+  /**
+   * Determine distance to root node.
+   * @param data Data reference
+   * @param p pre value of current node
+   * @return dist distance to root node
+   */
+  private static int distToRoot(final Data data, final int p) {
+    int d = 0;
+    int parent = data.parent(p, data.kind(p));
+    while(parent > 0) {
+      d++;
+      parent = data.parent(parent, data.kind(parent));
+    }
+    return d;
+  }
+   
 }

@@ -1,9 +1,8 @@
 package org.basex.query.item;
 
-import java.util.Iterator;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
-import org.basex.data.FTStringMatch;
+import org.basex.query.ft.Scoring;
 
 /**
  * XQuery item representing a full-text Node.
@@ -18,8 +17,6 @@ public final class FTItem extends DBNode {
   private int tl;
   /** Total number of indexed results. */
   private int is;
-  /** Flag for indexed score values. */
-  private boolean ids;
 
   /**
    * Constructor, called by the sequential variant.
@@ -38,46 +35,26 @@ public final class FTItem extends DBNode {
    * @param p pre value
    * @param tis total size indexed results
    * @param tol token length
-   * @param indexedScore flag for usage of indexed score values
    * @param s score value out of the index
    */
   public FTItem(final FTMatches a, final Data d, final int p, final int tol, 
-      final int tis, final boolean indexedScore, final double s) {
+      final int tis, final double s) {
     super(d, p, null, Type.TXT);
     all = a;
-    score = -1;
     tl = tol;
     is = tis;
-    ids = indexedScore;
     score = s;
   }
 
   @Override
   public double score() {
-    if(score == -1) {
-      if(ids) {
-        final Iterator<FTStringMatch> i = all.match[0].iterator();
-        if(!i.hasNext()) {
-          score = Math.max((double) all.size / (double) is,
-              Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
-        }
-      } else {
-        // [SG] rewritten to get score values <= 1
-        score = Math.max((double) all.size / (double) is,
-            Math.log(tl * all.size + 1) / Math.log(data.textLen(pre) + 1));
-      }
-      //score = (double) ((tl + 1) * all.match.length - 1) /
-      //  (double) data.textLen(pre);
-      // [SG] default scoring
-      //score = all.matches() ? 1 : 0;
-    }
+    if(score == -1) 
+        score = Scoring.scoreTextNode(all.size, is, tl, data.textLen(pre));
     return score;
   }
 
   @Override
   public String toString() {
     return super.toString() + (all != null ? " (" + all.size + ")" : "");
-    /*return data != null ? super.toString() + " (" + all.size + ")" :
-      name() + " (" + all.size + ")";*/
   }
 }

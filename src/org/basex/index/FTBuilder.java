@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.query.ft.Scoring;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.ScoringTokenizer;
@@ -111,7 +112,7 @@ abstract class FTBuilder extends IndexBuilder {
         if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
             nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
             pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
-          final int score = ScoringTokenizer.score(nodes.size(), 
+          final int score = Scoring.scoreTFIDF(nodes.size(), 
               nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
           if (score > maxscore) maxscore = score;
           // first write score value
