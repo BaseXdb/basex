@@ -210,7 +210,6 @@ public final class MetaData {
       oldindex = true;
       update();
     }
-    System.out.println(ftmaxscore);
   }
 
   /**
@@ -256,8 +255,6 @@ public final class MetaData {
     out.writeString(DBPERM);
     users.write(out);
     out.write(0);
-    
-    System.out.println(ftmaxscore);
   }
 
   /**

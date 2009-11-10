@@ -36,7 +36,7 @@ abstract class FTBuilder extends IndexBuilder {
   /** Entry counter. */
   int c;
   /** Maximum indexed score. */
-  int maxscore = 0;
+  int maxscore;
   
     
   /**
@@ -75,7 +75,7 @@ abstract class FTBuilder extends IndexBuilder {
       getFreq();
     }
     Performance.gc(5);
-    System.out.println(Performance.getMem());
+    //System.out.println(Performance.getMem());
     write();
     if (scm > 0) {
       data.meta.ftmaxscore = maxscore;

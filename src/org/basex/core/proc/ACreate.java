@@ -40,14 +40,13 @@ abstract class ACreate extends Process {
   /**
    * Builds and creates a new database instance.
    * @param p parser instance
-   * @param db name of database; if set to null,
-   * a main memory database instance is created
+   * @param db name of database
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
     new Close().execute(context);
     
-    final boolean mem = db == null || prop.is(Prop.MAINMEM);
+    final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem) {
       if(context.pinned(db)) return error(DBINUSE);
       if(p.prop.dbpath(db + ".tmp").exists()) return error(DBTMP, db);
@@ -59,14 +58,15 @@ abstract class ACreate extends Process {
 
     String err = null;
     try {
-      final Data data = builder.build(db == null ? "" : db + ".tmp");
+      final Data data = builder.build(db);
       if(mem) {
         context.openDB(data);
       } else {
         index(data);
         data.close();
         if(!move(db, p.prop)) throw new Exception();
-        new Open(db).execute(context);
+        final Process pr = new Open(db);
+        if(!pr.execute(context)) throw new IOException(pr.info());
       }
       return info(DBCREATED, db, perf);
     } catch(final FileNotFoundException ex) {
@@ -87,7 +87,7 @@ abstract class ACreate extends Process {
     } catch(final IOException ex) {
       Main.debug(ex);
     }
-    if(db != null) DropDB.drop(db + ".tmp", prop);
+    if(!mem) DropDB.drop(db + ".tmp", prop);
     return error(err);
   }
 
@@ -98,7 +98,6 @@ abstract class ACreate extends Process {
    * @return true if move was successful
    */
   protected static boolean move(final String db, final Prop pr) {
-    DropDB.drop(db, pr);
     return pr.dbpath(db + ".tmp").renameTo(pr.dbpath(db));
   }
 

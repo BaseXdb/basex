@@ -51,23 +51,25 @@ public final class DiskBuilder extends Builder {
 
   @Override
   public void init(final String db) throws IOException {
+    final String tmp = db + ".tmp";
     final Prop pr = parser.prop;
-    meta = new MetaData(db, pr);
+    meta = new MetaData(tmp, pr);
     meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
 
     DropDB.drop(db, pr);
-    pr.dbpath(db).mkdirs();
+    DropDB.drop(tmp, pr);
+    pr.dbpath(tmp).mkdirs();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = IO.BLOCKSIZE;
     while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
 
-    tout = new DataOutput(new TableOutput(db, DATATBL, pr));
-    xout = new DataOutput(pr.dbfile(db, DATATXT), bs);
-    vout = new DataOutput(pr.dbfile(db, DATAATV), bs);
-    sout = new DataOutput(pr.dbfile(db, DATATMP), bs);
+    tout = new DataOutput(new TableOutput(tmp, DATATBL, pr));
+    xout = new DataOutput(pr.dbfile(tmp, DATATXT), bs);
+    vout = new DataOutput(pr.dbfile(tmp, DATAATV), bs);
+    sout = new DataOutput(pr.dbfile(tmp, DATATMP), bs);
   }
 
   @Override
@@ -75,9 +77,9 @@ public final class DiskBuilder extends Builder {
     close();
 
     // copy temporary values into database table
-    final String db = meta.name;
-    final TableAccess ta = new TableDiskAccess(db, DATATBL, parser.prop);
-    final DataInput in = new DataInput(parser.prop.dbfile(db, DATATMP));
+    final String tmp = meta.name;
+    final TableAccess ta = new TableDiskAccess(tmp, DATATBL, parser.prop);
+    final DataInput in = new DataInput(parser.prop.dbfile(tmp, DATATMP));
     for(int pre = 0; pre < ssize; pre++) {
       final boolean sz = in.readBool();
       final int p = in.readNum();
@@ -86,7 +88,7 @@ public final class DiskBuilder extends Builder {
     }
     ta.close();
     in.close();
-    parser.prop.dbfile(db, DATATMP).delete();
+    parser.prop.dbfile(tmp, DATATMP).delete();
 
     // return database instance
     return new DiskData(meta, tags, atts, path, ns);

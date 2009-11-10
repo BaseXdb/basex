@@ -60,8 +60,12 @@ public final class Set extends Process {
       } else {
         Main.notexpected();
       }
-      return info((s == null ? key :
-        Text.class.getField("INFO" + s).get(null).toString()) + ": " + val);
+      try {
+        return info(Text.class.getField("INFO" + s).get(null).toString() +
+            ": " + val);
+      } catch(final Exception ex) {
+        return info(key + ": " + val);
+      }
     } catch(final Exception ex) {
       Main.debug(ex);
       return error(SETERR, key, val);

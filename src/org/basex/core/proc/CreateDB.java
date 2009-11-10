@@ -88,9 +88,8 @@ public final class CreateDB extends ACreate {
       throw new IOException(Main.info(DBTMP, db));
 
     final Builder builder = new DiskBuilder(p);
-    final String tmp = db + ".tmp";
     try {
-      final Data data = builder.build(tmp);
+      final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(Type.TXT,
         new ValueBuilder(data, true).build());
       if(data.meta.atvindex) data.setIndex(Type.ATV,
@@ -106,7 +105,7 @@ public final class CreateDB extends ACreate {
       } catch(final IOException exx) {
         Main.debug(exx);
       }
-      DropDB.drop(tmp, pr);
+      DropDB.drop(db + ".tmp", pr);
       throw ex;
     }
     return Open.open(ctx, db);

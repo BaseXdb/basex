@@ -1447,7 +1447,6 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 84] Parses a PrimaryExpr.
-   * [ 85] Parses a Literal.
    * [ 87] Parses a VarRef.
    * [ 90] Parses a ContextItem.
    * @return query expression
@@ -1455,20 +1454,11 @@ public class QueryParser extends InputParser {
    */
   private Expr primary() throws QueryException {
     skipWS();
-    // numbers
-    final char c = curr();
-    if(digit(c)) return numericLiteral();
-    // decimal/double values or context item
-    if(c == '.' && next() != '.') {
-      consume('.');
-      if(!digit(curr())) return new Context();
-      tok.reset();
-      tok.add('.');
-      return decimalLiteral();
-    }
-    // strings
-    if(quote(c)) return new Str(stringLiteral(), true);
+    // literals
+    Expr e = literal();
+    if(e != null) return e;
     // variables
+    final char c = curr();
     if(c == '$') {
       final Var var = new Var(varName());
       if(ctx.vars.get(var) == null) error(VARNOTDEFINED, var);
@@ -1480,7 +1470,7 @@ public class QueryParser extends InputParser {
     if(c == '<') return constructor();
     // function calls and computed constructors
     if(letter(c)) {
-      Expr e = functionCall();
+      e = functionCall();
       if(e != null) return e;
       e = computedConstructor();
       if(e != null) return e;
@@ -1489,6 +1479,27 @@ public class QueryParser extends InputParser {
         return enclosed(NOENCLEXPR);
     }
     return null;
+  }
+
+
+  /**
+   * [ 85] Parses a Literal.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr literal() throws QueryException {
+    final char c = curr();
+    if(digit(c)) return numericLiteral();
+    // decimal/double values or context item
+    if(c == '.' && next() != '.') {
+      consume('.');
+      if(!digit(curr())) return new Context();
+      tok.reset();
+      tok.add('.');
+      return decimalLiteral();
+    }
+    // strings
+    return quote(c) ? new Str(stringLiteral(), true) : null;
   }
 
   /**
@@ -2255,7 +2266,19 @@ public class QueryParser extends InputParser {
     final FTOpt fto = new FTOpt(ctx.context.prop);
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
-    if(consumeWS(WEIGHT)) expr = new FTWeight(expr, range());
+    if(consumeWS(WEIGHT)) {
+      expr = new FTWeight(expr, range());
+      /*skipWS();
+      Expr r = null;
+      if(consume('{')) {
+        r = range();
+        check('}');
+      } else {
+        r = literal();
+      }
+     if(r == null) error(NOENCLEXPR);
+     expr = new FTWeight(expr, r);*/
+    }
     // skip options if none were specified...
     return found ? new FTOptions(expr, fto) : expr;
   }
@@ -2287,7 +2310,7 @@ public class QueryParser extends InputParser {
 
     skipWS();
     final Expr e = curr('{') ? enclosed(NOENCLEXPR) : quote(curr()) ?
-        Str.get(stringLiteral()) : null;
+        literal() : null;
     if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
 
     // FTAnyAllOption

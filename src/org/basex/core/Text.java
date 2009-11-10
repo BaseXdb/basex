@@ -595,6 +595,7 @@ public interface Text {
   String INFOENTITY = lang("info_entities");
   /** Info on result serialization. */
   String INFOSERIALIZE = lang("info_serialize");
+
   /** Info on tags. */
   String INFOTAGS = lang("info_tags");
   /** Info on attributes. */

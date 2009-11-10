@@ -111,6 +111,8 @@ public abstract class W3CTS {
   private boolean verbose;
   /** Debug flag. */
   private boolean debug;
+  /** Minimum conformance. */
+  private boolean minimum;
 
   /** Cached source files. */
   private final HashMap<String, String> srcs = new HashMap<String, String>();
@@ -167,6 +169,8 @@ public abstract class W3CTS {
           currTime = true;
         } else if(c == 'd') {
           debug = true;
+        } else if(c == 'm') {
+          minimum = true;
         } else if(c == 'p') {
           path = arg.string() + "/";
         } else if(c == 'v') {
@@ -185,6 +189,7 @@ public abstract class W3CTS {
           " [pat] perform only tests with the specified pattern" + NL +
           " -d show debugging info" + NL +
           " -h show this help" + NL +
+          " -m minimum conformance" + NL +
           " -p change path" + NL +
           " -r create report" + NL +
           " -v verbose output");
@@ -247,9 +252,9 @@ public abstract class W3CTS {
 
     Main.out("Parsing Queries");
     if(verbose) Main.outln();
-    final Nodes nodes = nodes("//*:test-case", root);
-    //final Nodes nodes = nodes(
-    //  "//*:test-group[starts-with(@name, 'Minimal')]//*:test-case", root);
+    final Nodes nodes = minimum ?
+      nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
+      nodes("//*:test-case", root);
     int total = nodes.size();
     for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
