@@ -8,7 +8,6 @@ import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.IntList;
 import org.basex.util.Num;
-import org.basex.util.Performance;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
@@ -74,8 +73,8 @@ abstract class FTBuilder extends IndexBuilder {
       freq = new IntList();
       getFreq();
     }
-    Performance.gc(5);
-    //System.out.println(Performance.getMem());
+//    Performance.gc(5);
+//    System.out.println(Performance.getMem());
     write();
     if (scm > 0) {
       data.meta.ftmaxscore = maxscore;
@@ -124,14 +123,13 @@ abstract class FTBuilder extends IndexBuilder {
         }
         lastpre = pre;
       }
-
+      
       // write fulltext data
       for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
         out.write(vpre[lpre++]);
       for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
         out.write(vpos[lpos++]);
     }
-
   }
   
   /**
