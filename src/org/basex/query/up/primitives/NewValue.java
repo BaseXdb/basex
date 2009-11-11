@@ -25,5 +25,5 @@ public abstract class NewValue extends UpdatePrimitive {
   }
   
   @Override
-  public void check() {}
+  public void check() { }
 }

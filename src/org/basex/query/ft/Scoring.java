@@ -203,9 +203,9 @@ public final class Scoring {
    * @param nod current node
    * @return score value
    */
-  public static double scoreParentAxis(final Data data, 
-      final DBNode nod) {
-    return nod.score() * (1d - (double) distToRoot(data, nod.pre) / (double) data.meta.height);
+  public static double scoreParentAxis(final Data data, final DBNode nod) {
+    return nod.score() * 
+      (1d - (double) distToRoot(data, nod.pre) / (double) data.meta.height);
   }
   
   /**
