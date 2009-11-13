@@ -64,6 +64,14 @@ public final class Users {
   public void add(final User user) {
     users.add(user);
   }
+  
+  /**
+   * Removes the specified user.
+   * @param user user reference
+   */
+  public void remove(final User user) {
+    users.remove(user);
+  }
 
   /**
    * Stores a user and encrypted password.

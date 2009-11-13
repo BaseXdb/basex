@@ -69,6 +69,9 @@ public abstract class AAdmin extends Process {
           data.meta.users.add(u);
         }
         u.perm(set, perm);
+        if(!u.perm(1) && !u.perm(2)) {
+          data.meta.users.remove(u);
+        }
         data.flush();
         Close.close(context, data);
       } catch(final IOException ex) {
