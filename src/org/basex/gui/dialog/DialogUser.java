@@ -340,7 +340,13 @@ public final class DialogUser extends BaseXBack {
 
     @Override
     public boolean isCellEditable(final int row, final int col) {
-      if(!global) return row == getRowCount() - 1;
+      if(!global) {
+        if(row == getRowCount() - 1) {
+          return true;
+        }
+        if(col != 0) return true;
+        return false;
+      }
       return col != 0;
     }
 
