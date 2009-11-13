@@ -9,10 +9,14 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import javax.swing.Box;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
+
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Session;
@@ -38,7 +42,7 @@ import org.basex.util.Table;
 
 /**
  * Panel for displaying information about global/lokal users.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -171,7 +175,8 @@ public final class DialogUser extends BaseXBack {
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
-        for(final Process p : permps) if(!sess.execute(p)) msg = sess.info();
+        for(final Process p : permps)
+          if(!sess.execute(p)) msg = sess.info();
         permps.clear();
         setData();
       } else if(BUTTONCREATE.equals(cmd)) {
@@ -198,13 +203,13 @@ public final class DialogUser extends BaseXBack {
       Main.debug(ex);
       if(ex instanceof BindException) msg = SERVERBIND;
       else if(ex instanceof LoginException) msg = SERVERLOGIN;
-      else msg = ex.getMessage(); //SERVERERR;
+      else msg = ex.getMessage(); // SERVERERR;
     }
 
     final boolean valuname = user.getText().matches("[\\w]*");
     final boolean valpass = new String(pass.getPassword()).matches("[\\w]*");
-    final boolean valnewpass = new String(
-        newpass.getPassword()).matches("[\\w]*");
+    final boolean valnewpass = new String(newpass.
+        getPassword()).matches("[\\w]*");
     boolean disname = !user.getText().equals(ADMIN);
     for(int i = 0; i < userco1.getItemCount(); i++) {
       disname &= !user.getText().equals(userco1.getItemAt(i).toString());
@@ -214,15 +219,15 @@ public final class DialogUser extends BaseXBack {
     if(msg != null) {
       warn = false;
     } else if(!(valuname && valpass && valnewpass && disname)) {
-      msg = !disname ? Main.info(USERKNOWN, user.getText()) :
-        Main.info(INVALID, !valuname ? SERVERUSER : SERVERPW);
+      msg = !disname ? Main.info(USERKNOWN, user.getText()) : Main.info(
+          INVALID, !valuname ? SERVERUSER : SERVERPW);
     }
     info.setError(msg, warn);
 
-    alter.setEnabled(valnewpass && newpass.getPassword().length != 0 &&
-        userco2.getSelectedIndex() != -1);
-    create.setEnabled(valuname && valpass && disname &&
-        !user.getText().isEmpty() && pass.getPassword().length != 0);
+    alter.setEnabled(valnewpass && newpass.getPassword().length != 0
+        && userco2.getSelectedIndex() != -1);
+    create.setEnabled(valuname && valpass && disname
+        && !user.getText().isEmpty() && pass.getPassword().length != 0);
     drop.setEnabled(userco1.getSelectedIndex() != -1);
     change.setEnabled(false);
   }
@@ -237,7 +242,13 @@ public final class DialogUser extends BaseXBack {
       throw new IOException(sess.info());
     }
     data = new Table(out.toString());
-    if (!global) {
+    StringList items = new StringList();
+    if(!global) {
+      StringList empty = new StringList();
+      empty.add(" ");
+      empty.add("");
+      empty.add("");
+      data.contents.add(empty);
       final CachedOutput out2 = new CachedOutput();
       sess.execute(new Show("Users"), out2);
       Table data2 = new Table(out2.toString());
@@ -251,11 +262,7 @@ public final class DialogUser extends BaseXBack {
       }
       for(String s : tmp2) {
         if(!tmp1.contains(s)) {
-          StringList item = new StringList();
-          item.add(s);
-          item.add("");
-          item.add("");
-          data.contents.add(item);
+          items.add(s);
         }
       }
     }
@@ -276,6 +283,11 @@ public final class DialogUser extends BaseXBack {
     userco2.setSelectedIndex(-1);
     if(global) data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
+    if(!global) {
+      // These are the combobox values
+      TableColumn col = table.getColumnModel().getColumn(0);
+      col.setCellEditor(new MyComboBoxEditor(items.getList()));
+    }
   }
 
   /**
@@ -287,7 +299,7 @@ public final class DialogUser extends BaseXBack {
     sess = s;
     setData();
   }
-  
+
   /**
    * Returns tablepanel.
    * @return BaseXBack
@@ -298,7 +310,7 @@ public final class DialogUser extends BaseXBack {
 
   /**
    * Dialog specific table model.
-   *
+   * 
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
@@ -328,24 +340,46 @@ public final class DialogUser extends BaseXBack {
 
     @Override
     public boolean isCellEditable(final int row, final int col) {
+      if(!global) return row == getRowCount() - 1;
       return col != 0;
     }
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
-      final String uname = data.contents.get(row).get(0);
-      final String right = CmdPerm.values()[col - 1].toString();
-      if(global) {
-      permps.add(value.equals(true) ? new Grant(right, uname) : new Revoke(
-          right, uname));
+      if(row == getRowCount() - 1 && col == 0) {
+        data.contents.get(row).set(value.toString(), col);
+        fireTableCellUpdated(row, col);
       } else {
-        String db = dia.gui.context.data().meta.name;
-        permps.add(value.equals(true) ? new Grant(right, uname,
-            db) : new Revoke(right, uname, db));
+        final String uname = data.contents.get(row).get(0);
+        final String right = CmdPerm.values()[col - 1].toString();
+        if(global) {
+          permps.add(value.equals(true) ? new Grant(right, uname) : new Revoke(
+              right, uname));
+        } else {
+          String db = dia.gui.context.data().meta.name;
+          permps.add(value.equals(true) ? new Grant(right, uname, db)
+              : new Revoke(right, uname, db));
+        }
+        data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
+        fireTableCellUpdated(row, col);
+        change.setEnabled(true);
       }
-      data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
-      fireTableCellUpdated(row, col);
-      change.setEnabled(true);
+    }
+  }
+
+  /**
+   * Combobox in JTable.
+   * 
+   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+   * @author Andreas Weiler
+   */
+  public class MyComboBoxEditor extends DefaultCellEditor {
+    /**
+     * Constructor.
+     * @param items String[]
+     */
+    public MyComboBoxEditor(final String[] items) {
+      super(new JComboBox(items));
     }
   }
 }

@@ -101,4 +101,12 @@ public final class StringList implements Iterable<String> {
       public void remove() { Main.notexpected(); }
     };
   }
+
+  /**
+   * Getter for list.
+   * @return String[]
+   */
+  public String[] getList() {
+    return list;
+  }
 }
