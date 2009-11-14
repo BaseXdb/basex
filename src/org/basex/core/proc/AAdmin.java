@@ -66,6 +66,8 @@ public abstract class AAdmin extends Process {
           u = user.copy();
           u.perm(false, User.ADMIN);
           u.perm(false, User.CREATE);
+          if(perm == 1) u.perm(false, User.WRITE);
+          if(perm == 2) u.perm(false, User.READ);
           data.meta.users.add(u);
         }
         u.perm(set, perm);

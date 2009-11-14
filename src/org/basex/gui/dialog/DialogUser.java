@@ -261,7 +261,7 @@ public final class DialogUser extends BaseXBack {
         tmp2.add(l.get(0));
       }
       for(String s : tmp2) {
-        if(!tmp1.contains(s)) {
+        if(!tmp1.contains(s) && !s.equals(ADMIN)) {
           items.add(s);
         }
       }
