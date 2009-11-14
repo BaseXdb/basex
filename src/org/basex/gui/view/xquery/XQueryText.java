@@ -97,7 +97,7 @@ final class XQueryText extends BaseXText {
       if(isModule(query)) return;
       view.stop.setEnabled(true);
       final String qu = Token.string(query);
-      gui.execute(new XQuery(qu.trim().length() == 0 ? "()" : qu));
+      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu));
     } else {
       markError();
     }

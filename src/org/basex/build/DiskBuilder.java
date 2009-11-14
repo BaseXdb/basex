@@ -2,6 +2,7 @@ package org.basex.build;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
@@ -51,25 +52,24 @@ public final class DiskBuilder extends Builder {
 
   @Override
   public void init(final String db) throws IOException {
-    final String tmp = db + ".tmp";
     final Prop pr = parser.prop;
-    meta = new MetaData(tmp, pr);
+    meta = new MetaData(db, pr);
     meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
 
     DropDB.drop(db, pr);
-    DropDB.drop(tmp, pr);
-    pr.dbpath(tmp).mkdirs();
+    pr.dbpath(db).mkdirs();
+    pr.dbfile(db, DATALOCK).createNewFile();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = IO.BLOCKSIZE;
     while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
 
-    tout = new DataOutput(new TableOutput(tmp, DATATBL, pr));
-    xout = new DataOutput(pr.dbfile(tmp, DATATXT), bs);
-    vout = new DataOutput(pr.dbfile(tmp, DATAATV), bs);
-    sout = new DataOutput(pr.dbfile(tmp, DATATMP), bs);
+    tout = new DataOutput(new TableOutput(db, DATATBL, pr));
+    xout = new DataOutput(pr.dbfile(db, DATATXT), bs);
+    vout = new DataOutput(pr.dbfile(db, DATAATV), bs);
+    sout = new DataOutput(pr.dbfile(db, DATATMP), bs);
   }
 
   @Override

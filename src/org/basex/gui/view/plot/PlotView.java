@@ -731,6 +731,7 @@ public final class PlotView extends View implements Runnable {
     final BufferedImage img = new BufferedImage(imgW, imgH,
         Transparency.BITMASK);
     final Graphics2D g2d = img.createGraphics();
+    smooth(g2d);
     g2d.rotate(ROTATE, imgW, 0 + textH);
     g2d.setFont(font);
     g2d.setColor(im ? color4 : Color.black);
@@ -992,7 +993,9 @@ public final class PlotView extends View implements Runnable {
   private String formatString(final double value, final boolean drawX) {
     final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
     return BaseXLayout.value(value, attr.equals("@" + DataText.S_SIZE),
-        attr.equals("@" + DataText.S_MTIME));
+        attr.equals("@" + DataText.S_MTIME) ||
+        attr.equals("@" + DataText.S_CTIME) ||
+        attr.equals("@" + DataText.S_ATIME));
   }
 
   @Override

@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-launch=Starte
 wait=Bitte Warten
 version=Version %
 
@@ -334,13 +333,12 @@ pc_pos="%" (Zeile %)
 
 # Database commands
 db_no=Datenbank '%' wurde nicht gefunden.
+db_locked=Database '%' is gerade gesperrt.
 db_closed=Datenbank '%' wurde geschlossen.
 db_closeerr=Datenbank konnte nicht geschlossen werden.
 db_optimized=Datenbank optimiert in %.
 db_dropped=Datenbank '%' wurde gelöscht.
 db_notdropped=Datenbank konnte nicht gelöscht werden.
-db_inuse=Datenbank wird von anderen Clients benutzt.
-db_tmp="%.tmp" besteht schon.
 db_notopened=Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet in %.
 db_exported=Datenbank '%' exportiert in %.

@@ -67,9 +67,7 @@ public final class List extends Process {
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return db;
 
-    for(final IO f : dir.children()) {
-      if(f.isDir() && !f.name().endsWith(".tmp")) db.add(f.name());
-    }
+    for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());
     db.sort(false);
     return db;
   }
@@ -87,7 +85,7 @@ public final class List extends Process {
 
     for(final IO f : dir.children()) {
       DataInput in = null;
-      if(f.isDir() && !f.name().endsWith(".tmp")) {
+      if(f.isDir()) {
         final String dbname = f.name();
         try {
           in = new DataInput(ctx.prop.dbfile(dbname, DATAINFO));

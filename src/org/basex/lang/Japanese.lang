@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-launch=起動中
 wait=お待ち下さい
 version=Version %
 
@@ -334,14 +333,13 @@ pc_pos=% (%行、)
 
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
+db_locked=Database '%' is currently locked.
 db_closed=データベース '%' を閉じました。
 db_closeerr=データベースを閉じる事が出来ませんでした。
 db_optimized=データベース % 最適化されました。（？）
 db_dropped=データベース '%' が削除されました。
 db_notdropped=データベースを削除できませんでした。
 info_nodeepfs=No DeepFS database found
-db_inuse=Database is currently accessed by other users.
-db_tmp="%.tmp" exists already.
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。

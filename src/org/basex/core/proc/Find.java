@@ -6,6 +6,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.io.PrintOutput;
+import org.basex.query.path.Axis;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -20,6 +21,9 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
+  /** Contains text token. */
+  private static final String CT = "contains text";
+  
   /**
    * Default constructor.
    * @param query simplified query
@@ -69,24 +73,25 @@ public final class Find extends AQuery {
         preds += "[text() ~> \"" + term.substring(1) + "\"]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[@* contains text \"" + term.substring(1) + "\"]";
+        preds += "[@* " + CT + " \"" + term.substring(1) + "\"]";
         term = term.substring(1);
         // add valid name tests
         if(XMLToken.isName(token(term))) {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
-        preds += "[text() contains text \"" + term + "\"]";
+        preds += "[text() " + CT + " \"" + term + "\"]";
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
+          pre += (r ? "/" : "") + Axis.DESC + "::*:" + term + " | ";
         }
         // add name test...
-        pre += "descendant-or-self::*[@name contains text \"" + term + "\"] | ";
+        pre += (r ? "/" : "") + Axis.DESCORSELF +
+          "::*[@name " + CT + " \"" + term + "\"] | ";
       }
     }
     if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
-    return pre + (r ? "/" : "") + "descendant-or-self::" + tag + preds;
+    return pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds;
   }
 
   /**
@@ -106,7 +111,7 @@ public final class Find extends AQuery {
     final boolean r = root || context.root();
 
     if(r) xquery.add("/");
-    xquery.add("descendant-or-self::");
+    xquery.add(Axis.DESCORSELF + "::");
     String name = "*";
 
     do {
@@ -130,7 +135,7 @@ public final class Find extends AQuery {
       int off = exact ? 1 : 0;
       while(off < qu.length() && qu.charAt(off) == ' ') off++;
       qu = qu.substring(off);
-      if(qu.length() == 0) continue;
+      if(qu.isEmpty()) continue;
 
       final int i = qu.indexOf(' ');
       String t = qu.substring(0, i);
@@ -148,7 +153,7 @@ public final class Find extends AQuery {
         t = "\"" + t + "\"";
       }
       // add predicate
-      xquery.add(name + "[@" + pred + (exact ? op : " contains text ") +
+      xquery.add(name + "[@" + pred + (exact ? op : " " + CT + " ") +
           t + "]");
 
       qu = qu.substring(i + 1);
@@ -158,8 +163,8 @@ public final class Find extends AQuery {
     boolean f = true;
     for(final String t : split(query)) {
       if(Character.isLetterOrDigit(t.charAt(0))) {
-        if(f) xquery.add(" | " + (r ? "/" : "") + "descendant-or-self::file");
-        xquery.add("[descendant::text() contains text \"" + t + "\"]");
+        if(f) xquery.add(" | " + (r ? "/" : "") + Axis.DESCORSELF + "::file");
+        xquery.add("[" + Axis.DESC + "::text() " + CT + " \"" + t + "\"]");
         f = false;
       }
     }
@@ -187,25 +192,26 @@ public final class Find extends AQuery {
         if(contains(term, '"')) term = replace(term, '\"', ' ');
         term = trim(term);
         if(term.length == 0) continue;
-        tb.add("[");
+        tb.add('[');
 
         final boolean elm = elem.get(i);
-        tb.add(elm ? ".//" : "@");
+        if(!elm) tb.add('@');
         tb.add(cols.get(i));
 
         if(term[0] == '<' || term[0] == '>') {
           tb.add(term[0]);
           tb.add(calcNum(substring(term, 1)));
         } else {
-          tb.add(" contains text \"");
+          tb.add(" " + CT + " \"");
           tb.add(term);
-          tb.add("\"");
+          tb.add('"');
         }
-        tb.add("]");
+        tb.add(']');
       }
     }
-    return tb.size() == 0 ? "." : (root ? "/" : "") +
-      "descendant-or-self::" + string(tag) + tb;
+    // [CG] no query - jump to root or context? dep. on realtime filtering?
+    return tb.size() == 0 ? "/" : (root ? "/" : "") +
+        Axis.DESCORSELF + "::" + string(tag) + tb;
   }
 
   /**

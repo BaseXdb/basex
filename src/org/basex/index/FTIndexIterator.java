@@ -140,7 +140,7 @@ public abstract class FTIndexIterator extends IndexIterator {
       
       @Override 
       public double score() {
-        return Scoring.scorePhrase(i1.score(), i2.score());
+        return Scoring.phrase(i1.score(), i2.score());
       }
     };
   }

@@ -112,7 +112,7 @@ abstract class FTBuilder extends IndexBuilder {
         if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
             nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
             pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
-          final int score = Scoring.scoreTFIDF(nodes.size(), 
+          final int score = Scoring.tfIDF(nodes.size(), 
               nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
           if (score > maxscore) maxscore = score;
           // first write score value

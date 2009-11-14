@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.util.Token.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 
@@ -105,10 +106,12 @@ public class Itr extends Item {
         return (short) val;
       case INT:
       case USH:
+        return (int) val;
       case LNG:
       case UIN:
+        return val;
       default:
-        return (int) val;
+        return new BigInteger(Token.string(str()));
     }
   }
 

@@ -47,10 +47,7 @@ abstract class ACreate extends Process {
     new Close().execute(context);
     
     final boolean mem = prop.is(Prop.MAINMEM);
-    if(!mem) {
-      if(context.pinned(db)) return error(DBINUSE);
-      if(p.prop.dbpath(db + ".tmp").exists()) return error(DBTMP, db);
-    }
+    if(!mem && p.prop.dblocked(db)) return error(DBLOCKED, db);
 
     final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
         new NativeBuilder(p) : new DiskBuilder(p);
@@ -64,7 +61,6 @@ abstract class ACreate extends Process {
       } else {
         index(data);
         data.close();
-        if(!move(db, p.prop)) throw new Exception();
         final Process pr = new Open(db);
         if(!pr.execute(context)) throw new IOException(pr.info());
       }
@@ -87,18 +83,7 @@ abstract class ACreate extends Process {
     } catch(final IOException ex) {
       Main.debug(ex);
     }
-    if(!mem) DropDB.drop(db + ".tmp", prop);
     return error(err);
-  }
-
-  /**
-   * Moves a temporary database to the final destination.
-   * @param db name of database
-   * @param pr database properties
-   * @return true if move was successful
-   */
-  protected static boolean move(final String db, final Prop pr) {
-    return pr.dbpath(db + ".tmp").renameTo(pr.dbpath(db));
   }
 
   /**

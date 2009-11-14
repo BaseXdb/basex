@@ -320,13 +320,6 @@ public interface Text {
     "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
   };
 
-  // STARTER WINDOW ===========================================================
-
-  /** Waiting info. */
-  String WAIT1 = lang("launch") + " " + TITLE;
-  /** Waiting info. */
-  String WAIT2 = lang("wait") + DOTS;
-
   // PROCESS INFOS ============================================================
 
   /** Process time. */
@@ -401,6 +394,8 @@ public interface Text {
 
   /** Database not found. */
   String DBNOTFOUND = lang("db_no");
+  /** Database locked. */
+  String DBLOCKED = lang("db_locked");
   /** Database closed. */
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */
@@ -409,10 +404,6 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
-  /** Database is in use by a other client. */
-  String DBINUSE = lang("db_inuse");
-  /** Temporary database is found. */
-  String DBTMP = lang("db_tmp");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */

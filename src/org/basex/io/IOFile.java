@@ -120,10 +120,12 @@ public final class IOFile extends IO {
    * @return result of check
    */
   private boolean zip() {
-    final String suf = path.toLowerCase().replaceAll(".*\\.", ".");
-    return suf.equals(ZIPSUFFIX) || suf.equals(".docx") ||
-      suf.equals(".xslx") || suf.equals(".pptx") ||
-      suf.equals(".odt") || suf.equals(".ods") || suf.equals(".odp");
+    final String[] zips = {
+        "zip", "docx", "xslx", "pptx", "odt", "ods", "odp", "thmx"
+    };
+    final String suf = path.toLowerCase().replaceAll(".*\\.", "");
+    for(final String z : zips) if(suf.equals(z)) return true;
+    return false;
   }
 
   @Override

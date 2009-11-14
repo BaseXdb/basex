@@ -168,7 +168,8 @@ public interface QueryText {
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };
   /** XPDY0050: Evaluation exception. */
-  Object[] CTXNODE = { XPDY, 50, "Context item must be a node." };
+  Object[] CTXNODE = { XPDY, 50,
+      "Root of the context item must be a document node." };
   /** XPDY0050: Evaluation exception. */
   Object[] NOTREAT = { XPDY, 50, "%: % expected, % found." };
   /** XPDY0050: Evaluation exception. */

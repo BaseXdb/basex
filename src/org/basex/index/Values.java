@@ -42,7 +42,7 @@ public final class Values extends Index {
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
-    final Prop pr = data.meta.prop;
+    final Prop pr = d.meta.prop;
     idxl = new DataAccess(db, file + 'l', pr);
     idxr = new DataAccess(db, file + 'r', pr);
     size = idxl.readNum();

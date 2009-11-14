@@ -82,10 +82,7 @@ public final class CreateDB extends ACreate {
 
     final Prop pr = p.prop;
     if(pr.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
-
-    if(ctx.pinned(db)) throw new IOException(DBINUSE);
-    if(p.prop.dbpath(db + ".tmp").exists()) 
-      throw new IOException(Main.info(DBTMP, db));
+    if(p.prop.dblocked(db)) throw new IOException(Main.info(DBLOCKED, db));
 
     final Builder builder = new DiskBuilder(p);
     try {
@@ -98,14 +95,12 @@ public final class CreateDB extends ACreate {
         new FTFuzzyBuilder(data, pr).build() :
         new FTTrieBuilder(data, pr).build());
       data.close();
-      if(!move(db, pr)) throw new IOException();
     } catch(final IOException ex) {
       try {
         builder.close();
       } catch(final IOException exx) {
         Main.debug(exx);
       }
-      DropDB.drop(db + ".tmp", pr);
       throw ex;
     }
     return Open.open(ctx, db);

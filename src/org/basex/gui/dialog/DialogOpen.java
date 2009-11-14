@@ -156,7 +156,7 @@ public final class DialogOpen extends Dialog {
       }
     } else {
       final String db = choice.getValue().trim();
-      ok = !db.isEmpty() && ctx.prop.dbpath(db).exists();
+      ok = !db.isEmpty() && ctx.prop.dbexists(db);
       enableOK(buttons, BUTTONDROP, ok);
 
       if(ok) {

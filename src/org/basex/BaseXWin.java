@@ -1,31 +1,19 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.util.Enumeration;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Check;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.io.IO;
-import org.basex.util.Performance;
 
 /**
  * This is the starter class for the graphical frontend.
@@ -37,7 +25,7 @@ public final class BaseXWin {
   /**
    * Main method.
    * @param args command-line arguments.
-   * An initial XML document or database file can be specified as argument.
+   * An initial XML document or query file can be specified as argument.
    */
   public static void main(final String[] args) {
     new BaseXWin(args);
@@ -58,9 +46,6 @@ public final class BaseXWin {
     ctx.prop.set(Prop.CACHEQUERY, true);
     Prop.gui = true;
 
-    // show waiting panel and wait some time to allow repainting
-    final JFrame wait = waitPanel();
-    Performance.sleep(50);
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {
@@ -73,11 +58,14 @@ public final class BaseXWin {
         // open specified document or database
         if(args.length != 0) {
           final String db = args[0].replace('\\', '/');
-          gui.execute(new CreateDB(db));
-          gprop.set(GUIProp.OPENPATH, IO.get(db).path());
+          final IO io = IO.get(db);
+          if(db.endsWith(IO.XQSUFFIX)) {
+            gui.query.setQuery(io);
+          } else {
+            gui.execute(new Check(db));
+            gprop.set(GUIProp.OPENPATH, io.path());
+          }
         }
-        // close wait panel
-        wait.dispose();
       }
     });
   }
@@ -111,36 +99,5 @@ public final class BaseXWin {
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
-  }
-
-  /**
-   * Returns a starter window.
-   * @return starter window
-   */
-  private JFrame waitPanel() {
-    final JFrame wait = new JFrame(Text.TITLE);
-    wait.setUndecorated(true);
-
-    final JPanel panel = new JPanel();
-    panel.setLayout(new GridLayout(2, 1));
-    panel.setBackground(Color.white);
-    panel.setBorder(new CompoundBorder(new MatteBorder(1, 1, 1, 1,
-        Color.GRAY), new EmptyBorder(3, 16, 6, 16)));
-
-    JLabel label = new JLabel(WAIT1);
-    label.setFont(label.getFont().deriveFont(0));
-    panel.add(label);
-    label = new JLabel(WAIT2, SwingConstants.CENTER);
-    label.setFont(label.getFont().deriveFont(0));
-    panel.add(label);
-
-    wait.add(panel);
-    wait.pack();
-
-    final Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
-    final Dimension p = wait.getSize();
-    wait.setLocation(s.width - p.width >> 1, s.height - p.height >> 1);
-    wait.setVisible(true);
-    return wait;
   }
 }

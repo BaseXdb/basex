@@ -219,7 +219,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             case INT:
               addSlider(stat.min, stat.max, cp + 1,
                   item.equals("@" + DataText.S_SIZE),
-                  item.equals("@" + DataText.S_MTIME), true);
+                  item.equals("@" + DataText.S_MTIME) ||
+                  item.equals("@" + DataText.S_CTIME) ||
+                  item.equals("@" + DataText.S_ATIME), true);
               break;
             case DBL:
               addSlider(stat.min, stat.max, cp + 1, false, false, false);

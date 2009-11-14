@@ -199,7 +199,7 @@ public class DBNode extends Nod {
           (double) sk.counter / (double) data.tags.tn));
     }*/
 
-    node.score(Scoring.scoreParentAxis(node.score));
+    node.score(Scoring.parentAxis(node.score));
     return node;
   }
 
@@ -258,7 +258,7 @@ public class DBNode extends Nod {
         if(!more()) return null;
         k = data.kind(p);
         node.set(p, k);
-        node.score(Scoring.scoreChildAxis(sc));
+        node.score(Scoring.childAxis(sc));
         p += data.size(p, k);
         return node;
       }
@@ -285,7 +285,7 @@ public class DBNode extends Nod {
         k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
-        node.score(Scoring.scoreDescAxis(sc));
+        node.score(Scoring.descAxis(sc));
         return node;
 
         /* [SG] I temporarily added a comment and replace this by a very

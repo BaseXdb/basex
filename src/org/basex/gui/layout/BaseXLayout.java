@@ -217,7 +217,7 @@ public final class BaseXLayout {
       final boolean date) {
 
     if(size) return Performance.format((long) val, true);
-    if(date) return DATE.format(new Date((long) val * 60000));
+    if(date) return DATE.format(new Date((long) val));
     return string(chopNumber(token(val)));
   }
 

@@ -91,6 +91,10 @@ public interface DataText {
   /** Time of last modification. */
   String S_SIZE = "size";
   /** Time of last modification. */
+  String S_ATIME = "atime";
+  /** Time of last modification. */
+  String S_CTIME = "ctime";
+  /** Time of last modification. */
   String S_MTIME = "mtime";
   /** Time of last modification. */
   String S_SUFFIX = "suffix";
@@ -119,9 +123,9 @@ public interface DataText {
   /** Suffix attribute. */
   byte[] SUFFIX = token(S_SUFFIX);
   /** Time of last access token. */
-  byte[] ATIME = token("atime");
+  byte[] ATIME = token(S_ATIME);
   /** Time of creation token. */
-  byte[] CTIME = token("ctime");
+  byte[] CTIME = token(S_CTIME);
   /** Number of links token. */
   byte[] NLINK = token("nlink");
   /** User ID token. */
@@ -243,4 +247,6 @@ public interface DataText {
   String DATAATV = "atv";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
+  /** Database - Lock. */
+  String DATALOCK = "lock";
 }

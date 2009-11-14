@@ -250,12 +250,13 @@ public abstract class W3CTS {
       delete(new File[] { new File(results) });
     }
 
-    Main.out("Parsing Queries");
     if(verbose) Main.outln();
     final Nodes nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
       nodes("//*:test-case", root);
+
     int total = nodes.size();
+    Main.out("Parsing " + total + " Queries");
     for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(!verbose && t % 1000 == 0) Main.out(".");
@@ -481,29 +482,32 @@ public abstract class W3CTS {
               ri = "<X>" + ri + "</X>";
             }
 
-            final Data rdata = CreateDB.xml(IO.get(ri), context.prop);
-            final SeqIter si = new SeqIter();
-            for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
-              si.add(new DBNode(rdata, pre));
-              pre += rdata.size(pre, rdata.kind(pre));
+            try {
+              final Data rdata = CreateDB.xml(IO.get(ri), context.prop);
+              final SeqIter si = new SeqIter();
+              for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
+                si.add(new DBNode(rdata, pre));
+                pre += rdata.size(pre, rdata.kind(pre));
+              }
+              
+              final boolean eq = FNSeq.deep(iter, si);
+              if(!eq && debug) {
+                iter.reset();
+                si.reset();
+                final XMLSerializer ser = new XMLSerializer(
+                    new PrintOutput(System.out));
+                Item it;
+                Main.outln(NL + "=== " + testid + " ===");
+                while((it = si.next()) != null) it.serialize(ser);
+                Main.outln(NL + "=== " + NAME + " ===");
+                while((it = iter.next()) != null) it.serialize(ser);
+                Main.outln();
+              }
+              rdata.close();
+              if(eq) break;
+            } catch(final IOException ex) {
+              ex.printStackTrace();
             }
-            
-            final boolean eq = FNSeq.deep(iter, si);
-            if(!eq && debug) {
-              iter.reset();
-              si.reset();
-              final XMLSerializer ser = new XMLSerializer(
-                  new PrintOutput(System.out));
-              Item it;
-              Main.outln(NL + "=== " + testid + " ===");
-              while((it = si.next()) != null) it.serialize(ser);
-              Main.outln(NL + "=== " + NAME + " ===");
-              while((it = iter.next()) != null) it.serialize(ser);
-              Main.outln();
-            }
-
-            rdata.close();
-            if(eq) break;
           }
         }
         if((rs > 0 || !expError.isEmpty()) && s == rs && !inspect) {
@@ -738,9 +742,8 @@ public abstract class W3CTS {
    * @param nm test name
    * @param error XQTS error
    * @return error message
-   * @throws Exception exception
    */
-  private String error(final String nm, final String error) throws Exception {
+  private String error(final String nm, final String error) {
     final String error2 = expected + nm + ".log";
     final IO file = IO.get(error2);
     return file.exists() ? error + "/" + read(file) : error;
@@ -817,10 +820,14 @@ public abstract class W3CTS {
    * Returns the contents of the specified file.
    * @param f file to be read
    * @return content
-   * @throws IOException I/O exception
    */
-  private String read(final IO f) throws IOException {
-    return string(f.content()).replaceAll("\r\n?", "\n");
+  private String read(final IO f) {
+    try {
+      return string(f.content()).replaceAll("\r\n?", "\n");
+    } catch(final IOException ex) {
+      ex.printStackTrace();
+      return "";
+    }
   }
 
   /**

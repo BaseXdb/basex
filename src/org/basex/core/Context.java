@@ -198,15 +198,6 @@ public final class Context {
   }
 
   /**
-   * Checks if the specified database is pinned.
-   * @param db name of database
-   * @return int use-status
-   */
-  public boolean pinned(final String db) {
-    return pool.pinned(db);
-  }
-
-  /**
    * Returns the number of references of the specified database in the pool.
    * @param db name of the database
    * @return number of references

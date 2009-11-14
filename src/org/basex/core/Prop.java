@@ -1,7 +1,7 @@
 package org.basex.core;
 
+import static org.basex.data.DataText.*;
 import java.io.File;
-
 import org.basex.io.IO;
 
 /**
@@ -207,6 +207,24 @@ public final class Prop extends AProp {
    */
   public File dbpath(final String db) {
     return new File(get(DBPATH) + '/' + db);
+  }
+
+  /**
+   * Checks if the specified database exists.
+   * @param db name of the database
+   * @return result of check
+   */
+  public boolean dbexists(final String db) {
+    return dbpath(db).exists();
+  }
+
+  /**
+   * Checks if the specified database is locked.
+   * @param db name of the database
+   * @return result of check
+   */
+  public boolean dblocked(final String db) {
+    return dbfile(db, DATALOCK).exists();
   }
 
   @Override

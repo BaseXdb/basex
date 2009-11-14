@@ -76,6 +76,8 @@ public final class DiskData extends Data {
   public DiskData(final String db, final Prop pr) throws IOException {
     DataInput in = null;
     try {
+      pr.dbfile(db, DATALOCK).createNewFile();
+      
       // read meta data and indexes
       in = new DataInput(pr.dbfile(db, DATAINFO));
       meta = new MetaData(db, in, pr);
@@ -95,7 +97,6 @@ public final class DiskData extends Data {
       if(meta.atvindex) atvindex = new Values(this, false);
       if(meta.ftxindex) ftxindex = meta.ftfz ?
           new FTFuzzy(this) : new FTTrie(this);
-
     } catch(final IOException ex) {
       throw ex;
     } finally {
@@ -178,6 +179,7 @@ public final class DiskData extends Data {
     closeIndex(Type.TXT);
     closeIndex(Type.ATV);
     closeIndex(Type.FTX);
+    meta.prop.dbfile(meta.name, DATALOCK).delete();
   }
 
   @Override

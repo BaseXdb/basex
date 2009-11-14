@@ -35,9 +35,7 @@ public final class FNBaseX extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case EVAL:  return eval(ctx);
       case INDEX: return index(ctx);
-      case RUN:   return run(ctx);
       default:    return super.iter(ctx);
     }
   }
@@ -45,8 +43,10 @@ public final class FNBaseX extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
+      case EVAL:   return eval(ctx);
       case READ:   return read(ctx);
       case RANDOM: return random();
+      case RUN:    return run(ctx);
       case DB:     return db(ctx);
       default:     return super.atomic(ctx);
     }
@@ -64,7 +64,7 @@ public final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter eval(final QueryContext ctx) throws QueryException {
+  private Item eval(final QueryContext ctx) throws QueryException {
     return eval(ctx, checkStr(expr[0], ctx));
   }
 
@@ -74,7 +74,7 @@ public final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter run(final QueryContext ctx) throws QueryException {
+  private Item run(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
     final IO io = IO.get(string(name));
     if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(NODOC, name);
@@ -94,12 +94,12 @@ public final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter eval(final QueryContext ctx, final byte[] qu)
+  private Item eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
-    return qt.iter();
+    return qt.iter().finish();
   }
 
   /**

@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
@@ -57,8 +56,10 @@ public final class Open extends Process {
     Data data = ctx.pin(db);
     if(data == null) {
       // check if document exists
-      if(!ctx.prop.dbpath(db).exists())
-        throw new FileNotFoundException(Main.info(DBNOTFOUND, db));
+      if(!ctx.prop.dbexists(db))
+        throw new IOException(Main.info(DBNOTFOUND, db));
+      if(ctx.prop.dblocked(db))
+        throw new IOException(Main.info(DBLOCKED, db));
 
       data = new DiskData(db, ctx.prop);
       ctx.addToPool(data);

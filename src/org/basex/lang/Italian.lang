@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-launch=Inizializzazione di
 wait=Attendi
 version=Versione %
 
@@ -336,13 +335,12 @@ pc_pos="%" (Linea %)
 
 # Database commands
 db_no=Database '%' non trovato.
+db_locked=Database '%' is currently locked.
 db_closed=Database '%' chiuso.
 db_closeerr=Impossibile chiudere il Database.
 db_optimized=Database ottimizzato in %.
 db_dropped=Database '%' cancellato.
 db_notdropped=Impossibile cancellare il Database.
-db_inuse=Database is currently accessed by other users.
-db_tmp="%.tmp" exists already.
 db_notopened=Impossibile aprire il Database '%'.
 db_opened=Database '%' aperto in %.
 db_exported=Database '%' esportato in %.

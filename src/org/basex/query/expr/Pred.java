@@ -39,7 +39,11 @@ public class Pred extends Preds {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
+    // [CG] check reset of context item
+    final Item tmp = ctx.item;
+    ctx.item = null;
     if(super.comp(ctx) != this) return Seq.EMPTY;
+    ctx.item = tmp;
 
     if(root.e()) {
       ctx.compInfo(OPTPRE, this);
