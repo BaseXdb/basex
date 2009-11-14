@@ -30,7 +30,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.prop.dbpath(name).exists();
+    final boolean exists = ctx.prop.dbexists(name);
     return exists ? new BXCollection(name, exists, ctx) : null;
   }
 
