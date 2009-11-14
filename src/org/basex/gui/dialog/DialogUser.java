@@ -54,6 +54,8 @@ public final class DialogUser extends BaseXBack {
 
   /** List of permission processes. */
   final ArrayList<Process> permps = new ArrayList<Process>();
+  /** List of temp global permissions. */
+  final ArrayList<StringList> tempP = new ArrayList<StringList>();
   /** Change button. */
   final BaseXButton change;
 
@@ -175,8 +177,7 @@ public final class DialogUser extends BaseXBack {
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
-        for(final Process p : permps)
-          if(!sess.execute(p)) msg = sess.info();
+        for(final Process p : permps) if(!sess.execute(p)) msg = sess.info();
         permps.clear();
         setData();
       } else if(BUTTONCREATE.equals(cmd)) {
@@ -237,7 +238,7 @@ public final class DialogUser extends BaseXBack {
    * @throws IOException I/O Exception
    */
   public void setData() throws IOException {
-    final CachedOutput out = new CachedOutput();
+    CachedOutput out = new CachedOutput();
     if(!sess.execute(global ? new Show("Users") : new InfoUsers(), out)) {
       throw new IOException(sess.info());
     }
@@ -249,9 +250,9 @@ public final class DialogUser extends BaseXBack {
       empty.add("");
       empty.add("");
       data.contents.add(empty);
-      final CachedOutput out2 = new CachedOutput();
-      sess.execute(new Show("Users"), out2);
-      Table data2 = new Table(out2.toString());
+      out = new CachedOutput();
+      sess.execute(new Show("Users"), out);
+      Table data2 = new Table(out.toString());
       StringList tmp1 = new StringList();
       for(StringList l : data.contents) {
         tmp1.add(l.get(0));
@@ -263,6 +264,15 @@ public final class DialogUser extends BaseXBack {
       for(String s : tmp2) {
         if(!tmp1.contains(s) && !s.equals(ADMIN)) {
           items.add(s);
+          for(StringList l : data2.contents) {
+            if(l.get(0).equals(s)) {
+              StringList tmp = new StringList();
+              tmp.add(s);
+              tmp.add(l.get(1));
+              tmp.add(l.get(2));
+              tempP.add(tmp);
+            }
+          }
         }
       }
     }
@@ -281,10 +291,9 @@ public final class DialogUser extends BaseXBack {
     }
     userco1.setSelectedIndex(-1);
     userco2.setSelectedIndex(-1);
-    if(global) data.contents.remove(tmp);
+    data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
     if(!global) {
-      // These are the combobox values
       TableColumn col = table.getColumnModel().getColumn(0);
       col.setCellEditor(new MyComboBoxEditor(items.getList()));
     }
@@ -353,8 +362,28 @@ public final class DialogUser extends BaseXBack {
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
       if(row == getRowCount() - 1 && col == 0) {
-        data.contents.get(row).set(value.toString(), col);
-        fireTableCellUpdated(row, col);
+        if(value != null) {
+          data.contents.get(row).set(value.toString(), col);
+          fireTableCellUpdated(row, col);
+          for(StringList l : tempP) {
+            if(l.get(0).equals(value.toString())) {
+              data.contents.get(row).set(l.get(1), col + 1);
+              data.contents.get(row).set(l.get(2), col + 2);
+              fireTableCellUpdated(row, col + 1);
+              fireTableCellUpdated(row, col + 2);
+              String db = dia.gui.context.data().meta.name;
+              String right = CmdPerm.values()[col].toString();
+              permps.add(getValueAt(row, col + 1).equals(true) ? new Grant(
+                  right, value.toString(), db) : new Revoke(right,
+                  value.toString(), db));
+              right = CmdPerm.values()[col + 1].toString();
+              permps.add(getValueAt(row, col + 2).equals(true) ? new Grant(
+                  right, value.toString(), db) : new Revoke(right,
+                  value.toString(), db));
+            }
+          }
+          if(permps.size() != 0) action(BUTTONCHANGE);
+        }
       } else {
         final String uname = data.contents.get(row).get(0);
         final String right = CmdPerm.values()[col - 1].toString();
