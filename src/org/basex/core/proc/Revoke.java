@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import org.basex.core.Commands.Cmd;
 import org.basex.io.PrintOutput;
 

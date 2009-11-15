@@ -10,7 +10,6 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.data.Data;

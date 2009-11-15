@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;

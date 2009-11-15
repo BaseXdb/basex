@@ -27,10 +27,8 @@ public final class JFUSEAdapter { //implements FileModeFlags {
   /** File bit mask. */
   private static final int DFS_S_IFMT = 0170000;
 
-  /** Private utility constructor. */
-  private JFUSEAdapter() {
-    throw new UnsupportedOperationException();
-  }
+  /** Private constructor, preventing instantiation. */
+  private JFUSEAdapter() { }
 
   /**
    * Check (and load) native Java FUSE bindings.

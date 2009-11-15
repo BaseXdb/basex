@@ -52,11 +52,7 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWSTATUS = { "SHOWSTATUS", true };
 
   /** GUI Layout. */
-  public static final Object[] LAYOUTCLOSED =
-    { "LAYOUTCLOSED", GUIConstants.LAYOUTCLOSE };
-  /** GUI Layout. */
-  public static final Object[] LAYOUTOPENED =
-    { "LAYOUTOPENED", GUIConstants.LAYOUTOPEN };
+  public static final Object[] LAYOUT = { "LAYOUT", GUIConstants.LAYOUT };
 
   /** Flag for activated info view. */
   public static final Object[] SHOWINFO = { "SHOWINFO", false };
@@ -74,13 +70,6 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWPLOT = { "SHOWPLOT", false };
   /** Flag for activated xquery view. */
   public static final Object[] SHOWXQUERY = { "SHOWXQUERY", true };
-
-  /** Flag for activated text view after starting. */
-  public static final Object[] SHOWSTARTTEXT = { "SHOWSTARTTEXT", false };
-  /** Flag for activated xquery view after starting. */
-  public static final Object[] SHOWSTARTXQUERY = { "SHOWSTARTXQUERY", false };
-  /** Flag for activated info view after starting. */
-  public static final Object[] SHOWSTARTINFO = { "SHOWSTARTINFO", false };
 
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };

@@ -3,9 +3,7 @@ package org.basex.build.fs.util;
 import java.io.IOException;
 import java.util.Date;
 import java.util.TreeMap;
-
 import javax.xml.datatype.Duration;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.core.Main;
 import org.basex.query.item.Type;

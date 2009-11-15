@@ -1,6 +1,7 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,7 +63,7 @@ public final class XQueryView extends View {
    * @param man view manager
    */
   public XQueryView(final ViewNotifier man) {
-    super(HELPXQUERYY, man);
+    super(XQUERYVIEW, HELPXQUERYY, man);
 
     setLayout(new BorderLayout());
     setBorder(6, 8, 8, 8);
@@ -70,9 +71,9 @@ public final class XQueryView extends View {
 
     header = new BaseXLabel(XQUERYTIT, true, false);
 
-    final BaseXBack back = new BaseXBack(Fill.NONE);
-    back.setLayout(new BorderLayout());
-    back.add(header, BorderLayout.CENTER);
+    final BaseXBack b = new BaseXBack(Fill.NONE);
+    b.setLayout(new BorderLayout());
+    b.add(header, BorderLayout.CENTER);
 
     final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
     final BaseXButton save = BaseXButton.command(GUICommands.XQSAVEAS, gui);
@@ -108,8 +109,8 @@ public final class XQueryView extends View {
     sp.add(save);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(hist);
-    back.add(sp, BorderLayout.EAST);
-    add(back, BorderLayout.NORTH);
+    b.add(sp, BorderLayout.EAST);
+    add(b, BorderLayout.NORTH);
 
     text = new XQueryText(this);
     add(text, BorderLayout.CENTER);
@@ -168,16 +169,13 @@ public final class XQueryView extends View {
   }
 
   @Override
-  protected void refreshContext(final boolean more, final boolean quick) {
-  }
+  protected void refreshContext(final boolean more, final boolean quick) { }
 
   @Override
-  protected void refreshFocus() {
-  }
+  protected void refreshFocus() { }
 
   @Override
-  protected void refreshInit() {
-  }
+  protected void refreshInit() { }
 
   @Override
   protected void refreshLayout() {
@@ -200,8 +198,12 @@ public final class XQueryView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(gui.context.data() != null ?
-        GUIProp.SHOWXQUERY : GUIProp.SHOWSTARTXQUERY);
+    return gui.prop.is(GUIProp.SHOWXQUERY);
+  }
+
+  @Override
+  protected boolean db() {
+    return false;
   }
 
   /**
@@ -212,21 +214,13 @@ public final class XQueryView extends View {
     gui.prop.files(file);
     gui.context.query = file;
     try {
-      setQuery(file.content());
+      if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
+      modified(false, true);
+      text.setText(file.content());
+      if(gui.prop.is(GUIProp.EXECRT)) text.query();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTOPENED);
     }
-  }
-
-  /**
-   * Sets a new XQuery.
-   * @param qu query
-   */
-  public void setQuery(final byte[] qu) {
-    if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
-    modified(false, true);
-    text.setText(qu);
-    text.query();
   }
 
   /**

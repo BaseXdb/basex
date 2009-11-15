@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Transparency;
@@ -109,7 +110,7 @@ public final class TreeView extends View {
    * @param man view manager
    */
   public TreeView(final ViewNotifier man) {
-    super(null, man);
+    super(TREEVIEW, null, man);
     new BaseXPopup(this, GUIConstants.POPUP);
   }
 
@@ -152,6 +153,11 @@ public final class TreeView extends View {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWTREE);
+  }
+
+  @Override
+  protected boolean db() {
+    return true;
   }
 
   @Override

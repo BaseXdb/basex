@@ -62,7 +62,7 @@ public enum GUICommands implements GUICommand {
   /* FILE MENU */
 
   /** Opens a dialog to create a new database. */
-  CREATE(false, GUICREATE + DOTS, "% N", GUICREATETT) {
+  CREATE(GUICREATE + DOTS, "% N", GUICREATETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -75,7 +75,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to open a database. */
-  OPEN(false, GUIOPEN + DOTS, "% O", GUIOPENTT) {
+  OPEN(GUIOPEN + DOTS, "% O", GUIOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, false);
@@ -89,7 +89,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows database info. */
-  INFO(true, GUIINFO + DOTS, "% D", GUIINFOTT) {
+  INFO(GUIINFO + DOTS, "% D", GUIINFOTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);
@@ -129,7 +129,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exports a document. */
-  EXPORT(true, GUIEXPORT + DOTS, null, GUIEXPORTTT) {
+  EXPORT(GUIEXPORT + DOTS, null, GUIEXPORTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final IO file = save(gui, gui.context.data().doc().length == 1);
@@ -138,7 +138,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to drop databases. */
-  DROP(false, GUIDROP + DOTS, null, GUIDROPTT) {
+  DROP(GUIDROP + DOTS, null, GUIDROPTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogOpen(gui, true, false).nodb()) Dialog.info(gui, INFONODB);
@@ -146,7 +146,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Closes the database. */
-  CLOSE(true, GUICLOSE, "% W", GUICLOSETT) {
+  CLOSE(GUICLOSE, "% W", GUICLOSETT, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
@@ -154,7 +154,7 @@ public enum GUICommands implements GUICommand {
   },
   
   /** Server Dialog. */
-  SERVER(false, "Server...", "% serv", "SERVER") {
+  SERVER("Server...", "% serv", "SERVER", false, false) {
     @Override
     public void execute(final GUI gui) {
    // open file chooser for XML creation
@@ -163,7 +163,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens an XQuery file. */
-  XQOPEN(false, GUIXQOPEN + DOTS, "% R", GUIXQOPENTT) {
+  XQOPEN(GUIXQOPEN + DOTS, "% R", GUIXQOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.query.confirm();
@@ -179,7 +179,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Saves the current XQuery. */
-  XQSAVE(false, GUISAVE, "% S", GUISAVETT) {
+  XQSAVE(GUISAVE, "% S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       final IO file = gui.context.query;
@@ -196,13 +196,13 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      button.setEnabled(gui.query.modified());
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.query.modified());
     }
   },
 
   /** Saves the current XQuery. */
-  XQSAVEAS(false, GUISAVEAS + DOTS, "% shift S", GUISAVETT) {
+  XQSAVEAS(GUISAVEAS + DOTS, "% shift S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -220,7 +220,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exits the application. */
-  EXIT(false, GUIEXIT, null, GUIEXITTT) {
+  EXIT(GUIEXIT, null, GUIEXITTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.dispose();
@@ -230,7 +230,7 @@ public enum GUICommands implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copies the current path. */
-  COPYPATH(true, GUICPPATH, "% shift C", GUICPPATHTT) {
+  COPYPATH(GUICPPATH, "% shift C", GUICPPATHTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked().nodes[0];
@@ -241,15 +241,15 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       // disallow copy of empty node set or root node
       final Nodes marked = gui.context.marked();
-      button.setEnabled(marked != null && marked.size() != 0);
+      b.setEnabled(marked != null && marked.size() != 0);
     }
   },
 
   /** Copies the currently marked nodes. */
-  COPY(true, GUICOPY, "", GUICOPYTT) {
+  COPY(GUICOPY, "", GUICOPYTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -258,14 +258,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       // disallow copy of empty node set or root node
-      button.setEnabled(updatable(gui.context.marked()));
+      b.setEnabled(updatable(gui.context.marked()));
     }
   },
 
   /** Pastes the copied nodes. */
-  PASTE(true, GUIPASTE, "", GUIPASTETT) {
+  PASTE(GUIPASTE, "", GUIPASTETT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
@@ -280,16 +280,15 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       final Context ctx = gui.context;
       // disallow copy of empty node set or root node
-      button.setEnabled(updatable(ctx.marked(), Data.DOC) &&
-          ctx.copied() != null);
+      b.setEnabled(updatable(ctx.marked(), Data.DOC) && ctx.copied() != null);
     }
   },
 
   /** Deletes the currently marked nodes. */
-  DELETE(true, GUIDELETE + DOTS, "", GUIDELETETT) {
+  DELETE(GUIDELETE + DOTS, "", GUIDELETETT, true, false) {
     @Override
     public void execute(final GUI gui) {
       if(Dialog.confirm(gui, DELETECONF)) {
@@ -307,14 +306,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      button.setEnabled(updatable(gui.context.marked()));
+      b.setEnabled(updatable(gui.context.marked()));
     }
   },
 
   /** Inserts new nodes. */
-  INSERT(true, GUIINSERT + DOTS, "", GUIINSERTTT) {
+  INSERT(GUIINSERT + DOTS, "", GUIINSERTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked();
@@ -343,14 +342,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      button.setEnabled(updatable(gui.context.marked(),
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(updatable(gui.context.marked(),
           Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
     }
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  EDIT(true, GUIEDIT + DOTS, "", GUIEDITTT) {
+  EDIT(GUIEDIT + DOTS, "", GUIEDITTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked();
@@ -374,13 +373,13 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      button.setEnabled(updatable(gui.context.marked(), Data.DOC));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(updatable(gui.context.marked(), Data.DOC));
     }
   },
 
   /** Filters the currently marked nodes. */
-  FILTER(true, GUIFILTER, "% ENTER", GUIFILTERTT) {
+  FILTER(GUIFILTER, "% ENTER", GUIFILTERTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -395,56 +394,46 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       final Nodes marked = gui.context.marked();
-      button.setEnabled(marked != null && marked.size() != 0);
+      b.setEnabled(marked != null && marked.size() != 0);
     }
   },
 
   /** Shows the XQuery view. */
-  SHOWXQUERY(false, GUISHOWXQUERY, "% E", GUISHOWXQUERYTT) {
+  SHOWXQUERY(GUISHOWXQUERY, "% E", GUISHOWXQUERYTT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTXQUERY :
-        GUIProp.SHOWXQUERY);
+      gui.prop.invert(GUIProp.SHOWXQUERY);
       gui.layoutViews();
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(gui.context.data() != null ?
-          GUIProp.SHOWXQUERY : GUIProp.SHOWSTARTXQUERY));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWXQUERY));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows info. */
-  SHOWINFO(false, GUISHOWINFO, "% I", GUISHOWINFOTT) {
+  SHOWINFO(GUISHOWINFO, "% I", GUISHOWINFOTT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTINFO :
-        GUIProp.SHOWINFO);
+      gui.prop.invert(GUIProp.SHOWINFO);
       gui.layoutViews();
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(gui.context.data() != null ?
-          GUIProp.SHOWINFO : GUIProp.SHOWSTARTINFO));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWINFO));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /* VIEW MENU */
 
   /** Shows the menu. */
-  SHOWMENU(false, GUISHOWMENU, null, GUISHOWMENUTT) {
+  SHOWMENU(GUISHOWMENU, null, GUISHOWMENUTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWMENU);
@@ -453,17 +442,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWMENU));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWMENU));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the buttons. */
-  SHOWBUTTONS(false, GUISHOWBUTTONS, null, GUISHOWBUTTONSTT) {
+  SHOWBUTTONS(GUISHOWBUTTONS, null, GUISHOWBUTTONSTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWBUTTONS);
@@ -472,17 +458,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWBUTTONS));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWBUTTONS));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Show Input Field. */
-  SHOWINPUT(false, GUISHOWINPUT, null, GUISHOWINPUTTT) {
+  SHOWINPUT(GUISHOWINPUT, null, GUISHOWINPUTTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.nav, gui.prop.invert(GUIProp.SHOWINPUT),
@@ -490,17 +473,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWINPUT));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWINPUT));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the status bar. */
-  SHOWSTATUS(false, GUISHOWSTATUS, null, GUISHOWSTATUSTT) {
+  SHOWSTATUS(GUISHOWSTATUS, null, GUISHOWSTATUSTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.status, gui.prop.invert(GUIProp.SHOWSTATUS),
@@ -508,37 +488,29 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWSTATUS));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWSTATUS));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the text view. */
-  SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
+  SHOWTEXT(GUISHOWTEXT, "% 1", GUISHOWTEXTTT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(gui.context.data() == null ? GUIProp.SHOWSTARTTEXT :
-        GUIProp.SHOWTEXT);
+      gui.prop.invert(GUIProp.SHOWTEXT);
       gui.layoutViews();
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(gui.context.data() != null ?
-          GUIProp.SHOWTEXT : GUIProp.SHOWSTARTTEXT));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWTEXT));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the map. */
-  SHOWMAP(true, GUISHOWMAP, "% 2", GUISHOWMAPTT) {
+  SHOWMAP(GUISHOWMAP, "% 2", GUISHOWMAPTT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWMAP);
@@ -546,17 +518,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWMAP));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWMAP));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the tree view. */
-  SHOWFOLDER(true, GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT) {
+  SHOWFOLDER(GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWFOLDER);
@@ -564,17 +533,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWFOLDER));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWFOLDER));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the table view. */
-  SHOWTABLE(true, GUISHOWTABLE, "% 4", GUISHOWTABLETT) {
+  SHOWTABLE(GUISHOWTABLE, "% 4", GUISHOWTABLETT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWTABLE);
@@ -582,17 +548,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWTABLE));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWTABLE));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the plot view. */
-  SHOWPLOT(true, GUISHOWPLOT, "% 5", GUISHOWPLOTTT) {
+  SHOWPLOT(GUISHOWPLOT, "% 5", GUISHOWPLOTTT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWPLOT);
@@ -600,17 +563,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWPLOT));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWPLOT));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the explorer view. */
-  SHOWEXPLORER(true, GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT) {
+  SHOWEXPLORER(GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWEXPLORE);
@@ -618,36 +578,30 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWEXPLORE));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWEXPLORE));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Fullscreen mode. */
-  FULL(false, GUIFULL, "F11", GUIFULLTT) {
+  FULL(GUIFULL, "F11", GUIFULLTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.fullscreen();
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.fullscreen);
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.fullscreen);
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /* OPTION MENU */
 
   /** Realtime execution on/off. */
-  RTEXEC(false, GUIRTEXEC, null, GUIRTEXECTT) {
+  RTEXEC(GUIRTEXEC, null, GUIRTEXECTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.EXECRT);
@@ -656,17 +610,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.EXECRT));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.EXECRT));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Realtime filtering on/off. */
-  RTFILTER(true, GUIRTFILTER, null, GUIRTFILTERTT) {
+  RTFILTER(GUIRTFILTER, null, GUIRTFILTERTT, true, true) {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.prop.invert(GUIProp.FILTERRT);
@@ -692,17 +643,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.FILTERRT));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.FILTERRT));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Color schema. */
-  COLOR(false, GUICOLOR + DOTS, null, GUICOLORTT) {
+  COLOR(GUICOLOR + DOTS, null, GUICOLORTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogColors(gui);
@@ -710,7 +658,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Changes the fonts. */
-  FONTS(false, GUIFONTS, null, GUIFONTSTT) {
+  FONTS(GUIFONTS, null, GUIFONTSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogFontChooser(gui);
@@ -718,7 +666,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
+  MAPLAYOUT(GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);
@@ -726,7 +674,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  PREFS(false, GUIPREFS + DOTS, "% P", GUIPREFSTT) {
+  PREFS(GUIPREFS + DOTS, "% P", GUIPREFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);
@@ -736,7 +684,7 @@ public enum GUICommands implements GUICommand {
   /* DEEPFS MENU */
 
   /** Opens a dialog to import given directory as DeepFS instance. */
-  CREATEFS(false, GUICREATEFS + DOTS, null, GUICREATEFSTT) {
+  CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogCreateFS(gui).ok()) return;
@@ -749,7 +697,7 @@ public enum GUICommands implements GUICommand {
   },
   
   /** Opens a dialog to use DeepFS instance as Desktop Query Engine. */
-  DQE(false, GUIDQE + DOTS, null, GUIDQETT) {
+  DQE(GUIDQE + DOTS, null, GUIDQETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, true);
@@ -763,7 +711,7 @@ public enum GUICommands implements GUICommand {
   },
   
   /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace. */
-  MOUNTFS(false, GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT) {
+  MOUNTFS(GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogMountFS dialog = new DialogMountFS(gui);
@@ -776,16 +724,16 @@ public enum GUICommands implements GUICommand {
     }
     
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       // disable mount button, if native library is not available.
-      button.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
+      b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
   },
  
   /* HELP MENU */
 
   /** Shows the help window. */
-  SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
+  SHOWHELP(GUISHOWHELP, "F1", GUISHOWHELPTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       if(!gui.prop.is(GUIProp.SHOWHELP)) {
@@ -798,17 +746,14 @@ public enum GUICommands implements GUICommand {
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      super.refresh(gui, button);
-      select(button, gui.prop.is(GUIProp.SHOWHELP));
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWHELP));
     }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Shows the "about" information. */
-  ABOUT(false, GUIABOUT + DOTS, null, GUIABOUTTT) {
+  ABOUT(GUIABOUT + DOTS, null, GUIABOUTTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogAbout(gui);
@@ -818,52 +763,54 @@ public enum GUICommands implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  GOBACK(true, GUIGOBACK, "alt LEFT", GUIGOBACKTT) {
+  GOBACK(GUIGOBACK, "alt LEFT", GUIGOBACK, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(true);
       final boolean en = tt != null;
-      button.setEnabled(en);
-      button.setToolTipText(en && tt.isEmpty() ? GUIGOBACKTT : tt);
+      b.setEnabled(en);
+      b.setToolTipText(en && tt.isEmpty() ? GUIGOBACK : tt);
     }
   },
 
   /** Goes one step forward. */
-  GOFORWARD(true, GUIGOFORWARD, "alt RIGHT", GUIGOFORWARDTT) {
+  GOFORWARD(GUIGOFORWARD, "alt RIGHT", GUIGOFORWARD, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(false);
       final boolean en = tt != null;
-      button.setEnabled(en);
-      button.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARDTT : tt);
+      b.setEnabled(en);
+      b.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARD : tt);
     }
   },
 
   /** Goes one level up. */
-  GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
+  GOUP(GUIGOUP, "alt UP", GUIGOUPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Cs(".."));
     }
 
     @Override
-    public void refresh(final GUI gui, final AbstractButton button) {
-      button.setEnabled(!gui.context.root());
+    public void refresh(final GUI gui, final AbstractButton b) {
+      final boolean en = !gui.context.root();
+      b.setEnabled(en);
+      b.setToolTipText(en ? GUIGOUP : null);
     }
   },
 
   /** Goes to the root node. */
-  ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
+  ROOT(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Cs("/"));
@@ -871,7 +818,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Displays the root node in the text view. */
-  HOME(true, GUIROOT, null, GUIROOTTT) {
+  HOME(GUIROOT, null, GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new XQuery("/"));
@@ -886,29 +833,34 @@ public enum GUICommands implements GUICommand {
   private final String key;
   /** Help string. */
   private final String help;
+  /** Flag for commands that can be (un)checked. */
+  private final boolean checked;
 
   /**
    * Constructor.
-   * @param d data reference flag
    * @param e text of the menu item
    * @param k key shortcut
    * @param h help string
+   * @param d data reference flag
+   * @param c checked flag
    */
-  GUICommands(final boolean d, final String e, final String k, final String h) {
-    data = d;
+  GUICommands(final String e, final String k, final String h, final boolean d,
+      final boolean c) {
     entry = e;
     key = k;
     help = h;
+    data = d;
+    checked = c;
   }
 
   public abstract void execute(final GUI gui);
 
-  public void refresh(final GUI gui, final AbstractButton button) {
+  public void refresh(final GUI gui, final AbstractButton b) {
     final boolean e = !data || gui.context.data() != null;
-    if(button.isEnabled() != e) button.setEnabled(e);
+    if(b.isEnabled() != e) b.setEnabled(e);
   }
 
-  public boolean checked() { return false; }
+  public final boolean checked() { return checked; }
 
   public String help() { return help; }
 

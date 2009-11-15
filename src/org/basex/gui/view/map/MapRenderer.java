@@ -5,9 +5,9 @@ import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
-
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
@@ -21,7 +21,7 @@ import org.basex.util.Tokenizer;
  */
 final class MapRenderer {
   /** Color for each tooltip token.  */
-  private static IntList ttcol;
+  private static BoolList ttcol;
   /** Index of tooltip token to underline. */
   private static int ul;
 
@@ -79,7 +79,6 @@ final class MapRenderer {
 
     // get index on first pre value
     int count = 0;
-    int pp = 0;
     int ll = 0;
     int ls = 0;
     while(ftt.more()) {
@@ -125,8 +124,7 @@ final class MapRenderer {
       }
 
       if(draw) {
-        g.setColor(r.pos != null && pp < r.pos.size() &&
-            count == r.pos.pos[pp] ? getFTColor(r.pos.poi[pp++]) : textc);
+        g.setColor(r.pos != null && r.pos.contains(count) ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
         count++;
       }
@@ -182,10 +180,10 @@ final class MapRenderer {
 
       switch(r.thumbal) {
         case 0:
-          h = drawThumbnailsToken(g, r, data, 0, 0, fs, false);
+          h = drawToken(g, r, data, false);
           break;
         case 1: case 2:
-          h = drawThumbnailsSentence(g, r, data, r.thumbal == 1, false);
+          h = drawSentence(g, r, data, false);
           break;
       }
 
@@ -198,10 +196,10 @@ final class MapRenderer {
           r.thumbsw = r.thumbf;
           switch(r.thumbal) {
             case 0:
-              drawThumbnailsToken(g, r, data, 0, 0, fs, true);
+              drawToken(g, r, data, true);
               return;
             case 1: case 2:
-              drawThumbnailsSentence(g, r, data, r.thumbal == 1, true);
+              drawSentence(g, r, data, true);
               return;
           }
         }
@@ -242,9 +240,9 @@ final class MapRenderer {
     r.thumblh = lhmi;
     r.thumbsw = Math.max(1, fnew);
 
-    h = drawThumbnailsSentence(g, r, data, false, false);
+    h = drawSentence(g, r, data, false);
     if(h <= r.h) {
-      drawThumbnailsSentence(g, r, data, false, true);
+      drawSentence(g, r, data, true);
     } else {
       r.thumbf = 0; // used to suppress tooltip
     }
@@ -280,14 +278,13 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param data full-text to be drawn
-   * @param sen flag for sentence or paragraph
    * @param draw boolean for drawing (used for calculating the height)
    * @return height
    */
-  private static int drawThumbnailsSentence(final Graphics g,
-      final MapRect r, final int[][] data, final boolean sen,
-      final boolean draw) {
+  private static int drawSentence(final Graphics g,
+      final MapRect r, final int[][] data, final boolean draw) {
 
+    final boolean sen = r.thumbal == 1;
     final FTPos ftp = r.pos;
     final int xx = r.x;
     final int ww = r.w;
@@ -325,7 +322,7 @@ final class MapRenderer {
         }
         wl += lastl;
 
-        if(ftp != null && pp < ftp.size() && count == ftp.pos[pp]) {
+        if(ftp != null && ftp.contains(count)) {
           ct++;
           pp++;
         }
@@ -347,8 +344,8 @@ final class MapRenderer {
         int cttmp = 0;
         int wltmp = wl / ct;
         while(cttmp < ct) {
-          if(pp - ct + cttmp < ftp.size()) g.setColor(getFTColor(ftp.poi[pp
-              - ct + cttmp]));
+          if(pp - ct + cttmp < ftp.pos.length) g.setColor(COLORFT);
+
           while(ll + wltmp >= ww) {
             if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
             wltmp -= ww - ll;
@@ -390,7 +387,6 @@ final class MapRenderer {
         }
       }
     }
-
     return yy - r.y + r.thumbfh;
   }
 
@@ -399,15 +395,11 @@ final class MapRenderer {
    * @param g graphics reference
    * @param r rectangle
    * @param data full-text to be drawn
-   * @param x x-value of the cursor
-   * @param y y-value of the cursor
-   * @param fs font size
    * @param draw boolean for drawing (used for calculating the height)
    * @return heights
    */
-  private static int drawThumbnailsToken(final Graphics g, final MapRect r,
-      final int[][] data, final int x, final int y, final int fs,
-      final boolean draw) {
+  private static int drawToken(final Graphics g, final MapRect r,
+      final int[][] data, final boolean draw) {
 
     final double xx = r.x;
     final double ww = r.w;
@@ -422,13 +414,9 @@ final class MapRenderer {
 
     final Color textc = COLORS[r.level + 4];
     int count = 0;
-    int pp = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     int cchars = 0;
-    final IntList tcol = new IntList();
-    final TokenList tl = new TokenList();
-    int ml = 0;
     for(int i = 0; i < data[0].length; i++) {
       wl = (int) (data[0][i] * r.thumbf);
       e += data[0][i] * r.thumbf - wl;
@@ -445,48 +433,13 @@ final class MapRenderer {
           && sl == data[1][psl] ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
-        ml = 0;
         if(wl >= ww) return r.h + 3;
       }
 
       if(draw) {
         // draw word
-        if(ftp != null && pp < ftp.size() && count == ftp.pos[pp]) {
-          g.setColor(getFTColor(ftp.poi[pp]));
-          pp++;
-        } else
-          g.setColor(textc);
+        g.setColor(ftp != null && ftp.contains(count) ? COLORFT : textc);
         g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
-      }
-
-      // check if cursor is inside the rect
-      if(x > 0 && y > 0
-          && (inRect((int) (xx + ll) + 1, yy, wl, r.thumbfh, x, y) || ml > 0)) {
-        ul = -1;
-        ml = ml == 0 ? getTooltipLength((int) ww, fs) : ml;
-        final byte[] tok = new byte[data[0][i] + 2 < ml ? data[0][i] : ml];
-        int k = 0;
-        for(; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
-          tok[k] = (byte) data[3][cchars - data[0][i] + k];
-
-        if(ftp != null) {
-          while(pp < ftp.size() && count > ftp.pos[pp]) pp++;
-          if(pp < ftp.size() && count == ftp.pos[pp]) {
-            tcol.add(ftp.poi[pp]);
-            pp++;
-          } else {
-            tcol.add(-1);
-          }
-        } else tcol.add(-1);
-
-        if(k < tok.length) {
-          tok[k] = '.';
-          tok[k + 1] = '.';
-          tl.add(tok);
-          return yy - r.y - 3;
-        }
-        tl.add(tok);
-        ml -= tok.length + 1;
       }
 
       ll += wl;
@@ -502,7 +455,6 @@ final class MapRenderer {
         ll += r.thumbsw;
         psl++;
         sl = 0;
-        ml = 0;
       }
 
       ll += r.thumbf;
@@ -517,16 +469,6 @@ final class MapRenderer {
       }
     }
     return yy - r.y + 3;
-  }
-
-  /**
-   * Calculates a tooltip length.
-   * @param ww int width
-   * @param fs font size
-   * @return tooltip length
-   */
-  private static int getTooltipLength(final int ww, final int fs) {
-    return ww / fs + 2;
   }
 
   /**
@@ -548,39 +490,37 @@ final class MapRenderer {
    * Calculates a text using thumbnail visualization.
    * @param r rectangle
    * @param data full-text to be drawn
-   * @param sen flag for sentence or paragraph
    * @param x mouseX
    * @param y mouseY
    * @param w width of map view
    * @param g Graphics
-   * @param ds boolean flag for drawing space between tokens
    * @return token list
    */
-  static TokenList calculateThumbnailsToolTip(final MapRect r,
-      final int[][] data, final boolean sen, final int x, final int y,
-      final int w, final Graphics g, final boolean ds) {
+  static TokenList calculateToolTip(final MapRect r, final int[][] data,
+      final int x, final int y, final int w, final Graphics g) {
 
     // rectangle is empty - don't need a tooltip
     if(r.thumbf == 0) return null;
+
+    final boolean sen = r.thumbal < 2;
+    final boolean ds = r.thumbal < 1;
 
     final FTPos ftp = r.pos;
     final int ww = r.w;
     int yy = r.y + 3;
 
-    int wl = 0; // word length
     double ll = 0; // line length
     double error = 0;
     ul = -1;
-    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0, pp = 0;
+    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
     final TokenList tl = new TokenList();
-    ttcol = new IntList();
-    boolean ir;
+    ttcol = new BoolList();
     for(int i = 0; i < data[0].length; i++) {
-      ir = false;
-      wl = (int) (data[0][i] * r.thumbf);
+      boolean ir = false;
+      double wl = data[0][i] * r.thumbf;
       error += data[0][i] * r.thumbf - wl;
       if(error >= 1) {
-        wl += (int) error;
+        wl += error;
         error -= (int) error;
       }
 
@@ -616,8 +556,6 @@ final class MapRenderer {
         final int sp = BaseXLayout.width(g, cw, ' ');
         final int sd = BaseXLayout.width(g, cw, '.');
         // go some tokens backwards form current token
-        while(ftp != null && pp < ftp.size() && i > ftp.pos[pp]) pp++;
-        final int pps = pp;
         final int bpsl = data[1][psl] == sl ? psl + 1 : psl;
         final int bsl = data[1][psl] == sl ? 0 : sl;
         ll = sd * 2 + sp;
@@ -636,7 +574,7 @@ final class MapRenderer {
 
           if(apm) {
             tok[tok.length - 1] = (byte) data[4][psl];
-            sl += 1;
+            sl++;
           }
           sl -= tok.length;
 
@@ -654,38 +592,30 @@ final class MapRenderer {
 
           tl.add(tok);
           // find token color
-          if(ftp != null) {
-            while(pp < ftp.size() && pp > -1 && i < ftp.pos[pp]) pp--;
-            if(pp < ftp.size() && pp > -1 && i == ftp.pos[pp]) {
-              ttcol.add(ftp.poi[pp]);
-              pp++;
-            } else ttcol.add(-1);
-          } else ttcol.add(-1);
-
+          ttcol.add(ftp != null && ftp.contains(i));
           if(i == 0) break;
           p -= data[0][i - 1];
           i--;
         }
         if(i > 0) {
           tl.add(new byte[] { '.', '.' });
-          ttcol.add(-1);
+          ttcol.add(false);
         }
 
         i = si + 1;
         p = cc;
         // invert tokens
+        ul = tl.size() - 1;
         final byte[][] toks = tl.finish();
-        final int[] tc = ttcol.finish();
+        final boolean[] tc = ttcol.finish();
         tl.reset();
-        ttcol = new IntList();
-        for(int j = toks.length - 1; j > -1; j--) {
+        ttcol.reset();
+        for(int j = toks.length - 1; j >= 0; j--) {
           tl.add(toks[j]);
           ttcol.add(tc[j]);
         }
-        ul = tl.size() - 1;
         ll = 0;
 
-        pp = pps;
         sl = bsl;
         psl = bpsl;
         // process tokens after current token
@@ -703,9 +633,7 @@ final class MapRenderer {
             tok[k] = (byte) data[3][p + k];
           }
 
-          if(apm) {
-            tok[tok.length - 1] = (byte) data[4][psl - 1];
-          }
+          if(apm) tok[tok.length - 1] = (byte) data[4][psl - 1];
           sl += apm ? sl : tok.length;
 
           for(int n = 0; n < tok.length; n += cl(tok[n]))
@@ -715,20 +643,13 @@ final class MapRenderer {
 
           tl.add(tok);
 
-          pp = 0;
-          if(ftp != null) {
-            while(pp < ftp.size() && i > ftp.pos[pp]) pp++;
-            if(pp < ftp.size() && i == ftp.pos[pp]) {
-              ttcol.add(ftp.poi[pp]);
-              pp++;
-            } else ttcol.add(-1);
-          } else ttcol.add(-1);
+          ttcol.add(ftp != null && ftp.contains(i));
           p += tok.length - (apm ? 1 : 0);
           i++;
         }
         if(i < data[0].length) {
           tl.add(new byte[] { '.', '.' });
-          ttcol.add(-1);
+          ttcol.add(false);
         }
         return tl;
       }
@@ -771,65 +692,56 @@ final class MapRenderer {
   static void drawToolTip(final Graphics g, final int x, final int y,
       final MapRect mr, final TokenList tl, final int fs) {
 
-    if(tl != null && tl.size() > 0) {
-      final int[] cw = fontWidths(g.getFont());
-      final int sw = BaseXLayout.width(g, cw, ' ');
-      int wl = 0;
-      int l;
-      int nl = 1;
-      int wi = mr.w / 2;
-      final IntList len = new IntList();
-      for(int i = 0; i < tl.size(); i++) {
-        l = 0;
-        final byte[] tok = tl.get(i);
-        final int ns = tok.length;
-        for(int n = 0; n < ns; n += cl(tok[n])) {
-          l += BaseXLayout.width(g, cw, cp(tok, n));
-        }
-        if(wl + l + sw < wi) wl += l + sw;
-        else {
-          nl++;
-          if(l > wi) wi = l;
-          wl = l + sw;
-        }
-        len.add(l);
+    if(tl == null || tl.size() == 0) return;
+    final int[] cw = fontWidths(g.getFont());
+    final int sw = BaseXLayout.width(g, cw, ' ');
+    int wl = 0;
+    int nl = 1;
+    int wi = mr.w / 2;
+    final IntList len = new IntList();
+    for(int i = 0; i < tl.size(); i++) {
+      int l = 0;
+      final byte[] tok = tl.get(i);
+      final int ns = tok.length;
+      for(int n = 0; n < ns; n += cl(tok[n])) {
+        l += BaseXLayout.width(g, cw, cp(tok, n));
       }
-
-      final int ww = nl == 1 && wl < wi ? wl : wi;
-      final int xx = x + 10 + ww >= mr.x + mr.w ? mr.x + mr.w - ww - 2 : x + 10;
-      int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
-        y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
-
-      g.setColor(COLORS[10]);
-      g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
-      g.setColor(COLORS[0]);
-      g.fillRect(xx - 2, yy - fs, ww + 2, fs * nl + 6);
-
-      g.setColor(COLORS[20]);
-      wl = 0;
-      final int is = tl.size();
-      for(int i = 0; i < is; i++) {
-        l = len.get(i);
-        if(wl + l + sw >= wi) {
-          yy += fs + 1;
-          wl = 0;
-        }
-        final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);
-        if(ttcol.get(i) > -1) {
-          g.setColor(getFTColor(ttcol.get(i)));
-          g.drawString(string(tl.get(i)), xx + wl, yy);
-          if(ul > -1 && i == ul)
-            g.drawLine(xx + wl, yy + 1, xx + wl + l, yy + 1);
-          g.setColor(COLORS[24]);
-          wl += l;
-        } else {
-          g.drawString(string(tl.get(i)), xx + wl, yy);
-          if(ul > -1 && i == ul)
-            g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
-          wl += l;
-        }
-        wl += sw;
+      if(wl + l + sw < wi) {
+        wl += l + sw;
+      } else {
+        nl++;
+        if(l > wi) wi = l;
+        wl = l + sw;
       }
+      len.add(l);
+    }
+
+    final int ww = nl == 1 && wl < wi ? wl : wi;
+    final int xx = x + 10 + ww >= mr.x + mr.w ? mr.x + mr.w - ww - 2 : x + 10;
+    int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
+      y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
+
+    g.setColor(COLORS[10]);
+    g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
+    g.setColor(COLORS[0]);
+    g.fillRect(xx - 2, yy - fs, ww + 2, fs * nl + 6);
+    g.setColor(COLORS[20]);
+    wl = 0;
+    final int is = tl.size();
+    for(int i = 0; i < is; i++) {
+      int l = len.get(i);
+      if(wl + l + sw >= wi) {
+        yy += fs + 1;
+        wl = 0;
+      }
+      final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);
+      if(ttcol.get(i)) g.setColor(COLORFT);
+      g.drawString(string(tl.get(i)), xx + wl, yy);
+      if(i == ul) {
+        g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
+      }
+      g.setColor(COLORS[24]);
+      wl += l + sw;
     }
   }
 }

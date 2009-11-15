@@ -874,7 +874,7 @@ public final class Token {
   }
 
   /**
-   * Returns true if the specified character is full-text letter or digit.
+   * Returns true if the specified character is a full-text letter or digit.
    * @param ch character to be tested
    * @return result of check
    */

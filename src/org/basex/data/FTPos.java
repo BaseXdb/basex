@@ -11,10 +11,10 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class FTPos {
+  /** Sorted flag. */
+  boolean sorted = true;
   /** Positions. */
   public int[] pos;
-  /** Pointers. */
-  public byte[] poi;
   /** Pre value. */
   int pre;
 
@@ -22,52 +22,59 @@ public final class FTPos {
    * Constructor.
    * @param p pre value
    * @param ps positions
-   * @param pi pointers
    */
-  FTPos(final int p, final int[] ps, final byte[] pi) {
+  FTPos(final int p, final int[] ps) {
     pre = p;
     pos = ps;
-    poi = pi;
-  }
-
-  /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  public int size() {
-    return pos.length;
+    int x = -1;
+    for(final int i : ps) {
+      sorted &= i >= x;
+      x = i;
+      if(!sorted) break;
+    }
   }
 
   /**
    * Merges the specified position arrays.
    * @param ps positions
-   * @param pi pointers
    */
-  void union(final int[] ps, final byte[] pi) {
+  void union(final int[] ps) {
     // skip existing values
     if(Arrays.equals(pos, ps)) return;
 
     // merge entries with the same pre value
-    final int prs = ps.length;
-    final int pss = pos.length;
-    final int[] ts = new int[prs + pss];
-    final byte[] ti = new byte[ts.length];
-    for(int i = 0, i0 = 0, i1 = 0; i < ts.length; i++) {
-      final boolean s = i0 == prs || i1 < pss && pos[i1] < ps[i0];
-      ts[i] = s ? pos[i1] : ps[i0];
-      ti[i] = s ? poi[i1++] : pi[i0++];
+    final int psl = ps.length;
+    final int pol = pos.length;
+    final int[] ts = new int[psl + pol];
+    for(int i = 0, si = 0, oi = 0; i < ts.length; i++) {
+      final boolean s = si == psl || oi < pol && pos[oi] < ps[si];
+      ts[i] = s ? pos[oi++] : ps[si++];
     }
     pos = ts;
-    poi = ti;
+    int x = -1;
+    for(final int i : pos) {
+      sorted &= i >= x;
+      x = i;
+      if(!sorted) break;
+    }
+  }
+
+  /**
+   * Checks if the specified position is found.
+   * @param p position to be found
+   * @return result of check
+   */
+  public boolean contains(final int p) {
+    if(sorted) return Arrays.binarySearch(pos, p) >= 0;
+    for(final int i : pos) if(i == p) return true;
+    return false;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Main.name(this));
     sb.append("[" + pre + ": ");
-    for(int i = 0; i < pos.length; i++) {
-      sb.append((i != 0 ? "," : "") + pos[i] + "/" + poi[i]);
-    }
+    for(int i = 0; i < pos.length; i++) sb.append((i != 0 ? "," : "") + pos[i]);
     return sb.append("]").toString();
   }
 }

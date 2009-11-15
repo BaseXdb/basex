@@ -109,7 +109,7 @@ public final class PlotView extends View implements Runnable {
    * @param man view manager
    */
   public PlotView(final ViewNotifier man) {
-    super(HELPPLOT, man);
+    super(PLOTVIEW, HELPPLOT, man);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
 
@@ -803,8 +803,6 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-    if(!gui.prop.is(GUIProp.SHOWPLOT)) return;
-
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
         nextContext : gui.context.current(), !more || !rightClick);
@@ -832,7 +830,7 @@ public final class PlotView extends View implements Runnable {
 
     final Data data = gui.context.data();
     if(data != null) {
-      if(!gui.prop.is(GUIProp.SHOWPLOT)) return;
+      if(!visible()) return;
 
       plotData = new PlotData(gui.context);
 
@@ -881,6 +879,11 @@ public final class PlotView extends View implements Runnable {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWPLOT);
+  }
+
+  @Override
+  protected boolean db() {
+    return true;
   }
 
   /**

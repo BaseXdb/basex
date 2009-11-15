@@ -1,0 +1,35 @@
+package org.basex.core.proc;
+
+import org.basex.build.Parser;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
+import org.basex.io.IO;
+import org.basex.io.PrintOutput;
+
+/**
+ * Evaluates the 'create db' command and creates a new database.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Christian Gruen
+ */
+public final class CreateColl extends ACreate {
+  /**
+   * Default constructor.
+   * @param name name of database
+   * (special characters are stripped before the name is applied)
+   */
+  public CreateColl(final String name) {
+    super(STANDARD, name);
+  }
+
+  @Override
+  protected boolean exec(final PrintOutput out) {
+    final IO io = IO.get(args[0]);
+    return build(Parser.emptyParser(io, prop), args[0]);
+  }
+
+  @Override
+  public String toString() {
+    return Cmd.CREATE + " " + CmdCreate.DB + args();
+  }
+}

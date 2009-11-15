@@ -3,7 +3,6 @@ package org.deepfs;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.ElementType;
@@ -13,7 +12,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoTable;

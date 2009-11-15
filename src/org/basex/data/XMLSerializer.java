@@ -123,15 +123,13 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void text(final byte[] b, final FTPos ftp) throws IOException {
     finishElement();
-    int c = -1, pp = 0, wl = 0;
+    
+    int c = -1, wl = 0;
     final Tokenizer ftt = new Tokenizer(b, null);
     while(ftt.more()) {
       c++;
       for(int i = wl; i < ftt.p;) {
-        if(ftChar(cp(b, i)) && pp < ftp.pos.length && c == ftp.pos[pp]) {
-          // write color indicator in front of the token
-          out.write(0x10 + (ftp.poi[pp++] & 0x0F));
-        }
+        if(ftChar(cp(b, i)) && ftp.contains(c)) out.write(0x10);
         int cl = cl(b[i]);
         while(cl-- != 0) ch(b[i++]);
       }

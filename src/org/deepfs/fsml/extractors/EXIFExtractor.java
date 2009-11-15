@@ -8,7 +8,6 @@ import org.basex.build.fs.FSText;
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.deepfs.fsml.extractors.EXIFIndex.EXIFInfo;
-
 import static org.basex.build.fs.FSText.*;
 
 /**

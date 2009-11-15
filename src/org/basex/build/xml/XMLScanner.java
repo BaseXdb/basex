@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Main;

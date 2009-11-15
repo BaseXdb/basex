@@ -1,6 +1,7 @@
 package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -49,7 +50,7 @@ public final class TableView extends View implements Runnable {
    * @param man view manager
    */
   public TableView(final ViewNotifier man) {
-    super(HELPTABLE, man);
+    super(TABLEVIEW, HELPTABLE, man);
     tdata = new TableData(gui.context, gui.prop);
     setLayout(new BorderLayout());
     header = new TableHeader(this);
@@ -73,7 +74,7 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!visible() || tdata.cols.length == 0) return;
+    if(tdata.cols.length == 0) return;
 
     tdata.context(false);
     scroll.pos(0);
@@ -125,6 +126,11 @@ public final class TableView extends View implements Runnable {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWTABLE);
+  }
+
+  @Override
+  protected boolean db() {
+    return true;
   }
 
   @Override

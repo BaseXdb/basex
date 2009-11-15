@@ -1,7 +1,7 @@
 package org.basex.gui.view.text;
 
 import static org.basex.core.Text.*;
-
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +30,7 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
+import org.basex.util.Token;
 
 /**
  * This class offers a fast text view, using the {@link BaseXText} class.
@@ -58,7 +59,7 @@ public final class TextView extends View implements ActionListener {
    * @param man view manager
    */
   public TextView(final ViewNotifier man) {
-    super(HELPTEXT, man);
+    super(TEXTVIEW, HELPTEXT, man);
 
     setLayout(new BorderLayout(0, 4));
     setBorder(6, 8, 8, 8);
@@ -66,9 +67,9 @@ public final class TextView extends View implements ActionListener {
 
     header = new BaseXLabel(TEXTTIT, true, false);
 
-    final BaseXBack back = new BaseXBack(Fill.NONE);
-    back.setLayout(new BorderLayout());
-    back.add(header, BorderLayout.CENTER);
+    final BaseXBack b = new BaseXBack(Fill.NONE);
+    b.setLayout(new BorderLayout());
+    b.add(header, BorderLayout.CENTER);
 
     final BaseXButton save = new BaseXButton(gui, "save", HELPSAVE);
     home = BaseXButton.command(GUICommands.HOME, gui);
@@ -84,8 +85,8 @@ public final class TextView extends View implements ActionListener {
     sp.add(save);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(home);
-    back.add(sp, BorderLayout.EAST);
-    add(back, BorderLayout.NORTH);
+    b.add(sp, BorderLayout.EAST);
+    add(b, BorderLayout.NORTH);
 
     area = new BaseXText(false, gui);
     area.setSyntax(new XMLSyntax());
@@ -128,8 +129,12 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(gui.context.data() != null ?
-        GUIProp.SHOWTEXT : GUIProp.SHOWSTARTTEXT);
+    return gui.prop.is(GUIProp.SHOWTEXT);
+  }
+
+  @Override
+  protected boolean db() {
+    return false;
   }
 
   /**
@@ -181,9 +186,15 @@ public final class TextView extends View implements ActionListener {
 
     try {
       final PrintOutput out = new PrintOutput(file.toString());
-      if(proc != null) proc.execute(gui.context, out);
-      else if(ns != null) ns.serialize(new XMLSerializer(out));
-      else out.write(area.getText());
+      if(proc != null) {
+        proc.execute(gui.context, out);
+      } else if(ns != null) {
+        ns.serialize(new XMLSerializer(out));
+      } else {
+        final byte[] txt = area.getText();
+        for(final byte t : txt) if(t < 0 || t > ' ' || Token.ws(t))
+          out.write(t);
+      }
       out.close();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);

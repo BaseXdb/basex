@@ -60,14 +60,6 @@ final class MapRects implements Iterable<MapRect> {
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  int size() {
-    return size;
-  }
-
-  /**
    * Resets the integer list.
    */
   void reset() {

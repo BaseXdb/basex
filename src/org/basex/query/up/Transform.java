@@ -2,9 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;

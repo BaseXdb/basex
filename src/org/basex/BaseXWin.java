@@ -42,9 +42,9 @@ public final class BaseXWin {
 
     // read properties
     final Context ctx = new Context();
-    final GUIProp gprop = new GUIProp();
     ctx.prop.set(Prop.CACHEQUERY, true);
     Prop.gui = true;
+    final GUIProp gprop = new GUIProp();
 
     GUIConstants.init(gprop);
 

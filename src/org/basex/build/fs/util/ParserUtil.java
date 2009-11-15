@@ -1,22 +1,19 @@
 package org.basex.build.fs.util;
 
 import static org.basex.util.Token.*;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.core.Main;
 import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */

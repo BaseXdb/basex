@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -259,7 +257,7 @@ public abstract class W3CTS {
     Main.out("Parsing " + total + " Queries");
     for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
-      if(!verbose && t % 1000 == 0) Main.out(".");
+      if(!verbose && t % 500 == 0) Main.out(".");
     }
     Main.outln();
     total = ok + ok2 + err + err2;
@@ -336,7 +334,7 @@ public abstract class W3CTS {
     final Nodes nodes = states(root);
     for(int n = 0; n < nodes.size(); n++) {
       final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
-      
+
       final String inname = text("*:query/@name", state);
       context.query = IO.get(queries + pth + inname + ".xq");
       final String in = read(context.query);
@@ -361,8 +359,6 @@ public abstract class W3CTS {
       try {
         files.add(file(nodes("*:input-file", state),
             nodes("*:input-file/@variable", state), qctx, n == 0));
-        //files.add(file(nodes("*:input-URI", state),
-        //    nodes("*:input-URI/@variable", state), qctx, n == 0));
         files.add(file(nodes("*:defaultCollection", state),
             null, qctx, n == 0));
 
@@ -389,26 +385,16 @@ public abstract class W3CTS {
           it.serialize(xml);
         }
         xml.close();
-
       } catch(final QueryException ex) {
         error = ex.getMessage();
         if(error.startsWith(STOPPED)) {
           error = error.substring(error.indexOf('\n') + 1);
         }
-
         if(error.startsWith("[")) {
-          final int i = error.indexOf("]");
-          error = error.substring(1).substring(0, i - 1) +
-            error.substring(i + 1);
+          error = error.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
         }
       } catch(final Exception ex) {
-        final ByteArrayOutputStream bw = new ByteArrayOutputStream();
-        ex.printStackTrace(new PrintStream(bw));
-        error = bw.toString();
-      } catch(final Error ex) {
-        final ByteArrayOutputStream bw = new ByteArrayOutputStream();
-        ex.printStackTrace(new PrintStream(bw));
-        error = bw.toString();
+        error = ex.toString();
       }
 
       final Nodes outFiles = nodes("*:output-file/text()", state);
@@ -489,7 +475,7 @@ public abstract class W3CTS {
                 si.add(new DBNode(rdata, pre));
                 pre += rdata.size(pre, rdata.kind(pre));
               }
-              
+
               final boolean eq = FNSeq.deep(iter, si);
               if(!eq && debug) {
                 iter.reset();
@@ -581,7 +567,7 @@ public abstract class W3CTS {
     }
     return single == null || !outname.equals(single);
   }
-  
+
   /**
    * Normalizes the specified string.
    * @param in input string

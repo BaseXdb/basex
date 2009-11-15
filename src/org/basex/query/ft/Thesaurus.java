@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.core.Context;

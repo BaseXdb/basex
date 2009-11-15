@@ -2,7 +2,6 @@ package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
 import java.util.TreeMap;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.NewFSParser;

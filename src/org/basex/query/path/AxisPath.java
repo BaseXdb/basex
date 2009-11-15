@@ -6,7 +6,6 @@ import static org.basex.query.path.Test.NODE;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;

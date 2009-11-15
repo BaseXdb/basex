@@ -66,9 +66,10 @@ final class ViewAlignment implements ViewLayout {
 
   /**
    * Sets the visibility of the views to the property values.
+   * @param db database flag
    */
-  public void setVisibility() {
-    for(final ViewLayout c : comp) c.setVisibility();
+  public void setVisibility(final boolean db) {
+    for(final ViewLayout c : comp) c.setVisibility(db);
   }
 
   /**

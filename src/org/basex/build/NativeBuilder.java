@@ -2,7 +2,6 @@ package org.basex.build;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.NativeData;

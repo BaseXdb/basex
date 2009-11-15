@@ -73,4 +73,11 @@ public final class BoolList {
   public boolean[] finish() {
     return size == list.length ? list : Arrays.copyOf(list, size);
   }
+
+  /**
+   * Resets the integer list.
+   */
+  public void reset() {
+    size = 0;
+  }
 }

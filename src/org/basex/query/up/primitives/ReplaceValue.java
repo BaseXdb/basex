@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;

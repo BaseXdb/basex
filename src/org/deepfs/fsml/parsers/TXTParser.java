@@ -1,10 +1,8 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.TreeMap;
-
 import org.basex.build.fs.NewFSParser;
 import org.basex.build.fs.util.BufferedFileChannel;
 import org.basex.build.fs.util.MetaStore.MetaType;

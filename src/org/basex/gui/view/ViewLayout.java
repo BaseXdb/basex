@@ -17,14 +17,9 @@ interface ViewLayout {
 
   /**
    * Sets the visibility of the view layout.
+   * @param db database flag
    */
-  void setVisibility();
-
-  /**
-   * Constructs a build string.
-   * @return build string
-   */
-  String layoutString();
+  void setVisibility(final boolean db);
 
   /**
    * Removes the specified panel.
@@ -38,4 +33,10 @@ interface ViewLayout {
    * @param panel current panel
    */
   void createView(BaseXBack panel);
+
+  /**
+   * Constructs a build string.
+   * @return build string
+   */
+  String layoutString();
 }

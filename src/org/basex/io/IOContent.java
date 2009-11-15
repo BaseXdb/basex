@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.ByteArrayInputStream;
-
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 

@@ -13,7 +13,6 @@ import java.math.BigInteger;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;

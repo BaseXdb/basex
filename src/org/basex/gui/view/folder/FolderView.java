@@ -69,7 +69,7 @@ public final class FolderView extends View {
    * @param man view manager
    */
   public FolderView(final ViewNotifier man) {
-    super(HELPFOLDER, man);
+    super(FOLDERVIEW, HELPFOLDER, man);
     createBoxes();
     setMode(Fill.UP);
     setLayout(new BorderLayout());
@@ -84,7 +84,7 @@ public final class FolderView extends View {
 
     if(gui.context.data() == null) {
       opened = null;
-    } else if(gui.prop.is(GUIProp.SHOWFOLDER)) {
+    } else if(visible()) {
       refreshOpenedNodes();
       refreshHeight();
       repaint();
@@ -123,12 +123,11 @@ public final class FolderView extends View {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!gui.prop.is(GUIProp.SHOWFOLDER)) return;
-
     startY = 0;
     scroll.pos(0);
 
-    if(more) jumpTo(gui.context.current().nodes[0], true);
+    final Nodes curr = gui.context.current();
+    if(more && curr.size() != 0) jumpTo(curr.nodes[0], true);
     refreshHeight();
     repaint();
   }
@@ -161,6 +160,11 @@ public final class FolderView extends View {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWFOLDER);
+  }
+
+  @Override
+  protected boolean db() {
+    return true;
   }
 
   /**
@@ -308,7 +312,7 @@ public final class FolderView extends View {
    * @param open opened folder
    */
   void jumpTo(final int pre, final boolean open) {
-    if(getWidth() == 0 || !gui.prop.is(GUIProp.SHOWFOLDER)) return;
+    if(getWidth() == 0 || !visible()) return;
 
     if(open) {
       int p = pre;

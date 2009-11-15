@@ -41,7 +41,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.ViewContainer;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.gui.view.ViewPanel;
 import org.basex.gui.view.explore.ExploreView;
 import org.basex.gui.view.folder.FolderView;
 import org.basex.gui.view.info.InfoView;
@@ -255,27 +254,15 @@ public final class GUI extends JFrame {
 
     // create views
     notify = new ViewNotifier(this);
-    query = new XQueryView(notify);
     text = new TextView(notify);
+    query = new XQueryView(notify);
     info = new InfoView(notify);
-    final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
-    final ViewPanel querypanel = new ViewPanel(query, XQUERYVIEW);
-    final ViewPanel infopanel = new ViewPanel(info, INFOVIEW);
 
     // create panels for closed and opened database mode
-    final ViewPanel[][] panels = {
-      { querypanel, infopanel, textpanel },
-      { new ViewPanel(new FolderView(notify), FOLDERVIEW),
-        new ViewPanel(new PlotView(notify), PLOTVIEW),
-        new ViewPanel(new TableView(notify), TABLEVIEW),
-        new ViewPanel(new MapView(notify), MAPVIEW),
-        new ViewPanel(new TreeView(notify), TREEVIEW),
-        new ViewPanel(new ExploreView(notify), EXPLOREVIEW),
-        querypanel, infopanel, textpanel
-      }
-    };
-    views = new ViewContainer(this, panels);
-    views.setViews(false);
+    views = new ViewContainer(this, text, query, info,
+        new FolderView(notify), new PlotView(notify), new TableView(notify),
+        new MapView(notify), new TreeView(notify), new ExploreView(notify)
+    );
 
     top.add(views, BorderLayout.CENTER);
     setContentBorder();
@@ -447,7 +434,7 @@ public final class GUI extends JFrame {
       final boolean ok = pr.execute(context, out);
       final String inf = pr.info();
       updating = false;
-
+      
       if(!ok && inf.equals(PROGERR)) {
         // command was interrupted..
         proc = null;
@@ -483,6 +470,7 @@ public final class GUI extends JFrame {
         final Data ndata = context.data();
         final String time = perf.getTimer();
         Nodes marked = context.marked();
+
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();

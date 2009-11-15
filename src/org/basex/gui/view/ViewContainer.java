@@ -56,9 +56,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   /** View Layout. */
   private ViewAlignment layout;
   /** View panels. */
-  private final ViewPanel[][] panels;
-  /** View Array. */
-  private ViewPanel[] views;
+  private final ViewPanel[] views;
   /** Source View. */
   private ViewPanel source;
   /** Target View. */
@@ -75,29 +73,19 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   /**
    * Constructor.
    * @param main reference to the main window
-   * @param p panels
+   * @param v view panels
    */
-  public ViewContainer(final GUI main, final ViewPanel[][] p) {
+  public ViewContainer(final GUI main, final View... v) {
     setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
     logo = BaseXLayout.image("logo");
-    panels = p;
+    
+    views = new ViewPanel[v.length];
+    for(int i = 0; i < v.length; i++) views[i] = new ViewPanel(v[i]);
     gui = main;
-  }
-
-  /**
-   * Sets the specified views.
-   * @param db database flag
-   */
-  public void setViews(final boolean db) {
-    views = panels[db ? 1 : 0];
-
     // build layout or use default if something goes wrong
-    final String lo1 = gui.prop.get(db ?
-        GUIProp.LAYOUTOPENED : GUIProp.LAYOUTCLOSED);
-    final String lo2 = db ? LAYOUTOPEN : LAYOUTCLOSE;
-    if(!buildLayout(lo1) && !buildLayout(lo2)) {
-      Main.errln("Could not build layout \"%\"", lo2);
+    if(!buildLayout(gui.prop.get(GUIProp.LAYOUT)) && !buildLayout(LAYOUT)) {
+      Main.errln("Could not build layout \"%\"", LAYOUT);
     }
   }
 
@@ -106,14 +94,11 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    */
   public void updateViews() {
     removeAll();
-    layout.setVisibility();
+    layout.setVisibility(gui.context.data() != null);
     layout.createView(this);
     validate();
     repaint();
-
-    final String lay = layout.layoutString();
-    gui.prop.set(views == panels[0] ?
-        GUIProp.LAYOUTCLOSED : GUIProp.LAYOUTOPENED, lay);
+    gui.prop.set(GUIProp.LAYOUT, layout.layoutString());
   }
 
   public void run() {
@@ -248,20 +233,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       }
     }
     return l;
-  }
-
-  /**
-   * Returns the view specified by its internal name. The view names
-   * are specified in the {@link GUIConstants} class.
-   * @param name name of the view
-   * @return found view container
-   */
-  public ViewPanel getView(final String name) {
-    for(final ViewPanel view : views) {
-      if(view.toString().equals(name)) return view;
-    }
-    Main.debug("ViewContainer.getView: Unknown view \"%\"", name);
-    return null;
   }
 
   /**
@@ -430,8 +401,23 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       if(nv == views.length) return true;
       Main.errln("Missing Views: " + cnstr);
     } catch(final Exception ex) {
+      Main.debug(ex);
       Main.errln("Could not build layout: " + cnstr);
     }
     return false;
+  }
+
+  /**
+   * Returns the view specified by its internal name. The view names
+   * are specified in the {@link GUIConstants} class.
+   * @param name name of the view
+   * @return found view container
+   */
+  public ViewPanel getView(final String name) {
+    for(final ViewPanel view : views) {
+      if(view.toString().equals(name)) return view;
+    }
+    Main.debug("ViewContainer.getView: Unknown view \"%\"", name);
+    return null;
   }
 }

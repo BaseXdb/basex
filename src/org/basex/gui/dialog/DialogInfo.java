@@ -9,7 +9,6 @@ import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.LocalSession;
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;

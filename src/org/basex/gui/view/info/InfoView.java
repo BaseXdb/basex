@@ -65,7 +65,7 @@ public final class InfoView extends View {
    * @param man view manager
    */
   public InfoView(final ViewNotifier man) {
-    super(HELPINFOO, man);
+    super(INFOVIEW, HELPINFOO, man);
     setMode(Fill.UP);
     setBorder(6, 8, 8, 8);
     setLayout(new BorderLayout());
@@ -108,8 +108,12 @@ public final class InfoView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(gui.context.data() != null ?
-        GUIProp.SHOWINFO : GUIProp.SHOWSTARTINFO);
+    return gui.prop.is(GUIProp.SHOWINFO);
+  }
+
+  @Override
+  protected boolean db() {
+    return false;
   }
 
   /**

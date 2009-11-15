@@ -273,9 +273,8 @@ public final class BaseXTextRenderer extends BaseXBack {
 
     final int ch = text.curr();
     if(y > 0 && y < h) {
-      if(ch >= 0x10 && ch < 0x20) {
-        final int c = ch - 0x10;
-        col = GUIConstants.getFTColor(c);
+      if(ch == 0x10) {
+        col = GUIConstants.COLORFT;
         high = true;
       }
 

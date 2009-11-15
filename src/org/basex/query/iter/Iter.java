@@ -1,7 +1,6 @@
 package org.basex.query.iter;
 
 import java.util.Arrays;
-
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;

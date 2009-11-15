@@ -99,7 +99,6 @@ final class MapLayout {
    */
   private MapList children(final int par) {
     final MapList list = new MapList();
-
     final int last = par + ViewData.size(data, par);
     final boolean atts = prop.is(GUIProp.MAPATTS) && data.fs == null;
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
@@ -118,7 +117,6 @@ final class MapLayout {
    * @param ne end array position
    */
   void makeMap(final MapRect r, final MapList l, final int ns, final int ne) {
-
     if(ne - ns == 0) {
       // one rectangle left, add it and go deeper
       r.pre = l.get(ns);
@@ -127,8 +125,7 @@ final class MapLayout {
       int nn = 0;
       if(r.level == 0) {
         final int is = l.size();
-        for(int i = 0; i < is; i++)
-          nn += ViewData.size(data, l.get(i));
+        for(int i = 0; i < is; i++) nn += ViewData.size(data, l.get(i));
       } else {
         nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }
@@ -148,7 +145,6 @@ final class MapLayout {
    * @param r parent rectangle
    */
   public void putRect(final MapRect r) {
-
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
     final int y = r.y + layout.y;

@@ -8,7 +8,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.UIManager;
 import org.basex.core.Text;
-import org.basex.gui.view.ViewPanel;
+import org.basex.gui.view.View;
 import org.basex.io.IO;
 
 /**
@@ -23,11 +23,10 @@ import org.basex.io.IO;
  * <ul>
  *  <li> define a unique name for your view (e.g. <code>map</code>)</li>
  *  <li> add a string for your view, as shown below</li>
- *  <li> add the string in the {@link #LAYOUTOPEN} string below</li>
+ *  <li> add the string in the {@link #LAYOUT} string below</li>
  *  <li> create your view implementation in a new sub package
  *    (e.g. {@link org.basex.gui.view.map.MapView}).
- *  <li> add a new {@link ViewPanel} instance for your view in the {@link GUI}
- *    constructor.</li>
+ *  <li> add a new {@link View} instance in the {@link GUI} constructor.</li>
  * </ul>
  *
  * Add some more code to allow switching on/off your view:
@@ -79,13 +78,9 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUTOPEN = "H V " + XQUERYVIEW + " " +
-    EXPLOREVIEW + " " + TEXTVIEW + " - V " + MAPVIEW + " " + TABLEVIEW + " " +
-    INFOVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
-
-  /** This layout is shown when no database is opened. */
-  public static final String LAYOUTCLOSE = "H V " + XQUERYVIEW + " " +
-    INFOVIEW + " - " + TEXTVIEW + " -";
+  public static final String LAYOUT = "H V " + XQUERYVIEW + " " +
+    TEXTVIEW + " " + EXPLOREVIEW + " - V " + INFOVIEW + " " + MAPVIEW + " " +
+    TABLEVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
 
   // TOOLBAR ==================================================================
 
@@ -169,7 +164,7 @@ public final class GUIConstants {
   public static final Color COLORDARK = new Color(64, 64, 64);
 
   /** Colors of full-text hits. */
-  public static final Color[] COLORFT = { new Color(0, 192, 0) };
+  public static final Color COLORFT = new Color(0, 192, 0);
 
   /* Colors of full-text hits.
   private static final Color[] COLORFT = {
@@ -324,14 +319,5 @@ public final class GUIConstants {
     if(f == lfont) return lwidth;
     if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
-  }
-
-  /**
-   * Returns a full-text color for the specified pointer.
-   * @param p pointer on token in query.
-   * @return color
-   */
-  public static Color getFTColor(final int p) {
-    return COLORFT[p == 0 || p > COLORFT.length ? 0 : p - 1];
   }
 }

@@ -2,12 +2,10 @@ package org.basex.query.up;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;

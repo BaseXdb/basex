@@ -1,6 +1,7 @@
 package org.basex.gui.view.explore;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,7 +40,7 @@ public final class ExploreView extends View {
    * @param man view manager
    */
   public ExploreView(final ViewNotifier man) {
-    super(HELPEXPLORE, man);
+    super(EXPLOREVIEW, HELPEXPLORE, man);
 
     setLayout(new BorderLayout(0, 4));
     setBorder(6, 8, 8, 8);
@@ -47,9 +48,9 @@ public final class ExploreView extends View {
 
     header = new BaseXLabel(EXPLORETIT, true, false);
 
-    final BaseXBack back = new BaseXBack(Fill.NONE);
-    back.setLayout(new BorderLayout());
-    back.add(header, BorderLayout.CENTER);
+    final BaseXBack b = new BaseXBack(Fill.NONE);
+    b.setLayout(new BorderLayout());
+    b.add(header, BorderLayout.CENTER);
 
     go = new BaseXButton(gui, "go", HELPGO);
     go.addKeyListener(this);
@@ -67,8 +68,8 @@ public final class ExploreView extends View {
     sp.add(go);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(filter);
-    back.add(sp, BorderLayout.EAST);
-    add(back, BorderLayout.NORTH);
+    b.add(sp, BorderLayout.EAST);
+    add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
     add(search, BorderLayout.CENTER);
@@ -109,6 +110,11 @@ public final class ExploreView extends View {
     return gui.prop.is(GUIProp.SHOWEXPLORE);
   }
 
+  @Override
+  protected boolean db() {
+    return true;
+  }
+  
   @Override
   public void keyPressed(final KeyEvent e) {
     if(e.isAltDown()) super.keyPressed(e);

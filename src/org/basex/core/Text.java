@@ -716,11 +716,7 @@ public interface Text {
   /** Command info. */
   String GUIGOBACK = lang("c_goback");
   /** Command info. */
-  String GUIGOBACKTT = lang("c_gobacktt");
-  /** Command info. */
   String GUIGOFORWARD = lang("c_goforward");
-  /** Command info. */
-  String GUIGOFORWARDTT = lang("c_goforwardtt");
   /** Command info. */
   String GUIGOUP = lang("c_goup");
   /** Command info. */

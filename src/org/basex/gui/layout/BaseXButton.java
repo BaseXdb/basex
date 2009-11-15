@@ -21,7 +21,7 @@ import org.basex.util.Token;
  */
 public final class BaseXButton extends JButton {
   /**
-   * Default constructor.
+   * Constructor for text buttons.
    * @param l button title
    * @param win parent window
    */
@@ -49,7 +49,7 @@ public final class BaseXButton extends JButton {
   }
 
   /**
-   * Default constructor.
+   * Constructor for image buttons.
    * @param gui main window
    * @param img image reference
    * @param hlp help text

@@ -17,12 +17,14 @@ import org.basex.gui.layout.BaseXPanel;
 public abstract class View extends BaseXPanel {
   /**
    * Registers the specified view.
+   * @param name name of view
    * @param hlp help text
    * @param man view manager
    */
-  protected View(final byte[] hlp, final ViewNotifier man) {
+  protected View(final String name, final byte[] hlp, final ViewNotifier man) {
     super(hlp, man.gui);
     setMode(GUIConstants.Fill.DOWN);
+    setName(name);
     setFocusable(true);
     addMouseListener(this);
     addMouseMotionListener(this);
@@ -70,6 +72,12 @@ public abstract class View extends BaseXPanel {
    * @return result of check.
    */
   public abstract boolean visible();
+
+  /**
+   * Returns if this view needs a database instance.
+   * @return result of check
+   */
+  protected abstract boolean db();
 
   @Override
   public void mouseEntered(final MouseEvent e) {

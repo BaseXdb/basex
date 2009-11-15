@@ -2,14 +2,12 @@ package org.basex.build.fs;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.util.BufferedFileChannel;

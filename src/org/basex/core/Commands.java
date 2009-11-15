@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("all")
 public interface Commands {
   /** Create command definitions. */
-  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
+  enum CmdCreate { DATABASE, DB, COLLECTION, COLL, MAB, FS, INDEX, USER }
   /** Info command definitions. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE, USERS }
   /** Drop command definitions. */

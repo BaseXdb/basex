@@ -1,7 +1,6 @@
 package org.deepfs.util;
 
 import java.io.File;
-
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;

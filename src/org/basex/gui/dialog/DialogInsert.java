@@ -2,12 +2,10 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
-
 import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;

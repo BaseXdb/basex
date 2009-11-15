@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.basex.core.Context;

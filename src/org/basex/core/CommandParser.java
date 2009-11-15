@@ -11,6 +11,7 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.Check;
+import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -117,6 +118,8 @@ public final class CommandParser extends InputParser {
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
             return new CreateDB(string(cmd), name(null));
+          case COLLECTION: case COLL:
+            return new CreateColl(name(cmd));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case FS:

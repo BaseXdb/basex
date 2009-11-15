@@ -1,5 +1,6 @@
 package org.deepfs.util;
 
+import java.util.HashMap;
 import org.basex.core.Main;
 
 /**
@@ -17,80 +18,48 @@ public final class LibraryLoader {
   public static final String JFUSELIBNAME = "jfuse";
   /** Name of DeepFUSE library. */
   public static final String DEEPFUSELIBNAME = "deepfuse";
+  /** Map with loaded libraries. */
+  private static final HashMap<String, Boolean> LIBS =
+    new HashMap<String, Boolean>();
 
-  /** Spotlight library presence flag. */
-  private static boolean spotexLoaded;
-  /** Joint storage library presence flag. */
-  private static boolean jsdbfsLoaded;
-  /** jFUSE bindings presence flag. */
-  private static boolean jfuseLoaded;
-  /** DeepFUSE presence flag. */
-  private static boolean deepfuseLoaded;
-
-  /**
-   * Loads a native library from java.library.path.
-   * @param libName name of the library to be loaded.
-   * @return true on success
-   */
-  private static boolean loadLibrary(final String libName) {
-    try {
-      System.loadLibrary(libName);
-      Main.debug("Loading library (" + libName + ") ... OK.");
-
-      if(libName.equals(SPOTEXLIBNAME)) {
-        spotexLoaded = true;
-        return true;
-      }
-      if(libName.equals(JSDBFSLIBNAME)) {
-        jsdbfsLoaded = true;
-        return true;
-      }
-      if(libName.equals(JFUSELIBNAME)) {
-        jfuseLoaded = true;
-        return true;
-      }
-      if(libName.equals(DEEPFUSELIBNAME)) {
-        deepfuseLoaded = true;
-        return true;
-      }
-      return false;
-    } catch(final UnsatisfiedLinkError ex) {
-//      Main.debug("Loading library (" + libName + ") ... FAILED.\n" + ex);
-//      Main.debug("-Djava.library.path is : '"
-//          + System.getProperty("java.library.path") + "'");
-      return false;
-    }
-  }
+  /** Private constructor, preventing instantiation. */
+  private LibraryLoader() { }
 
   /**
    * Loads native library if not already present.
-   * @param libName name of the library to be loaded.
+   * @param lib name of the library to be loaded.
    * @return true on success 
    */
-  public static boolean load(final String libName) {
-    if(libName.equals(SPOTEXLIBNAME) && spotexLoaded) return true;
-    if(libName.equals(JSDBFSLIBNAME) && jsdbfsLoaded) return true;
-    if(libName.equals(JFUSELIBNAME) && jfuseLoaded) return true;
-    if(libName.equals(JFUSELIBNAME) && deepfuseLoaded) return true;
-
-    return loadLibrary(libName);
+  public static boolean load(final String lib) {
+    final Boolean b = LIBS.get(lib);
+    return b != null ? b : loadLibrary(lib);
   }
 
   /**
    * Checks if a library is loaded.
-   * @param libName name of the library.
+   * @param lib name of the library.
    * @return true if the library is loaded, false otherwise.
    */
-  public static boolean isLoaded(final String libName) {
-    if(libName.equals(SPOTEXLIBNAME)) return spotexLoaded;
-    if(libName.equals(JSDBFSLIBNAME)) return jsdbfsLoaded;
-    if(libName.equals(JFUSELIBNAME)) return jfuseLoaded;
-    if(libName.equals(DEEPFUSELIBNAME)) return deepfuseLoaded;
-    return false;
+  public static boolean isLoaded(final String lib) {
+    final Boolean b = LIBS.get(lib);
+    return b != null ? b : false;
   }
-
-  /** Default constructor disabled. */
-  protected LibraryLoader() {
-    throw new UnsupportedOperationException();
+  
+  /**
+   * Loads a native library from java.library.path.
+   * @param lib name of the library to be loaded.
+   * @return true on success
+   */
+  private static boolean loadLibrary(final String lib) {
+    boolean found = LIBS.containsKey(lib);
+    if(found) return false;
+    try {
+      System.loadLibrary(lib);
+      Main.debug("Loading library (" + lib + ") ... OK.");
+    } catch(final UnsatisfiedLinkError ex) {
+      found = false;
+    }
+    LIBS.put(lib, found);
+    return found;
   }
 }

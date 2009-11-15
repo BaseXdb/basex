@@ -99,7 +99,7 @@ public final class MapView extends View implements Runnable {
   private boolean constMag;
   /** Draw ThumbMap. */
   private boolean thumbMap;
-  /** Mapdistortion. */
+  /** Map distortion. */
   private boolean mapdist;
   /** scaling. */
   private static int fkt = 4;
@@ -117,8 +117,7 @@ public final class MapView extends View implements Runnable {
    * @param man view manager
    */
   public MapView(final ViewNotifier man) {
-    super(HELPMAP, man);
-    setMode(Fill.NONE);
+    super(MAPVIEW, HELPMAP, man);
     new BaseXPopup(this, POPUP);
   }
 
@@ -143,7 +142,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     final GUIProp gprop = gui.prop;
     if(data != null && getWidth() != 0) {
-      if(!gprop.is(GUIProp.SHOWMAP)) return;
+      if(!visible()) return;
       painter = data.fs != null ? new MapFS(this, data.fs, gprop) :
         new MapDefault(this, gprop);
       mainMap = createImage();
@@ -187,11 +186,6 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!gui.prop.is(GUIProp.SHOWMAP)) {
-      mainRects = null;
-      return;
-    }
-
     // use simple zooming animation for result node filtering
     final Nodes context = gui.context.current();
     final int hist = gui.notify.hist;
@@ -263,6 +257,11 @@ public final class MapView extends View implements Runnable {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWMAP);
+  }
+
+  @Override
+  protected boolean db() {
+    return true;
   }
 
   /**
@@ -379,10 +378,10 @@ public final class MapView extends View implements Runnable {
       // calculate new main rectangles
       initLen();
       layout = new MapLayout(nodes.data, textLen, gui.prop);
-
       layout.makeMap(rect, new MapList(nodes.nodes.clone()),
           0, nodes.size() - 1);
       mainRects = layout.rectangles.copy();
+      // [CG] check..
       // mainRects = layout.rectangles;
     }
 
@@ -402,11 +401,8 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data();
     final GUIProp gprop = gui.prop;
 
-    if(data == null || data.meta.size == 0) {
+    if(mainRects == null || mainRects.size == 0) {
       super.paintComponent(g);
-      return;
-    }
-    if(mainRects == null) {
       refreshInit();
       return;
     }
@@ -470,6 +466,7 @@ public final class MapView extends View implements Runnable {
 
       // draw tag label
       g.setFont(font);
+      smooth(g);
       if(data.kind(focused.pre) == Data.ELEM) {
         String tt = Token.string(ViewData.tag(gprop, data, focused.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
@@ -479,11 +476,9 @@ public final class MapView extends View implements Runnable {
       if(focused != null && focused.thumb) {
         focused.x += 3;
         focused.w -= 3;
-        final boolean sen = focused.thumbal < 2;
-        final boolean spc = focused.thumbal < 1;
         final byte[] text = ViewData.content(data, focused.pre, false);
-        final TokenList tl = MapRenderer.calculateThumbnailsToolTip(focused,
-            Tokenizer.getInfo(text), sen, mouseX, mouseY, getWidth(), g, spc);
+        final TokenList tl = MapRenderer.calculateToolTip(focused,
+            Tokenizer.getInfo(text), mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,
             gprop.num(GUIProp.FONTSIZE));
@@ -652,8 +647,8 @@ public final class MapView extends View implements Runnable {
    */
   void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
-    ((Graphics2D) g).addRenderingHints(HINTS);
-    g.setColor(COLORS[2]);
+    smooth(g);
+    // [CG] check null reference...
     if(rects != null) painter.drawRectangles(g, rects, sc);
   }
 

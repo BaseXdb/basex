@@ -72,8 +72,6 @@ public final class ViewNotifier {
     hist = 0;
     maxhist = 0;
     for(final View v : view) v.refreshInit();
-
-    gui.views.setViews(db);
     gui.layoutViews();
     gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.name : ""));
   }
@@ -149,7 +147,7 @@ public final class ViewNotifier {
     init(gui.context, cont[hist], marked[hist]);
 
     gui.input.setText(query);
-    for(final View v : view) v.refreshContext(forward, false);
+    for(final View v : view) if(v.visible()) v.refreshContext(forward, false);
     gui.refreshControls();
   }
 
@@ -160,25 +158,23 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
-    if(nodes.size() == 0) return;
-
     final Context context = gui.context;
     final Nodes n = new Nodes(context.data(), context.marked().ftpos);
 
-    if(!quick) {
-      final String input = gui.input.getText();
-
-      // add new entry
-      checkHist();
-      queries[hist] = input;
-      marked[hist] = context.marked();
-      cont[++hist] = nodes;
-      queries[hist] = input;
-      marked[hist] = n;
-      maxhist = hist;
-    } else {
-      // check if current node set has already been cached
-      if(!cont[hist].same(context.current())) {
+    if(!cont[hist].same(quick ? context.current() : context.marked())) {
+      if(!quick) {
+        final String input = gui.input.getText();
+  
+        // add new entry
+        checkHist();
+        queries[hist] = input;
+        marked[hist] = context.marked();
+        cont[++hist] = nodes;
+        queries[hist] = input;
+        marked[hist] = n;
+        maxhist = hist;
+      } else {
+        // check if current node set has already been cached
         checkHist();
         // add new entry
         queries[hist] = "";
@@ -189,7 +185,8 @@ public final class ViewNotifier {
     }
     init(context, nodes, n);
 
-    for(final View v : view) if(v != vw) v.refreshContext(true, quick);
+    for(final View v : view) if(v != vw && v.visible())
+      v.refreshContext(true, quick);
     gui.refreshControls();
   }
 
@@ -199,10 +196,10 @@ public final class ViewNotifier {
    * @param nodes new context nodes
    */
   public void jump(final Nodes nodes) {
-    if(nodes.size() == 0) return;
     final Context context = gui.context;
     init(context, nodes, new Nodes(context.data()));
-    for(final View v : view) v.refreshContext(true, true);
+
+    for(final View v : view) if(v.visible()) v.refreshContext(true, true);
     gui.refreshControls();
   }
 
@@ -230,8 +227,8 @@ public final class ViewNotifier {
    * @return query string
    */
   public String tooltip(final boolean back) {
-    return back ? hist > 0 ? gui.notify.queries[hist - 1] : null :
-      hist < gui.notify.maxhist ? gui.notify.queries[hist + 1] : null;
+    return back ? hist > 0 ? hist > 1 ? queries[hist - 2] : "" : null :
+      hist < maxhist ? queries[hist + 1] : null;
   }
 
   // Private Methods ==========================================================

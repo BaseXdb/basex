@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.basex.core.Context;
 import org.basex.core.Session;
 import org.basex.core.LocalSession;

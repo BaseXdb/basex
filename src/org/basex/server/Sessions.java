@@ -1,9 +1,7 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-
 import java.util.Arrays;
-
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 

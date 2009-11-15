@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -48,7 +49,6 @@ abstract class ACreate extends Process {
     
     final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem && p.prop.dblocked(db)) return error(DBLOCKED, db);
-
     final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
         new NativeBuilder(p) : new DiskBuilder(p);
     progress(builder);
@@ -79,6 +79,7 @@ abstract class ACreate extends Process {
       err = Main.info(CREATEERR, args[0]);
     }
     try {
+      if(!mem) context.prop.dbfile(db, DATALOCK).delete();
       builder.close();
     } catch(final IOException ex) {
       Main.debug(ex);

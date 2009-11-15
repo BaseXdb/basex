@@ -2,18 +2,15 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.Context;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;

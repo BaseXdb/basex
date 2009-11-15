@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
-
 import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.Session;

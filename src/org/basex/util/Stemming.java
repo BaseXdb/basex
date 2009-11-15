@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-
 import java.util.Arrays;
 
 /**

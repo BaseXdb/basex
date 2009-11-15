@@ -3,7 +3,6 @@ package org.basex.data;
 import java.util.Arrays;
 import org.basex.util.Array;
 import org.basex.util.IntList;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class provides a container for query full-text positions,
@@ -26,13 +25,9 @@ public final class FTPosData {
    */
   public void add(final int pre, final FTMatches all) {
     final IntList ps = new IntList();
-    final TokenBuilder pi = new TokenBuilder();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; s++) {
-          ps.add(s);
-          pi.add(sm.q);
-        }
+        for(int s = sm.s; s <= sm.e; s++) ps.add(s);
       }
     }
 
@@ -41,10 +36,9 @@ public final class FTPosData {
       c = -c - 1;
       if(size == pos.length) pos = Arrays.copyOf(pos, size << 1);
       Array.move(pos, c, 1, size++ - c);
-
-      pos[c] = new FTPos(pre, ps.finish(), pi.finish());
+      pos[c] = new FTPos(pre, ps.finish());
     } else {
-      pos[c].union(ps.finish(), pi.finish());
+      pos[c].union(ps.finish());
     }
   }
 
@@ -70,8 +64,7 @@ public final class FTPosData {
     if(size != ft.size) return false;
     for(int i = 0; i < size; i++) {
       if(pos[i].pre != ft.pos[i].pre ||
-          !Arrays.equals(pos[i].pos, ft.pos[i].pos) ||
-          !Arrays.equals(pos[i].poi, ft.pos[i].poi)) return false;
+          !Arrays.equals(pos[i].pos, ft.pos[i].pos)) return false;
     }
     return true;
   }

@@ -19,7 +19,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Arrays;
-
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;

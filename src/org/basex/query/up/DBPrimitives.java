@@ -3,7 +3,6 @@ package org.basex.query.up;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
