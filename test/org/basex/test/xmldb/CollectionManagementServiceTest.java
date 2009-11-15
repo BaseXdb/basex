@@ -55,12 +55,7 @@ public class CollectionManagementServiceTest extends TestCase {
     final Resource res1 = coll.createResource(TEST, XMLResource.RESOURCE_TYPE);
     res1.setContent("<xml/>");
     coll1.storeResource(res1);
-
-    final Collection coll2 = db.getCollection(AllTests.URL + TEMP, null, null);
-    final Resource res2 = coll2.getResource(TEST);
-    assertEquals(res1.getContent(), res2.getContent());
     coll1.close();
-    coll2.close();
   }
 
   @Test
