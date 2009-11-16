@@ -56,7 +56,7 @@ public final class TreeView extends View {
   private final Color descendantHighlightColor = Color.RED;
   // new Color(0x4F7092);
   /** Minimum space in rectangles needed for tags. **/
-  private final int minSpace = 35;
+  private final int minSpace = 25;
   /** Minimum space between the levels. **/
   final int minimumLevelDistance = 15;
 
@@ -69,18 +69,21 @@ public final class TreeView extends View {
   private final boolean showDescendants = true;
   /** Always draw same node space. */
   private final boolean consistentNodeSpace = true;
-  /** Sum of spaces in current node line. */
-  private int nodeSpacesPerLine = -1;
   /** Draw rectangle border. */
   private final boolean drawRectangleBorder = true;
   /** Fill rectangle. */
   private final boolean fillRectangle = false;
+  /** slim rectangles to text length. */
+  private final boolean slimNodeToTextLength = true;
   /** Border padding value. */
   private final int borderPadding = 2;
   /** Filling padding value. */
   private final int fillPadding = 1;
   /** Changes Color until given level. */
   private final int changeColorTillLevel = 9;
+
+  /** Sum of spaces in current node line. */
+  private int nodeSpacesPerLine = -1;
 
   /** Nodes in current line. */
   private int nodeCount;
@@ -373,13 +376,13 @@ public final class TreeView extends View {
    * @param level the current level
    * @param nodeList the node list
    */
-  private void drawNodes(final Graphics g, final int level, 
-      final int[] nodeList) {
+  private void drawNodes(final Graphics g, 
+      final int level, final int[] nodeList) {
 
     // calculate screen-width, if more than one root split screen in parts
     final int numberOfRoots = gui.context.current().nodes.length;
-    final double screenWidth = numberOfRoots > 1 ? (getSize().width - 1 / 
-        (double) numberOfRoots)
+    final double screenWidth = numberOfRoots > 1 ? 
+        (getSize().width - 1 / (double) numberOfRoots)
         : getSize().width - 1;
 
     // calculate the important coordinate values of a rectangle
@@ -424,6 +427,7 @@ public final class TreeView extends View {
     rect.add(bigRect);
     rect.trimToSize();
     rectsPerLevel.add(rect);
+    System.out.println(nodeLine.size());
 
     // draw rectangle
     drawRectangle(g, l, 0, (int) w, y, h, null, null, drawRectangleBorder,
@@ -446,35 +450,47 @@ public final class TreeView extends View {
       final int h, final int size) {
 
     double xx = x;
+    double ww = w;
 
     // new array list, to be filled with the rectangles of the current level
     final ArrayList<TreeRect> rects = new ArrayList<TreeRect>();
 
     for(int i = 0; i < size; i++) {
 
-      final double boxMiddle = xx + w / 2f;
+      final double boxMiddle = xx + ww / 2f;
 
       final int pre = nodeList[i];
 
       if(pre == -1) {
 
-        if(!consistentNodeSpace) xx += w;
+        if(!consistentNodeSpace) xx += ww;
 
         continue;
       }
 
+      if(slimNodeToTextLength) {
+        String s = getText(pre);
+        int o = calcOptimalRectWidth(g, s) + 10;
+        if(o < minSpace) o = minSpace;
+
+        if(w > o) {
+          xx = boxMiddle - o / 2;
+          ww = o;
+        }
+      }
+
       final TreeRect rect = new TreeRect();
       rect.x = (int) xx;
-      rect.w = (int) w;
+      rect.w = (int) ww;
       rect.pre = pre;
       rects.add(rect);
 
       // draw rectangle
-      drawRectangle(g, l, (int) xx, (int) w, y, h, null, null,
+      drawRectangle(g, l, (int) xx, (int) ww, y, h, null, null,
           drawRectangleBorder, fillRectangle);
 
       // draw text into rectangle if enough space
-      drawTextIntoRectangle(g, pre, (int) boxMiddle, (int) w, y);
+      drawTextIntoRectangle(g, pre, (int) boxMiddle, (int) ww, y);
 
       xx += w;
     }
@@ -501,8 +517,8 @@ public final class TreeView extends View {
 
     if(border) {
 
-      g.setColor(borderColor == null ? getColorPerLevel(l, false) : 
-        borderColor);
+      g.setColor(borderColor == null ? 
+          getColorPerLevel(l, false) : borderColor);
 
       g.drawRect(x + borderPadding, y, w - borderPadding, h);
     }
@@ -642,7 +658,7 @@ public final class TreeView extends View {
 
     if(childX > -1) {
       g.drawLine(childX, getYperLevel(l + 1) - 1,
-          multiPreX == -1 ? (2 * r.x + r.w) / 2 : 
+          multiPreX == -1 ? (2 * r.x + r.w) / 2 :
             multiPreX, y + nodeHeight + 1);
     }
 
@@ -899,6 +915,7 @@ public final class TreeView extends View {
 
     if(data.meta.deepfs) {
 
+      // TODO [WM]
       if(data.fs.isFile(pre)) s = Token.string(data.fs.name(pre));
       else s = "hi";
 
@@ -927,7 +944,7 @@ public final class TreeView extends View {
       }
     }
 
-    int textWidth = 0;
+    int textWidth = 5;
 
     while((textWidth = BaseXLayout.width(g, s)) + 4 > w) {
       s = s.substring(0, s.length() / 2).concat("*");
@@ -1068,7 +1085,13 @@ public final class TreeView extends View {
     repaint();
   }
 
-//  private int calculateOptimalNodeWidth(Graphics g, String s) {
-//    return BaseXLayout.width(g, s);
-//  }
+  /**
+   * Calculates optimal rectangle width.
+   * @param g the graphics reference.
+   * @param s given string.
+   * @return optimal rectangle width.
+   */
+  private int calcOptimalRectWidth(final Graphics g, final String s) {
+    return BaseXLayout.width(g, s);
+  }
 }
