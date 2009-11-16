@@ -211,4 +211,12 @@ public final class Users {
     table.sort();
     return table.finish();
   }
+  
+  /**
+   * Returns the Userslist.
+   * @return list of users
+   */
+  public ArrayList<User> getUsers() {
+    return users;
+  }
 }
