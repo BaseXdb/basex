@@ -651,7 +651,7 @@ public final class TreeView extends View {
       final int lv = l - 1;
       TreeRect parRect = null;
 
-      if(l >= 0) {
+      if(lv >= 0) {
         final ArrayList<TreeRect> rList = rectsPerLevel.get(lv);
 
         if(rList.get(0).multiPres != null) {
