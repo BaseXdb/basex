@@ -7,11 +7,11 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 
 /**
- * Represents a replace primitive.
+ * Replace primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
@@ -26,7 +26,7 @@ public final class ReplacePrimitive extends NodeCopy {
    * @param replace replace nodes
    * @param attr replacing nodes are attributes
    */
-  public ReplacePrimitive(final Nod n, final Iter replace, 
+  public ReplacePrimitive(final Nod n, final NodIter replace, 
       final boolean attr) {
     super(n, replace);
     a = attr;
@@ -47,10 +47,9 @@ public final class ReplacePrimitive extends NodeCopy {
     }
     final int k = Nod.kind(n.type);
     final int par = d.parent(p, k);
-    if(a)
-      insertAttributes(p, par, d, m);
-    else d.insertSeq(p, par , m);
-    d.delete(p + m.meta.size - 1);
+    if(a) insertAttributes(p, par, d, m);
+    else d.insert(p, par , m);
+    d.delete(p + m.meta.size);
     mergeTextNodes(d, p, p + 1);
     mergeTextNodes(d, p - 1, p);
   }

@@ -7,7 +7,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 
 /**
- * Represents a delete primitive.
+ * Delete primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher

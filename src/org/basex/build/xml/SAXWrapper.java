@@ -11,6 +11,7 @@ import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -87,12 +88,10 @@ public final class SAXWrapper extends Parser {
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
-    if(is == null) return null;
-    final String id = is.getSystemId();
-    if(is.getByteStream() != null || id == null || id.isEmpty()) return is;
+    if(!(io instanceof IOFile) || is == null || is.getByteStream() != null ||
+        is.getSystemId() == null || is.getSystemId().isEmpty()) return is;
 
-    length = IO.get(id).length();
-    final FileInputStream fis = new FileInputStream(io.path()) {
+    final InputSource in = new InputSource(new FileInputStream(io.path()) {
       @Override
       public int read(final byte[] b, final int off, final int len)
           throws IOException {
@@ -101,10 +100,10 @@ public final class SAXWrapper extends Parser {
         counter += i;
         return i;
       }
-    };
-    final InputSource input = new InputSource(fis);
-    source.setInputSource(input);
-    return input;
+    });
+    source.setInputSource(in);
+    length = io.length();
+    return in;
   }
 
   @Override

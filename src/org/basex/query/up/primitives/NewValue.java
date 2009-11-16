@@ -4,7 +4,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 
 /**
- * Abstract udpate primitive which holds an aditional 'name' attribute to for
+ * Abstract update primitive which holds an additional 'name' attribute to for
  * updating values, names, etc.. 
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License

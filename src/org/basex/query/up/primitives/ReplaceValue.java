@@ -37,11 +37,8 @@ public final class ReplaceValue extends NewValue {
     final byte[] nn = name.str();
     if(k == Data.ATTR) {
       d.update(n.pre, d.attName(n.pre), nn);
-    } else if(k == Data.PI) {
-      final byte[] nm = n.nname();
-      d.update(n.pre, concat(nm, SPACE, nn));
     } else {
-      d.update(n.pre, nn);
+      d.update(n.pre, k == Data.PI ? concat(n.nname(), SPACE, nn) : nn);
     }
     // [LK] add delete if replace with empty string ?
   }

@@ -37,8 +37,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
     final int p = n.pre + add;
     final Data d = n.data;
     final int j = p + d.attSize(p, Data.ELEM);
-    int i = p + d.size(p, Data.ELEM) - 1;
-    while(i >= j) d.delete(i--);
+    while(p + d.size(p, Data.ELEM) > j) d.delete(j);
     if(r.length > 0) d.insert(j, p, r, Data.TEXT);
   }
 

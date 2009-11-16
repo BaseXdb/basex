@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -90,8 +91,12 @@ public final class Optimize extends ACreate {
     } catch(final IOException ex) {
       Main.debug(ex);
     }
-
     data.flush();
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return true;
   }
 
   @Override

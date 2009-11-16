@@ -16,7 +16,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
@@ -51,19 +50,18 @@ public final class Replace extends Update {
     if(c.errAtt) Err.or(UPNOATTRPER);
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
     
-    final Iter t = SeqIter.get(expr[0].iter(ctx));
+    final Iter t = expr[0].iter(ctx);
     Item i = t.next();
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, i);
     final int k = Nod.kind(i.type);
-    if(t.size() > 1 || !(i instanceof Nod) || k == Data.DOC) 
+    if(!(i instanceof Nod) || k == Data.DOC || t.next() != null)
       Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
-    final Nod p = n.parent();
-    if(p == null) Err.or(UPNOPAR, i);
     
     // replace node
     if(!value) {
+      if(n.parent() == null) Err.or(UPNOPAR, i);
       if(k != Data.ATTR) {
         // replace non-attribute node
         if(aSeq.size() > 0) Err.or(UPWRELM, i);

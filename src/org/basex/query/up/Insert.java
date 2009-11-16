@@ -12,7 +12,6 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.InsertAfter;
 import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
@@ -64,11 +63,10 @@ public final class Insert extends Update {
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
 
     // check target constraints
-    final Iter t = SeqIter.get(expr[0].iter(ctx));
-
+    final Iter t = expr[0].iter(ctx);
     Item i = t.next();
     if(i == null) Err.or(UPSEQEMP, this);
-    if(!(i instanceof Nod) || t.size() > 1)
+    if(!(i instanceof Nod) || t.next() != null)
       Err.or(before || after ? UPTRGTYP2 : UPTRGTYP, this);
 
     final Nod n = (Nod) i;
@@ -100,10 +98,10 @@ public final class Insert extends Update {
         up = new InsertBefore(n, seq);
       } else if(after) {
         up = new InsertAfter(n, seq);
+      } else if(first) {
+        up = new InsertIntoFirst(n, seq);
       } else {
-        if(first) up = new InsertIntoFirst(n, seq);
-        else if(last) up = new InsertInto(n, seq, true);
-        else up = new InsertInto(n, seq, false);
+        up = new InsertInto(n, seq, last);
       }
       ctx.updates.add(up, ctx);
     }

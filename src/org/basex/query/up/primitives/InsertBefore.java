@@ -3,7 +3,7 @@ package org.basex.query.up.primitives;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 
 /**
  * Insert before primitive.
@@ -17,7 +17,7 @@ public final class InsertBefore extends NodeCopy {
    * @param n target node
    * @param copy copy of nodes to be inserted
    */
-  public InsertBefore(final Nod n, final Iter copy) {
+  public InsertBefore(final Nod n, final NodIter copy) {
     super(n, copy);
   }
   
@@ -31,8 +31,8 @@ public final class InsertBefore extends NodeCopy {
     final Data d = n.data;
     final int pos = n.pre;
 //    InfoTable.pT(d, 180, -1);
-    d.insertSeq(pos, d.parent(pos, Nod.kind(node.type)), m);
-//    final int s = m.meta.size - 1;
+    d.insert(pos, d.parent(pos, Nod.kind(node.type)), m);
+//    final int s = m.meta.size;
 //    InfoTable.pT(d, 180, -1);
 //    if(!mergeTextNodes(d, pos + s - 1, pos + s)) 
 //      mergeTextNodes(d, pos - 1, pos);

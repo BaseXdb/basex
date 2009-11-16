@@ -15,6 +15,7 @@ import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
 import org.basex.index.FTTrieBuilder;
@@ -37,7 +38,7 @@ public final class CreateDB extends ACreate {
    * (special characters are stripped before the name is applied)
    */
   public CreateDB(final String input, final String name) {
-    super(STANDARD, input, IO.get(name == null ? input : name).dbname());
+    super(User.CREATE, input, IO.get(name == null ? input : name).dbname());
   }
 
   /**

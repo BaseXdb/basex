@@ -13,7 +13,6 @@ import org.basex.core.Main;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
@@ -35,7 +34,7 @@ abstract class ACreate extends Process {
    * @param a arguments
    */
   protected ACreate(final int p, final String... a) {
-    super(p | User.CREATE, a);
+    super(p, a);
   }
 
   /**
@@ -78,11 +77,13 @@ abstract class ACreate extends Process {
       Main.debug(ex);
       err = Main.info(CREATEERR, args[0]);
     }
-    try {
-      if(!mem) context.prop.dbfile(db, DATALOCK).delete();
-      builder.close();
-    } catch(final IOException ex) {
-      Main.debug(ex);
+    if(!mem) {
+      try {
+        context.prop.dbfile(db, DATALOCK).delete();
+        builder.close();
+      } catch(final IOException ex) {
+        Main.debug(ex);
+      }
     }
     return error(err);
   }

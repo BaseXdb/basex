@@ -85,16 +85,15 @@ public final class InfoTable extends AInfo {
   }
   
   /**
-   * [CG] just use data.toString() ...
    * Print table to standard output for testing purposes.  
    * @param d data 
    * @param s start node
    * @param e end node
+   */
   public static void pT(final Data d, final int s, final int e) {
     System.out.println(string(table(d, s > 0 ? s : 0, 
         e > 0 ? e : d.meta.size)));
   }
-   */
 
   /**
    * Writes the header for the 'table' command.

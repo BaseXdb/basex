@@ -536,28 +536,22 @@ public abstract class Data {
   public final void insert(final int pre, final int par, final Data dt) {
     meta.update();
 
-    // first source node to be copied; if input is a document, skip first node
-    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
-    // number of nodes to be inserted
-    final int ss = dt.size(sa, dt.kind(sa));
-
     // copy database entries
-    for(int s = sa; s < sa + ss; s++) {
+    final int ss = dt.meta.size;
+    for(int s = 0; s < ss; s++) {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
-      // recalculate distance for root nodes
-      // [CG] Updates/Insert: test collections
-      final int d = r < sa ? pre - par : s - r;
-      final int p = pre + s - sa;
+      final int p = s + pre;
+      final int d = r >= 0 ? s - r : p - par;
 
       switch(k) {
-        case ELEM:
-          // add element
-          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
-          break;
         case DOC:
           // add document
           insertDoc(p, dt.size(s, k), dt.text(s));
+          break;
+        case ELEM:
+          // add element
+          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
           break;
         case TEXT:
         case COMM:
@@ -571,59 +565,11 @@ public abstract class Data {
           break;
       }
     }
-    // update table if no document was inserted
-    if(par != 0) updateTable(pre, par, ss);
+    // no document was inserted - update table structure
+    if(par >= 0) updateTable(pre, par, ss);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
-  }
-  
-  /**
-   * Inserts a data instance at the specified pre value.
-   * Note that the specified data instance must differ from this instance.
-   * @param pre value at which to insert new data
-   * @param par parent pre value of node
-   * @param dt data instance to copy from
-   */
-  public final void insertSeq(final int pre, final int par, final Data dt) {
-
-    // [LK] should be merged again with insert()
-    
-    meta.update();
-    final int sa = 1;
-    // number of nodes to be inserted
-    final int ss = dt.size(0, dt.kind(0));
-
-    // copy database entries
-    for(int s = sa; s < ss; s++) {
-      final int k = dt.kind(s);
-      final int r = dt.parent(s, k);
-      final int p = pre + s - 1;
-      final int d = r > 0 ? s - r : p - par;
-
-      switch(k) {
-        case ELEM:
-          // add element
-          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
-          break;
-        case DOC:
-          // add document
-          insertDoc(p, dt.size(s, k), dt.text(s));
-          break;
-        case TEXT:
-        case COMM:
-        case PI:
-          // add text
-          insertText(p, d, dt.text(s), k);
-          break;
-        case ATTR:
-          // add attribute
-          insertAttr(p, d, dt.attName(s), dt.attValue(s));
-          break;
-      }
-    }
-    // [LK] test insertion of document nodes
-    updateTable(pre, par, ss - 1);
   }
 
   /**

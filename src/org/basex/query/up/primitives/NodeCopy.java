@@ -5,10 +5,8 @@ import java.util.LinkedList;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.up.UpdateFunctions;
 import static org.basex.query.up.UpdateFunctions.*;
 
@@ -20,7 +18,7 @@ import static org.basex.query.up.UpdateFunctions.*;
  */
 public abstract class NodeCopy extends UpdatePrimitive {
   /** Insertion nodes. */
-  final LinkedList<Iter> c = new LinkedList<Iter>();
+  final LinkedList<NodIter> c = new LinkedList<NodIter>();
   /** Final copy of insertion nodes. */
   public Data m;
 
@@ -29,7 +27,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param n target node
    * @param copy node copy
    */
-  protected NodeCopy(final Nod n, final Iter copy) {
+  protected NodeCopy(final Nod n, final NodIter copy) {
     super(n);
     c.add(copy);
   }
@@ -39,12 +37,12 @@ public abstract class NodeCopy extends UpdatePrimitive {
     if(!(node instanceof DBNode)) return;
 
     if(c.size() == 0) return;
-    final SeqIter seq = new SeqIter();
-    final Iterator<Iter> it = c.iterator();
+    final NodIter seq = new NodIter();
+    final Iterator<NodIter> it = c.iterator();
     while(it.hasNext()) {
-      final Iter ni = it.next();
+      final NodIter ni = it.next();
       ni.reset();
-      Item i;
+      Nod i;
       while((i = ni.next()) != null) seq.add(i);
     }
     // Text nodes still need to be merged. Two adjacent iterators in c may

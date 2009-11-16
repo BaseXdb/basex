@@ -14,7 +14,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
@@ -37,12 +36,12 @@ public final class Rename extends Update {
 
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
-    final Iter t = SeqIter.get(expr[0].iter(ctx));
+    final Iter t = expr[0].iter(ctx);
     final Item i = t.next();
 
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, this);
-    if(t.size() != 1) Err.or(UPWRTRGTYP, this);
+    if(t.next() != null) Err.or(UPWRTRGTYP, this);
 
     CFrag ex = null;
     if(i.type == Type.ELM) {

@@ -217,8 +217,7 @@ public final class QueryContext extends Progress {
           }
         }
         if(docs == 0) {
-          for(final int p : data.doc())
-            addDoc(new DBNode(data, p));
+          for(final int p : data.doc()) addDoc(new DBNode(data, p));
         }
         rootDocs = docs;
 
@@ -505,9 +504,8 @@ public final class QueryContext extends Progress {
   private void addDocs(final DBNode db) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    for(int p = 0; p < data.meta.size;) {
+    for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       col.add(new DBNode(data, p));
-      p += data.size(p, data.kind(p));
     }
     addColl(col, token(data.meta.name));
   }

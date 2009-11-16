@@ -248,7 +248,7 @@ public final class Find extends AQuery {
 
     int s = 0;
     char delim = 0;
-    final StringBuilder tb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < l; i++) {
       final char c = str.charAt(i);
       if(delim == 0) {
@@ -256,26 +256,26 @@ public final class Find extends AQuery {
           delim = c;
         } else if(!Character.isLetterOrDigit(c) && c != '@' && c != '='
             && c != '<' && c != '>' && c != '~') {
-          if(tb.length() != 0) {
-            split[s++] = tb.toString();
-            tb.setLength(0);
+          if(sb.length() != 0) {
+            split[s++] = sb.toString();
+            sb.setLength(0);
           }
         } else {
-          tb.append(c);
+          sb.append(c);
         }
       } else {
         if(c == delim) {
           delim = 0;
-          if(tb.length() != 0) {
-            split[s++] = tb.toString();
-            tb.setLength(0);
+          if(sb.length() != 0) {
+            split[s++] = sb.toString();
+            sb.setLength(0);
           }
         } else {
-          if(c != '\'' && c != '"') tb.append(c);
+          if(c != '\'' && c != '"') sb.append(c);
         }
       }
     }
-    if(tb.length() != 0) split[s++] = tb.toString();
+    if(sb.length() != 0) split[s++] = sb.toString();
     return Arrays.copyOf(split, s);
   }
 

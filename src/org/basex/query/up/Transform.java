@@ -68,11 +68,9 @@ public final class Transform extends Arr {
       final Constr c = new Constr(ctx, fo.expr);
       final int cs = c.children.size();
       final int os = cs + c.ats.size();
-      if(os > 1 || os == 0) Err.or(UPCOPYMULT, this);
-      final Data m = UpdateFunctions.buildDB(cs > 0 ?
-          c.children : c.ats, null);
-      ctx.vars.add(fo.var.bind(new DBNode(m,
-          Math.min(1, m.meta.size - 1)), ctx).copy());
+      if(os != 1) Err.or(UPCOPYMULT, this);
+      final Data m = UpdateFunctions.buildDB(cs > 0 ? c.children : c.ats, null);
+      ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       tUpd.addDataReference(m);
     }
 

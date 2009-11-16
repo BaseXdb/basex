@@ -9,9 +9,8 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Err;
 
-
 /**
- * Represents a rename primitive.
+ * Rename primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher

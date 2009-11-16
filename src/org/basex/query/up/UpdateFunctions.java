@@ -11,15 +11,12 @@ import org.basex.data.PathSummary;
 import org.basex.index.Names;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FNode;
 import org.basex.query.item.FTxt;
-import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.SeqIter;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -39,11 +36,10 @@ public final class UpdateFunctions {
    * must contain
    * @param n iterator
    * @return iterator with merged text nodes
-   * @throws QueryException query exception
    */
-  public static SeqIter mergeText(final Iter n) throws QueryException {
-    final SeqIter s = new SeqIter();
-    Item i = n.next();
+  public static NodIter mergeText(final NodIter n) {
+    final NodIter s = new NodIter();
+    Nod i = n.next();
     while(i != null) {
       if(i.type == Type.TXT) {
         final TokenBuilder tb = new TokenBuilder();
@@ -59,26 +55,25 @@ public final class UpdateFunctions {
     }
     return s;
   }
-  
+
   /**
    * Blabooo.
    * @param at ?
    * @param r ?
    * @param m ?
    * @return ?
-   * @throws QueryException ?
    */
-  public static boolean checkAttNames(final Iter at, final Iter r, 
-      final String m) throws QueryException {
+  public static boolean checkAttNames(final NodIter at, final NodIter r,
+      final String m) {
     final Set<String> s = new HashSet<String>();
-    Nod n = (Nod) at.next();
-    
+    Nod n = at.next();
+
     while(n != null) {
       s.add(string(n.nname()));
-      n = (Nod) at.next();
+      n = at.next();
     }
-    
-    n = (Nod) r.next();
+
+    n = r.next();
     while(n != null) {
       final String t = string(n.nname());
       final boolean b = s.add(t);
@@ -86,7 +81,7 @@ public final class UpdateFunctions {
         if(m == null) return false;
         if(!t.equals(m)) return false;
       }
-      n = (Nod) r.next();
+      n = r.next();
     }
     return true;
   }
@@ -106,7 +101,7 @@ public final class UpdateFunctions {
     if(a >= s || b >= s || a == b || a < 0 || b < 0) return false;
     if(!(d.kind(a) == Data.TEXT && d.kind(b) == Data.TEXT)) return false;
     if(d.parent(a, d.kind(a)) != d.parent(b, d.kind(b))) return false;
-    
+
     d.update(a, concat(d.text(a), d.text(b)));
     d.delete(b);
     return true;
@@ -121,9 +116,9 @@ public final class UpdateFunctions {
    */
   public static void insertAttributes(final int pre, final int par,
       final Data d, final Data m) {
-    final int ss = m.size(0, m.kind(0));
-    for(int s = 1; s < ss; s++) {
-      d.insert(pre + s - 1, par, m.attName(s), m.attValue(s));
+    final int ss = m.meta.size;
+    for(int s = 0; s < ss; s++) {
+      d.insert(pre + s, par, m.attName(s), m.attValue(s));
     }
   }
 
@@ -140,7 +135,7 @@ public final class UpdateFunctions {
     if(k == Data.ELEM) {
       data.update(pre, name.str());
     } else if(k == Data.PI) {
-      byte[] val = data.text(pre);
+      final byte[] val = data.text(pre);
       final int i = indexOf(val, ' ');
       data.update(pre, i == -1 ? name.str() :
         concat(name.str(), SPACE, substring(val, i + 1)));
@@ -156,40 +151,22 @@ public final class UpdateFunctions {
    * @return new data instance
    * @throws QueryException query exception
    */
-  public static Data buildDB(final Iter ch, final Data d)
+  public static Data buildDB(final NodIter ch, final Data d)
       throws QueryException {
 
     // [LK] usage of index refs only possible if target node is a dbnode,
     // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
-    MemData m = d == null ? new MemData(20, new Names(), new Names(),
-        new Namespaces(), new PathSummary(), new Prop()) : new MemData(20, d);
+    final MemData m = d == null ? new MemData(16, new Names(), new Names(),
+        new Namespaces(), new PathSummary(), new Prop()) : new MemData(16, d);
 
     // [LK] BuildDB.. namespaces must be copied as well
     //m.ns.add(...);
-    
-    // determine size of sequence
-    int ds = 1;
-    Item n;
-    while((n = ch.next()) != null) {
-      if(n instanceof DBNode) {
-        final DBNode dbn = (DBNode) n;
-        ds += dbn.data.size(dbn.pre, Nod.kind(n.type));
-      } else if(n instanceof FNode) {
-        ds += fragmentSize((FNode) n, false);
-      }
-    }
-    // add root node for data instance
-    m.addDoc(EMPTY, ds);
 
-    // add nodes as children
     int pre = 1;
-    ch.reset();
+    Nod n;
     while((n = ch.next()) != null) {
-      if(n instanceof DBNode) {
-        pre = addDBNode((DBNode) n, m, pre, 0);
-      } else if(n instanceof FNode) {
-        pre = addFragment((FNode) n, m, pre, 0);
-      }
+      pre = n instanceof DBNode ? addDBNode((DBNode) n, m, pre, 0) :
+        addFragment(n, m, pre, 0);
     }
     return m;
   }
@@ -351,5 +328,5 @@ public final class UpdateFunctions {
       }
     }
     return tmp;
-  }  
+  }
 }

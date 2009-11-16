@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Main;
+import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -25,7 +26,7 @@ public final class DropIndex extends ACreate {
    * @param type index type, defined in {@link CmdIndex}
    */
   public DropIndex(final Object type) {
-    super(DATAREF, type.toString());
+    super(DATAREF | User.WRITE, type.toString());
   }
 
   @Override

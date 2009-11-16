@@ -27,9 +27,9 @@ import org.basex.query.util.Err;
  */
 public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  private final Map<Data, DBPrimitives> dbs;
+  private final Map<Data, DBPrimitives> dbs = new HashMap<Data, DBPrimitives>();
   /** Update primitives which target nodes are fragments. */
-  private final DBPrimitives frags;
+  private final DBPrimitives frags = new DBPrimitives(null);
   /** The update operations are part of a transform expression. */
   private final boolean t;
   /** Holds all data references created by the copy clause of a transform
@@ -39,7 +39,7 @@ public final class PendingUpdates {
    * part of this set, hence the target node has not been copied.
    */
   private Set<Data> refs;
-  /** Validates upates. */
+  /** Validates updates. */
   private ValidateUpdates val = new ValidateUpdates();
 
   /**
@@ -49,8 +49,6 @@ public final class PendingUpdates {
   public PendingUpdates(final boolean transform) {
     t = transform;
     if(t) refs = new HashSet<Data>(); 
-    dbs = new HashMap<Data, DBPrimitives>();
-    frags = new DBPrimitives(null);
   }
   
   /**
@@ -75,7 +73,7 @@ public final class PendingUpdates {
       throws QueryException {
 
     final boolean frag = p.node instanceof FNode;
-    if(t && (!refs.contains(((DBNode) p.node).data) || frag)) 
+    if(t && (frag || !refs.contains(((DBNode) p.node).data))) 
       Err.or(UPWRONGTRG, p.node);
     
     if(frag) {

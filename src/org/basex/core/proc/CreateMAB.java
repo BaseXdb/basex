@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import org.basex.build.mediovis.MAB2Parser;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
@@ -21,7 +22,7 @@ public final class CreateMAB extends ACreate {
    * @param name database name
    */
   public CreateMAB(final String input, final String name) {
-    super(STANDARD, input, name == null ? IO.get(input).dbname() : name);
+    super(User.CREATE, input, name == null ? IO.get(input).dbname() : name);
   }
 
   @Override

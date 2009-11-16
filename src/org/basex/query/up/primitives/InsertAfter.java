@@ -4,7 +4,7 @@ import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 
 /**
  * Insert after primitive.
@@ -18,7 +18,7 @@ public final class InsertAfter extends NodeCopy {
    * @param n target node
    * @param copy copy of nodes to be inserted
    */
-  public InsertAfter(final Nod n, final Iter copy) {
+  public InsertAfter(final Nod n, final NodIter copy) {
     super(n, copy);
   }
 
@@ -33,11 +33,9 @@ public final class InsertAfter extends NodeCopy {
     final Data d = n.data;
     final int k = Nod.kind(node.type);
     // [LK] check if parent null?
-    d.insertSeq(p + d.size(p, k), d.parent(p, k), m);
+    d.insert(p + d.size(p, k), d.parent(p, k), m);
     if(!mergeTextNodes(d, p - 1, p)) {
-      // the number of inserted nodes equals (m.meta.size - 1) because
-      // the DOC root node of the insertion data set is not inserted
-      final int s = m.meta.size - 1;
+      final int s = m.meta.size;
       mergeTextNodes(d, p + s - 1, p + s);
     }
   }

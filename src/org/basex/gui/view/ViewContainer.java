@@ -241,9 +241,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @return view container
    */
   private ViewPanel getTarget() {
-    for(final ViewPanel view : views) {
-      if(view.isVisible() && new Rectangle(absLoc(view),
-          view.getSize()).contains(sp)) return view;
+    for(final ViewPanel v : views) {
+      if(v.isVisible() && new Rectangle(absLoc(v), v.getSize()).contains(sp))
+        return v;
     }
     return null;
   }

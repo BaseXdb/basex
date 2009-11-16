@@ -18,7 +18,7 @@ import org.basex.query.up.primitives.UpdatePrimitive.Type;
  * @author Lukas Kircher
  */
 public final class DBPrimitives {
-  /** Atomic update operations hashed after pre value. */
+  /** Atomic update operations hashed by the pre value. */
   public Map<Integer, UpdatePrimitive[]> op;
   /** Target nodes of update primitives are fragments. */
   private final boolean f;
@@ -100,8 +100,7 @@ public final class DBPrimitives {
   public void apply() throws QueryException {
     // apply updates backwards, starting with the highest pre value -> no id's
     // needed and less table alterations
-    final int l = sortedPre.length;
-    for(int i = l - 1; i >= 0; i--) {
+    for(int i = sortedPre.length - 1; i >= 0; i--) {
       final UpdatePrimitive[] pl = op.get(sortedPre[i]);
       // W3C wants us to check fragment constraints as well
       for(final UpdatePrimitive pp : pl) if(pp != null) pp.check();
@@ -114,7 +113,7 @@ public final class DBPrimitives {
         // further down, hence increases its pre value by the number of 
         // inserted nodes.
         if(pp.type() == Type.INSERTBEFORE) {
-          add = ((InsertBefore) pp).m.size(0, Data.DOC) - 1;
+          add = ((InsertBefore) pp).m.meta.size;
         }
         pp.apply(add);
         // operations cannot be applied to a node which has been replaced

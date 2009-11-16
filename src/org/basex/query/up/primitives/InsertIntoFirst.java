@@ -3,7 +3,7 @@ package org.basex.query.up.primitives;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 
 /**
  * Insert into as first primitive.
@@ -17,7 +17,7 @@ public final class InsertIntoFirst extends NodeCopy {
    * @param n target node
    * @param copy copy of nodes to be inserted
    */
-  public InsertIntoFirst(final Nod n, final Iter copy) {
+  public InsertIntoFirst(final Nod n, final NodIter copy) {
     super(n, copy);
   }
   
@@ -30,7 +30,7 @@ public final class InsertIntoFirst extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-    d.insertSeq(p + d.attSize(p, Nod.kind(node.type)), p, m);
+    d.insert(p + d.attSize(p, Nod.kind(node.type)), p, m);
   }
 
   @Override

@@ -50,15 +50,7 @@ public class MemData extends Data {
    * @param data data reference
    */
   public MemData(final int cap, final Data data) {
-    val1 = new long[cap];
-    val2 = new long[cap];
-    txtindex = new MemValues();
-    atvindex = new MemValues();
-    meta = new MetaData("", data.meta.prop);
-    tags = data.tags;
-    atts = data.atts;
-    ns = data.ns;
-    path = data.path;
+    this(cap, data.tags, data.atts, data.ns, data.path, data.meta.prop);
   }
 
   @Override

@@ -4,7 +4,7 @@ import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 
 /**
  * Insert into as last primitive.
@@ -24,7 +24,7 @@ public final class InsertInto extends NodeCopy {
    * @param copy copy of nodes to be inserted
    * @param l as last flag
    */
-  public InsertInto(final Nod n, final Iter copy, final boolean l) {
+  public InsertInto(final Nod n, final NodIter copy, final boolean l) {
     super(n, copy);
     last = l;
   }
@@ -36,11 +36,9 @@ public final class InsertInto extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)) + add;
-    n.data.insertSeq(pos, n.pre, m);
+    d.insert(pos, n.pre, m);
     if(!mergeTextNodes(d, pos - 1, pos)) {
-      // the number of inserted nodes equals (m.meta.size - 1) because
-      // the DOC root node of the insertion data set is not inserted
-      final int s = m.meta.size - 1;
+      final int s = m.meta.size;
       mergeTextNodes(d, pos + s - 1, pos + s);
     }
   }

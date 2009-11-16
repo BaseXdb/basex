@@ -9,6 +9,7 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
+import org.basex.core.proc.Add;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.CreateColl;
@@ -137,6 +138,8 @@ public final class CommandParser extends InputParser {
         return new Open(name(cmd));
       case CHECK:
         return new Check(string(cmd));
+      case ADD:
+        return new Add(string(cmd));
       case INFO: case I:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
