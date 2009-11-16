@@ -164,31 +164,32 @@ public final class UpdateFunctions {
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) {
-      pre = n instanceof DBNode ? addDBNode((DBNode) n, m, pre, 0) :
-        addFragment(n, m, pre, 0);
-    }
+    while((n = ch.next()) != null) pre = addFragment(n, m, pre, 0);
     return m;
   }
 
   /**
    * Determines the number of descendants of a fragment.
    * @param n fragment node
-   * @param attr count attribute size of node
+   * @param a count attribute size of node
    * @return number of descendants + 1 or attribute size + 1
    * @throws QueryException query exception
    */
-  private static int fragmentSize(final Nod n, final boolean attr)
-      throws QueryException {
-
+  private static int size(final Nod n, final boolean a) throws QueryException {
+    if(n instanceof DBNode) {
+      final DBNode dbn = (DBNode) n;
+      final int k = Nod.kind(n.type);
+      return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
+    }
+    
     int s = 1;
-    final NodeIter at = n.attr();
-    while(at.next() != null) s++;
-    if(attr) return s;
-
-    final NodeIter it = n.child();
-    Nod i;
-    while((i = it.next()) != null) s += fragmentSize(i, false);
+    NodeIter ch = n.attr();
+    while(ch.next() != null) s++;
+    if(!a) {
+      ch = n.child();
+      Nod i;
+      while((i = ch.next()) != null) s += size(i, a);
+    }
     return s;
   }
 
@@ -196,99 +197,40 @@ public final class UpdateFunctions {
    * Adds a fragment to a data instance.
    * @param n node to be added
    * @param m data reference
-   * @param pval node position
+   * @param pre node position
    * @param par node parent
    * @return pre value of next node
    * @throws QueryException query exception
    */
   private static int addFragment(final Nod n, final MemData m,
-      final int pval, final int par) throws QueryException {
+      final int pre, final int par) throws QueryException {
 
     final int k = Nod.kind(n.type);
-    int pre = pval;
-    // add node
     switch(k) {
-      case Data.ELEM:
-        final int as = fragmentSize(n, true);
-        final int s = fragmentSize(n, false);
-        m.addElem(m.tags.index(n.nname(), null, false),
-            0, pre - par, as, s, false);
-        pre++;
-        break;
       case Data.ATTR:
-        // needed to build data instance from attribute sequence
         m.addAtt(m.atts.index(n.nname(), null, false), 0, n.str(), pre - par);
-        return ++pre;
+        return pre + 1;
       case Data.PI:
         final byte[] nm = n.nname();
         final byte[] vl = n.str();
         m.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
-        return ++pre;
+        return pre + 1;
       case Data.TEXT:
       case Data.COMM:
         m.addText(n.str(), pre - par, k);
-        return ++pre;
-    }
-
-    // add attributes and children if n is element
-    NodeIter ir = n.attr();
-    Nod i;
-    while((i = ir.next()) != null) {
-      m.addAtt(m.atts.index(i.nname(), null, false), 0, i.str(), pre++ - pval);
-    }
-    ir = n.child();
-    while((i = ir.next()) != null) pre = addFragment(i, m, pre, pval);
-    return pre;
-  }
-
-  /**
-   * Adds a database node to a {@link MemData} instance.
-   * @param n node to be added
-   * @param m data reference
-   * @param pval node position
-   * @param par node parent
-   * @return pre value of next node
-   * @throws QueryException query exception
-   */
-  private static int addDBNode(final DBNode n, final MemData m,
-      final int pval, final int par) throws QueryException {
-
-    // [LK] copy nodes directly from table - see copy() method below
-    final Data data = n.data;
-    final int k = Nod.kind(n.type);
-    int pre = pval;
-    // [LK] type DOC? --- not possible --- DOC nodes are replaced by children,
-    // see specification insert/replace - check though!
-    switch(k) {
-      case Data.ELEM:
+        return pre + 1;
+      default:
+        // no document nodes will occur at this point..
         m.addElem(m.tags.index(n.nname(), null, false),
-            0, pre - par, data.attSize(n.pre, k), data.size(n.pre, k), false);
-        pre++;
-        break;
-      case Data.ATTR:
-        // needed to build data instance from attribute sequence
-        m.addAtt(m.atts.index(n.nname(), null, false), 0, n.str(), pre - par);
-        return ++pre;
-      case Data.PI:
-        final byte[] nm = n.nname();
-        final byte[] vl = n.str();
-        m.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
-        return ++pre;
-      case Data.TEXT:
-      case Data.COMM:
-        m.addText(n.str(), pre - par, k);
-        return ++pre;
+            0, pre - par, size(n, true), size(n, false), false);
+        NodeIter ir = n.attr();
+        Nod i;
+        int p = pre + 1;
+        while((i = ir.next()) != null) p = addFragment(i, m, p, pre);
+        ir = n.child();
+        while((i = ir.next()) != null) p = addFragment(i, m, p, pre);
+        return p;
     }
-
-    // add attributes and children if n is element
-    NodeIter ir = n.attr();
-    Nod i;
-    while((i = ir.next()) != null) {
-      m.addAtt(m.atts.index(i.nname(), null, false), 0, i.str(), pre++ - pval);
-    }
-    ir = n.child();
-    while((i = ir.next()) != null) pre = addDBNode((DBNode) i, m, pre, pval);
-    return pre;
   }
 
   /**
