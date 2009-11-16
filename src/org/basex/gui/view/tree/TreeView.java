@@ -427,7 +427,6 @@ public final class TreeView extends View {
     rect.add(bigRect);
     rect.trimToSize();
     rectsPerLevel.add(rect);
-    System.out.println(nodeLine.size());
 
     // draw rectangle
     drawRectangle(g, l, 0, (int) w, y, h, null, null, drawRectangleBorder,
