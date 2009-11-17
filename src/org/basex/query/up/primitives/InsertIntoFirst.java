@@ -39,7 +39,17 @@ public final class InsertIntoFirst extends NodeCopy {
   }
 
   @Override
-  public Type type() {
-    return Type.INSERTINTOFI;
+  public PrimitiveType type() {
+    return PrimitiveType.INSERTINTOFI;
+  }
+  
+  @Override
+  public boolean addAtt() {
+    return false;
+  }
+  
+  @Override
+  public boolean remAtt() {
+    return false;
   }
 }

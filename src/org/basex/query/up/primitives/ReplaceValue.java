@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
+import static org.basex.query.up.primitives.PrimitiveType.*;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -44,12 +44,22 @@ public final class ReplaceValue extends NewValue {
   }
   
   @Override
-  public Type type() {
+  public PrimitiveType type() {
     return REPLACEVALUE;
   }
   
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPV, node);
+  }
+
+  @Override
+  public boolean addAtt() {
+    return false;
+  }
+  
+  @Override
+  public boolean remAtt() {
+    return false;
   }
 }

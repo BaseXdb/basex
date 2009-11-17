@@ -14,25 +14,6 @@ public abstract class UpdatePrimitive {
   public final Nod node;
   
   /**
-   * Update primitive type enumeration.
-   *
-   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
-   * @author Lukas Kircher
-   */
-  public enum Type { 
-    /** Type Insert attribute. */ INSERTATTR,
-    /** Type Replace value. */ REPLACEVALUE,
-    /** Type Rename. */ RENAME,
-    /** Type Insert before. */ INSERTBEFORE,
-    /** Type Insert after. */ INSERTAFTER,
-    /** Type Insert into as first. */ INSERTINTOFI,
-    /** Type Insert into AND insert into as last. */ INSERTINTO,
-    /** Type Replace node. */ REPLACENODE,
-    /** Type Replace element content. */ REPLACEELEMCONT,
-    /** Type Delete. */ DELETE;
-  };
-  
-  /**
    * Constructor.
    * @param n DBNode reference
    */
@@ -44,7 +25,7 @@ public abstract class UpdatePrimitive {
    * Returns the type of the update primitive.
    * @return type
    */
-  public abstract Type type();
+  public abstract PrimitiveType type();
   
   /**
    * Checks for constraints, etc.
@@ -56,7 +37,7 @@ public abstract class UpdatePrimitive {
    * Applies the update operation represented by this primitive to the 
    * database. If an 'insert before' primitive is applied to a target node t,
    * the pre value of t changes. Thus the number of inserted nodes is added to
-   * the pre value of t for the following update operations.
+   * the pre value of t for all following update operations.
    * @param add size to add
    * @throws QueryException query exception 
    */
@@ -69,4 +50,17 @@ public abstract class UpdatePrimitive {
    * @throws QueryException query exception
    */
   public abstract void merge(final UpdatePrimitive p) throws QueryException;
+  
+  /**
+   * States if this update primitive adds an attribute to the attribute pool.
+   * @return true if target node is an attribute
+   */
+  public abstract boolean addAtt();
+  
+  /**
+   * States if this update primitive removes an attribute from the attribute 
+   * pool.
+   * @return true if target node is an attribute
+   */
+  public abstract boolean remAtt();
 }

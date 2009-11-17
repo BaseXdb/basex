@@ -1,7 +1,8 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.up.UpdateFunctions.*;
-import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
+import static org.basex.query.up.primitives.PrimitiveType.*;
+
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -13,12 +14,16 @@ import org.basex.query.item.Nod;
  * @author Lukas Kircher
  */
 public final class DeletePrimitive extends UpdatePrimitive {
+  /** Target node is an attribute. */
+  final boolean a;
+  
   /**
    * Constructor.
    * @param n expression target node
    */
   public DeletePrimitive(final Nod n) {
     super(n);
+    a = Nod.kind(n.type) == Data.ATTR;
   }
   
   @Override
@@ -35,11 +40,21 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public Type type() {
+  public PrimitiveType type() {
     return DELETE;
   }
 
   @Override
   public void merge(final UpdatePrimitive p) {
+  }
+
+  @Override
+  public boolean addAtt() {
+    return false;
+  }
+
+  @Override
+  public boolean remAtt() {
+    return a;
   }
 }

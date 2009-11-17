@@ -8,8 +8,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.InsertBefore;
+import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.up.primitives.UpdatePrimitive.Type;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -57,7 +57,9 @@ public final class DBPrimitives {
     final Integer[] t = new Integer[l];
     op.keySet().toArray(t);
     sortedPre = new int[l];
-    for(int i = 0; i < l; i++) sortedPre[i] = t[i];
+    for(int i = 0; i < l; i++) { 
+      sortedPre[i] = t[i];
+    }
     Arrays.sort(sortedPre);
     finished = true;
   }
@@ -86,7 +88,7 @@ public final class DBPrimitives {
     UpdatePrimitive[] l = op.get(i);
     final int pos = p.type().ordinal();
     if(l == null) {
-      l = new UpdatePrimitive[Type.values().length];
+      l = new UpdatePrimitive[PrimitiveType.values().length];
       l[pos] = p;
       op.put(i, l);
     } else if(l[pos] == null) l[pos] = p;
@@ -112,12 +114,12 @@ public final class DBPrimitives {
         // An 'insert before' update moves the currently updated db node 
         // further down, hence increases its pre value by the number of 
         // inserted nodes.
-        if(pp.type() == Type.INSERTBEFORE) {
+        if(pp.type() == PrimitiveType.INSERTBEFORE) {
           add = ((InsertBefore) pp).m.meta.size;
         }
         pp.apply(add);
         // operations cannot be applied to a node which has been replaced
-        if(pp.type() == Type.REPLACENODE) break;
+        if(pp.type() == PrimitiveType.REPLACENODE) break;
       }
     }
   }

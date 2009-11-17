@@ -38,7 +38,17 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public Type type() {
-    return Type.INSERTATTR;
+  public PrimitiveType type() {
+    return PrimitiveType.INSERTATTR;
+  }
+  
+  @Override
+  public boolean addAtt() {
+    return true;
+  }
+  
+  @Override
+  public boolean remAtt() {
+    return false;
   }
 }

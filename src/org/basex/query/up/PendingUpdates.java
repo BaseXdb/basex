@@ -101,13 +101,21 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // finish, check, apply
-    val.validate(frags);
+    // validate updates
+    final int[] fnodes = frags.getNodes();
+    for(int i = 0; i < fnodes.length; i++) 
+      val.validate(frags.op.get(fnodes[i]));
     for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
-      val.validate(dbs.get(d));
+      final DBPrimitives dbp = dbs.get(d);
+      final int[] nodes = dbp.getNodes();
+      for(int i = 0; i < nodes.length; i++) {
+        val.validate(dbp.op.get(nodes[i]));
+      }
     }
+    // check status of validation
     val.status();
-    // apply updates if validation yields no errors
+    
+    // apply updates if validation finds no errors
     frags.apply();
     for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
       dbs.get(d).apply();

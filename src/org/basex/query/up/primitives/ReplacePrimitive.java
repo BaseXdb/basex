@@ -2,7 +2,8 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.UpdateFunctions.*;
-import static org.basex.query.up.primitives.UpdatePrimitive.Type.*;
+import static org.basex.query.up.primitives.PrimitiveType.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -18,7 +19,7 @@ import org.basex.query.util.Err;
  */
 public final class ReplacePrimitive extends NodeCopy {
   /** Target node is an attribute. */
-  public boolean a;
+  private final boolean a;
 
   /**
    * Constructor.
@@ -55,12 +56,22 @@ public final class ReplacePrimitive extends NodeCopy {
   }
 
   @Override
-  public Type type() {
+  public PrimitiveType type() {
     return REPLACENODE;
   }
   
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPL, node.qname());
+  }
+  
+  @Override
+  public boolean addAtt() {
+    return a;
+  }
+  
+  @Override
+  public boolean remAtt() {
+    return a;
   }
 }

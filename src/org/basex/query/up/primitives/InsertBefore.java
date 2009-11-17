@@ -45,7 +45,17 @@ public final class InsertBefore extends NodeCopy {
   }
 
   @Override
-  public Type type() {
-    return Type.INSERTBEFORE;
+  public PrimitiveType type() {
+    return PrimitiveType.INSERTBEFORE;
+  }
+  
+  @Override
+  public boolean addAtt() {
+    return false;
+  }
+  
+  @Override
+  public boolean remAtt() {
+    return false;
   }
 }
