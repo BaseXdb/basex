@@ -30,8 +30,8 @@ import junit.framework.TestCase;
 @SuppressWarnings("all")
 public class CollectionTest extends TestCase {
   /** Collection. */
-  static Collection coll;
-
+  Collection coll;
+  
   @Before
   @Override
   protected void setUp() throws Exception {

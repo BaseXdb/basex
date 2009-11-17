@@ -64,7 +64,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   public String getName() {
-    return ctx.data().meta.name;
+    return ctx.data.meta.name;
   }
 
   public Service[] getServices() throws XMLDBException {
@@ -111,13 +111,13 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data().doc().length;
+    return ctx.data.doc().length;
   }
 
   public String[] listResources() throws XMLDBException {
     check();
     final StringList sl = new StringList();
-    final Data data = ctx.data();
+    final Data data = ctx.data;
     for(final int d : data.doc()) sl.add(Token.string(data.text(d)));
     return sl.finish();
   }
@@ -142,7 +142,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // resource is no relevant xml resource
     final BXXMLResource del = checkXML(res);
-    final Data data = ctx.data();
+    final Data data = ctx.data;
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
@@ -179,8 +179,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
         new DOCWrapper((Document) cont, id, ctx.prop) :
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop);
 
-      final Data data = ctx.data();
-      data.insert(data.meta.size, -1, new MemBuilder(p).build(id));
+      final Data data = ctx.data;
+      final Data d = new MemBuilder(p).build(id);
+      data.insert(data.meta.size, -1, d);
       data.flush();
       ctx.update();
     } catch(final IOException ex) {
@@ -191,7 +192,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
-    final Data data = ctx.data();
+    final Data data = ctx.data;
     final byte[] idd = Token.token(id);
     for(final int d : data.doc()) {
       if(Token.eq(data.text(d), idd))
@@ -229,7 +230,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public String getProperty(final String key) throws XMLDBException {
     check();
     try {
-      return MetaData.class.getField(key).get(ctx.data().meta).toString();
+      return MetaData.class.getField(key).get(ctx.data.meta).toString();
     } catch(final Exception ex) {
       return null;
     }
@@ -245,7 +246,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       throws XMLDBException {
     check();
     try {
-      final MetaData md = ctx.data().meta;
+      final MetaData md = ctx.data.meta;
       final Field f = MetaData.class.getField(key);
       final Object k = f.get(md);
 

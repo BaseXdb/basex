@@ -66,7 +66,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   }
 
   public BXResourceSet query(final String query) throws XMLDBException {
-    return query(coll.ctx.current(), query);
+    return query(coll.ctx.current, query);
   }
 
   public BXResourceSet queryResource(final String id, final String query)
