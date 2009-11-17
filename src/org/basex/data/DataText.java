@@ -56,7 +56,11 @@ public interface DataText {
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
   /** Maximal indexed full-text score. */
-  String DBFTMSC = "FTMSC"; 
+  String DBFTMSC = "FTMSC";
+  /** Minimal indexed full-text score. */
+  String DBFTMISC = "FTMISC"; 
+  /** Maximal indexed full-text score. */
+  String DBFTISCM = "FTISCM"; 
   /** Up-to-date flag. */
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */

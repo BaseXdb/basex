@@ -130,7 +130,8 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
   /** Flag for full-text scoring algorithm. */
-  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2 }; 
+  /** Scoring mode. 1 = document based, 2 = textnode based .*/
+  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2}; 
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };

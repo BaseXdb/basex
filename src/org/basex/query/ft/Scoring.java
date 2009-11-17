@@ -17,6 +17,8 @@ public final class Scoring {
   private static final double LOG = Math.E - 1;
   /** Scoring step. */
   private static final double SCORESTEP = 0.8;
+  
+//  public static boolean print = false;
 
 
   /**
@@ -137,12 +139,14 @@ public final class Scoring {
    */
   public static int tfIDF(final double numdoc, final double numdocterm,
       final double max, final double f) {
-//    System.out.println("freq. token in document: " + f);
-//    System.out.println("max freq. any token in document: " + max);
-//    System.out.println("numb documents: " + numdoc);
-//    System.out.println("numb documents with token: " + numdocterm);
-//    System.out.println("score: " + (numdoc != numdocterm ?
-//    Math.log(numdoc / numdocterm) : 1) * f /max);
+//    if (print) {
+//      System.out.println("freq. token in document: " + f);
+//      System.out.println("max freq. any token in document: " + max);
+//      System.out.println("numb documents: " + numdoc);
+//      System.out.println("numb documents with token: " + numdocterm);
+//      System.out.println((numdoc != numdocterm ?
+//      Math.log(numdoc / numdocterm) : 1) * f /max);
+//    }
     return (int) ((numdoc != numdocterm ?
         Math.log(numdoc / numdocterm) : 1) * f * 1000 / max);
   }
@@ -195,6 +199,7 @@ public final class Scoring {
    * @return new score value
    */
   public static double descAxis(final double sc) {
+    
     return sc * SCORESTEP;
   }
 

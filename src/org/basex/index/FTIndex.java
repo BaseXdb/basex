@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.io.DataAccess;
@@ -25,7 +24,7 @@ abstract class FTIndex extends Index {
    */
   FTIndex(final Data d) {
     data = d;
-    scm = d.meta.prop.num(Prop.FTSCTYPE);
+    scm = d.meta.ftiscm;
   }
 
   /**
@@ -54,7 +53,9 @@ abstract class FTIndex extends Index {
         if(f) {
           if (scm > 0) {
             nscore = -da.readNum(pos) / 1000d;            
-            nscore = nscore / (data.meta.ftmaxscore / 1000d);
+//            nscore = nscore / (data.meta.ftmaxscore / 1000d);
+            nscore = (Math.log(nscore) - Math.log(data.meta.ftminscore / 1000d)) / 
+            (Math.log(data.meta.ftmaxscore / 1000d) - Math.log(data.meta.ftminscore / 1000d));
             pos = da.pos();
           }
           lpre = da.readNum(pos);
@@ -73,10 +74,13 @@ abstract class FTIndex extends Index {
         }
         if (scm > 0 && lpre < 0) {
           nscore = -lpre / 1000d;
-          nscore = nscore / (data.meta.ftmaxscore / 1000d);
+//          nscore = nscore / (data.meta.ftmaxscore / 1000d);
+          nscore = (Math.log(nscore) - Math.log(data.meta.ftminscore / 1000d)) / 
+                  (Math.log(data.meta.ftmaxscore / 1000d) - Math.log(data.meta.ftminscore / 1000d));
           lpre =  da.readNum();          
         }
         pos = da.pos();
+        
         return true;
       }
 

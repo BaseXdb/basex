@@ -37,7 +37,8 @@ abstract class FTBuilder extends IndexBuilder {
   int c;
   /** Maximum indexed score. */
   int maxscore;
-  
+  /** Minimum indexed score. */
+  int minscore;
     
   /**
    * Constructor.
@@ -47,7 +48,9 @@ abstract class FTBuilder extends IndexBuilder {
   protected FTBuilder(final Data d, final Prop pr) {
     super(d);
     scm = pr.num(Prop.FTSCTYPE);
-    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);    
+    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr); 
+    maxscore = -1;
+    minscore = Integer.MAX_VALUE;
   }
 
   /**
@@ -74,13 +77,14 @@ abstract class FTBuilder extends IndexBuilder {
       freq = new IntList();
       getFreq();
     }
-//    Performance.gc(5);
-//    System.out.println(Performance.getMem());
-    write();
+    // normalization
+    data.meta.ftiscm = scm;
+    write();    
     if (scm > 0) {
       data.meta.ftmaxscore = maxscore;
+      data.meta.ftminscore = minscore;
       data.meta.dirty = true;
-    }    
+    }
   }
 
   /**
@@ -115,6 +119,7 @@ abstract class FTBuilder extends IndexBuilder {
           final int score = Scoring.tfIDF(nodes.size(), 
               nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
           if (score > maxscore) maxscore = score;
+          if (score < minscore) minscore = score; 
           // first write score value
           out.write(Num.num(-score));
           if (scm == 2) {

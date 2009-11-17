@@ -108,6 +108,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
         // write compressed pre and pos arrays
         final byte[] vpre = tre.pre[p];
         final byte[] vpos = tre.pos[p];
+//        Scoring.print = (new String(key)).startsWith("anarchism");
         writeFTData(outz, vpre, vpos);
 
         dr = outz.size();

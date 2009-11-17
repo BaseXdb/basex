@@ -62,7 +62,12 @@ public final class MetaData {
   public boolean ftdc;
   /** Maximal indexed full-text score. */
   public int ftmaxscore;
+  /** Minimal indexed full-text score. */
+  public int ftminscore;
+  /** Mode of inexed score values. */
+  public int ftiscm;
 
+  
   /** Flag for removed index structures. */
   public boolean uptodate = true;
   /** Dirty flag. */
@@ -197,6 +202,8 @@ public final class MetaData {
       else if(k.equals(DBFTCS))   ftcs       = toBool(v);
       else if(k.equals(DBFTDC))   ftdc       = toBool(v);
       else if(k.equals(DBFTMSC))  ftmaxscore = Token.toInt(v);
+      else if(k.equals(DBFTMISC))  ftminscore = Token.toInt(v);
+      else if(k.equals(DBFTISCM)) ftiscm     = Token.toInt(v);
       else if(k.equals(DBTIME))   time       = Token.toLong(v);
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
       else if(k.equals(DBLID))    lastid     = Token.toInt(v);
@@ -245,6 +252,8 @@ public final class MetaData {
     writeInfo(out, DBFTCS,   ftcs);
     writeInfo(out, DBFTDC,   ftdc);
     writeInfo(out, DBFTMSC,  ftmaxscore);
+    writeInfo(out, DBFTMISC,  ftminscore);
+    writeInfo(out, DBFTISCM, ftiscm);
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
