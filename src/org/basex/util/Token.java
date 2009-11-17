@@ -955,11 +955,11 @@ public final class Token {
     final int i = indexOf(name, ':');
     return i == -1 ? EMPTY : substring(name, 0, i);
   }
-  
+
   /**
    * Returns a md5 hash.
    * @param pw String
-   * @return String 
+   * @return String
    */
   public static String md5(final String pw) {
     try {

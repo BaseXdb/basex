@@ -6,7 +6,7 @@ package org.basex.query.up.primitives;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public enum PrimitiveType { 
+public enum PrimitiveType {
   /** Type Insert attribute. */ INSERTATTR,
   /** Type Replace value. */ REPLACEVALUE,
   /** Type Rename. */ RENAME,

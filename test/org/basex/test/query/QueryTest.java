@@ -111,7 +111,7 @@ public final class QueryTest {
           proc = new CreateDB(file, name);
           ok = proc.execute(context);
         }
-        
+
         final boolean correct = qu.length == 3;
         final String query = qu[correct ? 2 : 1].toString();
         final String cmd = qu[0] + ": " + query;

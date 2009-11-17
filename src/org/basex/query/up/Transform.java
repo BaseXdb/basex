@@ -43,7 +43,7 @@ public final class Transform extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     final boolean u = ctx.updating;
     ctx.updating = true;
-    
+
     final int s = ctx.vars.size();
     for(final Let c : copies) {
       c.expr = checkUp(c.expr, ctx).comp(ctx);

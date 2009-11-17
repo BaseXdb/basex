@@ -17,7 +17,7 @@ public final class Scoring {
   private static final double LOG = Math.E - 1;
   /** Scoring step. */
   private static final double SCORESTEP = 0.8;
-  
+
 //  public static boolean print = false;
 
 
@@ -199,7 +199,7 @@ public final class Scoring {
    * @return new score value
    */
   public static double descAxis(final double sc) {
-    
+
     return sc * SCORESTEP;
   }
 

@@ -13,6 +13,8 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
+import org.basex.util.TokenBuilder;
+
 /**
  * This class serves as a buffered wrapper for input streams.
  *
@@ -168,6 +170,18 @@ public class BufferInput {
       if(size <= 0) return 0;
     }
     return buffer[pos++];
+  }
+
+  /**
+   * Reads a string from the input stream.
+   * @return string
+   * @throws IOException IO Exception
+   */
+  public String readString() throws IOException {
+    final TokenBuilder tb = new TokenBuilder();
+    byte l;
+    while((l = readByte()) != 0) tb.add(l);
+    return tb.toString();
   }
 
   /**

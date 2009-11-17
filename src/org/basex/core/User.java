@@ -22,7 +22,7 @@ public class User {
   byte[] pw;
   /** Permission. */
   int perm;
-  
+
   /**
    * Constructor.
    * @param n user name
@@ -34,7 +34,7 @@ public class User {
     pw = p;
     perm = r;
   }
-  
+
   /**
    * Returns if the specified permission is set.
    * @param flag flag to be checked
@@ -53,12 +53,12 @@ public class User {
     if(set) perm |= p;
     else perm &= ~p;
   }
-  
+
   /**
    * Returns a copy of this user.
    * @return user copy
    */
   public User copy() {
-    return new User(name, pw, perm); 
+    return new User(name, pw, perm);
   }
 }

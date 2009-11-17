@@ -5,7 +5,7 @@ import org.basex.query.item.QNm;
 
 /**
  * Abstract update primitive which holds an additional 'name' attribute to for
- * updating values, names, etc.. 
+ * updating values, names, etc..
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
@@ -23,7 +23,7 @@ public abstract class NewValue extends UpdatePrimitive {
     super(n);
     name = newName;
   }
-  
+
   @Override
   public void check() { }
 }

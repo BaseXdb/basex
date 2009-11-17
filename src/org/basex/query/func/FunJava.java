@@ -79,7 +79,7 @@ public final class FunJava extends Arr {
       arg[a] = expr[a].iter(ctx).finish();
       if(arg[a].size(ctx) == 0) Err.empty(this);
     }
-    
+
     Object result = null;
     try {
       result = mth.equals("new") ? constructor(arg) : method(arg);
@@ -150,7 +150,7 @@ public final class FunJava extends Arr {
     for(final Class<?> par : params) {
       final Type jtype = type(par);
       if(jtype == null) return null;
-      
+
       final Item arg = args[s + a];
       if(!arg.type.instance(jtype) && !jtype.instance(arg.type)) return null;
       val[a++] = arg.java();

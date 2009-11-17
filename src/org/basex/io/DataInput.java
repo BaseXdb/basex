@@ -39,15 +39,6 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a string from the input stream.
-   * @return string
-   * @throws IOException IO Exception
-   */
-  public String readString() throws IOException {
-    return Token.string(readBytes());
-  }
-
-  /**
    * Reads a byte array from the input stream.
    * @return byte array
    * @throws IOException IO Exception

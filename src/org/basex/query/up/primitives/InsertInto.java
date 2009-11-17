@@ -17,7 +17,7 @@ public final class InsertInto extends NodeCopy {
   private boolean last;
   /** Index of most recently added 'insert into' nodes. */
   private int i;
-  
+
   /**
    * Constructor.
    * @param n target node
@@ -28,11 +28,11 @@ public final class InsertInto extends NodeCopy {
     super(n, copy);
     last = l;
   }
-  
+
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
-    
+
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)) + add;

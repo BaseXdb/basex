@@ -11,7 +11,7 @@ import org.basex.query.iter.NodIter;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class InsertBefore extends NodeCopy {  
+public final class InsertBefore extends NodeCopy {
   /**
    * Constructor.
    * @param n target node
@@ -20,11 +20,11 @@ public final class InsertBefore extends NodeCopy {
   public InsertBefore(final Nod n, final NodIter copy) {
     super(n, copy);
   }
-  
+
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
-    
+
     // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;
@@ -34,7 +34,7 @@ public final class InsertBefore extends NodeCopy {
     d.insert(pos, d.parent(pos, Nod.kind(node.type)), m);
 //    final int s = m.meta.size;
 //    System.out.println(d.toString(180, -1);
-//    if(!mergeTextNodes(d, pos + s - 1, pos + s)) 
+//    if(!mergeTextNodes(d, pos + s - 1, pos + s))
 //      mergeTextNodes(d, pos - 1, pos);
 //    System.out.println(d.toString(180, -1);
   }

@@ -67,22 +67,22 @@ public final class InexTFCalc {
     final Performance p = new Performance();
     Main.outln(Main.name(InexTFCalc.class));
     databases = new StringList();
-    
+
     if(!parseArguments(args)) return;
-    
+
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(WORDS));
     words = new StringList();
     String l;
-    while((l = br.readLine()) != null) 
-        words.add(l);      
+    while((l = br.readLine()) != null)
+        words.add(l);
     br.close();
-    
+
     freq = new int[words.size()];
-    
+
     // cache database names
     if (databases.size() == 0)
-      for(final String s : List.list(ctx)) 
+      for(final String s : List.list(ctx))
         if(s.startsWith(DBPREFIX)) databases.add(s);
 
     Main.outln("=> % words on % databases: time in ms\n",
@@ -91,13 +91,13 @@ public final class InexTFCalc {
     // run test
     test();
 
-    for (int i = 0; i < freq.length; i++) 
+    for (int i = 0; i < freq.length; i++)
       res.println(words.get(i) + ";" + freq[i]);
     res.close();
-    
+
     Main.outln("Total Time: " + p);
   }
-  
+
   /**
    * Parses the command line arguments.
    * @param args the command line arguments
@@ -161,13 +161,13 @@ public final class InexTFCalc {
 
       final String str = session.info();
       final String items = find(str, "Results   : ([0-9]+) Item");
-      
+
       // output result
       Main.outln("Query % on %: % items",
           qu + 1, databases.get(db), items);
       final int n = Integer.parseInt(items);
       if (n > 0) freq[qu] += n;
-    } else  Main.outln(session.info());    
+    } else  Main.outln(session.info());
   }
 
   /**

@@ -17,6 +17,10 @@ abstract class FTIndex extends Index {
   final Data data;
   /** Scoring mode. 1 = document based, 2 = textnode based .*/
   final int scm;
+  /** Minimum scoring value. */
+  final double max;
+  /** Minimum scoring value. */
+  final double min;
 
   /**
    * Constructor.
@@ -25,6 +29,8 @@ abstract class FTIndex extends Index {
   FTIndex(final Data d) {
     data = d;
     scm = d.meta.ftiscm;
+    max = Math.log(data.meta.ftmaxscore);
+    min = Math.log(data.meta.ftminscore);
   }
 
   /**
@@ -39,6 +45,7 @@ abstract class FTIndex extends Index {
       final boolean fast) {
 
     return new FTIndexIterator() {
+      // cached min/max values to speedup scoring
       final FTMatches all = new FTMatches(toknum);
       boolean f = true;
       long pos = p;
@@ -52,10 +59,9 @@ abstract class FTIndex extends Index {
 
         if(f) {
           if (scm > 0) {
-            nscore = -da.readNum(pos) / 1000d;            
-//            nscore = nscore / (data.meta.ftmaxscore / 1000d);
-            nscore = (Math.log(nscore) - Math.log(data.meta.ftminscore / 1000d)) / 
-            (Math.log(data.meta.ftmaxscore / 1000d) - Math.log(data.meta.ftminscore / 1000d));
+            nscore = -da.readNum(pos);
+//            nscore = nscore / (data.meta.ftmaxscore);
+            nscore = (Math.log(nscore) - min) / (max - min);
             pos = da.pos();
           }
           lpre = da.readNum(pos);
@@ -73,14 +79,13 @@ abstract class FTIndex extends Index {
           if(!fast) all.or(n);
         }
         if (scm > 0 && lpre < 0) {
-          nscore = -lpre / 1000d;
-//          nscore = nscore / (data.meta.ftmaxscore / 1000d);
-          nscore = (Math.log(nscore) - Math.log(data.meta.ftminscore / 1000d)) / 
-                  (Math.log(data.meta.ftmaxscore / 1000d) - Math.log(data.meta.ftminscore / 1000d));
-          lpre =  da.readNum();          
+          nscore = -lpre;
+//          nscore = nscore / (data.meta.ftmaxscore);
+          nscore = (Math.log(nscore) - min) / (max - min);
+          lpre =  da.readNum();
         }
         pos = da.pos();
-        
+
         return true;
       }
 
@@ -93,8 +98,8 @@ abstract class FTIndex extends Index {
       public int next() {
         return pre;
       }
-      
-      @Override 
+
+      @Override
       public double score() {
         return score;
       }

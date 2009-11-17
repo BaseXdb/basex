@@ -45,9 +45,8 @@ public abstract class Session {
   /**
    * Returns process info.
    * @return process info
-   * @throws IOException I/O exception
    */
-  public abstract String info() throws IOException;
+  public abstract String info();
 
   /**
    * Closes the session.

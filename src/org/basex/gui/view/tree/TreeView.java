@@ -253,7 +253,7 @@ public final class TreeView extends View {
     for(int i = 0; i < size; i++) {
       final int yL = getYperLevel(i);
 
-      if((yL >= f || yL + nodeHeight >= f) && 
+      if((yL >= f || yL + nodeHeight >= f) &&
           (yL <= t || yL + nodeHeight <= t)) {
 
         final ArrayList<TreeRect> rList = rectsPerLevel.get(i);
@@ -376,12 +376,12 @@ public final class TreeView extends View {
    * @param level the current level
    * @param nodeList the node list
    */
-  private void drawNodes(final Graphics g, 
+  private void drawNodes(final Graphics g,
       final int level, final int[] nodeList) {
 
     // calculate screen-width, if more than one root split screen in parts
     final int numberOfRoots = gui.context.current.nodes.length;
-    final double screenWidth = numberOfRoots > 1 ? 
+    final double screenWidth = numberOfRoots > 1 ?
         (getSize().width - 1 / (double) numberOfRoots)
         : getSize().width - 1;
 
@@ -516,7 +516,7 @@ public final class TreeView extends View {
 
     if(border) {
 
-      g.setColor(borderColor == null ? 
+      g.setColor(borderColor == null ?
           getColorPerLevel(l, false) : borderColor);
 
       g.drawRect(x + borderPadding, y, w - borderPadding, h);
@@ -582,7 +582,7 @@ public final class TreeView extends View {
 
           if(index > -1) {
 
-            final int x = (int) (currRect.w * index / 
+            final int x = (int) (currRect.w * index /
                 (double) currRect.multiPres.length);
 
             mIg.setColor(Color.RED);

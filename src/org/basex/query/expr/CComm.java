@@ -54,7 +54,7 @@ public final class CComm extends CFrag {
     if(contains(atom, DASHES) || endsWith(atom, '-')) Err.or(COMINVALID, atom);
     return atom;
   }
-  
+
   @Override
   public String info() {
     return "comment constructor";

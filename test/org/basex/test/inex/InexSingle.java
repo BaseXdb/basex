@@ -54,7 +54,7 @@ public final class InexSingle {
 
     // use tf/idf scoring model
     session.execute(new Set("indexscores", true));
-    
+
     if(!parseArguments(args)) return;
 
     // cache queries
@@ -85,7 +85,7 @@ public final class InexSingle {
       "file='{ replace(base-uri($i), '.*/', '') }'>{ $i }</result>)" +
       "[position() <= " + MAX + "]\n" +
       "return <results query=\"" + query + "\">{ $hits }</results>\n");
-    
+
     String file = Integer.toString(quindex) + ".xml";
     final PrintOutput out = new PrintOutput(file);
     final boolean ok = session.execute(new XQuery(qu.toString()), out);

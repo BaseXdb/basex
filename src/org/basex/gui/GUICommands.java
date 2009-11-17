@@ -1,5 +1,5 @@
 package org.basex.gui;
- 
+
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
@@ -152,7 +152,7 @@ public enum GUICommands implements GUICommand {
       gui.execute(new Close());
     }
   },
-  
+
   /** Server Dialog. */
   SERVER("Server...", "% serv", "SERVER", false, false) {
     @Override
@@ -319,7 +319,7 @@ public enum GUICommands implements GUICommand {
       final Nodes n = gui.context.marked;
       final DialogInsert insert = new DialogInsert(gui);
       if(!insert.ok()) return;
-      
+
       final StringList sl = insert.result;
       String item = null;
       final int k = insert.kind;
@@ -680,7 +680,7 @@ public enum GUICommands implements GUICommand {
       new DialogPrefs(gui);
     }
   },
-  
+
   /* DEEPFS MENU */
 
   /** Opens a dialog to import given directory as DeepFS instance. */
@@ -695,7 +695,7 @@ public enum GUICommands implements GUICommand {
       progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n) });
     }
   },
-  
+
   /** Opens a dialog to use DeepFS instance as Desktop Query Engine. */
   DQE(GUIDQE + DOTS, null, GUIDQETT, false, false) {
     @Override
@@ -709,7 +709,7 @@ public enum GUICommands implements GUICommand {
       }
     }
   },
-  
+
   /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace. */
   MOUNTFS(GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT, false, false) {
     @Override
@@ -722,14 +722,14 @@ public enum GUICommands implements GUICommand {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
       }
     }
-    
+
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disable mount button, if native library is not available.
       b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
   },
- 
+
   /* HELP MENU */
 
   /** Shows the help window. */

@@ -535,7 +535,7 @@ public interface QueryText {
   Object[] UPWRTRGTYP = { XUTY, 12,
       "Target must be element, attribute or processing instruction." };
   /** XUTY0013: XQuery Update type exception. */
-  Object[] UPCOPYMULT = { XUTY, 13, 
+  Object[] UPCOPYMULT = { XUTY, 13,
       "Source expression in copy clause must return single node." };
   /** XUTY0022: XQuery Update type exception. */
   Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };

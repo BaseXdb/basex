@@ -52,7 +52,7 @@ public final class BaseXLabel extends JLabel {
     setIcon(text == null ? null : BaseXLayout.icon(warning ? "warn" : "error"));
     setText(text == null ? " " : text);
   }
-  
+
   @Override
   public void setEnabled(final boolean flag) {
     if(flag != isEnabled()) super.setEnabled(flag);

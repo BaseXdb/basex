@@ -39,7 +39,7 @@ abstract class FTBuilder extends IndexBuilder {
   int maxscore;
   /** Minimum indexed score. */
   int minscore;
-    
+
   /**
    * Constructor.
    * @param d data reference
@@ -48,7 +48,7 @@ abstract class FTBuilder extends IndexBuilder {
   protected FTBuilder(final Data d, final Prop pr) {
     super(d);
     scm = pr.num(Prop.FTSCTYPE);
-    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr); 
+    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);
     maxscore = -1;
     minscore = Integer.MAX_VALUE;
   }
@@ -61,9 +61,9 @@ abstract class FTBuilder extends IndexBuilder {
     for(id = 0; id < total; id++) {
       if(data.kind(id) != Data.TEXT) {
         if(data.kind(id) == Data.DOC && scm == 1) nodes.add(id);
-        continue; 
-      } 
-      
+        continue;
+      }
+
       if (scm == 2) nodes.add(id);
       checkStop();
       wp.init(data.text(id));
@@ -79,7 +79,7 @@ abstract class FTBuilder extends IndexBuilder {
     }
     // normalization
     data.meta.ftiscm = scm;
-    write();    
+    write();
     if (scm > 0) {
       data.meta.ftmaxscore = maxscore;
       data.meta.ftminscore = minscore;
@@ -91,11 +91,11 @@ abstract class FTBuilder extends IndexBuilder {
    * Write full-text data to disk.
    * @param out DataOutput for disk access
    * @param vpre compressed pre values
-   * @param vpos compressed pos values 
+   * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  
-  final void writeFTData(final DataOutput out, final byte[] vpre, 
+
+  final void writeFTData(final DataOutput out, final byte[] vpre,
       final byte[] vpos) throws IOException {
     int lpre = 4;
     int lpos = 4;
@@ -104,22 +104,22 @@ abstract class FTBuilder extends IndexBuilder {
     // -scoreU, preU, posU
     final int pres = Num.size(vpre);
     final int poss = Num.size(vpos);
-    int cn = scm == 1 ? 1 : 0; 
+    int cn = scm == 1 ? 1 : 0;
     int lastpre = -1;
     int pre = -1;
     while(lpre < pres && lpos < poss) {
       if (scm > 0) {
         if (lastpre < pre) fc++;
         pre = Num.read(vpre, lpre);
-        
+
         while (cn < nodes.size() && nodes.get(cn) < pre) cn++;
         if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
             nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
             pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
-          final int score = Scoring.tfIDF(nodes.size(), 
+          final int score = Scoring.tfIDF(nodes.size(),
               nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
           if (score > maxscore) maxscore = score;
-          if (score < minscore) minscore = score; 
+          if (score < minscore) minscore = score;
           // first write score value
           out.write(Num.num(-score));
           if (scm == 2) {
@@ -129,7 +129,7 @@ abstract class FTBuilder extends IndexBuilder {
         }
         lastpre = pre;
       }
-      
+
       // write fulltext data
       for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
         out.write(vpre[lpre++]);
@@ -137,14 +137,14 @@ abstract class FTBuilder extends IndexBuilder {
         out.write(vpos[lpos++]);
     }
   }
-  
+
   /**
    * Calculate frequencies for tfidf.
    * @param vpre pre values for a token
    */
   final void getFreq(final byte[] vpre) {
     int lpre = 4;
-    final int size = Num.size(vpre);        
+    final int size = Num.size(vpre);
     int cr = 1;
     int co = 0;
     int pre = Num.read(vpre, lpre);
@@ -153,12 +153,12 @@ abstract class FTBuilder extends IndexBuilder {
       // find document root
       while (cr < nodes.size() && pre > nodes.get(cr)) cr++;
       while ((scm == 1 && (cr == nodes.size() || pre < nodes.get(cr))) ||
-          scm == 2 && pre == nodes.get(cr - 1)) {              
+          scm == 2 && pre == nodes.get(cr - 1)) {
         co++;
         lpre += le;
         if (lpre >= size) break;
         pre = Num.read(vpre, lpre);
-        le = Num.len(vpre, lpre);            
+        le = Num.len(vpre, lpre);
       }
       if (co > 0) {
         maxfreq[cr - 1] = co > maxfreq[cr - 1] ? co : maxfreq[cr - 1];
@@ -169,9 +169,9 @@ abstract class FTBuilder extends IndexBuilder {
       cr++;
     }
     c++;
-  }  
+  }
 
-  
+
   /**
    * Indexes a single token.
    * @param tok token to be indexed
@@ -183,9 +183,9 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   abstract void write() throws IOException;
-  
+
   /**
-   * Evaluates the maximum frequencies for tfidf. 
+   * Evaluates the maximum frequencies for tfidf.
    */
   abstract void getFreq();
 

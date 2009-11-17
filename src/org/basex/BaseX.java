@@ -60,7 +60,7 @@ public class BaseX extends Main {
     try {
       boolean u = false;
       if(input != null) process(new Check(input), true);
-      
+
       if(file != null) {
         // query file contents
         context.query = IO.get(file);

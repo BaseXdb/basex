@@ -87,7 +87,7 @@ public final class DialogCreateFS extends Dialog {
     final BaseXLabel lab = new BaseXLabel(IMPORTFSTEXT, false, true);
     lab.setBorder(new EmptyBorder(4, 4, 0, 0));
     p.add(lab);
-   
+
     button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -100,7 +100,7 @@ public final class DialogCreateFS extends Dialog {
       }
     });
     p.add(button);
-    
+
     path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
     path.addKeyListener(new KeyAdapter() {
       @Override
@@ -120,12 +120,12 @@ public final class DialogCreateFS extends Dialog {
       }
     });
     p.add(all);
-    
+
     final BaseXLabel lab1 = new BaseXLabel(CREATEFSNAME, false, true);
     lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
     p.add(lab1);
     p.add(new BaseXLabel(""));
-    
+
     dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
     dbname.addKeyListener(new KeyAdapter() {
       @Override

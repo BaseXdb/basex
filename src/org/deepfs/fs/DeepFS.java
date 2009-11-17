@@ -259,7 +259,7 @@ public final class DeepFS implements DataText {
     final int s = path.lastIndexOf('/');
     return s > 0 ? path.substring(0, s) : "/";
   }
-  
+
   /**
    * Extract file name suffix.
    * @param name of the file
@@ -270,7 +270,7 @@ public final class DeepFS implements DataText {
     final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
     return suf;
   }
-  
+
   /**
    * Construct file node as MemData object, ready to be inserted into main
    * data instance.
@@ -297,7 +297,7 @@ public final class DeepFS implements DataText {
     m.addAtt(suffixID, 0, getSuffix(fname), 10);
     return m;
   }
-  
+
   /**
    * Offset of size value.
    * Used to calculated the dir size in {@link FSParser}.
@@ -306,7 +306,7 @@ public final class DeepFS implements DataText {
   public static int getSizeOffset() {
     return 3;
   }
-  
+
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name

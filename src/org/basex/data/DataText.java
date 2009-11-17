@@ -58,9 +58,9 @@ public interface DataText {
   /** Maximal indexed full-text score. */
   String DBFTMSC = "FTMSC";
   /** Minimal indexed full-text score. */
-  String DBFTMISC = "FTMISC"; 
+  String DBFTMISC = "FTMISC";
   /** Maximal indexed full-text score. */
-  String DBFTISCM = "FTISCM"; 
+  String DBFTISCM = "FTISCM";
   /** Up-to-date flag. */
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */
@@ -73,7 +73,7 @@ public interface DataText {
   String DBBCK = "BACKING";
   /** DeepFS instance. */
   String DBDEEPFS = "DEEPFS";
-  
+
   /** Tags. */
   String DBTAGS = "TAGS";
   /** Attributes. */
@@ -235,8 +235,7 @@ public interface DataText {
   String TABLEKND = "KIND";
   /** Fifth table Header. */
   String TABLECON = "CONTENT";
-  
-  
+
   // DATABASE FILES ===========================================================
 
   /** Database - Info. */

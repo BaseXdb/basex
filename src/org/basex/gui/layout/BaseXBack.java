@@ -75,7 +75,7 @@ public class BaseXBack extends JPanel {
       final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
   }
-    
+
   /**
    * Activates graphics anti-aliasing.
    * @param g graphics reference

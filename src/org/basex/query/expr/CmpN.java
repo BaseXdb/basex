@@ -86,7 +86,7 @@ public final class CmpN extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    
+
     if(expr[0].e() || expr[1].e()) {
       ctx.compInfo(OPTSIMPLE, this, Seq.EMPTY);
       return Seq.EMPTY;

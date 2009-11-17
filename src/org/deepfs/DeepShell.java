@@ -198,7 +198,7 @@ public final class DeepShell {
     }
     if(args.length == 2) {
       final File d = new File(args[1]);
-      if (d.isDirectory()) { 
+      if (d.isDirectory()) {
         new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
@@ -207,7 +207,7 @@ public final class DeepShell {
     help(new String[] { "help", "tree"});
     return;
   }
-  
+
   /**
    * Prints stat information of file to stdout.
    * @param args argument vector

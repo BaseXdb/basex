@@ -251,13 +251,13 @@ public final class FNSeq extends Fun {
 
         final Item qn1 = n1.qname();
         if(qn1 != null && !qn1.eq(n2.qname())) return false;
-        
+
         if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM ||
             n1.type == Type.TXT) {
           if(!Token.eq(n1.str(), n2.str())) return false;
           continue;
         }
-        
+
         NodeIter att1 = n1.attr();
         int s1 = 0;
         while(att1.next() != null) s1++;

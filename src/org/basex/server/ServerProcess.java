@@ -1,8 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import org.basex.BaseXServer;
@@ -14,11 +12,9 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
-import org.basex.core.proc.IntError;
-import org.basex.core.proc.IntInfo;
 import org.basex.data.Data;
+import org.basex.io.BufferInput;
 import org.basex.io.BufferedOutput;
-import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -39,11 +35,11 @@ public final class ServerProcess extends Thread {
   /** Info flag. */
   private final boolean info;
   /** Input stream. */
-  private DataInputStream dis;
+  private BufferInput in;
   /** Output stream. */
   private PrintOutput out;
   /** Core. */
-  private Process core;
+  private Process proc;
   /** Timeout thread. */
   private Thread timeout;
 
@@ -66,12 +62,12 @@ public final class ServerProcess extends Thread {
    */
   public boolean init() {
     try {
-      dis = new DataInputStream(socket.getInputStream());
+      in = new BufferInput(socket.getInputStream());
       out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
 
       // evaluate login data
-      final String us = dis.readUTF();
-      final String pw = dis.readUTF();
+      final String us = in.readString();
+      final String pw = in.readString();
       context.user = context.users.get(us, pw);
       final boolean ok = context.user != null;
       send(ok);
@@ -93,9 +89,9 @@ public final class ServerProcess extends Thread {
     if(info) Main.outln(this + " Login: " + context.user.name);
     try {
       while(true) {
-        String in = null;
+        String input = null;
         try {
-          in = dis.readUTF();
+          input = in.readString();
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
           exit();
@@ -104,37 +100,37 @@ public final class ServerProcess extends Thread {
 
         // parse input and create process instance
         final Performance perf = new Performance();
-        Process proc = null;
+        proc = null;
         try {
-          proc = new CommandParser(in, context, true).parse()[0];
-
-          if(proc instanceof IntInfo) {
-            String inf = core.info();
-            if(inf.equals(PROGERR)) inf = SERVERTIME;
-            new DataOutputStream(out).writeUTF(inf);
-            out.flush();
-          } else if(proc instanceof Exit) {
-            exit();
-            break;
-          } else {
-            core = proc;
-            startTimer(proc);
-            final boolean up = proc.updating(context) || 
-              (proc.flags & User.CREATE) != 0;
-            sem.before(up);
-            final boolean ok = proc.execute(context, out);
-            out.write(new byte[IO.BLOCKSIZE]);
-            send(ok);
-            stopTimer();
-            sem.after(up);
-          }
+          proc = new CommandParser(input, context, true).parse()[0];
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create error feedback
-          proc = new IntError(ex.extended());
-          core = proc;
-          out.write(new byte[IO.BLOCKSIZE]);
+          out.write(0);
+          out.print(ex.extended());
+          out.write(0);
           send(false);
         }
+
+        // stop console
+        if(proc instanceof Exit) {
+          exit();
+          break;
+        }
+
+        // process command and send results
+        startTimer(proc);
+        final boolean up = proc.updating(context) ||
+          (proc.flags & User.CREATE) != 0;
+        sem.before(up);
+        final boolean ok = proc.execute(context, out);
+        out.write(0);
+        final String inf = proc.info();
+        out.print(inf.equals(PROGERR) ? SERVERTIME : inf);
+        out.write(0);
+        send(ok);
+        stopTimer();
+        sem.after(up);
+
         if(info) Main.outln(this + " " + in + ": " + perf);
       }
       if(info) Main.outln(this + " Logout: " + context.user.name);
@@ -155,9 +151,9 @@ public final class ServerProcess extends Thread {
 
   /**
    * Starts a timeout thread for the specified process.
-   * @param proc process reference
+   * @param p process reference
    */
-  private void startTimer(final Process proc) {
+  private void startTimer(final Process p) {
     final long to = context.prop.num(Prop.TIMEOUT);
     if(to == 0) return;
 
@@ -165,7 +161,7 @@ public final class ServerProcess extends Thread {
       @Override
       public void run() {
         Performance.sleep(to * 1000);
-        proc.stop();
+        p.stop();
       }
     };
     timeout.start();
@@ -183,7 +179,7 @@ public final class ServerProcess extends Thread {
    */
   public void exit() {
     new Close().execute(context);
-    if(core != null) core.stop();
+    if(proc != null) proc.stop();
     stopTimer();
     context.delete(this);
 

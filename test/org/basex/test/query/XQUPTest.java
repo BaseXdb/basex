@@ -9,7 +9,7 @@ import org.basex.core.AProp;
  * @author Lukas Kircher
  */
 public class XQUPTest extends AbstractTest {
-  /** Testing sequence containing different kinds of fragments for 
+  /** Testing sequence containing different kinds of fragments for
    * insert / replace expressions. */
   static final String SEQ1 = "(<a/>, 5, 'fooboo')";
   /** S.a. */
@@ -24,7 +24,7 @@ public class XQUPTest extends AbstractTest {
   /** S.a. */
   static final String SEQ6 =
     "(attribute n{'b'}, 'fooboo', 5, <a/>, 'fooboo', 'aaa')";
-  
+
   /**
    * Constructor.
    */
@@ -40,7 +40,7 @@ public class XQUPTest extends AbstractTest {
             "<wheels>optional</wheels>" +
           "</car>" +
         "</good>" +
-        
+
         "<bad howbad='really bad'>" +
           "<car id='3' color='pink'>" +
             "<?advice nogo='buying this one'?>" +
@@ -50,7 +50,7 @@ public class XQUPTest extends AbstractTest {
             "</wheels>" +
           "</car>" +
         "</bad>" +
-        
+
         "<ugly>" +
           "<car id='4'>" +
             "<!-- nice one -->" +
@@ -59,14 +59,14 @@ public class XQUPTest extends AbstractTest {
       "</cars>" +
       "<?dohere what='how'?>" +
       "</up>";
-    
-    // XQUP expressions return an empty iterator thus every test query q which 
+
+    // XQUP expressions return an empty iterator thus every test query q which
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
         { "xxxxxxxxxxxxx", nodes(11),
         "/up/cars/good/car/wheels[text()='optional']" },
-        
+
         // delete
         { "xxxdel1", nodes(),
         "delete nodes /up/cars/good/car[1]" },
@@ -92,7 +92,7 @@ public class XQUPTest extends AbstractTest {
         "delete node //processing-instruction()" },
         { "del6", nodes(),
         "//processing-instruction()" },
-        
+
         // rename
         { "xxxren1", nodes(),
         "rename node /up/cars as 'CARS'" },
@@ -106,7 +106,7 @@ public class XQUPTest extends AbstractTest {
         "rename node //processing-instruction('dohere') as 'BADVICE'" },
         { "ren3", nodes(28),
         "//processing-instruction('BADVICE')" },
-        
+
         //[LK] add fragment tests?
         // replace elem
         { "xxxrep1", nodes(),
@@ -137,57 +137,57 @@ public class XQUPTest extends AbstractTest {
         // replace comment
         { "xxxrep6", nodes(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", nodes(8),  
+        { "rep6", nodes(8),
         "/up/cars/good/car/text()" },
         // replace processing instruction
         { "xxxrep7", nodes(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", nodes(18, 19), 
+        { "rep7", nodes(18, 19),
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
         // replace element content
         { "xxxrep8", nodes(),
         "replace value of node //car[@id=1] with 'foo'"},
-        { "rep8", nodes(5), 
+        { "rep8", nodes(5),
         "//car[text()='foo']" },
         // "no man's land"
         { "xxxrep9", nodes(),
         "replace value of node //car[@id=1] with \"no man's land\""},
         { "rep9", nodes(5),
         "//car[text()=\"no man's land\"]" },
-    
+
         // insert
         { "xxxins1", nodes(),
         "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
-        { "ins1", nodes(8, 9), 
+        { "ins1", nodes(8, 9),
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
         { "xxxins2", nodes(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nodes(6, 9, 10), 
+        { "ins2", nodes(6, 9, 10),
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
         /*
         { "xxxins3", nodes(),
         "insert node" + SEQ6 + " into /up/cars/good/car[@id=1]"},
-        { "ins3", nodes(5, 5), 
+        { "ins3", nodes(5, 5),
         "/up/cars/good/car[text()='fooboo5'], " +
         "/up/cars/good/car[text()='foobooaaa']" },
         */
-        
+
         // merge text nodes
         { "xxxMERGEins", nodes(),
           "insert node 'foo' into /up/cars/good/car/wheels"},
-          { "MERGEins", nodes(11), 
+          { "MERGEins", nodes(11),
           "/up/cars/good/car/wheels[text()='optionalfoo']" },
         // [LK] test emtpy insertion node set for insert/replace
-        
+
         // parser tests
     };
   }
   @Override
   String details(final AProp prop) { return ""; }
- 
+
   /*
-  
+
   PRE DIS SIZ ATS  NS  KIND  CONTENT
   0   1  29   1   0  DOC   basex
   1   1  28   1   0  ELEM  up
@@ -196,7 +196,7 @@ public class XQUPTest extends AbstractTest {
   4   2   9   1   0  ELEM  good
   5   1   3   2   0  ELEM  car
   6   1   1   1   0  ATTR  id="1"
-  7   2   1   1   0  COMM   NO COMMENT 
+  7   2   1   1   0  COMM   NO COMMENT
   8   4   5   3   0  ELEM  car
   9   1   1   1   0  ATTR  id="2"
  10   2   1   1   0  ATTR  color="blue"
@@ -216,8 +216,8 @@ public class XQUPTest extends AbstractTest {
  24  22   4   1   0  ELEM  ugly
  25   1   3   2   0  ELEM  car
  26   1   1   1   0  ATTR  id="4"
- 27   2   1   1   0  COMM   nice one 
+ 27   2   1   1   0  COMM   nice one
  28  27   1   1   0  PI    dohere what='how'
-  
+
   */
 }

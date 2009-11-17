@@ -45,7 +45,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.8";
+  String VERSION = "5.81";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -120,7 +120,7 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  
+
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
     "Usage: " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
@@ -495,7 +495,7 @@ public interface Text {
   String[] USERHEAD = { "Username",  "Read", "Write", "Create", "Admin" };
   /** Admin user. */
   String ADMIN = "admin";
-  
+
   // ADMIN COMMANDS ==========================================================
 
   /** Show databases. */
@@ -987,14 +987,14 @@ public interface Text {
   /** Dialog asking if a new database should be be created. */
   String NODEEPFSQUESTION = lang("info_nodeepfs") + DOT + NL +
     lang("do_nodbquestion") + NL + " ";
-  
+
   /** File dialog error. */
   String NOTOPENED = lang("c_notopened");
   /** File dialog error. */
   String NOTSAVED = lang("c_notsaved");
   /** File dialog replace information. */
   String FILEREPLACE = lang("c_replace");
-  
+
   /** Server title. */
   String SRVTITLE = lang("ds_servdia");
   /** Server. */
@@ -1029,7 +1029,7 @@ public interface Text {
   String DATABASES = lang("ds_databases");
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
-  
+
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
   /** Dialog title for import options. */
@@ -1067,7 +1067,7 @@ public interface Text {
   String OPENMOUNTTITLE = lang("dmnt_title") + DOTS;
   /** No valid path to mount point. */
   String NOVALIDMOUNT = lang("dmnt_nomountpath") + DOT;
-  
+
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */

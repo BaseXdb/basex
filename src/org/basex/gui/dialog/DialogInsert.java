@@ -143,7 +143,7 @@ public final class DialogInsert extends Dialog {
   public void action(final String cmd) {
     for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
     lkind = kind;
-    
+
     String msg = null;
     ok = kind != Data.TEXT || input2.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {

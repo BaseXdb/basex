@@ -5,7 +5,7 @@ import org.basex.query.ft.FTOpt;
 
 /**
  * Full-text tokenizer with tfidf scoring support.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
@@ -16,7 +16,7 @@ public final class ScoringTokenizer extends Tokenizer{
   private int max = 1;
   /** Container for frequency. */
   private IntMap freq;
-  
+
   /**
    * Empty constructor.
    * @param pr (optional) database properties
@@ -24,7 +24,7 @@ public final class ScoringTokenizer extends Tokenizer{
   public ScoringTokenizer(final Prop pr) {
     super(Token.EMPTY, pr);
   }
-  
+
   /**
    * Constructor.
    * @param txt text
@@ -41,14 +41,14 @@ public final class ScoringTokenizer extends Tokenizer{
   public byte[] get() {
     return super.get();
   }
-  
+
   @Override
   public void init(final byte[] txt) {
     super.init(txt);
     initScoring();
     init();
   }
-  
+
   /**
    * Returns the score for the specified key.
    * @param key key
@@ -65,7 +65,7 @@ public final class ScoringTokenizer extends Tokenizer{
     }
     return c == 0 ? 0 : Math.max(1, c * 1000 / max);
   }
- 
+
   /**
    * Initializes the scoring process.
    */

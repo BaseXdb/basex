@@ -11,7 +11,7 @@ import org.deepfs.fsml.util.DeepFile;
  * @author Bastian Lemke
  */
 public interface IFileParser {
-  
+
   /**
    * <p>
    * Checks if there is a File in correct format and can be read by the parser.

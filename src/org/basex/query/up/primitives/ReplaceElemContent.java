@@ -8,13 +8,13 @@ import org.basex.query.item.Nod;
 import org.basex.query.util.Err;
 
 /**
- * Replace element content primitive.  
+ * Replace element content primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
 public final class ReplaceElemContent extends UpdatePrimitive {
-  /** Replacing text node. */ 
+  /** Replacing text node. */
   public byte[] r;
 
   /**
@@ -26,7 +26,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
     super(n);
     r = tn;
   }
-  
+
   @Override
   public void check() { }
 

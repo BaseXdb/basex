@@ -26,7 +26,7 @@ public final class MetaData {
   public String name;
   /** Database users. */
   public Users users;
-  
+
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
   /** Original filename of XML document. */
@@ -67,7 +67,6 @@ public final class MetaData {
   /** Mode of inexed score values. */
   public int ftiscm;
 
-  
   /** Flag for removed index structures. */
   public boolean uptodate = true;
   /** Dirty flag. */
@@ -139,8 +138,8 @@ public final class MetaData {
       String str = "", k;
       IO f = null;
       long t = 0;
-      while(!(k = in.readString()).isEmpty()) {
-        final String v = in.readString();
+      while(!(k = Token.string(in.readBytes())).isEmpty()) {
+        final String v = Token.string(in.readBytes());
         if(k.equals(DBSTR)) str = v;
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = Token.toLong(v);
@@ -175,13 +174,13 @@ public final class MetaData {
   private void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
-      final String k = in.readString();
+      final String k = Token.string(in.readBytes());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
         users = new Users(in);
         continue;
       }
-      final String v = in.readString();
+      final String v = Token.string(in.readBytes());
       if(k.equals(DBSTR))         storage    = v;
       else if(k.equals(IDBSTR))   istorage   = v;
       else if(k.equals(DBSIZE))   size       = Token.toInt(v);
@@ -202,7 +201,7 @@ public final class MetaData {
       else if(k.equals(DBFTCS))   ftcs       = toBool(v);
       else if(k.equals(DBFTDC))   ftdc       = toBool(v);
       else if(k.equals(DBFTMSC))  ftmaxscore = Token.toInt(v);
-      else if(k.equals(DBFTMISC))  ftminscore = Token.toInt(v);
+      else if(k.equals(DBFTMISC)) ftminscore = Token.toInt(v);
       else if(k.equals(DBFTISCM)) ftiscm     = Token.toInt(v);
       else if(k.equals(DBTIME))   time       = Token.toLong(v);
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
@@ -252,7 +251,7 @@ public final class MetaData {
     writeInfo(out, DBFTCS,   ftcs);
     writeInfo(out, DBFTDC,   ftdc);
     writeInfo(out, DBFTMSC,  ftmaxscore);
-    writeInfo(out, DBFTMISC,  ftminscore);
+    writeInfo(out, DBFTMISC, ftminscore);
     writeInfo(out, DBFTISCM, ftiscm);
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);

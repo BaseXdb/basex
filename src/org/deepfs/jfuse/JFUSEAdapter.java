@@ -6,17 +6,17 @@ package org.deepfs.jfuse;
 
 /**
  * This class assembles all references to the external jfuse library.
- * 
+ *
  * In order to keep BaseX independent from external libraries this class
  * assembles all calls to the Java FUSE bindings and provides default values. In
  * case jfuse.jar is removed from the build path this class and the actual FUSE
  * implementation should be the only classes to be modified or removed. In fact,
  * it is intended to just exclude DeepFSImpl from the build path and to toggle
  * the (un)commented code here.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
- * 
+ *
  */
 public final class JFUSEAdapter { //implements FileModeFlags {
 
@@ -68,7 +68,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
 
   /**
    * Returns directory bit.
-   * 
+   *
    * @return bitmask indicating a directory
    */
   public static int getSIFDIR() {
@@ -78,7 +78,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
 
   /**
    * Returns regular file bit.
-   * 
+   *
    * @return bitmask indicating a directory
    */
   public static int getSIFREG() {

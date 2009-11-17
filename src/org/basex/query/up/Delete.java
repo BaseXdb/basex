@@ -26,7 +26,7 @@ public final class Delete extends Update {
   public Delete(final Expr r) {
     super(r);
   }
-  
+
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Iter t = expr[0].iter(ctx);

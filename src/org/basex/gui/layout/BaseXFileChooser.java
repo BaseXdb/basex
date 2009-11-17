@@ -118,7 +118,7 @@ public final class BaseXFileChooser {
     return !io.exists() || Dialog.confirm(gui, Main.info(FILEREPLACE, io)) ?
         io : null;
   }
-  
+
   /**
    * Defines a file filter for XML documents.
    */

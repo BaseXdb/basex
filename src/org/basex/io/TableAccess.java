@@ -31,7 +31,7 @@ public abstract class TableAccess {
     pref = f;
     prop = pr;
   }
-  
+
   /**
    * Reads a byte value and returns it as an integer value.
    * @param p pre value

@@ -54,7 +54,7 @@ public final class Constr {
     }
     if(text.size() != 0) children.add(new FTxt(text.finish(), null));
   }
-  
+
   /**
    * Recursively adds nodes to the element arrays. Recursion is necessary
    * as documents are resolved to their child nodes.

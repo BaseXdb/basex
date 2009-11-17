@@ -8,7 +8,7 @@ import org.deepfs.util.LibraryLoader;
 
 /**
  * Evaluates the 'mount' command and mounts a DeepFS database as FUSE.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */

@@ -50,9 +50,7 @@ public interface Commands {
     GRANT(HELPGRANT), REVOKE(HELPREVOKE), ALTER(HELPALTER),
     // General commands
     HG(HID, HELPG), SET(HELPSET), PASSWORD(HELPPASSWORD),
-    HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID),
-    // Internal commands
-    INTINFO(INT);
+    HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID);
 
     /** Flags for controlling command parsing. */
     private final int flags;

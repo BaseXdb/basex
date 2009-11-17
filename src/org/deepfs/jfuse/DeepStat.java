@@ -42,7 +42,7 @@ public final class DeepStat {
   public long stflags;
   /** File generation number. Type: u_long (4 bytes) */
   public long stgen;
-  
+
   /**
    * Print stat fields to provided stream.
    * @param prefix to output

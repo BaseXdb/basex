@@ -180,7 +180,7 @@ public final class UpdateFunctions {
       final int k = Nod.kind(n.type);
       return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
-    
+
     int s = 1;
     NodeIter ch = n.attr();
     while(ch.next() != null) s++;

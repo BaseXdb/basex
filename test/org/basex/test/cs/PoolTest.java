@@ -54,7 +54,7 @@ public class PoolTest {
       throw new AssertionError(ex.toString());
     }
   }
-  
+
   /** Create and Drop Tests. */
   @Test
   public final void createAndDrop() {
@@ -71,7 +71,7 @@ public class PoolTest {
     ok(new DropDB(NAME), session1);
     pins(0, NAME);
   }
-  
+
   /** Close and Open Tests. */
   @Test
   public final void closeAndOpen() {
@@ -90,8 +90,8 @@ public class PoolTest {
     ok(new Close(), session2);
     pins(0, NAME);
   }
-  
-  
+
+
   /** Stops the server. */
   @AfterClass
   public static void stop() {
@@ -105,7 +105,7 @@ public class PoolTest {
     // Stop server instance.
     new BaseXServer("stop");
   }
-  
+
   /**
    * Checks the number of database pins for the specified database.
    * @param pin expected number of pins
@@ -114,7 +114,7 @@ public class PoolTest {
   private void pins(final int pin, final String name) {
     assertEquals(pin, server.context.size(name));
   }
-  
+
   /**
    * Assumes that this command is successful.
    * @param pr process reference
@@ -133,7 +133,7 @@ public class PoolTest {
   private void no(final Process pr, final Session s) {
     ok(process(pr, s) != null);
   }
-  
+
   /**
    * Assumes that the specified flag is successful.
    * @param flag flag
@@ -141,7 +141,7 @@ public class PoolTest {
   private static void ok(final boolean flag) {
     assertTrue(flag);
   }
-  
+
   /**
    * Runs the specified process.
    * @param pr process reference

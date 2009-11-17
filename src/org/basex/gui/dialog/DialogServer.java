@@ -253,7 +253,7 @@ public final class DialogServer extends Dialog {
     tabs.setEnabledAt(2, connected);
     ctx.prop.write();
   }
-  
+
   /**
    * Fills sessions/databases panel.
    * @throws IOException Exception

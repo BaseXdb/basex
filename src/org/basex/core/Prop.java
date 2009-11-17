@@ -131,7 +131,7 @@ public final class Prop extends AProp {
   public static final Object[] FTDC = { "FTDC", false };
   /** Flag for full-text scoring algorithm. */
   /** Scoring mode. 1 = document based, 2 = textnode based .*/
-  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2}; 
+  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2 };
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };
@@ -142,7 +142,7 @@ public final class Prop extends AProp {
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
 
   // DEEPFS OPTIONS ===========================================================
-  
+
   /** Flag for importing file metadata. */
   public static final Object[] FSMETA = { "FSMETA", true };
   /** Flag for importing file contents. */

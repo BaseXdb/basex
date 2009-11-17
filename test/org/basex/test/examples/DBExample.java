@@ -16,8 +16,9 @@ public final class DBExample {
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
+   * @throws BaseXException exception
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws BaseXException {
     // Creates a new database context, referencing the database.
     Context context = new Context();
 

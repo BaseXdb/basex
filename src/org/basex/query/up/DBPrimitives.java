@@ -13,7 +13,7 @@ import org.basex.util.IntList;
 
 /**
  * Holds all update primitives for a specific data reference.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
@@ -28,10 +28,10 @@ public final class DBPrimitives {
   private final Data d;
   /** Primitives for this database are finished. */
   private boolean finished;
-  
+
   /**
-   * Constructor. 
-   * @param data Data reference. If data == null, all target nodes 
+   * Constructor.
+   * @param data Data reference. If data == null, all target nodes
    * are fragments.
    */
   public DBPrimitives(final Data data) {
@@ -39,7 +39,7 @@ public final class DBPrimitives {
     f = d == null;
     op = new HashMap<Integer, UpdatePrimitive[]>();
   }
-  
+
   /**
    * Getter.
    * @return data reference
@@ -47,7 +47,7 @@ public final class DBPrimitives {
   public Data data() {
     return d;
   }
-  
+
   /**
    * Finishes something. Not finished yet.
    */
@@ -59,7 +59,7 @@ public final class DBPrimitives {
     sortedPre = il.finish();
     finished = true;
   }
-  
+
   /**
    * Getter.
    * @return sorted pre values of target nodes
@@ -68,7 +68,7 @@ public final class DBPrimitives {
     if(!finished) finish();
     return sortedPre;
   }
-  
+
   /**
    * Adds a primitive to a primitive list depending on its type.
    * @param p update primitive
@@ -78,7 +78,7 @@ public final class DBPrimitives {
     int i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
     // Possible to use node id cause nodes in map belong to the same
-    // database. Thus there won't be any collisions between dbnodes and 
+    // database. Thus there won't be any collisions between dbnodes and
     // fragments.
     else i = ((FNode) p.node).id();
     UpdatePrimitive[] l = op.get(i);
@@ -90,7 +90,7 @@ public final class DBPrimitives {
     } else if(l[pos] == null) l[pos] = p;
     else l[pos].merge(p);
   }
-  
+
   /**
    * Checks constraints and applies all updates to the data bases.
    * @throws QueryException query exception
@@ -107,8 +107,8 @@ public final class DBPrimitives {
       // apply all updates for current database node
       for(final UpdatePrimitive pp : pl) {
         if(pp == null) continue;
-        // An 'insert before' update moves the currently updated db node 
-        // further down, hence increases its pre value by the number of 
+        // An 'insert before' update moves the currently updated db node
+        // further down, hence increases its pre value by the number of
         // inserted nodes.
         if(pp.type() == PrimitiveType.INSERTBEFORE) {
           add = ((InsertBefore) pp).m.meta.size;

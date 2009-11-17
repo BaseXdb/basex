@@ -29,7 +29,7 @@ public final class If extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     List.updating(ctx, new Expr[] { expr[1], expr[2] });
-    
+
     Expr e = this;
     if(checkUp(expr[0], ctx).i()) {
       // static result: return then or else branch

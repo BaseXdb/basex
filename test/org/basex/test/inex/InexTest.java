@@ -161,7 +161,7 @@ public final class InexTest {
       final String str = session.info();
       final String time = find(str, "Total Time: (.*) ms");
       final String items = find(str, "Results   : ([0-9]+) Item");
-      
+
       // output result
       Main.outln("Query % on %: % (% items)",
           qu + 1, databases.get(db), time, items);

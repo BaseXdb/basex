@@ -39,7 +39,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   private byte isize = 1;
   /** Number of indexed tokens. */
   private int ntok;
-  
+
 
   /**
    * Constructor.
@@ -114,7 +114,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
         dr = outz.size();
         tr = (int) outy.size();
         c++;
-      }      
+      }
     }
     tree = null;
 
@@ -140,7 +140,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
           getFreq(tre.pre[tre.next()]);
         }
       }
-    }  
+    }
   }
 
 }

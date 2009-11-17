@@ -123,7 +123,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void text(final byte[] b, final FTPos ftp) throws IOException {
     finishElement();
-    
+
     int c = -1, wl = 0;
     final Tokenizer ftt = new Tokenizer(b, null);
     while(ftt.more()) {

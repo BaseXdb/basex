@@ -23,7 +23,7 @@ import static org.basex.util.Token.*;
 public final class Find extends AQuery {
   /** Contains text token. */
   private static final String CT = "contains text";
-  
+
   /**
    * Default constructor.
    * @param query simplified query

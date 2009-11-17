@@ -121,7 +121,7 @@ public final class FTWords extends FTExpr {
               iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
             }
           iat.setTokenNum(++ctx.ftoknum);
-        }        
+        }
         return iat.more() ? new FTItem(iat.matches(),
             data, iat.next(), txt.length, iat.indexSize(),
             iat.score()) : null;
@@ -253,7 +253,7 @@ public final class FTWords extends FTExpr {
         if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
       }
     }
-    
+
     // summarize number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
     ic.is = 0;

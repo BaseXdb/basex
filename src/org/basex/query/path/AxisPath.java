@@ -194,7 +194,7 @@ public class AxisPath extends Path {
         }
       }
     }
-    
+
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Use.VAR, ctx);
 

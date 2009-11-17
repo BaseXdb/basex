@@ -81,7 +81,7 @@ public final class DiskData extends Data {
       meta = new MetaData(db, in, pr);
 
       while(true) {
-        final String k = in.readString();
+        final String k = Token.string(in.readBytes());
         if(k.isEmpty()) break;
         if(k.equals(DBTAGS))      tags = new Names(in);
         else if(k.equals(DBATTS)) atts = new Names(in);

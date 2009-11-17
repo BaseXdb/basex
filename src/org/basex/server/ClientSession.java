@@ -1,7 +1,5 @@
 package org.basex.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +10,7 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
-import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -22,17 +20,14 @@ import org.basex.util.Token;
  * The following steps show how to talk to the server instance with any
  * other programming language:
  * <ul>
- * <li> A socket is created by the constructor.</li>
- * <li> The {@link #execute} method sends database commands to the server
- * as UTF8 byte arrays. The byte array is preceded by two bytes (high/low byte)
- * containing the string length. A single byte is received as result,
- * determining if command execution was successful (0) or not (1).
- * If the command was successful, the query result is sent.
- * As the length of the resulting byte array is unknown,
- * it is concluded by {@link IO#BLOCKSIZE} zero bytes.</li>
- * <li> The {@link #info} method sends the {@link Cmd#INTINFO} command and
- * receives a UTF8 byte array as result, which has the format as the one sent
- * by {@link #execute}.</li>
+ * <li> A socket instance is created by the constructor.</li>
+ * <li> The {@link #execute} method sends database commands to the server.
+ * All strings are encoded as UTF8 and concluded by a zero byte.</li>
+ * <li> If the command was successfully processed,
+ * the query string is sent.</li>
+ * <li> Next, the processing info string is sent.</li>
+ * <li> A last byte is next sent to indicate if command execution
+ * was successful (0) or not (1).</li>
  * <li> {@link #close} closes the session by sending the {@link Cmd#EXIT}
  * command to the server.</li>
  * </ul>
@@ -42,9 +37,11 @@ import org.basex.util.Token;
  */
 public final class ClientSession extends Session {
   /** Output stream. */
-  private final DataOutputStream out;
+  private final PrintOutput out;
   /** Input stream. */
   private final InputStream in;
+  /** Process info. */
+  private String info;
 
   /**
    * Constructor, specifying the database context and the
@@ -72,11 +69,13 @@ public final class ClientSession extends Session {
       final String user, final String pw) throws IOException {
     final Socket socket = new Socket(host, port);
     in = socket.getInputStream();
-    out = new DataOutputStream(socket.getOutputStream());
+    out = new PrintOutput(socket.getOutputStream());
 
     // send user name and password
-    out.writeUTF(user);
-    out.writeUTF(Token.md5(pw));
+    out.print(user);
+    out.write(0);
+    out.print(Token.md5(pw));
+    out.write(0);
     if(in.read() != 0) throw new LoginException();
   }
 
@@ -84,11 +83,12 @@ public final class ClientSession extends Session {
   public boolean execute(final String cmd, final OutputStream o)
       throws IOException {
 
-    out.writeUTF(cmd);
+    out.print(cmd);
+    out.write(0);
     final BufferInput bi = new BufferInput(in);
     int l;
     while((l = bi.read()) != 0) o.write(l);
-    for(int i = 0; i < IO.BLOCKSIZE - 1; i++) bi.read();
+    info = bi.readString();
     return bi.read() == 0;
   }
 
@@ -99,9 +99,8 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public String info() throws IOException {
-    out.writeUTF(Cmd.INTINFO.toString());
-    return new DataInputStream(in).readUTF();
+  public String info() {
+    return info;
   }
 
   @Override

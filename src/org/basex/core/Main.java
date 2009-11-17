@@ -199,7 +199,7 @@ public abstract class Main {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new BaseXException(bug(ext));
+    throw new RuntimeException(bug(ext));
   }
 
   /**
@@ -210,7 +210,7 @@ public abstract class Main {
   public static Object notimplemented(final Object... ext) {
     final TokenBuilder sb = new TokenBuilder("Not Implemented.");
     if(ext.length != 0) sb.add(" (%)", ext);
-    throw new BaseXException(sb.add('.').toString());
+    throw new RuntimeException(sb.add('.').toString());
   }
 
   /**

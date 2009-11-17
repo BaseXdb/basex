@@ -103,11 +103,11 @@ public final class FTFuzzy extends FTIndex {
     // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
-    
+
     byte[] tok;
     if (ind instanceof ScoringTokenizer) {
       tok = ((ScoringTokenizer) ind).get();
-    } else 
+    } else
     tok = fto.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);

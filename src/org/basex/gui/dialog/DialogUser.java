@@ -48,7 +48,7 @@ import org.basex.util.Table;
 
 /**
  * Panel for displaying information about global/lokal users.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -364,7 +364,7 @@ public final class DialogUser extends BaseXBack {
 
   /**
    * Dialog specific table model.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
@@ -451,7 +451,7 @@ public final class DialogUser extends BaseXBack {
 
   /**
    * Combobox in JTable.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */

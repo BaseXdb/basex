@@ -49,7 +49,7 @@ public final class Replace extends Update {
     final NodIter aSeq = c.ats;
     if(c.errAtt) Err.or(UPNOATTRPER);
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
-    
+
     final Iter t = expr[0].iter(ctx);
     Item i = t.next();
     // check target constraints
@@ -58,7 +58,7 @@ public final class Replace extends Update {
     if(!(i instanceof Nod) || k == Data.DOC || t.next() != null)
       Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
-    
+
     // replace node
     if(!value) {
       if(n.parent() == null) Err.or(UPNOPAR, i);
@@ -84,7 +84,7 @@ public final class Replace extends Update {
     }
     return Seq.EMPTY;
   }
-  
+
   @Override
   public String toString() {
     return REPLACE + ' ' + (value ? VALUEE + ' ' + OF : "") +

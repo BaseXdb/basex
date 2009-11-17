@@ -79,7 +79,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
     logo = BaseXLayout.image("logo");
-    
+
     views = new ViewPanel[v.length];
     for(int i = 0; i < v.length; i++) views[i] = new ViewPanel(v[i]);
     gui = main;

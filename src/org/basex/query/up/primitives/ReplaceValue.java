@@ -11,7 +11,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.util.Err;
 
 /**
- * Replace value primitive.  
+ * Replace value primitive.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
@@ -29,7 +29,7 @@ public final class ReplaceValue extends NewValue {
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
-    
+
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
@@ -42,12 +42,12 @@ public final class ReplaceValue extends NewValue {
     }
     // [LK] add delete if replace with empty string ?
   }
-  
+
   @Override
   public PrimitiveType type() {
     return REPLACEVALUE;
   }
-  
+
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPV, node);

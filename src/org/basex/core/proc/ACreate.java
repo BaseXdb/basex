@@ -46,7 +46,7 @@ abstract class ACreate extends Process {
    */
   protected final boolean build(final Parser p, final String db) {
     new Close().execute(context);
-    
+
     final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem && context.pinned(db)) return error(DBLOCKED, db);
 

@@ -16,7 +16,7 @@ import org.basex.util.Performance;
 
 /**
  * This class tests the four locking cases.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -79,7 +79,7 @@ public final class LockingTest {
     runTest(true, true);
     Main.outln("--> Test 2 successful, Test 3 started...");
     done = false;
-    
+
     // write write test
     runTest(false, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
@@ -88,16 +88,16 @@ public final class LockingTest {
       Main.outln("--> Test 3 successful, Test 4 started...");
     }
     done = false;
-    
+
     // write read test
     runTest(false, true);
     Main.outln("--> Test 4 successful, Test 5 started...");
     done = false;
-    
+
     // read write test
     runTest(true, false);
     Main.outln("--> Test 5 successful, last check...");
-    
+
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       err("test failed write read / read write");
     } else {
@@ -110,7 +110,7 @@ public final class LockingTest {
     while(tdone < tests) Performance.sleep(200);
     stop();
   }
-  
+
   /**
    * Starts a xquery thread.
    * @param s Session
@@ -142,10 +142,10 @@ public final class LockingTest {
     session1 = createSession();
     session2 = createSession();
   }
-  
+
   /**
    * Creates a Clientsession.
-   * @return ClientSession 
+   * @return ClientSession
    */
   ClientSession createSession() {
     try {
@@ -155,7 +155,7 @@ public final class LockingTest {
     }
     return null;
   }
-  
+
   /**
    * Closes a Clientsession.
    * @param s Session

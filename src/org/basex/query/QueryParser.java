@@ -1883,7 +1883,7 @@ public class QueryParser extends InputParser {
       name = check(expr(), NOTAGNAME);
       check(BRACE2);
     }
-    
+
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);

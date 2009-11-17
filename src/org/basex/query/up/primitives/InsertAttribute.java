@@ -43,7 +43,7 @@ public final class InsertAttribute extends NodeCopy {
   public PrimitiveType type() {
     return PrimitiveType.INSERTATTR;
   }
-  
+
   @Override
   public String[] addAtt() {
     final String[] a = new String[m.atts.size()];

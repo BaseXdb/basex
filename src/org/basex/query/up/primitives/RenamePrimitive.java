@@ -21,7 +21,7 @@ import org.basex.util.Token;
 public final class RenamePrimitive extends NewValue {
   /** Target node is an attribute. */
   final boolean a;
-  
+
   /**
    * Constructor.
    * @param n target node
@@ -43,17 +43,17 @@ public final class RenamePrimitive extends NewValue {
   public PrimitiveType type() {
     return RENAME;
   }
-  
+
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREN, node);
   }
-  
+
   @Override
   public String[] addAtt() {
     return a ? new String[] { Token.string(name.str()) } : null;
   }
-  
+
   @Override
   public String[] remAtt() {
     return a ? new String[] { Token.string(node.nname()) } : null;

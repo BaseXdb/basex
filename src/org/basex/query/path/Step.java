@@ -78,7 +78,7 @@ public class Step extends Preds {
     ctx.leaf = false;
 
     if(e != this) return Seq.EMPTY;
-    
+
     // no predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
     final Expr p = pred[0];

@@ -106,7 +106,7 @@ public final class DialogEdit extends Dialog {
     }
     pp.add(b, BorderLayout.CENTER);
     set(pp, BorderLayout.CENTER);
-    
+
     pp = new BaseXBack();
     pp.setLayout(new BorderLayout());
     info = new BaseXLabel(" ");
@@ -116,7 +116,7 @@ public final class DialogEdit extends Dialog {
     // create buttons
     buttons = okCancel(this);
     pp.add(buttons, BorderLayout.EAST);
-    
+
     set(pp, BorderLayout.SOUTH);
     finish(null);
   }

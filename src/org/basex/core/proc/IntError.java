@@ -5,7 +5,7 @@ import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'info users' command and returns user information.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -21,6 +21,6 @@ public final class IntError extends Process {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    return true;
+    return false;
   }
 }

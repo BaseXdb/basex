@@ -24,7 +24,7 @@ public final class XQUTS extends W3CTS {
   public XQUTS() {
     super("XQUTS");
   }
-  
+
   @Override
   Nodes states(final Nodes root) throws Exception {
     return nodes("*:state", root);

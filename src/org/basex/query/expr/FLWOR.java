@@ -64,17 +64,17 @@ public class FLWOR extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     checkUp(where, ctx);
-    
+
     final int vs = ctx.vars.size();
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
       ctx.ftfast &= fl[f].standard();
       final Expr e = fl[f].comp(ctx);
-      fl[f] = e == Seq.EMPTY ? null : (ForLet) e; 
+      fl[f] = e == Seq.EMPTY ? null : (ForLet) e;
       ctx.ftfast = fast;
     }
-    
+
     boolean em = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx);

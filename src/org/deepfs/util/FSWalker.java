@@ -8,7 +8,7 @@ import java.util.ListIterator;
 
 /**
  * Perform a preorder traversal of a directory hierarchy and notify visitors.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  */
@@ -24,7 +24,7 @@ public class FSWalker implements FSTraversal {
   public void levelUpdate(final int l) {
     ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().levelUpdate(l);  }
-  
+
   @Override
   public void postDirectoryVisit(final File d) {
     ListIterator<FSTraversal> i = visitors.listIterator();
@@ -136,27 +136,27 @@ public class FSWalker implements FSTraversal {
     }
   }
 
-  /** 
+  /**
    * Creates a new FSWalker that has to be populated with #{@link FSTraversal}.
    */
   public FSWalker() { /* DEFAULT */ }
-  
-  /** 
+
+  /**
    * Creates a new FSWalker and registers visitor(s).
    * @param v visitor implementing #{@link FSTraversal}
    */
   public FSWalker(final FSTraversal v) {
       register(v);
   }
-  
+
   /**
    * Registers a new visitor to be informed during the traversal.
-   * @param v visitor implementing #{@link FSTraversal} 
+   * @param v visitor implementing #{@link FSTraversal}
    */
   public void register(final FSTraversal v) {
     visitors.add(v);
   }
-  
+
   /**
    * Entry point for a directory traversal.
    * @param d directory traversal should start from.

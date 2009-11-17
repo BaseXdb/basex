@@ -150,7 +150,7 @@ public final class TableMemAccess extends TableAccess {
     final long d = ((o < 8 ? 3 : 11) - o) << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFFFL << d) | v << d;
   }
-  
+
   @Override
   public void delete(final int pre, final int nr) {
     move(pre + nr, pre);

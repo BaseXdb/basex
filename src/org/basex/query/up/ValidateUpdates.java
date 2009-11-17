@@ -22,13 +22,13 @@ public class ValidateUpdates {
     for(int i = 0; i < up.length; i++) {
       final UpdatePrimitive p = up[i];
       if(p == null) continue;
-      
+
 //      String[] s;
 //      if((s = p.addAtt()) != null) changeAttributePool(m, s, true);
 //      if((s = p.remAtt()) != null) changeAttributePool(m, s, false);
     }
   }
-  
+
   /**
    * Adds or removes attributes to the current attribute pool.
    * @param m map holding attribute pool
@@ -36,7 +36,7 @@ public class ValidateUpdates {
    * @param incr true if attributes must be added
    */
   @SuppressWarnings("unused")
-  private void changeAttributePool(final Map<String, Integer> m, 
+  private void changeAttributePool(final Map<String, Integer> m,
       final String[] a, final boolean incr) {
   }
 

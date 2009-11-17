@@ -41,7 +41,7 @@ public abstract class FTIndexIterator extends IndexIterator {
   public void setTokenNum(final byte tn) {
     toknum = tn;
   }
-  
+
   /**
    * Get number of indexed results.
    * @return number of indexed results
@@ -49,7 +49,7 @@ public abstract class FTIndexIterator extends IndexIterator {
   public final int indexSize() {
     return size;
   }
-  
+
   /**
    * Merges two index array iterators.
    * @param i1 first index array iterator to merge
@@ -89,8 +89,8 @@ public abstract class FTIndexIterator extends IndexIterator {
         i1.toknum = tn;
         i2.toknum = tn;
       }
-      
-      @Override 
+
+      @Override
       public double score() {
         return Math.max(i1.score(), i2.score());
       }
@@ -137,8 +137,8 @@ public abstract class FTIndexIterator extends IndexIterator {
         i1.toknum = tn;
         i2.toknum = tn;
       }
-      
-      @Override 
+
+      @Override
       public double score() {
         return Scoring.phrase(i1.score(), i2.score());
       }

@@ -37,7 +37,7 @@ public final class DataPool {
     }
     return null;
   }
-  
+
   /**
    * Returns number of references for the specified database, or 0.
    * @param db name of the database

@@ -50,7 +50,7 @@ public final class FTTrieBuilder extends FTBuilder {
     if (scm == 0) hash.init();
     else hash.initIter();
     c = 0;
-    
+
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
@@ -59,7 +59,7 @@ public final class FTTrieBuilder extends FTBuilder {
       // write compressed pre and pos arrays
       final byte[] vpre = hash.pre[p];
       final byte[] vpos = hash.pos[p];
-      
+
       fc = 0;
       writeFTData(outb, vpre, vpos);
       /*
@@ -163,7 +163,7 @@ public final class FTTrieBuilder extends FTBuilder {
     nmbdocwt = new int[hash.size()];
     c = 0;
     hash.init();
-    
+
     while(hash.more()) {
       getFreq(hash.pre[hash.next()]);
     }

@@ -77,21 +77,21 @@ public final class InfoTable extends AInfo {
       tb.add(ns);
       tb.add(NL);
     }
-    
+
     final Table table = th();
     for(int p = ps; p < pe; p++) table(table, data, p);
     tb.add(table.finish());
     return tb.finish();
   }
-  
+
   /**
-   * Print table to standard output for testing purposes.  
-   * @param d data 
+   * Print table to standard output for testing purposes.
+   * @param d data
    * @param s start node
    * @param e end node
    */
   public static void pT(final Data d, final int s, final int e) {
-    System.out.println(string(table(d, s > 0 ? s : 0, 
+    System.out.println(string(table(d, s > 0 ? s : 0,
         e > 0 ? e : d.meta.size)));
   }
 

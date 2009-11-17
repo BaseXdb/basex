@@ -6,12 +6,13 @@ package org.basex.core;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class BaseXException extends RuntimeException {
+public class BaseXException extends Exception {
   /**
-   * Constructor.
-   * @param msg detail message
+   * Constructs an exception with the specified message and extension.
+   * @param s message
+   * @param e message extension
    */
-  public BaseXException(final String msg) {
-    super(msg);
+  public BaseXException(final String s, final Object... e) {
+    super(Main.info(s, e));
   }
 }

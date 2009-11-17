@@ -28,20 +28,20 @@ public final class ReplacePrimitive extends NodeCopy {
    * @param replace replace nodes
    * @param attr replacing nodes are attributes
    */
-  public ReplacePrimitive(final Nod n, final NodIter replace, 
+  public ReplacePrimitive(final Nod n, final NodIter replace,
       final boolean attr) {
     super(n, replace);
     a = attr;
   }
-  
+
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
-      
+
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-    // source nodes may be empty, thus the replace results in deleting the 
+    // source nodes may be empty, thus the replace results in deleting the
     // target node
     if(m == null) {
       d.delete(p);
@@ -60,12 +60,12 @@ public final class ReplacePrimitive extends NodeCopy {
   public PrimitiveType type() {
     return REPLACENODE;
   }
-  
+
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPL, node.qname());
   }
-  
+
   @Override
   public String[] addAtt() {
     if(!a) return null;
@@ -74,7 +74,7 @@ public final class ReplacePrimitive extends NodeCopy {
     for(final byte[] b : m.atts.keys()) at[i++] = Token.string(b);
     return at;
   }
-  
+
   @Override
   public String[] remAtt() {
     return a ? new String[] { Token.string(node.nname()) } : null;

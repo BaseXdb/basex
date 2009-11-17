@@ -114,7 +114,7 @@ public final class ExploreView extends View {
   protected boolean db() {
     return true;
   }
-  
+
   @Override
   public void keyPressed(final KeyEvent e) {
     if(e.isAltDown()) super.keyPressed(e);

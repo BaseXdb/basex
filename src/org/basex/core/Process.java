@@ -58,8 +58,10 @@ public abstract class Process extends Progress {
    * If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param out output stream reference
+   * @throws BaseXException exception
    */
-  public void exec(final Context ctx, final OutputStream out) {
+  public void exec(final Context ctx, final OutputStream out)
+      throws BaseXException {
     if(!execute(ctx, out instanceof PrintOutput ? (PrintOutput) out :
       new PrintOutput(out))) throw new BaseXException(info());
   }
@@ -93,10 +95,6 @@ public abstract class Process extends Progress {
     final int i = context.perm(flags & 0xFF, data);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 
-    //final boolean up = updating(context) || (flags & User.CREATE) != 0;
-    //if(up) sem.beforeWrite();
-    //else sem.beforeRead();
-
     boolean ok = false;
     try {
       ok = exec(out);
@@ -107,9 +105,6 @@ public abstract class Process extends Progress {
       ex.printStackTrace();
       return error(PROCERR, this, ex.toString());
     }
-    //if(up) sem.afterWrite();
-    //else sem.afterRead();
-
     return ok;
   }
 

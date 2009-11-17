@@ -37,7 +37,7 @@ public final class FTItem extends DBNode {
    * @param tol token length
    * @param s score value out of the index
    */
-  public FTItem(final FTMatches a, final Data d, final int p, final int tol, 
+  public FTItem(final FTMatches a, final Data d, final int p, final int tol,
       final int tis, final double s) {
     super(d, p, null, Type.TXT);
     all = a;
@@ -48,7 +48,7 @@ public final class FTItem extends DBNode {
 
   @Override
   public double score() {
-    if(score == -1) 
+    if(score == -1)
         score = Scoring.textNode(all.size, is, tl, data.textLen(pre));
     return score;
   }

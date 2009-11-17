@@ -54,7 +54,7 @@ public final class List extends Arr {
       s = u ? 1 : 2;
     }
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {

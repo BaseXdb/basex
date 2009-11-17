@@ -7,7 +7,7 @@ import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'drop user' command and drops a user.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */

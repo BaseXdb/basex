@@ -37,7 +37,7 @@ public abstract class IndexIterator {
    * @return scoring value
    */
   public abstract double score();
-  
+
   /**
    * Returns the number of index results. A new iterator must be created
    * after this method has been called.

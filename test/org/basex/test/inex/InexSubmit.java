@@ -226,7 +226,7 @@ public final class InexSubmit {
    */
   private SeqIter addSortedServer(final SeqIter it1, final SeqIter it2) {
     if(it1 == null || it1.size() == 0) return it2;
-    
+
     final SeqIter tmp = new SeqIter();
     Item i1 = it1.next(), i2 = it2.next();
     while(i1 != null && i2 != null) {
@@ -246,7 +246,7 @@ public final class InexSubmit {
       tmp.add(i1);
       i1 = it1.next();
     }
-    
+
     while(i2 != null) {
       tmp.add(i2);
       i2 = it2.next();

@@ -40,7 +40,7 @@ public final class Treat extends Single {
     ctx.compInfo(OPTPRE, this);
     return atomic(ctx);
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr);

@@ -20,11 +20,11 @@ public final class InsertIntoFirst extends NodeCopy {
   public InsertIntoFirst(final Nod n, final NodIter copy) {
     super(n, copy);
   }
-  
+
   @Override
   public void apply(final int add) {
     if(!(node instanceof DBNode)) return;
-    
+
     // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;

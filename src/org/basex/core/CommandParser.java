@@ -28,7 +28,6 @@ import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.InfoUsers;
-import org.basex.core.proc.IntInfo;
 import org.basex.core.proc.Help;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
@@ -200,10 +199,6 @@ public final class CommandParser extends InputParser {
         return new Help(hc);
       case EXIT: case QUIT: case Q:
         return new Exit();
-
-      // internal commands
-      case INTINFO:
-        return new IntInfo();
 
       // admin commands
       case KILL:

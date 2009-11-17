@@ -80,14 +80,14 @@ public final class CElem extends CFrag {
     final Constr c = new Constr(ctx, expr);
     if(c.errAtt) Err.or(NOATTALL);
     if(c.duplAtt != null) Err.or(ATTDUPL, c.duplAtt);
-    
+
     final FElem node = new FElem(tname, c.children, c.ats, c.base, nsp, null);
     for(int n = 0; n < c.children.size(); n++) c.children.get(n).parent(node);
     for(int n = 0; n < c.ats.size(); n++) c.ats.get(n).parent(node);
     ctx.ns.size(s);
     return node;
   }
-  
+
   @Override
   public Expr remove(final Var v) {
     tag = tag.remove(v);

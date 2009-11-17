@@ -56,10 +56,22 @@ public final class CreateDB extends ACreate {
   }
 
   /**
+   * Creates an empty database.
+   * @param ctx database context
+   * @param name name of the database
+   * @return database instance
+   * @throws IOException I/O exception
+   */
+  public static Data emptyXml(final Context ctx, final String name)
+      throws IOException {
+    return xml(ctx, Parser.emptyParser(IO.get(name), ctx.prop), name);
+  }
+
+  /**
    * Creates a database for the specified XML document.
    * @param ctx database context
    * @param io file reference
-   * @param name name of the database to be created
+   * @param name name of the database
    * @return database instance
    * @throws IOException I/O exception
    */

@@ -298,7 +298,7 @@ public abstract class Data {
    * @param val value to be stored
    */
   public abstract void size(final int pre, final int kind, final int val);
-  
+
   /**
    * Finds the specified attribute and returns its value.
    * @param att the attribute id of the attribute to be found
@@ -422,7 +422,7 @@ public abstract class Data {
   public final void delete(final int pre) {
     meta.update();
     //if(fs != null) fs.delete(pre);
-    
+
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
@@ -437,7 +437,7 @@ public abstract class Data {
       size(par, ELEM, size(par, ELEM) - 1);
       k = kind(par);
     }
-    
+
     // reduce size of remaining ancestors
     while(par > 0 && k != DOC) {
       par = parent(par, k);
@@ -616,7 +616,7 @@ public abstract class Data {
    */
   protected abstract void update(final int pre, final byte[] val,
       final boolean txt);
-  
+
   /**
    * Inserts an element node without updating the size and distance values
    * of the table.
@@ -681,7 +681,7 @@ public abstract class Data {
    * @param v attribute name ID
    */
   protected abstract void attNameID(final int pre, final int v);
-  
+
   @Override
   public String toString() {
     return string(InfoTable.table(this, 0, meta.size));

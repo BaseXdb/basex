@@ -165,7 +165,7 @@ public final class ViewNotifier {
     if(!cont[hist].same(quick ? context.current : context.marked)) {
       if(!quick) {
         final String input = gui.input.getText();
-  
+
         // add new entry
         checkHist();
         queries[hist] = input;

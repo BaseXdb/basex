@@ -53,7 +53,7 @@ public final class Insert extends Update {
     before = b;
     after = a;
   }
-  
+
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);

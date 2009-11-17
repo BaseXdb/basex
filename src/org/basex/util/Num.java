@@ -39,8 +39,8 @@ public final class Num {
     add(array, val, 0, len);
     return array;
   }
-  
-  
+
+
   /**
    * Compresses and writes an integer value to the specified array and
    * returns the array.

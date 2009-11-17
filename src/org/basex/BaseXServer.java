@@ -84,7 +84,7 @@ public final class BaseXServer extends Main implements Runnable {
       }
     }
   }
-  
+
   @Override
   public synchronized void quit(final boolean user) {
     if(!running) return;
@@ -141,7 +141,7 @@ public final class BaseXServer extends Main implements Runnable {
     }
     if(!success) outln(SERVERINFO);
   }
-  
+
   /**
    * Stops the server.
    * @param ctx context reference

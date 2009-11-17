@@ -33,7 +33,7 @@ import org.basex.util.Token;
 
 /**
  * Open database dialog.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  */
@@ -53,7 +53,7 @@ public final class DialogMountFS extends Dialog {
 
   /** Mountpoint path. */
   final BaseXTextField mountpoint;
-  
+
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -136,7 +136,7 @@ public final class DialogMountFS extends Dialog {
 
     finish(null);
   }
-  
+
   /**
    * Returns the database name.
    * @return database name
@@ -145,7 +145,7 @@ public final class DialogMountFS extends Dialog {
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
   }
-  
+
   /**
    * Returns the mount point.
    * @return database name
@@ -154,7 +154,7 @@ public final class DialogMountFS extends Dialog {
     final String db = mountpoint.getText().trim();
     return ok && db.length() > 0 ? db : null;
   }
-  
+
   /**
    * Returns if no databases have been found.
    * @return result of check
@@ -168,7 +168,7 @@ public final class DialogMountFS extends Dialog {
     final Context ctx = gui.context;
     final String db = choice.getValue().trim();
     final String mp = mountpoint.getText().trim();
-    
+
     if(BUTTONMOUNT.equals(cmd)) {
 //      DeepFSImpl.main(new String[] {mp, db});
       close();
@@ -191,7 +191,7 @@ public final class DialogMountFS extends Dialog {
           if (!mpok) {
             warn.setText(NOVALIDMOUNT);
             warn.setIcon(BaseXLayout.icon("error"));
-          } 
+          }
           ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

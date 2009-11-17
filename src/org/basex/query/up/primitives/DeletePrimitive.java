@@ -17,7 +17,7 @@ import org.basex.util.Token;
 public final class DeletePrimitive extends UpdatePrimitive {
   /** Target node is an attribute. */
   final boolean a;
-  
+
   /**
    * Constructor.
    * @param n expression target node
@@ -26,7 +26,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
     super(n);
     a = Nod.kind(n.type) == Data.ATTR;
   }
-  
+
   @Override
   public void check() { }
 

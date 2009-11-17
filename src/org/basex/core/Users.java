@@ -9,6 +9,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Table;
+import org.basex.util.Token;
 
 /**
  * This class organizes all users.
@@ -64,7 +65,7 @@ public final class Users {
   public void add(final User user) {
     users.add(user);
   }
-  
+
   /**
    * Removes the specified user.
    * @param user user reference
@@ -148,8 +149,8 @@ public final class Users {
   private void read(final DataInput in) throws IOException {
     final int s = in.readNum();
     for(int u = 0; u < s; u++) {
-      final User user = new User(in.readString(), in.readBytes(),
-          in.readNum());
+      final User user = new User(Token.string(in.readBytes()),
+        in.readBytes(), in.readNum());
       users.add(user);
     }
   }
@@ -211,7 +212,7 @@ public final class Users {
     table.sort();
     return table.finish();
   }
-  
+
   /**
    * Returns the Userslist.
    * @return list of users

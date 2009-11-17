@@ -26,7 +26,7 @@ public final class ObsoleteTexts {
     org.basex.api.dom.BXText.class,  org.basex.query.QueryText.class,
     org.basex.query.QueryTokens.class,
     org.basex.build.mediovis.MAB2.class,
-  }; 
+  };
 
   /** Private constructor, preventing instantiation. */
   private ObsoleteTexts() { }
@@ -39,7 +39,7 @@ public final class ObsoleteTexts {
   public static void main(final String[] args) throws Exception {
     final HashSet<String> set = new HashSet<String>();
     read(new File("src"), set);
-    
+
     for(final Class<?> c : CLASSES) {
       int i = 0;
       for(final Field f : c.getDeclaredFields()) {
@@ -53,7 +53,7 @@ public final class ObsoleteTexts {
       if(i != 0) Main.outln("\n");
     }
   }
-  
+
   /**
    * Parses all java classes.
    * @param file file reference
@@ -72,9 +72,9 @@ public final class ObsoleteTexts {
         boolean found = false;
         for(final Class<?> c : CLASSES) {
           found |= c.getSimpleName().equals(name);
-        }        
+        }
         if(found) continue;
-        
+
         final BufferedReader br = new BufferedReader(new FileReader(f));
         while(true) {
           final String l = br.readLine();

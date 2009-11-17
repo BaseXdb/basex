@@ -187,7 +187,7 @@ public class DBNode extends Nod {
     // check if parent constructor exists; if not, include document root node
     final DBNode node = copy();
     node.set(p, data.kind(p));
-   
+
     /* [SG] I moved this code down and temporarily added a comment
      * due to performance issues (should be revised as soon as another
      * cheap scoring variant is found)

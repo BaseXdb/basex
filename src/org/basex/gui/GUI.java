@@ -432,7 +432,7 @@ public final class GUI extends JFrame {
       final boolean ok = pr.execute(context, out);
       final String inf = pr.info();
       updating = false;
-      
+
       if(!ok && inf.equals(PROGERR)) {
         // command was interrupted..
         proc = null;
