@@ -52,14 +52,4 @@ public final class ReplaceValue extends NewValue {
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREPV, node);
   }
-
-  @Override
-  public boolean addAtt() {
-    return false;
-  }
-  
-  @Override
-  public boolean remAtt() {
-    return false;
-  }
 }

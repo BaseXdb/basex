@@ -49,14 +49,4 @@ public final class InsertAfter extends NodeCopy {
   public PrimitiveType type() {
     return PrimitiveType.INSERTAFTER;
   }
-
-  @Override
-  public boolean addAtt() {
-    return false;
-  }
-  
-  @Override
-  public boolean remAtt() {
-    return false;
-  }
 }

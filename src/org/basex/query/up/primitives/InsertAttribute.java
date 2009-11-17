@@ -1,10 +1,12 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.up.UpdateFunctions.*;
+
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
+import org.basex.util.Token;
 
 /**
  * Insert attribute primitive.
@@ -43,12 +45,10 @@ public final class InsertAttribute extends NodeCopy {
   }
   
   @Override
-  public boolean addAtt() {
-    return true;
-  }
-  
-  @Override
-  public boolean remAtt() {
-    return false;
+  public String[] addAtt() {
+    final String[] a = new String[m.atts.size()];
+    int i = 0;
+    for(final byte[] b : m.atts.keys()) a[i++] = Token.string(b);
+    return a;
   }
 }

@@ -10,6 +10,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Rename primitive.
@@ -49,12 +50,12 @@ public final class RenamePrimitive extends NewValue {
   }
   
   @Override
-  public boolean addAtt() {
-    return a;
+  public String[] addAtt() {
+    return a ? new String[] { Token.string(name.str()) } : null;
   }
   
   @Override
-  public boolean remAtt() {
-    return a;
+  public String[] remAtt() {
+    return a ? new String[] { Token.string(node.nname()) } : null;
   }
 }

@@ -6,6 +6,7 @@ import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.util.Token;
 
 /**
  * Delete primitive.
@@ -49,12 +50,12 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public boolean addAtt() {
-    return false;
+  public String[] addAtt() {
+    return null;
   }
 
   @Override
-  public boolean remAtt() {
-    return a;
+  public String[] remAtt() {
+    return a ? new String[] { Token.string(node.nname()) } : null;
   }
 }

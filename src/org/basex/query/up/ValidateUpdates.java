@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import java.util.Map;
+
 import org.basex.query.up.primitives.UpdatePrimitive;
 
 /**
@@ -21,14 +23,22 @@ public class ValidateUpdates {
       final UpdatePrimitive p = up[i];
       if(p == null) continue;
       
-//      if(p.addAtt()) changeAttributePool(m, null, true);
-//      if(p.remAtt()) changeAttributePool(m, null, false);
+//      String[] s;
+//      if((s = p.addAtt()) != null) changeAttributePool(m, s, true);
+//      if((s = p.remAtt()) != null) changeAttributePool(m, s, false);
     }
   }
   
-//  private void changeAttributePool(final Map m, final String a, 
-//      final boolean incr) {
-//  }
+  /**
+   * Adds or removes attributes to the current attribute pool.
+   * @param m map holding attribute pool
+   * @param a attribute names to add/remove
+   * @param incr true if attributes must be added
+   */
+  @SuppressWarnings("unused")
+  private void changeAttributePool(final Map<String, Integer> m, 
+      final String[] a, final boolean incr) {
+  }
 
   /**
    * If the updates at large would leave one database invalid, no updates are

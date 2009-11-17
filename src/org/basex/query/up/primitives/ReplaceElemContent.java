@@ -50,14 +50,4 @@ public final class ReplaceElemContent extends UpdatePrimitive {
   public PrimitiveType type() {
     return PrimitiveType.REPLACEELEMCONT;
   }
-  
-  @Override
-  public boolean addAtt() {
-    return false;
-  }
-  
-  @Override
-  public boolean remAtt() {
-    return false;
-  }
 }

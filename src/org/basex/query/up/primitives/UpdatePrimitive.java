@@ -52,15 +52,14 @@ public abstract class UpdatePrimitive {
   public abstract void merge(final UpdatePrimitive p) throws QueryException;
   
   /**
-   * States if this update primitive adds an attribute to the attribute pool.
-   * @return true if target node is an attribute
+   * States which attributes are added to the attribute pool.
+   * @return names of added attributes
    */
-  public abstract boolean addAtt();
+  public String[] addAtt() { return null; };
   
   /**
-   * States if this update primitive removes an attribute from the attribute 
-   * pool.
-   * @return true if target node is an attribute
+   * States which attributes are removed from the attribute pool.
+   * @return names of removed attributes if target node is an attribute
    */
-  public abstract boolean remAtt();
+  public String[] remAtt() { return null; };
 }

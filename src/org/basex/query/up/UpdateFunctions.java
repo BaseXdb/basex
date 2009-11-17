@@ -161,9 +161,6 @@ public final class UpdateFunctions {
     final MemData m = d == null ? new MemData(16, new Names(), new Names(),
         new Namespaces(), new PathSummary(), new Prop()) : new MemData(16, d);
 
-    // [LK] BuildDB.. namespaces must be copied as well
-    //m.ns.add(...);
-
     int pre = 1;
     Nod n;
     while((n = ch.next()) != null) pre = addFragment(n, m, pre, 0);

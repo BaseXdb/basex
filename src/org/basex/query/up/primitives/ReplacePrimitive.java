@@ -10,6 +10,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Replace primitive.
@@ -66,12 +67,16 @@ public final class ReplacePrimitive extends NodeCopy {
   }
   
   @Override
-  public boolean addAtt() {
-    return a;
+  public String[] addAtt() {
+    if(!a) return null;
+    final String[] at = new String[m.atts.size()];
+    int i = 0;
+    for(final byte[] b : m.atts.keys()) at[i++] = Token.string(b);
+    return at;
   }
   
   @Override
-  public boolean remAtt() {
-    return a;
+  public String[] remAtt() {
+    return a ? new String[] { Token.string(node.nname()) } : null;
   }
 }

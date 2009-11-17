@@ -53,14 +53,4 @@ public final class InsertInto extends NodeCopy {
   public PrimitiveType type() {
     return PrimitiveType.INSERTINTO;
   }
-  
-  @Override
-  public boolean addAtt() {
-    return false;
-  }
-  
-  @Override
-  public boolean remAtt() {
-    return false;
-  }
 }
