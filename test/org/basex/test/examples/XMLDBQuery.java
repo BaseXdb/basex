@@ -20,7 +20,7 @@ public final class XMLDBQuery {
   private static final String QUERY = "//li";
 
   /** Private constructor. */
-  private XMLDBQuery() { }  
+  private XMLDBQuery() { }
 
   /**
    * Main method of the example class.

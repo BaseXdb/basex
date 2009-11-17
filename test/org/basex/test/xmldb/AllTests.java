@@ -1,5 +1,6 @@
 package org.basex.test.xmldb;
 
+import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,9 +30,9 @@ public final class AllTests {
   /** Database/document path. */
   static final String PATH = URL + COLL;
   /** Optional login. */
-  static final String LOGIN = null;
+  static final String LOGIN = ADMIN;
   /** Optional password. */
-  static final String PW = null;
+  static final String PW = ADMIN;
 
   /** Test document. */
   static final String DOC1 = "first.xml";

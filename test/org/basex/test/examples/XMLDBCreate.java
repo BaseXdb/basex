@@ -18,7 +18,7 @@ public final class XMLDBCreate {
 
   /** Private constructor. */
   private XMLDBCreate() { }
-  
+
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

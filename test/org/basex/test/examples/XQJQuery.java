@@ -20,7 +20,7 @@ public final class XQJQuery {
 
   /** Private constructor. */
   private XQJQuery() { }
-  
+
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

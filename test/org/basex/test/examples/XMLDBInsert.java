@@ -19,7 +19,7 @@ public final class XMLDBInsert {
 
   /** Private constructor. */
   private XMLDBInsert() { }
-  
+
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

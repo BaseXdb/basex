@@ -37,7 +37,7 @@ public final class RunTests {
 
     Main.outln("============= XMLDB Tests =============");
     org.basex.test.xmldb.AllTests.main(args);
-    
+
     Main.outln("============= XQJ Examples =============");
     XQJQuery.main(args);
     Main.outln();

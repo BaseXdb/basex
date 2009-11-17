@@ -25,7 +25,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
     return getCollectionName(uri) != null;
   }
 
-  public Collection getCollection(final String uri, final String username,
+  public Collection getCollection(final String uri, final String user,
       final String password) throws XMLDBException {
 
     // create database context

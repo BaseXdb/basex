@@ -30,19 +30,18 @@ final class BXCollectionManagementService implements
    * Standard Constructor.
    * @param c Collection reference
    */
-  BXCollectionManagementService(final Collection c) {
-    coll = (BXCollection) c;
+  BXCollectionManagementService(final BXCollection c) {
+    coll = c;
   }
 
   /**
-   * Creates a new collection. Note that a new collection equals the creation
-   * of a new database.
+   * Creates a new collection. Note that a new collection equals a new database.
    * @param name name of collection
    * @return collection
    * @throws XMLDBException exception
    */
   public Collection createCollection(final String name) throws XMLDBException {
-    return new BXCollection(name, false);
+    return new BXCollection(name, false, coll.ctx);
   }
 
   public void removeCollection(final String name) throws XMLDBException {

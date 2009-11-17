@@ -16,7 +16,6 @@ import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
-import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -56,8 +55,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     ctx = c;
     try {
-      ctx.openDB(open ? Open.open(ctx, name) :
-        CreateDB.xml(ctx, Parser.emptyParser(IO.get(name), ctx.prop), name));
+      ctx.openDB(open ? Open.open(ctx, name) : CreateDB.emptyXml(ctx, name));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

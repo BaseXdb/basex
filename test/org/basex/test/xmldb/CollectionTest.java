@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 public class CollectionTest extends TestCase {
   /** Collection. */
   Collection coll;
-  
+
   @Before
   @Override
   protected void setUp() throws Exception {
@@ -362,7 +362,7 @@ public class CollectionTest extends TestCase {
    * Abstract class for defining arbitrary methods.
    */
   abstract static class Code {
-    /** 
+    /**
      * Method to be executed.
      * @return result
      * @throws XMLDBException exception
