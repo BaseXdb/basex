@@ -1,22 +1,25 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
+
 import java.io.EOFException;
 import java.io.IOException;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
+import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for GIF files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public final class GIFParser extends AbstractParser {
+public final class GIFParser implements IFileParser {
 
   /** GIF87a header info. */
   private static final byte[] HEADERGIF87 = token("GIF87a");
@@ -24,10 +27,15 @@ public final class GIFParser extends AbstractParser {
   private static final byte[] HEADERGIF89 = token("GIF89a");
 
   static {
-    NewFSParser.register("gif", GIFParser.class);
+    ParserRegistry.register("gif", GIFParser.class);
   }
 
-  @Override
+  /**
+   * Checks if the gif header is valid.
+   * @param f the file channel to read from
+   * @return true if the header is valid, false otherwise.
+   * @throws IOException if any error occurs while reading from the channel.
+   */
   public boolean check(final BufferedFileChannel f) throws IOException {
     final int len = HEADERGIF87.length;
     if(f.size() < len) return false;
@@ -36,32 +44,27 @@ public final class GIFParser extends AbstractParser {
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    try {
-      f.buffer(10);
-    } catch(final EOFException e) {
-      return;
+  public void extract(final DeepFile deepFile) throws IOException {
+    final BufferedFileChannel f = deepFile.getBufferedFileChannel();
+    if(deepFile.fsmeta) {
+      try {
+        f.buffer(10);
+      } catch(final EOFException e) {
+        return;
+      }
+      if(!check(f)) return;
+
+      deepFile.setFileType(FileType.PICTURE);
+      deepFile.setFileFormat(MimeType.GIF);
+
+      // extract image dimensions
+      deepFile.addMeta(MetaElem.PIXEL_WIDTH, f.get() + (f.get() << 8));
+      deepFile.addMeta(MetaElem.PIXEL_HEIGHT, f.get() + (f.get() << 8));
     }
-    if(!check(f)) return;
-
-    meta.setType(MetaType.PICTURE);
-    meta.setFormat(MimeType.GIF);
-
-    // extract image dimensions
-    meta.add(MetaElem.PIXEL_WIDTH, f.get() + (f.get() << 8));
-    meta.add(MetaElem.PIXEL_HEIGHT, f.get() + (f.get() << 8));
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, //
-      final NewFSParser parser) {
-  // no content to read...
-  }
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
-    return false;
+  public void propagate(final DeepFile deepFile) {
+    Main.notimplemented();
   }
 }

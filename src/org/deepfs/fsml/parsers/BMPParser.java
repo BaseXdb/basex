@@ -1,30 +1,39 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
+
 import java.io.EOFException;
 import java.io.IOException;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
+import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for BMP files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public final class BMPParser extends AbstractParser {
+public class BMPParser implements IFileParser {
 
   /** BMP header info. */
   private static final byte[] HEADERBMP = token("BM");
 
   static {
-    NewFSParser.register("bmp", BMPParser.class);
+    ParserRegistry.register("bmp", BMPParser.class);
   }
 
+  /**
+   * Checks the header bytes.
+   * @param f the {@link BufferedFileChannel} to read from.
+   * @return true if the header is valid.
+   * @throws IOException if any error occurs while reading from the channel.
+   */
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     if(f.size() < 2) return false;
@@ -33,9 +42,12 @@ public final class BMPParser extends AbstractParser {
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
+  public void extract(final DeepFile deepFile) throws IOException {
+    if(!deepFile.fsmeta) return; // no content to extract
+
+    final BufferedFileChannel f = deepFile.getBufferedFileChannel();
     if(!check(f)) return;
+
     f.skip(16);
     try {
       f.buffer(8);
@@ -43,25 +55,18 @@ public final class BMPParser extends AbstractParser {
       return;
     }
 
-    meta.setType(MetaType.PICTURE);
-    meta.setFormat(MimeType.BMP);
+    deepFile.setFileType(FileType.PICTURE);
+    deepFile.setFileFormat(MimeType.BMP);
 
     // extract image dimensions
     final int w = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
     final int h = f.get() + (f.get() << 8) + (f.get() << 16) + (f.get() << 24);
-    meta.add(MetaElem.PIXEL_WIDTH, w);
-    meta.add(MetaElem.PIXEL_HEIGHT, h);
+    deepFile.addMeta(MetaElem.PIXEL_WIDTH, w);
+    deepFile.addMeta(MetaElem.PIXEL_HEIGHT, h);
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, //
-      final NewFSParser parser) {
-  // no content to read...
-  }
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
-    return false;
+  public void propagate(final DeepFile deepFile) {
+    Main.notimplemented();
   }
 }

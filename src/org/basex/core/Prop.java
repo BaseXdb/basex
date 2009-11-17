@@ -147,11 +147,16 @@ public final class Prop extends AProp {
   public static final Object[] FSMETA = { "FSMETA", true };
   /** Flag for importing file contents. */
   public static final Object[] FSCONT = { "FSCONT", true };
+  /** Flag for importing xml contents. */
+  public static final Object[] FSXML = { "FSXML", true };
   /** Maximum size for textual imports. */
   public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 1048576 };
 
-  /** FSParser implementation. If true, the new implementation is used. */
-  public static final Object[] NEWFSPARSER = { "NEWFSPARSER", false };
+  /**
+   * FSTraversal implementation. If true, the FSTraversal implementation (based
+   * on XQuery Update) is used.
+   */
+  public static final Object[] FSTRAVERSAL = { "FSTRAVERSAL", false };
   /** Fuse support. [AH] check this flag. */
   public static final Object[] FUSE = { "FUSE", false };
   /** Flag for creating a native (joint) database. */

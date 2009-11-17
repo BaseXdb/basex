@@ -7,20 +7,18 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore;
+
 import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.MetaElem;
 
 /**
  * Parser for Exif data. This is not a standalone parser. Only used for parsing
  * Exif data that is embedded in e.g. a TIFF file.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
- * 
  */
 public final class ExifParser {
   /**
@@ -51,10 +49,10 @@ public final class ExifParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            o.meta.add(MetaElem.PIXEL_WIDTH, buf.getShort() & 0xFFFF);
+            o.deepFile.addMeta(MetaElem.PIXEL_WIDTH, buf.getShort() & 0xFFFF);
             buf.getShort(); // empty two bytes
           } else if(type == IFD_TYPE_LONG) {
-            o.meta.add(MetaElem.PIXEL_WIDTH, buf.getInt());
+            o.deepFile.addMeta(MetaElem.PIXEL_WIDTH, buf.getInt());
           } else error(o, "Image width (0x0100)");
         } else error(o, "Image width (0x0100)");
       }
@@ -66,9 +64,9 @@ public final class ExifParser {
         final int type = buf.getShort();
         if(buf.getInt() == 1) {
           if(type == IFD_TYPE_SHORT) {
-            o.meta.add(MetaElem.PIXEL_HEIGHT, buf.getShort() & 0xFFFF);
+            o.deepFile.addMeta(MetaElem.PIXEL_HEIGHT, buf.getShort() & 0xFFFF);
           } else if(type == IFD_TYPE_LONG) {
-            o.meta.add(MetaElem.PIXEL_HEIGHT, buf.getInt());
+            o.deepFile.addMeta(MetaElem.PIXEL_HEIGHT, buf.getInt());
           } else error(o, "Image length (0x0101)");
         } else error(o, "Image length (0x0101)");
       }
@@ -78,7 +76,7 @@ public final class ExifParser {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.meta.add(MetaElem.DESCRIPTION, o.readAscii(buf));
+          o.deepFile.addMeta(MetaElem.DESCRIPTION, o.readAscii(buf));
         } else error(o, "Image description (0x010E)");
       }
     },
@@ -100,7 +98,7 @@ public final class ExifParser {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.meta.add(MetaElem.CREATOR, o.readAscii(buf));
+          o.deepFile.addMeta(MetaElem.CREATOR, o.readAscii(buf));
         } else error(o, "Creator (0x013B)");
       }
     },
@@ -180,8 +178,8 @@ public final class ExifParser {
      * @param fieldName the name of the current IFD field.
      */
     void error(final ExifParser o, final String fieldName) {
-      if(NewFSParser.VERBOSE) Main.debug("ExifParser: Invalid " + fieldName
-          + " field (%)", o.bfc.getFileName());
+      Main.debug("ExifParser: Invalid " + fieldName + " field (%)",
+          o.bfc.getFileName());
     }
   }
 
@@ -217,23 +215,13 @@ public final class ExifParser {
   // private static final int IFD_TYPE_SRATIONAL = 10;
   // ---------------------------------------------------------------------------
 
-  /** The {@link NewFSParser} instance to fire events. */
-  NewFSParser fsparser;
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
-  /** The metadata store. */
-  final MetaStore meta;
+  /** The metadata and content store. */
+  DeepFile deepFile;
   /** The format of the date values. */
   private static final SimpleDateFormat SDF = new SimpleDateFormat(
       "yyyy:MM:dd HH:mm:ss");
-
-  /**
-   * Constructor.
-   * @param metaStore the metadata store to store the metadata elements to.
-   */
-  public ExifParser(final MetaStore metaStore) {
-    meta = metaStore;
-  }
 
   /**
    * Checks if the Exif IFD is valid.
@@ -241,7 +229,7 @@ public final class ExifParser {
    * @return true if the IFD is valid, false otherwise.
    * @throws IOException if any error occurs while reading from the channel.
    */
-  public boolean check(final BufferedFileChannel f) throws IOException {
+  boolean check(final BufferedFileChannel f) throws IOException {
     try {
       f.buffer(4);
     } catch(final EOFException e) {
@@ -254,20 +242,19 @@ public final class ExifParser {
 
   /**
    * Parse the Exif data.
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @param parser the {@link NewFSParser} to fire events.
+   * @param df the DeepFile to store metadata and file content.
    * @throws IOException if any error occurs while reading from the channel.
    */
-  public void parse(final BufferedFileChannel f, final NewFSParser parser)
+  public void extract(final DeepFile df)
       throws IOException {
+    deepFile = df;
+    bfc = df.getBufferedFileChannel();
     try {
-      f.buffer(8);
+      bfc.buffer(8);
     } catch(final EOFException e) {
       return;
     }
-    if(!check(f)) return;
-    bfc = f;
-    fsparser = parser;
+    if(!check(bfc)) return;
 
     final int ifdOffset = bfc.getInt();
     /*
@@ -328,9 +315,9 @@ public final class ExifParser {
   void dateEvent(final MetaElem elem, final byte[] date) {
     try {
       final Date d = SDF.parse(new String(date));
-      meta.add(elem, d);
+      deepFile.addMeta(elem, d);
     } catch(final ParseException ex) {
-      if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
+      Main.debug(ex.getMessage());
     }
   }
 

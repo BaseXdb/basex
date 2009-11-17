@@ -2,26 +2,26 @@ package org.deepfs.fsml.parsers;
 
 import java.io.EOFException;
 import java.io.IOException;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
 import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for JPG files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public final class JPGParser extends AbstractParser {
+public final class JPGParser implements IFileParser {
 
   static {
-    NewFSParser.register("jpg", JPGParser.class);
-    NewFSParser.register("jpeg", JPGParser.class);
+    ParserRegistry.register("jpg", JPGParser.class);
+    ParserRegistry.register("jpeg", JPGParser.class);
   }
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
@@ -40,13 +40,19 @@ public final class JPGParser extends AbstractParser {
   { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
   private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00};
+  /** DeepFile instance to store metadata and file contents. */
+  private DeepFile deepFile;
   /** Parser for Exif data. */
-  private final ExifParser exifParser = new ExifParser(meta);
-  /** The {@link NewFSParser} instance to fire events. */
-  private NewFSParser fsparser;
+  private final ExifParser exifParser = new ExifParser();
   /** The {@link BufferedFileChannel} to read from. */
   private BufferedFileChannel bfc;
 
+  /**
+   * Checks if the JPG header is valid.
+   * @param f the file channel to read from.
+   * @return true if the header is valid, false otherwise.
+   * @throws IOException if any error occurs while reading from the channel.
+   */
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
     try {
@@ -61,49 +67,37 @@ public final class JPGParser extends AbstractParser {
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    if(!check(f)) return;
-    meta.setType(MetaType.PICTURE);
-    meta.setFormat(MimeType.JPG);
-    bfc = f;
-    fsparser = parser;
-    bfc.skip(-2);
-    while(bfc.get() == 0xFF) {
-      final int b = bfc.get(); // segment marker
-      final int size = readSize();
-      switch(b) {
-        case 0xE0: // JFIF
-          readJFIF(size);
-          break;
-        case 0xE1: // Exif
-          readExif(size);
-          break;
-        case 0xFE: // Comment
-          readComment(size);
-          break;
-        default:
-          if(b >= 0xC0 && b <= 0xC3) {
-            readDimensions();
-            return;
-          }
-          bfc.skip(size);
+  public void extract(final DeepFile df) throws IOException {
+    if(df.fsmeta) {
+      deepFile = df;
+      bfc = deepFile.getBufferedFileChannel();
+      if(!check(bfc)) return;
+      deepFile.setFileType(FileType.PICTURE);
+      deepFile.setFileFormat(MimeType.JPG);
+      bfc.skip(-2);
+      while(bfc.get() == 0xFF) {
+        final int b = bfc.get(); // segment marker
+        final int size = readSize();
+        switch(b) {
+          case 0xE0: // JFIF
+            readJFIF(size);
+            break;
+          case 0xE1: // Exif
+            readExif(size);
+            break;
+          case 0xFE: // Comment
+            readComment(size);
+            break;
+          default:
+            if(b >= 0xC0 && b <= 0xC3) {
+              readDimensions();
+              return;
+            }
+            bfc.skip(size);
+        }
+        bfc.buffer(4); // next segment marker and size value
       }
-      bfc.buffer(4); // next segment marker and size value
     }
-  }
-
-  @Override
-  protected void content(final BufferedFileChannel f, final NewFSParser p) {
-  // no textual representation for jpg content ...
-  }
-
-  // ---------------------------------------------------------------------------
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel f,
-      final NewFSParser parser) {
-    return false;
   }
 
   /**
@@ -147,11 +141,11 @@ public final class JPGParser extends AbstractParser {
     if(bfc.get() == 8) {
       final int height = bfc.getShort();
       final int width = bfc.getShort();
-      meta.add(MetaElem.PIXEL_HEIGHT, height);
-      meta.add(MetaElem.PIXEL_WIDTH, width);
+      deepFile.addMeta(MetaElem.PIXEL_HEIGHT, height);
+      deepFile.addMeta(MetaElem.PIXEL_WIDTH, width);
     } else {
-      if(NewFSParser.VERBOSE) Main.debug(
-          "JPGParser: Wrong data precision field (%).", bfc.getFileName());
+      Main.debug("JPGParser: Wrong data precision field (%).",
+          bfc.getFileName());
     }
   }
 
@@ -165,12 +159,12 @@ public final class JPGParser extends AbstractParser {
     final int len = HEADER_EXIF.length;
     bfc.buffer(len);
     if(!checkNextBytes(HEADER_EXIF)) bfc.skip(size - len);
-    final BufferedFileChannel sub = bfc.subChannel(size - len);
+    final DeepFile subFile = deepFile.subfile(size - len);
     try {
-      exifParser.parse(sub, fsparser);
+      exifParser.extract(subFile);
     } finally {
       try {
-        sub.finish();
+        subFile.finish();
       } catch(final Exception ex) {
         Main.debug(ex);
       }
@@ -208,38 +202,34 @@ public final class JPGParser extends AbstractParser {
       return;
     }
     int s = size - HEADER_JFXX.length - 1;
-    fsparser.startContent(bfc.absolutePosition(), s);
-    MetaStore contentMeta = new MetaStore();
+    final DeepFile content = deepFile.newContentSection("Thumbnail",
+        bfc.absolutePosition(), s);
     switch(bfc.get()) { // extension code
       case 0x10: // Thumbnail coded using JPEG
-        contentMeta.setType(MetaType.PICTURE);
-        contentMeta.setFormat(MimeType.JPG);
-        contentMeta.add(MetaElem.TITLE, "Thumbnail");
+        content.setFileType(FileType.PICTURE);
+        content.setFileFormat(MimeType.JPG);
+        content.addMeta(MetaElem.DESCRIPTION, "Thumbnail coded using JPEG.");
         break;
       case 0x11: // Thumbnail coded using 1 byte/pixel
         s -= 2;
-        contentMeta.setType(MetaType.PICTURE);
-        contentMeta.add(MetaElem.TITLE, "Thumbnail");
-        contentMeta.add(MetaElem.DESCRIPTION,
+        content.setFileType(FileType.PICTURE);
+        content.addMeta(MetaElem.DESCRIPTION,
             "Thumbnail coded using 1 byte/pixel.");
-        contentMeta.add(MetaElem.PIXEL_WIDTH, bfc.get());
-        contentMeta.add(MetaElem.PIXEL_HEIGHT, bfc.get());
+        content.addMeta(MetaElem.PIXEL_WIDTH, bfc.get());
+        content.addMeta(MetaElem.PIXEL_HEIGHT, bfc.get());
         break;
       case 0x13: // Thumbnail coded using 3 bytes/pixel
         s -= 2;
-        contentMeta.setType(MetaType.PICTURE);
-        contentMeta.add(MetaElem.TITLE, "Thumbnail");
-        contentMeta.add(MetaElem.DESCRIPTION,
+        content.setFileType(FileType.PICTURE);
+        content.addMeta(MetaElem.DESCRIPTION,
             "Thumbnail coded using 3 bytes/pixel.");
-        contentMeta.add(MetaElem.PIXEL_WIDTH, bfc.get());
-        contentMeta.add(MetaElem.PIXEL_HEIGHT, bfc.get());
+        content.addMeta(MetaElem.PIXEL_WIDTH, bfc.get());
+        content.addMeta(MetaElem.PIXEL_HEIGHT, bfc.get());
         break;
       default:
         Main.debug("JPGParser: Illegal or unsupported JFIF header (%)",
             bfc.getFileName());
     }
-    contentMeta.write(fsparser);
-    fsparser.endContent();
     bfc.skip(s);
   }
 
@@ -249,6 +239,11 @@ public final class JPGParser extends AbstractParser {
    * @throws IOException if any error occurs while reading from the file.
    */
   private void readComment(final int size) throws IOException {
-    meta.add(MetaElem.DESCRIPTION, bfc.get(new byte[size]));
+    deepFile.addMeta(MetaElem.DESCRIPTION, bfc.get(new byte[size]));
+  }
+
+  @Override
+  public void propagate(final DeepFile df) {
+    Main.notimplemented();
   }
 }

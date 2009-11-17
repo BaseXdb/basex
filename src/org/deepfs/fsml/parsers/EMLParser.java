@@ -7,28 +7,28 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for EML files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  * @author Lukas Kircher
  */
-public final class EMLParser extends AbstractParser {
+public final class EMLParser implements IFileParser {
 
   static {
-    NewFSParser.register("eml", EMLParser.class);
-    NewFSParser.register("emlx", EMLParser.class);
+    ParserRegistry.register("eml", EMLParser.class);
+    ParserRegistry.register("emlx", EMLParser.class);
   }
 
   // ----- enums ---------------------------------------------------------------
@@ -52,10 +52,9 @@ public final class EMLParser extends AbstractParser {
       public boolean parse(final EMLParser obj) {
         try {
           final Date d = SDF.parse(obj.mCurrLine);
-          obj.meta.add(MetaElem.DATE_CREATED, d);
+          obj.deepFile.addMeta(MetaElem.DATE_CREATED, d);
         } catch(final ParseException ex) {
-          if(NewFSParser.VERBOSE) Main.debug("%: %", obj.bfc.getFileName(),
-              ex.getMessage());
+          Main.debug("%: %", obj.bfc.getFileName(), ex.getMessage());
         }
         return true;
       }
@@ -114,7 +113,7 @@ public final class EMLParser extends AbstractParser {
         }
         text = tmp.finish();
         text = Token.replace(text, '_', ' ');
-        obj.meta.add(MetaElem.SUBJECT, text);
+        obj.deepFile.addMeta(MetaElem.SUBJECT, text);
         return false;
       }
     },
@@ -168,7 +167,7 @@ public final class EMLParser extends AbstractParser {
      *         <code>mCurrLine</code>
      * @throws IOException if any error occurs while reading from the file.
      */
-    abstract boolean parse(EMLParser obj) throws IOException;
+    abstract boolean parse(final EMLParser obj) throws IOException;
   }
 
   /**
@@ -246,86 +245,71 @@ public final class EMLParser extends AbstractParser {
   String mCurrLine;
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
-  /** The {@link NewFSParser} instance to fire events. */
-  NewFSParser fsparser;
+
+  /** The DeepFile representing the eml file. */
+  DeepFile deepFile;
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
+    // [BL] check if the file has a mail header
     bfc = f;
     return readLine();
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    meta0(f, parser);
-  }
-
-  /**
-   * Reads the metadata.
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @param parser the parser to fire metaEvents.
-   * @return true if the file was successfully parsed, false otherwise.
-   * @throws IOException if any error occurs.
-   */
-  private boolean meta0(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    if(!check(f)) return false;
-    meta.setType(MetaType.MESSAGE);
-    meta.setFormat(MimeType.EML);
-    fsparser = parser;
-    mBoundary = "";
-    do {
-      String type = "";
-      final Matcher m = KEYPAT.matcher(mCurrLine);
-      if(m.matches()) {
-        type = m.group(1).toUpperCase().replace('-', '_');
-        mCurrLine = m.group(2).trim();
-      }
-      boolean readNext = true;
-      try {
-        readNext = EML_Meta.valueOf(type).parse(this);
-      } catch(final IllegalArgumentException ex) {
-        getBoundary();
-        getCharset();
-      }
-      if(readNext && !readLine()) return true;
-    } while(!mCurrLine.isEmpty());
-    return true;
+  public void propagate(final DeepFile df) {
+    Main.notimplemented();
   }
 
   @Override
-  protected void content(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    if(!check(f)) return;
-    fsparser = parser;
-    do {
-      String type = "";
-      final Matcher m = KEYPAT.matcher(mCurrLine);
-      if(m.matches()) {
-        type = m.group(1);
-        mCurrLine = m.group(2).trim();
-        if(type.equalsIgnoreCase("content-type")) getContentType();
-        else if(type.equalsIgnoreCase("content-transfer-encoding")) {
-          getEncoding();
+  public void extract(final DeepFile df) throws IOException {
+    deepFile = df;
+    bfc = df.getBufferedFileChannel();
+    if(!check(bfc)) return;
+
+    if(df.fsmeta) {
+      df.setFileType(FileType.MESSAGE);
+      df.setFileFormat(MimeType.EML);
+      mBoundary = "";
+
+      do {
+        String type = "";
+        final Matcher m = KEYPAT.matcher(mCurrLine);
+        if(m.matches()) {
+          type = m.group(1).toUpperCase().replace('-', '_');
+          mCurrLine = m.group(2).trim();
         }
-      } else {
-        getBoundary();
-        getCharset();
-      }
-      if(!readLine()) return;
-    } while(!mCurrLine.isEmpty());
+        boolean readNext = true;
+        try {
+          readNext = EML_Meta.valueOf(type).parse(this);
+        } catch(final IllegalArgumentException ex) {
+          getBoundary();
+          getCharset();
+        }
+        if(readNext && !readLine()) return;
+      } while(!mCurrLine.isEmpty());
 
-    parseContent();
-  }
+      if(df.fscont) if(mCurrLine != null) parseContent();
+    } else if(df.fscont) {
+      do {
+        String type = "";
+        final Matcher m = KEYPAT.matcher(mCurrLine);
+        if(m.matches()) {
+          type = m.group(1);
+          mCurrLine = m.group(2).trim();
+          if(type.equalsIgnoreCase("content-type")) getContentType();
+          else if(type.equalsIgnoreCase("content-transfer-encoding")) {
+            getEncoding();
+          }
+        } else {
+          getBoundary();
+          getCharset();
+        }
+        if(!readLine()) return;
+      } while(!mCurrLine.isEmpty());
 
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel f,
-      final NewFSParser parser) throws IOException {
-    if(!meta0(f, parser)) return true;
-    if(mCurrLine == null) return true;
-    parseContent();
-    return true;
+      parseContent();
+    }
   }
 
   /**
@@ -357,10 +341,12 @@ public final class EMLParser extends AbstractParser {
   private boolean getBodyData(final boolean multipart) throws IOException {
     final long bodyStartPos = bfc.absolutePosition();
 
-    if(multipart) fsparser.startContent(bodyStartPos);
-    MetaStore contentMeta = new MetaStore();
+    final DeepFile content;
+    if(multipart) content = deepFile.newContentSection(bodyStartPos);
+    else content = deepFile;
+
     // if we have a multipart message, extract text only if it is plaintext.
-    if(multipart ? readSectionHeader(contentMeta) : mContentType == null
+    if(multipart ? readSectionHeader(content) : mContentType == null
         || mContentType.startsWith("text")) {
       final long pos2 = bfc.absolutePosition();
       final TokenBuilder tb = new TokenBuilder();
@@ -387,7 +373,7 @@ public final class EMLParser extends AbstractParser {
       final byte[] text = tb.finish();
       final byte[] data = bodyEnc.decode(text, utf);
       final int size = data.length;
-      if(size > 0) fsparser.textContent(pos2, text.length, data, true);
+      if(size > 0) deepFile.addText(pos2, text.length, data);
     } else {
       while(readLine()) {
         if(multipart) if(mCurrLine.contains(mBoundary)) break;
@@ -397,10 +383,8 @@ public final class EMLParser extends AbstractParser {
     if(multipart) {
       bodyEnc = Encoding.NONE;
       final int readAhead = mCurrLine == null ? 0 : mCurrLine.length();
-      fsparser.setContentSize(bfc.absolutePosition() - bodyStartPos - readAhead
+      content.setSize(bfc.absolutePosition() - bodyStartPos - readAhead
           - 1);
-      contentMeta.write(fsparser);
-      fsparser.endContent();
     }
 
     return mCurrLine != null && multipart && !mCurrLine.endsWith("--");
@@ -413,7 +397,7 @@ public final class EMLParser extends AbstractParser {
    * @return true if content is plaintext, false otherwise.
    * @throws IOException I/O exception
    */
-  private boolean readSectionHeader(final MetaStore contentMeta)
+  private boolean readSectionHeader(final DeepFile contentMeta)
       throws IOException {
     boolean plaintext = false;
     do {
@@ -438,12 +422,12 @@ public final class EMLParser extends AbstractParser {
         }
         mime = MimeType.getItem(mimeString);
         if(mime != null) {
-          for(final MetaType mt : mime.getMetaTypes()) {
-            contentMeta.setType(mt);
+          for(final FileType mt : mime.getMetaTypes()) {
+            contentMeta.setFileType(mt);
             // [BL] handle mail attachments that are not plaintext
-            if(mt == MetaType.TEXT) plaintext = true;
+            if(mt == FileType.TEXT) plaintext = true;
           }
-          contentMeta.setFormat(mime);
+          contentMeta.setFileFormat(mime);
           getCharset();
         }
       } else getCharset();
@@ -476,7 +460,7 @@ public final class EMLParser extends AbstractParser {
       addresses.append(mCurrLine);
     }
     for(final Matcher m = MAILPATTERN.matcher(addresses); m.find();) {
-      meta.add(elem, m.group());
+      deepFile.addMeta(elem, m.group());
     }
   }
 
@@ -502,7 +486,7 @@ public final class EMLParser extends AbstractParser {
     if(mCurrLine.contains("charset=")) {
       mBodyCharset = mCurrLine.split("charset=")[1].split(";")[0].replace("\"",
           "").trim();
-      meta.add(MetaElem.ENCODING, mBodyCharset);
+      deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
     }
   }
 

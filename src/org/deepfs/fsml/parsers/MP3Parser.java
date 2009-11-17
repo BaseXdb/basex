@@ -1,20 +1,23 @@
 package org.deepfs.fsml.parsers;
 
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
 import org.basex.core.Main;
 import org.basex.util.Token;
-import static org.basex.util.Token.*;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.util.ParserUtil;
 
 /**
  * <p>
@@ -27,15 +30,13 @@ import static org.basex.util.Token.*;
  * <li>extended tag (before ID3v1 tag)</li>
  * </ul>
  * </p>
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
- * 
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>
  * @see <a href="http://www.id3.org/id3v2.4.0-frames">ID3v2.4.0 frames</a>
  */
-public final class MP3Parser extends AbstractParser {
+public final class MP3Parser implements IFileParser {
 
   // ---------------------------------------------------------------------------
   // ----- static stuff --------------------------------------------------------
@@ -247,7 +248,7 @@ public final class MP3Parser extends AbstractParser {
   };
 
   /** All available picture types for APIC frames. */
-  private static final String[] PICTURE_TYPE = new String[] { "Other",
+  static final String[] PICTURE_TYPE = new String[] { "Other",
       "file icon", "Other file icon", "Front cover", "Back cover",
       "Leaflet page", "Media - e.g. label side of CD",
       "Lead artist or lead performer or soloist", "Artist or performer",
@@ -275,7 +276,7 @@ public final class MP3Parser extends AbstractParser {
   static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy");
 
   static {
-    NewFSParser.register("mp3", MP3Parser.class);
+    ParserRegistry.register("mp3", MP3Parser.class);
   }
 
   // ---------------------------------------------------------------------------
@@ -284,40 +285,29 @@ public final class MP3Parser extends AbstractParser {
 
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
-  /** The {@link NewFSParser} instance to fire events. */
-  NewFSParser fsparser;
+  /** The DeepFile to store metadata and file contents. */
+  DeepFile deepFile;
 
   @Override
-  public boolean check(final BufferedFileChannel bufFC) throws IOException {
-    bfc = bufFC;
+  public boolean check(final BufferedFileChannel f) throws IOException {
+    bfc = f;
     return checkID3v2() || checkID3v1();
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    fsparser = parser;
-    bfc = f;
-    if(checkID3v2()) readMetaID3v2();
-    else if(checkID3v1()) readMetaID3v1();
+  public void extract(final DeepFile df) throws IOException {
+    if(df.fsmeta) {
+      bfc = df.getBufferedFileChannel();
+      deepFile = df;
+      if(checkID3v2()) readMetaID3v2();
+      else if(checkID3v1()) readMetaID3v1();
+    }
   }
 
-  @Override
-  protected void content(final BufferedFileChannel f, //
-      final NewFSParser parser) {
-  // no textual representation for mp3 content ...
-  }
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel f,
-      final NewFSParser parser) {
-    return false;
-  }
-
-  /** Sets {@link MetaType} and {@link MimeType}. */
+  /** Sets {@link FileType} and {@link MimeType}. */
   private void setTypeAndFormat() {
-    meta.setType(MetaType.AUDIO);
-    meta.setFormat(MimeType.MP3);
+    deepFile.setFileType(FileType.AUDIO);
+    deepFile.setFileFormat(MimeType.MP3);
   }
 
   // ---------------------------------------------------------------------------
@@ -349,31 +339,31 @@ public final class MP3Parser extends AbstractParser {
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
-    if(!ws(array)) meta.add(MetaElem.TITLE, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.TITLE, Token.trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) meta.add(MetaElem.CREATOR, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.CREATOR, Token.trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) meta.add(MetaElem.ALBUM, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.ALBUM, Token.trim(array));
     final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
     if(!ws(array)) {
       try {
         final Date d = SDF.parse(new String(a2));
-        meta.add(MetaElem.DATE, d);
+        deepFile.addMeta(MetaElem.DATE, d);
       } catch(final ParseException ex) {
-        if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
+        Main.debug(ex.getMessage());
       }
     }
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
-        meta.add(MetaElem.TRACK, array[29]);
+        deepFile.addMeta(MetaElem.TRACK, array[29]);
         array[29] = 0;
       }
     }
-    if(!ws(array)) meta.add(MetaElem.DESCRIPTION, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.DESCRIPTION, Token.trim(array));
     final int genreId = bfc.get() & 0xFF;
-    if(genreId != 0) meta.add(MetaElem.GENRE, getGenre(genreId));
+    if(genreId != 0) deepFile.addMeta(MetaElem.GENRE, getGenre(genreId));
   }
 
   // ---------------------------------------------------------------------------
@@ -580,10 +570,10 @@ public final class MP3Parser extends AbstractParser {
     if(id == Integer.MIN_VALUE) {
       final byte[][] arrays = Token.split(value, ',');
       for(final byte[] a : arrays) {
-        meta.add(MetaElem.GENRE, Token.trim(a));
+        deepFile.addMeta(MetaElem.GENRE, Token.trim(a));
       }
     } else {
-      meta.add(MetaElem.GENRE, getGenre(id));
+      deepFile.addMeta(MetaElem.GENRE, getGenre(id));
     }
   }
 
@@ -610,59 +600,6 @@ public final class MP3Parser extends AbstractParser {
     return Arrays.copyOfRange(value, start, i);
   }
 
-  /**
-   * Reads the file suffix of an embedded picture.
-   * @return the file suffix.
-   * @throws IOException if any error occurs while reading from the file.
-   */
-  String readPicSuffix() throws IOException {
-    bfc.buffer(9);
-    skipEncBytes();
-    final StringBuilder sb = new StringBuilder();
-    int b;
-    while((b = bfc.get()) != 0)
-      sb.append((char) b);
-    String string = sb.toString();
-    if(string.startsWith("image/")) {
-      string = string.substring(6); // skip "image/"
-    }
-    if(string.equals("jpeg")) string = "jpg";
-    else if(string.length() != 3) {
-      return null;
-    }
-    return string.toLowerCase();
-  }
-
-  /**
-   * Reads the picture type id from the APIC frame and returns a textual
-   * representation that can be used as file name.
-   * @return a textual representation of the picture.
-   * @throws IOException if any error occurs while reading from the file.
-   */
-  String getPicName() throws IOException {
-    // there may be more than one APIC frame with the same ID in the ID3 tag
-    bfc.buffer(1);
-    final int typeId = bfc.get() & 0xFF;
-    if(typeId >= 0 && typeId < PICTURE_TYPE.length) {
-      return PICTURE_TYPE[typeId];
-    }
-    return null;
-  }
-
-  /**
-   * Skips the picture description.
-   * @throws IOException if any error occurs while reading from the file.
-   */
-  void skipPicDescription() throws IOException {
-    while(true) {
-      try {
-        if(bfc.get() == 0) break;
-      } catch(final BufferUnderflowException ex) {
-        bfc.buffer(1);
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // ----- Frame enumeration that fires all the events -------------------------
   // ---------------------------------------------------------------------------
@@ -676,21 +613,21 @@ public final class MP3Parser extends AbstractParser {
     TIT2 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.add(MetaElem.TITLE, obj.readText(size));
+        obj.deepFile.addMeta(MetaElem.TITLE, obj.readText(size));
       }
     },
         /** */
     TPE1 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.add(MetaElem.CREATOR, obj.readText(size));
+        obj.deepFile.addMeta(MetaElem.CREATOR, obj.readText(size));
       }
     },
         /** */
     TALB {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.add(MetaElem.ALBUM, obj.readText(size));
+        obj.deepFile.addMeta(MetaElem.ALBUM, obj.readText(size));
       }
     },
         /** */
@@ -699,9 +636,9 @@ public final class MP3Parser extends AbstractParser {
       void parse(final MP3Parser obj, final int size) throws IOException {
         try {
           final Date d = SDF.parse(new String(obj.readText(size)));
-          obj.meta.add(MetaElem.DATE, d);
+          obj.deepFile.addMeta(MetaElem.DATE, d);
         } catch(final ParseException ex) {
-          if(NewFSParser.VERBOSE) Main.debug(ex.getMessage());
+          Main.debug(ex.getMessage());
         }
       }
     },
@@ -729,21 +666,22 @@ public final class MP3Parser extends AbstractParser {
         while(obj.bfc.get() != 0 && ++pos < size)
           ;
         if(pos >= size) return;
-        obj.meta.add(MetaElem.DESCRIPTION, obj.readText(size - pos, encoding));
+        obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size - pos,
+            encoding));
       }
     },
         /** */
     TRCK {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.add(MetaElem.TRACK, obj.readTrack(size));
+        obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
       }
     },
         /** */
     TLEN {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.meta.add(MetaElem.DURATION,
+        obj.deepFile.addMeta(MetaElem.DURATION,
             ParserUtil.convertDuration(obj.readText(size)));
       }
     },
@@ -751,32 +689,42 @@ public final class MP3Parser extends AbstractParser {
     APIC {
       @Override
       void parse(final MP3Parser obj, final int s) throws IOException {
-        final long position = obj.bfc.position();
-        String suffix = obj.readPicSuffix();
-        final String name = obj.getPicName();
-        obj.skipPicDescription();
-        if(suffix == null) {
-          // perhaps, MIME type is missing...
-          if(obj.fsparser.isParseable(obj.bfc, "png")) suffix = "png";
-          else if(obj.fsparser.isParseable(obj.bfc, "jpg")) suffix = "jpg";
-          else {
-            Main.debug(
-                "MP3Parser: Illegal or unsupported picture MIME type (%).",
-                obj.bfc.getFileName());
-            obj.bfc.skip(s - (obj.bfc.position() - position)); // skip frame
-            return;
+        final long pos = obj.bfc.position(); // beginning of the APIC frame
+
+        // read the file suffix of an embedded picture
+        obj.bfc.buffer(9);
+        obj.skipEncBytes();
+        final StringBuilder sb = new StringBuilder();
+        int b;
+        while((b = obj.bfc.get()) != 0)
+          sb.append((char) b);
+        String string = sb.toString();
+        if(string.startsWith("image/")) { // string may be a MIME type
+          string = string.substring(6); // skip "image/"
+        }
+        String[] suffixes;
+        if(string.equals("jpeg")) string = "jpg";
+        if(string.length() != 3) suffixes = new String[] { "png", "jpg"};
+        else suffixes = new String[] { string};
+
+        // read the picture type id and convert it to a text
+        obj.bfc.buffer(1);
+        final int typeId = obj.bfc.get() & 0xFF;
+        String name = null;
+        if(typeId >= 0 && typeId < PICTURE_TYPE.length) {
+          name = PICTURE_TYPE[typeId];
+        }
+
+        // skip the picture description
+        while(true) {
+          try {
+            if(obj.bfc.get() == 0) break;
+          } catch(final BufferUnderflowException ex) {
+            obj.bfc.buffer(1);
           }
         }
-        final int size = s - (int) (obj.bfc.position() - position);
-        try {
-          obj.fsparser.parseFileFragment(obj.bfc.subChannel(size), name, //
-              suffix);
-        } catch(final IOException ex) {
-          if(NewFSParser.VERBOSE) Main.debug(
-              "MP3Parser: Failed to parse APIC frame (%).",
-              ex.getMessage() == null ? obj.bfc.getFileName() : //
-              ex.getMessage());
-        }
+        final int size = (int) (s - (obj.bfc.position() - pos));
+        obj.deepFile.subfile(name, size, suffixes);
       }
     };
 
@@ -789,5 +737,10 @@ public final class MP3Parser extends AbstractParser {
      * @throws IOException if any error occurs while reading the file.
      */
     abstract void parse(final MP3Parser obj, final int size) throws IOException;
+  }
+
+  @Override
+  public void propagate(final DeepFile df) {
+    Main.notimplemented();
   }
 }

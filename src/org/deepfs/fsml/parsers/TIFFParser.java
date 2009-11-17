@@ -1,27 +1,29 @@
 package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
+import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for TIF files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public final class TIFFParser extends AbstractParser {
+public final class TIFFParser implements IFileParser {
 
   static {
-    NewFSParser.register("tiff", TIFFParser.class);
-    NewFSParser.register("tif", TIFFParser.class);
+    ParserRegistry.register("tiff", TIFFParser.class);
+    ParserRegistry.register("tif", TIFFParser.class);
   }
 
   /** Parser for Exif data. */
-  private final ExifParser exifParser = new ExifParser(meta);
+  private final ExifParser exifParser = new ExifParser();
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
@@ -29,23 +31,18 @@ public final class TIFFParser extends AbstractParser {
   }
 
   @Override
-  protected void meta(final BufferedFileChannel f, final NewFSParser parser)
-      throws IOException {
-    if(!check(f)) return;
-    meta.setType(MetaType.PICTURE);
-    meta.setFormat(MimeType.TIFF);
-    exifParser.parse(f, parser);
+  public void extract(final DeepFile deepFile) throws IOException {
+    if(deepFile.fsmeta) {
+      final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
+      if(!check(bfc)) return;
+      deepFile.setFileType(FileType.PICTURE);
+      deepFile.setFileFormat(MimeType.TIFF);
+      exifParser.extract(deepFile);
+    }
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, //
-      final NewFSParser parser) {
-  // no content to read...
-  }
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
-    return false;
+  public void propagate(final DeepFile deepFile) {
+    Main.notimplemented();
   }
 }

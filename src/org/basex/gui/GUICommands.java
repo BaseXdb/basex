@@ -684,7 +684,7 @@ public enum GUICommands implements GUICommand {
   /* DEEPFS MENU */
 
   /** Opens a dialog to import given directory as DeepFS instance. */
-  CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
+  CREATEFS(GUICREATEFS + DOTS, "% M", GUICREATEFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogCreateFS(gui).ok()) return;

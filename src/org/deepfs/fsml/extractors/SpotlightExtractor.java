@@ -6,15 +6,15 @@ import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore;
-import org.basex.build.fs.util.ParserUtil;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
+
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.deepfs.fsml.parsers.MP3Parser;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserUtil;
 import org.deepfs.util.LibraryLoader;
 
 /**
@@ -56,11 +56,11 @@ public final class SpotlightExtractor {
         /** PDF file. */
     COM_ADOBE_PDF(MimeType.PDF),
         /** Image. */
-    PUBLIC_IMAGE(MetaType.PICTURE),
+    PUBLIC_IMAGE(FileType.PICTURE),
         /** Audio. */
-    PUBLIC_AUDIO(MetaType.AUDIO),
+    PUBLIC_AUDIO(FileType.AUDIO),
         /** Audiovisual content. */
-    PUBLIC_AUDIOVISUAL_CONTENT(MetaType.VIDEO),
+    PUBLIC_AUDIOVISUAL_CONTENT(FileType.VIDEO),
         /** Data. */
     PUBLIC_DATA(),
         /** Item. */
@@ -68,8 +68,8 @@ public final class SpotlightExtractor {
         /** Content. */
     PUBLIC_CONTENT();
 
-    /** The {@link MetaType}. */
-    private final MetaType metaType;
+    /** The {@link FileType}. */
+    private final FileType metaType;
     /** The {@link MimeType}. */
     private final MimeType mimeType;
 
@@ -89,16 +89,16 @@ public final class SpotlightExtractor {
     }
 
     /**
-     * Initializes the content type instance with a {@link MetaType}.
-     * @param m the corresponding {@link MetaType}.
+     * Initializes the content type instance with a {@link FileType}.
+     * @param m the corresponding {@link FileType}.
      */
-    private SpotlightContentType(final MetaType m) {
+    private SpotlightContentType(final FileType m) {
       metaType = m;
       mimeType = null;
     }
 
     /**
-     * Returns the meta type for this spotlight media type.
+     * Returns the deepFile type for this spotlight media type.
      * @return the {@link MimeType}.
      */
     MimeType getFormat() {
@@ -106,10 +106,10 @@ public final class SpotlightExtractor {
     }
 
     /**
-     * Returns the meta type for this spotlight content type.
-     * @return the {@link MetaType}.
+     * Returns the deepFile type for this spotlight content type.
+     * @return the {@link FileType}.
      */
-    MetaType getType() {
+    FileType getType() {
       return metaType;
     }
   }
@@ -121,8 +121,9 @@ public final class SpotlightExtractor {
         /** Date and time of the last change made to a metadata attribute. */
     AttributeChangeDate {
       @Override
-      void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_ATTRIBUTE_MODIFIED,
+      void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, Date.class)) deepFile.addMeta(
+            MetaElem.DATE_ATTRIBUTE_MODIFIED,
             (Date) o);
       }
     },
@@ -132,22 +133,23 @@ public final class SpotlightExtractor {
      */
     Album {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.ALBUM, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.ALBUM, (String) o);
       }
     },
         /** Track number of a song or composition when it's part of an album. */
     AudioTrackNumber {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.TRACK, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.TRACK, o);
       }
     },
         /** The author of the contents of the file. */
     Authors {
       @Override
-      void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.CREATOR, (String) o);
+      void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.CREATOR,
+            (String) o);
       }
     },
         /**
@@ -156,8 +158,8 @@ public final class SpotlightExtractor {
      */
     City {
       @Override
-      void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.CITY, (String) o);
+      void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.CITY, (String) o);
       }
     },
         /**
@@ -166,29 +168,32 @@ public final class SpotlightExtractor {
      */
     Comment {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.DESCRIPTION, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.DESCRIPTION,
+            (String) o);
       }
     },
         /** Composer of the song in the audio file. */
     Composer {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.COMPOSER, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.COMPOSER,
+            (String) o);
       }
     },
         /** The date and time that the content was created. */
     ContentCreationDate {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (Date) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_CREATED,
+            (Date) o);
       }
     },
         // /** Date and time when the content of this item was modified. */
     // ContentModificationDate {
     // @Override
-    // public void parse(final MetaStore meta, final Object o) {
-    // if(check(o, Date.class)) meta.add(MetaElem.DATE_CONTENT_MODIFIED,
+    // public void parse(final MetaStore deepFile, final Object o) {
+    // if(check(o, Date.class)) deepFile.add(MetaElem.DATE_CONTENT_MODIFIED,
     // (String) o);
     // }
     // },
@@ -198,16 +203,16 @@ public final class SpotlightExtractor {
      */
     ContentTypeTree {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
+      public void parse(final DeepFile deepFile, final Object o) {
         try {
           String key = ((String) o).toUpperCase();
           key = key.replace('.', '_').replace('-', '_');
           final SpotlightContentType ct = SpotlightContentType.valueOf(key);
-          final MetaType me = ct.getType();
-          if(me != null) meta.setType(me);
+          final FileType me = ct.getType();
+          if(me != null) deepFile.setFileType(me);
           else {
             final MimeType mi = ct.getFormat();
-            if(mi != null) meta.setFormat(mi);
+            if(mi != null) deepFile.setFileFormat(mi);
           }
         } catch(final IllegalArgumentException ex) {
           Main.debug("SpotlightExtractor: unsupported ContentType found (%)",
@@ -222,8 +227,9 @@ public final class SpotlightExtractor {
      */
     Contributors {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.CONTRIBUTOR, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.CONTRIBUTOR,
+            (String) o);
       }
     },
         /**
@@ -233,15 +239,17 @@ public final class SpotlightExtractor {
      */
     Country {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.COUNTRY, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.COUNTRY,
+            (String) o);
       }
     },
         /** Description of the kind of item this file represents. */
     Description {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.DESCRIPTION, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.DESCRIPTION,
+            (String) o);
       }
     },
         /**
@@ -250,44 +258,45 @@ public final class SpotlightExtractor {
      */
     DurationSeconds {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseDuration(meta, MetaElem.DURATION, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseDuration(deepFile, MetaElem.DURATION, o);
       }
     },
         /** Mac OS X Finder comments for this item. */
     FinderComment {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.COMMENT, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.COMMENT,
+            (String) o);
       }
     },
         // /** Date the file contents last changed. */
     // FSContentChangeDate {
     // @Override
-    // void parse(final MetaStore meta, final Object o) {
-    // if(check(o, Date.class)) meta.add(MetaElem.DATE_CONTENT_MODIFIED,
+    // void parse(final MetaStore deepFile, final Object o) {
+    // if(check(o, Date.class)) deepFile.add(MetaElem.DATE_CONTENT_MODIFIED,
     // (String) o);
     // }
     // },
     // /** Date that the contents of the file were created. */
     // FSCreationDate {
     // @Override
-    // public void parse(final MetaStore meta, final Object o) {
+    // public void parse(final MetaStore deepFile, final Object o) {
     // obj.dateEvent(DateField.DATE_CREATED, o);
     // }
     // },
     /** Group ID of the owner of the file. */
     FSOwnerGroupID {
       @Override
-      void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.FS_OWNER_GROUP_ID, o);
+      void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.FS_OWNER_GROUP_ID, o);
       }
     },
         /** User ID of the owner of the file. */
     FSOwnerUserID {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.FS_OWNER_USER_ID, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.FS_OWNER_USER_ID, o);
       }
     },
         /**
@@ -296,8 +305,9 @@ public final class SpotlightExtractor {
      */
     Headline {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.HEADLINE, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.HEADLINE,
+            (String) o);
       }
     },
         /**
@@ -306,8 +316,9 @@ public final class SpotlightExtractor {
      */
     Identifier {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.IDENTIFIER, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.IDENTIFIER,
+            (String) o);
       }
     },
         /**
@@ -316,8 +327,9 @@ public final class SpotlightExtractor {
      */
     Keywords {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.KEYWORD, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.KEYWORD,
+            (String) o);
       }
     },
         /**
@@ -326,8 +338,9 @@ public final class SpotlightExtractor {
      */
     Languages {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.LANGUAGE, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.LANGUAGE,
+            (String) o);
       }
     },
         /**
@@ -337,15 +350,17 @@ public final class SpotlightExtractor {
      */
     LastUsedDate {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_LAST_USED, (Date) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_LAST_USED,
+            (Date) o);
       }
     },
         /** Lyricist of the song in the audio file. */
     Lyricist {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.LYRICIST, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.LYRICIST,
+            (String) o);
       }
     },
         /**
@@ -354,19 +369,19 @@ public final class SpotlightExtractor {
      */
     MusicalGenre {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
+      public void parse(final DeepFile deepFile, final Object o) {
         String g = (String) o;
         try {
           if(g.charAt(0) == '(') g = g.substring(1, g.length() - 2);
           final int genreId = Integer.parseInt(g);
-          meta.add(MetaElem.GENRE, MP3Parser.getGenre(genreId));
+          deepFile.addMeta(MetaElem.GENRE, MP3Parser.getGenre(genreId));
         } catch(final NumberFormatException ex) {
           if(g.contains(",")) {
             final StringTokenizer tok = new StringTokenizer(g, ", ");
             while(tok.hasMoreTokens())
-              meta.add(MetaElem.GENRE, tok.nextToken());
+              deepFile.addMeta(MetaElem.GENRE, tok.nextToken());
           } else {
-            meta.add(MetaElem.GENRE, g);
+            deepFile.addMeta(MetaElem.GENRE, g);
           }
         }
       }
@@ -374,8 +389,8 @@ public final class SpotlightExtractor {
         /** Number of pages in the document. */
     NumberOfPages {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.NUMBER_OF_PAGES, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.NUMBER_OF_PAGES, o);
       }
     },
         /**
@@ -384,8 +399,8 @@ public final class SpotlightExtractor {
      */
     PixelHeight {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.PIXEL_HEIGHT, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.PIXEL_HEIGHT, o);
       }
     },
         /**
@@ -394,8 +409,8 @@ public final class SpotlightExtractor {
      */
     PixelWidth {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        parseInt(meta, MetaElem.PIXEL_WIDTH, o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        parseInt(deepFile, MetaElem.PIXEL_WIDTH, o);
       }
     },
         /**
@@ -404,15 +419,17 @@ public final class SpotlightExtractor {
      */
     Publisher {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.PUBLISHER, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.PUBLISHER,
+            (String) o);
       }
     },
         /** Recipients of this item. */
     Recipients {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.RECEIVER, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.RECEIVER,
+            (String) o);
       }
     },
         /**
@@ -422,8 +439,9 @@ public final class SpotlightExtractor {
      */
     RecordingDate {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, Date.class)) meta.add(MetaElem.DATE_CREATED, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_CREATED,
+            (String) o);
       }
     },
         /**
@@ -432,17 +450,17 @@ public final class SpotlightExtractor {
      */
     Title {
       @Override
-      public void parse(final MetaStore meta, final Object o) {
-        if(check(o, String.class)) meta.add(MetaElem.TITLE, (String) o);
+      public void parse(final DeepFile deepFile, final Object o) {
+        if(check(o, String.class)) deepFile.addMeta(MetaElem.TITLE, (String) o);
       }
     };
 
     /**
      * Parses the data and fires parser events.
-     * @param meta {@link MetaStore} to store the metadata information to
+     * @param deepFile {@link DeepFile} to store the metadata information to
      * @param o the data to parse.
      */
-    abstract void parse(final MetaStore meta, final Object o);
+    abstract void parse(final DeepFile deepFile, final Object o);
 
     @Override
     public String toString() {
@@ -466,13 +484,13 @@ public final class SpotlightExtractor {
     /**
      * Converts the object to a Byte/Short/Integer/Long/Float or Double and adds
      * it to the metadata store.
-     * @param meta the metadata store for the current file.
+     * @param deepFile the metadata store for the current file.
      * @param elem the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseInt(final MetaStore meta, final MetaElem elem, final Object o) {
+    void parseInt(final DeepFile deepFile, final MetaElem elem, final Object o) {
       final Long value = long0(o);
-      if(value != null) meta.add(elem, value);
+      if(value != null) deepFile.addMeta(elem, value);
     }
 
     /**
@@ -481,9 +499,9 @@ public final class SpotlightExtractor {
      * @param e the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseDuration(final MetaStore ms, final MetaElem e, final Object o) {
+    void parseDuration(final DeepFile ms, final MetaElem e, final Object o) {
       final Long value = long0(o);
-      if(value != null) ms.add(e,
+      if(value != null) ms.addMeta(e,
           ParserUtil.convertMsDuration((int) (value * 1000)));
     }
 
@@ -533,24 +551,13 @@ public final class SpotlightExtractor {
     }
   }
 
-  /** The parser instance. */
-  private final NewFSParser parser;
-
-  /**
-   * Initializes the spotlight extractor.
-   * @param fsParser the parser instance to fire events.
-   */
-  public SpotlightExtractor(final NewFSParser fsParser) {
-    parser = fsParser;
-  }
-
   /**
    * Queries spotlight for metadata items for the file and fires parser events.
    * @param file the file to search metadata for.
-   * @throws IOException if any error occurs...
+   * @throws IOException if any error occurs.
    */
   public void parse(final File file) throws IOException {
-    final MetaStore meta = new MetaStore();
+    final DeepFile deepFile = new DeepFile(file);
     final Map<String, Object> metadata = getMetadata(file.getAbsolutePath());
     if(metadata == null) return;
     for(final Entry<String, Object> e : metadata.entrySet()) {
@@ -559,13 +566,12 @@ public final class SpotlightExtractor {
         final Object val = e.getValue();
         if(val instanceof Object[]) {
           for(final Object o : (Object[]) val)
-            item.parse(meta, o);
-        } else item.parse(meta, val);
+            item.parse(deepFile, o);
+        } else item.parse(deepFile, val);
       } catch(final IllegalArgumentException ex) {
         // item is not in enum ...do nothing
       }
     }
-    meta.write(parser);
   }
 
   /**

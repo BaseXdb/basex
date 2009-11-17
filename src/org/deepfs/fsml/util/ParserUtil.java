@@ -1,19 +1,20 @@
-package org.basex.build.fs.util;
+package org.deepfs.fsml.util;
 
 import static org.basex.util.Token.*;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.build.fs.NewFSParser;
+
 import org.basex.core.Main;
 import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
- *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
@@ -107,11 +108,11 @@ public final class ParserUtil {
       }
       b = minSec[++i];
     }
-    if(mins == Integer.MIN_VALUE || NewFSParser.VERBOSE) Main.debug(
+    if(mins == Integer.MIN_VALUE) Main.debug(
         "ParserUtil: Invalid min value in minSec duration (%)", string(minSec));
     // read seconds
     final int secs = toInt(minSec, ++i, max);
-    if(secs == Integer.MIN_VALUE || NewFSParser.VERBOSE) Main.debug(
+    if(secs == Integer.MIN_VALUE) Main.debug(
         "ParserUtil: Invalid sec value in minSec duration (%)", string(minSec));
     final int milliseconds = secs * 1000 + mins * 60000;
     return factory.newDuration(milliseconds);
@@ -191,15 +192,15 @@ public final class ParserUtil {
     assert size >= 0;
     if(size < KIB) return concat(token(size), B_STR);
     else if(size < MIB) {
-      return concat(token(Math.round((size * d) / KIB) / d), KIB_STR);
+      return concat(token(Math.round(size * d / KIB) / d), KIB_STR);
     } else if(size < GIB) {
-      return concat(token(Math.round((size * d) / MIB) / d), MIB_STR);
+      return concat(token(Math.round(size * d / MIB) / d), MIB_STR);
     } else if(size < TIB) {
-      return concat(token(Math.round((size * d) / GIB) / d), GIB_STR);
+      return concat(token(Math.round(size * d / GIB) / d), GIB_STR);
     } else if(size < PIB) {
-      return concat(token(Math.round((size * d) / TIB) / d), TIB_STR);
+      return concat(token(Math.round(size * d / TIB) / d), TIB_STR);
     } else {
-      return concat(token(Math.round((size * d) / PIB) / d), PIB_STR);
+      return concat(token(Math.round(size * d / PIB) / d), PIB_STR);
     }
   }
 }

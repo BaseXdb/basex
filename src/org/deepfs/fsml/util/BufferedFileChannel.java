@@ -1,4 +1,4 @@
-package org.basex.build.fs.util;
+package org.deepfs.fsml.util;
 
 import java.io.EOFException;
 import java.io.File;
@@ -8,23 +8,30 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+
+import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * <p>
- * Buffered {@link FileChannel} implementation.
- * </p>
+ * <h1>Buffered {@link FileChannel} implementation.</h1>
  * <p>
  * This implementation is optimized for sequential reading of a file or a
- * fragment of a file.
+ * fragment of a file. An instance of this class can either represent a regular
+ * file on disk or a fragment of a file (the instance is a "subchannel").
  * </p>
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
 public final class BufferedFileChannel {
+
+  /** The default buffer size. */
+  public static final int DEFAULT_BUFFER_SIZE = 1 << 12;
+
   /** The file we are reading from. */
   private final File f;
+  /** The filename of the (sub)channel. */
+  private final String name;
   /** The underlying {@link FileChannel} instance. */
   private final FileChannel fc;
   /** The {@link ByteBuffer} that is used for buffering the data. */
@@ -38,29 +45,29 @@ public final class BufferedFileChannel {
    */
   private long rem;
 
-  /*
+  /**
    * Standard constructor for creating a {@link BufferedFileChannel} from a
    * complete file.
    * @param file the file to read from.
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
-  public BufferedFileChannel(final File file) throws IOException {
-    this(file, IO.BLOCKSIZE);
-  }
    */
+  public BufferedFileChannel(final File file) throws IOException {
+    this(file, DEFAULT_BUFFER_SIZE);
+  }
 
-  /*
+  /**
    * Creates a {@link BufferedFileChannel} from a complete file with the given
    * buffer size.
    * @param file the file to read from.
    * @param bufferSize the size of the buffer.
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
+   */
   public BufferedFileChannel(final File file, final int bufferSize)
       throws IOException {
     this(file, ByteBuffer.allocate(bufferSize));
   }
-   */
 
   /**
    * Creates a {@link BufferedFileChannel} from a complete file and uses the
@@ -76,6 +83,7 @@ public final class BufferedFileChannel {
   public BufferedFileChannel(final File file, final ByteBuffer buffer)
       throws IOException {
     f = file;
+    name = file.getAbsolutePath();
     fc = new RandomAccessFile(file, "r").getChannel();
     mark = 0;
     buffer.clear();
@@ -87,6 +95,7 @@ public final class BufferedFileChannel {
   /**
    * Creates a {@link BufferedFileChannel}.
    * @param file the file to read from.
+   * @param subfilename the name of the subfile.
    * @param fileChannel the underlying {@link FileChannel} instance.
    * @param buffer the {@link ByteBuffer} to use.
    * @param bytesToRead the maximum number of bytes to read from the FileChannel
@@ -94,9 +103,12 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}.
    */
-  private BufferedFileChannel(final File file, final FileChannel fileChannel,
-      final ByteBuffer buffer, final long bytesToRead) throws IOException {
+  private BufferedFileChannel(final File file, final String subfilename,
+      final FileChannel fileChannel, final ByteBuffer buffer,
+      final long bytesToRead) throws IOException {
     f = file;
+    name = f.getAbsolutePath() + subfilename == null ? "" : Prop.SEP
+        + subfilename;
     fc = fileChannel;
     buf = buffer;
     mark = absolutePosition();
@@ -119,17 +131,19 @@ public final class BufferedFileChannel {
    * finishing the subChannel, the original channel's position is incremented by
    * <code>bytesToRead</code>.
    *</p>
+   * @param subfilename the name of the subfile.
    * @param bytesToRead the maximum number of bytes to read.
    * @return the new "subChannel".
    * @throws IOException if any error occurs while creating the channel.
    */
-  public BufferedFileChannel subChannel(final int bytesToRead)
+  public BufferedFileChannel subChannel(final String subfilename,
+      final int bytesToRead)
       throws IOException {
     if(remaining() < bytesToRead) throw new EOFException(
         "Requested number of bytes to read is too large.");
     rem -= bytesToRead;
     rem += buf.remaining();
-    return new BufferedFileChannel(f, fc, buf, bytesToRead);
+    return new BufferedFileChannel(f, subfilename, fc, buf, bytesToRead);
   }
 
   /**
@@ -335,19 +349,18 @@ public final class BufferedFileChannel {
    * @return The next four bytes at the channel's current position as integer.
    */
   public int getInt() {
-    // [BL] bit operation is redundant...
-    return buf.getInt() & 0xFFFFFFFF;
+    return buf.getInt();
   }
 
   /**
    * <p>
-   * Finishes reading from a channel created by {@link #subChannel(int)}. Any
-   * subsequent read from this BufferedFileChannel will fail.
+   * Finishes reading from a channel created by {@link #subChannel(String, int)}
+   * . Any subsequent read from this BufferedFileChannel will fail.
    * </p>
    * <p>
    * <b>This method must be called for every {@link BufferedFileChannel} that
-   * was created by {@link #subChannel(int)} instead of calling {@link #close()}
-   * .</b>
+   * was created by {@link #subChannel(String, int)} instead of calling
+   * {@link #close()} .</b>
    * </p>
    * @throws IOException if any error occurs while finishing the channel.
    * @see #close()
@@ -363,7 +376,7 @@ public final class BufferedFileChannel {
    * </p>
    * <p>
    * <b>This method must not be called for {@link BufferedFileChannel} instances
-   * that were created by {@link #subChannel(int)}.</b>
+   * that were created by {@link #subChannel(String, int)}.</b>
    * </p>
    * @throws IOException if any error occurs while closing the
    *           {@link FileChannel}.
@@ -407,7 +420,25 @@ public final class BufferedFileChannel {
    * @return the file name.
    */
   public String getFileName() {
-    return f.getAbsolutePath();
+    return name;
+  }
+
+  /**
+   * Returns the associated file.
+   * @return the file.
+   */
+  public File getAssociatedFile() {
+    return f;
+  }
+
+  /**
+   * Returns the offset of this (sub)channel regarding to the regular file in
+   * the file system.
+   * @return the offset of the current subchannel inside the regular file or
+   *         zero if this file channel is not a subchannel.
+   */
+  public long getOffset() {
+    return mark;
   }
 
   /**

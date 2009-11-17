@@ -1,23 +1,26 @@
 package org.deepfs.fsml.parsers;
 
-import java.io.IOException;
-import org.basex.build.fs.NewFSParser;
-import org.basex.build.fs.util.BufferedFileChannel;
-import org.basex.build.fs.util.MetaElem;
-import org.basex.build.fs.util.MetaStore.MetaType;
-import org.basex.build.fs.util.MetaStore.MimeType;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
+import org.basex.core.Main;
+import org.deepfs.fsml.util.BufferedFileChannel;
+import org.deepfs.fsml.util.DeepFile;
+import org.deepfs.fsml.util.FileType;
+import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Parser for PNG files.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-public final class PNGParser extends AbstractParser {
+public final class PNGParser implements IFileParser {
 
   static {
-    NewFSParser.register("png", PNGParser.class);
+    ParserRegistry.register("png", PNGParser.class);
   }
 
   /** PNG header. */
@@ -33,24 +36,19 @@ public final class PNGParser extends AbstractParser {
   }
 
   @Override
-  protected void content(final BufferedFileChannel bfc, //
-      final NewFSParser parser) {
-  // no textual representation for png content ...
+  public void extract(final DeepFile deepFile) throws IOException {
+    if(deepFile.fsmeta) {
+      final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
+      if(!check(bfc)) return;
+      deepFile.setFileType(FileType.PICTURE);
+      deepFile.setFileFormat(MimeType.PNG);
+      deepFile.addMeta(MetaElem.PIXEL_WIDTH, bfc.getInt());
+      deepFile.addMeta(MetaElem.PIXEL_HEIGHT, bfc.getInt());
+    }
   }
 
   @Override
-  protected void meta(final BufferedFileChannel bfc, final NewFSParser parser)
-      throws IOException {
-    if(!check(bfc)) return;
-    meta.setType(MetaType.PICTURE);
-    meta.setFormat(MimeType.PNG);
-    meta.add(MetaElem.PIXEL_WIDTH, bfc.getInt());
-    meta.add(MetaElem.PIXEL_HEIGHT, bfc.getInt());
-  }
-
-  @Override
-  protected boolean metaAndContent(final BufferedFileChannel bfc,
-      final NewFSParser parser) {
-    return false;
+  public void propagate(final DeepFile deepFile) {
+    Main.notimplemented();
   }
 }
