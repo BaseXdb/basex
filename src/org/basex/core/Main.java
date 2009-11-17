@@ -11,6 +11,7 @@ import org.basex.core.proc.Exit;
 import org.basex.core.proc.Password;
 import org.basex.core.proc.Set;
 import org.basex.query.QueryException;
+import org.basex.server.Log;
 import org.basex.server.LoginException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -35,12 +36,15 @@ public abstract class Main {
   protected Session session;
   /** Console mode. */
   protected boolean console;
+  /** Logging management. */
+  private static Log log;
 
   /**
    * Constructor.
    * @param args command line arguments
    */
   protected Main(final String... args) {
+    log = new Log(context);
     parseArguments(args);
     if(!success) return;
 
@@ -258,7 +262,9 @@ public abstract class Main {
    * @param ext text optional extensions
    */
   public static void out(final Object str, final Object... ext) {
-    System.out.print(info(str, ext));
+    String tmp = info(str, ext);
+    log.write(tmp);
+    System.out.print(tmp);
   }
 
   /**
@@ -276,7 +282,9 @@ public abstract class Main {
    * @param ext text optional extensions
    */
   public static void err(final String string, final Object... ext) {
-    System.err.print(info(string, ext));
+    String tmp = info(string, ext);
+    log.write(tmp);
+    System.err.print(tmp);
   }
 
   /**
