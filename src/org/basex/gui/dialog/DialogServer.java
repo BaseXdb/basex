@@ -43,7 +43,7 @@ public final class DialogServer extends Dialog {
   /** Server panel. */
   private final BaseXBack conn = new BaseXBack();
   /** User panel. */
-  private final DialogUser user = new DialogUser(true, this);
+  private final DialogUser user = new DialogUser(true, this, gui);
   /** Sessions/Databases panel. */
   private final BaseXBack sedb = new BaseXBack();
   /** Stop button. */

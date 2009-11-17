@@ -3,15 +3,21 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -27,6 +33,7 @@ import org.basex.core.proc.Grant;
 import org.basex.core.proc.InfoUsers;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
+import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -46,6 +53,8 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public final class DialogUser extends BaseXBack {
+  /** Reference to main window. */
+  public final GUI gui;
   /** ArrayList for table. */
   Table data = new Table();
   /** Session. */
@@ -75,7 +84,7 @@ public final class DialogUser extends BaseXBack {
   /** User columns. */
   private final BaseXCombo userco2;
   /** User table. */
-  private final JTable table;
+  final JTable table;
   /** Info label. */
   private final BaseXLabel info;
   /** Flag global/local. */
@@ -97,10 +106,12 @@ public final class DialogUser extends BaseXBack {
    * Constructor.
    * @param g global/local flag
    * @param d Dialog window
+   * @param gu Gui
    */
-  public DialogUser(final boolean g, final Dialog d) {
+  public DialogUser(final boolean g, final Dialog d, final GUI gu) {
     global = g;
     dia = d;
+    gui = gu;
 
     setLayout(new TableLayout(8, 1, 0, 4));
     setBorder(8, 8, 8, 8);
@@ -176,7 +187,8 @@ public final class DialogUser extends BaseXBack {
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
-        for(final Process p : permps) if(!sess.execute(p)) msg = sess.info();
+        for(final Process p : permps)
+          if(!sess.execute(p)) msg = sess.info();
         permps.clear();
         setData();
       } else if(BUTTONCREATE.equals(cmd)) {
@@ -295,6 +307,40 @@ public final class DialogUser extends BaseXBack {
     if(!global) {
       TableColumn col = table.getColumnModel().getColumn(0);
       col.setCellEditor(new MyComboBoxEditor(items.getList()));
+      table.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(final MouseEvent e) {
+          if(e.getButton() == MouseEvent.BUTTON3) {
+            final int row = table.rowAtPoint(e.getPoint());
+            int x = e.getPoint().x;
+            int y = e.getPoint().y;
+            table.setRowSelectionInterval(row, row);
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem item = new JMenuItem("Remove from db: "
+                + gui.context.data().meta.name);
+            menu.add(item);
+            item.addActionListener(new ActionListener() {
+              public void actionPerformed(final ActionEvent event) {
+                String usern = ((TableModel) table.getModel()).getValueAt(row,
+                    0).toString();
+                gui.context.data().meta.users.remove(
+                    gui.context.data().meta.users.get(usern));
+                try {
+                  setData();
+                } catch(IOException ex) {
+                  ex.printStackTrace();
+                }
+                permps.clear();
+                change.setEnabled(false);
+              }
+            });
+            int column = table.columnAtPoint(e.getPoint());
+            if(row != table.getRowCount() - 1 && column == 0) {
+            menu.show(table, x, y);
+            }
+          }
+        }
+      });
     }
   }
 
@@ -385,18 +431,20 @@ public final class DialogUser extends BaseXBack {
         }
       } else {
         final String uname = data.contents.get(row).get(0);
-        final String right = CmdPerm.values()[col - 1].toString();
-        if(global) {
-          permps.add(value.equals(true) ? new Grant(right, uname) : new Revoke(
-              right, uname));
-        } else {
-          String db = dia.gui.context.data().meta.name;
-          permps.add(value.equals(true) ? new Grant(right, uname, db)
-              : new Revoke(right, uname, db));
+        if(!uname.equals(" ")) {
+          final String right = CmdPerm.values()[col - 1].toString();
+          if(global) {
+            permps.add(value.equals(true) ? new Grant(right, uname)
+                : new Revoke(right, uname));
+          } else {
+            String db = dia.gui.context.data().meta.name;
+            permps.add(value.equals(true) ? new Grant(right, uname, db)
+                : new Revoke(right, uname, db));
+          }
+          data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
+          fireTableCellUpdated(row, col);
+          change.setEnabled(true);
         }
-        data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
-        fireTableCellUpdated(row, col);
-        change.setEnabled(true);
       }
     }
   }

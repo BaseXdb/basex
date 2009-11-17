@@ -187,7 +187,7 @@ public final class DialogInfo extends Dialog {
     tabs.addTab(INFOPATHINDEX, tab3);
     tabs.addTab(INDEXINFO, tab4);
     tabs.addTab(FTINFO, tab5);
-    dia = new DialogUser(false, this);
+    dia = new DialogUser(false, this, gui);
     try {
       dia.setSess(new LocalSession(gui.context));
     } catch(IOException e1) {
