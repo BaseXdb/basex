@@ -100,7 +100,7 @@ final class MapFSImages {
 
           try {
             // database closed - quit
-            final Data data = view.gui.context.data();
+            final Data data = view.gui.context.data;
             if(data == null) {
               loaderC = 0;
               break;

@@ -94,7 +94,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);
       if(info.ok()) {
-        final Data d = gui.context.data();
+        final Data d = gui.context.data;
         final boolean[] ind = info.indexes();
         if(info.opt) {
           d.meta.txtindex = ind[0];
@@ -132,7 +132,7 @@ public enum GUICommands implements GUICommand {
   EXPORT(GUIEXPORT + DOTS, null, GUIEXPORTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = save(gui, gui.context.data().doc().length == 1);
+      final IO file = save(gui, gui.context.data.doc().length == 1);
       if(file != null) gui.execute(new Export(file.path()));
     }
   },
@@ -233,8 +233,8 @@ public enum GUICommands implements GUICommand {
   COPYPATH(GUICPPATH, "% shift C", GUICPPATHTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final int pre = gui.context.marked().nodes[0];
-      final byte[] txt = ViewData.path(gui.context.data(), pre);
+      final int pre = gui.context.marked.nodes[0];
+      final byte[] txt = ViewData.path(gui.context.data, pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
       clip.setContents(new StringSelection(Token.string(txt)), null);
@@ -243,7 +243,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow copy of empty node set or root node
-      final Nodes marked = gui.context.marked();
+      final Nodes marked = gui.context.marked;
       b.setEnabled(marked != null && marked.size() != 0);
     }
   },
@@ -253,14 +253,14 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      final Nodes n = ctx.marked();
-      ctx.copy(new Nodes(n.nodes, n.data));
+      final Nodes n = ctx.marked;
+      ctx.copied = new Nodes(n.nodes, n.data);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow copy of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked()));
+      b.setEnabled(updatable(gui.context.marked));
     }
   },
 
@@ -269,21 +269,21 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
-      final Nodes n = gui.context.copied();
+      final Nodes n = gui.context.copied;
       for(int i = 0; i < n.size(); i++) {
         if(i > 0) sb.append(',');
         sb.append(fndb(n, i));
       }
-      gui.context.copy(null);
+      gui.context.copied = null;
       gui.exec(new XQuery("insert nodes (" + sb + ") into " +
-        fndb(gui.context.marked(), 0)), false);
+        fndb(gui.context.marked, 0)), false);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final Context ctx = gui.context;
       // disallow copy of empty node set or root node
-      b.setEnabled(updatable(ctx.marked(), Data.DOC) && ctx.copied() != null);
+      b.setEnabled(updatable(ctx.marked, Data.DOC) && ctx.copied != null);
     }
   },
 
@@ -293,14 +293,14 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       if(Dialog.confirm(gui, DELETECONF)) {
         final StringBuilder sb = new StringBuilder();
-        final Nodes n = gui.context.marked();
+        final Nodes n = gui.context.marked;
         for(int i = 0; i < n.size(); i++) {
           if(i > 0) sb.append(',');
           sb.append(fndb(n, i));
         }
-        gui.context.marked(new Nodes(n.data));
-        gui.context.copy(null);
-        gui.focused = -1;
+        gui.context.marked = new Nodes(n.data);
+        gui.context.copied = null;
+        gui.context.focused = -1;
         gui.exec(new XQuery("delete nodes (" + sb + ")"), false);
       }
     }
@@ -308,7 +308,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked()));
+      b.setEnabled(updatable(gui.context.marked));
     }
   },
 
@@ -316,7 +316,7 @@ public enum GUICommands implements GUICommand {
   INSERT(GUIINSERT + DOTS, "", GUIINSERTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked();
+      final Nodes n = gui.context.marked;
       final DialogInsert insert = new DialogInsert(gui);
       if(!insert.ok()) return;
       
@@ -336,14 +336,14 @@ public enum GUICommands implements GUICommand {
       } else if(k == Data.COMM) {
         item = Type.COM + " { " + quote(sl.get(0)) + " }";
       }
-      gui.context.copy(null);
+      gui.context.copied = null;
       gui.exec(new XQuery("insert node " + item + " into " + fndb(n, 0)),
           false);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(updatable(gui.context.marked(),
+      b.setEnabled(updatable(gui.context.marked,
           Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
     }
   },
@@ -352,7 +352,7 @@ public enum GUICommands implements GUICommand {
   EDIT(GUIEDIT + DOTS, "", GUIEDITTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked();
+      final Nodes n = gui.context.marked;
       final DialogEdit edit = new DialogEdit(gui, n.nodes[0]);
       if(!edit.ok()) return;
 
@@ -374,7 +374,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(updatable(gui.context.marked(), Data.DOC));
+      b.setEnabled(updatable(gui.context.marked, Data.DOC));
     }
   },
 
@@ -383,11 +383,11 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      Nodes marked = ctx.marked();
+      Nodes marked = ctx.marked;
       if(marked.size() == 0) {
-        final int pre = gui.focused;
+        final int pre = gui.context.focused;
         if(pre == -1) return;
-        marked = new Nodes(pre, ctx.data());
+        marked = new Nodes(pre, ctx.data);
       }
       gui.notify.context(marked, false, null);
       gui.input.requestFocusInWindow();
@@ -395,7 +395,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      final Nodes marked = gui.context.marked();
+      final Nodes marked = gui.context.marked;
       b.setEnabled(marked != null && marked.size() != 0);
     }
   },
@@ -628,15 +628,15 @@ public enum GUICommands implements GUICommand {
       final boolean root = ctx.root();
       if(!rt) {
         if(!root) {
-          gui.notify.context(new Nodes(0, ctx.data()), true, null);
-          gui.notify.mark(ctx.current(), null);
+          gui.notify.context(new Nodes(0, ctx.data), true, null);
+          gui.notify.mark(ctx.current, null);
         }
       } else {
         if(root) {
-          gui.notify.mark(new Nodes(ctx.data()), null);
+          gui.notify.mark(new Nodes(ctx.data), null);
         } else {
-          final Nodes mark = ctx.marked();
-          ctx.marked(new Nodes(ctx.data()));
+          final Nodes mark = ctx.marked;
+          ctx.marked = new Nodes(ctx.data);
           gui.notify.context(mark, true, null);
         }
       }
@@ -856,7 +856,7 @@ public enum GUICommands implements GUICommand {
   public abstract void execute(final GUI gui);
 
   public void refresh(final GUI gui, final AbstractButton b) {
-    final boolean e = !data || gui.context.data() != null;
+    final boolean e = !data || gui.context.data != null;
     if(b.isEnabled() != e) b.setEnabled(e);
   }
 

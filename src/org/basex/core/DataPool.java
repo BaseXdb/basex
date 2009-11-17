@@ -23,7 +23,8 @@ public final class DataPool {
   private int size;
 
   /**
-   * Returns an existing data reference for the specified database, or null.
+   * Pins and returns an existing data reference for the specified
+   * database, or returns null.
    * @param db name of the database
    * @return data reference
    */

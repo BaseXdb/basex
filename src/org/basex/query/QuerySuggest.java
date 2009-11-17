@@ -39,7 +39,7 @@ public final class QuerySuggest extends QueryParser {
    */
   public QuerySuggest(final QueryContext c, final Context context) {
     super(c);
-    data = context.data();
+    data = context.data;
     checkInit();
   }
 

@@ -150,7 +150,7 @@ final class TableData {
   void context(final boolean create) {
     if(cols.length == 0) return;
 
-    final Nodes n = context.current();
+    final Nodes n = context.current;
     final boolean r = n.size() == 1 && n.nodes[0] < 2;
     if(!create && r) {
       rows = rootRows;
@@ -168,7 +168,7 @@ final class TableData {
    * @param elem element flag
    */
   private void addCol(final byte[] name, final boolean elem) {
-    final Data data = context.data();
+    final Data data = context.data;
     final int id = elem ? data.tagID(name) : data.attNameID(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
@@ -182,8 +182,8 @@ final class TableData {
    * Creates the row list for the specified nodes.
    */
   void createRows() {
-    final Data data = context.data();
-    final int[] n = context.current().nodes;
+    final Data data = context.data;
+    final int[] n = context.current.nodes;
 
     rows = new IntList();
     for(int p : n) {
@@ -209,7 +209,7 @@ final class TableData {
   void calcWidths() {
     if(cols.length == 0) return;
 
-    final Data data = context.data();
+    final Data data = context.data;
     final int cs = cols.length;
 
     // scan first MAXROWS root tags
@@ -270,7 +270,7 @@ final class TableData {
     final int c = cols[sortCol].id;
     final boolean e = cols[sortCol].elem;
 
-    final Data data = context.data();
+    final Data data = context.data;
     final Names index = e ? data.tags : data.atts;
     final Kind kind = index.stat(c).kind;
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
@@ -342,7 +342,7 @@ final class TableData {
    * @return query
    */
   String find() {
-    final Data data = context.data();
+    final Data data = context.data;
     final boolean r = rows == rootRows;
     final StringList filters = new StringList();
     final TokenList names = new TokenList();

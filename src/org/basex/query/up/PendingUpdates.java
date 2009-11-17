@@ -35,12 +35,12 @@ public final class PendingUpdates {
   /** Holds all data references created by the copy clause of a transform
    * expression. Adding an update primitive that was declared within the modify
    * clause of this transform expression will cause a query exception
-   * (XUDY0014) if the data reference of the corresponding target node is not 
+   * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied.
    */
   private Set<Data> refs;
   /** Validates updates. */
-  private ValidateUpdates val = new ValidateUpdates();
+  private final ValidateUpdates val = new ValidateUpdates();
 
   /**
    * Constructor.
@@ -48,9 +48,9 @@ public final class PendingUpdates {
    */
   public PendingUpdates(final boolean transform) {
     t = transform;
-    if(t) refs = new HashSet<Data>(); 
+    if(t) refs = new HashSet<Data>();
   }
-  
+
   /**
    * Adds a data reference to the reference list.
    * @param d data reference to add
@@ -64,7 +64,7 @@ public final class PendingUpdates {
    * primitives which target nodes are fragments are treated differently,
    * because they don't effect any existing databases. They may not hurt
    * any constraints however.
-   * 
+   *
    * @param p primitive to add
    * @param ctx query context
    * @throws QueryException query exception
@@ -73,14 +73,14 @@ public final class PendingUpdates {
       throws QueryException {
 
     final boolean frag = p.node instanceof FNode;
-    if(t && (frag || !refs.contains(((DBNode) p.node).data))) 
+    if(t && (frag || !refs.contains(((DBNode) p.node).data)))
       Err.or(UPWRONGTRG, p.node);
-    
+
     if(frag) {
       frags.add(p);
     } else if(p.node instanceof DBNode) {
       final Data d = ((DBNode) p.node).data;
-      
+
       DBPrimitives dp = dbs.get(d);
       if(dp == null) {
         // check permissions
@@ -103,18 +103,16 @@ public final class PendingUpdates {
   public void apply() throws QueryException {
     // validate updates
     final int[] fnodes = frags.getNodes();
-    for(int i = 0; i < fnodes.length; i++) 
-      val.validate(frags.op.get(fnodes[i]));
-    for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
-      final DBPrimitives dbp = dbs.get(d);
-      final int[] nodes = dbp.getNodes();
-      for(int i = 0; i < nodes.length; i++) {
-        val.validate(dbp.op.get(nodes[i]));
+    for(final int fnode : fnodes)
+      val.validate(frags.op.get(fnode));
+    for(final DBPrimitives dbp : dbs.values()) {
+      for(final int node : dbp.getNodes()) {
+        val.validate(dbp.op.get(node));
       }
     }
     // check status of validation
     val.status();
-    
+
     // apply updates if validation finds no errors
     frags.apply();
     for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {

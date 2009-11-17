@@ -1,7 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -20,6 +20,7 @@ import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.FTTrieBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
+import org.basex.util.Performance;
 
 /**
  * Abstract class for database creation.
@@ -47,7 +48,8 @@ abstract class ACreate extends Process {
     new Close().execute(context);
     
     final boolean mem = prop.is(Prop.MAINMEM);
-    if(!mem && p.prop.dblocked(db)) return error(DBLOCKED, db);
+    if(!mem && context.pinned(db)) return error(DBLOCKED, db);
+
     final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
         new NativeBuilder(p) : new DiskBuilder(p);
     progress(builder);
@@ -61,7 +63,7 @@ abstract class ACreate extends Process {
         index(data);
         data.close();
         final Process pr = new Open(db);
-        if(!pr.execute(context)) throw new IOException(pr.info());
+        if(!pr.execute(context)) return error(pr.info());
       }
       return info(DBCREATED, db, perf);
     } catch(final FileNotFoundException ex) {
@@ -73,13 +75,17 @@ abstract class ACreate extends Process {
       Main.debug(ex);
       final String msg = ex.getMessage();
       err = Main.info(msg != null ? msg : args[0]);
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       Main.debug(ex);
-      err = Main.info(CREATEERR, args[0]);
+      if(ex instanceof OutOfMemoryError) {
+        Performance.gc(2);
+        err = PROCOUTMEM;
+      } else {
+        err = Main.info(CREATEERR, args[0]);
+      }
     }
     if(!mem) {
       try {
-        context.prop.dbfile(db, DATALOCK).delete();
         builder.close();
       } catch(final IOException ex) {
         Main.debug(ex);

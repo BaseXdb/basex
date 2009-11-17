@@ -10,50 +10,62 @@ import java.util.ArrayList;
  */
 public final class Semaphore {
   /** List of monitors for waiting writers. */
-  private ArrayList<Object> waitingWriters = new ArrayList<Object>();
+  private ArrayList<Object> waitingW = new ArrayList<Object>();
   /** Number of waiting readers. */
-  private int waitingReaders;
+  private int waitingR;
   /** Number of active writers. */
-  private boolean activeWriter;
+  private boolean activeW;
   /** Number of active readers. */
-  private int activeReaders;
+  private int activeR;
 
   /**
-   * Modifications before read.
+   * Modifications before executing a process.
+   * @param up updating flag
    */
-  public void beforeRead() {
-    synchronized(this) {
-      if(!activeWriter && waitingWriters.size() == 0) {
-        ++activeReaders;
-        return;
+  public void before(final boolean up) {
+    if(up) {
+      final Object monitor = new Object();
+      synchronized(monitor) {
+        synchronized(this) {
+          if(waitingW.size() == 0 && activeR == 0 && !activeW) {
+            activeW = true;
+            return;
+          }
+          waitingW.add(monitor);
+        }
+        try {
+          monitor.wait();
+        } catch(final InterruptedException ex) {
+          ex.printStackTrace();
+        }
       }
-      ++waitingReaders;
-      try {
-        wait();
-      } catch(final InterruptedException ex) {
-        ex.printStackTrace();
+    } else {
+      synchronized(this) {
+        if(!activeW && waitingW.size() == 0) {
+          ++activeR;
+          return;
+        }
+        ++waitingR;
+        try {
+          wait();
+        } catch(final InterruptedException ex) {
+          ex.printStackTrace();
+        }
       }
     }
   }
 
   /**
-   * Modifications before write.
+   * Modifications after executing a process.
+   * @param up updating flag
    */
-  public void beforeWrite() {
-    final Object monitor = new Object();
-    synchronized(monitor) {
-      synchronized(this) {
-        if(waitingWriters.size() == 0 && activeReaders == 0 && !activeWriter) {
-          activeWriter = true;
-          return;
-        }
-        waitingWriters.add(monitor);
-      }
-      try {
-        monitor.wait();
-      } catch(final InterruptedException ex) {
-        ex.printStackTrace();
-      }
+  public void after(final boolean up) {
+    if(up) {
+      activeW = false;
+      if(waitingR > 0) notifyReaders();
+      else notifyWriter();
+    } else {
+      if(--activeR == 0) notifyWriter();
     }
   }
 
@@ -62,36 +74,20 @@ public final class Semaphore {
    */
   private synchronized void notifyReaders() {
     notifyAll();
-    activeReaders = waitingReaders;
-    waitingReaders = 0;
+    activeR = waitingR;
+    waitingR = 0;
   }
 
   /**
    * Notifies the writers.
    */
   private synchronized void notifyWriter() {
-    if(waitingWriters.size() > 0) {
-      final Object eldest = waitingWriters.remove(0);
+    if(waitingW.size() > 0) {
+      final Object eldest = waitingW.remove(0);
       synchronized(eldest) {
         eldest.notify();
       }
-      activeWriter = true;
+      activeW = true;
     }
-  }
-
-  /**
-   * After read process.
-   */
-  public synchronized void afterRead() {
-    if(--activeReaders == 0) notifyWriter();
-  }
-
-  /**
-   * After writer process.
-   */
-  public synchronized void afterWrite() {
-    activeWriter = false;
-    if(waitingReaders > 0) notifyReaders();
-    else notifyWriter();
   }
 }

@@ -62,7 +62,7 @@ public final class DialogEdit extends Dialog {
     pp.setLayout(new BorderLayout());
 
     final Context context = gui.context;
-    final Data data = context.data();
+    final Data data = context.data;
     kind = data.kind(pre);
 
     final String title = Main.info(EDITTEXT, EDITKIND[kind]);

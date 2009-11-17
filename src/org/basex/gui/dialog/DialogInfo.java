@@ -66,7 +66,7 @@ public final class DialogInfo extends Dialog {
         new EmptyBorder(8, 8, 8, 8)));
     tab1.setLayout(new BorderLayout());
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final MetaData meta = data.meta;
 
     final BaseXLabel doc = new BaseXLabel(meta.name);
@@ -263,7 +263,7 @@ public final class DialogInfo extends Dialog {
       }
     }
     dia.action(cmd);
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }
 

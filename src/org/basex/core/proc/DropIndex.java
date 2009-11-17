@@ -31,7 +31,7 @@ public final class DropIndex extends ACreate {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    final Data data = context.data();
+    final Data data = context.data;
 
     switch(getOption(CmdIndex.class)) {
       case TEXT:
@@ -63,7 +63,7 @@ public final class DropIndex extends ACreate {
    */
   private boolean drop(final Type index, final String pat) {
     try {
-      final Data data = context.data();
+      final Data data = context.data;
       if(data instanceof MemData) return error(PROCMM);
       data.flush();
       data.closeIndex(index);

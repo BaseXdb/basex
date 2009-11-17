@@ -78,7 +78,7 @@ public class Step extends Preds {
     ctx.leaf = false;
 
     if(e != this) return Seq.EMPTY;
-
+    
     // no predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
     final Expr p = pred[0];
@@ -88,8 +88,8 @@ public class Step extends Preds {
     // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null &&
-        uses(Use.POS, ctx)) return this;
+    if(pred.length > 1 || !last && pos == null && uses(Use.POS, ctx))
+      return this;
     // use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }

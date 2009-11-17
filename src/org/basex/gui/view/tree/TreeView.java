@@ -149,7 +149,7 @@ public final class TreeView extends View {
 
   @Override
   protected void refreshLayout() {
-    if(gui.context.data() != null) repaint();
+    if(gui.context.data != null) repaint();
   }
 
   @Override
@@ -205,7 +205,7 @@ public final class TreeView extends View {
         rectsPerLevel.clear();
       }
 
-      final Nodes curr = gui.context.current();
+      final Nodes curr = gui.context.current;
       for(int i = 0; i < curr.size(); i++) {
         treeView(curr.nodes[i], tIg);
 
@@ -271,7 +271,7 @@ public final class TreeView extends View {
             list.add(mRect.multiPres[j]);
           }
 
-          gui.notify.mark(new Nodes(list.finish(), gui.context.data()), this);
+          gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
           markNodes();
           repaint();
 
@@ -295,7 +295,7 @@ public final class TreeView extends View {
 
           }
 
-          gui.notify.mark(new Nodes(list.finish(), gui.context.data()), this);
+          gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
           markNodes();
           repaint();
         }
@@ -311,7 +311,7 @@ public final class TreeView extends View {
    * @param g the graphics reference
    */
   private void treeView(final int root, final Graphics g) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     int level = 0;
     sumNodeSizeInLine = data.meta.size;
     int[] parentList = { root};
@@ -331,7 +331,7 @@ public final class TreeView extends View {
    * @return array filled with nodes of the current line.
    */
   private int[] getNextNodeLine(final int[] parentList) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final int l = parentList.length;
     final IntList temp = new IntList();
     int sumNodeSize = 0;
@@ -380,7 +380,7 @@ public final class TreeView extends View {
       final int level, final int[] nodeList) {
 
     // calculate screen-width, if more than one root split screen in parts
-    final int numberOfRoots = gui.context.current().nodes.length;
+    final int numberOfRoots = gui.context.current.nodes.length;
     final double screenWidth = numberOfRoots > 1 ? 
         (getSize().width - 1 / (double) numberOfRoots)
         : getSize().width - 1;
@@ -562,8 +562,8 @@ public final class TreeView extends View {
     markedImage = createImage();
     final Graphics mIg = markedImage.getGraphics();
 
-    final int size = gui.context.marked().size();
-    final int[] marked = Arrays.copyOf(gui.context.marked().sorted, size);
+    final int size = gui.context.marked.size();
+    final int[] marked = Arrays.copyOf(gui.context.marked.sorted, size);
 
     for(int k = 0; k < rectsPerLevel.size(); k++) {
 
@@ -634,7 +634,7 @@ public final class TreeView extends View {
     final int y = getYperLevel(l);
     final int h = nodeHeight;
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final int pre = r.pre;
     final int kind = data.kind(pre);
     final int size = data.size(pre, kind);
@@ -768,7 +768,7 @@ public final class TreeView extends View {
    * @return String with node text.
    */
   private String getText(final int pre) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final int kind = data.kind(pre);
     String s = "";
 
@@ -793,10 +793,8 @@ public final class TreeView extends View {
    * @return focused rectangle
    */
   public boolean focus() {
-
     if(refreshedFocus) {
-
-      final int pre = gui.focused;
+      final int pre = gui.context.focused;
 
       for(int i = 0; i < rectsPerLevel.size(); i++) {
         final ArrayList<TreeRect> rectsL = rectsPerLevel.get(i);
@@ -888,7 +886,7 @@ public final class TreeView extends View {
    * Determines the optimal distance between the levels.
    */
   private void setLevelDistance() {
-    final int levels = gui.context.data().meta.height + 1;
+    final int levels = gui.context.data.meta.height + 1;
     final int height = getSize().height - 1;
     final int heightLeft = height - levels * nodeHeight;
     final int lD = (int) (heightLeft / (double) levels);
@@ -908,7 +906,7 @@ public final class TreeView extends View {
 
     if(w < minSpace) return;
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final int nodeKind = data.kind(pre);
     String s = "";
 
@@ -1040,7 +1038,7 @@ public final class TreeView extends View {
     if(left) {
       gui.notify.mark(0, null);
       if(e.getClickCount() > 1 && focusedRect.pre > 0) {
-        gui.notify.context(gui.context.marked(), false, this);
+        gui.notify.context(gui.context.marked, false, this);
         refreshContext(false, false);
       }
     }
@@ -1048,9 +1046,9 @@ public final class TreeView extends View {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(gui.updating || gui.focused == -1) return;
-    if(e.getWheelRotation() > 0) gui.notify.context(new Nodes(gui.focused,
-        gui.context.data()), false, null);
+    if(gui.updating || gui.context.focused == -1) return;
+    if(e.getWheelRotation() > 0) gui.notify.context(
+        new Nodes(gui.context.focused, gui.context.data), false, null);
     else gui.notify.hist(false);
   }
 

@@ -35,7 +35,7 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    out.print(db(context.data().meta, false, true).finish());
+    out.print(db(context.data.meta, false, true).finish());
     return true;
   }
 

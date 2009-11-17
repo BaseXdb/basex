@@ -52,14 +52,13 @@ public final class DiskBuilder extends Builder {
   @Override
   public void init(final String db) throws IOException {
     final Prop pr = parser.prop;
+    DropDB.drop(db, pr);
+    pr.dbpath(db).mkdirs();
+
     meta = new MetaData(db, pr);
     meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
-
-    DropDB.drop(db, pr);
-    pr.dbpath(db).mkdirs();
-    pr.dbfile(db, DATALOCK).createNewFile();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = IO.BLOCKSIZE;

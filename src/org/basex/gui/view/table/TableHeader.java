@@ -289,7 +289,7 @@ final class TableHeader extends BaseXPanel {
   private void chooseRoot(final MouseEvent e) {
     if(tdata.roots.size() == 0) return;
 
-    final Data data = view.gui.context.data();
+    final Data data = view.gui.context.data;
     final JPopupMenu popup = new JPopupMenu("Items");
     final byte[] root = data.tags.key(tdata.root);
     for(final byte[] en : tdata.roots) {
@@ -385,7 +385,7 @@ final class TableHeader extends BaseXPanel {
     if(c == KeyEvent.VK_ENTER) {
       box.stop();
       inputCol = -1;
-      final Nodes marked = view.gui.context.marked();
+      final Nodes marked = view.gui.context.marked;
       if(marked.size() != 0) view.gui.notify.context(marked, false, null);
     } else if(c == KeyEvent.VK_TAB) {
       if(box != null) {

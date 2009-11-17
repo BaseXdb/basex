@@ -88,7 +88,7 @@ public final class ExploreView extends View {
   @Override
   public void refreshMark() {
     go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
-    final Nodes marked = gui.context.marked();
+    final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }

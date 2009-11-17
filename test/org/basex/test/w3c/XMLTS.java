@@ -69,7 +69,7 @@ public final class XMLTS {
     //context.prop.set(MAINMEM, true);
 
     new CreateDB(FILE).execute(context);
-    data = context.data();
+    data = context.data;
 
     int ok = 0;
     int wrong = 0;

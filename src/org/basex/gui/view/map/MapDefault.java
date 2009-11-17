@@ -35,7 +35,7 @@ final class MapDefault extends MapPainter {
     l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
-    final Data data = view.gui.context.data();
+    final Data data = view.gui.context.data;
 
     final int off = prop.num(GUIProp.MAPOFFSETS);
     final int rs = rects.size;
@@ -51,7 +51,7 @@ final class MapDefault extends MapPainter {
       Color col = color(rects, ri);
       final boolean mark = col != null;
 
-      r.pos = view.gui.context.marked().ftpos.get(pre);
+      r.pos = view.gui.context.marked.ftpos.get(pre);
       g.setColor(mark ? col : COLORS[lvl]);
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
@@ -87,8 +87,8 @@ final class MapDefault extends MapPainter {
 
     final int pre = rect.pre;
     final Context context = view.gui.context;
-    final Data data = context.data();
-    final Nodes current = context.current();
+    final Data data = context.data;
+    final Nodes current = context.current;
     final int kind = data.kind(pre);
     final int fsz = prop.num(GUIProp.FONTSIZE);
 

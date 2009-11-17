@@ -21,7 +21,7 @@ public interface IFileParser {
    * @return true if the file is supported.
    * @throws IOException if an error occurs while reading from the file.
    */
-  public abstract boolean check(final BufferedFileChannel bfc)
+  boolean check(final BufferedFileChannel bfc)
       throws IOException;
 
   /**
@@ -29,7 +29,7 @@ public interface IFileParser {
    * @param deepFile the {@link DeepFile} to save metadata and content to.
    * @throws IOException if any error occurs while reading from the file.
    */
-  public abstract void extract(final DeepFile deepFile) throws IOException;
+  void extract(final DeepFile deepFile) throws IOException;
 
   /**
    * Propagates the metadata and file contents back to the file in the file
@@ -38,5 +38,5 @@ public interface IFileParser {
    *          contents.
    * @throws IOException if any error occurs.
    */
-  public abstract void propagate(final DeepFile deepFile) throws IOException;
+  void propagate(final DeepFile deepFile) throws IOException;
 }

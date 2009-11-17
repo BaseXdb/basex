@@ -178,8 +178,8 @@
 //  /**
 //   * Gets a parser implementation for given file suffix.
 //   * @param suffix the file suffix to get the parser for.
-//   * @return the parser implementation or <code>null</code> if no implementation
-//   *         is available.
+//   * @return the parser implementation or <code>null</code> if no
+//   *         implementation is available.
 //   */
 //  private IFileParser getParser(final String suffix) {
 //    IFileParser instance = parserInstances.get(suffix);
@@ -336,7 +336,8 @@
 //          if(prop.is(Prop.FSMETA)) spotlight.parse(f);
 //          if(prop.is(Prop.FSCONT)) {
 //            try {
-//              final BufferedFileChannel fc = new BufferedFileChannel(f, buffer);
+//              final BufferedFileChannel fc =
+//                new BufferedFileChannel(f, buffer);
 //              try {
 //                fallbackParserInstance.readContent(fc, this);
 //              } finally {
@@ -393,8 +394,8 @@
 //   * {@link BufferedFileChannel#subChannel(int)}.
 //   * </p>
 //   * @param df the DeepFile to fill with metadata and contents.
-//   * @param suffix the file suffix(es). More than one suffix means that the file
-//   *          type is unknown. All given suffixes will be tested.
+//   * @param suffix the file suffix(es). More than one suffix means that the
+//   *          file type is unknown. All given suffixes will be tested.
 //   * @throws IOException if any error occurs while reading from the file.
 //   */
 //  public void parseFileFragment(final DeepFile df, final String... suffix)
@@ -417,7 +418,8 @@
 //      // final long size = f.size();
 //      // startContent(offset, size);
 //      // // [BL] more generic method for setting metadata for file fragments
-//      // if(title != null) builder.nodeAndText(MetaElem.TITLE.get(), EMPTY_ATTS,
+//      // if(title != null) builder.nodeAndText(MetaElem.TITLE.get(),
+//      //   EMPTY_ATTS,
 //      // token(title));
 //      // if(parser != null) {
 //      // try {
@@ -500,9 +502,9 @@
 //    return dir.delete();
 //  }
 //
-//  // ---------------------------------------------------------------------------
-//  // ---------------------------------------------------------------------------
-//  // ---------------------------------------------------------------------------
+//  // -------------------------------------------------------------------------
+//  // -------------------------------------------------------------------------
+//  // -------------------------------------------------------------------------
 //
 //  /**
 //   * Generates the xml representation for a map with key-value pairs that
@@ -520,9 +522,9 @@
 //
 //  /**
 //   * Adds a text element.
-//   * @param offset the absolute position of the first byte of the file fragment
-//   *          represented by this content element inside the current file. A
-//   *          negative value stands for an unknown offset.
+//   * @param offset the absolute position of the first byte of the file
+//   *          fragment represented by this content element inside the current
+//   *          file. A negative value stands for an unknown offset.
 //   * @param size the size of the content element.
 //   * @param text the text to add.
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -536,9 +538,9 @@
 //
 //  /**
 //   * Adds a text element.
-//   * @param offset the absolute position of the first byte of the file fragment
-//   *          represented by this content element inside the current file. A
-//   *          negative value stands for an unknown offset.
+//   * @param offset the absolute position of the first byte of the file
+//   *          fragment represented by this content element inside the current
+//   *          file. A negative value stands for an unknown offset.
 //   * @param size the size of the content element.
 //   * @param text the text to add.
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -557,9 +559,9 @@
 //   * characters!</b> Otherwise the generated XML document may be not
 //   * well-formed.
 //   * </p>
-//   * @param offset the absolute position of the first byte of the file fragment
-//   *          represented by this content element inside the current file. A
-//   *          negative value stands for an unknown offset.
+//   * @param offset the absolute position of the first byte of the file
+//   *          fragment represented by this content element inside the current
+//   *          file. A negative value stands for an unknown offset.
 //   * @param size the size of the content element.
 //   * @param text the text to add.
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
@@ -569,7 +571,8 @@
 //  @SuppressWarnings("all")
 //  // suppress dead code warning for ADD_ATTS
 //  public void textContent(final long offset, final long size,
-//      final TokenBuilder text, final boolean preserveSpace) throws IOException {
+//      final TokenBuilder text, final boolean preserveSpace)
+//         throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
 //    atts.reset();
 //    atts.add(OFFSET, offset >= 0 ? token(offset) : UNKNOWN);
@@ -588,9 +591,9 @@
 //   * value may be set with {@link #setContentSize(long) setContentSize(size)}.
 //   * If it's not set, the size is supposed to be unknown.
 //   * </p>
-//   * @param offset the absolute position of the first byte of the file fragment
-//   *          represented by this content element inside the current file. A
-//   *          negative value stands for an unknown offset.
+//   * @param offset the absolute position of the first byte of the file
+//   *          fragment represented by this content element inside the current
+//   *          file. A negative value stands for an unknown offset.
 //   * @throws IOException if any I/O error occurs.
 //   */
 //  public void startContent(final long offset) throws IOException {
@@ -619,16 +622,17 @@
 //   * Generates the xml representation for a new content element inside the
 //   * current file or content node node.
 //   * </p>
-//   * @param offset the absolute position of the first byte of the file fragment
-//   *          represented by this content element inside the current file. A
-//   *          negative value stands for an unknown offset.
+//   * @param offset the absolute position of the first byte of the file
+//   *          fragment represented by this content element inside the current
+//   *          file. A negative value stands for an unknown offset.
 //   * @param size the size of the content element.
 //   * @throws IOException if any I/O error occurs.
 //   */
 //  public void startContent(final long offset, final long size)
 //      throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
-//    if(size < 1) throw new IllegalArgumentException("content size must be > 0");
+//    if(size < 1)
+//      throw new IllegalArgumentException("content size must be > 0");
 //    if(offset == lastContentOffset && size == lastContentSize) {
 //      /*
 //       * content range is exactly the same as the range of the parent element.
@@ -656,7 +660,8 @@
 //  /**
 //   * Generates the xml representation for a new XML content element inside the
 //   * current file or content node node.
-//   * @param offset the absolute position of the first byte of the file fragment
+//   * @param offset the absolute position of the first byte of the
+//   *   file fragment
 //   *          represented by this content element inside the current file.
 //   * @param size the size of the content element.
 //   * @throws IOException if any error occurs while reading from the file.
@@ -680,8 +685,8 @@
 //  }
 //
 //  /**
-//   * Checks if a parser for the given suffix is available and the file is in the
-//   * correct format.
+//   * Checks if a parser for the given suffix is available and the file
+//   * is in the correct format.
 //   * @param f the {@link BufferedFileChannel} to check.
 //   * @param suffix the file suffix.
 //   * @return true if the data is supported.

@@ -94,7 +94,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the name of the associated file in the file system.
@@ -116,7 +117,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -139,7 +141,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -211,7 +214,9 @@ public class DeepFile {
    * @param contentSize the size of the underlying {@link BufferedFileChannel}.
    * @throws IOException if any error occurs.
    */
-  private DeepFile(final DeepFile df, final int contentSize) throws IOException {
+  private DeepFile(final DeepFile df, final int contentSize)
+      throws IOException {
+
     parser = df.parser;
     bfc = df.bfc.subChannel(df.bfc.getFileName(), contentSize);
     fsmeta = df.fsmeta;

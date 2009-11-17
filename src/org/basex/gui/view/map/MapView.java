@@ -139,7 +139,7 @@ public final class MapView extends View implements Runnable {
     textLen = null;
     zoomStep = 0;
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final GUIProp gprop = gui.prop;
     if(data != null && getWidth() != 0) {
       if(!visible()) return;
@@ -161,14 +161,14 @@ public final class MapView extends View implements Runnable {
       focused = null;
       return;
     }
-    if(gui.focused == -1 && focused != null) focused = null;
+    final int f = gui.context.focused;
+    if(f == -1 && focused != null) focused = null;
 
     final MapRect m = focused;
     final int ms = mainRects.size;
     for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
-      if(gui.focused == rect.pre || mi + 1 < ms
-          && gui.focused < mainRects.get(mi + 1).pre) {
+      if(f == rect.pre || mi + 1 < ms && f < mainRects.get(mi + 1).pre) {
         focused = rect;
         break;
       }
@@ -187,14 +187,11 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
     // use simple zooming animation for result node filtering
-    final Nodes context = gui.context.current();
+    final Nodes context = gui.context.current;
     final int hist = gui.notify.hist;
-    final boolean page = !more
-        && rectHist[hist + 1] != null
-        && rectHist[hist + 1].pre == 0
-        || more
-        && (context.size() != 1
-        || focused == null || context.nodes[0] != focused.pre);
+    final boolean page = !more && rectHist[hist + 1] != null
+        && rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
+        focused == null || context.nodes[0] != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -213,7 +210,7 @@ public final class MapView extends View implements Runnable {
       // MapLayout hugeLayout = new MapLayout(data, textLen);
 
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-      calc(rect, gui.context.current(), mainMap);
+      calc(rect, gui.context.current, mainMap);
 
       //MapRect dest = new MapRect(0, 0, fkt * w, fkt * h, mainRects.get(0).pre,
       //  mainRects.get(0).level);
@@ -235,7 +232,7 @@ public final class MapView extends View implements Runnable {
       drawMap(hugeMap, hugeRects, fkt);
     } else {
       final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-      calc(rect, gui.context.current(), mainMap);
+      calc(rect, gui.context.current, mainMap);
     }
 
     //  final MapRect hrect = new MapRect(0, 0, fkt * w, fkt * h, 0, 0);
@@ -398,7 +395,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final GUIProp gprop = gui.prop;
 
     if(mainRects == null || mainRects.size == 0) {
@@ -730,7 +727,7 @@ public final class MapView extends View implements Runnable {
 
     if(gui.prop.is(GUIProp.MAPINTERACTION) && !mapdist) {
       thumbMap = true;
-      final Data data = gui.context.data();
+      final Data data = gui.context.data;
       int screensize = getWidth() * getHeight();
       screensize = screensize / gui.prop.num(GUIProp.MAPTHUMBSIZE);
 
@@ -780,10 +777,10 @@ public final class MapView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     dragTol = 0;
-    if(!focus() && gui.focused == -1) return;
+    if(!focus() && gui.context.focused == -1) return;
 
     // add or remove marked node
-    final Nodes marked = gui.context.marked();
+    final Nodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -791,7 +788,7 @@ public final class MapView extends View implements Runnable {
     } else if(e.isControlDown()) {
       gui.notify.mark(2, null);
     } else {
-      if(!marked.contains(gui.focused)) gui.notify.mark(0, null);
+      if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
     }
   }
 
@@ -809,7 +806,7 @@ public final class MapView extends View implements Runnable {
     if(mh < 0) my -= mh = -mh;
     selBox = new MapRect(mx, my, mw, mh);
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     final IntList il = new IntList();
     int np = 0;
     final int rl = mainRects.size;
@@ -835,9 +832,9 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(gui.updating || gui.focused == -1) return;
-    if(e.getWheelRotation() > 0) gui.notify.context(new Nodes(gui.focused,
-        gui.context.data()), false, null);
+    if(gui.updating || gui.context.focused == -1) return;
+    if(e.getWheelRotation() > 0) gui.notify.context(
+        new Nodes(gui.context.focused, gui.context.data), false, null);
     else gui.notify.hist(false);
   }
 
@@ -851,9 +848,9 @@ public final class MapView extends View implements Runnable {
     final boolean shift = e.isShiftDown();
 
     final Context context = gui.context;
-    final Data data = context.data();
+    final Data data = context.data;
     final int size = data.meta.size;
-    final Nodes current = context.current();
+    final Nodes current = context.current;
 
     int pre = current.nodes[0];
     final GUIProp prop = gui.prop;
@@ -947,7 +944,7 @@ public final class MapView extends View implements Runnable {
   private void initLen() {
     painter.reset();
 
-    final Data data = gui.context.current().data;
+    final Data data = gui.context.current.data;
     if(data.fs != null || textLen != null ||
         gui.prop.num(GUIProp.MAPWEIGHT) == 0) return;
 

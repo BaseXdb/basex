@@ -187,7 +187,7 @@ public final class XQueryView extends View {
   @Override
   protected void refreshMark() {
     go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
-    final Nodes marked = gui.context.marked();
+    final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }

@@ -39,7 +39,7 @@ public final class QueryProcessor extends Progress {
    * @param cx database context
    */
   public QueryProcessor(final String qu, final Context cx) {
-    this(qu, cx.current(), cx);
+    this(qu, cx.current, cx);
   }
 
   /**

@@ -317,14 +317,14 @@ public final class DialogUser extends BaseXBack {
             table.setRowSelectionInterval(row, row);
             JPopupMenu menu = new JPopupMenu();
             JMenuItem item = new JMenuItem("Remove from db: "
-                + gui.context.data().meta.name);
+                + gui.context.data.meta.name);
             menu.add(item);
             item.addActionListener(new ActionListener() {
               public void actionPerformed(final ActionEvent event) {
                 String usern = ((TableModel) table.getModel()).getValueAt(row,
                     0).toString();
-                gui.context.data().meta.users.remove(
-                    gui.context.data().meta.users.get(usern));
+                gui.context.data.meta.users.remove(
+                    gui.context.data.meta.users.get(usern));
                 try {
                   setData();
                 } catch(IOException ex) {
@@ -416,7 +416,7 @@ public final class DialogUser extends BaseXBack {
               data.contents.get(row).set(l.get(2), col + 2);
               fireTableCellUpdated(row, col + 1);
               fireTableCellUpdated(row, col + 2);
-              String db = dia.gui.context.data().meta.name;
+              String db = dia.gui.context.data.meta.name;
               String right = CmdPerm.values()[col].toString();
               permps.add(getValueAt(row, col + 1).equals(true) ? new Grant(
                   right, value.toString(), db) : new Revoke(right,
@@ -437,7 +437,7 @@ public final class DialogUser extends BaseXBack {
             permps.add(value.equals(true) ? new Grant(right, uname)
                 : new Revoke(right, uname));
           } else {
-            String db = dia.gui.context.data().meta.name;
+            String db = dia.gui.context.data.meta.name;
             permps.add(value.equals(true) ? new Grant(right, uname, db)
                 : new Revoke(right, uname, db));
           }

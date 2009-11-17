@@ -87,7 +87,7 @@ public final class DeepFS implements DataText {
     if(!new Open(dbname).execute(ctx))
       new CreateDB("<" + string(DEEPFS) + " " + "mountpoint=\""
           + mountpoint + "\"/>", dbname).execute(ctx);
-    data = ctx.data();
+    data = ctx.data;
     initNames();
     initRootStat();
   }
@@ -108,7 +108,7 @@ public final class DeepFS implements DataText {
    */
   public DeepFS(final Context c) {
     ctx = c;
-    data = ctx.data();
+    data = ctx.data;
     initNames();
     initRootStat();
   }

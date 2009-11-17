@@ -25,7 +25,7 @@ public final class Close extends Process {
   @Override
   protected boolean exec(final PrintOutput out) {
     try {
-      final Data data = context.data();
+      final Data data = context.data;
       if(data == null) return true;
       close(context, data);
       context.closeDB();

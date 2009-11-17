@@ -6,11 +6,10 @@ import org.basex.core.Users;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.io.PrintOutput;
-import org.basex.util.StringList;
 
 /**
  * Evaluates the 'info users' command and returns user information.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
@@ -24,26 +23,13 @@ public final class InfoUsers extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    Users loc = context.data().meta.users;
-    Users glob = context.users;
-    StringList remove = new StringList();
-    StringList tmp1 = new StringList();
-    StringList tmp2 = new StringList();
-    for(User u : loc.getUsers()) {
-      tmp1.add(u.name);
+    // [CG] to be moved...
+    final Users loc = context.data.meta.users;
+    for(final User u : context.users.getUsers()) {
+      final User us = loc.get(u.name);
+      if(us != null) loc.remove(us);
     }
-    for(User u : glob.getUsers()) {
-      tmp2.add(u.name);
-    }
-    for(String s : tmp1) {
-      if(!tmp2.contains(s)) {
-        remove.add(s);
-      }
-    }
-    for(String s : remove) {
-      loc.remove(loc.get(s));
-    }
-    out.println(context.data().meta.users.info());
+    out.println(context.data.meta.users.info());
     return true;
   }
 

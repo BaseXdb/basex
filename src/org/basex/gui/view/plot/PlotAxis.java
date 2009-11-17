@@ -90,7 +90,7 @@ public final class PlotAxis {
     byte[] b = token(attribute);
     isTag = !contains(b, '@');
     b = delete(b, '@');
-    final Data data = plotData.context.data();
+    final Data data = plotData.context.data;
     attrID = isTag ? data.tags.id(b) : data.atts.id(b);
     refreshAxis();
     return true;
@@ -102,7 +102,7 @@ public final class PlotAxis {
    * is of kind TEXT, it is treated as INT.
    */
   void refreshAxis() {
-    final Data data = plotData.context.data();
+    final Data data = plotData.context.data;
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     type = key.kind;
@@ -212,7 +212,7 @@ public final class PlotAxis {
     // special case: deepfs @mtime. trying to get a better distribution for
     // newer files. the newest file gets the lowest value (max - d + min) but is
     // still displayed on the right end of the plot.
-    final Data data = plotData.context.data();
+    final Data data = plotData.context.data;
     if(data.fs != null && !isTag && attrID == data.fs.mtimeID) {
       range = ln(max - min);
       return 1 - 1 / range * ln(max - d);
@@ -259,7 +259,7 @@ public final class PlotAxis {
    * @return item value
    */
   byte[] getValue(final int pre) {
-    final Data data = plotData.context.data();
+    final Data data = plotData.context.data;
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);

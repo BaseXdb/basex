@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.BuildException;
@@ -84,7 +83,7 @@ public final class CreateDB extends ACreate {
 
     final Prop pr = p.prop;
     if(pr.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
-    if(p.prop.dblocked(db)) throw new IOException(Main.info(DBLOCKED, db));
+    if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
 
     final Builder builder = new DiskBuilder(p);
     try {
@@ -99,7 +98,6 @@ public final class CreateDB extends ACreate {
       data.close();
     } catch(final IOException ex) {
       try {
-        pr.dbfile(db, DATALOCK).delete();
         builder.close();
       } catch(final IOException exx) {
         Main.debug(exx);

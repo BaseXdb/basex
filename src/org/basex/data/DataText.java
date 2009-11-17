@@ -247,6 +247,4 @@ public interface DataText {
   String DATAATV = "atv";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
-  /** Database - Lock. */
-  String DATALOCK = "lock";
 }

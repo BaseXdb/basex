@@ -58,11 +58,9 @@ public final class Open extends Process {
       // check if document exists
       if(!ctx.prop.dbexists(db))
         throw new IOException(Main.info(DBNOTFOUND, db));
-      if(ctx.prop.dblocked(db))
-        throw new IOException(Main.info(DBLOCKED, db));
 
       data = new DiskData(db, ctx.prop);
-      ctx.addToPool(data);
+      ctx.pin(data);
     }
 
     // check permissions

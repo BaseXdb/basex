@@ -231,43 +231,4 @@ public final class UpdateFunctions {
         return p;
     }
   }
-
-  /**
-   * Creates a memory data instance from the specified database and pre value.
-   * @param data data reference
-   * @param pre pre value
-   * @return database instance
-   */
-  // [LK] need it or not? Maybe replace parts of addDBNode() with this one ...
-  public static MemData copy(final Data data, final int pre) {
-    // size of the data instance
-    final int size = data.size(pre, data.kind(pre));
-    // create temporary data instance, adopting the indexes of the source data
-    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns,
-        data.path, data.meta.prop);
-
-    // copy all nodes
-    for(int p = pre; p < pre + size; p++) {
-      final int k = data.kind(p);
-      final int d = p - data.parent(p, k);
-      switch(k) {
-        case Data.DOC:
-          tmp.addDoc(data.text(p), data.size(p, k));
-          break;
-        case Data.ELEM:
-          tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
-              data.size(p, k), data.ns(p).length != 0);
-          break;
-        case Data.ATTR:
-          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d);
-          break;
-        case Data.TEXT:
-        case Data.COMM:
-        case Data.PI:
-          tmp.addText(data.text(p), d, k);
-          break;
-      }
-    }
-    return tmp;
-  }
 }

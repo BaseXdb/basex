@@ -146,7 +146,7 @@ public final class DialogOpen extends Dialog {
       final String db = choice.getValue();
       if(db.isEmpty()) return;
       if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
-        if(ctx.data() != null && ctx.data().meta.name.equals(db)) {
+        if(ctx.data != null && ctx.data.meta.name.equals(db)) {
           new Close().execute(gui.context);
           gui.notify.init();
         }

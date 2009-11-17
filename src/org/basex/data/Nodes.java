@@ -35,7 +35,17 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final Data d) {
-    this(new int[] {}, d);
+    this(d, false);
+  }
+
+  /**
+   * Node Set constructor.
+   * @param d data reference
+   * @param r root flag (all nodes will refer to root documents)
+   */
+  public Nodes(final Data d, final boolean r) {
+    this(r ? d.doc() : new int[] {}, d, Prop.gui ? new FTPosData() : null);
+    doc = r;
   }
 
   /**
@@ -69,24 +79,13 @@ public final class Nodes implements Result {
    * Node Set constructor.
    * @param n node set
    * @param d data reference
-   * @param r doc flag (all nodes refer to documents)
-   */
-  public Nodes(final int[] n, final Data d, final boolean r) {
-    this(n, d, Prop.gui ? new FTPosData() : null);
-    doc = r;
-  }
-
-  /**
-   * Node Set constructor.
-   * @param n node set
-   * @param d data reference
    * @param ft ft position data
    */
   private Nodes(final int[] n, final Data d, final FTPosData ft) {
-    if(d == null) Main.notexpected("No data available");
     data = d;
     ftpos = ft;
     set(n);
+    if(d == null) Main.notexpected("No data available");
   }
 
   public int size() {

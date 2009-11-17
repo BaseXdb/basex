@@ -6,11 +6,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import org.basex.core.Context;
 import org.basex.core.Session;
-import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.Semaphore;
+import org.basex.server.ServerProcess;
 import org.basex.server.ServerSession;
 import org.basex.util.Args;
 import org.basex.util.Token;
@@ -70,7 +70,7 @@ public final class BaseXServer extends Main implements Runnable {
   public void run() {
     while(running) {
       try {
-        final ServerSession s = new ServerSession(server.accept(), this, info);
+        final ServerProcess s = new ServerProcess(server.accept(), this, info);
         if(STOP.exists()) {
           STOP.delete();
           outln(SERVERSTOPPED);
@@ -105,7 +105,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected Session session() {
-    if(session == null) session = new LocalSession(context);
+    if(session == null) session = new ServerSession(context, sem);
     return session;
   }
 

@@ -26,7 +26,7 @@ public final class InfoIndex extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    final Data data = context.data();
+    final Data data = context.data;
     out.println(INFOTAGS);
     out.println(data.info(Type.TAG));
     out.println(INFOATTS);

@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Sessions {
   /** Entries. */
-  ServerSession[] list = new ServerSession[8];
+  ServerProcess[] list = new ServerProcess[1];
   /** Number of entries. */
   int size;
 
@@ -21,7 +21,7 @@ public final class Sessions {
    * Adds a session to the array.
    * @param s string to be added
    */
-  public void add(final ServerSession s) {
+  public void add(final ServerProcess s) {
     if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = s;
   }
@@ -39,7 +39,7 @@ public final class Sessions {
    * @param p position
    * @return entry
    */
-  public ServerSession get(final int p) {
+  public ServerProcess get(final int p) {
     return list[p];
   }
 
@@ -47,7 +47,7 @@ public final class Sessions {
    * Deletes the specified entry.
    * @param s entry to be deleted.
    */
-  public void delete(final ServerSession s) {
+  public void delete(final ServerProcess s) {
     for(int i = 0; i < size; i++) {
       if(list[i] == s) {
         Array.move(list, i + 1, -1, --size - i);

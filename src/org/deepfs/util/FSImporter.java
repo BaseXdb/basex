@@ -124,7 +124,7 @@ public final class FSImporter implements FSTraversal {
         } finally {
           try {
             bfc.close();
-          } catch(final IOException e1) {}
+          } catch(final IOException e1) { }
         }
       } catch(final IOException e) { // opening failed
         Main.debug("Failed to open the file (% - %)", f.getAbsolutePath(), e);
@@ -160,11 +160,11 @@ public final class FSImporter implements FSTraversal {
         + escape(d.getAbsolutePath()) + "\"/>", db);
     if(!c.execute(ctx, out)) throw new RuntimeException(
         "Failed to create file system database (" + c.info() + ").");
-    ctx.data().meta.deepfs = true;
+    ctx.data.meta.deepfs = true;
   }
 
   @Override
-  public void postTraversalVisit(final File d) {}
+  public void postTraversalVisit(final File d) { }
 
   @Override
   public void levelUpdate(final int l) {

@@ -108,12 +108,12 @@ public final class TextView extends View implements ActionListener {
   @Override
   public void refreshMark() {
     if(refresh) refresh = false;
-    else setText(gui.context.marked());
+    else setText(gui.context.marked);
   }
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    setText(gui.context.current());
+    setText(gui.context.current);
   }
 
   @Override
@@ -167,7 +167,7 @@ public final class TextView extends View implements ActionListener {
   public void setText(final CachedOutput out, final Process p) {
     area.setText(out.buffer(), out.size());
     header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
-    home.setEnabled(gui.context.data() != null);
+    home.setEnabled(gui.context.data != null);
     refresh = true;
     if(!out.finished()) {
       proc = null;

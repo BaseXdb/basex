@@ -94,7 +94,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    */
   public void updateViews() {
     removeAll();
-    layout.setVisibility(gui.context.data() != null);
+    layout.setVisibility(gui.context.data != null);
     layout.createView(this);
     validate();
     repaint();

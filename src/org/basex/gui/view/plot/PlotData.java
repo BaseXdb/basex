@@ -47,7 +47,7 @@ public final class PlotData {
    * @return key array
    */
   TokenList getItems() {
-    final Data data = context.data();
+    final Data data = context.data;
     final TokenList tl = new TokenList();
     for(final byte[] k : data.path.desc(EMPTY, data, true, true)) {
       if(getCategories(k).size() > 1) tl.add(k);
@@ -61,7 +61,7 @@ public final class PlotData {
    * @return key array
    */
   TokenList getCategories(final byte[] it) {
-    final Data data = context.data();
+    final Data data = context.data;
     final TokenList tl = new TokenList();
     for(final byte[] k : data.path.desc(it, data, true, false)) {
       final Names index = startsWith(k, '@') ? data.atts : data.tags;
@@ -82,7 +82,7 @@ public final class PlotData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems(context.current(), true);
+    refreshItems(context.current, true);
     return true;
   }
 
@@ -93,7 +93,7 @@ public final class PlotData {
    * @param sub determine descendant nodes of given context nodes
    */
   void refreshItems(final Nodes ctx, final boolean sub) {
-    final Data data = context.data();
+    final Data data = context.data;
     final IntList tmpPres = new IntList();
     final int itmID = data.tagID(item);
 

@@ -168,7 +168,7 @@ public final class QueryContext extends Progress {
    */
   public QueryContext(final Context ctx) {
     context = ctx;
-    nodes = ctx.current();
+    nodes = ctx.current;
     ftopt = new FTOpt(ctx.prop);
     inf = ctx.prop.is(Prop.ALLINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
@@ -310,7 +310,7 @@ public final class QueryContext extends Progress {
 
       final Item i = iter.finish();
       updates.apply();
-      context.update();
+      if(context.data != null) context.update();
       return i.iter();
     } catch(final StackOverflowError ex) {
       if(Prop.debug) ex.printStackTrace();
@@ -355,8 +355,7 @@ public final class QueryContext extends Progress {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs; d++)
-      Close.close(context, doc[d].data);
+    for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
   }
 
   /**

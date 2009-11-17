@@ -291,7 +291,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     if(data == null || !data.meta.pathindex) return;
     super.paintComponent(g);
 
@@ -324,7 +324,7 @@ public final class PlotView extends View implements Runnable {
 
     gui.painting = true;
     // draw focused item
-    final int f = plotData.findPre(gui.focused);
+    final int f = plotData.findPre(gui.context.focused);
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
       final int ol = getOverlappingNodes(f).length;
@@ -345,7 +345,7 @@ public final class PlotView extends View implements Runnable {
         int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
-        final byte[] nm = data.attValue(data.nameID, gui.focused);
+        final byte[] nm = data.attValue(data.nameID, gui.context.focused);
         String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
@@ -390,13 +390,13 @@ public final class PlotView extends View implements Runnable {
    * Draws marked nodes.
    */
   private void createMarkedNodes() {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     markedImg = new BufferedImage(getWidth(), getHeight(),
         Transparency.BITMASK);
     final Graphics gi = markedImg.getGraphics();
     smooth(gi);
 
-    final Nodes marked = gui.context.marked();
+    final Nodes marked = gui.context.marked;
     if(marked.size() <= 0) return;
     final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
     int i = 0;
@@ -805,7 +805,7 @@ public final class PlotView extends View implements Runnable {
   protected void refreshContext(final boolean more, final boolean quick) {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
-        nextContext : gui.context.current(), !more || !rightClick);
+        nextContext : gui.context.current, !more || !rightClick);
     plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);
     plotData.xAxis.refreshAxis();
     plotData.yAxis.log = gui.prop.is(GUIProp.PLOTYLOG);
@@ -828,7 +828,7 @@ public final class PlotView extends View implements Runnable {
   protected void refreshInit() {
     plotData = null;
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     if(data != null) {
       if(!visible()) return;
 
@@ -898,7 +898,7 @@ public final class PlotView extends View implements Runnable {
    */
   private boolean focus() {
     final int size = itemImg.getWidth() / 2;
-    int focusedPre = gui.focused;
+    int focusedPre = gui.context.focused;
     // if mouse pointer is outside of the plot the focused item is set to -1,
     // focus may be refreshed, if necessary
     if(mouseX < MARGIN[1] ||
@@ -937,7 +937,7 @@ public final class PlotView extends View implements Runnable {
     }
 
     // if the focus changed, views are refreshed
-    if(focusedPre != gui.focused) {
+    if(focusedPre != gui.context.focused) {
       gui.notify.focus(focusedPre, this);
       return true;
     }
@@ -981,7 +981,7 @@ public final class PlotView extends View implements Runnable {
    */
   private String formatString(final boolean drawX) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
-    final byte[] val = axis.getValue(gui.focused);
+    final byte[] val = axis.getValue(gui.context.focused);
     if(val.length == 0) return "";
     return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
       formatString(toDouble(val), drawX);
@@ -1079,8 +1079,8 @@ public final class PlotView extends View implements Runnable {
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
 
-    gui.notify.mark(new Nodes(il.finish(), gui.context.data()), this);
-    nextContext = gui.context.marked();
+    gui.notify.mark(new Nodes(il.finish(), gui.context.data), this);
+    nextContext = gui.context.marked;
     drawSubNodes = false;
     markingChanged = true;
     repaint();
@@ -1106,34 +1106,34 @@ public final class PlotView extends View implements Runnable {
     final boolean r = !SwingUtilities.isLeftMouseButton(e);
     if(r) { rightClick = true; return; }
     // no item is focused. no nodes marked after mouse click
-    if(gui.focused == -1) {
-      gui.notify.mark(new Nodes(gui.context.data()), this);
+    if(gui.context.focused == -1) {
+      gui.notify.mark(new Nodes(gui.context.data), this);
       return;
     }
 
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
-    final int pre = plotData.findPre(gui.focused);
+    final int pre = plotData.findPre(gui.context.focused);
     final int[] il = getOverlappingNodes(pre);
     // right mouse or shift down
     if(e.isShiftDown()) {
-      final Nodes marked = gui.context.marked();
+      final Nodes marked = gui.context.marked;
       marked.union(il);
       gui.notify.mark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
       // context change also self implied, thus right click set to true
       rightClick = true;
-      final Nodes marked = new Nodes(gui.context.data());
+      final Nodes marked = new Nodes(gui.context.data);
       marked.union(il);
       gui.notify.context(marked, false, null);
       // simple mouse click
     } else {
-      final Nodes marked = new Nodes(gui.context.data());
+      final Nodes marked = new Nodes(gui.context.data);
       marked.union(il);
       gui.notify.mark(marked, this);
     }
-    nextContext = gui.context.marked();
+    nextContext = gui.context.marked;
   }
 
   @Override

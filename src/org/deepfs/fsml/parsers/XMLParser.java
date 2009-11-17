@@ -74,7 +74,8 @@ public final class XMLParser implements IFileParser {
         if(deepFile.fsmeta) {
           deepFile.setFileType(FileType.XML);
           final String name = bfc.getFileName();
-          final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+          final String suf = name.substring(
+              name.lastIndexOf('.') + 1).toLowerCase();
           final MimeType mime = SUFFIXES.get(suf);
           if(mime == null) Main.notexpected();
           deepFile.setFileFormat(mime);

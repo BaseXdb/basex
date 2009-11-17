@@ -209,7 +209,7 @@ public abstract class W3CTS {
     context.prop.set(Prop.CHOP, false);
 
     new CreateDB(path + input).execute(context);
-    data = context.data();
+    data = context.data;
 
     final Nodes root = new Nodes(0, data);
     Main.outln(NL + Main.name(this) + " Test Suite " +
@@ -347,11 +347,8 @@ public abstract class W3CTS {
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
-      if(cont.size() != 0) {
-        final Data d = Check.check(context,
-            srcs.get(string(data.atom(cont.nodes[0]))));
-        curr = new Nodes(d.doc(), d, true);
-      }
+      if(cont.size() != 0) curr = new Nodes(Check.check(context,
+          srcs.get(string(data.atom(cont.nodes[0])))), true);
 
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       final QueryContext qctx = xq.ctx;
@@ -385,7 +382,7 @@ public abstract class W3CTS {
           it.serialize(xml);
         }
         xml.close();
-      } catch(final QueryException ex) {
+      } catch(final Exception ex) {
         error = ex.getMessage();
         if(error.startsWith(STOPPED)) {
           error = error.substring(error.indexOf('\n') + 1);
@@ -393,8 +390,6 @@ public abstract class W3CTS {
         if(error.startsWith("[")) {
           error = error.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
         }
-      } catch(final Exception ex) {
-        error = ex.toString();
       }
 
       final Nodes outFiles = nodes("*:output-file/text()", state);

@@ -47,7 +47,7 @@ public class AxisPath extends Path {
   /** Flag for result caching. */
   private boolean cache;
   /** Cached result. */
-  private NodIter citem;
+  private NodIter citer;
   /** Last visited item. */
   private Item litem;
 
@@ -194,7 +194,7 @@ public class AxisPath extends Path {
         }
       }
     }
-
+    
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Use.VAR, ctx);
 
@@ -423,20 +423,21 @@ public class AxisPath extends Path {
 
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
 
-    if(!cache || citem == null || litem != it || it.type != Type.DOC) {
+    if(!cache || citer == null || litem.type != Type.DOC ||
+        it.type != Type.DOC || !((Nod) litem).is((Nod) it)) {
       litem = it;
       ctx.item = it;
-      citem = new NodIter();
-      iter(0, citem, ctx);
-      citem.sort(true);
+      citer = new NodIter();
+      iter(0, citer, ctx);
+      citer.sort(true);
     } else {
-      citem.reset();
+      citer.reset();
     }
 
     ctx.item = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return citem;
+    return citer;
   }
 
   /**

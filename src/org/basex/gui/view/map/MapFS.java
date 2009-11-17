@@ -54,7 +54,7 @@ final class MapFS extends MapPainter {
   @Override
   void drawRectangles(final Graphics g, final MapRects rects,
       final float scale) {
-    final Data data = view.gui.context.data();
+    final Data data = view.gui.context.data;
     final MapRect l = view.layout.layout;
     l.x = (int) scale * l.x; l.y = (int) scale * l.y;
     l.w = (int) scale * l.w; l.h = (int) scale * l.h;
@@ -140,7 +140,7 @@ final class MapFS extends MapPainter {
   @Override
   boolean drawRectangle(final Graphics g, final MapRect rect) {
     final Context context = view.gui.context;
-    final Data data = context.data();
+    final Data data = context.data;
     final int fsz = prop.num(GUIProp.FONTSIZE);
     final int pre = rect.pre;
     final int kind = data.kind(pre);
@@ -149,7 +149,7 @@ final class MapFS extends MapPainter {
     final boolean dir = !file && fs.isDir(pre);
 
     // show full path in top rectangle
-    final Nodes current = context.current();
+    final Nodes current = context.current;
     final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
       current.size() == 1 && pre != 0 && !file && pre == current.nodes[0] ?
           ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
@@ -295,7 +295,7 @@ final class MapFS extends MapPainter {
     rect.pos = null;
     for(int i = pre; i < pre + size; i++) {
       if(data.kind(i) == Data.ELEM && data.tagID(i) == fs.contentID) {
-        rect.pos = view.gui.context.marked().ftpos.get(i + 1);
+        rect.pos = view.gui.context.marked.ftpos.get(i + 1);
         break;
       }
     }
@@ -325,7 +325,7 @@ final class MapFS extends MapPainter {
       mx - r.x < 16 && fs.isFile(r.pre) &&
       GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
 
-    if(active && click) fs.launch(view.gui.focused);
+    if(active && click) fs.launch(view.gui.context.focused);
     return active;
   }
 

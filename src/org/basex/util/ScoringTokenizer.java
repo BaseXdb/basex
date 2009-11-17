@@ -16,8 +16,6 @@ public final class ScoringTokenizer extends Tokenizer{
   private int max = 1;
   /** Container for frequency. */
   private IntMap freq;
-  /** Flag for phrase processing. */
-  private boolean phrase;
   
   /**
    * Empty constructor.
@@ -41,7 +39,7 @@ public final class ScoringTokenizer extends Tokenizer{
 
   @Override
   public byte[] get() {
-    return phrase ? super.text : super.get();
+    return super.get();
   }
   
   @Override
@@ -49,13 +47,6 @@ public final class ScoringTokenizer extends Tokenizer{
     super.init(txt);
     initScoring();
     init();
-  }
-
-  /**
-   * Sets flag for phrase processing.
-   */
-  public void phrase() {
-    phrase = true;
   }
   
   /**

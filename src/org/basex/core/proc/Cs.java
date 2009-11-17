@@ -24,7 +24,7 @@ public final class Cs extends AQuery {
   protected boolean exec(final PrintOutput out) {
     queryNodes();
     if(result == null) return false;
-    if(result.size() != 0) context.current((Nodes) result);
+    if(result.size() != 0) context.current = (Nodes) result;
     return true;
   }
 

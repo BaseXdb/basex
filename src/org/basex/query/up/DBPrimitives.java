@@ -1,6 +1,5 @@
 package org.basex.query.up;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.data.Data;
@@ -10,6 +9,7 @@ import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.util.IntList;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -53,14 +53,10 @@ public final class DBPrimitives {
    */
   private void finish() {
     // get keys (pre values) and sort ascending
-    final int l = op.size();
-    final Integer[] t = new Integer[l];
-    op.keySet().toArray(t);
-    sortedPre = new int[l];
-    for(int i = 0; i < l; i++) { 
-      sortedPre[i] = t[i];
-    }
-    Arrays.sort(sortedPre);
+    final IntList il = new IntList(op.size());
+    for(final int i : op.keySet()) il.add(i);
+    il.sort();
+    sortedPre = il.finish();
     finished = true;
   }
   
@@ -79,7 +75,7 @@ public final class DBPrimitives {
    * @throws QueryException query exception
    */
   public void add(final UpdatePrimitive p) throws QueryException {
-    Integer i;
+    int i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
     // Possible to use node id cause nodes in map belong to the same
     // database. Thus there won't be any collisions between dbnodes and 

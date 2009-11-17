@@ -4,11 +4,11 @@ import static org.basex.core.Text.*;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
-import org.basex.server.ServerSession;
+import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 
 /**
- * This class offers as central database context.
+ * This class serves as a central database context.
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
  *
@@ -16,27 +16,31 @@ import org.basex.server.Sessions;
  * @author Christian Gruen
  */
 public final class Context {
-  /** Current client connections. */
+  /** Client connections. */
   public final Sessions sessions;
+  /** Database pool. */
+  public final DataPool pool;
   /** Users. */
   public final Users users;
   /** Database properties. */
   public final Prop prop;
-  /** Database pool. */
-  public final DataPool pool;
-  /** Current user. */
+  /** User reference. */
   public User user;
   /** Current query file. */
   public IO query;
 
-  /** Central data reference. */
-  private Data data;
-  /** Current context. */
-  private Nodes current;
-  /** Currently marked nodes. */
-  private Nodes marked;
-  /** Currently copied nodes. */
-  private Nodes copied;
+  /** Data reference. */
+  public Data data;
+  /** Node context. */
+  public Nodes current;
+
+  // GUI references
+  /** Marked nodes. */
+  public Nodes marked;
+  /** Copied nodes. */
+  public Nodes copied;
+  /** Focused node. */
+  public int focused = -1;
 
   /**
    * Constructor.
@@ -79,14 +83,6 @@ public final class Context {
   }
 
   /**
-   * Returns data reference.
-   * @return data reference
-   */
-  public Data data() {
-    return data;
-  }
-
-  /**
    * Sets the specified data instance as current database.
    * @param d data reference
    */
@@ -105,74 +101,26 @@ public final class Context {
     current = null;
     marked = null;
     copied = null;
+    focused = -1;
   }
 
   /**
    * Updates references to the document nodes.
    */
   public void update() {
-    // [CG] necessary check?
-    if(data != null) current = new Nodes(data.doc(), data, true);
+    current = new Nodes(data, true);
   }
 
   /**
-   * Returns the current context set.
-   * @return current context set
-   */
-  public Nodes current() {
-    return current;
-  }
-
-  /**
-   * Sets the current context set.
-   * @param curr current context set
-   */
-  public void current(final Nodes curr) {
-    current = curr;
-  }
-
-  /**
-   * Sets the data reference.
+   * Adds the specified data reference to the pool.
    * @param d data reference
    */
-  public void data(final Data d) {
-    data = d;
+  public void pin(final Data d) {
+    pool.add(d);
   }
 
   /**
-   * Returns the copied context set.
-   * @return copied context set
-   */
-  public Nodes copied() {
-    return copied;
-  }
-
-  /**
-   * Sets the current node set as copy.
-   * @param copy current node set as copy.
-   */
-  public void copy(final Nodes copy) {
-    copied = copy;
-  }
-
-  /**
-   * Returns the marked context set.
-   * @return marked context set
-   */
-  public Nodes marked() {
-    return marked;
-  }
-
-  /**
-   * Sets the marked context set.
-   * @param mark marked context set
-   */
-  public void marked(final Nodes mark) {
-    marked = mark;
-  }
-
-  /**
-   * Pins the pool.
+   * Pins the specified database.
    * @param name name of database
    * @return data reference
    */
@@ -190,11 +138,12 @@ public final class Context {
   }
 
   /**
-   * Adds the specified data reference to the pool.
-   * @param d data reference
+   * Checks if the specified database is pinned.
+   * @param db name of database
+   * @return int use-status
    */
-  public void addToPool(final Data d) {
-    pool.add(d);
+  public boolean pinned(final String db) {
+    return pool.pinned(db);
   }
 
   /**
@@ -210,7 +159,7 @@ public final class Context {
    * Adds the specified session.
    * @param s session to be added
    */
-  public void add(final ServerSession s) {
+  public void add(final ServerProcess s) {
     sessions.add(s);
   }
 
@@ -218,7 +167,7 @@ public final class Context {
    * Removes the specified session.
    * @param s session to be removed
    */
-  public void delete(final ServerSession s) {
+  public void delete(final ServerProcess s) {
     sessions.delete(s);
   }
 

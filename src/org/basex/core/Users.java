@@ -17,10 +17,10 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public final class Users {
-  /** User list. */
-  private final ArrayList<User> users = new ArrayList<User>();
   /** Default permissions for new users. */
   private static final int PERM = User.READ | User.WRITE;
+  /** User list. */
+  private final ArrayList<User> users = new ArrayList<User>();
   /** Filename; set to null for local user permissions. */
   private String file;
 

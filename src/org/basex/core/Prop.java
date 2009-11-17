@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import static org.basex.data.DataText.*;
 import java.io.File;
 import org.basex.io.IO;
 
@@ -131,7 +130,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
   /** Flag for full-text scoring algorithm. */
-  public static final Object[] FTSCTYPE = { "FTSCTYPE", 1}; 
+  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2 }; 
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };
@@ -221,15 +220,6 @@ public final class Prop extends AProp {
    */
   public boolean dbexists(final String db) {
     return dbpath(db).exists();
-  }
-
-  /**
-   * Checks if the specified database is locked.
-   * @param db name of the database
-   * @return result of check
-   */
-  public boolean dblocked(final String db) {
-    return dbfile(db, DATALOCK).exists();
   }
 
   @Override

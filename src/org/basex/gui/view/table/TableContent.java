@@ -62,9 +62,9 @@ final class TableContent extends BaseXBack {
     final int fsz = gui.prop.num(GUIProp.FONTSIZE);
 
     final Context context = tdata.context;
-    final Data data = context.data();
-    final int rfocus = tdata.getRoot(data, gui.focused);
-    final int focus = gui.focused;
+    final Data data = context.data;
+    final int focus = gui.context.focused;
+    final int rfocus = tdata.getRoot(data, focus);
     int mpos = 0;
 
     final int nCols = tdata.cols.length;
@@ -76,7 +76,7 @@ final class TableContent extends BaseXBack {
     for(int i = 0; i < nCols; i++) tb[i] = new TokenBuilder();
 
     focusedString = null;
-    final Nodes marked = context.marked();
+    final Nodes marked = context.marked;
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 

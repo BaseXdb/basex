@@ -108,7 +108,7 @@ public final class DialogPrefs extends Dialog {
 
     // enable only if current document contains name attributes
     names = new BaseXCheckBox(PREFNAME, gprop.is(GUIProp.SHOWNAME), 12, this);
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
 

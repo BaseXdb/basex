@@ -85,8 +85,6 @@ public final class GUI extends JFrame {
   public boolean painting;
   /** Working flag. */
   public boolean updating;
-  /** Currently focused node (pre value). */
-  public int focused = -1;
 
   /** Fullscreen flag. */
   public boolean fullscreen;
@@ -214,7 +212,7 @@ public final class GUI extends JFrame {
             popup.setVisible(false);
           }
         };
-        final int i = context.data() == null ? 2 :
+        final int i = context.data == null ? 2 :
           prop.num(GUIProp.SEARCHMODE);
         final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
             prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
@@ -326,7 +324,7 @@ public final class GUI extends JFrame {
    */
   protected void execute() {
     final String in = input.getText();
-    final boolean db = context.data() != null;
+    final boolean db = context.data != null;
     final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
     if(cmd || in.startsWith("!")) {
@@ -358,7 +356,7 @@ public final class GUI extends JFrame {
    */
   public void xquery(final String qu, final boolean main) {
     // check and add default namespace
-    final Namespaces ns = context.data().ns;
+    final Namespaces ns = context.data.ns;
     final int def = ns.get(Token.EMPTY, 0);
     String in = qu;
     if(in.trim().isEmpty()) {
@@ -423,8 +421,8 @@ public final class GUI extends JFrame {
     try {
       // cache some variables before executing the command
       final Performance perf = new Performance();
-      final Nodes current = context.current();
-      final Data data = context.data();
+      final Nodes current = context.current;
+      final Data data = context.data;
       proc = pr;
 
       // execute command and cache result
@@ -467,9 +465,9 @@ public final class GUI extends JFrame {
           text.setText(out, pr);
         }
 
-        final Data ndata = context.data();
+        final Data ndata = context.data;
         final String time = perf.getTimer();
-        Nodes marked = context.marked();
+        Nodes marked = context.marked;
 
         if(ndata != data) {
           // database reference has changed - notify views
@@ -478,7 +476,7 @@ public final class GUI extends JFrame {
           // update command
           notify.update();
         } else if(result != null) {
-          if(context.current() != current || prop.is(GUIProp.FILTERRT)) {
+          if(context.current != current || prop.is(GUIProp.FILTERRT)) {
             // refresh context
             if(nodes != null) {
               notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
@@ -582,7 +580,7 @@ public final class GUI extends JFrame {
    * Refreshes the menu and the buttons.
    */
   public void refreshControls() {
-    final Nodes marked = context.marked();
+    final Nodes marked = context.marked;
     if(marked != null) setHits(marked.size());
 
     filter.setEnabled(marked != null && marked.size() != 0);
@@ -590,7 +588,7 @@ public final class GUI extends JFrame {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = context.data() == null ? 2 : prop.num(GUIProp.SEARCHMODE);
+    final int i = context.data == null ? 2 : prop.num(GUIProp.SEARCHMODE);
     final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
         prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
     hist.setEnabled(hs.length != 0);
@@ -600,7 +598,7 @@ public final class GUI extends JFrame {
    * Refreshes the input mode.
    */
   protected void refreshMode() {
-    final Data data = context.data();
+    final Data data = context.data;
     final boolean db = data != null;
     final int t = mode.getSelectedIndex();
     final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);

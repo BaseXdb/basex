@@ -31,7 +31,7 @@ public final class CreateIndex extends ACreate {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    final Data data = context.data();
+    final Data data = context.data;
 
     try {
       Type index = null;

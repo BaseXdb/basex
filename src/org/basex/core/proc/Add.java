@@ -9,7 +9,6 @@ import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
@@ -42,10 +41,10 @@ public final class Add extends ACreate {
       return error(msg != null ? msg : args[0]);
     }
 
-    final Data data = context.data();
+    final Data data = context.data;
     data.insert(data.meta.size, -1, d);
     data.flush();
-    context.current(new Nodes(data.doc(), data, true));
+    context.update();
     return true;
   }
 

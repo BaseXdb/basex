@@ -33,7 +33,7 @@ public final class Optimize extends ACreate {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    stats(context.data());
+    stats(context.data);
     return info(DBOPTIMIZED, perf);
   }
 

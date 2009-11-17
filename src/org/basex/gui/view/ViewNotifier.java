@@ -56,10 +56,10 @@ public final class ViewNotifier {
    */
   public void init() {
     final Context ctx = gui.context;
-    final boolean db = ctx.data() != null;
+    final boolean db = ctx.data != null;
     if(db) {
-      cont[0] = ctx.current();
-      marked[0] = new Nodes(ctx.data());
+      cont[0] = ctx.current;
+      marked[0] = new Nodes(ctx.data);
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
@@ -68,12 +68,12 @@ public final class ViewNotifier {
       }
     }
 
-    gui.focused = -1;
+    gui.context.focused = -1;
     hist = 0;
     maxhist = 0;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
-    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.name : ""));
+    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data.meta.name : ""));
   }
 
   /**
@@ -82,10 +82,10 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void focus(final int pre, final View vw) {
-    if(gui.focused == pre) return;
-    gui.focused = pre;
+    if(gui.context.focused == pre) return;
+    gui.context.focused = pre;
     for(final View v : view) if(v != vw && v.visible()) v.refreshFocus();
-    if(pre != -1) gui.status.setPath(ViewData.path(gui.context.data(), pre));
+    if(pre != -1) gui.status.setPath(ViewData.path(gui.context.data, pre));
   }
 
   /**
@@ -95,9 +95,9 @@ public final class ViewNotifier {
    */
   public void mark(final Nodes mark, final View vw) {
     final Context context = gui.context;
-    context.marked(mark);
+    context.marked = mark;
     for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
-    gui.filter.setEnabled(context.marked().size() != 0);
+    gui.filter.setEnabled(mark.size() != 0);
     gui.refreshControls();
   }
 
@@ -113,16 +113,17 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void mark(final int mode, final View vw) {
-    if(gui.focused == -1) return;
+    final int f = gui.context.focused;
+    if(f == -1) return;
 
     final Context context = gui.context;
-    Nodes nodes = context.marked();
+    Nodes nodes = context.marked;
     if(mode == 0) {
-      nodes = new Nodes(gui.focused, context.data());
+      nodes = new Nodes(f, context.data);
     } else if(mode == 1) {
-      nodes.union(new int[] { gui.focused });
+      nodes.union(new int[] { f });
     } else {
-      nodes.toggle(gui.focused);
+      nodes.toggle(f);
     }
     mark(nodes, vw);
   }
@@ -140,7 +141,7 @@ public final class ViewNotifier {
       query = queries[++hist];
     } else {
       if(hist == 0) return;
-      marked[hist] = gui.context.marked();
+      marked[hist] = gui.context.marked;
       query = queries[--hist];
     }
 
@@ -159,16 +160,16 @@ public final class ViewNotifier {
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
     final Context context = gui.context;
-    final Nodes n = new Nodes(context.data(), context.marked().ftpos);
+    final Nodes n = new Nodes(context.data, context.marked.ftpos);
 
-    if(!cont[hist].same(quick ? context.current() : context.marked())) {
+    if(!cont[hist].same(quick ? context.current : context.marked)) {
       if(!quick) {
         final String input = gui.input.getText();
   
         // add new entry
         checkHist();
         queries[hist] = input;
-        marked[hist] = context.marked();
+        marked[hist] = context.marked;
         cont[++hist] = nodes;
         queries[hist] = input;
         marked[hist] = n;
@@ -178,8 +179,8 @@ public final class ViewNotifier {
         checkHist();
         // add new entry
         queries[hist] = "";
-        marked[hist] = new Nodes(context.data());
-        cont[++hist] = context.current();
+        marked[hist] = new Nodes(context.data);
+        cont[++hist] = context.current;
         maxhist = hist;
       }
     }
@@ -197,7 +198,7 @@ public final class ViewNotifier {
    */
   public void jump(final Nodes nodes) {
     final Context context = gui.context;
-    init(context, nodes, new Nodes(context.data()));
+    init(context, nodes, new Nodes(context.data));
 
     for(final View v : view) if(v.visible()) v.refreshContext(true, true);
     gui.refreshControls();
@@ -240,9 +241,9 @@ public final class ViewNotifier {
    * @param mark marked nodes
    */
   private void init(final Context ctx, final Nodes curr, final Nodes mark) {
-    ctx.current(curr);
-    ctx.marked(mark);
-    gui.focused = -1;
+    ctx.current = curr;
+    ctx.marked = mark;
+    ctx.focused = -1;
   }
 
   /**

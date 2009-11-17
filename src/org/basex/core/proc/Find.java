@@ -54,7 +54,7 @@ public final class Find extends AQuery {
     if(query.isEmpty()) return r ? "/" : ".";
 
     // file system instance
-    final Data data = ctx.data();
+    final Data data = ctx.data;
     if(data.fs != null) return findFS(query, ctx, root);
 
     // parse user input

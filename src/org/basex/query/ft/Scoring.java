@@ -56,7 +56,8 @@ public final class Scoring {
    * @return result
    */
   public double finish(final double s) {
-    return Math.min(1, (int) (s * 1000) / 1000d);
+    return s;
+    //return Math.min(1, (int) (s * 1000) / 1000d);
   }
 
   /**

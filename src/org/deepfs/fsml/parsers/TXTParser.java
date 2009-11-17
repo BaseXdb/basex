@@ -52,7 +52,8 @@ public final class TXTParser implements IFileParser {
       if(!check(bfc)) return;
       deepFile.setFileType(FileType.TEXT);
       final String name = bfc.getFileName();
-      final String suf = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+      final String suf = name.substring(
+          name.lastIndexOf('.') + 1).toLowerCase();
       MimeType mime = SUFFIXES.get(suf);
       if(mime == null) mime = MimeType.UNKNOWN;
       deepFile.setFileFormat(mime);

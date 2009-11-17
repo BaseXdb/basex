@@ -66,7 +66,7 @@ public final class TableView extends View implements Runnable {
     tdata.rootRows = null;
     tdata.rows = null;
 
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     if(!visible() || data == null || !data.meta.pathindex) return;
     tdata.init(data);
     refreshContext(true, false);
@@ -102,9 +102,9 @@ public final class TableView extends View implements Runnable {
     if(!visible() || tdata.rows == null) return;
 
     final Context context = gui.context;
-    final Nodes marked = context.marked();
+    final Nodes marked = context.marked;
     if(marked.size() != 0) {
-      final int p = tdata.getRoot(context.data(), marked.nodes[0]);
+      final int p = tdata.getRoot(context.data, marked.nodes[0]);
       if(p != -1) setPos(p);
     }
     repaint();
@@ -200,7 +200,7 @@ public final class TableView extends View implements Runnable {
     if(valid) {
       final int pre = tdata.rows.get(l);
       final Context context = gui.context;
-      final TableIterator it = new TableIterator(context.data(), tdata);
+      final TableIterator it = new TableIterator(context.data, tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
@@ -212,7 +212,7 @@ public final class TableView extends View implements Runnable {
       }
     }
     final String str = content.focusedString;
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     gui.cursor(valid && (str != null &&
       str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
@@ -228,12 +228,12 @@ public final class TableView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     final Context context = gui.context;
-    final Data data = context.data();
+    final Data data = context.data;
     if(tdata.rows == null || data.fs != null && tdata.mouseX < 20) return;
 
     if(e.getY() < header.getHeight()) return;
 
-    final int pre = gui.focused;
+    final int pre = gui.context.focused;
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
         final String str = content.focusedString;
@@ -244,7 +244,7 @@ public final class TableView extends View implements Runnable {
         query();
         //repaint();
       } else {
-        Nodes nodes = context.marked();
+        Nodes nodes = context.marked;
         if(getCursor() == GUIConstants.CURSORARROW) {
           nodes = new Nodes(tdata.getRoot(nodes.data, pre), nodes.data);
         }
@@ -252,12 +252,12 @@ public final class TableView extends View implements Runnable {
       }
     } else {
       if(pre != -1) {
-        final TableIterator it = new TableIterator(context.data(), tdata);
+        final TableIterator it = new TableIterator(context.data, tdata);
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         it.init(pre);
         while(it.more()) {
           if(it.col == c) {
-            gui.notify.mark(new Nodes(it.pre, context.data()), null);
+            gui.notify.mark(new Nodes(it.pre, context.data), null);
             return;
           }
         }
@@ -275,9 +275,9 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    final Data data = gui.context.data();
+    final Data data = gui.context.data;
     if(data.fs != null && tdata.mouseX < 20) {
-      data.fs.launch(ViewData.parent(data, gui.focused));
+      data.fs.launch(ViewData.parent(data, gui.context.focused));
     }
   }
 
@@ -298,7 +298,7 @@ public final class TableView extends View implements Runnable {
     final int key = e.getKeyCode();
 
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
-    final int oldPre = tdata.getRoot(gui.context.data(), gui.focused);
+    final int oldPre = tdata.getRoot(gui.context.data, gui.context.focused);
     int pre = oldPre;
 
     final IntList rows = tdata.rows;

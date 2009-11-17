@@ -488,7 +488,8 @@ public final class SpotlightExtractor {
      * @param elem the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseInt(final DeepFile deepFile, final MetaElem elem, final Object o) {
+    void parseInt(final DeepFile deepFile, final MetaElem elem,
+        final Object o) {
       final Long value = long0(o);
       if(value != null) deepFile.addMeta(elem, value);
     }

@@ -11,11 +11,11 @@ import org.basex.query.QueryException;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class LocalSession extends Session {
+public class LocalSession extends Session {
   /** Database Context. */
-  private final Context ctx;
+  protected final Context ctx;
   /** Process reference. */
-  private Process proc;
+  protected Process proc;
 
   /**
    * Constructor.

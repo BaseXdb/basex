@@ -30,7 +30,7 @@ public final class Mount extends AAdmin {
     new Close().execute(context, out);
     new Open(db).execute(context, out);
 
-    final Data data = context.data();
+    final Data data = context.data;
     if(data.fs == null) {
       Main.err("No DeepFS instance");
       return false;

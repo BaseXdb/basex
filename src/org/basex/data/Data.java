@@ -686,4 +686,14 @@ public abstract class Data {
   public String toString() {
     return string(InfoTable.table(this, 0, meta.size));
   }
+
+  /**
+   * Returns a string representation of the specified table range.
+   * @param s start pre value
+   * @param e end pre value
+   * @return table
+   */
+  public String toString(final int s, final int e) {
+    return string(InfoTable.table(this, s, e));
+  }
 }

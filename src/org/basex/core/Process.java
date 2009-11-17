@@ -22,9 +22,9 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class Process extends Progress {
   /** Commands flag: standard. */
-  protected static final int STANDARD = 256;
+  public static final int STANDARD = 256;
   /** Commands flag: data reference needed. */
-  protected static final int DATAREF = 512;
+  public static final int DATAREF = 512;
 
   /** Command arguments. */
   protected String[] args;
@@ -41,7 +41,7 @@ public abstract class Process extends Progress {
   protected Result result;
 
   /** Flags for controlling process evaluation. */
-  private final int flags;
+  public final int flags;
 
   /**
    * Constructor.
@@ -87,25 +87,30 @@ public abstract class Process extends Progress {
     prop = ctx.prop;
 
     // check data reference
-    final Data data = context.data();
+    final Data data = context.data;
     if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
     // check permissions
     final int i = context.perm(flags & 0xFF, data);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 
+    //final boolean up = updating(context) || (flags & User.CREATE) != 0;
+    //if(up) sem.beforeWrite();
+    //else sem.beforeRead();
+
+    boolean ok = false;
     try {
-      return exec(out);
+      ok = exec(out);
     } catch(final IOException ex) {
       return error(ex.getMessage());
     } catch(final Throwable ex) {
       // catch unexpected errors...
       ex.printStackTrace();
-      if(ex instanceof OutOfMemoryError) {
-        Performance.gc(2);
-        return error(PROCOUTMEM);
-      }
       return error(PROCERR, this, ex.toString());
     }
+    //if(up) sem.afterWrite();
+    //else sem.afterRead();
+
+    return ok;
   }
 
   /**
