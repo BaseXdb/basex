@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,8 +23,8 @@ public class Log {
   private File logfile;
   /** Start date of log. */
   private Date start;
-  /** BufferedWriter. */
-  private BufferedWriter bw;
+  /** FileWriter. */
+  private FileWriter fw;
 
   /**
    * Constructor.
@@ -40,9 +39,9 @@ public class Log {
    * Creates a folde for log files.
    */
   private void createLogDir() {
-    logdir = IO.get(Prop.HOME + "\\BaseXLogs");
+    logdir = IO.get(Prop.HOME + "/BaseXLogs");
     if(!logdir.exists()) {
-      new File(Prop.HOME + "\\BaseXLogs").mkdir();
+      new File(Prop.HOME + "/BaseXLogs").mkdir();
     }
   }
 
@@ -52,14 +51,12 @@ public class Log {
    */
   private void createLogFile(final Date d) {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    logfile = new File(Prop.HOME + "\\BaseXLogs\\" +
+    logfile = new File(Prop.HOME + "/BaseXLogs/" +
         sdf.format(d) + ".log");
-    if(!logfile.exists()) {
-      try {
-        logfile.createNewFile();
-      } catch(IOException e) {
-        e.printStackTrace();
-      }
+    try {
+      fw = new FileWriter(logfile, true);
+    } catch(IOException e) {
+      e.printStackTrace();
     }
   }
   
@@ -81,17 +78,29 @@ public class Log {
    */
   public void write(final String s) {
     Date now = new Date();
-    if (!checkDay(now)) createLogFile(now);
-    try {
-      bw = new BufferedWriter(new FileWriter(logfile, true));
-    } catch(IOException e) {
-      e.printStackTrace();
+    if (!checkDay(now)) {
+      try {
+        fw.close();
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
+      createLogFile(now);
     }
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
     String tmp = sdf.format(now) + " : " + s + NL;
     try {
-      bw.write(tmp);
-      bw.close();
+      fw.write(tmp);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * Closes the log file.
+   */
+  public void closeLog() {
+    try {
+      fw.close();
     } catch(IOException e) {
       e.printStackTrace();
     }
