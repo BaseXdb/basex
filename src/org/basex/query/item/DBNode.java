@@ -187,18 +187,6 @@ public class DBNode extends Nod {
     // check if parent constructor exists; if not, include document root node
     final DBNode node = copy();
     node.set(p, data.kind(p));
-
-    /* [SG] I moved this code down and temporarily added a comment
-     * due to performance issues (should be revised as soon as another
-     * cheap scoring variant is found)
-
-    final int tid = data.tags.id(node.nname());
-    StatsKey sk = data.tags.stat(tid);
-    if (sk != null && sk.counter > 2) {
-      node.score(node.score * (1.00 -
-          (double) sk.counter / (double) data.tags.tn));
-    }*/
-
     node.score(Scoring.parentAxis(node.score));
     return node;
   }
@@ -268,11 +256,6 @@ public class DBNode extends Nod {
   @Override
   public final NodeIter desc() {
     return new NodeIter() {
-      /*final Stack<Integer> pres = new Stack<Integer>();
-      final Stack<Integer> level = new Stack<Integer>();
-      int l = -1;
-      */
-
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
@@ -287,34 +270,6 @@ public class DBNode extends Nod {
         p += data.attSize(p, k);
         node.score(Scoring.descAxis(sc));
         return node;
-
-        /* [SG] I temporarily added a comment and replace this by a very
-         *   trivial scoring method (although I agree that this method
-         *   shouldn't be too expensive; but we should check first if it
-         *   yields helpful results..).
-
-        if(data.size(node.pre, k) > 1) {
-          if (l == -1) {
-            final int pp = data.parent(node.pre, k);
-            if(pres.size() == 0) {
-              pres.push(pp);
-              level.push(0);
-              l = 1;
-            }
-
-            while(pres.peek() != pp) {
-              pres.pop();
-              level.pop();
-            }
-            l = level.peek() + 1;
-          }
-          pres.push(node.pre);
-          node.score(sc / Math.abs(l));
-          level.push(l++);
-        } else {
-          node.score(sc / Math.abs(l));
-          l = -1;
-        }*/
       }
     };
   }

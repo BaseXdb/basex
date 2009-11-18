@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import org.basex.data.Data;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
+import org.basex.index.FTIndex;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 
@@ -132,11 +133,14 @@ public final class Scoring {
    * Returns a tf-idf for the specified values.
    * Used definition: freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i)).
    * The result is multiplied with the {@link #MP} constant to yield
-   * integer values.
+   * integer values. The value <code>2</code> is used as minimum score,
+   * as the total minimum value will be subtracted by 1 to avoid eventual
+   * <code>0</code> scores; for more information, see how the scoring
+   * is evaluated in the {@link FTIndex} class.
    * 
-   * [SG] Some variants could return values which are better normalized; see eg:
-   * http://nlp.stanford.edu/IR-book/html/htmledition/
-   * variant-tf-idf-functions-1.html
+   * [SG] Some tf-idf variants could return values which are better normalized;
+   * see e.g.: http://nlp.stanford.edu/IR-book/html/htmledition/
+   *   variant-tf-idf-functions-1.html
    * 
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
@@ -146,7 +150,7 @@ public final class Scoring {
    */
   public static int tfIDF(final double freq, final double mfreq,
       final double docs, final double tokens) {
-    return (int) Math.max(1, MP * freq / mfreq * Math.log(1 + docs / tokens));
+    return (int) Math.max(2, MP * freq / mfreq * Math.log(1 + docs / tokens));
   }
   
   /**
