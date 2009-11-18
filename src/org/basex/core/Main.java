@@ -44,7 +44,7 @@ public abstract class Main {
    * @param args command line arguments
    */
   protected Main(final String... args) {
-    log = new Log(context);
+    log = new Log();
     parseArguments(args);
     if(!success) return;
 

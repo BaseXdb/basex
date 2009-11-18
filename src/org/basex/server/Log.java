@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Token;
@@ -17,8 +16,6 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public class Log {
-  /** Context. */
-  private Context ctx;
   /** Log files folder. */
   private IO logdir;
   /** Daily log file. */
@@ -28,23 +25,21 @@ public class Log {
 
   /**
    * Constructor.
-   * @param c Context
    */
-  public Log(final Context c) {
-    ctx = c;
-    logdir = IO.get(ctx.prop.get(Prop.DBPATH) + "\\Logs");
+  public Log() {
+    logdir = IO.get(Prop.HOME + "\\BaseXLogs");
     if(!logdir.exists()) {
-      new File(ctx.prop.get(Prop.DBPATH) + "\\Logs").mkdir();
+      new File(Prop.HOME + "\\BaseXLogs").mkdir();
     }
     DateFormat df = DateFormat.getDateInstance(2);
-    logfile = IO.get(ctx.prop.get(Prop.DBPATH) + "\\Logs\\" + df.format(d)
-        + ".txt");
+    logfile = IO.get(Prop.HOME + "\\BaseXLogs\\" + df.format(d)
+        + ".log");
     if(!logfile.exists()) {
       try {
-        new File(ctx.prop.get(Prop.DBPATH) + "\\Logs\\" +
-            df.format(d) + ".txt").createNewFile();
-        logfile = IO.get(ctx.prop.get(Prop.DBPATH) + "\\Logs\\" + df.format(d)
-            + ".txt");
+        new File(Prop.HOME + "\\BaseXLogs\\" +
+            df.format(d) + ".log").createNewFile();
+        logfile = IO.get(Prop.HOME + "\\BaseXLogs\\" + df.format(d)
+            + ".log");
       } catch(IOException e) {
         e.printStackTrace();
       }
