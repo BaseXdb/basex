@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -36,9 +35,9 @@ public class Log {
     if(!logdir.exists()) {
       new File(Prop.HOME + "\\BaseXLogs").mkdir();
     }
-    DateFormat df = DateFormat.getDateInstance(2);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     logfile = new File(Prop.HOME + "\\BaseXLogs\\" +
-        df.format(d) + ".log");
+        sdf.format(d) + ".log");
     if(!logfile.exists()) {
         try {
           logfile.createNewFile();
