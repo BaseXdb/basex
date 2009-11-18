@@ -1,13 +1,15 @@
 package org.basex.server;
 
+import static org.basex.core.Text.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.util.Token;
 
 /**
  * Management of logging.
@@ -16,12 +18,14 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public class Log {
-  /** Log files folder. */
+  /** Log folder checker. */
   private IO logdir;
   /** Daily log file. */
-  private IO logfile;
+  private File logfile;
   /** Date. */
   private Date d = new Date();
+  /** BufferedWriter. */
+  private BufferedWriter bw;
 
   /**
    * Constructor.
@@ -32,17 +36,19 @@ public class Log {
       new File(Prop.HOME + "\\BaseXLogs").mkdir();
     }
     DateFormat df = DateFormat.getDateInstance(2);
-    logfile = IO.get(Prop.HOME + "\\BaseXLogs\\" + df.format(d)
-        + ".log");
+    logfile = new File(Prop.HOME + "\\BaseXLogs\\" +
+        df.format(d) + ".log");
     if(!logfile.exists()) {
-      try {
-        new File(Prop.HOME + "\\BaseXLogs\\" +
-            df.format(d) + ".log").createNewFile();
-        logfile = IO.get(Prop.HOME + "\\BaseXLogs\\" + df.format(d)
-            + ".log");
-      } catch(IOException e) {
-        e.printStackTrace();
-      }
+        try {
+          logfile.createNewFile();
+        } catch(IOException e) {
+          e.printStackTrace();
+        }
+    }
+    try {
+      bw = new BufferedWriter(new FileWriter(logfile, true));
+    } catch(IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -53,11 +59,21 @@ public class Log {
   public void write(final String s) {
     try {
       DateFormat df = DateFormat.getTimeInstance(2);
-      String tmp = df.format(d) + " : " + s;
-      logfile.write(Token.token(tmp));
+      String tmp = df.format(d) + " : " + s + NL;
+      bw.write(tmp); 
     } catch(IOException e) {
       e.printStackTrace();
     }
   }
-
+  
+  /**
+   * Closes the log.
+   */
+  public void closeLog() {
+    try {
+      bw.close();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
