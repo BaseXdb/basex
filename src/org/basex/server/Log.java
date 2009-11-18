@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.basex.core.Prop;
@@ -58,8 +59,9 @@ public class Log {
    */
   public void write(final String s) {
     try {
-      DateFormat df = DateFormat.getTimeInstance(2);
-      String tmp = df.format(d) + " : " + s + NL;
+      d = new Date();
+      SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+      String tmp = sdf.format(d) + " : " + s + NL;
       bw.write(tmp); 
     } catch(IOException e) {
       e.printStackTrace();

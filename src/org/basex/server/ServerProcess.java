@@ -42,18 +42,23 @@ public final class ServerProcess extends Thread {
   private Process proc;
   /** Timeout thread. */
   private Thread timeout;
+  /** Log. */
+  private Log log;
 
   /**
    * Constructor.
    * @param s socket
    * @param b server reference
    * @param i info flag
+   * @param l log
    */
-  public ServerProcess(final Socket s, final BaseXServer b, final boolean i) {
+  public ServerProcess(final Socket s, final BaseXServer b, final boolean i,
+      final Log l) {
     context = new Context(b.context);
     sem = b.sem;
     socket = s;
     info = i;
+    log = l;
   }
 
   /**
@@ -87,6 +92,7 @@ public final class ServerProcess extends Thread {
   @Override
   public void run() {
     if(info) Main.outln(this + " Login: " + context.user.name);
+    log.write(this + " Login: " + context.user.name);
     try {
       while(true) {
         String input = null;
@@ -121,6 +127,8 @@ public final class ServerProcess extends Thread {
         startTimer(proc);
         final boolean up = proc.updating(context) ||
           (proc.flags & User.CREATE) != 0;
+        log.write(this + " " + proc.toString() + ": " + context.user.name +
+            " received");
         sem.before(up);
         final boolean ok = proc.execute(context, out);
         out.write(0);
@@ -130,10 +138,12 @@ public final class ServerProcess extends Thread {
         send(ok);
         stopTimer();
         sem.after(up);
-
+        log.write(this + " " + proc.toString() + ": " + context.user.name +
+            " executed");
         if(info) Main.outln(this + " " + in + ": " + perf);
       }
       if(info) Main.outln(this + " Logout: " + context.user.name);
+      log.write(this + " Logout: " + context.user.name);  
     } catch(final IOException ex) {
       Main.error(ex, false);
     }

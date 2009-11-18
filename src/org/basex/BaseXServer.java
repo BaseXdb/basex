@@ -9,6 +9,7 @@ import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.server.Log;
 import org.basex.server.Semaphore;
 import org.basex.server.ServerProcess;
 import org.basex.server.ServerSession;
@@ -36,6 +37,8 @@ public final class BaseXServer extends Main implements Runnable {
   boolean running = true;
   /** Verbose mode. */
   boolean info;
+  /** Log. */
+  private final Log log = new Log();
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -58,6 +61,7 @@ public final class BaseXServer extends Main implements Runnable {
       new Thread(this).start();
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
+      log.write("Server started...");
       if(console) quit(console());
     } catch(final Exception ex) {
       error(ex, true);
@@ -70,7 +74,8 @@ public final class BaseXServer extends Main implements Runnable {
   public void run() {
     while(running) {
       try {
-        final ServerProcess s = new ServerProcess(server.accept(), this, info);
+        final ServerProcess s = new ServerProcess(server.accept(), this,
+            info, log);
         if(STOP.exists()) {
           STOP.delete();
           outln(SERVERSTOPPED);
@@ -95,6 +100,8 @@ public final class BaseXServer extends Main implements Runnable {
       // close input streams
       if(console) System.in.close();
       server.close();
+      log.write("Server stopped.");
+      log.closeLog();
     } catch(final IOException ex) {
       error(ex, false);
     }
