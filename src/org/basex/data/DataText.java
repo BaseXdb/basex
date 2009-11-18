@@ -15,7 +15,7 @@ public interface DataText {
    * be parsed anymore. */
   String STORAGE = "5.6";
   /** Index version; if it's modified, old indexes can't be parsed anymore. */
-  String ISTORAGE = "5.6";
+  String ISTORAGE = "5.8";
 
   /** Database version. */
   String DBSTR = "STORAGE";
@@ -55,12 +55,12 @@ public interface DataText {
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
+  /** Maximum scoring value. */
+  String DBSCMAX = "FTSCMAX";
+  /** Minimum scoring value. */
+  String DBSCMIN = "FTSCMIN";
   /** Maximal indexed full-text score. */
-  String DBFTMSC = "FTMSC";
-  /** Minimal indexed full-text score. */
-  String DBFTMISC = "FTMISC";
-  /** Maximal indexed full-text score. */
-  String DBFTISCM = "FTISCM";
+  String DBSCTYPE = "FTSCTYPE";
   /** Up-to-date flag. */
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */

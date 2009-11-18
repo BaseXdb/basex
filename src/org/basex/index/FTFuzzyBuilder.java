@@ -63,9 +63,24 @@ public final class FTFuzzyBuilder extends FTBuilder {
       isize++;
       tree[tl] = new FTHash();
     }
-
-    tree[tl].index(tok, id, wp.pos);
+    tree[tl].index(tok, pre, wp.pos);
     ntok++;
+  }
+
+  @Override
+  int nrTokens() {
+    int l = 0;
+    for(final FTHash t : tree) if(t != null) l += t.size();
+    return l;
+  }
+
+  @Override
+  void getFreq() {
+    for(final FTHash t : tree) {
+      if(t == null) continue;
+      t.init();
+      while(t.more()) getFreq(t.pre[t.next()]);
+    }
   }
 
   @Override
@@ -78,43 +93,35 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
     // write index size
     outx.write(isize);
-    // first max score value is written
     long dr = 0;
     int tr = 0;
-    byte j = 1;
-    for(c = 0; j < tree.length && c < ntok; j++) {
-      final FTHash tre = tree[j];
-      if(tre == null) continue;
+    byte j = -1;
+    while(++j < tree.length) {
+      final FTHash hash = tree[j];
+      if(hash == null) continue;
 
       // write index and pointer on first token
       outx.write(j);
       outx.writeInt(tr);
 
-      if (scm == 0) tre.init();
-      else tre.initIter();
-      while(tre.more()) {
-        final int p = tre.next();
-        fc = 0;
-         // write token value
-        final byte[] key = tre.key();
-        for(int x = 0; x != j; x++) outy.write(key[x]);
+      if(scm == 0) hash.init();
+      else hash.initIter();
+      while(hash.more()) {
+        final int p = hash.next();
+        // write token value
+        final byte[] key = hash.key();
+        for(int i = 0; i < j; i++) outy.write(key[i]);
 
-        // write pointer on data
+        // write pointer on data and data size
         outy.write5(dr);
-        // write data size
-        final int ds = tre.ns[p];
-        outy.writeInt(ds);
-
+        outy.writeInt(hash.ns[p]);
         // write compressed pre and pos arrays
-        final byte[] vpre = tre.pre[p];
-        final byte[] vpos = tre.pos[p];
-//        Scoring.print = (new String(key)).startsWith("anarchism");
-        writeFTData(outz, vpre, vpos);
+        writeFTData(outz, hash.pre[p], hash.pos[p]);
 
         dr = outz.size();
         tr = (int) outy.size();
-        c++;
       }
+      tree[j] = null;
     }
     tree = null;
 
@@ -125,22 +132,4 @@ public final class FTFuzzyBuilder extends FTBuilder {
     outy.close();
     outz.close();
   }
-
-  @Override
-  void getFreq() {
-    byte j = 1;
-    maxfreq = new int[nodes.size()];
-    nmbdocwt = new int[ntok];
-    c = 0;
-    for(; j < tree.length; j++) {
-      final FTHash tre = tree[j];
-      if (tre != null) {
-        tre.init();
-        while(tre.more()) {
-          getFreq(tre.pre[tre.next()]);
-        }
-      }
-    }
-  }
-
 }

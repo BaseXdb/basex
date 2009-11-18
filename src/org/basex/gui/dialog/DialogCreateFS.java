@@ -202,7 +202,7 @@ public final class DialogCreateFS extends Dialog {
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, true, 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, false, 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 

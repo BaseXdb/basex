@@ -26,10 +26,10 @@ import org.deepfs.util.LibraryLoader;
 public final class SpotlightExtractor implements IFileParser {
 
   /** Flag, if the spotex library is available or not. */
-  private static final boolean libAvailable;
+  private static final boolean LIBAVAILABLE;
 
   static {
-    libAvailable = LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
+    LIBAVAILABLE = LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
   }
 
   /**
@@ -521,7 +521,8 @@ public final class SpotlightExtractor implements IFileParser {
      * @param elem the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseInt(final DeepFile deepFile, final MetaElem elem, final Object o) {
+    void parseInt(final DeepFile deepFile, final MetaElem elem,
+        final Object o) {
       final Long value = long0(o);
       if(value != null) deepFile.addMeta(elem, value);
     }
@@ -589,16 +590,17 @@ public final class SpotlightExtractor implements IFileParser {
    * @throws ParserException if the spotex library is not available.
    */
   public SpotlightExtractor() throws ParserException {
-    if(!libAvailable) throw new ParserException("Spotex library not available.");
+    if(!LIBAVAILABLE)
+      throw new ParserException("Spotex library not available.");
   }
 
   @Override
-  public boolean check(BufferedFileChannel bfc) {
+  public boolean check(final BufferedFileChannel bfc) {
     return true;
   }
 
   @Override
-  public void extract(DeepFile deepFile) {
+  public void extract(final DeepFile deepFile) {
     final String fileName = deepFile.getBufferedFileChannel().getFileName();
     final Map<String, Object> metadata = getMetadata(fileName);
     if(metadata == null) return;
@@ -617,7 +619,7 @@ public final class SpotlightExtractor implements IFileParser {
   }
 
   @Override
-  public void propagate(DeepFile deepFile) {
+  public void propagate(final DeepFile deepFile) {
     Main.notimplemented();
   }
 

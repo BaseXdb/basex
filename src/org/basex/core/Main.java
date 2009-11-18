@@ -307,7 +307,7 @@ public abstract class Main {
    * @param ex exception
    * @return always false
    */
-  public static boolean debug(final Exception ex) {
+  public static boolean debug(final Throwable ex) {
     if(Prop.debug && ex != null) ex.printStackTrace();
     return false;
   }

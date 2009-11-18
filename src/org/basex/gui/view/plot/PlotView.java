@@ -1129,8 +1129,7 @@ public final class PlotView extends View implements Runnable {
       gui.notify.context(marked, false, null);
       // simple mouse click
     } else {
-      final Nodes marked = new Nodes(gui.context.data);
-      marked.union(il);
+      final Nodes marked = new Nodes(il, gui.context.data);
       gui.notify.mark(marked, this);
     }
     nextContext = gui.context.marked;

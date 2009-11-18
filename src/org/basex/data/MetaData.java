@@ -61,11 +61,11 @@ public final class MetaData {
   /** Flag for full-text diacritics removal. */
   public boolean ftdc;
   /** Maximal indexed full-text score. */
-  public int ftmaxscore;
+  public int ftscmax;
   /** Minimal indexed full-text score. */
-  public int ftminscore;
-  /** Mode of inexed score values. */
-  public int ftiscm;
+  public int ftscmin;
+  /** Scoring mode: see {@link Prop#FTSCTYPE}. */
+  public int ftsctype;
 
   /** Flag for removed index structures. */
   public boolean uptodate = true;
@@ -181,34 +181,34 @@ public final class MetaData {
         continue;
       }
       final String v = Token.string(in.readBytes());
-      if(k.equals(DBSTR))         storage    = v;
-      else if(k.equals(IDBSTR))   istorage   = v;
-      else if(k.equals(DBSIZE))   size       = Token.toInt(v);
-      else if(k.equals(DBFNAME))  file       = IO.get(v);
-      else if(k.equals(DBFSIZE))  filesize   = Token.toLong(v);
-      else if(k.equals(DBNDOCS))  ndocs      = Token.toInt(v);
-      else if(k.equals(DBFTDC))   ftdc       = toBool(v);
-      else if(k.equals(DBENC))    encoding   = v;
-      else if(k.equals(DBHGHT))   height     = Token.toInt(v);
-      else if(k.equals(DBCHOP))   chop       = toBool(v);
-      else if(k.equals(DBENTITY)) entity     = toBool(v);
-      else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
-      else if(k.equals(DBTXTIDX)) txtindex   = toBool(v);
-      else if(k.equals(DBATVIDX)) atvindex   = toBool(v);
-      else if(k.equals(DBFTXIDX)) ftxindex   = toBool(v);
-      else if(k.equals(DBFZIDX))  ftfz       = toBool(v);
-      else if(k.equals(DBFTST))   ftst       = toBool(v);
-      else if(k.equals(DBFTCS))   ftcs       = toBool(v);
-      else if(k.equals(DBFTDC))   ftdc       = toBool(v);
-      else if(k.equals(DBFTMSC))  ftmaxscore = Token.toInt(v);
-      else if(k.equals(DBFTMISC)) ftminscore = Token.toInt(v);
-      else if(k.equals(DBFTISCM)) ftiscm     = Token.toInt(v);
-      else if(k.equals(DBTIME))   time       = Token.toLong(v);
-      else if(k.equals(DBUTD))    uptodate   = toBool(v);
-      else if(k.equals(DBLID))    lastid     = Token.toInt(v);
-      else if(k.equals(DBMNT))    mount      = v;
-      else if(k.equals(DBBCK))    backing    = v;
-      else if(k.equals(DBDEEPFS)) deepfs     = toBool(v);
+      if(k.equals(DBSTR))         storage   = v;
+      else if(k.equals(IDBSTR))   istorage  = v;
+      else if(k.equals(DBSIZE))   size      = Token.toInt(v);
+      else if(k.equals(DBFNAME))  file      = IO.get(v);
+      else if(k.equals(DBFSIZE))  filesize  = Token.toLong(v);
+      else if(k.equals(DBNDOCS))  ndocs     = Token.toInt(v);
+      else if(k.equals(DBFTDC))   ftdc      = toBool(v);
+      else if(k.equals(DBENC))    encoding  = v;
+      else if(k.equals(DBHGHT))   height    = Token.toInt(v);
+      else if(k.equals(DBCHOP))   chop      = toBool(v);
+      else if(k.equals(DBENTITY)) entity    = toBool(v);
+      else if(k.equals(DBPTHIDX)) pathindex = toBool(v);
+      else if(k.equals(DBTXTIDX)) txtindex  = toBool(v);
+      else if(k.equals(DBATVIDX)) atvindex  = toBool(v);
+      else if(k.equals(DBFTXIDX)) ftxindex  = toBool(v);
+      else if(k.equals(DBFZIDX))  ftfz      = toBool(v);
+      else if(k.equals(DBFTST))   ftst      = toBool(v);
+      else if(k.equals(DBFTCS))   ftcs      = toBool(v);
+      else if(k.equals(DBFTDC))   ftdc      = toBool(v);
+      else if(k.equals(DBSCMAX))  ftscmax   = Token.toInt(v);
+      else if(k.equals(DBSCMIN))  ftscmin   = Token.toInt(v);
+      else if(k.equals(DBSCTYPE)) ftsctype  = Token.toInt(v);
+      else if(k.equals(DBTIME))   time      = Token.toLong(v);
+      else if(k.equals(DBUTD))    uptodate  = toBool(v);
+      else if(k.equals(DBLID))    lastid    = Token.toInt(v);
+      else if(k.equals(DBMNT))    mount     = v;
+      else if(k.equals(DBBCK))    backing   = v;
+      else if(k.equals(DBDEEPFS)) deepfs    = toBool(v);
     }
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) {
@@ -250,9 +250,9 @@ public final class MetaData {
     writeInfo(out, DBFTST,   ftst);
     writeInfo(out, DBFTCS,   ftcs);
     writeInfo(out, DBFTDC,   ftdc);
-    writeInfo(out, DBFTMSC,  ftmaxscore);
-    writeInfo(out, DBFTMISC, ftminscore);
-    writeInfo(out, DBFTISCM, ftiscm);
+    writeInfo(out, DBSCMAX,  ftscmax);
+    writeInfo(out, DBSCMIN,  ftscmin);
+    writeInfo(out, DBSCTYPE, ftsctype);
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);

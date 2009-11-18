@@ -28,9 +28,9 @@ abstract class FTIndex extends Index {
    */
   FTIndex(final Data d) {
     data = d;
-    scm = d.meta.ftiscm;
-    max = Math.log(data.meta.ftmaxscore);
-    min = Math.log(data.meta.ftminscore);
+    scm = d.meta.ftsctype;
+    max = Math.log(data.meta.ftscmax);
+    min = Math.log(data.meta.ftscmin);
   }
 
   /**
@@ -45,32 +45,27 @@ abstract class FTIndex extends Index {
       final boolean fast) {
 
     return new FTIndexIterator() {
-      // cached min/max values to speedup scoring
       final FTMatches all = new FTMatches(toknum);
-      boolean f = true;
+      double sc = -1, lsc = -1;
+      int lpre, pre, c;
       long pos = p;
-      double score = -1, nscore = -1;
-      int lpre, c;
-      int pre;
 
       @Override
       public boolean more() {
         if(c == s) return false;
 
-        if(f) {
-          if (scm > 0) {
-            nscore = -da.readNum(pos);
-//            nscore = nscore / (data.meta.ftmaxscore);
-            nscore = (Math.log(nscore) - min) / (max - min);
-            pos = da.pos();
+        if(lpre == 0) {
+          int n = da.readNum(pos);
+          if(scm > 0) {
+            lsc = (Math.log(n) - min) / (max - min);
+            n = da.readNum();
           }
-          lpre = da.readNum(pos);
-          pos = da.pos();
-          f = false;
           size = s;
+          lpre = n;
+          pos = da.pos();
         }
         pre = lpre;
-        score = nscore;
+        sc = lsc;
 
         all.reset(toknum);
         all.or(da.readNum(pos));
@@ -78,14 +73,7 @@ abstract class FTIndex extends Index {
           final int n = da.readNum();
           if(!fast) all.or(n);
         }
-        if (scm > 0 && lpre < 0) {
-          nscore = -lpre;
-//          nscore = nscore / (data.meta.ftmaxscore);
-          nscore = (Math.log(nscore) - min) / (max - min);
-          lpre =  da.readNum();
-        }
         pos = da.pos();
-
         return true;
       }
 
@@ -101,7 +89,7 @@ abstract class FTIndex extends Index {
 
       @Override
       public double score() {
-        return score;
+        return sc;
       }
     };
   }

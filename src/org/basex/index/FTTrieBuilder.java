@@ -16,7 +16,7 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 public final class FTTrieBuilder extends FTBuilder {
-  /** CTArray for tokens. */
+  /** Trie index. */
   private final FTArray index = new FTArray(128);
   /** Hash structure for temporarily saving the tokens. */
   private FTHash hash = new FTHash();
@@ -38,7 +38,18 @@ public final class FTTrieBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) {
-    hash.index(tok, id, wp.pos);
+    hash.index(tok, pre, wp.pos);
+  }
+
+  @Override
+  int nrTokens() {
+    return hash.size();
+  }
+
+  @Override
+  void getFreq() {
+    hash.init();
+    while(hash.more()) getFreq(hash.pre[hash.next()]);
   }
 
   @Override
@@ -47,33 +58,16 @@ public final class FTTrieBuilder extends FTBuilder {
     final Prop pr = data.meta.prop;
     final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));
 
-    if (scm == 0) hash.init();
+    if(scm == 0) hash.init();
     else hash.initIter();
-    c = 0;
-
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
       final int ds = hash.ns[p];
       final long cpre = outb.size();
       // write compressed pre and pos arrays
-      final byte[] vpre = hash.pre[p];
-      final byte[] vpos = hash.pos[p];
-
-      fc = 0;
-      writeFTData(outb, vpre, vpos);
-      /*
-      // ftdata is stored here, with pre1, pos1, ..., preu, posu
-      final int pres = Num.size(vpre);
-      final int poss = Num.size(vpos);
-      while(lpre < pres && lpos < poss) {
-        for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
-          outb.write(vpre[lpre++]);
-        for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
-          outb.write(vpos[lpos++]);
-      }*/
+      writeFTData(outb, hash.pre[p], hash.pos[p]);
       index.insertSorted(tok, ds, cpre);
-      c++;
     }
 
     hash = null;
@@ -150,24 +144,12 @@ public final class FTTrieBuilder extends FTBuilder {
             * 5L + 9L;
       }
     }
-
     outS.writeInt(s);
     outb.close();
     outN.close();
     outS.close();
   }
 
-  @Override
-  void getFreq() {
-    maxfreq = new int[nodes.size()];
-    nmbdocwt = new int[hash.size()];
-    c = 0;
-    hash.init();
-
-    while(hash.more()) {
-      getFreq(hash.pre[hash.next()]);
-    }
-  }
   /**
    * Converts long values split with toArray back.
    * @param ar int[] with values

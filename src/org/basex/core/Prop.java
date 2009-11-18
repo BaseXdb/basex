@@ -130,7 +130,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] FTDC = { "FTDC", false };
   /** Flag for full-text scoring algorithm. */
-  /** Scoring mode. 1 = document based, 2 = textnode based .*/
+  /** Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] FTSCTYPE = { "FTSCTYPE", 2 };
 
   /** Levenshtein default error. */
@@ -150,7 +150,7 @@ public final class Prop extends AProp {
   /** Flag for importing xml contents. */
   public static final Object[] FSXML = { "FSXML", true };
   /** Maximum size for textual imports. */
-  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 1048576 };
+  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
 
   /**
    * FSTraversal implementation. If true, the FSTraversal implementation (based

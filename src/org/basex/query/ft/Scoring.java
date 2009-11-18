@@ -13,13 +13,12 @@ import org.basex.query.item.FTItem;
  * @author Christian Gruen
  */
 public final class Scoring {
+  /** Scoring multiplier to save values as integers. */
+  public static final int MP = 1000;
   /** Logarithmic base for calculating the score value. */
   private static final double LOG = Math.E - 1;
   /** Scoring step. */
   private static final double SCORESTEP = 0.8;
-
-//  public static boolean print = false;
-
 
   /**
    * Calculates a score value, based on the token length
@@ -130,27 +129,26 @@ public final class Scoring {
   }
 
   /**
-   * Returns the score for the specified key.
-   * @param numdoc number of documents in the collection
-   * @param numdocterm number of documents containing the term
-   * @param max maximum occurrence a term
-   * @param f frequency of the term
+   * Returns a tf-idf for the specified values.
+   * Used definition: freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i)).
+   * The result is multiplied with the {@link #MP} constant to yield
+   * integer values.
+   * 
+   * [SG] Some variants could return values which are better normalized; see eg:
+   * http://nlp.stanford.edu/IR-book/html/htmledition/
+   * variant-tf-idf-functions-1.html
+   * 
+   * @param freq frequency of the token. TF: freq(i, j)
+   * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
+   * @param docs number of documents in the collection. IDF: N
+   * @param tokens number of documents containing the token. IDF: n(i)
    * @return score value
    */
-  public static int tfIDF(final double numdoc, final double numdocterm,
-      final double max, final double f) {
-//    if (print) {
-//      System.out.println("freq. token in document: " + f);
-//      System.out.println("max freq. any token in document: " + max);
-//      System.out.println("numb documents: " + numdoc);
-//      System.out.println("numb documents with token: " + numdocterm);
-//      System.out.println((numdoc != numdocterm ?
-//      Math.log(numdoc / numdocterm) : 1) * f /max);
-//    }
-    return (int) ((numdoc != numdocterm ?
-        Math.log(numdoc / numdocterm) : 1) * f * 1000 / max);
+  public static int tfIDF(final double freq, final double mfreq,
+      final double docs, final double tokens) {
+    return (int) Math.max(1, MP * freq / mfreq * Math.log(1 + docs / tokens));
   }
-
+  
   /**
    * Returns the score for a text node.
    * Used when no index score is available.

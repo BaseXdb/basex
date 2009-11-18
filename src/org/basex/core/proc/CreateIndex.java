@@ -50,7 +50,7 @@ public final class CreateIndex extends ACreate {
           data.meta.ftst = prop.is(Prop.FTST);
           data.meta.ftcs = prop.is(Prop.FTCS);
           data.meta.ftdc = prop.is(Prop.FTDC);
-          data.meta.ftiscm = prop.num(Prop.FTSCTYPE);
+          data.meta.ftsctype = prop.num(Prop.FTSCTYPE);
           index = Type.FTX;
           break;
         case SUMMARY:

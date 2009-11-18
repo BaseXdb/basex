@@ -118,6 +118,8 @@ public class Set {
     }
     bucket = tmp;
     next = Arrays.copyOf(next, s);
-    keys = Arrays.copyOf(keys, s);
+    final byte[][] k = new byte[s][];
+    System.arraycopy(keys, 0, k, 0, size);
+    keys = k;
   }
 }

@@ -102,7 +102,7 @@ public abstract class Process extends Progress {
       return error(ex.getMessage());
     } catch(final Throwable ex) {
       // catch unexpected errors...
-      ex.printStackTrace();
+      Main.debug(ex);
       return error(PROCERR, this, ex.toString());
     }
     return ok;

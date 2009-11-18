@@ -39,10 +39,10 @@ public final class FTMatches implements Iterable<FTMatch> {
 
   /**
    * Adds a match entry.
-   * @param s position
+   * @param p position
    */
-  public void or(final int s) {
-    or(s, s);
+  public void or(final int p) {
+    or(p, p);
   }
 
   /**

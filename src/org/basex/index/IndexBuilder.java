@@ -20,7 +20,7 @@ public abstract class IndexBuilder extends Progress {
   /** Total parsing value. */
   protected final int total;
   /** Current parsing value. */
-  protected int id;
+  protected int pre;
 
   /**
    * Builds the index structure and returns an index instance.
@@ -57,6 +57,6 @@ public abstract class IndexBuilder extends Progress {
 
   @Override
   public final double prog() {
-    return (double) id / total;
+    return (double) pre / total;
   }
 }

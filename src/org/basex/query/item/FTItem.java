@@ -49,7 +49,7 @@ public final class FTItem extends DBNode {
   @Override
   public double score() {
     if(score == -1)
-        score = Scoring.textNode(all.size, is, tl, data.textLen(pre));
+      score = Scoring.textNode(all.size, is, tl, data.textLen(pre));
     return score;
   }
 

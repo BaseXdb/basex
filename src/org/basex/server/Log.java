@@ -36,7 +36,7 @@ public class Log {
   }
 
   /**
-   * Creates a folde for log files.
+   * Creates a folder for log files.
    */
   private void createLogDir() {
     logdir = IO.get(Prop.HOME + "/BaseXLogs");
@@ -73,7 +73,7 @@ public class Log {
   }
 
   /**
-   * Writes into the logfile.
+   * Writes into the log file.
    * @param s String
    */
   public void write(final String s) {

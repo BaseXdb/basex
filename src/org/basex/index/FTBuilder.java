@@ -3,12 +3,14 @@ package org.basex.index;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.query.ft.Scoring;
 import org.basex.util.IntList;
 import org.basex.util.Num;
+import org.basex.util.Performance;
 import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
@@ -20,25 +22,24 @@ import org.basex.util.Tokenizer;
  */
 abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
-  final Tokenizer wp;
-  /** Initial nodes for tfidf calculation. */
-  final IntList nodes = new IntList();
-  /** Container for maximal frequencies. */
-  int[] maxfreq;
-  /** Container for all frequencies. */
-  IntList freq;
-  /** Container for number of documents with token i. */
-  int[] nmbdocwt;
-  /** Scoring mode. 1 = document based, 2 = textnode based .*/
-  int scm;
-  /** Frequency counter. */
-  int fc;
-  /** Entry counter. */
-  int c;
-  /** Maximum indexed score. */
-  int maxscore;
-  /** Minimum indexed score. */
-  int minscore;
+  protected final Tokenizer wp;
+  /** Scoring mode; see {@link Prop#FTSCTYPE}. */
+  protected final int scm;
+
+  /** Document units (all document or text nodes in a document). */
+  private final IntList unit = new IntList();
+  /** Container for all frequencies. TF: freq(i, j). */
+  private final IntList freq = new IntList();
+  /** Container for maximal frequencies. TF: max(l, freq(l, j)). */
+  private int[] maxfreq;
+  /** Container for number of documents with token i. IDF: n(i). */
+  private int[] ntoken;
+  /** Maximum scoring value. */
+  private int max;
+  /** Minimum scoring value. */
+  private int min;
+  /** Current token. */
+  private int token;
 
   /**
    * Constructor.
@@ -49,128 +50,125 @@ abstract class FTBuilder extends IndexBuilder {
     super(d);
     scm = pr.num(Prop.FTSCTYPE);
     wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);
-    maxscore = -1;
-    minscore = Integer.MAX_VALUE;
+    max = -1;
+    min = Integer.MAX_VALUE;
   }
 
   /**
    * Extracts and indexes words from the specified data reference.
    * @throws IOException IO exception
    */
-  final void index() throws IOException {
-    for(id = 0; id < total; id++) {
-      if(data.kind(id) != Data.TEXT) {
-        if(data.kind(id) == Data.DOC && scm == 1) nodes.add(id);
+  protected final void index() throws IOException {
+    for(pre = 0; pre < total; pre++) {
+      final int k = data.kind(pre);
+      if(k != Data.TEXT) {
+        if(scm == 1 && k == Data.DOC) unit.add(pre);
         continue;
       }
+      if(scm == 2) unit.add(pre);
 
-      if (scm == 2) nodes.add(id);
       checkStop();
-      wp.init(data.text(id));
+      wp.init(data.text(pre));
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens
         if(tok.length <= MAXLEN) index(tok);
       }
     }
-    if (scm > 0) {
-      freq = new IntList();
+    if(scm > 0) {
+      maxfreq = new int[unit.size() + 1];
+      ntoken = new int[nrTokens()];
+      token = 0;
       getFreq();
     }
+
     // normalization
-    data.meta.ftiscm = scm;
+    token = 0;
     write();
-    if (scm > 0) {
-      data.meta.ftmaxscore = maxscore;
-      data.meta.ftminscore = minscore;
+    
+    if(Prop.debug) {
+      Performance.gc(4);
+      Main.debug("Memory: " + Performance.getMem());
+    }
+
+    if(scm > 0) {
+      data.meta.ftscmax = max;
+      data.meta.ftscmin = min;
+      data.meta.ftsctype = scm;
       data.meta.dirty = true;
     }
   }
 
   /**
-   * Write full-text data to disk.
+   * Calculates the tf-idf data for a single token.
+   * @param vpre pre values for a token
+   */
+  protected final void getFreq(final byte[] vpre) {
+    int np = 4;
+    int nl = Num.len(vpre, np);
+    int p = Num.read(vpre, np);
+    final int ns = Num.size(vpre);
+    while(np < ns) {
+      int up = unit.find(p);
+      if(up < 0) up = -up - 1;
+
+      int fr = 0;
+      do {
+        fr++;
+        np += nl;
+        if(np >= ns) break;
+        p = Num.read(vpre, np);
+        nl = Num.len(vpre, np);
+      } while(scm == 1 && (up == unit.size() || p < unit.get(up)) ||
+          scm == 2 && p == unit.get(up));
+
+      if(maxfreq[up] < fr) maxfreq[up] = fr;
+      freq.add(fr);
+      ntoken[token]++;
+    }
+    token++;
+  }
+
+  /**
+   * Writes full-text data for a single token to disk.
    * @param out DataOutput for disk access
    * @param vpre compressed pre values
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-
-  final void writeFTData(final DataOutput out, final byte[] vpre,
+  protected final void writeFTData(final DataOutput out, final byte[] vpre,
       final byte[] vpos) throws IOException {
-    int lpre = 4;
-    int lpos = 4;
 
-    // fulltext data is stored here, with -scoreU, pre1, pos1, ...,
-    // -scoreU, preU, posU
-    final int pres = Num.size(vpre);
-    final int poss = Num.size(vpos);
-    int cn = scm == 1 ? 1 : 0;
-    int lastpre = -1;
-    int pre = -1;
-    while(lpre < pres && lpos < poss) {
-      if (scm > 0) {
-        if (lastpre < pre) fc++;
-        pre = Num.read(vpre, lpre);
+    int np = 4, pp = 4, lp = -1, up = -1, fc = -1, p;
+    final int ns = Num.size(vpre);
+    while(np < ns) {
+      if(scm > 0) {
+        p = Num.read(vpre, np);
+        if(lp != p) {
+          // find document root
+          up = unit.find(p);
+          if(up < 0) up = -up - 1;
 
-        while (cn < nodes.size() && nodes.get(cn) < pre) cn++;
-        if (scm == 1 && (cn < nodes.size() && nodes.get(cn - 1) < pre &&
-            nodes.get(cn) > pre || cn == nodes.size() && nodes.get(cn - 1) <
-            pre) && pre != lastpre || scm == 2 && pre == nodes.get(cn)) {
-          final int score = Scoring.tfIDF(nodes.size(),
-              nmbdocwt[c], maxfreq[cn - (scm == 1 ? 1 : 0)], freq.get(fc));
-          if (score > maxscore) maxscore = score;
-          if (score < minscore) minscore = score;
-          // first write score value
-          out.write(Num.num(-score));
-          if (scm == 2) {
-            fc++;
-            cn++;
+          if(scm == 1 && (up == unit.size() || p < unit.get(up)) || scm == 2) {
+            final int s = Scoring.tfIDF(freq.get(++fc),
+                maxfreq[up], unit.size(), ntoken[token]);
+            if(max < s) max = s;
+            if(min > s) min = s;
+            if(np != 4) out.write(0);
+            out.write(Num.num(s));
           }
+          lp = p;
         }
-        lastpre = pre;
       }
-
-      // write fulltext data
-      for(int z = 0, l = Num.len(vpre, lpre); z < l; z++)
-        out.write(vpre[lpre++]);
-      for(int z = 0, l = Num.len(vpos, lpos); z < l; z++)
-        out.write(vpos[lpos++]);
+      // fulltext data is stored here, with -scoreU, pre1, pos1, ...,
+      // -scoreU, preU, posU
+      for(final int l = np + Num.len(vpre, np); np < l; np++)
+        out.write(vpre[np]);
+      for(final int l = pp + Num.len(vpos, pp); pp < l; pp++)
+        out.write(vpos[pp]);
     }
+    token++;
   }
-
-  /**
-   * Calculate frequencies for tfidf.
-   * @param vpre pre values for a token
-   */
-  final void getFreq(final byte[] vpre) {
-    int lpre = 4;
-    final int size = Num.size(vpre);
-    int cr = 1;
-    int co = 0;
-    int pre = Num.read(vpre, lpre);
-    int le = Num.len(vpre, lpre);
-    while(lpre < size) {
-      // find document root
-      while (cr < nodes.size() && pre > nodes.get(cr)) cr++;
-      while ((scm == 1 && (cr == nodes.size() || pre < nodes.get(cr))) ||
-          scm == 2 && pre == nodes.get(cr - 1)) {
-        co++;
-        lpre += le;
-        if (lpre >= size) break;
-        pre = Num.read(vpre, lpre);
-        le = Num.len(vpre, lpre);
-      }
-      if (co > 0) {
-        maxfreq[cr - 1] = co > maxfreq[cr - 1] ? co : maxfreq[cr - 1];
-        freq.add(co);
-      }
-      if (co > 0) nmbdocwt[c]++;
-      co = 0;
-      cr++;
-    }
-    c++;
-  }
-
 
   /**
    * Indexes a single token.
@@ -179,15 +177,21 @@ abstract class FTBuilder extends IndexBuilder {
   abstract void index(final byte[] tok);
 
   /**
-   * Writes the index data to disk.
-   * @throws IOException I/O exception
+   * Returns the number of disjunct tokens.
+   * @return number of tokens
    */
-  abstract void write() throws IOException;
+  abstract int nrTokens();
 
   /**
    * Evaluates the maximum frequencies for tfidf.
    */
   abstract void getFreq();
+
+  /**
+   * Writes the index data to disk.
+   * @throws IOException I/O exception
+   */
+  abstract void write() throws IOException;
 
   @Override
   public final String det() {

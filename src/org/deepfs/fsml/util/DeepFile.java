@@ -64,7 +64,7 @@ public class DeepFile {
   private final BufferedFileChannel bfc;
 
   /** The file system attributes for the file. */
-  private Atts fsAtts = null;
+  private Atts fsAtts;
   /** Map, containing all metadata key-value pairs for the current file. */
   private final TreeMap<MetaElem, byte[]> metaElements;
   /** List with all file fragments (fs:content elements). */
@@ -135,7 +135,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the name of the associated file in the file system.
@@ -157,7 +158,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -180,7 +182,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *   boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
