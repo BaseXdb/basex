@@ -31,8 +31,7 @@ public final class LibraryLoader {
    * @return true on success
    */
   public static boolean load(final String lib) {
-    final Boolean b = LIBS.get(lib);
-    return b != null ? b : loadLibrary(lib);
+    return loadLibrary(lib);
   }
 
   /**
@@ -52,10 +51,11 @@ public final class LibraryLoader {
    */
   private static boolean loadLibrary(final String lib) {
     boolean found = LIBS.containsKey(lib);
-    if(found) return false;
+    if(found) return LIBS.get(lib);
     try {
       System.loadLibrary(lib);
       Main.debug("Loading library (" + lib + ") ... OK.");
+      found = true;
     } catch(final UnsatisfiedLinkError ex) {
       found = false;
     }
