@@ -34,6 +34,7 @@ import org.deepfs.fsml.parsers.IFileParser;
  * that is stored inside another file, e.g. a file in a ZIP-file or a picture
  * that is included in an ID3 tag.
  * </p>
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public class DeepFile {

@@ -19,6 +19,7 @@ import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Build a FSML database while traversing a directory hierarchy.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
@@ -65,29 +66,14 @@ public final class FSImporter implements FSTraversal {
     final StringBuilder sb = new StringBuilder(text.length());
     for(final char c : text.toCharArray()) {
       switch(c) {
-        case '&':
-          sb.append("&amp;");
-          break;
-        case '>':
-          sb.append("&gt;");
-          break;
-        case '<':
-          sb.append("&lt;");
-          break;
-        case '\"':
-          sb.append("&quot;");
-          break;
-        case '\'':
-          sb.append("&apos;");
-          break;
-        case '{':
-          sb.append("{{");
-          break;
-        case '}':
-          sb.append("}}");
-          break;
-        default:
-          sb.append(c);
+        case '&':  sb.append("&amp;"); break;
+        case '>':  sb.append("&gt;"); break;
+        case '<':  sb.append("&lt;"); break;
+        case '\"': sb.append("&quot;"); break;
+        case '\'': sb.append("&apos;"); break;
+        case '{':  sb.append("{{"); break;
+        case '}':  sb.append("}}"); break;
+        default:   sb.append(c);
       }
     }
     return sb.toString();
@@ -164,12 +150,10 @@ public final class FSImporter implements FSTraversal {
   }
 
   @Override
-  public void postTraversalVisit(final File d) { }
+  public void postTraversalVisit(final File d) { /* NOT_USED */  }
 
   @Override
-  public void levelUpdate(final int l) {
-  /* NOT_USED */
-  }
+  public void levelUpdate(final int l) { /* NOT_USED */ }
 
   @Override
   public void preDirectoryVisit(final File d) {
@@ -188,9 +172,7 @@ public final class FSImporter implements FSTraversal {
   }
 
   @Override
-  public void symLinkVisit(final File f) {
-  // TODO Auto-generated method stub
-  }
+  public void symLinkVisit(final File f) { /* NOT_USED */ }
 
   /**
    * Returns the current file name.

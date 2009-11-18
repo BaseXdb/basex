@@ -115,9 +115,7 @@ public final class TreePrinter implements FSTraversal {
      * This method contains no code.
      */
     @Override
-    public void postTraversalVisit(final File d) {
-        /* NOT_USED */
-    }
+    public void postTraversalVisit(final File d) { /* NOT_USED */ }
 
     @Override
     public void levelUpdate(final int l) {
