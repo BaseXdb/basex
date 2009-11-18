@@ -7,6 +7,7 @@ import static org.deepfs.fsml.util.DeepFile.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.basex.io.PrintOutput;
@@ -205,20 +206,21 @@ public class FSMLSerializer {
         atts.add(SIZE, token(d.getSize()));
         startElem(CONTENT_NS, atts);
       } else { // regular file
-        final File f = d.getBufferedFileChannel().getAssociatedFile();
-        final Atts a = DeepFS.atts(f);
+        final Atts a = d.getFSAtts();
         startElem(FILE_NS, a);
       }
 
       // serialize metadata
-      if(d.fsmeta) {
-        for(final Entry<MetaElem, byte[]> e : d.getMeta().entrySet())
+      final TreeMap<MetaElem, byte[]> meta = d.getMeta();
+      if(meta != null) {
+        for(final Entry<MetaElem, byte[]> e : meta.entrySet())
           nodeAndText(e.getKey().get(), atts.reset(), e.getValue());
       }
 
       // serialize text contents
-      if(d.fscont) {
-        for(final TextContent t : d.getTextContents()) {
+      final TextContent[] textContents = d.getTextContents();
+      if(textContents != null) {
+        for(final TextContent t : textContents) {
           atts.reset();
           atts.add(OFFSET, token(t.getOffset()));
           atts.add(SIZE, token(t.getSize()));
@@ -229,8 +231,9 @@ public class FSMLSerializer {
       }
 
       // serialize xml contents
-      if(d.fsxml) {
-        for(final XMLContent x : d.getXMLContents()) {
+      final XMLContent[] xmlContents = d.getXMLContents();
+      if(xmlContents != null) {
+        for(final XMLContent x : xmlContents) {
           atts.reset();
           atts.add(OFFSET, token(x.getOffset()));
           atts.add(SIZE, token(x.getSize()));

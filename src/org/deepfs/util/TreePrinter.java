@@ -15,7 +15,7 @@ public final class TreePrinter implements FSTraversal {
     /** Maximal depth of indentation. */
     private int level;
     /** Indentation strings for each level. */
-    private String[] indentStrings = new String[MAX_DEPTH];
+    private final String[] indentStrings = new String[MAX_DEPTH];
 
     /**
      * Prints indentation prefix.
@@ -49,7 +49,7 @@ public final class TreePrinter implements FSTraversal {
      */
     private void printFileNode(final File f) {
         printIndent(level);
-        File[] ch = f.getParentFile().listFiles();
+        final File[] ch = f.getParentFile().listFiles();
         if (ch.length == 1 || ch[ch.length - 1].equals(f)) {
             indentStrings[level] = "    ";
             System.out.println("`-- " + f.getName());

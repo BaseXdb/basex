@@ -7,33 +7,39 @@ import org.basex.util.Token;
  * @author Bastian Lemke
  */
 public enum FileType {
-      /** Archive resource (e.g. ZIP file). */
+  /** Archive resource (e.g. ZIP file). */
   ARCHIVE,
-      /** Audio resource (e.g. MP3 file). */
+  /** Audio resource (e.g. MP3 file). */
   AUDIO,
-      /** Binary resource. */
+  /** Binary resource. */
   BINARY,
-      /** Calendar resource (e.g. ICS file). */
+  /** Calendar resource (e.g. ICS file). */
   CALENDAR,
-      /** Contact resource (e.g. VCF file). */
+  /** Contact resource (e.g. VCF file). */
   CONTACT,
-      /** Document resource (e.g. DOC or PDF file). */
+  /** Document resource (e.g. DOC or PDF file). */
   DOCUMENT,
-      /** Map resource (e.g. KML or GPX file). */
+  /** Map resource (e.g. KML or GPX file). */
   MAP,
-      /** Message resource (e.g. email). */
+  /** Message resource (e.g. email). */
   MESSAGE,
-      /** Picture resource (e.g. JPG file). */
+  /** Picture resource (e.g. JPG file). */
   PICTURE,
-      /** Presentation resource (e.g. PPT file). */
+  /** Presentation resource (e.g. PPT file). */
   PRESENTATION,
-      /** Text(-based) resource (e.g. plain text file). */
+  /** Script. */
+  SCRIPT,
+  /** Source code. */
+  SOURCE_CODE,
+  /** Text(-based) resource (e.g. plain text file). */
   TEXT,
-      /** Unknown resource type. */
+  /** Unknown resource type. */
   UNKNOWN,
-      /** Video resource (e.g. MPEG file). */
+  /** Video resource (e.g. MPEG file). */
   VIDEO,
-      /** XML(-based) resource. */
+  /** Website. */
+  WEBSITE,
+  /** XML(-based) resource. */
   XML;
 
   /** The attribute value as byte array. */
@@ -41,7 +47,7 @@ public enum FileType {
 
   /** Standard constructor for initializing the enum instance. */
   FileType() {
-    val = Token.token(toString().toLowerCase());
+    val = Token.token(toString().toLowerCase().replace("_", " "));
   }
 
   /**

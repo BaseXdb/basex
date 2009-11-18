@@ -32,14 +32,16 @@ public final class CreateFS extends ACreate {
   protected boolean exec(final PrintOutput out) {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
-    if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(args[0], prop),
-        args[1]); // old FSParser
+    final String path = args[0];
+    final String db = args[1];
+
+    // old FSParser
+    if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(path, prop), db);
 
     // XQUP-based implementation
-    new Close().execute(context);
-    final FSTraversalParser p = new FSTraversalParser();
-    progress(p);
-    p.parse(args[0], context, args[1]);
+    FSTraversalParser parser = new FSTraversalParser();
+    progress(parser);
+    parser.parse(path, context, db);
     final Optimize opt = new Optimize();
     progress(opt);
     opt.execute(context);

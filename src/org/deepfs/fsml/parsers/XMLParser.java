@@ -67,11 +67,11 @@ public final class XMLParser implements IFileParser {
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
-    final int maxSize = deepFile.fstextmax;
+    final int maxSize = deepFile.maxTextSize();
     if(bfc.size() <= maxSize) {
       final Data data = parse(bfc);
       if(data != null) {
-        if(deepFile.fsmeta) {
+        if(deepFile.extractMeta()) {
           deepFile.setFileType(FileType.XML);
           final String name = bfc.getFileName();
           final String suf = name.substring(
@@ -80,13 +80,13 @@ public final class XMLParser implements IFileParser {
           if(mime == null) Main.notexpected();
           deepFile.setFileFormat(mime);
         }
-        if(deepFile.fsxml) {
+        if(deepFile.extractXML()) {
           deepFile.addXML(bfc.getOffset(), (int) bfc.size(), data);
         }
         return; // successfully parsed xml content
       }
     }
-    if(deepFile.fscont) { // if file too big or not wellformed
+    if(deepFile.extractText()) { // if file too big or not wellformed
       try {
         deepFile.fallback();
       } catch(final ParserException e) {

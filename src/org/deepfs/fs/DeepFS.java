@@ -265,7 +265,7 @@ public final class DeepFS implements DataText {
    * @param name of the file
    * @return suffix or EMPTY token
    */
-  private static byte[] getSuffix(final String name) {
+  public static byte[] getSuffix(final String name) {
     final int s = name.lastIndexOf('.');
     final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
     return suf;

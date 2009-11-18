@@ -43,7 +43,7 @@ public class BMPParser implements IFileParser {
 
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
-    if(!deepFile.fsmeta) return; // no content to extract
+    if(!deepFile.extractMeta()) return; // no content to extract
 
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();
     if(!check(f)) return;

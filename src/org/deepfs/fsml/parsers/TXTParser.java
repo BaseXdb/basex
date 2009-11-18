@@ -48,7 +48,7 @@ public final class TXTParser implements IFileParser {
   public void extract(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
 
-    if(deepFile.fsmeta) {
+    if(deepFile.extractMeta()) {
       if(!check(bfc)) return;
       deepFile.setFileType(FileType.TEXT);
       final String name = bfc.getFileName();
@@ -58,10 +58,10 @@ public final class TXTParser implements IFileParser {
       if(mime == null) mime = MimeType.UNKNOWN;
       deepFile.setFileFormat(mime);
     }
-    if(deepFile.fscont) {
+    if(deepFile.extractText()) {
       // ignore *.emlxpart files
       if(bfc.getFileName().endsWith(".emlxpart")) return;
-      final int len = (int) Math.min(bfc.size(), deepFile.fstextmax);
+      final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
       final TokenBuilder content = new TokenBuilder(len);
       final int bufSize = bfc.getBufferSize();
       int remaining = len;

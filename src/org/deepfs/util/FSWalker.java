@@ -15,49 +15,49 @@ import java.util.ListIterator;
 public class FSWalker implements FSTraversal {
 
   /** Registered visitors to be notified of events. */
-  private List<FSTraversal> visitors = new LinkedList<FSTraversal>();
+  private final List<FSTraversal> visitors = new LinkedList<FSTraversal>();
 
   /** Depth of traversal. */
   private int level;
 
   @Override
   public void levelUpdate(final int l) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().levelUpdate(l);  }
 
   @Override
   public void postDirectoryVisit(final File d) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().postDirectoryVisit(d);
   }
 
   @Override
   public void postTraversalVisit(final File d) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().postTraversalVisit(d);
   }
 
   @Override
   public void preDirectoryVisit(final File d) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().preDirectoryVisit(d);
   }
 
   @Override
   public void preTraversalVisit(final File d) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().preTraversalVisit(d);
   }
 
   @Override
   public void regularFileVisit(final File f) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().regularFileVisit(f);
   }
 
   @Override
   public void symLinkVisit(final File f) {
-    ListIterator<FSTraversal> i = visitors.listIterator();
+    final ListIterator<FSTraversal> i = visitors.listIterator();
     while(i.hasNext()) i.next().symLinkVisit(f);
   }
 

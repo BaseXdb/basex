@@ -32,7 +32,7 @@ public final class TIFFParser implements IFileParser {
 
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
-    if(deepFile.fsmeta) {
+    if(deepFile.extractMeta()) {
       final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
       if(!check(bfc)) return;
       deepFile.setFileType(FileType.PICTURE);

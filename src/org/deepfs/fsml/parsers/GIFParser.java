@@ -46,7 +46,7 @@ public final class GIFParser implements IFileParser {
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();
-    if(deepFile.fsmeta) {
+    if(deepFile.extractMeta()) {
       try {
         f.buffer(10);
       } catch(final EOFException e) {

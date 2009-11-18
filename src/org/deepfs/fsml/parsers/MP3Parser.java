@@ -296,7 +296,7 @@ public final class MP3Parser implements IFileParser {
 
   @Override
   public void extract(final DeepFile df) throws IOException {
-    if(df.fsmeta) {
+    if(df.extractMeta()) {
       bfc = df.getBufferedFileChannel();
       deepFile = df;
       if(checkID3v2()) readMetaID3v2();

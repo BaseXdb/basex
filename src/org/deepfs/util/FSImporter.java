@@ -9,17 +9,17 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.deepfs.fsml.extractors.SpotlightExtractor;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FSMLSerializer;
+import org.deepfs.fsml.util.ParserException;
 import org.deepfs.fsml.util.ParserRegistry;
 
 /**
  * Build a FSML database while traversing a directory hierarchy.
- * 
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
@@ -32,7 +32,7 @@ public final class FSImporter implements FSTraversal {
   private final ParserRegistry parserRegistry = new ParserRegistry();
 
   /** Database context. */
-  private Context ctx;
+  private final Context ctx;
   /** Root node. */
   private final String rootNode = "/deepfs";
   /** Insertion target. */
@@ -42,6 +42,8 @@ public final class FSImporter implements FSTraversal {
   private final String db;
   /** The name of the current file. */
   private String currentFile;
+  /** The spotlight extractor. */
+  private final SpotlightExtractor spotlight;
 
   /**
    * Constructor.
@@ -55,6 +57,19 @@ public final class FSImporter implements FSTraversal {
     prop.set(Prop.ENTITY, false);
     prop.set(Prop.DTD, false);
     db = dbName;
+
+    if(prop.is(Prop.FSMETA) && prop.is(Prop.SPOTLIGHT) && Prop.MAC) {
+      SpotlightExtractor spot;
+      try {
+        spot = new SpotlightExtractor();
+      } catch(final ParserException ex) {
+        Main.debug("Failed to load spotex library (%).", ex);
+        spot = null;
+      }
+      spotlight = spot;
+      return;
+    }
+    spotlight = null;
   }
 
   /**
@@ -66,14 +81,29 @@ public final class FSImporter implements FSTraversal {
     final StringBuilder sb = new StringBuilder(text.length());
     for(final char c : text.toCharArray()) {
       switch(c) {
-        case '&':  sb.append("&amp;"); break;
-        case '>':  sb.append("&gt;"); break;
-        case '<':  sb.append("&lt;"); break;
-        case '\"': sb.append("&quot;"); break;
-        case '\'': sb.append("&apos;"); break;
-        case '{':  sb.append("{{"); break;
-        case '}':  sb.append("}}"); break;
-        default:   sb.append(c);
+        case '&':
+          sb.append("&amp;");
+          break;
+        case '>':
+          sb.append("&gt;");
+          break;
+        case '<':
+          sb.append("&lt;");
+          break;
+        case '\"':
+          sb.append("&quot;");
+          break;
+        case '\'':
+          sb.append("&apos;");
+          break;
+        case '{':
+          sb.append("{{");
+          break;
+        case '}':
+          sb.append("}}");
+          break;
+        default:
+          sb.append(c);
       }
     }
     return sb.toString();
@@ -97,10 +127,13 @@ public final class FSImporter implements FSTraversal {
       try {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
         try {
-          // [BL] check Prop.FSMETA and Prop.FSCONT
           final DeepFile deepFile = new DeepFile(parserRegistry, bfc,
               ctx.prop.is(Prop.FSMETA), ctx.prop.is(Prop.FSXML),
               ctx.prop.is(Prop.FSCONT), ctx.prop.num(Prop.FSTEXTMAX));
+          if(spotlight != null) {
+            spotlight.extract(deepFile);
+            deepFile.finishMetaExtraction();
+          }
           deepFile.extract();
           xmlFragment = FSMLSerializer.serialize(deepFile);
         } catch(final IOException ex) {
@@ -110,7 +143,7 @@ public final class FSImporter implements FSTraversal {
         } finally {
           try {
             bfc.close();
-          } catch(final IOException e1) { }
+          } catch(final IOException e1) {}
         }
       } catch(final IOException e) { // opening failed
         Main.debug("Failed to open the file (% - %)", f.getAbsolutePath(), e);
@@ -130,7 +163,7 @@ public final class FSImporter implements FSTraversal {
       } finally {
         try {
           qp.close();
-        } catch(IOException e) {
+        } catch(final IOException e) {
           Main.debug("Failed to close query processor (%).", e);
         }
       }
@@ -141,19 +174,18 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preTraversalVisit(final File d) {
-    PrintOutput out = new PrintOutput(System.out);
-    CreateDB c = new CreateDB("<deepfs backingstore=\""
+    final CreateDB c = new CreateDB("<deepfs backingstore=\""
         + escape(d.getAbsolutePath()) + "\"/>", db);
-    if(!c.execute(ctx, out)) throw new RuntimeException(
+    if(!c.execute(ctx)) throw new RuntimeException(
         "Failed to create file system database (" + c.info() + ").");
     ctx.data.meta.deepfs = true;
   }
 
   @Override
-  public void postTraversalVisit(final File d) { /* NOT_USED */  }
+  public void postTraversalVisit(final File d) { /* NOT_USED */}
 
   @Override
-  public void levelUpdate(final int l) { /* NOT_USED */ }
+  public void levelUpdate(final int l) { /* NOT_USED */}
 
   @Override
   public void preDirectoryVisit(final File d) {
@@ -172,7 +204,7 @@ public final class FSImporter implements FSTraversal {
   }
 
   @Override
-  public void symLinkVisit(final File f) { /* NOT_USED */ }
+  public void symLinkVisit(final File f) { /* NOT_USED */}
 
   /**
    * Returns the current file name.

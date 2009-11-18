@@ -427,7 +427,7 @@ public final class BufferedFileChannel {
    * Returns the associated file.
    * @return the file.
    */
-  public File getAssociatedFile() {
+  File getAssociatedFile() {
     return f;
   }
 

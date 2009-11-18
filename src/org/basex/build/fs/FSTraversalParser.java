@@ -5,6 +5,7 @@ import java.io.File;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Text;
+import org.basex.core.proc.Close;
 import org.deepfs.util.FSImporter;
 import org.deepfs.util.FSWalker;
 
@@ -26,6 +27,7 @@ public class FSTraversalParser extends Progress {
   public void parse(final String path, final Context context,
       final String dbName) {
     importer = new FSImporter(context, dbName);
+    new Close().execute(context);
     new FSWalker(importer).traverse(new File(path));
   }
 

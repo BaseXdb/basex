@@ -267,7 +267,7 @@ public final class EMLParser implements IFileParser {
     bfc = df.getBufferedFileChannel();
     if(!check(bfc)) return;
 
-    if(df.fsmeta) {
+    if(df.extractMeta()) {
       df.setFileType(FileType.MESSAGE);
       df.setFileFormat(MimeType.EML);
       mBoundary = "";
@@ -289,8 +289,8 @@ public final class EMLParser implements IFileParser {
         if(readNext && !readLine()) return;
       } while(!mCurrLine.isEmpty());
 
-      if(df.fscont) if(mCurrLine != null) parseContent();
-    } else if(df.fscont) {
+      if(df.extractText()) if(mCurrLine != null) parseContent();
+    } else if(df.extractText()) {
       do {
         String type = "";
         final Matcher m = KEYPAT.matcher(mCurrLine);

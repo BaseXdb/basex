@@ -1,7 +1,5 @@
 package org.deepfs.fsml.extractors;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -9,11 +7,14 @@ import java.util.Map.Entry;
 
 import org.basex.core.Main;
 import org.basex.util.Token;
+import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.MP3Parser;
+import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FileType;
 import org.deepfs.fsml.util.MetaElem;
 import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserException;
 import org.deepfs.fsml.util.ParserUtil;
 import org.deepfs.util.LibraryLoader;
 
@@ -22,10 +23,13 @@ import org.deepfs.util.LibraryLoader;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Bastian Lemke
  */
-public final class SpotlightExtractor {
+public final class SpotlightExtractor implements IFileParser {
+
+  /** Flag, if the spotex library is available or not. */
+  private static final boolean libAvailable;
 
   static {
-    LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
+    libAvailable = LibraryLoader.load(LibraryLoader.SPOTEXLIBNAME);
   }
 
   /**
@@ -34,27 +38,31 @@ public final class SpotlightExtractor {
    */
   enum SpotlightContentType {
         /** MP3 file. */
-    PUBLIC_MP3(MimeType.MP3),
+    PUBLIC_MP3(FileType.AUDIO, MimeType.MP3),
         /** JPEG file. */
-    PUBLIC_JPEG(MimeType.JPG),
+    PUBLIC_JPEG(FileType.PICTURE, MimeType.JPG),
         /** PNG file. */
-    PUBLIC_PNG(MimeType.PNG),
+    PUBLIC_PNG(FileType.PICTURE, MimeType.PNG),
         /** GIF file. */
-    COM_COMPUSERVE_GIF(MimeType.GIF),
+    COM_COMPUSERVE_GIF(FileType.PICTURE, MimeType.GIF),
         /** BMP file. */
-    COM_MICROSOFT_BMP(MimeType.BMP),
+    COM_MICROSOFT_BMP(FileType.PICTURE, MimeType.BMP),
         /** TIFF file. */
-    PUBLIC_TIFF(MimeType.TIFF),
+    PUBLIC_TIFF(FileType.PICTURE, MimeType.TIFF),
         /** HTML file. */
-    PUBLIC_HTML(MimeType.HTML),
+    PUBLIC_HTML(FileType.WEBSITE, MimeType.HTML),
         /** Plain text file. */
-    PUBLIC_PLAIN_TEXT(MimeType.TXT),
+    PUBLIC_PLAIN_TEXT(FileType.TEXT, MimeType.TXT),
         /** CSS file. */
-    COM_APPLE_DASHCODE_CSS(MimeType.CSS),
+    COM_APPLE_DASHCODE_CSS(FileType.TEXT, MimeType.CSS),
+        /** Email file. */
+    COM_APPLE_MAIL_EMAIL(FileType.MESSAGE),
+        /** Email file. */
+    COM_APPLE_MAIL_EMLX(FileType.MESSAGE),
         /** Word file. */
-    COM_MICROSOFT_WORD_DOC(MimeType.DOC),
+    COM_MICROSOFT_WORD_DOC(FileType.DOCUMENT, MimeType.DOC),
         /** PDF file. */
-    COM_ADOBE_PDF(MimeType.PDF),
+    COM_ADOBE_PDF(FileType.DOCUMENT, MimeType.PDF),
         /** Image. */
     PUBLIC_IMAGE(FileType.PICTURE),
         /** Audio. */
@@ -62,21 +70,46 @@ public final class SpotlightExtractor {
         /** Audiovisual content. */
     PUBLIC_AUDIOVISUAL_CONTENT(FileType.VIDEO),
         /** Data. */
-    PUBLIC_DATA(),
+    PUBLIC_DATA,
         /** Item. */
-    PUBLIC_ITEM(),
+    PUBLIC_ITEM,
         /** Content. */
-    PUBLIC_CONTENT();
+    PUBLIC_CONTENT,
+        /** E-mail message. */
+    PUBLIC_EMAIL_MESSAGE(FileType.MESSAGE),
+        /** Message. */
+    PUBLIC_MESSAGE(FileType.MESSAGE),
+        /** Script. */
+    PUBLIC_SCRIPT(FileType.SCRIPT),
+        /** Shell script. */
+    PUBLIC_SHELL_SCRIPT(FileType.SCRIPT),
+        /** Source code. */
+    PUBLIC_SOURCE_CODE,
+        /** Text. */
+    PUBLIC_TEXT(FileType.TEXT),
+        /** XML. */
+    PUBLIC_XML(FileType.XML, MimeType.XML);
 
     /** The {@link FileType}. */
-    private final FileType metaType;
+    private final FileType fileType;
     /** The {@link MimeType}. */
     private final MimeType mimeType;
 
     /** Constructor for items that should be ignored. */
     private SpotlightContentType() {
       mimeType = null;
-      metaType = null;
+      fileType = null;
+    }
+
+    /**
+     * Initializes the content type instance with a {@link FileType} and a
+     * {@link MimeType}.
+     * @param f the corresponding file type.
+     * @param m the corresponding mime type.
+     */
+    private SpotlightContentType(final FileType f, final MimeType m) {
+      fileType = f;
+      mimeType = m;
     }
 
     /**
@@ -85,15 +118,15 @@ public final class SpotlightExtractor {
      */
     private SpotlightContentType(final MimeType m) {
       mimeType = m;
-      metaType = null;
+      fileType = null;
     }
 
     /**
      * Initializes the content type instance with a {@link FileType}.
-     * @param m the corresponding {@link FileType}.
+     * @param f the corresponding {@link FileType}.
      */
-    private SpotlightContentType(final FileType m) {
-      metaType = m;
+    private SpotlightContentType(final FileType f) {
+      fileType = f;
       mimeType = null;
     }
 
@@ -110,7 +143,7 @@ public final class SpotlightExtractor {
      * @return the {@link FileType}.
      */
     FileType getType() {
-      return metaType;
+      return fileType;
     }
   }
 
@@ -208,8 +241,8 @@ public final class SpotlightExtractor {
           String key = ((String) o).toUpperCase();
           key = key.replace('.', '_').replace('-', '_');
           final SpotlightContentType ct = SpotlightContentType.valueOf(key);
-          final FileType me = ct.getType();
-          if(me != null) deepFile.setFileType(me);
+          final FileType ft = ct.getType();
+          if(ft != null) deepFile.setFileType(ft);
           else {
             final MimeType mi = ct.getFormat();
             if(mi != null) deepFile.setFileFormat(mi);
@@ -488,8 +521,7 @@ public final class SpotlightExtractor {
      * @param elem the corresponding metadata element for this object.
      * @param o the object to convert.
      */
-    void parseInt(final DeepFile deepFile, final MetaElem elem,
-        final Object o) {
+    void parseInt(final DeepFile deepFile, final MetaElem elem, final Object o) {
       final Long value = long0(o);
       if(value != null) deepFile.addMeta(elem, value);
     }
@@ -553,13 +585,22 @@ public final class SpotlightExtractor {
   }
 
   /**
-   * Queries spotlight for metadata items for the file and fires parser events.
-   * @param file the file to search metadata for.
-   * @throws IOException if any error occurs.
+   * Constructor.
+   * @throws ParserException if the spotex library is not available.
    */
-  public void parse(final File file) throws IOException {
-    final DeepFile deepFile = new DeepFile(file);
-    final Map<String, Object> metadata = getMetadata(file.getAbsolutePath());
+  public SpotlightExtractor() throws ParserException {
+    if(!libAvailable) throw new ParserException("Spotex library not available.");
+  }
+
+  @Override
+  public boolean check(BufferedFileChannel bfc) {
+    return true;
+  }
+
+  @Override
+  public void extract(DeepFile deepFile) {
+    final String fileName = deepFile.getBufferedFileChannel().getFileName();
+    final Map<String, Object> metadata = getMetadata(fileName);
     if(metadata == null) return;
     for(final Entry<String, Object> e : metadata.entrySet()) {
       try {
@@ -573,6 +614,11 @@ public final class SpotlightExtractor {
         // item is not in enum ...do nothing
       }
     }
+  }
+
+  @Override
+  public void propagate(DeepFile deepFile) {
+    Main.notimplemented();
   }
 
   /**

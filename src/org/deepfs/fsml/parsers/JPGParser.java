@@ -25,8 +25,8 @@ public final class JPGParser implements IFileParser {
   }
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
-  private static final byte[] HEADER_EXIF = //
-  { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
+  private static final byte[] HEADER_EXIF =
+      { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
   /**
    * <p>
    * JFIF header.
@@ -68,7 +68,7 @@ public final class JPGParser implements IFileParser {
 
   @Override
   public void extract(final DeepFile df) throws IOException {
-    if(df.fsmeta) {
+    if(df.extractMeta()) {
       deepFile = df;
       bfc = deepFile.getBufferedFileChannel();
       if(!check(bfc)) return;
