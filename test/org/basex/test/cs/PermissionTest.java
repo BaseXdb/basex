@@ -7,12 +7,15 @@ import org.basex.BaseXServer;
 import org.basex.core.Process;
 import org.basex.core.Session;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.CreateUser;
+import org.basex.core.proc.DropDB;
 import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.Revoke;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,9 +30,9 @@ public class PermissionTest {
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
-  static Session session1;
+  static Session adminSession;
   /** Socket reference. */
-  static Session session2;
+  static Session testSession;
   
   /** Starts the server. */
   @BeforeClass
@@ -45,39 +48,59 @@ public class PermissionTest {
     Performance.sleep(200);
     
     try {
-      session1 = new ClientSession(server.context, ADMIN, ADMIN);
+      adminSession = new ClientSession(server.context, ADMIN, ADMIN);
       if(server.context.users.get("test") != null) { 
-      ok(new DropUser("test"), session1);
+      ok(new DropUser("test"), adminSession);
       }
-      ok(new CreateUser("test", "test"), session1);
-      session2 = new ClientSession(server.context, "test", "test");
+      ok(new CreateUser("test", "test"), adminSession);
+      testSession = new ClientSession(server.context, "test", "test");
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
   }
   
-  /** Global permission tests. */
+  /** Tests revoke and grant permissions. */
   @Test
-  public final void globalPerms() {
-    no(new Grant("admin", "test"), session2);
-    ok(new Grant("create", "test"), session1);
-    ok(new CreateDB("<xml>This is a test</xml>", "test"), session2);
-    ok(new Revoke("create", "test"), session1);
-    no(new CreateDB("<xml>This is a test</xml>", "test"), session2);
-    ok(new Grant("admin", "test"), session1);
-    ok(new CreateUser("test2", "test2"), session2);
-    ok(new DropUser("test2"), session2);
-    //no(new DropUser("test"), session2);
-    //no(new DropUser("admin"), session2);
-    //no(new Revoke("admin", "test"), session2);
-    ok(new Revoke("admin", "test"), session1);
+  public final void revokegrantPerms() {
+    no(new Grant("admin", "test"), testSession);
+    ok(new Grant("admin", "test"), adminSession);
+    no(new Revoke("admin", "admin"), testSession);
+    no(new Revoke("admin", "admin"), adminSession);
+    ok(new Revoke("admin", "test"), testSession);
+    // [CG] Admin right should include Create right?
+    ok(new Grant("admin", "test"), adminSession);
+    ok(new Grant("create", "test"), testSession);
   }
   
-  /** Local permission tests. */
+  /** Tests create permissions. */
   @Test
-  public final void localPerms() {
-    
+  public final void createPerms() {
+    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    ok(new CreateIndex("SUMMARY"), testSession);
+    ok(new CreateUser("test2", "test2"), testSession);
+    ok(new DropUser("test2"), testSession);
+    ok(new Revoke("create", "test"), adminSession);
+    ok(new Revoke("admin", "test"), adminSession);
+    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    // [CG] Index can be created without admin or create rights??
+    // no(new CreateIndex("SUMMARY"), testSession);
+    no(new CreateUser("test2", "test2"), testSession);
+    ok(new CreateUser("test2", "test2"), adminSession);
   }
+  
+  /** Tests drop permissions. */
+  @Test
+  public final void dropPerms() {
+    ok(new Grant("admin", "test"), adminSession);
+    // [CG] Selfdropping...
+    // no(new DropUser("test"), testSession);
+    no(new DropUser("admin"), testSession);
+    // [CG] Dropping of logged in user...
+    // no(new DropUser("test"), adminSession);
+    ok(new DropUser("test2"), testSession);
+    ok(new DropDB("test"), testSession);
+  }
+
   
   
   /**
@@ -119,5 +142,19 @@ public class PermissionTest {
     } catch(final Exception ex) {
       return ex.toString();
     }
+  }
+  
+  /** Stops the server. */
+  @AfterClass
+  public static void stop() {
+    try {
+      adminSession.close();
+      testSession.close();
+    } catch(final Exception ex) {
+      throw new AssertionError(ex.toString());
+    }
+
+    // Stop server instance.
+    new BaseXServer("stop");
   }
 }

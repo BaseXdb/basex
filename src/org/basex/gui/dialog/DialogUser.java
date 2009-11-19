@@ -3,21 +3,15 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -73,6 +67,8 @@ public final class DialogUser extends BaseXBack {
   private final BaseXButton create;
   /** Delete button. */
   private final BaseXButton drop;
+  /** Remove button. */
+  private final BaseXButton remove;
   /** Username textfield. */
   private final BaseXTextField user;
   /** Password textfield. */
@@ -83,6 +79,8 @@ public final class DialogUser extends BaseXBack {
   private final BaseXCombo userco1;
   /** User columns. */
   private final BaseXCombo userco2;
+  /** User columns. */
+  private final BaseXCombo userco3;
   /** User table. */
   final JTable table;
   /** Info label. */
@@ -164,7 +162,7 @@ public final class DialogUser extends BaseXBack {
     add(p4);
 
     tablePanel = new BaseXBack();
-    tablePanel.setLayout(new TableLayout(3, 1, 2, 2));
+    tablePanel.setLayout(new TableLayout(5, 1, 2, 2));
     tablePanel.add(new BaseXLabel(PERMS, false, true));
     tablePanel.add(new JScrollPane(table));
     final BaseXBack tablePanel1 = new BaseXBack();
@@ -173,6 +171,15 @@ public final class DialogUser extends BaseXBack {
     tablePanel1.add(info, BorderLayout.WEST);
     BaseXLayout.setWidth(tablePanel1, 420);
     tablePanel.add(tablePanel1);
+    userco3 = new BaseXCombo(new String[] {}, dia);
+    remove = new BaseXButton("Remove", dia);
+    if(!global) {
+      tablePanel.add(new BaseXLabel("Remove:", false, true));
+      final BaseXBack removePanel = new BaseXBack();
+      removePanel.add(userco3);
+      removePanel.add(remove);
+      tablePanel.add(removePanel);
+    }
     add(tablePanel);
     add(Box.createVerticalStrut(20));
     action(null);
@@ -210,6 +217,11 @@ public final class DialogUser extends BaseXBack {
         if(!sess.execute(new AlterUser(u, p))) msg = sess.info();
         newpass.setText("");
         setData();
+      } else if("Remove".equals(cmd)) {
+        gui.context.data.meta.users.remove(
+            gui.context.data.meta.users.get(userco3.
+                getSelectedItem().toString()));
+        setData();
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -241,6 +253,7 @@ public final class DialogUser extends BaseXBack {
     create.setEnabled(valuname && valpass && disname
         && !user.getText().isEmpty() && pass.getPassword().length != 0);
     drop.setEnabled(userco1.getSelectedIndex() != -1);
+    remove.setEnabled(userco3.getSelectedIndex() != -1);
     change.setEnabled(false);
   }
 
@@ -256,6 +269,7 @@ public final class DialogUser extends BaseXBack {
     data = new Table(out.toString());
     StringList items = new StringList();
     if(!global) {
+      userco3.removeAllItems();
       StringList empty = new StringList();
       empty.add(" ");
       empty.add("");
@@ -284,6 +298,8 @@ public final class DialogUser extends BaseXBack {
               tempP.add(tmp);
             }
           }
+        } else if(!s.equals(ADMIN)) {
+          userco3.addItem(s);
         }
       }
     }
@@ -302,45 +318,12 @@ public final class DialogUser extends BaseXBack {
     }
     userco1.setSelectedIndex(-1);
     userco2.setSelectedIndex(-1);
+    userco3.setSelectedIndex(-1);
     data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
     if(!global) {
       TableColumn col = table.getColumnModel().getColumn(0);
       col.setCellEditor(new MyComboBoxEditor(items.getList()));
-      table.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(final MouseEvent e) {
-          if(e.getButton() == MouseEvent.BUTTON3) {
-            final int row = table.rowAtPoint(e.getPoint());
-            int x = e.getPoint().x;
-            int y = e.getPoint().y;
-            table.setRowSelectionInterval(row, row);
-            JPopupMenu menu = new JPopupMenu();
-            JMenuItem item = new JMenuItem("Remove from db: "
-                + gui.context.data.meta.name);
-            menu.add(item);
-            item.addActionListener(new ActionListener() {
-              public void actionPerformed(final ActionEvent event) {
-                String usern = ((TableModel) table.getModel()).getValueAt(row,
-                    0).toString();
-                gui.context.data.meta.users.remove(
-                    gui.context.data.meta.users.get(usern));
-                try {
-                  setData();
-                } catch(IOException ex) {
-                  ex.printStackTrace();
-                }
-                permps.clear();
-                change.setEnabled(false);
-              }
-            });
-            int column = table.columnAtPoint(e.getPoint());
-            if(row != table.getRowCount() - 1 && column == 0) {
-            menu.show(table, x, y);
-            }
-          }
-        }
-      });
     }
   }
 
