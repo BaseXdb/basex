@@ -157,11 +157,30 @@ public final class NodIter extends NodeIter {
     if(size > 1) {
       // sort arrays and remove duplicates
       if(force) sort(0, size);
+
+      // remove duplicates and merge scores
+      int i = 1;
+      for(int j = 1; j < size; j++) {
+        int c = 1;
+        while(item[i - 1].is(item[j])) {
+          item[i - 1].score += item[j++].score;
+          c++;
+          if(j == size) break;
+        }
+        // [SG] to be revised.. and moved to the Scoring class?
+        item[i - 1].score /= c;
+        if(j == size) break;
+        item[i++] = item[j];
+      }
+      size = i;
+
+      /* remove duplicates without score merge
       int i = 1;
       for(int j = 1; j < size; j++) {
         if(!item[i - 1].is(item[j])) item[i++] = item[j];
       }
       size = i;
+      */
     }
   }
 

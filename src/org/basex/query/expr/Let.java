@@ -75,7 +75,7 @@ public final class Let extends ForLet {
               s += it.score();
               c++;
             }
-            // [SG] should be revised.. and moved to the Scoring class?
+            // [SG] to be revised.. and moved to the Scoring class?
             it = Dbl.get(ctx.score.finish(s / c));
           } else {
             it = ir.finish();
