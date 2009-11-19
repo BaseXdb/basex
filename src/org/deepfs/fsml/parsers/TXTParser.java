@@ -36,31 +36,38 @@ public final class TXTParser implements IFileParser {
   /** {@inheritDoc} */
   @Override
   public boolean check(final BufferedFileChannel bfc) {
-    // final String name = bfc.getFileName();
-    // final String suf = name.substring(name.lastIndexOf('.') +
-    // 1).toLowerCase();
-    // return SUFFIXES.keySet().contains(suf);
-    // [BL] search for invalid characters
-    return true;
+    try {
+      final DeepFile deepFile = new DeepFile(bfc);
+      return extract0(deepFile);
+    } catch(IOException e) {
+      return false;
+    }
   }
 
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
+    extract0(deepFile);
+  }
+
+  /**
+   * Tries to extract the text contents.
+   * @param deepFile the deep file to fill with the text contents.
+   * @return true if the extraction was successful, false otherwise.
+   * @throws IOException if any error occurs.
+   */
+  private boolean extract0(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
 
     if(deepFile.extractMeta()) {
-      if(!check(bfc)) return;
-      deepFile.setFileType(FileType.TEXT);
       final String name = bfc.getFileName();
-      final String suf = name.substring(
-          name.lastIndexOf('.') + 1).toLowerCase();
+      final String suf = name.substring(name.lastIndexOf('.') +
+          1).toLowerCase();
       MimeType mime = SUFFIXES.get(suf);
+      deepFile.setFileType(FileType.TEXT);
       if(mime == null) mime = MimeType.UNKNOWN;
       deepFile.setFileFormat(mime);
     }
     if(deepFile.extractText()) {
-      // ignore *.emlxpart files
-      if(bfc.getFileName().endsWith(".emlxpart")) return;
       final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
       final TokenBuilder content = new TokenBuilder(len);
       final int bufSize = bfc.getBufferSize();
@@ -72,7 +79,7 @@ public final class TXTParser implements IFileParser {
         assert res;
         while(bytesToRead-- > 0) {
           final int b = bfc.get();
-          if(b >= 0 && b < ' ' && !ws(b)) return; // perhaps a binary file?
+          if(b >= 0 && b < ' ' && !ws(b)) return false; // binary file?
           if(b <= 0x7F) { // ascii char
             content.add((byte) b);
           } else {
@@ -84,13 +91,13 @@ public final class TXTParser implements IFileParser {
             } else if(b >= 0xF0 && b <= 0xF4) { // four byte UTF-8 char
               followingBytes = 3;
             } else {
-              return; // not an UTF-8 character
+              return false; // not an UTF-8 character
             }
             if(bytesToRead < followingBytes) {
               if(remaining + bytesToRead < followingBytes) {
                 content.chop();
                 deepFile.addText(0, len - remaining - bytesToRead, content);
-                return;
+                return true;
               }
               remaining += bytesToRead;
               bytesToRead = remaining > bufSize ? bufSize : remaining;
@@ -101,7 +108,7 @@ public final class TXTParser implements IFileParser {
             bytesToRead -= followingBytes;
             for(int i = 0; i < followingBytes; i++) {
               final int b2 = bfc.get();
-              if(b2 < 0x80 || b2 > 0xBF) return;
+              if(b2 < 0x80 || b2 > 0xBF) return false;
               content.add((byte) b2);
             }
           }
@@ -110,6 +117,7 @@ public final class TXTParser implements IFileParser {
       content.chop();
       deepFile.addText(0, len, content);
     }
+    return true;
   }
 
   @Override

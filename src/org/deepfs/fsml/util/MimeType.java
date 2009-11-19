@@ -8,86 +8,69 @@ import org.basex.util.Token;
  * @author Bastian Lemke
  */
 public enum MimeType {
-      /** Apple Mail to do. */
+  /** Apple Mail to do. */
   APPLE_MAIL_TODO("application/vnd.apple.mail+todo", ""),
-      /** BMP. */
+  /** BMP. */
   BMP("image/bmp", "bmp", FileType.PICTURE),
-      /** CSS. */
+  /** CSS. */
   CSS("text/css", "css", FileType.TEXT),
-      /** text/directory */
+  /** text/directory */
   DIRECTORY("text/directory", ""),
-      /** M$ Word. */
+  /** M$ Word. */
   DOC("application/msword", "doc", FileType.DOCUMENT),
-      /** Email. */
+  /** Email. */
   EML("message/rfc822", "eml", FileType.MESSAGE),
-      /** ? */
+  /** ? */
   FORCE_DOWNLOAD("application/force-download", ""),
-      /** GIF. */
+  /** GIF. */
   GIF("image/gif", "gif", FileType.PICTURE),
-      /** HTML. */
+  /** HTML. */
   HTML("text/html", "html", FileType.TEXT),
-      /** ICS. */
+  /** ICS. */
   ICS("application/ics", "ics", FileType.CALENDAR),
-      /** Java archive. */
+  /** Java archive. */
   JAR("application/java-archive", "jar", FileType.ARCHIVE),
-      /** JPG. */
+  /** JPG. */
   JPG("image/jpeg", "jpg", FileType.PICTURE),
-      /** KML. */
-  KML("application/vnd.google-earth.kml+xml", "kml", FileType.XML,
-      FileType.MAP),
-      /** MP3. */
+  /** KML. */
+  KML("application/vnd.google-earth.kml+xml", "kml", FileType.XML, FileType.MAP),
+  /** MP3. */
   MP3("audio/mp3", "mp3", FileType.AUDIO),
-      /** Object file. */
+  /** Object file. */
   O("application/octet-stream", "o"),
-      /** ODS. */
+  /** ODS. */
   ODS("application/vnd.oasis.opendocument.spreadsheet", "ods",
       FileType.DOCUMENT),
-      /** PDF. */
+  /** PDF. */
   PDF("application/pdf", "pdf", FileType.DOCUMENT),
-      /** pgp signature. */
+  /** pgp signature. */
   PGP("application/pgp-signature", ""),
-      /** pkcs7-signature. */
+  /** pkcs7-signature. */
   PKCS7("application/pkcs7-signature", ""),
-      /** PNG. */
+  /** PNG. */
   PNG("image/png", "png", FileType.PICTURE),
-      /** PPS. */
+  /** PPS. */
   PPS("application/vnd.ms-powerpoint", "pps", FileType.PRESENTATION),
-      /** Rich text format. */
+  /** Rich text format. */
   RTF("text/rtf", "rtf", FileType.TEXT, FileType.DOCUMENT),
-      /** TIFF. */
+  /** TIFF. */
   TIFF("image/tiff", "tif", FileType.PICTURE),
-      /** Plaintext. */
+  /** Plaintext. */
   TXT("text/plain", "txt", FileType.TEXT),
-      /** Unknown media. */
+  /** Unknown media. */
   UNKNOWN("unkown", "", FileType.UNKNOWN),
-      /** Vcard. */
+  /** Vcard. */
   VCARD("text/x-vcard", "vcf", FileType.CONTACT),
-      /** XLS. */
+  /** XLS. */
   XLS("application/vnd.ms-excel", "xls", FileType.DOCUMENT),
-      /** XML. */
+  /** XML. */
   XML("application/xml", "xml", FileType.XML),
-      /** XML. */
+  /** XML. */
   XML2("text/xml", "xml", FileType.XML),
-      /** x-pkcs7-signature. */
+  /** x-pkcs7-signature. */
   XPKCS7("application/x-pkcs7-signature", ""),
-      /** Zip. */
+  /** Zip. */
   ZIP("application/zip", "zip", FileType.ARCHIVE);
-
-  /**
-   * Tries to find the MimeType item for the given MIME type string.
-   * @param name the MIME type string to find.
-   * @return the {@link MimeType} item or <code>null</code> if the item was
-   *         not found.
-   */
-  public static MimeType getItem(final String name) {
-    // [BL] more efficient MimeType retrieval.
-    final byte[] token = Token.token(name);
-    for(final MimeType mt : MimeType.values()) {
-      if(Token.eq(mt.elem, token)) return mt;
-    }
-    Main.debug("MIME type not found: " + name);
-    return null;
-  }
 
   /** The element name as byte array. */
   private final byte[] elem;
@@ -132,5 +115,20 @@ public enum MimeType {
    */
   public FileType[] getMetaTypes() {
     return types;
+  }
+
+  /**
+   * Tries to find the MimeType item for the given MIME type string.
+   * @param name the MIME type string to find.
+   * @return the {@link MimeType} item or <code>null</code> if the item was not
+   *         found.
+   */
+  public static MimeType getItem(final String name) {
+    final byte[] token = Token.token(name);
+    for(final MimeType mt : MimeType.values()) {
+      if(Token.eq(mt.elem, token)) return mt;
+    }
+    Main.debug("MIME type not found: " + name);
+    return null;
   }
 }

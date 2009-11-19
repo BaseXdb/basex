@@ -341,7 +341,7 @@ public final class MP3Parser implements IFileParser {
     bfc.get(array, 0, 30);
     if(!ws(array)) deepFile.addMeta(MetaElem.TITLE, Token.trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) deepFile.addMeta(MetaElem.CREATOR, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.CREATOR_NAME, Token.trim(array));
     bfc.get(array, 0, 30);
     if(!ws(array)) deepFile.addMeta(MetaElem.ALBUM, Token.trim(array));
     final byte[] a2 = new byte[4];
@@ -620,7 +620,7 @@ public final class MP3Parser implements IFileParser {
     TPE1 {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.CREATOR, obj.readText(size));
+        obj.deepFile.addMeta(MetaElem.CREATOR_NAME, obj.readText(size));
       }
     },
         /** */

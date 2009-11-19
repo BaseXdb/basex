@@ -417,7 +417,6 @@
 //      // final long offset = f.absolutePosition();
 //      // final long size = f.size();
 //      // startContent(offset, size);
-//      // // [BL] more generic method for setting metadata for file fragments
 //      // if(title != null) builder.nodeAndText(MetaElem.TITLE.get(),
 //      //   EMPTY_ATTS,
 //      // token(title));

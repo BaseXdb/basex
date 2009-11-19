@@ -98,7 +98,7 @@ public final class ExifParser {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
         if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.deepFile.addMeta(MetaElem.CREATOR, o.readAscii(buf));
+          o.deepFile.addMeta(MetaElem.CREATOR_NAME, o.readAscii(buf));
         } else error(o, "Creator (0x013B)");
       }
     },

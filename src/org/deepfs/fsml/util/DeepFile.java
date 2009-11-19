@@ -43,8 +43,6 @@ import org.deepfs.fsml.parsers.IFileParser;
 public class DeepFile {
 
   // [BL] integrate BufferedFileChannel
-  // [BL] allow multiple meta elems with the same name (e.g. multiple comments)
-  // [BL] allow multiple file types (e.g. "xml" and "picture" for SVG files)
 
   /**
    * Default value for the maximum number of bytes to extract from text
@@ -66,7 +64,7 @@ public class DeepFile {
   /** The file system attributes for the file. */
   private Atts fsAtts;
   /** Map, containing all metadata key-value pairs for the current file. */
-  private final TreeMap<MetaElem, byte[]> metaElements;
+  private final TreeMap<MetaElem, ArrayList<byte[]>> metaElements;
   /** List with all file fragments (fs:content elements). */
   private final ArrayList<DeepFile> fileFragments;
   /** All text contents that are extracted from the file. */
@@ -89,39 +87,8 @@ public class DeepFile {
   /** Size of the deep file in bytes (-1 means unknown size). */
   private long size;
 
-  /**
-   * Returns true, if metadata should be extracted.
-   * @return true, if metadata should be extracted.
-   */
-  public boolean extractMeta() {
-    return !metaFinished;
-  }
-
-  /**
-   * Returns true, if text contents should be extracted.
-   * @return true, if text contents should be extracted.
-   */
-  public boolean extractText() {
-    return fscont;
-  }
-
-  /**
-   * Returns true, if xml contents should be extracted.
-   * @return true, if xml contents should be extracted.
-   */
-  public boolean extractXML() {
-    return fsxml;
-  }
-
-  /**
-   * Returns the number of bytes that should be extracted from text and xml
-   * contents.
-   * @return the maximum number of bytes to extract.
-   */
-  public int maxTextSize() {
-    return fstextmax;
-  }
-
+  // ---------------------------------------------------------------------------
+  // ----- constructors. -------------------------------------------------------
   // ---------------------------------------------------------------------------
 
   /**
@@ -136,7 +103,7 @@ public class DeepFile {
    * <p>
    * This constructor should only be used to parse a single file. Use
    * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *   boolean, int)}
+   *  boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the name of the associated file in the file system.
@@ -159,7 +126,7 @@ public class DeepFile {
    * <p>
    * This constructor should only be used to parse a single file. Use
    * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *   boolean, int)}
+   *  boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -177,13 +144,35 @@ public class DeepFile {
    * Constructor.
    * </p>
    * <p>
+   * Creates a DeepFile object for a buffered file channel that can be used to
+   * extract metadata and text/xml contents. By default, metadata and all
+   * contents will be extracted.
+   * </p>
+   * <p>
+   * This constructor should only be used to parse a single file. Use
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
+   *  boolean, int)}
+   * for parsing several files for better performance.
+   * </p>
+   * @param f the {@link BufferedFileChannel}.
+   * @throws IOException if any error occurs.
+   */
+  public DeepFile(final BufferedFileChannel f) throws IOException {
+    this(new ParserRegistry(), f, true, true, true, 0, f.size(),
+        DEFAULT_TEXT_MAX);
+  }
+
+  /**
+   * <p>
+   * Constructor.
+   * </p>
+   * <p>
    * Creates a DeepFile object for a file that can be used to extract metadata
    * and text/xml contents.
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *   boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -245,7 +234,7 @@ public class DeepFile {
     offset = position;
     size = contentSize;
     fileFragments = new ArrayList<DeepFile>();
-    metaElements = fsmeta ? new TreeMap<MetaElem, byte[]>() : null;
+    metaElements = fsmeta ? new TreeMap<MetaElem, ArrayList<byte[]>>() : null;
     textContents = fscont ? new ArrayList<TextContent>() : null;
     xmlContents = fsxml ? new ArrayList<XMLContent>() : null;
   }
@@ -273,113 +262,9 @@ public class DeepFile {
     xmlContents = df.xmlContents;
   }
 
-  /** Removes all metadata and contents. */
-  public void clear() {
-    metaElements.clear();
-    fileFragments.clear();
-    textContents.clear();
-    xmlContents.clear();
-  }
-
-  /**
-   * Returns all subfiles.
-   * @return the subfiles.
-   */
-  public DeepFile[] getContent() {
-    return fileFragments.toArray(new DeepFile[fileFragments.size()]);
-  }
-
-  /**
-   * Extract the file system attributes from the file.
-   * @return the file system attributes.
-   * @throws IOException if any error occurs while reading from the file.
-   */
-  private Atts extractFSAtts() throws IOException {
-    final File f = bfc.getAssociatedFile();
-    final String name = bfc.getFileName();
-    final byte[] time = token(System.currentTimeMillis());
-
-    /** Temporary attribute array. */
-    final Atts atts = new Atts();
-    atts.reset();
-    atts.add(NAME, token(name));
-    atts.add(SIZE, token(bfc.size()));
-    if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
-    else atts.add(MODE, token(getSIFREG() | 0644));
-    final byte[] uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
-    if(uid != null) {
-      atts.add(UID, uid);
-      metaElements.remove(MetaElem.FS_OWNER_USER_ID);
-    } else atts.add(UID, token(getUID()));
-    final byte[] gid = metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
-    if(gid != null) {
-      atts.add(GID, gid);
-      metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);
-    } else atts.add(GID, token(getGID()));
-    atts.add(ATIME, time);
-    atts.add(CTIME, time);
-    atts.add(MTIME, token(f.lastModified()));
-    atts.add(NLINK, token("1"));
-    atts.add(SUFFIX, DeepFS.getSuffix(name));
-    return atts;
-  }
-
-  /**
-   * Returns the file system attributes for the deep file. The file system
-   * attributes are extracted after finishing the metadata extraction.
-   * @return the file system attributes or <code>null</code> if the metadata
-   *         extraction was not finished yet.
-   * @see #finishMetaExtraction()
-   */
-  public Atts getFSAtts() {
-    return fsAtts;
-  }
-
-  /**
-   * Returns all metadata key-value pairs or <code>null</code> if metadata
-   * extraction is disabled.
-   * @return the metadata.
-   */
-  public TreeMap<MetaElem, byte[]> getMeta() {
-    return metaElements;
-  }
-
-  /**
-   * Returns all text sections or <code>null</code> if no text content
-   * extraction is disabled.
-   * @return all text sections.
-   */
-  public TextContent[] getTextContents() {
-    return textContents == null ? null
-        : textContents.toArray(new TextContent[textContents.size()]);
-  }
-
-  /**
-   * Returns all xml sections or <code>null</code> if xml extraction is
-   * disabled.
-   * @return all xml sections.
-   */
-  public XMLContent[] getXMLContents() {
-    return xmlContents == null ? null
-        : xmlContents.toArray(new XMLContent[xmlContents.size()]);
-  }
-
-  /**
-   * Returns the offset of the deep file inside the regular file in the file
-   * system.
-   * @return the offset.
-   */
-  public long getOffset() {
-    return offset;
-  }
-
-  /**
-   * Returns the size of the deep file.
-   * @return the size.
-   */
-  public long getSize() {
-    return size;
-  }
+  // ---------------------------------------------------------------------------
+  // ----- metadata/content extraction -----------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Extract metadata and text/xml contents from the associated file.
@@ -408,23 +293,110 @@ public class DeepFile {
     bfc.finish();
   }
 
+  // ---------------------------------------------------------------------------
+  // ----- getters for deep file settings and extracted metadata/contents ------
+  // ---------------------------------------------------------------------------
+
+  // ----- extraction settings -------------------------------------------------
+
   /**
-   * Processes a DeepFile and extracts metadata/content.
-   * @param df the DeepFile to process.
-   * @param suffix the file suffix(es). More than one suffix means that the file
-   *          type is unknown. All given suffixes will be tested.
-   * @throws IOException if any error occurs while reading from the file.
+   * Returns true, if metadata should be extracted.
+   * @return true, if metadata should be extracted.
    */
-  private void process(final DeepFile df, final String... suffix)
-      throws IOException {
-    IFileParser p = null;
-    for(final String s : suffix) {
-      try {
-        p = parser.getParser(s.toLowerCase());
-      } catch(final ParserException e) { /* ignore and continue ... */}
-      if(p != null) break;
-    }
-    if(p != null) p.extract(df);
+  public boolean extractMeta() {
+    return !metaFinished;
+  }
+
+  /**
+   * Returns true, if text contents should be extracted.
+   * @return true, if text contents should be extracted.
+   */
+  public boolean extractText() {
+    return fscont;
+  }
+
+  /**
+   * Returns true, if xml contents should be extracted.
+   * @return true, if xml contents should be extracted.
+   */
+  public boolean extractXML() {
+    return fsxml;
+  }
+
+  /**
+   * Returns the number of bytes that should be extracted from text and xml
+   * contents.
+   * @return the maximum number of bytes to extract.
+   */
+  public int maxTextSize() {
+    return fstextmax;
+  }
+
+  // ----- deep file properties and metadata/contents --------------------------
+
+  /**
+   * Returns the offset of the deep file inside the regular file in the file
+   * system.
+   * @return the offset.
+   */
+  public long getOffset() {
+    return offset;
+  }
+
+  /**
+   * Returns the size of the deep file.
+   * @return the size.
+   */
+  public long getSize() {
+    return size;
+  }
+
+  /**
+   * Returns the file system attributes for the deep file. The file system
+   * attributes are extracted after finishing the metadata extraction.
+   * @return the file system attributes or <code>null</code> if the metadata
+   *         extraction was not finished yet.
+   * @see #finishMetaExtraction()
+   */
+  public Atts getFSAtts() {
+    return fsAtts;
+  }
+
+  /**
+   * Returns all metadata key-value pairs or <code>null</code> if metadata
+   * extraction is disabled.
+   * @return the metadata.
+   */
+  public TreeMap<MetaElem, ArrayList<byte[]>> getMeta() {
+    return metaElements;
+  }
+
+  /**
+   * Returns all subfiles.
+   * @return the subfiles.
+   */
+  public DeepFile[] getContent() {
+    return fileFragments.toArray(new DeepFile[fileFragments.size()]);
+  }
+
+  /**
+   * Returns all text sections or <code>null</code> if no text content
+   * extraction is disabled.
+   * @return all text sections.
+   */
+  public TextContent[] getTextContents() {
+    return textContents == null ? null
+        : textContents.toArray(new TextContent[textContents.size()]);
+  }
+
+  /**
+   * Returns all xml sections or <code>null</code> if xml extraction is
+   * disabled.
+   * @return all xml sections.
+   */
+  public XMLContent[] getXMLContents() {
+    return xmlContents == null ? null
+        : xmlContents.toArray(new XMLContent[xmlContents.size()]);
   }
 
   // ---------------------------------------------------------------------------
@@ -447,17 +419,17 @@ public class DeepFile {
    * @param type the file type.
    */
   public void setFileType(final FileType type) {
-    if(!fsmeta) return;
-    metaElements.put(MetaElem.TYPE, type.get());
+    if(metaFinished) return;
+    addMeta0(MetaElem.TYPE, type.get());
   }
 
   /**
-   * Sets the MIME type of the file.
+   * Sets the MIME type of the file. A previously set value will be replaced.
    * @param format the MIME type.
    */
   public void setFileFormat(final MimeType format) {
-    if(!fsmeta) return;
-    metaElements.put(MetaElem.FORMAT, format.get());
+    if(metaFinished) return;
+    addMeta0(MetaElem.FORMAT, format.get());
   }
 
   /**
@@ -467,8 +439,7 @@ public class DeepFile {
    * @param dataType the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used.
    */
-  private void addMeta(final MetaElem e, final byte[] value,
-      final Type dataType) {
+  private void addMeta(final MetaElem e, final byte[] value, final Type dataType) {
     if(metaFinished) return;
     if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
       Main.bug(
@@ -479,7 +450,29 @@ public class DeepFile {
     }
     if(dataType != null) e.refineDataType(dataType);
     else e.reset();
-    metaElements.put(e, value);
+    addMeta0(e, value);
+  }
+
+  /**
+   * Add the metadata to the TreeMap.
+   * @param e metadata element (the key).
+   * @param value value as byte array. Must contain only correct UTF-8 values!
+   */
+  private void addMeta0(final MetaElem e, final byte[] value) {
+    final ArrayList<byte[]> vals;
+    if(metaElements.containsKey(e)) {
+      if(!e.isMultiVal()) {
+        Main.debug(
+            "Failed to add metadata value. Multiple values are forbidden for " +
+            "attribute % (%).", e, bfc.getFileName());
+        return;
+      }
+      vals = metaElements.get(e);
+    } else {
+      vals = new ArrayList<byte[]>();
+      metaElements.put(e, vals);
+    }
+    vals.add(value);
   }
 
   /**
@@ -567,6 +560,24 @@ public class DeepFile {
    */
   public void finishMetaExtraction() throws IOException {
     metaFinished = true;
+    final ArrayList<byte[]> type = metaElements.get(MetaElem.TYPE);
+    if(type != null && Token.eq(type.get(0), FileType.MESSAGE.get())) {
+      ArrayList<byte[]> creator = metaElements.get(MetaElem.CREATOR_NAME);
+      boolean err = false;
+      if(creator != null) {
+        if(creator.size() > 1) err = true;
+        addMeta0(MetaElem.SENDER_NAME, creator.get(0));
+        metaElements.remove(MetaElem.CREATOR_NAME);
+      }
+      creator = metaElements.get(MetaElem.CREATOR_EMAIL);
+      if(creator != null) {
+        if(creator.size() > 1) err = true;
+        addMeta0(MetaElem.SENDER_EMAIL, creator.get(0));
+        metaElements.remove(MetaElem.CREATOR_EMAIL);
+      }
+      if(err) Main.debug("Found multiple creators for a message. " +
+          "All but the first one are dropped (%).", bfc.getFileName());
+    }
     if(fsAtts == null) fsAtts = extractFSAtts();
   }
 
@@ -575,28 +586,34 @@ public class DeepFile {
    * @param elem the metadata element.
    * @return the metadata value as string.
    */
-  public String getValueAsString(final MetaElem elem) {
-    return metaElements.containsKey(elem) ?
-        Token.string(metaElements.get(elem)) :
-        null;
+  public String[] getValueAsString(final MetaElem elem) {
+    final ArrayList<byte[]> vals = metaElements.get(elem);
+    if(vals == null) return null;
+    final int max = vals.size();
+    final String[] strings = new String[max];
+    for(int i = 0; i < max; i++)
+      strings[i] = Token.string(vals.get(0));
+    return strings;
+  }
+
+  /**
+   * Returns true, if a value is set for the given metadata element.
+   * @param elem the metadata element.
+   * @return true, if a value is set.
+   */
+  public boolean isMetaSet(final MetaElem elem) {
+    return metaElements.containsKey(elem);
+  }
+
+  /**
+   * Returns true, if the file type is set for the current deep file.
+   * @return true, if the file type is set.
+   */
+  public boolean isFileTypeSet() {
+    return metaElements.containsKey(MetaElem.TYPE);
   }
 
   // ----- contents ------------------------------------------------------------
-
-  // /**
-  // * Adds a text section.
-  // * @param position the absolute position of the first byte of the file
-  // * fragment represented by this content element inside the current
-  // * file. A negative value stands for an unknown offset.
-  // * @param byteCount the size of the content element.
-  // * @param text the text to add.
-  // * @param preserveSpace if true, leading and trailing whitespaces are
-  // removed.
-  // */
-  // public void addText(final long position, final int byteCount,
-  // final String text, final boolean preserveSpace) {
-  // addText(position, byteCount, token(text), preserveSpace);
-  // }
 
   /**
    * Adds a text section.
@@ -674,6 +691,74 @@ public class DeepFile {
     }
   }
 
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Extract the file system attributes from the file.
+   * @return the file system attributes.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  private Atts extractFSAtts() throws IOException {
+    final File f = bfc.getAssociatedFile();
+    final String name = f.getName();
+    final byte[] time = token(System.currentTimeMillis());
+
+    /** Temporary attribute array. */
+    final Atts atts = new Atts();
+    atts.reset();
+    atts.add(NAME, token(name));
+    atts.add(SIZE, token(bfc.size()));
+    if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
+    else atts.add(MODE, token(getSIFREG() | 0644));
+    final ArrayList<byte[]> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
+    if(uid != null) {
+      atts.add(UID, uid.get(0));
+      metaElements.remove(MetaElem.FS_OWNER_USER_ID);
+    } else atts.add(UID, token(getUID()));
+    final ArrayList<byte[]> gid = metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
+    if(gid != null) {
+      atts.add(GID, gid.get(0));
+      metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);
+    } else atts.add(GID, token(getGID()));
+    atts.add(ATIME, time);
+    atts.add(CTIME, time);
+    atts.add(MTIME, token(f.lastModified()));
+    atts.add(NLINK, token("1"));
+    atts.add(SUFFIX, DeepFS.getSuffix(name));
+    return atts;
+  }
+
+  /**
+   * Processes a DeepFile and extracts metadata/content.
+   * @param df the DeepFile to process.
+   * @param suffix the file suffix(es). More than one suffix means that the file
+   *          type is unknown. All given suffixes will be tested.
+   * @throws IOException if any error occurs while reading from the file.
+   */
+  private void process(final DeepFile df, final String... suffix)
+      throws IOException {
+    IFileParser p = null;
+    for(final String s : suffix) {
+      try {
+        p = parser.getParser(s.toLowerCase());
+      } catch(final ParserException e) { /* ignore and continue ... */}
+      if(p != null) break;
+    }
+    if(p != null) p.extract(df);
+  }
+
+  /**
+   * Finishes the deep file.
+   * @throws IOException if any error occurs.
+   * @see BufferedFileChannel#finish()
+   */
+  public void finish() throws IOException {
+    finishMetaExtraction();
+    bfc.finish();
+  }
+
+  // ---------------------------------------------------------------------------
+
   /**
    * <p>
    * Creates a new "subfile" inside the current DeepFile with the given size,
@@ -724,16 +809,6 @@ public class DeepFile {
       throws IOException {
     bfc.position(position);
     return new DeepFile(this, contentSize);
-  }
-
-  /**
-   * Finishes the deep file.
-   * @throws IOException if any error occurs.
-   * @see BufferedFileChannel#finish()
-   */
-  public void finish() throws IOException {
-    finishMetaExtraction();
-    bfc.finish();
   }
 
   /**
@@ -924,6 +999,10 @@ public class DeepFile {
       return t;
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /** All namespaces used in the DeepFile. */
   public enum NS {

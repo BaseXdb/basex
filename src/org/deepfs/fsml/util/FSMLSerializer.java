@@ -7,6 +7,7 @@ import static org.deepfs.fsml.util.DeepFile.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -211,10 +212,11 @@ public class FSMLSerializer {
       }
 
       // serialize metadata
-      final TreeMap<MetaElem, byte[]> meta = d.getMeta();
+      final TreeMap<MetaElem, ArrayList<byte[]>> meta = d.getMeta();
       if(meta != null) {
-        for(final Entry<MetaElem, byte[]> e : meta.entrySet())
-          nodeAndText(e.getKey().get(), atts.reset(), e.getValue());
+        for(final Entry<MetaElem, ArrayList<byte[]>> e : meta.entrySet())
+          for(final byte[] val : e.getValue())
+            nodeAndText(e.getKey().get(), atts.reset(), val);
       }
 
       // serialize text contents

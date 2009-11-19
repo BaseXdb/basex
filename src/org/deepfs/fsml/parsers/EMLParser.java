@@ -42,7 +42,7 @@ public final class EMLParser implements IFileParser {
     FROM {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(MetaElem.SENDER);
+        obj.parseMailAddresses(MetaElem.SENDER_NAME, MetaElem.SENDER_EMAIL);
         return false;
       }
     },
@@ -70,50 +70,7 @@ public final class EMLParser implements IFileParser {
           tb.add(obj.mCurrLine);
         }
         byte[] text = tb.finish();
-
-        final TokenBuilder tmp = new TokenBuilder();
-        final int len = text.length;
-        int i = 0;
-        while(i < len) {
-          // add ASCII text
-          while(i < len && text[i] != '=')
-            tmp.add(text[i++]);
-          if(i + 4 >= len) {
-            break;
-          }
-          // char '=' detected -> must be encoded text
-          if(text[i++] == '=' && text[i++] == '?') {
-            // read the charset of the encoded text
-            final TokenBuilder subjEnc = new TokenBuilder();
-            while(i < len) {
-              final byte b = text[i++];
-              if(b == '?') break;
-              subjEnc.add(b);
-            }
-            final boolean utf = subjEnc.toString().equalsIgnoreCase(Token.UTF8);
-            // read the encoding flag
-            final byte flag = text[i++];
-            ++i; // skip '?'
-            Encoding enc;
-            if(flag == 'Q' || flag == 'q') enc = Encoding.Q_ENC;
-            else if(flag == 'B' || flag == 'b') enc = Encoding.BASE64;
-            else enc = Encoding.NONE;
-            final TokenBuilder tok = new TokenBuilder();
-            while(i < len && text[i] != '?')
-              tok.add(text[i++]);
-            ++i; // skip '?'
-            tmp.add(enc.decode(tok.finish(), utf));
-            assert text[i] == '=';
-            ++i;
-          } else {
-            Main.debug("EMLParser: Found invalid chars in subject (%)",
-                obj.bfc.getFileName());
-            break; // stop reading
-          }
-        }
-        text = tmp.finish();
-        text = Token.replace(text, '_', ' ');
-        obj.deepFile.addMeta(MetaElem.SUBJECT, text);
+        obj.deepFile.addMeta(MetaElem.SUBJECT, obj.decode(text));
         return false;
       }
     },
@@ -121,7 +78,7 @@ public final class EMLParser implements IFileParser {
     TO {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(MetaElem.RECEIVER);
+        obj.parseMailAddresses(MetaElem.RECEIVER_NAME, MetaElem.RECEIVER_EMAIL);
         return false;
       }
     },
@@ -129,7 +86,8 @@ public final class EMLParser implements IFileParser {
     CC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(MetaElem.COPY_RECEIVER);
+        obj.parseMailAddresses(MetaElem.COPY_RECEIVER_NAME,
+            MetaElem.COPY_RECEIVER_EMAIL);
         return false;
       }
     },
@@ -137,7 +95,8 @@ public final class EMLParser implements IFileParser {
     BCC {
       @Override
       public boolean parse(final EMLParser obj) throws IOException {
-        obj.parseMailAddresses(MetaElem.HIDDEN_RECEIVER);
+        obj.parseMailAddresses(MetaElem.HIDDEN_RECEIVER_NAME,
+            MetaElem.HIDDEN_RECEIVER_EMAIL);
         return false;
       }
     },
@@ -209,8 +168,8 @@ public final class EMLParser implements IFileParser {
   // ----- static stuff --------------------------------------------------------
 
   /** The pattern to isolate email addresses. */
-  private static final Pattern MAILPATTERN = Pattern.compile(//
-  /* */"[_a-zA-Z0-9-.]+(\\.[_a-zA-Z0-9-])*@([_a-zA-Z0-9-]+\\.)+([a-zA-Z]*)");
+  private static final Pattern MAILPATTERN = Pattern.compile(
+      "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9_.-]+\\.[a-zA-Z]{2,6}");
   /** Header key. */
   private static final Pattern KEYPAT = Pattern.compile("^([A-Za-z-]+): (.*)");
   /** Mac OS X plist. */
@@ -288,7 +247,7 @@ public final class EMLParser implements IFileParser {
         }
         if(readNext && !readLine()) return;
       } while(!mCurrLine.isEmpty());
-
+      deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
       if(df.extractText()) if(mCurrLine != null) parseContent();
     } else if(df.extractText()) {
       do {
@@ -307,9 +266,18 @@ public final class EMLParser implements IFileParser {
         }
         if(!readLine()) return;
       } while(!mCurrLine.isEmpty());
-
       parseContent();
     }
+  }
+
+  /**
+   * Checks if the given string contains a valid email address.
+   * @param str the string to check.
+   * @return true if the string contains a valid email address.
+   */
+  public static boolean isEmailAddress(final String str) {
+    final Matcher m = MAILPATTERN.matcher(str);
+    return m.find() && m.start() == 0 && m.end() == str.length();
   }
 
   /**
@@ -428,7 +396,7 @@ public final class EMLParser implements IFileParser {
             if(mt == FileType.TEXT) plaintext = true;
           }
           contentMeta.setFileFormat(mime);
-          getCharset();
+          contentMeta.addMeta(MetaElem.ENCODING, getCharset());
         }
       } else getCharset();
     } while(readLine() && !mCurrLine.isEmpty());
@@ -450,18 +418,76 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Parses mail addresses and fires parser events.
-   * @param elem the metadata element to set.
+   * @param name the metadata element to set (name).
+   * @param email the metadata element to set (email address).
    * @throws IOException if any error occurs while reading from the file.
    */
-  void parseMailAddresses(final MetaElem elem) throws IOException {
+  void parseMailAddresses(final MetaElem name, final MetaElem email)
+      throws IOException {
     final StringBuilder addresses = new StringBuilder();
     addresses.append(mCurrLine);
-    while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": ")) {
+    while(readLine() && !mCurrLine.isEmpty() && !mCurrLine.contains(": "))
       addresses.append(mCurrLine);
-    }
+    int pos = 0;
+    String lastMatch = "";
     for(final Matcher m = MAILPATTERN.matcher(addresses); m.find();) {
-      deepFile.addMeta(elem, m.group());
+      final String match = m.group();
+      if(match.equals(lastMatch)) continue;
+      lastMatch = match;
+      deepFile.addMeta(email, m.group());
+
+      int end = m.start() - 2;
+      if(end > pos) {
+        byte[] text = chop(Token.token(addresses.substring(pos, end)));
+        deepFile.addMeta(name, chop(decode(text)));
+      }
+      pos = m.end() + 2;
     }
+  }
+
+  /**
+   * Removes leading and trailing whitespaces and quoting signs.
+   * @param text the text to chop.
+   * @return the chopped text.
+   */
+  private byte[] chop(byte[] text) {
+    int start = 0;
+    int end = text.length - 1;
+    boolean finished = false;
+    while(!finished && start < end) {
+      byte b = text[start];
+      switch(b) {
+        case ' ':
+        case '\t':
+        case '\'':
+        case '"':
+          start++;
+          break;
+        default:
+          finished = true;
+      }
+    }
+    finished = false;
+    while(!finished && start < end) {
+      byte b = text[end];
+      switch(b) {
+        case ' ':
+        case '\t':
+        case '\'':
+        case '"':
+          end--;
+          break;
+        default:
+          finished = true;
+      }
+    }
+    if(start != 0 || end != text.length - 1) {
+      int size = end - start + 1;
+      byte[] newText = new byte[size];
+      System.arraycopy(text, start, newText, 0, size);
+      return newText;
+    }
+    return text;
   }
 
   /** Gets the encoding. */
@@ -472,8 +498,7 @@ public final class EMLParser implements IFileParser {
   }
 
   /**
-   * Gets the content-type, boundary and charset. Fires a parser event if the
-   * charset was found.
+   * Gets the content-type, boundary and charset.
    */
   void getContentType() {
     mContentType = mCurrLine;
@@ -481,13 +506,17 @@ public final class EMLParser implements IFileParser {
     getCharset();
   }
 
-  /** Gets the charset and fires a parser event. */
-  void getCharset() {
+  /**
+   * Returns the charset.
+   * @return the charset.
+   */
+  String getCharset() {
     if(mCurrLine.contains("charset=")) {
       mBodyCharset = mCurrLine.split("charset=")[1].split(";")[0].replace("\"",
           "").trim();
-      deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
+      return mBodyCharset;
     }
+    return "";
   }
 
   /** Gets the boundary. */
@@ -506,6 +535,55 @@ public final class EMLParser implements IFileParser {
   boolean readLine() throws IOException {
     mCurrLine = bfc.readLine(mBodyCharset);
     return mCurrLine != null;
+  }
+
+  /**
+   * Decodes a text.
+   * @param text the text to decode.
+   * @return the decoded text as byte array.
+   */
+  byte[] decode(final byte[] text) {
+    final int len = text.length;
+    final TokenBuilder tmp = new TokenBuilder(len);
+    int i = 0;
+    while(i < len) {
+      // add ASCII text
+      while(i < len && text[i] != '=')
+        tmp.add(text[i++]);
+      if(i + 4 >= len) {
+        break;
+      }
+      // char '=' detected -> must be encoded text
+      if(text[i++] == '=' && text[i++] == '?') {
+        // read the charset of the encoded text
+        final TokenBuilder subjEnc = new TokenBuilder();
+        while(i < len) {
+          final byte b = text[i++];
+          if(b == '?') break;
+          subjEnc.add(b);
+        }
+        final boolean utf = subjEnc.toString().equalsIgnoreCase(Token.UTF8);
+        // read the encoding flag
+        final byte flag = text[i++];
+        ++i; // skip '?'
+        Encoding enc;
+        if(flag == 'Q' || flag == 'q') enc = Encoding.Q_ENC;
+        else if(flag == 'B' || flag == 'b') enc = Encoding.BASE64;
+        else enc = Encoding.NONE;
+        final TokenBuilder tok = new TokenBuilder();
+        while(i < len && text[i] != '?')
+          tok.add(text[i++]);
+        ++i; // skip '?'
+        tmp.add(enc.decode(tok.finish(), utf));
+        assert text[i] == '=';
+        ++i;
+      } else {
+        Main.debug("EMLParser: Found invalid chars in subject (%)",
+            bfc.getFileName());
+        break; // stop reading
+      }
+    }
+    return Token.replace(tmp.finish(), '_', ' ');
   }
 
   /**

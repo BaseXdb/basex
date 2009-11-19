@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.basex.core.Main;
 import org.basex.util.Token;
+import org.deepfs.fsml.parsers.EMLParser;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.MP3Parser;
 import org.deepfs.fsml.util.BufferedFileChannel;
@@ -181,8 +182,11 @@ public final class SpotlightExtractor implements IFileParser {
     Authors {
       @Override
       void parse(final DeepFile deepFile, final Object o) {
-        if(check(o, String.class)) deepFile.addMeta(MetaElem.CREATOR,
-            (String) o);
+        if(!check(o, String.class)) return;
+        final String str = (String) o;
+        if(EMLParser.isEmailAddress(str)) deepFile.addMeta(
+            MetaElem.CREATOR_EMAIL, str);
+        else deepFile.addMeta(MetaElem.CREATOR_NAME, str);
       }
     },
         /**
@@ -242,7 +246,7 @@ public final class SpotlightExtractor implements IFileParser {
           key = key.replace('.', '_').replace('-', '_');
           final SpotlightContentType ct = SpotlightContentType.valueOf(key);
           final FileType ft = ct.getType();
-          if(ft != null) deepFile.setFileType(ft);
+          if(ft != null && !deepFile.isFileTypeSet()) deepFile.setFileType(ft);
           else {
             final MimeType mi = ct.getFormat();
             if(mi != null) deepFile.setFileFormat(mi);
@@ -461,8 +465,11 @@ public final class SpotlightExtractor implements IFileParser {
     Recipients {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
-        if(check(o, String.class)) deepFile.addMeta(MetaElem.RECEIVER,
-            (String) o);
+        if(!check(o, String.class)) return;
+        final String str = (String) o;
+        if(EMLParser.isEmailAddress(str)) deepFile.addMeta(
+            MetaElem.RECEIVER_EMAIL, str);
+        else deepFile.addMeta(MetaElem.RECEIVER_NAME, str);
       }
     },
         /**

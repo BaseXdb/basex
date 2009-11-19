@@ -12,108 +12,118 @@ import org.basex.query.item.Type;
 public enum MetaElem {
 
   /** Duration. */
-  DURATION(NS.FSMETA, "duration", Type.DUR),
+  DURATION(NS.FSMETA, "duration", Type.DUR, false),
 
   // ----- date fields -------------------------------------------------------
 
   /** Other date. */
-  DATE(NS.DCTERMS, "date", Type.DAT),
+  DATE(NS.DCTERMS, "date", Type.DAT, false),
 
   /** Date of the last change made to a metadata attribute. */
-  DATE_ATTRIBUTE_MODIFIED(NS.FSMETA, "dateAttributeModified", Type.DTM),
+  DATE_ATTRIBUTE_MODIFIED(NS.FSMETA, "dateAttributeModified", Type.DTM, false),
   /** Date of the last change made to the content. */
-  DATE_CONTENT_MODIFIED(NS.FSMETA, "dateContentModified", Type.DTM),
+  DATE_CONTENT_MODIFIED(NS.FSMETA, "dateContentModified", Type.DTM, false),
   /** Date when the content was created. */
-  DATE_CREATED(NS.FSMETA, "dateCreated", Type.DTM),
+  DATE_CREATED(NS.FSMETA, "dateCreated", Type.DTM, false),
   /** Date of the last usage. */
-  DATE_LAST_USED(NS.FSMETA, "dateLastUsed", Type.DTM),
+  DATE_LAST_USED(NS.FSMETA, "dateLastUsed", Type.DTM, false),
 
   // ----- integer fields ----------------------------------------------------
 
   /** Group ID of the owner of the file. */
-  FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId", Type.ITR),
+  FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId", Type.ITR, false),
   /** User ID of the owner of the file. */
-  FS_OWNER_USER_ID(NS.FSMETA, "fsOwnerUserId", Type.ITR),
+  FS_OWNER_USER_ID(NS.FSMETA, "fsOwnerUserId", Type.ITR, false),
   /** Size of the file in the file system. */
-  FS_SIZE(NS.FSMETA, "fsSize", Type.ITR),
+  FS_SIZE(NS.FSMETA, "fsSize", Type.ITR, false),
   /** Height in millimeters. */
-  MM_HEIGHT(NS.FSMETA, "mmHeight", Type.ITR),
+  MM_HEIGHT(NS.FSMETA, "mmHeight", Type.ITR, false),
   /** Width in millimeters. */
-  MM_WIDTH(NS.FSMETA, "mmWidth", Type.ITR),
+  MM_WIDTH(NS.FSMETA, "mmWidth", Type.ITR, false),
   /** Number of pages. */
-  NUMBER_OF_PAGES(NS.FSMETA, "numberOfPages", Type.ITR),
+  NUMBER_OF_PAGES(NS.FSMETA, "numberOfPages", Type.ITR, false),
   /** Height in pixels. */
-  PIXEL_HEIGHT(NS.FSMETA, "pixelHeight", Type.ITR),
+  PIXEL_HEIGHT(NS.FSMETA, "pixelHeight", Type.ITR, false),
   /** Width in pixels. */
-  PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.ITR),
+  PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.ITR, false),
   /** Track number. */
-  TRACK(NS.FSMETA, "track", Type.ITR),
+  TRACK(NS.FSMETA, "track", Type.ITR, false),
 
   // ----- string fields -----------------------------------------------------
 
   /** Abstract. */
-  ABSTRACT(NS.DCTERMS, "abstract", Type.STR),
+  ABSTRACT(NS.DCTERMS, "abstract", Type.STR, true),
   /** Album name. */
-  ALBUM(NS.FSMETA, "album", Type.STR),
+  ALBUM(NS.FSMETA, "album", Type.STR, true),
   /** Alternative title. */
-  ALTERNATIVE(NS.DCTERMS, "alternative", Type.STR),
+  ALTERNATIVE(NS.DCTERMS, "alternative", Type.STR, true),
   /** Comment. */
-  COMMENT(NS.FSMETA, "comment", Type.STR),
+  COMMENT(NS.FSMETA, "comment", Type.STR, true),
   /** Composer. */
-  COMPOSER(NS.FSMETA, "composer", Type.STR),
+  COMPOSER(NS.FSMETA, "composer", Type.STR, true),
   /** Contributor. */
-  CONTRIBUTOR(NS.DCTERMS, "contributor", Type.STR),
-  /** Carbon copy receiver. */
-  COPY_RECEIVER(NS.FSMETA, "copyReceiver", Type.STR),
-  /** Creator. */
-  CREATOR(NS.DCTERMS, "creator", Type.STR),
+  CONTRIBUTOR(NS.DCTERMS, "contributor", Type.STR, true),
+  /** Carbon copy receiver (name). */
+  COPY_RECEIVER_NAME(NS.FSMETA, "copyReceiverName", Type.STR, true),
+  /** Carbon copy receiver (email address). */
+  COPY_RECEIVER_EMAIL(NS.FSMETA, "copyReceiverEmail", Type.STR, true),
+  /** Creator (name). */
+  CREATOR_NAME(NS.FSMETA, "creatorName", Type.STR, true),
+  /** Creator (email address). */
+  CREATOR_EMAIL(NS.FSMETA, "creatorEmail", Type.STR, true),
   /** Description. */
-  DESCRIPTION(NS.DCTERMS, "description", Type.STR),
+  DESCRIPTION(NS.DCTERMS, "description", Type.STR, true),
   /** Text encoding. */
-  ENCODING(NS.FSMETA, "encoding", Type.STR),
+  ENCODING(NS.FSMETA, "encoding", Type.STR, false),
   /** Genre. */
-  GENRE(NS.FSMETA, "genre", Type.STR),
+  GENRE(NS.FSMETA, "genre", Type.STR, true),
   /**
    * Headline. Publishable entry providing a synopsis of the contents of the
    * item.
    */
-  HEADLINE(NS.FSMETA, "headline", Type.STR),
-  /** Blind carbon copy receiver. */
-  HIDDEN_RECEIVER(NS.FSMETA, "hiddenReceiver", Type.STR),
+  HEADLINE(NS.FSMETA, "headline", Type.STR, false),
+  /** Blind carbon copy receiver (name). */
+  HIDDEN_RECEIVER_NAME(NS.FSMETA, "hiddenReceiverName", Type.STR, true),
+  /** Blind carbon copy receiver (email address). */
+  HIDDEN_RECEIVER_EMAIL(NS.FSMETA, "hiddenReceiverEmail", Type.STR, true),
   /** Unique identifier. */
-  IDENTIFIER(NS.DCTERMS, "identifier", Type.STR),
+  IDENTIFIER(NS.DCTERMS, "identifier", Type.STR, false),
   /** Keyword. */
-  KEYWORD(NS.FSMETA, "keyword", Type.STR),
+  KEYWORD(NS.FSMETA, "keyword", Type.STR, true),
   /**
    * Language.
    * @see <a href="http://www.ietf.org/rfc/rfc4646.txt">RFC 4646</a>
    */
-  LANGUAGE(NS.DCTERMS, "language", Type.STR),
+  LANGUAGE(NS.DCTERMS, "language", Type.STR, false),
   /** Lyricist. */
-  LYRICIST(NS.FSMETA, "lyricist", Type.STR),
+  LYRICIST(NS.FSMETA, "lyricist", Type.STR, true),
 
   // ----- location -----
   /** City. */
-  CITY(NS.FSMETA, "city", Type.STR),
+  CITY(NS.FSMETA, "city", Type.STR, true),
   /** Country. */
-  COUNTRY(NS.FSMETA, "country", Type.STR),
+  COUNTRY(NS.FSMETA, "country", Type.STR, true),
 
   /** Publisher. */
-  PUBLISHER(NS.DCTERMS, "publisher", Type.STR),
-  /** Receiver. */
-  RECEIVER(NS.FSMETA, "receiver", Type.STR),
-  /** Sender. */
-  SENDER(NS.FSMETA, "sender", Type.STR),
+  PUBLISHER(NS.DCTERMS, "publisher", Type.STR, true),
+  /** Receiver (name). */
+  RECEIVER_NAME(NS.FSMETA, "receiverName", Type.STR, true),
+  /** Receiver (email address). */
+  RECEIVER_EMAIL(NS.FSMETA, "receiverEmail", Type.STR, true),
+  /** Sender (name). */
+  SENDER_NAME(NS.FSMETA, "senderName", Type.STR, false),
+  /** Sender (email address). */
+  SENDER_EMAIL(NS.FSMETA, "senderEmail", Type.STR, false),
   /** Message or document subject. */
-  SUBJECT(NS.DCTERMS, "subject", Type.STR),
+  SUBJECT(NS.DCTERMS, "subject", Type.STR, false),
   /** Table of contents. */
-  TABLE_OF_CONTENTS(NS.DCTERMS, "tableOfContents", Type.STR),
+  TABLE_OF_CONTENTS(NS.DCTERMS, "tableOfContents", Type.STR, false),
   /** Title. */
-  TITLE(NS.DCTERMS, "title", Type.STR),
+  TITLE(NS.DCTERMS, "title", Type.STR, false),
   /** Type. */
-  TYPE(NS.DCTERMS, "type", Type.STR),
+  TYPE(NS.DCTERMS, "type", Type.STR, true),
   /** Format (MIME type). */
-  FORMAT(NS.DCTERMS, "format", Type.STR),
+  FORMAT(NS.DCTERMS, "format", Type.STR, false),
 
   /** container element "content". */
   CONTENT(NS.DEEPURL, "content");
@@ -126,6 +136,8 @@ public enum MetaElem {
   private final Type dt;
   /** More precise data type. */
   private Type pdt;
+  /** Flag, if the metadata element may have multiple values. */
+  private final boolean multiVal;
 
   /*
    * content container element. private final TreeMap<MetaElem, byte[]> c;
@@ -136,12 +148,14 @@ public enum MetaElem {
    * @param name metadata key.
    * @param namespace namespace for the metadata attribute.
    * @param dataType xml datatype.
+   * @param mv flag, if the metadata element may hava multiple values.
    */
-  private MetaElem(final NS namespace, final String name, final Type dataType) {
+  private MetaElem(final NS namespace, final String name, final Type dataType,
+      final boolean mv) {
     ns = namespace;
     n = ns.tag(name);
     dt = dataType;
-    // c = null;
+    multiVal = mv;
   }
 
   /**
@@ -154,7 +168,7 @@ public enum MetaElem {
     ns = namespace;
     n = ns.tag(name);
     dt = null;
-    // c = new TreeMap<MetaElem, byte[]>();
+    multiVal = false;
   }
 
   /**
@@ -172,6 +186,14 @@ public enum MetaElem {
   public Type getType() {
     if(pdt != null) return pdt;
     return dt;
+  }
+
+  /**
+   * Returns true, if multiple values are allowed for the metadata attribute.
+   * @return true, if multiple values are allowed for the metadata attribute.
+   */
+  public boolean isMultiVal() {
+    return multiVal;
   }
 
   /**

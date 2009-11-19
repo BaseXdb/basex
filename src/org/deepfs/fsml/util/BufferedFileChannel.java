@@ -493,4 +493,9 @@ public final class BufferedFileChannel {
     }
     return tb.toString();
   }
+
+  @Override
+  public String toString() {
+    return getFileName();
+  }
 }
