@@ -131,7 +131,7 @@ public final class Prop extends AProp {
   public static final Object[] FTDC = { "FTDC", false };
   /** Flag for full-text scoring algorithm. */
   /** Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
-  public static final Object[] FTSCTYPE = { "FTSCTYPE", 2 };
+  public static final Object[] FTSCTYPE = { "FTSCTYPE", 1 };
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };

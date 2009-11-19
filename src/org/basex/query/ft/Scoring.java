@@ -183,7 +183,7 @@ public final class Scoring {
    * @return new score value
    */
   public static double parentAxis(final double sc) {
-    return sc * SCORESTEP;
+      return sc * SCORESTEP;
   }
 
   /**
@@ -201,7 +201,6 @@ public final class Scoring {
    * @return new score value
    */
   public static double descAxis(final double sc) {
-
     return sc * SCORESTEP;
   }
 

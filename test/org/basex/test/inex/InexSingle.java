@@ -2,12 +2,15 @@ package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.HashMap;
+
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.proc.List;
-import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
@@ -41,8 +44,45 @@ public final class InexSingle {
    */
   public static void main(final String[] args) throws Exception {
     new InexSingle(args);
+//    if (args.length != 1) System.out.println("submission file needed.");
+//    else convert(args[0]);
   }
 
+  /**
+   * Converts ids of a submission file. 
+   * @param subfile
+   * @throws Exception
+   */
+  public static void convert(final String subfile) throws Exception {    
+    String l;
+    HashMap<String, String> hs = new HashMap<String, String>();
+    
+    final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
+    while((l = br.readLine()) != null) {
+      final int i1 = l.indexOf(';');
+      final int i2 = l.indexOf(';', i1 + 1);
+      hs.put(l.substring(0, i1), l.substring(i1 + 1, i2));      
+    }
+    br.close();
+    
+    final BufferedReader in = new BufferedReader(new FileReader(subfile));
+    final String subfileN = subfile.substring(0, subfile.indexOf('.')) + "1" + ".xml";
+    System.out.println("........ Creating: " + subfileN);
+    final BufferedWriter out = new BufferedWriter(new FileWriter(subfileN));
+    while((l = in.readLine()) != null) {
+      if (l.contains("<topic topic-id=")) {
+        final int i1 = l.indexOf("\"");
+        final int i2 = l.indexOf("\"", i1 + 1);
+        final String key = l.substring(i1 + 1, i2);
+        l = l.substring(0, i1 + 1) + hs.get(key) + l.substring(i2);
+      }  
+      out.write(l + NL); 
+    }
+    out.close();
+    br.close();    
+    System.out.println("done!");
+  }
+  
   /**
    * Default constructor.
    * @param args command-line arguments
@@ -53,8 +93,6 @@ public final class InexSingle {
     Main.outln(Main.name(InexSingle.class));
 
     // use tf/idf scoring model
-    session.execute(new Set("indexscores", true));
-
     if(!parseArguments(args)) return;
 
     // cache queries
@@ -83,7 +121,8 @@ public final class InexSingle {
       "order by $s descending\n" +
       "return <result score='{ $s }' " +
       "file='{ replace(base-uri($i), '.*/', '') }'>{ $i }</result>)" +
-      "[position() <= " + MAX + "]\n" +
+      "\n" + 
+      //      "[position() <= " + MAX + "]\n" +
       "return <results query=\"" + query + "\">{ $hits }</results>\n");
 
     String file = Integer.toString(quindex) + ".xml";

@@ -161,14 +161,14 @@ public final class NodIter extends NodeIter {
       // remove duplicates and merge scores
       int i = 1;
       for(int j = 1; j < size; j++) {
-        int c = 1;
+//        int c = 1;
         while(item[i - 1].is(item[j])) {
-          item[i - 1].score += item[j++].score;
-          c++;
+          item[i - 1].score = Math.max(item[j++].score, item[i - 1].score); 
+//          c++;
           if(j == size) break;
         }
         // [SG] to be revised.. and moved to the Scoring class?
-        item[i - 1].score /= c;
+//        item[i - 1].score /= c;
         if(j == size) break;
         item[i++] = item[j];
       }
