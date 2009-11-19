@@ -100,8 +100,6 @@ public final class BaseXServer extends Main implements Runnable {
       // close input streams
       if(console) System.in.close();
       server.close();
-      log.write("Server stopped.");
-      log.closeLog();
     } catch(final IOException ex) {
       error(ex, false);
     }

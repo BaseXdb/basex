@@ -33,6 +33,14 @@ public class Log {
     start = new Date();
     createLogDir();
     createLogFile(start);
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        Log.this.write("Server stopped.");
+        Log.this.closeLog();
+      }
+    });
   }
 
   /**
@@ -105,4 +113,5 @@ public class Log {
       e.printStackTrace();
     }
   }
+  
 }
