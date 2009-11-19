@@ -4,10 +4,10 @@ import static org.basex.core.Text.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
-import org.basex.build.NativeBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.core.Process;
@@ -50,8 +50,7 @@ abstract class ACreate extends Process {
     final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem && context.pinned(db)) return error(DBLOCKED, db);
 
-    final Builder builder = mem ? new MemBuilder(p) : prop.is(Prop.NATIVEDATA) ?
-        new NativeBuilder(p) : new DiskBuilder(p);
+    final Builder builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
     progress(builder);
 
     String err = null;

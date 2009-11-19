@@ -159,8 +159,6 @@ public final class Prop extends AProp {
   public static final Object[] FSTRAVERSAL = { "FSTRAVERSAL", false };
   /** Fuse support. [AH] check this flag. */
   public static final Object[] FUSE = { "FUSE", false };
-  /** Flag for creating a native (joint) database. */
-  public static final Object[] NATIVEDATA = { "NATIVEDATA", false };
   /** Propagate changes in DeepFS back to original filesystem. */
   public static final Object[] WTHROUGH = {"WTHROUGH", false };
   /**
