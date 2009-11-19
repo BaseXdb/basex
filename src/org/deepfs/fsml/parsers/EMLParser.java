@@ -210,9 +210,10 @@ public final class EMLParser implements IFileParser {
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
-    // [BL] check if the file has a mail header
-    bfc = f;
-    return readLine();
+    while(readLine())
+      if(mCurrLine.startsWith("From:") && MAILPATTERN.matcher(mCurrLine).find())
+      /* */return true;
+    return false;
   }
 
   @Override
@@ -224,11 +225,9 @@ public final class EMLParser implements IFileParser {
   public void extract(final DeepFile df) throws IOException {
     deepFile = df;
     bfc = df.getBufferedFileChannel();
-    if(!check(bfc)) return;
+    if(!readLine()) return;
 
     if(df.extractMeta()) {
-      df.setFileType(FileType.MESSAGE);
-      df.setFileFormat(MimeType.EML);
       mBoundary = "";
 
       do {
@@ -247,7 +246,12 @@ public final class EMLParser implements IFileParser {
         }
         if(readNext && !readLine()) return;
       } while(!mCurrLine.isEmpty());
-      deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
+      if(deepFile.isMetaSet(MetaElem.SENDER_EMAIL)
+          || deepFile.isMetaSet(MetaElem.SENDER_NAME)) {
+        deepFile.setFileType(FileType.MESSAGE);
+        deepFile.setFileFormat(MimeType.EML);
+        deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
+      } else System.out.println("------");
       if(df.extractText()) if(mCurrLine != null) parseContent();
     } else if(df.extractText()) {
       do {

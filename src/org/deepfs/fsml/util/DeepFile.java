@@ -440,7 +440,7 @@ public class DeepFile {
    *          <code>null</code> if the default data type should be used.
    */
   private void addMeta(final MetaElem e, final byte[] value, final Type dataType) {
-    if(metaFinished) return;
+    if(metaFinished || value.length == 0) return;
     if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
       Main.bug(
           "The metadata attributes " + MetaElem.TYPE + " and "
