@@ -28,7 +28,6 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.server.ClientSession;
 import org.basex.util.Args;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
 
@@ -70,7 +69,7 @@ public final class InexSubmit {
   /** Databases. */
   private StringList databases;
   /** Topic ids of the queries. */
-  private IntList tid;
+  private StringList tid;
 
   /** PrintOutput for the submission file. */
   private PrintOutput sub;
@@ -111,12 +110,14 @@ public final class InexSubmit {
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     queries = new StringList();
-    tid = new IntList();
+    tid = new StringList();
 
     String l;
     while((l = br.readLine()) != null) {
-      tid.add(Integer.parseInt(l.substring(0, l.indexOf(';'))));
-      queries.add(l.substring(l.lastIndexOf(';') + 1));
+      final int i1 = l.indexOf(';');
+      final int i2 = l.lastIndexOf(';');
+      tid.add(l.substring(i1 + 1, i2));
+      queries.add(l.substring(i2 + 1));
     }
     br.close();
 
@@ -310,7 +311,7 @@ public final class InexSubmit {
         token("participant-id"), token("304"),
         token("run-id"), token("1111111"),
         token("task"), token(TASK[0]),
-        token("type"), token(TYPE[0]),
+        token("type"), token(TYPE[1]),
         token("query"), token(QUERY[0]),
         token("sequential"), token("yes"),
         token("no_cpu"), token("2"),

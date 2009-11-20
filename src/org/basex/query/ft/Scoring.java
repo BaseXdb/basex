@@ -73,22 +73,23 @@ public final class Scoring {
    */
   public double ftAnd(final FTItem item1, final FTItem item2) {
     final double score = Math.min(item1.score(), item2.score());
-    int sum = 0;
-    int count = 0;
-
-    for(final FTMatch m1 : item1.all) {
-      for(final FTStringMatch sm1 : m1) {
-        if(sm1.n) continue;
-        for(final FTMatch m2 : item2.all) {
-          for(final FTStringMatch sm2 : m2) {
-            if(sm2.n) continue;
-            sum += Math.abs(sm1.s - sm2.s);
-            count++;
-          }
-        }
-      }
-    }
-    return count == 0 ? 0 : score / Math.sqrt((double) sum / count);
+    return score;
+//    int sum = 0;
+//    int count = 0;
+//
+//    for(final FTMatch m1 : item1.all) {
+//      for(final FTStringMatch sm1 : m1) {
+//        if(sm1.n) continue;
+//        for(final FTMatch m2 : item2.all) {
+//          for(final FTStringMatch sm2 : m2) {
+//            if(sm2.n) continue;
+//            sum += Math.abs(sm1.s - sm2.s);
+//            count++;
+//          }
+//        }
+//      }
+//    }
+//    return count == 0 ? 0 : score / Math.sqrt((double) sum / count);
   }
 
   /**
@@ -205,29 +206,44 @@ public final class Scoring {
   }
 
   /**
+   * Scoring the descendant axis step.
+   * @param r current node
+   * @param d descendant node
+   * @param data data reference
+   * @param sc current score value
+   * @return new score value
+   */
+  public static double descAxis(final int r, final int d, final Data data, final double sc) {
+    return sc * 1d / Math.sqrt(distTo(data, d, r));    
+//    return sc * SCORESTEP;
+  }
+
+  
+  /**
    * Scoring the parent axis step by using meta information.
    * @param data Data reference
    * @param nod current node
    * @return score value
    */
   public static double parentAxis(final Data data, final DBNode nod) {
-    return nod.score() *
-      (1d - (double) distToRoot(data, nod.pre) / data.meta.height);
+    return nod.score() * 
+      (1d - (double) distTo(data, nod.pre, 0) / data.meta.height);
   }
 
   /**
-   * Determine distance to root node.
+   * Determine distance between two nodes using parent steps.
    * @param data Data reference
-   * @param p pre value of current node
+   * @param n1 start node
+   * @param n2 destination node
    * @return distance to root node
    */
-  private static int distToRoot(final Data data, final int p) {
-    int d = 0;
-    int parent = data.parent(p, data.kind(p));
-    while(parent > 0) {
-      d++;
+  private static int distTo(final Data data, final int n1, final int n2) {
+    int dist = 0;
+    int parent = data.parent(n1, data.kind(n1));
+    while(parent > n2) {
+      dist++;
       parent = data.parent(parent, data.kind(parent));
     }
-    return d;
+    return dist;
   }
 }
